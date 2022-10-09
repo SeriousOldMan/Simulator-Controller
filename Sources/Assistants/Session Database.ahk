@@ -3805,6 +3805,8 @@ editSettings(editorOrCommand) {
 
 					SoundPlay *32
 
+					title := translate("Information")
+
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
 					title := translate("Session Database")
 					MsgBox 262179, %title%, % translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
@@ -3868,6 +3870,7 @@ editSettings(editorOrCommand) {
 					setConfigurationValue(configuration, "Team Server", "Replication", serverUpdateEdit)
 					setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : false)
 					setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : false)
+					setConfigurationValue(configuration, "Team Server", "Synchronization", false)
 
 					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
@@ -3877,6 +3880,8 @@ editSettings(editorOrCommand) {
 				}
 
 				if changed {
+					title := translate("Information")
+
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 					MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
 					OnMessage(0x44, "")

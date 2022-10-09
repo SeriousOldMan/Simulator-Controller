@@ -1235,28 +1235,12 @@ computeDriverName(forName, surName, nickName) {
 	return Trim(name)
 }
 
-createGUID() {
-	local guid, pGuid, sGuid, size
-
-    VarSetCapacity(pGuid, 16, 0)
-
-	if !(DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid)) {
-        size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
-
-        if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {
-			guid := StrGet(&sGuid)
-
-            return SubStr(SubStr(guid, 1, StrLen(guid) - 1), 2)
-		}
-    }
-
-    return ""
-}
-
 synchronizeDatabase() {
 	local sessionDB := new SessionDatabase()
 	local connector := sessionDB.Connector
 	local timestamp, simulators, ignore, synchronizer
+
+	sessionDB.UseCommunity := false
 
 	if ((sessionDB.ID = sessionDB.DatabaseID) && connector) {
 		try {
@@ -1265,9 +1249,9 @@ synchronizeDatabase() {
 			lastSynchronization := sessionDB.Synchronization
 
 			for ignore, synchronizer in sessionDB.Synchronizers
-				%synchronizer%(connector, simulators, timestamp, lastSynchronization)
+				%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization)
 
-			sessionDB.Synchronization := timestamp
+			sessionDB.Synchronization := connector.GetServerTimestamp()
 		}
 		catch exception {
 			logError(exception)
@@ -1302,22 +1286,24 @@ parseData(properties) {
 	return result
 }
 
-synchronizeDrivers(connector, simulators, timestamp, lastSynchronization) {
+synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronization) {
 	local ignore, simulator, db, modified, identifier, driver, drivers
 
 	try {
 		for ignore, simulator in simulators {
-			simulator := this.getSimulatorCode(simulator)
+			simulator := sessionDB.getSimulatorCode(simulator)
 
 			db := new Database(kDatabaseDirectory . "User\" . simulator . "\", kSessionSchemas)
 
 			modified := false
 
-			for ignore, identifier in string2Values(";", connector.QueryData("License"
-																		   , "Simulator = '" . simulator . "' And Modified > " . lastSynchronization)) {
+			drivers := connector.QueryData("License", "Simulator = '" . simulator . "' And Modified > " . lastSynchronization)
+
+			for ignore, identifier in string2Values(";", drivers) {
 				modified := true
 
 				driver := parseData(connector.GetData("License", identifier))
+				driver.ID := ((driver.Driver = "") ? kNull : driver.Driver)
 				driver.Synchronized := timestamp
 
 				drivers := db.query("Drivers", {Where: {ID: driver.ID, Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname} })
@@ -1336,12 +1322,13 @@ synchronizeDrivers(connector, simulators, timestamp, lastSynchronization) {
 
 				driver.Synchronized := timestamp
 
+				db.changed("Drivers")
 				modified := true
 
 				if (connector.CountData("License", "Identifier = '" . driver.Identifier . "'") = 0)
-					connector.CreateData("License",
-									   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`nID=%ID%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
-														   , {Identifier: driver.Identifier, Simulator: simulator, ID: driver.ID, Forname: driver.Forname
+					connector.CreateData("License"
+									   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`nDriver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
+														   , {Identifier: driver.Identifier, Simulator: simulator, Driver: driver.ID, Forname: driver.Forname
 															, Surname: driver.Surname, Nickname: driver.Nickname}))
 			}
 

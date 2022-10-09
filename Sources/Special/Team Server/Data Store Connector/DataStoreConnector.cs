@@ -241,32 +241,32 @@ namespace TeamServer {
 
 		public string QueryData(string table, string where)
 		{
-			return Get("data/query/" + table, body: where);
+			return Put("data/query/" + table.ToLower(), body: where);
 		}
 
 		public string CountData(string table, string where)
 		{
-			return Get("data/count/" + table, body: where);
+			return Put("data/count/" + table.ToLower(), body: where);
 		}
 
 		public string GetData(string table, string identifier)
 		{
-			return Get("data/" + table + "/" + identifier);
+			return Get("data/" + table.ToLower() + "/" + identifier);
 		}
 
 		public void UpdateData(string table, string identifier, string properties)
 		{
-			Put("data/" + table + "/" + identifier, body: properties);
+			Put("data/" + table.ToLower() + "/" + identifier, body: properties);
 		}
 
 		public void DeleteData(string table, string identifier)
         {
-			Delete("data/" + table + "/" + identifier);
+			Delete("data/" + table.ToLower() + "/" + identifier);
 		}
 
 		public string CreateData(string table, string properties)
         {
-			return Post("data/" + table, body: properties);
+			return Post("data/" + table.ToLower(), body: properties);
 		}
 		#endregion
 	}

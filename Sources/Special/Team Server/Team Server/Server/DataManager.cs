@@ -23,12 +23,79 @@ namespace TeamServer.Server
         {
         }
 
-        #region Generic
-        protected void SetProperties(object obj, Dictionary<string, string> values)
+		#region Generic
+		public static dynamic Parse(Type toType, string text)
+		{
+			if (toType == typeof(int))
+			{
+				if (int.TryParse(text, out int x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(short))
+			{
+				if (short.TryParse(text, out short x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(long))
+			{
+				if (long.TryParse(text, out long x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(float))
+			{
+				if (float.TryParse(text, out float x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(double))
+			{
+				if (double.TryParse(text, out double x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(decimal))
+			{
+				if (decimal.TryParse(text, out decimal x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(DateTime))
+			{
+				if (DateTime.TryParse(text, out DateTime x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(byte))
+			{
+				if (byte.TryParse(text, System.Globalization.NumberStyles.HexNumber, null, out byte x))
+				{
+					return x;
+				}
+			}
+			else if (toType == typeof(string))
+			{
+				return text;
+			}
+
+			return null;
+		}
+		
+		protected void SetProperties(object obj, Dictionary<string, string> values)
 		{
 			foreach (KeyValuePair<string, string> kvp in values)
 			{
 				string property = kvp.Key;
+				
 				PropertyInfo propInfo =
 					obj.GetType().GetProperty(property, BindingFlags.Public | BindingFlags.Instance);
 
@@ -36,7 +103,7 @@ namespace TeamServer.Server
 					if (property.ToLower() == "identifier")
 						propInfo.SetValue(obj, new Guid(kvp.Value), null);
 					else
-						propInfo.SetValue(obj, kvp.Value, null);
+						propInfo.SetValue(obj, Parse(propInfo.PropertyType, kvp.Value), null);
 			}
 		}
 
@@ -45,9 +112,9 @@ namespace TeamServer.Server
 			where = where.Trim();
 
 			if (where.Length == 0)
-				return "AccoundID = '" + Token.AccountID + "'";
+				return "AccountID = '" + Token.AccountID + "'";
 			else
-				return "AccoundID = '" + Token.AccountID + "' And " + where;
+				return "AccountID = '" + Token.AccountID + "' And " + where;
 		}
         #endregion
 

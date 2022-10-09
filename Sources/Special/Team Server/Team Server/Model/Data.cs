@@ -140,7 +140,7 @@ namespace TeamServer.Model.Data
         public float PadWearRearRight { get; set; }
     }
 
-    public abstract class PressuresObject : SimulatorObject
+    public abstract class PressuresObject : CarObject
     {
         [Indexed]
         public string Weather { get; set; }
@@ -156,7 +156,7 @@ namespace TeamServer.Model.Data
         public string TyreCompoundColor { get; set; }
     }
 
-    [Table("Data_Tyres_Pressures")]
+    [Table("Data_TyresPressures")]
     public class TyresPressures : PressuresObject
     {
         public float HotPressureFrontLeft { get; set; }
@@ -176,7 +176,7 @@ namespace TeamServer.Model.Data
         public float ColdPressureRearRight { get; set; }
     }
 
-    [Table("Data_Tyres_Pressures_Distribution")]
+    [Table("Data_TyresPressuresDistribution")]
     public class TyresPressuresDistribution : PressuresObject
     {
         public string Type { get; set; }

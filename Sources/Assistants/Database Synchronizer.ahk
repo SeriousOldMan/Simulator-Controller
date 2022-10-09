@@ -35,6 +35,8 @@
 #Include ..\Libraries\FTP.ahk
 #Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -206,11 +208,16 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 }
 
 synchronizeSessionDatabase(minutes) {
-	synchronizeDatabase()
+	try {
+		synchronizeDatabase()
+	}
+	catch exception {
+		logError(exception)
 
-	Task.CurrentTask.Sleep := (minutes * 60000)
+		Task.CurrentTask.Sleep := (minutes * 60000)
 
-	return Task.CurrentTask
+		return Task.CurrentTask
+	}
 }
 
 updateSessionDatabase() {
@@ -234,14 +241,18 @@ updateSessionDatabase() {
 
 	minutes := inList(A_Args, "-Synchronize")
 
+	minutes := true
+
 	if minutes {
 		minutes := A_Args[id + 1]
+
+		minutes := true
 
 		if (minutes && (minutes != kFalse)) {
 			if ((minutes == true) || (minutes = kTrue)) {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-				minutes := getConfigurationValue(configuration, "Team Server", "Replication", value)
+				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 2)
 			}
 
 			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000)

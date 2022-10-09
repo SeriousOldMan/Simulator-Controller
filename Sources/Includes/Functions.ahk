@@ -740,6 +740,24 @@ getControllerActionDefinitions(type) {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+createGUID() {
+	local guid, pGuid, sGuid, size
+
+    VarSetCapacity(pGuid, 16, 0)
+
+	if !(DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid)) {
+        size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
+
+        if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {
+			guid := StrGet(&sGuid)
+
+            return SubStr(SubStr(guid, 1, StrLen(guid) - 1), 2)
+		}
+    }
+
+    return ""
+}
+
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
 	local BCM_SETIMAGELIST
@@ -2313,7 +2331,7 @@ loadSimulatorConfiguration()
 if !vDetachedInstallation {
 	checkForUpdates()
 
-	if !isDebug() {
+	if false && !isDebug() {
 		requestShareSessionDatabaseConsent()
 		shareSessionDatabase()
 		checkForNews()

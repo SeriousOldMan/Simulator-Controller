@@ -3,8 +3,10 @@ using Microsoft.Extensions.Hosting;
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using TeamServer.Model;
 using TeamServer.Model.Access;
 
@@ -30,8 +32,15 @@ namespace TeamServer {
         public IList<Account> Accounts { get; set; } = null;
     }
 
-    public class Program {
-        public static void Main(string[] args) {
+    public class Program
+    {
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+
+            CultureInfo.DefaultThreadCurrentCulture = Thread.CurrentThread.CurrentCulture;
+
             string json = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Settings.json"));
             Settings settings = JsonSerializer.Deserialize<Settings>(json);
 

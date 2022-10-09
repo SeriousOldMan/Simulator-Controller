@@ -77,7 +77,7 @@ class Database {
 	}
 
 	__New(directory, schemas) {
-		this.iDirectory := directory
+		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
 		this.iSchemas := schemas
 	}
 

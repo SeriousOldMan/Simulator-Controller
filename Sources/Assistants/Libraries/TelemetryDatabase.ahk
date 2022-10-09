@@ -450,13 +450,12 @@ removeInvalidLaps(rows) {
 	return result
 }
 
-synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
-	local sessionDB := new SessionDatabase()
+synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchronization) {
 	local ignore, simulator, car, track, db, modified, identifier, telemetry, properties
 
 	try {
 		for ignore, simulator in simulators {
-			simulator := this.getSimulatorCode(simulator)
+			simulator := sessionDB.getSimulatorCode(simulator)
 
 			for ignore, car in sessionDB.getCars(simulator)
 				for ignore, track in sessionDB.getTracks(simulator, car) {
@@ -479,8 +478,8 @@ synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
 												 , Driver: driver, Weather: weather
 												 , "Temperature.Air": telemetry.AirTemperature
 												 , "Temperature.Track": telemetry.TrackTemperature
-												 , Compound: telemetry.TyreCompound
-												 , "Compound.Color": telemetry.TyreCompoundColor
+												 , "Tyre.Compound": telemetry.TyreCompound
+												 , "Tyre.Compound.Color": telemetry.TyreCompoundColor
 												 , "Fuel.Remaining": telemetry.FuelRemaining, "Fuel.Consumption": telemetry.FuelConsumption
 												 , "Lap.Time": telemetry.LapTime, "Map": telemetry.Map, "TC": telemetry.TC, "ABS": telemetry.ABS})
 						}
@@ -492,10 +491,11 @@ synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
 
 						telemetry.Synchronized := timestamp
 
+						db.changed("Electronics")
 						modified := true
 
 						if (connector.CountData("Electronics", "Identifier = '" . telemetry.Identifier . "'") = 0)
-							connector.CreateData("Electronics",
+							connector.CreateData("Electronics"
 											   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
 																   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
@@ -504,7 +504,7 @@ synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
 																   , {Identifier: telemetry.Identifier, Driver: telemetry.Driver, Simulator: simulator, Car: car, Track: track
 																    , Weather: telemetry.Weather
 																	, AirTemperature: telemetry["Temperature.Air"], TrackTemperature: telemetry["Temperature.Track"]
-																	, TyreCompound: telemetry.Compound, TyreCompoundColor: telemetry["Compound.Color"]
+																	, TyreCompound: telemetry["Tyre.Compound"], TyreCompoundColor: telemetry["Tyre.Compound.Color"]
 																	, FuelConsumption: telemetry["Fuel.Consumption"], FuelRemaining: telemetry["Fuel.Remaining"]
 																	, LapTime: telemetry["Lap.Time"], Map: telemetry.Map, TC: telemetry.TC, ABS: telemetry.ABS}))
 					}
@@ -530,8 +530,8 @@ synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
 												 , Driver: driver, Weather: weather
 												 , "Temperature.Air": telemetry.AirTemperature
 												 , "Temperature.Track": telemetry.TrackTemperature
-												 , Compound: telemetry.TyreCompound
-												 , "Compound.Color": telemetry.TyreCompoundColor
+												 , "Tyre.Compound": telemetry.TyreCompound
+												 , "Tyre.Compound.Color": telemetry.TyreCompoundColor
 												 , "Fuel.Remaining": telemetry.FuelRemaining, "Fuel.Consumption": telemetry.FuelConsumption
 												 , "Lap.Time": telemetry.LapTime, "Tyre.Laps": telemetry.Laps
 												 , "Tyre.Pressure.Front.Left": telemetry.PressureFrontLeft
@@ -555,10 +555,11 @@ synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
 
 						telemetry.Synchronized := timestamp
 
+						db.changed("Tyres")
 						modified := true
 
 						if (connector.CountData("Tyres", "Identifier = '" . telemetry.Identifier . "'") = 0)
-							connector.CreateData("Tyres",
+							connector.CreateData("Tyres"
 											   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
 																   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
@@ -573,7 +574,7 @@ synchronizeTelemetry(connector, simulators, timestamp, lastSynchronization) {
 																   , {Identifier: telemetry.Identifier, Driver: telemetry.Driver, Simulator: simulator, Car: car, Track: track
 																    , Weather: telemetry.Weather
 																	, AirTemperature: telemetry["Temperature.Air"], TrackTemperature: telemetry["Temperature.Track"]
-																	, TyreCompound: telemetry.Compound, TyreCompoundColor: telemetry["Compound.Color"]
+																	, TyreCompound: telemetry["Tyre.Compound"], TyreCompoundColor: telemetry["Tyre.Compound.Color"]
 																	, FuelConsumption: telemetry["Fuel.Consumption"], FuelRemaining: telemetry["Fuel.Remaining"]
 																	, LapTime: telemetry["Lap.Time"], Laps: telemetry["Tyre.Laps"]
 																	, PressureFrontLeft: telemetry["Tyre.Pressure.Front.Left"]

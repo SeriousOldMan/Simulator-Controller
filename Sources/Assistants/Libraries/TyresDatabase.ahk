@@ -433,13 +433,12 @@ class TyresDatabase extends SessionDatabase {
 	}
 }
 
-synchronizeTyresPressures(connector, simulators, timestamp, lastSynchronization) {
-	local sessionDB := new SessionDatabase()
+synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynchronization) {
 	local ignore, simulator, car, track, db, modified, identifier, pressures, properties
 
 	try {
 		for ignore, simulator in simulators {
-			simulator := this.getSimulatorCode(simulator)
+			simulator := sessionDB.getSimulatorCode(simulator)
 
 			for ignore, car in sessionDB.getCars(simulator)
 				for ignore, track in sessionDB.getTracks(simulator, car) {
@@ -481,10 +480,11 @@ synchronizeTyresPressures(connector, simulators, timestamp, lastSynchronization)
 
 						pressures.Synchronized := timestamp
 
+						db.changed("Tyres.Pressures")
 						modified := true
 
 						if (connector.CountData("TyresPressures", "Identifier = '" . pressures.Identifier . "'") = 0)
-							connector.CreateData("TyresPressures",
+							connector.CreateData("TyresPressures"
 											   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`nSimulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																   . "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
 																   . "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
@@ -518,6 +518,7 @@ synchronizeTyresPressures(connector, simulators, timestamp, lastSynchronization)
 																											. "Track = '" . track . "' And "
 																											. "Modified > " . lastSynchronization . " And "
 																											. "Driver <> '" . sessionDB.ID . "'")) {
+						db.changed("Tyres.Pressures.Distribution")
 						modified := true
 
 						pressures := parseData(connector.GetData("TyresPressuresDistribution", identifier))
@@ -551,6 +552,7 @@ synchronizeTyresPressures(connector, simulators, timestamp, lastSynchronization)
 
 						pressures.Synchronized := timestamp
 
+						db.changed("Tyres.Pressures.Distribution")
 						modified := true
 
 						if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . identifier . "'") = 0)

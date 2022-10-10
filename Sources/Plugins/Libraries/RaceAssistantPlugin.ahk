@@ -320,7 +320,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		run() {
 			local raceAssistant := this.RaceAssistant
-			local teamServer := this.TeamServer
+			local teamServer := raceAssistant.TeamServer
 			local sessionSettings := this.getData(teamServer, "Settings")
 			local sessionState := this.getData(teamServer, "State")
 
@@ -363,6 +363,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			data := printConfiguration(data)
 
 			FileAppend %data%, %dataFile%, UTF-16
+
+			return dataFile
 		}
 	}
 

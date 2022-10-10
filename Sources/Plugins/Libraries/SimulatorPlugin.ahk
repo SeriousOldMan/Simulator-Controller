@@ -998,8 +998,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 			splitCompound(this.CurrentTyreCompound, compound, compoundColor)
 
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", compound)
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Current", compoundColor)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound.Color", compoundColor)
 		}
 
 		if this.RequestedTyreCompound {
@@ -1008,8 +1008,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 			splitCompound(this.RequestedTyreCompound, compound, compoundColor)
 
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", compound)
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Requested", compoundColor)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound.Color", compoundColor)
 		}
 	}
 
@@ -1019,17 +1019,19 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		this.CurrentTyreCompound := false
 		this.RequestedTyreCompound := false
 
-		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", false)
+		if sessionSettings {
+			compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", false)
 
-		if compound
-			this.CurrentTyreCompound := compound(compound, getConfigurationValue(sessionSettings
-																			   , "Simulator Settings", "Tyre.Compound.Color.Current"))
+			if compound
+				this.CurrentTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																				   , "Simulator Settings", "Tyre.Current.Compound.Color"))
 
-		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", false)
+			compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", false)
 
-		if compound
-			this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
-																				 , "Simulator Settings", "Tyre.Compound.Color.Requested"))
+			if compound
+				this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																					 , "Simulator Settings", "Tyre.Requested.Compound.Color"))
+		}
 	}
 
 	acquireTelemetryData() {

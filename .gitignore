@@ -15,3 +15,4 @@ Sources/Special/**/**/bin/
 *.pubxml
 profile.arm.json
 TeamServer.db
+Sources/*/*.exe

@@ -145,7 +145,7 @@ class Task {
 
 	Runnable[] {
 		Get {
-			return ((A_TickCount > this.NextExecution) && this.iRunnable && !this.Stopped)
+			return ((A_TickCount >= this.NextExecution) && this.iRunnable && !this.Stopped)
 		}
 
 		Set {
@@ -176,11 +176,11 @@ class Task {
 	}
 
 	__New(callable := false, sleep := 0, priority := 2) {
-		this.iSleep := Sleep
+		this.iSleep := ((sleep = kUndefined) ? 0 : sleep)
 		this.iNextExecution := (A_TickCount + sleep)
 
 		this.iCallable := callable
-		this.iPriority := priority
+		this.iPriority := ((priority = kUndefined) ? kNormalPriority : priority)
 	}
 
 	run() {
@@ -297,7 +297,7 @@ class Task {
 				theTask.iPriority := priority
 		}
 		else
-			theTask := new Task(theTask, sleep, (priority != kUndefined) ? priority : kNormalPriority)
+			theTask := new Task(theTask, sleep, priority)
 
 		Task.addTask(theTask)
 

@@ -1815,16 +1815,13 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	performPitstop(lapNumber := false) {
+	executePitstop(lapNumber) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastLap, flWear, frWear, rlWear, rrWear, driver, tyreCompound, tyreCompoundColor, tyreSet, result
 		local lastPitstop, pitstop
 
 		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")
-
-		if !lapNumber
-			lapNumber := knowledgeBase.getValue("Lap")
 
 		lastPitstop := knowledgeBase.getValue("Pitstop.Last", 0)
 
@@ -1848,38 +1845,25 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		this.startPitstop(lapNumber)
+		result := base.executePitstop(lapNumber)
 
-		base.performPitstop(lapNumber)
+		pitstop := knowledgeBase.getValue("Pitstop.Last", 0)
 
-		knowledgeBase.addFact("Pitstop.Lap", lapNumber)
-
-		result := knowledgeBase.produce()
-
-		if (this.Debug[kDebugKnowledgeBase])
-			this.dumpKnowledgeBase(knowledgeBase)
-
-		if result {
-			this.finishPitstop(lapNumber)
-
-			pitstop := knowledgeBase.getValue("Pitstop.Last", 0)
-
-			if (this.RemoteHandler && (flWear != kUndefined) && (pitstop != lastPitstop))
-				this.RemoteHandler.updateTyreSet(pitstop, driver, false
-											   , tyreCompound, tyreCompoundColor, tyreSet
-											   , flWear, frWear, rlWear, rrWear)
-		}
+		if (this.RemoteHandler && (flWear != kUndefined) && (pitstop != lastPitstop))
+			this.RemoteHandler.updateTyreSet(pitstop, driver, false
+										   , tyreCompound, tyreCompoundColor, tyreSet
+										   , flWear, frWear, rlWear, rrWear)
 
 		return result
 	}
 
-	finishPitstop(lapNumber := false) {
-		local knowledgebase := this.KnowledgeBase
-
-		base.finishPitstop(lapNumber)
+	finishPitstop(lapNumber) {
+		local result := base.finishPitstop(lapNumber)
 
 		if this.RemoteHandler
 			this.RemoteHandler.pitstopFinished(this.KnowledgeBase.getValue("Pitstop.Last", 0))
+
+		return result
 	}
 
 	callPlanPitstop(lap := "__Undefined__", arguments*) {

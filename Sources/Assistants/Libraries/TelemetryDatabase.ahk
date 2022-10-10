@@ -249,26 +249,32 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
-					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime, driver := false) {
+					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
+					 , driver := false, identifier := false) {
 		if !driver
 			driver := this.ID
 
-		this.Database.add("Electronics", {Driver: driver, Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+		this.Database.add("Electronics", {Driver: driver, Weather: weather
+										, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 										, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 										, "Fuel.Remaining": valueOrNull(fuelRemaining)
 										, "Fuel.Consumption": valueOrNull(fuelConsumption)
 										, "Lap.Time": valueOrNull(lapTime)
-										, Map: map, TC: tc, ABS: abs}, true)
+										, Map: map, TC: tc, ABS: abs
+										, Identifier: identifier ? identifier : kNull}
+									   , true)
 	}
 
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 			   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
-			   , wearFL, wearFR, wearRL, wearRR, fuelConsumption, fuelRemaining, lapTime, driver := false) {
+			   , wearFL, wearFR, wearRL, wearRR, fuelConsumption, fuelRemaining, lapTime
+			   , driver := false, identifier := false) {
 		if !driver
 			driver := this.ID
 
 		this.Database.add("Tyres", {Driver: driver, Weather: weather
-								  , "Temperature.Air": valueOrNull(airTemperature), "Temperature.Track": valueOrNull(trackTemperature)
+								  , "Temperature.Air": valueOrNull(airTemperature)
+								  , "Temperature.Track": valueOrNull(trackTemperature)
 								  , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 								  , "Fuel.Remaining": valueOrNull(fuelRemaining)
 								  , "Fuel.Consumption": valueOrNull(fuelConsumption)
@@ -284,8 +290,9 @@ class TelemetryDatabase extends SessionDatabase {
 								  , "Tyre.Wear.Front.Left": valueOrNull(wearFL)
 								  , "Tyre.Wear.Front.Right": valueOrNull(wearFR)
 								  , "Tyre.Wear.Rear.Left": valueOrNull(wearRL)
-								  , "Tyre.Wear.Rear.Right": valueOrNull(wearRR)}
-								  , true)
+								  , "Tyre.Wear.Rear.Right": valueOrNull(wearRR)
+								  , Identifier: identifier ? identifier : kNull}
+								 , true)
 	}
 }
 

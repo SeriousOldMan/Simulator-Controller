@@ -249,7 +249,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			teamServer.setLapValue(lapNumber, this.Plugin . " Telemetry"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature
 													, fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs,
-													, compound, compoundColor, pressures, temperatures, wear))
+													, compound, compoundColor, pressures, temperatures, wear, createGUID(), createGUID()))
 		else
 			this.LapDatabase.add("Telemetry", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
@@ -309,13 +309,14 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
 													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
-													 , telemetryData[9], driverID)
+													 , telemetryData[9], driverID, telemetryData.HasKey(19) ? telemetryData[19] : false)
 
 						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
 											   , pressures[1], pressures[2], pressures[4], pressures[4]
 											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
 											   , wear[1], wear[2], wear[3], wear[4]
-											   , telemetryData[7], telemetryData[8], telemetryData[9], driverID)
+											   , telemetryData[7], telemetryData[8], telemetryData[9], driverID
+											   , telemetryData.HasKey(20) ? telemetryData[20] : false)
 					}
 				}
 				catch exception {

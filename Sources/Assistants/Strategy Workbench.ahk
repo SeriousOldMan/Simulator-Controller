@@ -1226,9 +1226,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . xAxis . "');")
 
-		for ignore, yAxis in yAxises {
+		for ignore, yAxis in yAxises
 			drawChartFunction .= ("`ndata.addColumn('number', '" . yAxis . "');")
-		}
 
 		drawChartFunction .= "`ndata.addRows(["
 
@@ -1282,6 +1281,9 @@ class StrategyWorkbench extends ConfigurationItem {
 				series .= ", "
 				vAxis .= ", "
 			}
+
+			if (A_Index > 2)
+				break
 
 			index := A_Index - 1
 

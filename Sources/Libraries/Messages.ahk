@@ -55,6 +55,12 @@ class MessageManager extends PeriodicTask {
 		}
 
 		call(category, data) {
+			throw "Virtual method MessageHandler.call must be implemented in a subclass..."
+		}
+	}
+
+	class FunctionMessageHandler extends MessageManager.MessageHandler {
+		call(category, data) {
 			local handler := this.Handler
 
 			if handler
@@ -69,9 +75,6 @@ class MessageManager extends PeriodicTask {
 
 			return false
 		}
-	}
-
-	class FunctionMessageHandler extends MessageManager.MessageHandler {
 	}
 
 	class MethodMessageHandler extends MessageManager.MessageHandler {
@@ -138,6 +141,10 @@ class MessageManager extends PeriodicTask {
 	OutgoingMessages[key := false] {
 		Get {
 			return (key ? MessageManager.sOutgoingMessages[key] : MessageManager.sOutgoingMessages)
+		}
+
+		Set {
+			eturn (key ? (MessageManager.sOutgoingMessages[key] := value) : (MessageManager.sOutgoingMessages := value))
 		}
 	}
 
@@ -272,15 +279,27 @@ class MessageManager extends PeriodicTask {
 		return ((fileMessages.Length() > 0) ? fileMessages : this.receivePipeMessages())
 	}
 
-	deliverMessage() {
+	deliverMessages() {
 		local outgoingMessages := this.OutgoingMessages
+		local failed := []
+		local worked := true
 		local handler
 
-		if (outgoingMessages.Length() > 0) {
-			handler := outgoingMessages[1]
+		while worked {
+			worked := false
 
-			if %handler%()
-				outgoingMessages.RemoveAt(1)
+			if (outgoingMessages.Length() > 0) {
+				handler := outgoingMessages[1]
+
+				if !inList(failed, handler)
+					if %handler%() {
+						outgoingMessages.RemoveAt(1)
+
+						worked := true
+					}
+					else
+						failed.Push(handler)
+			}
 		}
 	}
 
@@ -295,7 +314,7 @@ class MessageManager extends PeriodicTask {
 			if (messages.Length() > 0)
 				new this.MessagesDispatcher(messages).start()
 			else
-				this.deliverMessage()
+				this.deliverMessages()
 		}
 		finally {
 			protectionOff()

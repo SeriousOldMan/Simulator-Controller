@@ -950,7 +950,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.TeamServerActive {
 			try {
 				if !this.SessionActive
-					throw Exception("Cannot start add a stint to an inactive session...")
+					throw Exception("Cannot add a stint to an inactive session...")
 
 				if isDebug()
 					showMessage("Updating stint in lap " . lapNumber . " for team session")

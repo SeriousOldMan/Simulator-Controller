@@ -840,6 +840,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
+		local session := this.Session
 		local ignore, assistant
 
 		RaceAssistantPlugin.initializeAssistantsState()
@@ -861,7 +862,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			RaceAssistantPlugin.disconnectTeamSession()
 
-			if (this.Session == kSessionRace)
+			if (session == kSessionRace)
 				RaceAssistantPlugin.WaitForShutdown[true] := true
 		}
 
@@ -1620,8 +1621,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								sessionLapsRemaining := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
 
 								if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
-									if ((sessionTimeRemaining <= 0) || (sessionLapsRemaining < 1))
+									if (sessionTimeRemaining <= 0)
 										RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
+									else if (sessionLapsRemaining < 1)
+										RaceAssistantPlugin.sFinished := (this.currentLap(data) + 2)
 								}
 								else if (sessionLapsRemaining == 0)
 									RaceAssistantPlugin.sFinished := dataLastLap

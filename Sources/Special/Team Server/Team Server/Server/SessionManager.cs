@@ -29,7 +29,7 @@ namespace TeamServer.Server {
 
 		public void ValidateAccount(int duration) {
 			if (!Token.Account.Administrator)
-				if (Token.Account.Contract != Model.Access.Account.ContractType.Expired)
+				if (Token.Account.Contract == Model.Access.Account.ContractType.Expired)
 					throw new Exception("Account is no longer valid...");
 				else if (!Token.Account.SessionAccess)
 					throw new Exception("Account does not support team sessions...");

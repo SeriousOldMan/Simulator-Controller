@@ -150,7 +150,6 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-
                 TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
                 Driver driver = teamManager.LookupDriver(identifier);
 

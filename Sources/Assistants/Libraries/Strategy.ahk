@@ -585,7 +585,7 @@ class StrategySimulation {
 		local progressWindow, message, scenarios, scenario, ignore, disposable
 
 		if verbose {
-			progressWindow := showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Data")})
+			progressWindow := showProgress({color: "Blue", title: translate("Acquiring Telemetry Data")})
 
 			if window {
 				Gui %progressWindow%:+Owner%window%

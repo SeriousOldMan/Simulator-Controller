@@ -271,7 +271,7 @@ requestShareSessionDatabaseConsent() {
 	}
 }
 
-shareSessionDatabase() {
+startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options, consent
 
 	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
@@ -292,7 +292,7 @@ shareSessionDatabase() {
 				shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 				shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 
-				options := ("-ID " . ID . " -Synchronize " . true)
+				options := ("-ID """ . ID . """ -Synchronize " . true)
 
 				if shareTyrePressures
 					options .= " -Pressures"
@@ -1157,8 +1157,15 @@ showProgress(options) {
 	local x, y, w, h, color
 
 	if !vProgressIsOpen {
-		x := options.X
-		y := options.Y
+		if options.HasKey("X")
+			x := options.X
+		else
+			x := Round((A_ScreenWidth - 300) / 2)
+
+		if options.HasKey("Y")
+			y := options.Y
+		else
+			y := A_ScreenHeight - 150
 
 		if options.HasKey("Width")
 			w := (options.Width - 20)
@@ -2334,7 +2341,7 @@ if !vDetachedInstallation {
 
 	if !isDebug() {
 		requestShareSessionDatabaseConsent()
-		shareSessionDatabase()
+		startDatabaseSynchronizer()
 		checkForNews()
 	}
 }

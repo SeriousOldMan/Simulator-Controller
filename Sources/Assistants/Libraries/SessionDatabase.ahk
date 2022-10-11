@@ -1235,7 +1235,7 @@ computeDriverName(forName, surName, nickName) {
 	return Trim(name)
 }
 
-synchronizeDatabase() {
+synchronizeDatabase(full := false) {
 	local sessionDB := new SessionDatabase()
 	local connector := sessionDB.Connector
 	local timestamp, simulators, ignore, synchronizer
@@ -1246,12 +1246,14 @@ synchronizeDatabase() {
 		try {
 			simulators := sessionDB.getSimulators()
 			timestamp := connector.GetServerTimestamp()
-			lastSynchronization := sessionDB.Synchronization
+			lastSynchronization := (!full ? sessionDB.Synchronization : false)
 
 			for ignore, synchronizer in sessionDB.Synchronizers
-				%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization)
+				%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, full)
 
 			sessionDB.Synchronization := connector.GetServerTimestamp()
+
+			hideProgress()
 		}
 		catch exception {
 			logError(exception)
@@ -1286,7 +1288,7 @@ parseData(properties) {
 	return result
 }
 
-synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronization) {
+synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronization, force) {
 	local ignore, simulator, db, modified, identifier, driver, drivers
 
 	try {
@@ -1318,7 +1320,7 @@ synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronizat
 						}
 					}
 
-					for ignore, driver in db.query("Drivers", {Where: {Synchronized: kNull, Driver: SessionDatabase.ID} }) {
+					for ignore, driver in db.query("Drivers", {Where: force ? {Driver: sessionDB.ID} : {Synchronized: kNull, Driver: sessionDB.ID} }) {
 						if (driver.Identifier = kNull)
 							driver.Identifier := createGUID()
 

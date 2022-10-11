@@ -271,7 +271,12 @@ class TelemetryDatabase extends SessionDatabase {
 					this.Database.remove("Electronics", where, filter, true)
 
 					if identifiers
-						connector.DeleteData("Electronics", values2String(";", identifiers*))
+						try {
+							connector.DeleteData("Electronics", values2String(";", identifiers*))
+						}
+						catch exception {
+							logError(exception, true)
+						}
 				}
 				finally {
 					if this.Shared
@@ -307,7 +312,12 @@ class TelemetryDatabase extends SessionDatabase {
 					this.Database.remove("Tyres", where, filter, true)
 
 					if identifiers
-						connector.DeleteData("Tyres", values2String(";", identifiers*))
+						try {
+							connector.DeleteData("Tyres", values2String(";", identifiers*))
+						}
+						catch exception {
+							logError(exception, true)
+						}
 				}
 				finally {
 					if this.Shared
@@ -544,7 +554,7 @@ removeInvalidLaps(rows) {
 	return result
 }
 
-synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchronization) {
+synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchronization, force) {
 	local ignore, simulator, car, track, db, modified, identifier, telemetry, properties
 
 	try {
@@ -571,7 +581,7 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 									telemetry := parseData(connector.GetData("Electronics", identifier))
 
 									db.add("Electronics", {Identifier: identifier, Synchronized: timestamp
-														 , Driver: driver, Weather: weather
+														 , Driver: telemetry.Driver, Weather: telemetry.Weather
 														 , "Temperature.Air": telemetry.AirTemperature
 														 , "Temperature.Track": telemetry.TrackTemperature
 														 , "Tyre.Compound": telemetry.TyreCompound
@@ -581,7 +591,8 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 								}
 							}
 
-							for ignore, telemetry in db.query("Electronics", {Where: {Synchronized: kNull, Driver: sessionDB.ID} }) {
+							for ignore, telemetry in db.query("Electronics", {Where: force ? {Driver: sessionDB.ID}
+																						   : {Synchronized: kNull, Driver: sessionDB.ID} }) {
 								if (telemetry.Identifier = kNull)
 									telemetry.Identifier := createGUID()
 
@@ -635,7 +646,7 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 									telemetry := parseData(connector.GetData("Tyres", identifier))
 
 									db.add("Tyres", {Identifier: identifier, Synchronized: timestamp
-														 , Driver: driver, Weather: weather
+														 , Driver: telemetry.Driver, Weather: telemetry.Weather
 														 , "Temperature.Air": telemetry.AirTemperature
 														 , "Temperature.Track": telemetry.TrackTemperature
 														 , "Tyre.Compound": telemetry.TyreCompound
@@ -657,7 +668,8 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 								}
 							}
 
-							for ignore, telemetry in db.query("Tyres", {Where: {Synchronized: kNull, Driver: sessionDB.ID} }) {
+							for ignore, telemetry in db.query("Tyres", {Where: force ? {Driver: sessionDB.ID}
+																					 : {Synchronized: kNull, Driver: sessionDB.ID} }) {
 								if (telemetry.Identifier = kNull)
 									telemetry.Identifier := createGUID()
 
@@ -677,7 +689,7 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 																		   . "LapTime=%LapTime%`nLaps=%Laps%`n"
 																		   . "PressureFrontLeft=%PressureFrontLeft%`nPressureFrontRight=%PressureFrontRight%`n"
 																		   . "PressureRearLeft=%PressureRearLeft%`nPressureRearRight=%PressureRearRight%`n"
-																		   . "TemperatureFrontLeft=%TemperatureFrontLeft%`n
+																		   . "TemperatureFrontLeft=%TemperatureFrontLeft%`n"
 																		   . "TemperatureFrontRight=%TemperatureFrontRight%`n"
 																		   . "TemperatureRearLeft=%TemperatureRearLeft%`n"
 																		   . "TemperatureRearRight=%TemperatureRearRight%`n"

@@ -284,12 +284,9 @@ createDatabases(inputDirectory, outputDirectory) {
 }
 
 createSharedDatabases() {
-	x := Round((A_ScreenWidth - 300) / 2)
-	y := A_ScreenHeight - 150
-	
 	vProgressCount := 0
 
-	showProgress({x: x, y: y, color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database..."})
+	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database..."})
 	
 	Sleep 500
 	

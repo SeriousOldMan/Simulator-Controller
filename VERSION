@@ -1,9 +1,9 @@
 [Development]
-Version=4.3.5.0-dev
-Target=4.3.5.0-release
-Date=10/14/2022
+Version=4.4.0.0-dev
+Target=4.4.0.0-release
+Date=10/11/2022
 Download=
-Changes=Added settings button to "Simulator Startup"
+Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Progress and Message windows can be positioned
 [Release]
 Version=4.3.3.0-release
 Date=09/23/2022
@@ -13,4 +13,4 @@ Changes=Fixed in infinite loop in "Race Center" track map update, Fixed some fal
 Type=Development
 [Version]
 Release=4.3.4.0-release
-Development=4.3.5.0-dev
+Development=4.4.0.0-dev

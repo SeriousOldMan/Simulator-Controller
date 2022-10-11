@@ -802,7 +802,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	startSimulator(application, splashImage := false) {
-		local theme, songFile, posX, posY, name, started
+		local theme, songFile, name, started
 
 		if !application.isRunning()
 			if (application.startup(false))
@@ -818,12 +818,9 @@ class SimulatorController extends ConfigurationItem {
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
 							sendMessage(kLocalMessage, "Startup", "playStartupSong:" . songFile)
 
-						posX := Round((A_ScreenWidth - 300) / 2)
-						posY := A_ScreenHeight - 150
-
 						name := application.Application
 
-						showProgress({x: posX, y: posY, message: name, title: translate("Starting Simulator")})
+						showProgress({message: name, title: translate("Starting Simulator")})
 
 						started := false
 

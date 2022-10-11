@@ -6164,9 +6164,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateStatisticsAsync() {
-		local x := Round((A_ScreenWidth - 300) / 2)
-		local y := A_ScreenHeight - 150
-		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Updating Stint Statistics")})
+		local progressWindow := showProgress({color: "Green", title: translate("Updating Stint Statistics")})
 		local currentStint := this.CurrentStint
 		local count, stint, window, currentListView, ignore, driver
 

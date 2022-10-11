@@ -427,7 +427,7 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	restoreState(fileName := false) {
-		local state, simulator, car, track, weather, characteristicLabels, characteristics, window, x, y
+		local state, simulator, car, track, weather, characteristicLabels, characteristics, window
 		local ignore, characteristic
 
 		if !fileName
@@ -469,12 +469,9 @@ class SetupAdvisor extends ConfigurationItem {
 				Gui %window%:+Disabled
 
 				try {
-					x := Round((A_ScreenWidth - 300) / 2)
-					y := A_ScreenHeight - 150
-
 					this.ProgressCount := 0
 
-					showProgress({x: x, y: y, color: "Green", title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
+					showProgress({color: "Green", title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
 
 					Sleep 200
 
@@ -1006,12 +1003,9 @@ class SetupAdvisor extends ConfigurationItem {
 
 		simulator := this.SelectedSimulator
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
 		this.ProgressCount := 0
 
-		showProgress({x: x, y: y, color: "Blue", title: translate(phase1), message: translate("Clearing Problems...")})
+		showProgress({color: "Blue", title: translate(phase1), message: translate("Clearing Problems...")})
 
 		Sleep 200
 

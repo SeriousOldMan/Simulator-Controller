@@ -1690,17 +1690,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	deleteEntries(connector, database, localTable, serverTable, driver) {
+		local ignore, row
+
+		database.lock(localTable)
+
+		try {
+			if connector {
+				try {
+					for ignore, row in database.query(localTable, {Where: {Driver: driver}})
+						if (row.Identifier != kNull)
+							connector.DeleteData(serverTable, row.Identifier)
+				}
+				catch exception {
+					logError(exception, true)
+				}
+			}
+
+			database.remove(localTable, {Driver: driver}, Func("always").Bind(true))
+		}
+		finally {
+			database.unlock(localTable)
+		}
+	}
+
+
 	deleteData() {
 		local window := this.Window
-		local x, y, progressWindow, defaultListView, simulator, count, row, type, data, car, track
+		local progressWindow, defaultListView, simulator, count, row, type, data, car, track
 		local driver, telemetryDB, tyresDB, code, candidate, progress
+		local connector, ignore, identifier, identifiers
 
 		Gui %window%:Default
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Deleting Data")})
+		progressWindow := showProgress({color: "Green", title: translate("Deleting Data")})
 
 		Gui %progressWindow%:+Owner%window%
 		Gui %window%:Default
@@ -1753,21 +1776,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				car := this.getCarCode(simulator, car)
 				track := this.getTrackCode(simulator, track)
 
+				connector := this.SessionDatabase.Connector
+
 				switch type {
 					case translate("Telemetry"):
 						telemetryDB := new TelemetryDatabase(simulator, car, track).Database
 
-						telemetryDB.remove("Electronics", {Driver: driver}, Func("always").Bind(true))
-						telemetryDB.remove("Tyres", {Driver: driver}, Func("always").Bind(true))
-
-						telemetryDB.flush()
+						this.deleteEntries(connector, telemetryDB, "Electronics", "Electronics", driver)
+						this.deleteEntries(connector, telemetryDB, "Tyres", "Tyres", driver)
 					case translate("Pressures"):
 						tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
 
-						tyresDB.remove("Tyres.Pressures", {Driver: driver}, Func("always").Bind(true))
-						tyresDB.remove("Tyres.Pressures.Distribution", {Driver: driver}, Func("always").Bind(true))
-
-						tyresDB.flush()
+						this.deleteEntries(connector, tyresDB, "Tyres.Pressures", "TyresPressures", driver)
+						this.deleteEntries(connector, tyresDB, "Tyres.Pressures.Distribution", "TyresPressuresDistribution", driver)
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -1806,9 +1827,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	exportData(directory) {
 		local window := this.Window
-		local x := Round((A_ScreenWidth - 300) / 2)
-		local y := A_ScreenHeight - 150
-		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Exporting Data")})
+		local progressWindow := showProgress({color: "Green", title: translate("Exporting Data")})
 		local defaultListView, simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
 		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
@@ -1970,17 +1989,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local simulator := this.SelectedSimulator
 		local info := readConfiguration(directory . "\Export.info")
-		local x, y, progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
+		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
 		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName
 
 		directory := normalizeDirectoryPath(directory)
 
 		if (this.SessionDatabase.getSimulatorName(getConfigurationValue(info, "General", "Simulator", "")) = simulator) {
-			x := Round((A_ScreenWidth - 300) / 2)
-			y := A_ScreenHeight - 150
-
-			progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Importing Data")})
+			progressWindow := showProgress({color: "Green", title: translate("Importing Data")})
 
 			Gui %progressWindow%:+Owner%window%
 			Gui %window%:Default
@@ -2051,22 +2067,36 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								sourceDB := new Database(sourceDirectory . "\", schemas)
 								targetDB := new TelemetryDatabase(simulator, car, track).Database
 
-								for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
-									data := Object()
+								targetDB.lock("Electronics")
 
-									for ignore, field in schemas["Electronics"]
-										data[field] := row[field]
+								try {
+									for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
+										data := Object()
 
-									targetDB.add("Electronics", data, true)
+										for ignore, field in schemas["Electronics"]
+											data[field] := row[field]
+
+										targetDB.add("Electronics", data, true)
+									}
+								}
+								finally {
+									targetDB.unlock("Electronics")
 								}
 
-								for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
-									data := Object()
+								targetDB.lock("Tyres")
 
-									for ignore, field in schemas["Tyres"]
-										data[field] := row[field]
+								try {
+									for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
+										data := Object()
 
-									targetDB.add("Tyres", data, true)
+										for ignore, field in schemas["Tyres"]
+											data[field] := row[field]
+
+										targetDB.add("Tyres", data, true)
+									}
+								}
+								finally {
+									targetDB.unlock("Tyres")
 								}
 							}
 
@@ -2075,26 +2105,29 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								tyresDB := new TyresDatabase()
 								sourceDB := new Database(sourceDirectory . "\", schemas)
-								targetDB := tyresDB.getTyresDatabase(simulator, car, track)
+								targetDB := tyresDB.lock(simulator, car, track)
 
-								for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
-									data := Object()
+								try {
+									for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
+										data := Object()
 
-									for ignore, field in schemas["Tyres.Pressures"]
-										data[field] := row[field]
+										for ignore, field in schemas["Tyres.Pressures"]
+											data[field] := row[field]
 
-									targetDB.add("Tyres.Pressures", data, true)
+										targetDB.add("Tyres.Pressures", data, true)
+									}
+
+									for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
+										tyresDB.updatePressure(simulator, car, track
+															 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
+															 , row.Compound, row["Compound.Color"]
+															 , row.Type, row.Tyre, row.Pressure, row.Count
+															 , false, true, "User", driver)
+									}
 								}
-
-								for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
-									tyresDB.updatePressure(simulator, car, track
-														 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
-														 , row.Compound, row["Compound.Color"]
-														 , row.Type, row.Tyre, row.Pressure, row.Count
-														 , false, true, "User", driver)
+								finally {
+									tyresDB.unlock()
 								}
-
-								tyresDB.flush()
 							}
 
 							if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
@@ -2149,9 +2182,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadData() {
 		local window := this.Window
-		local x := Round((A_ScreenWidth - 300) / 2)
-		local y := A_ScreenHeight - 150
-		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local defaultListView, selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
 		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, count, strategies
 		local automations, trackName
@@ -3287,10 +3318,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 			drivers[name] := id
 		}
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+		progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 
 		Gui %progressWindow%:+Owner%owner%
 		Gui %owner%:+Disabled
@@ -3746,7 +3774,7 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Add, Text, x24 yp+25 w110 h23 +0x200, % translate("Synchronize each")
 		Gui %window%:Add, Edit, x146 yp w40 Number Limit2 vserverUpdateEdit, %serverUpdateEdit%
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range2-60, %serverUpdateEdit%
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range5-60, %serverUpdateEdit%
 		Gui %window%:Add, Text, x190 yp w90 h23 +0x200, % translate("Minutes")
 
 
@@ -3838,10 +3866,7 @@ editSettings(editorOrCommand) {
 
 						original := normalizeDirectoryPath(kDatabaseDirectory)
 
-						x := Round((A_ScreenWidth - 300) / 2)
-						y := A_ScreenHeight - 150
-
-						showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
+						showProgress({color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
 
 						copyFiles(original, databaseLocationEdit)
 

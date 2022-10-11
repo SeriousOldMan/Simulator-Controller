@@ -213,11 +213,11 @@ synchronizeSessionDatabase(minutes) {
 	}
 	catch exception {
 		logError(exception)
-
-		Task.CurrentTask.Sleep := (minutes * 60000)
-
-		return Task.CurrentTask
 	}
+
+	Task.CurrentTask.Sleep := (minutes * 60000)
+
+	return Task.CurrentTask
 }
 
 updateSessionDatabase() {
@@ -242,13 +242,13 @@ updateSessionDatabase() {
 	minutes := inList(A_Args, "-Synchronize")
 
 	if minutes {
-		minutes := A_Args[id + 1]
+		minutes := A_Args[minutes + 1]
 
 		if (minutes && (minutes != kFalse)) {
 			if ((minutes == true) || (minutes = kTrue)) {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 2)
+				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 5)
 			}
 
 			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000)

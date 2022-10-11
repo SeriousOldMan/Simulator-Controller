@@ -454,30 +454,29 @@ namespace TeamServer.Controllers
 
             try
             {
-                foreach(string theIdentifier in identifier.Split(";"))
-                    switch (table.ToLower())
-                    {
-                        case "license":
-                            dataManager.DeleteLicense(dataManager.LookupLicense(theIdentifier));
-                            break;
-                        case "electronics":
-                            dataManager.DeleteElectronics(dataManager.LookupElectronics(theIdentifier));
-                            break;
-                        case "tyres":
-                            dataManager.DeleteTyres(dataManager.LookupTyres(theIdentifier));
-                            break;
-                        case "brakes":
-                            dataManager.DeleteBrakes(dataManager.LookupBrakes(theIdentifier));
-                            break;
-                        case "tyrespressures":
-                            dataManager.DeleteTyresPressures(dataManager.LookupTyresPressures(theIdentifier));
-                            break;
-                        case "tyrespressuresdistribution":
-                            dataManager.DeleteTyresPressuresDistribution(dataManager.LookupTyresPressuresDistribution(theIdentifier));
-                            break;
-                        default:
-                            throw new Exception("Unknown table detected...");
-                    }
+                switch (table.ToLower())
+                {
+                    case "license":
+                        dataManager.DeleteLicense(dataManager.LookupLicense(identifier));
+                        break;
+                    case "electronics":
+                        dataManager.DeleteElectronics(dataManager.LookupElectronics(identifier));
+                        break;
+                    case "tyres":
+                        dataManager.DeleteTyres(dataManager.LookupTyres(identifier));
+                        break;
+                    case "brakes":
+                        dataManager.DeleteBrakes(dataManager.LookupBrakes(identifier));
+                        break;
+                    case "tyrespressures":
+                        dataManager.DeleteTyresPressures(dataManager.LookupTyresPressures(identifier));
+                        break;
+                    case "tyrespressuresdistribution":
+                        dataManager.DeleteTyresPressuresDistribution(dataManager.LookupTyresPressuresDistribution(identifier));
+                        break;
+                    default:
+                        throw new Exception("Unknown table detected...");
+                }
 
                 return "Ok";
             }

@@ -69,6 +69,12 @@ class TyresDatabase extends SessionDatabase {
 		}
 	}
 
+	Database[] {
+		Get {
+			return this.iDatabase
+		}
+	}
+
 	Shared[] {
 		Get {
 			return this.iShared
@@ -479,7 +485,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 }
 
-synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynchronization) {
+synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynchronization, force) {
 	local ignore, simulator, car, track, db, modified, identifier, pressures, properties
 
 	try {
@@ -506,7 +512,7 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 									pressures := parseData(connector.GetData("TyresPressures", identifier))
 
 									db.add("Tyres.Pressures", {Identifier: identifier, Synchronized: timestamp
-															 , Driver: driver, Weather: weather
+															 , Driver: pressures.Driver, Weather: pressures.Weather
 															 , "Temperature.Air": pressures.AirTemperature
 															 , "Temperature.Track": pressures.TrackTemperature
 															 , Compound: pressures.TyreCompound
@@ -522,7 +528,8 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 								}
 							}
 
-							for ignore, pressures in db.query("Tyres.Pressures", {Where: {Synchronized: kNull, Driver: sessionDB.ID} }) {
+							for ignore, pressures in db.query("Tyres.Pressures", {Where: force ? {Driver: sessionDB.ID}
+																							   : {Synchronized: kNull, Driver: sessionDB.ID} }) {
 								if (pressures.Identifier = kNull)
 									pressures.Identifier := createGUID()
 
@@ -602,7 +609,8 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 								}
 							}
 
-							for ignore, pressures in db.query("Tyres.Pressures.Distribution", {Where: {Synchronized: kNull, Driver: sessionDB.ID} }) {
+							for ignore, pressures in db.query("Tyres.Pressures.Distribution", {Where: force ? {Driver: sessionDB.ID}
+																											: {Synchronized: kNull, Driver: sessionDB.ID} }) {
 								if (pressures.Identifier = kNull) {
 									identifier := createGUID()
 

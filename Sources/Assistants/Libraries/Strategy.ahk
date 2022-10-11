@@ -582,12 +582,9 @@ class StrategySimulation {
 		local progress := 0
 		local electronicsData := false
 		local tyresData := false
-		local x, y, progressWindow, message, scenarios, scenario, ignore, disposable
+		local progressWindow, message, scenarios, scenario, ignore, disposable
 
 		if verbose {
-			x := Round((A_ScreenWidth - 300) / 2)
-			y := A_ScreenHeight - 150
-
 			progressWindow := showProgress({x: x, y: y, color: "Blue", title: translate("Acquiring Telemetry Data")})
 
 			if window {

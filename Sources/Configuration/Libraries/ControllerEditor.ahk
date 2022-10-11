@@ -995,6 +995,10 @@ class LayoutsList extends ConfigurationItemList {
 			else
 				break
 
+		layoutRowEdit := ((rows.Length() > 0) ? rows[1] : "")
+
+		GuiControl Text, layoutRowEdit, %layoutRowEdit%
+
 		this.iRowDefinitions := rows
 
 		GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
@@ -1002,19 +1006,13 @@ class LayoutsList extends ConfigurationItemList {
 		if (choices.Length() > 0) {
 			GuiControl Choose, layoutRowDropDown, 1
 
-			layoutRowEdit := ((rows.Length() > 1) ? rows[1] : "")
-
 			this.iSelectedRow := 1
 		}
 		else {
 			GuiControl Choose, layoutRowDropDown, 0
 
-			layoutRowEdit := ""
-
 			this.iSelectedRow := false
 		}
-
-		GuiControl Text, layoutRowEdit, %layoutRowEdit%
 
 		preview := ControllerEditor.Instance.ControllerPreview
 

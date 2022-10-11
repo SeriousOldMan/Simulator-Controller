@@ -2242,7 +2242,7 @@ class RaceStrategist extends RaceAssistant {
 				sendMessage(kFileMessage, "Race Engineer", "planPitstop", ErrorLevel)
 	}
 
-	performPitstop(lapNumber := false) {
+	executePitstop(lapNumber) {
 		local knowledgeBase := this.KnowledgeBase
 		local nextPitstop, result, map
 
@@ -2251,25 +2251,14 @@ class RaceStrategist extends RaceAssistant {
 		else
 			nextPitstop := false
 
-		this.startPitstop(lapNumber)
-
-		base.performPitstop(lapNumber)
-
-		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
-
-		result := knowledgeBase.produce()
-
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledgeBase(knowledgeBase)
+		result := base.executePitstop(lapNumber)
 
 		if (nextPitstop && (nextPitstop != knowledgeBase.getValue("Strategy.Pitstop.Next", false))) {
-			map := knowledgeBase.getValue("Strategy.Pitstop.", nextPitstop, ".Map", "n/a")
+			map := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Map", "n/a")
 
 			if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
 				this.getSpeaker().speakPhrase("StintMap", {map: map})
 		}
-
-		this.finishPitstop(lapNumber)
 
 		return result
 	}

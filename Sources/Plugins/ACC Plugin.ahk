@@ -499,6 +499,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.sendCommand(this.OpenPitstopMFDHotkey)
 
+				Sleep 200
+
+				this.sendCommand(this.OpenPitstopMFDHotkey)
+
 				if !imgSearch {
 					if update {
 						this.initializePitstopMFD()
@@ -597,6 +601,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		protectionOn(true, true)
 
 		try {
+			this.sendCommand(this.OpenPitstopMFDHotkey)
+
+			Sleep 200
+
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
 			availableOptions := ["Pit Limiter", "Strategy", "Refuel"

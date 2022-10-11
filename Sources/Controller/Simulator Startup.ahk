@@ -83,6 +83,10 @@ class SimulatorStartup extends ConfigurationItem {
 		Get {
 			return this.iSettings
 		}
+
+		Set {
+			return (this.iSettings := value)
+		}
 	}
 
 	Finished[] {
@@ -104,7 +108,7 @@ class SimulatorStartup extends ConfigurationItem {
 	}
 
 	__New(configuration, settings) {
-		this.iSettings := settings
+		this.Settings := settings
 
 		base.__New(configuration)
 	}
@@ -156,7 +160,7 @@ class SimulatorStartup extends ConfigurationItem {
 			else if (result == kSave) {
 				writeConfiguration(kSimulatorSettingsFile, settings)
 
-				this.iSettings := settings
+				this.Settings := settings
 			}
 		}
 
@@ -461,7 +465,7 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s8 Norm, Arial
 
-		Gui LP:Add, Text, x550 YP w30, % string2Values("-", kVersion)[1]
+		Gui LP:Add, Text, x560 YP w30, % string2Values("-", kVersion)[1]
 
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
@@ -470,7 +474,10 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Font, s8 Norm, Arial
 
-		Gui LP:Add, Text, x8 yp+30 w590 0x10
+		Gui LP:Add, Button, x573 yp+4 w23 h23 HwndgeneralSettingsButtonHandle gmodifySettings
+		setButtonIcon(generalSettingsButtonHandle, kIconsDirectory . "General Settings.ico", 1)
+
+		Gui LP:Add, Text, x8 yp+26 w590 0x10
 
 		Gui LP:Add, Picture, x16 yp+24 w60 h60 Section vStartup glaunchStartup, % kIconsDirectory . "Startup.ico"
 
@@ -483,10 +490,11 @@ launchPad(command := false, arguments*) {
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vSimulatorConfiguration glaunchApplication, % kIconsDirectory . "Configuration.ico"
 		Gui LP:Add, Picture, xp yp+74 w60 h60 vSimulatorDownload glaunchSimulatorDownload, % kIconsDirectory . "Installer.ico"
 
-		Gui LP:Add, Picture, x16 ys+74 w60 h60 vSimulatorSettings glaunchApplication, % kIconsDirectory . "Settings.ico"
+		; Gui LP:Add, Picture, x16 ys+74 w60 h60 vSimulatorSettings glaunchApplication, % kIconsDirectory . "Settings.ico"
+		Gui LP:Add, Picture, x16 ys+74 w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
 		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceSettings glaunchApplication, % kIconsDirectory . "Race Settings.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vSessionDatabase glaunchApplication, % kIconsDirectory . "Session Database.ico"
-		Gui LP:Add, Picture, xp+164 yp w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
+		; Gui LP:Add, Picture, xp+164 yp w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
 
 		Gui LP:Font, s8 Norm, Arial
 
@@ -553,6 +561,24 @@ launchApplication() {
 
 	if executable
 		launchPad("Launch", executable)
+}
+
+modifySettings() {
+	local settings := readConfiguration(kSimulatorSettingsFile)
+
+	Gui SE:+OwnerLP
+	Gui LP:+Disabled
+
+	try {
+		if (editSettings(settings) == kSave) {
+			writeConfiguration(kSimulatorSettingsFile, settings)
+
+			this.Settings := settings
+		}
+	}
+	finally {
+		Gui LP:-Disabled
+	}
 }
 
 launchSimulatorDownload() {

@@ -1400,7 +1400,7 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		if this.hasEnoughData(false) {
-			if ((remainingSessionLaps <= 3) && (this.Session = kSessionRace)) {
+			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
 
 				if !this.SessionInfos.HasKey(situation) {
@@ -1415,7 +1415,7 @@ class RaceSpotter extends RaceAssistant {
 			if (sector = 1) {
 				stintLaps := Floor(remainingStintLaps)
 
-				if ((this.Session = kSessionRace) && (stintLaps < 4) && (remainingStintLaps < remainingSessionLaps)) {
+				if ((this.Session = kSessionRace) && (stintLaps < 4) && (Abs(remainingStintLaps - remainingSessionLaps) > 2)) {
 					if (stintLaps > 0) {
 						situation := ("StintEnding " . Ceil(lastLap + stintLaps))
 
@@ -2776,29 +2776,13 @@ class RaceSpotter extends RaceAssistant {
 		return positions
 	}
 
-	performPitstop(lapNumber := false) {
-		local knowledgeBase := this.KnowledgeBase
-		local result
-
+	executePitstop(lapNumber) {
 		this.PositionInfos := {}
 		this.TacticalAdvices := {}
 		this.SessionInfos := {}
 		this.iLastDeltaInformationLap := 0
 
-		this.startPitstop(lapNumber)
-
-		base.performPitstop(lapNumber)
-
-		knowledgeBase.addFact("Pitstop.Lap", lapNumber ? lapNumber : knowledgeBase.getValue("Lap"))
-
-		result := knowledgeBase.produce()
-
-		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledgeBase(knowledgeBase)
-
-		this.finishPitstop(lapNumber)
-
-		return result
+		return base.executePitstop(lapNumber)
 	}
 
 	requestInformation(category, arguments*) {

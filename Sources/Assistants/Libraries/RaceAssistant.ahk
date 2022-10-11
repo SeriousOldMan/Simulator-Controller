@@ -1028,7 +1028,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
 
-			this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false, DriverFullName: "John Doe (JD)"})
+			this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		}
 
 		if settingsFile {
@@ -1262,14 +1262,37 @@ class RaceAssistant extends ConfigurationItem {
 		return result
 	}
 
-	startPitstop(lapNumber := false) {
-	}
-
 	performPitstop(lapNumber := false) {
+		if !lapNumber
+			lapNumber := this.KnowledgeBase.getValue("Lap")
+
+		this.startPitstop(lapNumber)
+
+		this.executePitstop(lapNumber)
+
+		this.finishPitstop(lapNumber)
+
 		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 	}
 
-	finishPitstop(lapNumber := false) {
+	startPitstop(lapNumber) {
+		return true
+	}
+
+	executePitstop(lapNumber) {
+		local knowledgeBase := this.KnowledgeBase
+
+		knowledgeBase.addFact("Pitstop.Lap", lapNumber)
+
+		result := knowledgeBase.produce()
+
+		if (this.Debug[kDebugKnowledgeBase])
+			this.dumpKnowledgeBase(knowledgeBase)
+
+		return result
+	}
+
+	finishPitstop(lapNumber) {
 		local savedKnowledgeBase, settingsFile, stateFile
 
 		if this.RemoteHandler {
@@ -1277,14 +1300,16 @@ class RaceAssistant extends ConfigurationItem {
 
 			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
 
-			settingsFile := temporaryFileName("Race Assistant",  "settings")
-			stateFile := temporaryFileName("Race Assistant",  "state")
+			settingsFile := temporaryFileName(this.AssistantType, "settings")
+			stateFile := temporaryFileName(this.AssistantType, "state")
 
 			writeConfiguration(settingsFile, this.Settings)
 			writeConfiguration(stateFile, savedKnowledgeBase)
 
 			this.RemoteHandler.saveSessionState(settingsFile, stateFile)
 		}
+
+		return true
 	}
 
 	saveSessionSettings() {

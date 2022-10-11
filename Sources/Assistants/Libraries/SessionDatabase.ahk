@@ -102,7 +102,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
-			return (kDatabaseDirectory := value)
+			return (kDatabaseDirectory := (normalizeDirectoryPath(value) . "\"))
 		}
 	}
 

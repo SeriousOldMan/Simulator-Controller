@@ -5817,17 +5817,19 @@ class RaceCenter extends ConfigurationItem {
 				else if lastLap
 					hadLastLap := true
 
-				simulator := this.Connector.GetSessionValue(session, "Simulator")
-				car := this.Connector.GetSessionValue(session, "Car")
-				track := this.Connector.GetSessionValue(session, "Track")
+				if !this.Simulator {
+					simulator := this.Connector.GetSessionValue(session, "Simulator")
+					car := this.Connector.GetSessionValue(session, "Car")
+					track := this.Connector.GetSessionValue(session, "Track")
 
-				if (simulator && (simulator != ""))
-					try {
-						this.initializeSimulator(simulator, car, track)
-					}
-					catch exception {
-						logError(exception)
-					}
+					if (simulator && (simulator != ""))
+						try {
+							this.initializeSimulator(simulator, car, track)
+						}
+						catch exception {
+							logError(exception)
+						}
+				}
 
 				this.syncSetups()
 				this.syncTeamDrivers()
@@ -6985,6 +6987,9 @@ class RaceCenter extends ConfigurationItem {
 				series .= ", "
 				vAxis .= ", "
 			}
+
+			if (A_Index > 2)
+				break
 
 			index := A_Index - 1
 

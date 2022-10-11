@@ -27,6 +27,7 @@ class Database {
 	iDirectory := false
 	iSchemas := false
 	iTables := {}
+	iFiles := {}
 	iTableChanged := {}
 
 	Directory[] {
@@ -41,30 +42,60 @@ class Database {
 		}
 	}
 
+	Files[name := false] {
+		Get {
+			return (name ? this.iFiles[name] : this.iFiles)
+		}
+	}
+
 	Tables[name := false] {
 		Get {
 			local schema, data, row, values, length, ignore, column
+			local file, line
 
 			if name {
 				if !this.iTables.HasKey(name) {
 					schema := this.Schemas[name]
 					data := []
 
-					if this.Directory
-						loop Read, % (this.Directory . name . ".CSV")
-						{
-							row := {}
-							values := string2Values(";", A_LoopReadLine)
-							length := values.Length()
+					if this.Directory {
+						file := this.Files[name]
 
-							for ignore, column in schema
-								if (length >= A_Index)
-									row[column] := values[A_Index]
-								else
-									row[column] := kNull
+						if file {
+							file.Position := 0
 
-							data.Push(row)
+							while !file.AtEOF {
+								line := Trim(file.ReadLine(), " `t`n`r")
+
+								row := {}
+								values := string2Values(";", line)
+								length := values.Length()
+
+								for ignore, column in schema
+									if (length >= A_Index)
+										row[column] := values[A_Index]
+									else
+										row[column] := kNull
+
+								data.Push(row)
+							}
 						}
+						else
+							loop Read, % (this.Directory . name . ".CSV")
+							{
+								row := {}
+								values := string2Values(";", A_LoopReadLine)
+								length := values.Length()
+
+								for ignore, column in schema
+									if (length >= A_Index)
+										row[column] := values[A_Index]
+									else
+										row[column] := kNull
+
+								data.Push(row)
+							}
+					}
 
 					this.iTables[name] := data
 				}
@@ -79,6 +110,70 @@ class Database {
 	__New(directory, schemas) {
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
 		this.iSchemas := schemas
+	}
+
+	lock(name := false, wait := true) {
+		local done := false
+		local directory, file, ignore
+
+		if (!name && !wait)
+			throw "Inconsistent parameters detected in Database.lock..."
+
+		if name {
+			while !done {
+				directory := this.Directory
+
+				FileCreateDir %directory%
+
+				try {
+					file := FileOpen(directory . name . ".CSV", "rw-rwd")
+				}
+				catch exception {
+					logError(exception)
+
+					file := false
+				}
+
+				if (!file && wait)
+					Sleep 100
+				else
+					done := true
+			}
+
+			if file {
+				this.Files[name] := file
+
+				return true
+			}
+			else
+				return false
+		}
+		else
+			for name, ignore in getKeys(this.Schemas)
+				this.lock(name, wait)
+
+	}
+
+	unlock(name := false) {
+		local file, ignore
+
+		if name {
+			file := this.Files[name]
+
+			if file {
+				this.flush(name)
+
+				this.Files.Delete(name)
+
+				file.Close()
+			}
+			else
+				throw "Trying to unlock a file that is not locked in Database.unlock..."
+		}
+		else
+			for name, ignore in getKeys(this.Schemas)
+				this.unlock(name)
+
 	}
 
 	query(name, query) {
@@ -143,7 +238,7 @@ class Database {
 	}
 
 	add(name, values, flush := false) {
-		local row, directory, fileName, ignore, column
+		local row, directory, fileName, ignore, column, file
 
 		this.Tables[name].Push(values)
 
@@ -153,14 +248,23 @@ class Database {
 			for ignore, column in this.Schemas[name]
 				row.Push(values.HasKey(column) ? values[column] : kNull)
 
-			directory := this.Directory
-			fileName := (directory . name . ".CSV")
+			file := this.Files[name]
 
-			FileCreateDir %directory%
+			if file {
+				file.Position := file.Length
 
-			row := (values2String(";", row*) . "`n")
+				file.WriteLine(values2String(";", row*))
+			}
+			else {
+				directory := this.Directory
+				fileName := (directory . name . ".CSV")
 
-			FileAppend %row%, %fileName%
+				FileCreateDir %directory%
+
+				row := (values2String(";", row*) . "`n")
+
+				FileAppend %row%, %fileName%
+			}
 		}
 		else
 			this.iTableChanged[name] := true
@@ -217,28 +321,46 @@ class Database {
 	}
 
 	flush(name := false) {
-		local directory, fileName, schema, ignore, row, values, column
+		local directory, fileName, schema, ignore, row, values, column, file
 
 		if name {
 			if (this.Tables.HasKey(name) && this.iTableChanged.HasKey(name)) {
-				directory := this.Directory
-				fileName := (directory . name . ".CSV")
+				file := this.Files[name]
 
-				FileCreateDir %directory%
+				if file {
+					file.Length := 0
 
-				deleteFile(fileName)
+					schema := this.Schemas[name]
 
-				schema := this.Schemas[name]
+					for ignore, row in this.Tables[name] {
+						values := []
 
-				for ignore, row in this.Tables[name] {
-					values := []
+						for ignore, column in schema
+							values.Push(row.HasKey(column) ? row[column] : kNull)
 
-					for ignore, column in schema
-						values.Push(row.HasKey(column) ? row[column] : kNull)
+						file.WriteLine(values2String(";", values*))
+					}
+				}
+				else {
+					directory := this.Directory
+					fileName := (directory . name . ".CSV")
 
-					row := (values2String(";", values*) . "`n")
+					FileCreateDir %directory%
 
-					FileAppend %row%, %fileName%
+					deleteFile(fileName)
+
+					schema := this.Schemas[name]
+
+					for ignore, row in this.Tables[name] {
+						values := []
+
+						for ignore, column in schema
+							values.Push(row.HasKey(column) ? row[column] : kNull)
+
+						row := (values2String(";", values*) . "`n")
+
+						FileAppend %row%, %fileName%
+					}
 				}
 
 				this.iTableChanged.Delete(name)

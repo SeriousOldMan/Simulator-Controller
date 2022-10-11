@@ -339,55 +339,52 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local session := this.TeamSession
 		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData
 
-		if (teamServer && teamServer.Active && session) {
-			lastStint := false
-			driverID := kNull
+		tyresDB.lock()
 
-			loop % teamServer.getCurrentLap(session)
-			{
-				try {
-					stint := teamServer.getLapStint(A_Index, session)
-					newStint := (stint != lastStint)
+		try {
+			if (teamServer && teamServer.Active && session) {
+				lastStint := false
+				driverID := kNull
 
-					if newStint {
-						lastStint := stint
+				loop % teamServer.getCurrentLap(session)
+					try {
+						stint := teamServer.getLapStint(A_Index, session)
+						newStint := (stint != lastStint)
 
-						driverID := teamServer.getStintValue(stint, "ID", session)
+						if newStint {
+							lastStint := stint
+
+							driverID := teamServer.getStintValue(stint, "ID", session)
+						}
+
+						lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
+
+						if (!lapPressures || (lapPressures == ""))
+							continue
+
+						lapPressures := string2Values(";", lapPressures)
+
+						if (newStint && driverID)
+							tyresDB.registerDriver(lapPressures[1], driverID, teamServer.getStintDriverName(stint))
+
+						tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
+											  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
+											  , string2Values(",", lapPressures[10]), false, driverID)
 					}
-
-					lapPressures := teamServer.getLapValue(A_Index, this.Plugin . " Pressures", session)
-
-					if (!lapPressures || (lapPressures == ""))
-						continue
-
-					lapPressures := string2Values(";", lapPressures)
-
-					if (newStint && driverID)
-						tyresDB.registerDriver(lapPressures[1], driverID, teamServer.getStintDriverName(stint))
-
-					tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
-										  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
-										  , string2Values(",", lapPressures[10]), false, driverID)
-				}
-				catch exception {
-					break
-				}
-				finally {
-					tyresDB.flush()
-				}
+					catch exception {
+						break
+					}
 			}
-		}
-		else
-			try {
+			else
 				for ignore, lapData in this.LapDatabase.Tables["Pressures"]
 					tyresDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather
 										  , lapData["Temperature.Air"], lapData["Temperature.Track"]
 										  , lapData.Compound, lapData["Compound.Color"]
 										  , string2Values(",", lapData["Pressures.Cold"]), string2Values(",", lapData["Pressures.Hot"]), false)
-			}
-			finally {
-				tyresDB.flush()
-			}
+		}
+		finally {
+			tyresDB.unlock()
+		}
 	}
 }
 

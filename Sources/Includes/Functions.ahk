@@ -274,40 +274,41 @@ requestShareSessionDatabaseConsent() {
 shareSessionDatabase() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options, consent
 
-	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
-		idFileName := kUserConfigDirectory . "ID"
+	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
+		Process Exist, Database Synchronizer.exe
 
-		FileReadLine ID, %idFileName%, 1
+		if !ErrorLevel {
+			idFileName := kUserConfigDirectory . "ID"
 
-		dbIDFileName := kDatabaseDirectory . "ID"
+			FileReadLine ID, %idFileName%, 1
 
-		FileReadLine dbID, %dbIDFileName%, 1
+			dbIDFileName := kDatabaseDirectory . "ID"
 
-		if (ID = dbID) {
-			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			FileReadLine dbID, %dbIDFileName%, 1
 
-			shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-			shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+			if (ID = dbID) {
+				consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 
-			options := ("-ID " . ID . " -Synchronize " . true)
+				shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+				shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 
-			if shareTyrePressures
-				options .= " -Pressures"
+				options := ("-ID " . ID . " -Synchronize " . true)
 
-			if shareCarSetups
-				options .= " -Setups"
+				if shareTyrePressures
+					options .= " -Pressures"
 
-			try {
-				Process Exist, Database Synchronizer.exe
+				if shareCarSetups
+					options .= " -Setups"
 
-				if !ErrorLevel
+				try {
 					Run %kBinariesDirectory%Database Synchronizer.exe %options%
-			}
-			catch exception {
-				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
+				}
+				catch exception {
+					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 
-				showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
 			}
 		}
 	}

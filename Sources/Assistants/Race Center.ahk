@@ -379,6 +379,8 @@ class RaceCenter extends ConfigurationItem {
 
 			base.__New()
 
+			this.Shared := false
+
 			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
 
 			if simulator
@@ -7732,7 +7734,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 				if !found
-					names.Push(values2String(", ", sessionDB.getDriverNames(this.SelectedSimulator, id)*))
+					names.Push(values2String(",", sessionDB.getDriverNames(this.SelectedSimulator, id)*))
 
 				if (id = selected)
 					selected := A_Index

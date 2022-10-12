@@ -1361,11 +1361,14 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 
 			this.finishSession()
-		}
-		else
-			Task.startTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
 
-		return false
+			return false
+		}
+		else {
+			Task.CurrentTask.Sleep := 5000
+
+			return Task.CurrentTask
+		}
 	}
 
 	finishSessionWithReview(shutdown) {

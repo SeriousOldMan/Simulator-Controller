@@ -191,7 +191,7 @@ namespace TeamServer.Controllers {
                     account.SessionAccess = properties["SessionAccess"].ToLower() == "true";
 
                 if (properties.ContainsKey("DataAccess"))
-                    account.SessionAccess = properties["DataAccess"].ToLower() == "true";
+                    account.DataAccess = properties["DataAccess"].ToLower() == "true";
 
                 account.Save();
                 

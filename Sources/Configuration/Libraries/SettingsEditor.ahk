@@ -352,6 +352,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	static buttonBoxSimulation
 	static buttonBoxSimulationDuration
 	static buttonBoxPosition
+	static statusPosition
 	static lastPositions
 
 	static startup
@@ -408,6 +409,10 @@ restartSettings:
 		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
 
 		setConfigurationValue(newSettings, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
+
+		positions := ["Top", "Bottom"]
+
+		setConfigurationValue(newSettings, "Status", "Status Position", positions[inList(map(positions, "translate"), statusPosition)])
 
 		for descriptor, value in lastPositions
 			setConfigurationValue(newSettings, "Button Box", descriptor, value)
@@ -527,6 +532,7 @@ restartSettings:
 		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", false)
 		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
+		statusPosition := getConfigurationValue(settingsOrCommand, "Status", "Status Position", "Bottom")
 
 		lastPositions := {}
 
@@ -547,7 +553,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 
-		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h135, % translate("Controller Notifications")
+		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h160, % translate("Controller Notifications")
 
 		Gui SE:Font, Norm, Arial
 
@@ -576,6 +582,16 @@ restartSettings:
 			chosen := 4
 
 		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
+
+		Gui SE:Add, Text, X20 YP+30, % translate("Status Position")
+
+		choices := ["Top", "Bottom"]
+		chosen := inList(choices, statusPosition)
+
+		if !chosen
+			chosen := 1
+
+		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vstatusPosition, % values2String("|", map(choices, "translate")*)
 
 		if fromSetup
 			Gui SE:Add, Button, X10 Y+15 w220 Disabled gopenModesEditor, % translate("Controller Automation...")

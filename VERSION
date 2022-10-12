@@ -3,7 +3,7 @@ Version=4.4.0.0-dev
 Target=4.4.0.0-release
 Date=10/11/2022
 Download=
-Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Progress and Message windows can be positioned
+Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Progress and Message windows can be positioned, Position settings for status windows (Progress Bar, Message)
 [Release]
 Version=4.3.3.0-release
 Date=09/23/2022

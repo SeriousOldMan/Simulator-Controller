@@ -16,6 +16,7 @@
       "Password": "",
       "Minutes": 120,
       "Session": true,
+      "Data": true,
       "Reset": true
     },
     {

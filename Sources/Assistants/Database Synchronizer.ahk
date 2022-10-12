@@ -248,7 +248,7 @@ updateSessionDatabase() {
 			if ((minutes == true) || (minutes = kTrue)) {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 5)
+				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 30)
 			}
 
 			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000)

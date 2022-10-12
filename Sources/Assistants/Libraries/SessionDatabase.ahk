@@ -1235,7 +1235,7 @@ computeDriverName(forName, surName, nickName) {
 	return Trim(name)
 }
 
-synchronizeDatabase(full := false) {
+synchronizeDatabase(rebuild := false) {
 	local sessionDB := new SessionDatabase()
 	local connector := sessionDB.Connector
 	local timestamp, simulators, ignore, synchronizer
@@ -1246,10 +1246,10 @@ synchronizeDatabase(full := false) {
 		try {
 			simulators := sessionDB.getSimulators()
 			timestamp := connector.GetServerTimestamp()
-			lastSynchronization := (!full ? sessionDB.Synchronization : false)
+			lastSynchronization := (!rebuild ? sessionDB.Synchronization : false)
 
 			for ignore, synchronizer in sessionDB.Synchronizers
-				%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, full)
+				%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization)
 
 			sessionDB.Synchronization := connector.GetServerTimestamp()
 

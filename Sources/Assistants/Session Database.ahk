@@ -3594,11 +3594,19 @@ editSettings(editorOrCommand) {
 	static serverTokenEdit := ""
 	static serverUpdateEdit := 0
 	static tokenButtonHandle
+	static rebuildButton
 
 	if (editorOrCommand == kOk)
 		result := kOk
 	else if (editorOrCommand == kCancel)
 		result := kCancel
+	else if (editorOrCommand = "Rebuild") {
+		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		setConfigurationValue(configuration, "Team Server", "Synchronization", false)
+
+		writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+	}
 	else if (editorOrCommand = "DatabaseLocation") {
 		Gui +OwnDialogs
 
@@ -3690,16 +3698,23 @@ editSettings(editorOrCommand) {
 			GuiControl Enable, serverTokenEdit
 			GuiControl Enable, serverUpdateEdit
 			GuiControl Enable, %tokenButtonHandle%
+			GuiControl Enable, rebuildButton
+
+			GuiControlGet serverUpdateEdit
+
+			if (serverUpdateEdit = "")
+				GuiControl, , serverUpdateEdit, 10
 		}
 		else {
 			GuiControl Disable, serverURLEdit
 			GuiControl Disable, serverTokenEdit
 			GuiControl Disable, serverUpdateEdit
 			GuiControl Disable, %tokenButtonHandle%
+			GuiControl Disable, rebuildButton
 
 			serverURLEdit := ""
 			serverTokenEdit := ""
-			serverUpdateEdit := 0
+			serverUpdateEdit := ""
 
 			GuiControl, , serverURLEdit, %serverURLEdit%
 			GuiControl, , serverTokenEdit, %serverTokenEdit%
@@ -3774,9 +3789,10 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Add, Text, x24 yp+25 w110 h23 +0x200, % translate("Synchronize each")
 		Gui %window%:Add, Edit, x146 yp w40 Number Limit2 vserverUpdateEdit, %serverUpdateEdit%
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range5-60, %serverUpdateEdit%
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range10-90, %serverUpdateEdit%
 		Gui %window%:Add, Text, x190 yp w90 h23 +0x200, % translate("Minutes")
 
+		Gui %window%:Add, Button, x312 yp+2 w80 vrebuildButton grebuildDatabase, % translate("Rebuild...")
 
 		Gui %window%:Add, Button, x122 ys+150 w80 h23 gacceptSettings, % translate("Ok")
 		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
@@ -3887,22 +3903,23 @@ editSettings(editorOrCommand) {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
 				if (changed
-				 || (getConfigurationValue(configuration, "Team Server", "Replication", false) != (useTeamServerCheck != false))
-				 || (setConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
-				 || (setConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
+				 || ((getConfigurationValue(configuration, "Team Server", "Replication", false) != false) != useTeamServerCheck)
+				 || (getConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
+				 || (getConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
 					changed := true
 
-					setConfigurationValue(configuration, "Team Server", "Replication", serverUpdateEdit)
-					setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : false)
-					setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : false)
 					setConfigurationValue(configuration, "Team Server", "Synchronization", false)
 
 					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
 					setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
-
-					writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 				}
+
+				setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck ? serverUpdateEdit : false)
+				setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : "")
+				setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : "")
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
 				if changed {
 					title := translate("Information")
@@ -3932,6 +3949,16 @@ cancelSettings() {
 
 chooseDatabaseLocation() {
 	editSettings("DatabaseLocation")
+}
+
+rebuildDatabase() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Team Server")
+	MsgBox 262436, %title%, % translate("Do you really want to rebuild the local database?")
+	OnMessage(0x44, "")
+
+	IfMsgBox Yes
+		editSettings("Rebuild")
 }
 
 validateServerToken() {

@@ -1156,7 +1156,12 @@ hideSplashTheme() {
 showProgress(options) {
 	local x, y, w, h, color
 
+	static popupPosition := false
+
 	if !vProgressIsOpen {
+		if !popupPosition
+			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+												 , "General", "Popup Position", "Bottom")
 		if options.HasKey("X")
 			x := options.X
 		else
@@ -1165,7 +1170,7 @@ showProgress(options) {
 		if options.HasKey("Y")
 			y := options.Y
 		else
-			y := A_ScreenHeight - 150
+			y := ((popupPosition = "Bottom") ? A_ScreenHeight - 150 : 150)
 
 		if options.HasKey("Width")
 			w := (options.Width - 20)
@@ -1238,9 +1243,19 @@ getAllThemes(configuration := false) {
 }
 
 showMessage(message, title := false, icon := "__Undefined__", duration := 1000
-		  , x := "Center", y := "Bottom", width := 400, height := 100) {
+		  , x := "Center", y := "__Undefined__", width := 400, height := 100) {
 	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 	local innerWidth := width - 16
+
+	static popupPosition := false
+
+	if (y = kUndefined) {
+		if !popupPosition
+			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+																   , "General", "Popup Position", "Bottom")
+
+		y := popupPosition
+	}
 
 	if (icon = kUndefined)
 		icon := "Information.png"

@@ -279,6 +279,8 @@ class RaceCenter extends ConfigurationItem {
 	iSessionIdentifier := false
 	iSessionName := false
 
+	iSynchronize := true
+
 	iSessionLoaded := false
 	iSessionFinished := false
 
@@ -742,6 +744,12 @@ class RaceCenter extends ConfigurationItem {
 	SelectedSession[asIdentifier := false] {
 		Get {
 			return (asIdentifier ? this.iSessionIdentifier : this.iSessionName)
+		}
+	}
+
+	Synchronize[] {
+		Get {
+			return this.iSynchronize
 		}
 	}
 
@@ -1239,7 +1247,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
-		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu
 
 		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
@@ -1902,6 +1910,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iSelectedChartType := false
 		}
 
+		this.updateSessionMenu()
 		this.updateStrategyMenu()
 		this.updatePitstopMenu()
 
@@ -2042,6 +2051,19 @@ class RaceCenter extends ConfigurationItem {
 		finally {
 			Gui ListView, %currentListView%
 		}
+	}
+
+	updateSessionMenu() {
+		local window := this.Window
+		local synchronize
+
+		Gui %window%:Default
+
+		synchronize := (this.Synchronize ? "(x) Synchronize" : "      Synchronize")
+
+		GuiControl, , sessionMenuDropDown, % "|" . values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+
+		GuiControl Choose, sessionMenuDropDown, 1
 	}
 
 	updateStrategyMenu() {
@@ -3335,11 +3357,15 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You are not connected to an active session.")
 					OnMessage(0x44, "")
 				}
-			case 6:
+			case 6: ; Synchronize
+				this.iSynchronize := !this.Synchronize
+
+				this.updateState()
+			case 8:
 				this.manageTeam()
-			case 8: ; Load Session...
+			case 10: ; Load Session...
 				this.loadSession()
-			case 9: ; Save Session
+			case 11: ; Save Session
 				if this.HasData {
 					if this.SessionActive
 						this.saveSession()
@@ -3358,7 +3384,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 10: ; Save Session Copy...
+			case 12: ; Save Session Copy...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -3368,11 +3394,11 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 12: ; Update Statistics
+			case 14: ; Update Statistics
 				this.updateStatistics()
-			case 14: ; Race Summary
+			case 16: ; Race Summary
 				this.showRaceSummary()
-			case 15: ; Driver Statistics
+			case 17: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 	}
@@ -5783,7 +5809,7 @@ class RaceCenter extends ConfigurationItem {
 
 		static hadLastLap := false
 
-		if this.SessionActive {
+		if (this.SessionActive && this.Synchronize) {
 			session := this.SelectedSession[true]
 			window := this.Window
 

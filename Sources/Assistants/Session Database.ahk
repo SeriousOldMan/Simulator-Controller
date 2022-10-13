@@ -3774,8 +3774,8 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Activate")
-		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vuseTeamServerCheck gupdateSettingsState, % translate("Synchronize Telemetry Data")
+		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Synchronization")
+		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vuseTeamServerCheck gupdateSettingsState, % translate("Telemetry Data")
 
 		GuiControl, , useTeamServerCheck, %useTeamServerCheck%
 

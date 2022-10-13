@@ -26,6 +26,7 @@ global yellowFlagsDropDown
 global blueFlagsDropDown
 global sessionInformationDropDown
 global deltaInformationDropDown
+global deltaInformationMethodDropDown
 global tacticalAdvicesDropDown
 global pitWindowDropDown
 
@@ -131,13 +132,14 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos every")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose3 vdeltaInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps"))
+		Gui %window%:Add, DropDownList, x%x5% yp w70 AltSubmit Choose1 vdeltaInformationMethodDropDown HWNDwidget30 Hidden, % values2String("|", translate("Static"), translate("Dynamic"), translate("Both"))
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Tactical Advices")
 		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vtacticalAdvicesDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
 
 		Gui %window%:Font, Norm, Arial
 
-		loop 29
+		loop 30
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()
@@ -165,7 +167,10 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
 			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)
 
-			simulatorConfiguration["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DeltaInformation", default)
+			simulatorConfiguration["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements"
+																			  , simulator . ".DeltaInformation", default)
+			simulatorConfiguration["DeltaInformationMethod"] := getConfigurationValue(configuration, "Race Spotter Announcements"
+																					, simulator . ".DeltaInformationMethod", "Both")
 
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -232,6 +237,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			else
 				GuiControl Choose, deltaInformationDropDown, % (configuration["DeltaInformation"] + 2)
 
+			GuiControl Choose, deltaInformationMethodDropDown, % inList(["Static", "Dynamic", "Both"], configuration["DeltaInformationMethod"])
+
 			GuiControl Choose, tacticalAdvicesDropDown, % (configuration["TacticalAdvices"] + 1)
 			GuiControl Choose, pitWindowDropDown, % (configuration["PitWindow"] + 1)
 		}
@@ -254,6 +261,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControlGet blueFlagsDropDown
 			GuiControlGet sessionInformationDropDown
 			GuiControlGet deltaInformationDropDown
+			GuiControlGet deltaInformationMethodDropDown
 			GuiControlGet tacticalAdvicesDropDown
 			GuiControlGet pitWindowDropDown
 
@@ -275,6 +283,8 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				configuration["DeltaInformation"] := "S"
 			else
 				configuration["DeltaInformation"] := (deltaInformationDropDown - 2)
+
+			configuration["DeltaInformationMethod"] := ["Static", "Dynamic", "Both"][deltaInformationMethodDropDown]
 
 			configuration["TacticalAdvices"] := (tacticalAdvicesDropDown - 1)
 			configuration["PitWindow"] := (pitWindowDropDown - 1)

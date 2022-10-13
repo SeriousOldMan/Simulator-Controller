@@ -28,6 +28,10 @@
 
 global kDebugPositions := 4
 
+global kDeltaMethodStatic := 1
+global kDeltaMethodDynamic := 2
+global kDeltaMethodBoth := 3
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -1224,7 +1228,7 @@ class RaceSpotter extends RaceAssistant {
 							   , car[11], (carLaps - car[12]), car[13], car[14])
 					if (A_Index != driver)
 						if this.PositionInfos.HasKey(cInfo.Nr)
-							this.PositionInfos[cInfo.Nr].reset(sector, true)
+							this.PositionInfos[cInfo.Nr].reset(sector, true, true)
 			}
 		}
 	}
@@ -1743,7 +1747,7 @@ class RaceSpotter extends RaceAssistant {
 		return false
 	}
 
-	deltaInformation(lastLap, sector, positions, regular) {
+	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
 		local spoken := false
 		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed
@@ -1812,7 +1816,7 @@ class RaceSpotter extends RaceAssistant {
 					spoken := true
 				}
 			}
-			else if (standingsAhead  && standingsAhead.hasGap(sector)) {
+			else if (standingsAhead && standingsAhead.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
 				delta := Abs(standingsAhead.Delta[false, true, 1])
 				deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
@@ -1883,7 +1887,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if (standingsBehind && standingsBehind.hasGap(sector)) {
+			if (standingsBehind && standingsBehind.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
 				delta := Abs(standingsBehind.Delta[false, true, 1])
 				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
@@ -1951,7 +1955,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.endTalk()
 		}
 
-		if (!spoken && regular) {
+		if (!spoken && regular && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth))) {
 			if (regular = "S")
 				Random rnd, 1, 7
 			else
@@ -1990,7 +1994,8 @@ class RaceSpotter extends RaceAssistant {
 							this.iLastDeltaInformationLap := lastLap
 
 						hadInfo := this.deltaInformation(lastLap, sector, positions
-													   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap))
+													   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
+													   , this.Announcements["DeltaInformationMethod"])
 
 						if hadInfo {
 							Random rnd, 1, 10
@@ -2336,7 +2341,11 @@ class RaceSpotter extends RaceAssistant {
 		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
 		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 
-		announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DeltaInformation", default)
+		announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements"
+																 , simulatorName . ".DeltaInformation", default)
+		announcements["DeltaInformationMethod"] := inList(["Static", "Dynamic", "Both"]
+														, getConfigurationValue(configuration, "Race Spotter Announcements"
+																			  , simulatorName . ".DeltaInformationMethod", "Both"))
 
 		this.updateConfigurationValues({Announcements: announcements})
 	}

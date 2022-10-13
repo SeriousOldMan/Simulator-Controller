@@ -1019,6 +1019,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	restoreSessionState(settingsFile, stateFile) {
+		local knowledgeBase := this.KnowledgeBase
 		local sessionState, sessionSettings
 
 		if stateFile {
@@ -1026,8 +1027,10 @@ class RaceAssistant extends ConfigurationItem {
 
 			deleteFile(stateFile)
 
-			this.KnowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
+			knowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
 
+			this.updateSessionValues({SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
+									, SessionLaps: knowledgeBase.getValue("Session.Laps")})
 			this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
 		}
 
@@ -1137,7 +1140,7 @@ class RaceAssistant extends ConfigurationItem {
 		if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
 			this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 
-		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . lapNumber . ".Time.End"))
+		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Time.End"))
 
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 

@@ -28,6 +28,10 @@
 
 global kDebugPositions := 4
 
+global kDeltaMethodStatic := 1
+global kDeltaMethodDynamic := 2
+global kDeltaMethodBoth := 3
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -1224,7 +1228,7 @@ class RaceSpotter extends RaceAssistant {
 							   , car[11], (carLaps - car[12]), car[13], car[14])
 					if (A_Index != driver)
 						if this.PositionInfos.HasKey(cInfo.Nr)
-							this.PositionInfos[cInfo.Nr].reset(sector, true)
+							this.PositionInfos[cInfo.Nr].reset(sector, true, true)
 			}
 		}
 	}
@@ -1345,6 +1349,53 @@ class RaceSpotter extends RaceAssistant {
 			return false
 	}
 
+	reviewHalfTime(lastLap, sector, positions) {
+		local knowledgeBase, remainingSessionLaps, remainingStintLaps, remainingSessionTime
+		local remainingStintTime, remainingFuelLaps, enoughFuel, speaker
+
+		if (this.Session == kSessionRace) {
+			speaker := this.getSpeaker(true)
+
+			knowledgeBase := this.KnowledgeBase
+			remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
+			remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
+			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
+			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
+													, laps: remainingSessionLaps
+													, position: Round(positions["Position"])})
+
+				remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+
+				if (remainingStintTime < remainingSessionTime) {
+					speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
+
+					enoughFuel := (remainingStintLaps < remainingFuelLaps)
+				}
+				else {
+					speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
+														  , laps: Ceil(remainingSessionLaps)})
+
+					enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+				}
+
+				speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
+								  , {laps: Floor(remainingFuelLaps)})
+			}
+			finally {
+				speaker.endTalk()
+			}
+
+			return true
+		}
+		else
+			return false
+	}
+
 	announceFinalLaps(lastLap, sector, positions) {
 		local speaker := this.getSpeaker(true)
 		local position := positions["Position"]
@@ -1378,26 +1429,35 @@ class RaceSpotter extends RaceAssistant {
 		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
 		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
-		local remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 		local standingsAhead := false
 		local standingsBehind := false
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
-		local situation, remainingFuelLaps, sessionDuration, lapTime, enoughFuel
-		local sessionEnding, minute, lastTemperature, stintLaps
+		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
 		local minute, rnd, phrase
 
-		if ((lastLap == 2) && (this.Session == kSessionRace)) {
-			situation := "StartSummary"
+		if (this.Session == kSessionRace)
+			if (lastLap == 2) {
+				situation := "StartSummary"
 
-			if !this.SessionInfos.HasKey(situation) {
-				this.SessionInfos[situation] := true
+				if !this.SessionInfos.HasKey(situation) {
+					this.SessionInfos[situation] := true
 
-				if this.reviewRaceStart(lastLap, sector, positions)
-					return true
+					if this.reviewRaceStart(lastLap, sector, positions)
+						return true
+				}
 			}
-		}
+			else if (remainingSessionLaps > 5) {
+				situation := "HalfTime"
+
+				if (!this.SessionInfos.HasKey(situation) && (Abs((this.SessionDuration / 2) - this.OverallTime) < 120000)) {
+					this.SessionInfos[situation] := true
+
+					if this.reviewHalfTime(lastLap, sector, positions)
+						return true
+				}
+			}
 
 		if this.hasEnoughData(false) {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
@@ -1476,46 +1536,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if (this.Session = kSessionRace) {
-				if (this.OverAllTime > (this.SessionDuration / 2)) {
-					situation := "HalfTime"
-
-					if !this.SessionInfos.HasKey(situation) {
-						this.SessionInfos[situation] := true
-
-						if (remainingSessionLaps > 5) {
-							speaker.beginTalk()
-
-							try {
-								speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
-																	, laps: remainingSessionLaps
-																	, position: Round(positions["Position"])})
-
-								remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
-
-								if (remainingStintTime < remainingSessionTime) {
-									speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
-
-									enoughFuel := (remainingStintLaps < remainingFuelLaps)
-								}
-								else {
-									speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
-																		  , laps: Ceil(remainingSessionLaps)})
-
-									enoughFuel := (remainingSessionLaps < remainingFuelLaps)
-								}
-
-								speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
-												  , {laps: Floor(remainingFuelLaps)})
-							}
-							finally {
-								speaker.endTalk()
-							}
-						}
-					}
-				}
-			}
-			else {
+			if (this.Session != kSessionRace) {
 				sessionEnding := false
 
 				if ((remainingSessionTime < 5) && !this.SessionInfos.HasKey("5MinAlert")) {
@@ -1743,7 +1764,7 @@ class RaceSpotter extends RaceAssistant {
 		return false
 	}
 
-	deltaInformation(lastLap, sector, positions, regular) {
+	deltaInformation(lastLap, sector, positions, regular, method) {
 		local knowledgeBase := this.KnowledgeBase
 		local spoken := false
 		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed
@@ -1812,7 +1833,7 @@ class RaceSpotter extends RaceAssistant {
 					spoken := true
 				}
 			}
-			else if (standingsAhead  && standingsAhead.hasGap(sector)) {
+			else if (standingsAhead && standingsAhead.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
 				delta := Abs(standingsAhead.Delta[false, true, 1])
 				deltaDifference := Abs(standingsAhead.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsAhead.LapTimeDifference)
@@ -1883,7 +1904,7 @@ class RaceSpotter extends RaceAssistant {
 				}
 			}
 
-			if (standingsBehind && standingsBehind.hasGap(sector)) {
+			if (standingsBehind && standingsBehind.hasGap(sector) && (method >= kDeltaMethodDynamic)) {
 				delta := Abs(standingsBehind.Delta[false, true, 1])
 				deltaDifference := Abs(standingsBehind.DeltaDifference[sector])
 				lapTimeDifference := Abs(standingsBehind.LapTimeDifference)
@@ -1951,7 +1972,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.endTalk()
 		}
 
-		if (!spoken && regular) {
+		if (!spoken && regular && ((method = kDeltaMethodStatic) || (method = kDeltaMethodBoth))) {
 			if (regular = "S")
 				Random rnd, 1, 7
 			else
@@ -1990,7 +2011,8 @@ class RaceSpotter extends RaceAssistant {
 							this.iLastDeltaInformationLap := lastLap
 
 						hadInfo := this.deltaInformation(lastLap, sector, positions
-													   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap))
+													   , (deltaInformation = "S") || (lastLap = this.iLastDeltaInformationLap)
+													   , this.Announcements["DeltaInformationMethod"])
 
 						if hadInfo {
 							Random rnd, 1, 10
@@ -2071,9 +2093,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	superfluousAlert(alert) {
-		if this.pendingAlert(alert)
-			return true
-		else if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
+		if (InStr(alert, "Behind") && this.pendingAlerts(["Behind", "Left", "Right", "Three", "Clear"], true))
 			return true
 
 		return false
@@ -2338,7 +2358,11 @@ class RaceSpotter extends RaceAssistant {
 		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
 		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 
-		announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DeltaInformation", default)
+		announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements"
+																 , simulatorName . ".DeltaInformation", default)
+		announcements["DeltaInformationMethod"] := inList(["Static", "Dynamic", "Both"]
+														, getConfigurationValue(configuration, "Race Spotter Announcements"
+																			  , simulatorName . ".DeltaInformationMethod", "Both"))
 
 		this.updateConfigurationValues({Announcements: announcements})
 	}
@@ -2536,11 +2560,14 @@ class RaceSpotter extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 
 			this.finishSession()
-		}
-		else
-			Task.startTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
 
-		return false
+			return false
+		}
+		else {
+			Task.CurrentTask.Sleep := 5000
+
+			return Task.CurrentTask
+		}
 	}
 
 	prepareData(lapNumber, data) {

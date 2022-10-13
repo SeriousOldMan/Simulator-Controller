@@ -16,7 +16,7 @@ Before starting up, *Simulator Startup* checks the configuration information. If
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.JPG)
 
-With this editor, which can also be opened by clicking on the small button with the gear icon in th upper right corner of the window of *Simulator Startup*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
+With this editor, which can also be opened by clicking on the small button with the gear icon in the upper right corner of the window of *Simulator Startup*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
 
 Beside maintaining this startup settings, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
 

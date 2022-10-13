@@ -71,6 +71,16 @@ The Spotter will give you critical and in most cases real time information about
 8. Delta Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
+   
+   There are two methods available for this information:
+   
+   - Static
+   
+     This calculation method is quite simple and uses only the direct delta information provided by the simulation. It will simply you provide you with the current gap to your opponent in front and the one behind. This method is precise but you must calculate on your own whether you have catched up or lost upon your opponent.
+
+   - Dynamic
+   
+     This method uses a complex traffic model and keeps track off all cars regarding their current position and specific deltas to your car. You will get much more information, for example, how much time you have lost on the car ahead during the last laps. But this model will fail in turbulent traffic situations especially in the beginning of the race or in sprint races with lots of fights and overtakes and you might get wrong deltas in those situations.
 
 9. Tactical Advices
 

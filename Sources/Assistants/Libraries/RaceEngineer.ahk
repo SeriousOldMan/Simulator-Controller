@@ -1095,7 +1095,6 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveSettings: saveSettings
 									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 
-
 		knowledgeBase := this.createKnowledgeBase(facts)
 
 		this.updateDynamicValues({KnowledgeBase: knowledgeBase, HasPressureData: false
@@ -1176,11 +1175,14 @@ class RaceEngineer extends RaceAssistant {
 			this.updateDynamicValues({KnowledgeBase: false})
 
 			this.finishSession()
-		}
-		else
-			Task.startTask(ObjBindMethod(this, "forceFinishSession"), 5000, kLowPriority)
 
-		return false
+			return false
+		}
+		else {
+			Task.CurrentTask.Sleep := 5000
+
+			return Task.CurrentTask
+		}
 	}
 
 	shutdownSession(phase) {

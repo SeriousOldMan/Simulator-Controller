@@ -1095,7 +1095,6 @@ class RaceEngineer extends RaceAssistant {
 									  , SaveSettings: saveSettings
 									  , SaveTyrePressures: getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveTyrePressures", kAsk)})
 
-
 		knowledgeBase := this.createKnowledgeBase(facts)
 
 		this.updateDynamicValues({KnowledgeBase: knowledgeBase, HasPressureData: false

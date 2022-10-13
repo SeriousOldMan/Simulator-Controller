@@ -6,7 +6,7 @@
   4. You can now choose between different methods for delta calculations for the Virtual Race Spotter. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
   
 
-## 4.3.4.0-release 09/30/22 (planned)
+## 4.3.4.0-release 09/30/22
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always

@@ -853,7 +853,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
-			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant && assistant.RaceAssistantActive)
+			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant)
 				assistant.finishSession(shutdownAssistant)
 
 		if (shutdownTeamSession && RaceAssistantPlugin.TeamSessionActive) {
@@ -1025,7 +1025,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
-				else if (this.RaceAssistant != false) {
+				else if this.RaceAssistantActive {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}

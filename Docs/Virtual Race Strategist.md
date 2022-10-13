@@ -435,7 +435,7 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 ### Drivers
 
-Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation tries to use driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so, if such data is available. If not, the grand average of all available data is used instead.
+Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation will use the driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so on. If no such data is available, the simulation ight fail to create a valid strategy. In that case, use for the corresponding stint.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%205.JPG)
 

@@ -93,7 +93,7 @@ cleanupTyrePressures() {
 	dryCorrection := ""
 	prompt := "Please input the adjustment factor for cold DRY pressures in PSI (use ""."" as decimal point).`n`nExample: -0.1 will adjust 25.6 to 25.5."
 	
-	Loop {
+	loop {
 		InputBox dryCorrection, Cold Pressure Correction, %prompt%, , 350, 200, , , , , %dryCorrection%
 	
 		if ErrorLevel {
@@ -108,7 +108,7 @@ cleanupTyrePressures() {
 	wetCorrection := ""
 	prompt := "Please input the adjustment factor for cold WET pressures in PSI (use ""."" as decimal point).`n`nExample: -0.1 will adjust 25.6 to 25.5."
 	
-	Loop {
+	loop {
 		InputBox wetCorrection, Cold Pressure Adjustment, %prompt%, , 350, 200, , , , , %wetCorrection%
 	
 		if ErrorLevel {
@@ -150,7 +150,7 @@ cleanupTelemetryData() {
 	laptimeCorrection := ""
 	prompt := "Please input the adjustment factor for laptimes in DRY conditions (use ""."" as decimal point).`n`nExample: 0.5 will increase all lap times in telemetry data by half a second."
 	
-	Loop {
+	loop {
 		InputBox laptimeCorrection, Laptime Correction, %prompt%, , 350, 200, , , , , %laptimeCorrection%
 	
 		if ErrorLevel {
@@ -203,10 +203,7 @@ cleanupACCDatabase() {
 		Menu Tray, Icon, %icon%, , 1
 		Menu Tray, Tip, ACC Database Adjustment
 
-		Menu Tray, NoStandard
-		Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
+		installTrayMenu()
 		
 		cleanupTyrePressures()
 		cleanupTelemetryData()
@@ -216,9 +213,6 @@ cleanupACCDatabase() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

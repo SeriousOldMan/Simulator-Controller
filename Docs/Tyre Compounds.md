@@ -46,13 +46,15 @@ Once a set of tyre compound mappings has been defined, these can be used to desc
 
 A word about the tyre compound identifiers used by the different simulators:
 
-Normally, you can use exactly the name, which is visible in the user interface of the given simulator. If a tyre compound is named "Hypercar Road (HR)" in *Assetto Corsa*, for example, you must use this as internal identifier as well. If this doesn't work as expected, you can take a look in the *.data files you find in the *Simulator Controller\Temp\[Simulator]* folder in your user *Documents* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. Search for "TyreCompoundRaw". This field will contain the internal tyre compound identifier used by the given simulator.
+Normally, you can use exactly the name, which is visible in the user interface of the given simulator. If a tyre compound is named "Hypercar Road (HR)" in *Assetto Corsa*, for example, you must use this as internal identifier as well. If this doesn't work as expected, you can take a look in the *.data files you find in the *Simulator Controller\Temp\\[Simulator] Data* folder in your user *Documents* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. Search for "TyreCompoundRaw". This field will contain the internal tyre compound identifier used by the given simulator.
 
-A special case is *Automobilista 2* and also *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
+When creating the tyre compound rule as in the examples above, it is **important** that you use the same order as the *internal* identifiiers appear in the Pitstop dialog. Otherwise you will end up with wrong tyres after a pitstop. A notable exception here is *rFactor 2*, which supports any order, since the API supports tyre compound selection by name. And of course *Assetto Corsa Competizione*, where the two available tyre categories (Dry and Wet) are hardcoded.
+
+A very special case is *Automobilista 2* and also *Project CARS 2*. The underlying simulation engine does not provide any tyre compound information at all. You may use any identifier here, even the placeholder "*". The system will work with relative offsets to compensate for this deficit.
 
 ### *Tyre Data* files
 
-A special meta data file can be created for each simulator, which contains the tyre compound mappings for a set of cars. Files are provided with the Simulator Controller distribution. These files, which are named "Tyre Data.ini", reside in the *Resources\Simulator Data\[Simulator]* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. They contain a growing list of car and compound definitions, but they will never be complete, since the list of available cars is simply to large. Here is an example of such a file (in this case for *Assetto Corsa*):
+A special meta data file can be created for each simulator, which contains the tyre compound mappings for a set of cars. Files are provided with the Simulator Controller distribution. These files, which are named "Tyre Data.ini", reside in the *Resources\Simulator Data\\[Simulator]* folder, with *[Simulator]* substitued by the short code of a given simulator, for example *AMS2*. They contain a growing list of car and compound definitions, but they will never be complete, since the list of available cars is simply to large. Here is an example of such a file (in this case for *Assetto Corsa*):
 
 	[Compounds]
 	Compounds.1=SemiSlicks (SM)->Dry (M);Street (ST)->Dry (H)
@@ -94,7 +96,7 @@ In the most likely case, that your preffered cars are not available in the prede
 
 #### *Tyre Data* files
 
-You can create your own "Tyre Data.ini" files. Use the above examples as a guide line to create your own mappings and store them as "Tyre Data.ini" file in the special *Simulator Controller\Simulator Data\[Simulator]* folder which resides in your user *Documents* folder, with *[Simulator]* substitued by the short code of the given simulator. When the subfolder for the given simulator does not exist, simply create it. Use the short codes "AMS2", "RF2", "R3E", "IRC", "AC", "PCARS" and so on.
+You can create your own "Tyre Data.ini" files. Use the above examples as a guide line to create your own mappings and store them as "Tyre Data.ini" file in the special *Simulator Controller\Simulator Data\\[Simulator]* folder which resides in your user *Documents* folder, with *[Simulator]* substitued by the short code of the given simulator. When the subfolder for the given simulator does not exist, simply create it. Use the short codes "AMS2", "RF2", "R3E", "IRC", "AC", "PCARS" and so on.
 
 Please make sure, that you use unique identifiers in the "[Compounds]" section, otherwise you will *overwrite* predefined compounds from the standard files. By the way, this is a possibility to substitute definitions from *standard*, but this is a different story.
 
@@ -114,9 +116,30 @@ You may have already wondered what all the nonsense is about. There are differen
 
 1. When changing the tyre compound for the next pitstop using one of the controller actions described in [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes), the tyre compound mapping is useed to derive the number of diffent compounds and the correct tyre compound identifier to send to the current simulator, when you choose the next compound.
 2. When the pitstop settings are derived by the Virtual Race Engineer, the same applies.
-3. All applications, which let you choose a tyre compound, will also use the available tyre compounds for the currently chosen car. This is especially true for "Strategy Workbench", where the compounds are used in the strategy simulation as well. The "Race Center" also uses the available tyre compounds when preparing a pitstop.
+3. All applications, which let you choose a tyre compound, will also use the available tyre compounds for the currently chosen car. This is especially true for "Strategy Workbench", where the compounds are used in the strategy simulation as well. The "Race Center" also uses the available tyre compounds when preparing a pitstop or to store the driver specific car setups.
 
-### Default behaviour
+As you have seen above, a tyre compound consists of a tyre category (Dry, Intermediate and Wet) and a suffix, which specifies the mixture or hardness of the compound. As you might expect, the tyre category is most important for the behaviour of the tyre in varying conditions, whereas the mixture determine properties like tyre life time.
+
+### Weather and Tyre Compounds
+
+When a tyre compound will be selected for a given weather condition, the following rules apply:
+
+| Weather      | Suitable Category | Optimal Category |
+| ------------ | ----------------- | ---------------- |
+| Dry          | Dry               | Dry              |
+| Drizzle      | Dry, Intermediate | Intermediate (1) |
+| Light Rain   | Intermediate, Wet | Intermediate (1) |
+| Medium Rain  | Wet               | Wet              |
+| Heavy Rain   | Wet               | Wet              |
+| Thunderstorm | Wet               | Wet              |
+
+(1) If no Intermediates are available, Dry Tyres will be used in Drizzle conditions and Wet Tyres in Light Rain conditions.
+
+When different mixtures are available for a given tyre type, only the first one will be used in most cases, where the tyre compound is chosen automatically, for example by the Race Engineer. Therefore it is wise, to configure the most suitable mixture in the first place. The same is true for the "Strategy Workbench", unless you limit the number of available tyre sets per mixture and use *Tyre Compound Variation* during the strategy simulation. A notable exception is the pitstop management in "Race Center", where you can manually select the desired tyre compound for the next pitstop.
+
+Looking at the above table, you can understand when and why a tyre change will be recommended by the Race Engineer or when you recalculate the currently active strategy either in the "Race Center" or by instructing the Race Strategist. As long as the currently mounted tyre has a suitable category, no unplanned pitstop will be requested. If you come in for a regular pitstop, the tyre compound with the optimal category will always be chosen, as long as it is available (see note (1)). But in the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, an urgent pitstop will be requested and the optimal tyre compound will be chosen, if available.
+
+### Default Tyre Compound
 
 The default tyre compouund is "Dry", when no dedicated information is available for a given car. This was the behaviour before the introduction of the tyre compound model. So everything should work as before, when you do nothing, but you may not be able to change the compound for a pitstop.
 

@@ -9,6 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\CLR.ahk
 #Include ..\Libraries\GDIP.ahk
 
@@ -17,10 +19,10 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kIcon = "Icon"
-global kLabel = "Label"
-global kIconAndLabel = "IconAndLabel"
-global kIconOrLabel = "IconOrLabel"
+global kIcon := "Icon"
+global kLabel := "Label"
+global kIconAndLabel := "IconAndLabel"
+global kIconOrLabel := "IconOrLabel"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -133,6 +135,8 @@ class StreamDeck extends FunctionController {
 
 	Mode[function := false, icon := false] {
 		Get {
+			local key
+
 			if (function != false) {
 				if isInstance(function, ControllerFunction)
 					function := function.Descriptor
@@ -170,6 +174,8 @@ class StreamDeck extends FunctionController {
 	}
 
 	__New(name, layout, controller, configuration) {
+		local dllName, dllFile
+
 		this.iName := name
 		this.iLayout := layout
 
@@ -182,20 +188,19 @@ class StreamDeck extends FunctionController {
 	}
 
 	loadFromConfiguration(configuration) {
-		local function
-
-		numButtons := 0
-		numDials := 0
-		num1WayToggles := 0
-		num2WayToggles := 0
+		local numButtons := 0
+		local numDials := 0
+		local num1WayToggles := 0
+		local num2WayToggles := 0
+		local function, special, rows, row, ignore, label, icon, mode, isRunning, layout
 
 		base.loadFromConfiguration(configuration)
 
 		if !this.sModes {
 			StreamDeck.sModes := {}
 
-			Loop {
-				special := mode := getConfigurationValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
+			loop {
+				special := getConfigurationValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
 
 				if (special == kUndefined)
 					break
@@ -212,8 +217,8 @@ class StreamDeck extends FunctionController {
 		this.iRows := layout[1]
 		this.iColumns := layout[2]
 
-		Loop {
-			special := mode := getConfigurationValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
+		loop {
+			special := getConfigurationValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
 
 			if (special == kUndefined)
 				break
@@ -226,7 +231,7 @@ class StreamDeck extends FunctionController {
 
 		rows := []
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
 
@@ -263,8 +268,8 @@ class StreamDeck extends FunctionController {
 							this.setControlLabel(function, label)
 					}
 
-					Loop {
-						special := mode := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
+					loop {
+						special := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
 
 						if (special == kUndefined)
 							break
@@ -285,7 +290,7 @@ class StreamDeck extends FunctionController {
 						case kDialType:
 							numDials += 1
 						default:
-							Throw "Unknown controller function type (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
+							throw "Unknown controller function type (" . ConfigurationItem.splitDescriptor(function)[1] . ") detected in StreamDeck.loadFromConfiguration..."
 					}
 				}
 
@@ -311,7 +316,7 @@ class StreamDeck extends FunctionController {
 	}
 
 	connectAction(plugin, function, action) {
-		actions := this.Actions
+		local actions := this.Actions
 
 		if actions.HasKey(function)
 			actions[function].Push(action)
@@ -323,21 +328,22 @@ class StreamDeck extends FunctionController {
 	}
 
 	disconnectAction(plugin, function, action) {
-		this.setControlLabel(function, "")
-		this.setControlIcon(function, false)
-
-		actions := this.Actions[function]
-
-		index := inList(actions, action)
+		local actions := this.Actions[function]
+		local index := inList(actions, action)
 
 		if index
 			actions.RemoveAt(index)
 
 		if (actions.Length() = 0)
 			this.Actions.Delete(function)
+
+		this.setControlLabel(function, "")
+		this.setControlIcon(function, false)
 	}
 
 	setControlLabel(function, text, color := "Black", overlay := false) {
+		local actions, icon, ignore, theAction, displayMode, labelMode
+
 		if !IsObject(function)
 			function := this.Controller.findFunction(function)
 
@@ -372,7 +378,8 @@ class StreamDeck extends FunctionController {
 	}
 
 	setControlIcon(function, icon) {
-		controller := this.Controller
+		local controller := this.Controller
+		local enabled, displayMode, iconMode, ignore, theAction
 
 		if !IsObject(function)
 			function := controller.findFunction(function)
@@ -456,7 +463,7 @@ class StreamDeck extends FunctionController {
 	}
 
 	refresh(full := false) {
-		local function
+		local function, theFunction, title, controller, image, enabled, ignore, theAction, update
 
 		if this.RefreshActive
 			return
@@ -476,14 +483,16 @@ class StreamDeck extends FunctionController {
 
 						function := controller.findFunction(theFunction)
 
-						for ignore, theAction in this.Actions[function]
-							if function.Enabled[theAction] {
-								enabled := true
+						if function {
+							for ignore, theAction in this.Actions[function]
+								if function.Enabled[theAction] {
+									enabled := true
 
-								break
+									break
+							}
+
+							this.setFunctionImage(theFunction, image, enabled, true)
 						}
-
-						this.setFunctionImage(theFunction, image, enabled, true)
 					}
 
 				this.iChangedFunctionTitles := {}
@@ -507,6 +516,8 @@ class StreamDeck extends FunctionController {
 ;;;-------------------------------------------------------------------------;;;
 
 disabledIcon(fileName) {
+	local extension, name, disabledFileName, token, bitmap, graphics, x, y, value, red, green, blue, gray
+
 	SplitPath fileName, , , extension, name
 
 	disabledFileName := (kTempDirectory . "Icons\" . name . "_Dsbld." . extension)
@@ -520,11 +531,11 @@ disabledIcon(fileName) {
 
 		graphics := Gdip_GraphicsFromImage(bitmap)
 
-		Loop % Gdip_GetImageHeight(bitmap)
+		loop % Gdip_GetImageHeight(bitmap)
 		{
 			x := A_Index - 1
 
-			Loop % Gdip_GetImageWidth(bitmap)
+			loop % Gdip_GetImageWidth(bitmap)
 			{
 				y := A_Index - 1
 
@@ -555,6 +566,8 @@ disabledIcon(fileName) {
 }
 
 refreshStreamDecks() {
+	local full, ignore, fnController
+
 	static cycle := 0
 
 	if (++cycle > 1) {
@@ -569,18 +582,13 @@ refreshStreamDecks() {
 	for ignore, fnController in SimulatorController.Instance.FunctionController
 		if isInstance(fnController, StreamDeck)
 			fnController.refresh(full)
-
-	SetTimer refreshStreamDecks, -5000
 }
 
-streamDeckEventHandler(event, data) {
-	local function
-
-	command := string2Values(A_Space, data)
-
-	function := command[1]
-
-	found := false
+handleStreamDeckMessage(category, data) {
+	local command := string2Values(A_Space, data)
+	local function := command[1]
+	local found := false
+	local ignore, fnController, descriptor
 
 	for ignore, fnController in SimulatorController.Instance.FunctionController
 		if isInstance(fnController, StreamDeck) && fnController.hasFunction(function)
@@ -599,14 +607,14 @@ streamDeckEventHandler(event, data) {
 		case kDialType:
 			rotateDial(descriptor[2], command[2])
 		default:
-			Throw "Unknown controller function type (" . descriptor[1] . ") detected in streamDeckEventHandler..."
+			throw "Unknown controller function type (" . descriptor[1] . ") detected in handleStreamDeckMessage..."
 	}
 }
 
 initializeStreamDeckPlugin() {
-	controller := SimulatorController.Instance
-
-	configuration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+	local controller := SimulatorController.Instance
+	local configuration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+	local ignore, strmDeck
 
 	for ignore, strmDeck in string2Values("|", getConfigurationValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
 		strmDeck := string2Values(":", strmDeck)
@@ -614,9 +622,9 @@ initializeStreamDeckPlugin() {
 		new StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
 	}
 
-	registerEventHandler("Stream Deck", "streamDeckEventHandler")
+	registerMessageHandler("Stream Deck", "handleStreamDeckMessage")
 
-	SetTimer refreshStreamDecks, -5000
+	new PeriodicTask("refreshStreamDecks", 5000, kLowPriority).start()
 }
 
 

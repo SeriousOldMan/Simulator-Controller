@@ -17,6 +17,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 
@@ -126,11 +128,13 @@ class VoiceManager {
 			this.iLanguage := language
 		}
 
-		startTalk() {
+		beginTalk() {
 			this.iIsTalking := true
 		}
 
-		finishTalk() {
+		endTalk() {
+			local text, focus
+
 			if this.Talking {
 				text := this.iText
 				focus := this.iFocus
@@ -150,11 +154,12 @@ class VoiceManager {
 				this.iFocus := (this.iFocus || focus)
 			}
 			else
-				raiseEvent(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
+				sendMessage(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
-			phrases := this.Phrases
+			local phrases := this.Phrases
+			local index
 
 			if phrases.HasKey(phrase) {
 				phrases := phrases[phrase]
@@ -229,11 +234,13 @@ class VoiceManager {
 			base.__New(synthesizer, speaker, language)
 		}
 
-		startTalk() {
+		beginTalk() {
 			this.iIsTalking := true
 		}
 
-		finishTalk() {
+		endTalk() {
+			local text, focus
+
 			if this.Talking {
 				text := this.iText
 				focus := this.iFocus
@@ -248,6 +255,8 @@ class VoiceManager {
 		}
 
 		speak(text, focus := false, cache := false) {
+			local stopped
+
 			if this.Talking {
 				this.iText .= (A_Space . text)
 				this.iFocus := (this.iFocus || focus)
@@ -273,7 +282,8 @@ class VoiceManager {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
-			phrases := this.Phrases
+			local phrases := this.Phrases
+			local index
 
 			if phrases.HasKey(phrase) {
 				phrases := phrases[phrase]
@@ -313,35 +323,53 @@ class VoiceManager {
 		}
 
 		continue() {
-			continuation := this.Continuation
+			local continuation := this.Continuation
 
 			if isInstance(continuation, VoiceManager.VoiceContinuation)
 				continuation.continue()
 			else if continuation
 				%continuation%()
 		}
+
+		cancel() {
+		}
 	}
 
 	class ReplyContinuation extends VoiceManager.VoiceContinuation {
-		iReply := false
+		iAccept := false
+		iReject := false
 
-		Reply[] {
+		Accept[] {
 			Get {
-				return this.iReply
+				return this.iAccept
 			}
 		}
 
-		__New(manager, continuation := false, reply := false) {
-			this.iReply := reply
+		Reject[] {
+			Get {
+				return this.iReject
+			}
+		}
+
+		__New(manager, continuation := false, accept := false, reject := false) {
+			this.iAccept := accept
+			this.iReject := reject
 
 			base.__New(manager, continuation)
 		}
 
 		continue() {
-			if (this.Manager.Speaker && this.Reply)
-				this.Manager.getSpeaker().speakPhrase(this.Reply)
+			if (this.Manager.Speaker && this.Accept)
+				this.Manager.getSpeaker().speakPhrase(this.Accept)
 
 			base.continue()
+		}
+
+		cancel() {
+			if (this.Manager.Speaker && this.Reject)
+				this.Manager.getSpeaker().speakPhrase(this.Reject)
+
+			base.cancel()
 		}
 	}
 
@@ -451,7 +479,7 @@ class VoiceManager {
 
 	User[] {
 		Get {
-			Throw "Virtual property VoiceManager.User must be implemented in a subclass..."
+			throw "Virtual property VoiceManager.User must be implemented in a subclass..."
 		}
 	}
 
@@ -471,13 +499,10 @@ class VoiceManager {
 		if !this.Speaker
 			this.iListener := false
 
-		registerEventHandler("Voice", ObjBindMethod(this, "handleVoiceCalls"))
+		registerMessageHandler("Voice", "methodMessageHandler", this)
 
-		if (!this.VoiceServer && this.PushToTalk) {
-			listen := ObjBindMethod(this, "listen")
-
-			SetTimer %listen%, 100
-		}
+		if (!this.VoiceServer && this.PushToTalk)
+			new PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority).start()
 
 		if this.VoiceServer
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
@@ -487,15 +512,15 @@ class VoiceManager {
 		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			Process Exist
 
-			processID := ErrorLevel
-
-			raiseEvent(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, processID), this.VoiceServer)
+			sendMessage(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ErrorLevel), this.VoiceServer)
 		}
 
 		return false
 	}
 
 	initialize(options) {
+		local vocalics
+
 		if options.HasKey("Vocalics") {
 			vocalics := options["Vocalics"]
 
@@ -541,11 +566,11 @@ class VoiceManager {
 	}
 
 	listen() {
-		theHotkey := this.PushToTalk
+		local theHotkey := this.PushToTalk
 
-		if !this.Speaking && GetKeyState(theHotKey, "P")
+		if !this.Speaking && GetKeyState(theHotkey, "P")
 			this.startListening()
-		else if !GetKeyState(theHotKey, "P")
+		else if !GetKeyState(theHotkey, "P")
 			this.stopListening()
 	}
 
@@ -570,28 +595,34 @@ class VoiceManager {
 	}
 
 	getSpeaker() {
+		local pid, activationCommand
+
 		if (this.Speaker && !this.iSpeechSynthesizer) {
 			if this.VoiceServer {
 				Process Exist
 
-				processID := ErrorLevel
+				pid := ErrorLevel
 
 				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
-				raiseEvent(kFileMessage, "Voice"
-						 , "registerVoiceClient:" . values2String(";", this.Name, processID
-																, activationCommand, "remoteActivationRecognized", "remoteDeactivationRecognized"
-																, this.Language, this.Synthesizer, this.Speaker
-																, this.Recognizer, this.Listener
-																, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed), this.VoiceServer)
+				sendMessage(kFileMessage, "Voice"
+						  , "registerVoiceClient:" . values2String(";", this.Name, pid
+																 , activationCommand
+																 , "remoteActivationRecognized", "remoteDeactivationRecognized"
+																 , this.Language, this.Synthesizer, this.Speaker
+																 , this.Recognizer, this.Listener
+																 , this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
+						  , this.VoiceServer)
 
 				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																, this.buildFragments(this.Language), this.buildPhrases(this.Language))
+																, this.buildFragments(this.Language)
+																, this.buildPhrases(this.Language))
 			}
 			else {
 				this.iSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-															   , this.buildFragments(this.Language), this.buildPhrases(this.Language))
+															   , this.buildFragments(this.Language)
+															   , this.buildPhrases(this.Language))
 
 				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 				this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -605,6 +636,8 @@ class VoiceManager {
 	}
 
 	startListener() {
+		local recognizer
+
 		static initialized := false
 
 		if (!initialized && this.Listener && !this.iSpeechRecognizer) {
@@ -630,11 +663,8 @@ class VoiceManager {
 
 		if this.iSpeechRecognizer && !this.Listening
 			if !this.iSpeechRecognizer.startRecognizer() {
-				if retry {
-					callback := ObjBindMethod(this, "startListening", true)
-
-					SetTimer %callback%, -200
-				}
+				if retry
+					Task.startTask(ObjBindMethod(this, "startListening", true), 200)
 
 				return false
 			}
@@ -652,11 +682,8 @@ class VoiceManager {
 
 		if this.iSpeechRecognizer && this.Listening
 			if !this.iSpeechRecognizer.stopRecognizer() {
-				if retry {
-					callback := ObjBindMethod(this, "stopListening", true)
-
-					SetTimer %callback%, -200
-				}
+				if retry
+					Task.startTask(ObjBindMethod(this, "stopListening", true), 200)
 
 				return false
 			}
@@ -668,33 +695,32 @@ class VoiceManager {
 	}
 
 	mute() {
-		if this.VoiceServer
+		local voiceServer := this.VoiceServer
+
+		if voiceServer
 			try {
 				FileAppend TRUE, %kTempDirectory%Voice.mute
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 	}
 
 	unmute() {
-		if this.VoiceServer
-			try {
-				FileDelete %kTempDirectory%Voice.mute
-			}
-			catch exception {
-				; ignore
-			}
+		local voiceServer := this.VoiceServer
+
+		if voiceServer
+			deleteFile(kTempDirectory . "Voice.mute")
 	}
 
 	getGrammars(language) {
-		Throw "Virtual method VoiceManager.getGrammars must be implemented in a subclass..."
+		throw "Virtual method VoiceManager.getGrammars must be implemented in a subclass..."
 	}
 
 	buildFragments(language) {
-		fragments := {}
-
-		grammars := this.getGrammars(language)
+		local fragments := {}
+		local grammars := this.getGrammars(language)
+		local fragment, word
 
 		for fragment, word in getConfigurationSectionValues(grammars, "Fragments", {})
 			fragments[fragment] := word
@@ -703,9 +729,9 @@ class VoiceManager {
 	}
 
 	buildPhrases(language, section := "Speaker Phrases") {
-		phrases := {}
-
-		grammars := this.getGrammars(language)
+		local phrases := {}
+		local grammars := this.getGrammars(language)
+		local key, value
 
 		for key, value in getConfigurationSectionValues(grammars, section, {}) {
 			key := ConfigurationItem.splitDescriptor(key)[1]
@@ -723,15 +749,14 @@ class VoiceManager {
 	}
 
 	buildGrammars(speechRecognizer, language) {
-		local grammar
-
-		grammars := this.getGrammars(language)
+		local grammars := this.getGrammars(language)
+		local grammar, definition, name, choices, nextCharIndex
 
 		for name, choices in getConfigurationSectionValues(grammars, "Choices", {})
 			if speechRecognizer
 				speechRecognizer.setChoices(name, choices)
 			else
-				raiseEvent(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
+				sendMessage(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
 
 		for grammar, definition in getConfigurationSectionValues(grammars, "Listener Grammars", {}) {
 			definition := substituteVariables(definition, {name: this.Name})
@@ -747,7 +772,7 @@ class VoiceManager {
 
 				try {
 					if !speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
-						Throw "Recognizer not running..."
+						throw "Recognizer not running..."
 				}
 				catch exception {
 					logMessage(kLogCritical, translate("Error while registering voice command """) . definition . translate(""" - please check the configuration"))
@@ -757,32 +782,28 @@ class VoiceManager {
 				}
 			}
 			else if (grammar != "Call")
-				raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
+				sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
 
+		/*
 		if speechRecognizer
 			try {
 				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
 			}
 			catch exception {
-				; ignore^
+				logError(exception)^
 			}
 		else
-			raiseEvent(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-	}
-
-	handleVoiceCalls(event, data) {
-		if InStr(data, ":") {
-			data := StrSplit(data, ":", , 2)
-
-			return withProtection(ObjBindMethod(this, data[1]), string2Values(";", data[2])*)
-		}
-		else
-			return withProtection(ObjBindMethod(this, data))
+			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+		*/
+		
+		if !speechRecognizer
+			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+		
 	}
 
 	raisePhraseRecognized(grammar, words) {
-		raiseEvent(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
+		sendMessage(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
 	}
 
 	localPhraseRecognized(grammar, words*) {
@@ -817,12 +838,12 @@ class VoiceManager {
 	}
 
 	recognizeActivation(grammar, words) {
-		raiseEvent(kFileMessage, "Voice", "recognizeActivation:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
+		sendMessage(kFileMessage, "Voice", "recognizeActivation:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
 	}
 
 	recognizeCommand(grammar, words) {
 		if this.VoiceServer
-			raiseEvent(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
+			sendMessage(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
 		else if this.Grammars.HasKey(grammar)
 			this.phraseRecognized(grammar, words)
 	}
@@ -839,6 +860,6 @@ class VoiceManager {
 	}
 
 	handleVoiceCommand(grammar, words) {
-		Throw "Virtual method VoiceManager.handleVoiceCommand must be implemented in a subclass..."
+		throw "Virtual method VoiceManager.handleVoiceCommand must be implemented in a subclass..."
 	}
 }

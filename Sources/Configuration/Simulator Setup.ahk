@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Configuration Wand.ico
 ;@Ahk2Exe-ExeName Simulator Setup.exe
@@ -35,6 +32,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include Libraries\SettingsEditor.ahk
@@ -51,34 +49,20 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "ok"
-global kCancel = "cancel"
-global kNext = "next"
-global kPrevious = "previous"
-global kLanguage = "language"
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vProgressCount = 0
-
-global vResult = false
-global vWorking = false
-
-global vPageSwitch = false
-
-global vSettingsReady = false
+global kOk := "ok"
+global kCancel := "cancel"
+global kNext := "next"
+global kPrevious := "previous"
+global kLanguage := "language"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kDebugOff = 0
-global kDebugKnowledgeBase = 1
-global kDebugRules = 2
+global kDebugOff := 0
+global kDebugKnowledgeBase := 1
+global kDebugRules := 2
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -92,12 +76,12 @@ global kDebugRules = 2
 class Preset {
 	Name[] {
 		Get {
-			Throw "Virtual property Preset.Name must be implemented in a subclass..."
+			throw "Virtual property Preset.Name must be implemented in a subclass..."
 		}
 	}
 
 	getArguments() {
-		Throw "Virtual method Preset.getArguments must be implemented in a subclass..."
+		throw "Virtual method Preset.getArguments must be implemented in a subclass..."
 	}
 
 	install(wizard) {
@@ -129,8 +113,10 @@ global stepSubtitle
 
 global languageDropDown
 
+global firstPageButton
 global previousPageButton
 global nextPageButton
+global lastPageButton
 global finishButton
 
 class SetupWizard extends ConfigurationItem {
@@ -138,6 +124,12 @@ class SetupWizard extends ConfigurationItem {
 
 	iWizardWindow := "SW"
 	iHelpWindow := "SH"
+
+	iProgressCount := false
+	iWorking := false
+	iPageSwitch := false
+	iSettingsOpen := false
+	iResult := false
 
 	iStepWizards := {}
 
@@ -152,6 +144,8 @@ class SetupWizard extends ConfigurationItem {
 
 	iPresets := false
 	iInitialize := false
+
+	iCachedActions := {}
 
 	Debug[option] {
 		Get {
@@ -168,6 +162,56 @@ class SetupWizard extends ConfigurationItem {
 	HelpWindow[] {
 		Get {
 			return this.iHelpWindow
+		}
+	}
+
+	Result[] {
+		Get {
+			return this.iResult
+		}
+
+		Set {
+			return (this.iResult := value)
+		}
+	}
+
+	ProgressCount[] {
+		Get {
+			return SetupWizard.sProgressCount
+		}
+
+		Set {
+			return (SetupWizard.sProgressCount := value)
+		}
+	}
+
+	Working[] {
+		Get {
+			return this.iWorking
+		}
+
+		Set {
+			return (this.iWorking := value)
+		}
+	}
+
+	PageSwitch[] {
+		Get {
+			return this.iPageSwitch
+		}
+
+		Set {
+			return (this.iPageSwitch := value)
+		}
+	}
+
+	SettingsOpen[] {
+		Get {
+			return this.iSettingsOpen
+		}
+
+		Set {
+			return (this.iSettingsOpen := value)
 		}
 	}
 
@@ -248,7 +292,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	createKnowledgeBase(facts) {
-		local rules
+		local rules, productions, reductions, engine
 
 		FileRead rules, % kResourcesDirectory . "Setup\Simulator Setup.rules"
 
@@ -267,9 +311,8 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	loadDefinition(definition := false) {
-		local knowledgeBase
-		local stepWizard
-		local count
+		local knowledgeBase, stepWizard, count, descriptor, step, stepDefinition, title, initialize
+		local ignore, fileName
 
 		if !definition
 			definition := this.Definition
@@ -296,12 +339,12 @@ class SetupWizard extends ConfigurationItem {
 			}
 		}
 
-		Loop %count% {
+		loop %count% {
 			step := this.Steps[A_Index]
 
-			vProgressCount += 2
+			this.ProgressCount += 2
 
-			showProgress({progress: vProgressCount})
+			showProgress({progress: this.ProgressCount})
 
 			if step {
 				stepDefinition := readConfiguration(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
@@ -328,16 +371,12 @@ class SetupWizard extends ConfigurationItem {
 		else
 			initialize  := false
 
-		showProgress({progress: ++vProgressCount, message: translate("Initializing AI Kernel...")})
+		showProgress({progress: ++this.ProgressCount, message: translate("Initializing AI Kernel...")})
 
 		if initialize {
-			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini", "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
-				try {
-					FileDelete %kUserHomeDirectory%Setup\%fileName%
-				}
-				catch exception {
-					; ignore
-				}
+			for ignore, fileName in ["Button Box Configuration.ini", "Stream Deck Configuration.ini", "Voice Control Configuration.ini"
+								   , "Race Engineer Configuration.ini", "Race Strategist Configuration.ini", "Simulator Settings.ini"]
+				deleteFile(kUserHomeDirectory . "Setup\" . fileName)
 
 			this.KnowledgeBase.addFact("Initialize", true)
 		}
@@ -357,12 +396,12 @@ class SetupWizard extends ConfigurationItem {
 			this.addPatchFile("Configuration", kUserHomeDirectory . "Setup\Configuration Patch.ini")
 		}
 
-		showProgress({progress: ++vProgressCount, message: translate("Starting AI Kernel...")})
+		showProgress({progress: ++this.ProgressCount, message: translate("Starting AI Kernel...")})
 
 		this.KnowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 	}
 
 	registerStepWizard(stepWizard) {
@@ -370,7 +409,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	unregisterStepWizard(descriptorOrWizard) {
-		local stepWizard
+		local stepWizard, descriptor
 
 		for descriptor, stepWizard in this.StepWizards
 			if ((descriptor = descriptorOrWizard) || (stepWizard = descriptorOrWizard)) {
@@ -388,9 +427,8 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local stepWizard
-
-		window := this.WizardWindow
+		local window := this.WizardWindow
+		local stepWizard, languages, choices, chosen, code, language, html
 
 		Gui %window%:Default
 
@@ -410,10 +448,14 @@ class SetupWizard extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, Button, x16 y540 w30 h30 HwndpreviousButtonHandle Disabled VpreviousPageButton GpreviousPage
+		Gui %window%:Add, Button, x16 y540 w30 h30 HwndfirstButtonHandle Disabled VfirstPageButton GfirstPage
+		setButtonIcon(firstButtonHandle, kIconsDirectory . "First.ico", 1, "L2 T2 R2 B2 H24 W24")
+		Gui %window%:Add, Button, x48 y540 w30 h30 HwndpreviousButtonHandle Disabled VpreviousPageButton GpreviousPage
 		setButtonIcon(previousButtonHandle, kIconsDirectory . "Previous.ico", 1, "L2 T2 R2 B2 H24 W24")
-		Gui %window%:Add, Button, x670 y540 w30 h30 HwndnextButtonHandle Disabled VnextPageButton GnextPage
+		Gui %window%:Add, Button, x638 y540 w30 h30 HwndnextButtonHandle Disabled VnextPageButton GnextPage
 		setButtonIcon(nextButtonHandle, kIconsDirectory . "Next.ico", 1, "L2 T2 R2 B2 H24 W24")
+		Gui %window%:Add, Button, x670 y540 w30 h30 HwndlastButtonHandle Disabled VlastPageButton GlastPage
+		setButtonIcon(lastButtonHandle, kIconsDirectory . "Last.ico", 1, "L2 T2 R2 B2 H24 W24")
 
 		languages := string2Values("|", getConfigurationValue(this.Definition, "Setup", "Languages"))
 
@@ -467,26 +509,25 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	createStepsGui() {
-		local stepWizard
-
-		x := 0
-		y := 0
-		width := 0
-		height := 0
+		local x := 0
+		local y := 0
+		local width := 0
+		local height := 0
+		local stepWizard, step
 
 		this.getWorkArea(x, y, width, height)
 
 		for step, stepWizard in this.StepWizards {
-			vProgressCount += 2
+			this.ProgressCount += 2
 
-			showProgress({progress: vProgressCount, message: translate("Creating UI for Step: ") . translate(step) . translate("...")})
+			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ") . translate(step) . translate("...")})
 
 			stepWizard.createGui(this, x, y, width, height)
 		}
 	}
 
 	saveToConfiguration(configuration) {
-		local stepWizard
+		local stepWizard, ignore
 
 		base.saveToConfiguration(configuration)
 
@@ -494,78 +535,101 @@ class SetupWizard extends ConfigurationItem {
 			stepWizard.saveToConfiguration(configuration)
 	}
 
-	reset() {
-		this.show(true)
+	reset(show := true) {
+		if show
+			this.show(true)
 
-		Loop % this.Count
+		loop % this.Count
 			if this.Steps.HasKey(A_Index)
 				this.Steps[A_Index].reset()
 	}
 
 	setDebug(option, enabled) {
+		local label := false
+
 		if enabled
 			this.iDebug := (this.iDebug | option)
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
+
+		switch option {
+			case kDebugKnowledgeBase:
+				label := translate("Debug Knowledgebase")
+
+				if enabled
+					this.dumpKnowledgeBase(this.KnowledgeBase)
+			case kDebugRules:
+				label := translate("Debug Rule System")
+
+				if enabled
+					this.dumpRules(this.KnowledgeBase)
+		}
+
+		if label
+			if enabled
+				Menu SupportMenu, Check, %label%
+			else
+				Menu SupportMenu, Uncheck, %label%
+	}
+
+	toggleDebug(option) {
+		this.setDebug(option, !this.Debug[option])
 	}
 
 	show(reset := false) {
-		static first := true
+		local wizardWindow := this.WizardWindow
+		local helpWindow := this.HelpWindow
+		local x, y, posX
 
-		if reset
-			first := true
+		if getWindowPosition("Simulator Setup", x, y)
+			Gui %wizardWindow%:Show, x%x% y%y%
 		else {
-			wizardWindow := this.WizardWindow
-			helpWindow := this.HelpWindow
+			posX := Round((A_ScreenWidth - 720 - 400) / 2)
 
-			if first {
-				posX := Round((A_ScreenWidth - 720 - 400) / 2)
+			Gui %wizardWindow%:Show, x%posX% yCenter h610
+		}
 
-				first := false
+		if getWindowPosition("Simulator Setup.Help", x, y)
+			Gui %helpWindow%:Show, x%x% y%y%
+		else {
+			posX := (Round((A_ScreenWidth - 720 - 400) / 2) + 750)
 
-				Gui %wizardWindow%:Show, x%posX% yCenter h610
-
-				posX := posX + 750
-
-				Gui %helpWindow%:Show, x800 x%posX% yCenter h610
-			}
-			else {
-				Gui %wizardWindow%:Show
-				Gui %helpWindow%:Show
-			}
+			Gui %helpWindow%:Show, x800 x%posX% yCenter h610
 		}
 	}
 
 	hide() {
-		wizardWindow := this.WizardWindow
-		helpWindow := this.HelpWindow
+		local wizardWindow := this.WizardWindow
+		local helpWindow := this.HelpWindow
 
 		Gui %wizardWindow%:Hide
 		Gui %helpWindow%:Hide
 	}
 
 	close() {
-		wizardWindow := this.WizardWindow
-		helpWindow := this.HelpWindow
+		local wizardWindow := this.WizardWindow
+		local helpWindow := this.HelpWindow
 
 		Gui %wizardWindow%:Destroy
 		Gui %helpWindow%:Destroy
 	}
 
 	startSetup() {
-		showProgress({progress: ++vProgressCount, message: translate("Initializing Settings && Options...")})
+		showProgress({progress: ++this.ProgressCount, message: translate("Initializing Settings && Options...")})
 
 		this.updateState()
 
 		this.iStep := false
 		this.iPage := false
 
-		showProgress({progress: ++vProgressCount, color: "Green", title: translate("Starting Setup Wizard"), message: translate("Starting Configuration Engine...")})
+		showProgress({progress: ++this.ProgressCount, color: "Green", title: translate("Starting Setup Wizard"), message: translate("Starting Configuration Engine...")})
 
 		this.nextPage()
 	}
 
 	applyPatches(configuration, patches) {
+		local section, values, key, substitution, currentValue, ignore, substitute, addition, deletion, value
+
 		for section, values in patches
 			if (InStr(section, "Replace:") == 1) {
 				section := Trim(StrReplace(section, "Replace:", ""))
@@ -598,7 +662,7 @@ class SetupWizard extends ConfigurationItem {
 				for key, deletion in values {
 					currentValue := getConfigurationValue(configuration, section, key, kUndefined)
 
-					if (currentValue != kUndefinedd)
+					if (currentValue != kUndefined)
 						setConfigurationValue(configuration, section, key, StrReplace(currentValue, deletion, ""))
 				}
 			}
@@ -608,7 +672,8 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	finishSetup(save := true) {
-		local preset
+		local preset, window, configuration, settings, ignore, file, startupLink, startupExe
+		local buttonBoxConfiguration, streamDeckConfiguration
 
 		if (this.Step && this.Step.hidePage(this.Page)) {
 			window := this.WizardWindow
@@ -617,11 +682,13 @@ class SetupWizard extends ConfigurationItem {
 
 			Gui %window%:+Disabled
 
+			GuiControl Disable, firstPageButton
 			GuiControl Disable, previousPageButton
 			GuiControl Disable, nextPageButton
+			GuiControl Disable, lastPageButton
 			GuiControl Disable, finishButton
 
-			vWorking := true
+			this.Working := true
 
 			try {
 				if save {
@@ -656,12 +723,7 @@ class SetupWizard extends ConfigurationItem {
 
 					writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 
-					try {
-						FileDelete %kUserConfigDirectory%Simulator Controller.config
-					}
-					catch exception {
-						; Ignore
-					}
+					deleteFile(kUserConfigDirectory . "Simulator Controller.config")
 
 					startupLink := A_Startup . "\Simulator Startup.lnk"
 
@@ -671,12 +733,9 @@ class SetupWizard extends ConfigurationItem {
 						FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
 					}
 					else
-						try {
-							FileDelete %startupLink%
-						}
-						catch exception {
-							; ignore
-						}
+						deleteFile(startupLink)
+
+					deleteDirectory(kTempDirectory, false)
 
 					if this.isModuleSelected("Controller") {
 						if FileExist(kUserConfigDirectory . "Button Box Configuration.ini")
@@ -710,7 +769,7 @@ class SetupWizard extends ConfigurationItem {
 				}
 			}
 			finally {
-				vWorking := false
+				this.Working := false
 			}
 
 			return true
@@ -720,14 +779,23 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	getSimulatorConfiguration() {
-		configuration := newConfiguration()
+		local configuration := newConfiguration()
 
 		this.saveToConfiguration(configuration)
 
 		return configuration
 	}
 
+	getFirstPage(ByRef step, ByRef page) {
+		step := this.Steps[1]
+		page := 1
+
+		return true
+	}
+
 	getPreviousPage(ByRef step, ByRef page) {
+		local index, candidate
+
 		if !this.Step
 			return false
 		else if this.Page > 1 {
@@ -742,7 +810,7 @@ class SetupWizard extends ConfigurationItem {
 			if (index == 1)
 				return false
 			else
-				Loop {
+				loop {
 					if (index == 0)
 						return false
 					else {
@@ -760,6 +828,8 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	getNextPage(ByRef step, ByRef page) {
+		local count, index, candidate
+
 		if (this.Step && (this.Page < this.Step.Pages)) {
 			step := this.Step
 			page := this.Page + 1
@@ -774,7 +844,7 @@ class SetupWizard extends ConfigurationItem {
 			else
 				index := this.Steps[this.Step] + 1
 
-			Loop {
+			loop {
 				if (index > this.Count)
 					return false
 				else {
@@ -791,40 +861,50 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 
+	getLastPage(ByRef step, ByRef page) {
+		step := this.Steps[this.Count]
+		page := step.Pages
+
+		return true
+	}
+
 	isFirstPage() {
-		step := false
-		page := false
+		local step := false
+		local page := false
 
 		return !this.getPreviousPage(step, page)
 	}
 
 	isLastPage() {
-		step := false
-		page := false
+		local step := false
+		local page := false
 
 		return !this.getNextPage(step, page)
 	}
 
 	showPage(step, page) {
-		change := (step != this.Step)
-
-		window := this.WizardWindow
+		local window := this.WizardWindow
+		local change := (step != this.Step)
+		local oldPageSwitch
 
 		Gui %window%:Default
 
 		Gui %window%:+Disabled
 
+		GuiControl Disable, firstPageButton
 		GuiControl Disable, previousPageButton
 		GuiControl Disable, nextPageButton
+		GuiControl Disable, lastPageButton
 		GuiControl Disable, finishButton
 
-		oldPageSwitch := vPageSwitch
-		vPageSwitch := true
+		oldPageSwitch := this.PageSwitch
+
+		this.PageSwitch := true
 
 		try {
 			if this.Step {
 				if !this.hidePage(this.Step, this.Page) {
-					vPageSwitch := oldPageSwitch
+					this.PageSwitch := oldPageSwitch
 
 					this.updateState()
 
@@ -842,7 +922,7 @@ class SetupWizard extends ConfigurationItem {
 			this.iPage := page
 		}
 		finally {
-			vPageSwitch := oldPageSwitch
+			this.PageSwitch := oldPageSwitch
 		}
 
 		this.updateState()
@@ -858,9 +938,33 @@ class SetupWizard extends ConfigurationItem {
 			return false
 	}
 
-	previousPage() {
+	firstPage() {
+		local step, page
+
 		try {
-			vWorking := true
+			this.Working := true
+
+			try {
+				step := false
+				page := false
+
+				if this.getFirstPage(step, page)
+					this.showPage(step, page)
+			}
+			finally {
+				this.Working := false
+			}
+		}
+		catch exception {
+			logError(exception)
+		}
+	}
+
+	previousPage() {
+		local step, page
+
+		try {
+			this.Working := true
 
 			try {
 				step := false
@@ -870,7 +974,7 @@ class SetupWizard extends ConfigurationItem {
 					this.showPage(step, page)
 			}
 			finally {
-				vWorking := false
+				this.Working := false
 			}
 		}
 		catch exception {
@@ -879,8 +983,10 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	nextPage() {
+		local step, page
+
 		try {
-			vWorking := true
+			this.Working := true
 
 			try {
 				step := false
@@ -890,7 +996,29 @@ class SetupWizard extends ConfigurationItem {
 					this.showPage(step, page)
 			}
 			finally {
-				vWorking := false
+				this.Working := false
+			}
+		}
+		catch exception {
+			logError(exception)
+		}
+	}
+
+	lastPage() {
+		local step, page
+
+		try {
+			this.Working := true
+
+			try {
+				step := false
+				page := false
+
+				if this.getLastPage(step, page)
+					this.showPage(step, page)
+			}
+			finally {
+				this.Working := false
 			}
 		}
 		catch exception {
@@ -899,31 +1027,37 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	updateState() {
+		local window := this.WizardWindow
+
 		this.KnowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
-			this.dumpKnowledge(this.KnowledgeBase)
+			this.dumpKnowledgeBase(this.KnowledgeBase)
 
-		Loop % this.Count
+		loop % this.Count
 			if this.Steps.HasKey(A_Index)
 				this.Steps[A_Index].updateState()
 
-		window := this.WizardWindow
-
 		Gui %window%:Default
 
-		if !vPageSwitch {
-			if this.isFirstPage()
+		if !this.PageSwitch {
+			if this.isFirstPage() {
+				GuiControl Disable, firstPageButton
 				GuiControl Disable, previousPageButton
-			else
+			}
+			else {
+				GuiControl Enable, firstPageButton
 				GuiControl Enable, previousPageButton
+			}
 
 			if this.isLastPage() {
 				GuiControl Disable, nextPageButton
+				GuiControl Disable, lastPageButton
 				GuiControl Enable, finishButton
 			}
 			else {
 				GuiControl Enable, nextPageButton
+				GuiControl Enable, lastPageButton
 				GuiControl Disable, finishButton
 			}
 
@@ -933,6 +1067,7 @@ class SetupWizard extends ConfigurationItem {
 
 	installPreset(preset) {
 		local knowledgeBase := this.KnowledgeBase
+		local count
 
 		preset.install(this)
 
@@ -950,6 +1085,7 @@ class SetupWizard extends ConfigurationItem {
 
 	uninstallPreset(preset) {
 		local knowledgeBase := this.KnowledgeBase
+		local class, arguments, presets, found, cClass, cArguments, index, descriptor
 
 		preset.uninstall(this)
 
@@ -959,7 +1095,7 @@ class SetupWizard extends ConfigurationItem {
 		presets := []
 		found := false
 
-		Loop % knowledgeBase.getValue("Preset.Count", 0)
+		loop % knowledgeBase.getValue("Preset.Count", 0)
 		{
 			cClass := knowledgeBase.getValue("Preset." . A_Index . ".Class")
 			cArguments := knowledgeBase.getValue("Preset." . A_Index . ".Arguments")
@@ -987,10 +1123,10 @@ class SetupWizard extends ConfigurationItem {
 
 	loadPresets() {
 		local knowledgeBase := this.KnowledgeBase
+		local presets := []
+		local class, arguments, outerclass
 
-		presets := []
-
-		Loop % knowledgeBase.getValue("Preset.Count", 0)
+		loop % knowledgeBase.getValue("Preset.Count", 0)
 		{
 			class := knowledgeBase.getValue("Preset." . A_Index . ".Class")
 			arguments := string2Values("###", knowledgeBase.getValue("Preset." . A_Index . ".Arguments"))
@@ -1009,15 +1145,14 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	addPatchFile(type, file) {
-		value := this.KnowledgeBase.getValue("Patch." . type . ".Files", "")
+		local value := this.KnowledgeBase.getValue("Patch." . type . ".Files", "")
 
 		this.KnowledgeBase.setFact("Patch." . type . ".Files", (value = "") ? file : value . ";" . file)
 	}
 
 	removePatchFile(type, file) {
-		files := string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", ""))
-
-		index := inList(files, file)
+		local files := string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", ""))
+		local index := inList(files, file)
 
 		if index {
 			files.RemoveAt(index)
@@ -1032,6 +1167,8 @@ class SetupWizard extends ConfigurationItem {
 
 	selectModule(module, selected, update := true) {
 		if (this.isModuleSelected(module) != (selected != false)) {
+			this.iCachedActions := {}
+
 			this.KnowledgeBase.setFact("Module." . module . ".Selected", selected != false)
 
 			if update
@@ -1040,7 +1177,7 @@ class SetupWizard extends ConfigurationItem {
 				this.KnowledgeBase.produce()
 
 				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledge(this.KnowledgeBase)
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 			}
 		}
 	}
@@ -1098,7 +1235,7 @@ class SetupWizard extends ConfigurationItem {
 					this.KnowledgeBase.produce()
 
 					if this.Debug[kDebugKnowledgeBase]
-						this.dumpKnowledge(this.KnowledgeBase)
+						this.dumpKnowledgeBase(this.KnowledgeBase)
 				}
 			}
 		}
@@ -1118,6 +1255,7 @@ class SetupWizard extends ConfigurationItem {
 
 	locateApplication(application, executable := false, update := true) {
 		local knowledgeBase := this.KnowledgeBase
+		local ignore, section, descriptor
 
 		if !this.isApplicationInstalled(application) {
 			if !executable
@@ -1176,10 +1314,9 @@ class SetupWizard extends ConfigurationItem {
 
 	setLaunchApplicationLabelsAndFunctions(labelsAndFunctions) {
 		local knowledgeBase := this.KnowledgeBase
-		local application
-		local function
+		local application, labelAndFunction, function, count
 
-		Loop % knowledgeBase.getValue("System.Launch.Application.Count", 0)
+		loop % knowledgeBase.getValue("System.Launch.Application.Count", 0)
 		{
 			application := knowledgeBase.getValue("System.Launch.Application." . A_Index, false)
 
@@ -1220,8 +1357,8 @@ class SetupWizard extends ConfigurationItem {
 
 	addModuleStaticFunction(module, function, label) {
 		local knowledgeBase := this.KnowledgeBase
-
-		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		local functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		local index, descriptor, parts
 
 		for index, descriptor in functions {
 			parts := string2Values("###", descriptor)
@@ -1243,10 +1380,9 @@ class SetupWizard extends ConfigurationItem {
 
 	removeModuleStaticFunction(module, function) {
 		local knowledgeBase := this.KnowledgeBase
-
-		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
-
-		found := true
+		local functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		local found := true
+		local index, descriptor, parts
 
 		while found {
 			found := false
@@ -1272,14 +1408,14 @@ class SetupWizard extends ConfigurationItem {
 
 	getModuleStaticFunctions() {
 		local knowledgeBase := this.KnowledgeBase
-
-		functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
-		result := []
+		local functions := string2Values("|", knowledgeBase.getValue("Controller.Function.Static", ""))
+		local result := []
+		local index, descriptor, parts
 
 		for index, descriptor in functions {
 			parts := string2Values("###", descriptor)
 
-			if wizard.isModuleSelected(parts[1])
+			if this.isModuleSelected(parts[1])
 				result.Push(Array(parts[2], parts[3]))
 		}
 
@@ -1288,9 +1424,9 @@ class SetupWizard extends ConfigurationItem {
 
 	setControllerFunctions(functions) {
 		local knowledgeBase := this.KnowledgeBase
-		local function
+		local ignore, function, name
 
-		Loop % knowledgeBase.getValue("Controller.Function.Count", 0)
+		loop % knowledgeBase.getValue("Controller.Function.Count", 0)
 		{
 			function := knowledgeBase.getValue("Controller.Function." . A_Index, false)
 
@@ -1303,9 +1439,7 @@ class SetupWizard extends ConfigurationItem {
 		for ignore, function in functions {
 			function := IsObject(function) ? function.Clone() : Array(function)
 
-			name := function[1]
-
-			function.RemoveAt(1)
+			name := function.RemoveAt(1)
 
 			knowledgeBase.addFact("Controller.Function." . A_Index, name)
 
@@ -1324,11 +1458,10 @@ class SetupWizard extends ConfigurationItem {
 
 	setSimulatorActionFunctions(simulator, mode, functions) {
 		local knowledgeBase := this.KnowledgeBase
-		local function
-		local action
 		local count := 0
+		local function, action
 
-		Loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Simulator." . simulator . ".Mode." . mode . ".Action." . A_Index, false)
 
@@ -1368,15 +1501,23 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	simulatorActionAvailable(simulator, mode, action) {
-		local knowledgeBase := this.KnowledgeBase
+		local goal, result
 
-		goal := new RuleCompiler().compileGoal("simulatorActionAvailable?(" . StrReplace(simulator, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
+		if this.iCachedActions.HasKey(simulator . mode . action)
+			return this.iCachedActions[simulator . mode . action]
+		else {
+			goal := new RuleCompiler().compileGoal("simulatorActionAvailable?(" . StrReplace(simulator, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
 
-		return (knowledgeBase.prove(goal) != false)
+			result := (this.KnowledgeBase.prove(goal) != false)
+
+			this.iCachedActions[simulator . mode . action] := result
+
+			return result
+		}
 	}
 
 	setSimulatorValue(simulator, key, value, update := true) {
-		oldCaseSense := A_StringCaseSense
+		local oldCaseSense := A_StringCaseSense
 
 		try {
 			StringCaseSense On
@@ -1404,11 +1545,10 @@ class SetupWizard extends ConfigurationItem {
 
 	setAssistantActionFunctions(assistant, functions) {
 		local knowledgeBase := this.KnowledgeBase
-		local function
-		local action
 		local count := 0
+		local function, action
 
-		Loop % knowledgeBase.getValue("Assistant." . assistant . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Assistant." . assistant . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Assistant." . assistant . ".Action." . A_Index, false)
 
@@ -1448,29 +1588,36 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	assistantActionAvailable(assistant, action) {
-		local knowledgeBase := this.KnowledgeBase
+		local goal, result
 
-		goal := new RuleCompiler().compileGoal("assistantActionAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
+		if this.iCachedActions.HasKey(assistant . action)
+			return this.iCachedActions[assistant . action]
+		else {
+			goal := new RuleCompiler().compileGoal("assistantActionAvailable?(" . StrReplace(assistant, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")")
 
-		return (knowledgeBase.prove(goal) != false)
+			result := (this.KnowledgeBase.prove(goal) != false)
+
+			this.iCachedActions[assistant . action] := result
+
+			return result
+		}
 	}
 
 	assistantSimulators(assistant) {
 		local knowledgeBase := this.KnowledgeBase
-		local resultSet
-		local variable
-
-		goal := new RuleCompiler().compileGoal("assistantSupportedSimulator?(" . StrReplace(assistant, A_Space, "\ ") . ", ?simulator)")
-		variable := goal.Arguments[2]
-
-		resultSet := knowledgeBase.prove(goal)
-		simulators := []
+		local goal := new RuleCompiler().compileGoal("assistantSupportedSimulator?(" . StrReplace(assistant, A_Space, "\ ") . ", ?simulator)")
+		local variable := goal.Arguments[2]
+		local resultSet := knowledgeBase.prove(goal)
+		local simulators := []
 
 		while resultSet {
 			simulators.Push(resultSet.getValue(variable).toString())
 
-			if !resultSet.nextResult()
+			if !resultSet.nextResult() {
+				resultSet.dispose()
+
 				resultSet := false
+			}
 		}
 
 		return simulators
@@ -1496,15 +1643,11 @@ class SetupWizard extends ConfigurationItem {
 
 	setModuleAvailableActions(module, mode, actions) {
 		local knowledgeBase := this.KnowledgeBase
-		local function
-		local action
-		local count
+		local modeClause := (mode ? (".Mode." . mode) : "")
+		local count := knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		local index, action
 
-		modeClause := (mode ? (".Mode." . mode) : "")
-
-		count := knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
-
-		Loop % count
+		loop % count
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 
@@ -1527,12 +1670,10 @@ class SetupWizard extends ConfigurationItem {
 
 	setModuleActionFunctions(module, mode, functions) {
 		local knowledgeBase := this.KnowledgeBase
-		local function
-		local action
+		local modeClause := (mode ? (".Mode." . mode) : "")
+		local function, action
 
-		modeClause := (mode ? (".Mode." . mode) : "")
-
-		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 
@@ -1553,11 +1694,8 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	getModuleActionFunction(module, mode, action) {
-		local function
-
-		modeClause := (mode ? (".Mode." . mode) : "")
-
-		function := this.KnowledgeBase.getValue("Module." . module . modeClause . ".Action." . action . ".Function", false)
+		local modeClause := (mode ? (".Mode." . mode) : "")
+		local function := this.KnowledgeBase.getValue("Module." . module . modeClause . ".Action." . action . ".Function", false)
 
 		if function {
 			function := string2Values("|", function)
@@ -1570,11 +1708,10 @@ class SetupWizard extends ConfigurationItem {
 
 	setModuleActionArguments(module, mode, arguments) {
 		local knowledgeBase := this.KnowledgeBase
-		local action
+		local modeClause := (mode ? (".Mode." . mode) : "")
+		local action, argument
 
-		modeClause := (mode ? (".Mode." . mode) : "")
-
-		Loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
+		loop % knowledgeBase.getValue("Module." . module . modeClause . ".Action.Count", 0)
 		{
 			action := knowledgeBase.getValue("Module." . module . modeClause . ".Action." . A_Index, false)
 
@@ -1590,52 +1727,64 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	getModuleActionArgument(module, mode, action) {
-		modeClause := (mode ? (".Mode." . mode) : "")
+		local modeClause := (mode ? (".Mode." . mode) : "")
 
 		return this.KnowledgeBase.getValue("Module." . module . modeClause . ".Action." . action . ".Argument", "")
 	}
 
 	moduleActionAvailable(module, mode, action) {
-		local knowledgeBase := this.KnowledgeBase
+		local goal, result
 
-		if mode
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
-		else
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
+		if this.iCachedActions.HasKey(module . mode . action)
+			return this.iCachedActions[module . mode . action]
+		else {
+			if mode
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
+			else
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(action, A_Space, "\ ") . ")"
 
-		goal := new RuleCompiler().compileGoal(goal)
+			goal := new RuleCompiler().compileGoal(goal)
 
-		return knowledgeBase.prove(goal)
+			result := (this.KnowledgeBase.prove(goal) != false)
+
+			this.iCachedActions[module . mode . action] := result
+
+			return result
+		}
 	}
 
 	moduleAvailableActions(module, mode) {
-		local knowledgeBase := this.KnowledgeBase
-		local resultSet
-		local variable
+		local resultSet, variable, goal, actions
 
-		if mode
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", ?action)"
-		else
-			goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", ?action)"
+		if this.iCachedActions.HasKey(module . mode)
+			return this.iCachedActions[module . mode]
+		else {
+			if mode
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", " . StrReplace(mode, A_Space, "\ ") . ", ?action)"
+			else
+				goal := "moduleActionAvailable?(" . StrReplace(module, A_Space, "\ ") . ", ?action)"
 
-		goal := new RuleCompiler().compileGoal(goal)
-		variable := goal.Arguments[mode ? 3 : 2]
+			goal := new RuleCompiler().compileGoal(goal)
+			variable := goal.Arguments[mode ? 3 : 2]
 
-		resultSet := knowledgeBase.prove(goal)
-		actions := []
+			resultSet := this.KnowledgeBase.prove(goal)
+			actions := []
 
-		while resultSet {
-			actions.Push(resultSet.getValue(variable).toString())
+			while resultSet {
+				actions.Push(resultSet.getValue(variable).toString())
 
-			if !resultSet.nextResult()
-				resultSet := false
+				if !resultSet.nextResult()
+					resultSet := false
+			}
+
+			this.iCachedActions[module . mode] := actions
+
+			return actions
 		}
-
-		return actions
 	}
 
 	setTitle(title) {
-		window := this.HelpWindow
+		local window := this.HelpWindow
 
 		Gui %window%:Default
 
@@ -1643,7 +1792,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	setSubtitle(subtitle) {
-		window := this.HelpWindow
+		local window := this.HelpWindow
 
 		Gui %window%:Default
 
@@ -1651,7 +1800,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	setInfo(html) {
-		window := this.HelpWindow
+		local window := this.HelpWindow
 
 		Gui %window%:Default
 
@@ -1663,7 +1812,7 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	saveKnowledgeBase() {
-		savedKnowledgeBase := newConfiguration()
+		local savedKnowledgeBase := newConfiguration()
 
 		setConfigurationSectionValues(savedKnowledgeBase, "Setup", this.KnowledgeBase.Facts.Facts)
 
@@ -1672,6 +1821,7 @@ class SetupWizard extends ConfigurationItem {
 
 	loadKnowledgeBase() {
 		local knowledgeBase = this.KnowledgeBase
+		local key, value
 
 		if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
 			for key, value in getConfigurationSectionValues(readConfiguration(kUserHomeDirectory . "Setup\Setup.data"), "Setup")
@@ -1683,65 +1833,16 @@ class SetupWizard extends ConfigurationItem {
 			return false
 	}
 
-	dumpKnowledge(knowledgeBase) {
-		try {
-			FileDelete %kTempDirectory%Simulator Setup.knowledge
-		}
-		catch exception {
-			; ignore
-		}
-
-		for key, value in knowledgeBase.Facts.Facts {
-			text := (key . " = " . value . "`n")
-
-			FileAppend %text%, %kTempDirectory%Simulator Setup.knowledge
-		}
+	dumpKnowledgeBase(knowledgeBase) {
+		knowledgeBase.dumpFacts()
 	}
 
 	dumpRules(knowledgeBase) {
-		local rules
-		local rule
-
-		try {
-			FileDelete %kTempDirectory%Simulator Setup.rules
-		}
-		catch exception {
-			; ignore
-		}
-
-		production := knowledgeBase.Rules.Productions[false]
-
-		Loop {
-			if !production
-				break
-
-			text := (production.Rule.toString() . "`n")
-
-			FileAppend %text%, %kTempDirectory%Simulator Setup.rules
-
-			production := production.Next[false]
-		}
-
-		for ignore, rules in knowledgeBase.Rules.Reductions
-			for ignore, rule in rules {
-				text := (rule.toString() . "`n")
-
-				FileAppend %text%, %kTempDirectory%Simulator Setup.rules
-			}
+		knowledgeBase.dumpRules()
 	}
 
 	toggleTriggerDetector(callback := false) {
-		if callback {
-			if !vShowTriggerDetector
-				vTriggerDetectorCallback := callback
-		}
-		else
-			vTriggerDetectorCallback := false
-
-		vShowTriggerDetector := !vShowTriggerDetector
-
-		if vShowTriggerDetector
-			SetTimer showTriggerDetector, -100
+		triggerDetector(callback)
 	}
 }
 
@@ -1803,9 +1904,9 @@ class StepWizard extends ConfigurationItem {
 	}
 
 	loadDefinition(definition, stepDefinition) {
-		local rule
 		local rules := {}
 		local count := 0
+		local descriptor, rule, index
 
 		showProgress({message: translate("Step: ") . getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Subtitle." . getLanguage())})
 
@@ -1817,10 +1918,11 @@ class StepWizard extends ConfigurationItem {
 				index := string2Values(".", descriptor)[3]
 
 				count := Max(count, index)
+
 				rules[index] := rule
 			}
 
-		Loop %count%
+		loop %count%
 			if rules.HasKey(A_Index)
 				this.SetupWizard.addRule(rules[A_Index])
 
@@ -1836,7 +1938,7 @@ class StepWizard extends ConfigurationItem {
 	}
 
 	createGui(wizard, x, y, width, height) {
-		Throw "Virtual method StepWizard.createGui must be implemented in a subclass..."
+		throw "Virtual method StepWizard.createGui must be implemented in a subclass..."
 	}
 
 	registerWidget(page, widget) {
@@ -1849,6 +1951,8 @@ class StepWizard extends ConfigurationItem {
 	}
 
 	registerWidgets(page, widgets*) {
+		local ignore, widget
+
 		for ignore, widget in widgets
 			this.registerWidget(page, widget)
 	}
@@ -1862,8 +1966,8 @@ class StepWizard extends ConfigurationItem {
 	}
 
 	show() {
-		language := getLanguage()
-		definition := this.SetupWizard.Definition
+		local language := getLanguage()
+		local definition := this.SetupWizard.Definition
 
 		this.setTitle(getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Title." . language))
 		this.setSubtitle(getConfigurationValue(definition, "Setup." . this.Step, this.Step . ".Subtitle." . language))
@@ -1877,7 +1981,8 @@ class StepWizard extends ConfigurationItem {
 	}
 
 	showPage(page) {
-		window := this.Window
+		local window := this.Window
+		local ignore, widget
 
 		Gui %window%:Default
 
@@ -1888,7 +1993,8 @@ class StepWizard extends ConfigurationItem {
 	}
 
 	hidePage(page) {
-		window := this.SetupWizard.HelpWindow
+		local window := this.Window
+		local ignore, widget
 
 		Gui %window%:Default
 
@@ -1931,11 +2037,13 @@ class StartStepWizard extends StepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
+		local window := this.Window
+		local text, image, html, ignore, directory, currentDirectory
+		local labelWidth, labelX, labelY, iconHandle, labelHandle, infoTextHandle, restartButtonHandle, info
+
 		static imageViewer
 		static imageViewerHandle
 		static infoText
-
-		window := this.Window
 
 		Sleep 200
 
@@ -2010,6 +2118,8 @@ class StartStepWizard extends StepWizard {
 	}
 
 	reset() {
+		local volume
+
 		base.reset()
 
 		this.iImageViewer := false
@@ -2020,13 +2130,15 @@ class StartStepWizard extends StepWizard {
 			SoundPlay NonExistent.avi
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
 		resetVolume(volume)
 	}
 
 	showPage(page) {
+		local imageViewer, audio
+
 		if (page == 1) {
 			imageViewer := this.iImageViewer
 
@@ -2044,6 +2156,8 @@ class StartStepWizard extends StepWizard {
 	}
 
 	hidePage(page) {
+		local volume
+
 		if (page == 1) {
 			volume := fadeOut()
 
@@ -2051,13 +2165,15 @@ class StartStepWizard extends StepWizard {
 				SoundPlay NonExistent.avi
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			resetVolume(volume)
 		}
 
 		if base.hidePage(page) {
+			local imageViewer
+
 			if (page == 1) {
 				imageViewer := this.iImageViewer
 
@@ -2065,18 +2181,6 @@ class StartStepWizard extends StepWizard {
 				imageViewer.Document.Write("<html></html>")
 				imageViewer.Document.Close()
 			}
-
-			/*
-			if initialize {
-				for ignore, preset in wizard.Presets
-					preset.initialize(this)
-
-				wizard.Knowledgebase.produce()
-
-				if wizard.Debug[kDebugKnowledgeBase]
-					wizard.dumpKnowledge(this.KnowledgeBase)
-			}
-			*/
 
 			return true
 		}
@@ -2097,11 +2201,11 @@ class FinishStepWizard extends StepWizard {
 	}
 
 	createGui(wizard, x, y, width, height) {
+		local window := this.Window
+		local imageViewerHandle := false
+		local image, text, html
+
 		static imageViewer
-
-		window := this.Window
-
-		imageViewerHandle := false
 
 		Gui %window%:Add, ActiveX, x%x% y%y% w%width% h%height% HWNDimageViewerHandle VimageViewer Hidden, shell.explorer
 
@@ -2121,25 +2225,16 @@ class FinishStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
-		vSettingsReady := false
+		this.SetupWizard.SettingsOpen := true
 
 		base.showPage(page)
 
-		settingsEditor := ObjBindMethod(this, "settingsEditor")
-
-		SetTimer %settingsEditor%, -200
+		Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200, kLowPriority)
 	}
 
 	hidePage(page) {
 		if base.hidePage(page) {
-			try {
-				settings := editSettings(kSave, false, true)
-
-				writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
-			}
-			catch exception {
-				; ignore
-			}
+			Task.startTask(ObjBindMethod(this, "closeSettingsEditor"), 1000, kHighPriority)
 
 			return true
 		}
@@ -2147,25 +2242,31 @@ class FinishStepWizard extends StepWizard {
 			return false
 	}
 
-	settingsEditor() {
-		if vWorking {
-			settingsEditor := ObjBindMethod(this, "settingsEditor")
+	openSettingsEditor() {
+		local settings, configuration
 
-			SetTimer %settingsEditor%, -200
+		if this.SetupWizard.Working
+			Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200)
+		else {
+			if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+				settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
+			else
+				settings := newConfiguration()
 
-			return
+			configuration := this.SetupWizard.getSimulatorConfiguration()
+
+			editSettings(settings, false, configuration
+					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
+					   , "Center")
+
+			this.SetupWizard.SettingsOpen := false
 		}
+	}
 
-		if FileExist(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-			settings := readConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini")
-		else
-			settings := newConfiguration()
+	closeSettingsEditor() {
+		local settings := editSettings(kSave, false, true)
 
-		configuration := this.SetupWizard.getSimulatorConfiguration()
-
-		editSettings(settings, false, configuration, Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360))
-
-		vSettingsReady := true
+		writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
 	}
 }
 
@@ -2175,18 +2276,15 @@ class FinishStepWizard extends StepWizard {
 ;;;-------------------------------------------------------------------------;;;
 
 finishSetup(finish := false, save := false) {
+	local window, title, message
+
 	if (finish = "Finish") {
-		if !vSettingsReady {
+		if (SetupWizard.Instance.SettingsOpen || SetupWizard.Instance.Working) {
 			; Let other threads finish...
 
-			callback := Func("finishSetup").Bind("Finish", save)
-
-			SetTimer %callback%, % -200
-
-			return
+			Task.startTask(Func("finishSetup").Bind("Finish", save), 200)
 		}
-
-		if SetupWizard.Instance.finishSetup(save)
+		else if SetupWizard.Instance.finishSetup(save)
 			ExitApp 0
 	}
 	else {
@@ -2205,15 +2303,17 @@ finishSetup(finish := false, save := false) {
 		else
 			save := false
 
-		callback := Func("finishSetup").Bind("Finish", save)
-
-		SetTimer %callback%, % -200
+		Task.startTask(Func("finishSetup").Bind("Finish", save), 200)
 	}
 }
 
 cancelSetup() {
 	if SetupWizard.Instance.finishSetup(false)
 		ExitApp 0
+}
+
+firstPage() {
+	SetupWizard.Instance.firstPage()
 }
 
 previousPage() {
@@ -2224,19 +2324,22 @@ nextPage() {
 	SetupWizard.Instance.nextPage()
 }
 
+lastPage() {
+	SetupWizard.Instance.lastPage()
+}
+
 chooseLanguage() {
-	local code
+	local wizard := SetupWizard.Instance
+	local code, language
 
 	GuiControlGet languageDropDown
 
-	languages := string2Values("|", getConfigurationValue(SetupWizard.Instance.Definition, "Setup", "Languages"))
-
 	for code, language in availableLanguages()
 		if (language = languageDropDown) {
-			if SetupWizard.Instance.finishSetup(false) {
+			if wizard.finishSetup(false) {
 				setLanguage(code)
 
-				vResult := kLanguage
+				wizard.Result := kLanguage
 			}
 			else
 				for code, language in availableLanguages()
@@ -2251,11 +2354,11 @@ chooseLanguage() {
 }
 
 moveSetupWizard() {
-	moveByMouse(SetupWizard.Instance.WizardWindow)
+	moveByMouse(SetupWizard.Instance.WizardWindow, "Simulator Setup")
 }
 
 moveSetupHelp() {
-	moveByMouse(SetupWizard.Instance.HelpWindow)
+	moveByMouse(SetupWizard.Instance.HelpWindow, "Simulator Setup.Help")
 }
 
 openSetupDocumentation() {
@@ -2266,12 +2369,7 @@ elevateAndRestart() {
 	if !(A_IsAdmin || RegExMatch(DllCall("GetCommandLine", "str"), " /restart(?!\S)")) {
 		try {
 			if SetupWizard.Instance.Initialize
-				try {
-					FileDelete %kUserHomeDirectory%Setup\Setup.data
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(kUserHomeDirectory . "Setup\Setup.data")
 
 			if A_IsCompiled
 				Run *RunAs "%A_ScriptFullPath%" /restart
@@ -2286,31 +2384,9 @@ elevateAndRestart() {
 	}
 }
 
-fixIE(version := 0, exeName := "") {
-	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
-	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
-
-	if versions.HasKey(version)
-		version := versions[version]
-
-	if !exeName {
-		if A_IsCompiled
-			exeName := A_ScriptName
-		else
-			SplitPath A_AhkPath, exeName
-	}
-
-	RegRead previousValue, HKCU, %key%, %exeName%
-
-	if (version = "")
-		RegDelete, HKCU, %key%, %exeName%
-	else
-		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
-
-	return previousValue
-}
-
 LV_ClickedColumn(listViewHandle) {
+	local POINT, LVHITTESTINFO
+
 	static LVM_SUBITEMHITTEST := 0x1039
 
 	VarSetCapacity(POINT, 8, 0)
@@ -2350,10 +2426,12 @@ convertVDF2JSON(vdf) {
 }
 
 findInRegistry(collection, filterName, filterValue, valueName) {
-	Loop 2 {
+	local exact, candidate, value
+
+	loop 2 {
 		exact := (A_Index = 1)
 
-		Loop Reg, %collection%, R
+		loop Reg, %collection%, R
 			if (A_LoopRegName = filterName) {
 				RegRead candidate
 
@@ -2374,7 +2452,7 @@ findInRegistry(collection, filterName, filterValue, valueName) {
 }
 
 findInstallProperty(name, property) {
-	value := findInRegistry("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, property)
+	local value := findInRegistry("HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "DisplayName", name, property)
 
 	if (value != "")
 		return value
@@ -2391,15 +2469,11 @@ findInstallProperty(name, property) {
 }
 
 initializeSimulatorSetup() {
-	icon := kIconsDirectory . "Configuration Wand.ico"
+	local icon := kIconsDirectory . "Configuration Wand.ico"
+	local definition, wizard, x, y, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 
 	FileCreateDir %kUserHomeDirectory%Setup
 
@@ -2412,12 +2486,30 @@ initializeSimulatorSetup() {
 
 	wizard := new SetupWizard(kSimulatorConfiguration, definition)
 
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Debug Rule System")
+	callback := ObjBindMethod(wizard, "toggleDebug", kDebugRules)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if wizard.Debug[kDebugRules]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Debug Knowledgebase")
+	callback := ObjBindMethod(wizard, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if wizard.Debug[kDebugKnowledgeBase]
+		Menu SupportMenu, Check, %label%
+
 	showSplashTheme("Rotating Brain")
 
 	x := Round((A_ScreenWidth - 300) / 2)
 	y := A_ScreenHeight - 150
 
-	vProgressCount := 0
+	wizard.ProgressCount := 0
 
 	showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
 
@@ -2428,15 +2520,11 @@ initializeSimulatorSetup() {
 	wizard.registerStepWizard(new FinishStepWizard(wizard, "Finish", kSimulatorConfiguration))
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 startupSimulatorSetup() {
-	local preset
-
-	wizard := SetupWizard.Instance
+	local wizard := SetupWizard.Instance
+	local preset, previous, x, y
 
 	wizard.loadDefinition()
 
@@ -2444,22 +2532,14 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 
 restartSetup:
-	previous := fixIE(9)
+	fixIE(10)
 
-	if (previous = "")
-		previous := "9"
-
-	try {
-		wizard.createGui(wizard.Configuration)
-	}
-	finally {
-		fixIE(previous)
-	}
+	wizard.createGui(wizard.Configuration)
 
 	wizard.startSetup()
 
-	while (vProgressCount < 100) {
-		showProgress({progress: ++vProgressCount, message: translate("Starting UI...")})
+	while (wizard.ProgressCount < 100) {
+		showProgress({progress: ++wizard.ProgressCount, message: translate("Starting UI...")})
 
 		Sleep 5
 	}
@@ -2471,33 +2551,28 @@ restartSetup:
 	hideSplashTheme()
 	hideProgress()
 
-	done := false
-
 	wizard.show()
 
 	try {
-		Loop {
-			vWorking := false
+		loop {
+			wizard.Working := false
 
 			Sleep 200
-
-			if (vResult == kLanguage)
-				done := true
-		} until done
+		} until (wizard.Result == kLanguage)
 	}
 	finally {
 		wizard.hide()
 	}
 
-	if (vResult == kLanguage) {
-		vResult := false
+	if (wizard.Result == kLanguage) {
+		wizard.Result := false
 
 		wizard.close()
-		wizard.reset()
+		wizard.reset(false)
 
 		setConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", translate("Modular Simulator Controller System") . translate(" - ") . translate("Setup && Configuration"))
 
-		vProgressCount := 0
+		wizard.ProgressCount := 0
 
 		x := Round((A_ScreenWidth - 300) / 2)
 		y := A_ScreenHeight - 150
@@ -2507,15 +2582,6 @@ restartSetup:
 
 		Goto restartSetup
 	}
-	else {
-		; Let finish all threads
-
-		SetTimer exitApp, % isDebug() ? -5000 : -2000
-	}
-}
-
-exitApp() {
-	ExitApp 0
 }
 
 
@@ -2524,7 +2590,8 @@ exitApp() {
 ;;;-------------------------------------------------------------------------;;;
 
 openLabelsAndIconsEditor() {
-	owner := SetupWizard.Instance.WizardWindow
+	local owner := SetupWizard.Instance.WizardWindow
+
 	Gui %owner%:+Disabled
 
 	Gui PAE:+Owner%owner%
@@ -2535,6 +2602,9 @@ openLabelsAndIconsEditor() {
 }
 
 findSoftware(definition, software) {
+	local ignore, section, name, descriptor, ignore, locator, value, folder, installPath, folders
+	local fileName, exePath, jsScript, script
+
 	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {
 			descriptor := string2Values("|", descriptor)
@@ -2617,7 +2687,8 @@ findSoftware(definition, software) {
 }
 
 getApplicationDescriptor(application) {
-	definition := SetupWizard.Instance.Definition
+	local definition := SetupWizard.Instance.Definition
+	local ignore, section, name, descriptor
 
 	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
 		for name, descriptor in getConfigurationSectionValues(definition, section, Object())
@@ -2628,6 +2699,8 @@ getApplicationDescriptor(application) {
 }
 
 fadeOut() {
+	local masterVolume, currentVolume
+
 	SoundGet masterVolume, MASTER
 
 	if GetKeyState("Ctrl")
@@ -2635,7 +2708,7 @@ fadeOut() {
 	else {
 		currentVolume := masterVolume
 
-		Loop {
+		loop {
 			currentVolume -= 5
 
 			if (currentVolume <= 0)

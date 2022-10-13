@@ -38,11 +38,9 @@ ListLines Off					; Disable execution history
 readSimulatorData(simulator, options := "", protocol := "SHM") {
 	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
 	
-	Random postfix, 1, 1000000
-	
 	FileCreateDir %kTempDirectory%%simulator% Data
 	
-	dataFile := (kTempDirectory . simulator . " Data\" . protocol . "_" . Round(postfix) . ".data")
+	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
 	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
@@ -59,12 +57,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	
 	data := readConfiguration(dataFile)
 	
-	try {
-		FileDelete %dataFile%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(dataFile)
 	
 	setConfigurationValue(data, "Session Data", "Simulator", simulator)
 	
@@ -76,20 +69,10 @@ runTeamSessionLogger() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Team Session Logger
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
-	try {
-		FileDelete %kTempDirectory%Team Session.log
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(kTempDirectory . "Team Session.log")
 	
-	Loop {
+	loop {
 		data := readSimulatorData("ACC")
 	
 		info := values2String("; ", A_Now,
@@ -110,9 +93,6 @@ runTeamSessionLogger() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

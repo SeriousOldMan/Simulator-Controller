@@ -205,7 +205,7 @@ class R3EPitstopTester extends Plugin {
 		
 		this.activateR3EWindow()
 
-		Loop 15
+		loop 15
 			this.sendPitstopCommand(this.NextOptionHotkey)
 			
 		if this.searchMFDImage("Strategy") {
@@ -314,7 +314,7 @@ class R3EPitstopTester extends Plugin {
 		static kSearchAreaLeft := 0
 		static kSearchAreaRight := 400
 		
-		Loop % imageNames.Length()
+		loop % imageNames.Length()
 		{
 			imageName := imageNames[A_Index]
 			pitstopImages := this.getImageFileNames(imageName)
@@ -326,7 +326,7 @@ class R3EPitstopTester extends Plugin {
 			imageX := kUndefined
 			imageY := kUndefined
 			
-			Loop % pitstopImages.Length()
+			loop % pitstopImages.Length()
 			{
 				pitstopImage := pitstopImages[A_Index]
 				
@@ -460,11 +460,6 @@ runR3EPitstopTester() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, R3E Pitstop Tester
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
 	while true {
 		pitstopTester := new R3EPitstopTester()
@@ -491,9 +486,6 @@ runR3EPitstopTester() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

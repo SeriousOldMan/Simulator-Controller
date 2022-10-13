@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Configuration\Libraries\ConfigurationItemList.ahk
 #Include ..\Configuration\Libraries\ButtonBoxPreview.ahk
 #Include ..\Configuration\Libraries\StreamDeckPreview.ahk
@@ -19,20 +20,13 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kControlTypes = {}
+global kControlTypes := {}
 
 kControlTypes[k1WayToggleType] := "1-way Toggle"
 kControlTypes[k2WayToggleType] := "2-way Toggle"
 kControlTypes[kButtonType] := "Button"
 kControlTypes[kDialType] := "Rotary"
 kControlTypes[kCustomType] := "Custom"
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Private Variables Section                       ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vControllerPreviews = {}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,6 +38,8 @@ global vControllerPreviews = {}
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ControllerEditor extends ConfigurationItem {
+	static sPreviewCenters := {}
+
 	iControlsList := false
 	iLabelsList := false
 	iLayoutsList := false
@@ -180,14 +176,27 @@ class ControllerEditor extends ConfigurationItem {
 		this.iLayoutsList.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save)
 	}
 
-	setPreviewCenter(centerX, centerY) {
+	setPreviewCenter(descriptor, centerX, centerY) {
+		if descriptor
+			ControllerEditor.sPreviewCenters[descriptor] := [centerX, centerY]
+
 		this.iPreviewCenterX := centerX
 		this.iPreviewCenterY := centerY
 	}
 
-	getPreviewCenter(ByRef centerX, ByRef centerY) {
-		centerX := this.iPreviewCenterX
-		centerY := this.iPreviewCenterY
+	getPreviewCenter(descriptor, ByRef centerX, ByRef centerY) {
+		local center
+
+		if (descriptor && ControllerEditor.sPreviewCenters.HasKey(descriptor)) {
+			center := ControllerEditor.sPreviewCenters[descriptor]
+
+			centerX := center[1]
+			centerY := center[2]
+		}
+		else {
+			centerX := this.iPreviewCenterX
+			centerY := this.iPreviewCenterY
+		}
 	}
 
 	getPreviewMover() {
@@ -195,6 +204,8 @@ class ControllerEditor extends ConfigurationItem {
 	}
 
 	selectLayout(name) {
+		local index, item
+
 		Gui CTRLE:Default
 
 		Gui ListView, % this.iLayoutsList.ListHandle
@@ -208,17 +219,26 @@ class ControllerEditor extends ConfigurationItem {
 			}
 	}
 
-	open(x := "Center", y := "Center") {
-		Gui CTRLE:Show, AutoSize x%x% y%y%
+	open(x := "__Undefined__", y := "__Undefined__") {
+		local name
+
+		if ((x = kUndefined) || (y = kUndefined)) {
+			if getWindowPosition("Controller Editor", x, y)
+				Gui CTRLE:Show, x%x% y%y%
+			else
+				Gui CTRLE:Show
+		}
+		else
+			Gui CTRLE:Show, AutoSize x%x% y%y%
 
 		name := this.Name
 
-		callback := ObjBindMethod(this, "selectLayout", name)
-
-		SetTimer %callback%, -1000
+		Task.startTask(ObjBindMethod(this, "selectLayout", name), 1000)
 	}
 
 	close(save := true) {
+		local buttonBoxConfiguration, streamDeckConfiguration
+
 		if save {
 			buttonBoxConfiguration := newConfiguration()
 			streamDeckConfiguration := newConfiguration()
@@ -245,7 +265,7 @@ class ControllerEditor extends ConfigurationItem {
 	editController() {
 		this.open()
 
-		Loop
+		loop
 			Sleep 200
 		until this.iClosed
 	}
@@ -255,8 +275,9 @@ class ControllerEditor extends ConfigurationItem {
 	}
 
 	updateControllerPreview(type, name) {
-		buttonBoxConfiguration := newConfiguration()
-		streamDeckConfiguration := newConfiguration()
+		local buttonBoxConfiguration := newConfiguration()
+		local streamDeckConfiguration := newConfiguration()
+		local oldPreview
 
 		this.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, false)
 
@@ -287,11 +308,11 @@ class ControllerEditor extends ConfigurationItem {
 
 global controlsListView := "|"
 
-global controlNameEdit = ""
-global controlTypeDropDown = 0
-global imageFilePathEdit = ""
-global imageWidthEdit = 0
-global imageHeightEdit = 0
+global controlNameEdit := ""
+global controlTypeDropDown := 0
+global imageFilePathEdit := ""
+global imageWidthEdit := 0
+global imageHeightEdit := 0
 
 global controlAddButton
 global controlDeleteButton
@@ -343,9 +364,10 @@ class ControlsList extends ConfigurationItemList {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		local controls := []
+		local name, definition
 
-		controls := []
+		base.loadFromConfiguration(configuration)
 
 		for name, definition in getConfigurationSectionValues(configuration, "Controls", Object())
 			controls.Push(Array(name, string2Values(";", definition)*))
@@ -354,10 +376,11 @@ class ControlsList extends ConfigurationItemList {
 	}
 
 	saveToConfiguration(configuration, save := true) {
+		local controls := {}
+		local ignore, control
+
 		if save
 			base.saveToConfiguration(configuration)
-
-		controls := {}
 
 		for ignore, control in this.ItemList
 			controls[control[1]] := values2String(";", control[2], control[3], control[4])
@@ -366,6 +389,8 @@ class ControlsList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
+		local ignore, control
+
 		static first := true
 
 		Gui ListView, % this.ListHandle
@@ -390,10 +415,10 @@ class ControlsList extends ConfigurationItemList {
 	}
 
 	loadEditor(item) {
+		local size := string2Values("x", item[4])
+
 		controlNameEdit := item[1]
 		imageFilePathEdit := item[3]
-
-		size := string2Values("x", item[4])
 
 		imageWidthEdit := size[1]
 		imageHeightEdit := size[2]
@@ -412,6 +437,8 @@ class ControlsList extends ConfigurationItemList {
 	}
 
 	buildItemFromEditor(isNew := false) {
+		local title
+
 		GuiControlGet controlNameEdit
 		GuiControlGet controlTypeDropDown
 		GuiControlGet imageFilePathEdit
@@ -431,12 +458,13 @@ class ControlsList extends ConfigurationItemList {
 	}
 
 	getControls() {
+		local controls := {}
+		local ignore, control
+
 		if ControllerEditor.Instance.AutoSave {
 			if (this.CurrentItem != 0)
 				this.updateItem()
 		}
-
-		controls := {}
 
 		for ignore, control in this.ItemList
 			controls[control[1]] := values2String(";", control[2], control[3], control[4])
@@ -451,9 +479,9 @@ class ControlsList extends ConfigurationItemList {
 
 global labelsListView := "|"
 
-global labelNameEdit = ""
-global labelWidthEdit = 0
-global labelHeightEdit = 0
+global labelNameEdit := ""
+global labelWidthEdit := 0
+global labelHeightEdit := 0
 
 global labelAddButton
 global labelDeleteButton
@@ -500,9 +528,10 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		local labels := []
+		local name, definition
 
-		labels := []
+		base.loadFromConfiguration(configuration)
 
 		for name, definition in getConfigurationSectionValues(configuration, "Labels", Object())
 			labels.Push(Array(name, definition))
@@ -511,10 +540,11 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	saveToConfiguration(configuration, save := true) {
+		local labels := {}
+		local ignore, label
+
 		if save
 			base.saveToConfiguration(configuration)
-
-		labels := {}
 
 		for ignore, label in this.ItemList
 			labels[label[1]] := label[2]
@@ -523,6 +553,8 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
+		local ignore, label
+
 		static first := true
 
 		Gui ListView, % this.ListHandle
@@ -546,9 +578,9 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	loadEditor(item) {
-		labelNameEdit := item[1]
+		local size := string2Values("x", item[2])
 
-		size := string2Values("x", item[2])
+		labelNameEdit := item[1]
 
 		labelWidthEdit := size[1]
 		labelHeightEdit := size[2]
@@ -563,6 +595,8 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	buildItemFromEditor(isNew := false) {
+		local title
+
 		GuiControlGet labelNameEdit
 		GuiControlGet labelWidthEdit
 		GuiControlGet labelHeightEdit
@@ -580,12 +614,13 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	getLabels() {
+		local labels := {}
+		local ignore, label
+
 		if ControllerEditor.Instance.AutoSave {
 			if (this.CurrentItem != 0)
 				this.updateItem()
 		}
-
-		labels := {}
 
 		for ignore, label in this.ItemList
 			labels[label[1]] := label[2]
@@ -600,21 +635,21 @@ class LabelsList extends ConfigurationItemList {
 
 global layoutsListView := "|"
 
-global layoutNameEdit = ""
+global layoutNameEdit := ""
 global layoutTypeDropDown
 global layoutDropDown
 
-global layoutRowsEdit = ""
-global layoutColumnsEdit = ""
-global layoutRowMarginEdit = ""
-global layoutColumnMarginEdit = ""
-global layoutSidesMarginEdit = ""
-global layoutBottomMarginEdit = ""
+global layoutRowsEdit := ""
+global layoutColumnsEdit := ""
+global layoutRowMarginEdit := ""
+global layoutColumnMarginEdit := ""
+global layoutSidesMarginEdit := ""
+global layoutBottomMarginEdit := ""
 
-global layoutRowDropDown = 0
-global layoutRowEdit = ""
+global layoutRowDropDown := 0
+global layoutRowEdit := ""
 
-global layoutVisibleCheck = true
+global layoutVisibleCheck := true
 
 global layoutAddButton
 global layoutDeleteButton
@@ -712,7 +747,7 @@ class LayoutsList extends ConfigurationItemList {
 
 		Gui CTRLE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit hwndbbWidget19, %layoutRowEdit%
 
-		Loop 17
+		loop 17
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 
 		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
@@ -720,7 +755,7 @@ class LayoutsList extends ConfigurationItemList {
 
 		Gui CTRLE:Add, Button, x102 yp+30 w230 h23 Center gopenDisplayRulesEditor hwndsdWidget3, % translate("Edit Display Rules...")
 
-		Loop 3
+		loop 3
 			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)
 
 		Gui CTRLE:Add, Button, x223 y589 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
@@ -733,9 +768,10 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		local layouts := {}
+		local descriptor, definition, name, rowMargin, columnMargin, sidesMargin, bottomMargin, items
 
-		layouts := {}
+		base.loadFromConfiguration(configuration)
 
 		for descriptor, definition in getConfigurationSectionValues(this.ButtonBoxConfiguration, "Layouts", Object()) {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
@@ -792,6 +828,8 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save := true) {
+		local ignore, layout, grid
+
 		if save
 			base.saveToConfiguration(buttonBoxConfiguration)
 
@@ -802,7 +840,7 @@ class LayoutsList extends ConfigurationItemList {
 				setConfigurationValue(buttonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
 									, grid . ", " . values2String(", ", layout[2]["Margins"]*))
 
-				Loop % string2Values("x", grid)[1]
+				loop % string2Values("x", grid)[1]
 					setConfigurationValue(buttonBoxConfiguration, "Layouts"
 										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
@@ -814,7 +852,7 @@ class LayoutsList extends ConfigurationItemList {
 
 				setConfigurationValue(streamDeckConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout"), grid)
 
-				Loop % string2Values("x", grid)[1]
+				loop % string2Values("x", grid)[1]
 					setConfigurationValue(streamDeckConfiguration, "Layouts"
 										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
@@ -825,6 +863,8 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
+		local ignore, layout, grid, definition
+
 		static first := true
 		static inCall := false
 
@@ -839,7 +879,7 @@ class LayoutsList extends ConfigurationItemList {
 
 			definition := ""
 
-			Loop % string2Values("x", grid)[1]
+			loop % string2Values("x", grid)[1]
 			{
 				if (A_Index > 1)
 					definition .= "; "
@@ -865,14 +905,12 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	loadEditor(item) {
-		if !item
-			MsgBox Oops
+		local size := string2Values("x", item[2]["Grid"])
+		local object, ignore, widget, margins, choices, rows, preview
 
 		layoutNameEdit := item[1]
 		layoutTypeDropDown := item[2]["Type"]
 		layoutVisibleCheck := item[2]["Visible"]
-
-		size := string2Values("x", item[2]["Grid"])
 
 		layoutRowsEdit := size[1]
 		layoutColumnsEdit := size[2]
@@ -941,35 +979,40 @@ class LayoutsList extends ConfigurationItemList {
 			GuiControl Disable, layoutVisibleCheck
 		}
 
+		Gui CTRLE:Default
+
 		choices := []
-		rowDefinitions := []
+		rows := []
 
-		Loop %layoutRowsEdit% {
-			choices.Push(translate("Row ") . A_Index)
+		loop
+			if item[2].HasKey(A_Index) {
+				choices.Push(translate("Row ") . A_Index)
 
-			rowDefinitions.Push(item[2][A_Index])
-		}
+				definition := item[2]
 
-		this.iRowDefinitions := rowDefinitions
+				rows.Push(definition[A_Index])
+			}
+			else
+				break
+
+		layoutRowEdit := ((rows.Length() > 0) ? rows[1] : "")
+
+		GuiControl Text, layoutRowEdit, %layoutRowEdit%
+
+		this.iRowDefinitions := rows
 
 		GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
 
 		if (choices.Length() > 0) {
 			GuiControl Choose, layoutRowDropDown, 1
 
-			layoutRowEdit := (rowDefinitions.HasKey(1) ? rowDefinitions[1] : "")
-
 			this.iSelectedRow := 1
 		}
 		else {
 			GuiControl Choose, layoutRowDropDown, 0
 
-			layoutRowEdit := ""
-
 			this.iSelectedRow := false
 		}
-
-		GuiControl Text, layoutRowEdit, %layoutRowEdit%
 
 		preview := ControllerEditor.Instance.ControllerPreview
 
@@ -978,6 +1021,8 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	addItem() {
+		local type, preview
+
 		base.addItem()
 
 		if this.CurrentItem {
@@ -993,12 +1038,14 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	clearEditor() {
-		margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
+		local margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
 
 		this.loadEditor(Array("", {Type: "Button Box", Visible: true, Grid: "0x0", Margins: margins}))
 	}
 
 	buildItemFromEditor(isNew := false) {
+		local title, layout
+
 		GuiControlGet layoutNameEdit
 		GuiControlGet layoutTypeDropDown
 		GuiControlGet layoutRowsEdit
@@ -1031,7 +1078,7 @@ class LayoutsList extends ConfigurationItemList {
 			else
 				layout := {Type: "Stream Deck", Grid: layoutRowsEdit . " x " . layoutColumnsEdit, Visible: false}
 
-			Loop % this.iRowDefinitions.Length()
+			loop % this.iRowDefinitions.Length()
 				layout[A_Index] := this.iRowDefinitions[A_Index]
 
 			return Array(layoutNameEdit, layout)
@@ -1039,6 +1086,8 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	chooseLayoutType() {
+		local grid, margins
+
 		GuiControlGet layoutNameEdit
 		GuiControlGet layoutTypeDropDown
 
@@ -1083,7 +1132,8 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	openDisplayRulesEditor() {
-		name := false
+		local name := false
+		local result, configuration
 
 		if this.CurrentItem {
 			GuiControlGet layoutNameEdit
@@ -1113,6 +1163,8 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	updateLayoutRowEditor(save := true) {
+		local rows, changed, choices
+
 		Gui CTRLE:Default
 
 		GuiControlGet layoutRowsEdit
@@ -1126,7 +1178,7 @@ class LayoutsList extends ConfigurationItemList {
 		changed := false
 
 		if (layoutRowsEdit > rows) {
-			Loop % layoutRowsEdit - rows
+			loop % layoutRowsEdit - rows
 				this.iRowDefinitions.Push("")
 
 			changed := true
@@ -1137,7 +1189,7 @@ class LayoutsList extends ConfigurationItemList {
 			changed := true
 		}
 
-		Loop %layoutRowsEdit%
+		loop %layoutRowsEdit%
 			this.iRowDefinitions[A_Index] := values2String(";", this.getRowDefinition(A_Index)*)
 
 		if (layoutRowDropDown > 0) {
@@ -1151,7 +1203,7 @@ class LayoutsList extends ConfigurationItemList {
 		if changed {
 			choices := []
 
-			Loop %layoutRowsEdit%
+			loop %layoutRowsEdit%
 				choices.Push(translate("Row ") . A_Index)
 
 			GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
@@ -1183,14 +1235,14 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	getRowDefinition(row) {
-		rowDefinition := string2Values(";", this.iRowDefinitions[row])
+		local rowDefinition := string2Values(";", this.iRowDefinitions[row])
 
 		GuiControlGet layoutColumnsEdit
 
 		if (rowDefinition.Length() > layoutColumnsEdit)
 			rowDefinition.RemoveAt(layoutColumnsEdit + 1, rowDefinition.Length() - layoutColumnsEdit)
 		else
-			Loop % layoutColumnsEdit - rowDefinition.Length()
+			loop % layoutColumnsEdit - rowDefinition.Length()
 				rowDefinition.Push("")
 
 		return rowDefinition
@@ -1207,8 +1259,9 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	changeControl(row, column, control, argument := false) {
-		number := argument
-		oldButton := false
+		local number := argument
+		local oldButton := false
+		local rowDefinition, definition, oldLabel, title, prompt, locale, oldImage, newImage, oldNumber
 
 		Gui CTRLE:Default
 
@@ -1339,9 +1392,8 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	changeLabel(row, column, label) {
-		rowDefinition := this.getRowDefinition(row)
-
-		definition := string2Values(",", rowDefinition[column])
+		local rowDefinition := this.getRowDefinition(row)
+		local definition := string2Values(",", rowDefinition[column])
 
 		if (definition.Length() = 0)
 			definition := (label ? ("," . label) : "")
@@ -1360,6 +1412,7 @@ class LayoutsList extends ConfigurationItemList {
 
 class ControllerPreview extends ConfigurationItem {
 	static sCurrentWindow := 0
+	static sControllerPreviews := {}
 
 	iPreviewManager := false
 	iName := ""
@@ -1386,9 +1439,15 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
+	Descriptor[] {
+		Get {
+			return this.Name
+		}
+	}
+
 	Type[] {
 		Get {
-			Throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
+			throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
 		}
 	}
 
@@ -1398,7 +1457,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iRows := value
+			return (this.iRows := value)
 		}
 	}
 
@@ -1408,7 +1467,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iColumns := value
+			return (this.iColumns := value)
 		}
 	}
 
@@ -1418,7 +1477,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iWidth := value
+			return (this.iWidth := value)
 		}
 	}
 
@@ -1428,7 +1487,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 
 		Set {
-			this.iHeight := value
+			return (this.iHeight := value)
 		}
 	}
 
@@ -1441,6 +1500,16 @@ class ControllerPreview extends ConfigurationItem {
 	CurrentWindow[] {
 		Get {
 			return ("CTRLP" . ControllerPreview.sCurrentWindow)
+		}
+	}
+
+	ControllerPreviews[key := false] {
+		Get {
+			return (key ? ControllerPreview.sControllerPreviews[key] : ControllerPreview.sControllerPreviews)
+		}
+
+		Set {
+			return (key ? (ControllerPreview.sControllerPreviews[key] := value) : (ControllerPreview.sControllerPreviews := value))
 		}
 	}
 
@@ -1460,14 +1529,14 @@ class ControllerPreview extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		Throw "Virtual method ControllerPreview.createGui must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.createGui must be implemented in a subclass..."
 	}
 
 	createBackground(configuration) {
 	}
 
 	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
-		Throw "Virtual method ControllerPreview.getControl must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.getControl must be implemented in a subclass..."
 	}
 
 	setControlClickHandler(handler) {
@@ -1475,23 +1544,25 @@ class ControllerPreview extends ConfigurationItem {
 	}
 
 	controlClick(element, row, column, isEmpty) {
-		Throw "Virtual method ControllerPreview.controlClick must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.controlClick must be implemented in a subclass..."
 	}
 
 	openControlMenu(preview, element, function, row, column, isEmpty) {
-		Throw "Virtual method ControllerPreview.openControlMenu must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.openControlMenu must be implemented in a subclass..."
 	}
 
 	getFunction(row, column) {
-		Throw "Virtual method ControllerPreview.getFunction must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.getFunction must be implemented in a subclass..."
 	}
 
 	findFunction(function, ByRef row, ByRef column) {
-		Loop % this.Rows
+		local cRow
+
+		loop % this.Rows
 		{
 			cRow := A_Index
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				if (this.getFunction(cRow, A_Index) = function) {
 					row := cRow
@@ -1506,13 +1577,13 @@ class ControllerPreview extends ConfigurationItem {
 	}
 
 	resetLabels() {
-		local function
+		local function, row
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				function := this.getFunction(row, A_Index)
 
@@ -1523,17 +1594,18 @@ class ControllerPreview extends ConfigurationItem {
 	}
 
 	setLabel(row, column, text) {
-		Throw "Virtual method ControllerPreview.setLabel must be implemented in a subclass..."
+		throw "Virtual method ControllerPreview.setLabel must be implemented in a subclass..."
 	}
 
 	open() {
-		width := this.Width
-		height := this.Height
+		local width := this.Width
+		local height := this.Height
+		local centerX := 0
+		local centerY := 0
+		local window, x, y
+		local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 
-		centerX := 0
-		centerY := 0
-
-		this.PreviewManager.getPreviewCenter(centerX, centerY)
+		this.PreviewManager.getPreviewCenter(this.Descriptor, centerX, centerY)
 
 		SysGet mainScreen, MonitorWorkArea
 
@@ -1548,15 +1620,15 @@ class ControllerPreview extends ConfigurationItem {
 
 		window := this.Window
 
-		vControllerPreviews[window] := this
+		this.ControllerPreviews[window] := this
 
 		Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
 	}
 
 	close() {
-		window := this.Window
+		local window := this.Window
 
-		vControllerPreviews.Delete(window)
+		this.ControllerPreviews.Delete(window)
 
 		Gui %window%:Destroy
 	}
@@ -1622,6 +1694,8 @@ class DisplayRulesEditor extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
+		local layouts, chosen, buttons, disabled
+
 		Gui IRE:Default
 
 		Gui IRE:-Border ; -Caption
@@ -1629,7 +1703,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		Gui IRE:Color, D0D0D0, D8D8D8
 		Gui IRE:Font, Bold, Arial
 
-		Gui IRE:Add, Text, x0 w332 Center gmoveDisplayRulesEditor, % translate("Modular Simulator Controller System")
+		Gui IRE:Add, Text, w316 Center gmoveDisplayRulesEditor, % translate("Modular Simulator Controller System")
 
 		Gui IRE:Font, Norm, Arial
 		Gui IRE:Font, Italic Underline, Arial
@@ -1671,16 +1745,17 @@ class DisplayRulesEditor extends ConfigurationItem {
 		Gui IRE:Add, Button, x180 yp w80 h23 GcancelDisplayRulesEditor, % translate("Cancel")
 
 		this.loadLayoutButtons()
-}
+	}
 
 	saveToConfiguration(configuration) {
 		this.iDisplayRulesList.saveToConfiguration(configuration)
 	}
 
 	loadLayoutButtons() {
-		Gui IRE:Default
+		local buttons := [translate("All Buttons")]
+		local descriptor, definition, ignore, button
 
-		buttons := [translate("All Buttons")]
+		Gui IRE:Default
 
 		if this.SelectedLayout
 			for descriptor, definition in getConfigurationSectionValues(LayoutsList.Instance.StreamDeckConfiguration, "Layouts", Object()) {
@@ -1710,7 +1785,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 	editDisplayRules() {
 		this.open()
 
-		Loop
+		loop
 			Sleep 200
 		until this.iClosed
 
@@ -1718,9 +1793,13 @@ class DisplayRulesEditor extends ConfigurationItem {
 	}
 
 	open() {
-		window := this.Window
+		local window := this.Window
+		local x, y
 
-		Gui IRE:Show, AutoSize Center
+		if getWindowPosition("Controller Editor.Display Rules", x, y)
+			Gui IRE:Show, x%x% y%y%
+		else
+			Gui IRE:Show, AutoSize Center
 	}
 
 	close(save := true) {
@@ -1777,7 +1856,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 
 global displayRulesListView := "|"
 
-global iconFilePathEdit = ""
+global iconFilePathEdit := ""
 global displayRuleDropDown
 global displayRuleAddButton
 global displayRuleDeleteButton
@@ -1823,7 +1902,7 @@ class DisplayRulesList extends ConfigurationItemList {
 	}
 
 	saveToConfiguration(configuration) {
-		fullConfiguration := this.Configuration
+		local fullConfiguration := this.Configuration
 
 		this.saveDisplayRules(fullConfiguration, DisplayRulesEditor.Instance.SelectedLayout, DisplayRulesEditor.Instance.SelectedButton, this.ItemList)
 
@@ -1832,12 +1911,13 @@ class DisplayRulesList extends ConfigurationItemList {
 	}
 
 	loadDisplayRules(configuration, layout, button) {
-		icons := []
+		local icons := []
+		local prefix, icon
 
 		if button {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
-			Loop {
+			loop {
 				icon := getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
@@ -1849,7 +1929,7 @@ class DisplayRulesList extends ConfigurationItemList {
 		else {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
-			Loop {
+			loop {
 				icon := getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
@@ -1863,10 +1943,12 @@ class DisplayRulesList extends ConfigurationItemList {
 	}
 
 	saveDisplayRules(configuration, layout, button, displayRules) {
+		local prefix, index, displayRule
+
 		if button {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
-			Loop {
+			loop {
 				if (getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else
@@ -1879,7 +1961,7 @@ class DisplayRulesList extends ConfigurationItemList {
 		else {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
-			Loop {
+			loop {
 				if (getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else
@@ -1892,7 +1974,7 @@ class DisplayRulesList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
-		local rule
+		local ignore, displayRule, rule
 
 		Gui ListView, % this.ListHandle
 
@@ -1937,7 +2019,8 @@ class DisplayRulesList extends ConfigurationItemList {
 ;;;-------------------------------------------------------------------------;;;
 
 controlClick() {
-	curCoordMode := A_CoordModeMouse
+	local curCoordMode := A_CoordModeMouse
+	local row, column, isEmpty, element, clickX, clickY
 
 	CoordMode Mouse, Window
 
@@ -1948,10 +2031,10 @@ controlClick() {
 		column := 0
 		isEmpty := false
 
-		element := vControllerPreviews[A_Gui].getControl(clickX, clickY, row, column, isEmpty)
+		element := ControllerPreview.ControllerPreviews[A_Gui].getControl(clickX, clickY, row, column, isEmpty)
 
 		if element
-			vControllerPreviews[A_Gui].controlClick(element, row, column, isEmpty)
+			ControllerPreview.ControllerPreviews[A_Gui].controlClick(element, row, column, isEmpty)
 	}
 	finally {
 		CoordMode Mouse, curCoordMode
@@ -1959,6 +2042,19 @@ controlClick() {
 }
 
 controlMenuIgnore() {
+}
+
+moveControllerPreview() {
+	local window := ControllerPreview.CurrentWindow
+	local preview, x, y, width, height
+
+	moveByMouse(window)
+
+	WinGetPos x, y, width, height, A
+
+	preview := ControllerPreview.ControllerPreviews[A_Gui]
+
+	preview.PreviewManager.setPreviewCenter(preview.Descriptor, x + Round(width / 2), y + Round(height / 2))
 }
 
 
@@ -1975,7 +2071,7 @@ cancelControllerEditor() {
 }
 
 moveControllerEditor() {
-	moveByMouse(A_Gui)
+	moveByMouse(A_Gui, "Controller Editor")
 }
 
 openControllerDocumentation() {
@@ -1991,7 +2087,8 @@ chooseLayout() {
 }
 
 chooseImageFile(path) {
-	title := translate("Select Image...")
+	local title := translate("Select Image...")
+	local pictureFile
 
 	Gui +OwnDialogs
 
@@ -2003,6 +2100,8 @@ chooseImageFile(path) {
 }
 
 chooseImageFilePath() {
+	local path, pictureFile
+
 	GuiControlGet imageFilePathEdit
 
 	path := imageFilePathEdit
@@ -2022,6 +2121,8 @@ chooseImageFilePath() {
 }
 
 chooseIconFilePath() {
+	local path, pictureFile
+
 	GuiControlGet iconFilePathEdit
 
 	path := iconFilePathEdit
@@ -2041,6 +2142,8 @@ chooseIconFilePath() {
 }
 
 updateLayoutRowEditor() {
+	local list
+
 	try {
 		list := ConfigurationItemList.getList("layoutsListView")
 
@@ -2048,7 +2151,7 @@ updateLayoutRowEditor() {
 			list.updateLayoutRowEditor()
 	}
 	catch exception {
-		; ignore
+		logError(exception)
 	}
 }
 
@@ -2057,7 +2160,8 @@ openDisplayRulesEditor() {
 }
 
 openControllerActionsEditor() {
-	owner := ControllerEditor.Instance.Window
+	local owner := ControllerEditor.Instance.Window
+
 	Gui CTRLE:+Disabled
 
 	Gui PAE:+OwnerCTRLE
@@ -2065,16 +2169,6 @@ openControllerActionsEditor() {
 	new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions()
 
 	Gui CTRLE:-Disabled
-}
-
-moveControllerPreview() {
-	window := ControllerPreview.CurrentWindow
-
-	moveByMouse(window)
-
-	WinGetPos x, y, width, height, A
-
-	vControllerPreviews[A_Gui].PreviewManager.setPreviewCenter(x + Round(width / 2), y + Round(height / 2))
 }
 
 saveDisplayRulesEditor() {
@@ -2086,7 +2180,7 @@ cancelDisplayRulesEditor() {
 }
 
 moveDisplayRulesEditor() {
-	moveByMouse(A_Gui)
+	moveByMouse(A_Gui, "Controller Editor.Display Rules")
 }
 
 openDisplayRulesDocumentation() {

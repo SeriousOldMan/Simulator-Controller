@@ -55,7 +55,7 @@ class BasicReporting extends Assert {
 	BasisTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -85,7 +85,7 @@ class BasicReporting extends Assert {
 					this.AssertEqual(11, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -97,7 +97,7 @@ class BasicReporting extends Assert {
 	StandingsMemoryTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -105,7 +105,7 @@ class BasicReporting extends Assert {
 			else
 				strategist.addLap(A_Index, data)
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -154,7 +154,7 @@ class GapReporting extends Assert {
 	StandingsGapTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -175,7 +175,7 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4464, 4, 9153, 1, -519263), "Unexpected standings gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -187,7 +187,7 @@ class GapReporting extends Assert {
 	TrackGapTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -208,7 +208,7 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 21, -4103, 4, 9153), "Unexpected track gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -222,7 +222,7 @@ class PositionProjection extends Assert {
 	PositionProjectionTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -237,7 +237,7 @@ class PositionProjection extends Assert {
 
 				position := strategist.KnowledgeBase.getValue("Standings.Extrapolated." . 10 . ".Car.13.Position", false)
 
-				strategist.dumpKnowledge(strategist.KnowledgeBase)
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 				this.AssertEqual(8, position, "Unexpected future position detected in lap 3...")
 			}
@@ -251,7 +251,7 @@ class PositionProjection extends Assert {
 				this.AssertEqual(4, position, "Unexpected future position detected in lap 3...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -265,7 +265,7 @@ class PitstopRecommendation extends Assert {
 	PitstopRecommendationTest() {
 		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
@@ -281,7 +281,7 @@ class PitstopRecommendation extends Assert {
 				this.AssertFalse(strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 3...")
 			}
 
-			strategist.dumpKnowledge(strategist.KnowledgeBase)
+			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -305,7 +305,7 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms; Garbage: [RS: " . vActiveResultSets . " (" . vMaxResultSets . "), CP: " . vActiveChoicePoints . " (" . vMaxChoicePoints . "), V: " . vActiveVariables . "]"
+	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
 }
 else {
 	raceNr := 17
@@ -317,10 +317,10 @@ else {
 	if (raceNr == 15) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -358,10 +358,10 @@ else {
 	else if (raceNr == 16) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -393,10 +393,10 @@ else {
 	else if (raceNr == 17) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (lap == 1 && A_Index == 1)

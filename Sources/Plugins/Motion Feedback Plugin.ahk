@@ -7,31 +7,38 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Task.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kMotionIntensityIncrement = 5
-global kMotionIntensityMin = 0
-global kMotionIntensityMax = 50
-global kMotionIntensityRange = 100
+global kMotionIntensityIncrement := 5
+global kMotionIntensityMin := 0
+global kMotionIntensityMax := 50
+global kMotionIntensityRange := 100
 
-global kMotionSliderY = 231
-global kMotionSliderMinX = 377
-global kMotionSliderMaxX = 450
-global kMotionSliderWidth = kMotionSliderMaxX - kMotionSliderMinX
+global kMotionSliderY := 231
+global kMotionSliderMinX := 377
+global kMotionSliderMaxX := 450
+global kMotionSliderWidth := kMotionSliderMaxX - kMotionSliderMinX
 
-global kEffectIntensityIncrement = 0.1
-global kEffectIntensityMin = 0.2
-global kEffectIntensityMax = 1.8
-global kEffectIntensityRange = 2.0
+global kEffectIntensityIncrement := 0.1
+global kEffectIntensityMin := 0.2
+global kEffectIntensityMax := 1.8
+global kEffectIntensityRange := 2.0
 
-global kEffectMuteToggleX = 276
-global kEffectMuteToggleY = [330, 425, 520, 615, 710, 805, 900]
+global kEffectMuteToggleX := 276
+global kEffectMuteToggleY := [330, 425, 520, 615, 710, 805, 900]
 
-global kEffectsSliderMinX = 730
-global kEffectsSliderMaxX = 950
-global kEffectsSliderWidth = kEffectsSliderMaxX - kEffectsSliderMinX
-global kEffectsSliderY = [305, 400, 495, 590, 685, 780, 875]
+global kEffectsSliderMinX := 730
+global kEffectsSliderMaxX := 950
+global kEffectsSliderWidth := kEffectsSliderMaxX - kEffectsSliderMinX
+global kEffectsSliderY := [305, 400, 495, 590, 685, 780, 875]
 
 global kSimFeedbackConnector := false
 
@@ -40,8 +47,8 @@ global kSimFeedbackConnector := false
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kMotionFeedbackPlugin = "Motion Feedback"
-global kMotionMode = "Motion"
+global kMotionFeedbackPlugin := "Motion Feedback"
+global kMotionMode := "Motion"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -62,9 +69,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	iMotionApplication := false
 	iIsMotionActive := false
 
+	iUpdateMotionStateTask := false
+
 	class MotionMode extends ControllerMode {
 		iSelectedEffect := false
 		iIntensityActions := []
+
+		iUpdateLabelsTask := false
 
 		Mode[] {
 			Get {
@@ -92,7 +103,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		updateEffectLabels() {
-			local action
+			local action, state, index, effect
 
 			static isInfo := false
 
@@ -119,6 +130,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		selectEffect(effect) {
+			local ignore, action
+
 			this.iSelectedEffect := effect
 
 			for ignore, action in this.iIntensityActions
@@ -126,6 +139,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		chooseEffect() {
+			local ignore, action
+
 			this.iSelectedEffect := kUndefined
 
 			for ignore, action in this.iIntensityActions
@@ -147,19 +162,29 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.updateActionStates()
 
-			SetTimer updateEffectLabels, 1500
+			if !this.iUpdateLabelsTask {
+				this.iUpdateLabelsTask := new PeriodicTask(ObjBindMethod(this, "updateEffectLabels"), 1500, kLowPriority)
+
+				this.iUpdateLabelsTask.start()
+			}
 		}
 
 		deactivate() {
 			base.deactivate()
 
-			SetTimer updateEffectLabels, Off
+			if this.iUpdateLabelsTask {
+				this.iUpdateLabelsTask.stop()
+
+				this.iUpdateLabelsTask := false
+			}
 
 			this.deselectEffect()
 		}
 
 		updateActionStates() {
-			for index, effect in this.Plugin.kEffects
+			local ignore, effect
+
+			for ignore, effect in this.Plugin.kEffects
 				this.findAction(this.Plugin.getLabel(ConfigurationItem.descriptor(effect, "Toggle"), effect)).updateLabel("Normal")
 		}
 	}
@@ -215,6 +240,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
+			local currentIntensity
+
 			if ((trigger = "On") || (trigger = kIncrease))
 				this.Mode.Plugin.increaseMotionIntensity()
 			else if ((trigger = "Off") || (trigger = kDecrease))
@@ -255,9 +282,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		__New(function, motionMode, effect) {
-			this.iEffect := effect
+			local descriptor := ConfigurationItem.descriptor(effect, "Toggle")
 
-			descriptor := ConfigurationItem.descriptor(effect, "Toggle")
+			this.iEffect := effect
 
 			base.__New(function, motionMode, motionMode.Plugin.getLabel(descriptor, effect), motionMode.Plugin.getIcon(descriptor))
 		}
@@ -303,6 +330,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
+			local effect, currentIntensity
+
 			if (this.iCurrentEffect != false) {
 				effect := this.iCurrentEffect
 
@@ -340,7 +369,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 	class EffectSelectorAction extends ControllerAction {
 		fireAction(function, trigger) {
-			mode := this.Controller.findMode(kMotionFeedbackPlugin, kMotionMode)
+			local mode := this.Controller.findMode(kMotionFeedbackPlugin, kMotionMode)
 
 			if (mode.PendingEffect || (mode.SelectedEffect != false))
 				mode.deselectEffect()
@@ -368,7 +397,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		local function
+		local function, motionArguments, motionEffectsArguments, motionEffectIntensityArguments, initialIntensity
+		local effectFunctions, ignore, index, effect, descriptor, motionMode, increaseAction, decreaseAction, intensityDialAction
 
 		base.__New(controller, name, configuration, false)
 
@@ -396,10 +426,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			motionEffectsArguments := string2Values(",", this.getArgumentValue("motionEffects", ""))
 			motionEffectIntensityArguments := string2Values(A_Space, this.getArgumentValue("motionEffectIntensity", ""))
 
-			initialIntensity := motionArguments[motionArguments.Length()]
+			if (motionArguments.Length() == 4) {
+				initialIntensity := motionArguments[4]
 
-			this.kInitialMotionIntensity := initialIntensity
-			this.iCurrentMotionIntensity := initialIntensity
+				this.kInitialMotionIntensity := initialIntensity
+				this.iCurrentMotionIntensity := initialIntensity
+			}
 
 			effectFunctions := []
 
@@ -432,7 +464,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.iMotionMode := motionMode
 
-			if (motionArguments.Length() > 3) {
+			if (motionArguments.Length() > 2) {
 				descriptor := motionArguments[3]
 				function := this.Controller.findFunction(descriptor)
 
@@ -534,9 +566,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			ControlGet isChecked, Checked, , %muteToggle%, % this.Application.WindowTitle
 			*/
-			isChecked := this.kInitialEffectStates[effect]
 
-			this.iCurrentEffectStates[effect] := isChecked
+			this.iCurrentEffectStates[effect] := this.kInitialEffectStates[effect]
 		}
 	}
 
@@ -551,6 +582,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	loadMotionStateFromSimFeedback() {
+		local isActive, posX, posY
+
 		if kSimFeedbackConnector
 			this.iIsMotionActive := this.callSimFeedback("IsRunning")
 		else {
@@ -577,6 +610,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	loadFromSimFeedback() {
+		local ignore, effect
+
 		this.loadMotionStateFromSimFeedback()
 		this.loadMotionIntensityFromSimFeedback()
 
@@ -594,11 +629,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if (function != false)
 			mode.registerAction(new this.EffectToggleAction(function, mode, effect))
 		else
-			this.logFunctionNotFound(descriptor)
+			this.logFunctionNotFound(functionDescriptor)
 	}
 
 	activate() {
-		local action
+		local action, isRunning
 
 		base.activate()
 
@@ -609,11 +644,19 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if action
 			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 
-		SetTimer updateMotionState, -100
+		if !this.iUpdateMotionStateTask {
+			this.iUpdateMotionStateTask := new PeriodicTask(ObjBindMethod(this, "updateMotionState"), 100, kLowPriority)
+
+			this.iUpdateMotionStateTask.start()
+		}
 	}
 
 	deactivate() {
-		SetTimer updateMotionState, Off
+		if this.iUpdateMotionStateTask {
+			this.iUpdateMotionStateTask.stop()
+
+			this.iUpdateMotionStateTask := false
+		}
 
 		base.deactivate()
 	}
@@ -626,6 +669,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	callSimFeedback(arguments*) {
+		local index, argument, result, message
+
 		if this.requireSimFeedback()
 			try {
 				for index, argument in arguments
@@ -667,6 +712,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	toggleEffect(effect) {
+		local yCoordinate
+
 		if this.Application.isRunning() {
 			if kSimFeedbackConnector {
 				this.callSimFeedback("EffectToggle", effect)
@@ -679,6 +726,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				yCoordinate := kEffectMuteToggleY[effect]
 
 				ControlClick X%kEffectMuteToggleX% Y%yCoordinate%, % this.Application.WindowTitle
+
 				Sleep 100
 
 				this.iCurrentEffectStates[effect] := !this.iCurrentEffectStates[effect]
@@ -687,6 +735,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	setEffectIntensity(effect, targetIntensity) {
+		local currentIntensity, sliderY
+
 		if (this.Application.isRunning() && (targetIntensity >= kEffectIntensityMin) && (targetIntensity <= kEffectIntensityMax)) {
 			if kSimFeedbackConnector {
 				this.callSimFeedback("EffectIntensitySet", effect, Round(targetIntensity * 10))
@@ -704,6 +754,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 									   , sliderY
 									   , kEffectsSliderMinX + Round(kEffectsSliderWidth * (targetIntensity / kEffectIntensityRange))
 									   , sliderY
+
 					Sleep 100
 
 					this.iCurrentEffectIntensities[effect] := targetIntensity
@@ -725,6 +776,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 									   , kMotionSliderY
 									   , kMotionSliderMinX + Round(kMotionSliderWidth * (targetIntensity / kMotionIntensityRange))
 									   , kMotionSliderY
+
 					Sleep 100
 
 					this.iCurrentMotionIntensity := targetIntensity
@@ -733,9 +785,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	requireSimFeedback(startup := true) {
-		static needsInitialize := true
+		local isRunning := this.Application.isRunning()
+		local windowTitle
 
-		isRunning := this.Application.isRunning()
+		static needsInitialize := true
 
 		if (!isRunning && startup) {
 			startSimFeedback(kSimFeedbackConnector == false)
@@ -757,14 +810,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		if !isRunning
-			Loop 20 {
+			loop 20
 				Sleep 500
-			} until this.Application.isRunning()
+			until this.Application.isRunning()
 
 		return this.Application.isRunning()
 	}
 
 	increaseMotionIntensity() {
+		local wasHidden
+
 		if ((this.iCurrentMotionIntensity + kMotionIntensityIncrement) < kMotionIntensityMax)
 			if kSimFeedbackConnector
 				this.setMotionIntensity(this.iCurrentMotionIntensity + kMotionIntensityIncrement)
@@ -779,6 +834,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	decreaseMotionIntensity() {
+		local wasHidden
+
 		if ((this.iCurrentMotionIntensity - kMotionIntensityIncrement) > kMotionIntensityMin)
 			if kSimFeedbackConnector
 				this.setMotionIntensity(this.iCurrentMotionIntensity - kMotionIntensityIncrement)
@@ -793,6 +850,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	unmuteEffect(effect) {
+		local wasHidden
+
 		if kSimFeedbackConnector
 			this.toggleEffect(effect)
 		else {
@@ -800,6 +859,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			if !this.getEffectState(effect) {
 				this.toggleEffect(effect)
+
 				Sleep 100
 			}
 
@@ -809,6 +869,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	muteEffect(effect) {
+		local wasHidden
+
 		if kSimFeedbackConnector
 			this.toggleEffect(effect)
 		else {
@@ -816,6 +878,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			if this.getEffectState(effect) {
 				this.toggleEffect(effect)
+
 				Sleep 100
 			}
 
@@ -825,12 +888,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	increaseEffectIntensity(effect) {
+		local wasHidden
+
 		if kSimFeedbackConnector
 			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] + kEffectIntensityIncrement)
 		else {
 			wasHidden := this.showMotionWindow()
 
 			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] + kEffectIntensityIncrement)
+
 			Sleep 100
 
 			if wasHidden
@@ -839,12 +905,15 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	decreaseEffectIntensity(effect) {
+		local wasHidden
+
 		if kSimFeedbackConnector
 			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] - kEffectIntensityIncrement)
 		else {
 			wasHidden := this.showMotionWindow()
 
 			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] - kEffectIntensityIncrement)
+
 			Sleep 100
 
 			if wasHidden
@@ -853,20 +922,26 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	resetEffectStates() {
+		local index, effect
+
 		for index, effect in this.kEffects {
 			if (this.iCurrentEffectStates[index] != this.kInitialEffectStates[index]) {
 				this.toggleEffect(effect)
+
 				Sleep 50
 			}
 		}
 	}
 
 	resetEffectIntensities() {
+		local index, effect, initialIntensity
+
 		for index, effect in this.kEffects {
 			initialIntensity := this.kInitialEffectIntensities[index]
 
 			if (this.iCurrentEffectIntensities[index] != initialIntensity) {
 				this.setEffectIntensity(effect, initialIntensity, false)
+
 				Sleep 50
 			}
 		}
@@ -877,9 +952,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	showMotionWindow() {
-		window := this.Application.WindowTitle
-
-		wasHidden := (WinActive(window) == 0)
+		local window := this.Application.WindowTitle
+		local wasHidden := (WinActive(window) == 0)
 
 		if this.requireSimFeedback() {
 			window := this.Application.WindowTitle
@@ -914,6 +988,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	updateTrayLabel(label, enabled) {
+		local callback
+
 		static hasTrayMenu := false
 
 		label := StrReplace(label, "`n", A_Space)
@@ -934,6 +1010,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	startMotion(label := false, force := false) {
+		local actionLabel, action, wasHidden
+
 		if (!this.MotionActive || force) {
 			actionLabel := this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")
 			action := this.findAction(actionLabel)
@@ -953,6 +1031,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 				if !this.MotionActive {
 					ControlClick Start, % this.Application.WindowTitle
+
 					Sleep 100
 
 					this.iIsMotionActive := true
@@ -973,6 +1052,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	stopMotion(label := false, force := false, stop := true) {
+		local actionLabel, action, wasHidden, motionMode
+
 		if (this.MotionActive || force) {
 			actionLabel := this.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion")
 			action := this.findAction(actionLabel)
@@ -1004,6 +1085,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 						this.resetToInitialState()
 
 						ControlClick Stop, % this.Application.WindowTitle
+
 						Sleep 100
 
 						this.iIsMotionActive := false
@@ -1020,12 +1102,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.updateTrayLabel(label, this.MotionActive)
 
-			action.Function.setLabel(label, "Gray")
+			if action
+				action.Function.setLabel(label, "Gray")
 		}
 	}
 
 	updatePluginState() {
-		mode := this.findMode(kMotionMode)
+		local mode := this.findMode(kMotionMode)
 
 		if (inList(this.Controller.ActiveModes, mode))
 			if this.Application.isRunning()
@@ -1065,7 +1148,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			protectionOff()
 		}
 
-		SetTimer updateMotionState, % isRunning ? 10000 : 5000
+		Task.CurrentTask.Sleep := (isRunning ? 10000 : 5000)
 	}
 }
 
@@ -1074,33 +1157,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-updateMotionState() {
-	static plugin := false
-
-	if !plugin
-		plugin := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin)
-
-	plugin.updateMotionState()
-}
-
-updateEffectLabels() {
-	static mode := false
-
-	if !mode
-		mode := SimulatorController.Instance.findMode(kMotionFeedbackPlugin, kMotionMode)
-
-	protectionOn()
-
-	try {
-		mode.updateEffectLabels()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
 startSimFeedback(stayOpen := false) {
-	simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)
+	local simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)
+	local pid, windowTitle
 
 	if simFeedback.isRunning()
 		pid := simFeedback.CurrentPID
@@ -1125,7 +1184,7 @@ startSimFeedback(stayOpen := false) {
 }
 
 initializeMotionFeedbackPlugin() {
-	controller := SimulatorController.Instance
+	local controller := SimulatorController.Instance
 
 	new MotionFeedbackPlugin(controller, kMotionFeedbackPlugin, controller.Configuration)
 }
@@ -1137,16 +1196,12 @@ initializeMotionFeedbackPlugin() {
 
 startMotion() {
 	local plugin := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin)
-	local action
 
 	protectionOn()
 
 	try {
-		if SimulatorController.Instance.isActive(plugin) {
-			; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
-
-			plugin.startMotion() ; action.fireAction(action.Function, "On")
-		}
+		if (plugin && SimulatorController.Instance.isActive(plugin))
+			plugin.startMotion()
 	}
 	finally {
 		protectionOff()
@@ -1155,16 +1210,12 @@ startMotion() {
 
 stopMotion() {
 	local plugin := SimulatorController.Instance.findPlugin(kMotionFeedbackPlugin)
-	local action
 
 	protectionOn()
 
 	try {
-		if SimulatorController.Instance.isActive(plugin) {
-			; action := plugin.findAction(plugin.getLabel(ConfigurationItem.descriptor("Motion", "Toggle"), "Motion"))
-
-			plugin.stopMotion() ; action.fireAction(action.Function, "Off")
-		}
+		if (plugin && SimulatorController.Instance.isActive(plugin))
+			plugin.stopMotion()
 	}
 	finally {
 		protectionOff()

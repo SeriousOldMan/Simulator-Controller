@@ -40,6 +40,7 @@
   - [Using Simulator Controller](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#using-simulator-controller)
     - [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands)
     - [Controller Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#controller-commands)
+    - [External Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands)
 
 [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
 ------
@@ -135,9 +136,11 @@
     - [Rules & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings)
     - [Pitstop & Service](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop--service)
 	- [Drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#drivers)
+	- [Weather](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#weather)
     - [Simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#simulation)
     - [Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy)
   - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling)
+	- [Recalculating the Strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#adjusting-the-strategy-during-a-race)
   - [Technical Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#technical-information)
     - [Data acquisition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#data-acquisition)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#troubleshooting)
@@ -191,7 +194,7 @@
   - [Functions Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference)
     - [Configurations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#configurations-functionsahk)
     - [Tray Messages](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#tray-messages-functionsahk)
-    - [Event Messages](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#event-messages-functionsahk)
+    - [Process Communication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#process-communication-messagesahk)
     - [Collection Helper](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#collection--string-helper-functions-functionsahk)
     - [File Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#file-handling-functionsahk)
     - [Localization & Translation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#localization--translation-functionsahk)

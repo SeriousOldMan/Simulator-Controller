@@ -23,22 +23,22 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kWeatherOptions = ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
+global kWeatherConditions := ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
-global kTyreCompounds = ["Wet", "Intermediate", "Dry"
-					   , "Wet (S)", "Wet (M)", "Wet (H)"
-					   , "Intermediate (S)", "Intermediate (M)", "Intermediate (H)"
-					   , "Dry (S+)", "Dry (S)", "Dry (M)", "Dry (H)", "Dry (H+)"
-					   , "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
+global kTyreCompounds := ["Wet", "Intermediate", "Dry"
+					    , "Wet (S)", "Wet (M)", "Wet (H)"
+					    , "Intermediate (S)", "Intermediate (M)", "Intermediate (H)"
+					    , "Dry (S+)", "Dry (S)", "Dry (M)", "Dry (H)", "Dry (H+)"
+					    , "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
 
-global kDryQualificationSetup = "DQ"
-global kDryRaceSetup = "DR"
-global kWetQualificationSetup = "WQ"
-global kWetRaceSetup = "WR"
+global kDryQualificationSetup := "DQ"
+global kDryRaceSetup := "DR"
+global kWetQualificationSetup := "WQ"
+global kWetRaceSetup := "WR"
 
-global kSetupTypes = [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
+global kSetupTypes := [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
-global kSessionSchemas = {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
+global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -62,8 +62,10 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	DBID[] {
+	DatabaseID[] {
 		Get {
+			local id
+
 			try {
 				FileRead id, %kDatabaseDirectory%ID
 
@@ -72,6 +74,40 @@ class SessionDatabase extends ConfigurationItem {
 			catch exception {
 				return this.ID
 			}
+		}
+	}
+
+	DatabasePath[] {
+		Get {
+			return kDatabaseDirectory
+		}
+
+		Set {
+			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			setConfigurationValue(configuration, "Database", "Path", value)
+			setConfigurationValue(this.Configuration, "Database", "Path", value)
+
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+			return (kDatabaseDirectory := (normalizeDirectoryPath(value) . "\"))
+		}
+	}
+
+	DatabaseVersion[] {
+		Get {
+			return getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini")
+									   , "Database", "Version", false)
+		}
+
+		Set {
+			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			setConfigurationValue(configuration, "Database", "Version", value)
+
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+			return value
 		}
 	}
 
@@ -87,6 +123,8 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		Set {
+			local configuration
+
 			if persistent {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
@@ -100,6 +138,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	__New(controllerConfiguration := false) {
+		local identifier
+
 		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
 
 		if !this.ID {
@@ -123,6 +163,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	prepareDatabase(simulator, car, track, data := false) {
+		local simulatorCode, prefix, carName
+
 		if (simulator && car && track) {
 			simulatorCode := this.getSimulatorCode(simulator)
 			car := this.getCarCode(simulator, car)
@@ -142,7 +184,7 @@ class SessionDatabase extends ConfigurationItem {
 									FileMoveDir %prefix%%carName%, %prefix%%car%, R
 							}
 							catch exception {
-								; ignore
+								logError(exception)
 							}
 
 							return
@@ -159,7 +201,7 @@ class SessionDatabase extends ConfigurationItem {
 										FileMoveDir %prefix%%carName%, %prefix%%car%, R
 								}
 								catch exception {
-									; ignore
+									logError(exception)
 								}
 
 								return
@@ -174,6 +216,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getAllDrivers(simulator, names := false) {
+		local sessionDB, ids, index, row, ignore, id
+
 		if simulator {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
@@ -198,11 +242,13 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	registerDriver(simulator, id, name) {
+		local sessionDB, forName, surName, nickName
+
 		if (simulator && id && name && (name != "John Doe (JD)")) {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			forName := false
-			surname := false
+			surName := false
 			nickName := false
 
 			parseDriverName(name, forName, surName, nickName)
@@ -213,7 +259,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getDriverID(simulator, name) {
-		ids := this.getDriverIDs(simulator, name)
+		local ids := this.getDriverIDs(simulator, name)
 
 		return ((ids.Length() > 0) ? ids[1] : false)
 	}
@@ -223,6 +269,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getDriverIDs(simulator, name) {
+		local sessionDB, forName, surName, nickName, ids, ignore, entry
+
 		if (simulator && name) {
 			forName := false
 			surName := false
@@ -244,6 +292,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getDriverNames(simulator, id) {
+		local sessionDB, drivers, ignore, driver
+
 		if (simulator && id) {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
@@ -259,19 +309,18 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	hasTrackMap(simulator, track) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
 		return (FileExist(prefix . ".map") && this.getTrackImage(simulator, track))
 	}
 
 	availableTrackMaps(simulator) {
-		sessionDB := new SessionDatabase()
+		local sessionDB := new SessionDatabase()
+		local code := sessionDB.getSimulatorCode(simulator)
+		local tracks := []
+		local track
 
-		code := sessionDB.getSimulatorCode(simulator)
-
-		tracks := []
-
-		Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
+		loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
 		{
 			SplitPath A_LoopFileName, , , , track
 
@@ -282,14 +331,13 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	availableTrackImages(simulator) {
-		sessionDB := new SessionDatabase()
+		local sessionDB := new SessionDatabase()
+		local code := sessionDB.getSimulatorCode(simulator)
+		local directory := (kDatabaseDirectory . "User\Tracks\" . code . "\")
+		local tracks := []
+		local track
 
-		code := sessionDB.getSimulatorCode(simulator)
-
-		directory := (kDatabaseDirectory . "User\Tracks\" . code . "\")
-		tracks := []
-
-		Loop Files, %directory%*.map, F		; Track
+		loop Files, %directory%*.map, F		; Track
 		{
 			SplitPath A_LoopFileName, , , , track
 
@@ -302,7 +350,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	updateTrackMap(simulator, track, map, imageFileName, dataFileName := false) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+		local extension
 
 		writeConfiguration(prefix . ".map", map)
 
@@ -315,16 +364,16 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackMap(simulator, track) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+		local fileName := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track) . ".map")
 
-		if FileExist(prefix . ".map")
-			return readConfiguration(prefix . ".map")
+		if FileExist(fileName)
+			return readConfiguration(fileName)
 		else
 			return false
 	}
 
 	getTrackImage(simulator, track) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
 		if FileExist(prefix . ".map") {
 			if FileExist(prefix . ".png")
@@ -341,16 +390,17 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackData(simulator, track) {
-		prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+		local fileName := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track) . ".data")
 
-		if FileExist(prefix . ".data")
-			return (prefix . ".data")
+		if FileExist(fileName)
+			return (fileName)
 		else
 			return false
 	}
 
 	hasTrackAutomations(simulator, car, track) {
-		code := this.getSimulatorCode(simulator)
+		local code := this.getSimulatorCode(simulator)
+
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
@@ -358,7 +408,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackAutomations(simulator, car, track) {
-		code := this.getSimulatorCode(simulator)
+		local code := this.getSimulatorCode(simulator)
+
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
@@ -366,6 +417,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackAutomation(simulator, car, track, name := false) {
+		local ignore, trackAutomation
+
 		for ignore, trackAutomation in this.getTrackAutomations(simulator, car, track)
 			if ((name && (trackAutomation.Name = name)) || trackAutomation.Active)
 				return trackAutomation
@@ -374,7 +427,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	setTrackAutomations(simulator, car, track, trackAutomations) {
-		code := this.getSimulatorCode(simulator)
+		local code := this.getSimulatorCode(simulator)
+
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
@@ -382,18 +436,19 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	loadTrackAutomations(data) {
+		local result := []
+		local id, actions
+
 		if !IsObject(data)
 			data := readConfiguration(data)
 
-		result := []
-
-		Loop % getConfigurationValue(data, "Automations", "Count", 0)
+		loop % getConfigurationValue(data, "Automations", "Count", 0)
 		{
 			id := A_Index
 
 			actions := []
 
-			Loop % getConfigurationValue(data, "Automations", id . ".Actions", 0)
+			loop % getConfigurationValue(data, "Automations", id . ".Actions", 0)
 				actions.Push({X: getConfigurationValue(data, "Actions", id . "." . A_Index . ".X", 0)
 							, Y: getConfigurationValue(data, "Actions", id . "." . A_Index . ".Y", 0)
 							, Type: getConfigurationValue(data, "Actions", id . "." . A_Index . ".Type", 0)
@@ -408,7 +463,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	saveTrackAutomations(trackAutomations, fileName := false) {
-		data := newConfiguration()
+		local data := newConfiguration()
+		local id, trackAutomation, ignore, trackAction
 
 		for id, trackAutomation in trackAutomations {
 			setConfigurationValue(data, "Automations", id . ".Name", trackAutomation.Name)
@@ -432,14 +488,14 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getEntries(filter := "*.*", option := "D") {
-		result := []
+		local result := []
 
-		Loop Files, %kDatabaseDirectory%User\%filter%, %option%
+		loop Files, %kDatabaseDirectory%User\%filter%, %option%
 			if ((A_LoopFileName != "1") && (InStr(A_LoopFileName, ".") != 1))
 				result.Push(A_LoopFileName)
 
 		if this.UseCommunity
-			Loop Files, %kDatabaseDirectory%Community\%filter%, %option%
+			loop Files, %kDatabaseDirectory%Community\%filter%, %option%
 				if ((A_LoopFileName != "1") && (InStr(A_LoopFileName, ".") != 1) && !inList(result, A_LoopFileName))
 					result.Push(A_LoopFileName)
 
@@ -447,6 +503,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getSimulatorName(simulatorCode) {
+		local name, description, code
+
 		if (simulatorCode = "Unknown")
 			return "Unknown"
 		else if (this.ControllerConfiguration.Count() > 0) {
@@ -458,7 +516,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else {
 			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
-							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "PCARS2": "Project CARS 2"}
+							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "Project CARS 2": "PCARS2"}
 				if ((simulatorCode = name) || (simulatorCode = code))
 					return name
 
@@ -467,6 +525,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getSimulatorCode(simulatorName) {
+		local code, ignore, description, name
+
 		if (simulatorName = "Unknown")
 			return "Unknown"
 		else {
@@ -480,7 +540,7 @@ class SessionDatabase extends ConfigurationItem {
 						return simulatorName
 
 				for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
-								 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "PCARS2": "Project CARS 2"}
+								 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "Project CARS 2": "PCARS2"}
 					if ((simulatorName = name) || (simulatorName = code))
 						return code
 
@@ -490,14 +550,23 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getSimulators() {
-		simulators := []
+		local configuredSimulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration"
+																									  , "Simulators", ""))
+		local controllerSimulators := getKeys(getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object()))
+		local simulators := []
+		local simulator, ignore, name, code
 
-		for simulator, ignore in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
-			simulators.Push(simulator)
+		for ignore, simulator in configuredSimulators
+			if inList(controllerSimulators, simulator)
+				simulators.Push(simulator)
+
+		for ignore, simulator in controllerSimulators
+			if !inList(simulators, simulator)
+				simulators.Push(simulator)
 
 		if (simulators.Length() = 0)
 			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
-							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "PCARS2": "Project CARS 2"}
+							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "Project CARS 2": "PCARS2"}
 				if FileExist(kDatabaseDirectory . "User\" . code)
 					simulators.Push(name)
 
@@ -505,7 +574,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getCars(simulator) {
-		code := this.getSimulatorCode(simulator)
+		local code := this.getSimulatorCode(simulator)
 
 		if code
 			return this.getEntries(code . "\*.*")
@@ -514,7 +583,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTracks(simulator, car) {
-		code := this.getSimulatorCode(simulator)
+		local code := this.getSimulatorCode(simulator)
+		local tracks
 
 		if code {
 			tracks := this.getEntries(code . "\" . car . "\*.*")
@@ -526,6 +596,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	loadData(cache, simulator, fileName) {
+		local name, data, section, values, key, value
+
 		if cache.HasKey(simulator)
 			return cache[simulator]
 		else {
@@ -554,8 +626,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	registerCar(simulator, car, name) {
-		fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Car Data.ini")
-		carData := readConfiguration(fileName)
+		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Car Data.ini")
+		local carData := readConfiguration(fileName)
 
 		if (getConfigurationValue(carData, "Car Names", car, kUndefined) == kUndefined) {
 			setConfigurationValue(carData, "Car Names", car, name)
@@ -568,7 +640,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getCarName(simulator, car) {
-		name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
 									, "Car Names", car, car)
 
 		if (!name || (name = ""))
@@ -578,8 +650,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getCarCode(simulator, car) {
-		code := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									, "Car Codes", car, car)
+		local code := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+										  , "Car Codes", car, car)
 
 		if (!code || (code = ""))
 			code := car
@@ -588,8 +660,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	registerTrack(simulator, track, shortName, longName) {
-		fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Track Data.ini")
-		trackData := readConfiguration(fileName)
+		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Track Data.ini")
+		local trackData := readConfiguration(fileName)
 
 		if (getConfigurationValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
 			setConfigurationValue(trackData, "Track Names Long", track, longName)
@@ -604,8 +676,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackName(simulator, track, long := true) {
-		name := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									, long ? "Track Names Long" : "Track Names Short", track, track)
+		local name := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+										  , long ? "Track Names Long" : "Track Names Short", track, track)
 
 		if (!name || (name = ""))
 			name := track
@@ -614,8 +686,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackCode(simulator, track) {
-		code := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
-									, "Track Codes", track, track)
+		local code := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+										  , "Track Codes", track, track)
 
 		if (!code || (code = ""))
 			code := track
@@ -624,6 +696,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompounds(simulator, car, track, codes := false) {
+		local code, cache, key, compounds, data, cds, nms, ignore, compound, candidate
+
 		static settingsDB := false
 		static sNames := {}
 		static sCodes := {}
@@ -674,11 +748,11 @@ class SessionDatabase extends ConfigurationItem {
 			cds := []
 			nms := []
 
-			for ignore, tyre in string2Values(";", compounds) {
-				tyre := string2Values("->", tyre)
+			for ignore, compound in string2Values(";", compounds) {
+				compound := string2Values("->", compound)
 
-				cds.Push(tyre[1])
-				nms.Push(tyre[2])
+				cds.Push(compound[1])
+				nms.Push(compound[2])
 			}
 
 			if codes
@@ -693,6 +767,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
+		local index, code
+
 		for index, code in this.getTyreCompounds(simulator, car, track, true)
 			if (code = compound)
 				return this.getTyreCompounds(simulator, car, track)[index]
@@ -701,6 +777,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
+		local index, name, code
+
 		for index, name in this.getTyreCompounds(simulator, car, track)
 			if (name = compound) {
 				code := this.getTyreCompounds(simulator, car, track, true)[index]
@@ -711,8 +789,76 @@ class SessionDatabase extends ConfigurationItem {
 		return default
 	}
 
+	suitableTyreCompound(simulator, car, track, weather, compound) {
+		local compoundColor := compoundColor(compound)
+
+		compound := compound(compound)
+
+		if (weather = "Dry") {
+			if (compound = "Dry")
+				return true
+		}
+		else if (weather = "Drizzle") {
+			if inList(["Dry", "Intermediate"], compound)
+				return true
+		}
+		else if (weather = "LightRain") {
+			if inList(["Intermediate", "Wet"], compound)
+				return true
+		}
+		else if (compound = "Wet")
+			return true
+
+		return false
+	}
+
+	optimalTyreCompound(simulator, car, track, weather, airTemeperature, trackTemperature, availableTyreCompounds := false) {
+		local compounds, compound, index
+
+		if !availableTyreCompounds
+			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
+
+		compounds := map(availableTyreCompounds, "compound")
+
+		switch weather {
+			case "Dry":
+				compound := "Dry"
+			case "Drizzle", "LightRain":
+				compound := "Intermediate"
+			default:
+				compound := "Wet"
+		}
+
+		index := inList(compounds, compound)
+
+		if index
+			return availableTyreCompounds[index]
+		else if ((compound = "Intermediate") && (weather = "Drizzle")) {
+			index := inList(compounds, "Dry")
+
+			if index
+				return availableTyreCompounds[index]
+		}
+		else if ((compound = "Intermediate") && (weather = "LightRain")) {
+			index := inList(compounds, "Wet")
+
+			if index
+				return availableTyreCompounds[index]
+		}
+		else {
+			index := inList(compounds, "Dry")
+
+			if index
+				return availableTyreCompounds[index]
+		}
+
+		return false
+	}
+
 	readNotes(simulator, car, track) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local notes
+
 		car := this.getCarCode(simulator, car)
 
 		try {
@@ -731,22 +877,21 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeNotes(simulator, car, track, notes) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
+
 		car := this.getCarCode(simulator, car)
 
-		try {
-			if (car && (car != true)) {
-				if (track && (track != true))
-					FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt
-				else
-					FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
-			}
+		if (car && (car != true)) {
+			if (track && (track != true))
+				fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Notes.txt)
 			else
-				FileDelete %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
+				fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\Notes.txt
 		}
-		catch exception {
-			; ignore
-		}
+		else
+			fileName = %kDatabaseDirectory%User\%simulatorCode%\Notes.txt
+
+		deleteFile(fileName)
 
 		if (car && (car != true)) {
 			if (track && (track != true)) {
@@ -768,7 +913,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getSetupNames(simulator, car, track, ByRef userSetups, ByRef communitySetups) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local ignore, type, setups, name
+
 		car := this.getCarCode(simulator, car)
 
 		if userSetups {
@@ -777,7 +924,7 @@ class SessionDatabase extends ConfigurationItem {
 			for ignore, type in kSetupTypes {
 				setups := []
 
-				Loop Files, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
+				loop Files, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
 				{
 					SplitPath A_LoopFileName, name
 
@@ -794,7 +941,7 @@ class SessionDatabase extends ConfigurationItem {
 			for ignore, type in kSetupTypes {
 				setups := []
 
-				Loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
+				loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
 				{
 					SplitPath A_LoopFileName, name
 
@@ -807,7 +954,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readSetup(simulator, car, track, type, name, ByRef size) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local data, fileName, file
+
 		car := this.getCarCode(simulator, car)
 
 		data := false
@@ -834,21 +983,18 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size) {
-		simulatorCode := this.getSimulatorCode(simulator)
-		car := this.getCarCode(simulator, car)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName, file
 
-		try {
-			FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
-		}
-		catch exception {
-			; ignore
-		}
+		car := this.getCarCode(simulator, car)
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%
 
 		FileCreateDir %fileName%
 
 		fileName := (fileName . "\" . name)
+
+		deleteFile(fileName)
 
 		file := FileOpen(fileName, "w", "")
 
@@ -858,27 +1004,27 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	renameSetup(simulator, car, track, type, oldName, newName) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+
 		car := this.getCarCode(simulator, car)
 
 		try {
 			FileMove %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%oldName%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%newName%, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
 	removeSetup(simulator, car, track, type, name) {
-		simulatorCode := this.getSimulatorCode(simulator)
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
+
 		car := this.getCarCode(simulator, car)
 
-		try {
-			FileDelete %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
-		}
-		catch exception {
-			; ignore
-		}
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
+
+		deleteFile(fileName)
 	}
 }
 
@@ -925,11 +1071,11 @@ parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {
 	fullName := StrSplit(fullName, A_Space, " `t", 2)
 
 	forName := fullName[1]
-	surName := fullName[2]
+	surName := ((fullName.Length() > 1) ? fullName[2] : "")
 }
 
 computeDriverName(forName, surName, nickName) {
-	name := ""
+	local name := ""
 
 	if (forName != "")
 		name .= (forName . A_Space)

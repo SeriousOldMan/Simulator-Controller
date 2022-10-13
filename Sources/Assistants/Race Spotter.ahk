@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-; ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence.ico
 ;@Ahk2Exe-ExeName Race Spotter.exe
@@ -35,15 +32,10 @@ SetBatchLines -1				; Maximize CPU utilization
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceSpotter.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRemotePID = 0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -51,11 +43,12 @@ global vRemotePID = 0
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	static videoPlayer
+	local info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local logo := kResourcesDirectory . "Rotating Brain.gif"
+	local image := "1:" . logo
+	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html
 
-	info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
-	logo := kResourcesDirectory . "Rotating Brain.gif"
-	image := "1:" . logo
+	static videoPlayer
 
 	SysGet mainScreen, MonitorWorkArea
 
@@ -88,34 +81,29 @@ hideLogo() {
 	SplashImage 1:Off
 }
 
-checkRemoteProcessAlive() {
-	Process Exist, %vRemotePID%
+checkRemoteProcessAlive(pid) {
+	Process Exist, %pid%
 
 	if !ErrorLevel
 		ExitApp 0
 }
 
 startRaceSpotter() {
-	icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local remotePID := false
+	local spotterName := "Elisa"
+	local spotterLogo := false
+	local spotterLanguage := false
+	local spotterSynthesizer := true
+	local spotterSpeaker := false
+	local spotterSpeakerVocalics := false
+	local spotterRecognizer := true
+	local spotterListener := false
+	local debug := false
+	local voiceServer, index, spotter, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Spotter
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
-	remotePID := 0
-	spotterName := "Elisa"
-	spotterLogo := false
-	spotterLanguage := false
-	spotterSynthesizer := true
-	spotterSpeaker := false
-	spotterSpeakerVocalics := false
-	spotterRecognizer := true
-	spotterListener := false
-	debug := false
 
 	Process Exist, Voice Server.exe
 
@@ -176,13 +164,41 @@ startRaceSpotter() {
 	if debug
 		setDebug(true)
 
-	RaceSpotter.Instance := new RaceSpotter(kSimulatorConfiguration
+	spotter := new RaceSpotter(kSimulatorConfiguration
 										  , remotePID ? new RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 										  , spotterName, spotterLanguage
 										  , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
 										  , spotterRecognizer, spotterListener, voiceServer)
 
-	registerEventHandler("Race Spotter", "handleSpotterRemoteCalls")
+	RaceSpotter.Instance := spotter
+
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Debug Positions")
+	callback := ObjBindMethod(spotter, "toggleDebug", kDebugPositions)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if spotter.Debug[kDebugPositions]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Debug Rule System")
+	callback := ObjBindMethod(spotter, "toggleDebug", kDebugRules)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if spotter.Debug[kDebugRules]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Debug Knowledgebase")
+	callback := ObjBindMethod(spotter, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if spotter.Debug[kDebugKnowledgebase]
+		Menu SupportMenu, Check, %label%
+
+	registerMessageHandler("Race Spotter", "handleSpotterMessage")
 
 	if (debug && spotterSpeaker) {
 		RaceSpotter.Instance.getSpeaker()
@@ -193,42 +209,35 @@ startRaceSpotter() {
 	if (spotterLogo && !kSilentMode)
 		showLogo(spotterName)
 
-	if (remotePID != 0) {
-		vRemotePID := remotePID
-
-		SetTimer checkRemoteProcessAlive, 10000
-	}
+	if remotePID
+		Task.startTask(new PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceSpotter(shutdown := false) {
 	if shutdown
 		ExitApp 0
 
-	if (RaceSpotter.Instance.Session == kSessionFinished) {
-		callback := Func("shutdownRaceSpotter").Bind(true)
-
-		SetTimer %callback%, -10000
-	}
+	if (RaceSpotter.Instance.Session == kSessionFinished)
+		Task.startTask(Func("shutdownRaceSpotter").Bind(true), 10000, kLowPriority)
 	else
-		SetTimer shutdownRaceSpotter, -1000
+		Task.startTask("shutdownRaceSpotter", 1000, kLowPriority)
+
+	return false
 }
 
-handleSpotterRemoteCalls(event, data) {
+handleSpotterMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			SetTimer shutdownRaceSpotter, -20000
+			Task.startTask("shutdownRaceSpotter", 20000, kLowPriority)
 
 			return true
 		}
@@ -236,7 +245,7 @@ handleSpotterRemoteCalls(event, data) {
 			return withProtection(ObjBindMethod(RaceSpotter.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		SetTimer shutdownRaceSpotter, -20000
+		Task.startTask("shutdownRaceSpotter", 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceSpotter.Instance, data))
 }

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
+#include <fstream>
 #include <string.h>
 #include <windows.h>
 #include <tchar.h>
@@ -119,7 +120,8 @@ int sessionDuration = 0;
 
 const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
-const float longitudinalDistance = 4;
+float longitudinalFrontDistance = 4;
+float longitudinalRearDistance = 5;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
 
@@ -139,12 +141,13 @@ bool carBehind = false;
 bool carBehindLeft = false;
 bool carBehindRight = false;
 bool carBehindReported = false;
+int carBehindCount = 0;
 
 const int YELLOW_SECTOR_1 = 1;
 const int YELLOW_SECTOR_2 = 2;
 const int YELLOW_SECTOR_3 = 4;
 
-const int YELLOW_FULL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
+const int YELLOW_ALL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
 
 const int BLUE = 16;
 
@@ -196,6 +199,10 @@ string computeAlert(int newSituation) {
 					alert = "ClearAll";
 				else
 					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+
+				carBehindReported = true;
+				carBehindCount = 21;
+
 				break;
 			case LEFT:
 				if (lastSituation == THREE)
@@ -263,14 +270,15 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 
 		rotateBy(&transX, &transY, angle);
 
-		if ((abs(transY) < longitudinalDistance) && (abs(transX) < lateralDistance) && (abs(otherZ - carZ) < verticalDistance))
+		if ((abs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) &&
+			(abs(transX) < lateralDistance) && (abs(otherZ - carZ) < verticalDistance))
 			return (transX < 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0) {
 				carBehind = true;
 
-				if ((faster && abs(transY) < longitudinalDistance * 1.5) ||
-					(abs(transY) < longitudinalDistance * 2 && abs(transX) > lateralDistance / 2))
+				if ((faster && abs(transY) < longitudinalFrontDistance * 1.5) ||
+					(abs(transY) < longitudinalFrontDistance * 2 && abs(transX) > lateralDistance / 2))
 					if (transX < 0)
 						carBehindRight = true;
 					else
@@ -355,30 +363,40 @@ bool checkPositions() {
 			carBehindReported = false;
 		}
 
+		if (carBehindCount++ > 200)
+			carBehindCount = 0;
+
 		string alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
-			if (alert != "Hold")
-				carBehindReported = false;
+			longitudinalRearDistance = 4;
 
 			sendSpotterMessage("proximityAlert:" + alert);
 
 			return true;
 		}
-		else if (carBehind) {
-			if (!carBehindReported) {
-				carBehindReported = true;
+		else {
+			longitudinalRearDistance = 5;
+			
+			if (carBehind) {
+				if (!carBehindReported) {
+					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
+						carBehindReported = true;
 
-				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+							(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-				return true;
+						return true;
+					}
+				}
 			}
+			else
+				carBehindReported = false;
 		}
-		else
-			carBehindReported = false;
 	}
 	else {
+		longitudinalRearDistance = 5;
+			
 		lastSituation = CLEAR;
 		carBehind = false;
 		carBehindLeft = false;
@@ -458,10 +476,10 @@ bool checkFlagState() {
 	}
 
 	if (gf->GlobalYellow1 && gf->GlobalYellow2 && gf->GlobalYellow3) {
-		if ((lastFlagState & YELLOW_FULL) == 0) {
-			sendSpotterMessage("yellowFlag:Full");
+		if ((lastFlagState & YELLOW_ALL) == 0) {
+			sendSpotterMessage("yellowFlag:All");
 
-			lastFlagState |= YELLOW_FULL;
+			lastFlagState |= YELLOW_ALL;
 
 			return true;
 		}
@@ -517,8 +535,8 @@ bool checkFlagState() {
 			if (waitYellowFlagState != lastFlagState)
 				sendSpotterMessage("yellowFlag:Clear");
 
-			lastFlagState &= ~YELLOW_FULL;
-			waitYellowFlagState &= ~YELLOW_FULL;
+			lastFlagState &= ~YELLOW_ALL;
+			waitYellowFlagState &= ~YELLOW_ALL;
 			yellowCount = 0;
 
 			return true;
@@ -528,7 +546,7 @@ bool checkFlagState() {
 	return false;
 }
 
-void checkPitWindow() {
+bool checkPitWindow() {
 	SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
@@ -545,14 +563,36 @@ void checkPitWindow() {
 			pitWindowClosedReported = false;
 
 			sendSpotterMessage("pitWindow:Open");
+
+			return true;
 		}
 		else if (pitWindowEnd < currentTime && !pitWindowClosedReported) {
 			pitWindowClosedReported = true;
 			pitWindowOpenReported = false;
 
 			sendSpotterMessage("pitWindow:Closed");
+
+			return true;
 		}
 	}
+
+	return false;
+}
+
+bool greenFlagReported = false;
+
+bool greenFlag() {
+	if (!greenFlagReported && (((SPageFileGraphic*)m_graphics.mapFileBuffer)->flag == AC_GREEN_FLAG)) {
+		greenFlagReported = true;
+		
+		sendSpotterMessage("greenFlag");
+		
+		Sleep(2000);
+		
+		return true;
+	}
+	else
+		return false;
 }
 
 float initialX = 0.0;
@@ -681,6 +721,8 @@ int main(int argc, char* argv[])
 	int safety = 200;
 
 	while (true) {
+		bool wait = true;
+
 		if (mapTrack) {
 			if (!writeCoordinates())
 				break;
@@ -688,8 +730,16 @@ int main(int argc, char* argv[])
 		else if (positionTrigger)
 			checkCoordinates();
 		else {
-			if (!running)
-				running = ((gf->flag == AC_GREEN_FLAG) || (countdown-- <= 0) || (pf->speedKmh >= 200));
+			bool startGo = (gf->flag == AC_GREEN_FLAG);
+			
+			if (!running) {
+				countdown -= 1;
+
+				if (!greenFlagReported && ((countdown <= 0) || (pf->speedKmh >= 200)))
+					greenFlagReported = true;
+
+				running = (startGo || (countdown <= 0) || (pf->speedKmh >= 200));
+			}
 
 			if (running) {
 				if (pf->speedKmh > 120)
@@ -708,10 +758,15 @@ int main(int argc, char* argv[])
 					sessionDuration = gf->sessionTimeLeft;
 
 				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
-					if (!checkFlagState() && !checkPositions())
-						checkPitWindow();
+					if (!startGo || !greenFlag())
+						if (!checkFlagState() && !checkPositions())
+							wait = !checkPitWindow();
+						else
+							wait = false;
 				}
 				else {
+					longitudinalRearDistance = 5;
+			
 					lastSituation = CLEAR;
 					carBehind = false;
 					carBehindLeft = false;
@@ -722,10 +777,10 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
-
+		
 		if (positionTrigger)
 			Sleep(10);
-		else
+		else if (wait)
 			Sleep(50);
 	}
 
@@ -735,5 +790,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
-

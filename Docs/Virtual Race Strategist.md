@@ -4,7 +4,7 @@ Cato is based entirely on the technology of Jona, the Virtual Race Engineer. The
 
 ## Introduction
 
-As a complement to Jona, your Virtual Race Engineer, this new Assistant will accompany you during your races as a Virtual Strategist. Cato will have complete knowledge over the race session incl. lap times of you and your opponents, the current race positions, pitstop events, weather changes, and so on. You can request updates for all these informations by asking Cato for the position, the gaps to the car in front and behind and also request information about the current lap times of your opponents and wether they are closing in. All this, although very useful, if you are racing using VR, is only a part of Catos capabilties. Cato will furthermore be able to develop appropriate pitstop strategies if you are stuck in traffic and he will be able to react to unforeseen events such as sudden weather changes and severe damage - all hand in hand with Jona, the Virtual Race Engineer. This functionality will come step by step over the course of the next releases. Also step by step will the support for the various simulation games develop. Support for *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing*, *Automobilista 2* and *Project CARS 2* is already there.
+As a complement to Jona, your Virtual Race Engineer, this new Assistant will accompany you during your races as a Virtual Strategist. Cato will have complete knowledge over the race session incl. lap times of you and your opponents, the current race positions, pitstop events, weather changes, and so on. You can request updates for all these informations by asking Cato for the position, the gaps to the car in front and behind and also request information about the current lap times of your opponents and wether they are closing in. All this, although very useful, if you are racing using VR, is only a part of Catos capabilties. Cato is furthermore able to develop appropriate pitstop strategies if you are stuck in traffic and he will be able to react to unforeseen events such as sudden weather changes and severe damage - all hand in hand with Jona, the Virtual Race Engineer. Cato currently supports *Assetto Corsa*, *Assetto Corsa Competizione*, *rFactor 2*, *RaceRoom Racing Experience*, *iRacing*, *Automobilista 2* and *Project CARS 2*.
 
 Before we dig deeper into the inner workings, here is a typical dialog based interaction, to give you an understanding of the current capabilities of Cato.
 
@@ -102,6 +102,8 @@ Cato will be active during practice and race sessions by default, although the A
 
 Cato will always be active during a race, even if you have disabled data collection for races. You can activate the assitant anytime using the activation phrase and ask then for information about current lap times, current and possible future standings and so on. Normally, Cato will not contact you on its own as often as Jona does, but Cato will collaberate with Jona, when it is time for a pitstop. In this situation, Cato might suggest a specific lap for the next pitstop to optimize your race position after the stop.
 
+Important: In the default configuration, Cato will be activated in the first lap of a session. This is necessary, so that Cato can setup the initial knowledge (starting grid, your position, the initial strategy, etc.). If you join a session later than during the first lap, Cato will refuse to work. This behaviour can be changed with the setting "Strategist: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), but the behaviour of Cato may be somewhat confusing.
+
 ### Race Settings
 
 Cato shares many settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool and the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
@@ -145,7 +147,11 @@ The following statistical models are currently implemented:
 
 ## Race Reports
 
-Cato allows you to save most of the data that is acquired during a race to an external database as a report for later analysis. You can configure, where and also when these reports are stored, using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). If a report has been saved for a given race, you use the "Race Reports" application to open this race from the database. After the race report has been opened, the "Race Reports" tool gives you several different views, which you can use to analyze the data.
+Cato allows you to save most of the data that is acquired during a race to an external database as a report for later analysis. You can configure, where and also when these reports are stored, using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist). If a report has been saved for a given race, you use the "Race Reports" application to open this race from the database.
+
+Important: "Race Reports" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corrsponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Race Reports" once using administrator privileges.
+
+After a given race report has been selected, the "Race Reports" tool offers you several different views, which you can use to analyze the data.
 
   1. Overview Report
   
@@ -211,6 +217,8 @@ Another valuable tool, which is supported by Cato is the "Strategy Workbench". W
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 
+Important: "Strategy Workbench" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Strategy Workbench" once using administrator privileges.
+
 The "Strategy Workbench" is divided into two main areas. The upper area allows you to analyze the available telemetry information for a given car / track / conditions combination using several available graphical charts. Telemetry information is divided into an *Electronics* and a *Tyres* group.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Chart%20Selector.JPG)
@@ -250,6 +258,8 @@ Loading of settings is supported for:
 	   - Safety Fuel
 	 - Drivers
 	   - The complete list of drivers, as long as known in the current telemetry database), will be restored
+	 - Weather
+	   - The complete weather forecast will be restored from the current strategy
 	 - Simulation
 	   - Tyre Compound
 	   - Tyre Compound Color
@@ -425,11 +435,21 @@ In this tab you have to enter the time required for several pitstop activities, 
 
 ### Drivers
 
-Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation tries to use driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so, if such data is available. If not the grand average of all available data is used instead.
+Using this tab, you can create a kind of a stint plan for the simulated session. You can use every driver, which is known in the current telemetry database. When the simulation runs, the drivers are picked up for each stint in the order, in which they appear in this list and the simulation will use the driver specific data for all simulation relevant aspects like lap times, fuel consumption, tyre degredation, and so on. If no such data is available, the simulation ight fail to create a valid strategy. In that case, use for the corresponding stint.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%205.JPG)
 
 Note: If you import the strategy into the "Race Center", the driver information may be used to populate the stint plan for the session in "Race Center".
+
+### Weather
+
+Here you can configure a time dependent weather forecast for the strategy simulation. For each weather change specify the time into the race in hours and minutes and supply the expected rain level and temperatures.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%206.JPG)
+
+Depending on the forecast, appropriate pitstops with tyre changes will be planned just before the weather change. If you use this feature, make sure to have enough telemetry data for all applicable tyre compounds available. Otherwise, the simulation will fail or yield false results.
+
+Note: This information will be only used during the initial simulation of the strategy. If you later on recalculate the strategy using the Race Strategist or the "Race Center", the actual current weather or the weather outlook (if available by the simulator) will be used instead.
 
 ### Simulation
 
@@ -456,12 +476,14 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
   - Tyre Compound
   
     When you are preparing the Strategy for a car, for which different tyre compound mixtures (for example White - Blue - Red) are available, you can define with this slider the propabilty, with which a different mixture will be used for the next stint. Up to 100 variations may be evaluated for best possible lap times and thereby overall race performance. Tyre usage based lap time degredation will be included in the stochiastic modeling, as long as enough data is available for each tyre compound mixture.
+	
+	Important to understand: The simulation will use only those tyre compounds, for which telemtry data is available. So even, if you enetered a soft dry compound into the list of available tyre sets for example, it might never be used, if there is no data available. So be sure to have driven and recorded at least a couple of laps in varying conditions with all tyre compounds, which are available for the given car / track combination.
 
-For every slider not at the zero position, four different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. 
+For every slider not at the zero position, different variations of the underlying value will be created as strategy sceanrios, which will be compared at the end for better results. The number of variations depend on the slider position. The slider more to the right will result in more variations.
 
 You can use the commands in the *Simulation* drop down menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. If you hold the Control key while pressing the "Simulate!" button or choosing the corresponding menu item, the selected scenario will be copied to the *Strategy* tab after the simulation.
 
-Important: You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, especially for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. The telemtry data is stored lap by lap in the CSV files "Electronics.CSV" and "Tyres.CSV", which are located in the folder *Simulator Controller\Database\User\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. Another approach is to use the "Cleanup Data" command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value.
+Important: You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, for example for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. The telemtry data is stored lap by lap in the CSV files "Electronics.CSV" and "Tyres.CSV", which are located in the folder *Simulator Controller\Database\User\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. Another approach is to use the "Cleanup Data" command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value.
 
 ### Strategy
 
@@ -479,7 +501,17 @@ When a race session starts, Cato looks for a currently defined strategy and chec
 
 The currently active strategy might be dropped, if you do not adhere to the pitstop plan defined in the strategy. To conform to the strategy, you must execute the pitstops in the laps as defined in the strategy +/- a few laps (10% deviation is allowed). If you think, that the predefined strategy is not of any use any more, because of a crash or changing weather conditions, you can cancel it actively with a voice command or by using ["StrategyCancel" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist).
 
-Please note, that in a team race, the starting driver must be the one, which created and activated the strategy for the given event. If there is a need to alter or adopt the selected strategy later on, for example due to accidents or severe wether changes, this can be done using the [strategy support of "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling).
+Please note, that in a team race, the starting driver must be the one, which created and activated the strategy for the given event, or you musr use the "Instruct Strategist" command of the "Race Center" during the first laps to activate the strategy.
+
+### Adjusting the Strategy during a race
+
+If there is a need to alter or adopt the selected strategy later on, for example due to an accident with an unplanned repair pitstop or also due to severe wether changes, you can instruct the Strategist to recalculate and adjust the currently active strategy using a voice command or the ["StrategyRecommend" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist). In this case, the currently active strategy will be taken as a template incl. all original settings like pitstop rules, available tyre sets, and so on, but other aspects like starting fuel level or the current weather conditions, will be taken from the current race situation. Based on this conditions a new strategy will be derived for the remaining race and will be activated automatically. If it is not possible to calculate a new strategy, for example, when too few laps remain or if there is no telemetry data available for the requested weather conditions and tyre compound, the currently active strategy will be canceled automatically.
+
+The weather forecast will be taken into account for the new strategy. If the currently mounted tyres are not suitable for the upcoming weather, the new strategy will start with a pitstop to change tyres. For additional information, how tyre compounds are chosen during weather changes, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) about weather specific tyre compounds.
+
+Please note, that if you are running a race with Team Server support, a new strategy can be also created and activated using the [strategy support of "Race Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling), which gives you much more control over various aspects of the new strategy.
+
+Finally a word of a advice: The calculation of a strategy can be a time consuming and CPU intensive process, especially for long endurance races or if the *Optimizer* was used during the creation of the initially strategy. This can result in framerate drops on weaker PC systems. So please check before an important race, whether you can use this functionality safely in your specific environment. But, even if your system is capable to handle the load, the recalculation may take some time, especially when high *Optimizer* settings were chosen during the creation of the initially strategy.
 
 ## Technical information
 

@@ -105,7 +105,7 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[(KoennenWir) (Number) Liter nachtanken, Wir brauchen (Number) Liter]
 
-	[(KoennenWir) Regen Reifen {verwenden, aufziehen}, (KannstDu) Trocken Reifen {verwenden, aufziehen}]
+	[(KoennenWir) Regen Reifen {verwenden, aufziehen}, (KannstDu) Trocken Reifen {verwenden, aufziehen}, (KannstDu) Intermediate Reifen {verwenden, aufziehen}]
 
 	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) Punkt (Digit) erhöhen, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) Punkt (Digit) mehr {Druck, Druck bitte}]
 
@@ -118,3 +118,5 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 	[(KannstDu) die Aufhängung {reparieren, reparieren bitte}, (KannstDu) die Aufhängung {bitte nicht, nicht} {reparieren, reparieren bitte}]
 
 	[(KannstDu) die Verkleidung {reparieren, reparieren bitte}, (KannstDu) die Verkleidung {bitte nicht, nicht} {reparieren, reparieren bitte}]
+	
+	[(KannstDu) den Motor {reparieren, reparieren bitte}, (KannstDu) den Motor {bitte nicht, nicht} {reparieren, reparieren bitte}]

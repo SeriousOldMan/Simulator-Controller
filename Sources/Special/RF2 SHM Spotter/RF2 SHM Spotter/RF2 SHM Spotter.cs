@@ -166,7 +166,8 @@ namespace RF2SHMSpotter {
 
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
-		const double longitudinalDistance = 4;
+		double longitudinalFrontDistance = 4;
+		double longitudinalRearDistance = 5;
 		const double lateralDistance = 6;
 		const double verticalDistance = 2;
 
@@ -186,12 +187,13 @@ namespace RF2SHMSpotter {
 		bool carBehindLeft = false;
 		bool carBehindRight = false;
 		bool carBehindReported = false;
+		int carBehindCount = 0;
 
 		const int YELLOW_SECTOR_1 = 1;
 		const int YELLOW_SECTOR_2 = 2;
 		const int YELLOW_SECTOR_3 = 4;
 
-		const int YELLOW_FULL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
+		const int YELLOW_ALL = (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3);
 
 		const int BLUE = 16;
 
@@ -248,6 +250,10 @@ namespace RF2SHMSpotter {
 								alert = "ClearAll";
 							else
 								alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+
+							carBehindReported = true;
+							carBehindCount = 21;
+
 							break;
 						case LEFT:
 							if (lastSituation == THREE)
@@ -321,7 +327,8 @@ namespace RF2SHMSpotter {
 
 				rotateBy(ref transX, ref transY, angle);
 
-				if ((Math.Abs(transY) < longitudinalDistance) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
+				if ((Math.Abs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) &&
+					(Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
 					return (transX < 0) ? RIGHT : LEFT;
 				else
 				{
@@ -329,8 +336,8 @@ namespace RF2SHMSpotter {
 					{
 						carBehind = true;
 
-						if ((faster && Math.Abs(transY) < longitudinalDistance * 1.5) ||
-							(Math.Abs(transY) < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
+						if ((faster && Math.Abs(transY) < longitudinalFrontDistance * 1.5) ||
+							(Math.Abs(transY) < longitudinalFrontDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
 							if (transX < 0)
 								carBehindRight = true;
 							else
@@ -398,7 +405,7 @@ namespace RF2SHMSpotter {
 				{
 					var vehicle = scoring.mVehicles[i];
 
-					if (vehicle.mIsPlayer == 0)
+					if ((vehicle.mIsPlayer == 0) && (vehicle.mInPits == 0))
 					{
 						// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
 						// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
@@ -436,34 +443,45 @@ namespace RF2SHMSpotter {
 					carBehindReported = false;
 				}
 
+				if (carBehindCount++ > 200)
+					carBehindCount = 0;
+
 				string alert = computeAlert(newSituation);
 
 				if (alert != noAlert)
 				{
-					if (alert != "Hold")
-						carBehindReported = false;
+					longitudinalRearDistance = 4;
 
 					SendSpotterMessage("proximityAlert:" + alert);
 
 					return true;
 				}
-				else if (carBehind)
-				{
-					if (!carBehindReported)
+				else {
+					longitudinalRearDistance = 5;
+
+					if (carBehind)
 					{
-						carBehindReported = true;
+						if (!carBehindReported)
+						{
+							if (carBehindLeft || carBehindRight || (carBehindCount < 20))
+							{
+								carBehindReported = true;
 
-						SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-													(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+								SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+															(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-						return true;
+								return true;
+							}
+						}
 					}
+					else
+						carBehindReported = false;
 				}
-				else
-					carBehindReported = false;
 			}
 			else
 			{
+				longitudinalRearDistance = 5;
+				
 				lastSituation = CLEAR;
 				carBehind = false;
 				carBehindReported = false;
@@ -548,6 +566,7 @@ namespace RF2SHMSpotter {
 				blueCount = 0;
 			}
 
+			/*
 			if (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.FullCourseYellow)
 			{
 				if ((lastFlagState & YELLOW_FULL) == 0)
@@ -555,6 +574,18 @@ namespace RF2SHMSpotter {
 					SendSpotterMessage("yellowFlag:Full");
 
 					lastFlagState |= YELLOW_FULL;
+
+					return true;
+				}
+			}
+			*/
+			if ((scoring.mScoringInfo.mSectorFlag[0] == 1) && (scoring.mScoringInfo.mSectorFlag[1] == 1) && (scoring.mScoringInfo.mSectorFlag[2] == 1))
+			{
+				if ((lastFlagState & YELLOW_ALL) == 0)
+				{
+					SendSpotterMessage("yellowFlag:All");
+
+					lastFlagState |= YELLOW_ALL;
 
 					return true;
 				}
@@ -618,8 +649,8 @@ namespace RF2SHMSpotter {
 					if (waitYellowFlagState != lastFlagState)
 						SendSpotterMessage("yellowFlag:Clear");
 
-					lastFlagState &= ~YELLOW_FULL;
-					waitYellowFlagState &= ~YELLOW_FULL;
+					lastFlagState &= ~YELLOW_ALL;
+					waitYellowFlagState &= ~YELLOW_ALL;
 					yellowCount = 0;
 
 					return true;
@@ -629,9 +660,27 @@ namespace RF2SHMSpotter {
 			return false;
 		}
 
-		void checkPitWindow(ref rF2VehicleScoring playerScoring)
+		bool checkPitWindow(ref rF2VehicleScoring playerScoring)
 		{
 			// No support by rFactor 2
+
+			return false;
+		}
+
+		bool greenFlagReported = false;
+
+		bool greenFlag() {
+			if (!greenFlagReported && (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag)) {
+				greenFlagReported = true;
+				
+				SendSpotterMessage("greenFlag");
+				
+				Thread.Sleep(2000);
+				
+				return true;
+			}
+			else
+				return false;
 		}
 
 		double initialX = 0.0d;
@@ -762,6 +811,8 @@ namespace RF2SHMSpotter {
 					}
 
 					if (connected) {
+						bool wait = true;
+
 						rF2VehicleScoring playerScoring = GetPlayerScoring(ref scoring);
 
 						if (mapTrack)
@@ -773,20 +824,34 @@ namespace RF2SHMSpotter {
 							checkCoordinates(ref playerScoring);
 						else
 						{
+							bool startGo = (scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag);
+
 							if (!running)
-								if ((scoring.mScoringInfo.mGamePhase == (byte)rF2GamePhase.GreenFlag) || (countdown-- <= 0))
+							{
+								countdown -= 1;
+
+								if (!greenFlagReported && (countdown <= 0))
+									greenFlagReported = true;
+
+								if (startGo || (countdown <= 0))
 									running = true;
+							}
 
 							if (running)
 							{
 								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
 									playerScoring.mPitState < (byte)Entering)
 								{
-									if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
-										checkPitWindow(ref playerScoring);
+									if (!startGo || !greenFlag())
+										if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
+											wait = !checkPitWindow(ref playerScoring);
+										else
+											wait = false;
 								}
 								else
 								{
+									longitudinalRearDistance = 5;
+									
 									lastSituation = CLEAR;
 									carBehind = false;
 									carBehindReported = false;
@@ -798,7 +863,7 @@ namespace RF2SHMSpotter {
 
 						if (positionTrigger)
 							Thread.Sleep(10);
-						else
+						else if (wait)
 							Thread.Sleep(50);
 					}
 					else

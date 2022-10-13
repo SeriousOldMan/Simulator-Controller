@@ -31,7 +31,10 @@ inline double normalizeKelvin(double value) {
 long getRemainingTime(SharedMemory* shm);
 
 long getRemainingLaps(SharedMemory* shm) {
-	if (shm->mLapsInEvent > 0) {
+	if (shm->mSessionState == SESSION_PRACTICE && shm->mEventTimeRemaining == -1)
+		return 360;
+
+	if (shm->mSessionState != SESSION_PRACTICE && shm->mLapsInEvent > 0) {
 		return (long)shm->mLapsInEvent - shm->mParticipantInfo[shm->mViewedParticipantIndex].mLapsCompleted;
 	}
 	else {
@@ -45,8 +48,16 @@ long getRemainingLaps(SharedMemory* shm) {
 }
 
 long getRemainingTime(SharedMemory* shm) {
-	if (shm->mLapsInEvent > 0) {
-		return getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);
+	if (shm->mSessionState == SESSION_PRACTICE && shm->mEventTimeRemaining == -1)
+		return 3600000 * 12;
+
+	if (shm->mSessionState != SESSION_PRACTICE && shm->mLapsInEvent > 0) {
+		long time = getRemainingLaps(shm) * (long)(shm->mLastLapTime * 1000);
+
+		if (time > 0)
+			return time;
+		else
+			return 0;
 	}
 	else
 		return normalize(shm->mEventTimeRemaining) * 1000;
@@ -125,7 +136,13 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
+	bool writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	bool writeTelemetry = !writeStandings;
+
+	writeTelemetry = true;
+	writeStandings = true;
+
+	if (writeStandings) {
 		printf("[Position Data]\n");
 
 		if (fileHandle == NULL) {
@@ -179,10 +196,14 @@ int main(int argc, char* argv[]) {
 					printf("Car.%d.Driver.Surname=%s\n", i, "");
 					printf("Car.%d.Driver.Nickname=%s\n", i, "");
 				}
+
+				printf("Car.%d.InPitLane=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_NONE ? "true" : "false");
+				printf("Car.%d.InPit=%s\n", i, localCopy->mPitModes[i - 1] > PIT_MODE_IN_PIT ? "true" : "false");
 			}
 		}
 	}
-	else {
+
+	if (writeTelemetry) {
 		printf("[Session Data]\n");
 
 		if (fileHandle == NULL) {
@@ -194,7 +215,12 @@ int main(int argc, char* argv[]) {
 		printf("Active=true\n");
 		printf("Paused=%s\n", (localCopy->mGameState == GAME_INGAME_PAUSED) ? "true" : "false");
 
-		if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
+		if (localCopy->mSessionState != SESSION_PRACTICE && localCopy->mLapsInEvent > 0 &&
+			(localCopy->mLapsInEvent - localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted) <= 0)
+			printf("Session=Finished\n");
+		else if (localCopy->mHighestFlagColour == FLAG_COLOUR_CHEQUERED)
+			printf("Session=Finished\n");
+		else if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
 			printf("Session=Race\n");
 		else if (localCopy->mSessionState == SESSION_QUALIFY)
 			printf("Session=Qualification\n");
@@ -207,16 +233,20 @@ int main(int argc, char* argv[]) {
 		printf("Track=%s-%s\n", localCopy->mTrackLocation, localCopy->mTrackVariation);
 		printf("FuelAmount=%d\n", (int)localCopy->mFuelCapacity);
 
-		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Lap");
+		printf("SessionFormat=%s\n", (localCopy->mLapsInEvent == 0) ? "Time" : "Laps");
 
+		/*
 		if (localCopy->mSessionState == SESSION_PRACTICE) {
 			printf("SessionTimeRemaining=3600000\n");
 			printf("SessionLapsRemaining=30\n");
 		}
 		else {
+		*/
 			printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
 			printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+		/*
 		}
+		*/
 
 		printf("[Car Data]\n");
 
@@ -229,6 +259,10 @@ int main(int argc, char* argv[]) {
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_FRONT_RIGHT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_LEFT]),
 			normalizeDamage(localCopy->mSuspensionDamage[TYRE_REAR_RIGHT]));
+
+		double engineDamage = normalizeDamage(localCopy->mEngineDamage);
+
+		printf("EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10: 0);
 		printf("FuelRemaining=%f\n", localCopy->mFuelLevel * localCopy->mFuelCapacity);
 
 		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
@@ -255,8 +289,6 @@ int main(int argc, char* argv[]) {
 			(int)round(localCopy->mBrakeDamage[TYRE_FRONT_RIGHT] * 100),
 			(int)round(localCopy->mBrakeDamage[TYRE_REAR_LEFT] * 100),
 			(int)round(localCopy->mBrakeDamage[TYRE_REAR_RIGHT] * 100));
-
-
 
 		printf("[Stint Data]\n");
 
@@ -297,14 +329,18 @@ int main(int argc, char* argv[]) {
 
 		long timeRemaining = getRemainingTime(localCopy);
 
+		/*
 		if (localCopy->mSessionState == SESSION_PRACTICE) {
 			printf("StintTimeRemaining=3600000\n");
 			printf("DriverTimeRemaining=3600000\n");
 		}
 		else {
+		*/
 			printf("StintTimeRemaining=%ld\n", timeRemaining);
 			printf("DriverTimeRemaining=%ld\n", timeRemaining);
+		/*
 		}
+		*/
 		printf("InPit=%s\n", (localCopy->mPitMode == PIT_MODE_IN_PIT) ? "true" : "false");
 
 		printf("[Track Data]\n");

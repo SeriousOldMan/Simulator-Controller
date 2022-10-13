@@ -48,6 +48,7 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg
 									  lapDamage(?lap, Bodywork, Center, ?centerDmg),
 									  sum([?frontDmg, ?rearDmg, ?leftDmg, ?rightDmg, ?centerDmg], ?damage),
 									  Set(Lap, ?lap, Damage.Bodywork, ?damage)
+lapDamage(?lap, Engine, ?damage) <= Get(Lap, ?lap, Damage.Engine, ?damage)
 									  
 lapAvgFuel(?lap, ?avgFuel) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgFuel), ?avgFuel > 0
 
@@ -163,7 +164,8 @@ clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
 								  Weather, Grip, Temperature.Air, Temperature.Track,
 								  Damage.Bodywork, Damage.Bodywork.Center, Damage.Bodywork.Front, Damage.Bodywork.Rear,
 								  Damage.Bodywork.Left, Damage.Bodywork.Right,
-								  Damage.Suspension, Damage.Suspension.FL, Damage.Suspension.FR, Damage.Suspension.RL, Damage.Suspension.RR])
+								  Damage.Suspension, Damage.Suspension.FL, Damage.Suspension.FR, Damage.Suspension.RL, Damage.Suspension.RR,
+								  Damage.Engine])
 clearLap(?)
 
 clearLap(?, []) <= !

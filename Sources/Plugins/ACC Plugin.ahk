@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\Math.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
@@ -19,17 +20,17 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kACCApplication = "Assetto Corsa Competizione"
+global kACCApplication := "Assetto Corsa Competizione"
 
-global kACCPlugin = "ACC"
-global kChatMode = "Chat"
+global kACCPlugin := "ACC"
+global kChatMode := "Chat"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Constant Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPSMutatingOptions = ["Strategy", "Change Tyres", "Tyre Compound", "Change Brakes"]
+global kPSMutatingOptions := ["Strategy", "Change Tyres", "Tyre Compound", "Change Brakes"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -39,6 +40,8 @@ global kPSMutatingOptions = ["Strategy", "Change Tyres", "Tyre Compound", "Chang
 class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iUDPClient := false
 	iUDPConnection := false
+
+	iSessionID := 0
 
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
@@ -77,7 +80,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		updateActions(sessionState) {
+		updateActions(session) {
 		}
 	}
 
@@ -97,7 +100,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		fireAction(function, trigger) {
-			message := this.Message
+			local message := this.Message
 
 			this.Controller.findPlugin(kACCPlugin).activateWindow()
 
@@ -165,12 +168,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			controller.registerPlugin(this)
 
-			OnExit(ObjBindMethod(this, "shutdownUDPClient"))
+			OnExit(ObjBindMethod(this, "shutdownUDPClient", true))
 		}
 	}
 
 	loadFromConfiguration(configuration) {
-		local function
+		local function, descriptor, message
 
 		base.loadFromConfiguration(configuration)
 
@@ -201,6 +204,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startupUDPClient(force := false) {
+		local exePath, options, udpClient
+
 		if (!this.UDPClient || force) {
 			this.shutdownUDPClient(force)
 
@@ -208,10 +213,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			try {
 				if FileExist(kTempDirectory . "ACCUDP.cmd")
-					FileDelete %kTempDirectory%ACCUDP.cmd
+					deleteFile(kTempDirectory . "ACCUDP.cmd")
 
 				if FileExist(kTempDirectory . "ACCUDP.out")
-					FileDelete %kTempDirectory%ACCUDP.out
+					deleteFile(kTempDirectory . "ACCUDP.out")
 
 				options := ""
 
@@ -238,76 +243,88 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 	shutdownUDPClient(force := false) {
 		if (this.UDPClient || force) {
-			FileAppend Exit`n, %kTempDirectory%ACCUDP.cmd
+			Process Exist, ACC UDP Provider.exe
 
-			Sleep 250
-
-			Loop 5 {
-				Process Exist, ACC UDP Provider.exe
-
-				if ErrorLevel {
-					Process Close, %ErrorLevel%
+			if ErrorLevel
+				loop 5 {
+					FileAppend Exit`n, %kTempDirectory%ACCUDP.cmd
 
 					Sleep 250
-				}
-				else
-					break
-			}
 
-			this.iUDPClient := false
+					Process Exist, ACC UDP Provider.exe
+
+					if !ErrorLevel {
+						this.iUDPClient := false
+
+						break
+					}
+				}
 		}
 
 		return false
 	}
 
-	requireUDPClient() {
+	requireUDPClient(restart := false) {
 		Process Exist, ACC UDP Provider.exe
 
 		if !ErrorLevel
 			this.iUDPClient := false
 
-		if (this.SessionState == kSessionRace)
-			this.startupUDPClient()
+		this.startupUDPClient(restart)
 	}
 
-	updateSessionState(sessionState) {
-		lastSessionState := this.SessionState
+	updateSession(session) {
+		local lastSession := this.Session
+		local activeModes
 
-		base.updateSessionState(sessionState)
+		base.updateSession(session)
 
 		activeModes := this.Controller.ActiveModes
 
 		if (inList(activeModes, this.iChatMode))
-			this.iChatMode.updateActions(sessionState)
+			this.iChatMode.updateActions(session)
 
 		if (inList(activeModes, this.iPitstopMode))
-			this.iPitstopMode.updateActions(sessionState)
+			this.iPitstopMode.updateActions(session)
 
-		if (sessionState == kSessionRace)
-			this.startupUDPClient((lastSessionState != kSessionRace) && (lastSessionState != kSessionPaused))
+		if (session == kSessionRace)
+			this.requireUDPClient((lastSession != kSessionRace) && (lastSession != kSessionPaused))
 		else {
-			if (sessionState == kSessionFinished) {
+			if (session == kSessionFinished) {
 				this.iRepairSuspensionChosen := true
 				this.iRepairBodyworkChosen := true
 			}
 
-			if (sessionState != kSessionPaused)
-				this.shutdownUDPClient()
+			if (session != kSessionPaused)
+				this.shutdownUDPClient(true)
 		}
 	}
 
-	updatePositionsData(data) {
-		base.updatePositionsData(data)
+	acquirePositionsData(telemetryData) {
+		local positionsData
+		local lap, restart, fileName, tries
+		local driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
 		static carIDs := false
 		static lastDriverCar := false
 		static lastRead := false
-		static standings := false
+		static sessionID := 0
+		static lastLap := 0
 
-		if (this.SessionState == kSessionRace)
-			this.requireUDPClient()
-		else if !this.UDPClient
-			return
+		lap := getConfigurationValue(telemetryData, "Stint Data", "Laps", 0)
+		restart := false
+
+		if ((lastLap > lap) && (this.iSessionID = sessionID)) {
+			sessionID += 1
+
+			restart := true
+		}
+
+		this.iSessionID := sessionID
+
+		lastLap := lap
+
+		this.requireUDPClient(restart)
 
 		if !carIDs
 			carIDs := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car IDs")
@@ -315,7 +332,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if ((A_TickCount + 5000) > lastRead) {
 			lastRead := (A_TickCount + 0)
 
-			fileName := kTempDirectory . "ACCUDP.cmd"
+			fileName := (kTempDirectory . "ACCUDP.cmd")
 
 			FileAppend Read`n, %fileName%
 
@@ -331,44 +348,34 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if (tries > 0) {
 				fileName := kTempDirectory . "ACCUDP.out"
 
-				standings := readConfiguration(fileName)
+				positionsData := readConfiguration(fileName)
 
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 			}
 			else {
-				standings := false
+				positionsData := false
 
-				try {
-					FileDelete %fileName%
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(fileName)
 
 				this.iUDPClient := false
 			}
 		}
 
-		if standings {
-			if (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)
+		if positionsData {
+			if (lap <= 1)
 				lastDriverCar := false
 
-			driverForname := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
-			driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-			driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+			driverForname := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
+			driverSurname := getConfigurationValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
+			driverNickname := getConfigurationValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
 
-			lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
+			lapTime := getConfigurationValue(telemetryData, "Stint Data", "LapLastTime", 0)
 
 			driverCar := false
 			driverCarCandidate := false
 
-			Loop {
-				carID := getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+			loop {
+				carID := getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 				if (carID == kUndefined)
 					break
@@ -378,26 +385,29 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if ((car = "Unknown") && isDebug())
 						showMessage("Unknown car with ID " . carID . " detected...")
 
-					setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Car", car)
+					setConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Car", car)
 
 					if !driverCar
-						if ((getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
-						 && (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
+						if ((getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Forname") = driverForname)
+						 && (getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Driver.Surname") = driverSurname)) {
 							driverCar := A_Index
 
 							lastDriverCar := driverCar
 						}
-						else if (getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Time") = lapTime)
-							driverCarCandiate := A_Index
+						else if (getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Time") = lapTime)
+							driverCarCandidate := A_Index
 				}
 			}
 
 			if !driverCar
 				driverCar := (lastDriverCar ? lastDriverCar : driverCarCandidate)
 
-			setConfigurationValue(standings, "Position Data", "Driver.Car", driverCar)
-			setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+			setConfigurationValue(positionsData, "Position Data", "Driver.Car", driverCar)
+
+			return positionsData
 		}
+		else
+			return newConfiguration()
 	}
 
 	computeBrakePadWear(location, compound, thickness) {
@@ -425,8 +435,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
-	updateSessionData(data) {
-		base.updateSessionData(data)
+	updateTelemetryData(data) {
+		local brakePadThickness, frontBrakePadCompound, rearBrakePadCompound, brakePadWear
+
+		base.updateTelemetryData(data)
 
 		if !getConfigurationValue(data, "Stint Data", "InPit", false)
 			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
@@ -454,6 +466,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	openPitstopMFD(descriptor := false, update := "__Undefined__") {
+		local car, track, settings, imgSearch, wasOpen
+
 		static reported := false
 
 		if (this.iImageSearch = kUndefined) {
@@ -485,6 +499,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.sendCommand(this.OpenPitstopMFDHotkey)
 
+				Sleep 200
+
+				this.sendCommand(this.OpenPitstopMFDHotkey)
+
 				if !imgSearch {
 					if update {
 						this.initializePitstopMFD()
@@ -505,7 +523,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						this.openPitstopMFD(false, false)
 
 					if this.iPSIsOpen
-						SetTimer updatePitstopState, 5000
+						Task.startTask("updatePitstopState", 5000, kLowPriority)
 				}
 			}
 		}
@@ -533,8 +551,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				this.sendCommand(this.ClosePitstopMFDHotkey)
 
 				this.iPSIsOpen := false
-
-				SetTimer updatePitstopState, Off
 			}
 		}
 		else if !reported {
@@ -563,15 +579,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 				logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
 
-				Loop 2
+				loop 2
 					SoundPlay %kResourcesDirectory%Sounds\Critical.wav, Wait
 			}
 
 			SoundPlay %kResourcesDirectory%Sounds\Critical.wav
 
 			this.iNoImageSearch := true
-
-			SetTimer updatePitstopState, Off
 
 			this.openPitstopMFD(false, true)
 
@@ -582,71 +596,84 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	initializePitstopMFD() {
-		this.sendCommand(this.OpenPitstopMFDHotkey)
+		local availableOptions, currentPressures, tyreChange
 
-		availableOptions := ["Pit Limiter", "Strategy", "Refuel"
-						   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
-						   , "Change Brakes", "Front Brake", "Rear Brake", "Driver", "Repair Suspension", "Repair Bodywork"]
+		protectionOn(true, true)
 
-		currentPressures := this.getPitstopOptionValues("Tyre Pressures")
-
-		if !this.isStrategyAvailable(availableOptions, currentPressures)
-			availableOptions.RemoveAt(inList(availableOptions, "Strategy"))
-
-		tyreChange := this.isTyreChangeSelected(availableOptions, currentPressures)
-
-		if !tyreChange {
+		try {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(availableOptions, "Change Tyres") - 1
-				this.sendCommand("{Down}")
+			Sleep 200
 
-			this.sendCommand("{Right}")
-		}
-
-		this.iPSChangeTyres := true
-
-		if this.isWetTyreSelected(availableOptions, currentPressures) {
-			this.iPSTyreOptions := 6
-
-			availableOptions.RemoveAt(inList(availableOptions, "Tyre Set"))
-		}
-		else
-			this.iPSTyreOptions := 7
-
-		if this.isBrakeChangeSelected(availableOptions, currentPressures)
-			this.iPSChangeBrakes := true
-		else
-			this.iPSChangeBrakes := false
-
-		if !this.isDriverAvailable(availableOptions, currentPressures)
-			availableOptions.RemoveAt(inList(availableOptions, "Driver"))
-
-		if !tyreChange {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(availableOptions, "Change Tyres") - 1
-				this.sendCommand("{Down}")
+			availableOptions := ["Pit Limiter", "Strategy", "Refuel"
+							   , "Change Tyres", "Tyre Set", "Tyre Compound", "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"
+							   , "Change Brakes", "Front Brake", "Rear Brake", "Driver", "Repair Suspension", "Repair Bodywork"]
 
-			this.sendCommand("{Left}")
+			currentPressures := this.getPitstopOptionValues("Tyre Pressures")
 
-			this.iPSChangeTyres := false
+			if !this.isStrategyAvailable(availableOptions, currentPressures)
+				availableOptions.RemoveAt(inList(availableOptions, "Strategy"))
+
+			tyreChange := this.isTyreChangeSelected(availableOptions, currentPressures)
+
+			if !tyreChange {
+				this.sendCommand(this.OpenPitstopMFDHotkey)
+
+				loop % inList(availableOptions, "Change Tyres") - 1
+					this.sendCommand("{Down}")
+
+				this.sendCommand("{Right}")
+			}
+
+			this.iPSChangeTyres := true
+
+			if this.isWetTyreSelected(availableOptions, currentPressures) {
+				this.iPSTyreOptions := 6
+
+				availableOptions.RemoveAt(inList(availableOptions, "Tyre Set"))
+			}
+			else
+				this.iPSTyreOptions := 7
+
+			if this.isBrakeChangeSelected(availableOptions, currentPressures)
+				this.iPSChangeBrakes := true
+			else
+				this.iPSChangeBrakes := false
+
+			if !this.isDriverAvailable(availableOptions, currentPressures)
+				availableOptions.RemoveAt(inList(availableOptions, "Driver"))
+
+			if !tyreChange {
+				this.sendCommand(this.OpenPitstopMFDHotkey)
+
+				loop % inList(availableOptions, "Change Tyres") - 1
+					this.sendCommand("{Down}")
+
+				this.sendCommand("{Left}")
+
+				this.iPSChangeTyres := false
+			}
+
+			this.iPSOptions := availableOptions
+
+			this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
+			this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
+
+			this.sendCommand(this.OpenPitstopMFDHotkey)
 		}
-
-		this.iPSOptions := availableOptions
-
-		this.iPSTyreOptionPosition := inList(this.iPSOptions, "Change Tyres")
-		this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
-
-		this.sendCommand(this.OpenPitstopMFDHotkey)
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	isStrategyAvailable(options, currentPressures) {
-		index := inList(options, "Change Tyres")
+		local modifiedPressures
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Tyres") - 1 + 3
+		loop % inList(options, "Change Tyres") - 1 + 3
 			this.sendCommand("{Down}")
 
 		this.sendCommand("{Right}")
@@ -658,12 +685,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if listEqual(currentPressures, modifiedPressures) {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(options, "Change Tyres") - 1
+			loop % inList(options, "Change Tyres") - 1
 				this.sendCommand("{Down}")
 
 			this.sendCommand("{Right}")
 
-			Loop 3
+			loop 3
 				this.sendCommand("{Down}")
 
 			this.sendCommand("{Right}")
@@ -672,24 +699,24 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.sendCommand("{Left}")
 
-			Loop 3
+			loop 3
 				this.sendCommand("{Up}")
 
 			this.sendCommand("{Left}")
 
 			if listEqual(currentPressures, modifiedPressures)
-				return := false
+				return false
 		}
 
 		return true
 	}
 
 	isTyreChangeSelected(options, currentPressures) {
-		index := inList(options, "Change Tyres")
+		local modifiedPressures
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Tyres") - 1 + 3
+		loop % inList(options, "Change Tyres") - 1 + 3
 			this.sendCommand("{Down}")
 
 		this.sendCommand("{Right}")
@@ -702,12 +729,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	isWetTyreSelected(options, currentPressures) {
-		if this.iPSChangeTyres {
-			index := inList(options, "Change Tyres")
+		local index, modifiedPressures, pressure
 
+		if this.iPSChangeTyres {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			Loop % inList(options, "Change Tyres") - 1 + 4
+			loop % inList(options, "Change Tyres") - 1 + 4
 				this.sendCommand("{Down}")
 
 			this.sendCommand("{Right}")
@@ -725,12 +752,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	isBrakeChangeSelected(options, currentPressures) {
+		local index, modifiedPressures, pressure
+
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Brakes") - 1
+		loop % inList(options, "Change Brakes") - 1
 			this.sendCommand("{Down}")
 
-		Loop % 13 - (inList(options, "Strategy") ? 0 : 1) - (7 - this.iPSTyreOptions)
+		loop % 13 - (inList(options, "Strategy") ? 0 : 1) - (7 - this.iPSTyreOptions)
 			this.sendCommand("{Down}")
 
 		this.sendCommand("{Right}")
@@ -748,9 +777,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	isDriverAvailable(options, currentPressures) {
+		local modifiedPressures
+
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		Loop % inList(options, "Change Brakes") - 1 + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
+		loop % inList(options, "Change Brakes") - 1 + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
 														 + (inList(options, "Strategy") ? 1 : 0)
 														 - (7 - this.iPSTyreOptions)
 			this.sendCommand("{Down}")
@@ -765,124 +796,156 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option, retry := true) {
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			targetSelectedOption := inList(this.iPSOptions, option)
+		local delta, targetSelectedOption
 
-			if targetSelectedOption {
-				delta := 0
+		protectionOn(true, true)
 
-				if (targetSelectedOption > this.iPSTyreOptionPosition) {
-					if (targetSelectedOption <= (this.iPSTyreOptionPosition + this.iPSTyreOptions)) {
-						if !this.iPSChangeTyres {
-							this.toggleActivity("Change Tyres")
+		try {
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				targetSelectedOption := inList(this.iPSOptions, option)
 
-							return (retry && this.selectPitstopOption(option, false))
+				if targetSelectedOption {
+					delta := 0
+
+					if (targetSelectedOption > this.iPSTyreOptionPosition) {
+						if (targetSelectedOption <= (this.iPSTyreOptionPosition + this.iPSTyreOptions)) {
+							if !this.iPSChangeTyres {
+								this.toggleActivity("Change Tyres")
+
+								return (retry && this.selectPitstopOption(option, false))
+							}
 						}
+						else
+							if !this.iPSChangeTyres
+								delta -= this.iPSTyreOptions
 					}
-					else
-						if !this.iPSChangeTyres
-							delta -= this.iPSTyreOptions
-				}
 
-				if (targetSelectedOption > this.iPSBrakeOptionPosition) {
-					if (targetSelectedOption <= (this.iPSBrakeOptionPosition + this.iPSBrakeOptions)) {
-						if !this.iPSChangeBrakes {
-							this.toggleActivity("Change Brakes")
+					if (targetSelectedOption > this.iPSBrakeOptionPosition) {
+						if (targetSelectedOption <= (this.iPSBrakeOptionPosition + this.iPSBrakeOptions)) {
+							if !this.iPSChangeBrakes {
+								this.toggleActivity("Change Brakes")
 
-							return (retry && this.selectPitstopOption(option, false))
+								return (retry && this.selectPitstopOption(option, false))
+							}
 						}
+						else
+							if !this.iPSChangeBrakes
+								delta -= this.iPSBrakeOptions
 					}
+
+					targetSelectedOption += delta
+
+					this.activateWindow()
+
+					if (targetSelectedOption > this.iPSSelectedOption)
+						loop % targetSelectedOption - this.iPSSelectedOption
+							this.sendCommand("{Down}")
 					else
-						if !this.iPSChangeBrakes
-							delta -= this.iPSBrakeOptions
+						loop % this.iPSSelectedOption - targetSelectedOption
+							this.sendCommand("{Up}")
+
+					this.iPSSelectedOption := targetSelectedOption
+
+					return true
 				}
-
-				targetSelectedOption += delta
-
-				this.activateWindow()
-
-				if (targetSelectedOption > this.iPSSelectedOption)
-					Loop % targetSelectedOption - this.iPSSelectedOption
-						this.sendCommand("{Down}")
 				else
-					Loop % this.iPSSelectedOption - targetSelectedOption
-						this.sendCommand("{Up}")
-
-				this.iPSSelectedOption := targetSelectedOption
-
-				return true
+					return false
 			}
 			else
 				return false
 		}
-		else
-			return false
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	changePitstopOption(option, direction, steps := 1) {
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			switch direction {
-				case "Increase":
-					this.activateWindow()
+		protectionOn(true, true)
 
-					Loop %steps%
-						this.sendCommand("{Right}")
-				case "Decrease":
-					this.activateWindow()
+		try {
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				switch direction {
+					case "Increase":
+						this.activateWindow()
 
-					Loop %steps%
-						this.sendCommand("{Left}")
-				default:
-					Throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
+						loop %steps%
+							this.sendCommand("{Right}")
+					case "Decrease":
+						this.activateWindow()
+
+						loop %steps%
+							this.sendCommand("{Left}")
+					default:
+						throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
+				}
+
+				if (option = "Repair Suspension")
+					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+				else if (option = "Repair Bodywork")
+					this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+
+				this.resetPitstopState(inList(kPSMutatingOptions, option))
 			}
-
-			if (option = "Repair Suspension")
-				this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-			else if (option = "Repair Bodywork")
-				this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
-
-			this.resetPitstopState(inList(kPSMutatingOptions, option))
+		}
+		finally {
+			protectionOff(true, true)
 		}
 	}
 
 	updatePitstopOption(option, action, steps := 1) {
-		if (this.OpenPitstopMFDHotkey != "Off") {
-			if inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
-				this.toggleActivity(option)
-			else
-				switch option {
-					case "Strategy":
-						this.changeStrategy(action, steps)
-					case "Refuel":
-						this.changeFuelAmount(action, steps)
-					case "Tyre Compound":
-						this.changeTyreCompound(action)
-					case "Tyre Set":
-						this.changeTyreSet(action, steps)
-					case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-						this.changeTyrePressure(option, action, steps)
-					case "Front Brake", "Rear Brake":
-						this.changeBrakeType(option, action)
-					case "Driver":
-						this.changeDriver(action)
-					default:
-						base.updatePitstopOption(option, action, steps)
-				}
+		protectionOn(true, true)
+
+		try {
+			if (this.OpenPitstopMFDHotkey != "Off") {
+				if inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
+					this.toggleActivity(option)
+				else
+					switch option {
+						case "Strategy":
+							this.changeStrategy(action, steps)
+						case "Refuel":
+							this.changeFuelAmount(action, steps)
+						case "Tyre Compound":
+							this.changeTyreCompound(action)
+						case "Tyre Set":
+							this.changeTyreSet(action, steps)
+						case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+							this.changeTyrePressure(option, action, steps)
+						case "Front Brake", "Rear Brake":
+							this.changeBrakeType(option, action)
+						case "Driver":
+							this.changeDriver(action)
+						default:
+							base.updatePitstopOption(option, action, steps)
+					}
+			}
+		}
+		finally {
+			protectionOff(true, true)
 		}
 	}
 
 	toggleActivity(activity) {
-		if this.requirePitstopMFD()
-			switch activity {
-				case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
-					if this.selectPitstopOption(activity)
-						this.changePitstopOption(activity, "Increase")
-				default:
-					Throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
-			}
+		protectionOn(true, true)
+
+		try {
+			if this.requirePitstopMFD()
+				switch activity {
+					case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
+						if this.selectPitstopOption(activity)
+							this.changePitstopOption(activity, "Increase")
+					default:
+						throw "Unsupported activity """ . activity . """ detected in ACCPlugin.toggleActivity..."
+				}
+		}
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	notifyPitstopChanged(option) {
+		local newValues
+
 		if this.RaceEngineer
 			switch option {
 				case "Change Tyres":
@@ -896,109 +959,163 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	changeStrategy(selection, steps := 1) {
-		if (this.requirePitstopMFD() && this.selectPitstopOption("Strategy"))
-			switch selection {
-				case "Next":
-					this.changePitstopOption("Strategy", "Increase")
-				case "Previous":
-					this.changePitstopOption("Strategy", "Decrease")
-				case "Increase", "Decrease":
-					this.changePitstopOption("Strategy", selection)
-				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeStrategy..."
-			}
+		protectionOn(true, true)
+
+		try {
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Strategy"))
+				switch selection {
+					case "Next":
+						this.changePitstopOption("Strategy", "Increase")
+					case "Previous":
+						this.changePitstopOption("Strategy", "Decrease")
+					case "Increase", "Decrease":
+						this.changePitstopOption("Strategy", selection)
+					default:
+						throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeStrategy..."
+				}
+		}
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	changeFuelAmount(direction, litres := 5) {
-		if (this.requirePitstopMFD() && this.selectPitstopOption("Refuel"))
-			this.changePitstopOption("Refuel", direction, litres)
+		protectionOn(true, true)
+
+		try {
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Refuel"))
+				this.changePitstopOption("Refuel", direction, litres)
+		}
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	changeTyreCompound(type) {
-		if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre Compound"))
-			switch type {
-				case "Wet":
-					this.changePitstopOption("Tyre Compound", "Increase")
-				case "Dry":
-					this.changePitstopOption("Tyre Compound", "Decrease")
-				case "Increase", "Decrease":
-					this.changePitstopOption("Tyre Compound", type)
-				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreCompound..."
-			}
+		protectionOn(true, true)
+
+		try {
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre Compound"))
+				switch type {
+					case "Wet":
+						this.changePitstopOption("Tyre Compound", "Increase")
+					case "Dry":
+						this.changePitstopOption("Tyre Compound", "Decrease")
+					case "Increase", "Decrease":
+						this.changePitstopOption("Tyre Compound", type)
+					default:
+						throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreCompound..."
+				}
+		}
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	changeTyreSet(selection, steps := 1) {
-		if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre set"))
-			switch selection {
-				case "Next":
-					this.changePitstopOption("Tyre set", "Increase", steps)
-				case "Previous":
-					this.changePitstopOption("Tyre set", "Decrease", steps)
-				case "Increase", "Decrease":
-					this.changePitstopOption("Tyre Set", selection, steps)
-				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreSet..."
-			}
+		protectionOn(true, true)
+
+		try {
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre set"))
+				switch selection {
+					case "Next":
+						this.changePitstopOption("Tyre set", "Increase", steps)
+					case "Previous":
+						this.changePitstopOption("Tyre set", "Decrease", steps)
+					case "Increase", "Decrease":
+						this.changePitstopOption("Tyre Set", selection, steps)
+					default:
+						throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeTyreSet..."
+				}
+		}
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	changeTyrePressure(tyre, direction, increments := 1) {
-		if this.requirePitstopMFD() {
-			found := false
+		local found
 
-			switch tyre {
-				case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
-					found := this.selectPitstopOption(tyre)
-				default:
-					Throw "Unsupported tyre position """ . tyre . """ detected in ACCPlugin.changeTyrePressure..."
+		protectionOn(true, true)
+
+		try {
+			if this.requirePitstopMFD() {
+				found := false
+
+				switch tyre {
+					case "All Around", "Front Left", "Front Right", "Rear Left", "Rear Right":
+						found := this.selectPitstopOption(tyre)
+					default:
+						throw "Unsupported tyre position """ . tyre . """ detected in ACCPlugin.changeTyrePressure..."
+				}
+
+				if found
+					this.changePitstopOption(tyre, direction, increments)
 			}
-
-			if found
-				this.changePitstopOption(tyre, direction, increments)
+		}
+		finally {
+			protectionOff(true, true)
 		}
 	}
 
 	changeBrakeType(brake, selection) {
-		if this.requirePitstopMFD() {
-			found := false
+		local found
 
-			switch brake {
-				case "Front Brake", "Rear Brake":
-					found := this.selectPitstopOption(brake)
-				default:
-					Throw "Unsupported brake """ . brake . """ detected in ACCPlugin.changeBrakeType..."
-			}
+		protectionOn(true, true)
 
-			if found
-				switch selection {
-					case "Next":
-						this.changePitstopOption(brake, "Increase")
-					case "Previous":
-						this.changePitstopOption(brake, "Decrease")
-					case "Increase", "Decrease":
-						this.changePitstopOption(brake, selection)
+		try {
+			if this.requirePitstopMFD() {
+				found := false
+
+				switch brake {
+					case "Front Brake", "Rear Brake":
+						found := this.selectPitstopOption(brake)
 					default:
-						Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeBrakeType..."
+						throw "Unsupported brake """ . brake . """ detected in ACCPlugin.changeBrakeType..."
 				}
+
+				if found
+					switch selection {
+						case "Next":
+							this.changePitstopOption(brake, "Increase")
+						case "Previous":
+							this.changePitstopOption(brake, "Decrease")
+						case "Increase", "Decrease":
+							this.changePitstopOption(brake, selection)
+						default:
+							throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeBrakeType..."
+					}
+			}
+		}
+		finally {
+			protectionOff(true, true)
 		}
 	}
 
 	changeDriver(selection) {
-		if (this.requirePitstopMFD() && this.selectPitstopOption("Driver"))
-			switch selection {
-				case "Next":
-					this.changePitstopOption("Driver", "Increase")
-				case "Previous":
-					this.changePitstopOption("Driver", "Decrease")
-				case "Increase", "Decrease":
-					this.changePitstopOption("Driver", selection)
-				default:
-					Throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeDriver..."
-			}
+		protectionOn(true, true)
+
+		try {
+			if (this.requirePitstopMFD() && this.selectPitstopOption("Driver"))
+				switch selection {
+					case "Next":
+						this.changePitstopOption("Driver", "Increase")
+					case "Previous":
+						this.changePitstopOption("Driver", "Decrease")
+					case "Increase", "Decrease":
+						this.changePitstopOption("Driver", selection)
+					default:
+						throw "Unsupported selection """ . selection . """ detected in ACCPlugin.changeDriver..."
+				}
+		}
+		finally {
+			protectionOff(true, true)
+		}
 	}
 
 	getLabelFileNames(labelNames*) {
-		fileNames := []
+		local fileNames := []
+		local ignore, labelName, fileName
 
 		for ignore, labelName in labelNames {
 			labelName := ("ACC\" . labelName)
@@ -1052,6 +1169,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	searchPitstopLabel(images) {
+		local curTickCount, imageX, imageY, localLabels, ignore, fileName, pitstopLabel, lastY
+
 		static kSearchAreaLeft := 350
 		static kSearchAreaRight := 250
 		static pitstopLabels := false
@@ -1075,9 +1194,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				break
 			}
 
-		Loop % (localLabels ? 3 : 1)
+		loop % (localLabels ? 3 : 1)
 		{
-			Loop % pitstopLabels.Length()
+			loop % pitstopLabels.Length()
 			{
 				pitstopLabel := pitstopLabels[A_Index]
 
@@ -1123,15 +1242,16 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 		else {
 			this.iPSIsOpen := false
-
-			SetTimer updatePitstopState, Off
 		}
 
 		return lastY
 	}
 
 	searchStrategyLabel(ByRef lastY, images) {
+		local curTickCount, reload, imageX, imageY, pitStrategyLabel, position
+
 		static pitStrategyLabels := false
+
 		curTickCount := A_TickCount
 		reload := false
 
@@ -1143,7 +1263,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 
-		Loop % pitStrategyLabels.Length()
+		loop % pitStrategyLabels.Length()
 		{
 			pitStrategyLabel := pitStrategyLabels[A_Index]
 
@@ -1206,9 +1326,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	searchNoRefuelLabel(ByRef lastY, images) {
+		local curTickCount := A_TickCount
+		local reload := false
+		local imageX, imageY, position, noRefuelLabel
+
 		static noRefuelLabels := false
-		curTickCount := A_TickCount
-		reload := false
 
 		if !noRefuelLabels
 			noRefuelLabels := this.getLabelFileNames("No Refuel")
@@ -1218,7 +1340,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 
-		Loop % noRefuelLabels.Length()
+		loop % noRefuelLabels.Length()
 		{
 			noRefuelLabel := noRefuelLabels[A_Index]
 
@@ -1281,10 +1403,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	searchTyreLabel(ByRef lastY, images) {
+		local curTickCount := A_TickCount
+		local reload := false
+		local imageX, imageY, position, wetLabel, compoundLabel
+
 		static wetLabels := false
 		static compoundLabels := false
-		curTickCount := A_TickCount
-		reload := false
 
 		if !wetLabels {
 			wetLabels := this.getLabelFileNames("Wet 1", "Wet 2")
@@ -1296,7 +1420,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 
-		Loop % wetLabels.Length()
+		loop % wetLabels.Length()
 		{
 			wetLabel := wetLabels[A_Index]
 
@@ -1343,7 +1467,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			imageX := kUndefined
 			imageY := kUndefined
 
-			Loop % compoundLabels.Length()
+			loop % compoundLabels.Length()
 			{
 				compoundLabel := compoundLabels[A_Index]
 
@@ -1391,9 +1515,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	searchBrakeLabel(ByRef lastY, images) {
+		local curTickCount := A_TickCount
+		local reload := false
+		local imageX, imageY, position, frontBrakeLabel
+
 		static frontBrakeLabels := false
-		curTickCount := A_TickCount
-		reload := false
 
 		if !frontBrakeLabels
 			frontBrakeLabels := this.getLabelFileNames("Front Brake 1", "Front Brake 2")
@@ -1403,7 +1529,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 
-		Loop % frontBrakeLabels.Length()
+		loop % frontBrakeLabels.Length()
 		{
 			frontBrakeLabel := frontBrakeLabels[A_Index]
 
@@ -1448,9 +1574,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	searchDriverLabel(ByRef lastY, images) {
+		local curTickCount := A_TickCount
+		local reload := false
+		local imageX, imageY, position, selectDriverLabel
+
 		static selectDriverLabels := false
-		curTickCount := A_TickCount
-		reload := false
 
 		if !selectDriverLabels
 			selectDriverLabels := this.getLabelFileNames("Select Driver 1", "Select Driver 2")
@@ -1460,7 +1588,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		imageX := kUndefined
 		imageY := kUndefined
 
-		Loop % selectDriverLabels.Length()
+		loop % selectDriverLabels.Length()
 		{
 			selectDriverLabel := selectDriverLabels[A_Index]
 
@@ -1514,17 +1642,19 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		return reload
 	}
 
-	updatePitstopState(fromTimer := false) {
+	updatePitstopState(fromTask := false) {
+		local beginTickCount, lastY, images, reload
+
 		if isACCRunning() {
 			beginTickCount := A_TickCount
 			lastY := 0
 			images := []
 
 			try {
-				if (fromTimer || !this.iPSImageSearchArea)
+				if (fromTask || !this.iPSImageSearchArea)
 					lastY := this.searchPitstopLabel(images)
 
-				if (!fromTimer && this.iPSIsOpen) {
+				if (!fromTask && this.iPSIsOpen) {
 					reload := this.searchStrategyLabel(lastY, images)
 
 					; reload := (this.searchNoRefuelLabel(lastY, images) || reload)
@@ -1547,6 +1677,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			catch exception {
 				this.iPSOpen := false
 			}
+
+			if (fromTask && this.iPSOpen && !this.iNoImageSearch) {
+				Task.CurrentTask.NextExecution := (A_TickCount + 5000)
+
+				return Task.CurrentTask
+			}
+
+			return false
 		}
 
 		return false
@@ -1576,6 +1714,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopOptionValues(option) {
+		local data
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option {
 				case "Pit Limiter":
@@ -1627,18 +1767,25 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		closePitstopMFD()
 	}
 
-	pitstopFinished(pitstopNumber, updateState := false) {
-		static callback := false
+	pitstopFinished(pitstopNumber, async := false) {
+		local retry, updateTime, carState, pitstopState, currentDriver, currentTyreSet, tyreStates, pitstopData
+		local pressures, index, pressure, ignore, tyreSet, wearState, tread, section, grain, blister, flatSpot
+		local data, tyre, key, value, wear
 
-		if !updateState {
-			if callback
-				SetTimer %callback%, Off
+		static updateTask := false
+
+		if !async {
+			if updateTask {
+				updateTask.stop()
+
+				updateTask := false
+			}
 
 			base.pitstopFinished(pitstopNumber)
 		}
 
 		if this.RaceEngineer {
-			if updateState {
+			if async {
 				try {
 					retry := false
 
@@ -1656,9 +1803,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						retry := true
 
 					if retry {
-						callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
+						Task.CurrentTask.NextExecution := (A_TickCount + 10000)
 
-						SetTimer %callback%, -10000
+						return Task.CurrentTask
 					}
 					else {
 						FileRead carState, %A_MyDocuments%\Assetto Corsa Competizione\Debug\swap_dump_carjson.json
@@ -1735,18 +1882,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					}
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
+
+				return false
 			}
 			else {
-				callback := ObjBindMethod(this, "pitstopFinished", pitstopNumber, true)
+				updateTask := new Task(ObjBindMethod(this, "pitstopFinished", pitstopNumber, true), 10000, kLowPriority)
 
-				SetTimer %callback%, -10000
+				updateTask.start()
 			}
 		}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, litres) {
+		local litresIncrement
+
 		base.setPitstopRefuelAmount(pitstopNumber, litres)
 
 		litresIncrement := Round(litres - this.getPitstopOptionValues("Refuel")[1])
@@ -1756,6 +1907,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		local tyreSetIncrement
+
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if compound {
@@ -1774,6 +1927,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
+		local pressures, pressureFLIncrement, pressureFRIncrement, pressureRLIncrement, pressureRRIncrement
+
 		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		pressures := this.getPitstopOptionValues("Tyre Pressures")
@@ -1804,6 +1959,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
+		local delta
+
 		base.requestPitstopDriver(pitstopNumber, driver)
 
 		if driver {
@@ -1811,12 +1968,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			delta := (string2Values(":", driver[2])[2] - string2Values(":", driver[1])[2])
 
-			Loop % Abs(delta)
+			loop % Abs(delta)
 				this.changeDriver((delta < 0) ? "Previous" : "Next")
 		}
 	}
 
 	restoreSessionState(sessionSettings, sessionState) {
+		local pitstop
+
 		base.restoreSessionState(sessionSettings, sessionState)
 
 		if sessionState {
@@ -1865,6 +2024,8 @@ stopACC() {
 }
 
 isACCRunning() {
+	local running, thePlugin
+
 	Process Exist, acc.exe
 
 	running := (ErrorLevel != 0)
@@ -1873,11 +2034,13 @@ isACCRunning() {
 		try {
 			thePlugin := SimulatorController.Instance.findPlugin("ACC")
 
-			thePlugin.iRepairSuspensionChosen := true
-			thePlugin.iRepairBodyworkChosen := true
+			if (thePlugin && SimulatorController.Instance.isActive(thePlugin)) {
+				thePlugin.iRepairSuspensionChosen := true
+				thePlugin.iRepairBodyworkChosen := true
+			}
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 

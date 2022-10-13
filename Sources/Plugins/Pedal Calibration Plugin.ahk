@@ -9,8 +9,8 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPedalCalibrationPlugin = "Pedal Calibration"
-global kPedalCalibrationMode = "Pedal Calibration"
+global kPedalCalibrationPlugin := "Pedal Calibration"
+global kPedalCalibrationMode := "Pedal Calibration"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,9 +20,9 @@ global kPedalCalibrationMode = "Pedal Calibration"
 global kCurveShapes := ["Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S on Side", "Slow Start", "Slow End", "Custom"]
 
 /* For SmartControl Version 1.3+ - but not working at the moment, due to an error in SmartControl...
-global kClutchXPosition = 235
-global kBrakeXPosition = 555
-global kThrottleXPosition = 875
+global kClutchXPosition := 235
+global kBrakeXPosition := 555
+global kThrottleXPosition := 875
 
 global kShapeYPosition := 315
 global kShapeYDelta := 20
@@ -31,9 +31,9 @@ global kSaveToPedalX := 940
 global kSaveToPedalY := 785
 */
 
-global kClutchXPosition = 205
-global kBrakeXPosition = 530
-global kThrottleXPosition = 845
+global kClutchXPosition := 205
+global kBrakeXPosition := 530
+global kThrottleXPosition := 845
 
 global kShapeYPosition := 245
 global kShapeYDelta := 20
@@ -84,7 +84,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			this.iSelectionIndex := inList(kCurveShapes, shape)
 
 			if !this.iSelectionIndex
-				Throw "Unknown calibration shape """ . shape . """ detected in CurveShapeAction.__New..."
+				throw "Unknown calibration shape """ . shape . """ detected in CurveShapeAction.__New..."
 
 			switch pedal {
 				case "Clutch":
@@ -94,7 +94,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				case "Throttle":
 					this.iSelectionXPosition := kThrottleXPosition
 				default:
-					Throw "Unknown pedal type """ . pedal . """ detected in CurveShapeAction.__New..."
+					throw "Unknown pedal type """ . pedal . """ detected in CurveShapeAction.__New..."
 			}
 
 			base.__New(function, label, icon)
@@ -102,8 +102,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 		fireAction(function, trigger) {
 			local application := SimulatorController.Instance.findPlugin(kPedalCalibrationPlugin).Application
-			windowTitle := application.WindowTitle
-			wasRunning := application.isRunning()
+			local windowTitle := application.WindowTitle
+			local wasRunning := application.isRunning()
+			local xPosition, yPosition
 
 			if !wasRunning
 				application.startup()
@@ -129,11 +130,13 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 						yPosition := kShapeYPosition
 
 						MouseClick Left, %xPosition%, %yPosition%
+
 						Sleep 500
 
 						yPosition += (this.iSelectionIndex * kShapeYDelta)
 
 						MouseClick Left, %xPosition%, %yPosition%
+
 						Sleep 500
 
 						MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
@@ -144,11 +147,13 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					yPosition := kShapeYPosition
 
 					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+
 					Sleep 500
 
 					yPosition += (this.iSelectionIndex * kShapeYDelta)
 
 					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+
 					Sleep 500
 
 					ControlClick X%kSaveToPedalX% Y%yPosition%, %kSaveToPedalY%, , , , NA
@@ -177,6 +182,8 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
+		local smartCtrl, ignore, theAction
+
 		base.__New(controller, name, configuration, false)
 
 		if (this.Active || isDebug()) {
@@ -205,6 +212,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 	createPedalCalibrationAction(controller, pedalAndShape, descriptor) {
 		local function := this.Controller.findFunction(descriptor)
+		local pedal, shape, label, icon
 
 		pedalAndShape := ConfigurationItem.splitDescriptor(pedalAndShape)
 		pedal := pedalAndShape[1]
@@ -214,6 +222,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 		if (function != false) {
 			icon := this.getIcon("CurveShape." . shape . ".Activate", this.getIcon("CurveShape.Activate"))
+
 			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, icon, pedal, shape))
 		}
 		else

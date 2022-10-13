@@ -47,7 +47,7 @@ namespace ACSHMProvider
 
         private long GetRemainingLaps(long timeLeft)
         {
-            if (staticInfo.IsTimedRace == 0)
+            if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0)
                 return (graphics.NumberOfLaps - graphics.CompletedLaps);
             else {
                 if (graphics.iLastTime > 0)
@@ -59,8 +59,15 @@ namespace ACSHMProvider
 
         private long GetRemainingTime(long timeLeft)
         {
-            if (staticInfo.IsTimedRace != 0)
-                return (timeLeft - (graphics.iLastTime * graphics.NumberOfLaps));
+            if (GetSession(graphics.Session) == "Practice" || staticInfo.IsTimedRace != 0)
+            {
+                long time = (timeLeft - (graphics.iLastTime * graphics.NumberOfLaps));
+
+                if (time > 0)
+                    return time;
+                else
+                    return 0;
+            }
             else
                 return (GetRemainingLaps(timeLeft) * graphics.iLastTime);
         }
@@ -269,6 +276,9 @@ namespace ACSHMProvider
                     Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(driverName));
                     Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(driverName));
                     Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Nickname="); Console.WriteLine(GetNickname(driverName));
+
+                    Console.Write("Car."); Console.Write(i); Console.Write(".InPitLane="); Console.WriteLine((car.isCarInPitline + car.isCarInPit) == 0 ? "false" : "true");
+                    Console.Write("Car."); Console.Write(i); Console.Write(".InPit="); Console.WriteLine((car.isCarInPit == 0) ? "false" : "true");
                 }
 
                 Console.WriteLine("Driver.Car=" + ((cars.numVehicles > 0) ? 1 : 0));
@@ -300,15 +310,22 @@ namespace ACSHMProvider
             {
                 Console.Write("Paused="); Console.WriteLine((graphics.Status == AC_STATUS.AC_REPLAY || graphics.Status == AC_STATUS.AC_PAUSE) ? "true" : "false");
 
-                session = GetSession(graphics.Session);
+                if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0 &&
+                    (graphics.NumberOfLaps - graphics.CompletedLaps) <= 0)
+                    session = "Finished";
+                else if (graphics.Flag == AC_FLAG_TYPE.AC_CHECKERED_FLAG)
+                    session = "Finished";
+                else
+                    session = GetSession(graphics.Session);
 
                 Console.Write("Session="); Console.WriteLine(session);
 
                 Console.Write("Car="); Console.WriteLine(staticInfo.CarModel);
                 Console.Write("Track="); Console.WriteLine(staticInfo.Track + "-" + staticInfo.TrackConfiguration);
-                Console.Write("SessionFormat="); Console.WriteLine(staticInfo.IsTimedRace != 0 ? "Time" : "Lap");
+                Console.Write("SessionFormat="); Console.WriteLine((session == "Practice" || staticInfo.IsTimedRace != 0) ? "Time" : "Laps");
                 Console.Write("FuelAmount="); Console.WriteLine(staticInfo.MaxFuel);
 
+                /*
                 if (session == "Practice")
                 {
                     Console.WriteLine("SessionTimeRemaining=3600000");
@@ -316,6 +333,7 @@ namespace ACSHMProvider
                 }
                 else
                 {
+                */
                     timeLeft = (long)graphics.SessionTimeLeft;
 
                     if (timeLeft < 0)
@@ -325,7 +343,9 @@ namespace ACSHMProvider
 
                     Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));
                     Console.Write("SessionLapsRemaining="); Console.WriteLine(GetRemainingLaps(timeLeft));
+                /*
                 }
+                */
             }
             else
                 return;
@@ -343,6 +363,7 @@ namespace ACSHMProvider
             Console.WriteLine("LapLastTime=" + graphics.iLastTime);
             Console.WriteLine("LapBestTime=" + graphics.iBestTime);
 
+            /*
             if (session == "Practice")
             {
                 Console.WriteLine("StintTimeRemaining=3600000");
@@ -350,11 +371,14 @@ namespace ACSHMProvider
             }
             else
             {
+            */
                 long time = GetRemainingTime(timeLeft);
 
                 Console.WriteLine("StintTimeRemaining=" + time);
                 Console.WriteLine("DriverTimeRemaining=" + time);
+            /*
             }
+            */
             Console.WriteLine("InPit=" + (graphics.IsInPit != 0 ? "true" : "false"));
 
             Console.WriteLine("[Track Data]");
@@ -400,6 +424,7 @@ namespace ACSHMProvider
             Console.WriteLine("BodyworkDamage=" + damageFront + "," + damageRear + "," + damageLeft + "," + damageRight + ","
                                                 + (damageFront + damageRear + damageLeft + damageRight));
             Console.WriteLine("SuspensionDamage=0, 0, 0, 0");
+            Console.WriteLine("EngineDamage=0");
         }
     }
 }

@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Microphon.ico
 ;@Ahk2Exe-ExeName Voice Server.exe
@@ -35,6 +32,8 @@ ListLines Off					; Disable execution history
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\SpeechSynthesizer.ahk
 #Include ..\Libraries\SpeechRecognizer.ahk
 
@@ -71,8 +70,8 @@ class VoiceServer extends ConfigurationItem {
 
 	iSpeechRecognizer := false
 
-	iIsSpeaking := false
-	iIsListening := false
+	iSpeaking := false
+	iListening := false
 
 	iPendingCommands := []
 	iHasPendingActivation := false
@@ -97,10 +96,12 @@ class VoiceServer extends ConfigurationItem {
 		iSpeechSynthesizer := false
 
 		iMuted := false
+		iInterrupted := false
+		iInterruptable := true
 
 		iSpeechRecognizer := false
-		iIsSpeaking := false
-		iIsListening := false
+		iSpeaking := false
+		iListening := false
 
 		iActivationCallback := false
 		iDeactivationCallback := false
@@ -144,7 +145,7 @@ class VoiceServer extends ConfigurationItem {
 
 		Speaking[] {
 			Get {
-				return this.iIsSpeaking
+				return this.iSpeaking
 			}
 		}
 
@@ -162,7 +163,7 @@ class VoiceServer extends ConfigurationItem {
 
 		Listening[] {
 			Get {
-				return this.iIsListening
+				return this.iListening
 			}
 		}
 
@@ -232,6 +233,18 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
+		Interrupted[] {
+			Get {
+				return this.iInterrupted
+			}
+		}
+
+		Interruptable[] {
+			Get {
+				return this.iInterruptable
+			}
+		}
+
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
@@ -258,20 +271,46 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		speak(text) {
+			local tries := 5
+			local stopped, oldSpeaking, oldInterruptable
+
 			while this.Muted
 				Sleep 100
 
+			this.iInterrupted := false
+
 			stopped := this.VoiceServer.stopListening()
 			oldSpeaking := this.Speaking
-
-			this.iIsSpeaking := true
+			oldInterruptable := this.iInterruptable
 
 			try {
+				this.iSpeaking := true
+				this.iInterruptable := true
+
 				try {
-					this.SpeechSynthesizer[true].speak(text, true)
+					while (tries-- > 0) {
+						if (tries == 0)
+							this.SpeechSynthesizer[true].speak(text, true)
+						else {
+							if !this.Interrupted
+								this.SpeechSynthesizer[true].speak(text, true)
+
+							if this.Interrupted {
+								Sleep 2000
+
+								while this.Muted
+									Sleep 100
+
+								this.iInterrupted := false
+							}
+							else
+								break
+						}
+					}
 				}
 				finally {
-					this.iIsSpeaking := oldSpeaking
+					this.iInterruptable := oldInterruptable
+					this.iSpeaking := oldSpeaking
 				}
 			}
 			finally {
@@ -281,15 +320,10 @@ class VoiceServer extends ConfigurationItem {
 		}
 
 		startListening(retry := true) {
-			local function
-
 			if (this.SpeechRecognizer[true] && !this.Listening)
 				if !this.SpeechRecognizer.startRecognizer() {
-					if retry {
-						function := ObjBindMethod(this, "startListening", true)
-
-						SetTimer %function%, -200
-					}
+					if retry
+						Task.startTask(ObjBindMethod(this, "startListening", true), 200)
 
 					return false
 				}
@@ -297,58 +331,63 @@ class VoiceServer extends ConfigurationItem {
 					if this.VoiceServer.PushToTalk
 						SoundPlay %kResourcesDirectory%Sounds\Talk.wav
 
-					this.iIsListening := true
+					this.iListening := true
 
 					return true
 				}
 		}
 
 		stopListening(retry := false) {
-			local function
-
 			if (this.SpeechRecognizer && this.Listening)
 				if !this.SpeechRecognizer.stopRecognizer() {
-					if retry {
-						function := ObjBindMethod(this, "stopListening", true)
-
-						SetTimer %function%, -200
-					}
+					if retry
+						Task.startTask(ObjBindMethod(this, "stopListening", true), 200)
 
 					return false
 				}
 				else {
-					this.iIsListening := false
+					this.iListening := false
 
 					return true
 				}
 		}
 
 		mute() {
-			this.iMuted := true
+			local synthesizer := this.SpeechSynthesizer
 
-			synthesizer := this.SpeechSynthesizer
+			if (synthesizer && this.Speaking && !this.Interrupted && this.Interruptable && synthesizer.Stoppable)
+					this.iInterrupted := synthesizer.stop()
 
-			if synthesizer
-				synthesizer.mute()
+			if !this.Muted {
+				this.iMuted := true
+
+				if synthesizer
+					synthesizer.mute()
+			}
 		}
 
 		unmute() {
-			this.iMuted := false
+			local synthesizer
 
-			synthesizer := this.SpeechSynthesizer
+			if this.Muted {
+				this.iMuted := false
 
-			if synthesizer
-				synthesizer.unmute()
+				synthesizer := this.SpeechSynthesizer
+
+				if synthesizer
+					synthesizer.unmute()
+			}
 		}
 
 		registerChoices(name, choices*) {
-			recognizer := this.SpeechRecognizer[true]
+			local recognizer := this.SpeechRecognizer[true]
 
 			recognizer.setChoices(name, values2String(",", choices*))
 		}
 
 		registerVoiceCommand(grammar, command, callback) {
-			recognizer := this.SpeechRecognizer[true]
+			local recognizer := this.SpeechRecognizer[true]
+			local key, descriptor, nextCharIndex
 
 			if !grammar {
 				for key, descriptor in this.iVoiceCommands
@@ -372,7 +411,7 @@ class VoiceServer extends ConfigurationItem {
 
 			try {
 				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
-					Throw "Recognizer not running..."
+					throw "Recognizer not running..."
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
@@ -389,13 +428,13 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				raiseEvent(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+				sendMessage(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
 		}
 
 		deactivate() {
 			if this.DeactivationCallback
-				raiseEvent(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
+				sendMessage(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
 
 		recognizeVoiceCommand(grammar, words) {
@@ -442,7 +481,7 @@ class VoiceServer extends ConfigurationItem {
 
 	Speaking[] {
 		Get {
-			return this.iIsSpeaking
+			return this.iSpeaking
 		}
 	}
 
@@ -460,7 +499,7 @@ class VoiceServer extends ConfigurationItem {
 
 	Listening[] {
 		Get {
-			return this.iIsListening
+			return this.iListening
 		}
 	}
 
@@ -496,13 +535,13 @@ class VoiceServer extends ConfigurationItem {
 						this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
-							Throw "Server speech recognizer engine not installed..."
+							throw "Server speech recognizer engine not installed..."
 					}
 					catch exception {
 						this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
-							Throw "Desktop speech recognizer engine not installed..."
+							throw "Desktop speech recognizer engine not installed..."
 					}
 				}
 				catch exception {
@@ -524,24 +563,12 @@ class VoiceServer extends ConfigurationItem {
 
 		VoiceServer.Instance := this
 
-		timer := ObjBindMethod(this, "runPendingCommands")
+		new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500).start()
+		new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority).start()
 
-		SetTimer %timer%, 500
+		deleteFile(kTempDirectory . "Voice.mute")
 
-		timer := ObjBindMethod(this, "unregisterStaleVoiceClients")
-
-		SetTimer %timer%, 5000
-
-		try {
-			FileDelete %kTempDirectory%Voice.mute
-		}
-		catch exception {
-			; ignore
-		}
-
-		timer := ObjBindMethod(this, "muteVoiceClients")
-
-		SetTimer %timer%, 50
+		new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -558,21 +585,45 @@ class VoiceServer extends ConfigurationItem {
 		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
 		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
 
-		if this.PushToTalk {
-			listen := ObjBindMethod(this, "listen")
+		this.initializePushToTalk()
+	}
 
-			SetTimer %listen%, 50
+	initializePushToTalk() {
+		local p2tHotkey := this.PushToTalk
+		local toggle, handler
+
+		if p2tHotkey {
+			toggle := false
+
+			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
+				toggle := (getConfigurationValue(readConfiguration(kUserConfigDirectory . "P2T Configuration.ini")
+											   , "PushToTalk", "Mode", "Press") = "Toggle")
+
+			if toggle {
+				handler := ObjBindMethod(this, "listen", true)
+
+				Hotkey %p2tHotkey%, %handler%
+				Hotkey %p2tHotkey%, On
+			}
+			else
+				new PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
 		}
 	}
 
-	listen() {
+	listen(toggle, down := true) {
+		local listen := false
+		local pressed
+
 		static isPressed := false
 		static lastDown := 0
 		static lastUp := 0
 		static clicks := 0
 		static activation := false
+		static listening := false
 
-		pressed := GetKeyState(this.PushToTalk, "P")
+		static listenTask := false
+
+		pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount
@@ -596,26 +647,95 @@ class VoiceServer extends ConfigurationItem {
 				clicks := 0
 		}
 
-		if (((A_TickCount - lastDown) < 200) && !activation)
-			pressed := false
+		if toggle {
+			if pressed {
+				if listenTask {
+					listen := true
 
-		if !this.Speaking && pressed {
-			if activation
-				this.startActivationListener()
-			else
-				this.startListening(false)
+					listenTask.stop()
+
+					listenTask := false
+				}
+
+				if (activation && listening) {
+					this.stopActivationListener()
+					this.stopListening()
+
+					this.startActivationListener()
+				}
+				else if listening {
+					this.stopActivationListener()
+					this.stopListening()
+
+					listening := false
+				}
+				else {
+					if activation {
+						this.startActivationListener()
+
+						listening := true
+					}
+					else if listen {
+						this.startListening(false)
+
+						listening := true
+					}
+					else {
+						listenTask := new Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
+
+						Task.startTask(listenTask)
+					}
+				}
+			}
 		}
-		else if !pressed {
-			this.stopActivationListener()
-			this.stopListening()
+		else {
+			if (((A_TickCount - lastDown) < 200) && !activation)
+				pressed := false
+
+			if !this.Speaking && pressed {
+				if activation
+					this.startActivationListener()
+				else
+					this.startListening(false)
+
+				listening := true
+			}
+			else if !pressed {
+				this.stopActivationListener()
+				this.stopListening()
+
+				listening := false
+			}
 		}
+
+		if (toggle && down)
+			this.listen(toggle, false)
 	}
 
 	setDebug(option, enabled) {
+		local label := false
+
 		if enabled
 			this.iDebug := (this.iDebug | option)
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
+
+		switch option {
+			case kDebugRecognitions:
+				label := translate("Debug Recognitions")
+			case kDebugGrammars:
+				label := translate("Debug Grammars")
+		}
+
+		if label
+			if enabled
+				Menu SupportMenu, Check, %label%
+			else
+				Menu SupportMenu, Uncheck, %label%
+	}
+
+	toggleDebug(option) {
+		this.setDebug(option, !this.Debug[option])
 	}
 
 	getVoiceClient(descriptor := false) {
@@ -626,6 +746,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	activateVoiceClient(descriptor, words := false) {
+		local activeVoiceClient
+
 		if (this.ActiveVoiceClient && (this.ActiveVoiceClient.Descriptor = descriptor))
 			this.ActiveVoiceClient.activate(words)
 		else {
@@ -644,7 +766,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	deactivateVoiceClient(descriptor) {
-		activeVoiceClient := this.ActiveVoiceClient
+		local activeVoiceClient := this.ActiveVoiceClient
 
 		if (activeVoiceClient && (activeVoiceClient.Descriptor = descriptor)) {
 			activeVoiceClient.stopListening()
@@ -656,15 +778,10 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	startActivationListener(retry := false) {
-		local function
-
 		if (this.SpeechRecognizer && !this.Listening)
 			if !this.SpeechRecognizer.startRecognizer() {
-				if retry {
-					function := ObjBindMethod(this, "startActivationListener", true)
-
-					SetTimer %function%, -200
-				}
+				if retry
+					Task.startTask(ObjBindMethod(this, "startActivationListener", true), 200)
 
 				return false
 			}
@@ -672,57 +789,64 @@ class VoiceServer extends ConfigurationItem {
 				if this.PushToTalk
 					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
 
-				this.iIsListening := true
+				this.iListening := true
 
 				return true
 			}
 	}
 
 	stopActivationListener(retry := false) {
-		local function
-
 		if (this.SpeechRecognizer && this.Listening)
 			if !this.SpeechRecognizer.stopRecognizer() {
-				if retry {
-					function := ObjBindMethod(this, "stopActivationListener", true)
-
-					SetTimer %function%, -200
-				}
+				if retry
+					Task.startTask(ObjBindMethod(this, "stopActivationListener", true), 200)
 
 				return false
 			}
 			else {
-				this.iIsListening := false
+				this.iListening := false
 
 				return true
 			}
 	}
 
 	startListening(retry := true) {
-		activeClient := this.getVoiceClient()
+		local activeClient := this.getVoiceClient()
 
 		return (activeClient ? activeClient.startListening(retry) : false)
 	}
 
 	stopListening(retry := false) {
-		activeClient := this.getVoiceClient()
+		local activeClient := this.getVoiceClient()
 
 		return (activeClient ? activeClient.stopListening(retry) : false)
 	}
 
+	mute() {
+		local ignore, client
+
+		for ignore, client in this.VoiceClients
+			client.mute()
+	}
+
+	unmute() {
+		local ignore, client
+
+		for ignore, client in this.VoiceClients
+			client.unmute()
+	}
+
 	muteVoiceClients() {
 		if FileExist(kTempDirectory . "Voice.mute")
-			for ignore, client in this.VoiceClients
-				client.mute()
+			this.mute()
 		else
-			for ignore, client in this.VoiceClients
-				client.unmute()
+			this.unmute()
 	}
 
 	speak(descriptor, text, activate := false) {
-		oldSpeaking := this.Speaking
+		local oldSpeaking := this.Speaking
 
-		this.iIsSpeaking := true
+		this.iSpeaking := true
 
 		try {
 			this.getVoiceClient(descriptor).speak(text)
@@ -732,12 +856,12 @@ class VoiceServer extends ConfigurationItem {
 
 		}
 		finally {
-			this.iIsSpeaking := oldSpeaking
+			this.iSpeaking := oldSpeaking
 		}
 	}
 
 	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, synthesizer := true, speaker := true, recognizer := false, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
-		local grammar
+		local grammar, client, nextCharIndex, command, theDescriptor, ignore
 
 		static counter := 1
 
@@ -789,7 +913,7 @@ class VoiceServer extends ConfigurationItem {
 				command := recognizer.compileGrammar(activationCommand)
 
 				if !recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
-					Throw "Recognizer not running..."
+					throw "Recognizer not running..."
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . activationCommand . translate(""" - please check the configuration"))
@@ -812,7 +936,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	unregisterVoiceClient(descriptor, pid) {
-		client := this.VoiceClients[descriptor]
+		local client := this.VoiceClients[descriptor]
+		local theDescriptor, ignore
 
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
@@ -829,6 +954,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	unregisterStaleVoiceClients() {
+		local descriptor, voiceClient, pid
+
 		protectionOn()
 
 		try {
@@ -867,6 +994,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	recognizeCommand(grammar, words*) {
+		local ignore, voiceClient
+
 		for ignore, voiceClient in this.VoiceClients
 			voiceClient.recognizeVoiceCommand(grammar, words)
 	}
@@ -895,6 +1024,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	clearPendingActivations() {
+		local index, command
+
 		for index, command in this.iPendingCommands
 			if command[1] {
 				this.iPendingCommands.RemoveAt(index)
@@ -906,6 +1037,8 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	runPendingCommands() {
+		local command
+
 		if (A_TickCount < (this.iLastCommand + 1000))
 			return
 
@@ -937,12 +1070,12 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	voiceCommandRecognized(voiceClient, grammar, words) {
+		local descriptor := voiceClient.VoiceCommands[grammar]
+
 		if this.Debug[kDebugRecognitions]
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
 
-		descriptor := voiceClient.VoiceCommands[grammar]
-
-		raiseEvent(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
+		sendMessage(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
 	}
 }
 
@@ -950,16 +1083,12 @@ class VoiceServer extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeVoiceServer() {
-	icon := kIconsDirectory . "Microphon.ico"
+startupVoiceServer() {
+	local icon := kIconsDirectory . "Microphon.ico"
+	local debug, index, server, label, callback
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Voice Server
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 
 	debug := false
 
@@ -978,22 +1107,37 @@ initializeVoiceServer() {
 	if debug
 		setDebug(true)
 
-	new VoiceServer(kSimulatorConfiguration)
+	server := new VoiceServer(kSimulatorConfiguration)
 
-	registerEventHandler("Voice", "handleVoiceRemoteCalls")
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Debug Recognitions")
+	callback := ObjBindMethod(server, "toggleDebug", kDebugRecognitions)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if server.Debug[kDebugRecognitions]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Debug Grammars")
+	callback := ObjBindMethod(server, "toggleDebug", kDebugGrammars)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if server.Debug[kDebugGrammars]
+		Menu SupportMenu, Check, %label%
+
+	registerMessageHandler("Voice", "handleVoiceMessage")
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-handleVoiceRemoteCalls(event, data) {
+handleVoiceMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 
@@ -1019,4 +1163,4 @@ handleVoiceRemoteCalls(event, data) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeVoiceServer()
+startupVoiceServer()

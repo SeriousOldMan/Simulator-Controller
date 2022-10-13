@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Race Settings.ico
 ;@Ahk2Exe-ExeName Race Settings.exe
@@ -35,6 +32,7 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\CLR.ahk
 #Include Libraries\SessionDatabase.ahk
 
@@ -43,14 +41,14 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kLoad = "Load"
-global kSave = "Save"
-global kOk = "Ok"
-global kCancel = "Cancel"
-global kConnect = "Connect"
-global kUpdate = "Update"
+global kLoad := "Load"
+global kSave := "Save"
+global kOk := "Ok"
+global kCancel := "Cancel"
+global kConnect := "Connect"
+global kUpdate := "Update"
 
-global kRaceSettingsFile = getFileName("Race.settings", kUserConfigDirectory)
+global kRaceSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -82,6 +80,11 @@ global repairBodyworkDropDown
 global repairBodyworkThresholdEdit
 global repairBodyworkGreaterLabel
 global repairBodyworkThresholdLabel
+
+global repairEngineDropDown
+global repairEngineThresholdEdit
+global repairEngineGreaterLabel
+global repairEngineThresholdLabel
 
 global changeTyreDropDown
 global changeTyreThresholdEdit
@@ -119,50 +122,11 @@ global spWetRearRightEdit
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
-;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
-;   2) {File} 		File containing icon image
-;   3) {Index} 		Index of icon in file
-;						Optional: Default = 1
-;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
-;						W = Width of Icon (default = 16)
-;						H = Height of Icon (default = 16)
-;						S = Size of Icon, Makes Width and Height both equal to Size
-;						L = Left Margin
-;						T = Top Margin
-;						R = Right Margin
-;						B = Botton Margin
-;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
-
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
-
-	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
-
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
-
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
-
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
-
-	return IL_Add(normal_il, file, index)
-}
-
 loginDialog(connectorOrCommand := false, teamServerURL := false) {
-	static result := false
+	local window := "TSL"
+	local title
 
+	static result := false
 	static nameEdit := ""
 	static passwordEdit := ""
 
@@ -172,7 +136,6 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 		result := kCancel
 	else {
 		result := false
-		window := "TSL"
 
 		Gui %window%:New
 
@@ -232,7 +195,7 @@ cancelLogin() {
 }
 
 moveRaceSettingsEditor() {
-	moveByMouse("RES")
+	moveByMouse("RES", "Race Settings")
 }
 
 loadRaceSettings() {
@@ -272,8 +235,10 @@ openSettingsDocumentation() {
 }
 
 isPositiveFloat(numbers*) {
+	local ignore, value
+
 	for ignore, value in numbers
-		if value is not float
+		if value is not Float
 			return false
 		else if (value < 0)
 			return false
@@ -282,8 +247,10 @@ isPositiveFloat(numbers*) {
 }
 
 isPositiveNumber(numbers*) {
+	local ignore, value
+
 	for ignore, value in numbers
-		if value is not number
+		if value is not Number
 			return false
 		else if (value < 0)
 			return false
@@ -339,6 +306,30 @@ updateRepairBodyworkState() {
 	}
 }
 
+updateRepairEngineState() {
+	GuiControlGet repairEngineDropDown
+
+	if ((repairEngineDropDown == 1) || (repairEngineDropDown == 2)) {
+		GuiControl Hide, repairEngineGreaterLabel
+		GuiControl Hide, repairEngineThresholdEdit
+		GuiControl Hide, repairEngineThresholdLabel
+
+		repairEngineThresholdEdit := 0
+
+		GuiControl, , repairEngineThresholdEdit, 0
+	}
+	else if (repairEngineDropDown == 3) {
+		GuiControl Show, repairEngineGreaterLabel
+		GuiControl Show, repairEngineThresholdEdit
+		GuiControl Hide, repairEngineThresholdLabel
+	}
+	else if (repairEngineDropDown == 4) {
+		GuiControl Show, repairEngineGreaterLabel
+		GuiControl Show, repairEngineThresholdEdit
+		GuiControl Show, repairEngineThresholdLabel
+	}
+}
+
 updateChangeTyreState() {
 	GuiControlGet changeTyreDropDown
 
@@ -368,6 +359,8 @@ updateChangeTyreState() {
 }
 
 readTyreSetup(settings) {
+	local color
+
 	if (vCompound && vCompoundColor) {
 		spSetupTyreCompoundDropDown := vCompound
 		color := vCompoundColor
@@ -393,7 +386,7 @@ readTyreSetup(settings) {
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
-	value := getConfigurationValue(data, newSection, key, kUndefined)
+	local value := getConfigurationValue(data, newSection, key, kUndefined)
 
 	if (value != kUndefined)
 		return value
@@ -402,11 +395,12 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 }
 
 parseObject(properties) {
-	result := {}
+	local result := {}
+	local property
 
 	properties := StrReplace(properties, "`r", "")
 
-	Loop Parse, properties, `n
+	loop Parse, properties, `n
 	{
 		property := string2Values("=", A_LoopField)
 
@@ -417,7 +411,8 @@ parseObject(properties) {
 }
 
 loadTeams(connector) {
-	teams := {}
+	local teams := {}
+	local identifiers, ignore, identifier, team
 
 	try {
 		identifiers := string2Values(";", connector.GetAllTeams())
@@ -436,7 +431,8 @@ loadTeams(connector) {
 }
 
 loadDrivers(connector, team) {
-	drivers := {}
+	local drivers := {}
+	local identifiers, ignore, identifier, driver, name
 
 	if team {
 		try {
@@ -459,7 +455,8 @@ loadDrivers(connector, team) {
 }
 
 loadSessions(connector, team) {
-	sessions := {}
+	local sessions := {}
+	local identifiers, ignore, identifier, session
 
 	if team {
 		try {
@@ -476,7 +473,7 @@ loadSessions(connector, team) {
 				sessions[session.Name] := session.Identifier
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 		}
 	}
@@ -485,6 +482,10 @@ loadSessions(connector, team) {
 }
 
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
+	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
+	local dirName, simulatorCode, title, file, compound, compoundColor, fileName, token
+	local x, y, e, sessionDB, directory
+
 	static result
 	static newSettings
 
@@ -595,7 +596,7 @@ restart:
 				GuiControl Choose, sessionDropDownMenu, % chosen
 
 				if exception
-					Throw exception
+					throw exception
 			}
 			else if (arguments[1] == "Driver") {
 				GuiControlGet driverDropDownMenu
@@ -666,7 +667,7 @@ restart:
 					showMessage(translate("Successfully connected to the Team Server."))
 				}
 				else
-					Throw Exception("Invalid or missing token...")
+					throw Exception("Invalid or missing token...")
 			}
 			catch exception {
 				title := translate("Error")
@@ -687,7 +688,8 @@ restart:
 						   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit
 						   , spDryFrontLeftEdit, spDryFrontRightEdit, spDryRearLeftEdit, spDryRearRightEdit
 						   , spWetFrontLeftEdit, spWetFrontRightEdit, spWetRearLeftEdit, spWetRearRightEdit)
-		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit, repairBodyworkThresholdEdit)
+		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit
+							, repairBodyworkThresholdEdit, repairEngineThresholdEdit)
 		 || (trafficConsideredEdit < 1) || (trafficConsideredEdit > 100)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
@@ -706,6 +708,10 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairBodyworkDropDown])
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", Round(repairBodyworkThresholdEdit, 1))
+
+		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair"
+							, ["Never", "Always", "Threshold", "Impact"][repairEngineDropDown])
+		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", Round(repairEngineThresholdEdit, 1))
 
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change"
 							, ["Never", "Temperature", "Weather"][changeTyreDropDown])
@@ -786,7 +792,7 @@ restart:
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 
-					Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+					throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 				}
 
 				connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
@@ -808,6 +814,9 @@ restart:
 
 		repairBodyworkDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact")
 		repairBodyworkThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1)
+
+		repairEngineDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact")
+		repairEngineThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1)
 
 		changeTyreDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never")
 		changeTyreThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0)
@@ -872,21 +881,21 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		if !vTestMode {
-			Gui RES:Add, Button, x228 y450 w80 h23 Default gacceptRaceSettings, % translate("Ok")
-			Gui RES:Add, Button, x316 y450 w80 h23 gcancelRaceSettings, % translate("&Cancel")
+			Gui RES:Add, Button, x228 y475 w80 h23 Default gacceptRaceSettings, % translate("Ok")
+			Gui RES:Add, Button, x316 y475 w80 h23 gcancelRaceSettings, % translate("&Cancel")
 		}
 		else
-			Gui RES:Add, Button, x316 y450 w80 h23 Default gcancelRaceSettings, % translate("Close")
+			Gui RES:Add, Button, x316 y475 w80 h23 Default gcancelRaceSettings, % translate("Close")
 
-		Gui RES:Add, Button, x8 y450 w77 h23 gloadRaceSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y450 w77 h23 gsaveRaceSettings, % translate("&Save...")
+		Gui RES:Add, Button, x8 y475 w77 h23 gloadRaceSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y475 w77 h23 gsaveRaceSettings, % translate("&Save...")
 
 		if vTeamMode
 			tabs := map(["Race", "Pitstop", "Strategy", "Team"], "translate")
 		else
 			tabs := map(["Race", "Pitstop", "Strategy"], "translate")
 
-		Gui RES:Add, Tab3, x8 y48 w388 h395 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y48 w388 h420 -Wrap, % values2String("|", tabs*)
 
 		Gui Tab, 2
 
@@ -920,6 +929,21 @@ restart:
 		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel, % translate("Sec. p. Lap")
 
 		updateRepairBodyworkState()
+
+		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Repair Engine")
+
+		choices := map(["Never", "Always", "Threshold", "Impact"], "translate")
+
+		repairEngineDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairEngineDropDown)
+
+		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairEngineDropDown% VrepairEngineDropDown gupdateRepairEngineState, % values2String("|", choices*)
+		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairEngineGreaterLabel, % translate(">")
+		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairEngineThresholdEdit gvalidateRepairEngineThreshold, %repairEngineThresholdEdit%
+		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairEngineThresholdLabel, % translate("Sec. p. Lap")
+
+		updateRepairEngineState()
+
+
 
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
 
@@ -1210,12 +1234,15 @@ restart:
 			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions.")
 		}
 
-		Gui RES:Show, AutoSize Center
+		if getWindowPosition("Race Settings", x, y)
+			Gui RES:Show, x%x% y%y%
+		else
+			Gui RES:Show
 
-		Loop {
-			Loop {
+		loop {
+			loop
 				Sleep 1000
-			} until result
+			until result
 
 			if (result == kLoad) {
 				result := false
@@ -1223,9 +1250,12 @@ restart:
 				title := translate("Load Race Settings...")
 
 				if (vSimulator && vCar && vTrack) {
-					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					sessionDB := new SessionDatabase()
 
-					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					directory := sessionDB.DatabasePath
+					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
+
+					dirName = %directory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
 
 					FileCreateDir %dirName%
 				}
@@ -1250,9 +1280,12 @@ restart:
 				result := false
 
 				if (vSimulator && vCar && vTrack) {
-					simulatorCode := new SessionDatabase().getSimulatorCode(vSimulator)
+					sessionDB := new SessionDatabase()
 
-					dirName = %kDatabaseDirectory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
+					directory := sessionDB.DatabasePath
+					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
+
+					dirName = %directory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
 
 					FileCreateDir %dirName%
 
@@ -1290,7 +1323,7 @@ restart:
 }
 
 validateNumber(field) {
-	oldValue := %field%
+	local oldValue := %field%
 
 	GuiControlGet %field%
 
@@ -1308,6 +1341,10 @@ validateRepairSuspensionThreshold() {
 
 validateRepairBodyworkThreshold() {
 	validateNumber("repairBodyworkThresholdEdit")
+}
+
+validateRepairEngineThreshold() {
+	validateNumber("repairEngineThresholdEdit")
 }
 
 validateTPDryFrontLeft() {
@@ -1387,8 +1424,9 @@ validatePitstopRefuelService() {
 }
 
 readSimulatorData(simulator) {
-	dataFile := kTempDirectory . simulator . " Data\Setup.data"
-	exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
+	local exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+	local data, compound, compoundColor
 
 	FileCreateDir %kTempDirectory%%simulator% Data
 
@@ -1403,6 +1441,8 @@ readSimulatorData(simulator) {
 	}
 
 	data := readConfiguration(dataFile)
+	
+	deleteFile(dataFile)
 
 	if (getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
 		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
@@ -1425,7 +1465,8 @@ readSimulatorData(simulator) {
 }
 
 openSessionDatabase() {
-	exePath := kBinariesDirectory . "Session Database.exe"
+	local exePath := kBinariesDirectory . "Session Database.exe"
+	local pid, options, ignore, arg
 
 	try {
 		options := []
@@ -1452,6 +1493,8 @@ openSessionDatabase() {
 }
 
 importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {
+	local candidate, ignore, data, compound, compoundColor
+
 	if (message != "Import") {
 		settings := false
 
@@ -1493,10 +1536,10 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			spDryRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)
 
 			if settings {
-				color := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", color)
+				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
@@ -1504,7 +1547,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
 
 				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
-					message := (translate("Tyre setup imported: ") . translate(((color = "Black") ? compound : " (" . color . ")")))
+					message := (translate("Tyre setup imported: ") . translate(compound(compound, compoundColor)))
 
 					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
 							  . Round(spDryFrontLeftEdit, 1) . translate(", ") . Round(spDryFrontRightEdit, 1) . translate(", ")
@@ -1562,15 +1605,11 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 }
 
 showRaceSettingsEditor() {
-	icon := kIconsDirectory . "Race Settings.ico"
+	local icon := kIconsDirectory . "Race Settings.ico"
+	local index, fileName, settings
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Settings
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 
 	vSimulator := false
 	vCar := false
@@ -1652,7 +1691,7 @@ showRaceSettingsEditor() {
 		writeConfiguration(fileName, settings)
 	}
 	else {
-		registerEventHandler("Setup", "functionEventHandler")
+		registerMessageHandler("Setup", "functionMessageHandler")
 
 		if (editRaceSettings(settings) = kOk) {
 			writeConfiguration(fileName, settings)
@@ -1662,14 +1701,11 @@ showRaceSettingsEditor() {
 	}
 
 	ExitApp 0
-
-Exit:
-	ExitApp 0
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {

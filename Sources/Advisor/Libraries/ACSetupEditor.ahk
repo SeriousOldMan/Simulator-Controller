@@ -62,12 +62,43 @@ class ACSetup extends FileSetup {
 		return getConfigurationValue(this.Data[original], getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE")
 	}
 
-	setValue(setting, value) {
-		setConfigurationValue(this.Data, getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE", value)
+	setValue(setting, value, display := false) {
+		local data := (display ? display : this.Data)
 
-		this.Setup := printConfiguration(this.Data)
+		setConfigurationValue(data, getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE", value)
+
+		if !display
+			this.Setup := this.printSetup(data)
 
 		return value
+	}
+
+	printSetup(setup) {
+		local display := newConfiguration()
+		local ignore, setting, section, values, key, value
+
+		for section, values in setup
+			for key, value in values
+				setConfigurationValue(display, section, key, value)
+
+		for ignore, setting in this.Editor.Advisor.Settings
+			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
+
+		return printConfiguration(display)
+	}
+
+	enable(setting) {
+		base.enable(setting)
+
+		if setting
+			this.setValue(setting, this.getValue(setting))
+	}
+
+	disable(setting) {
+		base.disable(setting)
+
+		if setting
+			this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {
@@ -89,17 +120,17 @@ class ACSetupEditor extends FileSetupEditor {
 	}
 
 	chooseSetup(load := true) {
-		sessionDB := new SessionDatabase()
-
-		directory := (A_MyDocuments . "\Assetto Corsa\setups")
-		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
-		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local sessionDB := new SessionDatabase()
+		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
+		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local title, fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
 
 		if (track && (track != true))
-			Loop Files, %directory%\*.*, D
+			loop Files, %directory%\*.*, D
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 
@@ -127,7 +158,8 @@ class ACSetupEditor extends FileSetupEditor {
 	}
 
 	saveSetup() {
-		fileName := this.Setup.FileName
+		local fileName := this.Setup.FileName
+		local directory, title, text
 
 		if fileName = this.Setup.FileName[true]
 			SplitPath fileName, , directory
@@ -146,12 +178,7 @@ class ACSetupEditor extends FileSetupEditor {
 			if !InStr(fileName, ".ini")
 				fileName := (fileName . ".ini")
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 
 			text := this.Setup.Setup
 
@@ -168,17 +195,17 @@ class ACSetupEditor extends FileSetupEditor {
 
 class ACSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
-		sessionDB := new SessionDatabase()
-
-		directory := (A_MyDocuments . "\Assetto Corsa\setups")
-		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
-		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local sessionDB := new SessionDatabase()
+		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
+		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local title, fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
 
 		if (track && (track != true))
-			Loop Files, %directory%\*.*, D
+			loop Files, %directory%\*.*, D
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 

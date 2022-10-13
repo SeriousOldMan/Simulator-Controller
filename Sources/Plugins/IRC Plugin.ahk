@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kIRCApplication = "iRacing"
+global kIRCApplication := "iRacing"
 
-global kIRCPlugin = "IRC"
+global kIRCPlugin := "IRC"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -61,10 +61,11 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {
+		local simulator, exePath
+
 		if this.iCurrentPitstopMFD {
 			simulator := this.Code
 			arguments := values2String(";", arguments*)
-
 			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
 
 			try {
@@ -86,8 +87,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	openPitstopMFD(descriptor := false) {
+		local key := false
+
 		static reported := false
-		key := false
 
 		if !descriptor
 			descriptor := "Fuel"
@@ -101,7 +103,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			else if (descriptor = "Tyre")
 				key := this.PitstopTyreMFDHotkey
 			else
-				Throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
+				throw "Unsupported Pitstop MFD detected in IRCPlugin.openPitstopMFD..."
 
 			if key {
 				if (key != "Off") {
@@ -128,7 +130,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	closePitstopMFD() {
-		key := false
+		local key := false
 
 		if this.iCurrentPitstopMFD {
 			if (this.iCurrentPitstopMFD = "Fuel")
@@ -138,7 +140,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 			else {
 				this.iCurrentPitstopMFD := false
 
-				Throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
+				throw "Unsupported Pitstop MFD detected in IRCPlugin.closePitstopMFD..."
 			}
 
 			if (key != "Off")
@@ -153,8 +155,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
-		actions := false
-		ignore := false
+		local actions := false
+		local ignore := false
+		local candidate
 
 		this.getPitstopActions(actions, ignore)
 
@@ -258,13 +261,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	updatePositionsData(data) {
 		base.updatePositionsData(data)
 
-		standings := readSimulatorData(this.Code, "-Standings")
-
-		Loop % getConfigurationValue(standings, "Position Data", "Car.Count", 0)
-			setConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr"
-								, StrReplace(getConfigurationValue(standings, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
+		loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
+			setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"
+								, StrReplace(getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
 	}
 }
 

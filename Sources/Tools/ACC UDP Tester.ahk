@@ -35,7 +35,7 @@ ListLines Off					; Disable execution history
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vUDPClient = false
+global vUDPClient := false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -137,12 +137,12 @@ startUDPClient() {
 			
 	try {
 		if FileExist(kTempDirectory . "ACCUDP.cmd")
-			FileDelete %kTempDirectory%ACCUDP.cmd
+			deleteFile(kTempDirectory . "ACCUDP.cmd")
 			
 		if FileExist(kTempDirectory . "ACCUDP.out")
-			FileDelete %kTempDirectory%ACCUDP.out
+			deleteFile(kTempDirectory . "ACCUDP.out")
 		
-		Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"", , Hide, pid
+		Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"", , Hide
 		
 		vUDPClient := "stopUDPClient"
 		
@@ -189,8 +189,7 @@ readUDPData() {
 				
 				viewFile(traceFile, "Invalid - Error Trace")
 				
-				try
-					FileDelete %traceFile%
+				deleteFile(traceFile)
 			}
 			else
 				viewFile(kTempDirectory . "ACCUDP.out", "Valid - Car Positions")
@@ -217,24 +216,16 @@ runACCUDPTester() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, ACC UDP Tester
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
 	startUDPClient()
 
 	Sleep 5000
 
-	Loop
+	loop
 		if !readUDPData()
 			break
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

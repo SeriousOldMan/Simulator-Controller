@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Configuration.ico
 ;@Ahk2Exe-ExeName Simulator Configuration.exe
@@ -76,7 +73,11 @@ class GeneralTab extends ConfigurationItem {
 	}
 
 	createGui(editor, x, y, width, height) {
-		window := editor.Window
+		local window := editor.Window
+		local choices := []
+		local chosen := 0
+		local enIndex := 0
+		local code, language
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -99,10 +100,6 @@ class GeneralTab extends ConfigurationItem {
 		Gui %window%:Add, GroupBox, -Theme x16 y160 w458 h95, % translate("Settings")
 
 		Gui %window%:Font, Norm, Arial
-
-		choices := []
-		chosen := 0
-		enIndex := 0
 
 		for code, language in availableLanguages() {
 			choices.Push(language)
@@ -186,6 +183,9 @@ class GeneralTab extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
+		local languageCode := "en"
+		local code, language, choices
+
 		base.saveToConfiguration(configuration)
 
 		GuiControlGet nirCmdPathEdit
@@ -197,8 +197,6 @@ class GeneralTab extends ConfigurationItem {
 
 		setConfigurationValue(configuration, "Configuration", "NirCmd Path", nirCmdPathEdit)
 		setConfigurationValue(configuration, "Configuration", "Home Path", homePathEdit)
-
-		languageCode := "en"
 
 		for code, language in availableLanguages()
 			if (language = languageDropDown) {
@@ -237,7 +235,8 @@ class GeneralTab extends ConfigurationItem {
 	}
 
 	getSimulators() {
-		simulators := []
+		local simulators := []
+		local simulator, ignore
 
 		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
 			simulators.Push(simulator)
@@ -246,17 +245,15 @@ class GeneralTab extends ConfigurationItem {
 	}
 
 	openTranslationsEditor() {
+		local window := ConfigurationEditor.Instance.Window
+		local choices, chosen, enIndex, code, language
+
 		GuiControlGet languageDropDown
-
-		; ConfigurationEditor.Instance.hide()
-
-		window := ConfigurationEditor.Instance.Window
 
 		Gui TE:+Owner%window%
 		Gui %window%:+Disabled
 
 		if (new TranslationsEditor(this.Configuration)).editTranslations() {
-			; ConfigurationEditor.Instance.show()
 			Gui %window%:-Disabled
 
 			window := ConfigurationEditor.Instance.Window
@@ -286,21 +283,17 @@ class GeneralTab extends ConfigurationItem {
 			GuiControl Choose, languageDropDown, %chosen%
 		}
 		else
-			; ConfigurationEditor.Instance.show()
 			Gui %window%:-Disabled
 	}
 
 	openThemesEditor() {
-		; ConfigurationEditor.Instance.hide()
-
-		window := ConfigurationEditor.Instance.Window
+		local window := ConfigurationEditor.Instance.Window
 
 		Gui TE:+Owner%window%
 		Gui %window%:+Disabled
 
 		this.iSplashThemesConfiguration := (new ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
 
-		; ConfigurationEditor.Instance.show()
 		Gui %window%:-Disabled
 	}
 }
@@ -311,7 +304,7 @@ class GeneralTab extends ConfigurationItem {
 
 global simulatorsListBox := "|"
 
-global simulatorEdit = ""
+global simulatorEdit := ""
 
 global simulatorUpButton
 global simulatorDownButton
@@ -328,7 +321,7 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 
 	createGui(editor, x, y, width, height) {
-		window := editor.Window
+		local window := editor.Window
 
 		Gui %window%:Add, ListBox, x24 y284 w194 h96 HwndsimulatorsListBoxHandle VsimulatorsListBox glistEvent, %simulatorsListBox%
 
@@ -405,6 +398,8 @@ class SimulatorsList extends ConfigurationItemList {
 ;;;-------------------------------------------------------------------------;;;
 
 chooseHomePath() {
+	local directory
+
 	protectionOn()
 
 	try {
@@ -425,6 +420,8 @@ chooseHomePath() {
 }
 
 chooseNirCmdPath() {
+	local directory
+
 	protectionOn()
 
 	try {
@@ -445,6 +442,8 @@ chooseNirCmdPath() {
 }
 
 chooseAHKPath() {
+	local directory
+
 	protectionOn()
 
 	try {
@@ -465,6 +464,8 @@ chooseAHKPath() {
 }
 
 chooseMSBuildPath() {
+	local directory
+
 	protectionOn()
 
 	try {
@@ -493,18 +494,14 @@ openThemesEditor() {
 }
 
 saveConfiguration(configurationFile, editor) {
-	configuration := newConfiguration()
+	local configuration := newConfiguration()
+	local startupLink, startupExe
 
 	editor.saveToConfiguration(configuration)
 
 	writeConfiguration(configurationFile, configuration)
 
-	try {
-		FileDelete %kUserConfigDirectory%Simulator Controller.config
-	}
-	catch exception {
-		; Ignore
-	}
+	deleteFile(kUserConfigDirectory . "Simulator Controller.config")
 
 	startupLink := A_Startup . "\Simulator Startup.lnk"
 
@@ -514,24 +511,17 @@ saveConfiguration(configurationFile, editor) {
 		FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
 	}
 	else
-		try {
-			FileDelete %startupLink%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(startupLink)
+
+	deleteDirectory(kTempDirectory, false)
 }
 
 initializeSimulatorConfiguration() {
-	icon := kIconsDirectory . "Configuration.ico"
+	local icon := kIconsDirectory . "Configuration.ico"
+	local title, initialize
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Configuration
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 
 	kConfigurationEditor := true
 
@@ -561,13 +551,11 @@ initializeSimulatorConfiguration() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 startupSimulatorConfiguration() {
-	editor := ConfigurationEditor.Instance
+	local editor := ConfigurationEditor.Instance
+	local done, saved, result
 
 	editor.createGui(editor.Configuration)
 
@@ -577,18 +565,21 @@ startupSimulatorConfiguration() {
 	editor.show()
 
 	try {
-		Loop {
+		loop {
 			Sleep 200
 
-			if (vResult == kApply) {
+			result := ConfigurationEditor.Instance.Result
+
+			if (result == kApply) {
 				saved := true
-				vResult := false
+
+				ConfigurationEditor.Instance.Result := false
 
 				saveConfiguration(kSimulatorConfigurationFile, editor)
 			}
-			else if (vResult == kCancel)
+			else if (result == kCancel)
 				done := true
-			else if (vResult == kOk) {
+			else if (result == kOk) {
 				saved := true
 				done := true
 

@@ -105,7 +105,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings
 
 	[(CanWe) refuel (Number) litres, We need to refuel (Number) litres]
 
-	[(CanWe) {use, switch to} wet tires, {Can we, Please} {use, switch to} dry tires]
+	[(CanWe) {use, switch to} wet tires, {Can we, Please} {use, switch to} dry tires, {Can we, Please} {use, switch to} intemediate tires]
 
 	[(CanWe) increase {front left, front right, rear left, rear right} by (Digit) point (Digit), (Digit) point (Digit) more pressure for the {front left, front right, rear left, rear right} tire]
 
@@ -118,3 +118,5 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings
 	[(CanWe) repair the suspension, {Please} do not repair the suspension]
 
 	[(CanWe) repair the bodywork, {Please} do not repair the bodywork]
+	
+	[(CanWe) repair the engine, {Please} do not repair the engine]

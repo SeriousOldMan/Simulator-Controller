@@ -35,26 +35,25 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vFuelWarnings = {}
+global vFuelWarnings := {}
 
-global vSuspensionDamage = kNotInitialized
-global vBodyworkDamage = kNotInitialized
+global vSuspensionDamage := kNotInitialized
+global vBodyworkDamage := kNotInitialized
+global vEngineDamage := kNotInitialized
+global vDamageRepair := kNotInitialized
+global vDamageLapDelta := kNotInitialized
+global vDamageStintLaps := kNotInitialized
 
-global vCompletedActions = {}
+global vCompletedActions := {}
 
-global vPitstopFuel = kNotInitialized
-global vPitstopTyreCompound = kNotInitialized
-global vPitstopTyreCompoundColor = kNotInitialized
-global vPitstopTyreSet = kNotInitialized
-global vPitstopTyrePressures = kNotInitialized
-global vPitstopRepairSuspension = kNotInitialized
-global vPitstopRepairBodywork = kNotInitialized
-
-global vSuspensionDamage
-global vBodyworkDamage
-global vDamageRepair
-global vDamageLapDelta
-global vDamageStintLaps
+global vPitstopFuel := kNotInitialized
+global vPitstopTyreCompound := kNotInitialized
+global vPitstopTyreCompoundColor := kNotInitialized
+global vPitstopTyreSet := kNotInitialized
+global vPitstopTyrePressures := kNotInitialized
+global vPitstopRepairSuspension := kNotInitialized
+global vPitstopRepairBodywork := kNotInitialized
+global vPitstopRepairEngine := kNotInitialized
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -81,14 +80,15 @@ class TestRaceEngineer extends RaceEngineer {
 		vFuelWarnings[this.KnowledgeBase.getValue("Lap")] := remainingLaps
 	}
 
-	damageWarning(newSuspensionDamage, newBodyworkDamage) {
-		base.damageWarning(newSuspensionDamage, newBodyworkDamage)
+	damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage) {
+		base.damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage)
 
 		if isDebug()
-			showMessage("Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? "Bodywork" : ""))
+			showMessage("Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? " Bodywork" : "") . (newEngineDamage ? " Engine" : ""))
 
 		vSuspensionDamage := newSuspensionDamage
 		vBodyworkDamage := newBodyworkDamage
+		vEngineDamage := newEngineDamage
 	}
 
 	reportDamageAnalysis(repair, stintLaps, delta) {
@@ -174,13 +174,14 @@ class TestPitstopHandler {
 		vPitstopTyrePressures := [pressureFL, pressureFR, pressureRL, pressureRR]
 	}
 
-	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork) {
-		this.showAction("requestPitstopRepairs", pitstopNumber, repairSuspension, repairBodywork)
+	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine) {
+		this.showAction("requestPitstopRepairs", pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		vCompletedActions["requestPitstopRepairs"] := pitstopNumber
 
 		vPitstopRepairSuspension := repairSuspension
 		vPitstopRepairBodywork := repairBodywork
+		vPitstopRepairEngine := repairEngine
 	}
 }
 
@@ -195,7 +196,7 @@ class FuelReporting extends Assert {
 
 		vFuelWarnings := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -203,7 +204,7 @@ class FuelReporting extends Assert {
 			else
 				engineer.addLap(A_Index, data)
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(false, vFuelWarnings.HasKey(1), "Unexpected fuel warning in lap 1...")
@@ -220,7 +221,7 @@ class FuelReporting extends Assert {
 
 		vFuelWarnings := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -228,7 +229,7 @@ class FuelReporting extends Assert {
 			else
 				engineer.addLap(A_Index, data)
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(3, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
@@ -243,11 +244,12 @@ class DamageReporting extends Assert {
 	DamageReportingTest() {
 		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
+			vEngineDamage := kNotInitialized
 
 			if (data.Count() == 0)
 				break
@@ -267,18 +269,12 @@ class DamageReporting extends Assert {
 				this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		engineer.finishSession(false)
 	}
 }
-
-global vSuspensionDamage
-global vBodyworkDamage
-global vDamageRepair
-global vDamageLapDelta
-global vDamageStintLaps
 
 class DamageAnalysis extends Assert {
 	DamageRace2ReportingTest() {
@@ -286,12 +282,13 @@ class DamageAnalysis extends Assert {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
+				vEngineDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
@@ -310,7 +307,7 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 0.0	->	1.1		Report Bodywork
@@ -353,12 +350,13 @@ class DamageAnalysis extends Assert {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
+				vEngineDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
@@ -377,7 +375,7 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 3.1	->	3.2		Report Bodywork
@@ -431,12 +429,13 @@ class DamageAnalysis extends Assert {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				vSuspensionDamage := kNotInitialized
 				vBodyworkDamage := kNotInitialized
+				vEngineDamage := kNotInitialized
 				vDamageRepair := kNotInitialized
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
@@ -455,7 +454,7 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 0.0	->	1.1		Report Bodywork
@@ -522,7 +521,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -534,7 +533,7 @@ class PitstopHandling extends Assert {
 					engineer.planPitstop()
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
@@ -568,7 +567,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -580,7 +579,7 @@ class PitstopHandling extends Assert {
 					engineer.planPitstop()
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
@@ -614,7 +613,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -629,7 +628,7 @@ class PitstopHandling extends Assert {
 					Break
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.HasKey("pitstopPlanned"), "No pitstop planned...")
@@ -670,8 +669,9 @@ class PitstopHandling extends Assert {
 		vPitstopTyrePressures := kNotInitialized
 		vPitstopRepairSuspension := kNotInitialized
 		vPitstopRepairBodywork := kNotInitialized
+		vPitstopRepairEngine := kNotInitialized
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -685,7 +685,7 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
@@ -706,6 +706,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
 		this.AssertEqual(false, vPitstopRepairSuspension, "Expected no suspension repair...")
 		this.AssertEqual(false, vPitstopRepairBodywork, "Expected no bodywork repair...")
+		this.AssertEqual(false, vPitstopRepairEngine, "Expected no engine repair...")
 
 		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.4, 26.6, 26.1]), "Unexpected tyre pressures...")
 
@@ -724,8 +725,9 @@ class PitstopHandling extends Assert {
 		vPitstopTyrePressures := kNotInitialized
 		vPitstopRepairSuspension := kNotInitialized
 		vPitstopRepairBodywork := kNotInitialized
+		vPitstopRepairEngine := kNotInitialized
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -739,7 +741,7 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
@@ -760,6 +762,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
 		this.AssertEqual(true, vPitstopRepairSuspension, "Expected suspension repair...")
 		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")
+		this.AssertEqual(false, vPitstopRepairEngine, "Expected no engine repair...")
 
 		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.3, 26.6, 26.1]), "Unexpected tyre pressures...")
 
@@ -771,7 +774,7 @@ class PitstopHandling extends Assert {
 
 		vCompletedActions := {}
 
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -787,7 +790,7 @@ class PitstopHandling extends Assert {
 				if (A_Index = 5) {
 					engineer.performPitstop()
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(1, vCompletedActions["pitstopFinished"], "Pitstop not prepared as number 1...")
 
@@ -816,10 +819,11 @@ class PitstopHandling extends Assert {
 
 					vSuspensionDamage := kNotInitialized
 					vBodyworkDamage := kNotInitialized
+					vEngineDamage := kNotInitialized
 
 					engineer.planPitstop()
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr"), "Pitstop number increment failed...")
 					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
@@ -837,9 +841,10 @@ class PitstopHandling extends Assert {
 	PitstopMultipleTest() {
 		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
 
-		Loop {
+		loop {
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
+			vEngineDamage := kNotInitialized
 
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
@@ -888,7 +893,7 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledge(engineer.KnowledgeBase)
+			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		engineer.finishSession(false)
@@ -913,7 +918,7 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms; Garbage: [RS: " . vActiveResultSets . ", CP: " . vActiveChoicePoints . "]"
+	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
@@ -923,7 +928,7 @@ else {
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 
 	if (raceNr == 1) {
-		Loop {
+		loop {
 			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
@@ -940,7 +945,7 @@ else {
 					engineer.performPitstop()
 				}
 
-				engineer.dumpKnowledge(engineer.KnowledgeBase)
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if isDebug()
 					MsgBox % "Lap " . A_Index . " loaded - Continue?"
@@ -960,10 +965,10 @@ else {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -978,7 +983,7 @@ else {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -994,10 +999,10 @@ else {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1012,7 +1017,7 @@ else {
 					else
 						engineer.updateLap(lap, data)
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1028,10 +1033,10 @@ else {
 
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1052,7 +1057,7 @@ else {
 						engineer.preparePitstop()
 					}
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1063,10 +1068,10 @@ else {
 	else if (raceNr == 5) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 5\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1084,7 +1089,7 @@ else {
 					if (lap = 8)
 						engineer.planPitstop()
 
-					engineer.dumpKnowledge(engineer.KnowledgeBase)
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if (lap = 8)
 						MsgBox Pitstop
@@ -1098,10 +1103,10 @@ else {
 	else if (raceNr == 6) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 6\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1119,7 +1124,7 @@ else {
 					if (lap = 17) {
 						engineer.planPitstop()
 
-						engineer.dumpKnowledge(engineer.KnowledgeBase)
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 						MsgBox Pitstop
 					}
@@ -1133,10 +1138,10 @@ else {
 	else if ((raceNr = 9) || (raceNr = 11) || (raceNr = 12)) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1209,10 +1214,10 @@ else {
 	else if (raceNr = 18) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
@@ -1236,10 +1241,10 @@ else {
 	else if (raceNr > 6) {
 		done := false
 
-		Loop {
+		loop {
 			lap := A_Index
 
-			Loop {
+			loop {
 				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {

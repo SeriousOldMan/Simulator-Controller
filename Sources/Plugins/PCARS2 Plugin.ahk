@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kPCARS2Application = "Project CARS 2"
+global kPCARS2Application := "Project CARS 2"
 
-global kPCARS2Plugin = "PCARS2"
+global kPCARS2Plugin := "PCARS2"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -128,7 +128,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.sendCommand(this.PreviousOptionHotkey)
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-				Loop 3
+				loop 3
 					this.sendCommand(this.PreviousOptionHotkey)
 			}
 
@@ -165,7 +165,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				return true
 			}
 			else if ((option = "Repair Bodywork") || (option = "Repair Suspension")) {
-				Loop 3
+				loop 3
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
@@ -189,13 +189,13 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			switch action {
 				case "Increase":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+					throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
 			}
 	}
 
@@ -250,7 +250,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.closePitstopMFD("Repair Suspension")
 			}
 			else
-				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+				throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
 		}
 	}
 
@@ -270,6 +270,8 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		local delta
+
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
@@ -311,22 +313,14 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updateSessionState(sessionState) {
-		base.updateSessionState(sessionState)
+	updateSession(session) {
+		base.updateSession(session)
 
-		if (sessionState == kSessionFinished) {
+		if (session == kSessionFinished) {
 			this.iTyreCompoundChosen := 0
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
 		}
-	}
-
-	updatePositionsData(data) {
-		base.updatePositionsData(data)
-
-		standings := readSimulatorData(this.Code, "-Standings")
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }
 

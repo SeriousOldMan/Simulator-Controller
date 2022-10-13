@@ -9,14 +9,7 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kEmptySpaceDescriptor = "Button;" . kButtonBoxImagesDirectory . "Empty.png;52 x 52"
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Private Variables Section                       ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vButtonBoxPreviews = {}
+global kEmptySpaceDescriptor := "Button;" . kButtonBoxImagesDirectory . "Empty.png;52 x 52"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -89,28 +82,28 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	createGui(configuration) {
-		local function
-
-		rowHeights := false
-		columnWidths := false
+		local rowHeights := false
+		local columnWidths := false
+		local function, height, width, window, vertical, row, rowHeight, rowDefinition
+		local horizontal, column, columnWidth, descriptor, label, labelWidth, labelHeight, descriptor, number
+		local image, imageWidth, imageHeight, x, y, labelHandle
 
 		this.computeLayout(rowHeights, columnWidths)
 
 		height := 0
-		Loop % rowHeights.Length()
+
+		loop % rowHeights.Length()
 			height += rowHeights[A_Index]
 
 		width := 0
-		Loop % columnWidths.Length()
+
+		loop % columnWidths.Length()
 			width += columnWidths[A_Index]
 
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
 		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
 
 		window := this.Window
-
-		; previewMover := this.PreviewManager.getPreviewMover()
-		; previewMover := (previewMover ? ("g" . previewMover) : "")
 
 		Gui %window%:-Border -Caption
 
@@ -127,7 +120,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 		vertical := this.kHeaderHeight
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
@@ -136,7 +129,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 			horizontal := this.SidesMargin
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				column := A_Index
 
@@ -166,7 +159,6 @@ class ButtonBoxPreview extends ControllerPreview {
 				else {
 					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
 					number := descriptor[2]
-
 					descriptor := getConfigurationValue(this.Configuration, "Controls", descriptor[1], "")
 				}
 
@@ -220,16 +212,17 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	createBackground(configuration) {
-		window := this.Window
-
-		previewMover := this.PreviewManager.getPreviewMover()
+		local window := this.Window
+		local previewMover := this.PreviewManager.getPreviewMover()
+		
 		previewMover := (previewMover ? ("g" . previewMover) : "")
 
 		Gui %window%:Add, Picture, x-10 y-10 %previewMover% 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
 	}
 
 	loadFromConfiguration(configuration) {
-		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		local layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		local rows := []
 
 		if (layout.Length() > 1)
 			this.iRowMargin := layout[2]
@@ -248,28 +241,28 @@ class ButtonBoxPreview extends ControllerPreview {
 		this.Rows := layout[1]
 		this.Columns := layout[2]
 
-		rows := []
-
-		Loop % this.Rows
+		loop % this.Rows
 			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
 
 		this.iRowDefinitions := rows
 	}
 
 	computeLayout(ByRef rowHeights, ByRef columnWidths) {
-		columnWidths := []
-		rowHeights := []
+		local rowHeight, rowDefinition, descriptor, label, labelWidth, labelHeight, imageWidth, imageHeight
 
-		Loop % this.Columns
+		rowHeights := []
+		columnWidths := []
+
+		loop % this.Columns
 			columnWidths.Push(0)
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			rowHeight := 0
 
 			rowDefinition := this.RowDefinitions[A_Index]
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				descriptor := rowDefinition[A_Index]
 
@@ -317,19 +310,21 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
-		local function
-
-		rowHeights := false
-		columnWidths := false
+		local rowHeights := false
+		local columnWidths := false
+		local function, height, width, vertical, horizontal, rowHeight, rowDefinition, columnWidth
+		local descriptor, name, number, image, imageWidth, imageHeight, x, y, labelHeight, label, labelWidth
 
 		this.computeLayout(rowHeights, columnWidths)
 
 		height := 0
-		Loop % rowHeights.Length()
+
+		loop % rowHeights.Length()
 			height += rowHeights[A_Index]
 
 		width := 0
-		Loop % columnWidths.Length()
+
+		loop % columnWidths.Length()
 			width += columnWidths[A_Index]
 
 		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
@@ -337,7 +332,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 		vertical := this.kHeaderHeight
 
-		Loop % this.Rows
+		loop % this.Rows
 		{
 			row := A_Index
 
@@ -346,7 +341,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 			horizontal := this.SidesMargin
 
-			Loop % this.Columns
+			loop % this.Columns
 			{
 				column := A_Index
 
@@ -383,7 +378,6 @@ class ButtonBoxPreview extends ControllerPreview {
 					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
 					name := descriptor[1]
 					number := descriptor[2]
-
 					descriptor := getConfigurationValue(this.Configuration, "Controls", descriptor[1], "")
 				}
 
@@ -404,8 +398,6 @@ class ButtonBoxPreview extends ControllerPreview {
 						return ["Control", ConfigurationItem.descriptor(name, number)]
 
 					if ((labelWidth > 0) && (labelHeight > 0)) {
-						Gui %window%:Font, s8 Norm
-
 						x := horizontal + Round((columnWidth - labelWidth) / 2)
 						y := vertical + rowHeight - labelHeight
 
@@ -424,6 +416,8 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	getFunction(row, column) {
+		local rowFunctions
+
 		if this.iFunctions.HasKey(row) {
 			rowFunctions := this.iFunctions[row]
 
@@ -435,6 +429,8 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	setLabel(row, column, text) {
+		local rowLabels, label
+
 		if this.iLabels.HasKey(row) {
 			rowLabels := this.iLabels[row]
 
@@ -447,11 +443,9 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	controlClick(element, row, column, isEmpty) {
-		local function
-
-		handler := this.iControlClickHandler
-
-		function := ConfigurationItem.splitDescriptor(element[2])
+		local handler := this.iControlClickHandler
+		local function := ConfigurationItem.splitDescriptor(element[2])
+		local control, descriptor
 
 		for control, descriptor in getConfigurationSectionValues(this.Configuration, "Controls")
 			if (control = function[1]) {
@@ -464,7 +458,7 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	openControlMenu(preview, element, function, row, column, isEmpty) {
-		local count
+		local count, menuItem, window, label, handler, control, definition, menu
 
 		if (GetKeyState("Ctrl", "P") && !isEmpty)
 			LayoutsList.Instance.changeControl(row, column, "__Number__", false)
@@ -475,7 +469,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				Menu MainMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			window := this.Window
@@ -490,7 +484,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				Menu ControlMenu, DeleteAll
 			}
 			catch exception {
-				; ignore
+				logError(exception)
 			}
 
 			label := translate("Empty")
@@ -515,7 +509,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					Menu NumberMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				label := translate("Input...")
@@ -526,7 +520,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 				count := 1
 
-				Loop 4 {
+				loop 4 {
 					label := (count . " - " . (count + 9))
 
 					menu := ("NumSubMenu" . A_Index)
@@ -535,11 +529,12 @@ class ButtonBoxPreview extends ControllerPreview {
 						Menu %menu%, DeleteAll
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 
-					Loop 10 {
+					loop 10 {
 						handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", count)
+
 						Menu %menu%, Add, %count%, %handler%
 
 						if (count = ConfigurationItem.splitDescriptor(element[2])[2])
@@ -552,6 +547,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				}
 
 				label := translate("Number")
+
 				Menu ControlMenu, Add, %label%, :NumberMenu
 			}
 
@@ -564,7 +560,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					Menu LabelMenu, DeleteAll
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				label := translate("Empty")
@@ -594,6 +590,6 @@ class ButtonBoxPreview extends ControllerPreview {
 ;;;-------------------------------------------------------------------------;;;
 
 buttonBoxContextMenu(guiHwnd, ctrlHwnd, eventInfo, isRightClick, x, y) {
-	if (isRightClick && vControllerPreviews.HasKey(A_Gui))
+	if (isRightClick && ControllerPreview.ControllerPreviews.HasKey(A_Gui))
 		controlClick()
 }

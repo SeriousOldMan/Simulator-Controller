@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAMS2Application = "Automobilista 2"
+global kAMS2Application := "Automobilista 2"
 
-global kAMS2Plugin = "AMS2"
+global kAMS2Plugin := "AMS2"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -131,6 +131,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
+		local steps
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.sendCommand(this.NextChoiceHotkey)
 
@@ -150,7 +152,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				steps := 1
 
 			if steps {
-				Loop %steps%
+				loop %steps%
 					this.sendCommand(this.PreviousOptionHotkey)
 
 				return true
@@ -163,6 +165,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	deselectPitstopOption(option) {
+		local steps
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			steps := false
 
@@ -179,7 +183,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Request Pitstop")
 				steps := 1
 
-			Loop %steps%
+			loop %steps%
 				this.sendCommand(this.NextOptionHotkey)
 
 			this.sendCommand(this.NextChoiceHotkey)
@@ -190,13 +194,13 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off")
 			switch action {
 				case "Increase":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					Loop %steps%
+					loop %steps%
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+					throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
 			}
 	}
 
@@ -251,7 +255,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.deselectPitstopOption("Repair All")
 			}
 			else
-				Throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+				throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
 		}
 	}
 
@@ -271,6 +275,8 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
+		local delta
+
 		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
@@ -324,22 +330,14 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	updateSessionState(sessionState) {
-		base.updateSessionState(sessionState)
+	updateSession(session) {
+		base.updateSession(session)
 
-		if (sessionState == kSessionFinished) {
+		if (session == kSessionFinished) {
 			this.iTyreCompoundChosen := 0
 			this.iRepairSuspensionChosen := true
 			this.iRepairBodyworkChosen := true
 		}
-	}
-
-	updatePositionsData(data) {
-		base.updatePositionsData(data)
-
-		standings := readSimulatorData(this.Code, "-Standings")
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }
 

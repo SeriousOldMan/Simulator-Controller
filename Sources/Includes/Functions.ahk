@@ -14,68 +14,65 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Task.ahk
+#Include ..\Libraries\Messages.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vDetachedInstallation = false
+global vDetachedInstallation := false
 
-global vDebug = false
-global vLogLevel = kLogWarn
+global vDebug := false
+global vLogLevel := kLogWarn
 
-global vTargetLanguageCode = "en"
+global vTargetLanguageCode := "en"
 
-global vSplashCounter = 0
+global vSplashCounter := 0
 global vLastImage
 global vVideoPlayer
-global vSongIsPlaying = false
+global vSongIsPlaying := false
 
-global vProgressIsOpen = false
+global vProgressIsOpen := false
 global vProgressBar
 global vProgressTitle
 global vProgressMessage
 
-global vEventHandlers = Object()
-global vIncomingMessages = []
-global vOutgoingMessages = []
-global vDispatching = false
+global vTrayMessageDuration := false
 
-global vPendingTrayMessages = []
-global vTrayMessageDuration = false
-
-global vHasSupportMenu = false
+global vHasTrayMenu := false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+exitApplication() {
+	ExitApp 0
+}
+
 moveHTMLViewer() {
-	moveByMouse("HV")
+	moveByMouse("HV", "HTML Viewer")
 }
 
 dismissHTMLViewer() {
 	viewHTML(false)
 }
 
-createMessageReceiver() {
-	; Gui MR:-Border -Caption
-	Gui MR:New, , % A_ScriptName
-	Gui MR:Color, D0D0D0, D8D8D8
-	Gui MR:Add, Text, X10 Y10, % translate("Modular Simulator Controller System")
-	Gui MR:Add, Text, , % A_ScriptName
-
-	Gui MR:Margin, 10, 10
-	Gui MR:Show, X0 Y0 Hide AutoSize
-}
-
 consentDialog(id, consent := false) {
+	local language, texts, chosen, x, y
+
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
 	static closed
@@ -124,11 +121,15 @@ consentDialog(id, consent := false) {
 	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
 
 	Gui CNS:+AlwaysOnTop
-	Gui CNS:Show, Center AutoSize
+
+	if getWindowPosition("Consent", x, y)
+		Gui CNS:Show, x%x% y%y%
+	else
+		Gui CNS:Show
 
 	Gui CNS:Default
 
-	Loop
+	loop
 		Sleep 100
 	until closed
 
@@ -145,30 +146,32 @@ closeConsentDialog() {
 }
 
 moveConsentDialog() {
-	moveByMouse("CNS")
+	moveByMouse("CNS", "Consent")
 }
 
 changeProtection(up, critical := false, block := false) {
 	static level := 0
 
-	level += (up ? 1 : -1)
+	if (critical || block) {
+		level += (up ? 1 : -1)
 
-	if (level > 0) {
-		if critical
-			Critical 100
+		if (level > 0) {
+			if critical
+				Critical 100
 
-		if block
-			BlockInput On
+			if block
+				BlockInput On
+		}
+		else if (level == 0) {
+			if block
+				BlockInput Off
+
+			if critical
+				Critical Off
+		}
+		else if (level <= 0)
+			throw "Nesting error detected in changeProtection..."
 	}
-	else if (level == 0) {
-		if block
-			BlockInput Off
-
-		if critical
-			Critical Off
-	}
-	else if (level <= 0)
-		Throw "Nesting error detected in changeProtection..."
 }
 
 playThemeSong(songFile) {
@@ -179,9 +182,10 @@ playThemeSong(songFile) {
 }
 
 readLanguage(targetLanguageCode) {
-	translations := {}
+	local translations := {}
+	local translation
 
-	Loop Read, % getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory)
+	loop Read, % getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory)
 	{
 		translation := StrSplit(A_LoopReadLine, "=>")
 
@@ -189,391 +193,28 @@ readLanguage(targetLanguageCode) {
 			return translation[2]
 	}
 
-	Throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
-}
-
-receivePipeMessage() {
-	result := false
-
-	for event, handler in vEventHandlers {
-		if (event = "*")
-			continue
-
-		pipeName := "\\.\pipe\SC." . event
-
-		if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
-			Loop Read, %pipeName%
-			{
-				data := StrSplit(A_LoopReadLine, ":", , 2)
-				event := data[1]
-
-				eventHandler := vEventHandlers[event]
-
-				if (!eventHandler)
-					eventHandler := vEventHandlers["*"]
-
-				logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
-
-				vIncomingMessages.Push(Array(eventHandler, event, data[2]))
-
-				result := true
-			}
-	}
-
-	return result
-}
-
-sendPipeMessage(event, data) {
-	static ERROR_PIPE_CONNECTED := 535
-	static ERROR_PIPE_LISTENING := 536
-	static ptr
-
-	pipeName := "\\.\pipe\SC." . event
-
-	pipe := DllCall("CreateNamedPipe", "str", pipeName, "uint", 2, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0)
-
-	DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
-
-	if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
-		message := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (event := event . ":" . data)
-
-		DllCall("WriteFile", ptr, pipe, "str", message, "uint", (StrLen(message) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
-
-		DllCall("CloseHandle", ptr, pipe)
-
-		return true
-	}
+	if isDebug()
+		throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
 	else
-		return false
-}
-
-receiveWindowMessage(wParam, lParam) {
-	;---------------------------------------------------------------------------
-    ; retrieve info from COPYDATASTRUCT
-    ;---------------------------------------------------------------------------
-    dwData := NumGet(lParam + A_PtrSize * 0)    ; DWORD encoded request
-    cbData := NumGet(lParam + A_PtrSize * 1)    ; length of DATA string (incl ZERO)
-    lpData := NumGet(lParam + A_PtrSize * 2)    ; pointer to DATA string
-
-	;---------------------------------------------------------------------------
-    ; interpret available info
-    ;---------------------------------------------------------------------------
-    request := decodeDWORD(dwData)              ; 4-char decoded request
-
-	if (request = "EVNT") {
-		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
-		data    := StrGet(lpData, length)           ; DATA string from pointer
-	}
-	else if ((request = "RS") || (request = "SD")) {
-		length  := (cbData - 1)						; length of DATA string (excl ZERO)
-		data    := StrGet(lpData, length, "")       ; DATA string from pointer
-	}
-	else
-		Throw % "Unhandled message received: " . request . " in dispatchEvent..."
-
-	data := StrSplit(data, ":", , 2)
-	event := data[1]
-
-	eventHandler := vEventHandlers[event]
-
-	if (!eventHandler)
-		eventHandler := vEventHandlers["*"]
-
-	logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
-
-	if (request = "RS")
-		withProtection(eventHandler, event, data[2])
-	else
-		vIncomingMessages.Push(Array(eventHandler, event, data[2]))
-}
-
-sendWindowMessage(target, event, data) {
-	curDetectHiddenWindows := A_DetectHiddenWindows
-	curTitleMatchMode := A_TitleMatchMode
-
-	event := event . ":" . data
-
-	;---------------------------------------------------------------------------
-	; construct the message to send
-	;---------------------------------------------------------------------------
-	dwData := encodeDWORD("EVNT")
-	cbData := StrLen(event) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
-	lpData := &event                                ; pointer to DATA string
-
-	;---------------------------------------------------------------------------
-	; put the message in a COPYDATASTRUCT
-	;---------------------------------------------------------------------------
-	VarSetCapacity(struct, A_PtrSize * 3, 0)        ; initialize COPYDATASTRUCT
-	NumPut(dwData, struct, A_PtrSize * 0, "UInt")   ; DWORD
-	NumPut(cbData, struct, A_PtrSize * 1, "UInt")   ; DWORD
-	NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
-
-	;---------------------------------------------------------------------------
-	; parameters for SendMessage command
-	;---------------------------------------------------------------------------
-	message := 0x4a     ; WM_COPYDATA
-	wParam  := ""       ; not used
-	lParam  := &struct  ; COPYDATASTRUCT
-	control := ""       ; not needed
-
-	SetTitleMatchMode 2 ; match part of the title
-	DetectHiddenWindows On ; needed for sending messages
-
-	try {
-		SendMessage %message%, %wParam%, %lParam%, %control%, %target%
-
-		return (ErrorLevel != "FAIL")
-	}
-	catch exception {
-		return false
-	}
-	finally {
-		DetectHiddenWindows %curDetectHiddenWindows%
-		SetTitleMatchMode %curTitleMatchMode%
-	}
-}
-
-receiveFileMessage() {
-	result := false
-
-	Process Exist
-
-	pid := ErrorLevel
-
-	fileName := kTempDirectory . "Messages\" . pid . ".msg"
-
-	if FileExist(fileName) {
-		file := false
-
-		try {
-			file := FileOpen(fileName, "rw-rwd")
-		}
-		catch exception {
-			return false
-		}
-
-		while !file.AtEOF {
-			line := Trim(file.ReadLine(), " `t`n`r")
-
-			if (StrLen(line) == 0)
-				break
-
-			data := StrSplit(line, ":", , 2)
-			event := data[1]
-
-			eventHandler := vEventHandlers[event]
-
-			if (!eventHandler)
-				eventHandler := vEventHandlers["*"]
-
-			logMessage(kLogInfo, translate("Dispatching event """) . event . (data[2] ? translate(""": ") . data[2] : translate("""")))
-
-			vIncomingMessages.Push(Array(eventHandler, event, data[2]))
-
-			result := true
-		}
-
-		file.Length := 0
-
-		file.Close()
-	}
-
-	return result
-}
-
-sendFileMessage(pid, event, data) {
-	text := event . ":" . data . "`n"
-
-	try {
-		FileAppend %text%, % kTempDirectory . "Messages\" . pid . ".msg"
-	}
-	catch exception {
-		return false
-	}
-
-	return true
-}
-
-receiveMessage() {
-	return (receiveFileMessage() || receivePipeMessage())
-}
-
-sendMessage() {
-	if (vOutgoingMessages.Length() > 0) {
-		handler := vOutgoingMessages[1]
-
-		if %handler%()
-			vOutgoingMessages.RemoveAt(1)
-	}
-}
-
-messageDispatcher() {
-	if vDispatching
-		return
-	else {
-		vDispatching := true
-
-		try {
-			while (vIncomingMessages.Length() > 0) {
-				descriptor := vIncomingMessages.RemoveAt(1)
-
-				withProtection(descriptor[1], descriptor[2], descriptor[3])
-			}
-		}
-		finally {
-			vDispatching := false
-
-			SetTimer messageDispatcher, -200
-		}
-	}
-}
-
-messageQueue() {
-	protectionOn()
-
-	try {
-		if !receiveMessage()
-			sendMessage()
-	}
-	finally {
-		protectionOff()
-
-		SetTimer messageQueue, -100
-
-		messageDispatcher()
-	}
-}
-
-trayMessageQueue() {
-	if (vPendingTrayMessages.Length() > 0) {
-		protectionOn()
-
-		try {
-			if (vPendingTrayMessages.Length() = 0)
-				return
-			else {
-				message := vPendingTrayMessages.RemoveAt(1)
-
-				protectionOff()
-
-				try {
-					duration := message[3]
-					title := StrReplace(message[1], "`n", A_Space)
-					message := StrReplace(message[2], "`n", A_Space)
-
-					TrayTip %title%, %message%
-
-					Sleep %duration%
-
-					TrayTip
-
-					if SubStr(A_OSVersion,1,3) = "10." {
-						Menu Tray, NoIcon
-						Sleep 200  ; It may be necessary to adjust this sleep...
-						Menu Tray, Icon
-					}
-				}
-				finally {
-					protectionOn()
-				}
-			}
-		}
-		finally {
-			protectionOff()
-
-			SetTimer trayMessageQueue, -500
-		}
-	}
-	else
-		SetTimer trayMessageQueue, -500
-}
-
-encodeDWORD(string) {
-	result := 0
-
-	Loop % StrLen(string) {
-        result <<= 8
-        result += Asc(SubStr(string, A_Index, 1))
-    }
-
-    return result
-}
-
-decodeDWORD(data) {
-	result := ""
-
-    Loop 4 {
-        result := Chr(data & 0xFF) . result
-        data >>= 8
-    }
-
-    return result
-}
-
-unknownEventHandler(event, data) {
-	logMessage(kLogCritical, translate("Unhandled event """) . event . translate(""": ") . data)
-
-	raiseEvent(kLocalMessage, event, data)
-}
-
-stopMessageManager() {
-	Process Exist
-
-	pid := ErrorLevel
-
-	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
-		FileDelete %kTempDirectory%Messages\%pid%.msg
-
-	return false
-}
-
-startMessageManager() {
-	FileCreateDir %kTempDirectory%Messages
-
-	OnMessage(0x4a, "receiveWindowMessage")
-
-	registerEventHandler("*", "unknownEventHandler")
-
-	Process Exist
-
-	pid := ErrorLevel
-
-	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
-		FileDelete %kTempDirectory%Messages\%pid%.msg
-
-	OnExit("stopMessageManager")
-
-	SetTimer messageQueue, -2000
-	SetTimer messageDispatcher, -4000
-}
-
-logError(exception) {
-	if IsObject(exception)
-		logMessage(kLogCritical, translate("Unhandled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
-	else
-		logMessage(kLogCritical, translate("Unhandled exception encountered: ") . exception)
-
-	return (isDebug() ? false : true)
+		logError("Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage...")
 }
 
 initializeLoggingSystem() {
-	OnError("logError")
-}
-
-startTrayMessageManager() {
-	SetTimer trayMessageQueue, -1000
+	OnError(Func("logError").Bind(true))
 }
 
 requestShareSessionDatabaseConsent() {
+	local idFileName, ID, consent, request, countdown, newConsent, result
+
 	if !inList(A_Args, "-Install") {
 		if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database", "Simulator Setup"], StrSplit(A_ScriptName, ".")[1]) {
 			idFileName := kUserConfigDirectory . "ID"
 
-			FileReadLine id, %idFileName%, 1
+			FileReadLine ID, %idFileName%, 1
 
 			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 
-			request := ((consent.Count() == 0) || (id != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
+			request := ((consent.Count() == 0) || (ID != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
 
 			if !request {
 				countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
@@ -631,6 +272,8 @@ requestShareSessionDatabaseConsent() {
 }
 
 shareSessionDatabase() {
+	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options, consent
+
 	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
 		idFileName := kUserConfigDirectory . "ID"
 
@@ -670,6 +313,8 @@ shareSessionDatabase() {
 }
 
 checkForNews() {
+	local check, lastModified, news, nr, html
+
 	if vDetachedInstallation
 		return
 
@@ -689,7 +334,7 @@ checkForNews() {
 				URLDownloadToFile https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1, %kTempDirectory%NEWS
 
 				if ErrorLevel
-					Throw "Error while downloading NEWS..."
+					throw "Error while downloading NEWS..."
 			}
 			catch exception {
 				check := false
@@ -705,7 +350,7 @@ checkForNews() {
 						URLDownloadToFile %html%, %kTempDirectory%NEWS.htm
 
 						if ErrorLevel
-							Throw "Error while downloading NEWS..."
+							throw "Error while downloading NEWS..."
 
 						setConfigurationValue(news, "News", nr, true)
 
@@ -714,13 +359,16 @@ checkForNews() {
 						viewHTML(kTempDirectory . "NEWS.htm")
 					}
 					catch exception {
-						; ignore
+						logError(exception)
 					}
 		}
 	}
 }
 
 checkForUpdates() {
+	local check, lastModified, release, version, current, releasePostFix, currentPostFix, title, automaticUpdates
+	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments, versionPostfix
+
 	if vDetachedInstallation
 		return
 
@@ -740,7 +388,7 @@ checkForUpdates() {
 				URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserConfigDirectory%VERSION
 
 				if ErrorLevel
-					Throw "Error while checking VERSION..."
+					throw "Error while checking VERSION..."
 			}
 			catch exception {
 				check := false
@@ -863,14 +511,14 @@ restartUpdate:
 }
 
 loadSimulatorConfiguration() {
+	local version, section, pid, path
+
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
 
 	if !FileExist(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory))
-		vTargetLanguageCode := getSystemLanguage()
+		setLanguage(getSystemLanguage())
 	else
-		vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
-
-	vTargetLanguageCode := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage())
+		setLanguage(getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 
 	version := readConfiguration(kHomeDirectory . "VERSION")
 	section := getConfigurationValue(version, "Current", "Type", false)
@@ -893,7 +541,7 @@ loadSimulatorConfiguration() {
 
 	path := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
 	if path {
-		kDatabaseDirectory := path . "\"
+		kDatabaseDirectory := (normalizeDirectoryPath(path) . "\")
 
 		FileCreateDir %kDatabaseDirectory%Community
 		FileCreateDir %kDatabaseDirectory%User
@@ -959,6 +607,8 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
+	local installOptions, installLocation, install, title, newID, idFileName, ID, ticks, wait, major, minor
+
 	"".base.__Get := "".base.__Set := "".base.__Call := Func("reportNonObjectUsage")
 
 	if A_IsCompiled {
@@ -1036,9 +686,9 @@ initializeEnvironment() {
 	if !newID {
 		idFileName := kUserConfigDirectory . "ID"
 
-		FileReadLine id, %idFileName%, 1
+		FileReadLine ID, %idFileName%, 1
 
-		newID := ((id = false) || (Trim(id) = ""))
+		newID := ((ID = false) || (Trim(ID) = ""))
 	}
 
 	if newID {
@@ -1054,16 +704,11 @@ initializeEnvironment() {
 		Random, , % Min(4294967295, A_TickCount)
 		Random minor, 0, 10000
 
-		id := values2String(".", A_TickCount, major, minor)
+		ID := values2String(".", A_TickCount, major, minor)
 
-		try {
-			FileDelete %kUserConfigDirectory%ID
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(kUserConfigDirectory . "ID")
 
-		FileAppend %id%, % kUserConfigDirectory . "ID"
+		FileAppend %ID%, % kUserConfigDirectory . "ID"
 	}
 
 	if !FileExist(kDatabaseDirectory . "ID")
@@ -1074,7 +719,8 @@ initializeEnvironment() {
 }
 
 getControllerActionDefinitions(type) {
-	fileName := ("Controller Action " . type . "." . getLanguage())
+	local fileName := ("Controller Action " . type . "." . getLanguage())
+	local definitions, section, values, key, value
 
 	if (!FileExist(kTranslationsDirectory . fileName) && !FileExist(kUserTranslationsDirectory . fileName))
 		fileName := ("Controller Action " . type . ".en")
@@ -1093,19 +739,111 @@ getControllerActionDefinitions(type) {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-installSupportMenu() {
+setButtonIcon(buttonHandle, file, index := 1, options := "") {
+	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
+	local BCM_SETIMAGELIST
+
+;   Parameters:
+;   1) {Handle} 	HWND handle of Gui button
+;   2) {File} 		File containing icon image
+;   3) {Index} 		Index of icon in file
+;						Optional: Default = 1
+;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
+;						W = Width of Icon (default = 16)
+;						H = Height of Icon (default = 16)
+;						S = Size of Icon, Makes Width and Height both equal to Size
+;						L = Left Margin
+;						T = Top Margin
+;						R = Right Margin
+;						B = Botton Margin
+;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+
+	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
+	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
+	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
+	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
+	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
+	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
+	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
+	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+
+	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+
+	VarSetCapacity(button_il, 20 + ptrSize, 0)
+
+	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
+	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
+	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
+	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
+	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
+	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+
+	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+
+	return IL_Add(normal_il, file, index)
+}
+
+fixIE(version := 0, exeName := "") {
+	local previousValue
+
+	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
+	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
+
+	if versions.HasKey(version)
+		version := versions[version]
+
+	if !exeName {
+		if A_IsCompiled
+			exeName := A_ScriptName
+		else
+			SplitPath A_AhkPath, exeName
+	}
+
+	RegRead previousValue, HKCU, %key%, %exeName%
+
+	if (version = "") {
+		RegDelete, HKCU, %key%, %exeName%
+		RegDelete, HKLM, %key%, %exeName%
+	}
+	else {
+		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
+		RegWrite, REG_DWORD, HKLM, %key%, %exeName%, %version%
+	}
+
+	return previousValue
+}
+
+installTrayMenu(update := false) {
+	local icon := kIconsDirectory . "Pause.ico"
+	local label := translate("Exit")
+	local levels, level, ignore, oldLabel, label, handler
+
+	Menu Tray, Icon, %icon%, , 1
+
+	Sleep 50
+
+	if (update && vHasTrayMenu) {
+		oldLabel := translate("Exit", vHasTrayMenu)
+
+		Menu Tray, Rename, %oldLabel%, %label%
+	}
+	else {
+		Menu Tray, NoStandard
+		Menu Tray, Add, %label%, exitApplication
+	}
+
 	try {
 		Menu LogMenu, DeleteAll
 	}
 	catch exception {
-		; ignore
+		logError(exception)
 	}
 
 	try {
 		Menu SupportMenu, DeleteAll
 	}
 	catch exception {
-		; ignore
+		logError(exception)
 	}
 
 	levels := {Off: kLogOff, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
@@ -1134,15 +872,38 @@ installSupportMenu() {
 
 	Menu SupportMenu, Add, %label%, :LogMenu
 
+	Menu SupportMenu, Add
+
+	label := translate("Clear log files")
+	handler := Func("deleteDirectory").Bind(kLogsDirectory, false)
+
+	Menu SupportMenu, Add, %label%, %handler%
+
+	label := translate("Clear temporary files")
+	handler := Func("deleteDirectory").Bind(kTempDirectory, false)
+
+	Menu SupportMenu, Add, %label%, %handler%
+
 	label := translate("Support")
 
-	Menu Tray, Insert, 1&
-	Menu Tray, Insert, 1&, %label%, :SupportMenu
+	if (update && vHasTrayMenu) {
+		oldLabel := translate("Support", vHasTrayMenu)
 
-	vHasSupportMenu := true
+		Menu Tray, Delete, %oldLabel%
+		Menu Tray, Insert, 1&, %label%, :SupportMenu
+	}
+	else {
+		Menu Tray, Insert, 1&
+		Menu Tray, Insert, 1&, %label%, :SupportMenu
+	}
+
+	vHasTrayMenu := getLanguage()
 }
 
-viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, height := 400) {
+viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", width := 800, height := 400) {
+	local html, innerWidth, editHeight, buttonX
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+
 	static htmlViewer
 	static dismissed := false
 
@@ -1180,7 +941,12 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 
 	SysGet mainScreen, MonitorWorkArea
 
-	if x is not integer
+	if !getWindowPosition("HTML Viewer", x, y) {
+		x := kUndefined
+		y := kUndefined
+	}
+
+	if (x = kUndefined)
 		switch x {
 			case "Left":
 				x := 25
@@ -1190,7 +956,7 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 				x := "Center"
 		}
 
-	if y is not integer
+	if (y = kUndefined)
 		switch y {
 			case "Top":
 				y := 25
@@ -1214,9 +980,11 @@ viewHTML(fileName, title := false, x := "Center", y := "Center", width := 800, h
 }
 
 showSplash(image, alwaysOnTop := true, video := false) {
+	local lastSplash := vSplashCounter
+	local title, subTitle, extension, html, options
+
 	image := getFileName(image, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
-	lastSplash := vSplashCounter
 	vSplashCounter += 1
 	vLastImage := image
 
@@ -1224,7 +992,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 		vSplashCounter := 1
 
 	title := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
-	subtitle := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
+	subTitle := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
 
 	SplitPath image, , , extension
 
@@ -1247,7 +1015,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 		Gui %vSplashCounter%:Add, Picture, x10 y30 w780 h439, %image%
 
 	Gui %vSplashCounter%:Font, s8 Norm, Arial
-	Gui %vSplashCounter%:Add, Text, x10 y474 w780 Center, %subtitle%
+	Gui %vSplashCounter%:Add, Text, x10 y474 w780 Center, %subTitle%
 
 	options := "x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4)
 
@@ -1286,6 +1054,8 @@ rotateSplash(alwaysOnTop := true) {
 }
 
 showSplashTheme(theme := "__Undefined__", songHandler := false, alwaysOnTop := true) {
+	local song, video, duration, type
+
 	static images := false
 	static number := 1
 	static numImages := 0
@@ -1357,13 +1127,15 @@ hideSplashTheme() {
 			SoundPlay NonExistent.avi
 		}
 		catch ignore {
-			; Ignore
+			logError(exception)
 		}
 
 	hideSplash()
 }
 
 showProgress(options) {
+	local x, y, w, h, color
+
 	if !vProgressIsOpen {
 		x := options.X
 		y := options.Y
@@ -1422,7 +1194,8 @@ hideProgress() {
 }
 
 getAllThemes(configuration := false) {
-	themes := []
+	local descriptor, value, theme
+	local result := []
 
 	if !configuration
 		configuration := kSimulatorConfiguration
@@ -1430,16 +1203,17 @@ getAllThemes(configuration := false) {
 	for descriptor, value in getConfigurationSectionValues(configuration, "Splash Themes", Object()) {
 		theme := StrSplit(descriptor, ".")[1]
 
-		if !inList(themes, theme)
-			themes.Push(theme)
+		if !inList(result, theme)
+			result.Push(theme)
 	}
 
-	return themes
+	return result
 }
 
 showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		  , x := "Center", y := "Bottom", width := 400, height := 100) {
-	innerWidth := width - 16
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+	local innerWidth := width - 16
 
 	if (icon = kUndefined)
 		icon := "Information.png"
@@ -1465,7 +1239,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 
 	SysGet mainScreen, MonitorWorkArea
 
-	if x is not integer
+	if x is not Integer
 		switch x {
 			case "Left":
 				x := 25
@@ -1475,7 +1249,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 				x := "Center"
 		}
 
-	if y is not integer
+	if y is not Integer
 		switch y {
 			case "Top":
 				y := 25
@@ -1493,11 +1267,14 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 	Gui SM:Destroy
 }
 
-moveByMouse(window) {
-	if window is not alpha
-		window := A_Gui
+moveByMouse(window, descriptor := false) {
+	local curCoordMode := A_CoordModeMouse
+	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
 
-	curCoordMode := A_CoordModeMouse
+	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
+
+	if window is not Alpha
+		window := A_Gui
 
 	CoordMode Mouse, Screen
 
@@ -1516,9 +1293,33 @@ moveByMouse(window) {
 
 			Gui %window%:Show, X%newX% Y%newY%
 		}
+
+		if descriptor {
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Window Positions", descriptor . ".X", newX)
+			setConfigurationValue(settings, "Window Positions", descriptor . ".Y", newY)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
 	}
 	finally {
 		CoordMode Mouse, curCoordMode
+	}
+}
+
+getWindowPosition(descriptor, ByRef x, ByRef y) {
+	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	local posX := getConfigurationValue(settings, "Window Positions", descriptor . ".X", kUndefined)
+	local posY := getConfigurationValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
+
+	if ((posX == kUndefined) || (posY == kUndefined))
+		return false
+	else {
+		x := posX
+		y := posY
+
+		return true
 	}
 }
 
@@ -1543,6 +1344,8 @@ getLogLevel() {
 }
 
 logMessage(logLevel, message) {
+	local level, fileName, directory, tries
+
 	if (logLevel >= vLogLevel) {
 		level := ""
 
@@ -1556,7 +1359,7 @@ logMessage(logLevel, message) {
 			case kLogOff:
 				level := "Off     "
 			default:
-				Throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
+				throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
 		}
 
 		fileName := kLogsDirectory . StrSplit(A_ScriptName, ".")[1] . " Logs.txt"
@@ -1581,8 +1384,29 @@ logMessage(logLevel, message) {
 	}
 }
 
+logError(exception, unhandled := false) {
+	local message
+
+	if IsObject(exception) {
+		message := exception.Message
+
+		if message is not Number
+			logMessage(unhandled ? kLogCritical : kLogInfo
+					 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
+					 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+	}
+	else if exception is not Number
+		logMessage(unhandled ? kLogCritical : kLogInfo
+				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
+
+	return (isDebug() ? false : true)
+}
+
+
+
 availableLanguages() {
-	translations := {en: "English"}
+	local translations := {en: "English"}
+	local ignore, fileName, languageCode
 
 	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
 		SplitPath fileName, , , languageCode
@@ -1594,8 +1418,9 @@ availableLanguages() {
 }
 
 readTranslations(targetLanguageCode, withUserTranslations := true) {
-	fileNames := []
-	fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
+	local fileNames := []
+	local fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
+	local translations, translation, ignore, enString
 
 	if FileExist(fileName)
 		fileNames.Push(fileName)
@@ -1610,7 +1435,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 	translations := {}
 
 	for ignore, fileName in fileNames
-		Loop Read, %fileName%
+		loop Read, %fileName%
 		{
 			translation := A_LoopReadLine
 
@@ -1623,19 +1448,22 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 
 			if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
 				if ((A_Index == 1) && (translations.HasKey(enString) && (translations[enString] != translation[2])))
-					Throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
-				else
-					translations[enString] := translation[2]
+					if isDebug()
+						throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
+					else
+						logError("Inconsistent translation encountered for """ . enString . """ in readTranslations...")
+
+				translations[enString] := translation[2]
 		}
 
 	return translations
 }
 
 writeTranslations(languageCode, languageName, translations) {
-	fileName := kUserTranslationsDirectory . "Translations." . languageCode
-
-	stdTranslations := readTranslations(languageCode, false)
-	hasValues := false
+	local fileName := kUserTranslationsDirectory . "Translations." . languageCode
+	local stdTranslations := readTranslations(languageCode, false)
+	local hasValues := false
+	local ignore, key, value, temp, curEncoding, original, translation
 
 	for ignore, value in stdTranslations {
 		hasValues := true
@@ -1653,12 +1481,7 @@ writeTranslations(languageCode, languageName, translations) {
 		translations := temp
 	}
 
-	try {
-		FileDelete %fileName%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(fileName)
 
 	curEncoding := A_FileEncoding
 
@@ -1686,11 +1509,24 @@ writeTranslations(languageCode, languageName, translations) {
 	}
 }
 
-translate(string) {
+translate(string, targetLanguageCode := false) {
+	local theTranslations, translation
+
 	static currentLanguageCode := "en"
 	static translations := false
 
-	if (vTargetLanguageCode != "en") {
+	if (targetLanguageCode && (targetLanguageCode != vTargetLanguageCode)) {
+		theTranslations := readTranslations(targetLanguageCode)
+
+		if theTranslations.HasKey(string) {
+			translation := theTranslations[string]
+
+			return ((translation != "") ? translation : string)
+		}
+		else
+			return string
+	}
+	else if (vTargetLanguageCode != "en") {
 		if (vTargetLanguageCode != currentLanguageCode) {
 			currentLanguageCode := vTargetLanguageCode
 
@@ -1711,10 +1547,13 @@ translate(string) {
 
 setLanguage(languageCode) {
 	vTargetLanguageCode := languageCode
+
+	if vHasTrayMenu
+		installTrayMenu(true)
 }
 
 getLanguageFromLCID(lcid) {
-	code := SubStr(lcid, StrLen(lcid) - 1)
+	local code := SubStr(lcid, StrLen(lcid) - 1)
 
 	if (code = "07")
 		return "DE"
@@ -1748,16 +1587,16 @@ withProtection(function, params*) {
 	protectionOn()
 
 	try {
-		result := %function%(params*)
+		return %function%(params*)
 	}
 	finally {
 		protectionOff()
 	}
-
-	return result
 }
 
 isInstance(object, root) {
+	local candidate, classVar, outerClassVar
+
 	if IsObject(object) {
 		candidate := object.base
 
@@ -1786,6 +1625,8 @@ isInstance(object, root) {
 }
 
 getFileName(fileName, directories*) {
+	local driveName, ignore, directory
+
 	fileName := substituteVariables(fileName)
 
 	SplitPath fileName, , , , , driveName
@@ -1805,26 +1646,29 @@ getFileName(fileName, directories*) {
 }
 
 getFileNames(filePattern, directories*) {
-	files := []
+	local result := []
+	local ignore, directory, pattern
 
 	for ignore, directory in directories {
 		pattern := directory . filePattern
 
-		Loop Files, %pattern%, FD
-			files.Push(A_LoopFileLongPath)
+		loop Files, %pattern%, FD
+			result.Push(A_LoopFileLongPath)
 	}
 
-	return files
+	return result
 }
 
 normalizeFilePath(filePath) {
-	Loop {
+	local position, index
+
+	loop {
 		position := InStr(filePath, "\..")
 
 		if position {
 			index := position - 1
 
-			Loop {
+			loop {
 				if (index == 0)
 					return filePath
 				else if (SubStr(filePath, index, 1) == "\") {
@@ -1841,12 +1685,71 @@ normalizeFilePath(filePath) {
 	}
 }
 
+normalizeDirectoryPath(path) {
+	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
+}
+
+temporaryFileName(name, extension) {
+	local rnd
+
+	Random rnd, 1, 100000
+
+	return (kTempDirectory . name . "_" . Round(rnd) . "." . extension)
+}
+
+deleteFile(fileName) {
+	try {
+		FileDelete %fileName%
+
+		return !ErrorLevel
+	}
+	catch exception {
+		logError(exception)
+
+		return false
+	}
+}
+
+deleteDirectory(directoryName, includeDirectory := true) {
+	local files, ignore, fileName, result
+
+	if includeDirectory {
+		try {
+			FileRemoveDir %directoryName%, 1
+
+			return !ErrorLevel
+		}
+		catch exception {
+			logError(exception)
+
+			return false
+		}
+	}
+	else {
+		files := []
+		result := true
+
+		loop Files, %directoryName%\*.*, DF
+			files.Push(A_LoopFilePath)
+
+		for ignore, fileName in files {
+			if InStr(FileExist(fileName), "D") {
+				if !deleteDirectory(fileName)
+					result := false
+			}
+			else if !deleteFile(fileName)
+				result := false
+		}
+
+		return result
+	}
+}
+
 substituteVariables(string, values := false) {
-	local variable
+	local result := string
+	local variable, startPos, endPos, value
 
-	result := string
-
-	Loop {
+	loop {
 		startPos := InStr(result, "%")
 
 		if startPos {
@@ -1861,7 +1764,7 @@ substituteVariables(string, values := false) {
 				result := StrReplace(result, "%" . variable . "%", value)
 			}
 			else
-				Throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
+				throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
 		}
 		else
 			break
@@ -1875,7 +1778,8 @@ string2Values(delimiter, string, count := false) {
 }
 
 values2String(delimiter, values*) {
-	result := ""
+	local result := ""
+	local index, value
 
 	for index, value in values {
 		if (index > 1)
@@ -1888,6 +1792,8 @@ values2String(delimiter, values*) {
 }
 
 inList(list, value) {
+	local index, candidate
+
 	for index, candidate in list
 		if (candidate = value)
 			return index
@@ -1896,6 +1802,8 @@ inList(list, value) {
 }
 
 listEqual(list1, list2) {
+	local index, value
+
 	if (list1.Length() != list2.Length())
 		return false
 	else
@@ -1906,28 +1814,30 @@ listEqual(list1, list2) {
 	return true
 }
 
-concatenate(arrays*) {
-	result := []
+concatenate(lists*) {
+	local result := []
+	local ignore, list, value
 
-	for ignore, array in arrays
-		for ignore, value in array
+	for ignore, list in lists
+		for ignore, value in list
 			result.Push(value)
 
 	return result
 }
 
 reverse(list) {
-	newList := []
-	length := list.Length()
+	local result := []
+	local length := list.Length()
 
-	Loop %length%
-		newList.Push(list[length - (A_Index - 1)])
+	loop %length%
+		result.Push(list[length - (A_Index - 1)])
 
-	return newList
+	return result
 }
 
 map(list, function) {
-	result := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in list
 		result.Push(%function%(value))
@@ -1936,7 +1846,8 @@ map(list, function) {
 }
 
 remove(list, object) {
-	result := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in list
 		if (value != object)
@@ -1946,7 +1857,8 @@ remove(list, object) {
 }
 
 removeDuplicates(list) {
-	result := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in list
 		if !inList(result, value)
@@ -1955,22 +1867,42 @@ removeDuplicates(list) {
 	return result
 }
 
+do(list, function) {
+	local ignore, value
+
+	for ignore, value in list
+		%function%(value)
+}
+
+combine(maps*) {
+	local result := {}
+	local ignore, map, key, value
+
+	for ignore, map in maps
+		for key, value in map
+			result[key] := value
+
+	return result
+}
+
 getKeys(map) {
-	keys := []
+	local result := []
+	local ignore, key
 
 	for key, ignore in map
-		keys.Push(key)
+		result.Push(key)
 
-	return keys
+	return result
 }
 
 getValues(map) {
-	values := []
+	local result := []
+	local ignore, value
 
 	for ignore, value in map
-		values.Push(value)
+		result.Push(value)
 
-	return values
+	return result
 }
 
 greaterComparator(a, b) {
@@ -1978,7 +1910,8 @@ greaterComparator(a, b) {
 }
 
 bubbleSort(ByRef array, comparator := "greaterComparator") {
-	n := array.Length()
+	local n := array.Length()
+	local newN, i, j, lineI, lineJ
 
 	while (n > 1) {
 		newN := 1
@@ -1989,7 +1922,7 @@ bubbleSort(ByRef array, comparator := "greaterComparator") {
 
 			if %comparator%(lineI := array[i], lineJ := array[j]) {
 				array[i] := lineJ
-				array[J] := lineI
+				array[j] := lineI
 
 				newN := j
 			}
@@ -1999,65 +1932,35 @@ bubbleSort(ByRef array, comparator := "greaterComparator") {
 	}
 }
 
-functionEventHandler(event, data) {
-	if InStr(data, ":") {
-		data := StrSplit(data, ":", , 2)
+trayMessage(title, message, duration := false, async := true) {
+	if (async && (duration || vTrayMessageDuration))
+		Task.startTask(Func("trayMessage").Bind(title, message, duration, false), 0, kLowPriority)
+	else {
+		title := StrReplace(title, "`n", A_Space)
+		message := StrReplace(message, "`n", A_Space)
 
-		return withProtection(data[1], string2Values(";", data[2])*)
-	}
-	else
-		return withProtection(data)
-}
+		if !duration
+			duration := vTrayMessageDuration
 
-registerEventHandler(event, handler) {
-	vEventHandlers[event] := handler
-}
+		if duration {
+			protectionOn()
 
-raiseEvent(messageType, event, data, target := false) {
-	switch messageType {
-		case kLocalMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
+			try {
+				TrayTip %title%, %message%
 
-			eventHandler := vEventHandlers[event]
+				Sleep %duration%
 
-			if (!eventHandler)
-				eventHandler := vEventHandlers["*"]
+				TrayTip
 
-			logMessage(kLogInfo, translate("Dispatching event """) . event . (data ? translate(""": ") . data : translate("""")))
-
-			vIncomingMessages.Push(Array(eventHandler, event, data))
-		case kWindowMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
-
-			vOutgoingMessages.Push(Func("sendWindowMessage").Bind(target, event, data))
-		case kPipeMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")))
-
-			vOutgoingMessages.Push(Func("sendPipeMessage").Bind(event, data))
-		case kFileMessage:
-			logMessage(kLogInfo, translate("Raising event """) . event . (data ? translate(""": ") . data : translate("""")) . translate(" in target ") . target)
-
-			vOutgoingMessages.Push(Func("sendFileMessage").Bind(target, event, data))
-		default:
-			Throw "Unknown message type (" . messageType . ") detected in raiseEvent..."
-	}
-}
-
-trayMessage(title, message, duration := false) {
-	title := StrReplace(title, "`n", A_Space)
-	message := StrReplace(message, "`n", A_Space)
-
-	if !duration
-		duration := vTrayMessageDuration
-
-	if duration {
-		protectionOn()
-
-		try {
-			vPendingTrayMessages.Push(Array(title, message, duration))
-		}
-		finally {
-			protectionOff()
+				if SubStr(A_OSVersion,1,3) = "10." {
+					Menu Tray, NoIcon
+					Sleep 200  ; It may be necessary to adjust this sleep...
+					Menu Tray, Icon
+				}
+			}
+			finally {
+				protectionOff()
+			}
 		}
 	}
 }
@@ -2071,7 +1974,8 @@ enableTrayMessages(duration := 1500) {
 }
 
 translateMsgBoxButtons(buttonLabels) {
-	curDetectHiddenWindows := A_DetectHiddenWindows
+	local curDetectHiddenWindows := A_DetectHiddenWindows
+	local index, label
 
     DetectHiddenWindows, On
 
@@ -2084,7 +1988,7 @@ translateMsgBoxButtons(buttonLabels) {
 					ControlSetText Button%index%, % translate(label)
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 		}
 	}
@@ -2093,13 +1997,18 @@ translateMsgBoxButtons(buttonLabels) {
 	}
 }
 
+newConfiguration() {
+	return {}
+}
+
 readConfiguration(configFile) {
+	local configuration := {}
+	local section := false
+	local currentLine, firstChar, keyValue, key, value
+
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
-	configuration := Object()
-	section := false
-
-	Loop Read, %configFile%
+	loop Read, %configFile%
 	{
 		currentLine := LTrim(A_LoopReadLine)
 
@@ -2134,33 +2043,24 @@ readConfiguration(configFile) {
 }
 
 parseConfiguration(text) {
-	Random postfix, 1, 100000
-
-	fileName := (kTempDirectory . "Config " . postFix . ".ini")
+	local fileName := temporaryFileName("Config", "ini")
+	local configuration
 
 	FileAppend %text%, %fileName%, UTF-16
 
 	configuration := readConfiguration(fileName)
 
-	try {
-		FileDelete %fileName%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(fileName)
 
 	return configuration
 }
 
 writeConfiguration(configFile, configuration) {
+	local directory, section, keyValues, key, value, pairs
+
 	configFile := getFileName(configFile, kUserConfigDirectory)
 
-	try {
-		FileDelete %configFile%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(configFile)
 
 	SplitPath configFile, , directory
 	FileCreateDir %directory%
@@ -2183,26 +2083,26 @@ writeConfiguration(configFile, configuration) {
 }
 
 printConfiguration(configuration) {
-	Random postfix, 1, 100000
-
-	fileName := (kTempDirectory . "Config " . postFix . ".ini")
+	local fileName := temporaryFileName("Config", "ini")
+	local text
 
 	writeConfiguration(fileName, configuration)
 
-	text := ""
-
 	try {
 		FileRead text, %fileName%
-		FileDelete %fileName%
 	}
 	catch exception {
-		; ignore
+		text := ""
 	}
+
+	deleteFile(fileName)
 
 	return text
 }
 
 getConfigurationValue(configuration, section, key, default := false) {
+	local value
+
 	if configuration.HasKey(section) {
 		value := configuration[section]
 
@@ -2217,20 +2117,20 @@ getConfigurationSectionValues(configuration, section, default := false) {
 	return configuration.HasKey(section) ? configuration[section].Clone() : default
 }
 
-newConfiguration() {
-	return Object()
-}
-
 setConfigurationValue(configuration, section, key, value) {
 	configuration[section, key] := value
 }
 
 setConfigurationSectionValues(configuration, section, values) {
+	local key, value
+
 	for key, value in values
 		setConfigurationValue(configuration, section, key, value)
 }
 
 setConfigurationValues(configuration, otherConfiguration) {
+	local section, values
+
 	for section, values in otherConfiguration
 		setConfigurationSectionValues(configuration, section, values)
 }
@@ -2246,12 +2146,14 @@ removeConfigurationSection(configuration, section) {
 }
 
 getControllerConfiguration(configuration := false) {
+	local pid, tries, options, exePath, fileName
+
 	Process Exist, Simulator Controller.exe
 
 	pid := ErrorLevel
 
 	if (pid && !configuration && !FileExist(kUserConfigDirectory . "Simulator Controller.config")) {
-		raiseEvent(kFileMessage, "Controller", "writeControllerConfiguration", pid)
+		sendMessage(kFileMessage, "Controller", "writeControllerConfiguration", pid)
 
 		tries := 10
 
@@ -2265,9 +2167,11 @@ getControllerConfiguration(configuration := false) {
 	else if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
 		try {
 			if configuration {
-				writeConfiguration(kTempDirectory . "Simulator Configuration.ini", configuration)
+				fileName := temporaryFileName("Config", "ini")
 
-				options := (" -Configuration """ . kTempDirectory . "Simulator Configuration.ini" . """")
+				writeConfiguration(fileName, configuration)
+
+				options := (" -Configuration """ . fileName . """")
 			}
 			else
 				options := ""
@@ -2290,7 +2194,7 @@ getControllerConfiguration(configuration := false) {
 			}
 
 			if configuration
-				FileDelete %kTempDirectory%Simulator Configuration.ini
+				deleteFile(fileName)
 		}
 		catch exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -2308,7 +2212,8 @@ getControllerActionLabels() {
 }
 
 getControllerActionIcons() {
-	icons := getControllerActionDefinitions("Icons")
+	local icons := getControllerActionDefinitions("Icons")
+	local section, values, key, value
 
 	for section, values in icons
 		for key, value in values
@@ -2327,9 +2232,10 @@ toggleDebug() {
 }
 
 setDebug(debug) {
-	label := translate("Debug")
+	local label := translate("Debug")
+	local title, state
 
-	if vHasSupportMenu
+	if vHasTrayMenu
 		if debug
 			Menu SupportMenu, Check, %label%
 		else
@@ -2344,7 +2250,9 @@ setDebug(debug) {
 }
 
 setLogLevel(level) {
-	if vHasSupportMenu
+	local ignore, label, title, state
+
+	if vHasTrayMenu
 		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
 			label := translate(label)
 
@@ -2377,7 +2285,7 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
-	if vHasSupportMenu
+	if vHasTrayMenu
 		Menu LogMenu, Check, %state%
 
 	title := translate("Modular Simulator Controller System")
@@ -2412,6 +2320,4 @@ if !vDetachedInstallation {
 }
 
 initializeLoggingSystem()
-startMessageManager()
-startTrayMessageManager()
-createMessageReceiver()
+installTrayMenu()

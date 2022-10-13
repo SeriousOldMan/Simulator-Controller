@@ -25,16 +25,16 @@
 ;;;                    Public Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTelemetrySchemas = {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+global kTelemetrySchemas := {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
 										, "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"]
-						  , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-								  , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
-								  , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
-								  , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
-								  , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
-								  , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
-								  , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
-								  , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"]}
+						   , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+								   , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
+								   , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
+								   , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
+								   , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
+								   , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
+								   , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
+								   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -58,6 +58,8 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	__New(simulator := false, car := false, track := false, drivers := false) {
+		local simulatorCode
+
 		this.iDrivers := drivers
 
 		base.__New()
@@ -71,7 +73,7 @@ class TelemetryDatabase extends SessionDatabase {
 			car := this.getCarCode(simulator, car)
 			track := this.getCarCode(simulator, track)
 
-			this.iDatabase := new Database(kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
+			this.iDatabase := new Database(this.DatabasePath . "User\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
 		}
 	}
 
@@ -84,7 +86,7 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getSchema(table, includeVirtualColumns := false) {
-		schema := kTelemetrySchemas[table].Clone()
+		local schema := kTelemetrySchemas[table].Clone()
 
 		if (includeVirtualColumns && (table = "Tyres")) {
 			schema.Push("Tyre.Pressure")
@@ -126,17 +128,17 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getElectronicsCount(drivers := "__Undefined__") {
-		result := this.combineResults("Electronics", {Group: [["Lap.Time", "count", "Count"]]
-													, Transform: "removeInvalidLaps"
-													, Where: {}}, drivers)
+		local result := this.combineResults("Electronics", {Group: [["Lap.Time", "count", "Count"]]
+														  , Transform: "removeInvalidLaps"
+														  , Where: {}}, drivers)
 
 		return ((result.Length() > 0) ? result[1].Count : 0)
 	}
 
 	getTyresCount(drivers := "__Undefined__") {
-		result := this.combineResults("Tyres", {Group: [["Lap.Time", "count", "Count"]]
-											  , Transform: "removeInvalidLaps"
-											  , Where: {}}, drivers)
+		local result := this.combineResults("Tyres", {Group: [["Lap.Time", "count", "Count"]]
+													, Transform: "removeInvalidLaps"
+													, Where: {}}, drivers)
 
 		return ((result.Length() > 0) ? result[1].Count : 0)
 	}
@@ -148,7 +150,7 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getTyreEntries(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Transform: combine("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
+		return this.combineResults("Tyres", {Transform: compose("removeInvalidLaps", "computePressures", "computeTemperatures", "computeWear")
 										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}}
 										  , drivers)
 	}
@@ -204,7 +206,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	getPressuresCount(weather, drivers := "__Undefined__") {
 		return this.combineResults("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
-										   , Transform: combine("removeInvalidLaps", "computePressures")
+										   , Transform: compose("removeInvalidLaps", "computePressures")
 										   , Where: {Weather: weather}},
 										  , drivers)
 	}
@@ -214,12 +216,14 @@ class TelemetryDatabase extends SessionDatabase {
 												   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
 												   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
 												   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
-										   , Transform: combine("removeInvalidLaps", "computePressures")
+										   , Transform: compose("removeInvalidLaps", "computePressures")
 										   , Where: {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}},
 										  , drivers)
 	}
 
 	cleanupData(weather, compound, compoundColor, drivers := "__Undefined__") {
+		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows
+
 		if this.Database {
 			where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
 
@@ -257,7 +261,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	addTyreEntry(weather, airTemperature, trackTemperature, compound, compoundColor, tyreLaps
 			   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
-			   , fuelConsumption, fuelRemaining, lapTime, wearFL, wearFR, wearRL, wearRR, driver := false) {
+			   , wearFL, wearFR, wearRL, wearRR, fuelConsumption, fuelRemaining, lapTime, driver := false) {
 		if !driver
 			driver := this.ID
 
@@ -289,7 +293,9 @@ class TelemetryDatabase extends SessionDatabase {
 ;;;-------------------------------------------------------------------------;;;
 
 countValues(groupedColumn, countColumn, rows) {
-	values := {}
+	local values := {}
+	local result := []
+	local ignore, row, value, count, object
 
 	for ignore, row in rows {
 		value := row[groupedColumn]
@@ -299,8 +305,6 @@ countValues(groupedColumn, countColumn, rows) {
 		else
 			values[value] := 1
 	}
-
-	result := []
 
 	for value, count in values {
 		object := Object()
@@ -314,12 +318,12 @@ countValues(groupedColumn, countColumn, rows) {
 	return result
 }
 
-combine(functions*) {
+compose(functions*) {
 	return Func("callFunctions").Bind(functions)
 }
 
 callFunctions(functions, rows) {
-	local function
+	local ignore, function
 
 	for ignore, function in functions
 		rows := %function%(rows)
@@ -328,6 +332,8 @@ callFunctions(functions, rows) {
 }
 
 computePressures(rows) {
+	local ignore, row
+
 	for ignore, row in rows {
 		row["Tyre.Pressure"] := Round(average([row["Tyre.Pressure.Front.Left"], row["Tyre.Pressure.Front.Right"]
 											 , row["Tyre.Pressure.Rear.Left"], row["Tyre.Pressure.Rear.Right"]]), 1)
@@ -339,6 +345,8 @@ computePressures(rows) {
 }
 
 computeTemperatures(rows) {
+	local ignore, row
+
 	for ignore, row in rows {
 		row["Tyre.Temperature"] := Round(average([row["Tyre.Temperature.Front.Left"], row["Tyre.Temperature.Front.Right"]
 												, row["Tyre.Temperature.Rear.Left"], row["Tyre.Temperature.Rear.Right"]]), 1)
@@ -350,6 +358,8 @@ computeTemperatures(rows) {
 }
 
 computeWear(rows) {
+	local ignore, row
+
 	for ignore, row in rows {
 		row["Tyre.Wear"] := averageWear([row["Tyre.Wear.Front.Left"], row["Tyre.Wear.Front.Right"]
 									   , row["Tyre.Wear.Rear.Left"], row["Tyre.Wear.Rear.Right"]])
@@ -361,7 +371,8 @@ computeWear(rows) {
 }
 
 averageWear(wears) {
-	result := 0
+	local result := 0
+	local ignore, wear
 
 	for ignore, wear in wears
 		if (wear = kNull)
@@ -373,8 +384,9 @@ averageWear(wears) {
 }
 
 computeFilterValues(rows, ByRef lapTimeAverage, ByRef lapTimeStdDev, ByRef consumptionAverage, ByRef consumptionStdDev) {
-	lapTimes := []
-	consumption := []
+	local lapTimes := []
+	local consumption := []
+	local ignore, row
 
 	for ignore, row in rows {
 		lapTimes.Push(row["Lap.Time"])
@@ -389,7 +401,10 @@ computeFilterValues(rows, ByRef lapTimeAverage, ByRef lapTimeStdDev, ByRef consu
 }
 
 validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
-	return ((Abs(row["Lap.Time"] - ltAvg) <= ltStdDev) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
+	if ((row["Lap.Time"] > 0) && (row["Fuel.Consumption"] > 0))
+		return ((Abs(row["Lap.Time"] - ltAvg) <= ltStdDev) && (Abs(row["Fuel.Consumption"] - cAvg) <= cStdDev))
+	else
+		return false
 }
 
 invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
@@ -403,14 +418,15 @@ invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
 }
 
 removeInvalidLaps(rows) {
-	ltAvg := false
-	ltStdDev := false
-	cAvg := false
-	cStdDev := false
+	local ltAvg := false
+	local ltStdDev := false
+	local cAvg := false
+	local cStdDev := false
+	local count := rows.Length()
+	local result := []
+	local ignore, row
 
 	computeFilterValues(rows, ltAvg, ltStdDev, cAvg, cStdDev)
-
-	count := rows.Length()
 
 	if (count < 5) {
 		ltStdDev *= 2
@@ -425,12 +441,9 @@ removeInvalidLaps(rows) {
 		cStdDev *= 1.2
 	}
 
-	result := []
-
 	for ignore, row in rows
 		if validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
 			result.Push(row)
 
 	return result
 }
-

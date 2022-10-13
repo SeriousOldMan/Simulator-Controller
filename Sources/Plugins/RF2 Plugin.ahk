@@ -17,9 +17,9 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRF2Application = "rFactor 2"
+global kRF2Application := "rFactor 2"
 
-global kRF2Plugin = "RF2"
+global kRF2Plugin := "RF2"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -59,10 +59,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	sendPitstopCommand(command, operation := false, message := false, arguments*) {
+		local simulator, exePath
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			simulator := this.Code
 			arguments := values2String(";", arguments*)
-
 			exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
 
 			try {
@@ -134,8 +135,9 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	selectPitstopOption(option) {
-		actions := false
-		ignore := false
+		local actions := false
+		local ignore := false
+		local candidate
 
 		this.getPitstopActions(actions, ignore)
 
@@ -182,6 +184,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopOptionValues(option) {
+		local data, compound, compoundColor
+
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			switch option {
 				case "Refuel":
@@ -264,6 +268,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
+		local delta
+
 		base.requestPitstopDriver(pitstopNumber, driver)
 
 		if driver {
@@ -271,25 +277,17 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 			delta := (string2Values(":", driver[2])[2] - string2Values(":", driver[1])[2])
 
-			Loop % Abs(delta)
+			loop % Abs(delta)
 				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
 		}
 	}
 
-	updateSessionData(data) {
-		base.updateSessionData(data)
+	updateTelemetryData(data) {
+		base.updateTelemetryData(data)
 
 		if !getConfigurationValue(data, "Stint Data", "InPit", false)
 			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
 				setConfigurationValue(data, "Session Data", "Paused", true)
-	}
-
-	updatePositionsData(data) {
-		base.updatePositionsData(data)
-
-		standings := readSimulatorData(this.Code, "-Standings")
-
-		setConfigurationSectionValues(data, "Position Data", getConfigurationSectionValues(standings, "Position Data"))
 	}
 }
 

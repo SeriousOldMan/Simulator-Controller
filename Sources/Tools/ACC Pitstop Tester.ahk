@@ -270,7 +270,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % pitstopLabels.Length()
+		loop % pitstopLabels.Length()
 		{
 			pitstopLabel := pitstopLabels[A_Index]
 			
@@ -321,7 +321,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % pitStrategyLabels.Length()
+		loop % pitStrategyLabels.Length()
 		{
 			pitStrategyLabel := pitStrategyLabels[A_Index]
 			
@@ -384,7 +384,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % noRefuelLabels.Length()
+		loop % noRefuelLabels.Length()
 		{
 			noRefuelLabel := noRefuelLabels[A_Index]
 			
@@ -450,7 +450,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % wetLabels.Length()
+		loop % wetLabels.Length()
 		{
 			wetLabel := wetLabels[A_Index]
 				
@@ -487,7 +487,7 @@ class ACCPitstopTester extends Plugin {
 			imageX := kUndefined
 			imageY := kUndefined
 			
-			Loop % compoundLabels.Length()
+			loop % compoundLabels.Length()
 			{
 				compoundLabel := compoundLabels[A_Index]
 				
@@ -536,7 +536,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % frontBrakeLabels.Length()
+		loop % frontBrakeLabels.Length()
 		{
 			frontBrakeLabel := frontBrakeLabels[A_Index]
 			
@@ -580,7 +580,7 @@ class ACCPitstopTester extends Plugin {
 		imageX := kUndefined
 		imageY := kUndefined
 		
-		Loop % selectDriverLabels.Length()
+		loop % selectDriverLabels.Length()
 		{
 			selectDriverLabel := selectDriverLabels[A_Index]
 			
@@ -637,11 +637,9 @@ class ACCPitstopTester extends Plugin {
 readSimulatorData(simulator, options := "", protocol := "SHM") {
 	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
 	
-	Random postfix, 1, 1000000
-	
 	FileCreateDir %kTempDirectory%%simulator% Data
 	
-	dataFile := (kTempDirectory . simulator . " Data\" . protocol . "_" . Round(postfix) . ".data")
+	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
 	
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
@@ -658,12 +656,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	
 	data := readConfiguration(dataFile)
 	
-	try {
-		FileDelete %dataFile%
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(dataFile)
 	
 	setConfigurationValue(data, "Session Data", "Simulator", simulator)
 	
@@ -765,11 +758,6 @@ runACCPitstopTester() {
 	
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, ACC Pitstop Tester
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 	
 	while true {
 		pitstopTester := new ACCPitstopTester()
@@ -803,9 +791,6 @@ runACCPitstopTester() {
 	}
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

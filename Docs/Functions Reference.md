@@ -56,13 +56,13 @@ Diasables all tray messages from now on. Every following call to *trayMessage* w
 
 ***
 
-## Event Messages ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Event messages may be used to communicate between different processes. In Simulator Controller, the startup application sends events to the controller application to start all components configured for the Simulator Controller, to play and stop a startup song and so on.
+## Process Communication ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
+Messages may be used to communicate between different processes. In Simulator Controller, the startup application sends events to the controller application to start all components configured for the Simulator Controller, to play and stop a startup song and so on.
 
-#### *registerEventHandler(event :: String, handler :: TypeUnion(String, FuncObj))*
-Registers an event handler function for the given event type. An event handler is supplied the event and the transmitted message as arguments and typically looks like this:
+#### *registerMesssageHandler(category :: String, handler :: TypeUnion(String, FuncObj), object :: Object := false)*
+Registers a message handler function for the given category. When *object* is not supplied, a message handler is supplied the category and the transmitted message as arguments and typically looks like this:
 
-	handleStartupEvents(event, data) {
+	handleStartupMessages(category, data) {
 		if InStr(data, ":") {
 			data := StrSplit(data, ":")
 			
@@ -75,13 +75,22 @@ Registers an event handler function for the given event type. An event handler i
 			withProtection(data)
 	}
 
-Since this is a very common implementation of an event handler, the predefined *functionEventHandler* may be used in those situations.
+When *object* was supplied during registration, the handler will receive the given *objec* as its second argument:
 
-#### *functionEventHandler(event data)*
-You can use this function as a generic event handler, when all events will be handled by global functions. *data* must be a ";"-delimited string list, where the first element is the function name and all remaining elements are the arguments for the function call. You can pass *functionEventHandler* to *registerEvenetHandler* when registering events, which adhere to these rules.
+	handleControllerMessages(category, controller, data) {
+		...
+	}
 
-#### *raiseEvent(messageType :: OneOf(kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage), event :: String, data :: String, target := false)*
-Raises the given event. The first parameter defines the delivery method, where *kFileMessage* is the most reliable, but also the slowest one. If the argument for *messageType* is *kLocalMessage*, the event is raised in the current process. Otherwise, the event is delivered to the process defined by target, which must have registered an event handler for the given event. For *kWindowMessage*, the target must be defined according to the [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) of *AutoHotkey* and for *kFileMessage*, you must provide the process id of the target process. Last but not least, if message type is *kPipeMessage*, not target must be specified and multiple processes may register an event handler for the given event, but only one process will receive the message.
+Since both variants are very common implementations of a message handler, the predefined *functionMessageHandler* and *methodMessageHandler* may be used in those situations.
+
+#### *functionMessageHandler(category :: String, data :: String)*
+You can use this function as a generic message handler, when all messages will be handled by global functions. *data* must be a ";"-delimited string list, where the first element is the function name and all remaining elements are the arguments for the function call. You can pass *functionMessageHandler* to *registerMessageHandler* when registering message categories, which adhere to these rules.
+
+#### *methodMessageHandler(category :: String, data :: String)*
+You can use this function as a generic message handler, when all messages will be handled by methods of a single object. *data* must be a ";"-delimited string list, where the first element is the function name and all remaining elements are the arguments for the function call. You can pass *methodMessageHandler* to *registerMessageHandler* when registering message categories, which adhere to these rules.
+
+#### *sendMessage(messageType :: OneOf(kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage), category :: String, data :: String, target := false)*
+Sends the given message. The first parameter defines the delivery method, where *kFileMessage* is the most reliable, but also the slowest one. If the argument for *messageType* is *kLocalMessage*, the message will be delivered in the current process. Otherwise, the message is delivered to the process defined by target, which must have registered a message handler for the given category. For *kWindowMessage*, the target must be defined according to the [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) of *AutoHotkey* and for *kFileMessage*, you must provide the process id of the target process. Last but not least, if message type is *kPipeMessage*, no target must be specified and multiple processes may register a message handler for the given category, but only one process will receive the message.
 
 ***
 
@@ -94,8 +103,20 @@ If *fileName* contains an absolute path, itself will be returned. Otherwise, all
 #### *getFileNames*(filePattern :: String, #rest directories :: String)*
 Returns a list of absolute paths for all files in the given directories satisfying *filePattern*.
 
-#### *normalizeFilePath(filePath)*
+#### *normalizeFilePath(filePath :: String)*
 Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this simplified file path.
+
+#### *normalizeDirectoryPath(directoryPath :: String)*
+Assures that a trailing "\" is present at the end of the directory path.
+
+#### *temporaryFileName(name :: String, extension :: String)*
+Creates and returns a unique file name in the temporary folder by adding a random number between 1 and 100000 to the name.
+
+#### *deleteFile(fileName :: String)*
+Deletes the file with the given name. Returns *true*, if the file was deleted, otherwise *false*.
+
+#### *deleteDirectory(directoryName :: String)*
+Deletes the directory with the given name incl. all current content. Returns *true*, if the directory was deleted, otherwise *false*.
 
 ***
 
@@ -132,11 +153,17 @@ Returns a new list with all occurencies of *object* removed from the original li
 #### *removeDuplicates(list :: Array)*
 Returns a new list with all duplicate values removed.
 
+#### *do(list :: Array, function :: TypeUnion(String, FuncObj))*
+Applies the given function to each element in *list* in the order of elements without collecting the results.
+
 #### *getKeys(map :: Map)*
 Returns a list of all keys in the given map.
 
 #### *getValues(map :: Map)*
 Returns a list of all values in the given map in the order of their keys.
+
+#### *combine(#rest maps :: Map)*
+Returns a freshly allocated map containing all the key/value pairs of all supplied maps. The maps are processed from left to right, which is important in case of duplicate keys.
 
 #### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
 Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
@@ -210,8 +237,14 @@ Closes the currently open progress window.
 ## GUI Tools ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
 Miscellaneous helper functions for GUI programming.
 
-#### *moveByMouse(guiPrefix :: String)*
-You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command.
+#### *moveByMouse(guiPrefix :: String, descriptor :: String := false)*
+You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command. If *descriptor* is supplied, the resulting new position is stored in the configuration and can be retrieved using [getWindowPosition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#getwindowpositiondescriptor--string-byref-x--integer-byref-y--integer).
+
+#### *getWindowPosition(descriptor :: String, ByRef x :: Integer, ByRef y :: Integer)*
+Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.
+
+#### *setButtonIcon(buttonHandle :: Handle, file :: String)*
+Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.
 
 ***
 
@@ -252,6 +285,9 @@ Reduces the current log level.
 
 #### *logMessage(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff), message :: String)*
 Sends the given message to the log file, if the supplied log level is at the same or a more critical level than the current log level. If *logLevel* is *kLogOff*, the message will be written to the log file, even if logging has been disabled completely by *setLogLevel(kLogOff)* previously.
+
+#### *logError(exception)*
+Writes information about the exception to the log file and continues.
 
 ***
 

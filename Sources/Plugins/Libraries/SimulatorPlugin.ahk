@@ -17,34 +17,26 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSessionFinished = 0
-global kSessionPaused = -1
-global kSessionOther = 1
-global kSessionPractice = 2
-global kSessionQualification = 3
-global kSessionRace = 4
+global kSessionFinished := 0
+global kSessionPaused := -1
+global kSessionOther := 1
+global kSessionPractice := 2
+global kSessionQualification := 3
+global kSessionRace := 4
 
-global kPitstopMode = "Pitstop"
-global kAssistantMode = "Assistant"
+global kPitstopMode := "Pitstop"
+global kAssistantMode := "Assistant"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSessionStates = [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace]
-global kSessionStateNames = ["Other", "Practice", "Qualification", "Race"]
+global kSessions := [kSessionOther, kSessionPractice, kSessionQualification, kSessionRace]
+global kSessionNames := ["Other", "Practice", "Qualification", "Race"]
 
-global kAssistantAnswerActions = ["Accept", "Reject"]
-global kAssistantRaceActions = ["PitstopPlan", "PitstopPrepare", "PitstopRecommend", "StrategyCancel"]
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRunningSimulator = false
-global vRunningSimulation = false
+global kAssistantAnswerActions := ["Accept", "Reject"]
+global kAssistantRaceActions := ["PitstopPlan", "PitstopPrepare", "PitstopRecommend", "StrategyCancel"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -61,16 +53,18 @@ class AssistantMode extends ControllerMode {
 	activate() {
 		base.activate()
 
-		this.updateActions(this.Plugin.SessionState)
+		this.updateActions(this.Plugin.Session)
 	}
 
-	updateActions(sessionState) {
-		this.updateRaceAssistantActions(sessionState)
+	updateActions(session) {
+		this.updateRaceAssistantActions(session)
 	}
 
-	updateRaceAssistantActions(sessionState) {
+	updateRaceAssistantActions(session) {
+		local ignore, theAction
+
 		if (!this.Plugin.RaceEngineer || !this.Plugin.RaceEngineer.RaceEngineer)
-			sessionState := kSessionFinished
+			session := kSessionFinished
 
 		for ignore, theAction in this.Actions
 			if (isInstance(theAction, RaceAssistantAction) && inList(this.Controller.ActiveModes, this))
@@ -78,7 +72,7 @@ class AssistantMode extends ControllerMode {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
-				else if inList([kSessionPractice, kSessionRace], sessionState) {
+				else if inList([kSessionPractice, kSessionRace], session) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -96,16 +90,18 @@ class PitstopMode extends AssistantMode {
 		}
 	}
 
-	updateActions(sessionState) {
-		this.updatePitstopActions(sessionState)
+	updateActions(session) {
+		this.updatePitstopActions(session)
 
-		base.updateActions(sessionState)
+		base.updateActions(session)
 	}
 
-	updatePitstopActions(sessionState) {
+	updatePitstopActions(session) {
+		local ignore, theAction
+
 		for ignore, theAction in this.Actions
 			if (isInstance(theAction, PitstopAction) && inList(this.Controller.ActiveModes, this))
-				if ((sessionState != kSessionFinished) && (sessionState != kSessionPaused)) {
+				if ((session != kSessionFinished) && (session != kSessionPaused)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -145,7 +141,7 @@ class PitstopAction extends ControllerAction {
 		this.iSteps := steps
 
 		if (moreArguments.Length() > 0)
-			Throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
+			throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
 
 		base.__New(function, label, icon)
 	}
@@ -201,16 +197,31 @@ class PitstopToggleAction extends PitstopAction {
 }
 
 class SimulatorPlugin extends ControllerPlugin {
+	static sActiveSimulator := false
+	static sActiveimulation := false
+
 	iCommandMode := "Event"
 	iCommandDelay := kUndefined
 
 	iSimulator := false
-	iSessionState := kSessionFinished
+	iSession := kSessionFinished
 
 	iCar := false
 	iTrack := false
 
 	iTrackAutomation := kUndefined
+
+	ActiveSimulator[] {
+		Get {
+			return SimulatorPlugin.sActiveSimulator
+		}
+	}
+
+	ActiveSimulation[] {
+		Get {
+			return SimulatorPlugin.sActiveSimulation
+		}
+	}
 
 	Code[] {
 		Get {
@@ -230,6 +241,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	CommandDelay[] {
 		Get {
+			local simulator, car, track, settings, default
+
 			if (this.iCommandDelay = kUndefined) {
 				simulator := this.Simulator[true]
 				car := (this.Car ? this.Car : "*")
@@ -237,7 +250,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 				settings := new SettingsDatabase().loadSettings(simulator, car, track, "*")
 
-				default := getConfigurationValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 20)
+				default := getConfigurationValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 30)
 
 				this.iCommandDelay := getConfigurationValue(settings, "Simulator." . simulator, "Command.KeyDelay", default)
 			}
@@ -288,6 +301,8 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	TrackAutomation[] {
 		Get {
+			local simulator, car, track
+
 			if (this.iTrackAutomation == kUndefined) {
 				simulator := this.Simulator[true]
 				car := this.Car
@@ -304,28 +319,32 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
-	SessionState[asText := false] {
+	Session[asText := false] {
 		Get {
-			if asText {
-				sessionState := this.iSessionState
+			local session
 
-				if (sessionState >= kSessionOther)
-					return kSessionStateNames[sessionState]
+			if asText {
+				session := this.iSession
+
+				if (session >= kSessionOther)
+					return kSessionNames[session]
 				else
-					return ((sessionState == kSessionFinished) ? "Finished" : "Paused")
+					return ((session == kSessionFinished) ? "Finished" : "Paused")
 			}
 			else
-				return this.iSessionState
+				return this.iSession
 		}
 	}
 
-	SessionStates[asText := false] {
+	Sessions[asText := false] {
 		Get {
-			return (asText ? kSessionStateNames : kSessionStates)
+			return (asText ? kSessionNames : kSessions)
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false, register := true) {
+		local ignore, theAction, arguments
+
 		this.iSimulator := new Application(simulator, SimulatorController.Instance.Configuration)
 
 		base.__New(controller, name, configuration, register)
@@ -349,7 +368,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
-		local function
+		local function, decreaseFunction, mode, label, icon, actions, selectActions, descriptor
 
 		this.getPitstopActions(actions, selectActions)
 
@@ -366,7 +385,6 @@ class SimulatorPlugin extends ControllerPlugin {
 			}
 
 			function := controller.findFunction(increaseFunction)
-
 			mode := this.findMode(kPitstopMode)
 
 			if (mode == false)
@@ -425,7 +443,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	activateWindow() {
-		window := this.Simulator.WindowTitle
+		local window := this.Simulator.WindowTitle
 
 		if !WinExist(window)
 			if isDebug()
@@ -436,6 +454,8 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	sendCommand(command) {
+		local delay
+
 		try {
 			switch this.CommandMode {
 				case "Event":
@@ -467,51 +487,53 @@ class SimulatorPlugin extends ControllerPlugin {
 	simulatorStartup(simulator) {
 		base.simulatorStartup(simulator)
 
-		if ((simulator = this.Simulator.Application) && (vRunningSimulator != this)) {
-			if vRunningSimulator
-				vRunningSimulator.simulatorShutdown(vRunningSimulation)
+		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator != this)) {
+			if SimulatorPlugin.ActiveSimulator
+				SimulatorPlugin.ActiveSimulator.simulatorShutdown(SimulatorPlugin.ActiveSimulation)
 
-			this.updateSessionState(kSessionFinished)
+			this.updateSession(kSessionFinished)
 
-			vRunningSimulator := this
-			vRunningSimulation := simulator
+			SimulatorPlugin.sActiveSimulator := this
+			SimulatorPlugin.sActiveSimulation := simulator
 		}
 	}
 
 	simulatorShutdown(simulator) {
 		base.simulatorShutdown(simulator)
 
-		if ((simulator = this.Simulator.Application) && (vRunningSimulator == this)) {
-			this.updateSessionState(kSessionFinished)
+		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator == this)) {
+			this.updateSession(kSessionFinished)
 
-			vRunningSimulator := false
-			vRunningSimulation := false
+			SimulatorPlugin.sActiveSimulator := false
+			SimulatorPlugin.sActiveSimulation := false
 		}
 	}
 
-	updateSessionState(sessionState) {
-		if ((sessionState != this.SessionState) && (sessionState != kSessionPaused)) {
-			this.iSessionState := sessionState
+	updateSession(session) {
+		local mode
 
-			if (sessionState == kSessionFinished) {
+		if ((session != this.Session) && (session != kSessionPaused)) {
+			this.iSession := session
+
+			if (session == kSessionFinished) {
 				this.Car := false
 				this.Track := false
 
 				this.Controller.setModes()
 			}
 			else
-				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][sessionState])
+				this.Controller.setModes(this.Simulator.Application, ["Other", "Practice", "Qualification", "Race"][session])
 		}
 
 		mode := this.findMode(kPitstopMode)
 
 		if (mode && inList(this.Controller.ActiveModes, mode))
-			mode.updateActions(sessionState)
+			mode.updateActions(session)
 
 		mode := this.findMode(kAssistantMode)
 
 		if (mode && inList(this.Controller.ActiveModes, mode))
-			mode.updateActions(sessionState)
+			mode.updateActions(session)
 	}
 
 	updatePitstopOption(option, action, steps := 1) {
@@ -520,9 +542,11 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	notifyPitstopChanged(option) {
+		local newValues
+
 		if this.RaceEngineer
 			switch option {
-				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork":
+				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					newValues := this.getPitstopOptionValues(option)
 
 					if newValues
@@ -540,22 +564,22 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	selectPitstopOption(option) {
-		Throw "Virtual method SimulatorPlugin.selectPitstopOption must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.selectPitstopOption must be implemented in a subclass..."
 	}
 
 	changePitstopOption(option, action, steps := 1) {
-		Throw "Virtual method SimulatorPlugin.changePitstopOption must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.changePitstopOption must be implemented in a subclass..."
 	}
 
 	openPitstopMFD(descriptor := false) {
-		Throw "Virtual method SimulatorPlugin.openPitstopMFD must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.openPitstopMFD must be implemented in a subclass..."
 	}
 
 	resetPitstopMFD(descriptor := false) {
 	}
 
 	closePitstopMFD() {
-		Throw "Virtual method SimulatorPlugin.closePitstopMFD must be implemented in a subclass..."
+		throw "Virtual method SimulatorPlugin.closePitstopMFD must be implemented in a subclass..."
 	}
 
 	requirePitstopMFD() {
@@ -613,7 +637,7 @@ class RaceAssistantAction extends ControllerAction {
 			case "Reject":
 				plugin.reject()
 			default:
-				Throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
+				throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
 		}
 	}
 }
@@ -667,6 +691,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
+		local ignore, theAction
+
 		base.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
@@ -680,7 +706,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		local function
+		local function, mode, descriptor
 
 		if (action = "InformationRequest") {
 			arguments.InsertAt(1, actionFunction)
@@ -689,7 +715,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 
 		function := controller.findFunction(actionFunction)
-
 		mode := this.findMode(this.iActionMode)
 
 		if (mode == false)
@@ -715,79 +740,39 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	simulatorStartup(simulator) {
+		local ignore, assistant
+
 		base.simulatorStartup(simulator)
 
 		if (simulator = this.Simulator.Application) {
-			if this.supportsRaceAssistant(kRaceEngineerPlugin) {
-				raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			RaceAssistantPlugin.startSimulation(this)
 
-				if (raceEngineer && raceEngineer.isActive()) {
-					raceEngineer.startSimulation(this)
-
-					this.iRaceEngineer := raceEngineer
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceStrategistPlugin) {
-				raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
-
-				if (raceStrategist && raceStrategist.isActive()) {
-					raceStrategist.startSimulation(this)
-
-					this.iRaceStrategist := raceStrategist
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceSpotterPlugin) {
-				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
-
-				if (raceSpotter && raceSpotter.isActive()) {
-					raceSpotter.startSimulation(this)
-
-					this.iRaceSpotter := raceSpotter
-				}
-			}
+			for ignore, assistant in RaceAssistantPlugin.Assistants
+				if isInstance(assistant, RaceEngineerPlugin)
+					this.iRaceEngineer := assistant
+				else if isInstance(assistant, RaceStrategistPlugin)
+					this.iRaceStrategist := assistant
+				else if isInstance(assistant, RaceSpotterPlugin)
+					this.iRaceSpotter := assistant
 		}
 	}
 
 	simulatorShutdown(simulator) {
+		local raceEngineer, raceStrategist, raceSpotter
+
 		base.simulatorShutdown(simulator)
 
 		if (simulator = this.Simulator.Application) {
-			if this.supportsRaceAssistant(kRaceEngineerPlugin) {
-				raceEngineer := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+			RaceAssistantPlugin.stopSimulation(this)
 
-				if (raceEngineer && raceEngineer.isActive()) {
-					raceEngineer.stopSimulation(this)
-
-					this.iRaceEngineer := false
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceStrategistPlugin) {
-				raceStrategist := SimulatorController.Instance.findPlugin(kRaceStrategistPlugin)
-
-				if (raceStrategist && raceStrategist.isActive()) {
-					raceStrategist.stopSimulation(this)
-
-					this.iRaceStrategist := false
-				}
-			}
-
-			if this.supportsRaceAssistant(kRaceSpotterPlugin) {
-				raceSpotter := SimulatorController.Instance.findPlugin(kRaceSpotterPlugin)
-
-				if (raceSpotter && raceSpotter.isActive()) {
-					raceSpotter.stopSimulation(this)
-
-					this.iRaceSpotter := false
-				}
-			}
+			this.iRaceEngineer := false
+			this.iRaceStrategist := false
+			this.iRaceSpotter := false
 		}
 	}
 
 	supportsRaceAssistant(assistantPlugin) {
-		hasProvider := (FileExist(kBinariesDirectory . this.Code . " SHM Provider.exe") != false)
+		local hasProvider := (FileExist(kBinariesDirectory . this.Code . " SHM Provider.exe") != false)
 
 		if (assistantPlugin = kRaceSpotterPlugin)
 			return (hasProvider && FileExist(kBinariesDirectory . this.Code . " SHM Spotter.exe"))
@@ -807,18 +792,20 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		return false
 	}
 
-	updateSessionState(sessionState) {
-		base.updateSessionState(sessionState)
+	updateSession(session) {
+		base.updateSession(session)
 
-		if (sessionState = kSessionFinished)
-			this.iTyreCompound := false
+		if (session = kSessionFinished) {
+			this.CurrentTyreCompound := false
+			this.RequestedTyreCompound := false
+		}
 	}
 
 	requestInformation(arguments*) {
 		if (this.RaceStrategist && this.RaceStrategist.requestInformation(arguments*))
 			return
-		else if (this.RaceEngineer && this.RaceStrategist.requestInformation(arguments*))
-			this.RaceEngineer.requestInformation(arguments*)
+		else if (this.RaceEngineer && this.RaceEngineer.requestInformation(arguments*))
+			return
 		else if this.RaceSpotter
 			this.RaceSpotter.requestInformation(arguments*)
 	}
@@ -842,12 +829,22 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	startSession(settings, data) {
-		compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-		compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+		local compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+		local compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+
+		this.Car := getConfigurationValue(data, "Session Data", "Car")
+		this.Track := getConfigurationValue(data, "Session Data", "Track")
 
 		this.CurrentTyreCompound := compound(compound, compoundColor)
 
 		this.updateTyreCompound(data)
+	}
+
+	finishSession() {
+		this.updateSession(kSessionFinished)
+
+		this.Car := false
+		this.Track := false
 	}
 
 	recommendPitstop() {
@@ -884,6 +881,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	tyreCompoundIndex(compound, compoundColor := false) {
+		local compounds, index, candidate
+
 		if compound {
 			compounds := new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
 			index := inList(compounds, compound(compound, compoundColor))
@@ -902,16 +901,20 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	tyreCompoundCode(compound, compoundColor := false) {
+		local index
+
 		if compound {
 			index := this.tyreCompoundIndex(compound, compoundColor)
 
-			return (index ? sessionDB.getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
+			return (index ? new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
 		}
 		else
 			return false
 	}
 
 	triggerAction(actionNr, positionX, positionY) {
+		local action, ignore, theHotkey
+
 		if this.TrackAutomation {
 			action := this.TrackAutomation.Actions[actionNr]
 
@@ -954,10 +957,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	requestPitstopDriver(pitstopNumber, driver) {
 	}
 
-	updatePositionsData(data) {
-	}
-
 	updateTyreCompound(data) {
+		local compound, compoundColor
+
 		if (!getConfigurationValue(data, "Car Data", "TyreCompound", false)
 		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false)) {
 			if this.CurrentTyreCompound {
@@ -972,16 +974,21 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	updateSessionData(data) {
+	updateTelemetryData(data) {
 		this.updateTyreCompound(data)
 
-		if (this.SessionState != kSessionFinished) {
+		if (this.Session != kSessionFinished) {
 			this.Car := getConfigurationValue(data, "Session Data", "Car")
 			this.Track := getConfigurationValue(data, "Session Data", "Track")
 		}
 	}
 
+	updatePositionsData(data) {
+	}
+
 	saveSessionState(ByRef sessionSettings, ByRef sessionState) {
+		local compound, compoundColor
+
 		if !sessionSettings
 			sessionSettings := newConfiguration()
 
@@ -991,8 +998,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 			splitCompound(this.CurrentTyreCompound, compound, compoundColor)
 
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", compound)
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Current", compoundColor)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound.Color", compoundColor)
 		}
 
 		if this.RequestedTyreCompound {
@@ -1001,50 +1008,140 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 			splitCompound(this.RequestedTyreCompound, compound, compoundColor)
 
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", compound)
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Color.Requested", compoundColor)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", compound)
+			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound.Color", compoundColor)
 		}
 	}
 
 	restoreSessionState(ByRef sessionSettings, ByRef sessionState) {
+		local compound
+
 		this.CurrentTyreCompound := false
 		this.RequestedTyreCompound := false
 
-		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Current", false)
+		if sessionSettings {
+			compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", false)
 
-		if compound
-			this.CurrentTyreCompound := compound(compound, getConfigurationValue(sessionSettings
-																			   , "Simulator Settings", "Tyre.Compound.Color.Current"))
+			if compound
+				this.CurrentTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																				   , "Simulator Settings", "Tyre.Current.Compound.Color"))
 
-		compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Compound.Requested", false)
+			compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", false)
 
-		if compound
-			this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
-																				 , "Simulator Settings", "Tyre.Compound.Color.Requested"))
+			if compound
+				this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
+																					 , "Simulator Settings", "Tyre.Requested.Compound.Color"))
+		}
+	}
+
+	acquireTelemetryData() {
+		local code, trackData, data
+
+		static sessionDB := false
+
+		if !sessionDB
+			sessionDB := new SessionDatabase()
+
+		code := this.Code
+		trackData := sessionDB.getTrackData(code, this.Track)
+
+		return (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
+	}
+
+	acquirePositionsData(telemetryData) {
+		local positionsData
+
+		if telemetryData.HasKey("Position Data") {
+			positionsData := newConfiguration()
+
+			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(telemetryData, "Position Data"))
+
+			return positionsData
+		}
+		else
+			return readSimulatorData(this.Code, "-Standings")
+	}
+
+	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+		local data := newConfiguration()
+		local section, values
+
+		setConfigurationValue(data, "System", "Time", A_TickCount)
+
+		telemetryData := this.acquireTelemetryData()
+		positionsData := this.acquirePositionsData(telemetryData)
+
+		RaceAssistantPlugin.updateAssistantsTelemetryData(telemetryData)
+		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
+
+		for section, values in telemetryData
+			setConfigurationSectionValues(data, section, values)
+
+		for section, values in positionsData
+			setConfigurationSectionValues(data, section, values)
+
+		return data
 	}
 }
 
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+readSimulatorData(simulator, options := "", protocol := "SHM") {
+	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
+	local dataFile, data
+
+	FileCreateDir %kTempDirectory%%simulator% Data
+
+	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
+
+	try {
+		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
+	}
+	catch exception {
+		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
+												   , {simulator: simulator, protocol: protocol})
+							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+							   . kBinariesDirectory . translate(")"))
+
+		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
+									  , {exePath: exePath, simulator: simulator, protocol: protocol})
+				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+	}
+
+	data := readConfiguration(dataFile)
+
+	deleteFile(dataFile)
+
+	setConfigurationValue(data, "Session Data", "Simulator", simulator)
+
+	return data
+}
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 getCurrentSimulatorPlugin(option := false) {
-	if vRunningSimulator {
+	local actions, ignore, candidate
+
+	if SimulatorPlugin.ActiveSimulator {
 		if option {
 			actions := false
 			ignore := false
 
-			vRunningSimulator.getPitstopActions(actions, ignore)
+			SimulatorPlugin.ActiveSimulator.getPitstopActions(actions, ignore)
 
 			for ignore, candidate in actions
 				if (candidate = option)
-					return vRunningSimulator
+					return SimulatorPlugin.ActiveSimulator
 
 			return false
 		}
 		else
-			return vRunningSimulator
+			return SimulatorPlugin.ActiveSimulator
 	}
 	else
 		return false

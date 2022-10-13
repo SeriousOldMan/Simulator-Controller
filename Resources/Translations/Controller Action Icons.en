@@ -476,6 +476,7 @@ GapToAheadStandings.Activate=
 GapToBehindStandings.Activate=
 GapToAheadTrack.Activate=
 GapToBehindTrack.Activate=
+StrategyRecommend.Activate=
 StrategyOverview.Activate=
 NextPitstop.Activate=
 [Race Spotter]

@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
 ;@Ahk2Exe-ExeName Simulator Tools.exe
@@ -45,48 +42,51 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kToolsConfigurationFile = "Simulator Tools.ini"
-global kToolsTargetsFile = "Simulator Tools.targets"
+global kToolsConfigurationFile := "Simulator Tools.ini"
+global kToolsTargetsFile := "Simulator Tools.targets"
 
-global kUpdateMessages = {updateTranslations: "Updating translations to "
+global kUpdateMessages := {updateTranslations: "Updating translations to "
 						, updatePluginLabels: "Updating plugin labels to "
 						, updateActionLabels: "Updating action labels to "
 						, updateActionIcons: "Updating action icons to "
 						, updatePhraseGrammars: "Updating phrase grammars to "}
 
-global kCompiler = kAHKDirectory . "Compiler\ahk2exe.exe"
+global kCompiler := kAHKDirectory . "Compiler\ahk2exe.exe"
 
-global kSave = "save"
-global kRevert = "revert"
+global kSave := "save"
+global kRevert := "revert"
 
-global kOk = "ok"
-global kCancel = "cancel"
+global kOk := "ok"
+global kCancel := "cancel"
 
-global kUninstallKey = "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
+global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-global kInstallDirectory = (A_ProgramFiles . "\Simulator Controller\")
+global kInstallDirectory := (A_ProgramFiles . "\Simulator Controller\")
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vUpdateTargets = []
-global vCleanupTargets = []
-global vCopyTargets = []
-global vBuildTargets = []
-global vSpecialTargets = []
+global vTargetConfiguration := "Development"
+global vTargetConfigurationChanged := false
 
-global vSplashTheme = false
+global vUpdateTargets := []
+global vCleanupTargets := []
+global vCopyTargets := []
+global vBuildTargets := []
+global vSpecialTargets := []
 
-global vTargetsCount = 0
+global vSplashTheme := false
 
-global vUpdateSettings = Object()
-global vCleanupSettings = Object()
-global vCopySettings = Object()
-global vBuildSettings = Object()
+global vTargetsCount := 0
 
-global vProgressCount = 0
+global vUpdateSettings := Object()
+global vCleanupSettings := Object()
+global vCopySettings := Object()
+global vBuildSettings := Object()
+
+global vProgressCount := 0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -96,6 +96,8 @@ global vProgressCount = 0
 global installLocationPathEdit
 
 installOptions(options) {
+	local directory, valid, empty, title, innerWidth, chosen, disabled, checked
+
 	static installationTypeDropDown
 	static automaticUpdatesCheck
 	static startMenuShortcutsCheck
@@ -103,6 +105,8 @@ installOptions(options) {
 	static startConfigurationCheck
 
 	static result := false
+
+	static update := false
 
 	if (options == kOk) {
 		GuiControlGet installLocationPathEdit
@@ -112,26 +116,27 @@ installOptions(options) {
 		valid := true
 		empty := true
 
-		if !FileExist(directory)
-			try {
-				FileCreateDir %directory%
-			}
-			catch exception {
-				title := translate("Error")
+		if !update
+			if !FileExist(directory)
+				try {
+					FileCreateDir %directory%
+				}
+				catch exception {
+					title := translate("Error")
 
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262160, %title%, % translate("You must enter a valid directory.")
-				OnMessage(0x44, "")
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+					OnMessage(0x44, "")
 
-				valid := false
-			}
-		else if (InStr(kHomeDirectory, directory) != 1)
-			Loop Files, %directory%\*.*, FD
-			{
-				empty := false
+					valid := false
+				}
+			else if (InStr(kHomeDirectory, directory) != 1)
+				loop Files, %directory%\*.*, FD
+				{
+					empty := false
 
-				break
-			}
+					break
+				}
 
 		if (empty && valid)
 			result := kOk
@@ -147,6 +152,7 @@ installOptions(options) {
 		result := kCancel
 	else {
 		result := false
+		update := options["Update"]
 
 		Gui Install:Default
 
@@ -211,9 +217,9 @@ installOptions(options) {
 		Gui Install:Margin, 10, 10
 		Gui Install:Show, AutoSize Center
 
-		Loop {
+		loop
 			Sleep 200
-		} until result
+		until result
 
 		if (result == kOk) {
 			Gui Install:Submit
@@ -233,9 +239,10 @@ installOptions(options) {
 }
 
 uninstallOptions(options) {
-	static keepUserFilesCheck
+	local innerWidth, checked
 
 	static result := false
+	static keepUserFilesCheck
 
 	if (options == kOk)
 		result := kOk
@@ -280,9 +287,9 @@ uninstallOptions(options) {
 		Gui Uninstall:Margin, 10, 10
 		Gui Uninstall:Show, AutoSize Center
 
-		Loop {
+		loop
 			Sleep 200
-		} until result
+		until result
 
 		if (result == kOk) {
 			Gui Uninstall:Submit
@@ -321,6 +328,8 @@ moveUninstallEditor() {
 }
 
 chooseInstallLocationPath() {
+	local valid, empty, title, directory
+
 	GuiControlGet installLocationPathEdit
 
 	Gui +OwnDialogs
@@ -346,7 +355,7 @@ chooseInstallLocationPath() {
 				valid := false
 			}
 		else if (InStr(kHomeDirectory, directory) != 1)
-			Loop Files, %directory%\*.*, FD
+			loop Files, %directory%\*.*, FD
 			{
 				empty := false
 
@@ -369,9 +378,11 @@ openInstallDocumentation() {
 }
 
 exitProcesses(silent := false, force := false) {
+	local pid, hasFGProcesses, hasBGProcesses, ignore, app, title
+
 	Process Exist
 
-	self := ErrorLevel
+	pid := ErrorLevel
 
 	while true {
 		hasFGProcesses := false
@@ -390,7 +401,7 @@ exitProcesses(silent := false, force := false) {
 		for ignore, app in kBackgroundApps {
 			Process Exist, %app%.exe
 
-			if (ErrorLevel && (ErrorLevel != self)) {
+			if (ErrorLevel && (ErrorLevel != pid)) {
 				hasBGProcesses := true
 
 				break
@@ -428,7 +439,7 @@ exitProcesses(silent := false, force := false) {
 			for ignore, app in kBackgroundApps {
 				Process Exist, %app%.exe
 
-				if (ErrorLevel && (ErrorLevel != self)) {
+				if (ErrorLevel && (ErrorLevel != pid)) {
 					Process Close, %ErrorLevel%
 
 					if !ErrorLevel
@@ -441,6 +452,9 @@ exitProcesses(silent := false, force := false) {
 }
 
 checkInstallation() {
+	local installLocation, installOptions, quiet, options, x, y
+	local install, title, index, options, isNew, packageLocation, ignore, directory, currentDirectory
+
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 
 	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
@@ -469,7 +483,7 @@ checkInstallation() {
 			ExitApp 1
 
 		options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
-				  , InstallLocation: normalizePath(installLocation)
+				  , InstallLocation: normalizeDirectoryPath(installLocation)
 				  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
 				  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 				  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
@@ -490,15 +504,10 @@ checkInstallation() {
 			if options["DeleteUserFiles"] {
 				showProgress({message: translate("Removing User files...")})
 
-				FileRemoveDir %kUserHomeDirectory%, true
+				deleteDirectory(kUserHomeDirectory)
 			}
 			else
-				try {
-					FileDelete %kUserConfigDirectory%Simulator Controller.install
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(kUserConfigDirectory . "Simulator Controller.install")
 
 			if options["StartMenuShortcuts"] {
 				showProgress({progress: vProgressCount, message: translate("Removing Start menu shortcuts...")})
@@ -561,14 +570,14 @@ checkInstallation() {
 						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate %options%
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				ExitApp 0
 			}
 
 			if (!installLocation || (installLocation = ""))
-				installLocation := normalizePath(kInstallDirectory)
+				installLocation := normalizeDirectoryPath(kInstallDirectory)
 
 			isNew := !FileExist(installLocation)
 
@@ -577,14 +586,14 @@ checkInstallation() {
 					ExitApp 1
 
 			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
-					  , InstallLocation: normalizePath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
+					  , InstallLocation: normalizeDirectoryPath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
 					  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
 					  , Verbose: getConfigurationValue(installOptions, "Updates", "Verbose", false)
 					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
 					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: isNew, Update: !isNew}
 
-			packageLocation := normalizePath(kHomeDirectory)
+			packageLocation := normalizeDirectoryPath(kHomeDirectory)
 
 			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]
@@ -661,6 +670,12 @@ checkInstallation() {
 					writeUninstallerInfo(installLocation)
 				}
 
+				fixIE(11, "Setup Advisor.exe")
+				fixIE(11, "Race Reports.exe")
+				fixIE(11, "Strategy Workbench.exe")
+				fixIE(11, "Race Center.exe")
+				fixIE(10, "Simulator Setup.exe")
+
 				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
 
 				hideSplashTheme()
@@ -682,6 +697,12 @@ checkInstallation() {
 				}
 
 				showProgress({progress: 100, message: translate("Finished...")})
+
+				deleteDirectory(kLogsDirectory)
+				deleteDirectory(kTempDirectory)
+
+				FileCreateDir %kLogsDirectory%
+				FileCreateDir %kTempDirectory%
 
 				Sleep 1000
 
@@ -720,15 +741,12 @@ checkInstallation() {
 	}
 }
 
-normalizePath(path) {
-	return ((SubStr(path, StrLen(path)) = "\") ? SubStr(path, 1, StrLen(path) - 1) : path)
-}
-
 copyFiles(source, destination, deleteOrphanes) {
-	count := 0
-	progress := 0
+	local count := 0
+	local progress := 0
+	local step, stepCount
 
-	Loop Files, %source%\*, DFR
+	loop Files, %source%\*, DFR
 	{
 		if (Mod(count, 100) == 0)
 			progress += 1
@@ -767,10 +785,11 @@ copyFiles(source, destination, deleteOrphanes) {
 }
 
 deleteFiles(installLocation) {
-	count := 0
-	progress := 0
+	local count := 0
+	local progress := 0
+	local step, stepCount
 
-	Loop Files, %installLocation%\*, DFR
+	loop Files, %installLocation%\*, DFR
 	{
 		if (Mod(count, 100) == 0)
 			progress += 1
@@ -789,7 +808,7 @@ deleteFiles(installLocation) {
 	step := (70 / count)
 	stepCount := 0
 
-	deleteDirectory(installLocation, step, stepCount)
+	clearDirectory(installLocation, step, stepCount)
 
 	vProgressCount := (vProgressCount + Round(step * count))
 
@@ -797,11 +816,12 @@ deleteFiles(installLocation) {
 }
 
 copyDirectory(source, destination, progressStep, ByRef count) {
+	local files := []
+	local ignore, fileName, file, subDirectory
+
 	FileCreateDir %destination%
 
-	files := []
-
-	Loop Files, %source%\*.*, DF
+	loop Files, %source%\*.*, DF
 		files.Push(A_LoopFilePath)
 
 	for ignore, fileName in files {
@@ -821,10 +841,11 @@ copyDirectory(source, destination, progressStep, ByRef count) {
 	}
 }
 
-deleteDirectory(directory, progressStep, ByRef count) {
-	files := []
+clearDirectory(directory, progressStep, ByRef count) {
+	local files := []
+	local ignore, fileName, subDirectory, file
 
-	Loop Files, %directory%\*.*, DF
+	loop Files, %directory%\*.*, DF
 		files.Push(A_LoopFilePath)
 
 	for ignore, fileName in files {
@@ -837,36 +858,37 @@ deleteDirectory(directory, progressStep, ByRef count) {
 		if InStr(FileExist(fileName), "D") {
 			SplitPath fileName, subDirectory
 
-			deleteDirectory(directory . "\" . subDirectory, progressStep, count)
+			clearDirectory(directory . "\" . subDirectory, progressStep, count)
 		}
 		else
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 
 		Sleep 1
 	}
 }
 
 cleanupDirectory(source, destination, maxStep, ByRef count) {
-	Loop Files, %destination%\*.*, DF
+	local fileName
+
+	loop Files, %destination%\*.*, DF
 	{
 		SplitPath A_LoopFilePath, fileName
 
 		if InStr(FileExist(A_LoopFilePath), "D") {
 			cleanupDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
 
-			FileRemoveDir %A_LoopFilePath%, false
+			try {
+				FileRemoveDir %A_LoopFilePath%
+			}
+			catch exception {
+			}
 		}
 		else if !FileExist(source . "\" . fileName) {
 			count := Min(count + 1, maxStep)
 
 			showProgress({progress: vProgressCount + count, message: translate("Deleting ") . fileName . translate("...")})
 
-			FileDelete %A_LoopFilePath%
+			deleteFile(A_LoopFilePath)
 
 			Sleep 100
 		}
@@ -874,12 +896,7 @@ cleanupDirectory(source, destination, maxStep, ByRef count) {
 }
 
 removeDirectory(directory) {
-	try {
-		FileDelete %A_Temp%\Cleanup.bat
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(A_Temp . "\Cleanup.bat")
 
 	command =
 (
@@ -894,6 +911,8 @@ rmdir "%directory%" /s /q
 }
 
 createShortcuts(location, installLocation) {
+	local ignore, name
+
 	if (location = A_StartMenu) {
 		FileCreateDir %location%\Simulator Controller
 
@@ -913,39 +932,25 @@ createShortcuts(location, installLocation) {
 }
 
 deleteShortcuts(location) {
-	deleteFolder := false
+	local deleteFolder := false
+	local ignore, name
 
 	if (location = A_StartMenu) {
 		location := (A_StartMenu . "\Simulator Controller")
 
 		deleteFolder := true
 
-		try {
-			FileDelete %location%\Uninstall.lnk
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(location . "\Uninstall.lnk")
 	}
 
 	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
 					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
-		try {
-			FileDelete %location%\%name%.lnk
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(location . "\" . name . ".lnk")
 
-	try {
-		FileDelete %location%\Documentation.lnk
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(location . "\Documentation.lnk")
 
 	if deleteFolder
-		FileRemoveDir %location%
+		deleteDirectory(location)
 }
 
 writeAppPaths(installLocation) {
@@ -979,7 +984,7 @@ deleteAppPaths() {
 }
 
 writeUninstallerInfo(installLocation) {
-	version := StrSplit(kVersion, "-", , 2)[1]
+	local version := StrSplit(kVersion, "-", , 2)[1]
 
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, DisplayName, Simulator Controller
 	RegWrite REG_SZ, HKLM, %kUninstallKey%, InstallLocation, % installLocation
@@ -997,10 +1002,12 @@ deleteUninstallerInfo() {
 	RegDelete HKLM, %kUninstallKey%
 }
 
-readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings, ByRef splashTheme) {
-	targets := readConfiguration(kToolsTargetsFile)
-	configuration := readConfiguration(kToolsConfigurationFile)
-	updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
+readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings
+					 , ByRef splashTheme, ByRef targetConfiguration) {
+	local targets := readConfiguration(kToolsTargetsFile)
+	local configuration := readConfiguration(kToolsConfigurationFile)
+	local updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
+	local target, rule
 
 	updateSettings := Object()
 	cleanupSettings := Object()
@@ -1031,13 +1038,15 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySe
 	}
 
 	splashTheme := getConfigurationValue(configuration, "General", "Splash Theme", false)
+	targetConfiguration := getConfigurationValue(configuration, "Compile", "TargetConfiguration", "Development")
 
 	if A_IsCompiled
 		buildSettings["Simulator Tools"] := false
 }
 
-writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme) {
-	configuration := newConfiguration()
+writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme, targetConfiguration) {
+	local configuration := newConfiguration()
+	local target, setting
 
 	for target, setting in cleanupSettings
 		setConfigurationValue(configuration, "Cleanup", target, setting)
@@ -1049,11 +1058,15 @@ writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSett
 		setConfigurationValue(configuration, "Build", target, setting)
 
 	setConfigurationValue(configuration, "General", "Splash Theme", splashTheme)
+	setConfigurationValue(configuration, "Compile", "TargetConfiguration", targetConfiguration)
 
 	writeConfiguration(kToolsConfigurationFile, configuration)
 }
 
 viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
+	local text, innerWidth, editHeight, buttonX
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+
 	static dismissed := false
 
 	dismissed := false
@@ -1081,7 +1094,7 @@ viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, 
 
 	SysGet mainScreen, MonitorWorkArea
 
-	if x is not integer
+	if x is not Integer
 		switch x {
 			case "Left":
 				x := 25
@@ -1091,7 +1104,7 @@ viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, 
 				x := "Center"
 		}
 
-	if y is not integer
+	if y is not Integer
 		switch y {
 			case "Top":
 				y := 25
@@ -1131,10 +1144,13 @@ cancelTargets() {
 }
 
 moveEditor() {
-	moveByMouse("TE")
+	moveByMouse("TE", "Simulator Tools")
 }
 
 editTargets(command := "") {
+	local target, setting, updateVariable, cleanupVariable, copyVariable, buildVariable, updateHeight, cleanupHeight
+	local cleanupPosOption, option, copyHeight, buildHeight, themes, chosen, yPos, x, y
+
 	static result
 
 	static updateVariable1
@@ -1206,6 +1222,7 @@ editTargets(command := "") {
 	static buildVariable24
 
 	static splashTheme
+	static targetConfiguration
 
 	if (command == kSave) {
 		Gui TE:Submit
@@ -1236,7 +1253,14 @@ editTargets(command := "") {
 
 		vSplashTheme := (splashTheme == translate("None")) ? false : splashTheme
 
-		writeToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
+		targetConfiguration := ["Development", "Production"][targetConfiguration]
+
+		if (vTargetConfiguration != targetConfiguration)
+			vTargetConfigurationChanged := true
+
+		vTargetConfiguration := targetConfiguration
+
+		writeToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme, vTargetConfiguration)
 
 		Gui TE:Destroy
 
@@ -1256,16 +1280,16 @@ editTargets(command := "") {
 		result := false
 
 		if (vUpdateSettings.Count() > 16)
-			Throw "Too many update targets detected in editTargets..."
+			throw "Too many update targets detected in editTargets..."
 
 		if (vCleanupSettings.Count() > 8)
-			Throw "Too many cleanup targets detected in editTargets..."
+			throw "Too many cleanup targets detected in editTargets..."
 
 		if (vCopySettings.Count() > 16)
-			Throw "Too many copy targets detected in editTargets..."
+			throw "Too many copy targets detected in editTargets..."
 
 		if (vBuildSettings.Count() > 24)
-			Throw "Too many build targets detected in editTargets..."
+			throw "Too many build targets detected in editTargets..."
 
 		Gui TE:-Border ; -Caption
 		Gui TE:Color, D0D0D0, D8D8D8
@@ -1337,7 +1361,7 @@ editTargets(command := "") {
 		copyHeight := 20 + (vCopySettings.Count() * 20)
 
 		if (copyHeight == 20)
-			copydHeight := 40
+			copyHeight := 40
 
 		Gui TE:Add, GroupBox, -Theme XP-10 YP+30 w200 h%copyHeight%, % translate("Copy")
 
@@ -1382,22 +1406,31 @@ editTargets(command := "") {
 		else
 			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 
+		yPos := (Max(cleanupHeight + copyHeight + (updateHeight ? updateHeight + 10 : 0), buildHeight) + 86)
+
+		chosen := inList(["Development", "Production"], vTargetConfiguration)
+
+		Gui TE:Add, Text, X10 Y%yPos%, % translate("Target")
+		Gui TE:Add, DropDownList, X110 YP-5 w310 AltSubmit Choose%chosen% vtargetConfiguration, % values2String("|", map(["Development", "Production"], "translate")*)
+
 		themes := getAllThemes()
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
 		themes := (translate("None") . "|" . values2String("|", themes*))
 
-		yPos := (Max(cleanupHeight + copyHeight + (updateHeight ? updateHeight + 10 : 0), buildHeight) + 86)
-
-		Gui TE:Add, Text, X10 Y%yPos%, % translate("Theme")
+		Gui TE:Add, Text, X10 YP+30, % translate("Theme")
 		Gui TE:Add, DropDownList, X110 YP-5 w310 Choose%chosen% vsplashTheme, %themes%
 
 		Gui TE:Add, Button, Default X110 y+20 w100 gsaveTargets, % translate("Run")
 		Gui TE:Add, Button, X+10 w100 gcancelTargets, % translate("&Cancel")
 
 		Gui TE:Margin, 10, 10
-		Gui TE:Show, AutoSize Center
 
-		Loop
+		if getWindowPosition("Simulator Tools", x, y)
+			Gui TE:Show, x%x% y%y%
+		else
+			Gui TE:Show
+
+		loop
 			Sleep 1000
 		until result
 
@@ -1454,61 +1487,99 @@ deleteActionLabels() {
 }
 
 deletePluginLabels(fileName := "Controller Plugin Labels") {
+	local ignore, fName
+
 	for ignore, fName in getFileNames(fileName . ".*", kUserTranslationsDirectory)
 		try {
 			FileMove %fName%, %fName%.bak, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 }
 
-updateActionDefinitions(fileName := "Controller Plugin Labels") {
-	/* Obsolete since 4.0.4...
-	languages := availableLanguages()
-	enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
+updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false) {
+	local languages, enDefinitions, ignore, userDefinitionsFile, languageCode, bundledDefinitions, changed
+	local section, keyValues, key, value, keys, userDefinitions
 
-	for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
-		SplitPath userDefinitionsFile, , , languageCode
+	if preset {
+		languages := availableLanguages()
+		enDefinitions := readConfiguration(kResourcesDirectory . "Setup\Presets\" . fileName . ".en")
 
-		if !languages.HasKey(languageCode)
-			bundledDefinitions := enDefinitions
-		else {
-			bundledDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
+		for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory) {
+			SplitPath userDefinitionsFile, , , languageCode
 
-			if (bundledDefinitions.Count() == 0)
+			if (!languages.HasKey(languageCode) || (languageCode = "en"))
 				bundledDefinitions := enDefinitions
+			else {
+				bundledDefinitions := readConfiguration(kResourcesDirectory . "Setup\Presets\" . fileName . "." . languageCode)
+
+				if (bundledDefinitions.Count() == 0)
+					bundledDefinitions := enDefinitions
+			}
+
+			userDefinitions := readConfiguration(userDefinitionsFile)
+			changed := false
+
+			for section, keyValues in bundledDefinitions
+				for key, value in keyValues
+					if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
+						setConfigurationValue(userDefinitions, section, key, value)
+
+						changed := true
+					}
+
+			if changed
+				writeConfiguration(userDefinitionsFile, userDefinitions)
 		}
-
-		userDefinitions := readConfiguration(userDefinitionsFile)
-		changed := false
-
-		for section, keyValues in bundledDefinitions
-			for key, value in keyValues
-				if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
-					setConfigurationValue(userDefinitions, section, key, value)
-
-					changed := true
-				}
-
-		for section, keyValues in userDefinitions {
-			keys := []
-
-			for key, value in keyValues
-				if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
-					keys.Push(key)
-
-					changed := true
-				}
-
-			for ignore, key in keys
-				removeConfigurationValue(userDefinitions, section, key)
-		}
-
-		if changed
-			writeConfiguration(userDefinitionsFile, userDefinitions)
 	}
-	*/
+	else {
+		/* Obsolete since 4.0.4...
+		languages := availableLanguages()
+		enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
+
+		for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
+			SplitPath userDefinitionsFile, , , languageCode
+
+			if (!languages.HasKey(languageCode) || (languageCode = "en"))
+				bundledDefinitions := enDefinitions
+			else {
+				bundledDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
+
+				if (bundledDefinitions.Count() == 0)
+					bundledDefinitions := enDefinitions
+			}
+
+			userDefinitions := readConfiguration(userDefinitionsFile)
+			changed := false
+
+			for section, keyValues in bundledDefinitions
+				for key, value in keyValues
+					if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
+						setConfigurationValue(userDefinitions, section, key, value)
+
+						changed := true
+					}
+
+			for section, keyValues in userDefinitions {
+				keys := []
+
+				for key, value in keyValues
+					if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
+						keys.Push(key)
+
+						changed := true
+					}
+
+				for ignore, key in keys
+					removeConfigurationValue(userDefinitions, section, key)
+			}
+
+			if changed
+				writeConfiguration(userDefinitionsFile, userDefinitions)
+		}
+		*/
+	}
 }
 
 updateActionLabels() {
@@ -1519,16 +1590,21 @@ updateActionIcons() {
 	updateActionDefinitions("Controller Action Icons")
 }
 
+updateStreamDeckIconPreset() {
+	updateActionDefinitions("Controller Action Icons", true)
+}
+
 updateCustomCalls(startNumber, endNumber) {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local bundledConfiguration, customCallIndex, key
 
 	if (userConfiguration.Count() > 0) {
 		bundledConfiguration := readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory))
 
 		customCallIndex := startNumber
 
-		Loop {
+		loop {
 			key := "Custom." . customCallIndex . ".Call"
 
 			if (getConfigurationValue(userConfiguration, "Controller Functions", key, kUndefined) == kUndefined) {
@@ -1547,7 +1623,7 @@ updateCustomCalls(startNumber, endNumber) {
 }
 
 renewConsent() {
-	consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+	local consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 
 	if (consent.Count() > 0) {
 		setConfigurationValue(consent, "General", "ReNew", true)
@@ -1557,18 +1633,19 @@ renewConsent() {
 }
 
 updateInstallationForV398() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	local installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	local installLocation
 
 	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
 		installLocation := getConfigurationValue(installOptions, "Install", "Location")
 
-		try {
-			FileDelete %installLocation%\Binaries\Setup Database.exe
+		deleteFile(installLocation . "\Binaries\Setup Database.exe")
 
+		try {
 			FileCreateShortCut %installLocation%\Binaries\Session Database.exe, %A_StartMenu%\Simulator Controller\Session Database.lnk, %installLocation%\Binaries
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 
@@ -1582,13 +1659,14 @@ updateInstallationForV398() {
 			RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 	}
 }
 
 updateInstallationForV392() {
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	local installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	local installLocation
 
 	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
 		installLocation := getConfigurationValue(installOptions, "Install", "Location")
@@ -1597,86 +1675,72 @@ updateInstallationForV392() {
 	}
 }
 
-addOwnerField(database, table, id) {
-	rows := database.Tables[table]
+updateConfigurationForV430() {
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local changed := false
 
-	if (rows.Length() > 0) {
-		changed := false
+	if (getConfigurationValue(userConfiguration, "Automobilista 2", "Window Title", false) = "Automobilista 2") {
+		setConfigurationValue(userConfiguration, "Automobilista 2", "Window Title", "ahk_exe AMS2AVX.exe")
 
-		for ignore, row in rows
-			if (!row.HasKey("Owner") || (row.Owner = kNull)) {
-				row.Owner := id
-
-				changed := true
-			}
-
-		if changed
-			database.changed(table)
+		changed := true
 	}
-}
 
-clearWearFields(database, table, id) {
-	rows := database.Tables[table]
+	if (getConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", false) = "Project CARS 2") {
+		setConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", "ahk_exe PCARS2AVX.exe")
 
-	if (rows.Length() > 0) {
-		changed := false
+		changed := true
+	}
 
-		for ignore, row in rows
-			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-				field := ("Tyre.Wear." . tyre)
+	if changed
+		writeConfiguration(userConfigurationFile, userConfiguration)
 
-				if (row.HasKey(field) && (row[field] = id)) {
-					row[field] := kNull
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data")
+		FileAppend `nModule.Team Server.Selected=true, %kUserHomeDirectory%Setup\Setup.data
 
-					changed := true
-				}
-			}
+	if FileExist(kUserConfigDirectory . "Simulator Startup.ini") {
+		userConfigurationFile := getFileName("Application Settings.ini", kUserConfigDirectory)
+		userConfiguration := readConfiguration(userConfigurationFile)
 
-		if changed
-			database.changed(table)
+		setConfigurationValue(userConfiguration, "Simulator Startup", "CloseLaunchPad"
+							, getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Startup.ini")
+												  , "Startup", "CloseLaunchPad"))
+
+		writeConfiguration(userConfigurationFile, userConfiguration)
+
+		deleteFile(kUserConfigDirectory . "Simulator Startup.ini")
 	}
 }
 
 updateConfigurationForV426() {
-	try {
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\AC, 1
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\R3E, 1
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\AMS2, 1
-		FileRemoveDir %kDatabaseDirectory%User\Tracks\PCARS2, 1
-	}
-	catch exception {
-		; ignore
-	}
+	local ignore, simulator, car, track, fileName
 
-	for ignore, simulator in ["AC", "AMS2", "PCARS2", "R3E"]
-		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+	for ignore, simulator in ["AC", "AMS2", "PCARS2", "R3E"] {
+		deleteDirectory(kDatabaseDirectory . "User\Tracks\" . simulator)
+
+		loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
 
-			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 			{
 				track := A_LoopFileName
 
-				if FileExist(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Track.automations")
-					try {
-						FileDelete %kDatabaseDirectory%User\%simulator%\%car%\%track%\Track.automations
-					}
-					catch exception {
-						; ignore
-					}
+				fileName := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Track.automations")
+
+				if FileExist(fileName)
+					deleteFile(fileName)
 			}
 		}
+	}
 }
 
 updateConfigurationForV425() {
-	try {
-		FileRemoveDir %kDatabaseDirectory%User\Tracks, 1
-	}
-	catch exception {
-		; ignore
-	}
+	local text, changed
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D
+	deleteDirectory(kDatabaseDirectory . "User\Tracks")
+
+	loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV
 
@@ -1689,12 +1753,7 @@ updateConfigurationForV425() {
 			}
 
 			if changed {
-				try {
-					FileDelete %A_LoopFilePath%\Settings.CSV
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(A_LoopFilePath . "\Settings.CSV")
 
 				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
 			}
@@ -1703,11 +1762,12 @@ updateConfigurationForV425() {
 }
 
 updateConfigurationForV424() {
-	tyresDB := new TyresDatabase()
+	local tyresDB := new TyresDatabase()
+	local simulator := "rFactor 2"
+	local car, oldCar, track, sourceDirectory, sourceDB, targetDB, ignore, row, data, field, tyresDB
+	local targetDirectory, fileName, targetName, name
 
-	simulator := "rFactor 2"
-
-	Loop Files, %kDatabaseDirectory%User\RF2\*.*, D
+	loop Files, %kDatabaseDirectory%User\RF2\*.*, D
 		if InStr(A_LoopFileName, "#") {
 			car := string2Values("#", A_LoopFileName)[1]
 
@@ -1716,7 +1776,7 @@ updateConfigurationForV424() {
 			else {
 				oldCar := A_LoopFileName
 
-				Loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
+				loop Files, %kDatabaseDirectory%User\RF2\%oldCar%\*.*, D
 				{
 					track := A_LoopFileName
 
@@ -1770,7 +1830,7 @@ updateConfigurationForV424() {
 
 					FileCreateDir %targetDirectory%
 
-					Loop Files, %sourceDirectory%Race Strategies\*.*, F
+					loop Files, %sourceDirectory%Race Strategies\*.*, F
 					{
 						fileName := A_LoopFileName
 						targetName := fileName
@@ -1785,12 +1845,15 @@ updateConfigurationForV424() {
 					}
 				}
 
-				FileRemoveDir %kDatabaseDirectory%User\RF2\%oldCar%, 1
+				deleteDirectory(kDatabaseDirectory . "User\RF2\" . oldCar)
 			}
 		}
 }
 
 updateConfigurationForV423() {
+	local sessionDB, sessionDBConfig, key, drivers, simulator, id, ignore, driver, car, track, empty
+	local directoryName
+
 	if FileExist(kUserConfigDirectory . "Session Database.ini") {
 		sessionDB := new SessionDatabase()
 		sessionDBConfig := readConfiguration(kUserConfigDirectory . "Session Database.ini")
@@ -1809,43 +1872,84 @@ updateConfigurationForV423() {
 		writeConfiguration(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
 	}
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
 		if (simulator = "ACC")
-			Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 			{
 				car := A_LoopFileName
 
-				Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+				loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 				{
 					track := A_LoopFileName
 
 					empty := true
 
-					Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\*.*, FD
+					loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\*.*, FD
 					{
 						empty := false
 
 						break
 					}
 
-					if (empty && (InStr(track, A_Space) || inList(["Spa-Franchorchamps", "Nürburgring"], track)))
-						try {
-							FileRemoveDir %kDatabaseDirectory%User\%simulator%\%car%\%track%
-						}
-						catch exception {
-							; ignore
-						}
+					if (empty && (InStr(track, A_Space) || inList(["Spa-Franchorchamps", "Nürburgring"], track))) {
+						directoryName = %kDatabaseDirectory%User\%simulator%\%car%\%track%
+
+						deleteDirectory(directoryName)
+					}
 				}
 			}
 	}
 }
 
+addOwnerField(database, table, id) {
+	local rows := database.Tables[table]
+	local changed, ignore, row
+
+	if (rows.Length() > 0) {
+		changed := false
+
+		for ignore, row in rows
+			if (!row.HasKey("Owner") || (row.Owner = kNull)) {
+				row.Owner := id
+
+				changed := true
+			}
+
+		if changed
+			database.changed(table)
+	}
+}
+
+clearWearFields(database, table, id) {
+	local rows := database.Tables[table]
+	local changed, ignore, row, tyre, field
+
+	if (rows.Length() > 0) {
+		changed := false
+
+		for ignore, row in rows
+			for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+				field := ("Tyre.Wear." . tyre)
+
+				if (row.HasKey(field) && (row[field] = id)) {
+					row[field] := kNull
+
+					changed := true
+				}
+			}
+
+		if changed
+			database.changed(table)
+	}
+}
+
 updateConfigurationForV422() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local id, simulator, car, track, db, tyresDB
 
 	if (getConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
 		setConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", "ahk_exe acs.exe")
@@ -1857,15 +1961,15 @@ updateConfigurationForV422() {
 
 	tyresDB := new TyresDatabase()
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
-		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
 
-			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 			{
 				track := A_LoopFileName
 
@@ -1889,7 +1993,9 @@ updateConfigurationForV422() {
 }
 
 updateConfigurationForV420() {
-	Loop Files, %kDatabaseDirectory%User\*.*, D
+	local text, changed
+
+	loop Files, %kDatabaseDirectory%User\*.*, D
 		if FileExist(A_LoopFilePath . "\Settings.CSV") {
 			FileRead text, %A_LoopFilePath%\Settings.CSV
 			changed := false
@@ -1907,12 +2013,7 @@ updateConfigurationForV420() {
 			}
 
 			if changed {
-				try {
-					FileDelete %A_LoopFilePath%\Settings.CSV
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(A_LoopFilePath . "\Settings.CSV")
 
 				FileAppend %text%, %A_LoopFilePath%\Settings.CSV
 			}
@@ -1927,17 +2028,13 @@ updateConfigurationForV402() {
 }
 
 updateConfigurationForV400() {
-	try {
-		FileDelete %kDatabaseDirectory%User\UPLOAD
-	}
-	catch exception {
-		; ignore
-	}
+	deleteFile(kDatabaseDirectory . "User\UPLOAD")
 }
 
 updateConfigurationForV398() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local simulator, car, track, fileName, text, ignore
 
 	if (userConfiguration.Count() > 0) {
 		for ignore, simulator in ["Assetto Corsa Competizione", "rFactor 2", "iRacing", "Automobilista 2", "RaceRoom Racing Experience"] {
@@ -1953,35 +2050,37 @@ updateConfigurationForV398() {
 		writeConfiguration(userConfigurationFile, userConfiguration)
 	}
 
-	if FileExist(kDatabaseDirectory . "Local")
+	if FileExist(kDatabaseDirectory . "Local") {
 		try {
 			FileCopyDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
-
-			FileRemoveDir %kDatabaseDirectory%Local, 1
 		}
 		catch exception {
-			; ignore
+			logError(exception)
 		}
 
-	if FileExist(kDatabaseDirectory . "Global")
+		deleteDirectory(kDatabaseDirectory . "Local")
+	}
+
+	if FileExist(kDatabaseDirectory . "Global") {
 		try {
 			FileCopyDir %kDatabaseDirectory%Global, %kDatabaseDirectory%Community, 1
-
-			FileRemoveDir %kDatabaseDirectory%Global, 1
 		}
 		catch exception {
 			; ignore
 		}
 
-	Loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
+		deleteDirectory(kDatabaseDirectory . "Global")
+	}
+
+	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
-		Loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+		loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
 		{
 			car := A_LoopFileName
 
-			Loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
+			loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 			{
 				track := A_LoopFileName
 
@@ -2003,14 +2102,16 @@ updateConfigurationForV398() {
 
 		text := StrReplace(text, "SetupDatabase", "SessionDatabase")
 
-		FileDelete %kUserHomeDirectory%Setup\Setup.data
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
 		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
 	}
 }
 
 updatePluginsForV426() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local changed, pcars2
 
 	if (userConfiguration.Count() > 0) {
 		changed := false
@@ -2046,8 +2147,9 @@ updatePluginsForV426() {
 }
 
 updatePluginsForV424() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local pcars2
 
 	if (userConfiguration.Count() > 0) {
 		if !getConfigurationValue(userConfiguration, "Plugins", "PCARS2", false) {
@@ -2061,8 +2163,9 @@ updatePluginsForV424() {
 }
 
 updateConfigurationForV394() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local subtitle
 
 	if (userConfiguration.Count() > 0) {
 		subtitle := getConfigurationValue(userConfiguration, "Splash Window", "Subtitle", "")
@@ -2076,49 +2179,46 @@ updateConfigurationForV394() {
 }
 
 updateConfigurationForV384() {
-	Loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
+	local simulator, car, track, directoryName
+
+	loop Files, %kDatabaseDirectory%Local\*.*, D									; Simulator
 	{
 		simulator := A_LoopFileName
 
-		if (simulator = "0")
-			try {
-				FileRemoveDir %kDatabaseDirectory%Local\%simulator%, 1
-			}
-			catch exception {
-				; ignore
-			}
+		if (simulator = "0") {
+			directoryName = %kDatabaseDirectory%Local\%simulator%
+
+			deleteDirectory(directoryName)
+		}
 		else
-			Loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
+			loop Files, %kDatabaseDirectory%Local\%simulator%\*.*, D				; Car
 			{
 				car := A_LoopFileName
 
-				if (car = "0")
-					try {
-						FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%, 1
-					}
-					catch exception {
-						; ignore
-					}
+				if (car = "0") {
+					directoryName = %kDatabaseDirectory%Local\%simulator%\%car%
+
+					deleteDirectory(directoryName)
+				}
 				else
-					Loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
+					loop Files, %kDatabaseDirectory%Local\%simulator%\%car%\*.*, D	; Track
 					{
 						track := A_LoopFileName
 
-						if (track = "0")
-							try {
-								FileRemoveDir %kDatabaseDirectory%Local\%simulator%\%car%\%track%, 1
-							}
-							catch exception {
-								; ignore
-							}
+						if (track = "0") {
+							directoryName = %kDatabaseDirectory%Local\%simulator%\%car%\%track%
+
+							deleteDirectory(directoryName)
+						}
 					}
 			}
 	}
 }
 
 updatePluginsForV402() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local descriptor
 
 	if (userConfiguration.Count() > 0) {
 		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
@@ -2134,8 +2234,9 @@ updatePluginsForV402() {
 }
 
 updatePluginsForV400() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local ignore, name, descriptor
 
 	if (userConfiguration.Count() > 0) {
 		for ignore, name in ["Race Engineer", "Race Strategist", "Race Spotter"] {
@@ -2161,8 +2262,9 @@ updatePluginsForV400() {
 }
 
 updatePluginsForV398() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local engineerDescriptor, strategistDescriptor
 
 	if (userConfiguration.Count() > 0) {
 		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
@@ -2186,8 +2288,9 @@ updatePluginsForV398() {
 }
 
 updatePluginsForV386() {
-	userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
+	local userConfiguration := readConfiguration(userConfigurationFile)
+	local raceSpotter
 
 	if (userConfiguration.Count() > 0) {
 		if !getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false) {
@@ -2201,6 +2304,8 @@ updatePluginsForV386() {
 }
 
 updateToV380() {
+	local title
+
 	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 	title := translate("Error")
 	MsgBox 262160, %title%, % translate("Your installed version is to old to be updated automatically. Please remove the ""Simulator Controller"" folder in your user ""Documents"" folder and restart the application. Application will exit...")
@@ -2210,6 +2315,8 @@ updateToV380() {
 }
 
 checkFileDependency(file, modification) {
+	local lastModified
+
 	logMessage(kLogInfo, translate("Checking file ") . file . translate(" for modification"))
 
 	FileGetTime lastModified, %file%, M
@@ -2224,11 +2331,12 @@ checkFileDependency(file, modification) {
 }
 
 checkDirectoryDependency(directory, modification) {
+	local files := []
+	local ignore, file
+
 	logMessage(kLogInfo, translate("Checking all files in ") . directory)
 
-	files := []
-
-	Loop Files, % directory . "*.ahk", R
+	loop Files, % directory . "*.ahk", R
 	{
 		files.Push(A_LoopFilePath)
 	}
@@ -2241,6 +2349,8 @@ checkDirectoryDependency(directory, modification) {
 }
 
 checkDependencies(dependencies, modification) {
+	local ignore, fileOrFolder, attributes
+
 	for ignore, fileOrFolder in dependencies {
 		attributes := FileExist(fileOrFolder)
 
@@ -2258,9 +2368,9 @@ checkDependencies(dependencies, modification) {
 }
 
 runSpecialTargets(ByRef buildProgress) {
-	msBuild := kMSBuildDirectory . "MSBuild.exe"
-
-	currentDirectory := A_WorkingDir
+	local msBuild := kMSBuildDirectory . "MSBuild.exe"
+	local currentDirectory := A_WorkingDir
+	local index, directory, file, success, solution, text, ignore
 
 	try {
 		for index, directory in getFileNames("*", kSourcesDirectory . "Special\") {
@@ -2276,17 +2386,17 @@ runSpecialTargets(ByRef buildProgress) {
 
 				try {
 					if (InStr(solution, "Speech") || InStr(solution, "AC UDP Provider"))
-						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release /p:Platform="x64" > "%kTempDirectory%build.out"", , Hide
+						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release /p:Platform="x64" > "%kTempDirectory%Special Build.out"", , Hide
 					else
-						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kTempDirectory%build.out"", , Hide
+						RunWait %ComSpec% /c ""%msBuild%" "%file%" /p:BuildMode=Release /p:Configuration=Release > "%kTempDirectory%Special Build.out"", , Hide
 
 					if ErrorLevel {
 						success := false
 
-						FileRead text, %kTempDirectory%build.out
+						FileRead text, %kTempDirectory%Special Build.out
 
 						if (StrLen(Trim(text)) == 0)
-							Throw "Error while compiling..."
+							throw "Error while compiling..."
 					}
 				}
 				catch exception {
@@ -2299,10 +2409,10 @@ runSpecialTargets(ByRef buildProgress) {
 				}
 
 				if !success
-					viewBuildLog(kTempDirectory . "build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
+					viewBuildLog(kTempDirectory . "Special Build.out", translate("Error while compiling ") . solution, "Left", "Top", 800, 600)
 
-				if FileExist(kTempDirectory . "build.out")
-					FileDelete %kTempDirectory%build.out
+				if FileExist(kTempDirectory . "Special Build.out")
+					deleteFile(kTempDirectory . "Special Build.out")
 			}
 		}
 	}
@@ -2312,6 +2422,8 @@ runSpecialTargets(ByRef buildProgress) {
 }
 
 runUpdateTargets(ByRef buildProgress) {
+	local ignore, target, targetName, progressStep, ignore, updateFunction, message, updatesFileName, updates
+
 	for ignore, target in vUpdateTargets {
 		targetName := target[1]
 
@@ -2358,6 +2470,8 @@ runUpdateTargets(ByRef buildProgress) {
 }
 
 runCleanTargets(ByRef buildProgress) {
+	local ignore, target, targetName, fileOrFolder, currentDirectory, directory, pattern, options
+
 	for ignore, target in vCleanupTargets {
 		targetName := target[1]
 
@@ -2375,13 +2489,13 @@ runCleanTargets(ByRef buildProgress) {
 				SetWorkingDir %fileOrFolder%
 
 				try {
-					Loop Files, *.*, FDR
+					loop Files, *.*, FDR
 					{
 						try {
 							if InStr(FileExist(A_LoopFilePath), "D")
-								FileRemoveDir %A_LoopFilePath%, 1
+								deleteDirectory(A_LoopFilePath)
 							else
-								FileDelete %A_LoopFilePath%
+								deleteFile(A_LoopFilePath)
 						}
 						catch exception {
 							; ignore
@@ -2397,9 +2511,8 @@ runCleanTargets(ByRef buildProgress) {
 					SetWorkingDir %currentDirectory%
 				}
 			}
-			else if (FileExist(fileOrFolder) != "") {
-				FileDelete %fileOrFolder%
-			}
+			else if (FileExist(fileOrFolder) != "")
+				deleteFile(fileOrFolder)
 		}
 		else {
 			currentDirectory := A_WorkingDir
@@ -2410,9 +2523,9 @@ runCleanTargets(ByRef buildProgress) {
 			SetWorkingDir %directory%
 
 			try {
-				Loop Files, %pattern%, %options%
+				loop Files, %pattern%, %options%
 				{
-					FileDelete %A_LoopFilePath%
+					deleteFile(A_LoopFilePath)
 
 					if !kSilentMode
 						showProgress({progress: buildProgress, message: translate("Deleting ") . A_LoopFileName . translate("...")})
@@ -2435,7 +2548,8 @@ runCleanTargets(ByRef buildProgress) {
 }
 
 runCopyTargets(ByRef buildProgress) {
-	local title
+	local title, ignore, target, targetSource, targetDestination, targetFile, srcLastModified, dstLastModified, copy
+	local targetName, targetDirectory
 
 	if !kSilentMode
 		showProgress({progress: buildProgress, message: A_Space})
@@ -2451,7 +2565,7 @@ runCopyTargets(ByRef buildProgress) {
 		if InStr(targetSource, "*") {
 			FileCreateDir %targetDestination%
 
-			Loop Files, %targetSource%
+			loop Files, %targetSource%
 			{
 				targetFile := (targetDestination . A_LoopFileName)
 
@@ -2510,12 +2624,7 @@ runCopyTargets(ByRef buildProgress) {
 				logMessage(kLogInfo, translate("Copying ") . targetSource)
 
 				if InStr(FileExist(targetSource), "D") {
-					try {
-						FileRemoveDir %targetDestination%, 1
-					}
-					catch exception {
-						; ignore
-					}
+					deleteDirectory(targetDestination)
 
 					FileCopyDir %targetSource%, %targetDestination%, 1
 				}
@@ -2538,7 +2647,8 @@ runCopyTargets(ByRef buildProgress) {
 }
 
 runBuildTargets(ByRef buildProgress) {
-	local title
+	local title, ignore, target, targetName, build, targetSource, targetBinary, srcLastModified, binLastModified
+	local compiledFile, targetDirectory, sourceDirectory, sourceCode
 
 	if !kSilentMode
 		showProgress({progress: buildProgress, message: ""})
@@ -2556,7 +2666,9 @@ runBuildTargets(ByRef buildProgress) {
 		FileGetTime srcLastModified, %targetSource%, M
 		FileGetTime binLastModified, %targetBinary%, M
 
-		if binLastModified {
+		if vTargetConfigurationChanged
+			build := true
+		else if binLastModified {
 			build := (build || (ErrorLevel || (srcLastModified > binLastModified)))
 			build := (build || checkDependencies(target[4], binLastModified))
 		}
@@ -2572,9 +2684,23 @@ runBuildTargets(ByRef buildProgress) {
 
 			try {
 				if !FileExist(targetSource)
-					Throw "Source file not found..."
+					throw "Source file not found..."
 
-				RunWait % kCompiler . " /in """ . targetSource . """"
+				SplitPath targetSource, , sourceDirectory
+
+				FileRead sourceCode, %targetSource%
+
+				if (vTargetConfiguration = "Production") {
+					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include ..\Includes\Development.ahk`r`n;@SC-EndIF", "")
+
+					sourceCode := StrReplace(sourceCode, ";@SC #Include ..\Includes\Production.ahk", "#Include ..\Includes\Production.ahk")
+				}
+
+				deleteFile(sourceDirectory . "\compile.ahk")
+
+				FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
+
+				RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
@@ -2582,6 +2708,8 @@ runBuildTargets(ByRef buildProgress) {
 				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
+
+			deleteFile(sourceDirectory . "\compile.ahk")
 
 			SplitPath targetBinary, compiledFile, targetDirectory
 			SplitPath targetSource, , sourceDirectory
@@ -2609,10 +2737,10 @@ compareUpdateTargets(t1, t2) {
 }
 
 prepareTargets(ByRef buildProgress, updateOnly) {
-	counter := 0
-	targets := readConfiguration(kToolsTargetsFile)
-
-	updateTargets := getConfigurationSectionValues(targets, "Update", Object())
+	local counter := 0
+	local targets := readConfiguration(kToolsTargetsFile)
+	local updateTargets := getConfigurationSectionValues(targets, "Update", Object())
+	local target, arguments, update, cleanupTargets, targetName, cleanup, copyTargets, copy, buildTargets, build, rule
 
 	for target, arguments in updateTargets {
 		buildProgress += (A_Index / updateTargets.Count())
@@ -2705,19 +2833,14 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 }
 
 startSimulatorTools() {
-	updateOnly := false
-
-	icon := kIconsDirectory . "Tools.ico"
+	local updateOnly := false
+	local icon := kIconsDirectory . "Tools.ico"
+	local x, y, buildProgress
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
-	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme)
+	readToolsConfiguration(vUpdateSettings, vCleanupSettings, vCopySettings, vBuildSettings, vSplashTheme, vTargetConfiguration)
 
 	if (A_Args.Length() > 0)
 		if (A_Args[1] = "-Update")
@@ -2783,9 +2906,26 @@ startSimulatorTools() {
 	}
 
 	ExitApp 0
+}
 
-Exit:
-	ExitApp 0
+cancelBuild() {
+	local title
+
+	protectionOn()
+
+	try {
+		SoundPlay *32
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		title := translate("Modular Simulator Controller System")
+		MsgBox 262180, %title%, % translate("Cancel target processing?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+			ExitApp 0
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 
@@ -2807,22 +2947,6 @@ startSimulatorTools()
 ;;; Escape::                   Cancel Build                                 ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 Escape::
-protectionOn()
-
-try {
-	SoundPlay *32
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-
-	title := translate("Modular Simulator Controller System")
-
-	MsgBox 262180, %title%, % translate("Cancel target processing?")
-	OnMessage(0x44, "")
-
-	IfMsgBox Yes
-		ExitApp 0
-}
-finally {
-	protectionOff()
-}
+cancelBuild()
 
 return

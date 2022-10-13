@@ -36,6 +36,7 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\FTP.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
@@ -107,38 +108,28 @@ class DatabaseCreator {
 		
 		this.iTyresDatabase := database
 		
-		Loop Files, %sourceDirectory%*.*, D
+		loop Files, %sourceDirectory%*.*, D
 			this.loadDatabase(A_LoopFilePath . "\")
 	}
 	
 	loadDatabase(databaseDirectory) {
-		Loop Files, %databaseDirectory%*.*, D									; Simulator
+		loop Files, %databaseDirectory%*.*, D									; Simulator
 		{
 			simulator := A_LoopFileName
 			
-			Loop Files, %databaseDirectory%%simulator%\*.*, D					; Car
+			loop Files, %databaseDirectory%%simulator%\*.*, D					; Car
 			{
 				car := A_LoopFileName
 				
 				if (car = "1")
-					try {
-						FileRemoveDir %databaseDirectory%%simulator%\%car%, 1
-					}
-					catch exception {
-						; ignore
-					}
+					deleteDirectory(databaseDirectory . simulator . "\" . car)
 				else
-					Loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
+					loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
 					{
 						track := A_LoopFileName
 						
 						if (track = "1")
-							try {
-								FileRemoveDir %databaseDirectory%%simulator%\%car%\%track%, 1
-							}
-							catch exception {
-								; ignore
-							}
+							deleteDirectory(databaseDirectory . simulator . "\" . car . "\" . track)
 						else {
 							directory = %databaseDirectory%%simulator%\%car%\%track%\
 							
@@ -148,11 +139,11 @@ class DatabaseCreator {
 							if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 								this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
 							
-							Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
+							loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
 							{
 								type := A_LoopFileName
 								
-								Loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
+								loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
 									this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
 							}
 						}
@@ -186,12 +177,14 @@ class DatabaseCreator {
 	}
 	
 	loadCarSetup(simulator, car, track, type, setupFile) {
+		local directory := new SessionDatabase.DatabasePath
+		
 		if this.IncludeSetups {
 			updateProgress("Setups: " simulator . " / " . car . " / " . track . "...")
 			
-			FileCreateDir %kDatabaseDirectory%Community\%simulator%\%car%\Car Setups
+			FileCreateDir %directory%Community\%simulator%\%car%\Car Setups
 			
-			FileCopy %setupFile%, %kDatabaseDirectory%Community\%simulator%\%car%\Car Setups\%type%, 1
+			FileCopy %setupFile%, %directory%Community\%simulator%\%car%\Car Setups\%type%, 1
 		}
 	}
 }
@@ -233,12 +226,7 @@ downloadUserDatabases(directory) {
 		
 		RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%directory%%fileName%' -DestinationPath '%wDirectory%', , Hide
 		
-		try {
-			FileDelete %directory%%fileName%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(directory . fileName)
 		
 		if FileExist(directory . "Shared Database")
 			FileMoveDir %directory%DBase, %directory%%idName%, R
@@ -296,11 +284,6 @@ createDatabases(inputDirectory, outputDirectory) {
 }
 
 createSharedDatabases() {
-	config := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-	
-	if getConfigurationValue(config, "General", "Theme", false)
-		showSplashTheme("McLaren 720s GT3 Pictures")
-	
 	x := Round((A_ScreenWidth - 300) / 2)
 	y := A_ScreenHeight - 150
 	
@@ -312,12 +295,7 @@ createSharedDatabases() {
 	
 	databaseDirectory := (kTempDirectory . "Shared Database")
 	
-	try {
-		FileRemoveDir %databaseDirectory%, 1
-	}
-	catch exception {
-		; ignore
-	}
+	deleteDirectory(databaseDirectory)
 	
 	FileCreateDir %databaseDirectory%\Input
 	FileCreateDir %databaseDirectory%\Output
@@ -346,12 +324,9 @@ createSharedDatabases() {
 	
 	showProgress({progress: 100, message: "Finished..."})
 	
-	hideProgress()
-	
-	if getConfigurationValue(config, "General", "Theme", false)
-		hideSplashTheme()
-	
 	Sleep 500
+	
+	hideProgress()
 	
 	ExitApp 0
 }

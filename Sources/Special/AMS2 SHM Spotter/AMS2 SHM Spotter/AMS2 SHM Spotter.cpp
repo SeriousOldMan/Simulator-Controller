@@ -77,7 +77,8 @@ void sendAutomationMessage(char* message) {
 
 const float nearByXYDistance = 10.0;
 const float nearByZDistance = 6.0;
-const float longitudinalDistance = 4;
+float longitudinalFrontDistance = 4;
+float longitudinalRearDistance = 5;
 const float lateralDistance = 6;
 const float verticalDistance = 2;
 
@@ -97,6 +98,7 @@ bool carBehind = false;
 bool carBehindLeft = false;
 bool carBehindRight = false;
 bool carBehindReported = false;
+int carBehindCount = 0;
 
 const int YELLOW = 1;
 
@@ -150,6 +152,10 @@ const char* computeAlert(int newSituation) {
 					alert = "ClearAll";
 				else
 					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+
+				carBehindReported = true;
+				carBehindCount = 21;
+
 				break;
 			case LEFT:
 				if (lastSituation == THREE)
@@ -217,14 +223,14 @@ int checkCarPosition(float carX, float carY, float carZ, float angle, bool faste
 
 		rotateBy(&transX, &transY, angle);
 
-		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
+		if ((fabs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
 			return (transX > 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0) {
 				carBehind = true;
 
-				if ((faster && fabs(transY) < longitudinalDistance * 1.5) ||
-					(fabs(transY) < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
+				if ((faster && fabs(transY) < longitudinalFrontDistance * 1.5) ||
+					(fabs(transY) < longitudinalFrontDistance * 2 && fabs(transX) > lateralDistance / 2))
 					if (transX > 0)
 						carBehindRight = true;
 					else
@@ -264,9 +270,9 @@ bool checkPositions(const SharedMemory* sharedData) {
 		carBehind = false;
 		carBehindLeft = false;
 		carBehindRight = false;
-
+		
 		for (int id = 0; id < sharedData->mNumParticipants; id++) {
-			if (id != carID) {
+			if ((id != carID) && (sharedData->mPitModes[id] == PIT_MODE_NONE)) {
 				bool faster = false;
 
 				if (hasLastCoordinates)
@@ -300,11 +306,13 @@ bool checkPositions(const SharedMemory* sharedData) {
 			carBehindReported = false;
 		}
 
+		if (carBehindCount++ > 200)
+			carBehindCount = 0;
+
 		const char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
-			if (strcmp(alert, "Hold") == 0)
-				carBehindReported = false;
+			longitudinalRearDistance = 4;
 
 			char buffer[128];
 
@@ -315,20 +323,28 @@ bool checkPositions(const SharedMemory* sharedData) {
 
 			return true;
 		}
-		else if (carBehind) {
-			if (!carBehindReported) {
-				carBehindReported = true;
+		else {
+			longitudinalRearDistance = 5;
+			
+			if (carBehind) {
+				if (!carBehindReported) {
+					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
+						carBehindReported = true;
 
-				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+							(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-				return true;
+						return true;
+					}
+				}
 			}
+			else
+				carBehindReported = false;
 		}
-		else
-			carBehindReported = false;
 	}
 	else {
+		longitudinalRearDistance = 5;
+		
 		lastSituation = CLEAR;
 		carBehind = false;
 		carBehindLeft = false;
@@ -412,7 +428,7 @@ bool checkFlagState(const SharedMemory* sharedData) {
 	return false;
 }
 
-void checkPitWindow(const SharedMemory* sharedData) {
+bool checkPitWindow(const SharedMemory* sharedData) {
 	if (sharedData->mEnforcedPitStopLap > 0)
 		if ((sharedData->mEnforcedPitStopLap == sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted + 1) &&
 			!pitWindowOpenReported) {
@@ -420,6 +436,8 @@ void checkPitWindow(const SharedMemory* sharedData) {
 			pitWindowClosedReported = false;
 
 			sendSpotterMessage("pitWindow:Open");
+
+			return true;
 		}
 		else if ((sharedData->mEnforcedPitStopLap < sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted) &&
 			!pitWindowClosedReported) {
@@ -427,7 +445,27 @@ void checkPitWindow(const SharedMemory* sharedData) {
 			pitWindowOpenReported = false;
 
 			sendSpotterMessage("pitWindow:Closed");
+
+			return true;
 		}
+
+	return false;
+}
+
+bool greenFlagReported = false;
+
+bool greenFlag(SharedMemory* shm) {
+	if (!greenFlagReported && (shm->mHighestFlagColour == FLAG_COLOUR_GREEN)) {
+		greenFlagReported = true;
+		
+		sendSpotterMessage("greenFlag");
+		
+		Sleep(2000);
+		
+		return true;
+	}
+	else
+		return false;
 }
 
 float initialX = 0.0;
@@ -548,6 +586,8 @@ int main(int argc, char* argv[]) {
 
 		while (true)
 		{
+			bool wait = true;
+
 			if (sharedData->mSequenceNumber % 2)
 			{
 				// Odd sequence number indicates, that write into the shared memory is just happening
@@ -573,15 +613,28 @@ int main(int argc, char* argv[]) {
 			else if (positionTrigger)
 				checkCoordinates(sharedData);
 			else {
-				if (!running)
-					running = ((localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN) || (countdown-- <= 0));
+				bool startGo = (localCopy->mHighestFlagColour == FLAG_COLOUR_GREEN);
+				
+				if (!running) {
+					countdown -= 1;
 
-				if (running) {
+					if (!greenFlagReported && (countdown <= 0))
+						greenFlagReported = true;
+
+					running = (startGo || (countdown <= 0));
+				}
+
+				if (running)
 					if (localCopy->mGameState != GAME_INGAME_PAUSED && localCopy->mPitMode == PIT_MODE_NONE) {
-						if (!checkFlagState(localCopy) && !checkPositions(localCopy))
-							checkPitWindow(localCopy);
+						if (!startGo || !greenFlag(localCopy))
+							if (!checkFlagState(localCopy) && !checkPositions(localCopy))
+								wait = !checkPitWindow(localCopy);
+							else
+								wait = false;
 					}
 					else {
+						longitudinalRearDistance = 5;
+						
 						lastSituation = CLEAR;
 						carBehind = false;
 						carBehindLeft = false;
@@ -590,12 +643,11 @@ int main(int argc, char* argv[]) {
 
 						lastFlagState = 0;
 					}
-				}
 			}
 
 			if (positionTrigger)
 				Sleep(10);
-			else
+			else if (wait)
 				Sleep(50);
 		}
 	}

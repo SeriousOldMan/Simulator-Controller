@@ -1,8 +1,169 @@
+## 4.3.5.0-release 10/14/22 (planned)
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. UI specific settings, which are managed by the app "Simulator Settings", are now directly available from "Simulator Startup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) for more information.
+  4. You can now choose between different methods for delta calculations for the Virtual Race Spotter. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+  
+
+## 4.3.4.0-release 09/30/22
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. The strength of the individual effects applied by the sound post processing using *SoX* can now be dialed in the configuration. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) for more information.
+  4. It is now possible to wildcard inidividual arguments in the ["raceAssistantVocalics" parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of the different Race Assistant plugins, so that the values chosen in the voice control configuration will be used.
+  5. The name of the team will be shown in the tool tip for the *Simulator Controller* tray icon, when you are connected to a team session.
+  6. More superfluous Spotter alerts (for example "Left", "Clear Left", "Left", "Clear Left" in fast succession) will be suppressed in certain situations.
+  7. Increased reliability of pitstop handover in team races.
+  8. Increased reliability of race report creation in team races.
+  9. New tyre compound data for *RaceRoom Racing Experience*, thanks to Chris Matthews. With this, allmost all current cars of *RaceRoom Racing Experience* should be covered now.
+  10. New car models for "Setup Advisor" (*Assetto Corsa Competizione* has been completed with this):
+      - Assetto Corsa:
+	    - Chevrolet Corvette C7R
+      - Assetto Corsa Competizione
+	    - BMW M4 GT4
+		- Lamborghini Huracan ST
+		- Lamborghini Huracan ST Evo2
+
+## 4.3.3.0-release 09/23/22
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Fixed a couple of regressions in "Race Center":
+     - Fixed infinite loop in special situations when the track map was updated.
+	 - Fixed tyre compound menu on the "Pitstop" tab resetting constantly to "No tyre change".
+  4. A couple of tweaks for special cases and edge situations by the Spotter:
+     - No more warnings for cars attacking you when they are just beeing passed by you.
+	 - No more reports for lapped cars for overtaking far too early.
+	 - Fixed tactical advise for possible slipstreaming a slightly faster car approaching from behind.
+  5. Fixed volume control for voice output, when SoX is used.
+  6. New settings in the [Session Database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) allow to configure, whether the Assistants will be active, when a session has been joined after the second lap has been completed. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#racing-with-jona) for more information.
+  7. Increased precision in session end detection in ACC races
+  8. New tyre compound data for *Automobilista 2*, thanks to Chris Matthews. With this, all current cars of *Automobilista 2* should be covered now.
+  9. New car models for "Setup Advisor":
+      - Assetto Corsa Competizione
+	    - Nissan GT-R Nismo GT3 (2015)
+      - Assetto Corsa
+	    - Maserati MC12 GT1
+
+## 4.3.2.0-release 09/16/22
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. "Setup Advisor" now supports setup files for modded cars.
+  4. All applications which use the Google chart library can now be run as administrator, so that the browser settings can be added to the registry. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#additional-requirements-for-the-embedded-html-browser) for more details.
+  5. "Simulator Setup" now has navigation buttons to jump to the last page and to the first page in one step.
+  6. Better last lap detection in races with fixed number of laps.
+  7. Race reports will now be created including the last lap for races with fixed number of laps.
+  8. Increased precision of average lap time calculation by the Spotter in case of off tracks and incidents.
+  9. The gap and position calculations of the Spotter has been completely rewritten. Time between data acquisition and the information reported by the Spotter is now less than 3 seconds.
+  10. Added more regular Spotter delta and lap time information for the cars around you.
+  11. The real race weather forecast as reported by the simulation is used now when a new strategy is created by the "Race Center".
+  12. A lot of new tyre compound data has been added for *Automobilista 2* (many thanks to Chris Matthews to provide the data).
+  13. Fixed a regression where in many lists and reports the last name of the drivers where missing.
+  14. Implemented state caching in "Simulator Setup" which results in a significant performance improvement when stepping to a page, which had already been visited.
+  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the Push-To-Talk trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behaviour) for more information.
+  16. New car models for "Setup Advisor":
+      - Assetto Corsa
+        - Pagani Zonda R
+	    - Mercedes-Benz AMG GT3
+	  - Assetto Corsa Competizione
+	    - Bentley Continental GT3 (2015)
+		- Lamborghini Huracan GT3
+
+## 4.3.1.0-release 09/09/22
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Mutually interruption of voice outputs of the Assistants works much more sensitive now.
+  4. Better detection for end of race at sessions with fixed laps.
+  5. Spotter informs about new best laps of direct opponents and the leader.
+  6. Spotter periodically announces lap times of direct oppenents.
+  7. Spotter informs about potential problems and much slower lap times of direct opponents.
+  8. Better handling of a couple of edge cases in the new weather model for strategy simulations.
+  9. Fixed a bug, where the Spotter incorrectly reported a car as one lap up or one lap down.
+  10. Small improvements in Spotter responsiveness for side and behind alerts.
+  11. Better handling of voice input when Push-2-Talk is not used.
+
+## 4.3.0.1-release 09/03/22
+
+  1. Fixed a bug in session restart handling
+  2. Better detection of session end in races with fixed number of laps
+
+## 4.3.0.0-release 09/02/22
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Improvements for the Spotter proximity alerts:
+     - Side alerts are more precise in tight corners.
+     - Rear alerts detect the side of the trailing car better in tight corners.
+  4. A lot of new Spotter announcements:
+     - Initial information at the beginning of a race session (duration, position, weather & temperatures, and so on).
+     - Announcement of the Green flag at race start.
+	 - Information when direct opponents or the race leader enter the pit.
+	 - Applause, when a new personal best lap time has been set.
+	 - Information when the current session (Practice or Qualification) is ending in 30, 15 or 5 minutes.
+	 - Detailed information package, when the first half of a race session has been finished.
+	 - Warning a few laps before the current stint is ending.
+	 - Information when temperatures are rising or falling.
+	 
+	 The configuration of "Race Spotter" plugin has been updated accordingly. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
+  5. Delta calculation has been improved again for the Spotter:
+     - The delta history will be reset when a given car is in the pits.
+	 - The delta history will also be reset when a car had a crash or a longer offtrack, which results in a lap time, which is far outside the standard deviation.
+	 - Cars that are currently in the pits, will be ignored completely, thereby eliminating disturbing and unnecessary gap updates when you have the last valid position on the track.
+  6. Improvements for the Race Strategist and Race Spotter when requesting gap informations:
+     - When you ask for the gap to the car ahead or behind, it will be mentioned when this car is in the pits.
+     - When you ask for the gap to the car ahead or behind, it will be mentioned whether this car is at least one lap up or one lap down.
+  7. A couple of improvements for the automated strategy handling (Race Strategist, Race Engineer and Race Center):
+     - When a strategy is recalculated / adjusted in "Race Center", an urgent pitstop is created when the currently mounted tyres are not suitable for the current weather conditions.
+     - The Race Strategist can now [recalculate / adjust the currently active strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) anytime during a race.
+	   - New voice command for the Strategist to trigger the recalculation of the current strategy.
+	   - New controller action ["StrategyRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin, which is equivalent to the above mentioned voice command, incl. a new icon in the Stream Deck icon set for this controller action.
+	 - When the Strategist instructs the Race Engineer to plan and prepare a pitstop, the tyre compound as defined in the strategy will now also be transfered to the Engineer, which will select this specific compound for the tyre change.
+	 - The Race Engineer now adjusts the fuel amount for the last stint when the pitstop has been triggered by the active strategy.
+  8. Improvements for the Race Engineer:
+     - Correct handling of all tyre compounds, incl. Intermediate compounds, for tyre recommendations and for automated pitstops. See the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) chapter as well as the corrsponding notes for [tyre compound handling by the "Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for more information.
+	 - Voice commands for tyre compound specification now also accept *Intermediate* as keyword.
+	 - Engine damage will now be detected and corresponding repair recommendations will be issued.
+	   - Damage will be detected for the simulators *Assetto Corsa*, *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*.
+	   - Engine repair will be handled automatically during pitstops for those simulators, which support this.
+	   - New voice command to enable or disable engine repairs during the preparation of automated pitstops.
+	   - "Race Settings" has been extended, so that you can configure the recommendation rule for engine repairs.
+	   - A new default setting has been added to the "Session Database" for the engine repair recommendation as well.
+  9. Improvements for the Strategy Workbench:
+     - The strategy simulation will always try to use the optimal tyre compound for the selected weather conditions. So, if you start with dry tyres in wet conditions, an immediate pitstop will be planned.
+	 - The available tyre cmpounds for the given simulator / car / track combination will be automatically preloaded into the Tyre Sets list in the Pitstop Rules group.
+	 - Full support for a weather forecast model. See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#weather) for more details.
+  10. All Race Assistants will try a few times to repeat their current voice message when they get interrupted by another Assistant, typically the Spotter.
+  11. You can now use checkboxes to choose which settings should be included / excluded by the "Setup Advisor", when a new setup is generated. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups) for more information.
+  12. Significant performance improvement for the data acquisition of all Race Assistants. Especially important during the startup phase in the first few laps.
+  13. The reliability of the ACC UDP connection has been improved when restarting a session without leaving the current session beforehand.
+  14. The termination of a simulation is now detected correctly for *Automobilista 2* and *Project CARS 2*.
+  15. Fixed a rare bug when the Google chart library does not load correctly in "Setup Advisor".
+  16. Fixed a rare bug for the "Motion Feedback" plugin where the motion intensity dial has not reacted correctly to user input.
+  17. A new module "Team Server" has been added to "Simulator Setup", so that support for Team Server can be enabled or disabled during initial configuration.
+  18. A new preset "Mode Automation" has been added to "Simulator Setup", which allows to select the modes which should be activated on the hardware controller depending on the current context. This creates the default for the "Mode Automation" configuration available in the "Simulator Settings" tool.
+  19. All application windows remember their position after beeing moved with the mouse.
+  20. All controller preview windows remember their position after being moved with the mouse in "Simulator Setup", as long as the application is not terminated.
+  21. It is now possible to send external commands to the central "Simulator Controller" background process to trigger controller actions. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands) for more information.
+  22. Temp and Logs folders will be cleaned automatically when an update is installed.
+  23. New options in the Tray menu allow you to dump the knowledgebase and the rule set of various applications  and the position and gap data for the "Race Spotter" as well as trace grammars and recognitions in the "Voice Server". You also have commands to delete the temporary files and the log files.
+  24. Significantly reduced CPU consumption of the "Simulator Controller" background process.
+  25. Transposed some tables in "Race Center" and "Strategy Workbench" for better readability with many stints.
+  26. [For Developer] New Task management system for concurrent processing. All applications have been fully rewritten to utilize the new Task model.
+  27. New car models for "Setup Advisor":
+      - Assetto Corsa
+	    - Lamborghini Huracan GT3
+	  - Assetto Corsa Competizione
+	    - McLaren 650s GT3
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-430), especially, if you want to use the "StrategyRecommend" controller action.
+
 ## 4.2.6.1-release 08/05/22
 
   1. Fixed "Setup Advisor" not loading the Google chart library in rare cases.
   2. Fixed an unbound variable error message when switching back to the General tab in "Simulator Configuration".
-
 
 ## 4.2.6.0-release 07/29/22
 

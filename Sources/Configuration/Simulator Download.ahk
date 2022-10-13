@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Installer.ico
 ;@Ahk2Exe-ExeName Simulator Download.exe
@@ -29,6 +26,13 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Includes\Includes.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Libraries\Task.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,15 +48,12 @@ updateProgress(max) {
 }
 
 downloadSimulatorController() {
-	icon := kIconsDirectory . "Installer.ico"
+	local icon := kIconsDirectory . "Installer.ico"
+	local options, index, title, cState, sState, devVersion, release, version, download, x, y, updateTask
+	local directory, currentDirectory, start, ignore, url, error
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Download
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
 
 	if !A_IsAdmin {
 		options := ""
@@ -96,9 +97,11 @@ downloadSimulatorController() {
 		URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kTempDirectory%VERSION
 
 		if ErrorLevel
-			Throw "No valid installation file..."
+			throw "No valid installation file (Error: " . ErrorLevel . ")..."
 	}
 	catch exception {
+		logError(exception, true)
+
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		title := translate("Error")
 		MsgBox 262160, %title%, % translate("The version repository is currently unavailable. Please try again later.")
@@ -122,17 +125,32 @@ downloadSimulatorController() {
 
 			showProgress({x: x, y: y, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
 
-			updateProgress := Func("updateProgress").Bind(45)
+			updateTask := new PeriodicTask(Func("updateProgress").Bind(45), 1500)
 
-			SetTimer %updateProgress%, 1500
+			updateTask.start()
 
-			try {
-				URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
+			error := false
 
-				if ErrorLevel
-					Throw "No valid installation file..."
-			}
-			catch exception {
+			for ignore, url in string2Values(";", download)
+				try {
+					URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
+
+					if ErrorLevel {
+						error := true
+
+						throw "No valid installation file (Error: " . ErrorLevel . ")..."
+					}
+					else {
+						error := false
+
+						break
+					}
+				}
+				catch exception {
+					logError(exception, true)
+				}
+
+			if error {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("The version repository is currently unavailable. Please try again later.")
@@ -141,29 +159,19 @@ downloadSimulatorController() {
 				ExitApp 0
 			}
 
-			SetTimer %updateProgress%, Off
+			updateTask.stop()
 
-			updateProgress := Func("updateProgress").Bind(90)
+			updateTask := new PeriodicTask(Func("updateProgress").Bind(90), 1000)
 
-			SetTimer %updateProgress%, 1000
+			updateTask.start()
 
 			showProgress({message: translate("Extracting installation files...")})
 
-			try {
-				FileRemoveDir %A_Temp%\Simulator Controller, true
-			}
-			catch exception {
-				; ignore
-			}
+			deleteDirectory(A_Temp . "\Simulator Controller")
 
 			RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%A_Temp%\Simulator Controller.zip' -DestinationPath '%A_Temp%\Simulator Controller', , Hide
 
-			try {
-				FileDelete %A_Temp%\Simulator Controller.zip
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(A_Temp . "\Simulator Controller.zip")
 
 			directory := (A_Temp . "\Simulator Controller")
 
@@ -183,7 +191,7 @@ downloadSimulatorController() {
 				SetWorkingDir %currentDirectory%
 			}
 
-			SetTimer %updateProgress%, Off
+			updateTask.stop()
 
 			showProgress({progress: 90, message: translate("Preparing installation...")})
 
@@ -202,7 +210,7 @@ downloadSimulatorController() {
 				else
 					Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
 			}
-			catch exeception {
+			catch exception {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")
@@ -217,9 +225,6 @@ downloadSimulatorController() {
 			Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
 	}
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

@@ -26,7 +26,7 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAzureLanguages = {"af-ZA": "Afrikaans (South Africa)"
+global kAzureLanguages := {"af-ZA": "Afrikaans (South Africa)"
 						, "am-ET": "Amharic (Ethiopia)"
 						, "ar-DZ": "Arabic (Algeria)"
 						, "ar-BH": "Arabic (Bahrain)"
@@ -73,82 +73,88 @@ global kAzureLanguages = {"af-ZA": "Afrikaans (South Africa)"
 						, "en-GG": "English (United Kingdom)"
 						, "en-US": "English (United States)"}
 
-for culture, name in {"et-EE": "Estonian (Estonia)"
-					, "fil-PH": "Filipino (Philippines)"
-					, "fi-FI": "Finnish (Finland)"
-					, "fr-BE": "French (Belgium)"
-					, "fr-CA": "French (Canada)"
-					, "fr-FR": "French (France)"
-					, "fr-CH": "French (Switzerland)"
-					, "de-AT": "German (Austria)"
-					, "de-DE": "German (Germany)"
-					, "de-CH": "German (Switzerland)"
-					, "el-GR": "Greek (Greece)"
-					, "gu-IN": "Gujarati (Indian)"
-					, "he-IL": "Hebrew (Israel)"
-					, "hi-IN": "Hindi (India)"
-					, "hu-HU": "Hungarian (Hungary)"
-					, "is-IS": "Icelandic (Iceland)"
-					, "id-ID": "Indonesian (Indonesia)"
-					, "ga-IE": "Irish (Ireland)"
-					, "it-IT": "Italian (Italy)"
-					, "ja-JP": "Japanese (Japan)"
-					, "jv-ID": "Javanese (Indonesia)"
-					, "kn-IN": "Kannada (India)"
-					, "km-KH": "Khmer (Cambodia)"
-					, "ko-KR": "Korean (Korea)"
-					, "lo-LA": "Lao (Laos)"
-					, "lv-LV": "Latvian (Latvia)"
-					, "lt-LT": "Lithuanian (Lithuania)"
-					, "mk-MK": "Macedonian (North Macedonia)"
-					, "ms-MY": "Malay (Malaysia)"
-					, "mt-MT": "Maltese (Malta)"
-					, "mr-IN": "Marathi (India)"
-					, "nb-NO": "Norwegian (Bokmal, Norway)"
-					, "fa-IR": "Persian (Iran)"
-					, "pl-PL": "Polish (Poland)"
-					, "pt-BR": "Portuguese (Brazil)"
-					, "pt-PT": "Portuguese (Portugal)"
-					, "ro-RO": "Romanian (Romania)"
-					, "ru-RU": "Russian (Russia)"
-					, "sr-RS": "Serbian (Serbia)"
-					, "si-LK": "Sinhala (Sri Lanka)"
-					, "sk-SK": "Slovak (Slovakia)"
-					, "sl-SI": "Slovenian (Slovenia)"
-					, "es-AR": "Spanish (Argentina)"
-					, "es-BO": "Spanish (Bolivia)"
-					, "es-CL": "Spanish (Chile)"
-					, "es-CO": "Spanish (Colombia)"
-					, "es-CR": "Spanish (Costa Rica)"
-					, "es-CU": "Spanish (Cuba)"
-					, "es-DO": "Spanish (Dominican Republic)"
-					, "es-EC": "Spanish (Ecuador)"
-					, "es-SV": "Spanish (El Salvador)"
-					, "es-GQ": "Spanish (Equatorial Guinea)"
-					, "es-GT": "Spanish (Guatemala)"
-					, "es-HN": "Spanish (Honduras)"
-					, "es-MX": "Spanish (Mexico)"
-					, "es-NI": "Spanish (Nicaragua)"
-					, "es-PA": "Spanish (Panama)"
-					, "es-PY": "Spanish (Paraguay)"
-					, "es-PE": "Spanish (Peru)"
-					, "es-PR": "Spanish (Puerto Rico)"
-					, "es-ES": "Spanish (Spain)"
-					, "es-UY": "Spanish (Uruguay)"
-					, "es-US": "Spanish (USA)"
-					, "es-VE": "Spanish (Venezuela)"
-					, "sw-KE": "Swahili (Kenya)"
-					, "sw-TZ": "Swahili (Tanzania)"
-					, "sv-SE": "Swedish (Sweden)"
-					, "ta-IN": "Tamil (India)"
-					, "te-IN": "Telugu (India)"
-					, "th-TH": "Thai (Thailand)"
-					, "tr-TR": "Turkish (Turkey)"
-					, "uk-UA": "Ukrainian (Ukraine)"
-					, "uz-UZ": "Uzbek (Uzbekistan)"
-					, "vi-VN": "Vietnamese (Vietnam)"
-					, "zu-ZA": "Zulu (South Africa)"}
-	kAzureLanguages[culture] := name
+initializeAzureLanguages() {
+	local culture, name
+	
+	for culture, name in {"et-EE": "Estonian (Estonia)"
+						, "fil-PH": "Filipino (Philippines)"
+						, "fi-FI": "Finnish (Finland)"
+						, "fr-BE": "French (Belgium)"
+						, "fr-CA": "French (Canada)"
+						, "fr-FR": "French (France)"
+						, "fr-CH": "French (Switzerland)"
+						, "de-AT": "German (Austria)"
+						, "de-DE": "German (Germany)"
+						, "de-CH": "German (Switzerland)"
+						, "el-GR": "Greek (Greece)"
+						, "gu-IN": "Gujarati (Indian)"
+						, "he-IL": "Hebrew (Israel)"
+						, "hi-IN": "Hindi (India)"
+						, "hu-HU": "Hungarian (Hungary)"
+						, "is-IS": "Icelandic (Iceland)"
+						, "id-ID": "Indonesian (Indonesia)"
+						, "ga-IE": "Irish (Ireland)"
+						, "it-IT": "Italian (Italy)"
+						, "ja-JP": "Japanese (Japan)"
+						, "jv-ID": "Javanese (Indonesia)"
+						, "kn-IN": "Kannada (India)"
+						, "km-KH": "Khmer (Cambodia)"
+						, "ko-KR": "Korean (Korea)"
+						, "lo-LA": "Lao (Laos)"
+						, "lv-LV": "Latvian (Latvia)"
+						, "lt-LT": "Lithuanian (Lithuania)"
+						, "mk-MK": "Macedonian (North Macedonia)"
+						, "ms-MY": "Malay (Malaysia)"
+						, "mt-MT": "Maltese (Malta)"
+						, "mr-IN": "Marathi (India)"
+						, "nb-NO": "Norwegian (Bokmal, Norway)"
+						, "fa-IR": "Persian (Iran)"
+						, "pl-PL": "Polish (Poland)"
+						, "pt-BR": "Portuguese (Brazil)"
+						, "pt-PT": "Portuguese (Portugal)"
+						, "ro-RO": "Romanian (Romania)"
+						, "ru-RU": "Russian (Russia)"
+						, "sr-RS": "Serbian (Serbia)"
+						, "si-LK": "Sinhala (Sri Lanka)"
+						, "sk-SK": "Slovak (Slovakia)"
+						, "sl-SI": "Slovenian (Slovenia)"
+						, "es-AR": "Spanish (Argentina)"
+						, "es-BO": "Spanish (Bolivia)"
+						, "es-CL": "Spanish (Chile)"
+						, "es-CO": "Spanish (Colombia)"
+						, "es-CR": "Spanish (Costa Rica)"
+						, "es-CU": "Spanish (Cuba)"
+						, "es-DO": "Spanish (Dominican Republic)"
+						, "es-EC": "Spanish (Ecuador)"
+						, "es-SV": "Spanish (El Salvador)"
+						, "es-GQ": "Spanish (Equatorial Guinea)"
+						, "es-GT": "Spanish (Guatemala)"
+						, "es-HN": "Spanish (Honduras)"
+						, "es-MX": "Spanish (Mexico)"
+						, "es-NI": "Spanish (Nicaragua)"
+						, "es-PA": "Spanish (Panama)"
+						, "es-PY": "Spanish (Paraguay)"
+						, "es-PE": "Spanish (Peru)"
+						, "es-PR": "Spanish (Puerto Rico)"
+						, "es-ES": "Spanish (Spain)"
+						, "es-UY": "Spanish (Uruguay)"
+						, "es-US": "Spanish (USA)"
+						, "es-VE": "Spanish (Venezuela)"
+						, "sw-KE": "Swahili (Kenya)"
+						, "sw-TZ": "Swahili (Tanzania)"
+						, "sv-SE": "Swedish (Sweden)"
+						, "ta-IN": "Tamil (India)"
+						, "te-IN": "Telugu (India)"
+						, "th-TH": "Thai (Thailand)"
+						, "tr-TR": "Turkish (Turkey)"
+						, "uk-UA": "Ukrainian (Ukraine)"
+						, "uz-UZ": "Uzbek (Uzbekistan)"
+						, "vi-VN": "Vietnamese (Vietnam)"
+						, "zu-ZA": "Zulu (South Africa)"}
+		kAzureLanguages[culture] := name
+}
+
+initializeAzureLanguages()
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -168,7 +174,8 @@ class SpeechRecognizer {
 
 	Recognizers[language := false] {
 		Get {
-			result := []
+			local result := []
+			local ignore, recognizer
 
 			for ignore, recognizer in this.getRecognizerList()
 				if language {
@@ -183,8 +190,9 @@ class SpeechRecognizer {
 	}
 
 	__New(engine, recognizer := false, language := false, silent := false) {
-		dllName := "Speech.Recognizer.dll"
-		dllFile := kBinariesDirectory . dllName
+		local dllName := "Speech.Recognizer.dll"
+		local dllFile := kBinariesDirectory . dllName
+		local instance, choices, found, ignore, recognizerDescriptor
 
 		this.iEngine := engine
 		this.Instance := false
@@ -194,7 +202,7 @@ class SpeechRecognizer {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
 			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
@@ -213,19 +221,19 @@ class SpeechRecognizer {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 
-					Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 				}
 
 				choices := []
 
-				Loop 101
+				loop 101
 					choices.Push((A_Index - 1) . "")
 
 				this.setChoices("Number", choices)
 
 				choices := []
 
-				Loop 11
+				loop 11
 					choices.Push((A_Index - 1) . "")
 
 				this.setChoices("Digit", choices)
@@ -237,7 +245,7 @@ class SpeechRecognizer {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
 				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 
-				Throw "Could not communicate with speech recognizer library (" . dllName . ")..."
+				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
 
 			this.RecognizerList := this.createRecognizerList()
@@ -289,7 +297,8 @@ class SpeechRecognizer {
 	}
 
 	createRecognizerList() {
-		recognizerList := []
+		local recognizerList := []
+		local culture, name, index, language, recognizer
 
 		if (this.iEngine = "Azure") {
 			for culture, name in kAzureLanguages {
@@ -301,7 +310,7 @@ class SpeechRecognizer {
 			}
 		}
 		else if this.Instance {
-			Loop % this.Instance.GetRecognizerCount()
+			loop % this.Instance.GetRecognizerCount()
 			{
 				index := A_Index - 1
 
@@ -324,7 +333,7 @@ class SpeechRecognizer {
 			if (this.iEngine = "Azure")
 				this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
 			else if (id > this.Instance.getRecognizerCount() - 1)
-				Throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
+				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
 				return this.Instance.Initialize(id)
 	}
@@ -342,9 +351,9 @@ class SpeechRecognizer {
 	}
 
 	getWords(list) {
-		result := []
+		local result := []
 
-		Loop % list.MaxIndex() + 1
+		loop % list.MaxIndex() + 1
 			result.Push(list[A_Index - 1])
 
 		return result
@@ -393,7 +402,7 @@ class SpeechRecognizer {
 
 	loadGrammar(name, grammar, callback) {
 		if (this._grammarCallbacks.HasKey(name))
-			Throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
+			throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
 
 		this._grammarCallbacks[name] := callback
 
@@ -415,7 +424,8 @@ class SpeechRecognizer {
 	}
 
 	allMatches(string, minRating, maxRating, strings*) {
-		ratings := []
+		local ratings := []
+		local index, value, rating
 
 		if this.Instance
 			for index, value in strings {
@@ -439,8 +449,9 @@ class SpeechRecognizer {
 	}
 
 	bestMatch(string, minRating, maxRating, strings*) {
-		highestRating := 0
-		bestMatch := false
+		local highestRating := 0
+		local bestMatch := false
+		local key, value, rating
 
 		if this.Instance
 			for key, value in strings {
@@ -460,16 +471,12 @@ class SpeechRecognizer {
 	}
 
 	_onGrammarCallback(name, wordArr) {
-		words := this.getWords(wordArr)
-
-		this._grammarCallbacks[name].Call(name, words)
+		this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
 	}
 
 	_onTextCallback(text) {
-		local grammar
-		local literal
-
-		words := string2Values(A_Space, text)
+		local words := string2Values(A_Space, text)
+		local name, grammar, rating, index, literal, bestRating, bestMatch, callback
 
 		for index, literal in words {
 			literal := StrReplace(literal, ".", "")
@@ -524,7 +531,7 @@ class SpeechRecognizer {
 	}
 
 	match(words, grammar, minRating := 0.7, maxRating := 0.85) {
-		matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
+		local matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
 
 		return (matches.HasKey("BestMatch") ? matches["BestMatch"]["Rating"] : false)
 	}
@@ -548,9 +555,11 @@ class GrammarCompiler {
 	}
 
 	compileGrammars(text) {
-		grammars := []
+		local grammars := []
+		local incompleteLine := false
+		local line
 
-		Loop Parse, text, `n, `r
+		loop Parse, text, `n, `r
 		{
 			line := Trim(A_LoopField)
 
@@ -579,7 +588,7 @@ class GrammarCompiler {
 		grammar := this.readGrammar(text, nextCharIndex)
 
 		if !grammar
-			Throw "Syntax error detected in """ . text . """ at 1 in GrammarCompiler.compileGrammar..."
+			throw "Syntax error detected in """ . text . """ at 1 in GrammarCompiler.compileGrammar..."
 
 		return this.parseGrammar(grammar)
 	}
@@ -591,18 +600,18 @@ class GrammarCompiler {
 			if (level = 0)
 				return this.readGrammars(text, nextCharIndex, level)
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
+				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
 		}
 		else
 			return this.readList(text, nextCharIndex)
 	}
 
 	readGrammars(ByRef text, ByRef nextCharIndex, level := 0) {
-		grammars := []
+		local grammars := []
 
 		this.skipDelimiter("[", text, nextCharIndex)
 
-		Loop {
+		loop {
 			grammars.Push(this.readGrammar(text, nextCharIndex, level + 1))
 
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
@@ -615,7 +624,8 @@ class GrammarCompiler {
 	}
 
 	readList(ByRef text, ByRef nextCharIndex) {
-		grammars := []
+		local grammars := []
+		local literalValue
 
 		while !this.isEmpty(text, nextCharIndex) {
 			this.skipWhiteSpace(text, nextCharIndex)
@@ -638,17 +648,18 @@ class GrammarCompiler {
 	}
 
 	readChoices(ByRef text, ByRef nextCharIndex) {
-		grammars := []
+		local grammars := []
+		local literalValue
 
 		this.skipDelimiter("{", text, nextCharIndex)
 
-		Loop {
+		loop {
 			literalValue := this.readLiteral(text, nextCharIndex)
 
 			if literalValue
 				grammars.Push(literalValue)
 			else
-				Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readChoices..."
+				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readChoices..."
 
 			if !this.skipDelimiter(",", text, nextCharIndex, false)
 				break
@@ -660,7 +671,8 @@ class GrammarCompiler {
 	}
 
 	readBuiltinChoices(ByRef text, ByRef nextCharIndex) {
-		builtin := false
+		local builtin := false
+		local literalValue
 
 		this.skipDelimiter("(", text, nextCharIndex)
 
@@ -669,7 +681,7 @@ class GrammarCompiler {
 		if literalValue
 			builtin := literalValue.Value
 		else
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
 
 		this.skipDelimiter(")", text, nextCharIndex)
 
@@ -677,15 +689,14 @@ class GrammarCompiler {
 	}
 
 	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{}[]()`,") {
-		local literal
-
-		length := StrLen(text)
+		local length := StrLen(text)
+		local literal, beginCharIndex, character
 
 		this.skipWhiteSpace(text, nextCharIndex)
 
 		beginCharIndex := nextCharIndex
 
-		Loop {
+		loop {
 			character := SubStr(text, nextCharIndex, 1)
 
 			if (InStr(delimiters, character) || (nextCharIndex > length)) {
@@ -700,7 +711,7 @@ class GrammarCompiler {
 	}
 
 	isEmpty(ByRef text, ByRef nextCharIndex) {
-		remainingText := Trim(SubStr(text, nextCharIndex))
+		local remainingText := Trim(SubStr(text, nextCharIndex))
 
 		if ((remainingText != "") && this.skipDelimiter(";", remainingText, 1, false))
 			remainingText := ""
@@ -709,9 +720,9 @@ class GrammarCompiler {
 	}
 
 	skipWhiteSpace(ByRef text, ByRef nextCharIndex) {
-		length := StrLen(text)
+		local length := StrLen(text)
 
-		Loop {
+		loop {
 			if (nextCharIndex > length)
 				return
 
@@ -723,7 +734,7 @@ class GrammarCompiler {
 	}
 
 	skipDelimiter(delimiter, ByRef text, ByRef nextCharIndex, throwError := true) {
-		length := StrLen(delimiter)
+		local length := StrLen(delimiter)
 
 		this.skipWhiteSpace(text, nextCharIndex)
 
@@ -733,7 +744,7 @@ class GrammarCompiler {
 			return true
 		}
 		else if throwError
-			Throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
+			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
 		else
 			return false
 	}
@@ -765,6 +776,8 @@ class Grammar {
 		}
 
 		__New(choices) {
+			local index, choice
+
 			for index, choice in choices
 				if !IsObject(choice)
 					choices[index] := new Grammar.Words(choice)
@@ -773,7 +786,8 @@ class Grammar {
 		}
 
 		matchWords(words, ByRef index) {
-			running := index
+			local running := index
+			local ignore, choice
 
 			for ignore, choice in this.Choices
 				if choice.matchWords(words, running) {
@@ -786,6 +800,8 @@ class Grammar {
 		}
 
 		combinePhrases(phrases) {
+			local ignore, choice
+
 			for ignore, choice in this.Choices
 				choice.combinePhrases(phrases)
 		}
@@ -801,7 +817,7 @@ class Grammar {
 		}
 
 		__New(string) {
-			local literal
+			local index, literal
 
 			if !IsObject(string)
 				string := string2Values(A_Space, string)
@@ -820,7 +836,8 @@ class Grammar {
 		}
 
 		matchWords(words, ByRef index) {
-			running := index
+			local running := index
+			local ignore, word
 
 			for ignore, word in this.Words
 				if (words.Length() < running)
@@ -870,12 +887,14 @@ class Grammar {
 	}
 
 	match(words) {
-		index := 1
+		local index := 1
 
 		return this.matchWords(words, index)
 	}
 
 	matchWords(words, ByRef index) {
+		local alternatives, running, ignore, part
+
 		if (words.Length() < index)
 			return true
 		else {
@@ -907,7 +926,7 @@ class Grammar {
 	}
 
 	allPhrases() {
-		result := []
+		local result := []
 
 		this.combinePhrases(result)
 
@@ -915,8 +934,9 @@ class Grammar {
 	}
 
 	combinePhrases(phrases) {
-		alternatives := false
-		pPhrases := []
+		local alternatives := false
+		local pPhrases := []
+		local index, part, temp, parts, pParts, ignore, p1, p2
 
 		for index, part in this.Parts {
 			if ((index == 1) && isInstance(part, Grammar))
@@ -974,6 +994,8 @@ class GrammarParser {
 	}
 
 	parse(grammar) {
+		local newGrammar
+
 		if isInstance(grammar, GrammarList)
 			return this.parseList(grammar)
 		else if isInstance(grammar, GrammarGrammars)
@@ -986,11 +1008,11 @@ class GrammarParser {
 			return newGrammar
 		}
 		else
-			Throw "Grammars may only contain literals, choices or other grammars in GrammarParser.parse..."
+			throw "Grammars may only contain literals, choices or other grammars in GrammarParser.parse..."
 	}
 
 	parseList(grammarList) {
-		local grammar
+		local ignore, grammar, newGrammar
 
 		newGrammar := this.Compiler.SpeechRecognizer.newGrammar()
 
@@ -1000,7 +1022,7 @@ class GrammarParser {
 			else if (isInstance(grammar, GrammarChoices) || isInstance(grammar, GrammarBuiltinChoices))
 				newGrammar.AppendChoices(grammar.parse(this))
 			else
-				Throw "Grammar lists may only contain literals or choices in GrammarParser.parseList..."
+				throw "Grammar lists may only contain literals or choices in GrammarParser.parseList..."
 
 		return newGrammar
 	}
@@ -1024,7 +1046,8 @@ class GrammarGrammars {
 	}
 
 	toString() {
-		result := "["
+		local result := "["
+		local ignore, list
 
 		for ignore, list in this.GrammarLists {
 			if (A_Index > 1)
@@ -1037,9 +1060,8 @@ class GrammarGrammars {
 	}
 
 	parse(parser) {
-		local grammar
-
-		grammars := []
+		local grammars := []
+		local grammar, ignore, list
 
 		for ignore, list in this.GrammarLists
 			grammars.Push(parser.parseList(list))
@@ -1070,7 +1092,8 @@ class GrammarChoices {
 	}
 
 	toString() {
-		result := "{"
+		local result := "{"
+		local ignore, choice
 
 		for ignore, choice in this.Choices {
 			if (A_Index > 1)
@@ -1083,11 +1106,12 @@ class GrammarChoices {
 	}
 
 	parse(parser) {
-		choices := []
+		local choices := []
+		local ignore, choice
 
 		for ignore, choice in this.Choices {
 			if !isInstance(choice, GrammarLiteral)
-				Throw "Invalid choice (" . choice.toString() . ") detected in GrammarChoices.parse..."
+				throw "Invalid choice (" . choice.toString() . ") detected in GrammarChoices.parse..."
 
 			choices.Push(choice.Value)
 		}
@@ -1118,12 +1142,7 @@ class GrammarBuiltinChoices {
 	}
 
 	parse(parser) {
-		choices := this.Builtin
-
-		; if (choices = "Number")
-		; 	choices := "Percent"
-
-		return parser.Compiler.SpeechRecognizer.getChoices(choices)
+		return parser.Compiler.SpeechRecognizer.getChoices(this.Builtin)
 	}
 }
 
@@ -1145,7 +1164,8 @@ class GrammarList {
 	}
 
 	toString() {
-		result := ""
+		local result := ""
+		local ignore, value
 
 		for ignore, value in this.List {
 			if (A_Index > 1)
@@ -1185,6 +1205,8 @@ class GrammarLiteral {
 ;;;-------------------------------------------------------------------------;;;
 
 matchWords(string1, string2) {
+	local dllName, dllFile
+
 	static recognizer := false
 
 	if !recognizer {
@@ -1195,7 +1217,7 @@ matchWords(string1, string2) {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Speech.Recognizer.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
 			recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
@@ -1203,9 +1225,8 @@ matchWords(string1, string2) {
 		catch exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
-			if !silent
-				showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 

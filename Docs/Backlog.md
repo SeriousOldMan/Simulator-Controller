@@ -4,12 +4,7 @@
   3. [Tactile & Motion Feedback Plugin] Definition of feedback settings for different tracks and cars, selectable by the touch of a button
 
 #### Data Handling
-  1. [Target: V4.7] Implement a server for the session database, which can be shared by multiple drivers.
-  
-#### Strategy Development
-  1. [Target: V4.x] Enhancements for Race Strategist
-     - Automatically adjust pitstop strategy depending on upcoming weather conditions
-	 - Support in Race Center to simulate alternative strategies for possible weather development
+  1. [Target: V4.5] Implement a server for the session database, which can be shared by multiple drivers.
 
 #### General
   1. [Target: V4.x] Choosing a specific theme depending on the selected simulation game

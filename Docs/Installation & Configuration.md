@@ -86,6 +86,10 @@ The startup process of Simulator Controller can entertain you with splash images
 
 Note: Choosing media files depending on the currently selected simulation game is on the wish list for a future release :-)
 
+## Additional requirements for the embedded HTML browser
+
+A couple of the applications of Simulator Controller display various charts and graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error that the Google library can not be loaded, you must run the application in question once using administrator privileges. This currently applies to "Race Reports", "Strategy Workbench", "Race Center" and "Setup Advisor".
+
 ## Special steps for *Assetto Corsa Compeitizione* and *RaceRoom Racinng Experience*
 
 If you want to use the automated handling of the pitstop settings for the *Assetto Corsa Competizione* or *RaceRoom Racinng Experience* simulations, either manually by using your connected controller or controlled by one of the Race Assistants, you need to create small graphical elements, which Simulator Controller uses to detect and *understand* the currently chossen pitstop settings. You will find detailed instructions for this task in the documentation for the [*Assetto Corsa Competizione* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling) and for the [*RaceRoom Racinng Experience* plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling-1).
@@ -125,7 +129,7 @@ Three files will be created by the *Simulator Setup* tool at the end of the inst
   - *Stream Deck Configuration.ini*
     This special configuration file describes the [layout and profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts) of your connected Stream Decks, if there are any.
   - *Simulator Settings.ini*
-    This file is also created in the last step of "Simulator Setup" and is maintained in the future by the "Simulator Settings" application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of Simulator Controller.
+    This file is also created in the last step of "Simulator Setup" and is maintained in the future by the "Simulator Startup" application. It defines the [runtime and startup settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings) of Simulator Controller.
 
 As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by "Simulator Setup". Please note, that each configuration change that you make with the "Simulator Configuration" tool, which is described in the following sections, will be overwritten, if you ever use "Simulator Setup" afterwards.
 
@@ -145,7 +149,7 @@ Please note, that you can remove presets later on. But depending on the type of 
 
 Disclaimer: The following mechanism is only for very experienced users, everybody else can skip this section.
 
-It is possible to patch the generated configuration and/or settings files created by "Simulator Setup". To do this, create a *.ini file with those section/key/value information you want to replace in or add to the final configuration and/or settings information, name them "Conifguration Patch.ini" or "Settings Patch.ini" and drop them into the *Simulator Controller\Setup* folder in your user *Documents* folder. Corresponding sample files can be found in the *Resources\Templates* folder.
+It is possible to patch the generated configuration and/or settings files created by "Simulator Setup". To do this, create a *.ini file with those section/key/value information you want to replace in or add to the final configuration and/or settings information, name them "Conifguration Patch.ini" or "Settings Patch.ini" and drop them into the *Simulator Controller\Setup* folder in your user *Documents* folder. Corresponding sample files can be found in the *Resources\Templates* folder or you can add the corrsponding available presets to your configuration using "Simulator Setup".
 
 The following rules apply:
 
@@ -237,7 +241,9 @@ Things to know:
   2. Regardles of what you have configured as listener for each Assistant (see below), a separate listener with the chosen language from this configuration will be used for the activation commands, with or without *Push to Talk*. Either the Server recognition engine will be used here (when you have installed the required libraries) or the Desktop recognition engine will be used. This applies always, also when you are not using Azure recognition services.
   3. As mentioned above, using the Azure Cognitive Services without *Push to Talk* is not a very good idea. It is not only because of the costs but even more, because the recognition will try to react to each and every thing you say. You will get a lot of "Sorry, can you repeat that, please", while you try to talk to your other Assistants while one is listening using the cloud-based recognition engine.
 
-Last, but not least, if you have installed [SoX](http://sox.sourceforge.net/), it will be used to apply audio post processing to the spoken voice to achieve a sound like a typical team radio. Really immersive stuff, you won't miss that.
+Last, but not least, if you have installed [SoX](http://sox.sourceforge.net/), it will be used to apply audio post processing to the spoken voice to achieve a sound like a typical team radio. Really immersive stuff, you won't miss that. When you have chosen the location of the *SoX* application folder, you can click on the small button with gear icon. This opens a small dialog, where you can specify the strength of the different sound effects. The default settings will give you the typical car radio sound with some background noises, crackles and a little bit of distortion.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Sound%20Processing.JPG)
 
 Note: Additionally to this default configuration, you can specify the spoken and recognized language and the voice for each Race Assistant individually using plugin parameters (see the configuration documentation of [Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) or [Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) or [Elisa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter) for more details). Choosing different voices will be helpful to better recognize who is currently talking.
 
@@ -303,9 +309,9 @@ Below you will find a brief and incomplete overview over the possible hotkeys, t
 
 | Symbol | Description |
 | ------ | ------ |
-| ^ | Represents the CTRL key. |
-| ! | Represents the ALT key. |
-| + | Represents the SHIFT key. |
+| ^ | A modifier that represents the CTRL key. |
+| ! | A modifier that represents the ALT key. |
+| + | A modifier that represents the SHIFT key. |
 | < | A modifier for all keys that restrict it to be on the left side of the keyboard. |
 | > | A modifier for all keys that restrict it to be on the right side of the keyboard. |
 | A - Z | A normal alphabetical key on the keyboard. |
@@ -318,8 +324,8 @@ Beside using the standard Hotkey syntax of AutoHotkey, you can use a special *Ho
 
 | Example | Description |
 | ------ | ------ |
-| ?Next mode | This voice hotkey will most likely used to switch the mode on the controller. You simply have to say: "Next Mode". |
-| ?{Please} activate motion | This voice hotkey can be used for a function that activates the rig motion. You can say: "Please activate motion", but the "please" is optional, so "Activate motion" will work as well. |
+| ?Next mode | This voice *hotkey* will most likely be used to switch the mode on the controller. You simply have to say: "Next Mode". |
+| ?{Please} activate motion | This voice *hotkey* can be used for a function that activates the rig motion. You can say: "Please activate motion", but the "please" is optional, so "Activate motion" will work as well. |
 
 Note: The handling of voice hotkeys follow the general rules of voice commands. Therefore you might need to user Push-To-Talk and also activation commands, if you have more than one voice dialog partner configured, for example the Virtual Race Assistants. Please see the documentation on [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
 
@@ -429,7 +435,7 @@ You can customize some parts of the statistical algorithms of Elisa, the Virtual
 
 Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the Virtual Race Spotter as well, as long as no other Assistants are active.
 
-In the second group of fields labeled *Announcements*, you can enable or disable the individual messages and announcements of Elisa for the driver. If you don't like the short summary for the race start Elisa gives you after the first few laps, you can simply switch it off. Most announcements can only be enabled or disabled, but for the periodic distance information regarding your direct opponents you can set the number of laps between each update as well. You can even choose an update each sector, if you want the Spotter to be really verbose. For more information about the individual announcements and alerts, please see the [Spotter documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information).
+In the second group of fields labeled *Announcements*, you can enable or disable the individual messages and announcements of Elisa for the driver. If you don't like, for example, the alerts of Elisa that another car is directly behind you, you can simply switch it off. Most announcements can only be enabled or disabled, but for the periodic distance information regarding your direct opponents you can set the number of laps between each update as well. You can even choose an update each sector, if you want the Spotter to be really verbose. For more information about the individual announcements and alerts, please see the [Spotter documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information).
 
 ### Tab *Team Server*
 

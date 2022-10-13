@@ -82,7 +82,7 @@ long getRemainingLaps() {
     if (map_buffer->session_iteration < 1)
         return 0;
 
-    if (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) {
+    if (map_buffer->session_type != R3E_SESSION_PRACTICE && map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) {
         return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
     }
     else {
@@ -99,9 +99,14 @@ long getRemainingTime() {
     if (map_buffer->session_iteration < 1)
         return 0;
 
-    if (map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
-        return (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
-                      (normalize(map_buffer->lap_time_previous_self) * normalize(map_buffer->completed_laps)));
+    if (map_buffer->session_type == R3E_SESSION_PRACTICE || map_buffer->session_length_format != R3E_SESSION_LENGTH_LAP_BASED) {
+        long time = (long)((map_buffer->race_session_minutes[map_buffer->session_iteration - 1] * 60) -
+						   (normalize(map_buffer->lap_time_previous_self) * normalize(map_buffer->completed_laps)));
+
+		if (time > 0)
+			return time;
+		else
+			return 0;
     }
     else {
         return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
@@ -139,9 +144,15 @@ int main(int argc, char* argv[])
             return err_code;
 
         mapped_r3e = TRUE;
-    }
+	}
+
+	BOOL writeStandings = ((argc > 1) && (strcmp(argv[1], "-Standings") == 0));
+	BOOL writeTelemetry = !writeStandings;
+
+	writeStandings = TRUE;
+	writeTelemetry = TRUE;
 	
-	if ((argc > 1) && (strcmp(argv[1], "-Standings") == 0)) {
+	if (writeStandings) {
 		wprintf_s(L"[Position Data]\n");
 		
 		if (!mapped_r3e) {
@@ -199,17 +210,25 @@ int main(int argc, char* argv[])
 					wprintf_s(L"Car.%d.Driver.Surname=%S\n", i, "");
 					wprintf_s(L"Car.%d.Driver.Nickname=%S\n", i, "");
 				}
+
+				wprintf_s(L"Car.%d.InPitLane=%S\n", i, vehicle.in_pitlane ? "true" : "false");
 			}
 		}
 	}
-	else {
+	
+	if (writeTelemetry) {
 		BOOL practice = FALSE;
 
 		wprintf_s(L"[Session Data]\n");
 		wprintf_s(L"Active=%S\n", mapped_r3e ? ((map_buffer->completed_laps >= 0) ? "true" : "false") : "false");
 		if (mapped_r3e) {
 			wprintf_s(L"Paused=%S\n", map_buffer->game_paused ? "true" : "false");
-			if (map_buffer->session_type == R3E_SESSION_QUALIFY)
+			if (map_buffer->session_type != R3E_SESSION_PRACTICE && map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED &&
+				map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps) <= 0)
+				wprintf_s(L"Session=Finished\n");
+			else if (map_buffer->flags.checkered)
+				wprintf_s(L"Session=Finished\n");
+			else if (map_buffer->session_type == R3E_SESSION_QUALIFY)
 				wprintf_s(L"Session=Qualification\n");
 			else if (map_buffer->session_type == R3E_SESSION_RACE)
 				wprintf_s(L"Session=Race\n");
@@ -228,20 +247,24 @@ int main(int argc, char* argv[])
 			wprintf_s(L"Car=%S\n", buffer);
 			wprintf_s(L"Track=%S-%S\n", map_buffer->track_name, map_buffer->layout_name);
 			wprintf_s(L"FuelAmount=%ld\n", (long)map_buffer->fuel_capacity);
-			wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Lap" : "Time");
+			wprintf_s(L"SessionFormat=%S\n", (map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED) ? "Laps" : "Time");
 
+			/*
 			if (practice) {
 				wprintf_s(L"SessionTimeRemaining=3600000\n");
 
 				wprintf_s(L"SessionLapsRemaining=30\n");
 			}
 			else {
+			*/
 				long timeRemaining = (getRemainingTime() * 1000);
 
 				wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
 
 				wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
+			/*
 			}
+			*/
 		}
 
 		wprintf_s(L"[Car Data]\n");
@@ -254,6 +277,10 @@ int main(int argc, char* argv[])
 
 			wprintf_s(L"BodyworkDamage=%f, %f, %f, %f, %f\n", 0.0, 0.0, 0.0, 0.0, normalizeDamage(map_buffer->car_damage.aerodynamics));
 			wprintf_s(L"SuspensionDamage=%f, %f, %f, %f\n", suspDamage, suspDamage, suspDamage, suspDamage);
+
+			double engineDamage = normalizeDamage(map_buffer->car_damage.engine);
+
+			wprintf_s(L"EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10 : 0);
 			wprintf_s(L"FuelRemaining=%f\n", map_buffer->fuel_left);
 			
 			char tyreCompoundRaw[11] = "Unknown";
@@ -334,16 +361,20 @@ int main(int argc, char* argv[])
 			wprintf_s(L"Sector=%ld\n", (long)normalize(map_buffer->track_sector == 0 ? 3 : map_buffer->track_sector));
 			wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
 
+			/*
 			if (practice) {
 				wprintf_s(L"StintTimeRemaining=3600000\n");
 				wprintf_s(L"DriverTimeRemaining=3600000\n");
 			}
 			else {
+			*/
 				long timeRemaining = (getRemainingTime() * 1000);
 
 				wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
 				wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);
+			/*
 			}
+			*/
 			wprintf_s(L"InPit=%S\n", (map_buffer->pit_state == 3) ? "true" : "false");
 		}
 

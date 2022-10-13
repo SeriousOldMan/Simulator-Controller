@@ -16,9 +16,9 @@ Before starting up, *Simulator Startup* checks the configuration information. If
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.JPG)
 
-With this editor, which is also available as a separate application named *Simulator Settings.exe*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, here you decide which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
+With this editor, which can also be opened by clicking on the small button with the gear icon in the upper right corner of the window of *Simulator Startup*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
 
-Beside maintaining this startup configuration, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
+Beside maintaining this startup settings, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
 
 ### Customizing Startup Configuration
 
@@ -40,7 +40,7 @@ You can choose the context with the first two dropdown menus, for example 1. whe
 
 ### Themes configuration
 
-In the lower part of the configuration dialog, you can choose the type of [splash theme](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor), which will be used for your entertainment during the startup process. Please see the [installation guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) on how to install your own media files in a special location in your *Documents* folder and hot to use the themes editor. If you decide to play a song while starting your Simulator Controller applications and even your favorite simulation game, the song will keep playing until you press the left mouse button or the Escape key, even if *Simulator Startup* has exited already.
+In the lower part of the settings dialog, you can choose the type of [splash theme](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor), which will be used for your entertainment during the startup process. Please see the [installation guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#using-your-own-pictures-videos-and-sounds-for-all-the-splash-screens) on how to install your own media files in a special location in your *Documents* folder and hot to use the themes editor. If you decide to play a song while starting your Simulator Controller applications and even your favorite simulation game, the song will keep playing until you press the left mouse button or the Escape key, even if *Simulator Startup* has exited already.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Splash%20Screen.JPG)
 
@@ -52,7 +52,7 @@ Here is an overview for the all settings and configuration options for the vario
 
   1. *Simulator Settings*
   
-     Maintained by the "Simulator Settings" application and stored in the *Simulator Settings.ini* file in the *Simulator Controller\Config* folder in your user *Documents* folder. As described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings), these settings influence the startup process of Simulator Controller and where on your screen the visual representations of your Button Boxes will appear.
+     Maintained by the "Simulator Startup" application and is stored in the *Simulator Settings.ini* file in the *Simulator Controller\Config* folder in your user *Documents* folder. As described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings), these settings influence the startup process of Simulator Controller and where on your screen the visual representations of your Button Boxes will appear.
 
   2. *Simulator Configuration*
   
@@ -88,6 +88,14 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 Important: In order to reduce confusion of an activation command with a normal command given to the currently active *dialog partner*, the [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) control has two different behaviours. If you simply press the configured control, for example a button on your steering wheel, you will talk to the currently active *dialog partner*. Whenever you press the control twice like double clicking a mouse button, you will activate a special listener, which only accepts the activation phrases. The last button press of the *double press* must be held down as long as you speak.
 
+#### Push-To-Talk Behaviour
+
+Beside the behaviour of the Push-To-Talk button described above, where you need to hold down the button as long as your are talking, there is an alternative mode available. This mode allows you to release the button while you are talking. Once, you have finished your voice command, you press the Push-2-Talk button again, to indicate that you have finished and that the command should be executed. This alternative mode can be activated either by choosing the corresponding preset in "Simulator Setup" or by copying the file "P2T Configuration.ini" from the *Resources\Templates* directory from the program folder to the *Simulator Controller\Config* directory which resides in your user *Documents* folder.
+
+Please don't forget to press the Push-To-Talk button at the end of your speech, even, if the command had already been recognized, because you made a long pause. If you don't push the button, the sequence will get out of sync and you will end up being very confused.
+
+#### Testing voice configuration and voice commands
+
 *After* you have finished all the required [installation and configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) steps (especially for the [voice support](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation) of the Assistants), you can test the dialog with two different Assistants. To do this, please open a Windows command shell (type Windows-R => cmd => Return), go to the *Binaries* folder of the Simulator Controller distribution and enter the following commands:
 
 	D:\Controller\Binaries>"Voice Server.exe" -Debug true
@@ -96,7 +104,7 @@ Important: In order to reduce confusion of an activation command with a normal c
 
 	D:\Controller\Binaries>"Race Strategist.exe" -Debug true -Speaker true -Listener true -language EN -Name Cato -Logo true
 	
-Both, the Virtual Race Engineer and the Virtual Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those Assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?". You may also start the Virtual Race Spotter here, but this will be of no great use, since the Spotter does not answer questions.
+Both, the Virtual Race Engineer and the Virtual Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [Push To Talk](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those Assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?". You may also start the Virtual Race Spotter here, but this will be of no big use, since the Spotter does not answer many questions.
 
 Note: If there is only *one* dialog partner configured, this will be activated for listen mode by default. In this situation, no activation command is necesssary.
 
@@ -116,9 +124,30 @@ The third Assistant, Elisa, is not so much of a dialog partner, but gives you cr
 
 ### Controller Commands
 
-If you have configured one or more hardware controllers (Button Boxes and/or Stream Decks), you will have the possibility to trigger almost all commands for the Virtual Race Assistants and other functionalities of Simulator Controller with your hardware. Sometimes it will be much more convinient (and faster) to tell Jona to plan the upcoming pitstop with a simple press of a button. You will find a complete overview and instructions on how to configure all those controller actions in the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) or you can use "Simulator Setup", which provides a graphical point and click environment to configure controller actions.
+If you have configured one or more hardware controllers (Button Boxes, Stream Decks or even your steering wheel), you will have the possibility to trigger almost all commands for the Virtual Race Assistants and other functionalities of Simulator Controller with your hardware. Sometimes it will be much more convinient (and faster) to tell Jona to plan the upcoming pitstop with a simple press of a button. You will find a complete overview and instructions on how to configure all those controller actions in the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes) or you can use "Simulator Setup", which provides a graphical point and click environment to configure controller actions.
 
 Please note, that you can mix voice commands and commands triggered by the controller hardware freely, so choose your weapon depending on the current situation on the track.
+
+### External Commands
+
+There is also the possibility to trigger actions in Simulator Controller from other applications. There are several ways to do this, but the most easy ones are:
+
+1. Keyboard commands
+
+   As you have seen in the chapter about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration), every action or command in Simulator Controller can be activated from any hardware controller like Button Boxes, Stream Decks or your steering wheel, but you can also define keyboard shortcuts, called Hotkeys, to achieve the same effect. These keyboard shortcuts can be triggered not only from the keyboard, but also from other applications, as long as they are able to send events to other applications.
+
+2. Command scripts
+
+   Not every application can easily send keyboard commands to other applications, for example Windows .BAT or .CMD scripts. A second method exists therefore, that uses a script file as an interface. You can create a file named "Controller.cmd" in the *Simulator Controller\Temp* folder which resides in your user *Documents* folder. This file is checked every 100 ms, and if it is not empty, it will be processed and afterwards deleted. Here is in example for a "Controller.cmd":
+   
+	2WayToggle.1 On
+	Button.1
+	Button.2
+	Dial.4 Decrease
+	
+   This will achieve the same effect as pushing or rotating the corresponding controls on your hardware controller. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) to see which controller functions (*1WayToggle*, *2WayToggle*, *Button*, *Dial* and *Custom*) are available and especially how to define *Custom* controller functions (which are typically not assiciated with a Button Box or a Stream Deck) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). As you have seen in the above example, you must use *On* and *Off* as a second argument for *2WayToggle*, and *Increase* and *Decrease* for *Dial*, to specify the desired change.
+
+   A last note for experienced users: Together with the [*execute* controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller), you can create powerful macros. Create a *Custom* controller function, which can be triggered by a button, for example on your steering wheel. This *Custom* function *executes* a Windows command script wich the writes a "Controller.cmd" file as described above.
 
 ## And now it's time
 

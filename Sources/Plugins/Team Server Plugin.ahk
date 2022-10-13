@@ -16,14 +16,14 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSessionFinished = 0
-global kSessionPaused = -1
-global kSessionOther = 1
-global kSessionPractice = 2
-global kSessionQualification = 3
-global kSessionRace = 4
+global kSessionFinished := 0
+global kSessionPaused := -1
+global kSessionOther := 1
+global kSessionPractice := 2
+global kSessionQualification := 3
+global kSessionRace := 4
 
-global kTeamServerPlugin = "Team Server"
+global kTeamServerPlugin := "Team Server"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -63,7 +63,6 @@ class TeamServerPlugin extends ControllerPlugin {
 		__New(plugin, function, label, icon) {
 			this.iPlugin := plugin
 
-
 			base.__New(function, label, icon)
 		}
 
@@ -99,7 +98,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
-			exePath := kBinariesDirectory . "Race Settings.exe"
+			local exePath := kBinariesDirectory . "Race Settings.exe"
 
 			try {
 				Run "%exePath%", %kBinariesDirectory%
@@ -129,7 +128,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 
 		fireAction(function, trigger) {
-			exePath := kBinariesDirectory . "Race Center.exe"
+			local exePath := kBinariesDirectory . "Race Center.exe"
 
 			try {
 				Run "%exePath%", %kBinariesDirectory%
@@ -229,21 +228,22 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	DriverActive[] {
 		Get {
-			currentDriver := this.getCurrentDriver()
+			local currentDriver := this.getCurrentDriver()
 
 			return (this.SessionActive && (currentDriver == this.Driver))
 		}
 	}
 
 	__New(controller, name, configuration := false, register := true) {
-		dllName := "Team Server Connector.dll"
-		dllFile := kBinariesDirectory . dllName
+		local dllName := "Team Server Connector.dll"
+		local dllFile := kBinariesDirectory . dllName
+		local teamServerToggle, arguments, openRaceSettings, openRaceCenter
 
 		try {
 			if (!FileExist(dllFile)) {
 				logMessage(kLogCritical, translate("Team Server Connector.dll not found in ") . kBinariesDirectory)
 
-				Throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
+				throw "Unable to find Team Server Connector.dll in " . kBinariesDirectory . "..."
 			}
 
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
@@ -296,13 +296,14 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.disableTeamServer(false, true)
 
 			this.keepAlive()
+
+			OnExit(ObjBindMethod(this, "finishSession"))
 		}
 	}
 
 	createTeamServerAction(controller, action, actionFunction, arguments*) {
-		local function
-
-		function := controller.findFunction(actionFunction)
+		local function := controller.findFunction(actionFunction)
+		local descriptor
 
 		if (function != false) {
 			if (action = "TeamServer") {
@@ -333,7 +334,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.updateActions(kSessionFinished)
 	}
 
-	updateActions(sessionState) {
+	updateActions(session) {
+		local ignore, theAction
+
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, TeamServerPlugin.TeamServerToggleAction) {
 				theAction.Function.enable(kAllTrigger, theAction)
@@ -353,6 +356,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	updateTrayLabel(label, enabled) {
+		local callback, index
+
 		static hasTrayMenu := false
 
 		label := StrReplace(label, "`n", A_Space)
@@ -366,20 +371,10 @@ class TeamServerPlugin extends ControllerPlugin {
 			hasTrayMenu := true
 		}
 
-		if enabled {
+		if enabled
 			Menu Tray, Check, %label%
-
-			if !InStr(A_IconTip, translate(" (Team)"))
-				Menu Tray, Tip, % A_IconTip . translate(" (Team)")
-		}
-		else {
+		else
 			Menu Tray, Uncheck, %label%
-
-			index := InStr(A_IconTip, translate(" (Team)"))
-
-			if index
-				Menu Tray, Tip, % SubStr(A_IconTip, 1, index - 1)
-		}
 	}
 
 	enableTeamServer(label := false, force := false) {
@@ -391,9 +386,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.iTeamServerEnabled := true
 
-			callback := ObjBindMethod(this, "tryConnect")
-
-			SetTimer %callback%, -5000
+			Task.startTask(ObjBindMethod(this, "tryConnect"), 2000, kLowPriority)
 
 			this.updateActions(kSessionFinished)
 
@@ -410,6 +403,8 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.disconnect()
 
+			Menu Tray, Tip, % string2Values(".", A_ScriptName)[1]
+
 			this.iTeamServerEnabled := false
 
 			this.updateActions(kSessionFinished)
@@ -419,11 +414,12 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	parseObject(properties) {
-		result := {}
+		local result := {}
+		local property
 
 		properties := StrReplace(properties, "`r", "")
 
-		Loop Parse, properties, `n
+		loop Parse, properties, `n
 		{
 			property := string2Values("=", A_LoopField)
 
@@ -444,13 +440,12 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	tryConnect() {
-		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
-
-		serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
-		accessToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
-		teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
-		driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
-		sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
+		local settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+		local serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
+		local accessToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
+		local teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
+		local driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
+		local sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
 
 		this.connect(serverURL, accessToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
 
@@ -458,6 +453,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	connect(serverURL, accessToken, team, driver, session, verbose := false) {
+		local driverObject, teamName, driverName, sessionName
+
 		this.disconnect()
 
 		this.iServerURL := ((serverURL && (serverURL != "")) ? serverURL : false)
@@ -484,12 +481,13 @@ class TeamServerPlugin extends ControllerPlugin {
 										. translate("Driver: ") . driverName . "`n"
 										. translate("Session: ") . sessionName
 							  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
+
+				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . teamName . translate(")")
 			}
 			catch exception {
 				this.iConnected := false
 
-				if !InStr(A_IconTip, translate(" - Invalid"))
-					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
+				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
 
 				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 
@@ -513,6 +511,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	getStintDriverName(stint, session := false) {
+		local driver
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -534,6 +534,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	getDriverForName() {
+		local driver
+
 		if (!this.iDriverForName && this.TeamServerActive) {
 			try {
 				driver := this.parseObject(this.Connector.GetDriver(this.Driver))
@@ -622,6 +624,8 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.iLapData := {Telemetry: {}, Positions: {}}
 		this.iSessionActive := false
+
+		return false
 	}
 
 	joinSession(simulator, car, track, lapNumber, duration := 0) {
@@ -688,6 +692,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	getSessionValue(name, default := "__Undefined__") {
+		local value
+
 		if this.SessionActive {
 			try {
 				value := this.Connector.GetSessionValue(this.Session, name)
@@ -734,6 +740,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	getStintValue(stint, name, session := false) {
+		local value
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -811,6 +819,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	getCurrentLap(session := false) {
+		local lap, lapNr
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -852,6 +862,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	getLapValue(lap, name, session := false) {
+		local value
+
 		if (!session && this.SessionActive)
 			session := this.Session
 
@@ -913,10 +925,12 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	addStint(lapNumber) {
+		local stint
+
 		if this.TeamServerActive {
 			try {
 				if !this.SessionActive
-					Throw Exception("Cannot start add a stint to an inactive session...")
+					throw Exception("Cannot start add a stint to an inactive session...")
 
 				if isDebug()
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
@@ -928,7 +942,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.Connector.SetStintValue(stint, "ID", this.ID)
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 
 				return stint
@@ -942,6 +956,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	addLap(lapNumber, telemetryData, positionsData) {
+		local driverForName, driverSurName, driverNickName, stint, simulator, car, track, lap
+
 		if this.TeamServerActive {
 			try {
 				driverForName := getConfigurationValue(telemetryData, "Stint Data", "DriverForname", "John")
@@ -952,7 +968,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Updating lap for team session: " . lapNumber)
 
 					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
-						Throw Exception("Driver inconsistency detected...")
+						throw Exception("Driver inconsistency detected...")
 				}
 
 				stint := false
@@ -1002,7 +1018,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	keepAlive() {
-		nextPing := 10000
+		local nextPing := 10000
 
 		if (this.Connector && this.ServerURL && this.AccessToken)
 			try {
@@ -1013,8 +1029,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				nextPing := 60000
 			}
 			catch exception {
-				if !InStr(A_IconTip, translate(" - Invalid"))
-					Menu Tray, Tip, % A_IconTip . translate(" - Invalid")
+				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
 
 				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL . translate(", Token: ") . this.AccessToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 
@@ -1023,9 +1038,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		else
 			this.iConnected := false
 
-		callback := ObjBindMethod(this, "keepAlive")
+		Task.startTask(ObjBindMethod(this, "keepAlive"), nextPing, kLowPriority)
 
-		SetTimer %callback%, -%nextPing%
+		return false
 	}
 }
 
@@ -1046,10 +1061,8 @@ initializeTeamServerPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 enableTeamServer() {
-	local plugin
-
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(kTeamServerPlugin)
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kTeamServerPlugin)
 
 	protectionOn()
 
@@ -1063,10 +1076,8 @@ enableTeamServer() {
 }
 
 disableTeamServer() {
-	local plugin
-
-	controller := SimulatorController.Instance
-	plugin := controller.findPlugin(kTeamServerPlugin)
+	local controller := SimulatorController.Instance
+	local plugin := controller.findPlugin(kTeamServerPlugin)
 
 	protectionOn()
 

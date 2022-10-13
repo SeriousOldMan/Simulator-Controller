@@ -118,7 +118,8 @@ void sendAutomationMessage(char* message) {
 
 #define nearByXYDistance 10.0
 #define nearByZDistance 6.0
-#define longitudinalDistance 4
+float longitudinalFrontDistance = 4;
+float longitudinalRearDistance = 5;
 #define lateralDistance 6
 #define verticalDistance 2
 
@@ -138,12 +139,13 @@ BOOL carBehind = FALSE;
 BOOL carBehindLeft = FALSE;
 BOOL carBehindRight = FALSE;
 BOOL carBehindReported = FALSE;
+int carBehindCount = 0;
 
 #define YELLOW_SECTOR_1 1
 #define YELLOW_SECTOR_2 2
 #define YELLOW_SECTOR_3 4
 
-#define YELLOW_FULL (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3)
+#define YELLOW_ALL (YELLOW_SECTOR_1 + YELLOW_SECTOR_2 + YELLOW_SECTOR_3)
 
 #define BLUE 16
 
@@ -195,6 +197,10 @@ char* computeAlert(int newSituation) {
 					alert = "ClearAll";
 				else
 					alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+
+				carBehindReported = TRUE;
+				carBehindCount = 21;
+
 				break;
 			case LEFT:
 				if (lastSituation == THREE)
@@ -262,14 +268,15 @@ int checkCarPosition(r3e_float32 carX, r3e_float32 carY, r3e_float32 carZ, r3e_f
 
 		rotateBy(&transX, &transY, angle);
 
-		if ((fabs(transY) < longitudinalDistance) && (fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
+		if ((fabs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) &&
+			(fabs(transX) < lateralDistance) && (fabs(otherZ - carZ) < verticalDistance))
 			return (transX > 0) ? RIGHT : LEFT;
 		else {
 			if (transY < 0) {
 				carBehind = TRUE;
 
-				if ((faster && fabs(transY) < longitudinalDistance * 1.5) ||
-					(fabs(transY) < longitudinalDistance * 2 && fabs(transX) > lateralDistance / 2))
+				if ((faster && fabs(transY) < longitudinalFrontDistance * 1.5) ||
+					(fabs(transY) < longitudinalFrontDistance * 2 && fabs(transX) > lateralDistance / 2))
 					if (transX > 0)
 						carBehindRight = TRUE;
 					else
@@ -317,7 +324,8 @@ BOOL checkPositions(int playerID) {
 		carBehindRight = FALSE;
 
 		for (int id = 0; id < map_buffer->num_cars; id++) {
-			if (map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID) {
+			if ((map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID) &&
+					(map_buffer->all_drivers_data_1[id].in_pitlane == 0)) {
 				BOOL faster = FALSE;
 
 				if (hasLastCoordinates)
@@ -349,11 +357,13 @@ BOOL checkPositions(int playerID) {
 			carBehindReported = FALSE;
 		}
 
+		if (carBehindCount++ > 200)
+			carBehindCount = 0;
+
 		char* alert = computeAlert(newSituation);
 
 		if (alert != noAlert) {
-			if (strcmp(alert, "Hold") == 0)
-				carBehindReported = FALSE;
+			longitudinalRearDistance = 4;
 
 			char buffer[128];
 
@@ -364,20 +374,28 @@ BOOL checkPositions(int playerID) {
 
 			return TRUE;
 		}
-		else if (carBehind) {
-			if (!carBehindReported) {
-				carBehindReported = TRUE;
+		else {
+			longitudinalRearDistance = 5;
+		
+			if (carBehind) {
+				if (!carBehindReported) {
+					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
+						carBehindReported = TRUE;
 
-				sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-												   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+														   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-				return TRUE;
+						return TRUE;
+					}
+				}
 			}
+			else
+				carBehindReported = FALSE;
 		}
-		else
-			carBehindReported = FALSE;
 	}
 	else {
+		longitudinalRearDistance = 5;
+		
 		lastSituation = CLEAR;
 		carBehind = FALSE;
 		carBehindLeft = FALSE;
@@ -463,10 +481,10 @@ BOOL checkFlagState() {
 			map_buffer->flags.sector_yellow[0] == 1 &&
 			map_buffer->flags.sector_yellow[1] == 1 &&
 			map_buffer->flags.sector_yellow[2] == 1) {
-			if ((lastFlagState & YELLOW_FULL) == 0) {
-				sendSpotterMessage("yellowFlag:Full");
+			if ((lastFlagState & YELLOW_ALL) == 0) {
+				sendSpotterMessage("yellowFlag:All");
 
-				lastFlagState |= YELLOW_FULL;
+				lastFlagState |= YELLOW_ALL;
 
 				return TRUE;
 			}
@@ -516,8 +534,8 @@ BOOL checkFlagState() {
 				if (waitYellowFlagState != lastFlagState)
 					sendSpotterMessage("yellowFlag:Clear");
 
-				lastFlagState &= ~YELLOW_FULL;
-				waitYellowFlagState &= ~YELLOW_FULL;
+				lastFlagState &= ~YELLOW_ALL;
+				waitYellowFlagState &= ~YELLOW_ALL;
 				yellowCount = 0;
 
 				return TRUE;
@@ -555,19 +573,41 @@ BOOL checkFlagState() {
 		return FALSE;
 }
 
-void checkPitWindow() {
+BOOL checkPitWindow() {
 	if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_OPEN) && !pitWindowOpenReported) {
 		pitWindowOpenReported = TRUE;
 		pitWindowClosedReported = FALSE;
 
 		sendSpotterMessage("pitWindow:Open");
+
+		return TRUE;
 	}
 	else if ((map_buffer->pit_window_status == R3E_PIT_WINDOW_CLOSED) && !pitWindowClosedReported) {
 		pitWindowClosedReported = TRUE;
 		pitWindowOpenReported = FALSE;
 
 		sendSpotterMessage("pitWindow:Closed");
+
+		return TRUE;
 	}
+
+	return FALSE;
+}
+
+BOOL greenFlagReported = FALSE;
+
+BOOL greenFlag() {
+	if (!greenFlagReported && (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN)) {
+		greenFlagReported = TRUE;
+		
+		sendSpotterMessage("greenFlag");
+		
+		Sleep(2000);
+		
+		return TRUE;
+	}
+	else
+		return FALSE;
 }
 
 float initialX = 0.0;
@@ -680,6 +720,8 @@ int main(int argc, char* argv[])
 	}
 
 	while (TRUE) {
+		BOOL wait = TRUE;
+
 		if (!mapped_r3e && map_exists())
 			if (!map_init()) {
 				mapped_r3e = TRUE;
@@ -695,15 +737,28 @@ int main(int argc, char* argv[])
 			else if (positionTrigger)
 				checkCoordinates(playerID);
 			else {
-				if (!running)
-					running = ((map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN) || (countdown-- <= 0));
+				BOOL startGo = (map_buffer->start_lights >= R3E_SESSION_PHASE_GREEN);
+				
+				if (!running) {
+					countdown -= 1;
+
+					if (!greenFlagReported && (countdown <= 0))
+						greenFlagReported = TRUE;
+
+					running = (startGo || (countdown <= 0));
+				}
 
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
-						if (!checkFlagState() && !checkPositions(playerID))
-							checkPitWindow();
+						if (!startGo || !greenFlag())
+							if (!checkFlagState() && !checkPositions(playerID))
+								wait = !checkPitWindow();
+							else
+								wait = FALSE;
 					}
 					else {
+						longitudinalRearDistance = 5;
+						
 						lastSituation = CLEAR;
 						carBehind = FALSE;
 						carBehindLeft = FALSE;
@@ -718,7 +773,7 @@ int main(int argc, char* argv[])
         
 		if (positionTrigger)
 			Sleep(10);
-		else
+		else if (wait)
 			Sleep(50);
     }
 

@@ -22,6 +22,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\CLR.ahk
 
 
@@ -29,7 +30,7 @@
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAzureVoices = {de: [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de-AT-JonasNeural"]
+global kAzureVoices := {de: [["de-AT", "de-AT-IngridNeural"], ["de-AT", "de-AT-JonasNeural"]
 						  , ["de-DE", "de-DE-KatjaNeural"], ["de-DE", "de-DE-ConradNeural"]
 						  , ["de-CH", "de-CH-LeniNeural"], ["de-CH", "de-CH-JanNeural"]]
 					 , en: [["en-AU", "en-AU-NatashaNeural"], ["en-AU", "en-AU-WilliamNeural"]
@@ -60,6 +61,7 @@ class SpeechSynthesizer {
 	iCacheDirectory := false
 
 	iSoundPlayer := false
+	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
 
 	iSpeechStatusCallback := false
@@ -72,13 +74,15 @@ class SpeechSynthesizer {
 
 	Voices[language := false] {
 		Get {
+			local voices, voice, lcid, ignore, candidate, name
+
 			if !language
 				return this.iVoices
 			else {
 				voices := []
 
 				if (this.Synthesizer = "Windows") {
-					Loop % this.iSpeechSynthesizer.GetVoices.Count
+					loop % this.iSpeechSynthesizer.GetVoices.Count
 					{
 						voice := this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1)
 						lcid := voice.GetAttribute("Language")
@@ -113,6 +117,12 @@ class SpeechSynthesizer {
 		}
 	}
 
+	Stoppable[] {
+		Get {
+			return true
+		}
+	}
+
 	Locale[] {
 		Get {
 			return this.iLocale
@@ -142,11 +152,24 @@ class SpeechSynthesizer {
 	}
 
 	__New(synthesizer, voice := false, language := false) {
+		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
+		local player, copied
+
+		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
+
+		FileCreateDir %kTempDirectory%%dirName%
+
+		this.iCacheDirectory := (kTempDirectory . dirName . "\")
+
+		this.clearCache()
+
+		OnExit(ObjBindMethod(this, "clearCache"))
+
 		if (synthesizer = "Windows") {
 			this.iSynthesizer := "Windows"
 			this.iSpeechSynthesizer := ComObjCreate("SAPI.SpVoice")
 
-			Loop % this.iSpeechSynthesizer.GetVoices.Count
+			loop % this.iSpeechSynthesizer.GetVoices.Count
 				this.Voices.Push(this.iSpeechSynthesizer.GetVoices.Item(A_Index - 1).GetAttribute("Name"))
 
 			this.setVoice(language, this.computeVoice(voice, language))
@@ -161,14 +184,14 @@ class SpeechSynthesizer {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
 
-					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
+					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
 
 				voices := this.iSpeechSynthesizer.GetVoices()
 			}
-			catch exceptions {
+			catch exception {
 				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
 
 				showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
@@ -191,7 +214,7 @@ class SpeechSynthesizer {
 				if (!FileExist(dllFile)) {
 					logMessage(kLogCritical, translate("Speech.Synthesizer.dll not found in ") . kBinariesDirectory)
 
-					Throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
+					throw "Unable to find Speech.Synthesizer.dll in " . kBinariesDirectory . "..."
 				}
 
 				this.iSpeechSynthesizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechSynthesizer")
@@ -202,7 +225,7 @@ class SpeechSynthesizer {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
 					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
 
-					Throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
+					throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
 
 				voices := this.iSpeechSynthesizer.GetVoices()
@@ -228,15 +251,31 @@ class SpeechSynthesizer {
 			this.setVoice(language, this.computeVoice(voice, language))
 		}
 		else
-			Throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
+			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
 
-		OnExit(ObjBindMethod(this, "clearCache"))
+		if kSox
+			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
+				if !FileExist(kTempDirectory . player) {
+					copied := false
+
+					while (!copied)
+						try {
+							FileCopy %kSox%, %kTempDirectory%%player%, 1
+
+							copied := true
+						}
+						catch exception {
+							logError(exception)
+						}
+				}
 	}
 
 	setPlayerLevel(level) {
-		pid := this.iSoundPlayer
+		local pid := this.iSoundPlayer
 
-		if (kNirCmd && pid) {
+		this.iSoundPlayerLevel := level
+
+		if (pid && kNirCmd) {
 			Process Exist, %pid%
 
 			if ErrorLevel {
@@ -260,67 +299,59 @@ class SpeechSynthesizer {
 	}
 
 	updateSpeechStatus(pid) {
+		local callback
+
 		Process Exist, %pid%
 
 		if ErrorLevel {
-			callback := ObjBindMethod(this, "updateSpeechStatus", pid)
+			Task.CurrentTask.Sleep := 50
 
-			SetTimer, %callback%, -50
+			return Task.CurrentTask
 		}
 		else {
 			this.iSoundPlayer := false
+			this.iPlaysCacheFile := false
 
 			callback := this.SpeechStatusCallback
 
 			%callback%("Stop")
+
+			return false
 		}
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback
-		local player
+		local callback, player, pid, workingDirectory, level
 
 		callback := this.SpeechStatusCallback
 
 		if kSox {
 			player := (wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe")
 
-			if !FileExist(kTempDirectory . player) {
-				copied := false
-
-				while (!copied)
-					try {
-						FileCopy %kSox%, %kTempDirectory%%player%, 1
-
-						copied := true
-					}
-					catch exception {
-						; ignore
-					}
-			}
-
-			if callback
-				%callback%("Start")
-
 			SplitPath kSox, , workingDirectory
 
 			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio -d, %workingDirectory%, HIDE, pid
 
+			if callback
+				%callback%("Start")
+
 			Sleep 500
+
+			this.iSoundPlayer := pid
 
 			if kNirCmd
 				try {
-					Run "%kNirCmd%" setappvolume /%pid% 1.0
+					level := this.iSoundPlayerLevel
+
+					Run "%kNirCmd%" setappvolume /%pid% %level%
 				}
 				catch exception {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 
-			this.iSoundPlayer := pid
-
 			if wait {
-				Loop {
+				loop {
 					Process Exist, %pid%
 
 					if ErrorLevel
@@ -334,11 +365,8 @@ class SpeechSynthesizer {
 				if callback
 					%callback%("Stop")
 			}
-			else {
-				callback := ObjBindMethod(this, "updateSpeechStatus", pid)
-
-				Settimer %callback%, -500
-			}
+			else if callback
+				Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 500, kHighPriority)
 		}
 		else {
 			if wait {
@@ -360,16 +388,10 @@ class SpeechSynthesizer {
 	}
 
 	clearCache() {
-		directory := this.iCacheDirectory
+		local directory := this.iCacheDirectory
 
-		if directory {
-			try {
-				FileRemoveDir %directory%, 1
-			}
-			catch exception {
-				; ignore
-			}
-		}
+		if directory
+			deleteFile(directory . "Unnamed*.*")
 
 		return false
 	}
@@ -378,19 +400,7 @@ class SpeechSynthesizer {
 		if this.iCache.HasKey(cacheKey)
 			return this.iCache[cacheKey]
 		else {
-			if !this.iCacheDirectory {
-				Random postfix, 1, 1000000
-
-				postfix := Round(postfix)
-
-				dirName := ("PhraseCache" . postfix)
-
-				FileCreateDir %kTempDirectory%%dirName%
-
-				this.iCacheDirectory := (kTempDirectory . dirName)
-			}
-
-			fileName := (this.iCacheDirectory . "\" . (fileName ? fileName : cacheKey) . ".wav")
+			fileName := (this.iCacheDirectory . (fileName ? fileName : cacheKey) . ".wav")
 
 			this.iCache[cacheKey] := fileName
 
@@ -399,6 +409,9 @@ class SpeechSynthesizer {
 	}
 
 	speak(text, wait := true, cache := false) {
+		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume
+		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
+
 		static counter := 1
 
 		this.wait()
@@ -428,16 +441,12 @@ class SpeechSynthesizer {
 			cacheFileName := false
 
 		if kSoX {
-			Random postfix, 1, 1000000
-
-			postfix := Round(postfix)
-
-			temp1Name := kTempDirectory . "temp1_" . postfix . ".wav"
+			temp1Name := temporaryFileName("temp1", "wav")
 
 			if cacheFileName
 				temp2Name := cacheFileName
 			else
-				temp2Name := kTempDirectory . "temp2_" . postfix . ".wav"
+				temp2Name := temporaryFileName("temp2", "wav")
 
 			this.speakToFile(temp1Name, text)
 
@@ -457,11 +466,28 @@ class SpeechSynthesizer {
 				return
 			}
 
+			overdriveGain := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.Overdrive", 20)
+			overdriveColor := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.Color", 20)
+			filterHighpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.HighPass", 800)
+			filterLowpass := getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.LowPass", 1800)
+			noiseVolume := Round(0.3 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.NoiseVolume", 66) / 100, 2)
+			clickVolume := Round(0.6 * getConfigurationValue(kSimulatorConfiguration, "Voice Control", "Speaker.ClickVolume", 80) / 100, 2)
+
 			try {
 				try {
-					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive 20 20 highpass 800 lowpass 1800, , Hide
-					RunWait "%kSoX%" -m -v 0.2 "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
-					RunWait "%kSoX%" -v 0.5 "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm, , Hide
+					RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" rate 16k channels 1 overdrive %overdriveGain% %overdriveColor% highpass %filterHighpass% lowpass %filterLowpass% Norm, , Hide
+
+					if (noiseVolume > 0)
+						RunWait "%kSoX%" -m -v %noiseVolume% "%kResourcesDirectory%Sounds\Noise.wav" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+					else
+						RunWait "%kSoX%" "%temp2Name%" "%temp1Name%" channels 1 reverse vad -p 1 reverse, , Hide
+
+					volume := Round(this.iVolume / 100, 2)
+
+					if (clickVolume > 0)
+						RunWait "%kSoX%" -v %clickVolume% "%kResourcesDirectory%Sounds\Click.wav" "%temp1Name%" "%temp2Name%" norm vol %volume%, , Hide
+					else
+						RunWait "%kSoX%" "%temp1Name%" "%temp2Name%" norm vol %volume%, , Hide
 				}
 				catch exception {
 					showMessage(substituteVariables(translate("Cannot start SoX (%kSoX%) - please check the configuration..."))
@@ -482,13 +508,13 @@ class SpeechSynthesizer {
 			finally {
 				try {
 					if FileExist(temp1Name)
-						FileDelete %temp1Name%
+						deleteFile(temp1Name)
 
 					if (!cache && FileExist(temp2Name))
-						FileDelete %temp2Name%
+						deleteFile(temp2Name)
 				}
 				catch exception {
-					; ignore
+					logError(exception)
 				}
 			}
 		}
@@ -496,11 +522,7 @@ class SpeechSynthesizer {
 			if (this.Synthesizer = "Windows")
 				this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 			else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
-				Random postfix, 1, 1000000
-
-				postfix := Round(postfix)
-
-				tempName := (cache ? cacheFileName : (kTempDirectory . "temp_" . postfix . ".wav"))
+				tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 				this.SpeakToFile(tempName, text)
 
@@ -510,17 +532,14 @@ class SpeechSynthesizer {
 				this.playSound(tempName, wait || !cache)
 
 				if !cache
-					try {
-						FileDelete %tempName%
-					}
-					catch exception {
-						; ignore
-					}
+					deleteFile(tempName)
 			}
 		}
 	}
 
 	speakToFile(fileName, text) {
+		local oldStream, stream, ssml
+
 		this.stop()
 
 		if (this.Synthesizer = "Windows") {
@@ -545,8 +564,14 @@ class SpeechSynthesizer {
 			ssml := "<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xml:lang=""%language%"">"
 		    ssml .= " <voice name=""%voice%"">"
 
-			if (this.Synthesizer = "Azure")
-				ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"" volume=""%volume%"">"
+			if (this.Synthesizer = "Azure") {
+				ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"""
+
+				if !kSoX
+					ssml .= " volume=""%volume%"""
+
+				ssml .= ">"
+			}
 			else
 				ssml .= "  <prosody pitch=""%pitch%"">"
 
@@ -560,7 +585,7 @@ class SpeechSynthesizer {
 
 			try {
 				if !this.iSpeechSynthesizer.SpeakSsmlToFile(fileName, ssml)
-					Throw "Error while speech synthesizing..."
+					throw "Error while speech synthesizing..."
 			}
 			catch exception {
 				if (this.Synthesizer = "Azure")
@@ -577,6 +602,7 @@ class SpeechSynthesizer {
 				return true
 			else {
 				this.iSoundPlayer := false
+				this.iPlaysCacheFile := false
 
 				return false
 			}
@@ -586,6 +612,8 @@ class SpeechSynthesizer {
 	}
 
 	pause() {
+		local status
+
 		if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
 
@@ -599,23 +627,40 @@ class SpeechSynthesizer {
 	wait() {
 		if this.iSoundPlayer
 			while this.isSpeaking()
-				Sleep 50
+				Sleep 1
 		else
 			this.stop()
 	}
 
 	stop() {
-		if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
-			try {
-				SoundPlay NonExistent.avi
+		local pid := this.iSoundPlayer
+		local status
+
+		if pid {
+			Process Exist, %pid%
+
+			if ErrorLevel {
+				Process Close, %pid%
 
 				this.iSoundPlayer := false
-			}
-			catch exception {
-				; Ignore
+				this.iPlaysCacheFile := false
 			}
 
-			this.iPlaysCacheFile := false
+			return true
+		}
+		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
+			try {
+				SoundPlay NonExistent.avi
+			}
+			catch exception {
+				logError(exception)
+			}
+
+			if this.iPlaysCacheFile {
+				this.iPlaysCacheFile := false
+
+				return true
+			}
 		}
 		else if (this.Synthesizer = "Windows") {
 			status := this.iSpeechSynthesizer.Status.RunningState
@@ -625,6 +670,8 @@ class SpeechSynthesizer {
 
 			this.iSpeechSynthesizer.Speak("", 0x1 | 0x2)
 		}
+
+		return false
 	}
 
 	setRate(rate) {
@@ -633,16 +680,16 @@ class SpeechSynthesizer {
 		if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Rate := rate
 		else if (this.Synthesizer = "dotNET")
-			this.iSpeechSynthesizer.SetProsody(rate, this.iVolume)
+			this.iSpeechSynthesizer.SetProsody(rate, kSoX ? 100 : this.iVolume)
 	}
 
 	setVolume(volume) {
 		this.iVolume := volume
 
 		if (this.Synthesizer = "Windows")
-			this.iSpeechSynthesizer.Volume := volume
+			this.iSpeechSynthesizer.Volume := (kSoX ? 100 : this.iVolume)
 		else if (this.Synthesizer = "dotNET")
-			this.iSpeechSynthesizer.SetProsody(this.iRate, volume)
+			this.iSpeechSynthesizer.SetProsody(this.iRate, kSoX ? 100 : this.iVolume)
 	}
 
 	setPitch(pitch) {
@@ -653,7 +700,8 @@ class SpeechSynthesizer {
 	}
 
 	computeVoice(voice, language, randomize := true) {
-		voices := this.Voices
+		local voices := this.Voices
+		local availableVoices, count, index, locale, ignore, candidate
 
 		if (this.Synthesizer = "Windows") {
 			if ((voice == true) && language) {

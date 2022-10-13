@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence.ico
 ;@Ahk2Exe-ExeName Race Engineer.exe
@@ -35,15 +32,10 @@ ListLines Off					; Disable execution history
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
+#Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceEngineer.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vRemotePID = 0
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -51,14 +43,15 @@ global vRemotePID = 0
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
+	local info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local logo := kResourcesDirectory . "Rotating Brain.gif"
+	local image := "1:" . logo
+	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html
+
 	static videoPlayer
 
-	info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
-	logo := kResourcesDirectory . "Rotating Brain.gif"
-	image := "1:" . logo
-
 	SysGet mainScreen, MonitorWorkArea
-	
+
 	x := mainScreenRight - 299
 	y := mainScreenBottom - 234
 
@@ -66,7 +59,7 @@ showLogo(name) {
 	title2 := substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})
 	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
 
-	Gui Logo:-Border -Caption 
+	Gui Logo:-Border -Caption
 	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
 
 	videoPlayer.Navigate("about:blank")
@@ -87,42 +80,37 @@ hideLogo() {
 	Gui Logo:Destroy
 	SplashImage 1:Off
 }
-	
-checkRemoteProcessAlive() {
-	Process Exist, %vRemotePID%
-	
+
+checkRemoteProcessAlive(pid) {
+	Process Exist, %pid%
+
 	if !ErrorLevel
 		ExitApp 0
 }
 
 startRaceEngineer() {
-	icon := kIconsDirectory . "Artificial Intelligence.ico"
-	
+	local icon := kIconsDirectory . "Artificial Intelligence.ico"
+	local remotePID := false
+	local engineerName := "Jona"
+	local engineerLogo := false
+	local engineerLanguage := false
+	local engineerSynthesizer := true
+	local engineerSpeaker := false
+	local engineerSpeakerVocalics := false
+	local engineerRecognizer := true
+	local engineerListener := false
+	local debug := false
+	local voiceServer, index, engineer, label, callback
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Race Engineer
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-	
-	remotePID := 0
-	engineerName := "Jona"
-	engineerLogo := false
-	engineerLanguage := false
-	engineerSynthesizer := true
-	engineerSpeaker := false
-	engineerSpeakerVocalics := false
-	engineerRecognizer := true
-	engineerListener := false
-	debug := false
-	
 	Process Exist, Voice Server.exe
-	
+
 	voiceServer := ErrorLevel
-	
+
 	index := 1
-	
+
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
 			case "-Remote":
@@ -162,81 +150,94 @@ startRaceEngineer() {
 				index += 1
 		}
 	}
-	
+
 	if (engineerSpeaker = kTrue)
 		engineerSpeaker := true
 	else if (engineerSpeaker = kFalse)
 		engineerSpeaker := false
-	
+
 	if (engineerListener = kTrue)
 		engineerListener := true
 	else if (engineerListener = kFalse)
 		engineerListener := false
-	
+
 	if debug
 		setDebug(true)
-	
-	RaceEngineer.Instance := new RaceEngineer(kSimulatorConfiguration
-											, remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
-											, engineerName, engineerLanguage
-											, engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
-											, engineerRecognizer, engineerListener, voiceServer)
-	
-	registerEventHandler("Race Engineer", "handleEngineerRemoteCalls")
-	
+
+	engineer := new RaceEngineer(kSimulatorConfiguration
+							   , remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
+							   , engineerName, engineerLanguage
+							   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
+							   , engineerRecognizer, engineerListener, voiceServer)
+
+	RaceEngineer.Instance := engineer
+
+	Menu SupportMenu, Insert, 1&
+
+	label := translate("Debug Rule System")
+	callback := ObjBindMethod(engineer, "toggleDebug", kDebugRules)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if engineer.Debug[kDebugRules]
+		Menu SupportMenu, Check, %label%
+
+	label := translate("Debug Knowledgebase")
+	callback := ObjBindMethod(engineer, "toggleDebug", kDebugKnowledgeBase)
+
+	Menu SupportMenu, Insert, 1&, %label%, %callback%
+
+	if engineer.Debug[kDebugKnowledgebase]
+		Menu SupportMenu, Check, %label%
+
+	registerMessageHandler("Race Engineer", "handleEngineerMessage")
+
 	if (debug && engineerSpeaker) {
-		RaceEngineer.Instance.getSpeaker()
-		
-		RaceEngineer.Instance.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
+		engineer.getSpeaker()
+
+		engineer.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
 	}
-	
+
 	if (engineerLogo && !kSilentMode)
 		showLogo(engineerName)
-	
-	if (remotePID != 0) {
-		vRemotePID := remotePID
-		
-		SetTimer checkRemoteProcessAlive, 10000
-	}
+
+	if remotePID
+		Task.startTask(new PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                          Event Handler Section                          ;;;
+;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 shutdownRaceEngineer(shutdown := false) {
 	if shutdown
 		ExitApp 0
 
-	if (RaceEngineer.Instance.Session == kSessionFinished) {
-		callback := Func("shutdownRaceEngineer").Bind(true)
-		
-		SetTimer %callback%, -10000
-	}
+	if (RaceEngineer.Instance.Session == kSessionFinished)
+		Task.startTask(Func("shutdownRaceEngineer").Bind(true), 10000, kLowPriority)
 	else
-		SetTimer shutdownRaceEngineer, -1000
+		Task.startTask("shutdownRaceEngineer", 1000, kLowPriority)
+
+	return false
 }
 
-handleEngineerRemoteCalls(event, data) {
+handleEngineerMessage(category, data) {
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
-		
+
 		if (data[1] = "Shutdown") {
-			SetTimer shutdownRaceEngineer, -20000
-			
+			Task.startTask("shutdownRaceEngineer", 20000, kLowPriority)
+
 			return true
 		}
 		else
 			return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		SetTimer shutdownRaceEngineer, -20000
+		Task.startTask("shutdownRaceEngineer", 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceEngineer.Instance, data))
 }

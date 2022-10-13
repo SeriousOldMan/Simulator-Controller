@@ -32,8 +32,6 @@ class ACCSetup extends FileSetup {
 	}
 
 	__New(editor, originalFileName := false) {
-		iEditor := editor
-
 		base.__New(editor, originalFileName)
 
 		this.iOriginalData := JSON.parse(this.Setup[true])
@@ -41,7 +39,8 @@ class ACCSetup extends FileSetup {
 	}
 
 	getValue(setting, original := false, default := false) {
-		data := this.Data[original]
+		local data := this.Data[original]
+		local ignore, path
 
 		for ignore, path in string2Values(".", getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting)) {
 			if InStr(path, "[") {
@@ -67,10 +66,11 @@ class ACCSetup extends FileSetup {
 		return data
 	}
 
-	setValue(setting, value) {
-		data := this.Data
-		elements := string2Values(".", getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting))
-		length := elements.Length()
+	setValue(setting, value, display := false) {
+		local data := (display ? display : this.Data)
+		local elements := string2Values(".", getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting))
+		local length := elements.Length()
+		local index, path, last
 
 		try {
 			for index, path in elements {
@@ -107,8 +107,33 @@ class ACCSetup extends FileSetup {
 			return (this.iModifiedData := value)
 		}
 		finally {
-			this.Setup := JSON.print(this.Data, false, "  ")
+			if !display
+				this.Setup := this.printSetup()
 		}
+	}
+
+	printSetup() {
+		local display := JSON.parse(this.Setup[true])
+		local ignore, setting
+
+		for ignore, setting in this.Editor.Advisor.Settings
+			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
+
+		return JSON.print(display, false, "  ")
+	}
+
+	enable(setting) {
+		base.enable(setting)
+
+		if setting
+			this.setValue(setting, this.getValue(setting))
+	}
+
+	disable(setting) {
+		base.disable(setting)
+
+		if setting
+			this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {
@@ -130,11 +155,11 @@ class ACCSetupEditor extends FileSetupEditor {
 	}
 
 	chooseSetup(load := true) {
-		sessionDB := new SessionDatabase()
-
-		directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
-		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local sessionDB := new SessionDatabase()
+		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
+		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local title, fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
@@ -163,7 +188,8 @@ class ACCSetupEditor extends FileSetupEditor {
 	}
 
 	saveSetup() {
-		fileName := this.Setup.FileName
+		local fileName := this.Setup.FileName
+		local directory, title, fileName, text
 
 		if fileName = this.Setup.FileName[true]
 			SplitPath fileName, , directory
@@ -182,12 +208,7 @@ class ACCSetupEditor extends FileSetupEditor {
 			if !InStr(fileName, ".json")
 				fileName := (fileName . ".json")
 
-			try {
-				FileDelete %fileName%
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(fileName)
 
 			text := this.Setup.Setup
 
@@ -204,11 +225,11 @@ class ACCSetupEditor extends FileSetupEditor {
 
 class ACCSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
-		sessionDB := new SessionDatabase()
-
-		directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
-		track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local sessionDB := new SessionDatabase()
+		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
+		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
+		local title, fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)

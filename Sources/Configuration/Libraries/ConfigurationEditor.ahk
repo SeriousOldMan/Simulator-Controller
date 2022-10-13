@@ -9,33 +9,19 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include Libraries\ConfigurationItemList.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vResult = false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constant Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kConfigurationEditor = false
+global kConfigurationEditor := false
 
-global kApply = "apply"
-global kOk = "ok"
-global kCancel = "cancel"
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Public Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vShowTriggerDetector = false
-global vTriggerDetectorCallback = false
+global kApply := "apply"
+global kOk := "ok"
+global kCancel := "cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -43,265 +29,87 @@ global vTriggerDetectorCallback = false
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ConfigurationEditor                                                     ;;;
+;;; TriggerDetectorTask                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global saveModeDropDown
-global configuratorTabView
+class TriggerDetectorTask extends Task {
+	iCallback := false
+	iJoysticks := []
 
-class ConfigurationEditor extends ConfigurationItem {
-	iWindow := "CFGE"
-	iGeneralTab := false
-
-	iConfigurators := []
-
-	iDevelopment := false
-	iSaveMode := false
-
-	Configurators[key := false] {
+	CallBack[] {
 		Get {
-			return (key ? this.iConfigurators[key] : this.iConfigurators)
+			return this.iCallback
 		}
 	}
 
-	AutoSave[] {
-		Get {
-			return (this.iSaveMode = "Auto")
+	Stopped[] {
+		Set {
+			if value
+				ToolTip, , , 1
+
+			return (base.Stopped := value)
 		}
 	}
 
-	Window[] {
+	Joysticks[] {
 		Get {
-			return this.iWindow
+			return this.iJoysticks
 		}
 	}
 
-	__New(development, configuration) {
-		this.iDevelopment := development
-		this.iGeneralTab := new GeneralTab(development, configuration)
+	__New(callback, arguments*) {
+		this.iCallback := callback
 
-		base.__New(configuration)
-
-		ConfigurationEditor.Instance := this
+		base.__New(false, arguments*)
 	}
 
-	registerConfigurator(label, configurator) {
-		this.Configurators.Push(Array(label, configurator))
+	run() {
+		local joysticks := []
+		local joyName
+
+		loop 16 { ; Query each joystick number to find out which ones exist.
+			GetKeyState joyName, %A_Index%JoyName
+
+			if (joyName != "")
+				joysticks.Push(A_Index)
+		}
+
+		this.iJoysticks := joysticks
+
+		return new TriggerDetectorContinuation(Task.CurrentTask)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; TriggerDetectorContinuation                                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class TriggerDetectorContinuation extends Continuation {
+	__New(task, arguments*) {
+		base.__New(task, false, arguments*)
 	}
 
-	unregisterConfigurator(labelOrConfigurator) {
-		for ignore, configurator in this.Configurators
-			if ((configurator[1] = labelOrConfigurator) || (configurator[2] = labelOrConfigurator)) {
-				this.Configurators.RemoveAt(A_Index)
+	run() {
+		local found, joysticks, joystickNumber, joy_buttons, joy_name, joy_state, buttons_down, joy_info
+		local joy1, joy2, joy3, joy4, joy5, joy6, joy7, joy8, joy9, joy10, joy11, joy12, joy13, joy14, joy15, joy16
+		local joyX, joyY, joyZ, joyU, joyV, joyP, joyR, axis_info
+		local buttonsDown, callback
 
-				break
+		if !this.Task.Stopped {
+			found := false
+
+			if GetKeyState("Esc", "P") {
+				this.stop()
+
+				return false
 			}
-	}
 
-	createGui(configuration) {
-		window := this.Window
+			joysticks := this.Task.Joysticks
 
-		Gui %window%:Default
+			joystickNumber := joysticks[1]
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
-
-		Gui %window%:Font, Bold, Arial
-
-		Gui %window%:Add, Text, w478 Center gmoveConfigurationEditor, % translate("Modular Simulator Controller System")
-
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
-
-		Gui %window%:Add, Text, x178 YP+20 w138 cBlue Center gopenConfigurationDocumentation, % translate("Configuration")
-
-		Gui %window%:Font, Norm, Arial
-
-		Gui %window%:Add, Button, x232 y528 w80 h23 Default gsaveAndExit, % translate("Save")
-		Gui %window%:Add, Button, x320 y528 w80 h23 gcancelAndExit, % translate("&Cancel")
-		Gui %window%:Add, Button, x408 y528 w77 h23 gsaveAndStay, % translate("&Apply")
-
-		choices := ["Auto", "Manual"]
-		chosen := inList(choices, saveModeDropDown)
-
-		Gui %window%:Add, Text, x8 y528 w55 h23 +0x200, % translate("Save")
-		Gui %window%:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% gupdateSaveMode VsaveModeDropDown, % values2String("|", map(choices, "translate")*)
-
-		labels := []
-
-		for ignore, configurator in this.Configurators
-			labels.Push(configurator[1])
-
-		Gui %window%:Add, Tab3, x8 y48 w478 h472 AltSubmit -Wrap vconfiguratorTabView gselectTab, % values2String("|", concatenate(Array(translate("General")), labels)*)
-
-		tab := 1
-
-		Gui %window%:Tab, % tab++
-
-		this.iGeneralTab.createGui(this, 16, 80, 458, 425)
-
-		for ignore, configurator in this.Configurators {
-			Gui %window%:Tab, % tab++
-
-			configurator[2].createGui(this, 16, 80, 458, 425)
-		}
-	}
-
-	registerWidget(plugin, widget) {
-		GuiControl Show, %widget%
-	}
-
-	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
-
-		this.iSaveMode := getConfigurationValue(configuration, "General", "Save", "Manual")
-
-		saveModeDropDown := this.iSaveMode
-	}
-
-	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
-
-		GuiControlGet saveModeDropDown
-
-		this.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
-
-		setConfigurationValue(configuration, "General", "Save", this.iSaveMode)
-
-		this.iGeneralTab.saveToConfiguration(configuration)
-
-		for ignore, configurator in this.Configurators
-			configurator[2].saveToConfiguration(configuration)
-	}
-
-	show() {
-		static first := true
-
-		window := this.Window
-
-		if first {
-			first := false
-
-			Gui %window%:Show, AutoSize Center
-		}
-		else
-			Gui %window%:Show
-	}
-
-	hide() {
-		window := this.Window
-
-		Gui %window%:Hide
-	}
-
-	close() {
-		window := this.Window
-
-		Gui %window%:Destroy
-	}
-
-	toggleTriggerDetector(callback := false) {
-		if callback {
-			if !vShowTriggerDetector
-				vTriggerDetectorCallback := callback
-		}
-		else
-			vTriggerDetectorCallback := false
-
-		vShowTriggerDetector := !vShowTriggerDetector
-
-		if vShowTriggerDetector
-			SetTimer showTriggerDetector, -100
-	}
-
-	getSimulators() {
-		return this.iGeneralTab.getSimulators()
-	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-saveAndExit() {
-	vResult := kOk
-}
-
-cancelAndExit() {
-	vResult := kCancel
-}
-
-saveAndStay() {
-	vResult := kApply
-}
-
-moveConfigurationEditor() {
-	moveByMouse(ConfigurationEditor.Instance.Window)
-}
-
-updateSaveMode() {
-	GuiControlGet saveModeDropDown
-
-	ConfigurationEditor.Instance.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
-}
-
-openConfigurationDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration
-}
-
-selectTab() {
-	editor := ConfigurationEditor.Instance
-
-	GuiControlGet configuratorTabView
-
-	configurator := ((configuratorTabView == 1) ? editor.iGeneralTab : editor.Configurators[configuratorTabView - 1][2])
-
-	if configurator.base.HasKey("activate")
-		configurator.activate()
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-showTriggerDetector() {
-	returnHotKey := vTriggerDetectorCallback
-	joystickNumbers := []
-
-	vTriggerDetectorCallback := false
-
-	Loop 16 { ; Query each joystick number to find out which ones exist.
-		GetKeyState joyName, %A_Index%JoyName
-
-		if (joyName != "")
-			joystickNumbers.Push(A_Index)
-	}
-
-	if (joystickNumbers.Length() == 0) {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		title := translate("Warning")
-		MsgBox 262192, %title%, % translate("No controller detected...")
-		OnMessage(0x44, "")
-
-		vShowTriggerDetector := false
-	}
-
-	if vShowTriggerDetector {
-		found := false
-
-		Loop {
-			if GetKeyState("Esc", "P")
-				vShowTriggerDetector := false
-
-			if (vTriggerDetectorCallback && (returnHotKey != vTriggerDetectorCallback))
-				returnHotKey := vTriggerDetectorCallback
-
-			joystickNumber := joystickNumbers[1]
-
-			joystickNumbers.RemoveAt(1)
-			joystickNumbers.Push(joystickNumber)
+			joysticks.RemoveAt(1)
+			joysticks.Push(joystickNumber)
 
 			SetFormat Float, 03  ; Omit decimal point from axis position percentages.
 
@@ -309,15 +117,9 @@ showTriggerDetector() {
 			GetKeyState joy_name, %joystickNumber%JoyName
 			GetKeyState joy_info, %joystickNumber%JoyInfo
 
-			if !vShowTriggerDetector {
-				ToolTip, , , 1
-
-				break
-			}
-
 			buttons_down := ""
 
-			Loop %joy_buttons%
+			loop %joy_buttons%
 			{
 				GetKeyState joy%A_Index%, %joystickNumber%joy%A_Index%
 
@@ -366,9 +168,9 @@ showTriggerDetector() {
 
 			IfInString joy_info, P
 			{
-				GetKeyState joyp, %joystickNumber%JoyPOV
+				GetKeyState joyP, %joystickNumber%JoyPOV
 
-				axis_info = %axis_info%%A_Space%%A_Space%POV%joyp%
+				axis_info = %axis_info%%A_Space%%A_Space%POV%joyP%
 			}
 
 			buttonsDown := translate("Buttons Down:")
@@ -376,59 +178,273 @@ showTriggerDetector() {
 			ToolTip %joy_name% (#%joystickNumber%):`n%axis_info%`n%buttonsDown% %buttons_down%, , , 1
 
 			if found {
-				if returnHotkey
-					%returnHotkey%(joystickNumber . "Joy" . found)
+				if this.Task.Callback {
+					callback := this.Task.Callback
+
+					%callback%(joystickNumber . "Joy" . found)
+
+					this.stop()
+
+					return false
+				}
 				else
-					Sleep 2000
-
-				found := false
+					return new TriggerDetectorContinuation(this.Task, 2000)
 			}
-			else
-				Sleep 750
 
-			if vResult
-				break
+			return new TriggerDetectorContinuation(this.Task, 750)
+		}
+		else {
+			this.stop()
+
+			return false
 		}
 	}
 }
 
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
-;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
-;   2) {File} 		File containing icon image
-;   3) {Index} 		Index of icon in file
-;						Optional: Default = 1
-;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
-;						W = Width of Icon (default = 16)
-;						H = Height of Icon (default = 16)
-;						S = Size of Icon, Makes Width and Height both equal to Size
-;						L = Left Margin
-;						T = Top Margin
-;						R = Right Margin
-;						B = Botton Margin
-;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ConfigurationEditor                                                     ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+global saveModeDropDown
+global configuratorTabView
 
-	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
+class ConfigurationEditor extends ConfigurationItem {
+	iWindow := "CFGE"
+	iResult := false
 
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
+	iConfigurators := []
 
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+	iDevelopment := false
+	iSaveMode := false
 
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+	Configurators[key := false] {
+		Get {
+			return (key ? this.iConfigurators[key] : this.iConfigurators)
+		}
+	}
 
-	return IL_Add(normal_il, file, index)
+	AutoSave[] {
+		Get {
+			return (this.iSaveMode = "Auto")
+		}
+	}
+
+	Window[] {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	GeneralTab[] {
+		Get {
+			return this.Configurators[1][2]
+		}
+	}
+
+	Result[] {
+		Get {
+			return this.iResult
+		}
+
+		Set {
+			return (this.iResult := value)
+		}
+	}
+
+	__New(development, configuration) {
+		this.iDevelopment := development
+
+		base.__New(configuration)
+
+		this.registerConfigurator(translate("General"), new GeneralTab(development, configuration))
+
+		ConfigurationEditor.Instance := this
+	}
+
+	registerConfigurator(label, configurator) {
+		this.Configurators.Push(Array(label, configurator))
+	}
+
+	unregisterConfigurator(labelOrConfigurator) {
+		local ignore, configurator
+
+		for ignore, configurator in this.Configurators
+			if ((configurator[1] = labelOrConfigurator) || (configurator[2] = labelOrConfigurator)) {
+				this.Configurators.RemoveAt(A_Index)
+
+				break
+			}
+	}
+
+	createGui(configuration) {
+		local window := this.Window
+		local choices, chosen, labels, ignore, configurator, tab
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, Bold, Arial
+
+		Gui %window%:Add, Text, w478 Center gmoveConfigurationEditor, % translate("Modular Simulator Controller System")
+
+		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
+
+		Gui %window%:Add, Text, x178 YP+20 w138 cBlue Center gopenConfigurationDocumentation, % translate("Configuration")
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Button, x232 y528 w80 h23 Default gsaveAndExit, % translate("Save")
+		Gui %window%:Add, Button, x320 y528 w80 h23 gcancelAndExit, % translate("&Cancel")
+		Gui %window%:Add, Button, x408 y528 w77 h23 gsaveAndStay, % translate("&Apply")
+
+		choices := ["Auto", "Manual"]
+		chosen := inList(choices, saveModeDropDown)
+
+		Gui %window%:Add, Text, x8 y528 w55 h23 +0x200, % translate("Save")
+		Gui %window%:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% gupdateSaveMode VsaveModeDropDown, % values2String("|", map(choices, "translate")*)
+
+		labels := []
+
+		for ignore, configurator in this.Configurators
+			labels.Push(configurator[1])
+
+		Gui %window%:Add, Tab3, x8 y48 w478 h472 AltSubmit -Wrap vconfiguratorTabView gselectTab, % values2String("|", labels*)
+
+		tab := 1
+
+		for ignore, configurator in this.Configurators {
+			Gui %window%:Tab, % tab++
+
+			configurator[2].createGui(this, 16, 80, 458, 425)
+		}
+	}
+
+	registerWidget(plugin, widget) {
+		GuiControl Show, %widget%
+	}
+
+	loadFromConfiguration(configuration) {
+		base.loadFromConfiguration(configuration)
+
+		this.iSaveMode := getConfigurationValue(configuration, "General", "Save", "Manual")
+
+		saveModeDropDown := this.iSaveMode
+	}
+
+	saveToConfiguration(configuration) {
+		local ignore, configurator
+
+		base.saveToConfiguration(configuration)
+
+		GuiControlGet saveModeDropDown
+
+		this.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
+
+		setConfigurationValue(configuration, "General", "Save", this.iSaveMode)
+
+		for ignore, configurator in this.Configurators
+			configurator[2].saveToConfiguration(configuration)
+	}
+
+	show() {
+		local window := this.Window
+		local x, y
+
+		if getWindowPosition("Simulator Configuration", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
+	}
+
+	hide() {
+		local window := this.Window
+
+		Gui %window%:Hide
+	}
+
+	close() {
+		local window := this.Window
+
+		Gui %window%:Destroy
+	}
+
+	toggleTriggerDetector(callback := false) {
+		triggerDetector(callback)
+	}
+
+	getSimulators() {
+		return this.GeneralTab.getSimulators()
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+saveAndExit() {
+	ConfigurationEditor.Instance.Result := kOk
+}
+
+cancelAndExit() {
+	ConfigurationEditor.Instance.Result := kCancel
+}
+
+saveAndStay() {
+	ConfigurationEditor.Instance.Result := kApply
+}
+
+moveConfigurationEditor() {
+	moveByMouse(ConfigurationEditor.Instance.Window, "Simulator Configuration")
+}
+
+updateSaveMode() {
+	GuiControlGet saveModeDropDown
+
+	ConfigurationEditor.Instance.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
+}
+
+openConfigurationDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration
+}
+
+selectTab() {
+	local configurator
+
+	GuiControlGet configuratorTabView
+
+	configurator := ConfigurationEditor.Instance.Configurators[configuratorTabView][2]
+
+	if configurator.base.HasKey("activate")
+		configurator.activate()
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+triggerDetector(callback := false) {
+	static detectorTask := false
+
+	if (callback = "Active")
+		return (detectorTask && !detectorTask.Stopped)
+	else {
+		if (detectorTask && detectorTask.Stopped)
+			detectorTask := false
+
+		if detectorTask {
+			detectorTask.stop()
+
+			detectorTask := false
+		}
+		else {
+			detectorTask := new TriggerDetectorTask(callback, 100)
+
+			detectorTask.start()
+		}
+	}
 }

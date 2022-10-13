@@ -143,7 +143,7 @@ All the arguments for the plugin parameters of the "Motion Feedback" plugin must
 
 	controlApplication: *Name of the SimFeedback application configuration*;
 	connector: *path to sfx-100-console-application*;
-	motion: *initialState* *onOffFunction* [*intensityFunction*] *initialIntensity*
+	motion: *initialState* *onOffFunction* [*intensityFunction* [*initialIntensity*]]
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SimFeedback*, if it is not named "Motion Feedback". The *connector* parameter may be used, when *SimFeedack* is running in expert mode and you have installed the extensions mentioned above. The path must be set to the location of the console executable, as in "D:\Programme\SimFeedback Connector\sfx-100-streamdeck-console.exe". For *motion*, you supply the *initialState* as one of "On" or "Off". 
 *onOffFunction* will define a controller function to start or stop the motion actuator motors. Both, unary and binary functions are supported. This function is connected to the plugin itself and is therefore always available. You can supply a function to control the overall motion intensity starting with *initialIntensity* with the optional *intensityFunction* parameter. You must supply a descriptor for a binary function here, unless you only want to increase the intensity all the time. Example: "motion: Off 2WayToggle.2 Dial.1 30". The intensity function will become an element of the "Motion" mode.
@@ -230,7 +230,7 @@ The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synth
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone. You can also activate voice recognition on the Azure Cognitive Services cloud using the same syntax as described above for the *raceAssistantSynthesizer* parameter. The default value for *raceAssistantRecognizer* is also taken from the general voice configuration, when no value is supplied.
 
-With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied, the values from the general voice control configuration will be taken as default. For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. Additionally, you can supply a "*" for each of the three values. In this case, the corresponding setting in the voice control configuration is used. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied at all, the values from the general voice control configuration will be taken as default as well. For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 
 It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
@@ -291,7 +291,7 @@ The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synth
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone.
  
-With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Cato. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Cato can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied, the values from the general voice control configuration will be taken as default. For more information about Cato, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Cato. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Cato can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. Additionally, you can supply a "*" for each of the three values. In this case, the corresponding setting in the voice control configuration is used. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied at all, the values from the general voice control configuration will be taken as default as well. For more information about Cato, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 
 Similar as for Jona, you can use the following parameters to trigger some of Catos service without using voice commands:
 
@@ -350,7 +350,7 @@ The paranmeter *raceAssistantSynthesizer* allows you to specify the speech synth
 
 With *raceAssistantRecognizer* you specify the engine used for voice recognition. The value *Server* stands for the older engine provided by Microsoft for server side solutions. It can handle low quality audio, for example from telephone calls, but the recognition quality is not the best. The value *Desktop* activates the recognition engine which is part of the Windows operating system. Very good recognition quality, but it needs high quality audio input, for example from a headset microphone.
  
-With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Elisa. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Elisa can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied, the values from the general voice control configuration will be taken as default. For more information about Elisa, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
+With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Elisa. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Elisa can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. Additionally, you can supply a "*" for each of the three values. In this case, the corresponding setting in the voice control configuration is used. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied at all, the values from the general voice control configuration will be taken as default as well. For more information about Elisa, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 
 With *trackAutomation* you can supply a function to enable or disable [location dependend actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) for your current session. The *onOffFunction* may be ommited, if you only want to enable or disable location dependend actions for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "Off") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 
@@ -415,7 +415,7 @@ Starting with Release 2.0, all pitstop settings of *Assetto Corsa Competizione* 
 
 Using the buttons and dials you may change the pitstop settings in the same way as using the keyboard. All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: {Insert};
+	openPitstopMFD: p; closePitstopMFD: {Insert};
 	pitstopCommands: Strategy Dial.1, Refuel Dial.2 5, TyreSet Button.1 Button.5, TyreCompound Button.2 Button.6,
 					 TyreAllAround Button.3 Button.7, SuspensionRepair Button.4, BodyworkRepair Button.8
 
@@ -436,7 +436,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "P" and the "Insert" keys on the keyboard.
+First, you need to define, how to open and close the Pitstop MFD in *Assetto Corsa Competizione*. If the standard keyboard mapping is used, this will be the "p" and the "Insert" keys on the keyboard.
 
 	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
@@ -541,7 +541,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: P;
+	openPitstopMFD: {Down};
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.6, BodyworkRepair Button.3, SuspensionRepair Button.4, EngineRepair Button.7
 
@@ -622,7 +622,7 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ### Special requirements when using the Pitstop automation
 
-*Assetto Corsa* does not provide any information about the current available settings in the Pitstop HUD and their corresponding car specific value range. And, since *assetto Corsa* is open to modding, the list of cars is potentially endless. Therefore, you may have to provide a couple of information for the car in use, so that the pitstop automation will function correctly, when contolled by the Virtual Race Engineer or using the Pitsop mode on your hardware controller. I will compile a list of meta data for all the standard cars over time, when they are added to "Setup Advisor" (you can check whether the meta data for a specific car is already there in the file *Resources\Simulator Data\AC\Car Data.ini*, which resides in the programm directory. Unless a car is already known there in the "[Pitstop Settings]" section, you will have to enter the values mentioned below into the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), as long as the defaults does not fit.
+*Assetto Corsa* does not provide any information about the current available settings in the Pitstop HUD and their corresponding car specific value range. And, since *Assetto Corsa* is open to modding, the list of cars is potentially endless. Therefore, you may have to provide a couple of information for the car in use, so that the pitstop automation will function correctly, when contolled by the Virtual Race Engineer or using the Pitsop mode on your hardware controller. I will compile a list of meta data for all the standard cars over time, when they are added to "Setup Advisor" (you can check whether the meta data for a specific car is already there in the file *Resources\Simulator Data\AC\Car Data.ini*, which resides in the programm directory. Unless a car is already known there in the "[Pitstop Settings]" section, you will have to enter the values mentioned below into the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), as long as the defaults does not fit.
 
   1. Minimum cold tyre pressure
   
@@ -737,7 +737,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: P;
+	openPitstopMFD: p; closePitstopMFD: p;
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.6, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
 
@@ -829,7 +829,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: P; closePitstopMFD: P;
+	openPitstopMFD: p; closePitstopMFD: p;
 	pitstopCommands: Strategy Dial.1, Refuel Dial.2 5, TyreChange Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3,
 					 PitstopPlan Button.7, PitstopPrepare Button.8
 
@@ -858,7 +858,7 @@ First, you need to define, how to open and close the Pitstop MFD (aka Menu) in *
 	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*;
 	acceptChoice: *acceptChoiceHotkey*
 	
-Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *RaceRoom Racing Experience* to control the Pitstop MFD. These parameters are defaulted to "W", "S", "A", "D" and "{Enter}", which are the default bindings of *RaceRoom Racing Experience*, so you won't have to supply them normally.
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *RaceRoom Racing Experience* to control the Pitstop MFD. These parameters are defaulted to "w", "s", "a", "d" and "{Enter}", which are the default bindings of *RaceRoom Racing Experience*, so you won't have to supply them normally.
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
@@ -921,7 +921,7 @@ Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a sma
 
 ## Plugin *AMS2*
 
-This plugin handles the *Automobilista 2* simulation game. An application with the name "Automobilista 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAMS2" as a special function hook in this configuration and "Automobilista 2" as the window title.
+This plugin handles the *Automobilista 2* simulation game. An application with the name "Automobilista 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAMS2" as a special function hook in this configuration and "ahk_exe AMS2AVX.exe" as the window title.
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Automobilista 2* in the "PCars 2" mode.
 
@@ -935,7 +935,7 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: I; previousOption: Z; nextOption: H; previousChoice: G; nextChoice: J;
+	openPitstopMFD: i; previousOption: z; nextOption: h; previousChoice: g; nextChoice: j;
 	pitstopCommands: Refuel Dial.2 5, TyreCompound Button.1, BodyworkRepair Button.2, SuspensionRepair Button.3
 
 ### Mode *Assistant*
@@ -955,14 +955,14 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Automobilista 2*. "I" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Automobilista 2*. You need to change these bindings in *Automobilista 2*, since the standard bindings are controller buttons, for which unfortunately no events can be generated by software.
+First, you need to define, how to open the Pitstop MFD (a part of the In Car Menu, aka ICM) in *Automobilista 2*. "i" is the default value for *openPitstopMFD*, which is **not** the standard binding of *Automobilista 2*. You need to change these bindings in *Automobilista 2*, since the standard bindings are controller buttons, for which unfortunately no events can be generated by software.
 
 	openPitstopMFD: *openHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default;
 	previousOption: *previousOptionHotkey*; nextOption: *nextOptionHotkey*;
 	previousChoice: *previousChoiceHotkey*; nextChoice: *nextChoiceHotkey*
 	
-Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Automobilista 2* to control the Pitstop MFD. These parameters are defaulted to "Z", "H", "G" and "J", which are **not** the default bindings of *Automobilista 2* (see above).
+Use the *...Option* and *...Choice* parameters to specify the keys, that will be send to *Automobilista 2* to control the Pitstop MFD. These parameters are defaulted to "z", "h", "g" and "j", which are **not** the default bindings of *Automobilista 2* (see above).
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
@@ -1017,7 +1017,7 @@ It is very important, that you do not use the *Automobilista 2* ICM on your own,
 
 ## Plugin *PCARS2*
 
-This plugin handles the *Automobilista 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "Project CARS 2" as the window title.
+This plugin handles the *Automobilista 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "ahk_exe PCARS2AVX.exe" as the window title.
 
 Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Project CARS 2* in the "PCars 2" mode.
 
@@ -1094,7 +1094,8 @@ See the following table for the supported assistant commands.
 | Command | Description |
 | ------ | ------ |
 | InformationRequest {command} | With *InformationRequest*, you can request a lot of information from your race assistants without using voice commands. Please see the documentation for the [Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) plugin and for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) plugin, for an overview what information can be requested. |
-| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. |
+| PitstopRecommend | Asks the virtual race strategist for a recommendation for the next pitstop. This commadn is most useful, when no strategy is currently active. |
+| StrategyRecommend | Asks the virtual race strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
@@ -1107,4 +1108,4 @@ Note: For convinience, all commands available for the *assistantCommands* parame
 
 ### Special requirements when using the Pitstop automation
 
-It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. Not complying with this requirements will give you funny results at least.
+It is very important, that you do not use the *Project CARS 2* ICM on your own, when you want to control the pitstop settings using the "Pitstop" mode, or if you want Jona to control the pitstop settings. Furthermore, you must leave *all* repairs selected in the default pitstop strategy and select *no tyre change* in the default pitstop strategy as well. And declare that the ICM should be returned to the standard page, when closed. This option can be found in the *Gameplay* section of the *Automobilista 2* settings. Not complying with this requirements will give you funny results at least.

@@ -9,4 +9,5 @@
 ;;;                         Public Variables Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-
+global base
+global exception

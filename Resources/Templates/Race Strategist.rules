@@ -158,7 +158,7 @@ projectedTyreTemperature(?lap, ?temperature) <=
 ;;;                                                                         ;;;
 ;;; This rule set will extrapolate the race positions into the future.      ;;;
 ;;;-------------------------------------------------------------------------;;;
-		
+
 [?Standings.Extrapolate] => (Prove: extrapolateLap(!Lap, ?Standings.Extrapolate)), (Clear: Standings.Extrapolate)
 
 extrapolateLap(?lap, ?futureLap) <= ?futureLap < ?lap, !, fail

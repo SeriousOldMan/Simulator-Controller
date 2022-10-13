@@ -261,7 +261,8 @@ namespace ACSHMSpotter {
 
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
-		const double longitudinalDistance = 4;
+		double longitudinalFrontDistance = 4;
+		double longitudinalRearDistance = 5;
 		const double lateralDistance = 6;
 		const double verticalDistance = 2;
 
@@ -281,6 +282,7 @@ namespace ACSHMSpotter {
 		bool carBehindLeft = false;
 		bool carBehindRight = false;
 		bool carBehindReported = false;
+		int carBehindCount = 0;
 
 		const int YELLOW = 1;
 
@@ -338,6 +340,10 @@ namespace ACSHMSpotter {
 								alert = "ClearAll";
 							else
 								alert = (lastSituation == RIGHT) ? "ClearRight" : "ClearLeft";
+
+							carBehindReported = true;
+							carBehindCount = 21;
+
 							break;
 						case LEFT:
 							if (lastSituation == THREE)
@@ -411,7 +417,7 @@ namespace ACSHMSpotter {
 
 				rotateBy(ref transX, ref transY, angle);
 
-				if ((Math.Abs(transY) < longitudinalDistance) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
+				if ((Math.Abs(transY) < ((transY > 0) ? longitudinalFrontDistance : longitudinalRearDistance)) && (Math.Abs(transX) < lateralDistance) && (Math.Abs(otherZ - carZ) < verticalDistance))
 					return (transX < 0) ? RIGHT : LEFT;
 				else
 				{
@@ -419,8 +425,8 @@ namespace ACSHMSpotter {
 					{
 						carBehind = true;
 
-						if ((faster && Math.Abs(transY) < longitudinalDistance * 1.5) ||
-							(Math.Abs(transY) < longitudinalDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
+						if ((faster && Math.Abs(transY) < longitudinalFrontDistance * 1.5) ||
+							(Math.Abs(transY) < longitudinalFrontDistance * 2 && Math.Abs(transX) > lateralDistance / 2))
 							if (transX < 0)
 								carBehindRight = true;
 							else
@@ -474,7 +480,7 @@ namespace ACSHMSpotter {
 
 				for (int id = 0; id < cars.numVehicles; id++)
 				{
-					if (id != carID)
+					if ((id != carID) && (cars.cars[id].isCarInPitline == 0) && (cars.cars[id].isCarInPit == 0))
 					{
 						bool faster = false;
 
@@ -507,34 +513,45 @@ namespace ACSHMSpotter {
 					carBehindReported = false;
 				}
 
+				if (carBehindCount++ > 200)
+					carBehindCount = 0;
+
 				string alert = computeAlert(newSituation);
 
 				if (alert != noAlert)
 				{
-					if (alert != "Hold")
-						carBehindReported = false;
+					longitudinalRearDistance = 4;
 
 					SendSpotterMessage("proximityAlert:" + alert);
 
 					return true;
 				}
-				else if (carBehind)
-				{
-					if (!carBehindReported)
+				else {
+					longitudinalRearDistance = 5;
+					
+					if (carBehind)
 					{
-						carBehindReported = true;
+						if (!carBehindReported)
+						{
+							if (carBehindLeft || carBehindRight || (carBehindCount < 20))
+							{
+								carBehindReported = true;
 
-						SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
-														   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
+								SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
+																   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
 
-						return true;
+								return true;
+							}
+						}
 					}
+					else
+						carBehindReported = false;
 				}
-				else
-					carBehindReported = false;
 			}
 			else
 			{
+				longitudinalRearDistance = 5;
+					
 				lastSituation = CLEAR;
 				carBehind = false;
 				carBehindLeft = false;
@@ -628,9 +645,11 @@ namespace ACSHMSpotter {
 			return false;
 		}
 
-		void checkPitWindow()
+		bool checkPitWindow()
 		{
 			// No support by Assetto Corsa
+
+			return false;
 		}
 
 		float initialX = 0.0f;
@@ -731,6 +750,8 @@ namespace ACSHMSpotter {
 				staticInfo = ReadStaticInfo();
 				cars = ReadCars();
 
+				bool wait = true;
+
 				if (mapTrack)
 				{
 					if (!writeCoordinates())
@@ -762,10 +783,14 @@ namespace ACSHMSpotter {
 						if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
 						{
 							if (!checkFlagState() && !checkPositions())
-								checkPitWindow();
+								wait = !checkPitWindow();
+							else
+								wait = false;
 						}
 						else
 						{
+							longitudinalRearDistance = 5;
+					
 							lastSituation = CLEAR;
 							carBehind = false;
 							carBehindLeft = false;
@@ -779,7 +804,7 @@ namespace ACSHMSpotter {
 
 				if (positionTrigger)
 					Thread.Sleep(10);
-				else
+				else if (wait)
 					Thread.Sleep(50);
 			}
 

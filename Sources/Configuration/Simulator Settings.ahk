@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Settings.ico
 ;@Ahk2Exe-ExeName Simulator Settings.exe
@@ -43,24 +40,17 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 showSettingsEditor() {
-	icon := kIconsDirectory . "Settings.ico"
-	
+	local icon := kIconsDirectory . "Settings.ico"
+	local settings
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Settings
 
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-	
 	settings := readConfiguration(kSimulatorSettingsFile)
-	
+
 	if (editSettings(settings) == kSave)
 		writeConfiguration(kSimulatorSettingsFile, settings)
-	
-	ExitApp 0
 
-Exit:
 	ExitApp 0
 }
 

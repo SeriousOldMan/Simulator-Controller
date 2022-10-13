@@ -52,25 +52,59 @@ The Spotter will give you critical and in most cases real time information about
 
    Once a lapping car appears behind, you will get a blue flag warning. This typically appears, when the faster car is less than 2 seconds behind. If there is also a direct opponent currently behind you, you will be informed about that as well, so that you can be cautios to not let this car pass together with the lapping car.
 
-4. Pit Window Information
+4. Green Flag (Race Start) Alert
+
+   The Spotter gives you a *push*, when the race has been started.
+
+5. Pit Window Information
 
    Elisa will inform you when the timed window or the designated lap for a required pitstop arrived. Elisa will inform you also, when the pit closes again.
 
-5. Start Performance Summary
+6. Start Performance Summary
 
    You will get an update whether you gained or lost places during the start phase a few laps into the race.
 
-6. Delta Information
+7. Best Lap Update
+
+   When ypu have scored a new personal best lap, you will get a notification.
+
+8. Delta Information
 
    Elisa observes your direct opponents behind and in front of you and informs you, whether you can catch up the car in front or whether you need to pay attention to the car behind you. Please take a look at the dedicated section about [Opponent and Delta Information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#opponent-and-delta-information) down below for more detailed information.
+   
+   There are two methods available for this information:
+   
+   - Static
+   
+     This calculation method is quite simple and uses only the direct delta information provided by the simulation. It will simply you provide you with the current gap to your opponent in front and the one behind. This method is precise but you must calculate on your own whether you have catched up or lost upon your opponent.
 
-7. Tactical Advices
+   - Dynamic
+   
+     This method uses a complex traffic model and keeps track off all cars regarding their current position and specific deltas to your car. You will get much more information, for example, how much time you have lost on the car ahead during the last laps. But this model will fail in turbulent traffic situations especially in the beginning of the race or in sprint races with lots of fights and overtakes and you might get wrong deltas in those situations.
+
+9. Tactical Advices
 
    The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
-8. Last Laps Announcement
+10. Weather Updates
 
-   You will get an announcement a few laps before the end of the race.
+    The Spotter will inform you when temperatures (both air and track) are rising or falling and will give you the new temperatures in degrees Celcius.
+
+11. Last Laps Announcement
+
+    You will get an announcement a few laps before the end of the race.
+   
+12. Stint Timer Alert
+
+    During an endurance race, the Spotter will alert you, that the stint time is ending soon and will tell you the number of laps, which you can still go.
+
+13. Session Timer Information
+
+    When you are in a practice or qualification session, the Spotter will issue a warning 30, 15 and 5 minutes before the end of the session.
+
+14. Half Time Notification
+
+    Exactly in the middle of the race, the Spotter will give you a couple of informations about the second half of the race, like your current position, the number of remaining minutes and laps, the number of laps which are possible using the remaining fuel, and so on.
 
 All these alerts and announcements can be individually configured or disabled with the configuration tool for each simulator. Please consult the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) for more information. 
 
@@ -109,20 +143,20 @@ Please note, that the corresponding settings in the ["Session Database"](https:/
 
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
-| Capability                | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
-| ------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
-| Side Alert                | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Behind Alert              | Yes           | Yes                        | Yes             | Yes (2)  | Yes                        | Yes       | Yes            |
-| Yellow Flag               | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Full Course Yellow        | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
-| Sector Yellow             | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
-| Yellow Distance           | No            | No                         | No              | No      | Yes                        | No        | No             |
-| Blue Flag                 | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Pit Window                | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
-| Start Performance Summary | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Delta Information         | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Final Laps Announcement   | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
-| Tactical Advices          | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Capability                      | Assetto Corsa | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 |
+| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- |
+| Side Alert                      | Yes (1)       | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Behind Alert                    | Yes           | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            |
+| Yellow Flag                     | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Full Course Yellow              | No            | No                         | No              | No      | No                         | No        | No             |
+| Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
+| Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             |
+| Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
+| Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Tactical Advices (4)            | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| General Session Information (5) | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 
 ##### Notes
 
@@ -131,6 +165,10 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. Therefore the decision, whether a car is behind you, is based on the track percentage value of the data interface and is therefore not as precise as in the other simulators.
 
 (3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
+
+(4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, and so on.
+
+(5) This includes a summary of the start performance, final laps announcement, weather updates, best lap acknowledgement and general information about stint, session and fuel limits.
 
 ## Track Mapping
 

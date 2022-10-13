@@ -47,6 +47,14 @@ All currently defined and supported simulator session types. *kSessionFinished =
 
 ***
 
+## Messsaging Types ([Messages.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Messages.ahk))
+Delivery method types used to supply to [sendMessage](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#sendmessagemessagetype--oneofklocalmessage-kwindowmessage-kpipemessage-kfilemessage-category--string-data--string-target--false).
+
+#### *kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage*
+These constants define the various delivery methods for messages send by the function [sendMessage](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#sendmessagemessagetype--oneofklocalmessage-kwindowmessage-kpipemessage-kfilemessage-category--string-data--string-target--false).
+
+***
+
 ## Miscellaneous Constants ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
 Additional constants used by Simulator Controller.
 
@@ -64,6 +72,3 @@ If this is *true*, most applications of Simulator Controller will adopt accordin
 
 #### *kTrue, kFalse, kActivate, kDeactivate, kIncrease, kDecrease*
 Miscellaneous constants, which define string representations for often used code constants.
-
-#### *kLocalMessage, kWindowMessage, kPipeMessage, kFileMessage*
-These constans define the various delivery methods for events raised by the function [raiseEvent](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#raiseeventmessagetype--oneofklocalmessage-kwindowmessage-kpipemessage-kfilemessage-event--string-data--string-target--false).

@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Dashboard.ico
 ;@Ahk2Exe-ExeName Strategy Workbench.exe
@@ -45,15 +42,8 @@ ListLines Off					; Disable execution history
 ;;;                        Private Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kOk = "Ok"
-global kCancel = "Cancel"
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variables Section                        ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vChartID = 0
+global kOk := "Ok"
+global kCancel := "Cancel"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -81,18 +71,18 @@ global chartViewer
 global stratViewer
 
 global sessionTypeDropDown
-global sessionLengthEdit = 60
+global sessionLengthEdit := 60
 global sessionLengthLabel
-global stintLengthEdit = 70
-global formationLapCheck = true
-global postRaceLapCheck = true
+global stintLengthEdit := 70
+global formationLapCheck := true
+global postRaceLapCheck := true
 
 global settingsMenuDropDown
 global simulationMenuDropDown
 global strategyMenuDropDown
 
 global pitstopRequirementsDropDown
-global pitstopWindowEdit = "25 - 35"
+global pitstopWindowEdit := "25 - 35"
 global pitstopWindowLabel
 global tyreChangeRequirementsDropDown
 global tyreChangeRequirementsLabel
@@ -104,47 +94,54 @@ global tyreSetCountEdit
 global tyreSetAddButton
 global tyreSetDeleteButton
 
-global pitstopDeltaEdit = 60
-global pitstopTyreServiceEdit = 30
-global pitstopFuelServiceEdit = 1.2
+global pitstopDeltaEdit := 60
+global pitstopTyreServiceEdit := 30
+global pitstopFuelServiceEdit := 1.2
 global pitstopServiceDropDown
-global fuelCapacityEdit = 125
-global safetyFuelEdit = 5
+global fuelCapacityEdit := 125
+global safetyFuelEdit := 5
 
 global simDriverDropDown
 global addDriverButton
 global deleteDriverButton
 
-global simCompoundDropDown
-global simMaxTyreLapsEdit = 40
-global simInitialFuelAmountEdit = 90
-global simMapEdit = 1
-global simAvgLapTimeEdit = 120
-global simFuelConsumptionEdit = 3.8
+global simWeatherTimeEdit
+global simWeatherDropDown
+global simWeatherAirTemperatureEdit
+global simWeatherTrackTemperatureEdit
+global addSimWeatherButton
+global deleteSimWeatherButton
 
-global simConsumptionVariation = 0
-global simTyreUsageVariation = 0
-global simtyreCompoundVariation = 0
-global simInitialFuelVariation = 0
+global simCompoundDropDown
+global simMaxTyreLapsEdit := 40
+global simInitialFuelAmountEdit := 90
+global simMapEdit := 1
+global simAvgLapTimeEdit := 120
+global simFuelConsumptionEdit := 3.8
+
+global simConsumptionVariation := 0
+global simTyreUsageVariation := 0
+global simtyreCompoundVariation := 0
+global simInitialFuelVariation := 0
 
 global simInputDropDown
 
-global simNumPitstopResult = ""
-global simNumTyreChangeResult = ""
-global simConsumedFuelResult = ""
-global simPitlaneSecondsResult = ""
-global simSessionResultResult = ""
+global simNumPitstopResult := ""
+global simNumTyreChangeResult := ""
+global simConsumedFuelResult := ""
+global simPitlaneSecondsResult := ""
+global simSessionResultResult := ""
 global simSessionResultLabel
 
-global strategyStartMapEdit = 1
-global strategyStartTCEdit = 1
-global strategyStartABSEdit = 2
+global strategyStartMapEdit := 1
+global strategyStartTCEdit := 1
+global strategyStartABSEdit := 2
 
 global strategyCompoundDropDown
-global strategyPressureFLEdit = 27.7
-global strategyPressureFREdit = 27.7
-global strategyPressureRLEdit = 27.7
-global strategyPressureRREdit = 27.7
+global strategyPressureFLEdit := 27.7
+global strategyPressureFREdit := 27.7
+global strategyPressureRLEdit := 27.7
+global strategyPressureRREdit := 27.7
 
 class StrategyWorkbench extends ConfigurationItem {
 	iDataListView := false
@@ -184,6 +181,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	iTrackTemperature := 27
 
 	iDriversListView := false
+	iWeatherListView := false
 	iPitstopListView := false
 
 	iStrategyViewer := false
@@ -223,6 +221,18 @@ class StrategyWorkbench extends ConfigurationItem {
 	SelectedWeather[] {
 		Get {
 			return this.iSelectedWeather
+		}
+	}
+
+	AirTemperature[] {
+		Get {
+			return this.iAirTemperature
+		}
+	}
+
+	TrackTemperature[] {
+		Get {
+			return this.iTrackTemperature
 		}
 	}
 
@@ -323,6 +333,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
+	WeatherListView[] {
+		Get {
+			return this.iWeatherListView
+		}
+	}
+
 	PitstopListView[] {
 		Get {
 			return this.iPitstopListView
@@ -332,18 +348,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	StrategyViewer[] {
 		Get {
 			return this.iStrategyViewer
-		}
-	}
-
-	AirTemperature[] {
-		Get {
-			return this.iAirTemperature
-		}
-	}
-
-	TrackTemperature[] {
-		Get {
-			return this.iTrackTemperature
 		}
 	}
 
@@ -371,9 +375,10 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local compound
-
-		window := this.Window
+		local window := this.Window
+		local compound, simulators, simulator, car, track, weather, choices, chosen, schema
+		local x, x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, w12, w3
+		local airTemperature, trackTemperature
 
 		Gui %window%:Default
 
@@ -428,8 +433,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Conditions")
 
 		weather := this.SelectedWeather
-		choices := map(kWeatherOptions, "translate")
-		chosen := inList(kWeatherOptions, weather)
+		choices := map(kWeatherConditions, "translate")
+		chosen := inList(kWeatherConditions, weather)
 
 		if (!chosen && (choices.Length() > 0)) {
 			weather := choices[1]
@@ -538,7 +543,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseWorkbench, % translate("Close")
 
-		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Drivers", "Simulation", "Strategy"], "translate")*)
+		Gui %window%:Add, Tab, x16 ys+39 w593 h216 -Wrap Section, % values2String("|", map(["Rules && Settings", "Pitstop && Service", "Drivers", "Weather", "Simulation", "Strategy"], "translate")*)
 
 		Gui %window%:Tab, 1
 
@@ -692,6 +697,41 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Tab, 4
 
 		x := 32
+		x2 := x + 220
+		x3 := x2 + 70
+		w3 := 100
+		x4 := x3 + w3 - 50
+		x5 := x4 + 25
+
+		x6 := x3 + w3 + 5
+		x7 := x6 + 47
+		x8 := x7 + 52
+
+		Gui %window%:Add, ListView, x24 ys+34 w216 h171 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDweatherListView gchooseSimWeather, % values2String("|", map(["Time", "Weather", "T Air", "T Track"], "translate")*)
+
+		this.iWeatherListView := weatherListView
+
+		Gui %window%:Add, Text, x%x2% ys+34 w70 h23 +0x200, % translate("Time")
+		Gui %window%:Add, DateTime, x%x3% yp w50 h23 vsimWeatherTimeEdit gupdateSimWeather 1, HH:mm
+
+		Gui %window%:Add, Text, x%x2% yp+24 w70 h23 +0x200, % translate("Weather")
+		Gui %window%:Add, DropDownList, x%x3% yp w%w3% AltSubmit vsimWeatherDropDown gupdateSimWeather, % values2String("|", map(kWeatherConditions, "translate")*)
+
+		Gui %window%:Add, Edit, x%x6% yp w40 vsimWeatherAirTemperatureEdit gupdateSimWeather
+		Gui %window%:Add, UpDown, x%x6% yp-2 w18 h20, % airTemperature
+
+		Gui %window%:Add, Edit, x%x7% yp w40 vsimWeatherTrackTemperatureEdit gupdateSimWeather
+		Gui %window%:Add, UpDown, x%x7% yp w18 h20, % trackTemperature
+		Gui %window%:Add, Text, x%x8% yp w70 h23 +0x200, % translate("Air / Track")
+
+		Gui %window%:Add, Button, x%x8% yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSimWeatherButton gaddSimWeather
+		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+25 yp w23 h23 Center +0x200 HWNDminusButton vdeleteSimWeatherButton gdeleteSimWeather
+		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Tab, 5
+
+		x := 32
 		x0 := x - 4
 		x1 := x + 74
 		x2 := x1 + 22
@@ -805,7 +845,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimSessionResultResult, %simSessionResultResult%
 		Gui %window%:Add, Text, x%x3% yp+2 w50 h20 VsimSessionResultLabel, % translate("Laps")
 
-		Gui %window%:Tab, 5
+		Gui %window%:Tab, 6
 
 		x := 32
 		x0 := x - 4
@@ -920,13 +960,18 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	show() {
-		window := this.Window
+		local window := this.Window
+		local x, y
 
-		Gui %window%:Show
+		if getWindowPosition("Strategy Workbench", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show
 	}
 
 	showTelemetryChart(drawChartFunction) {
-		window := this.Window
+		local window := this.Window
+		local width, height, before, after, html
 
 		Gui %window%:Default
 
@@ -980,7 +1025,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	showComparisonChart(html) {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Default
 
@@ -995,7 +1040,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateState() {
-		window := this.Window
+		local window := this.Window
+		local oldTChoice, oldFChoice
 
 		Gui %window%:Default
 
@@ -1089,10 +1135,35 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			GuiControl Choose, simDriverDropDown, 0
 		}
+
+		Gui ListView, % this.WeatherListView
+
+		GuiControl Enable, addSimWeatherButton
+
+		if LV_GetNext(0) {
+			GuiControl Enable, deleteSimWeatherButton
+			GuiControl Enable, simWeatherTimeEdit
+			GuiControl Enable, simWeatherTrackTemperatureEdit
+			GuiControl Enable, simWeatherAirTemperatureEdit
+			GuiControl Enable, simWeatherDropDown
+		}
+		else {
+			GuiControl Disable, deleteSimWeatherButton
+			GuiControl Disable, simWeatherTimeEdit
+			GuiControl Disable, simWeatherTrackTemperatureEdit
+			GuiControl Disable, simWeatherAirTemperatureEdit
+			GuiControl Disable, simWeatherDropDown
+
+			GuiControl Choose, simWeatherDropDown, 0
+			GuiControl, , simWeatherTimeEdit, 20200101000000
+			GuiControl, , simWeatherTrackTemperatureEdit, % ""
+			GuiControl, , simWeatherAirTemperatureEdit, % ""
+		}
 	}
 
 	updateSettingsMenu() {
-		window := this.Window
+		local window := this.Window
+		local settingsMenu, fileNames, validators, ignore, fileName, validator
 
 		Gui %window%:Default
 
@@ -1142,13 +1213,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	showDataPlot(data, xAxis, yAxises) {
+		local drawChartFunction := "function drawChart() {"
+		local double := (yAxises.Length() > 1)
+		local ignore, yAxis, minValue, maxValue, value, series, vAxis, index, values
+
 		this.iSelectedChart := "LapTimes"
 
-		double := (yAxises.Length() > 1)
-
-		drawChartFunction := ""
-
-		drawChartFunction .= "function drawChart() {"
 		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 
 		if (this.SelectedChartType = "Bubble")
@@ -1156,9 +1226,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . xAxis . "');")
 
-		for ignore, yAxis in yAxises {
+		for ignore, yAxis in yAxises
 			drawChartFunction .= ("`ndata.addColumn('number', '" . yAxis . "');")
-		}
 
 		drawChartFunction .= "`ndata.addRows(["
 
@@ -1206,11 +1275,15 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		series := "series: {"
 		vAxis := "vAxis: { gridlines: { color: 'E0E0E0' }, "
+
 		for ignore, yAxis in yAxises {
 			if (A_Index > 1) {
 				series .= ", "
 				vAxis .= ", "
 			}
+
+			if (A_Index > 2)
+				break
 
 			index := A_Index - 1
 
@@ -1264,6 +1337,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
+		local window, sessionDB, drivers, ignore, id, index, car, carNames, cars
+
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
 
@@ -1314,6 +1389,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
+		local window, tracks
+
 		if (force || (car != this.SelectedCar)) {
 			window := this.Window
 
@@ -1331,6 +1408,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
+		local window, simulator, car
+
 		if (force || (track != this.SelectedTrack)) {
 			window := this.Window
 
@@ -1350,6 +1429,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadWeather(weather, force := false) {
+		local window
+
 		if (force || (this.SelectedWeather != weather)) {
 			window := this.Window
 
@@ -1357,7 +1438,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.iSelectedWeather := weather
 
-			GuiControl Choose, weatherDropDown, % inList(kWeatherOptions, weather)
+			GuiControl Choose, weatherDropDown, % inList(kWeatherConditions, weather)
 
 			this.loadDataType(this.SelectedDataType, true)
 		}
@@ -1369,7 +1450,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadDataType(dataType, force := false, reload := false) {
-		local compound
+		local window, compound, compoundColor, telemetryDB, ignore, column, categories, field, category, value
+		local sessionDB, driverNames, index, names, schema, availableCompounds
 
 		if (force || (this.SelectedDataType != dataType)) {
 			this.showTelemetryChart(false)
@@ -1493,6 +1575,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadDriver(driver, force := false) {
+		local window
+
 		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers != false))
 				  || !inList(this.SelectedDrivers, driver)) {
 			window := this.Window
@@ -1518,11 +1602,11 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadTyreCompounds(simulator, car, track) {
-		window := this.Window
+		local window := this.Window
+		local compounds := new SessionDatabase().getTyreCompounds(simulator, car, track)
+		local translatedCompounds, choices, index, ignore, compound
 
 		Gui %window%:Default
-
-		compounds := new SessionDatabase().getTyreCompounds(simulator, car, track)
 
 		this.iTyreCompounds := compounds
 
@@ -1541,9 +1625,21 @@ class StrategyWorkbench extends ConfigurationItem {
 		GuiControl Choose, tyreSetDropDown, %index%
 		GuiControl Choose, simCompoundDropDown, %index%
 		GuiControl Choose, strategyCompoundDropDown, %index%
+
+		Gui ListView, % this.TyreSetListView
+
+		LV_Delete()
+
+		for ignore, compound in compounds
+			LV_Add("", translate(compound), 99)
+
+		LV_ModifyCol()
 	}
 
 	loadCompound(compound, force := false) {
+		local window
+		local compoundColor
+
 		if (force || (this.SelectedCompound[true] != compound)) {
 			window := this.Window
 
@@ -1552,7 +1648,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if compound {
 				GuiControl Choose, compoundDropDown, % inList(this.AvailableCompounds, compound)
 
-				compoundString := compound
+				compoundColor := false
 
 				splitCompound(compound, compound, compoundColor)
 
@@ -1575,9 +1671,10 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadChart(chartType) {
-		local compound
+		local window := this.Window
+		local telemetryDB, records, schema, xAxis, yAxises
 
-		window := this.Window
+		local compound
 
 		Gui %window%:Default
 
@@ -1630,451 +1727,458 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	chooseSettingsMenu(line) {
-		local compound
-		local strategy
+		local window := this.Window
+		local simulator := this.SelectedSimulator
+		local car := this.SelectedCar
+		local track := this.SelectedTrack
+		local compound, strategy, pitstopRule
+		local ignore, descriptor, sessionDB, directory, numPitstops, name, pitstop, compound, compoundColor
+		local title, simulator, car, track, simulatorCode, dirName, file, settings, settingsDB
+		local telemetryDB, fastestLapTime, row, lapTime, prefix, data, fuelCapacity, initialFuelAmount, map
+		local validators, index, fileName, validator, index, forecast, time, hour, minute
 
-		window := this.Window
+		protectionOn(true, true)
 
-		Gui %window%:Default
+		try {
+			Gui %window%:Default
 
-		switch line {
-			case 3: ; "Load from Strategy"
-				simulator := this.SelectedSimulator
-				car := this.SelectedCar
-				track := this.SelectedTrack
+			switch line {
+				case 3: ; "Load from Strategy"
+					if (simulator && car && track) {
+						strategy := this.SelectedStrategy
 
-				if (simulator && car && track) {
-					strategy := this.SelectedStrategy
+						if strategy {
+							GuiControl, , pitstopDeltaEdit, % strategy.PitstopDelta
+							GuiControl, , pitstopTyreServiceEdit, % strategy.PitstopTyreService
 
-					if strategy {
-						GuiControl, , pitstopDeltaEdit, % strategy.PitstopDelta
-						GuiControl, , pitstopTyreServiceEdit, % strategy.PitstopTyreService
+							pitstopFuelServiceEdit := strategy.PitstopFuelService
+							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 
-						pitstopFuelServiceEdit := strategy.PitstopFuelService
-						GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+							GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2
+							GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
+							GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
 
-						GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2
-						GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
-						GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
+							this.iSelectedValidator := strategy.Validator
 
-						this.iSelectedValidator := strategy.Validator
+							pitstopRule := strategy.PitstopRule
 
-						pitstopRule := strategy.PitstopRule
+							if !pitstopRule {
+								GuiControl Choose, pitstopRequirementsDropDown, 1
 
-						if !pitstopRule {
-							GuiControl Choose, pitstopRequirementsDropDown, 1
+								pitstopWindowEdit := ""
+							}
+							else if IsObject(pitstopRule) {
+								GuiControl Choose, pitstopRequirementsDropDown, 3
 
-							pitstopWindowEdit := ""
-						}
-						else if IsObject(pitstopRule) {
-							GuiControl Choose, pitstopRequirementsDropDown, 3
+								pitstopWindowEdit := values2String("-", pitstopRule*)
+							}
+							else {
+								GuiControl Choose, pitstopRequirementsDropDown, 2
 
-							pitstopWindowEdit := values2String("-", pitstopRule*)
+								pitstopWindowEdit := pitstopRule
+							}
+
+							GuiControl, , pitstopWindowEdit, %pitstopWindowEdit%
+							choosePitstopRequirements()
+
+							if pitstopRule {
+								GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Required", "Always", "Disallowed"], strategy.RefuelRule)
+								GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Required", "Always", "Disallowed"], strategy.TyreChangeRule)
+							}
+							else {
+								GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Always", "Disallowed"], strategy.RefuelRule)
+								GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule)
+							}
+
+							Gui ListView, % this.TyreSetListView
+
+							LV_Delete()
+
+							for ignore, descriptor in strategy.TyreSets
+								LV_Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[3])
+
+							LV_ModifyCol()
+
+							sessionDB := new SessionDatabase()
+
+							this.iStintDrivers := []
+
+							numPitstops := strategy.Pitstops.Length()
+
+							name := sessionDB.getDriverName(simulator, strategy.Driver)
+
+							Gui ListView, % this.DriversListView
+
+							LV_Delete()
+
+							LV_Add("", (numPitstops = 0) ? "1+" : 1, name)
+
+							this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
+
+							for ignore, pitstop in strategy.Pitstops {
+								name := sessionDB.getDriverName(simulator, pitstop.Driver)
+
+								LV_Add("", (numPitstops = A_Index) ? ((A_Index + 1) . "+") : (A_Index + 1), name)
+
+								this.StintDrivers.Push((name = "John Doe (JD)") ? false : pitstop.Driver)
+							}
+
+							LV_ModifyCol()
+
+							Gui ListView, % this.WeatherListView
+
+							LV_Delete()
+
+							for ignore, forecast in strategy.WeatherForecast {
+								time := "20200101000000"
+								hour := Floor(forecast[1] / 60)
+								minute := (forecast[1] - (hour * 60))
+
+								EnvAdd time, %hour%, Hours
+								EnvAdd time, %minute%, Minutes
+
+								FormatTime time, %time%, HH:mm
+
+								LV_Add("", time, translate(forecast[2]), forecast[3], forecast[4])
+							}
+
+							LV_ModifyCol()
+
+							Loop 4
+								LV_ModifyCol(A_Index, "AutoHdr")
+
+							if (strategy.SessionType = "Duration") {
+								GuiControl, , sessionTypeDropDown, 1
+								GuiControl, , sessionLengthlabel, % translate("Minutes")
+							}
+							else {
+								GuiControl, , sessionTypeDropDown, 2
+								GuiControl, , sessionLengthlabel, % translate("Laps")
+							}
+
+							GuiControl, , sessionLengthEdit, % Round(strategy.SessionLength)
+
+							GuiControl, , stintLengthEdit, % strategy.StintLength
+							GuiControl, , formationLapCheck, % strategy.FormationLap
+							GuiControl, , postRaceLapCheck, % strategy.PostRaceLap
+
+							compound := strategy.TyreCompound
+							compoundColor := strategy.TyreCompoundColor
+
+							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
+
+							simAvgLapTimeEdit := Round(strategy.AvgLapTime, 1)
+							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+
+							simFuelConsumptionEdit := Round(strategy.FuelConsumption, 2)
+							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+
+							GuiControl, , simMaxTyreLapsEdit, % Round(strategy.MaxTyreLaps)
+
+							GuiControl, , simInitialFuelAmountEdit, % Round(strategy.RemainingFuel)
+							GuiControl, , simMapEdit, % strategy.Map
+
+							GuiControl, , simConsumptionVariation, % strategy.ConsumptionVariation
+							GuiControl, , simTyreUsageVariation, % strategy.TyreUsageVariation
+							GuiControl, , simtyreCompoundVariation, % strategy.TyreCompoundVariation
+							GuiControl, , simInitialFuelVariation, % strategy.InitialFuelVariation
+
+							if (strategy.UseInitialConditions && strategy.UseTelemetryData)
+								simInputDropDown := 3
+							else if strategy.UseTelemetryData
+								simInputDropDown := 2
+							else
+								simInputDropDown := 1
+
+							GuiControl Choose, simInputDropDown, %simInputDropDown%
+
+							this.updateState()
+							this.updateSettingsMenu()
 						}
 						else {
-							GuiControl Choose, pitstopRequirementsDropDown, 2
+							title := translate("Information")
 
-							pitstopWindowEdit := pitstopRule
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+							MsgBox 262192, %title%, % translate("There is no current Strategy.")
+							OnMessage(0x44, "")
 						}
-
-						GuiControl, , pitstopWindowEdit, %pitstopWindowEdit%
-						choosePitstopRequirements()
-
-						if pitstopRule {
-							GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Required", "Always", "Disallowed"], strategy.RefuelRule)
-							GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Required", "Always", "Disallowed"], strategy.TyreChangeRule)
-						}
-						else {
-							GuiControl Choose, refuelRequirementsDropDown, % inList(["Optional", "Always", "Disallowed"], strategy.RefuelRule)
-							GuiControl Choose, tyreChangeRequirementsDropDown, % inList(["Optional", "Always", "Disallowed"], strategy.TyreChangeRule)
-						}
-
-						Gui ListView, % this.TyreSetListView
-
-						LV_Delete()
-
-						for ignore, descriptor in strategy.TyreSets
-							LV_Add("", translate(compound(descriptor[1], descriptor[2])), descriptor[3])
-
-						LV_ModifyCol()
-
-						Gui ListView, % this.DriversListView
-
-						sessionDB := new SessionDatabase()
-
-						LV_Delete()
-
-						this.iStintDrivers := []
-
-						numPitstops := strategy.Pitstops.Length()
-
-						name := sessionDB.getDriverName(simulator, strategy.Driver)
-
-						LV_Add("", (numPitstops = 0) ? "1+" : 1, name)
-
-						this.StintDrivers.Push((name = "John Doe (JD)") ? false : strategy.Driver)
-
-						for ignore, pitstop in strategy.Pitstops {
-							name := sessionDB.getDriverName(simulator, pitstop.Driver)
-
-							LV_Add("", (numPitstops = A_Index) ? ((A_Index + 1) . "+") : (A_Index + 1), name)
-
-							this.StintDrivers.Push((name = "John Doe (JD)") ? false : pitstop.Driver)
-						}
-
-						LV_ModifyCol()
-
-						if (strategy.SessionType = "Duration") {
-							GuiControl, , sessionTypeDropDown, 1
-							GuiControl, , sessionLengthlabel, % translate("Minutes")
-						}
-						else {
-							GuiControl, , sessionTypeDropDown, 2
-							GuiControl, , sessionLengthlabel, % translate("Laps")
-						}
-
-						GuiControl, , sessionLengthEdit, % Round(strategy.SessionLength)
-
-						GuiControl, , stintLengthEdit, % strategy.StintLength
-						GuiControl, , formationLapCheck, % strategy.FormationLap
-						GuiControl, , postRaceLapCheck, % strategy.PostRaceLap
-
-						compound := strategy.TyreCompound
-						compoundColor := strategy.TyreCompoundColor
-
-						GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
-
-						simAvgLapTimeEdit := Round(strategy.AvgLapTime, 1)
-						GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
-
-						simFuelConsumptionEdit := Round(strategy.FuelConsumption, 2)
-						GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
-
-						GuiControl, , simMaxTyreLapsEdit, % Round(strategy.MaxTyreLaps)
-
-						GuiControl, , simInitialFuelAmountEdit, % Round(strategy.RemainingFuel)
-						GuiControl, , simMapEdit, % strategy.Map
-
-						GuiControl, , simConsumptionVariation, % strategy.ConsumptionVariation
-						GuiControl, , simTyreUsageVariation, % strategy.TyreUsageVariation
-						GuiControl, , simtyreCompoundVariation, % strategy.TyreCompoundVariation
-						GuiControl, , simInitialFuelVariation, % strategy.InitialFuelVariation
-
-						if (strategy.UseInitialConditions && strategy.UseTelemetryData)
-							simInputDropDown := 3
-						else if strategy.UseTelemetryData
-							simInputDropDown := 2
-						else
-							simInputDropDown := 1
-
-						GuiControl Choose, simInputDropDown, %simInputDropDown%
-
-						this.updateState()
-						this.updateSettingsMenu()
 					}
 					else {
 						title := translate("Information")
 
 						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						MsgBox 262192, %title%, % translate("There is no current Strategy.")
+						MsgBox 262192, %title%, % translate("You must first select a car and a track.")
 						OnMessage(0x44, "")
 					}
-				}
-				else {
-					title := translate("Information")
+				case 4: ; "Load from Settings..."
+					if (simulator && car && track) {
+						if GetKeyState("Ctrl", "P") {
+							sessionDB := new SessionDatabase()
 
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
-					OnMessage(0x44, "")
-				}
-			case 4: ; "Load from Settings..."
-				simulator := this.SelectedSimulator
-				car := this.SelectedCar
-				track := this.SelectedTrack
+							directory := sessionDB.DatabasePath
+							simulatorCode := sessionDB.getSimulatorCode(simulator)
 
-				if (simulator && car && track) {
-					if GetKeyState("Ctrl", "P") {
-						simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
+							dirName = %directory%User\%simulatorCode%\%car%\%track%\Race Settings
 
-						dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Settings
+							FileCreateDir %dirName%
 
-						FileCreateDir %dirName%
+							title := translate("Load Race Settings...")
 
-						title := translate("Load Race Settings...")
+							Gui +OwnDialogs
 
-						Gui +OwnDialogs
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+							FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
+							OnMessage(0x44, "")
+						}
+						else
+							file := getFileName("Race.settings", kUserConfigDirectory)
 
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-						FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
+						if (file != "") {
+							settings := readConfiguration(file)
+
+							if (settings.Count() > 0) {
+								GuiControl, , sessionTypeDropDown, 1
+								GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration", 3600) / 60)
+								GuiControl, , sessionLengthlabel, % translate("Minutes")
+								GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation", false)
+								GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace", false)
+
+								GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
+								GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+
+								pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
+								GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+
+								GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2
+								GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
+
+								compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+								compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+
+								GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
+
+								simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
+								GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+
+								simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+								GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+							}
+						}
+					}
+					else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You must first select a car and a track.")
 						OnMessage(0x44, "")
 					}
-					else
-						file := getFileName("Race.settings", kUserConfigDirectory)
+				case 5:
+					if (simulator && car && track) {
+						settingsDB := new SettingsDatabase()
 
-					if (file != "") {
-						settings := readConfiguration(file)
+						settings := new SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
 
 						if (settings.Count() > 0) {
-							GuiControl, , sessionTypeDropDown, 1
-							GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration", 3600) / 60)
-							GuiControl, , sessionLengthlabel, % translate("Minutes")
-							GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation", false)
-							GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace", false)
+							if (getConfigurationValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
+								GuiControl, , sessionTypeDropDown, 1
+								GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration") / 60)
+								GuiControl, , sessionLengthlabel, % translate("Minutes")
+							}
 
-							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
-							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
+							if (getConfigurationValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
+								GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation")
 
-							pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+							if (getConfigurationValue(settings, "Session Settings", "Lap.PostRace", kUndefined) != kUndefined)
+								GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace")
 
-							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2
-							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
+							if (getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", kUndefined) != kUndefined)
+								GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta")
 
-							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+							if (getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", kUndefined) != kUndefined)
+								GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres")
 
-							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
+							if (getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined) {
+								pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel")
 
-							simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
-							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+								GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+							}
 
-							simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
-							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+							if (getConfigurationValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
+								GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2
+
+							if (getConfigurationValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
+								GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")
+
+							if (getConfigurationValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
+								GuiControl, , fuelCapacityEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.Amount")
+
+							if ((getConfigurationValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
+							 && (getConfigurationValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
+								compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound")
+								compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color")
+
+								GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
+							}
+
+							if (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined) {
+								simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime"), 1)
+
+								GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
+							}
+
+							if (getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined) {
+								simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption"), 2)
+
+								GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+							}
 						}
 					}
-				}
-				else {
-					title := translate("Information")
+					else {
+						title := translate("Information")
 
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
-					OnMessage(0x44, "")
-				}
-			case 5:
-				simulator := this.SelectedSimulator
-				car := this.SelectedCar
-				track := this.SelectedTrack
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+						OnMessage(0x44, "")
+					}
+				case 6: ; "Update from Telemetry..."
+					if (simulator && car && track) {
+						telemetryDB := new TelemetryDatabase(simulator, car, track, this.SelectedDrivers)
 
-				if (simulator && car && track) {
-					settingsDB := new SettingsDatabase()
+						fastestLapTime := false
 
-					settings := new SettingsDatabase().loadSettings(simulator, car, track, this.SelectedWeather)
+						for ignore, row in telemetryDB.getMapData(this.SelectedWeather
+																, this.SelectedCompound
+																, this.SelectedCompoundColor) {
+							lapTime := row["Lap.Time"]
 
-					if (settings.Count() > 0) {
-						if (getConfigurationValue(settings, "Session Settings", "Duration", kUndefined) != kUndefined) {
-							GuiControl, , sessionTypeDropDown, 1
-							GuiControl, , sessionLengthEdit, % Round(getConfigurationValue(settings, "Session Settings", "Duration") / 60)
-							GuiControl, , sessionLengthlabel, % translate("Minutes")
-						}
+							if (!fastestLapTime || (lapTime < fastestLapTime)) {
+								fastestLapTime := lapTime
 
-						if (getConfigurationValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
-							GuiControl, , formationLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.Formation")
+								GuiControl, , simMapEdit, % row["Map"]
 
-						if (getConfigurationValue(settings, "Session Settings", "Lap.PostRace", kUndefined) != kUndefined)
-							GuiControl, , postRaceLapCheck, % getConfigurationValue(settings, "Session Settings", "Lap.PostRace")
+								simAvgLapTimeEdit := Round(lapTime, 1)
+								GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
 
-						if (getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", kUndefined) != kUndefined)
-							GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta")
-
-						if (getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", kUndefined) != kUndefined)
-							GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres")
-
-						if (getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined) {
-							pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel")
-
-							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
-						}
-
-						if (getConfigurationValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
-							GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2
-
-						if (getConfigurationValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
-							GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")
-
-						if (getConfigurationValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
-							GuiControl, , fuelCapacityEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.Amount")
-
-						if ((getConfigurationValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
-						 && (getConfigurationValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
-							compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound")
-							compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color")
-
-							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
-						}
-
-						if (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined) {
-							simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime"), 1)
-
-							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
-						}
-
-						if (getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined) {
-							simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption"), 2)
-
-							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+								simFuelConsumptionEdit := Round(row["Fuel.Consumption"], 2)
+								GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
+							}
 						}
 					}
-				}
-				else {
-					title := translate("Information")
+					else {
+						title := translate("Information")
 
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
-					OnMessage(0x44, "")
-				}
-			case 6: ; "Update from Telemetry..."
-				if (this.SelectedSimulator && this.SelectedCar && this.SelectedTrack) {
-					telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar
-													   , this.SelectedTrack, this.SelectedDrivers)
-
-					fastestLapTime := false
-
-					for ignore, row in telemetryDB.getMapData(this.SelectedWeather
-															, this.SelectedCompound
-															, this.SelectedCompoundColor) {
-						lapTime := row["Lap.Time"]
-
-						if (!fastestLapTime || (lapTime < fastestLapTime)) {
-							fastestLapTime := lapTime
-
-							GuiControl, , simMapEdit, % row["Map"]
-
-							simAvgLapTimeEdit := Round(lapTime, 1)
-							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
-
-							simFuelConsumptionEdit := Round(row["Fuel.Consumption"], 2)
-							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
-						}
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You must first select a car and a track.")
+						OnMessage(0x44, "")
 					}
-				}
-				else {
-					title := translate("Information")
+				case 7: ; "Import from Simulation..."
+					if simulator {
+						prefix := new SessionDatabase().getSimulatorCode(simulator)
 
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must first select a car and a track.")
-					OnMessage(0x44, "")
-				}
-			case 7: ; "Import from Simulation..."
-				simulator := this.SelectedSimulator
-				car := this.SelectedCar
-				track := this.SelectedTrack
-
-				if simulator {
-					switch simulator {
-						case "Assetto Corsa":
-							prefix := "AC"
-						case "Assetto Corsa Competizione":
-							prefix := "ACC"
-						case "Automobilista 2":
-							prefix := "AMS2"
-						case "RaceRoom Racing Experience":
-							prefix := "R3E"
-						case "rFactor 2":
-							prefix := "RF2"
-						case "iRacing":
-							prefix := "IRC"
-						case "Project CARS 2":
-							prefix := "PCARS2"
-						default:
+						if !prefix {
 							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 							title := translate("Warning")
 							MsgBox 262192, %title%, % translate("This is not supported for the selected simulator...")
 							OnMessage(0x44, "")
 
 							return
-					}
-
-					data := readSimulatorData(prefix)
-
-					if ((getConfigurationValue(data, "Session Data", "Car") != this.SelectedCar)
-					 || (getConfigurationValue(data, "Session Data", "Track") != this.SelectedTrack))
-						return
-					else {
-						fuelCapacity := getConfigurationValue(data, "Session Data", "FuelAmount", kUndefined)
-						initialFuelAmount := getConfigurationValue(data, "Car Data", "FuelRemaining", kUndefined)
-
-						if (fuelCapacity != kUndefined)
-							GuiControl, , fuelCapacityEdit, % Round(fuelCapacity)
-
-						if (initialFuelAmount != kUndefined)
-							GuiControl, , simInitialFuelAmountEdit, % Round(initialFuelAmount)
-
-						compound := getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined)
-						compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", kUndefined)
-
-						if (compound = kUndefined) {
-							compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
-
-							if (compound != kUndefined) {
-								compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, false)
-
-								if compound
-									splitCompound(compound, compound, compoundColor)
-								else
-									compound := kUndefined
-							}
 						}
 
-						if ((compound != kUndefined) && (compoundColor != kUndefined))
-							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
+						data := readSimulatorData(prefix)
 
-						map := getConfigurationValue(data, "Car Data", "Map", kUndefined)
+						if ((getConfigurationValue(data, "Session Data", "Car") != this.SelectedCar)
+						 || (getConfigurationValue(data, "Session Data", "Track") != this.SelectedTrack))
+							return
+						else {
+							fuelCapacity := getConfigurationValue(data, "Session Data", "FuelAmount", kUndefined)
+							initialFuelAmount := getConfigurationValue(data, "Car Data", "FuelRemaining", kUndefined)
 
-						if (map != kUndefined)
-							GuiControl, , simMapEdit, % Round(map)
-					}
-				}
-				else {
-					title := translate("Information")
+							if (fuelCapacity != kUndefined)
+								GuiControl, , fuelCapacityEdit, % Round(fuelCapacity)
 
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("You must first select a simulation.")
-					OnMessage(0x44, "")
-				}
-			default:
-				if (line > 9) {
-					validators := []
+							if (initialFuelAmount != kUndefined)
+								GuiControl, , simInitialFuelAmountEdit, % Round(initialFuelAmount)
 
-					if GetKeyState("Ctrl", "P") {
-						index := 0
+							compound := getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined)
+							compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", kUndefined)
 
-						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
-							SplitPath fileName, , , , validator
+							if (compound = kUndefined) {
+								compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
-							if !inList(validators, validator) {
-								if ((++index = (line - 9)) && !InStr(fileName, kResourcesDirectory)) {
-									Run notepad %fileName%
+								if (compound != kUndefined) {
+									compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, false)
 
-									break
+									if compound
+										splitCompound(compound, compound, compoundColor)
+									else
+										compound := kUndefined
 								}
 							}
-							else
-								validators.Push(validator)
+
+							if ((compound != kUndefined) && (compoundColor != kUndefined))
+								GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
+
+							map := getConfigurationValue(data, "Car Data", "Map", kUndefined)
+
+							if (map != kUndefined)
+								GuiControl, , simMapEdit, % Round(map)
 						}
 					}
 					else {
-						for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
-							SplitPath fileName, , , , validator
+						title := translate("Information")
 
-							if !inList(validators, validator)
-								validators.Push(validator)
-						}
-
-						validator := validators[line - 9]
-
-						if (this.iSelectedValidator = validator)
-							this.iSelectedValidator := false
-						else
-							this.iSelectedValidator := validator
-
-						this.updateSettingsMenu()
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You must first select a simulation.")
+						OnMessage(0x44, "")
 					}
-				}
+				default:
+					if (line > 9) {
+						validators := []
+
+						if GetKeyState("Ctrl", "P") {
+							index := 0
+
+							for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+								SplitPath fileName, , , , validator
+
+								if !inList(validators, validator) {
+									if ((++index = (line - 9)) && !InStr(fileName, kResourcesDirectory)) {
+										Run notepad %fileName%
+
+										break
+									}
+								}
+								else
+									validators.Push(validator)
+							}
+						}
+						else {
+							for ignore, fileName in getFileNames("*.rules", kResourcesDirectory . "Strategy\Validators\", kUserHomeDirectory . "Validators\") {
+								SplitPath fileName, , , , validator
+
+								if !inList(validators, validator)
+									validators.Push(validator)
+							}
+
+							validator := validators[line - 9]
+
+							if (this.iSelectedValidator = validator)
+								this.iSelectedValidator := false
+							else
+								this.iSelectedValidator := validator
+
+							this.updateSettingsMenu()
+						}
+					}
+			}
+		}
+		finally {
+			protectionOff(true, true)
 		}
 	}
 
 	chooseSimulationMenu(line) {
-		local strategy
+		local strategy, selectStrategy, title
 
 		switch line {
 			case 3: ; "Run Simulation"
@@ -2099,16 +2203,19 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	chooseStrategyMenu(line) {
-		local strategy
-
-		simulator := this.SelectedSimulator
-		car := this.SelectedCar
-		track := this.SelectedTrack
+		local simulator := this.SelectedSimulator
+		local car := this.SelectedCar
+		local track := this.SelectedTrack
+		local strategy, strategies, simulatorCode, dirName, fileName, configuration, title, name, files, directory
+		local sessionDB
 
 		if (simulator && car && track) {
-			simulatorCode := new SessionDatabase().getSimulatorCode(simulator)
+			sessionDB := new SessionDatabase()
 
-			dirName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
+			directory := sessionDB.DatabasePath
+			simulatorCode := sessionDB.getSimulatorCode(simulator)
+
+			dirName = %directory%User\%simulatorCode%\%car%\%track%\Race Strategies
 
 			FileCreateDir %dirName%
 		}
@@ -2138,11 +2245,11 @@ class StrategyWorkbench extends ConfigurationItem {
 				Gui +OwnDialogs
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-				FileSelectFile file, 1, %dirName%, %title%, Strategy (*.strategy)
+				FileSelectFile fileName, 1, %dirName%, %title%, Strategy (*.strategy)
 				OnMessage(0x44, "")
 
-				if (file != "") {
-					configuration := readConfiguration(file)
+				if (fileName != "") {
+					configuration := readConfiguration(fileName)
 
 					if (configuration.Count() > 0)
 						this.selectStrategy(this.createStrategy(configuration))
@@ -2156,14 +2263,14 @@ class StrategyWorkbench extends ConfigurationItem {
 					Gui +OwnDialogs
 
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-					FileSelectFile file, S17, %fileName%, %title%, Strategy (*.strategy)
+					FileSelectFile fileName, S17, %fileName%, %title%, Strategy (*.strategy)
 					OnMessage(0x44, "")
 
-					if (file != "") {
-						if !InStr(file, ".strategy")
-							file := (file . ".strategy")
+					if (fileName != "") {
+						if !InStr(fileName, ".strategy")
+							fileName := (fileName . ".strategy")
 
-						SplitPath file, , , , name
+						SplitPath fileName, , , , name
 
 						this.SelectedStrategy.setName(name)
 
@@ -2171,7 +2278,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 						this.SelectedStrategy.saveToConfiguration(configuration)
 
-						writeConfiguration(file, configuration)
+						writeConfiguration(fileName, configuration)
 					}
 				}
 			case 7: ; "Compare Strategies..."
@@ -2188,7 +2295,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (files != "") {
 					directory := ""
 
-					Loop Parse, files, `n
+					loop Parse, files, `n
 					{
 						if (A_Index = 1)
 							directory := A_LoopField
@@ -2208,19 +2315,13 @@ class StrategyWorkbench extends ConfigurationItem {
 					writeConfiguration(kUserConfigDirectory . "Race.strategy", configuration)
 				}
 			case 10: ; "Clear Strategy..."
-				try {
-					FileDelete %kUserConfigDirectory%Race.strategy
-				}
-				catch exception {
-					; ignore
-				}
+				deleteFile(kUserConfigDirectory . "Race.strategy")
 		}
 	}
 
 	selectStrategy(strategy) {
-		local compound
-
-		window := this.Window
+		local window := this.Window
+		local compound, avgLapTimes, avgFuelConsumption, ignore, pitstop, compound
 
 		Gui %window%:Default
 		Gui ListView, % this.PitstopListView
@@ -2260,9 +2361,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	compareStrategies(strategies*) {
-		local strategy
-
-		vChartID += 1
+		local strategy, before, after, chart, ignore, laps, exhausted, index, hasData
+		local sLaps, html, timeSeries, lapSeries, fuelSeries, tyreSeries, width, chartArea, tableCSS
 
 		before =
 		(
@@ -2275,7 +2375,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				</style>
 				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 				<script type="text/javascript">
-					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%vChartID%);
+					google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart);
 		)
 
 		after =
@@ -2284,7 +2384,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			</head>
 		)
 
-		chart := ("function drawChart" . vChartID . "() {`nvar data = new google.visualization.DataTable();")
+		chart := ("function drawChart() {`nvar data = new google.visualization.DataTable();")
 
 		chart .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
 
@@ -2298,7 +2398,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		for ignore, strategy in strategies
 			laps.Push(strategy.getLaps(120))
 
-		Loop {
+		loop {
 			if (A_Index > 1)
 				chart .= ", "
 
@@ -2307,7 +2407,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			exhausted := true
 			index := A_Index
 
-			Loop % strategies.Length()
+			loop % strategies.Length()
 			{
 				sLaps := laps[A_Index]
 
@@ -2328,7 +2428,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		html := ""
 
 		for ignore, strategy in strategies {
-			timesSeries := []
+			timeSeries := []
 			lapSeries := []
 			fuelSeries := []
 			tyreSeries := []
@@ -2349,9 +2449,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		chart .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . translate("Minute") . "' }, vAxis: { title: '" . translate("Lap") . "', viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 
-		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id" . vChartID . "')); chart.draw(data, options); }")
+		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-		chartArea := ("<div id=""header""><i><b>" . translate("Performance") . "</b></i></div><br><div id=""chart_id" . vChartID . """ style=""width: " . width . "px; height: 348px"">")
+		chartArea := ("<div id=""header""><i><b>" . translate("Performance") . "</b></i></div><br><div id=""chart_id"" style=""width: " . width . "px; height: 348px"">")
 
 		tableCSS := getTableCSS()
 
@@ -2361,7 +2461,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	createStrategy(nameOrConfiguration, driver := false) {
-		name := nameOrConfiguration
+		local name := nameOrConfiguration
+		local theStrategy, name
 
 		if !IsObject(nameOrConfiguration)
 			nameOrConfiguration := false
@@ -2377,9 +2478,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
 					  , ByRef sessionType, ByRef sessionLength
 					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
-		local compound
-
-		window := this.Window
+		local window := this.Window
+		local compound, compoundColor, telemetryDB, lowestLapTime, ignore, row, lapTime, settings
 
 		Gui %window%:Default
 
@@ -2440,74 +2540,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
-		window := this.Window
-
-		Gui %window%:Default
-
-		GuiControlGet simInputDropDown
-		GuiControlGet simAvgLapTimeEdit
-
-		a := false
-		b := false
-
-		if (simInputDropDown > 1) {
-			telemetryDB := this.TelemetryDatabase
-
-			lapTimes := telemetryDB.getMapLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
-			tyreLapTimes := telemetryDB.getTyreLapTimes(this.SelectedWeather, tyreCompound, tyreCompoundColor)
-
-			if (tyreLapTimes.Length() > 1) {
-				xValues := []
-				yValues := []
-
-				for ignore, entry in tyreLapTimes {
-					xValues.Push(entry["Tyre.Laps"])
-					yValues.Push(entry["Lap.Time"])
-				}
-
-				linRegression(xValues, yValues, a, b)
-			}
-		}
-		else
-			lapTimes := []
-
-		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
-
-		count := 0
-		avgLapTime := 0
-		lapTime := false
-
-		Loop %numLaps% {
-			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
-
-			if (!lapTime || !baseLapTime)
-				lapTime := candidate
-			else if (candidate < lapTime)
-				lapTime := candidate
-
-			if lapTime {
-				if baseLapTime
-					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
-				else
-					avgLapTime += lapTime
-
-				count += 1
-			}
-		}
-
-		if (avgLapTime > 0)
-			avgLapTime := (avgLapTime / count)
-
-		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
-	}
-
 	getPitstopRules(ByRef validator, ByRef pitstopRule, ByRef refuelRule, ByRef tyreChangeRule, ByRef tyreSets) {
-		local compound
-
-		result := true
-
-		window := this.Window
+		local window := this.Window
+		local result := true
+		local compound, compoundColor, translatedCompounds, count
 
 		Gui %window%:Default
 
@@ -2561,7 +2597,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		translatedCompounds := map(this.TyreCompounds, "translate")
 		tyreSets := []
 
-		Loop % LV_GetCount()
+		loop % LV_GetCount()
 		{
 			LV_GetText(compound, A_Index, 1)
 			LV_GetText(count, A_Index, 2)
@@ -2576,7 +2612,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	getSessionSettings(ByRef stintLength, ByRef formationLap, ByRef postRaceLap, ByRef fuelCapacity, ByRef safetyFuel
 					 , ByRef pitstopDelta, ByRef pitstopFuelService, ByRef pitstopTyreService, ByRef pitstopServiceOrder) {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Default
 
@@ -2602,9 +2638,57 @@ class StrategyWorkbench extends ConfigurationItem {
 		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
 
-	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialTyreLaps, ByRef initialFuelAmount
+	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
+		local window := this.Window
+		local rows, ignore, time, tWeather, tAirTemperature, tTrackTemperature, candidate, weathers, cHour, cMinute
+
+		weather := this.SelectedWeather
+		airTemperature := this.AirTemperature
+		trackTemperature := this.TrackTemperature
+
+		Gui %window%:Default
+
+		Gui ListView, % this.WeatherListView
+
+		rows := LV_GetCount()
+
+		if (rows > 0) {
+			weathers := []
+
+			loop % rows
+			{
+				LV_GetText(time, A_Index, 1)
+				LV_GetText(tWeather, A_Index, 2)
+				LV_GetText(tAirTemperature, A_Index, 3)
+				LV_GetText(tTrackTemperature, A_Index, 4)
+
+				weathers.Push(Array(time, kWeatherConditions[inList(map(kWeatherConditions, "translate"), tWeather)]
+								  , tAirTemperature, tTrackTemperature))
+			}
+
+			bubbleSort(weathers, "compareTime")
+
+			hour := Floor(minute / 60)
+			minute := minute - (hour * 60)
+
+			for ignore, candidate in weathers {
+				time := string2Values(":", candidate[1])
+				cHour := (0 + time[1])
+				cMinute := (0 + time[2])
+
+				if ((cHour < hour) || ((cHour = hour) && (cMinute <= minute))) {
+					weather := candidate[2]
+					airTemperature := candidate[3]
+					trackTemperature := candidate[4]
+				}
+			}
+		}
+	}
+
+	getStartConditions(ByRef initialStint, ByRef initialLap, ByRef initialStintTime, ByRef initialSessionTime
+					 , ByRef initialTyreLaps, ByRef initialFuelAmount
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
-		window := this.Window
+		local window := this.Window
 
 		Gui %window%:Default
 
@@ -2617,6 +2701,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		initialStint := 1
 		initialLap := 0
 		initialStintTime := 0
+		initialSessionTime := 0
 		initialTyreLaps := 0
 		initialFuelAmount := simInitialFuelAmountEdit
 		initialMap := simMapEdit
@@ -2625,8 +2710,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData
-						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariationVariation) {
-		window := this.Window
+						, ByRef consumptionVariation, ByRef initialFuelVariation, ByRef tyreUsageVariation, ByRef tyreCompoundVariation) {
+		local window := this.Window
 
 		Gui %window%:Default
 
@@ -2643,11 +2728,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		consumptionVariation := simConsumptionVariation
 		initialFuelVariation := simInitialFuelVariation
 		tyreUsageVariation := simTyreUsageVariation
-		tyreCompoundVariationVariation := simtyreCompoundVariation
+		tyreCompoundVariation := simtyreCompoundVariation
 	}
 
 	getStintDriver(stintNumber, ByRef driverID, ByRef driverName) {
-		numDrivers := this.StintDrivers.Length()
+		local numDrivers := this.StintDrivers.Length()
 
 		if (numDrivers == 0) {
 			driverID := false
@@ -2665,12 +2750,82 @@ class StrategyWorkbench extends ConfigurationItem {
 		return true
 	}
 
-	setStintDriver(stintNumber, driverID) {
-		Throw "StrategyWorkbench.setStintDriver should never be called..."
+	getAvgLapTime(numLaps, map, remainingFuel, fuelConsumption, weather, tyreCompound, tyreCompoundColor, tyreLaps, default := false) {
+		local window := this.Window
+		local min := false
+		local max := false
+		local a, b, telemetryDB, lapTimes, tyreLapTimes, xValues, yValues, ignore, entry
+		local baseLapTime, count, avgLapTime, lapTime, candidate
+
+		Gui %window%:Default
+
+		GuiControlGet simInputDropDown
+		GuiControlGet simAvgLapTimeEdit
+
+		a := false
+		b := false
+
+		if (simInputDropDown > 1) {
+			telemetryDB := this.TelemetryDatabase
+
+			lapTimes := telemetryDB.getMapLapTimes(weather, tyreCompound, tyreCompoundColor)
+			tyreLapTimes := telemetryDB.getTyreLapTimes(weather, tyreCompound, tyreCompoundColor)
+
+			if (tyreLapTimes.Length() > 1) {
+				xValues := []
+				yValues := []
+
+				for ignore, entry in tyreLapTimes {
+					lapTime := entry["Lap.Time"]
+
+					xValues.Push(entry["Tyre.Laps"])
+					yValues.Push(lapTime)
+
+					min := (min ? Min(min, lapTime) : lapTime)
+					max := (max ? Min(max, lapTime) : lapTime)
+				}
+
+				linRegression(xValues, yValues, a, b)
+			}
+		}
+		else
+			lapTimes := []
+
+		baseLapTime := ((a && b) ? (a + (b * tyreLaps)) : false)
+
+		count := 0
+		avgLapTime := 0
+		lapTime := false
+
+		loop %numLaps% {
+			candidate := lookupLapTime(lapTimes, map, remainingFuel - (fuelConsumption * (A_Index - 1)))
+
+			if (!lapTime || !baseLapTime)
+				lapTime := candidate
+			else if (candidate < lapTime)
+				lapTime := candidate
+
+			if lapTime {
+				if baseLapTime
+					avgLapTime += (lapTime + ((a + (b * (tyreLaps + A_Index))) - baseLapTime))
+				else
+					avgLapTime += lapTime
+
+				count += 1
+			}
+		}
+
+		if (avgLapTime > 0)
+			avgLapTime := (avgLapTime / count)
+
+		if (min && max)
+			avgLapTime := Max(min, Min(max, avgLapTime))
+
+		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
 	}
 
 	runSimulation() {
-		telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		local telemetryDB := new TelemetryDatabase(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
 		this.iTelemetryDatabase := telemetryDB
 
@@ -2683,7 +2838,8 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	chooseScenario(strategy) {
-		window := this.Window
+		local window := this.Window
+		local numPitstops, numTyreChanges, consumedFuel, avgLapTimes, ignore, pitstop
 
 		Gui %window%:Default
 
@@ -2734,9 +2890,14 @@ class StrategyWorkbench extends ConfigurationItem {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+compareTime(w1, w2) {
+	return (w1[1] > w2[1])
+}
+
 readSimulatorData(simulator) {
-	dataFile := kTempDirectory . simulator . " Data\Setup.data"
-	exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
+	local exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
+	local data, setupData
 
 	FileCreateDir %kTempDirectory%%simulator% Data
 
@@ -2751,6 +2912,8 @@ readSimulatorData(simulator) {
 
 		data := readConfiguration(dataFile)
 
+		deleteFile(dataFile)
+
 		setConfigurationSectionValues(data, "Setup Data", setupData)
 
 		return data
@@ -2764,6 +2927,8 @@ readSimulatorData(simulator) {
 }
 
 validatePitstopRule(full := false) {
+	local reset, count, pitOpen, pitClose
+
 	GuiControlGet pitstopWindowEdit
 
 	if (StrLen(Trim(pitstopWindowEdit)) > 0) {
@@ -2842,7 +3007,7 @@ validatePitstopRule(full := false) {
 }
 
 validateNumber(field) {
-	oldValue := %field%
+	local oldValue := %field%
 
 	GuiControlGet %field%
 
@@ -2855,7 +3020,7 @@ validateNumber(field) {
 }
 
 validatePositiveInteger(field, minValue) {
-	oldValue := %field%
+	local oldValue := %field%
 
 	GuiControlGet %field%
 
@@ -2893,6 +3058,8 @@ validatePitstopFuelService() {
 }
 
 chooseSimDriver() {
+	local workbench, window, sessionDB, ignore, id, driver
+
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		workbench := StrategyWorkbench.Instance
 		window := workbench.Window
@@ -2917,8 +3084,9 @@ chooseSimDriver() {
 }
 
 updateSimDriver() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row, driver
 
 	Gui %window%:Default
 
@@ -2945,8 +3113,9 @@ updateSimDriver() {
 }
 
 addSimDriver() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row, title, numRows, sessionDB, driver
 
 	Gui %window%:Default
 
@@ -2977,7 +3146,7 @@ addSimDriver() {
 
 	numRows := LV_GetCount()
 
-	Loop %numRows%
+	loop %numRows%
 		LV_Modify(A_Index, "Col1", ((A_Index == numRows) ? (A_Index . "+") : A_Index))
 
 	sessionDB := new SessionDatabase()
@@ -2996,8 +3165,9 @@ addSimDriver() {
 }
 
 deleteSimDriver() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row, title, numRows
 
 	Gui %window%:Default
 
@@ -3020,7 +3190,7 @@ deleteSimDriver() {
 
 			numRows := LV_GetCount()
 
-			Loop %numRows%
+			loop %numRows%
 				LV_Modify(A_Index, "Col1", ((A_Index == numRows) ? (A_Index . "+") : A_Index))
 
 			workbench.updateState()
@@ -3028,10 +3198,185 @@ deleteSimDriver() {
 	}
 }
 
+chooseSimWeather() {
+	local workbench, window, sessionDB, time, weather, currentTime, airTemperature, trackTemperature
 
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		workbench := StrategyWorkbench.Instance
+		window := workbench.Window
+
+		Gui %window%:Default
+
+		Gui ListView, % workbench.WeatherListView
+
+		LV_GetText(time, A_EventInfo, 1)
+		LV_GetText(weather, A_EventInfo, 2)
+		LV_GetText(airTemperature, A_EventInfo, 3)
+		LV_GetText(trackTemperature, A_EventInfo, 4)
+
+		time := string2Values(":", time)
+
+		currentTime := "20200101000000"
+
+		EnvAdd currentTime, time[1], Hours
+		EnvAdd currentTime, time[2], Minutes
+
+		GuiControl, , simWeatherTimeEdit, %currentTime%
+		GuiControl, , simWeatherAirTemperatureEdit, %airTemperature%
+		GuiControl, , simWeatherTrackTemperatureEdit, %trackTemperature%
+		GuiControl Choose, simWeatherDropDown, % inList(map(kWeatherConditions, "translate"), weather)
+
+		workbench.updateState()
+	}
+}
+
+updateSimWeather() {
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row, time
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.WeatherListView
+
+	row := LV_GetNext(0)
+
+	if (row > 0) {
+		GuiControlGet simWeatherTimeEdit
+		GuiControlGet simWeatherAirTemperatureEdit
+		GuiControlGet simWeatherTrackTemperatureEdit
+		GuiControlGet simWeatherDropDown
+
+		FormatTime time, %simWeatherTimeEdit%, HH:mm
+
+		LV_Modify(row, "", time, translate(kWeatherConditions[simWeatherDropDown])
+						 , simWeatherAirTemperatureEdit, simWeatherTrackTemperatureEdit)
+
+		LV_ModifyCol()
+
+		Loop 4
+			LV_ModifyCol(A_Index, "AutoHdr")
+	}
+}
+
+addSimWeather() {
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local after := false
+	local row, title, lastWeather, lastAirTemperature, lastTrackTemperature, lastTime, currentTime
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.WeatherListView
+
+	row := LV_GetNext(0)
+
+	if row {
+		LV_GetText(lastTime, row, 1)
+		LV_GetText(lastWeather, row, 2)
+		LV_GetText(lastAirTemperature, row, 3)
+		LV_GetText(lastTrackTemperature, row, 4)
+
+		lastWeather := kWeatherConditions[inList(map(kWeatherConditions, "translate"), lastWeather)]
+
+		title := translate("Insert")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Before", "After", "Cancel"]))
+		MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Cancel
+			return
+
+		IfMsgBox No
+		{
+			row += 1
+
+			after := true
+		}
+
+		LV_Insert(row, "Select Vis", "", "")
+	}
+	else {
+		row := LV_GetCount()
+
+		if row {
+			LV_GetText(lastTime, row, 1)
+			LV_GetText(lastWeather, row, 2)
+			LV_GetText(lastAirTemperature, row, 3)
+			LV_GetText(lastTrackTemperature, row, 4)
+
+			lastWeather := kWeatherConditions[inList(map(kWeatherConditions, "translate"), lastWeather)]
+		}
+		else {
+			lastWeather := workbench.SelectedWeather
+			lastAirTemperature := workbench.AirTemperature
+			lastTrackTemperature := workbench.TrackTemperature
+			lastTime := "00:00"
+		}
+
+		LV_Add("Select Vis", "", "")
+
+		row += 1
+	}
+
+	lastTime := string2Values(":", lastTime)
+
+	currentTime := "20200101000000"
+
+	EnvAdd currentTime, lastTime[1], Hours
+	EnvAdd currentTime, lastTime[2], Minutes
+
+	if after
+		EnvAdd currentTime, 1, Hours
+	else if (LV_GetCount() > 1)
+		EnvAdd currentTime, -30, Minutes
+
+	GuiControl, , simWeatherTimeEdit, %currentTime%
+	GuiControl, , simWeatherAirTemperatureEdit, %lastAirTemperature%
+	GuiControl, , simWeatherTrackTemperatureEdit, %lastTrackTemperature%
+	GuiControl Choose, simWeatherDropDown, % inList(kWeatherConditions, lastWeather)
+
+	FormatTime currentTime, %currentTime%, HH:mm
+
+	LV_Modify(row, "", currentTime, translate(lastWeather), lastAirTemperature, lastTrackTemperature)
+
+	Loop 4
+		LV_ModifyCol(A_Index, "AutoHdr")
+
+	workbench.updateState()
+}
+
+deleteSimWeather() {
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row, title
+
+	Gui %window%:Default
+
+	Gui ListView, % workbench.WeatherListView
+
+	row := LV_GetNext(0)
+
+	if row {
+		title := translate("Delete")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		MsgBox 262436, %title%, % translate("Do you really want to delete the selected change of weather?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+		{
+			LV_Delete(row)
+
+			workbench.updateState()
+		}
+	}
+}
 
 filterSchema(schema) {
-	newSchema := []
+	local newSchema := []
+	local ignore, column
 
 	for ignore, column in schema
 		if !inList(["Driver", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
@@ -3045,7 +3390,7 @@ closeWorkbench() {
 }
 
 moveWorkbench() {
-	moveByMouse(StrategyWorkbench.Instance.Window)
+	moveByMouse(StrategyWorkbench.Instance.Window, "Strategy Workbench")
 }
 
 openWorkbenchDocumentation() {
@@ -3053,8 +3398,8 @@ openWorkbenchDocumentation() {
 }
 
 chooseSimulator() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
@@ -3064,8 +3409,8 @@ chooseSimulator() {
 }
 
 chooseCar() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
@@ -3075,8 +3420,9 @@ chooseCar() {
 }
 
 chooseTrack() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local simulator, tracks, trackNames
 
 	Gui %window%:Default
 
@@ -3090,19 +3436,19 @@ chooseTrack() {
 }
 
 chooseWeather() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
 	GuiControlGet weatherDropDown
 
-	workbench.loadWeather(kWeatherOptions[weatherDropDown])
+	workbench.loadWeather(kWeatherConditions[weatherDropDown])
 }
 
 updateTemperatures() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
@@ -3113,8 +3459,8 @@ updateTemperatures() {
 }
 
 chooseDriver() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
@@ -3124,8 +3470,8 @@ chooseDriver() {
 }
 
 chooseCompound() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
@@ -3135,8 +3481,9 @@ chooseCompound() {
 }
 
 chooseDataType() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local title
 
 	Gui %window%:Default
 
@@ -3174,8 +3521,8 @@ chooseDataType() {
 }
 
 chooseData() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
@@ -3189,8 +3536,8 @@ chooseAxis() {
 }
 
 chooseChartSource() {
-	workbench := StrategyWorkbench.Instance
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
 
 	Gui %window%:Default
 
@@ -3207,7 +3554,7 @@ chooseChartSource() {
 }
 
 chooseChartType() {
-	window := StrategyWorkbench.Instance.Window
+	local window := StrategyWorkbench.Instance.Window
 
 	Gui %window%:Default
 
@@ -3227,7 +3574,7 @@ choosePitstopRequirements() {
 }
 
 chooseTyreSet() {
-	local compound
+	local compound, workbench, window, count
 
 	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
 		workbench := StrategyWorkbench.Instance
@@ -3249,9 +3596,9 @@ chooseTyreSet() {
 }
 
 updateTyreSet() {
-	workbench := StrategyWorkbench.Instance
-
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local row
 
 	Gui %window%:Default
 
@@ -3270,9 +3617,9 @@ updateTyreSet() {
 }
 
 addTyreSet() {
-	workbench := StrategyWorkbench.Instance
-
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local index
 
 	Gui %window%:Default
 
@@ -3296,15 +3643,18 @@ addTyreSet() {
 }
 
 deleteTyreSet() {
-	workbench := StrategyWorkbench.Instance
-
-	window := workbench.Window
+	local workbench := StrategyWorkbench.Instance
+	local window := workbench.Window
+	local index
 
 	Gui %window%:Default
 
 	Gui ListView, % workbench.TyreSetListView
 
-	LV_Delete(LV_GetNext(0))
+	index := LV_GetNext(0)
+
+	if (index > 0)
+		LV_Delete(index)
 
 	workbench.updateState()
 }
@@ -3334,9 +3684,8 @@ strategyMenu() {
 }
 
 runSimulation() {
-	workbench := StrategyWorkbench.Instance
-
-	selectStrategy := GetKeyState("Ctrl")
+	local workbench := StrategyWorkbench.Instance
+	local selectStrategy := GetKeyState("Ctrl")
 
 	workbench.runSimulation()
 
@@ -3344,100 +3693,21 @@ runSimulation() {
 		workbench.chooseSimulationMenu(5)
 }
 
-setButtonIcon(buttonHandle, file, index := 1, options := "") {
-;   Parameters:
-;   1) {Handle} 	HWND handle of Gui button
-;   2) {File} 		File containing icon image
-;   3) {Index} 		Index of icon in file
-;						Optional: Default = 1
-;   4) {Options}	Single letter flag followed by a number with multiple options delimited by a space
-;						W = Width of Icon (default = 16)
-;						H = Height of Icon (default = 16)
-;						S = Size of Icon, Makes Width and Height both equal to Size
-;						L = Left Margin
-;						T = Top Margin
-;						R = Right Margin
-;						B = Botton Margin
-;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
-
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
-
-	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
-
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
-
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
-
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
-
-	return IL_Add(normal_il, file, index)
-}
-
-fixIE(version := 0, exeName := "") {
-	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
-	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
-
-	if versions.HasKey(version)
-		version := versions[version]
-
-	if !exeName {
-		if A_IsCompiled
-			exeName := A_ScriptName
-		else
-			SplitPath A_AhkPath, exeName
-	}
-
-	RegRead previousValue, HKCU, %key%, %exeName%
-
-	if (version = "")
-		RegDelete, HKCU, %key%, %exeName%
-	else
-		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
-
-	return previousValue
-}
-
-exitFixIE(previous) {
-	fixIE(previous)
-
-	return false
-}
-
 runStrategyWorkbench() {
-	local compound
-
-	icon := kIconsDirectory . "Dashboard.ico"
+	local icon := kIconsDirectory . "Dashboard.ico"
+	local simulator := false
+	local car := false
+	local track := false
+	local weather := "Dry"
+	local airTemperature := 23
+	local trackTemperature:= 27
+	local compound := "Dry"
+	local compoundColor := "Black"
+	local index := 1
+	local workbench
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Strategy Workbench
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
-	simulator := "Assetto Corsa Competizione"
-	car := false
-	track := false
-	weather := "Dry"
-	airTemperature := 23
-	trackTemperature:= 27
-	compound := "Dry"
-	compoundColor := "Black"
-
-	index := 1
 
 	while (index < A_Args.Length()) {
 		switch A_Args[index] {
@@ -3476,20 +3746,14 @@ runStrategyWorkbench() {
 	if (trackTemperature <= 0)
 		trackTemperature := 27
 
-	current := fixIE(11)
+	fixIE(11)
 
-	OnExit(Func("exitFixIE").Bind(current))
-
-	workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature
-									 , compound, compoundColor, map, tc, abs)
+	workbench := new StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
 
 	workbench.createGui(workbench.Configuration)
 	workbench.show()
 
 	return
-
-Exit:
-	ExitApp 0
 }
 
 

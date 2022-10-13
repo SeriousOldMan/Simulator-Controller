@@ -108,3 +108,5 @@ Announcements=Wetterwarnungen
 	[(KoennenWir) die Strategie {aussetzen, aufgeben}, Die Strategie macht jetzt keinen Sinn mehr, Wir können die Strategie {aufgeben, aussetzen}, Bitte die Strategie {aussetzen, aufgeben}]
 
 	[Wann ist {der, der nächste} {Boxenstopp, Boxenstopp geplant}, Wann soll ich an die Box kommen, {In welcher, Für welche} Runde ist {der, der nächste} Boxenstopp geplant, (KannstDu) (Mir) sagen {wann ich an die Box kommen soll, der nächste Boxenstopp geplant ist, in welcher Runde der nächste Boxenstopp geplant ist, für welche Runde der nächste Boxenstopp geplant ist}]
+	
+	[(KannstDu) eine neue Strategie entwickeln, (KannstDu) die Strategie {überarbeiten, anpassen}, Wir brauchen eine neue Strategie]

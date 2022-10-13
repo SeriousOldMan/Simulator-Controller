@@ -10,30 +10,33 @@
 ;;;-------------------------------------------------------------------------;;;
 
 minimum(numbers) {
-	min := kUndefined
+	local min := kUndefined
+	local ignore, value
 
 	for ignore, value in numbers
-		if value is number
+		if value is Number
 			min := ((min == kUndefined) ? value : Min(min, value))
 
 	return ((min == kUndefined) ? 0 : min)
 }
 
 maximum(numbers) {
-	max := kUndefined
+	local max := kUndefined
+	local ignore, value
 
 	for ignore, value in numbers
-		if value is number
+		if value is Number
 			max := ((max == kUndefined) ? value : Max(max, value))
 
 	return ((max == kUndefined) ? 0 : max)
 }
 
 average(numbers) {
-	avg := 0
+	local avg := 0
+	local ignore, value, count
 
 	for ignore, value in numbers
-		if value is number
+		if value is Number
 			avg += value
 
 	count := count(numbers, false)
@@ -45,12 +48,12 @@ average(numbers) {
 }
 
 stdDeviation(numbers) {
-	avg := average(numbers)
-
-	squareSum := 0
+	local avg := average(numbers)
+	local squareSum := 0
+	local ignore, value
 
 	for ignore, value in numbers
-		if value is number
+		if value is Number
 			squareSum += ((value - avg) * (value - avg))
 
 	squareSum := (squareSum / count(numbers, false))
@@ -59,6 +62,8 @@ stdDeviation(numbers) {
 }
 
 count(values, null := true) {
+	local result, ignore, value
+
 	if null
 		return values.Length()
 	else {
@@ -73,14 +78,14 @@ count(values, null := true) {
 }
 
 linRegression(xValues, yValues, ByRef a, ByRef b) {
-	xAverage := average(xValues)
-	yAverage := average(yValues)
-
-	dividend := 0
-	divisor := 0
+	local xAverage := average(xValues)
+	local yAverage := average(yValues)
+	local dividend := 0
+	local divisor := 0
+	local index, xValue, xDelta, yDelta
 
 	for index, xValue in xValues {
-		if xValue is number
+		if xValue is Number
 		{
 			xDelta := (xValue - xAverage)
 			yDelta := (yValues[index] - yAverage)

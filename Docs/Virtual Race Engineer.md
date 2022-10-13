@@ -208,15 +208,17 @@ To reactivate the Assistant use:
 
 ## Racing with Jona
 
-Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualification and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions, unless you enable them for other session types in the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
+Racing with Jona is easy, just begin your session and wait until Jona will contact you. This will be a few seconds after you crossed the start finish line after your first complete lap. Jona will be available in Practice, Qualification and Race sessions, but the amount of support you can expect from Jona will vary between those session types. Pitstops, for example, will only be handled during race sessions, unless you enable them for other session types in the ["Session Database" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
 
 The Virtual Race Engineer is handled by the "Race Engineer" plugin, which may be integrated by the different simulation game plugins, if they want to support Jona. This plugin will start *Race Engineer.exe*, which is located in the *Binaries* folder, as a subprocess, as long as you are out on a track. (Note for developers: The communication between those two processes uses named pipes. For more technical information, see the [technical information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#technical-information) section below).
 
 Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. Unfortunately, this data does not contain every required information, and also there are additional data and configuration information, which are required by Jona. For example, data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, tyre compound recommendations, and so on. In the end, all that means, that some setup work is required, before you start your session. 
 
+Important: In the default configuration, Jona will be activated in the first lap of a session. This is necessary, so that Jona can setup the initial knowledge (fuel, pressures, etc.). If you join a session later than during the first lap, Jona will refuse to work. This behaviour can be changed with the setting "Engineer: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), but the behaviour of Jona may be somewhat confusing.
+
 ### Race Settings
 
-That said, we now come to an unpleasant part of the game, at least for the moment. The additional knowledge Jona needs is stored in a special file, *Race.settings*, that exists in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to modify for each session. You can do this by editing this file using a text editor or you can use a graphical user interface by using the application *Race Settings.exe* from the *Binaries* folder. As a side note, I am still trying to gather at least the setup part of this information from the simulation game itself.
+The additional knowledge Jona needs is stored in a special file, *Race.settings*, that exists in the *Simulator Controller\Config* folder in your user *Documents* folder, which you have to modify for each session. You can do this by editing this file using a text editor or you can use a graphical user interface by using the application *Race Settings.exe* from the *Binaries* folder. As a side note, I am still trying to gather at least the setup part of this information from the simulation game itself.
 
 The *Race.settings* looks like this:
 
@@ -280,7 +282,7 @@ The first tab of the settings tool contains information about the actual session
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%201.JPG)
 
-You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. With the "Setups..." button you can open the [session database tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) to look up the best match for tyre pressures from recent sessions. Beside that, you can use the "Import" button to retrieve the current tyre setup information from your simulation game. But which data are available for an import depends on the capabilities of the simulator game in use. For example, *Assetto Corsa Competizione* currently only gives access to the tyre pressures that are configured in the Pitstop MFD. But you may use the "Use current pressures" option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and *import* the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values. As a convenience shortcut, the *Import* operation can also be triggered by your hardware controller without opening the settings dialog, which might be all you need during a race preparation. Please consult the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) on how to do this.
+You must supply the tyre selection and pressure setup, that is used at the beginning of the race, in the lower area of the *Race* tab, wherease the static information for the given track and race is located in the upper area. With the "Setups..." button you can open the ["Session Database" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) to look up the best match for tyre pressures from recent sessions. Beside that, you can use the "Import" button to retrieve the current tyre setup information from your simulation game. But which data are available for an import depends on the capabilities of the simulator game in use. For example, *Assetto Corsa Competizione* currently only gives access to the tyre pressures that are configured in the Pitstop MFD. But you may use the "Use current pressures" option in the *Assetto Corsa Competizione* "Fuel & Strategy" area to transfer your current tyre setup to the Pitstop MFD and *import* the settings from there. Depending on your currently mounted tyres, the values will be imported as "Dry" or "Wet" setup values. As a convenience shortcut, the *Import* operation can also be triggered by your hardware controller without opening the settings dialog, which might be all you need during a race preparation. Please consult the documentation for the ["Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) on how to do this.
 
 Note: We requested a more versatile access to setup informations from Kunos already. Hopefully, this will be available in a future version of *Assetto Corsa Competizione*, and the whole process will become much less cumbersome. But to be honest, there is even less functionality available at the moment for other simulators.
 
@@ -292,7 +294,7 @@ The second tab, *Pitstop*, contains information that will be used to derived the
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Settings%202.JPG)
 
-The upper area with the three dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact", where "Threshold" will allow you to enter a value. If the current damage is above this value, Jona will advise to go for a repair on the next pitstop. Please note, that these values are NOT to be confused with the number of seconds for example shown on the *Assetto Corsa Competizione* Pitstop MFD, which references the number of seconds it will take to repair the damage. Typically a good threshold for bodywork damage will be between 30 and 40, but it strongly depends on the type of damage (front/rear or on the sides). For supsension damage, I advise to go always for a repair, but you might also use a threshold range around 5. For "Impact" you can enter a number of seconds. Jona will analyse your lap time and will go for a repair, if your lap time is slower by the number you entered with regards to a reference lap before the accident.
+The upper area with the three dropdown menus give you you control over several decisions, Jona will take for an upcoming pitstop. For the repair settings you can decide between "Never", "Always", "Threshold" and "Impact", where "Threshold" will allow you to enter a value. If the current damage is above this value, Jona will advise to go for a repair on the next pitstop. Please note, that these values are NOT to be confused with the number of seconds needed to repair the given damage, which are for example shown on the *Assetto Corsa Competizione* Pitstop MFD. Also, the range of these values will differ between simulators and are difficult to interpret, therefore I recommend to use the "Impact" rule, whenever possible. For "Impact" you can enter a number of seconds. Jona will analyse your lap time and will go for a repair, if your lap time is slower by the number you entered with regards to the reference laps just before the accident. Beside that, I advise to go always for a repair for supsension damage, since additional damage in the next accident will most likely be catastrophic.
 
 For tyre compound changes, you can choose between the triggers "Never", "Tyre Temperature" and "Weather". If you choose "Weather", Jona will advise wet tyres for light rain or worse and dry tyres for a dry track or drizzle. "Tyre Temperature" will allow you to enter a temperature threshold, where Jona will plan a tyre change, if the tyre temeprature falls outside its optimal temperature window by this amount. For dry tyres, the optimal temperature is considered to be above 70 Degrees and for wet tyres below 55 Degrees.
 
@@ -300,7 +302,7 @@ In the lower area you can define the optimal or target tyre pressures. When ther
 
 If you open the settings tool, it will load the *Race.settings* file located in the *Simulator Controller\Config* folder in your user *Documents* folder. If you close the tool with the "Ok" button, this file will be overwritten with the new information. Beside that, you can load a settings file from a different location with the "Load..." button and you can save the current settings with the "Save..." button. As an alternative to handle the locations of the settings files yourself, you can use the session database to organize them. Plesse see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) for the session database for further information.
 
-Good to know: When the *Race.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions. And, if you click on the blue label of the dialog title, this documentation will be opened in your browser.
+Good to know: When the *Race.settings* file is changed while Jona or any other Assistant is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions. And, if you click on the blue label of the dialog title, this documentation will be opened in your browser.
 
 Beside the session respectively race specific settings described in the previous sections, the general behaviour of the Virtual Race Engineer can be customized using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer).
 
@@ -373,7 +375,7 @@ The following statistical models are currently implemented:
   
      The pressure development of the last laps and the deviation from the predefined target pressures are considered to derive pressure corrections for the next pitstop. The number of laps considered and the weighting of past laps can be configured using the settings tool. To get the most precise recommendations, set the *Statistical Window* as large as possible and the *Damping Factor* as small as possible. For example, a statistical window of 10 and a damping factor of 0.1 will consider your last 10 laps, where your most recent lap counts fully and the lap five laps ago only with 50%. Depending on accidents, severe traffic or safety car phases, especially in the most recent laps, the algorithm will come up with unexpected results, so always double check Jonas recommendations here.
 	 
-	 When planning and preparing a pitstop, Jona will consult the [session database](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) for a second opinion on tyre pressures for given temperature and weather conditions. Needless to say, these values are also specific for a given car and track combination. Jona will use the same algorithm as the database tool, therefore extra- or interpolation will be used, when no exact match is available. But in those cases an (un)certainty factor will be applied, so that the dynamically derived target pressures will be considered more relevant.
+	 When planning and preparing a pitstop, Jona will consult the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database) for a second opinion on tyre pressures for given temperature and weather conditions. Needless to say, these values are also specific for a given car and track combination. Jona will use the same algorithm as the database tool, therefore extra- or interpolation will be used, when no exact match is available. But in those cases an (un)certainty factor will be applied, so that the dynamically derived target pressures will be considered more relevant.
 
   2. Refuel amount
   
@@ -381,23 +383,105 @@ The following statistical models are currently implemented:
 	 
   3. Damage related lap time degration
   
-     After Jona detects a new damage, the devlopment of your lap times are observed and Jona might suggest an adopted pitstop strategy, depending on remaining stint time and the delta time necessary for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation. All laps of the current stint (except a couple of laps at the beginning) are considered by the algorithm and the average lap time incl. the standard deviation before the accident will be taken as the reference lap time. This means, that the computation will fail, if you had an accident very early in your stint, since you never had the chance to set a good reference lap. 
+     After Jona detects a new damage, the devlopment of your lap times are observed and Jona might suggest an adopted pitstop strategy, depending on remaining stint time and the delta time necessary for a pitstop. The underlying model is quite complex and recognizes and excludes special lap situations like pitstops, accidents, and so on, from the average laptime calculation. All laps of the current stint (except a couple of laps at the beginning) are considered by the algorithm and the average lap time incl. the standard deviation before the accident will be taken as the reference lap time. This means, that the computation will fail, if you had an accident very early in your stint, since you never had the chance to set a good reference lap.
+	 
+	 The following damage categories are supported for the different simulators:
+	 
+	 | Simulator                  | Bodywork & Aerodynamics | Suspension & Chassis | Engine |
+     | -------------------------- | ----------------------- | -------------------- | ------ |
+     | Assetto Corsa              | Yes (1)                 | No (1)               | No (1) |
+     | Assetto Corsa Competizione | Yes                     | Yes                  | No     |
+     | Automobilista 2            | Yes                     | Yes                  | Yes    |
+     | iRacing                    | No                      | No                   | No     |
+     | Projects CARS 2            | Yes                     | Yes                  | Yes    |
+     | RaceRoom Racing Experience | Yes                     | Yes                  | Yes    |
+     | rFactor 2                  | Yes (1)                 | No (1)               | No (1) |
+	 
+	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as adamage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
 	 
   4. Repair recommendations
   
      Based on the same model, Jona suggests repairs for the upcoming pitstop. You can configure various strategies (Repair Always, Repair Never, Repair when damage is above a given threshold, ...) using the settings tool.
 	 
+	 Some remarks regarding simulator specific restrictions for the different damage types:
+	 
+	 - *Assetto Corsa*
+	   
+	   Bodywork repair will be recommended, but you have to select suspension or engine repair on your own as needed.
+	 
+	 - *Assetto Corsa Competizione*
+	   
+	   Bodywork and suspension repair will be handled automatically, but although there is an engine warning light available in the HUDs, no data is available in the API regarding the current engine state. And it looks like configurable engine repair during pitstops is not supported as well.
+	   
+	 - *Automobilista 2* and *Project CARS 2*
+	   
+	   Repair recommendations will be given for all damage types.
+	   
+	 - *iRacing*
+	   
+	   No automatic support, you must select the "Quick fix" option for the upcoming pitstop manually.
+	   
+	 - *RaceRoom Racing Experience*
+	   
+	   Repair recommendations will be given for all damage types.
+	 
+	 - *rFactor 2*
+	 
+	   Since the damage types are not distinguishable in the API, only bodywork & aerodynamics damage will be recommended. Handle other damage types manually.
+	 
   5. Tyre pressure gambling
   
-     Linear regression models are used here. Depending on the development of ambient, track and tyre temperatures and the resulting tyre pressure development, Jona might suggest higher or lower pressures for the next pitstop than currently might be perfect as a result of a clear past trend, thereby propably giving you a good compromise for the upcoming stint.
+     Linear regression models are used here, depending on the development of ambient, track and tyre temperatures and the resulting tyre pressure development, Jona might suggest higher or lower pressures for the next pitstop than currently might be perfect as a result of a clear past trend, thereby propably giving you a good compromise for the upcoming stint.
 	 
   6. Weather trend analysis and tyre compound recommendation
   
      Beginning with Release 2.5, a weather model has been integrated in the working memory. The raw data is acquired from the simulation. For example, *Assetto Corsa Competizione* and *rFactor 2* supply current weather information ranging from "Dry" up to full "Thunderstorm". *Assetto Corsa Competizione* goes even further and can supply a full weather forecast from now on up to 30 minnutes into the future. Based on this information and currently mounted tyres, Jona will recommend a tyre change. This recomendation will be incorporated into the plan for an upcoming pitstop depending on the settings you have chosen in the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings).
 	 
-Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always doublecheck under those circumstances. This will get much better with one of the next major releases	, which will introduce a big data collection of recent races, which in the end will allow Jona to base or at least to secure the decisions on past experiences using neural networks.
+	 All applications of Simulator Controller, incl. the Race Engineer, support three different tyre categories (Dry, Intermediate and Wet), as well as a couple of mixtures for each category. The combination of both is a tyre compound, for example "Dry (M)", a dry tyre (aka Slick) with a medium hardness. Please read the chapter [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) carefully for more information and especially for the mapping of simulator specific tyre compounds to the tyre model of Simulator Controller. Jona uses the tyre model to recommend the best possible tyre compound for the given weather conditions.
+	 
+	 | Weather      | Suitable Category | Optimal Category |
+     | ------------ | ----------------- | ---------------- |
+     | Dry          | Dry               | Dry              |
+     | Drizzle      | Dry, Intermediate | Intermediate (1) |
+     | Light Rain   | Intermediate, Wet | Intermediate (1) |
+     | Medium Rain  | Wet               | Wet              |
+     | Heavy Rain   | Wet               | Wet              |
+     | Thunderstorm | Wet               | Wet              |
+     
+     (1) If no Intermediates are available, Dry Tyres will be used in Drizzle conditions and Wet Tyres in Light Rain conditions.
+	 
+	 Looking at the above table, you can understand when and why a tyre change will be recommended by the Jona. As long as the currently mounted tyre has a suitable category, no urgent pitstop will be requested. If you come in for a regular pitstop, the tyre compound with the optimal category will always be chosen, as long as it is available (see note (1)). But in the case, that the currently mounted tyre is not suitable for the current or upcoming weather conditions, an urgent pitstop will be requested and the optimal tyre compound will be chosen, if available.
+	 
+	 Finally some remarks regarding simulator specific restrictions:
+	 
+	 - *Assetto Corsa*
+	   
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter, but no weather model is available.
+	 
+	 - *Assetto Corsa Competizione*
+	   
+	   Everything works as designed, but only Dry and Wet tyre categories without different mixtures are available.
+	   
+	 - *Automobilista 2* and *Project CARS 2*
+	 
+	   Both simulator share the same engine, therefore everything applies to both. The API does not provide any information about the currently mounted tyre compound. So make sure, that the initial mounted tyres are specified correctly in the "Race Settings". Additionally, weather information is not available for the future, so weather warnings might come in a *little bit* late.
+	   
+	 - *iRacing*
+	   
+	   *iRacing* neither provides a weather model nor a sophisticated tyre model with different compounds. SO nothing to see her and move on.
+	   
+	 - *RaceRoom Racing Experience*
+	   
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter, but no weather model is available.
+	 
+	 - *rFactor 2*
+	   
+	   Tyre Compounds are supported as described in the [Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds) chapter. Weather information is not available for the future, so weather warnings might come in a *little bit* late. There might be a possibility to parse the weather control history, this will be implemented available in a future release.
 
-Additional notes for *iRacing* users: It looks like that tyre pressures and also to some extent tyre temperatures for most of the cars are not available in the *iRacing* live data. To make it worse, damage information is also not available in the API, although *iRacing* apparently has a sophisticated damage model. Since *iRacing* is a quite mature (not to say old) simulation game, and the API hasn't changed in a while, I am quite pessimistic, that this will be fixed. Therefore, the recommendations of the Virtual Race Engineer will be at best limited and in some cases even false. Nevertheless, Jona will help you with refuel recommendation for an upcoming pitstop and you will have someone to talk to while hunting down your opponent on the long straight.
+	 
+Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always doublecheck under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.
+
+Additional notes for *iRacing* users: It looks like that tyre pressures and also to some extent tyre temperatures for most of the cars are not available in the *iRacing* live data. To make it worse, damage information is also not available in the API, although *iRacing* apparently has a sophisticated damage model. Since *iRacing* is a quite mature (not to say old) simulation game, and the API hasn't changed in a while, I am quite pessimistic, that this will be fixed. Therefore, the recommendations of the Virtual Race Engineer will be at best limited and in some cases even false. Nevertheless, Jona will help you with refuel recommendation for an upcoming pitstop and you will have someone to talk to while hunting down your opponent on the long straights.
 
 ## Race & Session database
 
@@ -433,7 +517,7 @@ You will get a summary of all available data in the list below the tabs. Please 
 
 Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 
-With the dropdown menu in the lower left corner you can choose whether only your own setups (=> "Local") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "Local & Community").
+With the dropdown menu above the list of available data you can choose whether only your own setups (=> "User") will be included in the database search or that also the setups of other users of Simulator Controller might be considered (=> "User & Community").
 
 Important:
 

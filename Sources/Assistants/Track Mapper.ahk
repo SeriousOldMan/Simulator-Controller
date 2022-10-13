@@ -9,16 +9,13 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn							; Enable warnings to assist with detecting common errors.
-#Warn LocalSameAsGlobal, Off
+;@SC-IF %configuration% == Development
+#Include ..\Includes\Development.ahk
+;@SC-EndIF
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+;@SC-If %configuration% == Production
+;@SC #Include ..\Includes\Production.ahk
+;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Track.ico
 ;@Ahk2Exe-ExeName Track Mapper.exe
@@ -44,24 +41,21 @@ ListLines Off					; Disable execution history
 ;;;-------------------------------------------------------------------------;;;
 
 createTrackImage(trackMap) {
-	mapWidth := getConfigurationValue(trackMap, "Map", "Width")
-	mapHeight := getConfigurationValue(trackMap, "Map", "Height")
-
-	offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-	offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
-
-	margin := Min(mapWidth / 20, mapHeight / 20)
-	marginX := margin
-	marginY := margin
+	local mapWidth := getConfigurationValue(trackMap, "Map", "Width")
+	local mapHeight := getConfigurationValue(trackMap, "Map", "Height")
+	local offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
+	local offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+	local margin := Min(mapWidth / 20, mapHeight / 20)
+	local marginX := margin
+	local marginY := margin
+	local width := (mapWidth + 2 * marginX)
+	local height := (mapHeight + 2 * marginY)
+	local scale := Min(1000 / width, 1000 / height)
+	local token, bitmap, graphics, pen
+	local firstX, firstY, lastX, lastY, x, y
 
 	setConfigurationValue(trackMap, "Map", "Margin.X", marginX)
 	setConfigurationValue(trackMap, "Map", "Margin.Y", marginY)
-
-	width := (mapWidth + 2 * marginX)
-	height := (mapHeight + 2 * marginY)
-
-	scale := Min(1000 / width, 1000 / height)
-
 	setConfigurationValue(trackMap, "Map", "Scale", scale)
 
 	token := Gdip_Startup()
@@ -79,7 +73,7 @@ createTrackImage(trackMap) {
 	lastX := 0
 	lastY := 0
 
-	Loop % getConfigurationValue(trackMap, "Map", "Points")
+	loop % getConfigurationValue(trackMap, "Map", "Points")
 	{
 		x := Round((marginX + offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scale)
 		y := Round((marginY + offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scale)
@@ -111,13 +105,15 @@ createTrackImage(trackMap) {
 }
 
 createTrackMap(simulator, track, fileName) {
-	trackMap := newConfiguration()
-	coordinates := []
+	local trackMap := newConfiguration()
+	local coordinates := []
+	local exact, xIndex, yIndex, xMin, xMax, yMin, yMax, points, ignore, coordinate, width, height
+	local sessionDB, trackData, normalized
 
 	setConfigurationValue(trackMap, "General", "Simulator", simulator)
 	setConfigurationValue(trackMap, "General", "Track", track)
 
-	Loop Read, %fileName%
+	loop Read, %fileName%
 	{
 		coordinates.Push(string2Values(",", A_LoopReadLine))
 
@@ -175,7 +171,7 @@ createTrackMap(simulator, track, fileName) {
 		else {
 			normalized := []
 
-			Loop 1000
+			loop 1000
 				normalized.Push(false)
 
 			normalized[1] := [0.0, 0.0]
@@ -188,7 +184,7 @@ createTrackMap(simulator, track, fileName) {
 
 			trackData := ""
 
-			Loop 1000 {
+			loop 1000 {
 				coordinate := normalized[A_Index]
 
 				if !coordinate {
@@ -216,7 +212,7 @@ createTrackMap(simulator, track, fileName) {
 		setConfigurationValue(trackMap, "Map", "Precision", exact ? "Exact" : "Estimated")
 		setConfigurationValue(trackMap, "Map", "Points", points)
 
-		Loop %points% {
+		loop %points% {
 			setConfigurationValue(trackMap, "Points", A_Index . ".X", coordinates[A_Index][1])
 			setConfigurationValue(trackMap, "Points", A_Index . ".Y", coordinates[A_Index][2])
 
@@ -224,12 +220,7 @@ createTrackMap(simulator, track, fileName) {
 		}
 
 		if trackData {
-			try {
-				FileDelete %kTempDirectory%%track%.data
-			}
-			catch exception {
-				; ignore
-			}
+			deleteFile(kTempDirectory . track . ".data")
 
 			FileAppend %trackData%, %kTempDirectory%%track%.data
 
@@ -240,37 +231,33 @@ createTrackMap(simulator, track, fileName) {
 
 		sessionDB.updateTrackMap(simulator, track, trackMap, fileName, trackData)
 
-		try {
-			FileDelete %fileName%
+		deleteFile(fileName)
 
-			if trackData
-				FileDelete %trackData%
-		}
-		catch exception {
-			; ignore
-		}
+		if trackData
+			deleteFile(fileName)
 	}
 }
 
 recreateTrackMap(simulator, track) {
-	sessionDB := new SessionDatabase()
-
-	trackMap := sessionDB.getTrackMap(simulator, track)
-	fileName := createTrackImage(trackMap)
+	local sessionDB := new SessionDatabase()
+	local trackMap := sessionDB.getTrackMap(simulator, track)
+	local fileName := createTrackImage(trackMap)
 
 	sessionDB.updateTrackMap(simulator, track, trackMap, fileName)
 }
 
 recreateTrackMaps() {
-	sessionDB := new SessionDatabase()
+	local sessionDB := new SessionDatabase()
+	local directory := sessionDB.DatabasePath
+	local code, simulator, track
 
-	Loop Files, %kDatabaseDirectory%User\Tracks\*.*, D		; Simulator
+	loop Files, %directory%User\Tracks\*.*, D		; Simulator
 	{
 		code := A_LoopFileName
 
 		simulator := sessionDB.getSimulatorName(code)
 
-		Loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.map, F		; Track
+		loop Files, %directory%User\Tracks\%code%\*.map, F		; Track
 		{
 			SplitPath A_LoopFileName, , , , track
 
@@ -280,20 +267,15 @@ recreateTrackMaps() {
 }
 
 startTrackMapper() {
-	icon := kIconsDirectory . "Track.ico"
+	local icon := kIconsDirectory . "Track.ico"
+	local simulator := false
+	local track := false
+	local data := false
+	local recreate := false
+	local index
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Track Mapper
-
-	Menu Tray, NoStandard
-	Menu Tray, Add, Exit, Exit
-
-	installSupportMenu()
-
-	simulator := false
-	track := false
-	data := false
-	recreate := false
 
 	index := 1
 
@@ -319,20 +301,12 @@ startTrackMapper() {
 	if (simulator && track && data) {
 		createTrackMap(simulator, track, data)
 
-		try {
-			FileDelete %data%
-		}
-		catch exception {
-			; ignore
-		}
+		deleteFile(data)
 	}
 
 	if recreate
 		recreateTrackMaps()
 
-	ExitApp 0
-
-Exit:
 	ExitApp 0
 }
 

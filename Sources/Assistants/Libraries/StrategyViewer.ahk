@@ -17,14 +17,13 @@
 ;;;                        Private Variables Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vChartID = 1
-
-
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class StrategyViewer {
+	static sChartID := 1
+
 	iWindow := false
 	iStrategyViewer := false
 
@@ -46,6 +45,8 @@ class StrategyViewer {
 	}
 
 	lapTimeDisplayValue(lapTime) {
+		local seconds, fraction, minutes
+
 		if lapTime is Number
 		{
 			seconds := Floor(lapTime)
@@ -66,13 +67,12 @@ class StrategyViewer {
 	}
 
 	createStrategyInfo(strategy) {
-		sessionDB := new SessionDatabase()
+		local sessionDB := new SessionDatabase()
+		local simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
+		local car := (strategy.Car ? strategy.Car : translate("Unknown"))
+		local track := (strategy.Track ? strategy.Track : translate("Unknown"))
+		local html := "<table>"
 
-		simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
-		car := (strategy.Car ? strategy.Car : translate("Unknown"))
-		track := (strategy.Track ? strategy.Track : translate("Unknown"))
-
-		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . simulator . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . sessionDB.getCarName(simulator, car) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . sessionDB.getTrackName(simulator, track) . "</td></tr>")
@@ -93,7 +93,8 @@ class StrategyViewer {
 	}
 
 	createSetupInfo(strategy) {
-		html := "<table>"
+		local html := "<table>"
+
 		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . Round(strategy.RemainingFuel, 1) . A_Space . translate("Liter") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(compound(strategy.TyreCompound, strategy.TyreCompoundColor)) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
@@ -106,17 +107,18 @@ class StrategyViewer {
 	}
 
 	createStintsInfo(strategy, ByRef timeSeries, ByRef lapSeries, ByRef fuelSeries, ByRef tyreSeries) {
-		timeSeries := [strategy.StartTime / 60]
+		local startStint := strategy.StartStint
+		local html := "<table class=""table-std"">"
+		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopLaps, refuels, tyreChanges, weathers
+		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopLap
+		local lastWeather, lastTyreChange, lastTyreLaps, ignore, pitstop, pitstopLap
+
+		timeSeries := [strategy.SessionStartTime / 60]
 		lapSeries := [strategy.StartLap]
 		fuelSeries := [strategy.RemainingFuel]
 		tyreSeries := [strategy.RemainingTyreLaps]
 
-		startStint := strategy.StartStint
-
-		html := ""
-
 		if !strategy.LastPitstop {
-			html .= "<table class=""table-std"">"
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">" . startStint . "</th></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th><td class=""td-std"">" . strategy.DriverName . "</td></tr>")
 			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
@@ -140,6 +142,7 @@ class StrategyViewer {
 			pitstopLaps := []
 			refuels := []
 			tyreChanges := []
+			weathers := []
 
 			lastDriver := strategy.DriverName
 			lastMap := strategy.Map
@@ -148,6 +151,8 @@ class StrategyViewer {
 			lastFuelConsumption := strategy.FuelConsumption
 			lastRefuel := ""
 			lastPitstopLap := ""
+			lastWeather := (translate(strategy.Weather) . translate(" (") . strategy.AirTemperature . translate(" / ") . strategy.TrackTemperature . translate(")"))
+			lastTrackTemperature := strategy.TrackTemperature
 			lastTyreChange := ""
 			lastTyreLaps := strategy.RemainingTyreLaps
 
@@ -161,7 +166,8 @@ class StrategyViewer {
 				lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 				fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
 				pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
-				refuels.Push("<td class=""td-std"">" . (lastRefuel ? Ceil(lastRefuel) : "") . "</td>")
+				weathers.Push("<td class=""td-std"">" . lastWeather . "</td>")
+				refuels.Push("<td class=""td-std"">" . ((pitstop.Nr > 1) ? Ceil(lastRefuel) : "") . "</td>")
 				tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
 
 				timeSeries.Push(pitstop.Time / 60)
@@ -174,6 +180,7 @@ class StrategyViewer {
 				lastLap := pitstop.Lap
 				lastFuelConsumption := pitstop.FuelConsumption
 				lastLapTime := pitstop.AvgLapTime
+				lastWeather := (translate(pitstop.Weather) . translate(" (") . pitstop.AirTemperature . translate(" / ") . pitstop.TrackTemperature . translate(")"))
 				lastRefuel := pitstop.RefuelAmount
 				lastPitstopLap := pitstop.Lap
 				lastTyreChange := (pitstop.TyreChange ? translate(compound(pitstop.TyreCompound, pitstop.TyreCompoundColor)) : translate("No"))
@@ -192,6 +199,7 @@ class StrategyViewer {
 			lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 			fuelConsumptions.Push("<td class=""td-std"">" . Round(lastFuelConsumption, 2) . "</td>")
 			pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
+			weathers.Push("<td class=""td-std"">" . lastWeather . "</td>")
 			refuels.Push("<td class=""td-std"">" . Ceil(lastRefuel) . "</td>")
 			tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
 
@@ -201,15 +209,32 @@ class StrategyViewer {
 			tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
 
 			html .= "<table class=""table-std"">"
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th>" . values2String("", stints*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th>" . values2String("", drivers*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th>" . values2String("", maps*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th>" . values2String("", laps*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th>" . values2String("", map(lapTimes, ObjBindMethod(this, "lapTimeDisplayValue"))*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th>" . values2String("", fuelConsumptions*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Pitstop Lap") . "</th>" . values2String("", pitstopLaps*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Refuel Amount") . "</th>" . values2String("", refuels*) . "</tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Tyre Change") . "</th>" . values2String("", tyreChanges*) . "</tr>")
+
+			html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
+			       . "<th class=""th-std"">" . translate("Driver") . "</th>"
+			       . "<th class=""th-std"">" . translate("Weather") . "</th>"
+			       . "<th class=""th-std"">" . translate("Laps") . "</th>"
+			       . "<th class=""th-std"">" . translate("Map") . "</th>"
+			       . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
+			       . "<th class=""th-std"">" . translate("Consumption") . "</th>"
+			       . "<th class=""th-std"">" . translate("Pitstop Lap") . "</th>"
+			       . "<th class=""th-std"">" . translate("Refuel Amount") . "</th>"
+			       . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
+			   . "</tr>")
+
+			loop % stints.Length()
+				html .= ("<tr>" . stints[A_Index]
+								. drivers[A_Index]
+								. weathers[A_Index]
+								. laps[A_Index]
+								. maps[A_Index]
+								. this.lapTimeDisplayValue(lapTimes[A_Index])
+								. fuelConsumptions[A_Index]
+								. pitstopLaps[A_Index]
+								. refuels[A_Index]
+								. tyreChanges[A_Index]
+					   . "</tr>")
+
 			html .= "</table>"
 		}
 
@@ -217,13 +242,12 @@ class StrategyViewer {
 	}
 
 	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, ByRef drawChartFunction, ByRef chartID) {
-		vChartID += 1
+		local durationSession := (strategy.SessionType = "Duration")
+		local ignore, time, xAxis
 
-		chartID := vChartID
+		chartID := StrategyViewer.sChartID++
 
-		durationSession := (strategy.SessionType = "Duration")
-
-		drawChartFunction := ("function drawChart" . vChartID . "() {`nvar data = new google.visualization.DataTable();")
+		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
 
 		if durationSession
 			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
@@ -246,13 +270,15 @@ class StrategyViewer {
 
 		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 
-		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . vChartID . "')); chart.draw(data, options); }")
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
-		return ("<div id=""chart_" . vChartID . """ style=""width: " . width . "px; height: " . height . "px"">")
+		return ("<div id=""chart_" . chartID . """ style=""width: " . width . "px; height: " . height . "px"">")
 	}
 
 	showStrategyInfo(strategy) {
-		html := ""
+		local html := ""
+		local timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID, width, chartArea
+		local before, after, tableCSS
 
 		if !this.StrategyViewer
 			strategy := false
@@ -282,10 +308,7 @@ class StrategyViewer {
 			drawChartFunction := false
 			chartID := false
 
-			width := 555
-
-			if this.StrategyViewer
-				width := (this.StrategyViewer.Width - 10)
+			width := (this.StrategyViewer.Width - 10)
 
 			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID)
 
@@ -334,6 +357,8 @@ class StrategyViewer {
 ;;;-------------------------------------------------------------------------;;;
 
 getTableCSS() {
+	local script
+
 	script =
 	(
 		.table-std, .th-std, .td-std {

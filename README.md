@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.3.5.0-alpha](https://www.dropbox.com/s/1lgszfwr6xkxwcx/Simulator%20Controller%204.3.5.0-alpha.zip?dl=1) (Test version for 4.3.5. New features: Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods. Stable, incl. documentation updates.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-435) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

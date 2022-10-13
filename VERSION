@@ -2,7 +2,7 @@
 Version=4.3.5.0-alpha
 Target=4.3.5.0-release
 Date=10/13/2022
-Download=
+Download=https://www.dropbox.com/s/1lgszfwr6xkxwcx/Simulator%20Controller%204.3.5.0-alpha.zip?dl=1
 Changes=Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods
 [Release]
 Version=4.3.4.1-release
@@ -13,4 +13,4 @@ Changes=Full control over sound post processing, Default value handling for race
 Type=Development
 [Version]
 Release=4.3.4.1-release
-Development=4.3.5.0-dev
+Development=4.3.5.0-alpha

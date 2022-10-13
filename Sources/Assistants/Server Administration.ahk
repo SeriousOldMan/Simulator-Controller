@@ -131,7 +131,7 @@ loadConnections(connector, listView) {
 				if (session && (session != ""))
 					session := parseObject(connector.GetSession(session)).Name
 
-				LV_Add("", translate(connection.Type), connection.Created, connection.Name, session)
+				LV_Add("", translate(connection.Type), connection.Name, connection.Created, session)
 			}
 			catch exception {
 				logError(exception)
@@ -701,7 +701,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		Gui Tab, 3
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconnectionsListView gconnectionsListEvent, % values2String("|", map(["Type", "Since", "Name", "Session"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconnectionsListView gconnectionsListEvent, % values2String("|", map(["Role", "Name", "Since", "Session"], "translate")*)
 
 		Gui ADM:Add, Button, x%x0% y430 w80 h23 vrefreshConnectionsListButton grefreshConnectionsList, % translate("Refresh")
 

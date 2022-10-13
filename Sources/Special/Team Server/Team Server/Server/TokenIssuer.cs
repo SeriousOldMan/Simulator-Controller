@@ -78,6 +78,8 @@ namespace TeamServer.Server {
 
             if (account == null)
                 throw new Exception("Unknown account or password...");
+            else if (account.Contract == Account.ContractType.Expired)
+                throw new Exception("Account is no longer valid...");
             else if (!account.DataAccess)
                 throw new Exception("Account does not support data access...");
             else

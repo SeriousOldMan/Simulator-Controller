@@ -114,6 +114,37 @@ loadAccounts(connector, listView) {
 	return accounts
 }
 
+loadConnections(connector, listView) {
+	local ignore, identifier, connection, session
+
+	Gui ListView, % listView
+
+	LV_Delete()
+
+	if administrationEditor(kToken) {
+		for ignore, identifier in string2Values(";", connector.GetAllConnections()) {
+			try {
+				connection := parseObject(connector.GetConnection(identifier))
+
+				session := connection.Session
+
+				if (session && (session != ""))
+					session := parseObject(connector.GetSession(session)).Name
+
+				LV_Add("", translate(connection.Type), connection.Created, connection.Name, session)
+			}
+			catch exception {
+				logError(exception)
+			}
+		}
+	}
+
+	LV_ModifyCol()
+
+	loop 4
+		LV_ModifyCol(A_Index, "AutoHdr")
+}
+
 updateTask(connector, tasks, task, which, operation, frequency) {
 	if operation is integer
 		operation := ["Delete", "Cleanup", "Reset", "Renew"][operation],
@@ -155,6 +186,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static teamServerURLEdit = "https://localhost:5001"
 	static changePasswordButton
 	static accountsListView
+	static connectionsListView
 
 	static accountNameEdit
 	static accountEMailEdit
@@ -176,6 +208,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static taskQuotaFrequencyDropDown
 	static taskAccountOperationDropDown
 	static taskAccountFrequencyDropDown
+
+	static refreshConnectionsListButton
 
 	static addAccountButton
 	static deleteAccountButton
@@ -214,6 +248,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 				administrationEditor(kEvent, "TasksLoad")
 				administrationEditor(kEvent, "AccountClear")
+
+				loadConnections(connector, connectionsListView)
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
@@ -434,6 +470,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Enable, taskQuotaFrequencyDropDown
 					GuiControl Enable, taskAccountOperationDropDown
 					GuiControl Enable, taskAccountFrequencyDropDown
+
+					GuiControl Enable, refreshConnectionsListButton
 				}
 				else {
 					GuiControl Disable, changePasswordButton
@@ -447,6 +485,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Disable, taskQuotaFrequencyDropDown
 					GuiControl Disable, taskAccountOperationDropDown
 					GuiControl Disable, taskAccountFrequencyDropDown
+
+					GuiControl Disable, refreshConnectionsListButton
+
+					Gui ListView, % connectionsListView
+
+					LV_Delete()
 				}
 
 				if account {
@@ -507,6 +551,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					showMessage(translate("Password copied to the clipboard."))
 				}
 			}
+			else if (arguments[1] = "LoadConnections")
+				loadConnections(connector, connectionsListView)
 		}
 		catch exception {
 			title := translate("Error")
@@ -591,7 +637,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButtonHandle vchangePasswordButton gchangePassword
 		setButtonIcon(changePasswordButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		Gui ADM:Add, Tab3, x8 y122 w388 h343 -Wrap, % values2String("|", map(["Accounts", "Jobs"], "translate")*)
+		Gui ADM:Add, Tab3, x8 y122 w388 h343 -Wrap, % values2String("|", map(["Accounts", "Jobs", "Connections"], "translate")*)
 
 		x0 := 16
 		y := 152
@@ -652,6 +698,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Quotas")
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaOperationDropDown gupdateQuotaTask, % values2String("|", map(["Renew"], "translate")*)
 		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaFrequencyDropDown gupdateQuotaTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+
+		Gui Tab, 3
+
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconnectionsListView gconnectionsListEvent, % values2String("|", map(["Type", "Since", "Name", "Session"], "translate")*)
+
+		Gui ADM:Add, Button, x%x0% y430 w80 h23 vrefreshConnectionsListButton grefreshConnectionsList, % translate("Refresh")
 
 		if getWindowPosition("Server Administration", x, y)
 			Gui ADM:Show, x%x% y%y%
@@ -750,6 +802,15 @@ updateAvailableMinutes() {
 accountsListEvent() {
 	if ((A_GuiEvent == "DoubleClick") || (A_GuiEvent == "Normal"))
 		administrationEditor(kEvent, "AccountLoad", A_EventInfo)
+}
+
+connectionsListEvent() {
+	loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+}
+
+refreshConnectionsList() {
+	administrationEditor(kEvent, "LoadConnections")
 }
 
 createPassword() {

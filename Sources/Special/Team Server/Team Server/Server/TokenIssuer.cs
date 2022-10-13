@@ -224,10 +224,12 @@ namespace TeamServer.Server {
         #endregion
 
         #region Validation
-        public void ValidateConnection(Connection connection)
+        public Connection ValidateConnection(Connection connection)
         {
             if ((connection == null) || (!connection.IsConnected()))
                 throw new Exception("Not a valid or active connection...");
+            else
+                return connection;
         }
         #endregion
 

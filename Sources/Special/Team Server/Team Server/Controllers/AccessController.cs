@@ -228,13 +228,22 @@ namespace TeamServer.Controllers {
             try {
                 Server.TeamServer.TokenIssuer.ValidateToken(token);
                 
-                Connection connection = Server.TeamServer.TokenIssuer.LookupConnection(identifier);
+                Connection connection = Server.TeamServer.TokenIssuer.FindConnection(identifier);
 
-                if ((keepAlive != null) && (keepAlive.ToLower() == "true"))    
-                    connection.Renew();
+                if (connection != null)
+                {
+                    if ((keepAlive != null) && (keepAlive.ToLower() == "true"))
+                        connection.Renew();
 
-                return ControllerUtils.SerializeObject(connection,
-                                                       new List<string>(new string[] { "Identifier", "Client", "Name", "Type", "Session" }));
+                    string result = ControllerUtils.SerializeObject(connection,
+                                                                    new List<string>(new string[] { "Identifier", "Client", "Name", "Type", "Created" }));
+
+                    result += "\nSession=" + (connection.Session == null ? "" : connection.Session.Identifier.ToString());
+
+                    return result;
+                }
+                else
+                    return Server.TeamServer.TokenIssuer.ValidateConnection(null).ToString();
             }
             catch (AggregateException exception)
             {

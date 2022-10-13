@@ -166,7 +166,7 @@ class SessionDatabase extends ConfigurationItem {
 							}
 
 							if connector
-								new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+								new PeriodicTask(Func("keepAlive").Bind(connector, connection), 120000, kInterruptPriority).start()
 						}
 						else
 							connector := false
@@ -1346,6 +1346,10 @@ synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronizat
 				}
 		}
 	}
+}
+
+keepAlive(connector, connection) {
+	connector.KeepAlive(connection)
 }
 
 

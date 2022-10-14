@@ -643,9 +643,19 @@ Here is what you have to do:
 
 Then start the "Session Database", select the target simulator and run the import as described [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#administration).
 
-#### Choosing the Database location
+#### Database Configuration
 
-Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. If you want to move it to another location, or if you want to temporarily switch to another database, for example to look at the data of a friend, you can click at the small button with a gear in the upper right corner of the *Session Database* window. A file chooser will open up and allow you to select a different folder as the new database location. You will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper. Please note, that once you have changed the database location, you have to restart all applications.
+Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. You can move the location to another location on your PC, and you also can synchronize your telemetry data with that of other drivers in your team, as long as all of you are using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). To change the database configuration, click on the small button with the cog wheel in the upper right corner. The following window appears: 
+
+If you want to move it to another location, or if you want to temporarily switch to another database, for example to look at the data of a friend, you can click at the small button with a cog wheel in the upper right corner of the *Session Database* window.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2014.jpg)
+
+In the first field, you can define the location of the database on your local PC. If you change this location and leave the dialog with "Ok", you will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper.
+
+In the lower area of the window, you can configure the Team Server connection, which allows you to replicate all your telemetry data to a central database and also replicate the telemtery data of all your team mates from the central database to your local database. Very helpful for data analysis, strategy development and stint planning in endurance races.
+
+Please note, that once you have changed the database location or the synchronization settings, you have to restart all applications.
 
 ## Technical information
 

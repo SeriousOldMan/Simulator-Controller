@@ -3974,7 +3974,7 @@ moveSettings() {
 }
 
 openSettingsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#choosing-the-database-location
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration
 }
 
 loginDialog(connectorOrCommand := false, teamServerURL := false) {

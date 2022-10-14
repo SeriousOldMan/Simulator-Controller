@@ -4708,6 +4708,7 @@ class RaceCenter extends ConfigurationItem {
 		local window := this.Window
 		local session := this.SelectedSession[true]
 		local message, currentStint, first, newData, newStints, updatedStints, currentListView, ignore, stint, lap
+		local selected
 
 		Gui %window%:Default
 
@@ -4782,6 +4783,11 @@ class RaceCenter extends ConfigurationItem {
 
 					Gui ListView, % this.LapsListView
 
+					selected := LV_GetNext()
+
+					if selected
+						selected := (selected == LV_GetCount())
+
 					for ignore, stint in updatedStints {
 						for ignore, lap in this.loadNewLaps(stint) {
 							Gui ListView, % this.LapsListView
@@ -4821,6 +4827,15 @@ class RaceCenter extends ConfigurationItem {
 						else {
 							this.iWeather10Min := lastLap.Weather
 							this.iWeather30Min := lastLap.Weather
+						}
+
+						if selected {
+							Gui ListView, % this.LapsListView
+
+							LV_Modify(LV_GetCount(), "Select Vis")
+
+							if (this.SelectedDetailReport = "Lap")
+								this.showLapDetails(lap)
 						}
 					}
 

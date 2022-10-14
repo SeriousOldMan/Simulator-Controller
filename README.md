@@ -33,21 +33,19 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.3.4.1-release](https://cutt.ly/XBo2nvL) (New features: Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews).)
+[4.3.5.0-release]() (New features: Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-434) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-435) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[4.3.3.0-release](https://cutt.ly/EVn9i5Q) (New features: Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews).)
+[4.3.4.1-release](https://cutt.ly/XBo2nvL) (New features: Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews).)
 
-[4.3.2.1-release](https://cntr.click/Nr536zT) (New features: Integrated support in "Setup Advisor" for modded AC setups, Support admin mode for apps with Google chart library, Jump directly to the last page of "Simulator Setup", Better last lap detection in races with fixed nr of laps, Increased precision of average lap time calculation by the Spotter in case of off tracks and incidents, A lot of new tyre compound data for Automobilista 2 (by Chris Matthews), All new Spotter gap and position calculation, Fixed missing driver last name in many apps, Added more regular Spotter delta information, New car models for "Setup Advisor", Performance improvement in "Simulator Setup", New preset to activate a toggle beahviour for the P2T trigger, "Race Center" incorporates real race weather when creating a new strategy.)
+[4.3.3.0-release](https://cutt.ly/EVn9i5Q) (New features: Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews).)
 
 #### Latest development build
 
-[4.3.5.0-alpha](https://www.dropbox.com/s/1lgszfwr6xkxwcx/Simulator%20Controller%204.3.5.0-alpha.zip?dl=1) (Test version for 4.3.5. New features: Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods. Stable, incl. documentation updates.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-435) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

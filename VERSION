@@ -1,16 +1,16 @@
 [Development]
-Version=4.3.5.0-alpha
+Version=4.3.5.0-release
 Target=4.3.5.0-release
-Date=10/13/2022
-Download=https://www.dropbox.com/s/1lgszfwr6xkxwcx/Simulator%20Controller%204.3.5.0-alpha.zip?dl=1
+Date=10/14/2022
+Download=
 Changes=Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods
 [Release]
 Version=4.3.4.1-release
-Date=10/07/2022
+Date=10/14/2022
 Download=https://cutt.ly/XBo2nvL
 Changes=Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews)
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.3.4.1-release
-Development=4.3.5.0-alpha
+Release=4.3.5.0-release
+Development=4.3.5.0-release

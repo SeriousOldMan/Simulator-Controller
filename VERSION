@@ -2,7 +2,7 @@
 Version=4.3.5.0-release
 Target=4.3.5.0-release
 Date=10/14/2022
-Download=
+Download=https://cutt.ly/ZBYdiqF
 Changes=Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods
 [Release]
 Version=4.3.4.1-release

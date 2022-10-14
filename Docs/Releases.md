@@ -10,7 +10,7 @@
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. UI specific settings, which are managed by the app "Simulator Settings", are now directly available from "Simulator Startup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration) for more information.
+  3. UI specific settings, which are managed by the app "Simulator Settings", are now directly available from "Simulator Startup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) for more information.
   4. You can now choose between different methods for delta calculations for the Virtual Race Spotter. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
   
 

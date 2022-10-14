@@ -645,17 +645,21 @@ Then start the "Session Database", select the target simulator and run the impor
 
 #### Database Configuration
 
-Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. You can move the location to another location on your PC, and you also can synchronize your telemetry data with that of other drivers in your team, as long as all of you are using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). To change the database configuration, click on the small button with the cog wheel in the upper right corner. The following window appears: 
-
-If you want to move it to another location, or if you want to temporarily switch to another database, for example to look at the data of a friend, you can click at the small button with a cog wheel in the upper right corner of the *Session Database* window.
+Normally, the database is located in the *Simulator Controller\Database* folder in your user *Documents* folder. You can move the database to another location on your PC, and you also can synchronize your telemetry data with that of other drivers in your team, as long as all of you are using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). To change the database configuration, click on the small button with the cog wheel in the upper right corner. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2014.jpg)
 
-In the first field, you can define the location of the database on your local PC. If you change this location and leave the dialog with "Ok", you will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper.
+In the first field, you can define the location of the database on your local PC. Doing this, you can move your own database folderto another location, or you can switch temporarily to another database, for example to look at the data of a friend. If you change this location and leave the dialog with "Ok", you will be asked, if you want to transfer all your current data to the new location, or if you want to start with a blank sheet of paper. Please note, that as long as you configured your database to a location of a copy of a *foreign* users database, no telemetry data will be collected.
 
-In the lower area of the window, you can configure the Team Server connection, which allows you to replicate all your telemetry data to a central database and also replicate the telemtery data of all your team mates from the central database to your local database. Very helpful for data analysis, strategy development and stint planning in endurance races.
+In the lower area of the window, you can configure the Team Server connection, which allows you to synchronize all your telemetry data with a central database on a Team Server and also replicate the telemtery data of all your team mates from the central database to your local database. Very helpful for data analysis, strategy development and stint planning in endurance races.
 
-Please note, that once you have changed the database location or the synchronization settings, you have to restart all applications.
+To enable data synchronization, tick the corresponding check box and enter the login credentials (Server URL and access token), which you will normally get from your team manager (see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) for more information). Click on the small button with the key to check, whether a valid connection to the synchronization service can be established. You can also set the synchronization interval here. Using higher values will decrease the load on the Team Server, but in general it will be fine to use the default value of 10 minutes here.
+
+If you want to rebuild your local telemetry database, for example, after losing all your data due to a harddisk problem, you can click the "Rebuild" button. This will reload all data, which is available to you. Since pushing this button will trigger a complete and very time consuming re-synchronization, use it only in *emergency* situations.
+
+Please note, that the initial synchronization might take quite a while (up to a couple of hours), depending on the amount of telemetry data in your local database, but also depending on the amount of data available by your team mates. The synchronization will run in the background without any further user interaction. The background process is automatically started by "Simulator Startup". Once, the initial synchronization is finished, the incremental update of your database will take only a few seconds and happens in the interval mentioned above.
+
+Final note: Once you have changed the database location or the synchronization settings, you have to restart all applications.
 
 ## Technical information
 

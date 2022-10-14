@@ -1,9 +1,9 @@
 [Development]
 Version=4.4.0.0-dev
 Target=4.4.0.0-release
-Date=10/13/2022
+Date=10/14/2022
 Download=
-Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Progress and Message windows can be positioned, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command
+Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command
 [Release]
 Version=4.3.4.1-release
 Date=10/07/2022

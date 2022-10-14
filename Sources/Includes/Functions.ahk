@@ -1371,7 +1371,7 @@ isNull(value) {
 
 reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
 	if isDebug()
-		showMessage("The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
+		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
 				  , false, kUndefined, 5000)
 
 	return false

@@ -569,11 +569,8 @@ modifySettings() {
 	Gui LP:+Disabled
 
 	try {
-		if (editSettings(settings) == kSave) {
+		if (editSettings(settings) == kSave)
 			writeConfiguration(kSimulatorSettingsFile, settings)
-
-			this.Settings := settings
-		}
 	}
 	finally {
 		Gui LP:-Disabled

@@ -6,6 +6,8 @@
   4. The session synchronization can be [temporarily disabled](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session) in the "Race Center", while you are working with the data.
   5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
 
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440), especially, if you are using or even hosting a Team Server.
+
 ## 4.3.5.0-release 10/14/22
 
   1. Minor bugfixes, as always

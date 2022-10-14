@@ -319,7 +319,7 @@ The automatic selection of the next driver is supported for *Assetto Corsa Compe
   
      ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2018.JPG)
 	 
-	 Please make sure, that the names and the order of the selected drivers are identical to the content of the entry list for your team in the upcoming session. Otherwise, wrong drivers might be selected for the next stint in the pitstop automation. As a beneficial side effect, you can see in the list of drivers also, which of the drivers are currently connected to the Team Server.
+	 Please make sure, that the names and the order of the selected drivers are identical to the content of the entry list for your team in the upcoming session. Otherwise, wrong drivers might be selected for the next stint in the pitstop automation. As a beneficial side effect, you can see in the list of drivers also, which of the drivers are currently connected to the Team Server as a *Driver*.
 
 Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop" menu and the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
   

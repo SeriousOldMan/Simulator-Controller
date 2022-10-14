@@ -9788,7 +9788,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 			for ignore, connection in string2Values(";", raceCenterOrCommand.Connector.GetSessionConnections(raceCenterOrCommand.SelectedSession[true])) {
 				connection := parseObject(raceCenterOrCommand.Connector.GetConnection(connection))
 
-				if (connection.Name && (connection.Name != ""))
+				if (connection.Name && (connection.Name != "") && (connection.Type = "Driver"))
 					connectedDrivers.Push(connection.Name)
 			}
 

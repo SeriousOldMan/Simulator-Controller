@@ -3,13 +3,14 @@ Version=4.4.0.0-dev
 Target=4.4.0.0-release
 Date=10/14/2022
 Download=
-Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command
+Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command, New car models for "Setup Advisor"
+[Release]
 Version=4.3.5.0-release
 Date=10/14/2022
 Download=https://cutt.ly/ZBYdiqF
 Changes=Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.3.5.0-release
 Development=4.4.0.0-dev

@@ -1,16 +1,16 @@
 [Development]
-Version=4.3.5.0-release
-Target=4.3.5.0-release
+Version=4.4.0.0-dev
+Target=4.4.0.0-release
 Date=10/14/2022
-Download=https://cutt.ly/ZBYdiqF
-Changes=Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods
+Download=
+Changes=New car models for "Setup Advisor"
 [Release]
 Version=4.3.5.0-release
 Date=10/14/2022
 Download=https://cutt.ly/ZBYdiqF
 Changes=Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.3.5.0-release
-Development=4.3.5.0-release
+Development=4.4.0.0-dev

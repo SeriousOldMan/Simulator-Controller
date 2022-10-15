@@ -78,6 +78,31 @@ namespace TeamServer.Controllers {
             }
         }
 
+        [HttpDelete("token/{identifier}")]
+        public string DeleteToken([FromQuery(Name = "token")] string token, string identifier)
+        {
+            TokenIssuer tokenIssuer = Server.TeamServer.TokenIssuer;
+
+            try
+            {
+                Token theToken = tokenIssuer.ValidateToken(token);
+
+                ValidateToken(theToken);
+
+                tokenIssuer.DeleteToken(identifier);
+
+                return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
         [HttpGet("connect/{category}")]
         public string Connect([FromQuery(Name = "token")] string token,
                               [FromQuery(Name = "client")] string client, [FromQuery(Name = "name")] string name,

@@ -31,6 +31,8 @@ global teamServerDataTokenEdit := ""
 global teamServerTimeText := ""
 global renewDataTokenButton
 
+global changePasswordButton
+
 global teamDropDownList
 global driverListBox
 
@@ -192,7 +194,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget5 Hidden, %teamServerPasswordEdit%
 		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 gteamServerLogin HWNDwidget6 Hidden
 		setButtonIcon(widget6, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 gchangePassword HWNDwidget29 Hidden
+		Gui %window%:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 vchangePasswordButton gchangePassword HWNDwidget29 Hidden
 		setButtonIcon(widget29, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Add, Text, x%x0% yp+26 w90 h23 +0x200 HWNDwidget9 Hidden, % translate("Contingent")
@@ -213,7 +215,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 gcopyDataToken HWNDwidget36 Hidden
 		setButtonIcon(widget36, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 vrenewDataTokenButton grenewDataToken HWNDwidget37 Hidden
-		setButtonIcon(widget6, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
+		setButtonIcon(widget37, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Font, cBlack Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -387,7 +389,8 @@ class TeamServerConfigurator extends ConfigurationItem {
 			catch exception {
 				GuiControl, , teamServerSessionTokenEdit, % ""
 				GuiControl, , teamServerDataTokenEdit, % ""
-				GuiControl, , teamServerTimeText, % ""
+				GuiControl +cGray, teamServerTimeText
+				GuiControl, , teamServerTimeText, % translate("Please Login for actual data...")
 
 				if message {
 					title := translate("Error")
@@ -399,13 +402,20 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 				this.iToken := false
 			}
-		else
+		else {
+			GuiControl, , teamServerSessionTokenEdit, % ""
+			GuiControl, , teamServerDataTokenEdit, % ""
+			GuiControl +cGray, teamServerTimeText
+			GuiControl, , teamServerTimeText, % translate("Please Login for actual data...")
+
 			this.iToken := false
+		}
 
 		this.loadTeams()
 	}
 
 	updateState() {
+		GuiControl Disable, changePasswordButton
 		GuiControl Disable, addTeamButton
 		GuiControl Disable, deleteTeamButton
 		GuiControl Disable, editTeamButton
@@ -418,7 +428,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControl Disable, deleteSessionButton
 		GuiControl Disable, editSessionButton
 
+		if ((teamServerURLEdit = "") && (teamServerNameEdit = "")) {
+			teamServerSessionTokenEdit := ""
+			teamServerDataTokenEdit := ""
+
+			GuiControl, , teamServerSessionTokenEdit, %teamServerSessionTokenEdit%
+			GuiControl, , teamServerDataTokenEdit, %teamServerDataTokenEdit%
+		}
+
 		if this.Token {
+			GuiControl Enable, changePasswordButton
 			GuiControl Enable, addTeamButton
 
 			if this.SelectedTeam {
@@ -466,6 +485,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 	renewDataToken() {
 		local window := this.Editor.Window
+		local connector := this.Connector
 
 		Gui %window%:Default
 

@@ -189,6 +189,17 @@ namespace TeamServer {
 			return Get("login/token/data", new Parameters() { { "token", Token } });
 		}
 
+		public string RenewDataToken()
+		{
+			try
+			{
+				Delete("login/token/" + GetDataToken(), new Parameters() { { "token", Token } });
+			}
+			catch { }
+
+			return GetDataToken();
+		}
+
 		public string Connect(string token, string client, string name)
 		{
 			string connection = Get("login/connect/data", new Parameters() { { "token", token },

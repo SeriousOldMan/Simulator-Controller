@@ -29,6 +29,7 @@ global teamServerPasswordEdit := ""
 global teamServerSessionTokenEdit := """"
 global teamServerDataTokenEdit := ""
 global teamServerTimeText := ""
+global renewDataTokenButton
 
 global teamDropDownList
 global driverListBox
@@ -189,7 +190,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+23 w90 h23 +0x200 HWNDwidget3 Hidden, % translate("Login Credentials")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w3% h21 VteamServerNameEdit HWNDwidget4 Hidden, %teamServerNameEdit%
 		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget5 Hidden, %teamServerPasswordEdit%
-		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 grenewToken HWNDwidget6 Hidden
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 gteamServerLogin HWNDwidget6 Hidden
 		setButtonIcon(widget6, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 gchangePassword HWNDwidget29 Hidden
 		setButtonIcon(widget29, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
@@ -211,11 +212,13 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerDataTokenEdit HWNDwidget35 Hidden, %teamServerDataTokenEdit%
 		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 gcopyDataToken HWNDwidget36 Hidden
 		setButtonIcon(widget36, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 vrenewDataTokenButton grenewDataToken HWNDwidget37 Hidden
+		setButtonIcon(widget6, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Font, cBlack Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h214 HWNDwidget12 Hidden, % translate("Teams")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+36 w%width% h214 HWNDwidget12 Hidden, % translate("Teams")
 
 		Gui %window%:Font, Norm, Arial
 
@@ -250,7 +253,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditSessionButton grenameSession HWNDwidget28 Hidden
 		setButtonIcon(widget28, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		loop 36
+		loop 37
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.updateState()
@@ -436,6 +439,13 @@ class TeamServerConfigurator extends ConfigurationItem {
 				}
 			}
 		}
+
+		GuiControlGet teamServerDataTokenEdit
+
+		if (teamServerDataTokenEdit != "")
+			GuiControl Enable, renewDataTokenButton
+		else
+			GuiControl Disable, renewDataTokenButton
 	}
 
 	parseObject(properties) {
@@ -452,6 +462,23 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 
 		return result
+	}
+
+	renewDataToken() {
+		local window := this.Editor.Window
+
+		Gui %window%:Default
+
+		try {
+			teamServerDataTokenEdit := connector.RenewDataToken()
+		}
+		catch exception {
+			teamServerDataTokenEdit := ""
+		}
+
+		GuiControl, , teamServerDataTokenEdit, %teamServerDataTokenEdit%
+
+		this.updateState()
 	}
 
 	loadTeams() {
@@ -905,7 +932,7 @@ changePassword() {
 	}
 }
 
-renewToken() {
+teamServerLogin() {
 	TeamServerConfigurator.Instance.connect()
 }
 
@@ -927,6 +954,10 @@ copyDataToken() {
 
 		showMessage(translate("Token copied to the clipboard."))
 	}
+}
+
+renewDataToken() {
+	TeamServerConfigurator.Instance.renewDataToken()
 }
 
 selectTeam() {

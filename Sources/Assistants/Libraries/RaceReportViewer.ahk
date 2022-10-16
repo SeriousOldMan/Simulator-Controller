@@ -1110,7 +1110,7 @@ editReportSettings(raceReport, report := false, options := false) {
 		Gui RRS:Font, s9 Norm, Arial
 		Gui RRS:Font, Italic Underline, Arial
 
-		Gui RRS:Add, Text, x136 YP+20 w104 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
+		Gui RRS:Add, Text, x106 YP+20 w164 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
 
 		Gui RRS:Font, s8 Norm, Arial
 
@@ -1122,7 +1122,7 @@ editReportSettings(raceReport, report := false, options := false) {
 			Gui RRS:Add, Radio, x90 yp+4 w80 Group vallLapsRadio gchooseLapSelection, % translate(" All")
 			Gui RRS:Add, Radio, x90 yp+24 w80 vrangeLapsRadio gchooseLapSelection, % translate(" Range:")
 			Gui RRS:Add, Edit, x170 yp-3 w80 vrangeLapsEdit
-			Gui RRS:Add, Text, x255 yp+3 w110, % translate("(e.g.: 1-5;8;12)")
+			Gui RRS:Add, Text, x255 yp+3 w140, % translate("(e.g.: 1-5;8;12)")
 
 			if !raceReport.Settings.HasKey("Laps") {
 				GuiControl, , allLapsRadio, 1

@@ -267,7 +267,7 @@ class ControllerList extends ConfigurationItemList {
 			if inList(choices, controllerLayoutDropDown)
 				GuiControl Choose, controllerLayoutDropDown, %controllerLayoutDropDown%
 			else
-				GuiControl Choose, controllerLayoutDropDown, %A_Space%
+				GuiControl Choose, controllerLayoutDropDown, 0
 		}
 		finally {
 			Gui %window%:-Disabled

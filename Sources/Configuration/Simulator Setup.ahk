@@ -312,7 +312,7 @@ class SetupWizard extends ConfigurationItem {
 
 	loadDefinition(definition := false) {
 		local knowledgeBase, stepWizard, count, descriptor, step, stepDefinition, title, initialize
-		local ignore, fileName
+		local ignore, fileName, language, rootDirectory, section, keyValues, key, value
 
 		if !definition
 			definition := this.Definition
@@ -350,6 +350,13 @@ class SetupWizard extends ConfigurationItem {
 				stepDefinition := readConfiguration(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
 
 				setConfigurationSectionValues(definition, "Setup." . step.Step, getConfigurationSectionValues(stepDefinition, "Setup." . step.Step, Object()))
+
+				for language, ignore in availableLanguages()
+					for ignore, rootDirectory in [kResourcesDirectory, kUserHomeDirectory . "Translations\"]
+						if FileExist(rootDirectory . "Setup\Definitions\" . step.Step . " Step." . language)
+							for section, keyValues in readConfiguration(rootDirectory . "Setup\Definitions\" . step.Step . " Step." . language)
+								for key, value in keyValues
+									setConfigurationValue(definition, section, key, value)
 
 				step.loadDefinition(definition, getConfigurationValue(definition, "Setup." . step.Step, step.Step . ".Definition", Object()))
 			}
@@ -2470,7 +2477,7 @@ findInstallProperty(name, property) {
 
 initializeSimulatorSetup() {
 	local icon := kIconsDirectory . "Configuration Wand.ico"
-	local definition, wizard, x, y, label, callback
+	local definition, wizard, x, y, label, callback, ignore, languages, language, section, keyValues, key, value
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
@@ -2478,6 +2485,24 @@ initializeSimulatorSetup() {
 	FileCreateDir %kUserHomeDirectory%Setup
 
 	definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
+
+	languages := string2Values("|", getConfigurationValue(definition, "Setup", "Languages"))
+
+	if FileExist(kUserHomeDirectory . "Translations\Setup\Simulator Setup.ini") {
+		for ignore, language in string2Values("|", getConfigurationValue(readConfiguration(kUserHomeDirectory . "Translations\Setup\Simulator Setup.ini")
+																	   , "Setup", "Languages"))
+			if !inList(languages, language)
+				languages.Push(language)
+	}
+
+	setConfigurationValue(definition, "Setup", "Languages", values2String("|", languages*))
+
+	for language, ignore in languages
+		for ignore, root in [kResourcesDirectory, kUserHomeDirectory . "Translations\"]
+			if FileExist(kUserHomeDirectory . "Setup\Simulator Setup." . language)
+				for section, keyValues in readConfiguration(kUserHomeDirectory . "Setup\Simulator Setup." . language)
+					for key, value in keyValues
+						setConfigurationValue(definition, section, key, value)
 
 	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
 	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))

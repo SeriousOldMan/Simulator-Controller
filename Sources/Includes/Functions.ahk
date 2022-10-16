@@ -71,7 +71,7 @@ dismissHTMLViewer() {
 }
 
 consentDialog(id, consent := false) {
-	local language, texts, chosen, x, y
+	local language, texts, chosen, x, y, rootDirectory, ignore, section, keyValues, key, value
 
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
@@ -91,6 +91,13 @@ consentDialog(id, consent := false) {
 		language := "en"
 
 	texts := readConfiguration(kTranslationsDirectory . "Consent.ini")
+
+	for language, ignore in availableLanguages()
+		for ignore, rootDirectory in [kTranslationsDirectory, kUserHomeDirectory . "Translations\"]
+			if FileExist(rootDirectory . "Consent." . language)
+				for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
+					for key, value in keyValues
+						setConfigurationValue(texts, section, key, value)
 
 	Gui CNS:-Border ; -Caption
 	Gui CNS:Color, D0D0D0, D8D8D8
@@ -1126,7 +1133,7 @@ hideSplashTheme() {
 		try {
 			SoundPlay NonExistent.avi
 		}
-		catch ignore {
+		catch exception {
 			logError(exception)
 		}
 

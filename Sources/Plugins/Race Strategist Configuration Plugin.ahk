@@ -122,19 +122,19 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 		x5 := x1 + 144
 
-		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget20 Hidden, % translate("@ Session End")
+		Gui %window%:Add, Text, x%x5% yp+3 w140 h20 HWNDwidget20 Hidden, % translate("@ Session End")
 
 		choices := map(["Ask", "Always save", "No action"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+21 w105 h23 +0x200 HWNDwidget21 Hidden, % translate("Save Telemetry")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsSaveTelemetryDropDown HWNDwidget22 Hidden, % values2String("|", choices*)
 
-		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget23 Hidden, % translate("@ Session End")
+		Gui %window%:Add, Text, x%x5% yp+3 w140 h20 HWNDwidget23 Hidden, % translate("@ Session End")
 
 		choices := map(["No", "Yes"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+21 w105 h23 +0x200 HWNDwidget25 Hidden, % translate("Race Review")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vrsRaceReviewDropDown HWNDwidget26 Hidden, % values2String("|", choices*)
 
-		Gui %window%:Add, Text, x%x5% yp+3 w80 h20 HWNDwidget27 Hidden, % translate("@ Session End")
+		Gui %window%:Add, Text, x%x5% yp+3 w140 h20 HWNDwidget27 Hidden, % translate("@ Session End")
 
 		loop 28
 			editor.registerWidget(this, widget%A_Index%)

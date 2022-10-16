@@ -470,7 +470,7 @@ launchPad(command := false, arguments*) {
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
 
-		Gui LP:Add, Text, x258 YP+20 w90 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
+		Gui LP:Add, Text, x233 YP+20 w140 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
 
 		Gui LP:Font, s8 Norm, Arial
 

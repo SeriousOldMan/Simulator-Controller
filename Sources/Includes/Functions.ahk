@@ -526,9 +526,9 @@ loadSimulatorConfiguration() {
 	section := getConfigurationValue(version, "Current", "Type", false)
 
 	if section
-		kVersion := getConfigurationValue(version, section, "Version", "0.0.0-dev")
+		kVersion := getConfigurationValue(version, section, "Version", "0.0.0.0-dev")
 	else
-		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0-dev"))
+		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0.0-dev"))
 
 	Process Exist
 

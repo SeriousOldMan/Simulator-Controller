@@ -353,8 +353,8 @@ class SetupWizard extends ConfigurationItem {
 
 				for language, ignore in availableLanguages()
 					for ignore, rootDirectory in [kResourcesDirectory, kUserHomeDirectory . "Translations\"]
-						if FileExist(rootDirectory . "Setup\Definitions\" . step.Step . " Step." . language)
-							for section, keyValues in readConfiguration(rootDirectory . "Setup\Definitions\" . step.Step . " Step." . language)
+						if FileExist(rootDirectory . "Setup\Translations\" . step.Step . " Step." . language)
+							for section, keyValues in readConfiguration(rootDirectory . "Setup\Translations\" . step.Step . " Step." . language)
 								for key, value in keyValues
 									setConfigurationValue(definition, section, key, value)
 

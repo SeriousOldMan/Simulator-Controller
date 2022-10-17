@@ -85,19 +85,20 @@ consentDialog(id, consent := false) {
 	else
 		closed := false
 
-	language := getLanguage()
-
-	if ((language != "en") && (language != "de"))
-		language := "en"
-
-	texts := readConfiguration(kTranslationsDirectory . "Consent.ini")
+	texts := false
 
 	for language, ignore in availableLanguages()
 		for ignore, rootDirectory in [kTranslationsDirectory, kUserHomeDirectory . "Translations\"]
 			if FileExist(rootDirectory . "Consent." . language)
-				for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
-					for key, value in keyValues
-						setConfigurationValue(texts, section, key, value)
+				if !texts
+					texts := readConfiguration(rootDirectory . "Consent." . language)
+				else
+					for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
+						for key, value in keyValues
+							setConfigurationValue(texts, section, key, value)
+
+	if !texts
+		texts := readConfiguration(kTranslationsDirectory . "Consent.en")
 
 	Gui CNS:-Border ; -Caption
 	Gui CNS:Color, D0D0D0, D8D8D8
@@ -106,7 +107,7 @@ consentDialog(id, consent := false) {
 	Gui CNS:Font, Norm, Arial
 	Gui CNS:Add, Text, x0 y32 w800 h23 +0x200 +0x1 BackgroundTrans, % translate("Declaration of consent")
 
-	Gui CNS:Add, Text, x8 y70 w784 h180 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Introduction"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y70 w784 h180 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Introduction"), "``n", "`n"), "\<>", "=")
 
 	Gui CNS:Add, Text, x8 y260 w450 h23 +0x200, % translate("Your database identification key is:")
 	Gui CNS:Add, Edit, x460 y260 w332 h23 -VScroll ReadOnly Center, % id
@@ -121,9 +122,9 @@ consentDialog(id, consent := false) {
 	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided"))
 	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose%chosen% VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 
-	Gui CNS:Add, Text, x8 y364 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y364 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "=")
 
-	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "=")
 
 	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
 
@@ -2361,7 +2362,7 @@ loadSimulatorConfiguration()
 if !vDetachedInstallation {
 	checkForUpdates()
 
-	if !isDebug() {
+	if true || !isDebug() {
 		requestShareSessionDatabaseConsent()
 		startDatabaseSynchronizer()
 		checkForNews()

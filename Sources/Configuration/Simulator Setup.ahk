@@ -352,9 +352,9 @@ class SetupWizard extends ConfigurationItem {
 				setConfigurationSectionValues(definition, "Setup." . step.Step, getConfigurationSectionValues(stepDefinition, "Setup." . step.Step, Object()))
 
 				for language, ignore in availableLanguages()
-					for ignore, rootDirectory in [kResourcesDirectory, kUserHomeDirectory . "Translations\"]
-						if FileExist(rootDirectory . "Setup\Translations\" . step.Step . " Step." . language)
-							for section, keyValues in readConfiguration(rootDirectory . "Setup\Translations\" . step.Step . " Step." . language)
+					for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
+						if FileExist(rootDirectory . step.Step . " Step." . language)
+							for section, keyValues in readConfiguration(rootDirectory . step.Step . " Step." . language)
 								for key, value in keyValues
 									setConfigurationValue(definition, section, key, value)
 
@@ -527,7 +527,9 @@ class SetupWizard extends ConfigurationItem {
 		for step, stepWizard in this.StepWizards {
 			this.ProgressCount += 2
 
-			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ") . translate(step) . translate("...")})
+			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ")
+															   . getConfigurationValue(this.Definition, "Setup." . step, step . ".Name." . getLanguage())
+															   . translate("...")})
 
 			stepWizard.createGui(this, x, y, width, height)
 		}
@@ -2488,8 +2490,8 @@ initializeSimulatorSetup() {
 
 	languages := string2Values("|", getConfigurationValue(definition, "Setup", "Languages"))
 
-	if FileExist(kUserHomeDirectory . "Translations\Setup\Simulator Setup.ini") {
-		for ignore, language in string2Values("|", getConfigurationValue(readConfiguration(kUserHomeDirectory . "Translations\Setup\Simulator Setup.ini")
+	if FileExist(kUserTranslationsDirectory . "Setup\Simulator Setup.ini") {
+		for ignore, language in string2Values("|", getConfigurationValue(readConfiguration(kUserTranslationsDirectory . "Setup\Simulator Setup.ini")
 																	   , "Setup", "Languages"))
 			if !inList(languages, language)
 				languages.Push(language)
@@ -2498,7 +2500,7 @@ initializeSimulatorSetup() {
 	setConfigurationValue(definition, "Setup", "Languages", values2String("|", languages*))
 
 	for language, ignore in languages
-		for ignore, root in [kResourcesDirectory, kUserHomeDirectory . "Translations\"]
+		for ignore, root in [kResourcesDirectory, kUserTranslationsDirectory]
 			if FileExist(kUserHomeDirectory . "Setup\Simulator Setup." . language)
 				for section, keyValues in readConfiguration(kUserHomeDirectory . "Setup\Simulator Setup." . language)
 					for key, value in keyValues

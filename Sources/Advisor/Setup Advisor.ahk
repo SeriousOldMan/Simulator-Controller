@@ -261,6 +261,9 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	__New(simulator := false, car := false, track := false, weather := false) {
+		local found := false
+		local definition, section, values, key, value, ignore, rootDirectory
+
 		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
 
 		if simulator {
@@ -270,7 +273,23 @@ class SetupAdvisor extends ConfigurationItem {
 			this.iSelectedWeather := weather
 		}
 
-		this.iDefinition := readConfiguration(kResourcesDirectory . "Advisor\Setup Advisor.ini")
+		definition := readConfiguration(kResourcesDirectory . "Advisor\Setup Advisor.ini")
+
+		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
+			if FileExist(rootDirectory . "Setup Advisor." . getLanguage()) {
+				found := true
+
+				for section, values in readConfiguration(rootDirectory . "Setup Advisor." . getLanguage())
+					for key, value in values
+						setConfigurationValue(definition, section, key, value)
+			}
+
+		if !found
+			for section, values in readConfiguration(kTranslationsDirectory . "Setup Advisor.en")
+				for key, value in values
+					setConfigurationValue(definition, section, key, value)
+
+		this.iDefinition := definition
 
 		base.__New(kSimulatorConfiguration)
 
@@ -455,10 +474,7 @@ class SetupAdvisor extends ConfigurationItem {
 			this.loadTrack(track)
 			this.loadWeather(weather)
 
-			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
-
-			if (characteristicLabels.Count() == 0)
-				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
+			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
 
 			characteristics := string2Values(",", getConfigurationValue(state, "Characteristics", "Characteristics"))
 
@@ -471,7 +487,7 @@ class SetupAdvisor extends ConfigurationItem {
 				try {
 					this.ProgressCount := 0
 
-					showProgress({color: "Green", title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
+					showProgress({color: "Green", width: 350, title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
 
 					Sleep 200
 
@@ -549,10 +565,7 @@ class SetupAdvisor extends ConfigurationItem {
 					width := this.SettingsViewer.Width
 					height := (this.SettingsViewer.Height - 110 - 1)
 
-					info := getConfigurationValue(this.Definition, "Setup.Info." . getLanguage(), "ChangeWarning", false)
-
-					if !info
-						info := getConfigurationValue(this.Definition, "Setup.Info.EN", "ChangeWarning", false)
+					info := getConfigurationValue(this.Definition, "Setup.Info", "ChangeWarning", "")
 
 					iWidth := width - 10
 					iHeight := 90
@@ -852,6 +865,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 	loadCharacteristics(definition, simulator := false, car := false, track := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
+		local characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
 		local compiler, group, ignore, groupOption, option, characteristic
 
 		this.iCharacteristics := []
@@ -861,7 +875,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		compiler := new RuleCompiler()
 
-		for group, definition in getConfigurationSectionValues(definition, "Setup.Characteristics", Object())
+		for group, definition in getConfigurationSectionValues(definition, "Setup.Characteristics")
 			for ignore, groupOption in string2Values(";", definition) {
 				if InStr(groupOption, ":") {
 					groupOption := string2Values(":", groupOption)
@@ -870,7 +884,9 @@ class SetupAdvisor extends ConfigurationItem {
 						characteristic := factPath(group, groupOption[1], option)
 
 						if !simulator {
-							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Characteristic ")
+																				 . characteristicLabels[characteristic]
+																				 . translate("...")})
 
 							knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")")).dispose()
 
@@ -892,7 +908,8 @@ class SetupAdvisor extends ConfigurationItem {
 					characteristic := factPath(group, groupOption)
 
 					if !simulator {
-						showProgress({progress: ++this.ProgressCount, message: translate("Initializing Characteristic ") . characteristic . translate("...")})
+						showProgress({progress: ++this.ProgressCount, message: translate("Initializing Characteristic ")
+																			 . characteristicLabels[characteristic] . translate("...")})
 
 						knowledgeBase.prove(compiler.compileGoal("addCharacteristic(" . characteristic . ")")).dispose()
 
@@ -914,6 +931,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 	loadSettings(definition, simulator := false, car := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
+		local settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels")
 		local compiler, group, ignore, groupOption, option, setting
 
 		this.iSettings := []
@@ -923,7 +941,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		compiler := new RuleCompiler()
 
-		for group, definition in getConfigurationSectionValues(definition, "Setup.Settings", Object())
+		for group, definition in getConfigurationSectionValues(definition, "Setup.Settings")
 			for ignore, groupOption in string2Values(";", definition) {
 				if InStr(groupOption, ":") {
 					groupOption := string2Values(":", groupOption)
@@ -932,7 +950,9 @@ class SetupAdvisor extends ConfigurationItem {
 						setting := factPath(group, groupOption[1], option)
 
 						if !simulator {
-							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
+							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ")
+																				 . settingsLabels[setting]
+																				 . translate("...")})
 
 							knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 
@@ -954,7 +974,9 @@ class SetupAdvisor extends ConfigurationItem {
 					setting := factPath(group, groupOption)
 
 					if !simulator {
-						showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ") . setting . translate("...")})
+						showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ")
+																			 . settingsLabels[setting]
+																			 . translate("...")})
 
 						knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 
@@ -1005,7 +1027,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		this.ProgressCount := 0
 
-		showProgress({color: "Blue", title: translate(phase1), message: translate("Clearing Problems...")})
+		showProgress({color: "Blue", width: 350, title: translate(phase1), message: translate("Clearing Problems...")})
 
 		Sleep 200
 
@@ -1198,10 +1220,7 @@ class SetupAdvisor extends ConfigurationItem {
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
-			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
-
-			if (characteristicLabels.Count() == 0)
-				characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
+			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
 
 			this.SelectedCharacteristics.Push(characteristic)
 
@@ -1300,14 +1319,11 @@ class SetupAdvisor extends ConfigurationItem {
 			logError(exception)
 		}
 
-		characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels." . getLanguage(), Object())
-
-		if (characteristicLabels.Count() == 0)
-			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels.EN", Object())
+		characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
 
 		menuIndex := 1
 
-		groups := getConfigurationSectionValues(this.Definition, "Setup.Characteristics", Object())
+		groups := getConfigurationSectionValues(this.Definition, "Setup.Characteristics")
 		translatedGroups := {}
 
 		for group, definition in groups
@@ -1422,10 +1438,7 @@ class SetupAdvisor extends ConfigurationItem {
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 
 			if draw {
-				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
-
-				if (settingsLabels.Count() == 0)
-					settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels.EN", Object())
+				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels")
 
 				settings := []
 
@@ -2094,20 +2107,14 @@ class SetupEditor extends ConfigurationItem {
 
 		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
 
-		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels." . getLanguage(), Object())
+		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels")
 
-		if (categoriesLabels.Count() == 0)
-			categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels.EN", Object())
+		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels")
 
-		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
+		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units." . getLanguage(), {})
 
-		if (settingsLabels.Count() == 0)
-			settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels.EN", Object())
-
-		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units." . getLanguage(), Object())
-
-		if (settingsUnits.Count() == 0)
-			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN", Object())
+		if (settingsUnits.Count() = 0)
+			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN")
 
 		window := this.Window
 
@@ -2620,20 +2627,14 @@ class SetupComparator extends ConfigurationItem {
 
 		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
 
-		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels." . getLanguage(), Object())
+		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels")
 
-		if (categoriesLabels.Count() == 0)
-			categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels.EN", Object())
+		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels")
 
-		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels." . getLanguage(), Object())
+		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units", {})
 
-		if (settingsLabels.Count() == 0)
-			settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels.EN", Object())
-
-		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units." . getLanguage(), Object())
-
-		if (settingsUnits.Count() == 0)
-			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN", Object())
+		if (settingsUnits.Count() = 0)
+			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN")
 
 		LV_Delete()
 

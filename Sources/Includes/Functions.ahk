@@ -88,7 +88,7 @@ consentDialog(id, consent := false) {
 	texts := false
 
 	for language, ignore in availableLanguages()
-		for ignore, rootDirectory in [kTranslationsDirectory, kUserHomeDirectory . "Translations\"]
+		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
 			if FileExist(rootDirectory . "Consent." . language)
 				if !texts
 					texts := readConfiguration(rootDirectory . "Consent." . language)

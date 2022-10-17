@@ -2663,22 +2663,28 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	getAvailableSettings(selection := false) {
+		local found := false
 		local fileName, settingDescriptors, section, values, key, value, settings, skip, ignore
-		local available, index, candidate
+		local available, index, candidate, rootDirectory
 
 		if (this.SettingDescriptors.Count() = 0) {
-			fileName := ("Settings." . getLanguage())
+			settingDescriptors := readConfiguration(kResourcesDirectory . "Database\Settings.ini")
 
-			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory))
-				fileName := "Settings.en"
+			for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
+				if FileExist(rootDirectory . "Settings." . getLanguage()) {
+					found := true
 
-			settingDescriptors := readConfiguration(kTranslationsDirectory . fileName)
+					for section, values in readConfiguration(rootDirectory . "Settings." . getLanguage())
+						for key, value in values
+							setConfigurationValue(settingDescriptors, section, key, value)
+				}
+
+			if !found
+				for section, values in readConfiguration(kTranslationsDirectory . "Settings.en")
+					for key, value in values
+						setConfigurationValue(settingDescriptors, section, key, value)
 
 			this.iSettingDescriptors := settingDescriptors
-
-			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
-				for key, value in values
-					setConfigurationValue(settingDescriptors, section, key, value)
 		}
 
 		settings := []

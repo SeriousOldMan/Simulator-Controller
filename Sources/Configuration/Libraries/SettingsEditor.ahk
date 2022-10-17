@@ -471,7 +471,8 @@ restartSettings:
 
 		Gui SE:Add, Text, x68 YP+20 w100 cBlue Center gopenSettingsDocumentation, % translate("Settings")
 
-		coreSettings := [["Simulator Controller", true, false]]
+		coreSettings := [["Simulator Controller", true, false]
+					   , ["System Monitor", getConfigurationValue(settingsOrCommand, "Core", "System Monitor", false), true]]
 		feedbackSettings := []
 
 		for descriptor, applicationName in getConfigurationSectionValues(configuration, "Applications", Object()) {

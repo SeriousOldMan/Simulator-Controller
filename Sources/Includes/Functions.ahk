@@ -1271,21 +1271,21 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 	if (!title || (title = ""))
 		title := translate("Modular Simulator Controller System")
 
-	Gui SM:-Border -Caption
-	Gui SM:Color, D0D0D0, D8D8D8
-	Gui SM:Font, s10 Bold
-	Gui SM:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
-	Gui SM:Font
+	Gui MSGW:-Border -Caption
+	Gui MSGW:Color, D0D0D0, D8D8D8
+	Gui MSGW:Font, s10 Bold
+	Gui MSGW:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
+	Gui MSGW:Font
 
 	if icon {
-		Gui SM:Add, Picture, w50 h50, % kIconsDirectory . Icon
+		Gui MSGW:Add, Picture, w50 h50, % kIconsDirectory . Icon
 
 		innerWidth -= 66
 
-		Gui SM:Add, Text, X74 YP+5 W%innerWidth% H%height%, % message
+		Gui MSGW:Add, Text, X74 YP+5 W%innerWidth% H%height%, % message
 	}
 	else
-		Gui SM:Add, Text, X8 YP+30 W%innerWidth% H%height%, % message
+		Gui MSGW:Add, Text, X8 YP+30 W%innerWidth% H%height%, % message
 
 	SysGet mainScreen, MonitorWorkArea
 
@@ -1309,12 +1309,12 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 				y := "Center"
 		}
 
-	Gui SM:+AlwaysOnTop
-	Gui SM:Show, X%x% Y%y% W%width% H%height% NoActivate
+	Gui MSGW:+AlwaysOnTop
+	Gui MSGW:Show, X%x% Y%y% W%width% H%height% NoActivate
 
 	Sleep %duration%
 
-	Gui SM:Destroy
+	Gui MSGW:Destroy
 }
 
 moveByMouse(window, descriptor := false) {
@@ -1394,7 +1394,11 @@ getLogLevel() {
 }
 
 logMessage(logLevel, message) {
-	local level, fileName, directory, tries
+	local script := StrSplit(A_ScriptName, ".")[1]
+	local time := A_Now
+	local level, fileName, directory, tries, logTime, logLine
+
+	static sending := false
 
 	if (logLevel >= vLogLevel) {
 		level := ""
@@ -1412,8 +1416,10 @@ logMessage(logLevel, message) {
 				throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
 		}
 
-		fileName := kLogsDirectory . StrSplit(A_ScriptName, ".")[1] . " Logs.txt"
-		message := "[" level . " - " . A_Now . "]: " . message . "`n"
+		FormatTime, logTime, %time%, dd.MM.yy hh:mm:ss tt
+
+		fileName := kLogsDirectory . script . " Logs.txt"
+		logLine := "[" level . " - " . logTime . "]: " . message . "`n"
 
 		SplitPath fileName, , directory
 		FileCreateDir %directory%
@@ -1422,7 +1428,7 @@ logMessage(logLevel, message) {
 
 		while (tries > 0)
 			try {
-				FileAppend %message%, %fileName%, UTF-16
+				FileAppend %logLine%, %fileName%, UTF-16
 
 				break
 			}
@@ -1431,6 +1437,21 @@ logMessage(logLevel, message) {
 
 				tries -= 1
 			}
+
+		if (!sending && (script != "System Monitor")) {
+			Process Exist, System Monitor.exe
+
+			if ErrorLevel {
+				sending := true
+
+				try {
+					sendMessage(kFileMessage, "Monitor", "logMessage:" . values2String(";", script, time, logLevel, message), ErrorLevel)
+				}
+				finally {
+					sending := false
+				}
+			}
+		}
 	}
 }
 

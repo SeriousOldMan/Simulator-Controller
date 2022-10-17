@@ -1461,7 +1461,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			try {
 				Gui ListView, % this.TrackAutomationsListView
 
-				LV_Add("Vis Select", trackAutomationNameEdit, trackAutomation.Actions.Length())
+				LV_Modify(LV_Add("Select", trackAutomationNameEdit, trackAutomation.Actions.Length()), "Vis")
 
 				loop 2
 					LV_ModifyCol(A_Index, "AutoHdr")
@@ -2733,8 +2733,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			ignore := false
 
-			LV_Add("Select Vis", this.getSettingLabel(section, key)
-				 , IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value)
+			LV_Modify(LV_Add("Select", this.getSettingLabel(section, key)
+						   , IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value), "Vis")
 
 			LV_ModifyCol()
 

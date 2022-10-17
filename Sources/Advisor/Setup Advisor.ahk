@@ -1951,7 +1951,7 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x85 ys+14 w193 vsetupNameViewer
 		Gui %window%:Add, Button, x280 ys+10 w80 gresetSetup vresetSetupButton, % translate("&Reset")
 
-		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 CHecked AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Category", "Setting", "Value", "Unit"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Category", "Setting", "Value", "Unit"], "translate")*)
 
 		this.iSettingsListView := settingsListView
 
@@ -2361,7 +2361,7 @@ class SetupEditor extends ConfigurationItem {
 			setup.enable(setting)
 		}
 
-		LV_Modify(row, "+Vis Col3", value)
+		LV_Modify(row, "Vis Col3", value)
 		LV_Modify(row, (originalValue = modifiedValue) ? "-Check" : "Check")
 		LV_ModifyCol(3, "AutoHdr")
 	}
@@ -2780,7 +2780,7 @@ class SetupComparator extends ConfigurationItem {
 		else
 			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 
-		LV_Modify(row, "+Vis Col5", value)
+		LV_Modify(row, "Vis Col5", value)
 		LV_ModifyCol(5, "AutoHdr")
 	}
 

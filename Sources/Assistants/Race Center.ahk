@@ -2133,10 +2133,12 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl, , setupBasePressureRLEdit, %setupBasePressureRLEdit%
 				GuiControl, , setupBasePressureRREdit, %setupBasePressureRREdit%
 
-				LV_Add("Select Vis", getKeys(this.SessionDrivers)[1]
-								   , translate("Dry") . A_Space . translate("(") . setupAirTemperatureEdit . ", " . setupTrackTemperatureEdit . translate(")")
-								   , translate("Dry")
-								   , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit, setupBasePressureRLEdit, setupBasePressureRREdit))
+				LV_Modify(LV_Add("Select", getKeys(this.SessionDrivers)[1]
+										 , translate("Dry") . A_Space . translate("(") . setupAirTemperatureEdit
+															. ", " . setupTrackTemperatureEdit . translate(")")
+										 , translate("Dry")
+										 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit
+															 , setupBasePressureRLEdit, setupBasePressureRREdit)), "Vis")
 
 				this.iSelectedSetup := LV_GetCount()
 
@@ -2176,7 +2178,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(compound, row, 3)
 				LV_GetText(pressures, row, 4)
 
-				LV_Add("Select Vis", driver, conditions, compound, pressures)
+				LV_Modify(LV_Add("Select", driver, conditions, compound, pressures), "Vis")
 
 				this.iSelectedSetup := LV_GetCount()
 
@@ -2654,12 +2656,13 @@ class RaceCenter extends ConfigurationItem {
 			initial := ((stintNr = 1) ? "-" : "")
 
 			if position {
-				LV_Insert(position, "Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
+				LV_Insert(position, "Select", stintNr, "", "", "", initial, initial, initial, initial)
+				LV_Modify(position, "Vis")
 
 				this.iSelectedPlanStint := position
 			}
 			else {
-				LV_Add("Select Vis", stintNr, "", "", "", initial, initial, initial, initial)
+				LV_Modify(LV_Add("Select", stintNr, "", "", "", initial, initial, initial, initial), "Vis")
 
 				this.iSelectedPlanStint := LV_GetCount()
 			}
@@ -9683,7 +9686,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui ListView, %selectedDriversListView%
 
-		LV_Add("Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		LV_Modify(LV_Add("Select", driver, inList(connectedDrivers, driver) ? translate("x") : ""), "Vis")
 
 		updateTeamManager()
 	}
@@ -9697,7 +9700,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui ListView, %availableDriversListView%
 
-		LV_Add("Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		LV_Modify(LV_Add("", driver, inList(connectedDrivers, driver) ? translate("x") : ""), "Vis")
 
 		updateTeamManager()
 	}
@@ -9709,7 +9712,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		LV_GetText(driver, row)
 		LV_Delete(row)
 
-		LV_Insert(row - 1, "Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		LV_Insert(row - 1, "Select", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		LV_Modify(row - 1, "Vis")
 
 		updateTeamManager()
 	}
@@ -9721,7 +9725,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		LV_GetText(driver, row)
 		LV_Delete(row)
 
-		LV_Insert(row + 1, "Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		LV_Insert(row + 1, "Select", driver, inList(connectedDrivers, driver) ? translate("x") : "")
+		LV_Modify(row + 1, "Vis")
 
 		updateTeamManager()
 	}

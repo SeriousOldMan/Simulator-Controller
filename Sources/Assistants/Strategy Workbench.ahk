@@ -3136,10 +3136,11 @@ addSimDriver() {
 		IfMsgBox No
 			row += 1
 
-		LV_Insert(row, "Select Vis", "", "")
+		LV_Insert(row, "Select", "", "")
+		LV_Modify(row, "Vis")
 	}
 	else {
-		LV_Add("Select Vis", "", "")
+		LV_Modify(LV_Add("Select", "", ""), "Vis")
 
 		row := LV_GetCount()
 	}
@@ -3295,7 +3296,8 @@ addSimWeather() {
 			after := true
 		}
 
-		LV_Insert(row, "Select Vis", "", "")
+		LV_Insert(row, "Select", "", "")
+		LV_Modify(row, "Vis")
 	}
 	else {
 		row := LV_GetCount()
@@ -3315,7 +3317,7 @@ addSimWeather() {
 			lastTime := "00:00"
 		}
 
-		LV_Add("Select Vis", "", "")
+		LV_Modify(LV_Add("Select", "", ""), "Vis")
 
 		row += 1
 	}

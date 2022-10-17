@@ -171,6 +171,14 @@ class SimulatorStartup extends ConfigurationItem {
 		local title, exePath, pid
 
 		try {
+			if getConfigurationValue(this.Settings, "Core", "System Monitor", false) {
+				exePath := kBinariesDirectory . "System Monitor.exe"
+
+				Run %exePath%, %kBinariesDirectory%
+
+				Sleep 1000
+			}
+
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
 			exePath := kBinariesDirectory . "Voice Server.exe"

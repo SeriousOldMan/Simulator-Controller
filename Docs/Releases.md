@@ -4,7 +4,8 @@
   3. The position on the screen where info and progress overlays are displayed, can now be configured in the [UI settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications).
   4. The session synchronization can be [temporarily disabled](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session) in the "Race Center", while you are working with the data.
   5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
-  6. New car models for "Setup Advisor":
+  6. Refactoring of the translation framework to better support the new Spanish translation.
+  7. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT RS VLN
 

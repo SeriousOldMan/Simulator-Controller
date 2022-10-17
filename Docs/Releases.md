@@ -1,9 +1,14 @@
 ## 4.4.0.0-release 10/21/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. New car models for "Setup Advisor":
+  3. The position on the screen where info and progress overlays are displayed, can now be configured in the [UI settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications).
+  4. The session synchronization can be [temporarily disabled](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session) in the "Race Center", while you are working with the data.
+  5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
+  6. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT RS VLN
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440), especially, if you are using or even hosting a Team Server.
 
 ## 4.3.5.0-release 10/14/22
 
@@ -471,7 +476,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. Delta time calculation by the Spotter is much more precise now.
   4. Spotter warnings are much faster now due to caching of the generated sound files.
-  5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#choosing-the-database-location) for more information.
+  5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) for more information.
   6. The Virtual Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is remaining?".
   7. The same can be achieved using the new *InformationRequest* action *FuelRemaining*, which is available for all simulator plugins and the "Race Engineer" plugin. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).

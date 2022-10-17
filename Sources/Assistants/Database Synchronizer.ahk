@@ -33,7 +33,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\FTP.ahk
+#Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Assistants\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -128,6 +131,10 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 		showMessage(translate("Error while uploading database - please check your internet connection...")
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
+
+	Task.CurrentTask.Sleep := (24 * 60 * 60 * 1000)
+
+	return Task.CurrentTask
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups) {
@@ -194,11 +201,28 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 		showMessage(translate("Error while downloading database - please check your internet connection...")
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
+
+	Task.CurrentTask.Sleep := (24 * 60 * 60 * 1000)
+
+	return Task.CurrentTask
+}
+
+synchronizeSessionDatabase(minutes) {
+	try {
+		synchronizeDatabase()
+	}
+	catch exception {
+		logError(exception)
+	}
+
+	Task.CurrentTask.Sleep := (minutes * 60000)
+
+	return Task.CurrentTask
 }
 
 updateSessionDatabase() {
 	local icon := kIconsDirectory . "Database Update.ico"
-	local usePressures, useSetups, id
+	local usePressures, useSetups, id, minutes, configuration
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Database Synchronizer
@@ -211,11 +235,29 @@ updateSessionDatabase() {
 	if id {
 		id := A_Args[id + 1]
 
-		; uploadSessionDatabase(id, usePressures, useSetups)
-		downloadSessionDatabase(id, usePressures, useSetups)
+		new PeriodicTask(Func("uploadSessionDatabase").Bind(id, usePressures, useSetups)).start()
+		new PeriodicTask(Func("downloadSessionDatabase").Bind(id, usePressures, useSetups)).start()
 	}
 
-	ExitApp 0
+	minutes := inList(A_Args, "-Synchronize")
+
+	minutes := true
+
+	if minutes {
+		minutes := A_Args[minutes + 1]
+
+		minutes := true
+
+		if (minutes && (minutes != kFalse)) {
+			if ((minutes == true) || (minutes = kTrue)) {
+				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 30)
+			}
+
+			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000)
+		}
+	}
 }
 
 ;;;-------------------------------------------------------------------------;;;

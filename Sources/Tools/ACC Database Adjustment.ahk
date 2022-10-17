@@ -122,10 +122,7 @@ cleanupTyrePressures() {
 	
 	progress := 0
 	
-	x := Round((A_ScreenWidth - 300) / 2)
-	y := A_ScreenHeight - 150
-
-	showProgress({x: x, y: y, width: 450, color: "Silver", message: "", title: translate("Adjust Tyre Pressures")})
+	showProgress({width: 450, color: "Silver", message: "", title: translate("Adjust Tyre Pressures")})
 	
 	for ignore, car in tyresDB.getCars("Assetto Corsa Competizione")
 		for ignore, track in tyresDB.getTracks("Assetto Corsa Competizione", car)
@@ -165,10 +162,7 @@ cleanupTelemetryData() {
 	if (laptimeCorrection != 0) {
 		progress := 0
 		
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		showProgress({x: x, y: y, width: 450, color: "Silver", message: "", title: translate("Adjust Laptimes")})
+		showProgress({width: 450, color: "Silver", message: "", title: translate("Adjust Laptimes")})
 	
 		for ignore, car in tyresDB.getCars("Assetto Corsa Competizione")
 			for ignore, track in tyresDB.getTracks("Assetto Corsa Competizione", car) {

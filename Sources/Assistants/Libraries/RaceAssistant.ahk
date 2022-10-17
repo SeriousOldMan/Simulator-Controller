@@ -811,20 +811,25 @@ class RaceAssistant extends ConfigurationItem {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
 
-				if enabled
+				if (enabled && this.KnowledgeBase)
 					this.dumpKnowledgeBase(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
 
-				if enabled
+				if (enabled && this.KnowledgeBase)
 					this.dumpRules(this.KnowledgeBase)
 		}
 
-		if label
-			if enabled
-				Menu SupportMenu, Check, %label%
-			else
-				Menu SupportMenu, Uncheck, %label%
+		try {
+			if label
+				if enabled
+					Menu SupportMenu, Check, %label%
+				else
+					Menu SupportMenu, Uncheck, %label%
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	toggleDebug(option) {

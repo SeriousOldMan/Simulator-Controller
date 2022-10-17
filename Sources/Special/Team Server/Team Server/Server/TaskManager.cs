@@ -6,12 +6,26 @@ using TeamServer.Model;
 using TeamServer.Model.Access;
 
 namespace TeamServer.Server {
-    public class TaskManager : ManagerBase {
-        public TaskManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
+    public class TaskManager : ManagerBase
+    {
+        public TaskManager(ObjectManager objectManager, Token token) : base(objectManager, token)
+        {
+        }
+
+        public TaskManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+
+        public TaskManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
         }
 
         #region Task
         #region Validation
+        public override Token ValidateToken(Token token)
+        {
+            return TeamServer.TokenIssuer.ElevateToken(base.ValidateToken(token));
+        }
 
         public void ValidateTask(Model.Task.Task task) {
             if (task == null)
@@ -98,7 +112,7 @@ namespace TeamServer.Server {
         }
 
         private void CleanupSessions(Model.Task.Task task) {
-            SessionManager sessionManager = new SessionManager(ObjectManager, TeamServer.TokenIssuer.AdminToken);
+            SessionManager sessionManager = new SessionManager(ObjectManager, TeamServer.TokenIssuer.InternalToken);
 
             if (task.What == Model.Task.Task.Operation.Delete)
                 sessionManager.DeleteSessionsAsync();
@@ -113,9 +127,9 @@ namespace TeamServer.Server {
 
         private void CleanupAccounts(Model.Task.Task task) {
             if (task.What == Model.Task.Task.Operation.Renew)
-                new AccountManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).RenewAccountsAsync();
+                new AccountManager(ObjectManager, TeamServer.TokenIssuer.InternalToken).RenewAccountsAsync();
             else if (task.What == Model.Task.Task.Operation.Delete)
-                new AccountManager(ObjectManager, TeamServer.TokenIssuer.AdminToken).DeleteAccountsAsync();
+                new AccountManager(ObjectManager, TeamServer.TokenIssuer.InternalToken).DeleteAccountsAsync();
             else
                 throw new Exception("Unsupported task operation detected...");
         }
@@ -162,6 +176,8 @@ namespace TeamServer.Server {
 
                         ScheduleTask(task);
                     }
+
+                TeamServer.TokenIssuer.CleanupConnectionsAsync();
 
                 await Task.Delay(60 * 60 * 1000);
             }

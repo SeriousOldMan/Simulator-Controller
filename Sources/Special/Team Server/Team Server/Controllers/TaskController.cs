@@ -19,7 +19,7 @@ namespace TeamServer.Controllers {
         [HttpGet("alltasks")]
         public string GetTasks([FromQuery(Name = "token")] string token) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 
                 return String.Join(";", taskManager.GetAllTasks().Select(a => a.Identifier));
             }
@@ -34,10 +34,14 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 Model.Task.Task task = taskManager.LookupTask(identifier);
 
                 return ControllerUtils.SerializeObject(task, new List<string>(new string[] { "Identifier", "Which", "What", "When", "Active" }));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -47,7 +51,7 @@ namespace TeamServer.Controllers {
         [HttpPut("{identifier}")]
         public string Put([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 Model.Task.Task task = taskManager.LookupTask(identifier);
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
@@ -62,11 +66,15 @@ namespace TeamServer.Controllers {
                     task.When = (Model.Task.Task.Frequency)Enum.Parse(typeof(Model.Task.Task.Frequency), properties["When"]);
 
                 if (properties.ContainsKey("Active"))
-                    task.Active = (properties["Active"] == "true");
+                    task.Active = (properties["Active"].ToLower() == "true");
 
                 task.Save();
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -76,7 +84,7 @@ namespace TeamServer.Controllers {
         [HttpPost]
         public string Post([FromQuery(Name = "token")] string token, [FromBody] string keyValues) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
@@ -86,6 +94,10 @@ namespace TeamServer.Controllers {
 
                 return task.Identifier.ToString();
             }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
             }
@@ -94,11 +106,15 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ElevateToken(token));
+                TaskManager taskManager = new TaskManager(Server.TeamServer.ObjectManager, token);
                 
                 taskManager.DeleteTask(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

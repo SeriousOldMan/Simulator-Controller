@@ -255,8 +255,7 @@ class SimulatorStartup extends ConfigurationItem {
 			showSplashTheme(this.iSplashTheme, "playSong")
 
 		if !kSilentMode
-			showProgress({x: Round((A_ScreenWidth - 300) / 2)
-						, y: A_ScreenHeight - 150, color: "Blue"
+			showProgress({color: "Blue"
 						, message: translate("Start: Simulator Controller")
 						, title: translate("Initialize Core System")})
 
@@ -570,11 +569,8 @@ modifySettings() {
 	Gui LP:+Disabled
 
 	try {
-		if (editSettings(settings) == kSave) {
+		if (editSettings(settings) == kSave)
 			writeConfiguration(kSimulatorSettingsFile, settings)
-
-			this.Settings := settings
-		}
 	}
 	finally {
 		Gui LP:-Disabled

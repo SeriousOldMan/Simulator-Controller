@@ -126,6 +126,8 @@ class RaceStrategist extends RaceAssistant {
 			this.iRaceStrategist := strategist
 
 			base.__New()
+			
+			this.Shared := false
 
 			this.setDatabase(new Database(strategist.TelemetryDatabaseDirectory, kTelemetrySchemas))
 

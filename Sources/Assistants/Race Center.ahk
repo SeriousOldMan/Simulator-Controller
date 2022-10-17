@@ -263,7 +263,7 @@ class RaceCenter extends ConfigurationItem {
 	iRaceSettings := false
 
 	iConnector := false
-	iConnected := false
+	iConnection := false
 
 	iServerURL := ""
 	iServerToken := "__INVALID__"
@@ -278,6 +278,8 @@ class RaceCenter extends ConfigurationItem {
 
 	iSessionIdentifier := false
 	iSessionName := false
+
+	iSynchronize := true
 
 	iSessionLoaded := false
 	iSessionFinished := false
@@ -378,6 +380,8 @@ class RaceCenter extends ConfigurationItem {
 			this.iRaceCenter := raceCenter
 
 			base.__New()
+
+			this.Shared := false
 
 			this.setDatabase(new Database(raceCenter.SessionDirectory, kTelemetrySchemas))
 
@@ -673,7 +677,13 @@ class RaceCenter extends ConfigurationItem {
 
 	Connected[] {
 		Get {
-			return this.iConnected
+			return (this.iConnection != false)
+		}
+	}
+
+	Connection[] {
+		Get {
+			return this.iConnection
 		}
 	}
 
@@ -734,6 +744,12 @@ class RaceCenter extends ConfigurationItem {
 	SelectedSession[asIdentifier := false] {
 		Get {
 			return (asIdentifier ? this.iSessionIdentifier : this.iSessionName)
+		}
+	}
+
+	Synchronize[] {
+		Get {
+			return this.iSynchronize
 		}
 	}
 
@@ -1094,7 +1110,9 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iSyncTask := new SyncSessionTask()
 
-		Task.addTask(this.iSyncTask)
+		this.iSyncTask.start()
+
+		new PeriodicTask(ObjBindMethod(this, "keepAlive"), 120000, kLowPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1159,7 +1177,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Server URL")
 		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverURLEdit, % this.ServerURL
 
-		Gui %window%:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Access Token")
+		Gui %window%:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Session Token")
 		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverTokenEdit, % this.ServerToken
 		Gui %window%:Add, Button, x116 yp-1 w23 h23 Center +0x200 HWNDconnectButton gconnectServer
 		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
@@ -1229,7 +1247,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
-		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu, % values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu
 
 		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
@@ -1505,7 +1523,7 @@ class RaceCenter extends ConfigurationItem {
 
 	connectAsync(silent) {
 		local window := this.Window
-		local token, title
+		local token, title, sessionDB, connection
 
 		if (!silent && GetKeyState("Ctrl", "P")) {
 			Gui TSL:+Owner%window%
@@ -1541,18 +1559,31 @@ class RaceCenter extends ConfigurationItem {
 			if (!this.ServerToken || (this.ServerToken = ""))
 				throw "Invalid token detected..."
 
-			token := this.Connector.Connect(this.ServerURL, this.ServerToken)
+			this.Connector.Initialize(this.ServerURL)
 
-			this.iConnected := true
+			this.Connector.Token := this.ServerToken
 
-			showMessage(translate("Successfully connected to the Team Server."))
+			this.iConnection := true
 
 			this.loadTeams()
 
-			this.iSyncTask.resume()
+			sessionDB := new SessionDatabase()
+
+			connection := this.Connector.Connect(this.ServerToken, sessionDB.ID, sessionDB.getUserName(), "Internal", this.SelectedSession[true])
+
+			if connection {
+				this.iConnection := connection
+
+				showMessage(translate("Successfully connected to the Team Server."))
+
+				this.iSyncTask.resume()
+			}
+			else
+				throw "Cannot connect to Team Server..."
 		}
 		catch exception {
 			this.iServerToken := "__INVALID__"
+			this.iConnection := false
 
 			GuiControl, , serverTokenEdit, % ""
 
@@ -1566,6 +1597,13 @@ class RaceCenter extends ConfigurationItem {
 
 			this.loadTeams()
 		}
+	}
+
+	keepAlive() {
+		local connection := this.Connection
+
+		if connection
+			this.Connector.KeepAlive(connection)
 	}
 
 	loadTeams() {
@@ -1671,7 +1709,7 @@ class RaceCenter extends ConfigurationItem {
 
 	selectSession(identifier) {
 		local window := this.Window
-		local chosen, names
+		local chosen, names, sessionDB
 
 		this.iSyncTask.pause()
 
@@ -1686,10 +1724,16 @@ class RaceCenter extends ConfigurationItem {
 		if (chosen > 0) {
 			this.iSessionName := names[chosen]
 			this.iSessionIdentifier := identifier
+
+			sessionDB := new SessionDatabase()
+
+			this.iConnection := this.Connector.Connect(this.ServerToken, sessionDB.ID, sessionDB.getUserName(), "Internal", identifier)
 		}
 		else {
 			this.iSessionName := ""
 			this.iSessionIdentifier := false
+
+			this.iConnection := false
 		}
 
 		this.initializeSession()
@@ -1866,6 +1910,7 @@ class RaceCenter extends ConfigurationItem {
 			this.iSelectedChartType := false
 		}
 
+		this.updateSessionMenu()
 		this.updateStrategyMenu()
 		this.updatePitstopMenu()
 
@@ -2006,6 +2051,19 @@ class RaceCenter extends ConfigurationItem {
 		finally {
 			Gui ListView, %currentListView%
 		}
+	}
+
+	updateSessionMenu() {
+		local window := this.Window
+		local synchronize
+
+		Gui %window%:Default
+
+		synchronize := (this.Synchronize ? "(x) Synchronize" : "      Synchronize")
+
+		GuiControl, , sessionMenuDropDown, % "|" . values2String("|", map(["Session", "---------------------------------------------", "Connect", "Clear...", "---------------------------------------------", synchronize, "---------------------------------------------", "Select Team...", "---------------------------------------------", "Load Session...", "Save Session", "Save a Copy...", "---------------------------------------------", "Update Statistics", "---------------------------------------------", "Race Summary", "Driver Statistics"], "translate")*)
+
+		GuiControl Choose, sessionMenuDropDown, 1
 	}
 
 	updateStrategyMenu() {
@@ -3299,9 +3357,15 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("You are not connected to an active session.")
 					OnMessage(0x44, "")
 				}
-			case 6: ; Load Session...
+			case 6: ; Synchronize
+				this.iSynchronize := !this.Synchronize
+
+				this.updateState()
+			case 8:
+				this.manageTeam()
+			case 10: ; Load Session...
 				this.loadSession()
-			case 7: ; Save Session
+			case 11: ; Save Session
 				if this.HasData {
 					if this.SessionActive
 						this.saveSession()
@@ -3320,7 +3384,7 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 8: ; Save Session Copy...
+			case 12: ; Save Session Copy...
 				if this.HasData
 					this.saveSession(true)
 				else {
@@ -3330,11 +3394,11 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no session data to be saved.")
 					OnMessage(0x44, "")
 				}
-			case 10: ; Update Statistics
+			case 14: ; Update Statistics
 				this.updateStatistics()
-			case 12: ; Race Summary
+			case 16: ; Race Summary
 				this.showRaceSummary()
-			case 13: ; Driver Statistics
+			case 17: ; Driver Statistics
 				this.showDriverStatistics()
 		}
 	}
@@ -5760,7 +5824,7 @@ class RaceCenter extends ConfigurationItem {
 
 		static hadLastLap := false
 
-		if this.SessionActive {
+		if (this.SessionActive && this.Synchronize) {
 			session := this.SelectedSession[true]
 			window := this.Window
 
@@ -5794,19 +5858,17 @@ class RaceCenter extends ConfigurationItem {
 				else if lastLap
 					hadLastLap := true
 
-				if !this.Simulator {
-					simulator := this.Connector.GetSessionValue(session, "Simulator")
-					car := this.Connector.GetSessionValue(session, "Car")
-					track := this.Connector.GetSessionValue(session, "Track")
+				simulator := this.Connector.GetSessionValue(session, "Simulator")
+				car := this.Connector.GetSessionValue(session, "Car")
+				track := this.Connector.GetSessionValue(session, "Track")
 
-					if (simulator && (simulator != ""))
-						try {
-							this.initializeSimulator(simulator, car, track)
-						}
-						catch exception {
-							logError(exception)
-						}
-				}
+				if (simulator && (simulator != ""))
+					try {
+						this.initializeSimulator(simulator, car, track)
+					}
+					catch exception {
+						logError(exception)
+					}
 
 				this.syncSetups()
 				this.syncTeamDrivers()
@@ -6141,9 +6203,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateStatisticsAsync() {
-		local x := Round((A_ScreenWidth - 300) / 2)
-		local y := A_ScreenHeight - 150
-		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Updating Stint Statistics")})
+		local progressWindow := showProgress({color: "Green", title: translate("Updating Stint Statistics")})
 		local currentStint := this.CurrentStint
 		local count, stint, window, currentListView, ignore, driver
 
@@ -6730,7 +6790,7 @@ class RaceCenter extends ConfigurationItem {
 			else {
 				this.iSyncTask.pause()
 
-				this.iConnected := false
+				this.iConnection := false
 
 				this.initializeSession()
 
@@ -7716,7 +7776,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 				if !found
-					names.Push(values2String(", ", sessionDB.getDriverNames(this.SelectedSimulator, id)*))
+					names.Push(values2String(",", sessionDB.getDriverNames(this.SelectedSimulator, id)*))
 
 				if (id = selected)
 					selected := A_Index
@@ -9595,7 +9655,7 @@ class RaceCenter extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
-	local x, y, row, driver, owner, ignore, name
+	local x, y, row, driver, owner, ignore, name, connection
 
 	static result := false
 
@@ -9606,6 +9666,8 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	static deselectDriverButton
 	static upDriverButton
 	static downDriverButton
+
+	static connectedDrivers := []
 
 	if (raceCenterOrCommand = kCancel)
 		result := kCancel
@@ -9621,7 +9683,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui ListView, %selectedDriversListView%
 
-		LV_Add("Select Vis", driver)
+		LV_Add("Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9635,7 +9697,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui ListView, %availableDriversListView%
 
-		LV_Add("Vis", driver)
+		LV_Add("Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9647,7 +9709,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		LV_GetText(driver, row)
 		LV_Delete(row)
 
-		LV_Insert(row - 1, "Select Vis", driver)
+		LV_Insert(row - 1, "Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9659,7 +9721,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 		LV_GetText(driver, row)
 		LV_Delete(row)
 
-		LV_Insert(row + 1, "Select Vis", driver)
+		LV_Insert(row + 1, "Select Vis", driver, inList(connectedDrivers, driver) ? translate("x") : "")
 
 		updateTeamManager()
 	}
@@ -9720,19 +9782,37 @@ manageTeam(raceCenterOrCommand, teamDrivers := false) {
 
 		Gui TE:Font, s8 Norm, Arial
 
-		Gui TE:Add, ListView, x16 yp+30 w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriversListView gupdateTeamManager Section, % values2String("|", map(["Available Driver"], "translate")*)
+		connectedDrivers := []
+
+		if raceCenterOrCommand.SessionActive
+			for ignore, connection in string2Values(";", raceCenterOrCommand.Connector.GetSessionConnections(raceCenterOrCommand.SelectedSession[true])) {
+				connection := parseObject(raceCenterOrCommand.Connector.GetConnection(connection))
+
+				if (connection.Name && (connection.Name != "") && (connection.Type = "Driver"))
+					connectedDrivers.Push(connection.Name)
+			}
+
+		Gui TE:Add, ListView, x16 yp+30 w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriversListView gupdateTeamManager Section, % values2String("|", map(["Available Driver", "Online"], "translate")*)
 
 		if !teamDrivers
 			teamDrivers := raceCenterOrCommand.TeamDrivers
 
 		for name, ignore in raceCenterOrCommand.SessionDrivers
 			if !inList(teamDrivers, name)
-				LV_Add("", name)
+				LV_Add("", name, inList(connectedDrivers, name) ? translate("x") : "")
 
-		Gui TE:Add, ListView, x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriversListView gupdateTeamManager, % values2String("|", map(["Selected Driver"], "translate")*)
+		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr Center")
+
+		Gui TE:Add, ListView, x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedDriversListView gupdateTeamManager, % values2String("|", map(["Selected Driver", "Online"], "translate")*)
 
 		for ignore, name in teamDrivers
-			LV_Add("", name)
+			LV_Add("", name, inList(connectedDrivers, name) ? translate("x") : "")
+
+		LV_ModifyCol()
+		LV_ModifyCol(1, "AutoHdr")
+		LV_ModifyCol(2, "AutoHdr Center")
 
 		Gui TE:Font, s10 Bold, Arial
 
@@ -9874,9 +9954,11 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 			return false
 		else if (result == kOk) {
 			try {
-				connectorOrCommand.Connect(teamServerURL)
+				connectorOrCommand.Initialize(teamServerURL)
 
-				return connectorOrCommand.Login(nameEdit, passwordEdit)
+				connectorOrCommand.Login(nameEdit, passwordEdit)
+
+				return connectorOrCommand.GetSessionToken()
 			}
 			catch exception {
 				title := translate("Error")

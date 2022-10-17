@@ -2477,7 +2477,7 @@ findInstallProperty(name, property) {
 
 initializeSimulatorSetup() {
 	local icon := kIconsDirectory . "Configuration Wand.ico"
-	local definition, wizard, x, y, label, callback, ignore, languages, language, section, keyValues, key, value
+	local definition, wizard, label, callback, ignore, languages, language, section, keyValues, key, value
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
@@ -2531,12 +2531,9 @@ initializeSimulatorSetup() {
 
 	showSplashTheme("Rotating Brain")
 
-	x := Round((A_ScreenWidth - 300) / 2)
-	y := A_ScreenHeight - 150
-
 	wizard.ProgressCount := 0
 
-	showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
+	showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
 
 	if isDebug()
 		Sleep 500
@@ -2549,7 +2546,7 @@ initializeSimulatorSetup() {
 
 startupSimulatorSetup() {
 	local wizard := SetupWizard.Instance
-	local preset, previous, x, y
+	local preset, previous
 
 	wizard.loadDefinition()
 
@@ -2599,11 +2596,8 @@ restartSetup:
 
 		wizard.ProgressCount := 0
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
 		showSplashTheme("Rotating Brain")
-		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
+		showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 
 		Goto restartSetup
 	}

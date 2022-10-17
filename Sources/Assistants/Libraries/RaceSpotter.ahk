@@ -822,11 +822,16 @@ class RaceSpotter extends RaceAssistant {
 				label := translate("Debug Positions")
 		}
 
-		if label
-			if enabled
-				Menu SupportMenu, Check, %label%
-			else
-				Menu SupportMenu, Uncheck, %label%
+		try {
+			if label
+				if enabled
+					Menu SupportMenu, Check, %label%
+				else
+					Menu SupportMenu, Uncheck, %label%
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	createVoiceManager(name, options) {

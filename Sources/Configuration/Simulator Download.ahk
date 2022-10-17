@@ -49,7 +49,7 @@ updateProgress(max) {
 
 downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
-	local options, index, title, cState, sState, devVersion, release, version, download, x, y, updateTask
+	local options, index, title, cState, sState, devVersion, release, version, download, updateTask
 	local directory, currentDirectory, start, ignore, url, error
 
 	Menu Tray, Icon, %icon%, , 1
@@ -120,10 +120,7 @@ downloadSimulatorController() {
 			download := getConfigurationValue(release, "Release", "Download", false)
 
 		if download {
-			x := Round((A_ScreenWidth - 300) / 2)
-			y := A_ScreenHeight - 150
-
-			showProgress({x: x, y: y, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
+			showProgress({color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
 
 			updateTask := new PeriodicTask(Func("updateProgress").Bind(45), 1500)
 

@@ -329,6 +329,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	local descriptor, value, simulators, margin, choices, chosen, themes
 	local descriptor, applicationName, enabled, disabled, coreHeight, index, coreDescriptor
 	local coreOption, coreLabel, checked, feedbackHeight, feedbackDescriptor, feedbackOption, feedbackLabel
+	local applicationSettings
 
 	static modeSettings
 	static configuration
@@ -352,6 +353,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	static buttonBoxSimulation
 	static buttonBoxSimulationDuration
 	static buttonBoxPosition
+	static popupPosition
 	static lastPositions
 
 	static startup
@@ -408,6 +410,14 @@ restartSettings:
 		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
 
 		setConfigurationValue(newSettings, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
+
+		positions := ["Top", "Bottom"]
+
+		applicationSettings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		setConfigurationValue(applicationSettings, "General", "Popup Position", positions[inList(map(positions, "translate"), popupPosition)])
+
+		writeConfiguration(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
 
 		for descriptor, value in lastPositions
 			setConfigurationValue(newSettings, "Button Box", descriptor, value)
@@ -528,6 +538,9 @@ restartSettings:
 		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
 
+		popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+										     , "General", "Popup Position", "Bottom")
+
 		lastPositions := {}
 
 		for descriptor, value in getConfigurationSectionValues(settingsOrCommand, "Button Box", Object())
@@ -547,7 +560,7 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 
-		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h135, % translate("Controller Notifications")
+		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h160, % translate("Controller Notifications")
 
 		Gui SE:Font, Norm, Arial
 
@@ -576,6 +589,16 @@ restartSettings:
 			chosen := 4
 
 		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
+
+		Gui SE:Add, Text, X20 YP+30, % translate("Overlay Position")
+
+		choices := ["Top", "Bottom"]
+		chosen := inList(choices, popupPosition)
+
+		if !chosen
+			chosen := 1
+
+		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vpopupPosition, % values2String("|", map(choices, "translate")*)
 
 		if fromSetup
 			Gui SE:Add, Button, X10 Y+15 w220 Disabled gopenModesEditor, % translate("Controller Automation...")

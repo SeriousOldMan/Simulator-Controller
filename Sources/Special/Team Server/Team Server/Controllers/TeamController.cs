@@ -20,7 +20,7 @@ namespace TeamServer.Controllers {
         [HttpGet("allteams")]
         public string GetTeams([FromQuery(Name = "token")] string token) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
                 
                 return String.Join(";", teamManager.GetAllTeams().Select(d => d.Identifier));
             }
@@ -35,10 +35,14 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
                 Team team = teamManager.LookupTeam(identifier);
 
                 return ControllerUtils.SerializeObject(team, new List<string>(new string[] { "Identifier", "Name" }));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -48,9 +52,13 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/drivers")]
         public string GetDrivers([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
 
                 return String.Join(";", teamManager.LookupTeam(identifier).Drivers.Select(d => d.Identifier));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -60,7 +68,7 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}/sessions")]
         public string GetSessions([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
 
                 return String.Join(";", teamManager.LookupTeam(identifier).Sessions.Select(s => s.Identifier));
             }
@@ -75,7 +83,7 @@ namespace TeamServer.Controllers {
         [HttpPut("{identifier}")]
         public string Put([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
                 Team team = teamManager.LookupTeam(identifier);
 
                 ControllerUtils.DeserializeObject(team, keyValues);
@@ -83,6 +91,10 @@ namespace TeamServer.Controllers {
                 team.Save();
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -92,12 +104,15 @@ namespace TeamServer.Controllers {
         [HttpPost]
         public string Post([FromQuery(Name = "token")] string token, [FromBody] string keyValues) {
             try {
-                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, theToken);
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
                 
-                return teamManager.CreateTeam(theToken.Account, properties["Name"]).Identifier.ToString();
+                return teamManager.CreateTeam(teamManager.Token.Account, properties["Name"]).Identifier.ToString();
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -107,11 +122,15 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
 
                 teamManager.DeleteTeam(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -131,11 +150,14 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier) {
             try {
-
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
                 Driver driver = teamManager.LookupDriver(identifier);
 
                 return ControllerUtils.SerializeObject(driver, new List<string>(new string[] { "Identifier", "ForName", "SurName", "NickName" }));
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -145,7 +167,7 @@ namespace TeamServer.Controllers {
         [HttpPut("{identifier}")]
         public string Put([FromQuery(Name = "token")] string token, string identifier, [FromBody] string keyValues) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
                 Driver driver = teamManager.LookupDriver(identifier);
 
                 ControllerUtils.DeserializeObject(driver, keyValues);
@@ -153,6 +175,10 @@ namespace TeamServer.Controllers {
                 driver.Save();
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -162,13 +188,16 @@ namespace TeamServer.Controllers {
         [HttpPost]
         public string Post([FromQuery(Name = "token")] string token, [FromQuery(Name = "team")] string team, [FromBody] string keyValues) {
             try {
-                Token theToken = Server.TeamServer.TokenIssuer.ValidateToken(token);
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, theToken);
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
                 Team theTeam = teamManager.LookupTeam(team);
 
                 Dictionary<string, string> properties = ControllerUtils.ParseKeyValues(keyValues);
 
                 return teamManager.CreateDriver(theTeam, properties["ForName"], properties["SurName"], properties["NickName"]).Identifier.ToString();
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;
@@ -178,11 +207,15 @@ namespace TeamServer.Controllers {
         [HttpDelete("{identifier}")]
         public string Delete([FromQuery(Name = "token")] string token, string identifier) {
             try {
-                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, Server.TeamServer.TokenIssuer.ValidateToken(token));
+                TeamManager teamManager = new TeamManager(Server.TeamServer.ObjectManager, token);
 
                 teamManager.DeleteDriver(identifier);
 
                 return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
             }
             catch (Exception exception) {
                 return "Error: " + exception.Message;

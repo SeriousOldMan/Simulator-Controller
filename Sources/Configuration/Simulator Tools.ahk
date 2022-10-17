@@ -452,7 +452,7 @@ exitProcesses(silent := false, force := false) {
 }
 
 checkInstallation() {
-	local installLocation, installOptions, quiet, options, x, y
+	local installLocation, installOptions, quiet, options
 	local install, title, index, options, isNew, packageLocation, ignore, directory, currentDirectory
 
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
@@ -492,12 +492,9 @@ checkInstallation() {
 		if (quiet || uninstallOptions(options)) {
 			showSplashTheme("McLaren 720s GT3 Pictures")
 
-			x := Round((A_ScreenWidth - 300) / 2)
-			y := A_ScreenHeight - 150
-
 			vProgressCount := 0
 
-			showProgress({x: x, y: y, color: "Blue", title: translate("Uninstalling Simulator Controller"), message: translate("...")})
+			showProgress({color: "Blue", title: translate("Uninstalling Simulator Controller"), message: translate("...")})
 
 			deleteFiles(options["InstallLocation"])
 
@@ -607,12 +604,9 @@ checkInstallation() {
 
 				showSplashTheme("McLaren 720s GT3 Pictures")
 
-				x := Round((A_ScreenWidth - 300) / 2)
-				y := A_ScreenHeight - 150
-
 				vProgressCount := 0
 
-				showProgress({x: x, y: y, color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
+				showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
 
 				for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
 					vProgressCount += 1
@@ -2701,6 +2695,8 @@ runBuildTargets(ByRef buildProgress) {
 				FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
 
 				RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
+
+				deleteFile(sourceDirectory . "\compile.ahk")
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
@@ -2708,8 +2704,6 @@ runBuildTargets(ByRef buildProgress) {
 				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-
-			deleteFile(sourceDirectory . "\compile.ahk")
 
 			SplitPath targetBinary, compiledFile, targetDirectory
 			SplitPath targetSource, , sourceDirectory
@@ -2833,9 +2827,10 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 }
 
 startSimulatorTools() {
+	local exitProcesses := GetKeyState("Shift")
 	local updateOnly := false
 	local icon := kIconsDirectory . "Tools.ico"
-	local x, y, buildProgress
+	local buildProgress
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
@@ -2865,11 +2860,8 @@ startSimulatorTools() {
 
 	Sleep 500
 
-	x := Round((A_ScreenWidth - 300) / 2)
-	y := A_ScreenHeight - 150
-
 	if !kSilentMode
-		showProgress({x: x, y: y, color: "Blue", message: "", title: translate("Preparing Targets")})
+		showProgress({color: "Blue", message: "", title: translate("Preparing Targets")})
 
 	buildProgress := 0
 
@@ -2884,6 +2876,9 @@ startSimulatorTools() {
 	runUpdateTargets(buildProgress)
 
 	if !updateOnly {
+		if exitProcesses
+			exitProcesses(true, true)
+
 		runCleanTargets(buildProgress)
 
 		if (vSpecialTargets.Length() > 0)

@@ -278,26 +278,28 @@ requestShareSessionDatabaseConsent() {
 	}
 }
 
-shareSessionDatabase() {
+startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options, consent
 
-	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
-		idFileName := kUserConfigDirectory . "ID"
+	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
+		Process Exist, Database Synchronizer.exe
 
-		FileReadLine ID, %idFileName%, 1
+		if !ErrorLevel {
+			idFileName := kUserConfigDirectory . "ID"
 
-		dbIDFileName := kDatabaseDirectory . "ID"
+			FileReadLine ID, %idFileName%, 1
 
-		FileReadLine dbID, %dbIDFileName%, 1
+			dbIDFileName := kDatabaseDirectory . "ID"
 
-		if (ID = dbID) {
-			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			FileReadLine dbID, %dbIDFileName%, 1
 
-			shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-			shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+			if (ID = dbID) {
+				consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 
-			if (shareTyrePressures || shareCarSetups) {
-				options := ("-ID " . ID)
+				shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+				shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+
+				options := ("-ID """ . ID . """ -Synchronize " . true)
 
 				if shareTyrePressures
 					options .= " -Pressures"
@@ -531,9 +533,9 @@ loadSimulatorConfiguration() {
 	section := getConfigurationValue(version, "Current", "Type", false)
 
 	if section
-		kVersion := getConfigurationValue(version, section, "Version", "0.0.0-dev")
+		kVersion := getConfigurationValue(version, section, "Version", "0.0.0.0-dev")
 	else
-		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0-dev"))
+		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0.0-dev"))
 
 	Process Exist
 
@@ -745,6 +747,24 @@ getControllerActionDefinitions(type) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+createGUID() {
+	local guid, pGuid, sGuid, size
+
+    VarSetCapacity(pGuid, 16, 0)
+
+	if !(DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid)) {
+        size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
+
+        if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {
+			guid := StrGet(&sGuid)
+
+            return SubStr(SubStr(guid, 1, StrLen(guid) - 1), 2)
+		}
+    }
+
+    return ""
+}
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
@@ -1143,9 +1163,21 @@ hideSplashTheme() {
 showProgress(options) {
 	local x, y, w, h, color
 
+	static popupPosition := false
+
 	if !vProgressIsOpen {
-		x := options.X
-		y := options.Y
+		if !popupPosition
+			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+												 , "General", "Popup Position", "Bottom")
+		if options.HasKey("X")
+			x := options.X
+		else
+			x := Round((A_ScreenWidth - 300) / 2)
+
+		if options.HasKey("Y")
+			y := options.Y
+		else
+			y := ((popupPosition = "Bottom") ? A_ScreenHeight - 150 : 150)
 
 		if options.HasKey("Width")
 			w := (options.Width - 20)
@@ -1218,9 +1250,19 @@ getAllThemes(configuration := false) {
 }
 
 showMessage(message, title := false, icon := "__Undefined__", duration := 1000
-		  , x := "Center", y := "Bottom", width := 400, height := 100) {
+		  , x := "Center", y := "__Undefined__", width := 400, height := 100) {
 	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 	local innerWidth := width - 16
+
+	static popupPosition := false
+
+	if (y = kUndefined) {
+		if !popupPosition
+			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+																   , "General", "Popup Position", "Bottom")
+
+		y := popupPosition
+	}
 
 	if (icon = kUndefined)
 		icon := "Information.png"
@@ -1336,7 +1378,7 @@ isNull(value) {
 
 reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
 	if isDebug()
-		showMessage("The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
+		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
 				  , false, kUndefined, 5000)
 
 	return false
@@ -2321,7 +2363,7 @@ if !vDetachedInstallation {
 
 	if !isDebug() {
 		requestShareSessionDatabaseConsent()
-		shareSessionDatabase()
+		startDatabaseSynchronizer()
 		checkForNews()
 	}
 }

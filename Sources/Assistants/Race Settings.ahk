@@ -169,9 +169,11 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 			return false
 		else if (result == kOk) {
 			try {
-				connectorOrCommand.Connect(teamServerURL)
+				connectorOrCommand.Initialize(teamServerURL)
 
-				return connectorOrCommand.Login(nameEdit, passwordEdit)
+				connectorOrCommand.Login(nameEdit, passwordEdit)
+
+				return connectorOrCommand.GetSessionToken()
 			}
 			catch exception {
 				title := translate("Error")
@@ -484,7 +486,7 @@ loadSessions(connector, team) {
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, title, file, compound, compoundColor, fileName, token
-	local x, y, e, sessionDB, directory
+	local x, y, e, sessionDB, directory, connection
 
 	static result
 	static newSettings
@@ -521,6 +523,7 @@ editRaceSettings(ByRef settingsOrCommand, arguments*) {
 
 	static connector
 	static connected
+	static keepAliveTask := false
 
 	static teams := {}
 	static drivers := {}
@@ -639,7 +642,26 @@ restart:
 			}
 
 			try {
-				if (connector.Connect(serverURLEdit, serverTokenEdit) > 0) {
+				connector.Initialize(serverURLEdit)
+
+				connector.Token := serverTokenEdit
+
+				sessionDB := new SessionDatabase()
+
+				connection := connector.Connect(serverTokenEdit, sessionDB.ID
+											  , vSimulator ? sessionDB.getDriverName(vSimulator, sessionDB.ID) : sessionDB.getUserName()
+											  , "Driver")
+
+				if (connection && (connection != "")) {
+					connector.ValidateSessionToken()
+
+					if keepAliveTask
+						keepAliveTask.stop()
+
+					keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+
+					keepAliveTask.start()
+
 					teams := loadTeams(connector)
 
 					names := getKeys(teams)
@@ -1207,7 +1229,7 @@ restart:
 			Gui RES:Add, Text, x16 y82 w90 h23 +0x200, % translate("Server URL")
 			Gui RES:Add, Edit, x126 yp+1 w256 vserverURLEdit, %serverURLEdit%
 
-			Gui RES:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Access Token")
+			Gui RES:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Session Token")
 			Gui RES:Add, Edit, x126 yp w256 h21 vserverTokenEdit, %serverTokenEdit%
 			Gui RES:Add, Button, x102 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gconnectServer
 			setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
@@ -1441,7 +1463,7 @@ readSimulatorData(simulator) {
 	}
 
 	data := readConfiguration(dataFile)
-	
+
 	deleteFile(dataFile)
 
 	if (getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {

@@ -16,7 +16,7 @@ Before starting up, *Simulator Startup* checks the configuration information. If
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.JPG)
 
-With this editor, which can also be opened by clicking on the small button with the gear icon in the upper right corner of the window of *Simulator Startup*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
+With this editor, which can also be opened by clicking on the small button with the cog wheel icon in the upper right corner of the window of *Simulator Startup*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
 
 Beside maintaining this startup settings, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
 
@@ -29,6 +29,8 @@ The second group lets you decide whether to start the different feedback compone
 ### Customizing Controller Notifications
 
 In the next group, you can decide, how Simulator Controller will notify you about state changes in your simulation rig or in the applications under control of Simulator Controller. Two types of notifications are supported, for Tray Tips (small message windows popping up in lower right corner of your main screen) and for Button Boxes, the visual representation of your controller hardware. Depending on the situation you are in (in simulation game or not), you might want to use different notifications or no notifications at all. You can configure, how long in milliseconds the Tray Tip or the Button Box windows will stay open. For the Button Boxes, a duration of 9999 ms will be interpreted as *forever*, so the window will be kept open all the time. Also, you can decide where the Button Boxes will appear. To do that, choose one of the corners of your main screen in the dropdown list below the notification duration input fields.
+
+Some applications of Simulator Controller show you the progress of long-running tasks with a progress bar or popup some information windows as overlays in the foreground. You can choose the position where the overlays appear on your screen in the correspondinig dropdown list. If you are using a hardware dashboard, which hides the lower part of your screen, you can choose the "Top" position, for example.
 
 ### Configuration of the Controller Mode automation
 
@@ -72,7 +74,7 @@ After the startup process has completed, the splash screen of *Simulator Startup
 
 Normally, the active mode on your hardware controller will be the "Launch" mode, so that you can launch additional applications by the touch of a button. For a complete documentation on everything available in the "Simulator Controller" application, please consult the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
 
-Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small silverish gear, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
+Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small orange cog wheel, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
 
 ### Enabling and disabling features
 

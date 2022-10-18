@@ -2699,6 +2699,7 @@ class RaceSpotter extends RaceAssistant {
 		local standingsAhead := false
 		local standingsBehind := false
 		local leader := false
+		local found := false
 		local index, car, prefix, position, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
 		local carPosition, carDelta, carAheadDelta, carBehindDelta
 
@@ -2709,6 +2710,8 @@ class RaceSpotter extends RaceAssistant {
 				carRunning := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
 				if (A_Index = driver) {
+					found := true
+
 					driverLaps := carLaps
 					driverRunning := carRunning
 				}
@@ -2716,93 +2719,95 @@ class RaceSpotter extends RaceAssistant {
 				carPositions.Push(Array(A_Index, carLaps, carRunning))
 			}
 
-			bubbleSort(carPositions, "trackOrder")
+			if found {
+				bubbleSort(carPositions, "trackOrder")
 
-			positions["Driver"] := driver
-			positions["Count"] := count
+				positions["Driver"] := driver
+				positions["Count"] := count
 
-			position := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
-			lapTime := getConfigurationValue(data, "Position Data", "Car." . driver . ".Time")
+				position := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+				lapTime := getConfigurationValue(data, "Position Data", "Car." . driver . ".Time")
 
-			for index, car in carPositions {
-				carIndex := car[1]
-				carLaps := car[2]
-				carRunning := car[3]
+				for index, car in carPositions {
+					carIndex := car[1]
+					carLaps := car[2]
+					carRunning := car[3]
 
-				prefix := ("Car." . carIndex)
+					prefix := ("Car." . carIndex)
 
-				carPosition := getConfigurationValue(data, "Position Data", prefix . ".Position")
-				carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
+					carPosition := getConfigurationValue(data, "Position Data", prefix . ".Position")
+					carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
 
-				if (driverRunning < carRunning) {
-					carAheadDelta := ((carRunning - driverRunning) * lapTime)
-					carBehindDelta := ((1 - carRunning + driverRunning) * lapTime * -1)
-				}
-				else {
-					carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
-					carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
-				}
-
-				positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")
-										   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
-										   , computeDriverName(getConfigurationValue(data, "Position Data", prefix . ".Driver.Forname", "John")
-															 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
-															 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
-										   , carPosition, carLaps, carRunning
-										   , getConfigurationValue(data, "Position Data", prefix . ".Time")
-										   , carDelta, carAheadDelta, carBehindDelta
-										   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid", true)
-										   , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
-										   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
-										   , getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false))
-
-				if (carPosition = 1)
-					leader := carIndex
-
-				if (carPosition = (position - 1))
-					standingsAhead := carIndex
-				else if (carPosition = (position + 1))
-					standingsBehind := carIndex
-
-				if (carIndex = driver) {
-					if (index = count) {
-						trackAhead := (notAlone ? index - 1 : false)
-						trackBehind := (notAlone ? 1 : false)
-					}
-					else if (index = 1) {
-						trackAhead := (notAlone ? count : false)
-						trackBehind := (notAlone ? 2 : false)
+					if (driverRunning < carRunning) {
+						carAheadDelta := ((carRunning - driverRunning) * lapTime)
+						carBehindDelta := ((1 - carRunning + driverRunning) * lapTime * -1)
 					}
 					else {
-						trackAhead := (index - 1)
-						trackBehind := (index + 1)
+						carAheadDelta := ((1 - driverRunning + carRunning) * lapTime)
+						carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
+					}
+
+					positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")
+											   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
+											   , computeDriverName(getConfigurationValue(data, "Position Data", prefix . ".Driver.Forname", "John")
+																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
+																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
+											   , carPosition, carLaps, carRunning
+											   , getConfigurationValue(data, "Position Data", prefix . ".Time")
+											   , carDelta, carAheadDelta, carBehindDelta
+											   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid", true)
+											   , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
+											   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
+											   , getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false))
+
+					if (carPosition = 1)
+						leader := carIndex
+
+					if (carPosition = (position - 1))
+						standingsAhead := carIndex
+					else if (carPosition = (position + 1))
+						standingsBehind := carIndex
+
+					if (carIndex = driver) {
+						if (index = count) {
+							trackAhead := (notAlone ? index - 1 : false)
+							trackBehind := (notAlone ? 1 : false)
+						}
+						else if (index = 1) {
+							trackAhead := (notAlone ? count : false)
+							trackBehind := (notAlone ? 2 : false)
+						}
+						else {
+							trackAhead := (index - 1)
+							trackBehind := (index + 1)
+						}
 					}
 				}
+
+				trackAhead := carPositions[trackAhead][1]
+				trackBehind := carPositions[trackBehind][1]
+
+				if (gapAhead && standingsAhead) {
+					positions[standingsAhead][8] := gapAhead
+
+					if (standingsAhead = trackAhead)
+						positions[trackAhead][8] := gapAhead
+				}
+
+				if (gapBehind && standingsBehind) {
+					positions[standingsBehind][8] := gapBehind
+
+					if (standingsBehind = trackBehind)
+						positions[trackBehind][8] := gapBehind
+				}
+
+				positions["Position"] := position
+				positions["Leader"] := leader
+				positions["StandingsAhead"] := standingsAhead
+				positions["StandingsBehind"] := standingsBehind
+				positions["TrackAhead"] := trackAhead
+				positions["TrackBehind"] := trackBehind
 			}
-
-			trackAhead := carPositions[trackAhead][1]
-			trackBehind := carPositions[trackBehind][1]
-
-			if (gapAhead && standingsAhead) {
-				positions[standingsAhead][8] := gapAhead
-
-				if (standingsAhead = trackAhead)
-					positions[trackAhead][8] := gapAhead
-			}
-
-			if (gapBehind && standingsBehind) {
-				positions[standingsBehind][8] := gapBehind
-
-				if (standingsBehind = trackBehind)
-					positions[trackBehind][8] := gapBehind
-			}
-
-			positions["Position"] := position
-			positions["Leader"] := leader
-			positions["StandingsAhead"] := standingsAhead
-			positions["StandingsBehind"] := standingsBehind
-			positions["TrackAhead"] := trackAhead
-			positions["TrackBehind"] := trackBehind
 		}
 
 		return positions

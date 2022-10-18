@@ -442,7 +442,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		selectActions := []
 	}
 
-	writePluginConfiguration(configuration) {
+	writePluginStatus(configuration) {
 		local sessionDB, simulator
 
 		setConfigurationValue(configuration, this.Plugin, "Status", this.runningSimulator() ? "Active" : "Passive")

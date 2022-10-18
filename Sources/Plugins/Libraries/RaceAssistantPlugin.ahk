@@ -723,7 +723,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.logFunctionNotFound(actionFunction)
 	}
 
-	writePluginConfiguration(configuration) {
+	writePluginStatus(configuration) {
 		setConfigurationValue(configuration, this.Plugin, "Status", this.RaceAssistantActive ? "Active" : "Passive")
 	}
 

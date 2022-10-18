@@ -1190,7 +1190,7 @@ class SimulatorController extends ConfigurationItem {
 														   , values2String(",", simulators*), values2String(",", modes*)))
 				}
 
-				thePlugin.writePluginConfiguration(configuration)
+				thePlugin.writePluginStatus(configuration)
 			}
 
 			setConfigurationValue(configuration, "Plugins", "Plugins", values2String("|", getKeys(plugins)*))
@@ -1629,7 +1629,7 @@ class ControllerPlugin extends Plugin {
 		logMessage(kLogWarn, translate("Controller function ") . functionDescriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 
-	writePluginConfiguration(configuration) {
+	writePluginStatus(configuration) {
 		setConfigurationValue(configuration, this.Plugin, "Status", this.Active ? "Active" : "Disabled")
 	}
 }

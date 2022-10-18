@@ -43,8 +43,11 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	iSimulator := false
 	iTeam := false
+	iTeamName := ""
 	iDriver := false
+	iDriverName := ""
 	iSession := false
+	iSessionName := ""
 
 	iDriverForName := false
 	iDriverSurName := false
@@ -200,21 +203,30 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	Team[] {
+	Team[asText := false] {
 		Get {
-			return ((this.iTeam && (this.iTeam != "")) ? this.iTeam : false)
+			if asText
+				return ((this.iTeam && (this.iTeam != "")) ? this.iTeamName : "")
+			else
+				return ((this.iTeam && (this.iTeam != "")) ? this.iTeam : false)
 		}
 	}
 
-	Driver[] {
+	Driver[asText := false] {
 		Get {
-			return ((this.iDriver && (this.iDriver != "")) ? this.iDriver : false)
+			if asText
+				return ((this.iDriver && (this.iDriver != "")) ? this.iDriverName : "")
+			else
+				return ((this.iDriver && (this.iDriver != "")) ? this.iDriver : false)
 		}
 	}
 
-	Session[] {
+	Session[asText := false] {
 		Get {
-			return ((this.iSession && (this.iSession != "")) ? this.iSession : false)
+			if asText
+				return ((this.iSession && (this.iSession != "")) ? this.iSessionName : "")
+			else
+				return ((this.iSession && (this.iSession != "")) ? this.iSession : false)
 		}
 	}
 
@@ -356,14 +368,33 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.logFunctionNotFound(actionFunction)
 	}
 
-	writePluginConfiguration(configuration) {
+	writePluginStatus(configuration) {
+		local driverObject, teamName, driverName, sessionName
+
 		if this.TeamServerEnabled {
-			if (this.Connected && !this.Stalled)
-				setConfigurationValue(configuration, this.Plugin, "Status", "Active")
-			else
+			if this.Connected {
+				if (this.Stalled || if this.LastMessage) {
+					setConfigurationValue(configuration, this.Plugin, "Status", "Critical")
+
+					setConfigurationValue(configuration, this.Plugin, "Information", this.LastMessage)
+				}
+				else {
+					setConfigurationValue(configuration, this.Plugin, "Status", "Active")
+
+					setConfigurationValue(configuration, this.Plugin, "Information"
+										, values2String(" / ", this.Team[true], this.Driver[true], this.Session[true]))
+				}
+			}
+			else if this.Session {
+				setConfigurationValue(configuration, this.Plugin, "Status", "Critical")
+
+				setConfigurationValue(configuration, this.Plugin, "Information", this.LastMessage)
+			}
+			else {
 				setConfigurationValue(configuration, this.Plugin, "Status", "Warning")
 
-			setConfigurationValue(configuration, this.Plugin, "Information", this.LastMessage)
+				setConfigurationValue(configuration, this.Plugin, "Information", translate("No team session configured."))
+			}
 		}
 		else
 			setConfigurationValue(configuration, this.Plugin, "Status", "Passive")
@@ -494,7 +525,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	connect(serverURL, serverToken, team, driver, session, verbose := false) {
-		local driverObject, teamName, driverName, sessionName
+		local driverObject
 
 		this.disconnect()
 
@@ -509,26 +540,27 @@ class TeamServerPlugin extends ControllerPlugin {
 			try {
 				driverObject := this.parseObject(this.Connector.GetDriver(driver))
 
-				teamName := this.parseObject(this.Connector.GetTeam(team)).Name
-				driverName := (driverObject.ForName . A_Space . driverObject.SurName)
-				sessionName := this.parseObject(this.Connector.GetSession(session)).Name
+				this.iTeamName := this.parseObject(this.Connector.GetTeam(team)).Name
+				this.iDriverName := (driverObject.ForName . A_Space . driverObject.SurName)
+				this.iSessionName := this.parseObject(this.Connector.GetSession(session)).Name
 
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
-
-				this.iLastMessage := (translate("Successfully connected to the Team Server.") . "`n`n"
-								    . translate("Team: ") . teamName . "`n"
-									. translate("Driver: ") . driverName . "`n"
-									. translate("Session: ") . sessionName)
+					logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken
+									   . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
 
 				if verbose
-					showMessage(this.LastMessage
+					showMessage(translate("Successfully connected to the Team Server.") . "`n`n" . translate("Team: ") . this.Team[true] . "`n"
+							  . translate("Driver: ") . this.Driver[true] . "`n" . translate("Session: ") . this.Session[true]
 							  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
 
 				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . teamName . translate(")")
 			}
 			catch exception {
 				this.iConnection := false
+
+				this.iTeamName := ""
+				this.iDriverName := ""
+				this.iSessionName := ""
 
 				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
 

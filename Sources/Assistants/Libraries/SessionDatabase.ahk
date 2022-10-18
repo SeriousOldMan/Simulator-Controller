@@ -277,7 +277,7 @@ class SessionDatabase extends ConfigurationItem {
 		base.__New(SessionDatabase.sConfiguration)
 
 		if !controllerConfiguration {
-			controllerConfiguration := getControllerConfiguration()
+			controllerConfiguration := getControllerStatus()
 
 			if !controllerConfiguration
 				controllerConfiguration := {}

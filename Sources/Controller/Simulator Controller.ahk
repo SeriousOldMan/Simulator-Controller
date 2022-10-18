@@ -1154,45 +1154,63 @@ class SimulatorController extends ConfigurationItem {
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
 
-	writeControllerConfiguration() {
+	writeControllerConfiguration(periodic := true) {
+		local plugins := {}
 		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
 		configuration := newConfiguration()
 
-		for ignore, thePlugin in this.Plugins {
-			if (this.isActive(thePlugin)) {
-				modes := []
+		try {
+			for ignore, thePlugin in this.Plugins {
+				plugins[thePlugin.Plugin] := true
 
-				if isInstance(thePlugin, SimulatorPlugin) {
-					states := []
+				if (this.isActive(thePlugin)) {
+					modes := []
 
-					for ignore, name in thePlugin.Sessions[true]
-						states.Push(name)
+					if isInstance(thePlugin, SimulatorPlugin) {
+						states := []
 
-					setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
-										, thePlugin.Plugin . "|" . values2String(",", states*))
+						for ignore, name in thePlugin.Sessions[true]
+							states.Push(name)
+
+						setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
+											, thePlugin.Plugin . "|" . values2String(",", states*))
+					}
+
+					for ignore, theMode in thePlugin.Modes
+						modes.Push(theMode.Mode)
+
+					simulators := []
+
+					for ignore, simulator in thePlugin.Simulators
+						simulators.Push(simulator)
+
+					setConfigurationValue(configuration, "Plugins", thePlugin.Plugin
+										, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse)
+														   , values2String(",", simulators*), values2String(",", modes*)))
 				}
 
-				for ignore, theMode in thePlugin.Modes
-					modes.Push(theMode.Mode)
-
-				simulators := []
-
-				for ignore, simulator in thePlugin.Simulators
-					simulators.Push(simulator)
-
-				setConfigurationValue(configuration, "Plugins", thePlugin.Plugin
-									, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse)
-													   , values2String(",", simulators*), values2String(",", modes*)))
+				thePlugin.writePluginConfiguration(configuration)
 			}
+
+			setConfigurationValue(configuration, "Plugins", "Plugins", values2String("|", getKeys(plugins)*))
+
+			for ignore, fnController in this.FunctionController
+				setConfigurationValue(configuration, fnController.Type, fnController.Descriptor
+									, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
+													   , fnController.NumButtons, fnController.NumDials))
+
+			writeConfiguration(kUserConfigDirectory . "Simulator Controller.status", configuration)
+		}
+		catch exception {
+			logError(exception)
 		}
 
-		for ignore, fnController in this.FunctionController
-			setConfigurationValue(configuration, fnController.Type, fnController.Descriptor
-								, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
-												   , fnController.NumButtons, fnController.NumDials))
+		if periodic {
+			Process Exist, System Monitor.exe
 
-		writeConfiguration(kUserConfigDirectory . "Simulator Controller.config", configuration)
+			Task.CurrentTask.Sleep := (ErrorLevel ? 2000 : 60000)
+		}
 	}
 }
 
@@ -1609,6 +1627,10 @@ class ControllerPlugin extends Plugin {
 
 	logFunctionNotFound(functionDescriptor) {
 		logMessage(kLogWarn, translate("Controller function ") . functionDescriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+	}
+
+	writePluginConfiguration(configuration) {
+		setConfigurationValue(configuration, this.Plugin, "Status", this.Active ? "Active" : "Disabled")
 	}
 }
 
@@ -2052,14 +2074,18 @@ initializeSimulatorController() {
 
 startupSimulatorController() {
 	local controller := SimulatorController.Instance
+	local noStartup := ((A_Args.Length() > 0) && (A_Args[1] = "-NoStartup"))
 
-	controller.writeControllerConfiguration()
+	if noStartup
+		controller.writeControllerConfiguration(false)
+	else
+		new PeriodicTask(ObjBindMethod(controller, "writeControllerConfiguration"), 0, kLowPriority).start()
 
 	controller.computeControllerModes()
 
 	controller.updateLastEvent()
 
-	if ((A_Args.Length() > 0) && (A_Args[1] = "-NoStartup"))
+	if noStartup
 		ExitApp 0
 
 	controller.startup()
@@ -2152,7 +2178,7 @@ setMode(actionOrPlugin, mode := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 writeControllerConfiguration() {
-	SimulatorController.Instance.writeControllerConfiguration()
+	SimulatorController.Instance.writeControllerConfiguration(false)
 }
 
 

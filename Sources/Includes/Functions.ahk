@@ -702,6 +702,7 @@ initializeEnvironment() {
 	}
 
 	if newID {
+		/*
 		ticks := A_TickCount
 
 		Random wait, 0, 100
@@ -715,6 +716,9 @@ initializeEnvironment() {
 		Random minor, 0, 10000
 
 		ID := values2String(".", A_TickCount, major, minor)
+		*/
+
+		ID := createGUID()
 
 		deleteFile(kUserConfigDirectory . "ID")
 
@@ -2075,39 +2079,45 @@ newConfiguration() {
 readConfiguration(configFile) {
 	local configuration := {}
 	local section := false
-	local currentLine, firstChar, keyValue, key, value
+	local currentLine, firstChar, keyValue, key, value, file
 
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
-	loop Read, %configFile%
-	{
-		currentLine := LTrim(A_LoopReadLine)
+	file := FileOpen(configFile, "r")
 
-		if (StrLen(currentLine) == 0)
-			continue
+	if file {
+		loop Read, %configFile%
+		{
+			currentLine := LTrim(A_LoopReadLine)
 
-		firstChar := SubStr(currentLine, 1, 1)
+			if (StrLen(currentLine) == 0)
+				continue
 
-		if (firstChar = ";")
-			continue
-		else if (firstChar = "[") {
-			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
+			firstChar := SubStr(currentLine, 1, 1)
 
-			configuration[section] := {}
-		}
-		else if section {
-			keyValue := LTrim(A_LoopReadLine)
+			if (firstChar = ";")
+				continue
+			else if (firstChar = "[") {
+				section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
 
-			if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
-				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
-								   , "=", "", 2)
+				configuration[section] := {}
+			}
+			else if section {
+				keyValue := LTrim(A_LoopReadLine)
 
-				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
-				value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+				if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
+					keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
+									   , "=", "", 2)
 
-				configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+					key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+					value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+
+					configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+				}
 			}
 		}
+
+		file.Close()
 	}
 
 	return configuration
@@ -2127,13 +2137,12 @@ parseConfiguration(text) {
 }
 
 writeConfiguration(configFile, configuration) {
+	local tempFile := temporaryFileName("Config", "ini")
 	local directory, section, keyValues, key, value, pairs
 
-	configFile := getFileName(configFile, kUserConfigDirectory)
+	deleteFile(tempFile)
 
-	deleteFile(configFile)
-
-	SplitPath configFile, , directory
+	SplitPath tempFile, , directory
 	FileCreateDir %directory%
 
 	for section, keyValues in configuration {
@@ -2149,8 +2158,20 @@ writeConfiguration(configFile, configuration) {
 
 		section := "[" . section . "]" . pairs . "`n"
 
-		FileAppend %section%, %configFile%, UTF-16
+		FileAppend %section%, %tempFile%, UTF-16
 	}
+
+	configFile := getFileName(configFile, kUserConfigDirectory)
+
+	loop
+		try {
+			FileMove %tempFile%, %configFile%, 1
+
+			break
+		}
+		catch exception {
+			logError(exception)
+		}
 }
 
 printConfiguration(configuration) {
@@ -2216,26 +2237,14 @@ removeConfigurationSection(configuration, section) {
 		configuration.Delete(section)
 }
 
-getControllerConfiguration(configuration := false) {
+getControllerStatus(configuration := false) {
 	local pid, tries, options, exePath, fileName
 
 	Process Exist, Simulator Controller.exe
 
 	pid := ErrorLevel
 
-	if (pid && !configuration && !FileExist(kUserConfigDirectory . "Simulator Controller.config")) {
-		sendMessage(kFileMessage, "Controller", "writeControllerConfiguration", pid)
-
-		tries := 10
-
-		while (tries > 0) {
-			Sleep 200
-
-			if FileExist(kUserConfigDirectory . "Simulator Controller.config")
-				break
-		}
-	}
-	else if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
+	if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.status")))
 		try {
 			if configuration {
 				fileName := temporaryFileName("Config", "ini")
@@ -2275,7 +2284,7 @@ getControllerConfiguration(configuration := false) {
 		}
 
 
-	return readConfiguration(kUserConfigDirectory . "Simulator Controller.config")
+	return readConfiguration(kUserConfigDirectory . "Simulator Controller.status")
 }
 
 getControllerActionLabels() {

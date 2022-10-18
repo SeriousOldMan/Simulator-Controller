@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -211,14 +212,17 @@ namespace TeamServer {
 			return connection;
         }
 
-        public void KeepAlive(string identifier)
+        public int KeepAlive(string identifier)
         {
 			try
 			{
 				Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+
+				return 1;
 			}
 			catch (Exception)
 			{
+				return 0;
 			}
         }
 

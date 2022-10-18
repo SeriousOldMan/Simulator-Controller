@@ -251,7 +251,7 @@ namespace TeamServer.Controllers {
         [HttpGet("{identifier}")]
         public string Get([FromQuery(Name = "token")] string token, string identifier, [FromQuery(Name = "keepalive")] string keepAlive) {
             try {
-                Server.TeamServer.TokenIssuer.ValidateToken(token);
+               Server.TeamServer.TokenIssuer.ValidateToken(token);
                 
                 Connection connection = Server.TeamServer.TokenIssuer.FindConnection(identifier);
 

@@ -1107,7 +1107,7 @@ restart:
 
 		import := false
 
-		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+		for simulator, ignore in getConfigurationSectionValues(getControllerStatus(), "Simulators", Object())
 			if new Application(simulator, kSimulatorConfiguration).isRunning() {
 				import := true
 
@@ -1522,7 +1522,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 
 		simulator := false
 
-		for candidate, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+		for candidate, ignore in getConfigurationSectionValues(getControllerStatus(), "Simulators", Object())
 			if new Application(candidate, kSimulatorConfiguration).isRunning() {
 				simulator := candidate
 

@@ -206,15 +206,18 @@ namespace TeamServer {
 			return connection;
 		}
 
-		public void KeepAlive(string identifier)
-		{
-            try
-            {
-                Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
-            }
-            catch (Exception)
-            {
-            }
+        public int KeepAlive(string identifier)
+        {
+			try
+			{
+				Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+
+				return 1;
+			}
+			catch (Exception)
+			{
+				return 0;
+			}
         }
 
 		public string ValidateToken()

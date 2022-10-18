@@ -723,6 +723,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.logFunctionNotFound(actionFunction)
 	}
 
+	writePluginConfiguration(configuration) {
+		setConfigurationValue(configuration, this.Plugin, "Status", this.RaceAssistantActive ? "Active" : "Passive")
+	}
+
 	startSimulation(simulator) {
 		if (RaceAssistantPlugin.Simulator && (RaceAssistantPlugin.Simulator != simulator))
 			RaceAssistantPlugin.stopSimulation(RaceAssistantPlugin.Simulator)

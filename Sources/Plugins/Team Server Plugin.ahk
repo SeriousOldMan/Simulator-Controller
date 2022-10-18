@@ -373,7 +373,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if this.TeamServerEnabled {
 			if this.Connected {
-				if (this.Stalled || if this.LastMessage) {
+				if (this.Stalled || this.LastMessage) {
 					setConfigurationValue(configuration, this.Plugin, "Status", "Critical")
 
 					setConfigurationValue(configuration, this.Plugin, "Information", this.LastMessage)
@@ -553,7 +553,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							  . translate("Driver: ") . this.Driver[true] . "`n" . translate("Session: ") . this.Session[true]
 							  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
 
-				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . teamName . translate(")")
+				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")")
 			}
 			catch exception {
 				this.iConnection := false
@@ -586,6 +586,10 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.iServerToken := false
 
 			this.iConnection := false
+
+			this.iTeamName := ""
+			this.iDriverName := ""
+			this.iSessionName := ""
 
 			this.iLastMessage := ""
 
@@ -1157,6 +1161,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	keepAlive(start := false) {
 		local nextPing := 10000
+		local driverObject
 
 		static keepAliveTask := false
 
@@ -1177,9 +1182,13 @@ class TeamServerPlugin extends ControllerPlugin {
 																				   , this.DriverNickName[true])
 																 , "Driver", this.Session)
 
-						Menu Tray, Tip, % (string2Values(".", A_ScriptName)[1]
-										 . translate(" (Team: ")
-										 . this.parseObject(this.Connector.GetTeam(this.Team)).Name . translate(")"))
+						driverObject := this.parseObject(this.Connector.GetDriver(driver))
+
+						this.iTeamName := this.parseObject(this.Connector.GetTeam(team)).Name
+						this.iDriverName := (driverObject.ForName . A_Space . driverObject.SurName)
+						this.iSessionName := this.parseObject(this.Connector.GetSession(session)).Name
+
+						Menu Tray, Tip, % (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
 					}
 
 					this.iStalled := false

@@ -1182,11 +1182,11 @@ class TeamServerPlugin extends ControllerPlugin {
 																				   , this.DriverNickName[true])
 																 , "Driver", this.Session)
 
-						driverObject := this.parseObject(this.Connector.GetDriver(driver))
+						driverObject := this.parseObject(this.Connector.GetDriver(this.Driver))
 
-						this.iTeamName := this.parseObject(this.Connector.GetTeam(team)).Name
+						this.iTeamName := this.parseObject(this.Connector.GetTeam(this.Team)).Name
 						this.iDriverName := (driverObject.ForName . A_Space . driverObject.SurName)
-						this.iSessionName := this.parseObject(this.Connector.GetSession(session)).Name
+						this.iSessionName := this.parseObject(this.Connector.GetSession(this.Session)).Name
 
 						Menu Tray, Tip, % (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
 					}

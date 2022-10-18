@@ -642,8 +642,16 @@ WM_MOUSEMOVE() {
 }
 
 watchStartupSemaphore() {
-	if (!SimulatorStartup.StayOpen && !FileExist(kTempDirectory . "Startup.semaphore"))
-		exitStartup()
+	if !FileExist(kTempDirectory . "Startup.semaphore")
+		if !SimulatorStartup.StayOpen
+			exitStartup()
+		else
+			try {
+				hideSplashTheme()
+			}
+			catch exception {
+				logError(exception)
+			}
 }
 
 clearStartupSemaphore() {

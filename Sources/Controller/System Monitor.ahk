@@ -123,12 +123,8 @@ systemMonitor(command := false, arguments*) {
 				for ignore, plugin in plugins
 					LV_Add("Icon" . icons[A_Index], "    " . plugin, messages[A_Index])
 
-				if first {
-					first := false
-
-					LV_ModifyCol()
-					LV_ModifyCol(1, "AutoHdr")
-				}
+				LV_ModifyCol()
+				LV_ModifyCol(1, "AutoHdr")
 
 				statusPlugins := plugins
 			}

@@ -3,7 +3,7 @@ Version=4.4.0.0-dev
 Target=4.4.0.0-release
 Date=10/17/2022
 Download=
-Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command, New car models for "Setup Advisor", Refactoring of the translation framework to support the upcoming Spanish translation
+Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command, New car models for "Setup Advisor", Refactoring of the translation framework to support the upcoming Spanish translation, Initial version of a Spanish translation
 [Release]
 Version=4.3.5.0-release
 Date=10/14/2022

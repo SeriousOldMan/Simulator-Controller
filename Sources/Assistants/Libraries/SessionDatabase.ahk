@@ -151,25 +151,24 @@ class SessionDatabase extends ConfigurationItem {
 					}
 
 					if connector {
-						connector.Initialize(this.ServerURL)
+						connector.Initialize(this.ServerURL, this.ServerToken)
 
-						connector.Token := this.ServerToken
+						temp := connector.Token
 
-						connection := connector.Connect(this.ServerToken, this.ID, this.getUserName())
+						try {
+							connection := connector.Connect(this.ServerToken, this.ID, this.getUserName())
 
-						if (connection && (connection != "")) {
-							try {
+							if (connection && (connection != ""))
 								connector.ValidateDataToken()
-							}
-							catch exception {
-								connector := false
-							}
-
-							if connector
-								new PeriodicTask(Func("keepAlive").Bind(connector, connection), 120000, kInterruptPriority).start()
 						}
-						else
+						catch exception {
+							logError(exception)
+
 							connector := false
+						}
+
+						if connector
+							new PeriodicTask(Func("keepAlive").Bind(connector, connection), 120000, kInterruptPriority).start()
 					}
 
 					SessionDatabase.sConnector := connector

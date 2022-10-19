@@ -1559,9 +1559,7 @@ class RaceCenter extends ConfigurationItem {
 			if (!this.ServerToken || (this.ServerToken = ""))
 				throw "Invalid token detected..."
 
-			this.Connector.Initialize(this.ServerURL)
-
-			this.Connector.Token := this.ServerToken
+			this.Connector.Initialize(this.ServerURL, this.ServerToken)
 
 			this.iConnection := true
 

@@ -642,9 +642,7 @@ restart:
 			}
 
 			try {
-				connector.Initialize(serverURLEdit)
-
-				connector.Token := serverTokenEdit
+				connector.Initialize(serverURLEdit, serverTokenEdit)
 
 				sessionDB := new SessionDatabase()
 

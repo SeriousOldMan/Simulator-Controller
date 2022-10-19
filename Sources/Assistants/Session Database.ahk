@@ -2215,7 +2215,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					SplitPath A_LoopFileName, , , , track
 
 					if (((selectedTrack = true) || (track = selectedTrack)) && !inList(tracks, track)) {
-						LV_Add("", translate("Tracks"), this.SessionDatabase.getTrackName(selectedSimulator, track, true)
+						LV_Add("", translate("Tracks"), this.getTrackName(selectedSimulator, track)
 							 , "-", 1)
 
 						tracks.Push(track)
@@ -3342,7 +3342,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 				SplitPath A_LoopFileName, , , , track
 
 				if !inList(tracks, track) {
-					LV_Add("Check", translate("Tracks"), editor.SessionDatabase.getTrackName(simulator, track), "-", 1)
+					LV_Add("Check", translate("Tracks"), editor.getTrackName(simulator, track), "-", 1)
 
 					tracks.Push(track)
 				}
@@ -3674,9 +3674,7 @@ editSettings(editorOrCommand) {
 		}
 
 		try {
-			connector.Initialize(serverURLEdit)
-
-			connector.Token := serverTokenEdit
+			connector.Initialize(serverURLEdit, serverTokenEdit)
 
 			connection := connector.Connect(serverTokenEdit, sessionDB.ID, sessionDB.getUserName())
 

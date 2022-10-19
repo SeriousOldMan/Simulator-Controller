@@ -1149,11 +1149,11 @@ class RaceAssistant extends ConfigurationItem {
 
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+			
 		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
-			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid")
-		else
-			lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
-
+			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
+		
 		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)

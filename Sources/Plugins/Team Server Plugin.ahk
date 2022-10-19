@@ -1047,9 +1047,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if this.Connection
 					this.Connector.KeepAlive(this.Connection)
 				else {
-					this.Connector.Initialize(this.ServerURL)
-
-					this.Connector.Token := this.ServerToken
+					this.Connector.Initialize(this.ServerURL, this.ServerToken)
 
 					if (this.Driver && this.Session)
 						this.iConnection := this.Connector.Connect(this.ServerToken

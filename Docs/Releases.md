@@ -6,7 +6,8 @@
   5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
   6. Refactoring of the translation framework to better support the new Spanish translation.
   7. Thanks to the great work of Jose Krilin, we have an initial version of a Spanish translation. The UI has been translated for the most part and will be polished in the next weeks and you can also expect a working version of the voice generation and recognition soon.
-  8. New car models for "Setup Advisor":
+  8. Fixed startup of Race Spotter in situations with a very short rolling or even a standing start.
+  9. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT RS VLN
 

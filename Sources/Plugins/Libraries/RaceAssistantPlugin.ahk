@@ -723,8 +723,52 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.logFunctionNotFound(actionFunction)
 	}
 
-	writePluginStatus(configuration) {
-		setConfigurationValue(configuration, this.Plugin, "Status", this.RaceAssistantActive ? "Active" : "Passive")
+	writePluginState(configuration) {
+		local session
+
+		if this.Active {
+			if this.RaceAssistantEnabled {
+				if (this.RaceAssistant && !this.RaceAssistantActive) {
+					setConfigurationValue(configuration, this.Plugin, "State", "Active")
+
+					setConfigurationValue(configuration, this.Plugin, "Information"
+										, values2String("; ", translate("Started: ") . translate("No")
+															, translate("Session: ") . translate("Waiting...")))
+				}
+				else if this.RaceAssistantActive {
+					setConfigurationValue(configuration, this.Plugin, "State", "Active")
+
+					switch this.Session {
+						case kSessionQualification:
+							session := "Qualification"
+						case kSessionPractice:
+							session := "Practice"
+						case kSessionRace:
+							session := "Race"
+						default:
+							session := "Unknown"
+					}
+
+					setConfigurationValue(configuration, this.Plugin, "Information"
+										, values2String("; ", translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No")
+															, translate("Session: ") . translate(session)
+															, translate("Laps: ") . this.LastLap
+															, translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo")))
+
+				}
+				else if this.WaitForShutdown {
+					setConfigurationValue(configuration, this.Plugin, "State", "Warning")
+
+					setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("Waiting for shutdown..."))
+				}
+				else
+					setConfigurationValue(configuration, this.Plugin, "State", "Passive")
+			}
+			else
+				setConfigurationValue(configuration, this.Plugin, "State", "Disabled")
+		}
+		else
+			base.writePluginState(configuration)
 	}
 
 	startSimulation(simulator) {
@@ -1567,6 +1611,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								if (teamSessionActive && RaceAssistantPlugin.TeamServer.Connected) {
 									if !RaceAssistantPlugin.driverActive(data) {
+										RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
+
 										logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
 
 										return ; Still a different driver, might happen in some simulations
@@ -1581,6 +1627,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								; Regained the car after a driver swap, new stint
 
 								if !RaceAssistantPlugin.driverActive(data) {
+									RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
+
 									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
 
 									return ; Still a different driver, might happen in some simulations

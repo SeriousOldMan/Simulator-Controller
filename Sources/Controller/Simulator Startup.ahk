@@ -369,12 +369,19 @@ launchPad(command := false, arguments*) {
 
 	static closeCheckBox
 
-	if (command = kClose)
+	if (command = kClose) {
+		if (arguments.HasKey(1) && arguments[1])
+			launchPad("Close All")
+
 		result := kClose
+	}
 	else if (command = "Close All") {
 		for ignore, application in concatenate(kBackgroundApps, kForegroundApps)
 			if (application != "Simulator Startup")
 				closeApplication(application)
+
+		if (arguments.HasKey(1) && arguments[1])
+			launchPad(kClose)
 	}
 	else if (command = "ToolTip") {
 		if toolTips.HasKey(arguments[1])
@@ -537,7 +544,7 @@ launchPad(command := false, arguments*) {
 }
 
 closeLaunchPad() {
-	launchPad(kClose)
+	launchPad(kClose, GetKeyState("Ctrl", "P"))
 }
 
 closeAll() {
@@ -548,7 +555,7 @@ closeAll() {
 	OnMessage(0x44, "")
 
 	IfMsgBox Yes
-		launchPad("Close All")
+		launchPad("Close All", GetKeyState("Ctrl", "P"))
 }
 
 moveLaunchPad() {

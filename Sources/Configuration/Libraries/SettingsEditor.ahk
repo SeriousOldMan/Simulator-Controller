@@ -256,7 +256,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		selectedSession := false
 		simulatorSessions := []
 
-		configuration := getControllerStatus()
+		configuration := getControllerState()
 
 		for simulator, options in getConfigurationSectionValues(configuration, "Simulators", Object())
 			simulators.Push(simulator)

@@ -78,7 +78,7 @@ class TelemetryDatabase extends SessionDatabase {
 		base.__New()
 
 		if (simulator && car && track) {
-			if getConfigurationValue(this.ControllerConfiguration, "Simulators", simulator, false)
+			if getConfigurationValue(this.ControllerState, "Simulators", simulator, false)
 				simulatorCode := this.getSimulatorCode(simulator)
 			else
 				simulatorCode := simulator

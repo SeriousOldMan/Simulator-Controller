@@ -42,12 +42,12 @@
 
 global kClose := "Close"
 
-global kStatusIcons := {Disabled: kIconsDirectory . "Black.ico"
-					  , Passive: kIconsDirectory . "Gray.ico"
-					  , Active: kIconsDirectory . "Green.ico"
-					  , Warning: kIconsDirectory . "Yellow.ico"
-					  , Critical: kIconsDirectory . "Red.ico"
-					  , Unknown: kIconsDirectory . "Empty.png"}
+global kStateIcons := {Disabled: kIconsDirectory . "Black.ico"
+					 , Passive: kIconsDirectory . "Gray.ico"
+					 , Active: kIconsDirectory . "Green.ico"
+					 , Warning: kIconsDirectory . "Yellow.ico"
+					 , Critical: kIconsDirectory . "Red.ico"
+					 , Unknown: kIconsDirectory . "Empty.png"}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,69 +56,76 @@ global kStatusIcons := {Disabled: kIconsDirectory . "Black.ico"
 
 systemMonitor(command := false, arguments*) {
 	local x, y, time, logLevel, defaultGui, defaultListView
-	local controllerStatus, ignore, plugin, icons, plugins, key, icon, status
+	local controllerState, ignore, plugin, icons, plugins, key, value, icon, state, property
 
-	static statusIconsList := false
-	static statusIcons := {}
-	static statusPlugins := false
+	static stateIconsList := false
+	static stateIcons := {}
+	static statePlugins := false
+
+	static serverState
+	static serverURL := ""
+	static serverToken := ""
+	static serverDriver := ""
+	static serverTeam := ""
+	static serverSession := ""
 
 	static result := false
 	static first := true
 
-	static statusListView
+	static stateListView
 
 	static logMessageListView
 	static logBufferEdit
 
+	if !stateIconsList {
+		stateIconsList := IL_Create(kStateIcons.Count())
+
+		for key, icon in kStateIcons {
+			IL_Add(stateIconsList, icon)
+
+			stateIcons[key] := A_Index
+		}
+
+		LV_SetImageList(stateIconsList)
+	}
+
 	if (command = kClose)
 		result := kClose
-	else if (command = "UpdateStatus") {
+	else if (command = "UpdateModuleState") {
 		defaultGui := A_DefaultGui
 
 		Gui SM:Default
 
 		defaultListView := A_DefaultListView
 
-		Gui ListView, % statusListView
+		Gui ListView, % stateListView
 
 		try {
-			if !statusIconsList {
-				statusIconsList := IL_Create(kStatusIcons.Count())
-
-				for key, icon in kStatusIcons {
-					IL_Add(statusIconsList, icon)
-
-					statusIcons[key] := A_Index
-				}
-
-				LV_SetImageList(statusIconsList)
-			}
-
-			controllerStatus := getControllerStatus()
+			controllerState := getControllerState()
 
 			icons := []
 			plugins := []
 			messages := []
 
-			for ignore, plugin in string2Values("|", getConfigurationValue(controllerStatus, "Plugins", "Plugins")) {
+			for ignore, plugin in string2Values("|", getConfigurationValue(controllerState, "Plugins", "Plugins")) {
 				if plugin {
-					status := getConfigurationValue(controllerStatus, plugin, "Status")
+					state := getConfigurationValue(controllerState, plugin, "State")
 
-					if statusIcons.HasKey(status)
-						icons.Push(statusIcons[status])
+					if stateIcons.HasKey(state)
+						icons.Push(stateIcons[state])
 					else
-						icons.Push(statusIcons["Unknown"])
+						icons.Push(stateIcons["Unknown"])
 
 					plugins.Push(translate(plugin))
 
-					messages.Push(getConfigurationValue(controllerStatus, plugin, "Information", ""))
+					messages.Push(getConfigurationValue(controllerState, plugin, "Information", ""))
 				}
 			}
 
-			if (!statusPlugins || !listEqual(plugins, statusPlugins)) {
+			if (!statePlugins || !listEqual(plugins, statePlugins)) {
 				LV_Delete()
 
-				LV_SetImageList(statusIconsList)
+				LV_SetImageList(stateIconsList)
 
 				for ignore, plugin in plugins
 					LV_Add("Icon" . icons[A_Index], "    " . plugin, messages[A_Index])
@@ -126,7 +133,7 @@ systemMonitor(command := false, arguments*) {
 				LV_ModifyCol()
 				LV_ModifyCol(1, "AutoHdr")
 
-				statusPlugins := plugins
+				statePlugins := plugins
 			}
 			else
 				for ignore, plugin in plugins {
@@ -142,6 +149,71 @@ systemMonitor(command := false, arguments*) {
 		finally {
 			Gui %defaultGui%:Default
 			Gui ListView, %defaultListView%
+		}
+	}
+	else if (command = "UpdateServerState") {
+		serverURL := ""
+		serverToken := ""
+		serverDriver := ""
+		serverTeam := ""
+		serverSession := ""
+
+		defaultGui := A_DefaultGui
+
+		Gui SM:Default
+
+		try {
+			controllerState := getControllerState()
+
+			if (controllerState.Count() > 0) {
+				state := getConfigurationValue(controllerState, "Team Server", "State", "Unknown")
+
+				if kStateIcons.HasKey(state)
+					icon := kStateIcons[state]
+				else
+					icon := kStateIcons["Unknown"]
+
+				GuiControl, , serverState, %icon%
+
+				if ((state != "Unknown") && (state != "Disabled")) {
+					state := {}
+
+					for ignore, property in string2Values(";", getConfigurationValue(controllerState, "Team Server", "Properties")) {
+						property := StrSplit(property, ":", " `t", 2)
+
+						state[property[1]] := property[2]
+					}
+
+					for key, value in state {
+						if (value = "Invalid")
+							value := translate("Not valid")
+						else if (value = "Mismatch")
+							value := translate("No match")
+
+						switch key {
+							case "ServerURL":
+								serverURL := value
+							case "SessionToken":
+								serverToken := value
+							case "Driver":
+								serverDriver := value
+							case "Team":
+								serverTeam := value
+							case "Session":
+								serverSession := value
+						}
+					}
+				}
+			}
+
+			GuiControl, , serverURL, %serverURL%
+			GuiControl, , serverToken, %serverToken%
+			GuiControl, , serverDriver, %serverDriver%
+			GuiControl, , serverTeam, %serverTeam%
+			GuiControl, , serverSession, %serverSession%
+		}
+		finally {
+			Gui %defaultGui%:Default
 		}
 	}
 	else if (command = "LogMessage") {
@@ -222,15 +294,46 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x8 yp+26 w790 0x10
 
-		Gui SM:Add, Tab3, x16 yp+14 w773 h380 -Wrap Section, % values2String("|", map(["Plugins", "Team Server", "Processes", "Logs"], "translate")*)
+		Gui SM:Add, Tab3, x16 yp+14 w773 h375 -Wrap Section, % values2String("|", map(["State", "Team Server", "Processes", "Logs"], "translate")*)
 
 		Gui Tab, 1
 
-		Gui SM:Add, ListView, x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDstatusListView, % values2String("|", map(["Plugin", "Information"], "translate")*)
+		Gui SM:Add, ListView, x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDstateListView gnoSelect, % values2String("|", map(["Module", "Information"], "translate")*)
+
+		Gui Tab, 2
+
+		Gui SM:Font, s10 Bold, Arial
+
+		Gui SM:Add, Text, x24 ys+30 w120 h30, % translate("State")
+		Gui SM:Add, Picture, x155 yp-2 w24 h24 vServerState
+
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Font, Norm, Arial
+		Gui SM:Font, Italic, Arial
+
+		Gui SM:Add, GroupBox, -Theme x24 ys+60 w340 h150, % translate("Connection")
+
+		Gui SM:Font, Norm, Arial
+
+		Gui SM:Add, Text, x32 yp+21 w120, % translate("Server URL")
+		Gui SM:Add, Text, x155 yp w200 vserverURL
+
+		Gui SM:Add, Text, x32 yp+24 w120, % translate("Session Token")
+		Gui SM:Add, Text, x155 yp w200 vserverToken
+
+		Gui SM:Add, Text, x32 yp+28 w120, % translate("Team")
+		Gui SM:Add, Text, x155 yp w200 vserverTeam
+
+		Gui SM:Add, Text, x32 yp+24 w120, % translate("Driver")
+		Gui SM:Add, Text, x155 yp w200 vserverDriver
+
+		Gui SM:Add, Text, x32 yp+24 w120, % translate("Session")
+		Gui SM:Add, Text, x155 yp w200 vserverSession
 
 		Gui Tab, 4
 
-		Gui SM:Add, ListView, x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlogMessageListView, % values2String("|", map(["Application", "Time", "Category", "Message"], "translate")*)
+		Gui SM:Add, ListView, x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlogMessageListView gnoSelect, % values2String("|", map(["Application", "Time", "Category", "Message"], "translate")*)
 
 		Gui SM:Add, Text, x24 yp+320 w95 h20, % translate("Log Buffer")
 		Gui SM:Add, Edit, x120 yp-2 w50 h20 Limit3 Number VlogBufferEdit, 999
@@ -240,7 +343,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Font, s8 Norm, Arial
 
-		Gui SM:Add, Text, x8 ys+390 w790 0x10
+		Gui SM:Add, Text, x8 ys+385 w790 0x10
 
 		Gui SM:Add, Button, x367 yp+10 w80 h23 Default GcloseSystemMonitor, % translate("Close")
 
@@ -252,7 +355,8 @@ systemMonitor(command := false, arguments*) {
 		else
 			Gui SM:Show
 
-		new PeriodicTask(Func("systemMonitor").Bind("UpdateStatus"), 5000, kLowPriority).start()
+		new PeriodicTask(Func("systemMonitor").Bind("UpdateModuleState"), 2000, kLowPriority).start()
+		new PeriodicTask(Func("systemMonitor").Bind("UpdateServerState"), 5000, kLowPriority).start()
 
 		loop
 			Sleep 100
@@ -276,6 +380,11 @@ openSystemMonitorDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller
 }
 
+noSelect() {
+	loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+}
+
 startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch
@@ -285,7 +394,7 @@ startSystemMonitor() {
 
 	registerMessageHandler("Monitor", "monitorMessageHandler")
 
-	deleteFile(kUserConfigDirectory . "Simulator Controller.status")
+	deleteFile(kUserConfigDirectory . "Simulator Controller.state")
 
 	systemMonitor()
 

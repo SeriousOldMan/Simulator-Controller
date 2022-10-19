@@ -195,7 +195,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSettings := []
 
 	class EditorTyresDatabase extends TyresDatabase {
-		__New(controllerConfiguration := false) {
+		__New(controllerState := false) {
 			base.__New()
 
 			this.UseCommunity[false] := SessionDatabaseEditor.Instance.UseCommunity

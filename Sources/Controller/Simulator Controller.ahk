@@ -1154,7 +1154,7 @@ class SimulatorController extends ConfigurationItem {
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
 
-	writeControllerConfiguration(periodic := true) {
+	writeControllerState(periodic := true) {
 		local plugins := {}
 		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
@@ -1190,7 +1190,7 @@ class SimulatorController extends ConfigurationItem {
 														   , values2String(",", simulators*), values2String(",", modes*)))
 				}
 
-				thePlugin.writePluginStatus(configuration)
+				thePlugin.writePluginState(configuration)
 			}
 
 			setConfigurationValue(configuration, "Plugins", "Plugins", values2String("|", getKeys(plugins)*))
@@ -1200,7 +1200,7 @@ class SimulatorController extends ConfigurationItem {
 									, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
 													   , fnController.NumButtons, fnController.NumDials))
 
-			writeConfiguration(kUserConfigDirectory . "Simulator Controller.status", configuration)
+			writeConfiguration(kUserConfigDirectory . "Simulator Controller.state", configuration)
 		}
 		catch exception {
 			logError(exception)
@@ -1629,8 +1629,8 @@ class ControllerPlugin extends Plugin {
 		logMessage(kLogWarn, translate("Controller function ") . functionDescriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 
-	writePluginStatus(configuration) {
-		setConfigurationValue(configuration, this.Plugin, "Status", this.Active ? "Active" : "Disabled")
+	writePluginState(configuration) {
+		setConfigurationValue(configuration, this.Plugin, "State", this.Active ? "Passive" : "Disabled")
 	}
 }
 
@@ -2077,9 +2077,9 @@ startupSimulatorController() {
 	local noStartup := ((A_Args.Length() > 0) && (A_Args[1] = "-NoStartup"))
 
 	if noStartup
-		controller.writeControllerConfiguration(false)
+		controller.writeControllerState(false)
 	else
-		new PeriodicTask(ObjBindMethod(controller, "writeControllerConfiguration"), 0, kLowPriority).start()
+		new PeriodicTask(ObjBindMethod(controller, "writeControllerState"), 0, kLowPriority).start()
 
 	controller.computeControllerModes()
 
@@ -2177,8 +2177,8 @@ setMode(actionOrPlugin, mode := false) {
 ;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-writeControllerConfiguration() {
-	SimulatorController.Instance.writeControllerConfiguration(false)
+writeControllerState() {
+	SimulatorController.Instance.writeControllerState(false)
 }
 
 

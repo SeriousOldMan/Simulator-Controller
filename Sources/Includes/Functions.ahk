@@ -1477,8 +1477,6 @@ logError(exception, unhandled := false) {
 	return (isDebug() ? false : true)
 }
 
-
-
 availableLanguages() {
 	local translations := {en: "English"}
 	local ignore, fileName, languageCode
@@ -2079,11 +2077,21 @@ newConfiguration() {
 readConfiguration(configFile) {
 	local configuration := {}
 	local section := false
-	local currentLine, firstChar, keyValue, key, value, file
+	local file := false
+	local currentLine, firstChar, keyValue, key, value
 
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
-	file := FileOpen(configFile, "r")
+	loop
+		try {
+			file := FileOpen(configFile, "r")
+
+			break
+		}
+		catch exception {
+			if !FileExist(configFile)
+				return configuration
+		}
 
 	if file {
 		loop Read, %configFile%
@@ -2237,14 +2245,14 @@ removeConfigurationSection(configuration, section) {
 		configuration.Delete(section)
 }
 
-getControllerStatus(configuration := false) {
+getControllerState(configuration := false) {
 	local pid, tries, options, exePath, fileName
 
 	Process Exist, Simulator Controller.exe
 
 	pid := ErrorLevel
 
-	if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.status")))
+	if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.state")))
 		try {
 			if configuration {
 				fileName := temporaryFileName("Config", "ini")
@@ -2284,7 +2292,7 @@ getControllerStatus(configuration := false) {
 		}
 
 
-	return readConfiguration(kUserConfigDirectory . "Simulator Controller.status")
+	return readConfiguration(kUserConfigDirectory . "Simulator Controller.state")
 }
 
 getControllerActionLabels() {

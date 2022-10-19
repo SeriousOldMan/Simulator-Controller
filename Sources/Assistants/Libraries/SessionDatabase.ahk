@@ -62,7 +62,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	static sSynchronizers := []
 
-	iControllerConfiguration := false
+	iControllerState := false
 
 	iUseCommunity := false
 
@@ -235,9 +235,9 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	ControllerConfiguration[] {
+	ControllerState[] {
 		Get {
-			return this.iControllerConfiguration
+			return this.iControllerState
 		}
 	}
 
@@ -262,7 +262,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	__New(controllerConfiguration := false) {
+	__New(controllerState := false) {
 		local identifier
 
 		if !SessionDatabase.sConfiguration
@@ -276,14 +276,14 @@ class SessionDatabase extends ConfigurationItem {
 
 		base.__New(SessionDatabase.sConfiguration)
 
-		if !controllerConfiguration {
-			controllerConfiguration := getControllerStatus()
+		if !controllerState {
+			controllerState := getControllerState()
 
-			if !controllerConfiguration
-				controllerConfiguration := {}
+			if !controllerState
+				controllerState := {}
 		}
 
-		this.iControllerConfiguration := controllerConfiguration
+		this.iControllerState := controllerState
 	}
 
 	loadFromConfiguration(configuration) {
@@ -653,8 +653,8 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (simulatorCode = "Unknown")
 			return "Unknown"
-		else if (this.ControllerConfiguration.Count() > 0) {
-			for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+		else if (this.ControllerState.Count() > 0) {
+			for name, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
 				if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
 					return name
 
@@ -676,12 +676,12 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulatorName = "Unknown")
 			return "Unknown"
 		else {
-			code := getConfigurationValue(this.ControllerConfiguration, "Simulators", simulatorName, false)
+			code := getConfigurationValue(this.ControllerState, "Simulators", simulatorName, false)
 
 			if code
 				return string2Values("|", code)[1]
 			else {
-				for ignore, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+				for ignore, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
 
@@ -698,7 +698,7 @@ class SessionDatabase extends ConfigurationItem {
 	getSimulators() {
 		local configuredSimulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration"
 																									  , "Simulators", ""))
-		local controllerSimulators := getKeys(getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object()))
+		local controllerSimulators := getKeys(getConfigurationSectionValues(this.ControllerState, "Simulators", Object()))
 		local simulators := []
 		local simulator, ignore, name, code
 

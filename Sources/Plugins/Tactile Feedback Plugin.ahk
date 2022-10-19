@@ -415,6 +415,19 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 
+	writePluginState(configuration) {
+		if this.Active {
+			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+
+			setConfigurationValue(configuration, this.Plugin, "Information"
+								, values2String("; ", translate("Pedal Vibration: ") . this.PedalVibrationEnabled
+													, translate("Front Vibration: ") . this.FrontVibrationEnabled
+													, translate("Rear Vibration: ") . this.RearVibrationEnabled))
+		}
+		else
+			base.writePluginState(configuration)
+	}
+
 	getLabel(descriptor, default := false) {
 		local label := translate(base.getLabel(descriptor, default))
 

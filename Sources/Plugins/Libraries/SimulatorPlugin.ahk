@@ -442,19 +442,24 @@ class SimulatorPlugin extends ControllerPlugin {
 		selectActions := []
 	}
 
-	writePluginStatus(configuration) {
+	writePluginState(configuration) {
 		local sessionDB, simulator
 
-		setConfigurationValue(configuration, this.Plugin, "Status", this.runningSimulator() ? "Active" : "Passive")
+		if this.Acive {
+			setConfigurationValue(configuration, this.Plugin, "State", this.runningSimulator() ? "Active" : "Passive")
 
-		if (this.Car && this.Track) {
-			sessionDB := new SessionDatabase()
-			simulator := this.Simulator[true]
+			if (this.Car && this.Track) {
+				sessionDB := new SessionDatabase()
+				simulator := this.Simulator[true]
 
-			setConfigurationValue(configuration, this.Plugin, "Information"
-								, values2String(" / ", simulator, sessionDB.getCarName(simulator, this.Car)
-													 , sessionDB.getTrackName(simulator, this.Track)))
+				setConfigurationValue(configuration, this.Plugin, "Information"
+									, values2String("; ", translate("Simulator: ") . simulator
+														, translate("Car: ") . sessionDB.getCarName(simulator, this.Car)
+														, translate("Track: ") . sessionDB.getTrackName(simulator, this.Track)))
+			}
 		}
+		else
+			base.writePluginState(configuration)
 	}
 
 	activateWindow() {

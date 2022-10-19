@@ -445,7 +445,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	writePluginState(configuration) {
 		local sessionDB, simulator
 
-		if this.Acive {
+		if this.Active {
 			setConfigurationValue(configuration, this.Plugin, "State", this.runningSimulator() ? "Active" : "Passive")
 
 			if (this.Car && this.Track) {

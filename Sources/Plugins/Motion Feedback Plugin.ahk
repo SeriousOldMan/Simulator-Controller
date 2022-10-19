@@ -556,7 +556,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if this.Active {
 			setConfigurationValue(configuration, this.Plugin, "State", "Active")
 
-			setConfigurationValue(configuration, this.Plugin, "Information", translate("Motion: ") . translate(this.MotionActive ? "Yes" : "No"))
+			setConfigurationValue(configuration, this.Plugin, "Information", translate("Motion: ") . translate(this.MotionActive ? "On" : "Off"))
 		}
 		else
 			base.writePluginState(configuration)

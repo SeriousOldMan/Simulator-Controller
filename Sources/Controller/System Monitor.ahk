@@ -312,24 +312,24 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, Norm, Arial
 		Gui SM:Font, Italic, Arial
 
-		Gui SM:Add, GroupBox, -Theme x24 ys+60 w340 h150, % translate("Connection")
+		Gui SM:Add, GroupBox, -Theme x24 ys+60 w360 h150, % translate("Connection")
 
 		Gui SM:Font, Norm, Arial
 
 		Gui SM:Add, Text, x32 yp+21 w120, % translate("Server URL")
-		Gui SM:Add, Text, x155 yp w200 vserverURL
+		Gui SM:Add, Text, x155 yp w220 vserverURL
 
 		Gui SM:Add, Text, x32 yp+24 w120, % translate("Session Token")
-		Gui SM:Add, Text, x155 yp w200 vserverToken
+		Gui SM:Add, Text, x155 yp w220 vserverToken
 
 		Gui SM:Add, Text, x32 yp+28 w120, % translate("Team")
-		Gui SM:Add, Text, x155 yp w200 vserverTeam
+		Gui SM:Add, Text, x155 yp w220 vserverTeam
 
 		Gui SM:Add, Text, x32 yp+24 w120, % translate("Driver")
-		Gui SM:Add, Text, x155 yp w200 vserverDriver
+		Gui SM:Add, Text, x155 yp w220 vserverDriver
 
 		Gui SM:Add, Text, x32 yp+24 w120, % translate("Session")
-		Gui SM:Add, Text, x155 yp w200 vserverSession
+		Gui SM:Add, Text, x155 yp w220 vserverSession
 
 		Gui Tab, 4
 

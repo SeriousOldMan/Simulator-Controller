@@ -805,21 +805,21 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("SessionFormat=%s\n", (sessionLaps == -1) ? "Time" : "Laps");
 
 			long timeRemaining = -1;
-			
+
 			/*
 			if (practice)
 				timeRemaining = 3600000;
 			else {
 			*/
-				if (getDataValue(result, header, data, "SessionTimeRemain")) {
-					float time = atof(result);
+			if (getDataValue(result, header, data, "SessionTimeRemain")) {
+				float time = atof(result);
 
-					if (time != -1)
-						timeRemaining = ((long)time * 1000);
-				}
+				if (time != -1)
+					timeRemaining = ((long)time * 1000);
+			}
 
-				if (timeRemaining == -1)
-					timeRemaining = getRemainingTime(sessionInfo, practice, sessionLaps, sessionTime, laps, lastTime);
+			if (timeRemaining == -1)
+				timeRemaining = getRemainingTime(sessionInfo, practice, sessionLaps, sessionTime, laps, lastTime);
 			/*
 			}
 			*/
@@ -827,25 +827,25 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			printf("SessionTimeRemaining=%ld\n", timeRemaining);
 
 			long lapsRemaining = -1;
-			
+
 			/*
 			if (practice)
 				lapsRemaining = 30;
 			else {
 			*/
-				timeRemaining = -1;
+			timeRemaining = -1;
 
-				if (getDataValue(result, header, data, "SessionLapsRemain"))
-					lapsRemaining = atoi(result);
+			if (getDataValue(result, header, data, "SessionLapsRemain"))
+				lapsRemaining = atoi(result);
 
-				if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
-					long estTime = lastTime;
+			if ((lapsRemaining == -1) || (lapsRemaining == 32767)) {
+				long estTime = lastTime;
 
-					if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
-						estTime = (long)(atof(result) * 1000);
+				if ((estTime == 0) && getYamlValue(result, sessionInfo, "DriverInfo:DriverCarEstLapTime:"))
+					estTime = (long)(atof(result) * 1000);
 
-					lapsRemaining = getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, laps, estTime);
-				}
+				lapsRemaining = getRemainingLaps(sessionInfo, practice, sessionLaps, sessionTime, laps, estTime);
+			}
 			/*
 			}
 			*/
@@ -886,17 +886,22 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 				getTyreWear(header, sessionInfo, data, "RRwearL", "RRwearM", "RRwearR"));
 
 			printf("[Stint Data]\n");
-			
+
 			char forName[100];
 			char surName[100];
 			char nickName[3];
-				
+
 			readDriverInfo(sessionInfo, playerCarIdx, forName, surName, nickName);
 
 			printf("DriverForname=%s\n", forName);
 			printf("DriverSurname=%s\n", surName);
 			printf("DriverNickname=%s\n", nickName);
 
+			char* trackPositions;
+
+			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) 
+				printf("Sector=%d\n", max(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)])));
+			
 			printf("Laps=%s\n", itoa(laps, result, 10));
 
 			bool valid = true;
@@ -930,7 +935,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("[Track Data]\n");
 
-			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {
+			if (getDataValue(result, header, data, "TrackTemp"))
+				printf("Temperature=%f\n", atof(result));
+			else if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackSurfaceTemp:")) {
 				char temperature[10];
 
 				substring((char*)result, temperature, 0, strcspn(result, " "));
@@ -985,7 +992,9 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			printf("[Weather Data]\n");
 
-			if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackAirTemp:")) {
+			if (getDataValue(result, header, data, "AirTemp"))
+				printf("Temperature=%f\n", atof(result));
+			else if (getYamlValue(result, sessionInfo, "WeekendInfo:TrackAirTemp:")) {
 				char temperature[10];
 
 				substring((char*)result, temperature, 0, strcspn(result, " "));

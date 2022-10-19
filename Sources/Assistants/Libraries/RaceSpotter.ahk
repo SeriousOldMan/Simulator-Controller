@@ -639,6 +639,7 @@ class PositionInfo {
 
 class RaceSpotter extends RaceAssistant {
 	iSpotterPID := false
+	iRunning := false
 
 	iSessionDataActive := false
 
@@ -718,6 +719,12 @@ class RaceSpotter extends RaceAssistant {
 	class RaceSpotterRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			base.__New("Race Spotter", remotePID)
+		}
+	}
+
+	Running[] {
+		Get {
+			return this.iRunning
 		}
 	}
 
@@ -841,9 +848,13 @@ class RaceSpotter extends RaceAssistant {
 	updateSessionValues(values) {
 		base.updateSessionValues(values)
 
+		if values.HasKey("Running")
+			this.iRunning := values["Running"]
+
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
 			this.iLastDeltaInformationLap := 0
 
+			this.iRunning := false
 			this.iDriverCar := false
 			this.OtherCars := {}
 			this.PositionInfos := {}
@@ -2109,7 +2120,7 @@ class RaceSpotter extends RaceAssistant {
 
 		static alerting := false
 
-		if this.Speaker[false] {
+		if (this.Speaker[false] && this.Running) {
 			speaker := this.getSpeaker(true)
 
 			if alert {
@@ -2179,7 +2190,7 @@ class RaceSpotter extends RaceAssistant {
 	greenFlag(arguments*) {
 		local speaker
 
-		if (this.Speaker[false] && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking) {
+		if (this.Speaker[false] && (this.Session = kSessionRace) && this.Running) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -2196,7 +2207,7 @@ class RaceSpotter extends RaceAssistant {
 	yellowFlag(alert, arguments*) {
 		local speaker, sectors
 
-		if (this.Announcements["YellowFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["YellowFlags"] && this.Speaker[false] && this.Running) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -2228,7 +2239,7 @@ class RaceSpotter extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local position, delta
 
-		if (this.Announcements["BlueFlags"] && this.Speaker[false]) { ; && !this.SpotterSpeaking) {
+		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -2251,7 +2262,7 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	pitWindow(state) {
-		if (this.Announcements["PitWindow"] && this.Speaker[false] && (this.Session = kSessionRace)) { ; && !this.SpotterSpeaking ) {
+		if (this.Announcements["PitWindow"] && this.Speaker[false] && (this.Session = kSessionRace) && this.Running) {
 			this.SpotterSpeaking := true
 
 			try {
@@ -2456,7 +2467,8 @@ class RaceSpotter extends RaceAssistant {
 			this.getSpeaker(true)
 		}
 
-		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 25000)
+		Task.startTask(ObjBindMethod(this, "startupSpotter", true), 1000)
+		Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 25000)
 	}
 
 	startSession(settings, data) {
@@ -2514,10 +2526,10 @@ class RaceSpotter extends RaceAssistant {
 
 		this.initializeGridPosition(data)
 
+		this.startupSpotter()
+
 		if joined
-			Task.startTask(ObjBindMethod(this, "startupSpotter"), 10000)
-		else
-			this.startupSpotter()
+			Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 10000)
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
@@ -2699,7 +2711,7 @@ class RaceSpotter extends RaceAssistant {
 		local standingsAhead := false
 		local standingsBehind := false
 		local leader := false
-		local found := false
+		local hasDriver := false
 		local index, car, prefix, position, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
 		local carPosition, carDelta, carAheadDelta, carBehindDelta
 
@@ -2710,7 +2722,7 @@ class RaceSpotter extends RaceAssistant {
 				carRunning := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
 				if (A_Index = driver) {
-					found := true
+					hasDriver := true
 
 					driverLaps := carLaps
 					driverRunning := carRunning
@@ -2719,7 +2731,7 @@ class RaceSpotter extends RaceAssistant {
 				carPositions.Push(Array(A_Index, carLaps, carRunning))
 			}
 
-			if found {
+			if hasDriver {
 				bubbleSort(carPositions, "trackOrder")
 
 				positions["Driver"] := driver

@@ -10,7 +10,7 @@
       - Assetto Corsa:
 	    - Audi TT RS VLN
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440), especially, if you are using or even hosting a Team Server.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
 
 ## 4.3.5.0-release 10/14/22
 

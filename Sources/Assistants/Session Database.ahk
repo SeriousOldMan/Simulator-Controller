@@ -124,6 +124,7 @@ global uploadWetRaceButton
 global downloadWetRaceButton
 global deleteWetRaceButton
 
+global driverDropDown
 global tyreCompoundDropDown
 global airTemperatureEdit
 global trackTemperatureEdit
@@ -550,7 +551,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 3
 
-		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x386 yp w100 vdriverDropDown gloadPressures
+
+		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
 		Gui %window%:Add, Edit, x494 yp w40 -Background gloadPressures vairTemperatureEdit
@@ -2842,8 +2846,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
+		local sessionDB := this.SessionDatabase
 		local window, compounds, chosen, compound, compoundColor, pressureInfos, index
 		local ignore, tyre, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
+		local drivers, driver
 
 		static lastSimulator := false
 		static lastCar := false
@@ -2863,7 +2869,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControlGet trackTemperatureEdit
 				GuiControlGet tyreCompoundDropDown
 
-				compounds := this.SessionDatabase.getTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+				compounds := sessionDB.getTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
 				GuiControl, , tyreCompoundDropDown, % ("|" . values2String("|", map(compounds, "translate")*))
 
@@ -2878,6 +2884,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					chosen := 1
 
 				GuiControl Choose, tyreCompoundDropDown, %chosen%
+
+				if (this.SelectedSimulator != lastSimulator) {
+					drivers := [translate("All")]
+
+					chosen := false
+
+					for ignore, driver in sessionDB.getAllDrivers(this.SelectedSimulator) {
+						if (driver = sessionDB.ID)
+							chosen := driver
+
+						drivers.Push(sessionDB.getDriverName(this.SelectedSimulator, driver))
+					}
+
+					GuiControl, , driverDropDown, % "|" . values2String("|", drivers*)
+
+					if chosen {
+						GuiControl Choose, driverDropDown, % inList(sessionDB.getAllDrivers(this.SelectedSimulator), chosen) + 1
+
+						driver := [chosen]
+					}
+					else {
+						GuiControl Choose, driverDropDown, 1
+
+						driver := []
+					}
+				}
+				else {
+					GuiControlGet driverDropDown
+
+					if (driverDropDown = translate("All"))
+						driver := []
+					else
+						driver := [sessionDB.getDriverID(this.SelectedSimulator, driverDropDown)]
+				}
 
 				lastSimulator := this.SelectedSimulator
 				lastCar := this.SelectedCar
@@ -2895,7 +2935,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
 																			   , this.SelectedTrack, this.SelectedWeather
 																			   , airTemperatureEdit, trackTemperatureEdit
-																			   , compound, compoundColor)
+																			   , compound, compoundColor, driver*)
 				}
 				else
 					pressureInfos := []

@@ -135,6 +135,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceSpotter(this, pid)
 	}
 
+	writePluginState(configuration) {
+		base.writePluginState(configuration)
+
+		if (this.Active && this.RaceAssistant)
+			setConfigurationValue(configuration, "Assistants", this.Plugin, "Active")
+	}
+
 	updateActions(session) {
 		local ignore, theAction
 

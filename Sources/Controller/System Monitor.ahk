@@ -204,7 +204,7 @@ systemMonitor(command := false, arguments*) {
 				controllerState := getControllerState()
 
 				updateSimulationState(controllerState)
-				updateAssistsantsState(controllerState)
+				updateAssistantsState(controllerState)
 				updateSessionState(controllerState)
 				updateDataState(controllerState)
 				updateAutomationState(controllerState)
@@ -472,7 +472,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x34 ys+73 w32 h32 vsimulationState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x144 ys+46 w250 h90 vsimulationDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x134 ys+46 w260 h90 vsimulationDashboard, shell.explorer
 		simulationDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -480,15 +480,15 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x415 ys+73 w32 h32 vassistantsState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x525 ys+46 w250 h90 vassistantsDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x515 ys+46 w260 h90 vassistantsDashboard, shell.explorer
 		assistantsDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x24 ys+138 w375 h9, % translate("Team Session")
+		Gui SM:Add, GroupBox, -Theme x24 ys+138 w375 h9, % translate("Team")
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x34 ys+183 w32 h32 vsessionState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x144 ys+156 w250 h90 vsessionDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x134 ys+156 w260 h90 vsessionDashboard, shell.explorer
 		sessionDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -496,7 +496,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x415 ys+183 w32 h32 vdataState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x525 ys+156 w250 h90 vdataDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x515 ys+156 w260 h90 vdataDashboard, shell.explorer
 		dataDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -504,7 +504,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x34 ys+293 w32 h32 vautomationState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x144 ys+266 w250 h90 vautomationDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x134 ys+266 w260 h90 vautomationDashboard, shell.explorer
 		automationDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -512,7 +512,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x415 ys+293 w32 h32 vmapperState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x525 ys+266 w250 h90 vmapperDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x515 ys+266 w260 h90 vmapperDashboard, shell.explorer
 		mapperDashboard.Navigate("about:blank")
 
 		Gui Tab, 2
@@ -566,7 +566,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Add, Text, x413 yp+28 w120, % translate("Stint")
 		Gui SM:Add, Text, x528 yp w230 vstintNr
 
-		Gui SM:Add, Text, x413 yp+24 w120, % translate("Lap")
+		Gui SM:Add, Text, x413 yp+24 w120, % translate("Laps")
 		Gui SM:Add, Text, x528 yp w230 vstintLap
 
 		Gui SM:Add, Text, x413 yp+24 w120, % translate("Driver")
@@ -649,6 +649,7 @@ updateSimulationState(controllerState) {
 
 	if (state = "Active") {
 		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Car") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Track") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(getConfigurationValue(controllerState, "Simulation", "Session")) . "</td></tr>")
@@ -660,7 +661,37 @@ updateSimulationState(controllerState) {
 	updateDashboard(simulationDashboard, html)
 }
 
-updateAssistsantsState(controllerState) {
+updateAssistantsState(controllerState) {
+	local overallState := "Disabled"
+	local html := "<table>"
+	local assistant, state
+
+	for assistant, state in getConfigurationSectionValues(controllerState, "Assistants", {}) {
+		if (state = "Active") {
+			overallState := "Active"
+
+			state := translate("Active")
+		}
+		else if (state = "Wait") {
+			if (overallState = "Disabled")
+				overallState := "Passive"
+
+			state := translate("Waiting...")
+		}
+		else
+			state := translate("Inactive")
+
+		html .= ("<tr><td><b>" . translate(assistant) . translate(": ") . "</b></td><td>" . state . "</td></tr>")
+	}
+
+	GuiControl, , assistantsState, % kStateIcons[overallState]
+
+	if (overallState = "Disabled")
+		html := ""
+	else
+		html .= "</table>"
+
+	updateDashboard(assistantsDashboard, html)
 }
 
 updateSessionState(controllerState) {

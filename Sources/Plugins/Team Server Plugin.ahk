@@ -198,6 +198,10 @@ class TeamServerPlugin extends ControllerPlugin {
 		Get {
 			return (key ? this.iState[key] : this.iState)
 		}
+
+		Set {
+			return (key ? (this.iState[key] := value) : (this.iState := value))
+		}
 	}
 
 	Stalled[] {
@@ -381,7 +385,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		local connectedDrivers := []
 		local ignore, connection
 
-		if (this.TeamServerActive && this.SessionActive)
+		if this.SessionActive
 			try {
 				for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
 					if !this.iCachedObjects.HasKey(connection)
@@ -389,11 +393,12 @@ class TeamServerPlugin extends ControllerPlugin {
 
 					connection := this.iCachedObjects[connection]
 
-					if (connection.Name && (connection.Name != "") && (connection.Type = "Driver"))
+					if (connection.Name && (connection.Name != "") && (connection.Type = "Driver")
+										&& !inList(connectedDrivers, connection.Name))
 						connectedDrivers.Push(connection.Name)
 				}
 
-				state.Push("Drivers: " . values2String("|", connectedDrivers))
+				state.Push("Drivers: " . values2String("|", connectedDrivers*))
 			}
 			catch exception {
 				logError(exception)
@@ -403,7 +408,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	writeStintState(state) {
 		local stint, lap, driver
 
-		if (this.TeamServerActive && this.SessionActive)
+		if this.SessionActive
 			try {
 				stint := this.Connector.GetSessionCurrentStint(this.Session)
 
@@ -416,7 +421,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					if !this.iCachedObjects.HasKey(lap)
 						this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
 
-					driver := this.Connector.GetStintDriver(this.Session)
+					driver := this.Connector.GetStintDriver(stint)
 
 					if !this.iCachedObjects.HasKey(driver)
 						this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
@@ -594,16 +599,20 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	tryConnect() {
-		local settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
-		local serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
-		local serverToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
-		local teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
-		local driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
-		local sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
+		local settings, serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier
 
-		this.connect(serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
+		if !this.Connected {
+			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+			serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
+			serverToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
+			teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
+			driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
+			sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
 
-		this.disconnect()
+			this.connect(serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
+
+			this.disconnect()
+		}
 	}
 
 	connect(serverURL, serverToken, team, driver, session, verbose := false) {
@@ -693,7 +702,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	getDriverForName(ignore := false) {
 		local driver
 
-		if (!this.iDriverForName && this.TeamServerActive) {
+		if (!this.iDriverForName && (ignore || this.TeamServerActive)) {
 			try {
 				if !this.iCachedObjects.HasKey(this.Driver)
 					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))

@@ -729,13 +729,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if this.Active {
 			if this.RaceAssistantEnabled {
 				if (this.RaceAssistant && !this.RaceAssistantActive) {
+					setConfigurationValue(configuration, "Assistants", this.Plugin, "Wait")
+
 					setConfigurationValue(configuration, this.Plugin, "State", "Active")
 
 					setConfigurationValue(configuration, this.Plugin, "Information"
-										, values2String("; ", translate("Started: ") . translate("No")
+										, values2String("; ", translate("Started: ") . translate("Yes")
 															, translate("Session: ") . translate("Waiting...")))
 				}
 				else if this.RaceAssistantActive {
+					setConfigurationValue(configuration, "Assistants", this.Plugin, "Active")
+
 					setConfigurationValue(configuration, this.Plugin, "State", "Active")
 
 					switch this.Session {
@@ -756,13 +760,17 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 															, translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo")))
 
 				}
-				else if this.WaitForShutdown {
-					setConfigurationValue(configuration, this.Plugin, "State", "Warning")
+				else {
+					setConfigurationValue(configuration, "Assistants", this.Plugin, "Passive")
 
-					setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("Waiting for shutdown..."))
+					if this.WaitForShutdown {
+						setConfigurationValue(configuration, this.Plugin, "State", "Warning")
+
+						setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("Waiting for shutdown..."))
+					}
+					else
+						setConfigurationValue(configuration, this.Plugin, "State", "Passive")
 				}
-				else
-					setConfigurationValue(configuration, this.Plugin, "State", "Passive")
 			}
 			else
 				setConfigurationValue(configuration, this.Plugin, "State", "Disabled")

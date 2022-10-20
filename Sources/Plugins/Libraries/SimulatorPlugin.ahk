@@ -451,27 +451,27 @@ class SimulatorPlugin extends ControllerPlugin {
 
 			if simulator {
 				if (this.Car && this.Track) {
-					setConfigurationValue(configuration, "Simulator", "State", "Active")
+					setConfigurationValue(configuration, "Simulation", "State", "Active")
 
-					setConfigurationValue(configuration, "Simulator", "Session", this.Session[true])
+					setConfigurationValue(configuration, "Simulation", "Session", this.Session[true])
 
 					sessionDB := new SessionDatabase()
 
 					car := sessionDB.getCarName(simulator, this.Car)
 					track := sessionDB.getTrackName(simulator, this.Track)
 
-					setConfigurationValue(configuration, "Simulator", "Car", car)
-					setConfigurationValue(configuration, "Simulator", "Track", track)
+					setConfigurationValue(configuration, "Simulation", "Simulator", simulator)
+					setConfigurationValue(configuration, "Simulation", "Car", car)
+					setConfigurationValue(configuration, "Simulation", "Track", track)
 
 					setConfigurationValue(configuration, this.Plugin, "Information"
 										, values2String("; ", translate("Simulator: ") . simulator
-															, translate("Car: ") . car, translate("Track: ") . track))
+															, translate("Car: ") . car
+															, translate("Track: ") . track))
 				}
 				else
-					setConfigurationValue(configuration, "Simulator", "State", "Passive")
+					setConfigurationValue(configuration, "Simulation", "State", "Passive")
 			}
-			else
-				setConfigurationValue(configuration, "Simulator", "State", "Disabled")
 		}
 		else
 			base.writePluginState(configuration)

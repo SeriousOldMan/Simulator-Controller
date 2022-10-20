@@ -2530,6 +2530,8 @@ class RaceSpotter extends RaceAssistant {
 
 		if joined
 			Task.startTask(ObjBindMethod(this, "updateSessionValues", {Running: true}), 10000)
+		else
+			this.updateSessionValues({Running: true})
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)

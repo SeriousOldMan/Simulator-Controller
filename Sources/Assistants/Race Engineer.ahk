@@ -93,13 +93,13 @@ startRaceEngineer() {
 	local remotePID := false
 	local engineerName := "Jona"
 	local engineerLogo := false
-	local engineerLanguage := "ES" ; false
+	local engineerLanguage := false
 	local engineerSynthesizer := true
-	local engineerSpeaker := true ; false
+	local engineerSpeaker := false
 	local engineerSpeakerVocalics := false
 	local engineerRecognizer := true
-	local engineerListener := true ; false
-	local debug := true ; false
+	local engineerListener := false
+	local debug := false
 	local voiceServer, index, engineer, label, callback
 
 	Menu Tray, Icon, %icon%, , 1

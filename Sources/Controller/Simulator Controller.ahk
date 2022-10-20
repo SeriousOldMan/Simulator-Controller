@@ -1199,12 +1199,12 @@ class SimulatorController extends ConfigurationItem {
 				setConfigurationValue(configuration, fnController.Type, fnController.Descriptor
 									, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
 													   , fnController.NumButtons, fnController.NumDials))
-
-			writeConfiguration(kUserConfigDirectory . "Simulator Controller.state", configuration)
 		}
 		catch exception {
 			logError(exception)
 		}
+
+		writeConfiguration(kUserConfigDirectory . "Simulator Controller.state", configuration)
 
 		if periodic {
 			Process Exist, System Monitor.exe

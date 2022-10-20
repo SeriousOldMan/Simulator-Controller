@@ -54,9 +54,104 @@ global kStateIcons := {Disabled: kIconsDirectory . "Black.ico"
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+getTableCSS() {
+	local script
+
+	script =
+	(
+		.table-std, .th-std, .td-std {
+			border-collapse: collapse;
+			padding: .3em .5em;
+		}
+
+		.th-std, .td-std {
+			text-align: center;
+		}
+
+		.th-std, .caption-std {
+			background-color: #BBB;
+			color: #000;
+			border: thin solid #BBB;
+		}
+
+		.td-std {
+			border-left: thin solid #BBB;
+			border-right: thin solid #BBB;
+		}
+
+		.th-left {
+			text-align: left;
+		}
+
+		tfoot {
+			border-bottom: thin solid #BBB;
+		}
+
+		.caption-std {
+			font-size: 1.5em;
+			border-radius: .5em .5em 0 0;
+			padding: .5em 0 0 0
+		}
+
+		.table-std tbody tr:nth-child(even) {
+			background-color: #D8D8D8;
+		}
+
+		.table-std tbody tr:nth-child(odd) {
+			background-color: #D0D0D0;
+		}
+	)
+
+	return script
+}
+
+updateDashboard(viewer, html := "") {
+	local tableCSS := getTableCSS()
+	local script, ignore, chart
+
+	if (html == false)
+		html := ""
+
+	script =
+	(
+		<meta charset='utf-8'>
+		<head>
+			<style>
+				.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+				.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+				.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+				%tableCSS%
+			</style>
+		</head>
+	)
+
+	html := ("<html>" . script . "<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+
+	viewer.Document.Open()
+	viewer.Document.Write(html)
+	viewer.Document.Close()
+}
+
+global simulationDashboard
+global assistantsDashboard
+global sessionDashboard
+global dataDashboard
+global automationDashboard
+global mapperDashboard
+
+global simulationState
+global assistantsState
+global sessionState
+global dataState
+global automationState
+global mapperState
+
 systemMonitor(command := false, arguments*) {
 	local x, y, time, logLevel, defaultGui, defaultListView
 	local controllerState, ignore, plugin, icons, plugins, key, value, icon, state, property
+	local drivers
+
+	static monitorTabView
 
 	static stateIconsList := false
 	static stateIcons := {}
@@ -68,6 +163,12 @@ systemMonitor(command := false, arguments*) {
 	static serverDriver := ""
 	static serverTeam := ""
 	static serverSession := ""
+
+	static driversListView
+
+	static stintNr := ""
+	static stintLap := ""
+	static stintDriver := ""
 
 	static result := false
 	static first := true
@@ -91,7 +192,34 @@ systemMonitor(command := false, arguments*) {
 
 	if (command = kClose)
 		result := kClose
-	else if (command = "UpdateModuleState") {
+	else if (command = "UpdateDashboard") {
+		defaultGui := A_DefaultGui
+
+		Gui SM:Default
+
+		try {
+			GuiControlGet monitorTabView
+
+			if (monitorTabView = 1) {
+				controllerState := getControllerState()
+
+				updateSimulationState(controllerState)
+				updateAssistsantsState(controllerState)
+				updateSessionState(controllerState)
+				updateDataState(controllerState)
+				updateAutomationState(controllerState)
+				updateMapperState(controllerState)
+			}
+		}
+		catch exception {
+			logError(exception)
+		}
+		finally {
+			Gui %defaultGui%:Default
+		}
+
+	}
+	else if (command = "UpdateModules") {
 		defaultGui := A_DefaultGui
 
 		Gui SM:Default
@@ -101,47 +229,51 @@ systemMonitor(command := false, arguments*) {
 		Gui ListView, % stateListView
 
 		try {
-			controllerState := getControllerState()
+			GuiControlGet monitorTabView
 
-			icons := []
-			plugins := []
-			messages := []
+			if (monitorTabView = 2) {
+				controllerState := getControllerState()
 
-			for ignore, plugin in string2Values("|", getConfigurationValue(controllerState, "Plugins", "Plugins")) {
-				if plugin {
-					state := getConfigurationValue(controllerState, plugin, "State")
+				icons := []
+				plugins := []
+				messages := []
 
-					if stateIcons.HasKey(state)
-						icons.Push(stateIcons[state])
-					else
-						icons.Push(stateIcons["Unknown"])
+				for ignore, plugin in string2Values("|", getConfigurationValue(controllerState, "Plugins", "Plugins")) {
+					if plugin {
+						state := getConfigurationValue(controllerState, plugin, "State")
 
-					plugins.Push(translate(plugin))
+						if stateIcons.HasKey(state)
+							icons.Push(stateIcons[state])
+						else
+							icons.Push(stateIcons["Unknown"])
 
-					messages.Push(getConfigurationValue(controllerState, plugin, "Information", ""))
-				}
-			}
+						plugins.Push(translate(plugin))
 
-			if (!statePlugins || !listEqual(plugins, statePlugins)) {
-				LV_Delete()
-
-				LV_SetImageList(stateIconsList)
-
-				for ignore, plugin in plugins
-					LV_Add("Icon" . icons[A_Index], "    " . plugin, messages[A_Index])
-
-				LV_ModifyCol()
-				LV_ModifyCol(1, "AutoHdr")
-
-				statePlugins := plugins
-			}
-			else
-				for ignore, plugin in plugins {
-					LV_Modify(A_Index, "Icon" . icons[A_Index])
-					LV_Modify(A_Index, "Col2", messages[A_Index])
+						messages.Push(getConfigurationValue(controllerState, plugin, "Information", ""))
+					}
 				}
 
-			LV_ModifyCol(2, "AutoHdr")
+				if (!statePlugins || !listEqual(plugins, statePlugins)) {
+					LV_Delete()
+
+					LV_SetImageList(stateIconsList)
+
+					for ignore, plugin in plugins
+						LV_Add("Icon" . icons[A_Index], "    " . plugin, messages[A_Index])
+
+					LV_ModifyCol()
+					LV_ModifyCol(1, "AutoHdr")
+
+					statePlugins := plugins
+				}
+				else
+					for ignore, plugin in plugins {
+						LV_Modify(A_Index, "Icon" . icons[A_Index])
+						LV_Modify(A_Index, "Col2", messages[A_Index])
+					}
+
+				LV_ModifyCol(2, "AutoHdr")
+			}
 		}
 		catch exception {
 			logError(exception)
@@ -151,69 +283,104 @@ systemMonitor(command := false, arguments*) {
 			Gui ListView, %defaultListView%
 		}
 	}
-	else if (command = "UpdateServerState") {
-		serverURL := ""
-		serverToken := ""
-		serverDriver := ""
-		serverTeam := ""
-		serverSession := ""
+	else if (command = "UpdateServer") {
+		serverURL := translate("Not connectced")
+		serverToken := translate("Not connectced")
+		serverDriver := translate("Not connectced")
+		serverTeam := translate("Not connectced")
+		serverSession := translate("Not connectced")
+
+		stintNr := translate("Not started")
+		stintLap := translate("Not started")
+		stintDriver := translate("Not started")
+
+		drivers := []
 
 		defaultGui := A_DefaultGui
 
 		Gui SM:Default
 
+		defaultListView := A_DefaultListView
+
+		Gui ListView, % driversListView
+
 		try {
-			controllerState := getControllerState()
+			GuiControlGet monitorTabView
 
-			if (controllerState.Count() > 0) {
-				state := getConfigurationValue(controllerState, "Team Server", "State", "Unknown")
+			if (monitorTabView = 3) {
+				controllerState := getControllerState()
 
-				if kStateIcons.HasKey(state)
-					icon := kStateIcons[state]
-				else
-					icon := kStateIcons["Unknown"]
+				if (controllerState.Count() > 0) {
+					state := getConfigurationValue(controllerState, "Team Server", "State", "Unknown")
 
-				GuiControl, , serverState, %icon%
+					if kStateIcons.HasKey(state)
+						icon := kStateIcons[state]
+					else
+						icon := kStateIcons["Unknown"]
 
-				if ((state != "Unknown") && (state != "Disabled")) {
-					state := {}
+					GuiControl, , serverState, %icon%
 
-					for ignore, property in string2Values(";", getConfigurationValue(controllerState, "Team Server", "Properties")) {
-						property := StrSplit(property, ":", " `t", 2)
+					if ((state != "Unknown") && (state != "Disabled")) {
+						state := {}
 
-						state[property[1]] := property[2]
-					}
+						for ignore, property in string2Values(";", getConfigurationValue(controllerState, "Team Server", "Properties")) {
+							property := StrSplit(property, ":", " `t", 2)
 
-					for key, value in state {
-						if (value = "Invalid")
-							value := translate("Not valid")
-						else if (value = "Mismatch")
-							value := translate("No match")
+							state[property[1]] := property[2]
+						}
 
-						switch key {
-							case "ServerURL":
-								serverURL := value
-							case "SessionToken":
-								serverToken := value
-							case "Driver":
-								serverDriver := value
-							case "Team":
-								serverTeam := value
-							case "Session":
-								serverSession := value
+						for key, value in state {
+							if (value = "Invalid")
+								value := translate("Not valid")
+							else if (value = "Mismatch")
+								value := translate("No match")
+
+							switch key {
+								case "ServerURL":
+									serverURL := value
+								case "SessionToken":
+									serverToken := value
+								case "Driver":
+									serverDriver := value
+								case "Team":
+									serverTeam := value
+								case "Session":
+									serverSession := value
+								case "Drivers":
+									drivers := string2Values("|", value)
+								case "StintNr":
+									stintNr := value
+								case "StintLap":
+									stintLap := value
+								case "StintDriver":
+									stintDriver := value
+							}
 						}
 					}
 				}
-			}
 
-			GuiControl, , serverURL, %serverURL%
-			GuiControl, , serverToken, %serverToken%
-			GuiControl, , serverDriver, %serverDriver%
-			GuiControl, , serverTeam, %serverTeam%
-			GuiControl, , serverSession, %serverSession%
+				GuiControl, , serverURL, %serverURL%
+				GuiControl, , serverToken, %serverToken%
+				GuiControl, , serverDriver, %serverDriver%
+				GuiControl, , serverTeam, %serverTeam%
+				GuiControl, , serverSession, %serverSession%
+				GuiControl, , stintNr, %stintNr%
+				GuiControl, , stintLap, %stintLap%
+				GuiControl, , stintDriver, %stintDriver%
+
+				LV_Delete()
+
+				for ignore, driver in drivers
+					LV_Add("", driver, (driver = stintDriver) ? translate("x") : "")
+
+				LV_ModifyCol()
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+			}
 		}
 		finally {
 			Gui %defaultGui%:Default
+			Gui ListView, %defaultListView%
 		}
 	}
 	else if (command = "LogMessage") {
@@ -294,44 +461,120 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x8 yp+26 w790 0x10
 
-		Gui SM:Add, Tab3, x16 yp+14 w773 h375 -Wrap Section, % values2String("|", map(["State", "Team Server", "Processes", "Logs"], "translate")*)
+		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", map(["Dashboard", "Details", "Server", "Logs"], "translate")*)
 
 		Gui Tab, 1
 
-		Gui SM:Add, ListView, x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDstateListView gnoSelect, % values2String("|", map(["Module", "Information"], "translate")*)
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Font, Italic, Arial
+		Gui SM:Add, GroupBox, -Theme x24 ys+28 w375 h9, % translate("Simulation")
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Add, Picture, x34 ys+73 w32 h32 vsimulationState, % kIconsDirectory . "Black.ico"
+		Gui SM:Add, ActiveX, x144 ys+46 w250 h90 vsimulationDashboard, shell.explorer
+		simulationDashboard.Navigate("about:blank")
+
+		Gui SM:Font, Italic, Arial
+		Gui SM:Add, GroupBox, -Theme x405 ys+28 w375 h9, % translate("Assistants")
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Add, Picture, x415 ys+73 w32 h32 vassistantsState, % kIconsDirectory . "Black.ico"
+		Gui SM:Add, ActiveX, x525 ys+46 w250 h90 vassistantsDashboard, shell.explorer
+		assistantsDashboard.Navigate("about:blank")
+
+		Gui SM:Font, Italic, Arial
+		Gui SM:Add, GroupBox, -Theme x24 ys+138 w375 h9, % translate("Team Session")
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Add, Picture, x34 ys+183 w32 h32 vsessionState, % kIconsDirectory . "Black.ico"
+		Gui SM:Add, ActiveX, x144 ys+156 w250 h90 vsessionDashboard, shell.explorer
+		sessionDashboard.Navigate("about:blank")
+
+		Gui SM:Font, Italic, Arial
+		Gui SM:Add, GroupBox, -Theme x405 ys+138 w375 h9, % translate("Data Synchronization")
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Add, Picture, x415 ys+183 w32 h32 vdataState, % kIconsDirectory . "Black.ico"
+		Gui SM:Add, ActiveX, x525 ys+156 w250 h90 vdataDashboard, shell.explorer
+		dataDashboard.Navigate("about:blank")
+
+		Gui SM:Font, Italic, Arial
+		Gui SM:Add, GroupBox, -Theme x24 ys+248 w375 h9, % translate("Track Automation")
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Add, Picture, x34 ys+293 w32 h32 vautomationState, % kIconsDirectory . "Black.ico"
+		Gui SM:Add, ActiveX, x144 ys+266 w250 h90 vautomationDashboard, shell.explorer
+		automationDashboard.Navigate("about:blank")
+
+		Gui SM:Font, Italic, Arial
+		Gui SM:Add, GroupBox, -Theme x405 ys+248 w375 h9, % translate("Track Mapping")
+		Gui SM:Font, s8 Norm, Arial
+
+		Gui SM:Add, Picture, x415 ys+293 w32 h32 vmapperState, % kIconsDirectory . "Black.ico"
+		Gui SM:Add, ActiveX, x525 ys+266 w250 h90 vmapperDashboard, shell.explorer
+		mapperDashboard.Navigate("about:blank")
 
 		Gui Tab, 2
 
+		Gui SM:Add, ListView, x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDstateListView gnoSelect, % values2String("|", map(["Module", "Information"], "translate")*)
+
+		Gui Tab, 3
+
 		Gui SM:Font, s10 Bold, Arial
 
-		Gui SM:Add, Text, x24 ys+30 w120 h30, % translate("State")
-		Gui SM:Add, Picture, x155 yp-2 w24 h24 vServerState
+		; Gui SM:Add, Text, x24 ys+120 w120 h30, % translate("Connection")
+		Gui SM:Add, Picture, x180 ys+95 w64 h64 vServerState, % kIconsDirectory . "Black.ico"
 
 		Gui SM:Font, s8 Norm, Arial
 
-		Gui SM:Font, Norm, Arial
 		Gui SM:Font, Italic, Arial
 
-		Gui SM:Add, GroupBox, -Theme x24 ys+60 w360 h150, % translate("Connection")
+		Gui SM:Add, GroupBox, -Theme x405 ys+60 w375 h150, % translate("Connection")
 
 		Gui SM:Font, Norm, Arial
 
-		Gui SM:Add, Text, x32 yp+21 w120, % translate("Server URL")
-		Gui SM:Add, Text, x155 yp w220 vserverURL
+		Gui SM:Add, Text, x413 yp+21 w120, % translate("Server URL")
+		Gui SM:Add, Text, x528 yp w230 vserverURL
 
-		Gui SM:Add, Text, x32 yp+24 w120, % translate("Session Token")
-		Gui SM:Add, Text, x155 yp w220 vserverToken
+		Gui SM:Add, Text, x413 yp+24 w120, % translate("Session Token")
+		Gui SM:Add, Text, x528 yp w230 vserverToken
 
-		Gui SM:Add, Text, x32 yp+28 w120, % translate("Team")
-		Gui SM:Add, Text, x155 yp w220 vserverTeam
+		Gui SM:Add, Text, x413 yp+28 w120, % translate("Team")
+		Gui SM:Add, Text, x528 yp w230 vserverTeam
 
-		Gui SM:Add, Text, x32 yp+24 w120, % translate("Driver")
-		Gui SM:Add, Text, x155 yp w220 vserverDriver
+		Gui SM:Add, Text, x413 yp+24 w120, % translate("Driver")
+		Gui SM:Add, Text, x528 yp w230 vserverDriver
 
-		Gui SM:Add, Text, x32 yp+24 w120, % translate("Session")
-		Gui SM:Add, Text, x155 yp w220 vserverSession
+		Gui SM:Add, Text, x413 yp+24 w120, % translate("Session")
+		Gui SM:Add, Text, x528 yp w230 vserverSession
+
+		Gui SM:Font, Italic, Arial
+
+		Gui SM:Add, GroupBox, -Theme x24 ys+220 w375 h9, % translate("Drivers")
+
+		Gui SM:Font, Norm, Arial
+
+		Gui SM:Add, ListView, x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdriversListView gnoSelect, % values2String("|", map(["Driver", "Active"], "translate")*)
+
+		Gui SM:Font, Italic, Arial
+
+		Gui SM:Add, GroupBox, -Theme x405 ys+220 w375 h142, % translate("Stint")
+
+		Gui SM:Font, Norm, Arial
+
+		Gui SM:Add, Text, x413 yp+28 w120, % translate("Stint")
+		Gui SM:Add, Text, x528 yp w230 vstintNr
+
+		Gui SM:Add, Text, x413 yp+24 w120, % translate("Lap")
+		Gui SM:Add, Text, x528 yp w230 vstintLap
+
+		Gui SM:Add, Text, x413 yp+24 w120, % translate("Driver")
+		Gui SM:Add, Text, x528 yp w230 vstintDriver
 
 		Gui Tab, 4
+
+		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, ListView, x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlogMessageListView gnoSelect, % values2String("|", map(["Application", "Time", "Category", "Message"], "translate")*)
 
@@ -355,8 +598,16 @@ systemMonitor(command := false, arguments*) {
 		else
 			Gui SM:Show
 
-		new PeriodicTask(Func("systemMonitor").Bind("UpdateModuleState"), 2000, kLowPriority).start()
-		new PeriodicTask(Func("systemMonitor").Bind("UpdateServerState"), 5000, kLowPriority).start()
+		updateDashboard(simulationDashboard)
+		updateDashboard(assistantsDashboard)
+		updateDashboard(sessionDashboard)
+		updateDashboard(dataDashboard)
+		updateDashboard(automationDashboard)
+		updateDashboard(mapperDashboard)
+
+		new PeriodicTask(Func("systemMonitor").Bind("UpdateDashboard"), 2000, kLowPriority).start()
+		new PeriodicTask(Func("systemMonitor").Bind("UpdateModules"), 2000, kLowPriority).start()
+		new PeriodicTask(Func("systemMonitor").Bind("UpdateServer"), 5000, kLowPriority).start()
 
 		loop
 			Sleep 100
@@ -385,12 +636,91 @@ noSelect() {
 		LV_Modify(A_Index, "-Select")
 }
 
+updateSimulationState(controllerState) {
+	local state := getConfigurationValue(controllerState, "Simulation", "State", "Disabled")
+	local html, icon
+
+	if kStateIcons.HasKey(state)
+		icon := kStateIcons[state]
+	else
+		icon := kStateIcons["Unknown"]
+
+	GuiControl, , simulationState, %icon%
+
+	if (state = "Active") {
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Car") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Track") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(getConfigurationValue(controllerState, "Simulation", "Session")) . "</td></tr>")
+		html .= "</table>"
+	}
+	else
+		html := ""
+
+	updateDashboard(simulationDashboard, html)
+}
+
+updateAssistsantsState(controllerState) {
+}
+
+updateSessionState(controllerState) {
+	local state := getConfigurationValue(controllerState, "Team Server", "State", "Disabled")
+	local html, icon, ignore, property, key, value
+
+	if kStateIcons.HasKey(state)
+		icon := kStateIcons[state]
+	else
+		icon := kStateIcons["Unknown"]
+
+	GuiControl, , sessionState, %icon%
+
+	if ((state != "Unknown") && (state != "Disabled")) {
+		state := {}
+
+		for ignore, property in string2Values(";", getConfigurationValue(controllerState, "Team Server", "Properties")) {
+			property := StrSplit(property, ":", " `t", 2)
+
+			state[property[1]] := property[2]
+		}
+
+		for key, value in state
+			if (value = "Invalid")
+				value := translate("Not valid")
+			else if (value = "Mismatch")
+				value := translate("No match")
+
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . state["ServerURL"] . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . state["SessionToken"] . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Team:") . "</b></td><td>" . state["Team"] . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Driver:") . "</b></td><td>" . state["Driver"] . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . state["Session"] . "</td></tr>")
+		html .= "</table>"
+	}
+	else
+		html := ""
+
+	updateDashboard(sessionDashboard, html)
+}
+
+updateDataState(controllerState) {
+}
+
+updateAutomationState(controllerState) {
+}
+
+updateMapperState(controllerState) {
+}
+
+
 startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, System Monitor
+
+	fixIE(11)
 
 	registerMessageHandler("Monitor", "monitorMessageHandler")
 

@@ -50,6 +50,8 @@ class TeamServerPlugin extends ControllerPlugin {
 	iSession := false
 	iSessionName := ""
 
+	iCachedObjects := {}
+
 	iDriverForName := false
 	iDriverSurName := false
 	iDriverNickName := false
@@ -375,6 +377,63 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.logFunctionNotFound(actionFunction)
 	}
 
+	writeDriversState(state) {
+		local connectedDrivers := []
+		local ignore, connection
+
+		if (this.TeamServerActive && this.SessionActive)
+			try {
+				for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
+					if !this.iCachedObjects.HasKey(connection)
+						this.iCachedObjects[connection] := this.parseObject(this.Connector.GetConnection(connection))
+
+					connection := this.iCachedObjects[connection]
+
+					if (connection.Name && (connection.Name != "") && (connection.Type = "Driver"))
+						connectedDrivers.Push(connection.Name)
+				}
+
+				state.Push("Drivers: " . values2String("|", connectedDrivers))
+			}
+			catch exception {
+				logError(exception)
+			}
+	}
+
+	writeStintState(state) {
+		local stint, lap, driver
+
+		if (this.TeamServerActive && this.SessionActive)
+			try {
+				stint := this.Connector.GetSessionCurrentStint(this.Session)
+
+				if (stint && (stint != "")) {
+					if !this.iCachedObjects.HasKey(stint)
+						this.iCachedObjects[stint] := this.parseObject(this.Connector.GetStint(stint))
+
+					lap := this.Connector.GetSessionLastLap(this.Session)
+
+					if !this.iCachedObjects.HasKey(lap)
+						this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
+
+					driver := this.Connector.GetStintDriver(this.Session)
+
+					if !this.iCachedObjects.HasKey(driver)
+						this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
+
+					state.Push("StintNr: " . this.iCachedObjects[stint].Nr)
+					state.Push("StintLap: " . this.iCachedObjects[lap].Nr)
+
+					driver := this.iCachedObjects[driver]
+
+					state.Push("StintDriver: " . computeDriverName(driver.ForName, driver.SurName, driver.NickName))
+				}
+			}
+			catch exception {
+				logError(exception)
+			}
+	}
+
 	writePluginState(configuration) {
 		local key, value, teamServerState
 
@@ -410,6 +469,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				for key, value in this.State
 					teamServerState.Push(key . ": " . value)
+
+				this.writeDriversState(teamServerState)
+				this.writeStintState(teamServerState)
 
 				setConfigurationValue(configuration, this.Plugin, "Properties", values2String("; ", teamServerState*))
 			}
@@ -554,6 +616,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.setSession(team, driver, session)
 
+		this.iLastMessage := ""
+		this.iCachedObjects := {}
+
 		this.keepAlive()
 
 		if this.Connected {
@@ -588,6 +653,8 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.iLastMessage := ""
 
+			this.iCachedObjects := {}
+
 			this.keepAlive()
 		}
 	}
@@ -603,7 +670,12 @@ class TeamServerPlugin extends ControllerPlugin {
 				if stint is Integer
 					stint := this.Connector.GetSessionStint(session, stint)
 
-				driver := this.parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(stint)))
+				driver := this.Connector.GetStintDriver(stint)
+
+				if !this.iCachedObjects.HasKey(driver)
+					this.iCachedObjects[driver] := this.Connector.GetDriver(driver)
+
+				driver := this.iCachedObjects[driver]
 
 				return computeDriverName(driver.ForName, driver.SurName, driver.NickName)
 			}
@@ -623,7 +695,10 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (!this.iDriverForName && this.TeamServerActive) {
 			try {
-				driver := this.parseObject(this.Connector.GetDriver(this.Driver))
+				if !this.iCachedObjects.HasKey(this.Driver)
+					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
+
+				driver := this.iCachedObjects[this.Driver]
 
 				this.iDriverForName := driver.ForName
 				this.iDriverSurName := driver.SurName
@@ -663,7 +738,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.SessionActive
 			this.leaveSession()
 
-		if this.TeamServerActive && !this.SessionActive {
+		if (this.TeamServerActive && !this.SessionActive) {
 			if isDebug()
 				showMessage("Starting team session: " . car . ", " . track)
 
@@ -946,7 +1021,11 @@ class TeamServerPlugin extends ControllerPlugin {
 		if session {
 			try {
 				lap := this.Connector.GetSessionLastLap(session)
-				lapNr := this.parseObject(this.Connector.GetLap(lap)).Nr
+
+				if !this.iCachedObjects.HasKey(lap)
+					this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
+
+				lapNr := this.iCachedObjects[lap].Nr
 
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Fetching lap number (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Number: ") . lapNr . translate(")"))
@@ -1189,7 +1268,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						this.State["SessionToken"] := this.ServerToken
 
 						try {
-							this.iTeamName := this.parseObject(this.Connector.GetTeam(this.Team)).Name
+							if !this.iCachedObjects.HasKey(this.Team)
+								this.iCachedObjects[this.Team] := this.parseObject(this.Connector.GetTeam(this.Team))
+
+							this.iTeamName := this.iCachedObjects[this.Team].Name
 
 							this.State["Team"] := this.Team[true]
 						}
@@ -1200,7 +1282,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						}
 
 						try {
-							driverObject := this.parseObject(this.Connector.GetDriver(this.Driver))
+							if !this.iCachedObjects.HasKey(this.Driver)
+								this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
+
+							driverObject := this.iCachedObjects[this.Driver]
 							this.iDriverName := (driverObject.ForName . A_Space . driverObject.SurName)
 
 							this.State["Driver"] := this.Driver[true]
@@ -1212,7 +1297,10 @@ class TeamServerPlugin extends ControllerPlugin {
 						}
 
 						try {
-							this.iSessionName := this.parseObject(this.Connector.GetSession(this.Session)).Name
+							if !this.iCachedObjects.HasKey(this.Session)
+								this.iCachedObjects[this.Session] := this.parseObject(this.Connector.GetSession(this.Session))
+
+							this.iSessionName := this.iCachedObjects[this.Session].Name
 
 							this.State["Session"] := this.Session[true]
 						}

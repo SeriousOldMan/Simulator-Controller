@@ -1452,16 +1452,17 @@ synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronizat
 					for ignore, identifier in string2Values(";", drivers) {
 						modified := true
 
-						counter += 1
-
 						driver := parseData(connector.GetData("License", identifier))
 						driver.ID := ((driver.Driver = "") ? kNull : driver.Driver)
 						driver.Synchronized := timestamp
 
 						drivers := db.query("Drivers", {Where: {ID: driver.ID, Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname} })
 
-						if (drivers.Length() = 0)
+						if (drivers.Length() = 0) {
 							db.add("Drivers", driver)
+
+							counter += 1
+						}
 						else {
 							drivers[1].Identifier := driver.Identifier
 							drivers[1].Synchronized := timestamp
@@ -1477,15 +1478,15 @@ synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronizat
 						db.changed("Drivers")
 						modified := true
 
-						counter += 1
-
-						if (connector.CountData("License", "Identifier = '" . driver.Identifier . "'") = 0)
+						if (connector.CountData("License", "Identifier = '" . driver.Identifier . "'") = 0) {
 							connector.CreateData("License"
 											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
 																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
 																   , {Identifier: driver.Identifier, Simulator: simulator
 																    , Driver: driver.ID, Forname: driver.Forname
 																	, Surname: driver.Surname, Nickname: driver.Nickname}))
+							counter += 1
+						}
 					}
 				}
 				finally {

@@ -510,9 +510,7 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 								db.changed("Tyres.Pressures")
 								modified := true
 
-								counter += 1
-
-								if (connector.CountData("TyresPressures", "Identifier = '" . pressures.Identifier . "'") = 0)
+								if (connector.CountData("TyresPressures", "Identifier = '" . pressures.Identifier . "'") = 0) {
 									connector.CreateData("TyresPressures"
 													   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																		   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -541,6 +539,9 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 																			, ColdPressureFrontRight: pressures["Tyre.Pressure.Cold.Front.Right"]
 																			, ColdPressureRearLeft: pressures["Tyre.Pressure.Cold.Rear.Left"]
 																			, ColdPressureRearRight: pressures["Tyre.Pressure.Cold.Rear.Right"]}))
+
+									counter += 1
+								}
 							}
 
 							for ignore, identifier in string2Values(";"

@@ -500,7 +500,7 @@ systemMonitor(command := false, arguments*) {
 		assistantsDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x24 ys+138 w375 h9, % translate("Team")
+		Gui SM:Add, GroupBox, -Theme x24 ys+138 w375 h9, % translate("Team Session")
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x34 ys+183 w32 h32 vsessionState, % kIconsDirectory . "Black.ico"
@@ -787,7 +787,7 @@ updateDataState(databaseState) {
 					counter := getConfigurationValue(databaseState, "Database Synchronizer", "Counter", false)
 
 					if counter
-						action := substituteVariables(translate("Synchronizing database (%counter% objects transferred)..."), {counter: counter})
+						action := substituteVariables(translate("Synchronizing (%counter% objects transferred)..."), {counter: counter})
 					else
 						action := translate("Synchronizing database...")
 				case "Finished":

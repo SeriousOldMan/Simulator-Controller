@@ -1451,7 +1451,7 @@ class RaceSpotter extends RaceAssistant {
 		local trackBehind := false
 		local leader := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
-		local minute, rnd, phrase
+		local minute, rnd, phrase, bestLapTime
 
 		if (this.Session == kSessionRace)
 			if (lastLap == 2) {
@@ -1506,20 +1506,22 @@ class RaceSpotter extends RaceAssistant {
 				}
 
 				if (this.BestLapTime > 0) {
-					if (!this.SessionInfos.HasKey("BestLap") || (this.BestLapTime < this.SessionInfos["BestLap"])) {
-						lapTime := (this.BestLapTime / 1000)
+					bestLapTime := Round(this.BestLapTime, 2)
+
+					if (!this.SessionInfos.HasKey("BestLap") || (bestLapTime < this.SessionInfos["BestLap"])) {
+						lapTime := (bestLapTime / 1000)
 
 						minute := Floor(lapTime / 60)
 
 						speaker.speakPhrase("BestLap", {time: printNumber(lapTime, 1)
 													  , minute: minute, seconds: printNumber((lapTime - (minute * 60)), 1)})
 
-						this.SessionInfos["BestLap"] := this.BestLapTime
+						this.SessionInfos["BestLap"] := bestLapTime
 
 						return true
 					}
 					else
-						this.SessionInfos["BestLap"] := this.BestLapTime
+						this.SessionInfos["BestLap"] := bestLapTime
 				}
 			}
 

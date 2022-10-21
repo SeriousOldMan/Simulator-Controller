@@ -579,9 +579,7 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 								db.changed("Electronics")
 								modified := true
 
-								counter += 1
-
-								if (connector.CountData("Electronics", "Identifier = '" . telemetry.Identifier . "'") = 0)
+								if (connector.CountData("Electronics", "Identifier = '" . telemetry.Identifier . "'") = 0) {
 									connector.CreateData("Electronics"
 													   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																		   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -601,6 +599,9 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 																			, FuelRemaining: telemetry["Fuel.Remaining"]
 																			, LapTime: telemetry["Lap.Time"], Map: telemetry.Map
 																			, TC: telemetry.TC, ABS: telemetry.ABS}))
+
+									counter += 1
+								}
 							}
 
 							for ignore, identifier in string2Values(";"
@@ -647,9 +648,7 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 								db.changed("Tyres")
 								modified := true
 
-								counter += 1
-
-								if (connector.CountData("Tyres", "Identifier = '" . telemetry.Identifier . "'") = 0)
+								if (connector.CountData("Tyres", "Identifier = '" . telemetry.Identifier . "'") = 0) {
 									connector.CreateData("Tyres"
 													   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																		   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -688,6 +687,9 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 																			, WearFrontRight: telemetry["Tyre.Wear.Front.Right"]
 																			, WearRearLeft: telemetry["Tyre.Wear.Rear.Left"]
 																			, WearRearRight: telemetry["Tyre.Wear.Rear.Right"]}))
+
+									counter += 1
+								}
 							}
 
 							for ignore, identifier in string2Values(";"

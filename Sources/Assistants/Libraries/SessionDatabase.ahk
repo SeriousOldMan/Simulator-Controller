@@ -177,7 +177,7 @@ class SessionDatabase extends ConfigurationItem {
 								}
 
 								if connector
-									new PeriodicTask(Func("keepAlive").Bind(connector, connection), 5000, kInterruptPriority).start()
+									new PeriodicTask(Func("keepAlive").Bind(connector, connection), 10000, kInterruptPriority).start()
 							}
 							else
 								connector := false
@@ -1249,7 +1249,7 @@ class SessionDatabase extends ConfigurationItem {
 			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Waiting")
 			}
 		}
-		else if (info = "Schedule") {
+		else if (info = "Synchronize") {
 			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
 
 			rebuild := arguments[1]
@@ -1259,6 +1259,7 @@ class SessionDatabase extends ConfigurationItem {
 																	: translate("Synchronizing database...")))
 
 			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Running")
+			setConfigurationValue(configuration, "Database Synchronizer", "Counter", (arguments.Length() > 1) ? arguments[2] : false)
 		}
 		else if (info = "Success") {
 			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
@@ -1345,12 +1346,20 @@ computeDriverName(forName, surName, nickName) {
 	return Trim(name)
 }
 
+updateSynchronizationState(sessionDB, rebuild) {
+	sessionDB.writeDatabaseState("Synchronize", rebuild, synchronizeDatabase("Counter"))
+}
+
 synchronizeDatabase(rebuild := false) {
 	local sessionDB := new SessionDatabase()
 	local connector := sessionDB.Connector
-	local timestamp, simulators, ignore, synchronizer
+	local timestamp, simulators, ignore, synchronizer, synchronizeTask
 
 	static stateTask := false
+	static counter := 0
+
+	if (rebuild = "Counter")
+		return counter
 
 	if !stateTask {
 		stateTask := new PeriodicTask(ObjBindMethod(sessionDB, "writeDatabaseState", "State"), 10000)
@@ -1364,19 +1373,25 @@ synchronizeDatabase(rebuild := false) {
 		try {
 			stateTask.stop()
 
-			try {
-				sessionDB.writeDatabaseState("Schedule", rebuild)
+			counter := 0
 
+			synchronizeTask := new PeriodicTask(Func("updateSynchronizationState").Bind(sessionDB, rebuild), 1000, kInterruptPriority)
+
+			synchronizeTask.start()
+
+			try {
 				simulators := sessionDB.getSimulators()
 				timestamp := connector.GetServerTimestamp()
 				lastSynchronization := (!rebuild ? sessionDB.Synchronization : false)
 
 				for ignore, synchronizer in sessionDB.Synchronizers
-					%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization)
+					%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, counter)
 
 				sessionDB.Synchronization := connector.GetServerTimestamp()
 			}
 			finally {
+				synchronizeTask.stop()
+
 				stateTask.start()
 			}
 		}
@@ -1417,7 +1432,7 @@ parseData(properties) {
 	return result
 }
 
-synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronization, force) {
+synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
 	local ignore, simulator, db, modified, identifier, driver, drivers
 
 	try {
@@ -1434,6 +1449,8 @@ synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronizat
 
 					for ignore, identifier in string2Values(";", drivers) {
 						modified := true
+
+						counter += 1
 
 						driver := parseData(connector.GetData("License", identifier))
 						driver.ID := ((driver.Driver = "") ? kNull : driver.Driver)
@@ -1457,6 +1474,8 @@ synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronizat
 
 						db.changed("Drivers")
 						modified := true
+
+						counter += 1
 
 						if (connector.CountData("License", "Identifier = '" . driver.Identifier . "'") = 0)
 							connector.CreateData("License"

@@ -554,7 +554,7 @@ removeInvalidLaps(rows) {
 	return result
 }
 
-synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchronization, force) {
+synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
 	local ignore, simulator, car, track, db, modified, identifier, telemetry, properties
 
 	try {
@@ -578,6 +578,8 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 
 								db.changed("Electronics")
 								modified := true
+
+								counter += 1
 
 								if (connector.CountData("Electronics", "Identifier = '" . telemetry.Identifier . "'") = 0)
 									connector.CreateData("Electronics"
@@ -608,6 +610,8 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 																									 . "Modified > " . lastSynchronization)) {
 								if (db.query("Electronics", {Where: {Identifier: identifier} }).Length() = 0) {
 									modified := true
+
+									counter += 1
 
 									telemetry := parseData(connector.GetData("Electronics", identifier))
 
@@ -642,6 +646,8 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 
 								db.changed("Tyres")
 								modified := true
+
+								counter += 1
 
 								if (connector.CountData("Tyres", "Identifier = '" . telemetry.Identifier . "'") = 0)
 									connector.CreateData("Tyres"
@@ -691,6 +697,8 @@ synchronizeTelemetry(sessionDB, connector, simulators, timestamp, lastSynchroniz
 																							   . "Modified > " . lastSynchronization)) {
 								if (db.query("Tyres", {Where: {Identifier: identifier} }).Length() = 0) {
 									modified := true
+
+									counter += 1
 
 									telemetry := parseData(connector.GetData("Tyres", identifier))
 

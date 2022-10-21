@@ -485,7 +485,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 }
 
-synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynchronization, force) {
+synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
 	local ignore, simulator, car, track, db, modified, identifier, pressures, properties
 
 	try {
@@ -509,6 +509,8 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 
 								db.changed("Tyres.Pressures")
 								modified := true
+
+								counter += 1
 
 								if (connector.CountData("TyresPressures", "Identifier = '" . pressures.Identifier . "'") = 0)
 									connector.CreateData("TyresPressures"
@@ -548,6 +550,8 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 																										. "Modified > " . lastSynchronization)) {
 								if (db.query("Tyres.Pressures", {Where: {Identifier: identifier} }).Length() = 0) {
 									modified := true
+
+									counter += 1
 
 									pressures := parseData(connector.GetData("TyresPressures", identifier))
 
@@ -594,6 +598,8 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 								db.changed("Tyres.Pressures.Distribution")
 								modified := true
 
+								counter += 1
+
 								if (connector.CountData("TyresPressuresDistribution", "Identifier = '" . identifier . "'") = 0)
 									identifier := false
 
@@ -622,6 +628,8 @@ synchronizeTyresPressures(sessionDB, connector, simulators, timestamp, lastSynch
 																													. "Modified > " . lastSynchronization)) {
 								db.changed("Tyres.Pressures.Distribution")
 								modified := true
+
+								counter += 1
 
 								pressures := parseData(connector.GetData("TyresPressuresDistribution", identifier))
 

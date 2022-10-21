@@ -752,7 +752,7 @@ updateSessionState(controllerState) {
 
 updateDataState(databaseState) {
 	local state := getConfigurationValue(databaseState, "Database Synchronizer", "State", "Disabled")
-	local html, icon, serverURL, serverToken, action
+	local html, icon, serverURL, serverToken, action, counter
 
 	if kStateIcons.HasKey(state)
 		icon := kStateIcons[state]
@@ -784,18 +784,23 @@ updateDataState(databaseState) {
 		if action {
 			switch action {
 				case "Running":
-					action := "Synchronizing database..."
+					counter := getConfigurationValue(databaseState, "Database Synchronizer", "Counter", false)
+
+					if counter
+						action := substituteVariables(translate("Synchronizing database (%counter% objects transferred)..."), {counter: counter})
+					else
+						action := translate("Synchronizing database...")
 				case "Finished":
-					action := "Finished synchronization..."
+					action := translate("Finished synchronization...")
 				case "Waiting":
-					action := "Waiting for next synchronization..."
+					action := translate("Waiting for next synchronization...")
 				case "Failed":
-					action := "Synchronization failed..."
+					action := translate("Synchronization failed...")
 				default:
 					throw "Unknown action detected in updateDataState..."
 			}
 
-			html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . translate(action) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
 		}
 
 		html .= "</table>"

@@ -56,6 +56,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 	iConnector := false
 	iToken := false
+	iInitialized := false
 
 	iTeams := {}
 	iSelectedTeam := false
@@ -81,6 +82,12 @@ class TeamServerConfigurator extends ConfigurationItem {
 	Token[] {
 		Get {
 			return this.iToken
+		}
+	}
+
+	Initialized[] {
+		Get {
+			return this.iInitialized
 		}
 	}
 
@@ -269,7 +276,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		teamServerURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "https://localhost:5001")
 		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
-		teamServerPasswordEdit := getConfigurationValue(configuration, "Team Server", "Account.Password", "")
+		this.iToken := getConfigurationValue(configuration, "Team Server", "Account.Token", "")
 		teamServerSessionTokenEdit := getConfigurationValue(configuration, "Team Server", "Session.Token", "")
 		teamServerDataTokenEdit := getConfigurationValue(configuration, "Team Server", "Data.Token", "")
 
@@ -301,7 +308,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		setConfigurationValue(configuration, "Team Server", "Session.Token", teamServerSessionTokenEdit)
 		setConfigurationValue(configuration, "Team Server", "Data.Token", teamServerDataTokenEdit)
 		setConfigurationValue(configuration, "Team Server", "Account.Name", teamServerNameEdit)
-		setConfigurationValue(configuration, "Team Server", "Account.Password", teamServerPasswordEdit)
+		setConfigurationValue(configuration, "Team Server", "Account.Token", this.Token)
 
 		setConfigurationValue(configuration, "Team Server", "Session.Folder", sessionStorePathEdit)
 
@@ -315,13 +322,15 @@ class TeamServerConfigurator extends ConfigurationItem {
 	activate() {
 		local window
 
-		if !this.Token {
+		if !this.Initialized {
+			this.iInitialized := true
+
 			window := this.Editor.Window
 
 			Gui %window%:+Disabled
 
 			try {
-				this.connect()
+				this.connect(true, true)
 			}
 			finally {
 				Gui %window%:-Disabled
@@ -329,7 +338,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	connect(message := true) {
+	connect(message := true, reconnect := false) {
 		local connector := this.Connector
 		local window := this.Editor.Window
 		local token, availableMinutes, title, sessionDB, connection
@@ -346,9 +355,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 			try {
 				connector.Initialize(teamServerURLEdit)
 
-				token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+				if (this.Token && (this.Token != "") && reconnect) {
+					connector.Token := this.Token
 
-				this.iToken := token
+					token := this.Token
+				}
+				else {
+					token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+
+					this.iToken := token
+				}
 
 				sessionDB := new SessionDatabase()
 

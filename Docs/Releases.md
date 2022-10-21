@@ -1,14 +1,18 @@
-## 4.4.0.0-release 10/21/22 (planned)
+## 4.4.0.0-release 10/21/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. The position on the screen where info and progress overlays are displayed, can now be configured in the [UI settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications).
   4. The session synchronization can be [temporarily disabled](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session) in the "Race Center", while you are working with the data.
   5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
-  6. New car models for "Setup Advisor":
+  6. A driver may be selected in "Session Database" when [looking for tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressure-advisor). This very helpful when looking for cold tyre pressures for your team mate during a team race.
+  7. Refactoring of the translation framework to better support the new Spanish translation.
+  8. Thanks to the great work of Jose Krilin, we have an initial version of a Spanish translation. The UI has been translated for the most part and will be polished in the next weeks and you can also expect a working version of the voice generation and recognition soon.
+  9. Fixed startup of Race Spotter in situations with a very short rolling or even a standing start.
+  10. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT RS VLN
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440), especially, if you are using or even hosting a Team Server.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
 
 ## 4.3.5.0-release 10/14/22
 

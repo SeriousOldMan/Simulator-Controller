@@ -5,6 +5,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <ActiveDebugProfile>TeamServer</ActiveDebugProfile>
-    <NameOfLastUsedPublishProfile>C:\Users\juwig\Documents\Development\Simulator-Controller\Sources\Special\Team Server\Team Server\Properties\PublishProfiles\sc-teamserver2-test - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\juwig\Documents\Development\Simulator-Controller\Sources\Special\Team Server\Team Server\Properties\PublishProfiles\vgr-teamserver - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

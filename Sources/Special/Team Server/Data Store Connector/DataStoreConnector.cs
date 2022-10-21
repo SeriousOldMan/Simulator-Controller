@@ -26,7 +26,7 @@ namespace TeamServer {
 			}
 		}
 
-		string Server = "";
+		string ServerURL = "";
 
 		public string Token { get; set; } = "";
 		
@@ -35,9 +35,12 @@ namespace TeamServer {
 		}
 
 		public void Initialize(string url, string token = null) {
-			Server = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
+			ServerURL = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
 
-			Token = "";
+			if (token != null)
+				Token = token;
+			else
+				Token = "";
 		}
 
 		#region Requests
@@ -75,7 +78,7 @@ namespace TeamServer {
 			if (arguments.Length > 0)
 				arguments = "?" + arguments;
 
-			return Server + request + arguments;
+			return ServerURL + request + arguments;
 		}
 
 		public string Get(string request, Parameters arguments = null, string body = null) {

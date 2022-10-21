@@ -159,9 +159,9 @@ class SessionDatabase extends ConfigurationItem {
 					}
 
 					if connector {
-						connector.Initialize(this.ServerURL)
+						connector.Initialize(this.ServerURL, this.ServerToken)
 
-						connector.Token := this.ServerToken
+						temp := connector.Token
 
 						try {
 							connection := connector.Connect(this.ServerToken, this.ID, this.getUserName())
@@ -171,6 +171,8 @@ class SessionDatabase extends ConfigurationItem {
 									connector.ValidateDataToken()
 								}
 								catch exception {
+									logError(exception)
+
 									connector := false
 
 									throw exception

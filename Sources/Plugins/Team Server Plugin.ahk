@@ -1261,9 +1261,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.State["ServerURL"] := "Invalid"
 					this.State["SessionToken"] := "Invalid"
 
-					this.Connector.Initialize(this.ServerURL)
-
-					this.Connector.Token := this.ServerToken
+					this.Connector.Initialize(this.ServerURL, this.ServerToken)
 
 					this.State["Team"] := "Invalid"
 					this.State["Driver"] := "Invalid"

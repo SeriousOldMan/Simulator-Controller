@@ -49,6 +49,7 @@ global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname", "Id
 
 class SessionDatabase extends ConfigurationItem {
 	static sConfiguration := false
+	static sControllerState := false
 
 	static sCarData := {}
 	static sTrackData := {}
@@ -63,8 +64,6 @@ class SessionDatabase extends ConfigurationItem {
 	static sConnected := false
 
 	static sSynchronizers := []
-
-	iControllerState := false
 
 	iUseCommunity := false
 
@@ -270,7 +269,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	ControllerState[] {
 		Get {
-			return this.iControllerState
+			return SessionDatabase.sControllerState
 		}
 	}
 
@@ -295,11 +294,20 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	__New(controllerState := false) {
-		local identifier
+	__New() {
+		local identifier, controllerState
 
 		if !SessionDatabase.sConfiguration
 			SessionDatabase.sConfiguration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		if !SessionDatabase.sControllerState {
+			controllerState := getControllerState()
+
+			if !controllerState
+				controllerState := {}
+
+			SessionDatabase.sControllerState := controllerState
+		}
 
 		if !this.ID {
 			FileRead identifier, % kUserConfigDirectory . "ID"
@@ -308,15 +316,6 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		base.__New(SessionDatabase.sConfiguration)
-
-		if !controllerState {
-			controllerState := getControllerState()
-
-			if !controllerState
-				controllerState := {}
-		}
-
-		this.iControllerState := controllerState
 	}
 
 	loadFromConfiguration(configuration) {

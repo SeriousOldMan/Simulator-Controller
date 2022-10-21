@@ -2245,8 +2245,14 @@ removeConfigurationSection(configuration, section) {
 		configuration.Delete(section)
 }
 
-getControllerState(configuration := false) {
+getControllerState(configuration := "__Undefined__") {
+	local load := true
 	local pid, tries, options, exePath, fileName
+
+	if (configuration == false)
+		load := false
+	else if (configuration = kUndefined)
+		configuration := false
 
 	Process Exist, Simulator Controller.exe
 

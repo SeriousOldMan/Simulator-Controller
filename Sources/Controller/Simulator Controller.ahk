@@ -1193,7 +1193,7 @@ class SimulatorController extends ConfigurationItem {
 				thePlugin.writePluginState(configuration)
 			}
 
-			setConfigurationValue(configuration, "Plugins", "Plugins", values2String("|", getKeys(plugins)*))
+			setConfigurationValue(configuration, "Modules", "Plugins", values2String("|", getKeys(plugins)*))
 
 			for ignore, fnController in this.FunctionController
 				setConfigurationValue(configuration, fnController.Type, fnController.Descriptor

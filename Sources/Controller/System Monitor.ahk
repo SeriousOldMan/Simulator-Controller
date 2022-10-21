@@ -34,6 +34,7 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Messages.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -201,7 +202,7 @@ systemMonitor(command := false, arguments*) {
 			GuiControlGet monitorTabView
 
 			if (monitorTabView = 1) {
-				controllerState := getControllerState()
+				controllerState := getControllerState(false)
 				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
 
 				updateSimulationState(controllerState)
@@ -233,14 +234,14 @@ systemMonitor(command := false, arguments*) {
 			GuiControlGet monitorTabView
 
 			if (monitorTabView = 2) {
-				controllerState := getControllerState()
+				controllerState := getControllerState(false)
 				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
 
 				icons := []
 				modules := []
 				messages := []
 
-				for ignore, plugin in string2Values("|", getConfigurationValue(controllerState, "Plugins", "Plugins")) {
+				for ignore, plugin in string2Values("|", getConfigurationValue(controllerState, "Modules", "Plugins")) {
 					if plugin {
 						state := getConfigurationValue(controllerState, plugin, "State")
 
@@ -323,7 +324,7 @@ systemMonitor(command := false, arguments*) {
 			GuiControlGet monitorTabView
 
 			if (monitorTabView = 3) {
-				controllerState := getControllerState()
+				controllerState := getControllerState(false)
 
 				if (controllerState.Count() > 0) {
 					state := getConfigurationValue(controllerState, "Team Server", "State", "Unknown")
@@ -731,9 +732,9 @@ updateSessionState(controllerState) {
 
 		for key, value in state
 			if (value = "Invalid")
-				value := translate("Not valid")
+				state[key] := translate("Not valid")
 			else if (value = "Mismatch")
-				value := translate("No match")
+				state[key] := translate("No match")
 
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . state["ServerURL"] . "</td></tr>")
@@ -811,7 +812,6 @@ updateAutomationState(controllerState) {
 updateMapperState(controllerState) {
 }
 
-
 startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch
@@ -822,6 +822,8 @@ startSystemMonitor() {
 	fixIE(11)
 
 	registerMessageHandler("Monitor", "monitorMessageHandler")
+
+	new SessionDatabase() ; so that file Simulator Controller.state can be deleted...
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")

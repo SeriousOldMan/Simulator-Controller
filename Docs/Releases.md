@@ -1,4 +1,4 @@
-## 4.4.0.0-release 10/21/22 (planned)
+## 4.4.0.0-release 10/21/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. The position on the screen where info and progress overlays are displayed, can now be configured in the [UI settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications).

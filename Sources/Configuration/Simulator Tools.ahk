@@ -1669,6 +1669,11 @@ updateInstallationForV392() {
 	}
 }
 
+updateConfigurationForV441() {
+	deleteFile(kUserConfigDirectory . "Simulator Controller.config")
+	deleteFile(kUserConfigDirectory . "Simulator Controller.status")
+}
+
 updateConfigurationForV430() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readConfiguration(userConfigurationFile)

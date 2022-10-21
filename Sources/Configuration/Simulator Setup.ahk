@@ -732,7 +732,7 @@ class SetupWizard extends ConfigurationItem {
 
 					writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 
-					deleteFile(kUserConfigDirectory . "Simulator Controller.state")
+					deleteFile(kTempDirectory . "Simulator Controller.state")
 
 					startupLink := A_Startup . "\Simulator Startup.lnk"
 

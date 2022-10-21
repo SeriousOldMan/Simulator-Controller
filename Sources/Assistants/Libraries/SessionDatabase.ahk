@@ -60,6 +60,8 @@ class SessionDatabase extends ConfigurationItem {
 	static sServerURL := "__Undefined__"
 	static sServerToken := "__Undefined__"
 
+	static sConnected := false
+
 	static sSynchronizers := []
 
 	iControllerState := false
@@ -129,8 +131,15 @@ class SessionDatabase extends ConfigurationItem {
 			local connector := false
 			local dllName, dllFile, connection
 
-			if (SessionDatabase.sConnector == kUndefined)
+			static retry := 0
+
+			if (this.ServerURL && !SessionDatabase.sConnector && (A_TickCount > retry))
+				SessionDatabase.sConnector := kUndefined
+
+			if (SessionDatabase.sConnector == kUndefined) {
 				if this.ServerURL {
+					retry := (A_TickCount + 10000)
+
 					dllName := "Data Store Connector.dll"
 					dllFile := kBinariesDirectory . dllName
 
@@ -155,21 +164,32 @@ class SessionDatabase extends ConfigurationItem {
 
 						connector.Token := this.ServerToken
 
-						connection := connector.Connect(this.ServerToken, this.ID, this.getUserName())
+						try {
+							connection := connector.Connect(this.ServerToken, this.ID, this.getUserName())
 
-						if (connection && (connection != "")) {
-							try {
-								connector.ValidateDataToken()
+							if (connection && (connection != "")) {
+								try {
+									connector.ValidateDataToken()
+								}
+								catch exception {
+									connector := false
+
+									throw exception
+								}
+
+								if connector
+									new PeriodicTask(Func("keepAlive").Bind(connector, connection), 5000, kInterruptPriority).start()
 							}
-							catch exception {
+							else
 								connector := false
-							}
-
-							if connector
-								new PeriodicTask(Func("keepAlive").Bind(connector, connection), 120000, kInterruptPriority).start()
 						}
-						else
+						catch exception {
+							logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL
+												   . translate(", Token: ") . this.ServerToken
+												   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
 							connector := false
+						}
 					}
 
 					SessionDatabase.sConnector := connector
@@ -177,7 +197,20 @@ class SessionDatabase extends ConfigurationItem {
 				else
 					SessionDatabase.sConnector := false
 
+				this.Connected := (SessionDatabase.sConnector != false)
+			}
+
 			return SessionDatabase.sConnector
+		}
+	}
+
+	Connected[] {
+		Get {
+			return SessionDatabase.sConnected
+		}
+
+		Set {
+			return (SessionDatabase.sConnected := value)
 		}
 	}
 
@@ -1172,6 +1205,84 @@ class SessionDatabase extends ConfigurationItem {
 
 		deleteFile(fileName)
 	}
+
+	writeDatabaseState(info, arguments*) {
+		local configuration := newConfiguration()
+		local exception, rebuild
+
+		setConfigurationValue(configuration, "Database Synchronizer", "ServerURL", this.ServerURL)
+		setConfigurationValue(configuration, "Database Synchronizer", "ServerToken", this.ServerToken)
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Connected", this.Connected)
+
+		setConfigurationValue(configuration, "Database Synchronizer", "UserID", this.ID)
+		setConfigurationValue(configuration, "Database Synchronizer", "DatabaseID", this.DatabaseID)
+
+		if ((info = "State") || !this.Connector) {
+			if !this.ServerURL
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Disabled")
+			else if (this.ID != this.DatabaseID) {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Warning")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Cannot synchronize a database from another user..."))
+			}
+			else if !this.Connector {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Cannot connect to the Team Server (URL: ") . this.ServerURL
+															 . translate(", Token: ") . this.ServerToken . translate(")"))
+			}
+			else if !this.Connected {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Lost connection to the Team Server (URL: ") . this.ServerURL
+															 . translate(", Token: ") . this.ServerToken . translate(")"))
+			}
+			else {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Waiting for next synchronization..."))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Waiting")
+			}
+		}
+		else if (info = "Schedule") {
+			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+			rebuild := arguments[1]
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+								, translate("Message: ") . (rebuild ? translate("Rebuilding database...")
+																	: translate("Synchronizing database...")))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Running")
+		}
+		else if (info = "Success") {
+			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+								, translate("Message: ") . translate("Synchronization finished..."))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
+		}
+		else if (info = "Error") {
+			setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+
+			exception := arguments[1]
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+								, translate("Error: ") . translate("Synchronization failed (Exception: ")
+													   . (IsObject(exception) ? exception.Message : exception) . translate(")"))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Failed")
+		}
+
+		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+	}
 }
 
 
@@ -1240,26 +1351,45 @@ synchronizeDatabase(rebuild := false) {
 	local connector := sessionDB.Connector
 	local timestamp, simulators, ignore, synchronizer
 
+	static stateTask := false
+
+	if !stateTask {
+		stateTask := new PeriodicTask(ObjBindMethod(sessionDB, "writeDatabaseState", "State"), 10000)
+
+		stateTask.start()
+	}
+
 	sessionDB.UseCommunity := false
 
 	if ((sessionDB.ID = sessionDB.DatabaseID) && connector) {
 		try {
-			simulators := sessionDB.getSimulators()
-			timestamp := connector.GetServerTimestamp()
-			lastSynchronization := (!rebuild ? sessionDB.Synchronization : false)
+			stateTask.stop()
 
-			for ignore, synchronizer in sessionDB.Synchronizers
-				%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization)
+			try {
+				sessionDB.writeDatabaseState("Schedule", rebuild)
 
-			sessionDB.Synchronization := connector.GetServerTimestamp()
+				simulators := sessionDB.getSimulators()
+				timestamp := connector.GetServerTimestamp()
+				lastSynchronization := (!rebuild ? sessionDB.Synchronization : false)
 
-			hideProgress()
+				for ignore, synchronizer in sessionDB.Synchronizers
+					%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization)
+
+				sessionDB.Synchronization := connector.GetServerTimestamp()
+			}
+			finally {
+				stateTask.start()
+			}
 		}
 		catch exception {
 			logError(exception)
 
+			sessionDB.writeDatabaseState("Error", exception)
+
 			return false
 		}
+
+		sessionDB.writeDatabaseState("Success")
 
 		return true
 	}
@@ -1349,7 +1479,7 @@ synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronizat
 }
 
 keepAlive(connector, connection) {
-	connector.KeepAlive(connection)
+	SessionDatabase.Connected := connector.KeepAlive(connection)
 }
 
 

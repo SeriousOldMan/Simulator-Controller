@@ -2252,7 +2252,7 @@ getControllerState(configuration := false) {
 
 	pid := ErrorLevel
 
-	if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.state")))
+	if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
 		try {
 			if configuration {
 				fileName := temporaryFileName("Config", "ini")
@@ -2292,7 +2292,7 @@ getControllerState(configuration := false) {
 		}
 
 
-	return readConfiguration(kUserConfigDirectory . "Simulator Controller.state")
+	return readConfiguration(kTempDirectory . "Simulator Controller.state")
 }
 
 getControllerActionLabels() {

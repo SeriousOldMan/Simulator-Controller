@@ -1204,7 +1204,7 @@ class SimulatorController extends ConfigurationItem {
 			logError(exception)
 		}
 
-		writeConfiguration(kUserConfigDirectory . "Simulator Controller.state", configuration)
+		writeConfiguration(kTempDirectory . "Simulator Controller.state", configuration)
 
 		if periodic {
 			Process Exist, System Monitor.exe

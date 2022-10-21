@@ -148,14 +148,14 @@ global mapperState
 
 systemMonitor(command := false, arguments*) {
 	local x, y, time, logLevel, defaultGui, defaultListView
-	local controllerState, ignore, plugin, icons, plugins, key, value, icon, state, property
+	local controllerState, databaseState, ignore, plugin, icons, modules, key, value, icon, state, property
 	local drivers
 
 	static monitorTabView
 
 	static stateIconsList := false
 	static stateIcons := {}
-	static statePlugins := false
+	static stateModules := false
 
 	static serverState
 	static serverURL := ""
@@ -202,11 +202,12 @@ systemMonitor(command := false, arguments*) {
 
 			if (monitorTabView = 1) {
 				controllerState := getControllerState()
+				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
 
 				updateSimulationState(controllerState)
 				updateAssistantsState(controllerState)
 				updateSessionState(controllerState)
-				updateDataState(controllerState)
+				updateDataState(databaseState)
 				updateAutomationState(controllerState)
 				updateMapperState(controllerState)
 			}
@@ -233,9 +234,10 @@ systemMonitor(command := false, arguments*) {
 
 			if (monitorTabView = 2) {
 				controllerState := getControllerState()
+				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
 
 				icons := []
-				plugins := []
+				modules := []
 				messages := []
 
 				for ignore, plugin in string2Values("|", getConfigurationValue(controllerState, "Plugins", "Plugins")) {
@@ -247,27 +249,40 @@ systemMonitor(command := false, arguments*) {
 						else
 							icons.Push(stateIcons["Unknown"])
 
-						plugins.Push(translate(plugin))
+						modules.Push(translate(plugin))
 
 						messages.Push(getConfigurationValue(controllerState, plugin, "Information", ""))
 					}
 				}
 
-				if (!statePlugins || !listEqual(plugins, statePlugins)) {
+				if (databaseState.Count() > 0) {
+					state := getConfigurationValue(databaseState, "Database Synchronizer", "State")
+
+					if stateIcons.HasKey(state)
+						icons.Push(stateIcons[state])
+					else
+						icons.Push(stateIcons["Unknown"])
+
+					modules.Push(translate("Database Synchronizer"))
+
+					messages.Push(getConfigurationValue(databaseState, "Database Synchronizer", "Information", ""))
+				}
+
+				if (!stateModules || !listEqual(modules, stateModules)) {
 					LV_Delete()
 
 					LV_SetImageList(stateIconsList)
 
-					for ignore, plugin in plugins
+					for ignore, plugin in modules
 						LV_Add("Icon" . icons[A_Index], "    " . plugin, messages[A_Index])
 
 					LV_ModifyCol()
 					LV_ModifyCol(1, "AutoHdr")
 
-					statePlugins := plugins
+					stateModules := modules
 				}
 				else
-					for ignore, plugin in plugins {
+					for ignore, plugin in modules {
 						LV_Modify(A_Index, "Icon" . icons[A_Index])
 						LV_Modify(A_Index, "Col2", messages[A_Index])
 					}
@@ -461,7 +476,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x8 yp+26 w790 0x10
 
-		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", map(["Dashboard", "Details", "Server", "Logs"], "translate")*)
+		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", map(["Dashboard", "Modules", "Server", "Logs"], "translate")*)
 
 		Gui Tab, 1
 
@@ -734,7 +749,60 @@ updateSessionState(controllerState) {
 	updateDashboard(sessionDashboard, html)
 }
 
-updateDataState(controllerState) {
+updateDataState(databaseState) {
+	local state := getConfigurationValue(databaseState, "Database Synchronizer", "State", "Disabled")
+	local html, icon, serverURL, serverToken, action
+
+	if kStateIcons.HasKey(state)
+		icon := kStateIcons[state]
+	else
+		icon := kStateIcons["Unknown"]
+
+	GuiControl, , dataState, %icon%
+
+	if ((state != "Unknown") && (state != "Disabled")) {
+		if !getConfigurationValue(databaseState, "Database Synchronizer", "Connected", true) {
+			serverURL := translate("Not valid")
+			serverToken := translate("Not valid")
+		}
+		else {
+			serverURL := getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL")
+			serverToken := getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken")
+		}
+
+		action := getConfigurationValue(databaseState, "Database Synchronizer", "Synchronization", false)
+
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . serverURL . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>"
+							   . getConfigurationValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Database:") . "</b></td><td>"
+							   . getConfigurationValue(databaseState, "Database Synchronizer", "DatabaseID") . "</td></tr>")
+
+		if action {
+			switch action {
+				case "Running":
+					action := "Synchronizing database..."
+				case "Finished":
+					action := "Finished synchronization..."
+				case "Waiting":
+					action := "Waiting for next synchronization..."
+				case "Failed":
+					action := "Synchronization failed..."
+				default:
+					throw "Unknown action detected in updateDataState..."
+			}
+
+			html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . translate(action) . "</td></tr>")
+		}
+
+		html .= "</table>"
+	}
+	else
+		html := ""
+
+	updateDashboard(dataDashboard, html)
 }
 
 updateAutomationState(controllerState) {
@@ -755,7 +823,8 @@ startSystemMonitor() {
 
 	registerMessageHandler("Monitor", "monitorMessageHandler")
 
-	deleteFile(kUserConfigDirectory . "Simulator Controller.state")
+	deleteFile(kTempDirectory . "Simulator Controller.state")
+	deleteFile(kTempDirectory . "Database Synchronizer.state")
 
 	systemMonitor()
 

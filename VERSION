@@ -1,7 +1,7 @@
 [Development]
 Version=4.4.5.0-dev
 Target=4.4.5.0-release
-Date=10/28/2022
+Date=10/22/2022
 Download=
 Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database"
 [Release]

@@ -506,7 +506,7 @@ restartSettings:
 			checked := coreDescriptor[2]
 
 			if (index == 1)
-				coreOption := coreOption . " YP+20 XP+10"
+				coreOption := coreOption . " YP+20 X20"
 
 			Gui SE:Add, CheckBox, %coreOption% Checked%checked% vcoreVariable%index%, %coreLabel%
 		}
@@ -527,7 +527,7 @@ restartSettings:
 				checked := feedbackDescriptor[2]
 
 				if (index == 1)
-					feedbackOption := feedbackOption . " YP+20 XP+10"
+					feedbackOption := feedbackOption . " YP+20 X20"
 
 				Gui SE:Add, CheckBox, %feedbackOption% Checked%checked% vfeedbackVariable%index%, %feedbackLabel%
 			}
@@ -565,23 +565,23 @@ restartSettings:
 
 		Gui SE:Font, Norm, Arial
 
-		Gui SE:Add, CheckBox, YP+20 XP+10 Checked%trayTip% vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
+		Gui SE:Add, CheckBox, X20 YP+20 Checked%trayTip% Section vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
 		disabled := !trayTip ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipDuration HwndtrayTipDurationInput, %trayTipDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, X20 YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
+		Gui SE:Add, CheckBox, XS YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
 		disabled := !trayTipSimulation ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipSimulationDuration HwndtrayTipSimulationDurationInput, %trayTipSimulationDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, X20 YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
+		Gui SE:Add, CheckBox, XS YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
 		disabled := !buttonBox ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxDuration HwndbuttonBoxDurationInput, %buttonBoxDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, X20 YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
+		Gui SE:Add, CheckBox, XS YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
 		disabled := !buttonBoxSimulation ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxSimulationDuration HwndbuttonBoxSimulationDurationInput, %buttonBoxSimulationDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, Text, X20 YP+30, % translate("Button Box Position")
+		Gui SE:Add, Text, XS YP+30, % translate("Button Box Position")
 
 		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
@@ -591,7 +591,7 @@ restartSettings:
 
 		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
 
-		Gui SE:Add, Text, X20 YP+30, % translate("Overlay Position")
+		Gui SE:Add, Text, XS YP+30, % translate("Overlay Position")
 
 		choices := ["Top", "Bottom"]
 		chosen := inList(choices, popupPosition)

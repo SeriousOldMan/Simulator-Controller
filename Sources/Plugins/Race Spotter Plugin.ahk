@@ -243,6 +243,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 			trayMessage(label, translate("State: On"))
 
+			if this.Simulator
+				this.Simulator.resetTrackAutomation()
+
 			this.iTrackAutomationEnabled := true
 
 			this.updateAutomationTrayLabel(label, true)
@@ -261,6 +264,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			this.shutdownTrackAutomation()
 
 			this.updateAutomationTrayLabel(label, false)
+
+			if this.Simulator
+				this.Simulator.resetTrackAutomation()
 		}
 	}
 

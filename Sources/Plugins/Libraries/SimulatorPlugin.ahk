@@ -276,7 +276,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		Set {
 			if (value != this.iCar)
-				this.iTrackAutomation := kUndefined
+				this.resetTrackAutomation()
 
 			this.iCommandDelay := kUndefined
 
@@ -291,7 +291,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		Set {
 			if (value != this.iTrack)
-				this.iTrackAutomation := kUndefined
+				this.resetTrackAutomation()
 
 			this.iCommandDelay := kUndefined
 
@@ -945,6 +945,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 		else
 			return false
+	}
+
+	resetTrackAutomation() {
+		this.iTrackAutomation := kUndefined
 	}
 
 	triggerAction(actionNr, positionX, positionY) {

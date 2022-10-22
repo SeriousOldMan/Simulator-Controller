@@ -282,6 +282,17 @@ systemMonitor(command := false, arguments*) {
 
 				messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
 
+				state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
+
+				if stateIcons.HasKey(state)
+					icons.Push(stateIcons[state])
+				else
+					icons.Push(stateIcons["Unknown"])
+
+				modules.Push(translate("Track Automation"))
+
+				messages.Push(getConfigurationValue(controllerState, "Track Automation", "Information", ""))
+
 				if (!stateModules || !listEqual(modules, stateModules)) {
 					LV_Delete()
 
@@ -313,11 +324,11 @@ systemMonitor(command := false, arguments*) {
 		}
 	}
 	else if (command = "UpdateServer") {
-		serverURL := translate("Not connectced")
-		serverToken := translate("Not connectced")
-		serverDriver := translate("Not connectced")
-		serverTeam := translate("Not connectced")
-		serverSession := translate("Not connectced")
+		serverURL := translate("Not connected")
+		serverToken := translate("Not connected")
+		serverDriver := translate("Not connected")
+		serverTeam := translate("Not connected")
+		serverSession := translate("Not connected")
 
 		stintNr := translate("Not started")
 		stintLap := translate("Not started")
@@ -699,7 +710,7 @@ updateSimulationState(controllerState) {
 	}
 	else if (state = "Passive") {
 		html := "<table>"
-		html .= ("<tr><td>" . translate("Waiting for session...") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . translate("Waiting for session...") . "</td></tr>")
 		html .= "</table>"
 	}
 	else
@@ -856,7 +867,7 @@ updateAutomationState(controllerState) {
 	if ((state != "Unknown") && (state != "Disabled")) {
 		if (state = "Passive") {
 			html := "<table>"
-			html .= ("<tr><td>" . translate("Waiting for session...") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . translate("Waiting for session...") . "</td></tr>")
 			html .= "</table>"
 		}
 		else {

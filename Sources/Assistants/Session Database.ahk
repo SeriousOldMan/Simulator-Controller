@@ -3629,13 +3629,14 @@ showSettings() {
 
 editSettings(editorOrCommand) {
 	local title, window, x, y, done, configuration, dllName, dllFile, connector, connection
-	local directory, empty, original, changed
+	local directory, empty, original, changed, groups, replication
 
 	static result := false
 	static sessionDB := false
 
 	static databaseLocationEdit := ""
-	static useTeamServerCheck
+	static synchTelemetryCheck
+	static synchPressuresCheck
 	static serverURLEdit := ""
 	static serverTokenEdit := ""
 	static serverUpdateEdit := 0
@@ -3735,9 +3736,10 @@ editSettings(editorOrCommand) {
 		}
 	}
 	else if (editorOrCommand = "UpdateState") {
-		GuiControlGet useTeamServerCheck
+		GuiControlGet synchTelemetryCheck
+		GuiControlGet synchPressuresCheck
 
-		if useTeamServerCheck {
+		if (synchTelemetryCheck || synchPressuresCheck) {
 			GuiControl Enable, serverURLEdit
 			GuiControl Enable, serverTokenEdit
 			GuiControl Enable, serverUpdateEdit
@@ -3775,14 +3777,22 @@ editSettings(editorOrCommand) {
 
 		databaseLocationEdit := normalizeDirectoryPath(getConfigurationValue(configuration, "Database", "Path", kDatabaseDirectory))
 
-		useTeamServerCheck := getConfigurationValue(configuration, "Team Server", "Replication", false)
+		replication := getConfigurationValue(configuration, "Team Server", "Replication", false)
+		groups := string2Values(",", getConfigurationValue(configuration, "Team Server", "Groups", ""))
 
-		if useTeamServerCheck {
+		if (groups.Length() > 0) {
+			synchTelemetryCheck := (inList(groups, "Telemetry") != false)
+			synchPressuresCheck := (inList(groups, "Pressures") != false)
+		}
+		else {
+			synchTelemetryCheck := (replication != false)
+			synchPressuresCheck := (replication != false)
+		}
+
+		if (synchTelemetryCheck || synchPressuresCheck) {
 			serverURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "")
 			serverTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
-			serverUpdateEdit := useTeamServerCheck
-
-			useTeamServerCheck := true
+			serverUpdateEdit := replication
 		}
 		else {
 			serverURLEdit := ""
@@ -3819,9 +3829,11 @@ editSettings(editorOrCommand) {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Synchronization")
-		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vuseTeamServerCheck gupdateSettingsState, % translate("Telemetry Data")
+		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vsynchTelemetryCheck gupdateSettingsState, % translate("Telemetry Data")
+		Gui %window%:Add, CheckBox, x146 yp+24 w246 h21 vsynchPressuresCheck gupdateSettingsState, % translate("Pressures Data")
 
-		GuiControl, , useTeamServerCheck, %useTeamServerCheck%
+		GuiControl, , synchTelemetryCheck, %synchTelemetryCheck%
+		GuiControl, , synchPressuresCheck, %synchPressuresCheck%
 
 		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Server URL")
 		Gui %window%:Add, Edit, x146 yp+1 w246 vserverURLEdit, %serverURLEdit%
@@ -3860,7 +3872,8 @@ editSettings(editorOrCommand) {
 				done := true
 			else if (result == kOk) {
 				GuiControlGet databaseLocationEdit
-				GuiControlGet useTeamServerCheck
+				GuiControlGet synchTelemetryCheck
+				GuiControlGet synchPressuresCheck
 				GuiControlGet serverURLEdit
 				GuiControlGet serverTokenEdit
 				GuiControlGet serverUpdateEdit
@@ -3946,10 +3959,27 @@ editSettings(editorOrCommand) {
 
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-				if (changed
-				 || ((getConfigurationValue(configuration, "Team Server", "Replication", false) != false) != useTeamServerCheck)
-				 || (getConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
-				 || (getConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
+				if !changed {
+					groups := getConfigurationValue(configuration, "Team Server", "Groups", kUndefined)
+
+					if (groups != kUndefined) {
+						groups := string2Values(",", groups)
+
+						if (synchTelemetryCheck && synchPressuresCheck)
+							changed := (!inList(groups, "Telemetry") || !inList(groups, "Pressures"))
+						else if synchTelemetryCheck
+							changed := !inList(groups, "Telemetry")
+						else if synchPressuresCheck
+							changed := !inList(groups, "Pressures")
+						else
+							changed := (groups.Length() != 0)
+					}
+					else
+						changed := ((getConfigurationValue(configuration, "Team Server", "Replication", false) != false) != synchTelemetryCheck)
+				}
+
+				if (changed || (getConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
+							|| (getConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
 					changed := true
 
 					setConfigurationValue(configuration, "Team Server", "Synchronization", false)
@@ -3959,9 +3989,20 @@ editSettings(editorOrCommand) {
 					setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
 				}
 
-				setConfigurationValue(configuration, "Team Server", "Replication", useTeamServerCheck ? serverUpdateEdit : false)
-				setConfigurationValue(configuration, "Team Server", "Server.URL", useTeamServerCheck ? serverURLEdit : "")
-				setConfigurationValue(configuration, "Team Server", "Server.Token", useTeamServerCheck ? serverTokenEdit : "")
+				groups := []
+
+				if synchTelemetryCheck
+					groups.Push("Telemetry")
+
+				if synchPressuresCheck
+					groups.Push("Pressures")
+
+				replication := (synchTelemetryCheck || synchPressuresCheck)
+
+				setConfigurationValue(configuration, "Team Server", "Groups", values2String(",", groups*))
+				setConfigurationValue(configuration, "Team Server", "Replication", replication ? serverUpdateEdit : false)
+				setConfigurationValue(configuration, "Team Server", "Server.URL", replication ? serverURLEdit : "")
+				setConfigurationValue(configuration, "Team Server", "Server.Token", replication ? serverTokenEdit : "")
 
 				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 

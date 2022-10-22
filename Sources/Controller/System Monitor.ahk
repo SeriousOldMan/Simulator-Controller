@@ -477,7 +477,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x8 yp+26 w790 0x10
 
-		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", map(["Dashboard", "Modules", "Server", "Logs"], "translate")*)
+		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", map(["Dashboard", "Modules", "Team Session", "Logs"], "translate")*)
 
 		Gui Tab, 1
 
@@ -539,14 +539,14 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Font, s10 Bold, Arial
 
-		; Gui SM:Add, Text, x24 ys+120 w120 h30, % translate("Connection")
-		Gui SM:Add, Picture, x180 ys+95 w64 h64 vServerState, % kIconsDirectory . "Black.ico"
+		Gui SM:Add, Text, x160 ys+28 w104 h30 Center, % translate("State")
+		Gui SM:Add, Picture, x180 ys+75 w64 h64 vServerState, % kIconsDirectory . "Black.ico"
 
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Font, Italic, Arial
 
-		Gui SM:Add, GroupBox, -Theme x405 ys+60 w375 h150, % translate("Connection")
+		Gui SM:Add, GroupBox, -Theme x405 ys+28 w375 h150, % translate("Connection")
 
 		Gui SM:Font, Norm, Arial
 
@@ -567,7 +567,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Font, Italic, Arial
 
-		Gui SM:Add, GroupBox, -Theme x24 ys+220 w375 h9, % translate("Drivers")
+		Gui SM:Add, GroupBox, -Theme x24 ys+188 w375 h9, % translate("Drivers")
 
 		Gui SM:Font, Norm, Arial
 
@@ -575,7 +575,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Font, Italic, Arial
 
-		Gui SM:Add, GroupBox, -Theme x405 ys+220 w375 h142, % translate("Stint")
+		Gui SM:Add, GroupBox, -Theme x405 ys+188 w375 h142, % translate("Stint")
 
 		Gui SM:Font, Norm, Arial
 

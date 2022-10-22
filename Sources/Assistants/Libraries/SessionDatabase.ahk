@@ -590,7 +590,8 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		return FileExist(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		return (this.hasTrackMap(simulator, track)
+			 && FileExist(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations"))
 	}
 
 	getTrackAutomations(simulator, car, track) {
@@ -599,7 +600,10 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		return this.loadTrackAutomations(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		if this.hasTrackMap(simulator, track)
+			return this.loadTrackAutomations(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		else
+			return []
 	}
 
 	getTrackAutomation(simulator, car, track, name := false) {

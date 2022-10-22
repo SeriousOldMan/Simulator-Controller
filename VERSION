@@ -1,6 +1,6 @@
 [Development]
-Version=4.5.0.0-dev
-Target=4.5.0.0-release
+Version=4.4.5.0-dev
+Target=4.4.5.0-release
 Date=10/28/2022
 Download=
 Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database"
@@ -13,4 +13,4 @@ Changes=Full revision of Team Server, Telemetry data can be synchronized with th
 Type=Development
 [Version]
 Release=4.4.0.0-release
-Development=4.5.0.0-dev
+Development=4.4.5.0-dev

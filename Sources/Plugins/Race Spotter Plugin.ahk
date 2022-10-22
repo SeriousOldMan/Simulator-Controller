@@ -541,10 +541,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	shutdownTrackMapper(force := false) {
 		local pid, processName, tries
 
-		if (this.iMapperPID && (this.iMapperPhase = "Collect")) {
+		if (force || (this.iMapperPID && (this.iMapperPhase = "Collect"))) {
 			pid := this.iMapperPID
 
-			if pid {
+			if (force || pid) {
 				Process Close, %pid%
 
 				Sleep 500

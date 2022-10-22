@@ -1,4 +1,4 @@
-## 4.5.0.0-release 10/28/22 (planned)
+## 4.4.5.0-release 10/28/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Telemetry and pressures synchronization can be choosen separately in the "Session Database".

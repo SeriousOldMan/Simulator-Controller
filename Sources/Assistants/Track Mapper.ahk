@@ -87,6 +87,8 @@ createTrackImage(trackMap) {
 
 		lastX := x
 		lastY := y
+
+		Sleep 1
 	}
 
 	Gdip_DrawLine(graphics, pen, lastX, lastY, firstX, firstY)
@@ -130,7 +132,7 @@ createTrackMap(simulator, track, fileName) {
 
 		Sleep 1
 
-		if (Floor(A_Index / 100) = A_Index) {
+		if (Mod(A_Index, 100) = 0) {
 			setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
 			writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
@@ -171,7 +173,7 @@ createTrackMap(simulator, track, fileName) {
 
 			Sleep 1
 
-			if (Floor(A_Index / 100) = A_Index) {
+			if (Mod(A_Index, 100) = 0) {
 				setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
 				writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
@@ -210,7 +212,7 @@ createTrackMap(simulator, track, fileName) {
 
 				Sleep 1
 
-				if (Floor(A_Index / 100) = A_Index) {
+				if (Mod(A_Index, 100) = 0) {
 					setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
 					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
@@ -238,7 +240,7 @@ createTrackMap(simulator, track, fileName) {
 
 				Sleep 1
 
-				if (Floor(A_Index / 100) = A_Index) {
+				if (Mod(A_Index, 100) = 0) {
 					setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
 					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
@@ -263,7 +265,7 @@ createTrackMap(simulator, track, fileName) {
 
 			Sleep 1
 
-			if (Floor(A_Index / 100) = A_Index) {
+			if (Mod(A_Index, 100) = 0) {
 				setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
 				writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)

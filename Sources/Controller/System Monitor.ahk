@@ -211,7 +211,7 @@ systemMonitor(command := false, arguments*) {
 				updateSessionState(controllerState)
 				updateDataState(databaseState)
 				updateAutomationState(controllerState)
-				updateMapperState(controllerState)
+				updateMapperState(trackMapperState)
 			}
 		}
 		catch exception {
@@ -684,7 +684,7 @@ updateSimulationState(controllerState) {
 	}
 	else if (state = "Passive") {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Waiting for simulation...") . "</td></tr>")
+		html .= ("<tr><td>" . translate("Waiting for session...") . "</td></tr>")
 		html .= "</table>"
 	}
 	else
@@ -839,9 +839,9 @@ updateAutomationState(controllerState) {
 	GuiControl, , automationState, %icon%
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		if (state = "Passive")
+		if (state = "Passive") {
 			html := "<table>"
-			html .= ("<tr><td><b>" . translate("Waiting for simulation...") . "</td></tr>")
+			html .= ("<tr><td>" . translate("Waiting for session...") . "</td></tr>")
 			html .= "</table>"
 		}
 		else {
@@ -856,7 +856,7 @@ updateAutomationState(controllerState) {
 			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>"
 								   . getConfigurationValue(controllerState, "Track Automation", "Car") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
-								   . getConfigurationValue(controllerState, "TrackAutomation", "Track") . "</td></tr>")
+								   . getConfigurationValue(controllerState, "Track Automation", "Track") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Automation:") . "</b></td><td>" . automation . "</td></tr>")
 			html .= "</table>"
 		}
@@ -876,16 +876,16 @@ updateMapperState(trackMapperState) {
 	else
 		icon := kStateIcons["Unknown"]
 
-	GuiControl, , dataState, %icon%
+	GuiControl, , mapperState, %icon%
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		action := getConfigurationValue(databaseState, "Track Mapper", "Action", "Waiting")
+		action := getConfigurationValue(trackMapperState, "Track Mapper", "Action", "Waiting")
 
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"
-							   . getConfigurationValue(databaseState, "Track Mapper", "Simulator") . "</td></tr>")
+							   . getConfigurationValue(trackMapperState, "Track Mapper", "Simulator") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
-							   . getConfigurationValue(databaseState, "Track Mapper", "Track") . "</td></tr>")
+							   . getConfigurationValue(trackMapperState, "Track Mapper", "Track") . "</td></tr>")
 
 		switch action {
 			case "Waiting":
@@ -910,7 +910,7 @@ updateMapperState(trackMapperState) {
 				throw "Unknown action detected in updateDataState..."
 		}
 
-		action := substituteVariables(action, {points: getConfigurationValue(databaseState, "Track Mapper", "Points", 0)})
+		action := substituteVariables(action, {points: getConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)})
 
 		html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
 		html .= "</table>"
@@ -918,7 +918,7 @@ updateMapperState(trackMapperState) {
 	else
 		html := ""
 
-	updateDashboard(dataDashboard, html)
+	updateDashboard(mapperDashboard, html)
 }
 
 startSystemMonitor() {

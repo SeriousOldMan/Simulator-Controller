@@ -269,6 +269,12 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	Groups[] {
+		Get {
+			return string2Values(",", getConfigurationValue(this.Configuration, "Team Server", "Groups", "Telemetry, Pressures"))
+		}
+	}
+
 	ControllerState[] {
 		Get {
 			return SessionDatabase.sControllerState
@@ -1387,7 +1393,7 @@ synchronizeDatabase(rebuild := false) {
 				lastSynchronization := (!rebuild ? sessionDB.Synchronization : false)
 
 				for ignore, synchronizer in sessionDB.Synchronizers
-					%synchronizer%(sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, counter)
+					%synchronizer%(sessionDB.Groups, sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, counter)
 
 				sessionDB.Synchronization := connector.GetServerTimestamp()
 			}
@@ -1434,7 +1440,7 @@ parseData(properties) {
 	return result
 }
 
-synchronizeDrivers(sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
+synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
 	local ignore, simulator, db, modified, identifier, driver, drivers
 
 	try {

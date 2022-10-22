@@ -149,8 +149,8 @@ global mapperState
 
 systemMonitor(command := false, arguments*) {
 	local x, y, time, logLevel, defaultGui, defaultListView
-	local controllerState, databaseState, ignore, plugin, icons, modules, key, value, icon, state, property
-	local drivers
+	local controllerState, databaseState, trackMapperState, ignore, plugin, icons, modules, key, value
+	local icon, state, property, drivers
 
 	static monitorTabView
 
@@ -204,6 +204,7 @@ systemMonitor(command := false, arguments*) {
 			if (monitorTabView = 1) {
 				controllerState := getControllerState(false)
 				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
+				trackMapperState := readConfiguration(kTempDirectory . "Track Mapper.state")
 
 				updateSimulationState(controllerState)
 				updateAssistantsState(controllerState)
@@ -236,6 +237,7 @@ systemMonitor(command := false, arguments*) {
 			if (monitorTabView = 2) {
 				controllerState := getControllerState(false)
 				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
+				trackMapperState := readConfiguration(kTempDirectory . "Track Mapper.state")
 
 				icons := []
 				modules := []
@@ -256,18 +258,27 @@ systemMonitor(command := false, arguments*) {
 					}
 				}
 
-				if (databaseState.Count() > 0) {
-					state := getConfigurationValue(databaseState, "Database Synchronizer", "State")
+				state := getConfigurationValue(databaseState, "Database Synchronizer", "State", "Disabled")
 
-					if stateIcons.HasKey(state)
-						icons.Push(stateIcons[state])
-					else
-						icons.Push(stateIcons["Unknown"])
+				if stateIcons.HasKey(state)
+					icons.Push(stateIcons[state])
+				else
+					icons.Push(stateIcons["Unknown"])
 
-					modules.Push(translate("Database Synchronizer"))
+				modules.Push(translate("Database Synchronizer"))
 
-					messages.Push(getConfigurationValue(databaseState, "Database Synchronizer", "Information", ""))
-				}
+				messages.Push(getConfigurationValue(databaseState, "Database Synchronizer", "Information", ""))
+
+				state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
+
+				if stateIcons.HasKey(state)
+					icons.Push(stateIcons[state])
+				else
+					icons.Push(stateIcons["Unknown"])
+
+				modules.Push(translate("Track Mapper"))
+
+				messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
 
 				if (!stateModules || !listEqual(modules, stateModules)) {
 					LV_Delete()
@@ -671,6 +682,11 @@ updateSimulationState(controllerState) {
 		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(getConfigurationValue(controllerState, "Simulation", "Session")) . "</td></tr>")
 		html .= "</table>"
 	}
+	else if (state = "Passive") {
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Waiting for simulation...") . "</td></tr>")
+		html .= "</table>"
+	}
 	else
 		html := ""
 
@@ -812,9 +828,97 @@ updateDataState(databaseState) {
 }
 
 updateAutomationState(controllerState) {
+	local state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
+	local html, icon, automation
+
+	if kStateIcons.HasKey(state)
+		icon := kStateIcons[state]
+	else
+		icon := kStateIcons["Unknown"]
+
+	GuiControl, , automationState, %icon%
+
+	if ((state != "Unknown") && (state != "Disabled")) {
+		if (state = "Passive")
+			html := "<table>"
+			html .= ("<tr><td><b>" . translate("Waiting for simulation...") . "</td></tr>")
+			html .= "</table>"
+		}
+		else {
+			automation := getConfigurationValue(controllerState, "Track Automation", "Automation", false)
+
+			if !automation
+				automation := translate("Not available...")
+
+			html := "<table>"
+			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"
+								   . getConfigurationValue(controllerState, "Track Automation", "Simulator") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>"
+								   . getConfigurationValue(controllerState, "Track Automation", "Car") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
+								   . getConfigurationValue(controllerState, "TrackAutomation", "Track") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Automation:") . "</b></td><td>" . automation . "</td></tr>")
+			html .= "</table>"
+		}
+	}
+	else
+		html := ""
+
+	updateDashboard(automationDashboard, html)
 }
 
-updateMapperState(controllerState) {
+updateMapperState(trackMapperState) {
+	local state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
+	local html, icon, simulator, track, action, points
+
+	if kStateIcons.HasKey(state)
+		icon := kStateIcons[state]
+	else
+		icon := kStateIcons["Unknown"]
+
+	GuiControl, , dataState, %icon%
+
+	if ((state != "Unknown") && (state != "Disabled")) {
+		action := getConfigurationValue(databaseState, "Track Mapper", "Action", "Waiting")
+
+		html := "<table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"
+							   . getConfigurationValue(databaseState, "Track Mapper", "Simulator") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
+							   . getConfigurationValue(databaseState, "Track Mapper", "Track") . "</td></tr>")
+
+		switch action {
+			case "Waiting":
+				action := translate("Waiting for track scanner...")
+			case "Scanning":
+				action := translate("Scanning track...")
+			case "Reading":
+				action := translate("Reading track coordinates (%points%)...")
+			case "Analyzing":
+				action := translate("Analyzing track coordinates (%points%)...")
+			case "Normalizing":
+				action := translate("Normalizing track coordinates (%points%)...")
+			case "Tranforming":
+				action := translate("Transforming track coordinates (%points%)...")
+			case "Processing":
+				action := translate("Processing track spline (%points%)...")
+			case "Image":
+				action := translate("Creating track map...")
+			case "Metadata":
+				action := translate("Creating track meta data...")
+			default:
+				throw "Unknown action detected in updateDataState..."
+		}
+
+		action := substituteVariables(action, {points: getConfigurationValue(databaseState, "Track Mapper", "Points", 0)})
+
+		html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
+		html .= "</table>"
+	}
+	else
+		html := ""
+
+	updateDashboard(dataDashboard, html)
 }
 
 startSystemMonitor() {
@@ -832,6 +936,7 @@ startSystemMonitor() {
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
+	deleteFile(kTempDirectory . "Track Mapper.state")
 
 	systemMonitor()
 

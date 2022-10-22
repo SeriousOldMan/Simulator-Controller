@@ -376,9 +376,7 @@ launchPad(command := false, arguments*) {
 		result := kClose
 	}
 	else if (command = "Close All") {
-		for ignore, application in concatenate(kBackgroundApps, kForegroundApps)
-			if (application != "Simulator Startup")
-				closeApplication(application)
+		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "Simulator Startup")), "exitApplication")
 
 		if (arguments.HasKey(1) && arguments[1])
 			launchPad(kClose)

@@ -58,6 +58,28 @@ global vHasTrayMenu := false
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+doApplications(applications, callback) {
+	local ignore, application
+
+	for ignore, application in applications {
+		if !InStr(application, ".exe")
+			application .= ".exe"
+
+		Process Exist, %application%
+
+		if ErrorLevel
+			%callback%(ErrorLevel)
+	}
+}
+
+broadcastMessage(applications, message, arguments*) {
+	if (arguments.Length() > 0)
+		doApplications(applications, Func("sendMessage").Bind(kFileMessage, "Core", message . ":" . values2String(";", arguments*)))
+	else
+		doApplications(applications, Func("sendMessage").Bind(kFileMessage, "Core", message))
+
+}
+
 exitApplication() {
 	ExitApp 0
 }
@@ -730,6 +752,8 @@ initializeEnvironment() {
 
 	if (!FileExist(kUserConfigDirectory . "UPDATES") && FileExist(kResourcesDirectory . "Templates"))
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
+
+	registerMessageHandler("Core", "functionMessageHandler")
 }
 
 getControllerActionDefinitions(type) {

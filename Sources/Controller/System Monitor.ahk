@@ -147,10 +147,12 @@ global dataState
 global automationState
 global mapperState
 
+global logLevelDropDown
+
 systemMonitor(command := false, arguments*) {
 	local x, y, time, logLevel, defaultGui, defaultListView
 	local controllerState, databaseState, trackMapperState, ignore, plugin, icons, modules, key, value
-	local icon, state, property, drivers
+	local icon, state, property, drivers, choices, chosen
 
 	static monitorTabView
 
@@ -609,6 +611,13 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Add, Edit, x120 yp-2 w50 h20 Limit3 Number VlogBufferEdit, 999
 		Gui SM:Add, UpDown, x158 yp w18 h20 Range100-999, 999
 
+		Gui SM:Add, Text, x590 yp w95 h23 +0x200, % translate("Log Level")
+
+		choices := ["Info", "Warn", "Critical", "Off"]
+		chosen := getLogLevel()
+
+		Gui SM:Add, DropDownList, x689 yp-1 w91 AltSubmit Choose%chosen% VlogLevelDropDown gchooseLogLevel, % values2String("|", map(choices, "translate")*)
+
 		Gui Tab
 
 		Gui SM:Font, s8 Norm, Arial
@@ -661,6 +670,12 @@ openSystemMonitorDocumentation() {
 noSelect() {
 	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
+}
+
+chooseLogLevel() {
+	GuiControlGet logLevelDropDown
+
+	broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "System Monitor")), "setLogLevel", logLevelDropDown)
 }
 
 updateSimulationState(controllerState) {

@@ -282,17 +282,17 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					enabled := this.TrackAutomationEnabled
 
 					if enabled
-						this.disableTrackAutomations()
+						this.disableTrackAutomation()
 
 					if !label
 						label := this.getLabel("TrackAutomation.Toggle")
 
 					trayMessage(label, translate("Select: ") . (name ? name : "Active"))
 
-					this.Simulator.TrackAutomation := candidate
-
 					if enabled
 						this.enableTrackAutomation()
+
+					this.Simulator.TrackAutomation := candidate
 
 					return
 				}

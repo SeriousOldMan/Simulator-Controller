@@ -267,7 +267,7 @@ systemMonitor(command := false, arguments*) {
 				else
 					icons.Push(stateIcons["Unknown"])
 
-				modules.Push(translate("Database Synchronizer"))
+				modules.Push(translate("Database Synchronization"))
 
 				messages.Push(getConfigurationValue(databaseState, "Database Synchronizer", "Information", ""))
 
@@ -278,7 +278,7 @@ systemMonitor(command := false, arguments*) {
 				else
 					icons.Push(stateIcons["Unknown"])
 
-				modules.Push(translate("Track Mapper"))
+				modules.Push(translate("Track Mapping"))
 
 				messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
 
@@ -727,7 +727,7 @@ updateAssistantsState(controllerState) {
 
 	for key, state in getConfigurationSectionValues(controllerState, "Race Assistants", {}) {
 		if ((key = "Mode") || (key = "Session"))
-			info .= ("<tr><td><b>" . translate(key) . translate(": ") . "</b></td><td>" . translate(state) . "</td></tr>")
+			info .= ("<tr><td><b>" . translate(key . ":") . "</b></td><td>" . translate(state) . "</td></tr>")
 		else {
 			if (state = "Active") {
 				overallState := "Active"
@@ -743,7 +743,7 @@ updateAssistantsState(controllerState) {
 			else
 				state := "Inactive"
 
-			html .= ("<tr><td><b>" . translate(key) . translate(": ") . "</b></td><td>" . translate(state) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate(key) . translate(":") . "</b></td><td>" . translate(state) . "</td></tr>")
 		}
 	}
 
@@ -838,9 +838,9 @@ updateDataState(databaseState) {
 					if counter
 						action := substituteVariables(translate("Synchronizing (%counter% objects transferred)..."), {counter: counter})
 					else
-						action := translate("Synchronizing database...")
+						action := translate("Synchronizing...")
 				case "Finished":
-					action := translate("Finished synchronization...")
+					action := translate("Finished synchronization")
 				case "Waiting":
 					action := translate("Waiting for next synchronization...")
 				case "Failed":

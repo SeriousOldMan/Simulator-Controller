@@ -422,30 +422,12 @@ exitProcesses(silent := false, force := false) {
 
 		if hasFGProcesses
 			if force
-				for ignore, app in concatenate(kForegroundApps, ["Race Settings"]) {
-					Process Exist, %app%.exe
-
-					if ErrorLevel {
-						Process Close, %ErrorLevel%
-
-						if !ErrorLevel
-							return false
-					}
-				}
+				broadcastMessage(concatenate(kForegroundApps, ["Race Settings"]), "exitApplication")
 			else
 				return false
 
 		if hasBGProcesses
-			for ignore, app in kBackgroundApps {
-				Process Exist, %app%.exe
-
-				if (ErrorLevel && (ErrorLevel != pid)) {
-					Process Close, %ErrorLevel%
-
-					if !ErrorLevel
-						return false
-				}
-			}
+			broadcastMessage(remove(kBackgroundApps, ["Simulator Tools"]), "exitApplication")
 
 		return true
 	}

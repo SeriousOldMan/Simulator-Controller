@@ -1561,6 +1561,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					session := kSessionRace
 
 					setConfigurationValue(data, "Session Data", "Session", "Race")
+
+					if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
+						if !RaceAssistantPlugin.Finished
+							RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
+
+						finished := false
+					}
 				}
 
 				RaceAssistantPlugin.updateAssistantsSession(session)

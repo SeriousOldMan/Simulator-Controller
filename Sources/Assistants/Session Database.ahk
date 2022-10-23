@@ -3824,7 +3824,7 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x16 yp+30 w388 h132 Section, % translate("Team Server")
+		Gui %window%:Add, GroupBox, x16 yp+30 w388 h156 Section, % translate("Team Server")
 
 		Gui %window%:Font, Norm, Arial
 
@@ -3850,7 +3850,7 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Add, Button, x312 yp+2 w80 vrebuildButton grebuildDatabase, % translate("Rebuild...")
 
-		Gui %window%:Add, Button, x122 ys+150 w80 h23 gacceptSettings, % translate("Ok")
+		Gui %window%:Add, Button, x122 ys+174 w80 h23 gacceptSettings, % translate("Ok")
 		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
 
 		updateSettingsState()

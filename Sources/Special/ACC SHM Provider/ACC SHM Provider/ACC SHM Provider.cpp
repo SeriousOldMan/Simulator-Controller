@@ -324,7 +324,7 @@ int main(int argc, char* argv[])
 		SPageFileStatic* sf = (SPageFileStatic*)m_static.mapFileBuffer;
 		SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-		string session = getSession(gf->session); // (gf->flag == AC_CHECKERED_FLAG) ? "Finished" : getSession(gf->session);
+		string session = (gf->flag == AC_CHECKERED_FLAG) ? "Finished" : getSession(gf->session);
 
 		printData("Active", ((gf->status == AC_LIVE) || (gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");
 		printData("Paused", ((gf->status == AC_PAUSE) || (gf->status == AC_REPLAY)) ? "true" : "false");

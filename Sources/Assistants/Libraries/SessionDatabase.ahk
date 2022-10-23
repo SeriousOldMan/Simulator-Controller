@@ -1399,7 +1399,7 @@ synchronizeDatabase(rebuild := false) {
 				for ignore, synchronizer in sessionDB.Synchronizers
 					%synchronizer%(sessionDB.Groups, sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, counter)
 
-				sessionDB.Synchronization := connector.GetServerTimestamp()
+				sessionDB.Synchronization := timestamp
 			}
 			finally {
 				synchronizeTask.stop()

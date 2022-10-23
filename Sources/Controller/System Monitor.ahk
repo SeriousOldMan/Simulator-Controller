@@ -516,7 +516,7 @@ systemMonitor(command := false, arguments*) {
 		simulationDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x405 ys+28 w375 h9, % translate("Assistants")
+		Gui SM:Add, GroupBox, -Theme x405 ys+28 w375 h9, % translate("Race Assistants")
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x415 ys+73 w32 h32 vassistantsState, % kIconsDirectory . "Black.ico"
@@ -722,25 +722,32 @@ updateSimulationState(controllerState) {
 updateAssistantsState(controllerState) {
 	local overallState := "Disabled"
 	local html := "<table>"
+	local info := ""
 	local assistant, state
 
-	for assistant, state in getConfigurationSectionValues(controllerState, "Assistants", {}) {
-		if (state = "Active") {
-			overallState := "Active"
+	for key, state in getConfigurationSectionValues(controllerState, "Race Assistants", {}) {
+		if ((key = "Mode") || (key = "Session"))
+			info .= ("<tr><td><b>" . translate(key) . translate(": ") . "</b></td><td>" . translate(state) . "</td></tr>")
+		else {
+			if (state = "Active") {
+				overallState := "Active"
 
-			state := translate("Active")
+				state := "Active"
+			}
+			else if (state = "Waiting") {
+				if (overallState = "Disabled")
+					overallState := "Passive"
+
+				state := "Waiting..."
+			}
+			else
+				state := "Inactive"
+
+			html .= ("<tr><td><b>" . translate(key) . translate(": ") . "</b></td><td>" . translate(state) . "</td></tr>")
 		}
-		else if (state = "Wait") {
-			if (overallState = "Disabled")
-				overallState := "Passive"
-
-			state := translate("Waiting...")
-		}
-		else
-			state := translate("Inactive")
-
-		html .= ("<tr><td><b>" . translate(assistant) . translate(": ") . "</b></td><td>" . state . "</td></tr>")
 	}
+
+	html .= info
 
 	GuiControl, , assistantsState, % kStateIcons[overallState]
 
@@ -837,7 +844,7 @@ updateDataState(databaseState) {
 				case "Waiting":
 					action := translate("Waiting for next synchronization...")
 				case "Failed":
-					action := translate("Synchronization failed...")
+					action := translate("Synchronization failed")
 				default:
 					throw "Unknown action detected in updateDataState..."
 			}
@@ -874,7 +881,7 @@ updateAutomationState(controllerState) {
 			automation := getConfigurationValue(controllerState, "Track Automation", "Automation", false)
 
 			if !automation
-				automation := translate("Not available...")
+				automation := translate("Not available")
 
 			html := "<table>"
 			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"

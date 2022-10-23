@@ -729,7 +729,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if this.Active {
 			if this.RaceAssistantEnabled {
 				if (this.RaceAssistant && !this.RaceAssistantActive) {
-					setConfigurationValue(configuration, "Assistants", this.Plugin, "Wait")
+					setConfigurationValue(configuration, "Race Assistants", this.Plugin, "Waiting")
 
 					setConfigurationValue(configuration, this.Plugin, "State", "Active")
 
@@ -738,7 +738,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 															, translate("Session: ") . translate("Waiting...")))
 				}
 				else if this.RaceAssistantActive {
-					setConfigurationValue(configuration, "Assistants", this.Plugin, "Active")
+					setConfigurationValue(configuration, "Race Assistants", this.Plugin, "Active")
+					setConfigurationValue(configuration, "Race Assistants", "Mode", this.TeamSessionActive ? "Team" : "Solo")
 
 					setConfigurationValue(configuration, this.Plugin, "State", "Active")
 
@@ -752,6 +753,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						default:
 							session := "Unknown"
 					}
+
+					setConfigurationValue(configuration, "Race Assistants", "Session", session)
 
 					setConfigurationValue(configuration, this.Plugin, "Information"
 										, values2String("; ", translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No")
@@ -1710,6 +1713,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								}
 								else {
 									; Wrong Driver - no team session
+
+									RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
 
 									RaceAssistantPlugin.disconnectTeamSession()
 

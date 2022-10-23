@@ -389,24 +389,23 @@ class TeamServerPlugin extends ControllerPlugin {
 		local connectedDrivers := []
 		local ignore, connection
 
-		if this.SessionActive
-			try {
-				for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
-					if !this.iCachedObjects.HasKey(connection)
-						this.iCachedObjects[connection] := this.parseObject(this.Connector.GetConnection(connection))
+		try {
+			for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
+				if !this.iCachedObjects.HasKey(connection)
+					this.iCachedObjects[connection] := this.parseObject(this.Connector.GetConnection(connection))
 
-					connection := this.iCachedObjects[connection]
+				connection := this.iCachedObjects[connection]
 
-					if (connection.Name && (connection.Name != "") && (connection.Type = "Driver")
-										&& !inList(connectedDrivers, connection.Name))
-						connectedDrivers.Push(connection.Name)
-				}
-
-				state.Push("Drivers: " . values2String("|", connectedDrivers*))
+				if (connection.Name && (connection.Name != "") && (connection.Type = "Driver")
+									&& !inList(connectedDrivers, connection.Name))
+					connectedDrivers.Push(connection.Name)
 			}
-			catch exception {
-				logError(exception)
-			}
+
+			state.Push("Drivers: " . values2String("|", connectedDrivers*))
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	writeStintState(state) {
@@ -444,6 +443,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	writePluginState(configuration) {
+		local driverMismatch := false
 		local key, value, teamServerState
 
 		if this.Active {
@@ -455,11 +455,17 @@ class TeamServerPlugin extends ControllerPlugin {
 						setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . this.LastMessage)
 					}
 					else {
-						setConfigurationValue(configuration, this.Plugin, "State", "Active")
+						if (this.State["Driver"] = "Mismatch") {
+							setConfigurationValue(configuration, this.Plugin, "State", "Critical")
+
+							driverMismatch := true
+						}
+						else
+							setConfigurationValue(configuration, this.Plugin, "State", "Active")
 
 						setConfigurationValue(configuration, this.Plugin, "Information"
 											, values2String("; ", translate("Team: ") . this.Team[true]
-																, translate("Driver: ") . this.Driver[true]
+																, translate("Driver: ") . this.Driver[true] . (driverMismatch ? translate(" (No match)") : "")
 																, translate("Session: ") . this.Session[true]))
 					}
 				}

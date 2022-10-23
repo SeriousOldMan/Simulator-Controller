@@ -142,7 +142,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		if this.Active {
 			if this.RaceAssistant
-				setConfigurationValue(configuration, "Assistants", this.Plugin, "Active")
+				setConfigurationValue(configuration, "Race Assistants", this.Plugin, "Active")
 
 			if this.TrackAutomationEnabled {
 				simulator := this.Simulator

@@ -171,14 +171,6 @@ class SimulatorStartup extends ConfigurationItem {
 		local title, exePath, pid
 
 		try {
-			if getConfigurationValue(this.Settings, "Core", "System Monitor", false) {
-				exePath := kBinariesDirectory . "System Monitor.exe"
-
-				Run %exePath%, %kBinariesDirectory%
-
-				Sleep 1000
-			}
-
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
 			exePath := kBinariesDirectory . "Voice Server.exe"
@@ -366,6 +358,7 @@ launchPad(command := false, arguments*) {
 	static RaceSettings
 	static SessionDatabase
 	static SetupAdvisor
+	static SystemMonitor
 
 	static closeCheckBox
 
@@ -442,6 +435,7 @@ launchPad(command := false, arguments*) {
 		toolTips["RaceSettings"] := "Race Settings: Manage the settings for the Virtual Race Assistants and also the connection to the Team Server for team races."
 		toolTips["SessionDatabase"] := "Session Database: Manage simulator, car and track specific settings and gives access to various areas of the data collected by Simulator Controller during the sessions."
 		toolTips["SetupAdvisor"] := "Setup Advisor: Develop car setups using an interview-based approach, where you describe your handling problems."
+		toolTips["SystemMonitor"] := "System Monitor: Monitor all system activities on a dashboard and investigate log files of all system components."
 
 		executables["RaceReports"] := "Race Reports.exe"
 		executables["StrategyWorkbench"] := "Strategy Workbench.exe"
@@ -454,6 +448,7 @@ launchPad(command := false, arguments*) {
 		executables["RaceSettings"] := "Race Settings.exe"
 		executables["SessionDatabase"] := "Session Database.exe"
 		executables["SetupAdvisor"] := "Setup Advisor.exe"
+		executables["SystemMonitor"] := "System Monitor.exe"
 
 		icons["Startup"] := kIconsDirectory . "Startup.ico"
 		icons["RaceReports"] := kIconsDirectory . "Chart.ico"
@@ -467,6 +462,7 @@ launchPad(command := false, arguments*) {
 		icons["RaceSettings"] := kIconsDirectory . "Race Settings.ico"
 		icons["SessionDatabase"] := kIconsDirectory . "Session Database.ico"
 		icons["SetupAdvisor"] := kIconsDirectory . "Setup.ico"
+		icons["SystemMonitor"] := kIconsDirectory . "Monitoring.ico"
 
 		Gui LP:Default
 
@@ -497,18 +493,20 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceReports glaunchApplication, % kIconsDirectory . "Chart.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vStrategyWorkbench glaunchApplication, % kIconsDirectory . "Dashboard.ico"
-		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceCenter glaunchApplication, % kIconsDirectory . "Console.ico"
+		Gui LP:Add, Picture, xp+110 yp w60 h60 vRaceCenter glaunchApplication, % kIconsDirectory . "Console.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vServerAdministration glaunchApplication, % kIconsDirectory . "Server Administration.ico"
 
-		Gui LP:Add, Picture, xp+106 yp w60 h60 vSimulatorSetup glaunchApplication, % kIconsDirectory . "Configuration Wand.ico"
-		Gui LP:Add, Picture, xp+74 yp w60 h60 vSimulatorConfiguration glaunchApplication, % kIconsDirectory . "Configuration.ico"
-		Gui LP:Add, Picture, xp yp+74 w60 h60 vSimulatorDownload glaunchSimulatorDownload, % kIconsDirectory . "Installer.ico"
+		Gui LP:Add, Picture, xp+150 yp w60 h60 vSystemMonitor glaunchApplication, % kIconsDirectory . "Monitoring.ico"
 
 		; Gui LP:Add, Picture, x16 ys+74 w60 h60 vSimulatorSettings glaunchApplication, % kIconsDirectory . "Settings.ico"
 		Gui LP:Add, Picture, x16 ys+74 w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
 		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceSettings glaunchApplication, % kIconsDirectory . "Race Settings.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vSessionDatabase glaunchApplication, % kIconsDirectory . "Session Database.ico"
 		; Gui LP:Add, Picture, xp+164 yp w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
+
+		Gui LP:Add, Picture, xp+110 yp w60 h60 vSimulatorSetup glaunchApplication, % kIconsDirectory . "Configuration Wand.ico"
+		Gui LP:Add, Picture, xp+74 yp w60 h60 vSimulatorConfiguration glaunchApplication, % kIconsDirectory . "Configuration.ico"
+		Gui LP:Add, Picture, xp+150 yp w60 h60 vSimulatorDownload glaunchSimulatorDownload, % kIconsDirectory . "Installer.ico"
 
 		Gui LP:Font, s8 Norm, Arial
 

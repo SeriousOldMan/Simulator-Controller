@@ -348,14 +348,14 @@ class GuiFunctionController extends FunctionController {
 							case "Bottom Right":
 								x := mainScreenRight - width
 								y := mainScreenBottom - this.distanceFromBottom()
-							case "Secondary Screen":
+							case "Secondary Screen", "2nd Screen":
 								SysGet count, MonitorCount
 
 								if (count > 1) {
 									SysGet, secondScreen, MonitorWorkArea, 2
 
 									x := Round(secondScreenLeft + ((secondScreenRight - secondScreenLeft - width) / 2))
-									y := Round(secondScreenTop + ((secondScreenBottom - secondScreenTop- height) / 2))
+									y := Round(secondScreenTop + ((secondScreenBottom - secondScreenTop - height) / 2))
 								}
 								else
 									Goto defaultCase

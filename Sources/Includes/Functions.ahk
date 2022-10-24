@@ -1190,7 +1190,8 @@ hideSplashTheme() {
 }
 
 showProgress(options) {
-	local x, y, w, h, color
+	local x, y, w, h, color, count
+	local secondScreen, secondScreenLeft, secondScreenRight, secondScreenTop, secondScreenBottom
 
 	static popupPosition := false
 
@@ -1198,6 +1199,7 @@ showProgress(options) {
 		if !popupPosition
 			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 												 , "General", "Popup Position", "Bottom")
+
 		if options.HasKey("X")
 			x := options.X
 		else
@@ -1205,8 +1207,19 @@ showProgress(options) {
 
 		if options.HasKey("Y")
 			y := options.Y
-		else
-			y := ((popupPosition = "Bottom") ? A_ScreenHeight - 150 : 150)
+		else {
+			SysGet count, MonitorCount
+
+			if (count > 1)
+				SysGet, secondScreen, MonitorWorkArea, 2
+
+			if ((count > 1) && (popupPosition = "2nd Screen Top"))
+				y := (secondScreenTop + 150)
+			else if ((count > 1) && (popupPosition = "2nd Screen Bottom"))
+				y := (secondScreenTop + (secondScreenBottom - secondScreenTop) - 150)
+			else
+				y := ((popupPosition = "Top") ? 150 : A_ScreenHeight - 150)
+		}
 
 		if options.HasKey("Width")
 			w := (options.Width - 20)

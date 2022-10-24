@@ -1494,9 +1494,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	currentLap(data) {
-		loop % getConfigurationValue(data, "Position Data", "Car.Count")
-			if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
-				return getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
+		if (this.Session == kSessionRace)
+			loop % getConfigurationValue(data, "Position Data", "Car.Count")
+				if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
+					return getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
 
 		return getConfigurationValue(data, "Stint Data", "Laps", 0)
 	}

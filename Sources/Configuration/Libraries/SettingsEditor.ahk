@@ -407,11 +407,11 @@ restartSettings:
 		setConfigurationValue(newSettings, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
 		setConfigurationValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 
-		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
+		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
 
 		setConfigurationValue(newSettings, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
 
-		positions := ["Top", "Bottom"]
+		positions := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
 
 		applicationSettings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
@@ -583,7 +583,10 @@ restartSettings:
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
 		Gui SE:Add, Text, XS YP+30, % translate("Button Box Position")
 
-		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
+		if (buttonBoxPosition = "Secondary Screen")
+			buttonBoxPosition := "2nd Screen"
+
+		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
 
 		if !chosen
@@ -593,7 +596,7 @@ restartSettings:
 
 		Gui SE:Add, Text, XS YP+30, % translate("Overlay Position")
 
-		choices := ["Top", "Bottom"]
+		choices := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
 		chosen := inList(choices, popupPosition)
 
 		if !chosen

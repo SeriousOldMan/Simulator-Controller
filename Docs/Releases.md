@@ -5,7 +5,8 @@
   4. New monitoring tool gives you an integrated view over the health and activities of all system components. See the all new [documentation](*) for more information.
   5. Changed the upload / download of the community setup database to a new FTP service provider.
   6. Telemetry data synchronization will pick up at the right point in time after a system failure.
-  7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor".  
+  7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor".
+  8. Windows are no longer lost offscreen, when a Monitor has been deactivated or removed at all.
 
 ## 4.4.0.0-release 10/21/22
   1. Minor bugfixes, as always

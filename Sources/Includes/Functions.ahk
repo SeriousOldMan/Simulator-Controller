@@ -1403,14 +1403,26 @@ getWindowPosition(descriptor, ByRef x, ByRef y) {
 	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 	local posX := getConfigurationValue(settings, "Window Positions", descriptor . ".X", kUndefined)
 	local posY := getConfigurationValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
+	local count, screen, screenLeft, screenRight, screenTop, screenBottom
+
 
 	if ((posX == kUndefined) || (posY == kUndefined))
 		return false
 	else {
-		x := posX
-		y := posY
+		SysGet count, MonitorCount
 
-		return true
+		loop %count% {
+			SysGet, screen, MonitorWorkArea, %A_Index%
+
+			if ((posX >= screenLeft) && (posX <= screenRight) && (posY >= screenTop) && (posY <= screenBottom)) {
+				x := posX
+				y := posY
+
+				return true
+			}
+		}
+
+		return false
 	}
 }
 

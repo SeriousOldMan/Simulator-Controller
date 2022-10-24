@@ -3,7 +3,7 @@ Version=4.4.5.0-dev
 Target=4.4.5.0-release
 Date=10/22/2022
 Download=
-Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor"
+Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization
 [Release]
 Version=4.4.0.0-release
 Date=10/21/2022

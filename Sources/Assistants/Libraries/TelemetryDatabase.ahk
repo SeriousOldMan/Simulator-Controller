@@ -559,6 +559,80 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 
 	if inList(groups, "Telemetry")
 		try {
+			for ignore, identifier in string2Values(";", connector.QueryData("Electronics", "Modified > " . lastSynchronization)) {
+				telemetry := parseData(connector.GetData("Electronics", identifier))
+
+				simulator := telemetry.Simulator
+
+				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+					car := telemetry.Car
+					track := telemetry.Track
+
+					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+
+					if (db.query("Electronics", {Where: {Identifier: identifier} }).Length() = 0) {
+						counter += 1
+
+						try {
+							db.add("Electronics", {Identifier: identifier, Synchronized: timestamp
+												 , Driver: telemetry.Driver, Weather: telemetry.Weather
+												 , "Temperature.Air": telemetry.AirTemperature
+												 , "Temperature.Track": telemetry.TrackTemperature
+												 , "Tyre.Compound": telemetry.TyreCompound
+												 , "Tyre.Compound.Color": telemetry.TyreCompoundColor
+												 , "Fuel.Remaining": telemetry.FuelRemaining, "Fuel.Consumption": telemetry.FuelConsumption
+												 , "Lap.Time": telemetry.LapTime, "Map": telemetry.Map, "TC": telemetry.TC, "ABS": telemetry.ABS}, true)
+						}
+						catch exception {
+							logError(exception)
+						}
+					}
+				}
+			}
+
+			for ignore, identifier in string2Values(";", connector.QueryData("Tyres", "Modified > " . lastSynchronization)) {
+				telemetry := parseData(connector.GetData("Tyres", identifier))
+
+				simulator := telemetry.Simulator
+
+				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+					car := telemetry.Car
+					track := telemetry.Track
+
+					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+
+					if (db.query("Tyres", {Where: {Identifier: identifier} }).Length() = 0) {
+						counter += 1
+
+						try {
+							db.add("Tyres", {Identifier: identifier, Synchronized: timestamp
+										   , Driver: telemetry.Driver, Weather: telemetry.Weather
+										   , "Temperature.Air": telemetry.AirTemperature
+										   , "Temperature.Track": telemetry.TrackTemperature
+										   , "Tyre.Compound": telemetry.TyreCompound
+										   , "Tyre.Compound.Color": telemetry.TyreCompoundColor
+										   , "Fuel.Remaining": telemetry.FuelRemaining, "Fuel.Consumption": telemetry.FuelConsumption
+										   , "Lap.Time": telemetry.LapTime, "Tyre.Laps": telemetry.Laps
+										   , "Tyre.Pressure.Front.Left": telemetry.PressureFrontLeft
+										   , "Tyre.Pressure.Front.Right": telemetry.PressureFrontRight
+										   , "Tyre.Pressure.Rear.Left": telemetry.PressureRearLeft
+										   , "Tyre.Pressure.Rear.Right": telemetry.PressureRearRight
+										   , "Tyre.Temperature.Front.Left": telemetry.TemperatureFrontLeft
+										   , "Tyre.Temperature.Front.Right": telemetry.TemperatureFrontRight
+										   , "Tyre.Temperature.Rear.Left": telemetry.TemperatureRearLeft
+										   , "Tyre.Temperature.Rear.Right": telemetry.TemperatureRearRight
+										   , "Tyre.Wear.Front.Left": telemetry.WearFrontLeft
+										   , "Tyre.Wear.Front.Right": telemetry.WearFrontRight
+										   , "Tyre.Wear.Rear.Left": telemetry.WearRearLeft
+										   , "Tyre.Wear.Rear.Right": telemetry.WearRearRight}, true)
+						}
+						catch exception {
+							logError(exception)
+						}
+					}
+				}
+			}
+
 			for ignore, simulator in simulators {
 				simulator := sessionDB.getSimulatorCode(simulator)
 
@@ -602,29 +676,6 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 																				, TC: telemetry.TC, ABS: telemetry.ABS}))
 
 										counter += 1
-									}
-								}
-
-								for ignore, identifier in string2Values(";"
-																	  , connector.QueryData("Electronics", "Simulator = '" . simulator . "' And "
-																										 . "Car = '" . car . "' And "
-																										 . "Track = '" . track . "' And "
-																										 . "Modified > " . lastSynchronization)) {
-									if (db.query("Electronics", {Where: {Identifier: identifier} }).Length() = 0) {
-										modified := true
-
-										counter += 1
-
-										telemetry := parseData(connector.GetData("Electronics", identifier))
-
-										db.add("Electronics", {Identifier: identifier, Synchronized: timestamp
-															 , Driver: telemetry.Driver, Weather: telemetry.Weather
-															 , "Temperature.Air": telemetry.AirTemperature
-															 , "Temperature.Track": telemetry.TrackTemperature
-															 , "Tyre.Compound": telemetry.TyreCompound
-															 , "Tyre.Compound.Color": telemetry.TyreCompoundColor
-															 , "Fuel.Remaining": telemetry.FuelRemaining, "Fuel.Consumption": telemetry.FuelConsumption
-															 , "Lap.Time": telemetry.LapTime, "Map": telemetry.Map, "TC": telemetry.TC, "ABS": telemetry.ABS})
 									}
 								}
 							}
@@ -690,41 +741,6 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 																				, WearRearRight: telemetry["Tyre.Wear.Rear.Right"]}))
 
 										counter += 1
-									}
-								}
-
-								for ignore, identifier in string2Values(";"
-																	  , connector.QueryData("Tyres", "Simulator = '" . simulator . "' And "
-																								   . "Car = '" . car . "' And "
-																								   . "Track = '" . track . "' And "
-																								   . "Modified > " . lastSynchronization)) {
-									if (db.query("Tyres", {Where: {Identifier: identifier} }).Length() = 0) {
-										modified := true
-
-										counter += 1
-
-										telemetry := parseData(connector.GetData("Tyres", identifier))
-
-										db.add("Tyres", {Identifier: identifier, Synchronized: timestamp
-															 , Driver: telemetry.Driver, Weather: telemetry.Weather
-															 , "Temperature.Air": telemetry.AirTemperature
-															 , "Temperature.Track": telemetry.TrackTemperature
-															 , "Tyre.Compound": telemetry.TyreCompound
-															 , "Tyre.Compound.Color": telemetry.TyreCompoundColor
-															 , "Fuel.Remaining": telemetry.FuelRemaining, "Fuel.Consumption": telemetry.FuelConsumption
-															 , "Lap.Time": telemetry.LapTime, "Tyre.Laps": telemetry.Laps
-															 , "Tyre.Pressure.Front.Left": telemetry.PressureFrontLeft
-															 , "Tyre.Pressure.Front.Right": telemetry.PressureFrontRight
-															 , "Tyre.Pressure.Rear.Left": telemetry.PressureRearLeft
-															 , "Tyre.Pressure.Rear.Right": telemetry.PressureRearRight
-															 , "Tyre.Temperature.Front.Left": telemetry.TemperatureFrontLeft
-															 , "Tyre.Temperature.Front.Right": telemetry.TemperatureFrontRight
-															 , "Tyre.Temperature.Rear.Left": telemetry.TemperatureRearLeft
-															 , "Tyre.Temperature.Rear.Right": telemetry.TemperatureRearRight
-															 , "Tyre.Wear.Front.Left": telemetry.WearFrontLeft
-															 , "Tyre.Wear.Front.Right": telemetry.WearFrontRight
-															 , "Tyre.Wear.Rear.Left": telemetry.WearRearLeft
-															 , "Tyre.Wear.Rear.Right": telemetry.WearRearRight})
 									}
 								}
 							}

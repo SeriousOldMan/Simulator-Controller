@@ -238,6 +238,7 @@ class Database {
 	}
 
 	add(name, values, flush := false) {
+		local tries := 10
 		local row, directory, fileName, ignore, column, file
 
 		this.Tables[name].Push(values)
@@ -263,7 +264,18 @@ class Database {
 
 				row := (values2String(";", row*) . "`n")
 
-				FileAppend %row%, %fileName%
+				loop
+					try {
+						FileAppend %row%, %fileName%
+
+						break
+					}
+					catch exception {
+						if (tries-- > 0)
+							Sleep 10
+						else
+							throw Exception
+					}
 			}
 		}
 		else

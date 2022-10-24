@@ -20,6 +20,8 @@
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Database Update.ico
 ;@Ahk2Exe-ExeName Database Synchronizer.exe
 
+#MaxMem 1024
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;

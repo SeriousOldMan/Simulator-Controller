@@ -116,7 +116,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 
 		RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%Shared Database' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Shared Database\Database.%id%.zip', , Hide
 
-		ftpUpload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", kTempDirectory . "Shared Database\Database." . id . ".zip", "Simulator Controller\Database Uploads\Database." . id . ".zip")
+		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "simulator-controller\database-uploads\Database." . id . ".zip")
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "UPLOAD")
@@ -162,7 +162,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 			logError(exception)
 		}
 
-		for ignore, fileName in ftpListFiles("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads") {
+		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller\database-downloads") {
 			SplitPath fileName, , , , databaseDirectory
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
@@ -171,7 +171,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 				sessionDB := new SessionDatabase()
 
 				if (sessionDB.DatabaseVersion != databaseDirectory) {
-					ftpDownload("ftp.drivehq.com", "TheBigO", "29605343.9318.1940", "Simulator Controller\Database Downloads\" . fileName, kTempDirectory . fileName)
+					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller\database-downloads\" . fileName, kTempDirectory . fileName)
 
 					RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
 

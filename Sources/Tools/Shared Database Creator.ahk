@@ -213,14 +213,14 @@ windowsPath(path) {
 downloadUserDatabases(directory) {
 	wDirectory := windowsPath(directory)
 
-	for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller\database-uploads") {
+	for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-uploads") {
 		SplitPath fileName, , , , idName
 
 		idName := StrReplace(idName, "Database.", "")
 
 		updateProgress("Downloading " . idName . "...")
 
-		ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller\database-uploads\" . fileName, directory . fileName)
+		ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-uploads/" . fileName, directory . fileName)
 
 		updateProgress("Extracting " . idName . "...")
 
@@ -299,7 +299,7 @@ createSharedDatabases() {
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Creating Shared Database", message: "Cleaning remote repository..."})
 
-	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller\database-downloads")
+	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads")
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "Cleaning remote repository..."})
 
@@ -316,7 +316,7 @@ createSharedDatabases() {
 
 		updateProgress("Uploading " . fileName . "...")
 
-		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "simulator-controller\database-downloads\" . fileName)
+		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "simulator-controller/database-downloads/" . fileName)
 	}
 
 	showProgress({progress: 100, message: "Finished..."})

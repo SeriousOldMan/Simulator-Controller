@@ -67,45 +67,47 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 		{
 			simulator := A_LoopFileName
 
-			FileCreateDir %kTempDirectory%Shared Database\%simulator%
+			if (simulator != "Unknown") {
+				FileCreateDir %kTempDirectory%Shared Database\%simulator%
 
-			loop Files, %sessionDBPath%User\%simulator%\*.*, D					; Car
-			{
-				car := A_LoopFileName
+				loop Files, %sessionDBPath%User\%simulator%\*.*, D					; Car
+				{
+					car := A_LoopFileName
 
-				if (car = "1") {
-					directoryName = %sessionDBPath%User\%simulator%\%car%
+					if (car = "1") {
+						directoryName = %sessionDBPath%User\%simulator%\%car%
 
-					deleteDirectory(directoryName)
-				}
-				else {
-					FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
+						deleteDirectory(directoryName)
+					}
+					else {
+						FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
 
-					loop Files, %sessionDBPath%User\%simulator%\%car%\*.*, D			; Track
-					{
-						track := A_LoopFileName
+						loop Files, %sessionDBPath%User\%simulator%\%car%\*.*, D			; Track
+						{
+							track := A_LoopFileName
 
-						if (track = "1") {
-							directoryName = %sessionDBPath%User\%simulator%\%car%\%track%
+							if (track = "1") {
+								directoryName = %sessionDBPath%User\%simulator%\%car%\%track%
 
-							deleteDirectory(directoryName)
-						}
-						else {
-							FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
-
-							if uploadPressures {
-								distFile := (sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
-
-								if FileExist(distFile)
-									FileCopy %distFile%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
+								deleteDirectory(directoryName)
 							}
+							else {
+								FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
 
-							if uploadSetups {
-								try {
-									FileCopyDir %sessionDBPath%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
+								if uploadPressures {
+									distFile := (sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
+
+									if FileExist(distFile)
+										FileCopy %distFile%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
 								}
-								catch exception {
-									logError(exception)
+
+								if uploadSetups {
+									try {
+										FileCopyDir %sessionDBPath%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
+									}
+									catch exception {
+										logError(exception)
+									}
 								}
 							}
 						}
@@ -116,7 +118,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 
 		RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%Shared Database' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Shared Database\Database.%id%.zip', , Hide
 
-		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "simulator-controller\database-uploads\Database." . id . ".zip")
+		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "simulator-controller/database-uploads/Database." . id . ".zip")
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "UPLOAD")
@@ -162,7 +164,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 			logError(exception)
 		}
 
-		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller\database-downloads") {
+		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
 			SplitPath fileName, , , , databaseDirectory
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
@@ -171,7 +173,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 				sessionDB := new SessionDatabase()
 
 				if (sessionDB.DatabaseVersion != databaseDirectory) {
-					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller\database-downloads\" . fileName, kTempDirectory . fileName)
+					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
 					RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
 

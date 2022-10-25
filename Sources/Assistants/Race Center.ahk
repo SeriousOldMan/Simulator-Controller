@@ -3242,8 +3242,8 @@ class RaceCenter extends ConfigurationItem {
 
 			pitstopPlan := newConfiguration()
 
-			if ((pitstopPlanEdit = "") || (pitstopPlanEdit = 0))
-				pitstopPlanEdit := (this.LastLap ? this.LastLap.Nr : 1)
+			if ((pitstopLapEdit = "") || (pitstopLapEdit <= 0))
+				pitstopLapEdit := (this.LastLap ? this.LastLap.Nr : 1)
 
 			if (pitstopRefuelEdit = "")
 				pitstopRefuelEdit := 0

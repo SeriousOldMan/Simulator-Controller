@@ -222,13 +222,19 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		Set {
+			local configuration := readConfiguration(kTempDirectory . this.AssistantType . ".state")
+
+			setConfigurationValue(configuration, "Voice", "Muted", value)
+
+			writeConfiguration(kTempDirectory . this.AssistantType . ".state", configuration)
+
 			return (this.VoiceManager.Muted := value)
 		}
 	}
 
-	Speaker[muted := false] {
+	Speaker[force := false] {
 		Get {
-			return this.VoiceManager.Speaker[muted]
+			return this.VoiceManager.Speaker[force]
 		}
 	}
 
@@ -414,6 +420,14 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		this.iVoiceManager := this.createVoiceManager(name, options)
+
+		configuration := newConfiguration()
+
+		setConfigurationValue(configuration, "Voice", "Speaker", this.Speaker[true])
+		setConfigurationValue(configuration, "Voice", "Listener", this.Listener)
+		setConfigurationValue(configuration, "Voice", "Muted", this.Muted)
+
+		writeConfiguration(kTempDirectory . assistantType . ".state", configuration)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -1150,10 +1164,10 @@ class RaceAssistant extends ConfigurationItem {
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
 		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
-			
+
 		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
 			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
-		
+
 		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)

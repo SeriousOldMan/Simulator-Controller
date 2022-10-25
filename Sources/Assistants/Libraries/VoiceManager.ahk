@@ -413,9 +413,9 @@ class VoiceManager {
 		}
 	}
 
-	Speaker[muted := true] {
+	Speaker[force := true] {
 		Get {
-			return (muted || !this.Muted) ? this.iSpeaker : false
+			return (force || !this.Muted) ? this.iSpeaker : false
 		}
 	}
 

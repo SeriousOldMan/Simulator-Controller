@@ -2667,23 +2667,25 @@ runBuildTargets(ByRef buildProgress) {
 				if !FileExist(targetSource)
 					throw "Source file not found..."
 
-				SplitPath targetSource, , sourceDirectory
-
-				FileRead sourceCode, %targetSource%
-
 				if (vTargetConfiguration = "Production") {
+					SplitPath targetSource, , sourceDirectory
+
+					FileRead sourceCode, %targetSource%
+
 					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include ..\Includes\Development.ahk`r`n;@SC-EndIF", "")
 
 					sourceCode := StrReplace(sourceCode, ";@SC #Include ..\Includes\Production.ahk", "#Include ..\Includes\Production.ahk")
+
+					deleteFile(sourceDirectory . "\compile.ahk")
+
+					FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
+
+					RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
+
+					deleteFile(sourceDirectory . "\compile.ahk")
 				}
-
-				deleteFile(sourceDirectory . "\compile.ahk")
-
-				FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
-
-				RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
-
-				deleteFile(sourceDirectory . "\compile.ahk")
+				else
+					RunWait % kCompiler . " /in """ . targetSource . """"
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))

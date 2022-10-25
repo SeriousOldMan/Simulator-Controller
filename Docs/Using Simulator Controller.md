@@ -152,7 +152,43 @@ There is also the possibility to trigger actions in Simulator Controller from ot
    This will achieve the same effect as pushing or rotating the corresponding controls on your hardware controller. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) to see which controller functions (*1WayToggle*, *2WayToggle*, *Button*, *Dial* and *Custom*) are available and especially how to define *Custom* controller functions (which are typically not assiciated with a Button Box or a Stream Deck) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). As you have seen in the above example, you must use *On* and *Off* as a second argument for *2WayToggle*, and *Increase* and *Decrease* for *Dial*, to specify the desired change.
 
    A last note for experienced users: Together with the [*execute* controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller), you can create powerful macros. Create a *Custom* controller function, which can be triggered by a button, for example on your steering wheel. This *Custom* function *executes* a Windows command script wich the writes a "Controller.cmd" file as described above.
+   
+## Monitoring health and activities
+
+Simulator Controller is a complex system with lots of different processes and even uses cloud-based servers when you are using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). In such a complex system, lots of things can go wrong and it is therefore important to understand the internal state and activities of all parts of the system. This is, where the "System Monitor" comes into play.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%201.JPG)
+
+This tool, which either can be startet on demand by using the launch pad described above or automatically whenever you enter a simulation with Simualtor Controller (check "System Monitor" in the *Core* section of the settings as described above), provides you complete information about all the components of Simulator Controller. In order to give you a quick graphical clue, "System Monitor" uses color-coded traffic lights for each component and process.
+
+| Color      | Meaning                                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Dark gray  | Not started currently. An example is the current simulation, if no simulation game is currently running.                             |
+| Light gray | Started, but waiting to become active. For example, you have started the game but are in the main menus.                             |
+| Green      | Component is up and running.                                                                                                         |
+| Yellow     | Component is up, but no normal operation is possible. Example: The Race Assistants have a cool down time after the end of a session. |
+| Red        | Somthing is wrong and might need your attention. Example: The connection to the Team Server cannot be established.                   |
+
+The "System Monitor" is divided into several pages of information:
+
+  1. Dashboard
+  
+     This page gives an overview over the most important functions and background processes. You can see, when a running simulation has been detected, whether the Race Assistants are active, whether the connection to the Team Server has been sucessfully established and so on. The *traffic lights* will show you the health state at a glance using the color coding described above and a couple of important detail informations will be provided as well.
+
+  2. Modules
+  
+     A more detailed with than the Dashboard. Here you can see a list of all components of Simulator Controller and their current health state. In the "Information" column, you will get a short summary of the current state of operation, but you will also see detailed error messages here, when a component is in a critical state.
+
+  3. Team Session
+  
+     Since it is such an important part of the operation in team events, the connection to the Team Server has its own page of information. Beside monitoring your own connection to the Team Server you will see which other drivers are currently successfully connected to the Team Server and who is currently driving the car. You will also be warned if there is a mismatch in driver names, since driver name match is a very important aspect of the operation of the Team Server.
+
+  4. Logs
+  
+     Provides a very low level view into the operation of Simulator Controller. All applications write log information, especially when errors or other unexpected situations occur. The recent log entries of all applications will be displayed here in this list. You can switch between log levels for all currently running applications with the dropdown menu in the lower right corner, but be aware that chossing "Info" might slow down the applications significantly. So use this only when tracking down problems. 
+
+Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problem will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued.
 
 ## And now it's time
 
-...to have some fun. If you like Simulator Controller and find it useful, I would be very happy about a small donation, which will help in further development of this software. Please see the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) for the donation link. Thanks and see you on the track...
+...to have some fun. If you like Simulator Controller and find it useful, I would be very happy about a small donation, which will help in the further development of this software. Please see the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) for the donation link. Thanks and see you on the track...

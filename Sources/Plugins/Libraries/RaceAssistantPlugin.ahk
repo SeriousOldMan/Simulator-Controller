@@ -724,7 +724,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	writePluginState(configuration) {
-		local session
+		local session, information
 
 		if this.Active {
 			if this.RaceAssistantEnabled {
@@ -756,12 +756,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 					setConfigurationValue(configuration, "Race Assistants", "Session", session)
 
-					setConfigurationValue(configuration, this.Plugin, "Information"
-										, values2String("; ", translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No")
-															, translate("Session: ") . translate(session)
-															, translate("Laps: ") . this.LastLap
-															, translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo")))
+					information := values2String("; ", translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No")
+													 , translate("Session: ") . translate(session)
+													 , translate("Laps: ") . this.LastLap
+													 , translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo"))
 
+					if !this.RaceAssistantSpeaker {
+						information .= ("; " . translate("Muted: ") . translate("Yes"))
+
+						setConfigurationValue(configuration, this.Plugin, "Muted", true)
+					}
+
+					setConfigurationValue(configuration, this.Plugin, "Information", information)
 				}
 				else {
 					setConfigurationValue(configuration, "Assistants", this.Plugin, "Passive")

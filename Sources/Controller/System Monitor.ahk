@@ -723,7 +723,7 @@ updateAssistantsState(controllerState) {
 	local overallState := "Disabled"
 	local html := "<table>"
 	local info := ""
-	local assistant, state
+	local assistant, state, configuration
 
 	for key, state in getConfigurationSectionValues(controllerState, "Race Assistants", {}) {
 		if ((key = "Mode") || (key = "Session"))
@@ -733,17 +733,27 @@ updateAssistantsState(controllerState) {
 				overallState := "Active"
 
 				state := "Active"
+
+				if getConfigurationValue(controllerState, key, "Muted", false)
+					state .= translate(" (Muted)")
+				else {
+					configuration := readConfiguration(kTempDirectory . key . ".state")
+
+					if (getConfigurationValue(configuration, "Voice", "Muted", false)
+					 || !getConfigurationValue(configuration, "Voice", "Speaker", true))
+						state .= translate(" (Muted)")
+				}
 			}
 			else if (state = "Waiting") {
 				if (overallState = "Disabled")
 					overallState := "Passive"
 
-				state := "Waiting..."
+				state := translate("Waiting...")
 			}
 			else
-				state := "Inactive"
+				state := translate("Inactive")
 
-			html .= ("<tr><td><b>" . translate(key) . translate(":") . "</b></td><td>" . translate(state) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate(key) . translate(":") . "</b></td><td>" . state . "</td></tr>")
 		}
 	}
 

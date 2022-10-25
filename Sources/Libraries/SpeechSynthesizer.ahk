@@ -60,6 +60,8 @@ class SpeechSynthesizer {
 	iCache := {}
 	iCacheDirectory := false
 
+	static sSoundPlayerInitialized := false
+
 	iSoundPlayer := false
 	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
@@ -153,7 +155,7 @@ class SpeechSynthesizer {
 
 	__New(synthesizer, voice := false, language := false) {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
-		local player, copied
+		local player, copied, configuration, audioDevice, audioDriver
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -253,7 +255,22 @@ class SpeechSynthesizer {
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
 
-		if kSox
+		if kSox {
+			if !SpeechSynthesizer.sSoundPlayerInitialized {
+				SpeechSynthesizer.sSoundPlayerInitialized := true
+
+				configuration := readConfiguration(kUserConfigDirectory . "Audio Processing.ini")
+
+				audioDriver := getConfigurationValue(configuration, "Output", "AudioDriver", kUndefined)
+				audioDevice := getConfigurationValue(configuration, "Output", "AudioDevice", kUndefined)
+
+				if (audioDriver != kUndefined)
+					EnvSet AUDIODRIVER, %audioDriver%
+
+				if (audioDevice != kUndefined)
+					EnvSet AUDIODEV, %audioDevice%
+			}
+
 			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
 				if !FileExist(kTempDirectory . player) {
 					copied := false
@@ -268,6 +285,7 @@ class SpeechSynthesizer {
 							logError(exception)
 						}
 				}
+		}
 	}
 
 	setPlayerLevel(level) {

@@ -255,7 +255,7 @@ updateSessionDatabase() {
 				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 30)
 			}
 
-			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000)
+			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000, kLowPriority)
 		}
 	}
 }

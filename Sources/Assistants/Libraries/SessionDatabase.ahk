@@ -1404,7 +1404,7 @@ synchronizeDatabase(rebuild := false) {
 			finally {
 				synchronizeTask.stop()
 
-				stateTask.start()
+				Task.startTask(ObjBindMethod(stateTask, "start"), 10000)
 			}
 		}
 		catch exception {

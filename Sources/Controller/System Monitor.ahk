@@ -495,7 +495,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s9 Norm, Arial
 		Gui SM:Font, Italic Underline, Arial
 
-		Gui SM:Add, Text, x333 YP+20 w140 cBlue Center gopenSystemMonitorDocumentation, % translate("Monitor")
+		Gui SM:Add, Text, x333 YP+20 w140 cBlue Center gopenSystemMonitorDocumentation, % translate("Monitoring")
 
 		Gui SM:Font, s8 Norm, Arial
 
@@ -973,7 +973,7 @@ startSystemMonitor() {
 
 	fixIE(11)
 
-	registerMessageHandler("Monitor", "monitorMessageHandler")
+	registerMessageHandler("Monitoring", "monitoringMessageHandler")
 
 	new SessionDatabase() ; so that file Simulator Controller.state can be deleted...
 
@@ -990,7 +990,7 @@ startSystemMonitor() {
 ;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-monitorMessageHandler(category, data) {
+monitoringMessageHandler(category, data) {
 	if (InStr(data, "logMessage") = 1) {
 		data := StrSplit(StrSplit(data, ":", , 2)[2], ";", " `t", 5)
 

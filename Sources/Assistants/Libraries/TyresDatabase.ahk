@@ -499,7 +499,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 					car := pressures.Car
 					track := pressures.Track
 
-					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
 
 					if (db.query("Tyres.Pressures", {Where: {Identifier: identifier} }).Length() = 0) {
 						counter += 1
@@ -540,17 +540,18 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 
 					count := pressures.Count
 
-					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+
+					properties := {Identifier: pressures.Identifier, Synchronized: timestamp
+								 , Driver: pressures.Driver, Weather: pressures.Weather
+								 , "Temperature.Air": pressures.AirTemperature, "Temperature.Track": pressures.TrackTemperature
+								 , Compound: pressures.TyreCompound, "Compound.Color": pressures.TyreCompoundColor
+								 , Type: pressures.Type, Tyre: pressures.Tyre, Pressure: pressures.Pressure, Count: count}
+
 
 					pressures := db.query("Tyres.Pressures.Distribution", {Where: {Identifier: identifier} })
 
 					if (pressures.Length() = 0) {
-						properties := {Identifier: pressures.Identifier, Synchronized: timestamp
-									 , Driver: pressures.Driver, Weather: pressures.Weather
-									 , "Temperature.Air": pressures.AirTemperature, "Temperature.Track": pressures.TrackTemperature
-									 , Compound: pressures.TyreCompound, "Compound.Color": pressures.TyreCompoundColor
-									 , Type: pressures.Type, Tyre: pressures.Tyre, Pressure: pressures.Pressure, Count: pressures.Count}
-
 						try {
 							db.add("Tyres.Pressures.Distribution", properties, true)
 						}

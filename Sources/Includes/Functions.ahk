@@ -1498,7 +1498,7 @@ logMessage(logLevel, message) {
 				sending := true
 
 				try {
-					sendMessage(kFileMessage, "Monitor", "logMessage:" . values2String(";", script, time, logLevel, message), ErrorLevel)
+					sendMessage(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), ErrorLevel)
 				}
 				finally {
 					sending := false

@@ -6,8 +6,8 @@
   5. Changed the upload / download of the community setup database to a new FTP service provider.
   6. Telemetry data synchronization will pick up at the right point in time after a system failure.
   7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor".
-  8. Windows are no longer lost offscreen, when a Monitor has been deactivated or removed at all.
-  9. Info and progress overlays can be positioned on a secondary screen, if necessary, so that they not interfere with the simulation at all.
+  8. Windows are no longer lost offscreen, when a Monitor has been deactivated or disconnect from the PC.
+  9. Info and progress overlays can now be positioned on a secondary screen as well, so that they do not interfere with the simulation at all.
 
 ## 4.4.0.0-release 10/21/22
   1. Minor bugfixes, as always

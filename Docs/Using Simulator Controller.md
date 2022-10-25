@@ -177,7 +177,7 @@ The "System Monitor" is divided into several pages of information:
 
   2. Modules
   
-     A more detailed with than the Dashboard. Here you can see a list of all components of Simulator Controller and their current health state. In the "Information" column, you will get a short summary of the current state of operation, but you will also see detailed error messages here, when a component is in a critical state.
+     A more detailed view than the Dashboard, since a list of **all** components of Simulator Controller and their current health state will be shown here. In the "Information" column, you will get a short summary of the current state of operation, but you will also see detailed error messages here, when a component is in a critical state.
 
   3. Team Session
   

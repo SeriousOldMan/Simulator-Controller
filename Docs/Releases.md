@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Telemetry and pressures synchronization can be choosen separately in the "Session Database".
-  4. New monitoring tool gives you an integrated view over the health and activities of all system components. See the all new [documentation](*) for more information.
+  4. New monitoring tool gives you an integrated view over the health and activities of all system components. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) for more information.
   5. Changed the upload / download of the community setup database to a new FTP service provider.
   6. Telemetry data synchronization will pick up at the right point in time after a system failure.
   7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor".

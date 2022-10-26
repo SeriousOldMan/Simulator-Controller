@@ -41,7 +41,7 @@
     - [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands)
     - [Controller Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#controller-commands)
     - [External Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands)
-  - [Monitoring](*)
+  - [Monitoring](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities)
 
 [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
 ------

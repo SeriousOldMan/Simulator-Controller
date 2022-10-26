@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.4.5.0-dev](https://www.dropbox.com/s/wop7azjg01rb9xv/Simulator%20Controller%204.4.5.0-dev.zip?dl=1) (Early build for 4.4.5. New features: New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message). Stable, incl. documentation.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

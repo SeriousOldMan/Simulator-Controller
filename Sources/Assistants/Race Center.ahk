@@ -4947,7 +4947,7 @@ class RaceCenter extends ConfigurationItem {
 		else
 			lap := (getConfigurationValue(data, "Laps", "Count") + 1)
 
-		message := (translate("Syncing race report (Lap: ") . lap . translate(")"))
+		message := (translate("Syncing race report (Lap: ") . (lap - 1) . translate(")"))
 
 		this.showMessage(message)
 

@@ -161,31 +161,39 @@ Simulator Controller is a complex system with lots of different processes and ev
 
 This tool, which either can be startet on demand by using the launch pad described above or automatically whenever you enter a simulation with Simualtor Controller (check "System Monitor" in the *Core* section of the settings as described above), provides you complete information about all the components of Simulator Controller. In order to give you a quick graphical clue, "System Monitor" uses color-coded traffic lights for each component and process.
 
-| Color      | Meaning                                                                                                                              |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Dark gray  | Not started currently. An example is the current simulation, if no simulation game is currently running.                             |
-| Light gray | Started, but waiting to become active. For example, you have started the game but are in the main menus.                             |
-| Green      | Component is up and running.                                                                                                         |
-| Yellow     | Component is up, but no normal operation is possible. Example: The Race Assistants have a cool down time after the end of a session. |
-| Red        | Somthing is wrong and might need your attention. Example: The connection to the Team Server cannot be established.                   |
+| Color                                                                                           | Meaning                                                                                                                              |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Black.png)  | Not started currently. An example is the current simulation, if no simulation game is currently running.                             |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Gray.png)   | Started, but waiting to become active. For example, you have started the game but are in the main menus.                             |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Green.png)  | Component is up and running.                                                                                                         |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Yellow.png) | Component is up, but no normal operation is possible. Example: The Race Assistants have a cool down time after the end of a session. |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Red.png)    | Somthing is wrong and might need your attention. Example: The connection to the Team Server cannot be established.                   |
 
 The "System Monitor" is divided into several pages of information:
 
   1. Dashboard
   
      This page gives an overview over the most important functions and background processes. You can see, when a running simulation has been detected, whether the Race Assistants are active, whether the connection to the Team Server has been sucessfully established and so on. The *traffic lights* will show you the health state at a glance using the color coding described above and a couple of important detail informations will be provided as well.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%202.JPG)
 
   2. Modules
   
      A more detailed view than the Dashboard, since a list of **all** components of Simulator Controller and their current health state will be shown here. In the "Information" column, you will get a short summary of the current state of operation, but you will also see detailed error messages here, when a component is in a critical state.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%203.JPG)
 
   3. Team Session
   
      Since it is such an important part of the operation in team events, the connection to the Team Server has its own page of information. Beside monitoring your own connection to the Team Server you will see which other drivers are currently successfully connected to the Team Server and who is currently driving the car. You will also be warned if there is a mismatch in driver names, since driver name match is a very important aspect of the operation of the Team Server.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%204.JPG)
 
   4. Logs
   
      Provides a very low level view into the operation of Simulator Controller. All applications write log information, especially when errors or other unexpected situations occur. The recent log entries of all applications will be displayed here in this list. You can switch between log levels for all currently running applications with the dropdown menu in the lower right corner, but be aware that chossing "Info" might slow down the applications significantly. So use this only when tracking down problems. 
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%205.JPG)
 
 Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problem will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued.
 

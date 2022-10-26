@@ -4947,13 +4947,6 @@ class RaceCenter extends ConfigurationItem {
 		else
 			lap := (getConfigurationValue(data, "Laps", "Count") + 1)
 
-		message := (translate("Syncing race report (Lap: ") . (lap - 1) . translate(")"))
-
-		this.showMessage(message)
-
-		if (getLogLevel() <= kLogInfo)
-			logMessage(kLogInfo, message)
-
 		if (lap == 1) {
 			try {
 				try {
@@ -4983,6 +4976,14 @@ class RaceCenter extends ConfigurationItem {
 
 			if (getConfigurationValue(data, "Cars", "Driver") = "__NotInitialized__")
 				setConfigurationValue(data, "Cars", "Driver", 0)
+		}
+		else {
+			message := (translate("Syncing race report (Lap: ") . (lap - 1) . translate(")"))
+
+			this.showMessage(message)
+
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, message)
 		}
 
 		pitstops := false

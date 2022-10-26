@@ -237,6 +237,7 @@
 		(Prove: changeSetting(Differential.Preload, -1, ?Understeer.Corner.Entry.Slow.Correction))
 		
 {All: [?Understeer.Corner.Entry.Slow.Correction != 0], [?Understeer.Corner.Entry.Slow.Value > 50]} =>
+		(Prove: changeSetting(Geometry.Caster, [Left, Right], 0.25, ?Understeer.Corner.Entry.Slow.Correction)),
 		(Prove: changeSetting(Geometry.Toe, [Front.Left, Front.Right], 0.5, ?Understeer.Corner.Entry.Slow.Correction)),
 		(Prove: changeSetting(Spring.Rate, [Front.Left, Front.Right], -1, ?Understeer.Corner.Entry.Slow.Correction)),
 		(Prove: changeSetting(Bumpstop.Range, [Front.Left, Front.Right], 1, ?Understeer.Corner.Entry.Slow.Correction)),

@@ -477,7 +477,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				else {
 					setConfigurationValue(configuration, this.Plugin, "State", "Warning")
 
-					setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("No team session configured"))
+					setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("No valid team session configured"))
 				}
 
 				teamServerState := []

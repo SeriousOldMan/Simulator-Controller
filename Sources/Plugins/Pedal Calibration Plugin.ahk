@@ -228,6 +228,13 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		else
 			this.logFunctionNotFound(descriptor)
 	}
+
+	writePluginState(configuration) {
+		if this.Active
+			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+		else
+			base.writePluginState(configuration)
+	}
 }
 
 

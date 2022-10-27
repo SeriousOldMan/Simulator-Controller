@@ -1,6 +1,6 @@
 # Quick Start
 
-Before we go into the full details of the complete installation and configuration process, which can be really overwhelming, especially for users new to Simulator Controller, take a short break and read the [quick start guide](*) which helps you to create a simple initial configuration after you have installed the software for the first time. After you have succesfully created and used this initial configuration, you can always come back here and read the remainder of this documentation, which gives you tons of information aboud all the configuration options of Simulator Controller.
+Before we go into the full details of the complete installation and configuration process, which can be really overwhelming, especially for users new to Simulator Controller, take a short break and read the [quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) which helps you to create a simple initial configuration after you have installed the software for the first time. After you have succesfully created and used this initial configuration, you can always come back here and read the remainder of this documentation, which gives you tons of information aboud all the configuration options of Simulator Controller.
 
 # Installation
 

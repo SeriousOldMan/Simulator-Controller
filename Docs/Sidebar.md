@@ -9,7 +9,7 @@
 
 [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration)
 ------
-  - [Quick Start Guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#quick-start-guide)
+  - [Quick Start](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#quick-start)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation)
   - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration)
     - [General](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general)

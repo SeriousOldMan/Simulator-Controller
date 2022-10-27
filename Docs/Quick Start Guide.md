@@ -1,5 +1,3 @@
-# Quick Start Guide
-
 You propably already have understood, that Simulator Controller is a quite sophisticated software with tons of configuration options. On the other hand, and especially as a new user, you want to get up and running as quickly as possible. This quick start guide will help you to get a fairly simple initial configuration as quickly as possible. Please follow the followinig steps, but also read the disclaimer at the end of the list to fully understand, what you *get for your money* and what not.
 
 1. Start "Simulator Setup"

@@ -1,9 +1,9 @@
 [Development]
 Version=4.4.5.0-dev
 Target=4.4.5.0-release
-Date=10/26/2022
+Date=10/27/2022
 Download=https://www.dropbox.com/s/wop7azjg01rb9xv/Simulator%20Controller%204.4.5.0-dev.zip?dl=1
-Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message)
+Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message), New car models for "Setup Advisor"
 [Release]
 Version=4.4.0.0-release
 Date=10/21/2022

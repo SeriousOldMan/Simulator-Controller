@@ -12,6 +12,7 @@
   11. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Ferrari 488 GT3
+	    - Ferrari 488 GT3 Evo
 
 ## 4.4.0.0-release 10/21/22
   1. Minor bugfixes, as always

@@ -8,7 +8,8 @@
   7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor". Range definitions has been updated for most cars of *Assetto Corsa Competizione*, the rest will follow with the next release.
   8. Windows of Simulator Controller applications are no longer lost offscreen, when a Monitor has been deactivated or disconnect from the PC.
   9. Info and progress overlays can now be positioned on a secondary screen as well, so that they do not interfere with the simulation at all.
-  10. New car models for "Setup Advisor":
+  10. New quick start guide for new users at the very beginning of the [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) documentation.
+  11. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Ferrari 488 GT3
 

@@ -1,13 +1,17 @@
 ## 4.4.5.0-release 10/28/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. Telemetry and pressures synchronization can be choosen separately in the "Session Database".
-  4. New monitoring tool gives you an integrated view over the health and activities of all system components. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) for more information.
-  5. Changed the upload / download of the community setup database to a new FTP service provider.
+  3. Telemetry and pressures synchronization can now be choosen separately in the "Session Database".
+  4. A new monitoring tool gives you an integrated view over the health and activities of all system components. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) for more information.
+  5. Updated the upload / download of the community setup database to a new FTP service provider.
   6. Telemetry data synchronization will pick up at the right point in time after a system failure.
-  7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor".
-  8. Windows are no longer lost offscreen, when a Monitor has been deactivated or disconnect from the PC.
+  7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor". Range definitions has been updated for most cars of *Assetto Corsa Competizione*, the rest will follow with the next release.
+  8. Windows of Simulator Controller applications are no longer lost offscreen, when a Monitor has been deactivated or disconnect from the PC.
   9. Info and progress overlays can now be positioned on a secondary screen as well, so that they do not interfere with the simulation at all.
+  10. New quick start guide for new users at the very beginning of the [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) documentation.
+  11. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Ferrari 488 GT3
 
 ## 4.4.0.0-release 10/21/22
   1. Minor bugfixes, as always

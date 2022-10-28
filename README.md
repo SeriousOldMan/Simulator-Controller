@@ -33,21 +33,19 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.4.0.0-release](https://cutt.ly/DB3goy2) (New features: Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command, New car models for "Setup Advisor", Refactoring of the translation framework to support the upcoming Spanish translation, Initial version of a Spanish translation, Choose driver in "Session Database" for tyre pressures.)
+[4.4.5.0-release](https://cutt.ly/YNk3Msn) (New features: New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message), New car models for "Setup Advisor", New quick start guide for Beginners.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-445) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[4.3.5.0-release](https://cutt.ly/ZBYdiqF) (New features: Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods.)
+[4.4.0.0-release](https://cutt.ly/DB3goy2) (New features: Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command, New car models for "Setup Advisor", Refactoring of the translation framework to support the upcoming Spanish translation, Initial version of a Spanish translation, Choose driver in "Session Database" for tyre pressures.)
 
-[4.3.4.1-release](https://cutt.ly/XBo2nvL) (New features: Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews).)
+[4.3.5.0-release](https://cutt.ly/ZBYdiqF) (New features: Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods.)
 
 #### Latest development build
 
-[4.4.5.0-dev](https://www.dropbox.com/s/wop7azjg01rb9xv/Simulator%20Controller%204.4.5.0-dev.zip?dl=1) (Early build for 4.4.5. New features: New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message), New car models for "Setup Advisor", New quick start guide for Beginners. Stable, incl. documentation.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

@@ -1,16 +1,16 @@
 [Development]
-Version=4.4.5.0-dev
+Version=4.4.5.0-release
 Target=4.4.5.0-release
-Date=10/27/2022
-Download=https://www.dropbox.com/s/wop7azjg01rb9xv/Simulator%20Controller%204.4.5.0-dev.zip?dl=1
+Date=10/28/2022
+Download=https://cutt.ly/YNk3Msn
 Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message), New car models for "Setup Advisor", New quick start guide for Beginners
 [Release]
-Version=4.4.0.0-release
-Date=10/21/2022
-Download=https://cutt.ly/DB3goy2
-Changes=Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command, New car models for "Setup Advisor", Refactoring of the translation framework to support the upcoming Spanish translation, Initial version of a Spanish translation, Choose driver in "Session Database" for tyre pressures
+Version=4.4.5.0-release
+Date=10/28/2022
+Download=https://cutt.ly/YNk3Msn
+Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message), New car models for "Setup Advisor", New quick start guide for Beginners
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.4.0.0-release
-Development=4.4.5.0-dev
+Release=4.4.5.0-release
+Development=4.4.5.0-release

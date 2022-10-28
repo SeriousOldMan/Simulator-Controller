@@ -964,6 +964,24 @@ updateMapperState(trackMapperState) {
 	updateDashboard(mapperDashboard, html)
 }
 
+clearOrphaneStateFiles() {
+	local ignore, fileName, modTime
+
+	static stateFiles := {}
+
+	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
+		if !stateFiles.HasKey(fileName)
+			stateFiles[fileName] := 0
+
+		FileGetTime modTime, %fileName%, M
+
+		if (stateFiles[fileName] != modTime)
+			stateFiles[fileName] := modTime
+		else
+			deleteFile(fileName)
+	}
+}
+
 startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch
@@ -980,6 +998,8 @@ startSystemMonitor() {
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")
+
+	new PeriodicTask(Func("clearOrphaneStateFiles"), 60000, kLowPriority).start()
 
 	systemMonitor()
 

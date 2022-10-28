@@ -1,9 +1,9 @@
 [Development]
-Version=4.4.5.0-release
-Target=4.4.5.0-release
+Version=4.4.6.0-dev
+Target=4.4.6.0-release
 Date=10/28/2022
-Download=https://cutt.ly/YNk3Msn
-Changes=New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message), New car models for "Setup Advisor", New quick start guide for Beginners
+Download=
+Changes=
 [Release]
 Version=4.4.5.0-release
 Date=10/28/2022
@@ -13,4 +13,4 @@ Changes=New monitoring tool for integrated health and activity control, Separate
 Type=Release
 [Version]
 Release=4.4.5.0-release
-Development=4.4.5.0-release
+Development=4.4.6.0-dev

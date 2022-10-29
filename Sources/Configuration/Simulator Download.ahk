@@ -55,6 +55,7 @@ downloadSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Download
 
+	/*
 	if !A_IsAdmin {
 		options := ""
 
@@ -81,12 +82,13 @@ downloadSimulatorController() {
 		catch exception {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
-			MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")
+			MsgBox 262160, %title%, % translate("An error occured while starting the automatic installation due to Windows security restrictions. You can try a manual installation.")
 			OnMessage(0x44, "")
 		}
 
 		ExitApp 0
 	}
+	*/
 
 	cState := GetKeyState("Control", "P")
 	sState := GetKeyState("Shift", "P")

@@ -584,7 +584,7 @@ checkInstallation() {
 				setConfigurationValue(installOptions, "Shortcuts", "Desktop", options["DesktopShortcuts"])
 				setConfigurationValue(installOptions, "Shortcuts", "StartMenu", options["StartMenuShortcuts"])
 
-				showSplashTheme("McLaren 720s GT3 Pictures")
+				; showSplashTheme("McLaren 720s GT3 Pictures")
 
 				vProgressCount := 0
 
@@ -654,7 +654,7 @@ checkInstallation() {
 
 				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
 
-				hideSplashTheme()
+				; hideSplashTheme()
 
 				if (installLocation != packageLocation) {
 					showProgress({message: translate("Removing installation files...")})

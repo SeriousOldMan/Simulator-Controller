@@ -341,7 +341,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				nr := StrReplace(cars[A_Index][1], """", "")
 
-				rows.Push(Array(nr, "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+				rows.Push(Array("'" . nr . "'", "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
 			}
 
@@ -355,12 +355,13 @@ class RaceReportViewer extends RaceReportReader {
 				rows[A_Index] := ("[" . values2String(", ", row*) . "]")
 			}
 
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Avg Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result") . "');"
+
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 

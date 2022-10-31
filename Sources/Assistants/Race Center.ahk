@@ -3221,8 +3221,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	planPitstop() {
-		local window, pitstopPlan, stint, drivers, currentDriver, nextDriver, currentNr, nextNr, session, lap, title
-		local compound, compoundColor
+		local window, pitstopPlan, stint, drivers, currentDriver, nextDriver, currentNr, nextNr
+		local session, lap, title, compound, compoundColor
 
 		if this.SessionActive {
 			window := this.Window
@@ -3255,19 +3255,29 @@ class RaceCenter extends ConfigurationItem {
 			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
 
 			stint := this.CurrentStint
+			driverSelected := false
 
 			if (stint && pitstopDriverDropDownMenu && (pitstopDriverDropDownMenu != "")) {
-				drivers := this.getPlanDrivers()
+				nextDriver := pitstopDriverDropDownMenu
+				nextNr := inList(this.TeamDrivers, nextDriver)
 
-				if (drivers.HasKey(stint.Nr)) {
-					currentDriver := drivers[stint.Nr]
-					nextDriver := pitstopDriverDropDownMenu
-
+				if nextNr {
+					currentDriver := stint.Driver.Fullname
 					currentNr := inList(this.TeamDrivers, currentDriver)
-					nextNr := inList(this.TeamDrivers, nextDriver)
 
-					if (currentNr && nextNr)
+					if currentNr
 						setConfigurationValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . nextDriver . ":" . nextNr)
+					else {
+						drivers := this.getPlanDrivers()
+
+						if (drivers.HasKey(stint.Nr)) {
+							currentDriver := drivers[stint.Nr]
+							currentNr := inList(this.TeamDrivers, currentDriver)
+
+							if currentNr
+								setConfigurationValue(pitstopPlan, "Pitstop", "Driver", currentDriver . ":" . currentNr . "|" . nextDriver . ":" . nextNr)
+						}
+					}
 				}
 			}
 

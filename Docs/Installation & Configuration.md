@@ -616,9 +616,9 @@ Please note, that you can start new lines in the label using **\n**.
 2. Controller Action Icons.XX
 
 	[Tactile Feedback]  
-	TC.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC+.jpg
-	TC.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC-.jpg
-	ABS.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_+.jpg
+	TC.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC+.jpg  
+	TC.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\TC-.jpg  
+	ABS.Increase=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_+.jpg  
 	ABS.Decrease=D:\Dateien\Bilder\Simulator Icons\ButtonDeck\ABS_-.jpg  
 	...
 

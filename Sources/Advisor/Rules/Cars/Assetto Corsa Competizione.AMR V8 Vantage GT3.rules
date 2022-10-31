@@ -11,4 +11,4 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "AMR V8 Vantage GT3", Aero.Splitter.Front))
+[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "AMR V8 Vantage GT3", [Aero.Splitter.Front, Electronics.Map]))

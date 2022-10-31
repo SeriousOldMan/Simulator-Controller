@@ -12,7 +12,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Alpine A110 GT4",
-										[Aero.Splitter.Front,
+										[Aero.Splitter.Front, Electronics.Map,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,

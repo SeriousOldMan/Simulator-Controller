@@ -12,7 +12,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 718 Cayman GT4 Clubsport",
-										[Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+										[Electronics.Map,
+										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
 										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right]))

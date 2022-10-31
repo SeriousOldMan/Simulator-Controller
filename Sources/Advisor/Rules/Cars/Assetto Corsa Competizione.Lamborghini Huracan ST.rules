@@ -11,4 +11,4 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSetting("Assetto Corsa Competizione", "Lamborghini Huracan ST", Aero.Splitter.Front))
+[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Lamborghini Huracan ST", [Aero.Splitter.Front, Electronics.Map]))

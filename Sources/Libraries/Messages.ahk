@@ -202,7 +202,7 @@ class MessageManager extends PeriodicTask {
 				file := FileOpen(fileName, "rw-rwd")
 			}
 			catch exception {
-				return false
+				return result
 			}
 
 			messageHandlers := this.MessageHandlers

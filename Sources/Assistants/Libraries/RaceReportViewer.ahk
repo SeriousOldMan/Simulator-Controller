@@ -924,6 +924,7 @@ class RaceReportViewer extends RaceReportReader {
 			data.addColumn({id:'min', type:'number', role:'interval'});
 			data.addColumn({id:'firstQuartile', type:'number', role:'interval'});
 			data.addColumn({id:'median', type:'number', role:'interval'});
+			data.addColumn({id:'mean', type:'number', role:'interval'});
 			data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
 			)
 
@@ -950,7 +951,8 @@ class RaceReportViewer extends RaceReportReader {
 				series: [ { 'color': 'D8D8D8' } ],
 				intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
 				interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
-							min: { style: 'bars', fillOpacity: 1, color: '#777' } }
+							min: { style: 'bars', fillOpacity: 1, color: '#777' },
+							mean: { style: 'points', color: 'grey', pointsize: 5 } }
 			};
 			)
 
@@ -996,24 +998,26 @@ getPaceJSFunctions() {
 			var max = arr[arr.length - 1];
 			var min = arr[0];
 			var median = getMedian(arr);
+			var average = getAverage(arr);
 
 			if (arr.length `% 2 === 0) {
 				var midUpper = arr.length / 2;
 				var midLower = midUpper - 1;
 
 				array[i][base + 2] = getMedian(arr.slice(0, midUpper));
-				array[i][base + 4] = getMedian(arr.slice(midLower));
+				array[i][base + 5] = getMedian(arr.slice(midLower));
 			}
 			else {
 				var index = Math.floor(arr.length / 2);
 
 				array[i][base + 2] = getMedian(arr.slice(0, index + 1));
-				array[i][base + 4] = getMedian(arr.slice(index));
+				array[i][base + 5] = getMedian(arr.slice(index));
 			}
 
 			array[i][base] = max;
 			array[i][base + 1] = min
 			array[i][base + 3] = median;
+			array[i][base + 4] = average;
 		}
 
 		return array;
@@ -1039,6 +1043,23 @@ getPaceJSFunctions() {
 		}
 		else {
 			return array[Math.floor(length / 2)];
+		}
+	}
+
+	/*
+	* Takes an array and returns
+	* the average value.
+	*/
+	function getAverage(array) {
+		var value = 0;
+
+		if (array.length == 0)
+			return 0;
+		else {
+			for (var i = 0; i < array.length; i++)
+				value = value + array[i];
+
+			return value / array.length;
 		}
 	}
 	)

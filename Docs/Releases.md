@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Fixed a bug for occasional crashes during update installations.
-  4. Thanks to Jose Krilin, Spanish is now alos supported for voice output and voice recognition of the Race Assistants.
+  4. Thanks to Jose Krilin, Spanish is now also supported for voice output and voice recognition of the Race Assistants.
   5. Map and caster meta data has been completed for all cars of *Assetto Corsa Competizione* in "Setup Advisor".
   6. Automated driver selection works in "Race Center" now,  when no stint plan has been created.
   7. Fixed a bug in "Race Reports", when a race number of a car is actually not a number like in '59B'.

@@ -6,7 +6,7 @@
   5. Map and caster meta data has been completed for all cars of *Assetto Corsa Competizione* in "Setup Advisor".
   6. Automated driver selection works in "Race Center" now,  when no stint plan has been created.
   7. Fixed a bug in "Race Reports", when a race number of a car is actually not a number like in '59B'.
-  8. Simple tyre compounds now all use the suffix "(Black)" for a better distinguishment from "dry" weather conditions.
+  8. Simple tyre compounds now all use the suffix "(Black)" for a better distinguishment from "dry" and "wet" weather conditions, which was necessary for translation support.
   9. Speech synthesizer and recognizer libraries are updated to the latest release of the Azure libraries.
   10. Race reports have been update to show both the median and mean values of the lap times of the selected drivers / cars.
 

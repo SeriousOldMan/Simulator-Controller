@@ -1014,7 +1014,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
 		if (compound != kUndefined) {
-			compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, "Dry")
+			compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, kUndefined)
+			
+			if (compound = kUndefined)
+				compound := normalizeCompound("Dry")
+				
 			compoundColor := false
 
 			splitCompound(compound, compound, compoundColor)
@@ -1857,7 +1861,7 @@ getSimulatorOptions(plugin := false) {
 			options .= " -AirTemperature " . Round(getConfigurationValue(data, "Weather Data", "Temperature", "23"))
 			options .= " -TrackTemperature " . Round(getConfigurationValue(data, "Track Data", "Temperature", "27"))
 			options .= " -Compound " . getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-			options .= " -CompoundColor " . getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Dry")
+			options .= " -CompoundColor " . getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
 			options .= " -Map " . getConfigurationValue(data, "Car Data", "MAP", "n/a")
 			options .= " -TC " . getConfigurationValue(data, "Car Data", "TC", "n/a")
 			options .= " -ABS " . getConfigurationValue(data, "Car Data", "ABS", "n/a")

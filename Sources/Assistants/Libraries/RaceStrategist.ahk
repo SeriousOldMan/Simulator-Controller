@@ -126,7 +126,7 @@ class RaceStrategist extends RaceAssistant {
 			this.iRaceStrategist := strategist
 
 			base.__New()
-			
+
 			this.Shared := false
 
 			this.setDatabase(new Database(strategist.TelemetryDatabaseDirectory, kTelemetrySchemas))
@@ -2317,7 +2317,7 @@ class RaceStrategist extends RaceAssistant {
 				try {
 					speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
 																												  : "WeatherDryChange"
-									  , {minutes: minutes, compound: fragments[recommendedCompound]})
+									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 					if this.Strategy {
 						speaker.speakPhrase("ConfirmUpdateStrategy", false, true)

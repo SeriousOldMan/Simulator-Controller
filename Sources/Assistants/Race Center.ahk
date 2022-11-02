@@ -300,7 +300,7 @@ class RaceCenter extends ConfigurationItem {
 	iAirTemperature := false
 	iTrackTemperature := false
 
-	iTyreCompounds := ["Dry"]
+	iTyreCompounds := [normalizeCompound("Dry")]
 
 	iTyreCompound := false
 	iTyreCompoundColor := false
@@ -1428,7 +1428,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x523 yp w18 h20
 		Gui %window%:Add, Text, x563 yp w35 h23 +0x200, % translate("A / T")
 
-		choices := map(["Dry"], "translate")
+		choices := map([normalizeCompound("Dry")], "translate")
 
 		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x474 yp+1 w126 AltSubmit Choose0 vsetupCompoundDropDownMenu gupdateSetup, % values2String("|", choices*)
@@ -1473,7 +1473,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Tyre Change")
-		choices := map(["No Tyre Change", "Dry"], "translate")
+		choices := map(["No Tyre Change", normalizeCompound("Dry")], "translate")
 		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x24 yp+26 w85 h20, % translate("Tyre Set")
@@ -2134,7 +2134,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_Modify(LV_Add("Select", getKeys(this.SessionDrivers)[1]
 										 , translate("Dry") . A_Space . translate("(") . setupAirTemperatureEdit
 															. ", " . setupTrackTemperatureEdit . translate(")")
-										 , translate("Dry")
+										 , translate(normalizeCompound("Dry"))
 										 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit
 															 , setupBasePressureRLEdit, setupBasePressureRREdit)), "Vis")
 
@@ -4410,7 +4410,7 @@ class RaceCenter extends ConfigurationItem {
 					if row {
 						LV_GetText(compound, row, 3)
 
-						GuiControl Choose, setupCompoundDropDownMenu, % inList(map(this.TyreCompounds, "translate"), compound)
+						GuiControl Choose, setupCompoundDropDownMenu, % inList(map(this.TyreCompounds, "translate"), normalizeCompound(compound))
 					}
 					else
 						GuiControl Choose, setupCompoundDropDownMenu, % ((compounds.Length() > 0) ? 1 : 0)
@@ -6475,7 +6475,8 @@ class RaceCenter extends ConfigurationItem {
 			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint.ID})
 
 			newStint := {Nr: stint.Nr, Lap: stint.Lap, Driver: driver
-					   , Weather: stint.Weather, Compound: stint.Compound, AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"]
+					   , Weather: stint.Weather, Compound: normalizeCompound(stint.Compound)
+					   , AvgLaptime: stint["Lap.Time.Average"], BestLaptime: stint["Lap.Time.Best"]
 					   , FuelConsumption: stint["Fuel.Consumption"], Accidents: stint.Accidents
 					   , StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]
 					   , Time: stint["Time.Start"]}
@@ -10360,7 +10361,7 @@ chooseSetup() {
 			GuiControl Choose, setupDriverDropDownMenu, % inList(getKeys(rCenter.SessionDrivers), driver)
 
 			GuiControl Choose, setupWeatherDropDownMenu, % inList(map(kWeatherConditions, "translate"), conditions[1])
-			GuiControl Choose, setupCompoundDropDownMenu, % inList(map(rCenter.TyreCompounds, "translate"), compound)
+			GuiControl Choose, setupCompoundDropDownMenu, % inList(map(rCenter.TyreCompounds, "translate"), normalizeCompound(compound))
 
 			GuiControl, , setupAirTemperatureEdit, %setupAirTemperatureEdit%
 			GuiControl, , setupTrackTemperatureEdit, %setupTrackTemperatureEdit%

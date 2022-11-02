@@ -46,10 +46,10 @@ global kToolsConfigurationFile := "Simulator Tools.ini"
 global kToolsTargetsFile := "Simulator Tools.targets"
 
 global kUpdateMessages := {updateTranslations: "Updating translations to "
-						, updatePluginLabels: "Updating plugin labels to "
-						, updateActionLabels: "Updating action labels to "
-						, updateActionIcons: "Updating action icons to "
-						, updatePhraseGrammars: "Updating phrase grammars to "}
+						 , updatePluginLabels: "Updating plugin labels to "
+						 , updateActionLabels: "Updating action labels to "
+						 , updateActionIcons: "Updating action icons to "
+						 , updatePhraseGrammars: "Updating phrase grammars to "}
 
 global kCompiler := kAHKDirectory . "Compiler\ahk2exe.exe"
 

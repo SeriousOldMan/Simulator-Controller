@@ -202,7 +202,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 					compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw")
 					compound := new SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track
-																		, compound, "Dry")
+																		, compound, kUndefined)
+					
+					if (compound = kUndefined)
+						compound := normalizeCompound("Dry")
+						
 					compoundColor := false
 
 					splitCompound(compound, compound, compoundColor)

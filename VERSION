@@ -1,9 +1,9 @@
 [Development]
 Version=4.4.6.0-dev
 Target=4.4.6.0-release
-Date=10/31/2022
+Date=11/2/2022
 Download=
-Changes=Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure
+Changes=Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)"
 [Release]
 Version=4.4.5.0-release
 Date=10/28/2022

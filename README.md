@@ -220,7 +220,7 @@ Want to contribute? Great!
   - Build your own plugins and offer them on GitHub or join the [Discord community](https://discord.gg/5N8JrNr48H) and post your plugin in the #share-your-mods channel. Contact me and I will add a link to your plugin in this documentation.
   - Found a bug, or built a new feature? Even better. Please contact me, and I will give you access to the code repository.
 
-Heads Up: I am looking for a co-developer for the some fancy upcoming AI stuff.
+Heads Up: I am looking for a co-developer for some fancy upcoming AI stuff.
 
 ### To Do
 

@@ -8,7 +8,7 @@
   7. Fixed a bug in "Race Reports", when a race number of a car is actually not a number like in '59B'.
   8. Simple tyre compounds now all use the suffix "(Black)" for a better distinguishment from "dry" and "wet" weather conditions, which was necessary for translation support.
   9. Speech synthesizer and recognizer libraries are updated to the latest release of the Azure libraries.
-  10. Race reports have been update to show both the median and mean values of the lap times of the selected drivers / cars.
+  10. Race reports have been updated to show both median and mean values of the lap times of the selected drivers / cars.
 
 ## 4.4.5.0-release 10/28/22
   1. Minor bugfixes, as always

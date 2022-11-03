@@ -47,7 +47,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 [4.4.6.0-beta](https://www.dropbox.com/s/5i3ns6vlroit663/Simulator%20Controller%204.4.6.0-beta.zip?dl=1) (Test build for 4.4.6. New features: Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)", Both median and mean values are now shown in the pace report, New alternative pace report in "Race Reports". Stable, incl. documentation updates.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-445) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-446) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

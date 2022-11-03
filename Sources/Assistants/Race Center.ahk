@@ -1851,7 +1851,7 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
-			if inList(["Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Performance", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
@@ -7232,6 +7232,18 @@ class RaceCenter extends ConfigurationItem {
 		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
+	showPerformanceReport() {
+		this.selectReport("Performance")
+
+		this.ReportViewer.showPerformanceReport()
+
+		this.updateState()
+	}
+
+	editPerformanceReportSettings() {
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
+	}
+
 	showTrackMap() {
 		local html := false
 		local lastLap := this.LastLap
@@ -7510,6 +7522,8 @@ class RaceCenter extends ConfigurationItem {
 				this.showConsistencyReport()
 			case "Pace":
 				this.showPaceReport()
+			case "Performance":
+				this.showPerformanceReport()
 		}
 	}
 
@@ -8132,6 +8146,9 @@ class RaceCenter extends ConfigurationItem {
 			case "Pace":
 				if this.editPaceReportSettings()
 					this.showPaceReport()
+			case "Performance":
+				if this.editPerformanceReportSettings()
+					this.showPerformanceReport()
 			case "Pressures":
 				if this.editPressuresReportSettings()
 					this.showPressuresReport()

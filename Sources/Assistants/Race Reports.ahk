@@ -391,6 +391,29 @@ class RaceReports extends ConfigurationItem {
 		return this.ReportViewer.editReportSettings("Laps", "Cars")
 	}
 
+	showPerformanceReport(reportDirectory) {
+		if reportDirectory {
+			GuiControl Enable, reportSettingsButton
+			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Performance")
+
+			this.iSelectedReport := "Performance"
+		}
+		else {
+			GuiControl Choose, reportsDropDown, 0
+
+			this.iSelectedReport := false
+		}
+
+		this.ReportViewer.setReport(reportDirectory)
+		this.ReportViewer.showPerformanceReport()
+	}
+
+	editPerformanceReportSettings(reportDirectory) {
+		this.ReportViewer.setReport(reportDirectory)
+
+		return this.ReportViewer.editReportSettings("Laps", "Cars")
+	}
+
 	getSimulators() {
 		local simulators := []
 		local ignore, simulator, hasReports
@@ -696,6 +719,8 @@ class RaceReports extends ConfigurationItem {
 						this.showConsistencyReport(reportDirectory)
 					case "Pace":
 						this.showPaceReport(reportDirectory)
+					case "Performance":
+						this.showPerformanceReport(reportDirectory)
 				}
 			}
 			else {
@@ -728,6 +753,9 @@ class RaceReports extends ConfigurationItem {
 			case "Pace":
 				if this.editPaceReportSettings(reportDirectory)
 					this.showPaceReport(reportDirectory)
+			case "Performance":
+				if this.editPerformanceReportSettings(reportDirectory)
+					this.showPerformanceReport(reportDirectory)
 		}
 	}
 }

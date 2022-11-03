@@ -16,6 +16,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\CLR.ahk
+#Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 
 
@@ -26,10 +28,10 @@
 global kWeatherConditions := ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
 global kTyreCompounds := ["Wet", "Intermediate", "Dry"
-					    , "Wet (S)", "Wet (M)", "Wet (H)"
-					    , "Intermediate (S)", "Intermediate (M)", "Intermediate (H)"
-					    , "Dry (S+)", "Dry (S)", "Dry (M)", "Dry (H)", "Dry (H+)"
-					    , "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
+						, "Wet (S)", "Wet (M)", "Wet (H)"
+						, "Intermediate (S)", "Intermediate (M)", "Intermediate (H)"
+						, "Dry (S+)", "Dry (S)", "Dry (M)", "Dry (H)", "Dry (H+)"
+						, "Dry (Red)", "Dry (Yellow)", "Dry (White)", "Dry (Green)", "Dry (Blue)"]
 
 global kDryQualificationSetup := "DQ"
 global kDryRaceSetup := "DR"
@@ -38,7 +40,7 @@ global kWetRaceSetup := "WR"
 
 global kSetupTypes := [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
-global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
+global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname", "Identifier", "Synchronized"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -46,19 +48,28 @@ global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname"]}
 ;;;-------------------------------------------------------------------------;;;
 
 class SessionDatabase extends ConfigurationItem {
+	static sConfiguration := false
+	static sControllerState := false
+
 	static sCarData := {}
 	static sTrackData := {}
 	static sTyreData := {}
 
 	static sID := false
 
-	iControllerConfiguration := false
+	static sConnector := "__Undefined__"
+	static sServerURL := "__Undefined__"
+	static sServerToken := "__Undefined__"
+
+	static sConnected := false
+
+	static sSynchronizers := []
 
 	iUseCommunity := false
 
 	ID[] {
 		Get {
-			return this.sID
+			return SessionDatabase.sID
 		}
 	}
 
@@ -72,7 +83,7 @@ class SessionDatabase extends ConfigurationItem {
 				return id
 			}
 			catch exception {
-				return this.ID
+				return SessionDatabase.ID
 			}
 		}
 	}
@@ -84,6 +95,8 @@ class SessionDatabase extends ConfigurationItem {
 
 		Set {
 			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			value := (normalizeDirectoryPath(value) . "\")
 
 			setConfigurationValue(configuration, "Database", "Path", value)
 			setConfigurationValue(this.Configuration, "Database", "Path", value)
@@ -104,6 +117,7 @@ class SessionDatabase extends ConfigurationItem {
 			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
 			setConfigurationValue(configuration, "Database", "Version", value)
+			setConfigurationValue(this.Configuration, "Database", "Version", value)
 
 			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
@@ -111,9 +125,159 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	ControllerConfiguration[] {
+	Connector[] {
 		Get {
-			return this.iControllerConfiguration
+			local connector := false
+			local dllName, dllFile, connection
+
+			static retry := 0
+
+			if (this.ServerURL && !SessionDatabase.sConnector && (A_TickCount > retry))
+				SessionDatabase.sConnector := kUndefined
+
+			if (SessionDatabase.sConnector == kUndefined) {
+				if this.ServerURL {
+					retry := (A_TickCount + 10000)
+
+					dllName := "Data Store Connector.dll"
+					dllFile := kBinariesDirectory . dllName
+
+					try {
+						if (!FileExist(dllFile)) {
+							logMessage(kLogCritical, translate("Data Store Connector.dll not found in ") . kBinariesDirectory)
+
+							throw "Unable to find Data Store Connector.dll in " . kBinariesDirectory . "..."
+						}
+
+						connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
+					}
+					catch exception {
+						logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
+
+						showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
+								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					}
+
+					if connector {
+						connector.Initialize(this.ServerURL, this.ServerToken)
+
+						temp := connector.Token
+
+						try {
+							connection := connector.Connect(this.ServerToken, this.ID, this.getUserName())
+
+							if (connection && (connection != "")) {
+								try {
+									connector.ValidateDataToken()
+								}
+								catch exception {
+									logError(exception)
+
+									connector := false
+
+									throw exception
+								}
+
+								if connector
+									new PeriodicTask(Func("keepAlive").Bind(connector, connection), 10000, kInterruptPriority).start()
+							}
+							else
+								connector := false
+						}
+						catch exception {
+							logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL
+												   . translate(", Token: ") . this.ServerToken
+												   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+							connector := false
+						}
+					}
+
+					SessionDatabase.sConnector := connector
+				}
+				else
+					SessionDatabase.sConnector := false
+
+				this.Connected := (SessionDatabase.sConnector != false)
+			}
+
+			return SessionDatabase.sConnector
+		}
+	}
+
+	Connected[] {
+		Get {
+			return SessionDatabase.sConnected
+		}
+
+		Set {
+			return (SessionDatabase.sConnected := value)
+		}
+	}
+
+	ServerURL[] {
+		Get {
+			if (SessionDatabase.sServerURL == kUndefined) {
+				SessionDatabase.sServerURL := ((this.ID = this.DatabaseID)
+													? getConfigurationValue(this.Configuration, "Team Server", "Server.URL", false)
+													: false)
+
+				if (SessionDatabase.sServerURL = "")
+					SessionDatabase.sServerURL := false
+			}
+
+			return SessionDatabase.sServerURL
+		}
+	}
+
+	ServerToken[] {
+		Get {
+			if (SessionDatabase.sServerToken == kUndefined) {
+				SessionDatabase.sServerToken := ((this.ID = this.DatabaseID)
+													? getConfigurationValue(this.Configuration, "Team Server", "Server.Token", false)
+													: false)
+
+				if (SessionDatabase.sServerToken = "")
+					SessionDatabase.sServerToken := false
+			}
+
+			return SessionDatabase.sServerToken
+		}
+	}
+
+	Synchronizers[] {
+		Get {
+			return SessionDatabase.sSynchronizers
+		}
+	}
+
+	Synchronization[] {
+		Get {
+			return getConfigurationValue(this.Configuration, "Team Server", "Synchronization", 0)
+		}
+
+		Set {
+			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+			setConfigurationValue(configuration, "Team Server", "Synchronization", value)
+
+			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+			setConfigurationValue(this.Configuration, "Team Server", "Synchronization", value)
+
+			return value
+		}
+	}
+
+	Groups[] {
+		Get {
+			return string2Values(",", getConfigurationValue(this.Configuration, "Team Server", "Groups", "Telemetry, Pressures"))
+		}
+	}
+
+	ControllerState[] {
+		Get {
+			return SessionDatabase.sControllerState
 		}
 	}
 
@@ -129,6 +293,7 @@ class SessionDatabase extends ConfigurationItem {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
 				setConfigurationValue(configuration, "Scope", "Community", value)
+				setConfigurationValue(this.Configuration, "Scope", "Community", value)
 
 				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 			}
@@ -137,10 +302,20 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	__New(controllerConfiguration := false) {
-		local identifier
+	__New() {
+		local identifier, controllerState
 
-		base.__New(readConfiguration(kUserConfigDirectory . "Session Database.ini"))
+		if !SessionDatabase.sConfiguration
+			SessionDatabase.sConfiguration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		if !SessionDatabase.sControllerState {
+			controllerState := getControllerState()
+
+			if !controllerState
+				controllerState := {}
+
+			SessionDatabase.sControllerState := controllerState
+		}
 
 		if !this.ID {
 			FileRead identifier, % kUserConfigDirectory . "ID"
@@ -148,14 +323,7 @@ class SessionDatabase extends ConfigurationItem {
 			SessionDatabase.sID := identifier
 		}
 
-		if !controllerConfiguration {
-			controllerConfiguration := getControllerConfiguration()
-
-			if !controllerConfiguration
-				controllerConfiguration := {}
-		}
-
-		this.iControllerConfiguration := controllerConfiguration
+		base.__New(SessionDatabase.sConfiguration)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -215,6 +383,10 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	registerSynchronizer(synchronizer) {
+		SessionDatabase.Synchronizers.Push(synchronizer)
+	}
+
 	getAllDrivers(simulator, names := false) {
 		local sessionDB, ids, index, row, ignore, id
 
@@ -239,6 +411,10 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else
 			return []
+	}
+
+	getUserName() {
+		return this.getDriverNames(false, this.ID)[1]
 	}
 
 	registerDriver(simulator, id, name) {
@@ -303,6 +479,16 @@ class SessionDatabase extends ConfigurationItem {
 				drivers.Push(computeDriverName(driver.Forname, driver.Surname, driver.Nickname))
 
 			return ((drivers.Length() = 0) ? ["John Doe (JD)"] : drivers)
+		}
+		else if id {
+			for ignore, simulator in this.getSimulators() {
+				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+
+				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
+					return Array(computeDriverName(driver.Forname, driver.Surname, driver.Nickname))
+			}
+
+			return ["John Doe (JD)"]
 		}
 		else
 			return ["John Doe (JD)"]
@@ -404,7 +590,8 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		return FileExist(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		return (this.hasTrackMap(simulator, track)
+			 && FileExist(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations"))
 	}
 
 	getTrackAutomations(simulator, car, track) {
@@ -413,7 +600,10 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		return this.loadTrackAutomations(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		if this.hasTrackMap(simulator, track)
+			return this.loadTrackAutomations(kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Track.automations")
+		else
+			return []
 	}
 
 	getTrackAutomation(simulator, car, track, name := false) {
@@ -507,8 +697,8 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (simulatorCode = "Unknown")
 			return "Unknown"
-		else if (this.ControllerConfiguration.Count() > 0) {
-			for name, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+		else if (this.ControllerState.Count() > 0) {
+			for name, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
 				if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
 					return name
 
@@ -530,12 +720,12 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulatorName = "Unknown")
 			return "Unknown"
 		else {
-			code := getConfigurationValue(this.ControllerConfiguration, "Simulators", simulatorName, false)
+			code := getConfigurationValue(this.ControllerState, "Simulators", simulatorName, false)
 
 			if code
 				return string2Values("|", code)[1]
 			else {
-				for ignore, description in getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object())
+				for ignore, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
 
@@ -552,7 +742,7 @@ class SessionDatabase extends ConfigurationItem {
 	getSimulators() {
 		local configuredSimulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration"
 																									  , "Simulators", ""))
-		local controllerSimulators := getKeys(getConfigurationSectionValues(this.ControllerConfiguration, "Simulators", Object()))
+		local controllerSimulators := getKeys(getConfigurationSectionValues(this.ControllerState, "Simulators", Object()))
 		local simulators := []
 		local simulator, ignore, name, code
 
@@ -1026,6 +1216,85 @@ class SessionDatabase extends ConfigurationItem {
 
 		deleteFile(fileName)
 	}
+
+	writeDatabaseState(info, arguments*) {
+		local configuration := newConfiguration()
+		local exception, rebuild
+
+		setConfigurationValue(configuration, "Database Synchronizer", "ServerURL", this.ServerURL)
+		setConfigurationValue(configuration, "Database Synchronizer", "ServerToken", this.ServerToken)
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Connected", this.Connected)
+
+		setConfigurationValue(configuration, "Database Synchronizer", "UserID", this.ID)
+		setConfigurationValue(configuration, "Database Synchronizer", "DatabaseID", this.DatabaseID)
+
+		if ((info = "State") || !this.Connector) {
+			if !this.ServerURL
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Disabled")
+			else if (this.ID != this.DatabaseID) {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Warning")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Cannot synchronize a database from another user..."))
+			}
+			else if !this.Connector {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Cannot connect to the Team Server (URL: ") . this.ServerURL
+															 . translate(", Token: ") . this.ServerToken . translate(")"))
+			}
+			else if !this.Connected {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Lost connection to the Team Server (URL: ") . this.ServerURL
+															 . translate(", Token: ") . this.ServerToken . translate(")"))
+			}
+			else {
+				setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+									, translate("Message: ") . translate("Waiting for next synchronization..."))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Waiting")
+			}
+		}
+		else if (info = "Synchronize") {
+			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+			rebuild := arguments[1]
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+								, translate("Message: ") . (rebuild ? translate("Rebuilding database...")
+																	: translate("Synchronizing database...")))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Running")
+			setConfigurationValue(configuration, "Database Synchronizer", "Counter", (arguments.Length() > 1) ? arguments[2] : false)
+		}
+		else if (info = "Success") {
+			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+								, translate("Message: ") . translate("Synchronization finished..."))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
+		}
+		else if (info = "Error") {
+			setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+
+			exception := arguments[1]
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+								, translate("Error: ") . translate("Synchronization failed (Exception: ")
+													   . (IsObject(exception) ? exception.Message : exception) . translate(")"))
+
+			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Failed")
+		}
+
+		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+	}
 }
 
 
@@ -1088,3 +1357,165 @@ computeDriverName(forName, surName, nickName) {
 
 	return Trim(name)
 }
+
+updateSynchronizationState(sessionDB, rebuild) {
+	sessionDB.writeDatabaseState("Synchronize", rebuild, synchronizeDatabase("Counter"))
+}
+
+synchronizeDatabase(rebuild := false) {
+	local sessionDB := new SessionDatabase()
+	local connector := sessionDB.Connector
+	local timestamp, simulators, ignore, synchronizer, synchronizeTask
+
+	static stateTask := false
+	static counter := 0
+
+	if (rebuild = "Counter")
+		return counter
+
+	if !stateTask {
+		stateTask := new PeriodicTask(ObjBindMethod(sessionDB, "writeDatabaseState", "State"), 10000)
+
+		stateTask.start()
+	}
+
+	sessionDB.UseCommunity := false
+
+	if ((sessionDB.ID = sessionDB.DatabaseID) && connector) {
+		try {
+			stateTask.stop()
+
+			counter := 0
+
+			synchronizeTask := new PeriodicTask(Func("updateSynchronizationState").Bind(sessionDB, rebuild), 1000, kInterruptPriority)
+
+			synchronizeTask.start()
+
+			try {
+				simulators := sessionDB.getSimulators()
+				timestamp := connector.GetServerTimestamp()
+				lastSynchronization := (!rebuild ? sessionDB.Synchronization : false)
+
+				for ignore, synchronizer in sessionDB.Synchronizers
+					%synchronizer%(sessionDB.Groups, sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, counter)
+
+				sessionDB.Synchronization := timestamp
+			}
+			finally {
+				synchronizeTask.stop()
+
+				Task.startTask(ObjBindMethod(stateTask, "start"), 10000)
+			}
+		}
+		catch exception {
+			logError(exception)
+
+			sessionDB.writeDatabaseState("Error", exception)
+
+			return false
+		}
+
+		sessionDB.writeDatabaseState("Success")
+
+		return true
+	}
+	else
+		return false
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Private Function Declaration Section                 ;;;
+;;;-------------------------------------------------------------------------;;;
+
+parseData(properties) {
+	local result := {}
+	local property
+
+	properties := StrReplace(properties, "`r", "")
+
+	loop Parse, properties, `n
+	{
+		property := string2Values("=", A_LoopField)
+
+		result[property[1]] := property[2]
+	}
+
+	return result
+}
+
+synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
+	local ignore, simulator, db, modified, identifier, driver, drivers
+
+	try {
+		for ignore, simulator in simulators {
+			simulator := sessionDB.getSimulatorCode(simulator)
+
+			db := new Database(kDatabaseDirectory . "User\" . simulator . "\", kSessionSchemas)
+
+			if db.lock("Drivers", false)
+				try {
+					modified := false
+
+					drivers := connector.QueryData("License", "Simulator = '" . simulator . "' And Modified > " . lastSynchronization)
+
+					for ignore, identifier in string2Values(";", drivers) {
+						modified := true
+
+						driver := parseData(connector.GetData("License", identifier))
+						driver.ID := ((driver.Driver = "") ? kNull : driver.Driver)
+						driver.Synchronized := timestamp
+
+						drivers := db.query("Drivers", {Where: {ID: driver.ID, Forname: driver.Forname, Surname: driver.Surname, Nickname: driver.Nickname} })
+
+						if (drivers.Length() = 0) {
+							db.add("Drivers", driver)
+
+							counter += 1
+						}
+						else {
+							drivers[1].Identifier := driver.Identifier
+							drivers[1].Synchronized := timestamp
+						}
+					}
+
+					for ignore, driver in db.query("Drivers", {Where: force ? {Driver: sessionDB.ID} : {Synchronized: kNull, Driver: sessionDB.ID} }) {
+						if (driver.Identifier = kNull)
+							driver.Identifier := createGUID()
+
+						driver.Synchronized := timestamp
+
+						db.changed("Drivers")
+						modified := true
+
+						if (connector.CountData("License", "Identifier = '" . driver.Identifier . "'") = 0) {
+							connector.CreateData("License"
+											   , substituteVariables("Identifier=%Identifier%`nSimulator=%Simulator%`n"
+																   . "Driver=%Driver%`nForname=%Forname%`nSurname=%Surname%`nNickname=%Nickname%"
+																   , {Identifier: driver.Identifier, Simulator: simulator
+																    , Driver: driver.ID, Forname: driver.Forname
+																	, Surname: driver.Surname, Nickname: driver.Nickname}))
+							counter += 1
+						}
+					}
+				}
+				finally {
+					if modified
+						db.flush("Drivers")
+
+					db.unlock("Drivers")
+				}
+		}
+	}
+}
+
+keepAlive(connector, connection) {
+	SessionDatabase.Connected := connector.KeepAlive(connection)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                           Initialization Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+SessionDatabase.registerSynchronizer("synchronizeDrivers")

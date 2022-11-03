@@ -10,7 +10,7 @@ namespace TeamServer {
 
 		public class Parameters : Dictionary<string, string> { }
 
-		string Server = "";
+		string ServerURL = "";
 
 		public string Token { get; set; } = "";
 		
@@ -18,19 +18,14 @@ namespace TeamServer {
 			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
-		public string Connect(string url, string token = null) {
-			Server = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
+		public void Initialize(string url, string token = null) {
+			ServerURL = url + ((url[url.Length - 1] == '/') ? "api/" : "/api/");
 
-			if ((token != null) && (token != "")) {
-				Token = token;
-
-				string remainingMinutes = GetTokenLifeTime();
-
-				return remainingMinutes;
-			}
-			else
-				return "Ok";
-		}
+            if (token != null)
+                Token = token;
+            else
+                Token = "";
+        }
 
 		#region Requests
 		public void ValidateResult(string result) {
@@ -67,18 +62,37 @@ namespace TeamServer {
 			if (arguments.Length > 0)
 				arguments = "?" + arguments;
 
-			return Server + request + arguments;
+			return ServerURL + request + arguments;
 		}
 
-		public string Get(string request, Parameters arguments = null) {
+		public string Get(string request, Parameters arguments = null, string body = null)
+		{
 			string result;
 
-			try {
-                string uri = BuildRequest(request, arguments);
+			try
+			{
+				string uri = BuildRequest(request, arguments);
 
-                result = httpClient.GetStringAsync(uri).Result;
+				if (body == null)
+					result = httpClient.GetStringAsync(uri).Result;
+				else
+				{
+					var httpRequest = new HttpRequestMessage
+					{
+						Method = HttpMethod.Get,
+						RequestUri = new Uri(uri),
+						Content = new StringContent(body, Encoding.Unicode)
+					};
+
+					var response = httpClient.SendAsync(httpRequest).Result;
+
+					response.EnsureSuccessStatusCode();
+
+					result = response.Content.ReadAsStringAsync().Result;
+				}
 			}
-			catch (Exception e) {
+			catch (Exception e)
+			{
 				result = "Error: " + e.Message;
 			}
 
@@ -156,12 +170,86 @@ namespace TeamServer {
 			return token;
 		}
 
-		public string GetAvailableMinutes() {
-			return Get("login/accountavailableminutes");
+		public string GetSessionToken()
+		{
+			return Get("login/token/session", new Parameters() { { "token", Token } });
 		}
 
-		public string GetTokenLifeTime() {
-			return Get("login/tokenavailableminutes");
+		public string GetDataToken()
+		{
+			return Get("login/token/data", new Parameters() { { "token", Token } });
+		}
+
+		public string RenewDataToken()
+		{
+			try
+			{
+				Delete("login/token/" + GetDataToken(), new Parameters() { { "token", Token } });
+			}
+			catch { }
+
+			return GetDataToken();
+		}
+
+		public string Connect(string token, string client, string name, string type, string session = "")
+		{
+			string connection;
+				
+			if (session != "")
+                connection = Get("login/connect/session", new Parameters() { { "token", token },
+																			 { "client", client }, { "name", name },
+																			 { "type", type }, { "session", session } });
+			else
+				connection = Get("login/connect/admin", new Parameters() { { "token", token },
+																		   { "client", client }, { "name", name },
+																		   { "type", type } });
+
+            Token = token;
+
+			return connection;
+		}
+
+        public int KeepAlive(string identifier)
+        {
+			try
+			{
+				Get("login/" + identifier, new Parameters() { { "keepalive", "true" } });
+
+				return 1;
+			}
+			catch (Exception)
+			{
+				return 0;
+			}
+        }
+
+		public string ValidateToken()
+		{
+			return Get("login/validatetoken");
+        }
+
+        public string ValidateSessionToken()
+        {
+            return Get("session/validatetoken");
+        }
+
+        public string GetAllConnections()
+		{
+			return Get("login/allconnections");
+		}
+
+		public string GetAllSessions()
+		{
+			return Get("login/allsessions");
+		}
+
+		public string GetConnection(string identifier)
+		{
+			return Get("login/" + identifier);
+		}
+
+		public string GetAvailableMinutes() {
+			return Get("login/accountavailableminutes");
 		}
 
 		public void ChangePassword(string newPassword) {
@@ -180,22 +268,30 @@ namespace TeamServer {
 			return Get("account/allaccounts");
         }
 
-		public string CreateAccount(string name, string eMail, string password, string minutes, string contract, string renewal) {
+		public string CreateAccount(string name, string eMail, string password, string sessionAccess, string dataAccess,
+                                    string minutes, string contract, string renewal) {
 			return Post("account", body: BuildBody(new Parameters() { { "Name", name }, { "Password", password },
 																	  { "EMail", eMail },
-																	  { "Contract", contract }, { "ContractMinutes", renewal },
+                                                                      { "SessionAccess", sessionAccess }, { "DataAccess", dataAccess },
+                                                                      { "Contract", contract }, { "ContractMinutes", renewal },
 																	  { "AvailableMinutes", minutes } }));
 		}
 
 		public string GetAccount(string identifier) {
 			return Get("account/" + identifier);
-		}
+        }
 
-		public void ChangeAccountEMail(string identifier, string eMail) {
-			Put("account/" + identifier, body: BuildBody(new Parameters() { { "EMail", eMail } }));
-		}
+        public void ChangeAccountEMail(string identifier, string eMail)
+        {
+            Put("account/" + identifier, body: BuildBody(new Parameters() { { "EMail", eMail } }));
+        }
 
-		public void ChangeAccountContract(string identifier, string contract, string renewal) {
+        public void ChangeAccountAccess(string identifier, string sessionAccess, string dataAccess)
+        {
+            Put("account/" + identifier, body: BuildBody(new Parameters() { { "SessionAccess", sessionAccess }, { "DataAccess", dataAccess } }));
+        }
+
+        public void ChangeAccountContract(string identifier, string contract, string renewal) {
 			Put("account/" + identifier, body: BuildBody(new Parameters() { { "Contract", contract }, { "ContractMinutes", renewal } }));
 		}
 
@@ -288,8 +384,8 @@ namespace TeamServer {
 		#endregion
 
 		#region Session
-		public string GetAllSessions() {
-			return Get("session/allsessions");
+		public string GetSessions() {
+			return Get("session/sessions");
 		}
 
 		public string CreateSession(string team, string name) {
@@ -352,6 +448,11 @@ namespace TeamServer {
 
 		public string GetSessionTeam(string identifier) {
 			return Get("session/" + identifier + "/team");
+		}
+
+		public string GetSessionConnections(string identifier)
+		{
+			return Get("session/" + identifier + "/connections");
 		}
 
 		public string GetSessionStint(string identifier, string stint) {

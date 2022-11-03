@@ -4,14 +4,38 @@ using System.Threading.Tasks;
 using TeamServer.Model;
 
 namespace TeamServer.Server {
-	public class SessionManager : ManagerBase {
-		public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token) {
+	public class SessionManager : ManagerBase
+    {
+        public SessionManager(ObjectManager objectManager, Model.Access.Token token) : base(objectManager, token)
+        {
+        }
+        public SessionManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+        public SessionManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
+        }
+
+        #region Validation
+        public override Model.Access.Token ValidateToken(Model.Access.Token token)
+		{
+			token = base.ValidateToken(token);
+
+			if (!token.HasAccess(Model.Access.Token.TokenType.Session))
+				throw new Exception("Token does not support session access...");
+			
+			return token;
 		}
 
-		#region Validation
 		public void ValidateAccount(int duration) {
-			if (!Token.Account.Administrator && (Token.Account.AvailableMinutes < duration))
-				throw new Exception("Not enough time available on account...");
+			if (!Token.Account.Administrator)
+				if (Token.Account.Contract == Model.Access.Account.ContractType.Expired)
+					throw new Exception("Account is no longer valid...");
+				else if (!Token.Account.SessionAccess)
+					throw new Exception("Account does not support team sessions...");
+				else if (Token.Account.Contract != Model.Access.Account.ContractType.Unlimited &&
+						 (Token.Account.AvailableMinutes < duration))
+					throw new Exception("Not enough time available on account...");
 		}
 
 		public void ValidateSession(Session session) {
@@ -60,7 +84,13 @@ namespace TeamServer.Server {
 
 		#region Session
 		#region Query
-		public List<Session> GetAllSessions() {
+		public List<Session> GetAllSessions()
+		{
+			return ObjectManager.GetAllSessionsAsync().Result;
+		}
+
+		public List<Session> GetSessions()
+		{
 			return Token.Account.Sessions;
 		}
 
@@ -72,7 +102,7 @@ namespace TeamServer.Server {
 			return session;
 		}
 
-		internal Session LookupSession(string identifier) {
+		public Session LookupSession(string identifier) {
 			return LookupSession(new Guid(identifier));
 		}
 
@@ -407,7 +437,7 @@ namespace TeamServer.Server {
 			return lap;
 		}
 
-		internal Lap LookupLap(string identifier) {
+		public Lap LookupLap(string identifier) {
 			return LookupLap(new Guid(identifier));
 		}
 

@@ -222,13 +222,19 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		Set {
+			local configuration := readConfiguration(kTempDirectory . this.AssistantType . ".state")
+
+			setConfigurationValue(configuration, "Voice", "Muted", value)
+
+			writeConfiguration(kTempDirectory . this.AssistantType . ".state", configuration)
+
 			return (this.VoiceManager.Muted := value)
 		}
 	}
 
-	Speaker[muted := false] {
+	Speaker[force := false] {
 		Get {
-			return this.VoiceManager.Speaker[muted]
+			return this.VoiceManager.Speaker[force]
 		}
 	}
 
@@ -414,6 +420,14 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		this.iVoiceManager := this.createVoiceManager(name, options)
+
+		configuration := newConfiguration()
+
+		setConfigurationValue(configuration, "Voice", "Speaker", this.Speaker[true])
+		setConfigurationValue(configuration, "Voice", "Listener", this.Listener)
+		setConfigurationValue(configuration, "Voice", "Muted", this.Muted)
+
+		writeConfiguration(kTempDirectory . assistantType . ".state", configuration)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -811,20 +825,25 @@ class RaceAssistant extends ConfigurationItem {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
 
-				if enabled
+				if (enabled && this.KnowledgeBase)
 					this.dumpKnowledgeBase(this.KnowledgeBase)
 			case kDebugRules:
 				label := translate("Debug Rule System")
 
-				if enabled
+				if (enabled && this.KnowledgeBase)
 					this.dumpRules(this.KnowledgeBase)
 		}
 
-		if label
-			if enabled
-				Menu SupportMenu, Check, %label%
-			else
-				Menu SupportMenu, Uncheck, %label%
+		try {
+			if label
+				if enabled
+					Menu SupportMenu, Check, %label%
+				else
+					Menu SupportMenu, Uncheck, %label%
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	toggleDebug(option) {
@@ -1144,10 +1163,10 @@ class RaceAssistant extends ConfigurationItem {
 
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+
 		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
-			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid")
-		else
-			lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
 

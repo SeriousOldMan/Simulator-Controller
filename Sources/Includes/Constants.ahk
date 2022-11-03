@@ -66,7 +66,7 @@ global kSoX := false
 
 global kBackgroundApps := ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings", "Team Server"]
 
-global kForegroundApps := ["Simulator Startup", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Advisor"]
+global kForegroundApps := ["Simulator Startup", "System Monitor", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Advisor"]
 
 global k1WayToggleType := "1WayToggle"
 global k2WayToggleType := "2WayToggle"

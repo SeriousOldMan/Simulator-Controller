@@ -229,8 +229,6 @@ class ApplicationsStepWizard extends StepWizard {
 		else if (page == 2) {
 			Gui ListView, % this.iApplicationsListView
 
-			icons := []
-
 			LV_Delete()
 
 			for ignore, section in string2Values(",", definition[2]) {

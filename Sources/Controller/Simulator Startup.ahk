@@ -173,6 +173,14 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
+			if getConfigurationValue(this.Settings, "Core", "System Monitor", false) {
+				exePath := kBinariesDirectory . "System Monitor.exe"
+
+				Run %exePath%, %kBinariesDirectory%
+
+				Sleep 1000
+			}
+
 			exePath := kBinariesDirectory . "Voice Server.exe"
 
 			Run %exePath%, %kBinariesDirectory%, , pid
@@ -255,8 +263,7 @@ class SimulatorStartup extends ConfigurationItem {
 			showSplashTheme(this.iSplashTheme, "playSong")
 
 		if !kSilentMode
-			showProgress({x: Round((A_ScreenWidth - 300) / 2)
-						, y: A_ScreenHeight - 150, color: "Blue"
+			showProgress({color: "Blue"
 						, message: translate("Start: Simulator Controller")
 						, title: translate("Initialize Core System")})
 
@@ -359,15 +366,23 @@ launchPad(command := false, arguments*) {
 	static RaceSettings
 	static SessionDatabase
 	static SetupAdvisor
+	static SystemMonitor
 
 	static closeCheckBox
 
-	if (command = kClose)
+	if (command = kClose) {
+		if (arguments.HasKey(1) && arguments[1])
+			launchPad("Close All")
+
 		result := kClose
+	}
 	else if (command = "Close All") {
-		for ignore, application in concatenate(kBackgroundApps, kForegroundApps)
-			if (application != "Simulator Startup")
-				closeApplication(application)
+		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "Simulator Startup")), "exitApplication")
+
+		Sleep 2000
+
+		if (arguments.HasKey(1) && arguments[1])
+			launchPad(kClose)
 	}
 	else if (command = "ToolTip") {
 		if toolTips.HasKey(arguments[1])
@@ -428,6 +443,7 @@ launchPad(command := false, arguments*) {
 		toolTips["RaceSettings"] := "Race Settings: Manage the settings for the Virtual Race Assistants and also the connection to the Team Server for team races."
 		toolTips["SessionDatabase"] := "Session Database: Manage simulator, car and track specific settings and gives access to various areas of the data collected by Simulator Controller during the sessions."
 		toolTips["SetupAdvisor"] := "Setup Advisor: Develop car setups using an interview-based approach, where you describe your handling problems."
+		toolTips["SystemMonitor"] := "System Monitor: Monitor all system activities on a dashboard and investigate log files of all system components."
 
 		executables["RaceReports"] := "Race Reports.exe"
 		executables["StrategyWorkbench"] := "Strategy Workbench.exe"
@@ -440,6 +456,7 @@ launchPad(command := false, arguments*) {
 		executables["RaceSettings"] := "Race Settings.exe"
 		executables["SessionDatabase"] := "Session Database.exe"
 		executables["SetupAdvisor"] := "Setup Advisor.exe"
+		executables["SystemMonitor"] := "System Monitor.exe"
 
 		icons["Startup"] := kIconsDirectory . "Startup.ico"
 		icons["RaceReports"] := kIconsDirectory . "Chart.ico"
@@ -453,6 +470,7 @@ launchPad(command := false, arguments*) {
 		icons["RaceSettings"] := kIconsDirectory . "Race Settings.ico"
 		icons["SessionDatabase"] := kIconsDirectory . "Session Database.ico"
 		icons["SetupAdvisor"] := kIconsDirectory . "Setup.ico"
+		icons["SystemMonitor"] := kIconsDirectory . "Monitoring.ico"
 
 		Gui LP:Default
 
@@ -470,7 +488,7 @@ launchPad(command := false, arguments*) {
 		Gui LP:Font, s9 Norm, Arial
 		Gui LP:Font, Italic Underline, Arial
 
-		Gui LP:Add, Text, x258 YP+20 w90 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
+		Gui LP:Add, Text, x233 YP+20 w140 cBlue Center gopenLaunchPadDocumentation, % translate("Applications")
 
 		Gui LP:Font, s8 Norm, Arial
 
@@ -483,18 +501,20 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceReports glaunchApplication, % kIconsDirectory . "Chart.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vStrategyWorkbench glaunchApplication, % kIconsDirectory . "Dashboard.ico"
-		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceCenter glaunchApplication, % kIconsDirectory . "Console.ico"
+		Gui LP:Add, Picture, xp+110 yp w60 h60 vRaceCenter glaunchApplication, % kIconsDirectory . "Console.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vServerAdministration glaunchApplication, % kIconsDirectory . "Server Administration.ico"
 
-		Gui LP:Add, Picture, xp+106 yp w60 h60 vSimulatorSetup glaunchApplication, % kIconsDirectory . "Configuration Wand.ico"
-		Gui LP:Add, Picture, xp+74 yp w60 h60 vSimulatorConfiguration glaunchApplication, % kIconsDirectory . "Configuration.ico"
-		Gui LP:Add, Picture, xp yp+74 w60 h60 vSimulatorDownload glaunchSimulatorDownload, % kIconsDirectory . "Installer.ico"
+		Gui LP:Add, Picture, xp+150 yp w60 h60 vSystemMonitor glaunchApplication, % kIconsDirectory . "Monitoring.ico"
 
 		; Gui LP:Add, Picture, x16 ys+74 w60 h60 vSimulatorSettings glaunchApplication, % kIconsDirectory . "Settings.ico"
 		Gui LP:Add, Picture, x16 ys+74 w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
 		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceSettings glaunchApplication, % kIconsDirectory . "Race Settings.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vSessionDatabase glaunchApplication, % kIconsDirectory . "Session Database.ico"
 		; Gui LP:Add, Picture, xp+164 yp w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
+
+		Gui LP:Add, Picture, xp+110 yp w60 h60 vSimulatorSetup glaunchApplication, % kIconsDirectory . "Configuration Wand.ico"
+		Gui LP:Add, Picture, xp+74 yp w60 h60 vSimulatorConfiguration glaunchApplication, % kIconsDirectory . "Configuration.ico"
+		Gui LP:Add, Picture, xp+150 yp w60 h60 vSimulatorDownload glaunchSimulatorDownload, % kIconsDirectory . "Installer.ico"
 
 		Gui LP:Font, s8 Norm, Arial
 
@@ -530,7 +550,7 @@ launchPad(command := false, arguments*) {
 }
 
 closeLaunchPad() {
-	launchPad(kClose)
+	launchPad(kClose, GetKeyState("Ctrl", "P"))
 }
 
 closeAll() {
@@ -541,7 +561,7 @@ closeAll() {
 	OnMessage(0x44, "")
 
 	IfMsgBox Yes
-		launchPad("Close All")
+		launchPad("Close All", GetKeyState("Ctrl", "P"))
 }
 
 moveLaunchPad() {
@@ -570,11 +590,8 @@ modifySettings() {
 	Gui LP:+Disabled
 
 	try {
-		if (editSettings(settings) == kSave) {
+		if (editSettings(settings) == kSave)
 			writeConfiguration(kSimulatorSettingsFile, settings)
-
-			this.Settings := settings
-		}
 	}
 	finally {
 		Gui LP:-Disabled
@@ -638,8 +655,16 @@ WM_MOUSEMOVE() {
 }
 
 watchStartupSemaphore() {
-	if (!SimulatorStartup.StayOpen && !FileExist(kTempDirectory . "Startup.semaphore"))
-		exitStartup()
+	if !FileExist(kTempDirectory . "Startup.semaphore")
+		if !SimulatorStartup.StayOpen
+			exitStartup()
+		else
+			try {
+				hideSplashTheme()
+			}
+			catch exception {
+				logError(exception)
+			}
 }
 
 clearStartupSemaphore() {

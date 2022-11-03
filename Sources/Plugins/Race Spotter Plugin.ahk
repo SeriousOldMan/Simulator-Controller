@@ -135,6 +135,53 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		return new this.RemoteRaceSpotter(this, pid)
 	}
 
+	writePluginState(configuration) {
+		local sessionDB, simulator, simulatorName, trackAutomation
+
+		base.writePluginState(configuration)
+
+		if this.Active {
+			if this.RaceAssistant
+				setConfigurationValue(configuration, "Race Assistants", this.Plugin, "Active")
+
+			if this.TrackAutomationEnabled {
+				simulator := this.Simulator
+
+				if (simulator && simulator.Track) {
+					sessionDB := new SessionDatabase()
+
+					simulatorName := simulator.runningSimulator()
+
+					setConfigurationValue(configuration, "Track Automation", "Simulator", simulatorName)
+					setConfigurationValue(configuration, "Track Automation", "Car", sessionDB.getCarName(simulatorName, simulator.Car))
+					setConfigurationValue(configuration, "Track Automation", "Track", sessionDB.getTrackName(simulatorName, simulator.Track))
+
+					trackAutomation := simulator.TrackAutomation
+
+					if trackAutomation {
+						setConfigurationValue(configuration, "Track Automation", "State", "Active")
+
+						setConfigurationValue(configuration, "Track Automation", "Automation", trackAutomation.Name)
+					}
+					else {
+						setConfigurationValue(configuration, "Track Automation", "State", "Warning")
+
+						setConfigurationValue(configuration, "Track Automation", "Information"
+														   , translate("Message: ") . translate("No track automation available..."))
+					}
+				}
+				else {
+					setConfigurationValue(configuration, "Track Automation", "State", "Passive")
+
+					setConfigurationValue(configuration, "Track Automation", "Information"
+													   , translate("Message: ") . translate("Waiting for simulation..."))
+				}
+			}
+			else
+				setConfigurationValue(configuration, "Track Automation", "State", "Disabled")
+		}
+	}
+
 	updateActions(session) {
 		local ignore, theAction
 
@@ -196,6 +243,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 			trayMessage(label, translate("State: On"))
 
+			if this.Simulator
+				this.Simulator.resetTrackAutomation()
+
 			this.iTrackAutomationEnabled := true
 
 			this.updateAutomationTrayLabel(label, true)
@@ -214,6 +264,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			this.shutdownTrackAutomation()
 
 			this.updateAutomationTrayLabel(label, false)
+
+			if this.Simulator
+				this.Simulator.resetTrackAutomation()
 		}
 	}
 
@@ -229,17 +282,17 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					enabled := this.TrackAutomationEnabled
 
 					if enabled
-						this.disableTrackAutomations()
+						this.disableTrackAutomation()
 
 					if !label
 						label := this.getLabel("TrackAutomation.Toggle")
 
 					trayMessage(label, translate("Select: ") . (name ? name : "Active"))
 
-					this.Simulator.TrackAutomation := candidate
-
 					if enabled
 						this.enableTrackAutomation()
+
+					this.Simulator.TrackAutomation := candidate
 
 					return
 				}
@@ -345,7 +398,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	addLap(lap, running, data) {
-		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile
+		local simulator, simulatorName, hasTrackMap, track, code, exePath, pid, dataFile, trackMapperState
 
 		static sessionDB := false
 
@@ -405,9 +458,31 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 							this.iMapperPID := false
 						}
 
-						if ((ErrorLevel != "Error") && this.iMapperPID)
+						if ((ErrorLevel != "Error") && this.iMapperPID) {
+							trackMapperState := newConfiguration()
+
+							setConfigurationValue(trackMapperState, "Track Mapper", "State", "Active")
+							setConfigurationValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
+							setConfigurationValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+							setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Scanning")
+							setConfigurationValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Scanning track..."))
+
+							writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+
 							Task.startTask(ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile), 120000, kLowPriority)
+						}
 					}
+				}
+				else {
+					trackMapperState := newConfiguration()
+
+					setConfigurationValue(trackMapperState, "Track Mapper", "State", "Passive")
+					setConfigurationValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
+					setConfigurationValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+					setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Waiting")
+					setConfigurationValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
+
+					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
 				}
 			}
 		}
@@ -463,6 +538,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else {
 				this.iMapperPID := false
 				this.iMapperPhase := false
+
+				deleteFile(kTempDirectory . "Track Mapper.state")
 			}
 		}
 	}
@@ -470,10 +547,10 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	shutdownTrackMapper(force := false) {
 		local pid, processName, tries
 
-		if (this.iMapperPID && (this.iMapperPhase = "Collect")) {
+		if (force || (this.iMapperPID && (this.iMapperPhase = "Collect"))) {
 			pid := this.iMapperPID
 
-			if pid {
+			if (force || pid) {
 				Process Close, %pid%
 
 				Sleep 500

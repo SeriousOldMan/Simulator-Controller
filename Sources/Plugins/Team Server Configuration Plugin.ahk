@@ -11,6 +11,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\CLR.ahk
+#Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
@@ -25,8 +26,12 @@
 global teamServerURLEdit := "https://localhost:5001"
 global teamServerNameEdit := ""
 global teamServerPasswordEdit := ""
-global teamServerTokenEdit := ""
+global teamServerSessionTokenEdit := """"
+global teamServerDataTokenEdit := ""
 global teamServerTimeText := ""
+global renewDataTokenButton
+
+global changePasswordButton
 
 global teamDropDownList
 global driverListBox
@@ -51,6 +56,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 	iConnector := false
 	iToken := false
+	iInitialized := false
 
 	iTeams := {}
 	iSelectedTeam := false
@@ -76,6 +82,12 @@ class TeamServerConfigurator extends ConfigurationItem {
 	Token[] {
 		Get {
 			return this.iToken
+		}
+	}
+
+	Initialized[] {
+		Get {
+			return this.iInitialized
 		}
 	}
 
@@ -187,15 +199,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x0% yp+23 w90 h23 +0x200 HWNDwidget3 Hidden, % translate("Login Credentials")
 		Gui %window%:Add, Edit, x%x1% yp+1 w%w3% h21 VteamServerNameEdit HWNDwidget4 Hidden, %teamServerNameEdit%
 		Gui %window%:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit HWNDwidget5 Hidden, %teamServerPasswordEdit%
-		Gui %window%:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 gchangePassword HWNDwidget29 Hidden
-		setButtonIcon(widget29, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
-
-		Gui %window%:Add, Text, x%x0% yp+26 w90 h23 +0x200 HWNDwidget7 Hidden, % translate("Access Token")
-		Gui %window%:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerTokenEdit HWNDwidget8 Hidden, %teamServerTokenEdit%
-		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 grenewToken HWNDwidget6 Hidden
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 gteamServerLogin HWNDwidget6 Hidden
 		setButtonIcon(widget6, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 gcopyToken HWNDwidget11 Hidden
-		setButtonIcon(widget11, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 vchangePasswordButton gchangePassword HWNDwidget29 Hidden
+		setButtonIcon(widget29, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Add, Text, x%x0% yp+26 w90 h23 +0x200 HWNDwidget9 Hidden, % translate("Contingent")
 
@@ -204,9 +211,23 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x1% yp+4 w%w1% h21 VteamServerTimeText HWNDwidget10 Hidden, % translate("Please Login for actual data...")
 
 		Gui %window%:Font, cBlack Norm, Arial
+
+		Gui %window%:Add, Text, x%x0% yp+31 w90 h23 +0x200 HWNDwidget7 Hidden, % translate("Session Token")
+		Gui %window%:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerSessionTokenEdit HWNDwidget8 Hidden, %teamServerSessionTokenEdit%
+		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 gcopySessionToken HWNDwidget11 Hidden
+		setButtonIcon(widget11, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Text, x%x0% yp+26 w90 h23 +0x200 HWNDwidget34 Hidden, % translate("Data Token")
+		Gui %window%:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerDataTokenEdit HWNDwidget35 Hidden, %teamServerDataTokenEdit%
+		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 gcopyDataToken HWNDwidget36 Hidden
+		setButtonIcon(widget36, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 vrenewDataTokenButton grenewDataToken HWNDwidget37 Hidden
+		setButtonIcon(widget37, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Font, cBlack Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+30 w%width% h214 HWNDwidget12 Hidden, % translate("Teams")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+36 w%width% h214 HWNDwidget12 Hidden, % translate("Teams")
 
 		Gui %window%:Font, Norm, Arial
 
@@ -241,7 +262,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Button, x%x7% yp w23 h23 Center +0x200 veditSessionButton grenameSession HWNDwidget28 Hidden
 		setButtonIcon(widget28, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		loop 33
+		loop 37
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.updateState()
@@ -255,13 +276,17 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		teamServerURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "https://localhost:5001")
 		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
-		teamServerPasswordEdit := getConfigurationValue(configuration, "Team Server", "Account.Password", "")
-		teamServerTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
+		this.iToken := getConfigurationValue(configuration, "Team Server", "Account.Token", "")
+		teamServerSessionTokenEdit := getConfigurationValue(configuration, "Team Server", "Session.Token", "")
+		teamServerDataTokenEdit := getConfigurationValue(configuration, "Team Server", "Data.Token", "")
 
 		sessionStorePathEdit := getConfigurationValue(configuration, "Team Server", "Session.Folder", "")
 
-		if !teamServerTokenEdit
-			teamServerTokenEdit := ""
+		if !teamServerSessionTokenEdit
+			teamServerSessionTokenEdit := ""
+
+		if !teamServerDataTokenEdit
+			teamServerDataTokenEdit := ""
 	}
 
 	saveToConfiguration(configuration) {
@@ -275,13 +300,15 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControlGet teamServerURLEdit
 		GuiControlGet teamServerNameEdit
 		GuiControlGet teamServerPasswordEdit
-		GuiControlGet teamServerTokenEdit
+		GuiControlGet teamServerSessionTokenEdit
+		GuiControlGet teamServerDataTokenEdit
 		GuiControlGet sessionStorePathEdit
 
 		setConfigurationValue(configuration, "Team Server", "Server.URL", teamServerURLEdit)
-		setConfigurationValue(configuration, "Team Server", "Server.Token", teamServerTokenEdit)
+		setConfigurationValue(configuration, "Team Server", "Session.Token", teamServerSessionTokenEdit)
+		setConfigurationValue(configuration, "Team Server", "Data.Token", teamServerDataTokenEdit)
 		setConfigurationValue(configuration, "Team Server", "Account.Name", teamServerNameEdit)
-		setConfigurationValue(configuration, "Team Server", "Account.Password", teamServerPasswordEdit)
+		setConfigurationValue(configuration, "Team Server", "Account.Token", this.Token)
 
 		setConfigurationValue(configuration, "Team Server", "Session.Folder", sessionStorePathEdit)
 
@@ -295,13 +322,15 @@ class TeamServerConfigurator extends ConfigurationItem {
 	activate() {
 		local window
 
-		if !this.Token {
+		if !this.Initialized {
+			this.iInitialized := true
+
 			window := this.Editor.Window
 
 			Gui %window%:+Disabled
 
 			try {
-				this.connect()
+				this.connect(true, true)
 			}
 			finally {
 				Gui %window%:-Disabled
@@ -309,10 +338,12 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	connect(message := true) {
+	connect(message := true, reconnect := false) {
 		local connector := this.Connector
 		local window := this.Editor.Window
-		local token, availableMinutes, title
+		local token, availableMinutes, title, sessionDB, connection
+
+		static keepAliveTask := false
 
 		Gui %window%:Default
 
@@ -320,28 +351,62 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControlGet teamServerNameEdit
 		GuiControlGet teamServerPasswordEdit
 
-		if ((teamServerURLEdit != "") && (teamServerNameEdit != "") && (teamServerPasswordEdit != ""))
+		if ((teamServerURLEdit != "") && (teamServerNameEdit != ""))
 			try {
-				connector.Connect(teamServerURLEdit)
+				connector.Initialize(teamServerURLEdit)
 
-				token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+				if (this.Token && (this.Token != "") && reconnect) {
+					connector.Token := this.Token
 
-				this.iToken := token
+					token := this.Token
+				}
+				else {
+					token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+
+					this.iToken := token
+				}
+
+				sessionDB := new SessionDatabase()
+
+				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Manager")
+
+				if keepAliveTask
+					keepAliveTask.stop()
+
+				keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+
+				keepAliveTask.start()
 
 				availableMinutes := connector.GetAvailableMinutes()
 
-				teamServerTokenEdit := token
 				teamServerTimeText := (availableMinutes . translate(" Minutes"))
 
-				GuiControl Text, teamServerTokenEdit, %teamServerTokenEdit%
+				try {
+					teamServerSessionTokenEdit := connector.GetSessionToken()
+				}
+				catch exception {
+					teamServerSessionTokenEdit := ""
+				}
+
+				try {
+					teamServerDataTokenEdit := connector.GetDataToken()
+				}
+				catch exception {
+					teamServerDataTokenEdit := ""
+				}
+
+				GuiControl Text, teamServerSessionTokenEdit, %teamServerSessionTokenEdit%
+				GuiControl Text, teamServerDataTokenEdit, %teamServerDataTokenEdit%
 				GuiControl +cBlack, teamServerTimeText
 				GuiControl Text, teamServerTimeText, %teamServerTimeText%
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 			catch exception {
-				GuiControl, , teamServerTokenEdit, % ""
-				GuiControl, , teamServerTimeText, % ""
+				GuiControl, , teamServerSessionTokenEdit, % ""
+				GuiControl, , teamServerDataTokenEdit, % ""
+				GuiControl +cGray, teamServerTimeText
+				GuiControl, , teamServerTimeText, % translate("Please Login for actual data...")
 
 				if message {
 					title := translate("Error")
@@ -353,13 +418,20 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 				this.iToken := false
 			}
-		else
+		else {
+			GuiControl, , teamServerSessionTokenEdit, % ""
+			GuiControl, , teamServerDataTokenEdit, % ""
+			GuiControl +cGray, teamServerTimeText
+			GuiControl, , teamServerTimeText, % translate("Please Login for actual data...")
+
 			this.iToken := false
+		}
 
 		this.loadTeams()
 	}
 
 	updateState() {
+		GuiControl Disable, changePasswordButton
 		GuiControl Disable, addTeamButton
 		GuiControl Disable, deleteTeamButton
 		GuiControl Disable, editTeamButton
@@ -372,7 +444,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControl Disable, deleteSessionButton
 		GuiControl Disable, editSessionButton
 
+		if ((teamServerURLEdit = "") && (teamServerNameEdit = "")) {
+			teamServerSessionTokenEdit := ""
+			teamServerDataTokenEdit := ""
+
+			GuiControl, , teamServerSessionTokenEdit, %teamServerSessionTokenEdit%
+			GuiControl, , teamServerDataTokenEdit, %teamServerDataTokenEdit%
+		}
+
 		if this.Token {
+			GuiControl Enable, changePasswordButton
 			GuiControl Enable, addTeamButton
 
 			if this.SelectedTeam {
@@ -393,6 +474,13 @@ class TeamServerConfigurator extends ConfigurationItem {
 				}
 			}
 		}
+
+		GuiControlGet teamServerDataTokenEdit
+
+		if (teamServerDataTokenEdit != "")
+			GuiControl Enable, renewDataTokenButton
+		else
+			GuiControl Disable, renewDataTokenButton
 	}
 
 	parseObject(properties) {
@@ -409,6 +497,24 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 
 		return result
+	}
+
+	renewDataToken() {
+		local window := this.Editor.Window
+		local connector := this.Connector
+
+		Gui %window%:Default
+
+		try {
+			teamServerDataTokenEdit := connector.RenewDataToken()
+		}
+		catch exception {
+			teamServerDataTokenEdit := ""
+		}
+
+		GuiControl, , teamServerDataTokenEdit, %teamServerDataTokenEdit%
+
+		this.updateState()
 	}
 
 	loadTeams() {
@@ -862,18 +968,32 @@ changePassword() {
 	}
 }
 
-renewToken() {
+teamServerLogin() {
 	TeamServerConfigurator.Instance.connect()
 }
 
-copyToken() {
-	GuiControlGet teamServerTokenEdit
+copySessionToken() {
+	GuiControlGet teamServerSessionTokenEdit
 
-	if (teamServerTokenEdit && (teamServerTokenEdit != "")) {
-		Clipboard := teamServerTokenEdit
+	if (teamServerSessionTokenEdit && (teamServerSessionTokenEdit != "")) {
+		Clipboard := teamServerSessionTokenEdit
 
-		showMessage(translate("Access token copied to the clipboard."))
+		showMessage(translate("Token copied to the clipboard."))
 	}
+}
+
+copyDataToken() {
+	GuiControlGet teamServerDataTokenEdit
+
+	if (teamServerDataTokenEdit && (teamServerDataTokenEdit != "")) {
+		Clipboard := teamServerDataTokenEdit
+
+		showMessage(translate("Token copied to the clipboard."))
+	}
+}
+
+renewDataToken() {
+	TeamServerConfigurator.Instance.renewDataToken()
 }
 
 selectTeam() {

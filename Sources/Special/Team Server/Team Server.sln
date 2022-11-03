@@ -5,7 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Team Server", "Team Server\Team Server.csproj", "{B01D6569-CBAF-47AE-A237-DBCDA62B4BFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Team Server Connector", "Team Server Connector\Team Server Connector.csproj", "{DE68FDDC-F3E1-4200-B7A6-7C808D15C39B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Team Server Connector", "Team Server Connector\Team Server Connector.csproj", "{DE68FDDC-F3E1-4200-B7A6-7C808D15C39B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data Store Connector", "Data Store Connector\Data Store Connector.csproj", "{DFDFE29B-31C2-4F3C-9F77-3CC1BDA719FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DE68FDDC-F3E1-4200-B7A6-7C808D15C39B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE68FDDC-F3E1-4200-B7A6-7C808D15C39B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE68FDDC-F3E1-4200-B7A6-7C808D15C39B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFDFE29B-31C2-4F3C-9F77-3CC1BDA719FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFDFE29B-31C2-4F3C-9F77-3CC1BDA719FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFDFE29B-31C2-4F3C-9F77-3CC1BDA719FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFDFE29B-31C2-4F3C-9F77-3CC1BDA719FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

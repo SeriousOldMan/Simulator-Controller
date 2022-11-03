@@ -207,7 +207,7 @@ After a given race report has been selected, the "Race Reports" tool offers you 
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
 
-Some reports allow you to control the amount and type of data, which will be included in the report. Please click on the small gear button in the upper right corner of the window to open the settings dialog, with which you can change the settings for the report. The following window will open up:
+Some reports allow you to control the amount and type of data, which will be included in the report. Please click on the small button with the cog wheel in the upper right corner of the window to open the settings dialog, with which you can change the settings for the report. The following window will open up:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Report%20Settings.JPG)
 

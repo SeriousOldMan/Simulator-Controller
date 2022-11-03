@@ -33,6 +33,8 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\CLR.ahk
+#Include ..\Libraries\Task.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -94,20 +96,53 @@ loadAccounts(connector, listView) {
 			accounts[A_Index] := account
 			accounts[account.Name] := account
 
-			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
+			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
 
-			LV_Add("", account.Name, account.EMail, translate(["Expired", "One-Time", "Fixed", "Additional"][index]) . translate(" (") . account.ContractMinutes . translate(")"), account.AvailableMinutes)
+			LV_Add("", account.Name, account.EMail
+					 , (account.SessionAccess = "true") ? translate("Yes") : translate("No")
+					 , (account.DataAccess = "true") ? translate("Yes") : translate("No")
+					 , translate(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"][index]) . translate(" (") . account.ContractMinutes . translate(")")
+					 , account.AvailableMinutes)
 		}
 	}
 
 	LV_ModifyCol()
-	LV_ModifyCol(1, "AutoHdr")
-	LV_ModifyCol(2, "AutoHdr")
-	LV_ModifyCol(3, "AutoHdr")
-	LV_ModifyCol(4, "AutoHdr")
-	LV_ModifyCol(5, "AutoHdr")
+
+	loop 6
+		LV_ModifyCol(A_Index, "AutoHdr")
 
 	return accounts
+}
+
+loadConnections(connector, listView) {
+	local ignore, identifier, connection, session
+
+	Gui ListView, % listView
+
+	LV_Delete()
+
+	if administrationEditor(kToken) {
+		for ignore, identifier in string2Values(";", connector.GetAllConnections()) {
+			try {
+				connection := parseObject(connector.GetConnection(identifier))
+
+				session := connection.Session
+
+				if (session && (session != ""))
+					session := parseObject(connector.GetSession(session)).Name
+
+				LV_Add("", translate(connection.Type), connection.Name, connection.Created, session)
+			}
+			catch exception {
+				logError(exception)
+			}
+		}
+	}
+
+	LV_ModifyCol()
+
+	loop 4
+		LV_ModifyCol(A_Index, "AutoHdr")
 }
 
 updateTask(connector, tasks, task, which, operation, frequency) {
@@ -137,7 +172,7 @@ global teamServerPasswordEdit := ""
 
 administrationEditor(configurationOrCommand, arguments*) {
 	local task, title, prompt, locale, minutes, ignore, identifier, type, which, contract
-	local dllName, dllFile
+	local dllName, dllFile, sessionDB, connection
 	local x, y, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 
 	static connector := false
@@ -150,14 +185,16 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 	static teamServerURLEdit = "https://localhost:5001"
 	static changePasswordButton
-	static teamServerTokenEdit = ""
 	static accountsListView
+	static connectionsListView
 
 	static accountNameEdit
 	static accountEMailEdit
 	static accountPasswordEdit
 	static accountContractDropDown
 	static accountMinutesEdit := 120
+	static accountSessionAccessCheck
+	static accountDataAccessCheck
 
 	static createPasswordButton
 	static copyPasswordButton
@@ -172,9 +209,13 @@ administrationEditor(configurationOrCommand, arguments*) {
 	static taskAccountOperationDropDown
 	static taskAccountFrequencyDropDown
 
+	static refreshConnectionsListButton
+
 	static addAccountButton
 	static deleteAccountButton
 	static saveAccountButton
+
+	static keepAliveTask := false
 
 	if (configurationOrCommand == kClose)
 		done := true
@@ -184,27 +225,37 @@ administrationEditor(configurationOrCommand, arguments*) {
 		GuiControlGet teamServerPasswordEdit
 
 		try {
-			connector.Connect(teamServerURLEdit)
+			connector.Initialize(teamServerURLEdit)
+
 			token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
 
 			if (token = "")
 				token := false
 
 			if token {
+				sessionDB := new SessionDatabase()
+
+				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Admin")
+
+				if keepAliveTask
+					keepAliveTask.stop()
+
+				keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+
+				keepAliveTask.start()
+
 				accounts := loadAccounts(connector, accountsListView)
 
 				administrationEditor(kEvent, "TasksLoad")
 				administrationEditor(kEvent, "AccountClear")
 
-				GuiControl, , teamServerTokenEdit, % token
+				loadConnections(connector, connectionsListView)
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
 		catch exception {
 			token := false
-
-			GuiControl, , teamServerTokenEdit, % ""
 
 			accounts := loadAccounts(connector, accountsListView)
 			account := false
@@ -305,8 +356,10 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControl, , accountNameEdit, % account.Name
 				GuiControl, , accountEMailEdit, % account.EMail
 				GuiControl, , accountPasswordEdit, % ""
-				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"], account.Contract)
+				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
 				GuiControl, , accountMinutesEdit, % account.ContractMinutes
+				GuiControl, , accountSessionAccessCheck, % (account.SessionAccess = kTrue)
+				GuiControl, , accountDataAccessCheck, % (account.DataAccess = kTrue)
 
 				administrationEditor(kEvent, "UpdateState")
 			}
@@ -326,11 +379,15 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControlGet accountPasswordEdit
 				GuiControlGet accountContractDropDown
 				GuiControlGet accountMinutesEdit
+				GuiControlGet accountSessionAccessCheck
+				GuiControlGet accountDataAccessCheck
 
-				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes"][accountContractDropDown]
+				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"][accountContractDropDown]
 
 				if (account == true) {
 					connector.CreateAccount(accountNameEdit, accountEMailEdit, accountPasswordEdit
+										  , accountSessionAccessCheck ? "true" : "false"
+										  , accountDataAccessCheck ? "true" : "false"
 										  , accountMinutesEdit, contract, accountMinutesEdit)
 				}
 				else {
@@ -342,6 +399,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 					if (accountEMailEdit != account.EMail)
 						connector.ChangeAccountEMail(account.Identifier, accountEMailEdit)
+
+					connector.ChangeAccountAccess(account.Identifier, accountSessionAccessCheck ? "true" : "false"
+																	, accountDataAccessCheck ? "true" : "false")
 				}
 
 				accounts := loadAccounts(connector, accountsListView)
@@ -361,6 +421,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 				GuiControl, , accountNameEdit, % ""
 				GuiControl, , accountEMailEdit, % ""
 				GuiControl, , accountPasswordEdit, % ""
+				GuiControl, , accountSessionAccessCheck, 0
+				GuiControl, , accountDataAccessCheck, 0
 				GuiControl Choose, accountContractDropDown, 0
 				GuiControl, , accountMinutesEdit, % ""
 
@@ -408,6 +470,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Enable, taskQuotaFrequencyDropDown
 					GuiControl Enable, taskAccountOperationDropDown
 					GuiControl Enable, taskAccountFrequencyDropDown
+
+					GuiControl Enable, refreshConnectionsListButton
 				}
 				else {
 					GuiControl Disable, changePasswordButton
@@ -421,6 +485,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Disable, taskQuotaFrequencyDropDown
 					GuiControl Disable, taskAccountOperationDropDown
 					GuiControl Disable, taskAccountFrequencyDropDown
+
+					GuiControl Disable, refreshConnectionsListButton
+
+					Gui ListView, % connectionsListView
+
+					LV_Delete()
 				}
 
 				if account {
@@ -433,6 +503,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 					GuiControl Enable, accountEMailEdit
 					GuiControl Enable, accountPasswordEdit
+					GuiControl Enable, accountSessionAccessCheck
+					GuiControl Enable, accountDataAccessCheck
 					GuiControl Enable, accountContractDropDown
 
 					if (accountContractDropDown > 1) {
@@ -453,6 +525,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					GuiControl Disable, accountNameEdit
 					GuiControl Disable, accountEMailEdit
 					GuiControl Disable, accountPasswordEdit
+					GuiControl Disable, accountSessionAccessCheck
+					GuiControl Disable, accountDataAccessCheck
 					GuiControl Disable, accountContractDropDown
 					GuiControl Disable, accountMinutesEdit
 
@@ -477,6 +551,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 					showMessage(translate("Password copied to the clipboard."))
 				}
 			}
+			else if (arguments[1] = "LoadConnections")
+				loadConnections(connector, connectionsListView)
 		}
 		catch exception {
 			title := translate("Error")
@@ -524,7 +600,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		Gui ADM:Font, Norm, Arial
 
-		Gui ADM:Add, Button, x164 y450 w80 h23 gcloseAdministrationEditor, % translate("Close")
+		Gui ADM:Add, Button, x164 y474 w80 h23 gcloseAdministrationEditor, % translate("Close")
 
 		x := 8
 		y := 68
@@ -556,24 +632,21 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+23 w90 h23 +0x200, % translate("Login Credentials")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% h21 HWNDloginHandle VteamServerNameEdit, %teamServerNameEdit%
 		Gui ADM:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit, %teamServerPasswordEdit%
+		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton grenewToken
+		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButtonHandle vchangePasswordButton gchangePassword
 		setButtonIcon(changePasswordButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		Gui ADM:Add, Text, x%x0% yp+26 w90 h23 +0x200, % translate("Access Token")
-		Gui ADM:Add, Edit, x%x1% yp-1 w%w4% h21 ReadOnly VteamServerTokenEdit, %teamServerTokenEdit%
-		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton grenewToken
-		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-
-		Gui ADM:Add, Tab3, x8 y148 w388 h293 -Wrap, % values2String("|", map(["Accounts", "Jobs"], "translate")*)
+		Gui ADM:Add, Tab3, x8 y122 w388 h343 -Wrap, % values2String("|", map(["Accounts", "Jobs", "Connections"], "translate")*)
 
 		x0 := 16
-		y := 178
+		y := 152
 
 		Gui Tab, 1
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Quota", "Available"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h146 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], "translate")*)
 
-		Gui ADM:Add, Text, x%x0% yp+124 w90 h23 +0x200, % translate("Name")
+		Gui ADM:Add, Text, x%x0% yp+150 w90 h23 +0x200, % translate("Name")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
 
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Password")
@@ -586,8 +659,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("E-Mail")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%  vaccountEMailEdit
 
-		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Contingent")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional"], "translate")*)
+		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Session / Data")
+		Gui ADM:Add, CheckBox, x%x1% yp+3 w23 vaccountSessionAccessCheck
+		Gui ADM:Add, CheckBox, xp+24 yp w23 vaccountDataAccessCheck
+
+		Gui ADM:Add, Text, x%x0% yp+22 w90 h23 +0x200, % translate("Contingent")
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], "translate")*)
 		Gui ADM:Add, Edit, x%x3% yp w60 h21 Number vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
 		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDavailableMinutesButtonHandle vavailableMinutesButton gupdateAvailableMinutes
@@ -621,6 +698,12 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Quotas")
 		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaOperationDropDown gupdateQuotaTask, % values2String("|", map(["Renew"], "translate")*)
 		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaFrequencyDropDown gupdateQuotaTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+
+		Gui Tab, 3
+
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconnectionsListView gconnectionsListEvent, % values2String("|", map(["Role", "Name", "Since", "Session"], "translate")*)
+
+		Gui ADM:Add, Button, x%x0% y430 w80 h23 vrefreshConnectionsListButton grefreshConnectionsList, % translate("Refresh")
 
 		if getWindowPosition("Server Administration", x, y)
 			Gui ADM:Show, x%x% y%y%
@@ -719,6 +802,15 @@ updateAvailableMinutes() {
 accountsListEvent() {
 	if ((A_GuiEvent == "DoubleClick") || (A_GuiEvent == "Normal"))
 		administrationEditor(kEvent, "AccountLoad", A_EventInfo)
+}
+
+connectionsListEvent() {
+	loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
+}
+
+refreshConnectionsList() {
+	administrationEditor(kEvent, "LoadConnections")
 }
 
 createPassword() {

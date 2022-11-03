@@ -238,7 +238,7 @@ class GeneralTab extends ConfigurationItem {
 		local simulators := []
 		local simulator, ignore
 
-		for simulator, ignore in getConfigurationSectionValues(getControllerConfiguration(), "Simulators", Object())
+		for simulator, ignore in getConfigurationSectionValues(getControllerState(), "Simulators", Object())
 			simulators.Push(simulator)
 
 		return simulators
@@ -501,7 +501,7 @@ saveConfiguration(configurationFile, editor) {
 
 	writeConfiguration(configurationFile, configuration)
 
-	deleteFile(kUserConfigDirectory . "Simulator Controller.config")
+	deleteFile(kTempDirectory . "Simulator Controller.state")
 
 	startupLink := A_Startup . "\Simulator Startup.lnk"
 

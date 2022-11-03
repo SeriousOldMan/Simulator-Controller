@@ -552,6 +552,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 
+	writePluginState(configuration) {
+		if this.Active {
+			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+
+			setConfigurationValue(configuration, this.Plugin, "Information", translate("Motion: ") . translate(this.MotionActive ? "On" : "Off"))
+		}
+		else
+			base.writePluginState(configuration)
+	}
+
 	loadEffectStateFromSimFeedback(effect) {
 		if kSimFeedbackConnector
 			this.iCurrentEffectStates[inList(this.kEffects, effect)] := this.callSimFeedback("EffectIsEnabled", effect)

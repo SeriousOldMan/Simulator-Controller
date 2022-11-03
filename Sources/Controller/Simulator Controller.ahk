@@ -348,14 +348,14 @@ class GuiFunctionController extends FunctionController {
 							case "Bottom Right":
 								x := mainScreenRight - width
 								y := mainScreenBottom - this.distanceFromBottom()
-							case "Secondary Screen":
+							case "Secondary Screen", "2nd Screen":
 								SysGet count, MonitorCount
 
 								if (count > 1) {
 									SysGet, secondScreen, MonitorWorkArea, 2
 
 									x := Round(secondScreenLeft + ((secondScreenRight - secondScreenLeft - width) / 2))
-									y := Round(secondScreenTop + ((secondScreenBottom - secondScreenTop- height) / 2))
+									y := Round(secondScreenTop + ((secondScreenBottom - secondScreenTop - height) / 2))
 								}
 								else
 									Goto defaultCase
@@ -802,7 +802,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	startSimulator(application, splashImage := false) {
-		local theme, songFile, posX, posY, name, started
+		local theme, songFile, name, started
 
 		if !application.isRunning()
 			if (application.startup(false))
@@ -818,12 +818,9 @@ class SimulatorController extends ConfigurationItem {
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
 							sendMessage(kLocalMessage, "Startup", "playStartupSong:" . songFile)
 
-						posX := Round((A_ScreenWidth - 300) / 2)
-						posY := A_ScreenHeight - 150
-
 						name := application.Application
 
-						showProgress({x: posX, y: posY, message: name, title: translate("Starting Simulator")})
+						showProgress({message: name, title: translate("Starting Simulator")})
 
 						started := false
 
@@ -1157,45 +1154,63 @@ class SimulatorController extends ConfigurationItem {
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
 
-	writeControllerConfiguration() {
+	writeControllerState(periodic := true) {
+		local plugins := {}
 		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
 		configuration := newConfiguration()
 
-		for ignore, thePlugin in this.Plugins {
-			if (this.isActive(thePlugin)) {
-				modes := []
+		try {
+			for ignore, thePlugin in this.Plugins {
+				plugins[thePlugin.Plugin] := true
 
-				if isInstance(thePlugin, SimulatorPlugin) {
-					states := []
+				if (this.isActive(thePlugin)) {
+					modes := []
 
-					for ignore, name in thePlugin.Sessions[true]
-						states.Push(name)
+					if isInstance(thePlugin, SimulatorPlugin) {
+						states := []
 
-					setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
-										, thePlugin.Plugin . "|" . values2String(",", states*))
+						for ignore, name in thePlugin.Sessions[true]
+							states.Push(name)
+
+						setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
+											, thePlugin.Plugin . "|" . values2String(",", states*))
+					}
+
+					for ignore, theMode in thePlugin.Modes
+						modes.Push(theMode.Mode)
+
+					simulators := []
+
+					for ignore, simulator in thePlugin.Simulators
+						simulators.Push(simulator)
+
+					setConfigurationValue(configuration, "Plugins", thePlugin.Plugin
+										, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse)
+														   , values2String(",", simulators*), values2String(",", modes*)))
 				}
 
-				for ignore, theMode in thePlugin.Modes
-					modes.Push(theMode.Mode)
-
-				simulators := []
-
-				for ignore, simulator in thePlugin.Simulators
-					simulators.Push(simulator)
-
-				setConfigurationValue(configuration, "Plugins", thePlugin.Plugin
-									, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse)
-													   , values2String(",", simulators*), values2String(",", modes*)))
+				thePlugin.writePluginState(configuration)
 			}
+
+			setConfigurationValue(configuration, "Modules", "Plugins", values2String("|", getKeys(plugins)*))
+
+			for ignore, fnController in this.FunctionController
+				setConfigurationValue(configuration, fnController.Type, fnController.Descriptor
+									, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
+													   , fnController.NumButtons, fnController.NumDials))
+		}
+		catch exception {
+			logError(exception)
 		}
 
-		for ignore, fnController in this.FunctionController
-			setConfigurationValue(configuration, fnController.Type, fnController.Descriptor
-								, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
-												   , fnController.NumButtons, fnController.NumDials))
+		writeConfiguration(kTempDirectory . "Simulator Controller.state", configuration)
 
-		writeConfiguration(kUserConfigDirectory . "Simulator Controller.config", configuration)
+		if periodic {
+			Process Exist, System Monitor.exe
+
+			Task.CurrentTask.Sleep := (ErrorLevel ? 2000 : 60000)
+		}
 	}
 }
 
@@ -1612,6 +1627,10 @@ class ControllerPlugin extends Plugin {
 
 	logFunctionNotFound(functionDescriptor) {
 		logMessage(kLogWarn, translate("Controller function ") . functionDescriptor . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+	}
+
+	writePluginState(configuration) {
+		setConfigurationValue(configuration, this.Plugin, "State", this.Active ? "Passive" : "Disabled")
 	}
 }
 
@@ -2055,14 +2074,18 @@ initializeSimulatorController() {
 
 startupSimulatorController() {
 	local controller := SimulatorController.Instance
+	local noStartup := ((A_Args.Length() > 0) && (A_Args[1] = "-NoStartup"))
 
-	controller.writeControllerConfiguration()
+	if noStartup
+		controller.writeControllerState(false)
+	else
+		new PeriodicTask(ObjBindMethod(controller, "writeControllerState"), 0, kLowPriority).start()
 
 	controller.computeControllerModes()
 
 	controller.updateLastEvent()
 
-	if ((A_Args.Length() > 0) && (A_Args[1] = "-NoStartup"))
+	if noStartup
 		ExitApp 0
 
 	controller.startup()
@@ -2154,8 +2177,8 @@ setMode(actionOrPlugin, mode := false) {
 ;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-writeControllerConfiguration() {
-	SimulatorController.Instance.writeControllerConfiguration()
+writeControllerState() {
+	SimulatorController.Instance.writeControllerState(false)
 }
 
 

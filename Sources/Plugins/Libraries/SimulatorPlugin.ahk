@@ -276,7 +276,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		Set {
 			if (value != this.iCar)
-				this.iTrackAutomation := kUndefined
+				this.resetTrackAutomation()
 
 			this.iCommandDelay := kUndefined
 
@@ -291,7 +291,7 @@ class SimulatorPlugin extends ControllerPlugin {
 
 		Set {
 			if (value != this.iTrack)
-				this.iTrackAutomation := kUndefined
+				this.resetTrackAutomation()
 
 			this.iCommandDelay := kUndefined
 
@@ -440,6 +440,41 @@ class SimulatorPlugin extends ControllerPlugin {
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
 		allActions := {}
 		selectActions := []
+	}
+
+	writePluginState(configuration) {
+		local simulator := this.runningSimulator()
+		local sessionDB, car, track
+
+		if this.Active {
+			setConfigurationValue(configuration, this.Plugin, "State", simulator ? "Active" : "Passive")
+
+			if simulator {
+				if (this.Car && this.Track) {
+					setConfigurationValue(configuration, "Simulation", "State", "Active")
+
+					setConfigurationValue(configuration, "Simulation", "Session", this.Session[true])
+
+					sessionDB := new SessionDatabase()
+
+					car := sessionDB.getCarName(simulator, this.Car)
+					track := sessionDB.getTrackName(simulator, this.Track)
+
+					setConfigurationValue(configuration, "Simulation", "Simulator", simulator)
+					setConfigurationValue(configuration, "Simulation", "Car", car)
+					setConfigurationValue(configuration, "Simulation", "Track", track)
+
+					setConfigurationValue(configuration, this.Plugin, "Information"
+										, values2String("; ", translate("Simulator: ") . simulator
+															, translate("Car: ") . car
+															, translate("Track: ") . track))
+				}
+				else
+					setConfigurationValue(configuration, "Simulation", "State", "Passive")
+			}
+		}
+		else
+			base.writePluginState(configuration)
 	}
 
 	activateWindow() {
@@ -910,6 +945,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 		else
 			return false
+	}
+
+	resetTrackAutomation() {
+		this.iTrackAutomation := kUndefined
 	}
 
 	triggerAction(actionNr, positionX, positionY) {

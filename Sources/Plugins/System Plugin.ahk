@@ -333,6 +333,13 @@ class SystemPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, translate("Application ") . application . translate(" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 
+	writePluginState(configuration) {
+		if this.Active
+			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+		else
+			base.writePluginState(configuration)
+	}
+
 	simulatorStartup(simulator) {
 		local fileName
 

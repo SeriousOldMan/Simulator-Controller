@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
@@ -34,13 +35,22 @@ class TeamServerPlugin extends ControllerPlugin {
 	iConnector := false
 
 	iServerURL := false
-	iAccessToken := false
+	iServerToken := false
 
-	iConnected := false
+	iConnection := false
+	iLastMessage := ""
 
+	iState := {}
+
+	iSimulator := false
 	iTeam := false
+	iTeamName := ""
 	iDriver := false
+	iDriverName := ""
 	iSession := false
+	iSessionName := ""
+
+	iCachedObjects := {}
 
 	iDriverForName := false
 	iDriverSurName := false
@@ -160,51 +170,98 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	AccessToken[] {
+	ServerToken[] {
 		Get {
-			return ((this.iAccessToken && (this.iAccessToken != "")) ? this.iAccessToken : false)
+			return ((this.iServerToken && (this.iServerToken != "")) ? this.iServerToken : false)
+		}
+	}
+
+	Connection[] {
+		Get {
+			return this.iConnection
 		}
 	}
 
 	Connected[] {
 		Get {
-			return this.iConnected
+			return (this.Connection != false)
 		}
 	}
 
-	Team[] {
+	LastMessage[] {
 		Get {
-			return ((this.iTeam && (this.iTeam != "")) ? this.iTeam : false)
+			return this.iLastMessage
+		}
+
+		Set {
+			return (this.iLastMessage := StrReplace(value, "`n", A_Space))
 		}
 	}
 
-	Driver[] {
+	State[key := false] {
 		Get {
-			return ((this.iDriver && (this.iDriver != "")) ? this.iDriver : false)
+			return (key ? this.iState[key] : this.iState)
+		}
+
+		Set {
+			return (key ? (this.iState[key] := value) : (this.iState := value))
 		}
 	}
 
-	Session[] {
+	Stalled[] {
 		Get {
-			return ((this.iSession && (this.iSession != "")) ? this.iSession : false)
+			return (this.State.HasKey("Stalled") ? this.State["Stalled"] : false)
 		}
 	}
 
-	DriverForName[] {
+	Simulator[] {
 		Get {
-			return this.getDriverForName()
+			return this.iSimulator
 		}
 	}
 
-	DriverSurName[] {
+	Team[asText := false] {
 		Get {
-			return this.getDriverSurName()
+			if asText
+				return ((this.iTeam && (this.iTeam != "")) ? this.iTeamName : "")
+			else
+				return ((this.iTeam && (this.iTeam != "")) ? this.iTeam : false)
 		}
 	}
 
-	DriverNickName[] {
+	Driver[asText := false] {
 		Get {
-			return this.getDriverNickName()
+			if asText
+				return ((this.iDriver && (this.iDriver != "")) ? this.iDriverName : "")
+			else
+				return ((this.iDriver && (this.iDriver != "")) ? this.iDriver : false)
+		}
+	}
+
+	Session[asText := false] {
+		Get {
+			if asText
+				return ((this.iSession && (this.iSession != "")) ? this.iSessionName : "")
+			else
+				return ((this.iSession && (this.iSession != "")) ? this.iSession : false)
+		}
+	}
+
+	DriverForName[ignore := false] {
+		Get {
+			return this.getDriverForName(ignore)
+		}
+	}
+
+	DriverSurName[ignore := false] {
+		Get {
+			return this.getDriverSurName(ignore)
+		}
+	}
+
+	DriverNickName[ignore := false] {
+		Get {
+			return this.getDriverNickName(ignore)
 		}
 	}
 
@@ -295,7 +352,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			else
 				this.disableTeamServer(false, true)
 
-			this.keepAlive()
+			this.keepAlive(true)
 
 			OnExit(ObjBindMethod(this, "finishSession"))
 		}
@@ -326,6 +383,118 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 		else
 			this.logFunctionNotFound(actionFunction)
+	}
+
+	writeDriversState(state) {
+		local connectedDrivers := []
+		local ignore, connection
+
+		try {
+			for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
+				if !this.iCachedObjects.HasKey(connection)
+					this.iCachedObjects[connection] := this.parseObject(this.Connector.GetConnection(connection))
+
+				connection := this.iCachedObjects[connection]
+
+				if (connection.Name && (connection.Name != "") && (connection.Type = "Driver")
+									&& !inList(connectedDrivers, connection.Name))
+					connectedDrivers.Push(connection.Name)
+			}
+
+			state.Push("Drivers: " . values2String("|", connectedDrivers*))
+		}
+		catch exception {
+			logError(exception)
+		}
+	}
+
+	writeStintState(state) {
+		local stint, lap, driver
+
+		if this.SessionActive
+			try {
+				stint := this.Connector.GetSessionCurrentStint(this.Session)
+
+				if (stint && (stint != "")) {
+					if !this.iCachedObjects.HasKey(stint)
+						this.iCachedObjects[stint] := this.parseObject(this.Connector.GetStint(stint))
+
+					lap := this.Connector.GetSessionLastLap(this.Session)
+
+					if !this.iCachedObjects.HasKey(lap)
+						this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
+
+					driver := this.Connector.GetStintDriver(stint)
+
+					if !this.iCachedObjects.HasKey(driver)
+						this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
+
+					state.Push("StintNr: " . this.iCachedObjects[stint].Nr)
+					state.Push("StintLap: " . this.iCachedObjects[lap].Nr)
+
+					driver := this.iCachedObjects[driver]
+
+					state.Push("StintDriver: " . computeDriverName(driver.ForName, driver.SurName, driver.NickName))
+				}
+			}
+			catch exception {
+				logError(exception)
+			}
+	}
+
+	writePluginState(configuration) {
+		local driverMismatch := false
+		local key, value, teamServerState
+
+		if this.Active {
+			if this.TeamServerEnabled {
+				if this.Connected {
+					if (this.Stalled || this.LastMessage) {
+						setConfigurationValue(configuration, this.Plugin, "State", "Critical")
+
+						setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . this.LastMessage)
+					}
+					else {
+						if (this.State["Driver"] = "Mismatch") {
+							setConfigurationValue(configuration, this.Plugin, "State", "Critical")
+
+							driverMismatch := true
+						}
+						else
+							setConfigurationValue(configuration, this.Plugin, "State", "Active")
+
+						setConfigurationValue(configuration, this.Plugin, "Information"
+											, values2String("; ", translate("Team: ") . this.Team[true]
+																, translate("Driver: ") . this.Driver[true] . (driverMismatch ? translate(" (No match)") : "")
+																, translate("Session: ") . this.Session[true]))
+					}
+				}
+				else if this.Session {
+					setConfigurationValue(configuration, this.Plugin, "State", "Critical")
+
+					setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . this.LastMessage)
+				}
+				else {
+					setConfigurationValue(configuration, this.Plugin, "State", "Warning")
+
+					setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("No valid team session configured"))
+				}
+
+				teamServerState := []
+
+				for key, value in this.State
+					teamServerState.Push(key . ": " . value)
+
+				this.writeDriversState(teamServerState)
+				this.writeStintState(teamServerState)
+
+				setConfigurationValue(configuration, this.Plugin, "Properties", values2String("; ", teamServerState*))
+			}
+			else
+				setConfigurationValue(configuration, this.Plugin, "State", "Disabled")
+		}
+		else
+			base.writePluginState(configuration)
 	}
 
 	activate() {
@@ -401,7 +570,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			trayMessage(label, translate("State: Off"))
 
-			this.disconnect()
+			this.disconnect(true, true)
 
 			Menu Tray, Tip, % string2Values(".", A_ScriptName)[1]
 
@@ -440,74 +609,73 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	tryConnect() {
-		local settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
-		local serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
-		local accessToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
-		local teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
-		local driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
-		local sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
+		local settings, serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier
 
-		this.connect(serverURL, accessToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
+		if !this.Connected {
+			settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory))
+			serverURL := getConfigurationValue(settings, "Team Settings", "Server.URL", "")
+			serverToken := getConfigurationValue(settings, "Team Settings", "Server.Token", "")
+			teamIdentifier := getConfigurationValue(settings, "Team Settings", "Team.Identifier", false)
+			driverIdentifier := getConfigurationValue(settings, "Team Settings", "Driver.Identifier", false)
+			sessionIdentifier := getConfigurationValue(settings, "Team Settings", "Session.Identifier", false)
 
-		this.disconnect()
+			this.connect(serverURL, serverToken, teamIdentifier, driverIdentifier, sessionIdentifier, !kSilentMode)
+
+			this.disconnect()
+		}
 	}
 
-	connect(serverURL, accessToken, team, driver, session, verbose := false) {
-		local driverObject, teamName, driverName, sessionName
+	connect(serverURL, serverToken, team, driver, session, verbose := false) {
+		local driverObject
 
 		this.disconnect()
 
 		this.iServerURL := ((serverURL && (serverURL != "")) ? serverURL : false)
-		this.iAccessToken := ((accessToken && (accessToken != "")) ? accessToken : false)
+		this.iServerToken := ((serverToken && (serverToken != "")) ? serverToken : false)
 
 		this.setSession(team, driver, session)
+
+		this.LastMessage := ""
+		this.iCachedObjects := {}
 
 		this.keepAlive()
 
 		if this.Connected {
-			try {
-				driverObject := this.parseObject(this.Connector.GetDriver(driver))
+			if (getLogLevel() <= kLogInfo)
+				logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . serverToken
+								   . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
 
-				teamName := this.parseObject(this.Connector.GetTeam(team)).Name
-				driverName := (driverObject.ForName . A_Space . driverObject.SurName)
-				sessionName := this.parseObject(this.Connector.GetSession(session)).Name
+			if verbose
+				showMessage(translate("Successfully connected to the Team Server.") . "`n`n" . translate("Team: ") . this.Team[true] . "`n"
+						  . translate("Driver: ") . this.Driver[true] . "`n" . translate("Session: ") . this.Session[true]
+						  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
 
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Connected to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate(")"))
-
-				if verbose
-					showMessage(translate("Successfully connected to the Team Server.") . "`n`n"
-										. translate("Team: ") . teamName . "`n"
-										. translate("Driver: ") . driverName . "`n"
-										. translate("Session: ") . sessionName
-							  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
-
-				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . teamName . translate(")")
-			}
-			catch exception {
-				this.iConnected := false
-
-				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
-
-				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . serverURL . translate(", Token: ") . accessToken . translate(", Team: ") . team . translate(", Driver: ") . driver . translate(", Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
-
-				this.disconnect(false)
-			}
+			Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")")
 		}
 
 		return (this.Connected && this.Team && this.Driver && this.Session)
 	}
 
-	disconnect(leave := true) {
+	disconnect(leave := true, disconnect := false) {
 		if (leave && this.SessionActive)
 			this.leaveSession()
 
-		this.iServerURL := false
-		this.iAccessToken := false
+		if disconnect {
+			this.iServerURL := false
+			this.iServerToken := false
 
-		this.setSession(false, false, false)
+			this.iConnection := false
 
-		this.keepAlive()
+			this.iTeamName := ""
+			this.iDriverName := ""
+			this.iSessionName := ""
+
+			this.LastMessage := ""
+
+			this.iCachedObjects := {}
+
+			this.keepAlive()
+		}
 	}
 
 	getStintDriverName(stint, session := false) {
@@ -521,24 +689,35 @@ class TeamServerPlugin extends ControllerPlugin {
 				if stint is Integer
 					stint := this.Connector.GetSessionStint(session, stint)
 
-				driver := this.parseObject(this.Connector.GetDriver(this.Connector.GetStintDriver(stint)))
+				driver := this.Connector.GetStintDriver(stint)
+
+				if !this.iCachedObjects.HasKey(driver)
+					this.iCachedObjects[driver] := this.Connector.GetDriver(driver)
+
+				driver := this.iCachedObjects[driver]
 
 				return computeDriverName(driver.ForName, driver.SurName, driver.NickName)
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 
 		return false
 	}
 
-	getDriverForName() {
+	getDriverForName(ignore := false) {
 		local driver
 
-		if (!this.iDriverForName && this.TeamServerActive) {
+		if (!this.iDriverForName && (ignore || this.TeamServerActive)) {
 			try {
-				driver := this.parseObject(this.Connector.GetDriver(this.Driver))
+				if !this.iCachedObjects.HasKey(this.Driver)
+					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
+
+				driver := this.iCachedObjects[this.Driver]
 
 				this.iDriverForName := driver.ForName
 				this.iDriverSurName := driver.SurName
@@ -548,23 +727,28 @@ class TeamServerPlugin extends ControllerPlugin {
 					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver.ForName . A_Space . driver.SurName . translate(")"))
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching driver names (Driver: ") . this.Driver . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				if !ignore {
+					this.LastMessage := (translate("Error while fetching driver names (Driver: ") . this.Driver
+									   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
 
-				this.keepAlive()
+					logMessage(kLogCritical, this.LastMessage)
+
+					this.keepAlive()
+				}
 			}
 		}
 
 		return (this.iDriverForName ? this.iDriverForName : "")
 	}
 
-	getDriverSurName() {
-		this.getDriverForName()
+	getDriverSurName(ignore := false) {
+		this.getDriverForName(ignore)
 
 		return (this.iDriverSurName ? this.iDriverSurName : "")
 	}
 
-	getDriverNickName() {
-		this.getDriverForName()
+	getDriverNickName(ignore := false) {
+		this.getDriverForName(ignore)
 
 		return (this.iDriverNickName ? this.iDriverNickName : "")
 	}
@@ -573,12 +757,13 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.SessionActive
 			this.leaveSession()
 
-		if this.TeamServerActive && !this.SessionActive {
+		if (this.TeamServerActive && !this.SessionActive) {
 			if isDebug()
 				showMessage("Starting team session: " . car . ", " . track)
 
 			try {
 				this.iLapData := {Telemetry: {}, Positions: {}}
+				this.iSimulator := simulator
 
 				this.Connector.StartSession(this.Session, duration, car, track)
 
@@ -595,7 +780,11 @@ class TeamServerPlugin extends ControllerPlugin {
 			catch exception {
 				this.iSessionActive := false
 
-				logMessage(kLogCritical, translate("Error while starting session (Session: ") . this.Session . translate(", Car: ") . car . translate(", Track: ") . track . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while starting session (Session: ") . this.Session . translate(", Car: ") . car
+								   . translate(", Track: ") . track . translate("), Exception: ")
+								   . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 
 				this.keepAlive()
 			}
@@ -616,7 +805,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while finishing session (Session: ") . this.Session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while finishing session (Session: ") . this.Session
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 
 				this.keepAlive()
 			}
@@ -624,6 +816,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		this.iLapData := {Telemetry: {}, Positions: {}}
 		this.iSessionActive := false
+		this.iSimulator := false
 
 		return false
 	}
@@ -643,6 +836,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 					this.iLapData := {Telemetry: {}, Positions: {}}
 					this.iSessionActive := true
+					this.iSimulator := simulator
 				}
 
 				if (getLogLevel() <= kLogInfo)
@@ -666,6 +860,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		else {
 			this.iLapData := {Telemetry: {}, Positions: {}}
 			this.iSessionActive := false
+			this.iSimulator := false
 		}
 	}
 
@@ -682,7 +877,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return driver
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while requesting current driver session (Session: ") . this.Session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while requesting current driver session (Session: ") . this.Session
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 
 				return false
 			}
@@ -707,7 +905,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 
@@ -734,7 +935,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 	}
@@ -761,7 +965,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
+								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 
@@ -794,7 +1001,10 @@ class TeamServerPlugin extends ControllerPlugin {
 					logMessage(kLogInfo, translate("Storing stint data (Session: ") . this.Session . translate(", Name: ") . name . translate("), Value:`n`n") . value . "`n")
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while storing stint data (Session: ") . session . translate(", Stint: ") . stint . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while storing stint data (Session: ") . session . translate(", Stint: ") . stint
+								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 	}
@@ -811,7 +1021,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return this.Connector.GetStintSession(stint)
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 
@@ -827,7 +1040,11 @@ class TeamServerPlugin extends ControllerPlugin {
 		if session {
 			try {
 				lap := this.Connector.GetSessionLastLap(session)
-				lapNr := this.parseObject(this.Connector.GetLap(lap)).Nr
+
+				if !this.iCachedObjects.HasKey(lap)
+					this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
+
+				lapNr := this.iCachedObjects[lap].Nr
 
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Fetching lap number (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Number: ") . lapNr . translate(")"))
@@ -835,7 +1052,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return lapNr
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . session . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 
@@ -854,7 +1074,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return this.Connector.GetLapStint(lap)
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 
@@ -883,7 +1106,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return value
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap
+								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 
@@ -919,7 +1145,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap
+								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 	}
@@ -930,7 +1159,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.TeamServerActive {
 			try {
 				if !this.SessionActive
-					throw Exception("Cannot start add a stint to an inactive session...")
+					throw Exception("Cannot add a stint to an inactive session...")
 
 				if isDebug()
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
@@ -948,7 +1177,10 @@ class TeamServerPlugin extends ControllerPlugin {
 				return stint
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message :  exception))
+				this.LastMessage := (translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver
+								   . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message :  exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 
 				this.keepAlive()
 			}
@@ -1012,33 +1244,140 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Error while updating a lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.LastMessage := (translate("Error while updating a lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
 			}
 		}
 	}
 
-	keepAlive() {
+	keepAlive(start := false) {
 		local nextPing := 10000
+		local invalid := false
+		local driverObject
 
-		if (this.Connector && this.ServerURL && this.AccessToken)
+		static keepAliveTask := false
+
+		if (this.Connector && this.ServerURL && this.ServerToken) {
 			try {
-				this.Connector.Connect(this.ServerURL, this.AccessToken)
+				if this.Connection
+					this.State["Stalled"] := !this.Connector.KeepAlive(this.Connection)
+				else {
+					this.State["ServerURL"] := "Invalid"
+					this.State["SessionToken"] := "Invalid"
 
-				this.iConnected := true
+					this.Connector.Initialize(this.ServerURL, this.ServerToken)
 
-				nextPing := 60000
+					this.State["Team"] := "Invalid"
+					this.State["Driver"] := "Invalid"
+					this.State["Session"] := "Invalid"
+
+					if (this.Driver && this.Session) {
+						this.iConnection := this.Connector.Connect(this.ServerToken
+																 , new SessionDatabase().ID
+																 , computeDriverName(this.DriverForName[true]
+																				   , this.DriverSurName[true]
+																				   , this.DriverNickName[true])
+																 , "Driver", this.Session)
+
+						this.State["ServerURL"] := this.ServerURL
+						this.State["SessionToken"] := this.ServerToken
+
+						try {
+							if !this.iCachedObjects.HasKey(this.Team)
+								this.iCachedObjects[this.Team] := this.parseObject(this.Connector.GetTeam(this.Team))
+
+							this.iTeamName := this.iCachedObjects[this.Team].Name
+
+							this.State["Team"] := this.Team[true]
+						}
+						catch exception {
+							logError(exception)
+
+							invalid := exception
+						}
+
+						try {
+							if !this.iCachedObjects.HasKey(this.Driver)
+								this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
+
+							driverObject := this.iCachedObjects[this.Driver]
+							this.iDriverName := (driverObject.ForName . A_Space . driverObject.SurName)
+
+							this.State["Driver"] := this.Driver[true]
+						}
+						catch exception {
+							logError(exception)
+
+							invalid := exception
+						}
+
+						try {
+							if !this.iCachedObjects.HasKey(this.Session)
+								this.iCachedObjects[this.Session] := this.parseObject(this.Connector.GetSession(this.Session))
+
+							this.iSessionName := this.iCachedObjects[this.Session].Name
+
+							this.State["Session"] := this.Session[true]
+						}
+						catch exception {
+							logError(exception)
+
+							invalid := exception
+						}
+
+						if invalid
+							throw invalid
+						else
+							Menu Tray, Tip, % (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
+					}
+					else {
+						this.State["ServerURL"] := this.ServerURL
+						this.State["SessionToken"] := this.ServerToken
+					}
+
+					this.State["Stalled"] := false
+				}
 			}
 			catch exception {
 				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
 
-				logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL . translate(", Token: ") . this.AccessToken . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+				this.iDriverName := ""
+				this.iTeamName := ""
+				this.iSessionName := ""
 
-				this.iConnected := false
+				this.LastMessage := (translate("Cannot connect to the Team Server (URL: ") . this.ServerURL
+								   . translate(", Token: ") . this.ServerToken
+								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+
+				logMessage(kLogCritical, this.LastMessage)
+
+				this.iConnection := false
+				this.State["Stalled"] := false
 			}
-		else
-			this.iConnected := false
+		}
+		else {
+			this.iConnection := false
 
-		Task.startTask(ObjBindMethod(this, "keepAlive"), nextPing, kLowPriority)
+			this.State["ServerURL"] := "Invalid"
+			this.State["SessionToken"] := "Invalid"
+			this.State["Stalled"] := false
+		}
+
+		if this.Stalled
+			this.LastMessage := (translate("Lost connection to the Team Server (URL: ") . this.ServerURL
+							   . translate(", Token: ") . this.ServerToken . translate(")"))
+		else if this.Connected
+			this.LastMessage := ""
+
+		if start {
+			keepAliveTask := new PeriodicTask(ObjBindMethod(this, "keepAlive"), 10000, kLowPriority)
+
+			keepAliveTask.start()
+		}
+		else if keepAliveTask
+			keepAliveTask.Sleep := ((this.Connection && !this.Stalled) ? 60000 : 10000)
 
 		return false
 	}

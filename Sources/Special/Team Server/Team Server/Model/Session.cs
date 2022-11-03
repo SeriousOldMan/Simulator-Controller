@@ -24,6 +24,14 @@ namespace TeamServer.Model {
             }
         }
 
+        [Ignore]
+        public List<Connection> Connections
+        {
+            get {
+                return ObjectManager.GetSessionConnectionsAsync(this).Result;
+            }
+        }
+
         public string Name { get; set; }
 
         public int Duration { get; set; }

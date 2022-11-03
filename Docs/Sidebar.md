@@ -9,6 +9,7 @@
 
 [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration)
 ------
+  - [Quick Start](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#quick-start)
   - [Installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation)
   - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration)
     - [General](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general)
@@ -41,6 +42,7 @@
     - [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands)
     - [Controller Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#controller-commands)
     - [External Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#external-commands)
+  - [Monitoring](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities)
 
 [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes)
 ------

@@ -49,12 +49,13 @@ updateProgress(max) {
 
 downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
-	local options, index, title, cState, sState, devVersion, release, version, download, x, y, updateTask
+	local options, index, title, cState, sState, devVersion, release, version, download, updateTask
 	local directory, currentDirectory, start, ignore, url, error
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Download
 
+	/*
 	if !A_IsAdmin {
 		options := ""
 
@@ -81,12 +82,13 @@ downloadSimulatorController() {
 		catch exception {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
-			MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")
+			MsgBox 262160, %title%, % translate("An error occured while starting the automatic installation due to Windows security restrictions. You can try a manual installation.")
 			OnMessage(0x44, "")
 		}
 
 		ExitApp 0
 	}
+	*/
 
 	cState := GetKeyState("Control", "P")
 	sState := GetKeyState("Shift", "P")
@@ -120,10 +122,7 @@ downloadSimulatorController() {
 			download := getConfigurationValue(release, "Release", "Download", false)
 
 		if download {
-			x := Round((A_ScreenWidth - 300) / 2)
-			y := A_ScreenHeight - 150
-
-			showProgress({x: x, y: y, color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
+			showProgress({color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
 
 			updateTask := new PeriodicTask(Func("updateProgress").Bind(45), 1500)
 

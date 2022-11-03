@@ -84,8 +84,21 @@ namespace TeamServer.Model {
             return Connection.Table<Access.Account>().Where(c => c.Name == account && c.Password == password).FirstOrDefaultAsync();
         }
 
-        public Task<List<Access.Token>> GetAccountTokensAsync(Access.Account account) {
+        public Task<List<Access.Token>> GetAccountTokensAsync(Access.Account account)
+        {
             return Connection.Table<Access.Token>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<Access.Token> GetAccountDataTokenAsync(Access.Account account)
+        {
+            return Connection.Table<Access.Token>().Where(t => t.AccountID == account.ID &&
+                                                               t.Type == Access.Token.TokenType.Data).FirstOrDefaultAsync();
+        }
+
+        public async void DoAccountTokensAsync(Access.Account account, Action<Access.Token> action)
+        {
+            foreach (Access.Token t in await GetAccountTokensAsync(account))
+                action(t);
         }
 
         public Task<List<Team>> GetAccountTeamsAsync(Access.Account account) {
@@ -97,6 +110,69 @@ namespace TeamServer.Model {
                 @"
                     Select * From Sessions Where TeamID In (Select ID From Teams Where AccountID = ?)
                 ", account.ID);
+        }
+
+        public Task<List<Data.License>> GetAccountLicensesAsync(Access.Account account)
+        {
+            return Connection.Table<Data.License>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<List<Data.Electronics>> GetAccountElectronicsAsync(Access.Account account)
+        {
+            return Connection.Table<Data.Electronics>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<List<Data.Tyres>> GetAccountTyresAsync(Access.Account account)
+        {
+            return Connection.Table<Data.Tyres>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<List<Data.Brakes>> GetAccountBrakesAsync(Access.Account account)
+        {
+            return Connection.Table<Data.Brakes>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<List<Data.TyresPressures>> GetAccountTyresPressuresAsync(Access.Account account)
+        {
+            return Connection.Table<Data.TyresPressures>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public Task<List<Data.TyresPressuresDistribution>> GetAccountTyresPressuresDistributionDataAsync(Access.Account account)
+        {
+            return Connection.Table<Data.TyresPressuresDistribution>().Where(t => t.AccountID == account.ID).ToListAsync();
+        }
+
+        public async void DoAccountDataAsync(Access.Account account, Action<Data.DataObject> action)
+        {
+            foreach (Data.DataObject data in await GetAccountLicensesAsync(account))
+                action(data);
+
+            foreach (Data.DataObject data in await GetAccountElectronicsAsync(account))
+                action(data);
+
+            foreach (Data.DataObject data in await GetAccountTyresAsync(account))
+                action(data);
+
+            foreach (Data.DataObject data in await GetAccountBrakesAsync(account))
+                action(data);
+
+            foreach (Data.DataObject data in await GetAccountTyresPressuresAsync(account))
+                action(data);
+
+            foreach (Data.DataObject data in await GetAccountTyresPressuresDistributionDataAsync(account))
+                action(data);
+        }
+        
+        public Task<List<Data.DataObject>> GetAccountDataAsync(Access.Account account)
+        {
+            return new Task<List<Data.DataObject>>(() =>
+            {
+                List<Data.DataObject> list = new List<Data.DataObject>();
+
+                DoAccountDataAsync(account, (Data.DataObject data) => { list.Add(data); });
+
+                return list;
+            });
         }
         #endregion
 
@@ -114,7 +190,98 @@ namespace TeamServer.Model {
         }
 
         public Task<Access.Account> GetTokenAccountAsync(Access.Token token) {
-            return Connection.Table<Access.Account>().Where(a => a.ID == token.AccountID).FirstAsync();
+            if (token.AccountID == 0)
+            {
+                if (token != Server.TeamServer.TokenIssuer.InternalToken)
+                    throw new Exception("Corrupt token detected...");
+
+                return null;
+            }
+            else
+                return Connection.Table<Access.Account>().Where(a => a.ID == token.AccountID).FirstAsync();
+        }
+
+        public Task<Access.Connection> GetTokenConnectionAsync(Access.Token token, string client, string name,
+                                                               Access.Connection.ConnectionType type,
+                                                               Session session = null)
+        {
+            int theType = (int)type;
+
+            Task<Access.Connection> task =
+                (session != null) ?
+                    Connection.Table<Access.Connection>().Where(c => c.TokenID == token.ID && c.Type == type &&
+                                                                     c.Client == client && c.Name == name &&
+                                                                     c.SessionID == session.ID).FirstOrDefaultAsync()
+                :
+                    Connection.Table<Access.Connection>().Where(c => c.TokenID == token.ID && c.Type == type &&
+                                                                     c.Client == client && c.Name == name).FirstOrDefaultAsync();
+
+
+            return task.ContinueWith(t =>
+                {
+                    if (t.Result != null)
+                    {
+                        if (t.Result.IsConnected())
+                            return t.Result;
+                        else
+                        {
+                            t.Result.Delete();
+
+                            return null;
+                        }
+                    }
+                    else
+                        return null;
+                });
+        }
+
+        public Task<List<Access.Connection>> GetAllConnectionsAsync()
+        {
+            return Connection.Table<Access.Connection>().ToListAsync().
+                ContinueWith(t => t.Result.FindAll(c =>
+                {
+                    if (c.IsConnected())
+                        return true;
+                    else
+                    {
+                        c.Delete();
+
+                        return false;
+                    }
+                }));
+        }
+
+        public Task<List<Access.Connection>> GetTokenConnectionsAsync(Access.Token token)
+        {
+            return Connection.Table<Access.Connection>().Where(t => t.TokenID == token.ID).ToListAsync().
+                ContinueWith(t => t.Result.FindAll(c =>
+                {
+                    if (c.IsConnected())
+                        return true;
+                    else
+                    {
+                        c.Delete();
+
+                        return false;
+                    }
+                }));
+        }
+        #endregion
+
+        #region Access.Connection
+        public Task<Access.Connection> GetConnectionAsync(int id)
+        {
+            return Connection.Table<Access.Connection>().Where(c => c.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Connection> GetConnectionAsync(Guid identifier)
+        {
+            return Connection.Table<Access.Connection>().Where(c => c.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Access.Connection> GetConnectionAsync(string identifier)
+        {
+            return GetConnectionAsync(new Guid(identifier));
         }
         #endregion
 
@@ -173,6 +340,11 @@ namespace TeamServer.Model {
         #endregion
 
         #region Session
+        public Task<List<Session>> GetAllSessionsAsync()
+        {
+            return Connection.Table<Session>().ToListAsync();
+        }
+
         public Task<Session> GetSessionAsync(int id) {
             return Connection.Table<Session>().Where(s => s.ID == id).FirstOrDefaultAsync();
         }
@@ -187,6 +359,21 @@ namespace TeamServer.Model {
 
         public Task<Team> GetSessionTeamAsync(Session session) {
             return Connection.Table<Team>().Where(t => t.ID == session.TeamID).FirstAsync();
+        }
+
+        public Task<List<Access.Connection>> GetSessionConnectionsAsync(Session session) {
+            return Connection.Table<Access.Connection>().Where(c => c.SessionID == session.ID).ToListAsync().
+                ContinueWith(t => t.Result.FindAll(c =>
+                {
+                    if (c.IsConnected())
+                        return true;
+                    else
+                    {
+                        c.Delete();
+
+                        return false;
+                    }
+                }));
         }
 
         public Task<List<Stint>> GetSessionStintsAsync(Session session) {
@@ -235,6 +422,108 @@ namespace TeamServer.Model {
 
         public Task<Stint> GetLapStintAsync(Lap lap) {
             return Connection.Table<Stint>().Where(s => s.ID == lap.StintID).FirstAsync();
+        }
+        #endregion
+
+        #region Data.License
+        public Task<Data.License> GetLicenseAsync(int id)
+        {
+            return Connection.Table<Data.License>().Where(l => l.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.License> GetLicenseAsync(Guid identifier)
+        {
+            return Connection.Table<Data.License>().Where(l => l.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.License> GetLicenseAsync(string identifier)
+        {
+            return GetLicenseAsync(new Guid(identifier));
+        }
+        #endregion
+
+        #region Data.Electronics
+        public Task<Data.Electronics> GetElectronicsAsync(int id)
+        {
+            return Connection.Table<Data.Electronics>().Where(e => e.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Electronics> GetElectronicsAsync(Guid identifier)
+        {
+            return Connection.Table<Data.Electronics>().Where(e => e.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Electronics> GetElectronicsAsync(string identifier)
+        {
+            return GetElectronicsAsync(new Guid(identifier));
+        }
+        #endregion
+
+        #region Data.Tyres
+        public Task<Data.Tyres> GetTyresAsync(int id)
+        {
+            return Connection.Table<Data.Tyres>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Tyres> GetTyresAsync(Guid identifier)
+        {
+            return Connection.Table<Data.Tyres>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Tyres> GetTyresAsync(string identifier)
+        {
+            return GetTyresAsync(new Guid(identifier));
+        }
+        #endregion
+
+        #region Data.Brakes
+        public Task<Data.Brakes> GetBrakesAsync(int id)
+        {
+            return Connection.Table<Data.Brakes>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Brakes> GetBrakesAsync(Guid identifier)
+        {
+            return Connection.Table<Data.Brakes>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Brakes> GetBrakesAsync(string identifier)
+        {
+            return GetBrakesAsync(new Guid(identifier));
+        }
+        #endregion
+
+        #region Data.TyresPressures
+        public Task<Data.TyresPressures> GetTyresPressuresAsync(int id)
+        {
+            return Connection.Table<Data.TyresPressures>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressures> GetTyresPressuresAsync(Guid identifier)
+        {
+            return Connection.Table<Data.TyresPressures>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressures> GetTyresPressuresAsync(string identifier)
+        {
+            return GetTyresPressuresAsync(new Guid(identifier));
+        }
+        #endregion
+
+        #region Data.TyresPressuresDistribution
+        public Task<Data.TyresPressuresDistribution> GetTyresPressuresDistributionAsync(int id)
+        {
+            return Connection.Table<Data.TyresPressuresDistribution>().Where(t => t.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressuresDistribution> GetTyresPressuresDistributionAsync(Guid identifier)
+        {
+            return Connection.Table<Data.TyresPressuresDistribution>().Where(t => t.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.TyresPressuresDistribution> GetTyresPressuresDistributionAsync(string identifier)
+        {
+            return GetTyresPressuresDistributionAsync(new Guid(identifier));
         }
         #endregion
 

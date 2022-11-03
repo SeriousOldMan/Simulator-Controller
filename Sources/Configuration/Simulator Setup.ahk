@@ -312,7 +312,7 @@ class SetupWizard extends ConfigurationItem {
 
 	loadDefinition(definition := false) {
 		local knowledgeBase, stepWizard, count, descriptor, step, stepDefinition, title, initialize
-		local ignore, fileName
+		local ignore, fileName, language, rootDirectory, section, keyValues, key, value
 
 		if !definition
 			definition := this.Definition
@@ -350,6 +350,13 @@ class SetupWizard extends ConfigurationItem {
 				stepDefinition := readConfiguration(kResourcesDirectory . "Setup\Definitions\" . step.Step . " Step.ini")
 
 				setConfigurationSectionValues(definition, "Setup." . step.Step, getConfigurationSectionValues(stepDefinition, "Setup." . step.Step, Object()))
+
+				for language, ignore in availableLanguages()
+					for ignore, rootDirectory in [kResourcesDirectory . "Setup\Translations\", kUserTranslationsDirectory . "Setup\"]
+						if FileExist(rootDirectory . step.Step . " Step." . language)
+							for section, keyValues in readConfiguration(rootDirectory . step.Step . " Step." . language)
+								for key, value in keyValues
+									setConfigurationValue(definition, section, key, value)
 
 				step.loadDefinition(definition, getConfigurationValue(definition, "Setup." . step.Step, step.Step . ".Definition", Object()))
 			}
@@ -520,7 +527,9 @@ class SetupWizard extends ConfigurationItem {
 		for step, stepWizard in this.StepWizards {
 			this.ProgressCount += 2
 
-			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ") . translate(step) . translate("...")})
+			showProgress({progress: this.ProgressCount, message: translate("Creating UI for Step: ")
+															   . getConfigurationValue(this.Definition, "Setup." . step, step . ".Name." . getLanguage())
+															   . translate("...")})
 
 			stepWizard.createGui(this, x, y, width, height)
 		}
@@ -723,7 +732,7 @@ class SetupWizard extends ConfigurationItem {
 
 					writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 
-					deleteFile(kUserConfigDirectory . "Simulator Controller.config")
+					deleteFile(kTempDirectory . "Simulator Controller.state")
 
 					startupLink := A_Startup . "\Simulator Startup.lnk"
 
@@ -2470,7 +2479,7 @@ findInstallProperty(name, property) {
 
 initializeSimulatorSetup() {
 	local icon := kIconsDirectory . "Configuration Wand.ico"
-	local definition, wizard, x, y, label, callback
+	local definition, wizard, label, callback, ignore, languages, language, section, keyValues, key, value
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Setup
@@ -2478,6 +2487,24 @@ initializeSimulatorSetup() {
 	FileCreateDir %kUserHomeDirectory%Setup
 
 	definition := readConfiguration(kResourcesDirectory . "Setup\Simulator Setup.ini")
+
+	languages := string2Values("|", getConfigurationValue(definition, "Setup", "Languages"))
+
+	if FileExist(kUserTranslationsDirectory . "Setup\Simulator Setup.ini") {
+		for ignore, language in string2Values("|", getConfigurationValue(readConfiguration(kUserTranslationsDirectory . "Setup\Simulator Setup.ini")
+																	   , "Setup", "Languages"))
+			if !inList(languages, language)
+				languages.Push(language)
+	}
+
+	setConfigurationValue(definition, "Setup", "Languages", values2String("|", languages*))
+
+	for language, ignore in languages
+		for ignore, root in [kResourcesDirectory, kUserTranslationsDirectory]
+			if FileExist(kUserHomeDirectory . "Setup\Simulator Setup." . language)
+				for section, keyValues in readConfiguration(kUserHomeDirectory . "Setup\Simulator Setup." . language)
+					for key, value in keyValues
+						setConfigurationValue(definition, section, key, value)
 
 	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Window", getConfigurationSectionValues(definition, "Splash Window"))
 	setConfigurationSectionValues(kSimulatorConfiguration, "Splash Themes", getConfigurationSectionValues(definition, "Splash Themes"))
@@ -2506,12 +2533,9 @@ initializeSimulatorSetup() {
 
 	showSplashTheme("Rotating Brain")
 
-	x := Round((A_ScreenWidth - 300) / 2)
-	y := A_ScreenHeight - 150
-
 	wizard.ProgressCount := 0
 
-	showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
+	showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("Preparing Configuration Steps...")})
 
 	if isDebug()
 		Sleep 500
@@ -2524,7 +2548,7 @@ initializeSimulatorSetup() {
 
 startupSimulatorSetup() {
 	local wizard := SetupWizard.Instance
-	local preset, previous, x, y
+	local preset, previous
 
 	wizard.loadDefinition()
 
@@ -2574,11 +2598,8 @@ restartSetup:
 
 		wizard.ProgressCount := 0
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
 		showSplashTheme("Rotating Brain")
-		showProgress({x: x, y: y, color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
+		showProgress({color: "Blue", title: translate("Initializing Setup Wizard"), message: translate("")})
 
 		Goto restartSetup
 	}

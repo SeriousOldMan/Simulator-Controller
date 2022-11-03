@@ -256,7 +256,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		selectedSession := false
 		simulatorSessions := []
 
-		configuration := getControllerConfiguration()
+		configuration := getControllerState()
 
 		for simulator, options in getConfigurationSectionValues(configuration, "Simulators", Object())
 			simulators.Push(simulator)
@@ -329,6 +329,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	local descriptor, value, simulators, margin, choices, chosen, themes
 	local descriptor, applicationName, enabled, disabled, coreHeight, index, coreDescriptor
 	local coreOption, coreLabel, checked, feedbackHeight, feedbackDescriptor, feedbackOption, feedbackLabel
+	local applicationSettings
 
 	static modeSettings
 	static configuration
@@ -352,6 +353,7 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	static buttonBoxSimulation
 	static buttonBoxSimulationDuration
 	static buttonBoxPosition
+	static popupPosition
 	static lastPositions
 
 	static startup
@@ -405,9 +407,17 @@ restartSettings:
 		setConfigurationValue(newSettings, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
 		setConfigurationValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 
-		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
+		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
 
 		setConfigurationValue(newSettings, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
+
+		positions := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
+
+		applicationSettings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		setConfigurationValue(applicationSettings, "General", "Popup Position", positions[inList(map(positions, "translate"), popupPosition)])
+
+		writeConfiguration(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
 
 		for descriptor, value in lastPositions
 			setConfigurationValue(newSettings, "Button Box", descriptor, value)
@@ -461,7 +471,8 @@ restartSettings:
 
 		Gui SE:Add, Text, x68 YP+20 w100 cBlue Center gopenSettingsDocumentation, % translate("Settings")
 
-		coreSettings := [["Simulator Controller", true, false]]
+		coreSettings := [["Simulator Controller", true, false]
+					   , ["System Monitor", getConfigurationValue(settingsOrCommand, "Core", "System Monitor", false), true]]
 		feedbackSettings := []
 
 		for descriptor, applicationName in getConfigurationSectionValues(configuration, "Applications", Object()) {
@@ -495,7 +506,7 @@ restartSettings:
 			checked := coreDescriptor[2]
 
 			if (index == 1)
-				coreOption := coreOption . " YP+20 XP+10"
+				coreOption := coreOption . " YP+20 X20"
 
 			Gui SE:Add, CheckBox, %coreOption% Checked%checked% vcoreVariable%index%, %coreLabel%
 		}
@@ -516,7 +527,7 @@ restartSettings:
 				checked := feedbackDescriptor[2]
 
 				if (index == 1)
-					feedbackOption := feedbackOption . " YP+20 XP+10"
+					feedbackOption := feedbackOption . " YP+20 X20"
 
 				Gui SE:Add, CheckBox, %feedbackOption% Checked%checked% vfeedbackVariable%index%, %feedbackLabel%
 			}
@@ -527,6 +538,9 @@ restartSettings:
 		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", false)
 		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
+
+		popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+										     , "General", "Popup Position", "Bottom")
 
 		lastPositions := {}
 
@@ -547,35 +561,48 @@ restartSettings:
 		Gui SE:Font, Norm, Arial
 		Gui SE:Font, Italic, Arial
 
-		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h135, % translate("Controller Notifications")
+		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h160, % translate("Controller Notifications")
 
 		Gui SE:Font, Norm, Arial
 
-		Gui SE:Add, CheckBox, YP+20 XP+10 Checked%trayTip% vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
+		Gui SE:Add, CheckBox, X20 YP+20 Checked%trayTip% Section vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
 		disabled := !trayTip ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipDuration HwndtrayTipDurationInput, %trayTipDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, X20 YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
+		Gui SE:Add, CheckBox, XS YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
 		disabled := !trayTipSimulation ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipSimulationDuration HwndtrayTipSimulationDurationInput, %trayTipSimulationDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, X20 YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
+		Gui SE:Add, CheckBox, XS YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
 		disabled := !buttonBox ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxDuration HwndbuttonBoxDurationInput, %buttonBoxDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, X20 YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
+		Gui SE:Add, CheckBox, XS YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
 		disabled := !buttonBoxSimulation ? "Disabled" : ""
 		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxSimulationDuration HwndbuttonBoxSimulationDurationInput, %buttonBoxSimulationDuration%
 		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, Text, X20 YP+30, % translate("Button Box Position")
+		Gui SE:Add, Text, XS YP+30, % translate("Button Box Position")
 
-		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "Secondary Screen", "Last Position"]
+		if (buttonBoxPosition = "Secondary Screen")
+			buttonBoxPosition := "2nd Screen"
+
+		choices := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
 		chosen := inList(choices, buttonBoxPosition)
 
 		if !chosen
 			chosen := 4
 
 		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
+
+		Gui SE:Add, Text, XS YP+30, % translate("Overlay Position")
+
+		choices := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
+		chosen := inList(choices, popupPosition)
+
+		if !chosen
+			chosen := 1
+
+		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vpopupPosition, % values2String("|", map(choices, "translate")*)
 
 		if fromSetup
 			Gui SE:Add, Button, X10 Y+15 w220 Disabled gopenModesEditor, % translate("Controller Automation...")

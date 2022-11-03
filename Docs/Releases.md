@@ -1,10 +1,41 @@
+## 4.4.5.0-release 10/28/22
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Telemetry and pressures synchronization can now be choosen separately in the "Session Database".
+  4. A new monitoring tool gives you an integrated view over the health and activities of all system components. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) for more information.
+  5. Updated the upload / download of the community setup database to a new FTP service provider.
+  6. Telemetry data synchronization will pick up at the right point in time after a system failure.
+  7. ECU Map and Caster are now supported for *Assetto Corsa Competizione* in "Setup Advisor". Range definitions has been updated for most cars of *Assetto Corsa Competizione*, the rest will follow with the next release.
+  8. Windows of Simulator Controller applications are no longer lost offscreen, when a Monitor has been deactivated or disconnect from the PC.
+  9. Info and progress overlays can now be positioned on a secondary screen as well, so that they do not interfere with the simulation at all.
+  10. New quick start guide for new users at the very beginning of the [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) documentation.
+  11. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Ferrari 488 GT3
+	    - Ferrari 488 GT3 Evo
+
+## 4.4.0.0-release 10/21/22
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. The position on the screen where info and progress overlays are displayed, can now be configured in the [UI settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications).
+  4. The session synchronization can be [temporarily disabled](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session) in the "Race Center", while you are working with the data.
+  5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
+  6. A driver may be selected in "Session Database" when [looking for tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressure-advisor). This very helpful when looking for cold tyre pressures for your team mate during a team race.
+  7. Refactoring of the translation framework to better support the new Spanish translation.
+  8. Thanks to the great work of Jose Krilin, we have an initial version of a Spanish translation. The UI has been translated for the most part and will be polished in the next weeks and you can also expect a working version of the voice generation and recognition soon.
+  9. Fixed startup of Race Spotter in situations with a very short rolling or even a standing start.
+  10. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Audi TT RS VLN
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-440), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
+
 ## 4.3.5.0-release 10/14/22
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. UI specific settings, which are managed by the app "Simulator Settings", are now directly available from "Simulator Startup". See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller) for more information.
   4. You can now choose between different methods for delta calculations for the Virtual Race Spotter. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information) for more information.
-  
 
 ## 4.3.4.0-release 09/30/22
 
@@ -465,7 +496,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. Delta time calculation by the Spotter is much more precise now.
   4. Spotter warnings are much faster now due to caching of the generated sound files.
-  5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#choosing-the-database-location) for more information.
+  5. Session Database location is now configurable. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) for more information.
   6. The Virtual Race Engineer can be asked about the amount of remaining fuel, like: "How much fuel is remaining?".
   7. The same can be achieved using the new *InformationRequest* action *FuelRemaining*, which is available for all simulator plugins and the "Race Engineer" plugin. See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   8. Larger window sizes for "Strategy Workbench" and "Race Center" (as requested by the community).

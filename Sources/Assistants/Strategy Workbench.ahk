@@ -599,7 +599,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x5% yp+23 w75 h20, % translate("Pitstop")
 		Gui %window%:Add, DropDownList, x%x7% yp-4 w80 AltSubmit Choose3 VpitstopRequirementsDropDown gchoosePitstopRequirements, % values2String("|", map(["Optional", "Required", "Window"], "translate")*)
 		Gui %window%:Add, Edit, x%x11% yp+1 w50 h20 VpitstopWindowEdit gvalidatePitstopRule, %pitstopWindowEdit%
-		Gui %window%:Add, Text, x%x12% yp+3 w110 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
+		Gui %window%:Add, Text, x%x12% yp+3 w120 h20 VpitstopWindowLabel, % translate("Minute (From - To)")
 
 		Gui %window%:Add, Text, x%x5% yp+22 w75 h23 +0x200 VrefuelRequirementsLabel, % translate("Refuel")
 		Gui %window%:Add, DropDownList, x%x7% yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown, % values2String("|", map(["Optional", "Required", "Always", "Disallowed"], "translate")*)
@@ -643,35 +643,35 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w350 h171, % translate("Pitstop")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w390 h171, % translate("Pitstop")
 
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x% yp+21 w105 h20 +0x200, % translate("Pitlane Delta")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
 		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80, %pitstopDeltaEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Drive through - Drive by)")
+		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Seconds (Drive through - Drive by)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Tyre Service")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
 		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80, %pitstopTyreServiceEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Change four tyres)")
+		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Seconds (Change four tyres)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopFuelServiceEdit gvalidatePitstopFuelService, %pitstopFuelServiceEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Seconds (Refuel of 10 litres)")
+		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Seconds (Refuel of 10 litres)")
 
 		Gui %window%:Add, Text, x%x% yp+24 w160 h23, % translate("Service")
 		Gui %window%:Add, DropDownList, x%x1% yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui %window%:Add, Text, x%x% yp+27 w85 h20 +0x200, % translate("Fuel Capacity")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number Limit3 VfuelCapacityEdit, %fuelCapacityEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w180 h20, % translate("Liter")
+		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %safetyFuelEdit%
-		Gui %window%:Add, Text, x%x3% yp+2 w90 h20, % translate("Liter")
+		Gui %window%:Add, Text, x%x3% yp+2 w130 h20, % translate("Liter")
 
 		Gui %window%:Tab, 3
 
@@ -3136,10 +3136,11 @@ addSimDriver() {
 		IfMsgBox No
 			row += 1
 
-		LV_Insert(row, "Select Vis", "", "")
+		LV_Insert(row, "Select", "", "")
+		LV_Modify(row, "Vis")
 	}
 	else {
-		LV_Add("Select Vis", "", "")
+		LV_Modify(LV_Add("Select", "", ""), "Vis")
 
 		row := LV_GetCount()
 	}
@@ -3295,7 +3296,8 @@ addSimWeather() {
 			after := true
 		}
 
-		LV_Insert(row, "Select Vis", "", "")
+		LV_Insert(row, "Select", "", "")
+		LV_Modify(row, "Vis")
 	}
 	else {
 		row := LV_GetCount()
@@ -3315,7 +3317,7 @@ addSimWeather() {
 			lastTime := "00:00"
 		}
 
-		LV_Add("Select Vis", "", "")
+		LV_Modify(LV_Add("Select", "", ""), "Vis")
 
 		row += 1
 	}

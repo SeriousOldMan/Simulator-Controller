@@ -422,37 +422,19 @@ exitProcesses(silent := false, force := false) {
 
 		if hasFGProcesses
 			if force
-				for ignore, app in concatenate(kForegroundApps, ["Race Settings"]) {
-					Process Exist, %app%.exe
-
-					if ErrorLevel {
-						Process Close, %ErrorLevel%
-
-						if !ErrorLevel
-							return false
-					}
-				}
+				broadcastMessage(concatenate(kForegroundApps, ["Race Settings"]), "exitApplication")
 			else
 				return false
 
 		if hasBGProcesses
-			for ignore, app in kBackgroundApps {
-				Process Exist, %app%.exe
-
-				if (ErrorLevel && (ErrorLevel != pid)) {
-					Process Close, %ErrorLevel%
-
-					if !ErrorLevel
-						return false
-				}
-			}
+			broadcastMessage(remove(kBackgroundApps, ["Simulator Tools"]), "exitApplication")
 
 		return true
 	}
 }
 
 checkInstallation() {
-	local installLocation, installOptions, quiet, options, x, y
+	local installLocation, installOptions, quiet, options
 	local install, title, index, options, isNew, packageLocation, ignore, directory, currentDirectory
 
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
@@ -492,12 +474,9 @@ checkInstallation() {
 		if (quiet || uninstallOptions(options)) {
 			showSplashTheme("McLaren 720s GT3 Pictures")
 
-			x := Round((A_ScreenWidth - 300) / 2)
-			y := A_ScreenHeight - 150
-
 			vProgressCount := 0
 
-			showProgress({x: x, y: y, color: "Blue", title: translate("Uninstalling Simulator Controller"), message: translate("...")})
+			showProgress({color: "Blue", title: translate("Uninstalling Simulator Controller"), message: translate("...")})
 
 			deleteFiles(options["InstallLocation"])
 
@@ -605,14 +584,11 @@ checkInstallation() {
 				setConfigurationValue(installOptions, "Shortcuts", "Desktop", options["DesktopShortcuts"])
 				setConfigurationValue(installOptions, "Shortcuts", "StartMenu", options["StartMenuShortcuts"])
 
-				showSplashTheme("McLaren 720s GT3 Pictures")
-
-				x := Round((A_ScreenWidth - 300) / 2)
-				y := A_ScreenHeight - 150
+				; showSplashTheme("McLaren 720s GT3 Pictures")
 
 				vProgressCount := 0
 
-				showProgress({x: x, y: y, color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
+				showProgress({color: "Blue", title: translate("Installing Simulator Controller"), message: translate("...")})
 
 				for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
 					vProgressCount += 1
@@ -678,7 +654,7 @@ checkInstallation() {
 
 				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
 
-				hideSplashTheme()
+				; hideSplashTheme()
 
 				if (installLocation != packageLocation) {
 					showProgress({message: translate("Removing installation files...")})
@@ -1673,6 +1649,11 @@ updateInstallationForV392() {
 
 		FileCreateShortCut %installLocation%\Binaries\Setup Advisor.exe, %A_StartMenu%\Simulator Controller\Setup Advisor.lnk, %installLocation%\Binaries
 	}
+}
+
+updateConfigurationForV441() {
+	deleteFile(kUserConfigDirectory . "Simulator Controller.config")
+	deleteFile(kUserConfigDirectory . "Simulator Controller.status")
 }
 
 updateConfigurationForV430() {
@@ -2686,21 +2667,25 @@ runBuildTargets(ByRef buildProgress) {
 				if !FileExist(targetSource)
 					throw "Source file not found..."
 
-				SplitPath targetSource, , sourceDirectory
-
-				FileRead sourceCode, %targetSource%
-
 				if (vTargetConfiguration = "Production") {
+					SplitPath targetSource, , sourceDirectory
+
+					FileRead sourceCode, %targetSource%
+
 					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include ..\Includes\Development.ahk`r`n;@SC-EndIF", "")
 
 					sourceCode := StrReplace(sourceCode, ";@SC #Include ..\Includes\Production.ahk", "#Include ..\Includes\Production.ahk")
+
+					deleteFile(sourceDirectory . "\compile.ahk")
+
+					FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
+
+					RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
+
+					deleteFile(sourceDirectory . "\compile.ahk")
 				}
-
-				deleteFile(sourceDirectory . "\compile.ahk")
-
-				FileAppend %sourceCode%, % sourceDirectory . "\compile.ahk"
-
-				RunWait % kCompiler . " /in """ . sourceDirectory . "\compile.ahk" . """"
+				else
+					RunWait % kCompiler . " /in """ . targetSource . """"
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
@@ -2708,8 +2693,6 @@ runBuildTargets(ByRef buildProgress) {
 				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
-
-			deleteFile(sourceDirectory . "\compile.ahk")
 
 			SplitPath targetBinary, compiledFile, targetDirectory
 			SplitPath targetSource, , sourceDirectory
@@ -2833,9 +2816,10 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 }
 
 startSimulatorTools() {
+	local exitProcesses := GetKeyState("Shift")
 	local updateOnly := false
 	local icon := kIconsDirectory . "Tools.ico"
-	local x, y, buildProgress
+	local buildProgress
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Tools
@@ -2865,11 +2849,8 @@ startSimulatorTools() {
 
 	Sleep 500
 
-	x := Round((A_ScreenWidth - 300) / 2)
-	y := A_ScreenHeight - 150
-
 	if !kSilentMode
-		showProgress({x: x, y: y, color: "Blue", message: "", title: translate("Preparing Targets")})
+		showProgress({color: "Blue", message: "", title: translate("Preparing Targets")})
 
 	buildProgress := 0
 
@@ -2884,6 +2865,9 @@ startSimulatorTools() {
 	runUpdateTargets(buildProgress)
 
 	if !updateOnly {
+		if exitProcesses
+			exitProcesses(true, true)
+
 		runCleanTargets(buildProgress)
 
 		if (vSpecialTargets.Length() > 0)

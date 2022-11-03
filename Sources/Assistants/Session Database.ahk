@@ -34,6 +34,7 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Libraries\GDIP.ahk
+#Include ..\Libraries\CLR.ahk
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
@@ -123,6 +124,7 @@ global uploadWetRaceButton
 global downloadWetRaceButton
 global deleteWetRaceButton
 
+global driverDropDown
 global tyreCompoundDropDown
 global airTemperatureEdit
 global trackTemperatureEdit
@@ -194,7 +196,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iSettings := []
 
 	class EditorTyresDatabase extends TyresDatabase {
-		__New(controllerConfiguration := false) {
+		__New(controllerState := false) {
 			base.__New()
 
 			this.UseCommunity[false] := SessionDatabaseEditor.Instance.UseCommunity
@@ -449,7 +451,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Picture, x280 ys w30 h30 Section, %kIconsDirectory%Report.ico
 		Gui %window%:Add, Text, xp+34 yp+5 w120 h26, % translate("Notes")
 
-		Gui %window%:Add, Button, x647 yp w23 h23 HwndgeneralSettingsButtonHandle gchooseDatabasePath
+		Gui %window%:Add, Button, x647 yp w23 h23 HwndgeneralSettingsButtonHandle gshowSettings
 		setButtonIcon(generalSettingsButtonHandle, kIconsDirectory . "General Settings.ico", 1)
 
 		Gui %window%:Font, s8 Norm, Arial
@@ -549,7 +551,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 3
 
-		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Compound")
+		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Driver")
+		Gui %window%:Add, DropDownList, x386 yp w100 vdriverDropDown gloadPressures
+
+		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
 		Gui %window%:Add, Edit, x494 yp w40 -Background gloadPressures vairTemperatureEdit
@@ -751,8 +756,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if ((this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
 		}
-		else
-			GuiControl Choose, settingsTab, 0
 
 		if this.moduleAvailable("Settings") {
 			GuiControl Enable, settingsImg1
@@ -1462,7 +1465,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			try {
 				Gui ListView, % this.TrackAutomationsListView
 
-				LV_Add("Vis Select", trackAutomationNameEdit, trackAutomation.Actions.Length())
+				LV_Modify(LV_Add("Select", trackAutomationNameEdit, trackAutomation.Actions.Length()), "Vis")
 
 				loop 2
 					LV_ModifyCol(A_Index, "AutoHdr")
@@ -1691,17 +1694,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	deleteEntries(connector, database, localTable, serverTable, driver) {
+		local ignore, row
+
+		database.lock(localTable)
+
+		try {
+			if connector {
+				try {
+					for ignore, row in database.query(localTable, {Where: {Driver: driver}})
+						if (row.Identifier != kNull)
+							connector.DeleteData(serverTable, row.Identifier)
+				}
+				catch exception {
+					logError(exception, true)
+				}
+			}
+
+			database.remove(localTable, {Driver: driver}, Func("always").Bind(true))
+		}
+		finally {
+			database.unlock(localTable)
+		}
+	}
+
+
 	deleteData() {
 		local window := this.Window
-		local x, y, progressWindow, defaultListView, simulator, count, row, type, data, car, track
+		local progressWindow, defaultListView, simulator, count, row, type, data, car, track
 		local driver, telemetryDB, tyresDB, code, candidate, progress
+		local connector, ignore, identifier, identifiers
 
 		Gui %window%:Default
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Deleting Data")})
+		progressWindow := showProgress({color: "Green", title: translate("Deleting Data")})
 
 		Gui %progressWindow%:+Owner%window%
 		Gui %window%:Default
@@ -1754,21 +1780,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				car := this.getCarCode(simulator, car)
 				track := this.getTrackCode(simulator, track)
 
+				connector := this.SessionDatabase.Connector
+
 				switch type {
 					case translate("Telemetry"):
 						telemetryDB := new TelemetryDatabase(simulator, car, track).Database
 
-						telemetryDB.remove("Electronics", {Driver: driver}, Func("always").Bind(true))
-						telemetryDB.remove("Tyres", {Driver: driver}, Func("always").Bind(true))
-
-						telemetryDB.flush()
+						this.deleteEntries(connector, telemetryDB, "Electronics", "Electronics", driver)
+						this.deleteEntries(connector, telemetryDB, "Tyres", "Tyres", driver)
 					case translate("Pressures"):
 						tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
 
-						tyresDB.remove("Tyres.Pressures", {Driver: driver}, Func("always").Bind(true))
-						tyresDB.remove("Tyres.Pressures.Distribution", {Driver: driver}, Func("always").Bind(true))
-
-						tyresDB.flush()
+						this.deleteEntries(connector, tyresDB, "Tyres.Pressures", "TyresPressures", driver)
+						this.deleteEntries(connector, tyresDB, "Tyres.Pressures.Distribution", "TyresPressuresDistribution", driver)
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -1807,9 +1831,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	exportData(directory) {
 		local window := this.Window
-		local x := Round((A_ScreenWidth - 300) / 2)
-		local y := A_ScreenHeight - 150
-		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Exporting Data")})
+		local progressWindow := showProgress({color: "Green", title: translate("Exporting Data")})
 		local defaultListView, simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
 		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
@@ -1971,17 +1993,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local simulator := this.SelectedSimulator
 		local info := readConfiguration(directory . "\Export.info")
-		local x, y, progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
+		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
 		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName
 
 		directory := normalizeDirectoryPath(directory)
 
 		if (this.SessionDatabase.getSimulatorName(getConfigurationValue(info, "General", "Simulator", "")) = simulator) {
-			x := Round((A_ScreenWidth - 300) / 2)
-			y := A_ScreenHeight - 150
-
-			progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Importing Data")})
+			progressWindow := showProgress({color: "Green", title: translate("Importing Data")})
 
 			Gui %progressWindow%:+Owner%window%
 			Gui %window%:Default
@@ -2052,22 +2071,36 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								sourceDB := new Database(sourceDirectory . "\", schemas)
 								targetDB := new TelemetryDatabase(simulator, car, track).Database
 
-								for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
-									data := Object()
+								targetDB.lock("Electronics")
 
-									for ignore, field in schemas["Electronics"]
-										data[field] := row[field]
+								try {
+									for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
+										data := Object()
 
-									targetDB.add("Electronics", data, true)
+										for ignore, field in schemas["Electronics"]
+											data[field] := row[field]
+
+										targetDB.add("Electronics", data, true)
+									}
+								}
+								finally {
+									targetDB.unlock("Electronics")
 								}
 
-								for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
-									data := Object()
+								targetDB.lock("Tyres")
 
-									for ignore, field in schemas["Tyres"]
-										data[field] := row[field]
+								try {
+									for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
+										data := Object()
 
-									targetDB.add("Tyres", data, true)
+										for ignore, field in schemas["Tyres"]
+											data[field] := row[field]
+
+										targetDB.add("Tyres", data, true)
+									}
+								}
+								finally {
+									targetDB.unlock("Tyres")
 								}
 							}
 
@@ -2076,26 +2109,29 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								tyresDB := new TyresDatabase()
 								sourceDB := new Database(sourceDirectory . "\", schemas)
-								targetDB := tyresDB.getTyresDatabase(simulator, car, track)
+								targetDB := tyresDB.lock(simulator, car, track)
 
-								for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
-									data := Object()
+								try {
+									for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
+										data := Object()
 
-									for ignore, field in schemas["Tyres.Pressures"]
-										data[field] := row[field]
+										for ignore, field in schemas["Tyres.Pressures"]
+											data[field] := row[field]
 
-									targetDB.add("Tyres.Pressures", data, true)
+										targetDB.add("Tyres.Pressures", data, true)
+									}
+
+									for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
+										tyresDB.updatePressure(simulator, car, track
+															 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
+															 , row.Compound, row["Compound.Color"]
+															 , row.Type, row.Tyre, row.Pressure, row.Count
+															 , false, true, "User", driver)
+									}
 								}
-
-								for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
-									tyresDB.updatePressure(simulator, car, track
-														 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
-														 , row.Compound, row["Compound.Color"]
-														 , row.Type, row.Tyre, row.Pressure, row.Count
-														 , false, true, "User", driver)
+								finally {
+									tyresDB.unlock()
 								}
-
-								tyresDB.flush()
 							}
 
 							if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
@@ -2150,9 +2186,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadData() {
 		local window := this.Window
-		local x := Round((A_ScreenWidth - 300) / 2)
-		local y := A_ScreenHeight - 150
-		local progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local defaultListView, selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
 		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, count, strategies
 		local automations, trackName
@@ -2185,7 +2219,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					SplitPath A_LoopFileName, , , , track
 
 					if (((selectedTrack = true) || (track = selectedTrack)) && !inList(tracks, track)) {
-						LV_Add("", translate("Tracks"), this.SessionDatabase.getTrackName(selectedSimulator, track, true)
+						LV_Add("", translate("Tracks"), this.getTrackName(selectedSimulator, track)
 							 , "-", 1)
 
 						tracks.Push(track)
@@ -2633,22 +2667,28 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	getAvailableSettings(selection := false) {
+		local found := false
 		local fileName, settingDescriptors, section, values, key, value, settings, skip, ignore
-		local available, index, candidate
+		local available, index, candidate, rootDirectory
 
 		if (this.SettingDescriptors.Count() = 0) {
-			fileName := ("Settings." . getLanguage())
+			settingDescriptors := readConfiguration(kResourcesDirectory . "Database\Settings.ini")
 
-			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory))
-				fileName := "Settings.en"
+			for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
+				if FileExist(rootDirectory . "Settings." . getLanguage()) {
+					found := true
 
-			settingDescriptors := readConfiguration(kTranslationsDirectory . fileName)
+					for section, values in readConfiguration(rootDirectory . "Settings." . getLanguage())
+						for key, value in values
+							setConfigurationValue(settingDescriptors, section, key, value)
+				}
+
+			if !found
+				for section, values in readConfiguration(kTranslationsDirectory . "Settings.en")
+					for key, value in values
+						setConfigurationValue(settingDescriptors, section, key, value)
 
 			this.iSettingDescriptors := settingDescriptors
-
-			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
-				for key, value in values
-					setConfigurationValue(settingDescriptors, section, key, value)
 		}
 
 		settings := []
@@ -2697,8 +2737,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			ignore := false
 
-			LV_Add("Select Vis", this.getSettingLabel(section, key)
-				 , IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value)
+			LV_Modify(LV_Add("Select", this.getSettingLabel(section, key)
+						   , IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value), "Vis")
 
 			LV_ModifyCol()
 
@@ -2806,8 +2846,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadPressures() {
+		local sessionDB := this.SessionDatabase
 		local window, compounds, chosen, compound, compoundColor, pressureInfos, index
 		local ignore, tyre, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
+		local drivers, driver
 
 		static lastSimulator := false
 		static lastCar := false
@@ -2827,7 +2869,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControlGet trackTemperatureEdit
 				GuiControlGet tyreCompoundDropDown
 
-				compounds := this.SessionDatabase.getTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+				compounds := sessionDB.getTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
 				GuiControl, , tyreCompoundDropDown, % ("|" . values2String("|", map(compounds, "translate")*))
 
@@ -2842,6 +2884,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					chosen := 1
 
 				GuiControl Choose, tyreCompoundDropDown, %chosen%
+
+				if (this.SelectedSimulator != lastSimulator) {
+					drivers := [translate("All")]
+
+					chosen := false
+
+					for ignore, driver in sessionDB.getAllDrivers(this.SelectedSimulator) {
+						if (driver = sessionDB.ID)
+							chosen := driver
+
+						drivers.Push(sessionDB.getDriverName(this.SelectedSimulator, driver))
+					}
+
+					GuiControl, , driverDropDown, % "|" . values2String("|", drivers*)
+
+					if chosen {
+						GuiControl Choose, driverDropDown, % inList(sessionDB.getAllDrivers(this.SelectedSimulator), chosen) + 1
+
+						driver := [chosen]
+					}
+					else {
+						GuiControl Choose, driverDropDown, 1
+
+						driver := []
+					}
+				}
+				else {
+					GuiControlGet driverDropDown
+
+					if (driverDropDown = translate("All"))
+						driver := []
+					else
+						driver := [sessionDB.getDriverID(this.SelectedSimulator, driverDropDown)]
+				}
 
 				lastSimulator := this.SelectedSimulator
 				lastCar := this.SelectedCar
@@ -2859,7 +2935,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
 																			   , this.SelectedTrack, this.SelectedWeather
 																			   , airTemperatureEdit, trackTemperatureEdit
-																			   , compound, compoundColor)
+																			   , compound, compoundColor, driver*)
 				}
 				else
 					pressureInfos := []
@@ -3262,7 +3338,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		Gui IDS:Font, s9 Norm, Arial
 		Gui IDS:Font, Italic Underline, Arial
 
-		Gui IDS:Add, Text, x153 YP+20 w104 cBlue Center gopenImportDocumentation, % translate("Import Data")
+		Gui IDS:Add, Text, x153 YP+20 w104 cBlue Center gopenSettingsDocumentation, % translate("Database Location")
 
 		Gui IDS:Font, s8 Norm, Arial
 
@@ -3288,10 +3364,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 			drivers[name] := id
 		}
 
-		x := Round((A_ScreenWidth - 300) / 2)
-		y := A_ScreenHeight - 150
-
-		progressWindow := showProgress({x: x, y: y, color: "Green", title: translate("Analyzing Data")})
+		progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 
 		Gui %progressWindow%:+Owner%owner%
 		Gui %owner%:+Disabled
@@ -3309,7 +3382,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 				SplitPath A_LoopFileName, , , , track
 
 				if !inList(tracks, track) {
-					LV_Add("Check", translate("Tracks"), editor.SessionDatabase.getTrackName(simulator, track), "-", 1)
+					LV_Add("Check", translate("Tracks"), editor.getTrackName(simulator, track), "-", 1)
 
 					tracks.Push(track)
 				}
@@ -3535,6 +3608,534 @@ openImportDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
 }
 
+showSettings() {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+
+	protectionOn()
+
+	Gui SE:+Owner%window%
+	Gui %window%:+Disabled
+
+	try {
+		editSettings(editor)
+	}
+	finally {
+		Gui %window%:-Disabled
+
+		protectionOff()
+	}
+}
+
+editSettings(editorOrCommand) {
+	local title, window, x, y, done, configuration, dllName, dllFile, connector, connection
+	local directory, empty, original, changed, groups, replication
+
+	static result := false
+	static sessionDB := false
+
+	static databaseLocationEdit := ""
+	static synchTelemetryCheck
+	static synchPressuresCheck
+	static serverURLEdit := ""
+	static serverTokenEdit := ""
+	static serverUpdateEdit := 0
+	static tokenButtonHandle
+	static rebuildButton
+
+	if (editorOrCommand == kOk)
+		result := kOk
+	else if (editorOrCommand == kCancel)
+		result := kCancel
+	else if (editorOrCommand = "Rebuild") {
+		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		setConfigurationValue(configuration, "Team Server", "Synchronization", false)
+
+		writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+	}
+	else if (editorOrCommand = "DatabaseLocation") {
+		Gui +OwnDialogs
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
+		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
+		OnMessage(0x44, "")
+
+		if (directory != "") {
+			databaseLocationEdit := directory
+
+			GuiControl, , databaseLocationEdit, %databaseLocationEdit%
+		}
+	}
+	else if (editorOrCommand = "ValidateToken") {
+		GuiControlGet serverURLEdit
+		GuiControlGet serverTokenEdit
+
+		dllName := "Data Store Connector.dll"
+		dllFile := kBinariesDirectory . dllName
+
+		try {
+			if (!FileExist(dllFile)) {
+				logMessage(kLogCritical, translate("Data Store Connector.dll not found in ") . kBinariesDirectory)
+
+				throw "Unable to find Data Store Connector.dll in " . kBinariesDirectory . "..."
+			}
+
+			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
+		}
+		catch exception {
+			logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
+
+			showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			return
+		}
+
+		if GetKeyState("Ctrl", "P") {
+			Gui TSL:+OwnerSE
+			Gui SE:+Disabled
+
+			try {
+				token := loginDialog(connector, serverURLEdit)
+
+				if token {
+					serverTokenEdit := token
+
+					Gui SE:Default
+
+					GuiControl Text, serverTokenEdit, %serverTokenEdit%
+				}
+				else
+					return
+			}
+			finally {
+				Gui SE:-Disabled
+			}
+		}
+
+		try {
+			connector.Initialize(serverURLEdit, serverTokenEdit)
+
+			connection := connector.Connect(serverTokenEdit, sessionDB.ID, sessionDB.getUserName())
+
+			if (connection && (connection != "")) {
+				connector.ValidateDataToken()
+
+				showMessage(translate("Successfully connected to the Team Server."))
+			}
+		}
+		catch exception {
+			title := translate("Error")
+
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
+			OnMessage(0x44, "")
+
+			return false
+		}
+	}
+	else if (editorOrCommand = "UpdateState") {
+		GuiControlGet synchTelemetryCheck
+		GuiControlGet synchPressuresCheck
+
+		if (synchTelemetryCheck || synchPressuresCheck) {
+			GuiControl Enable, serverURLEdit
+			GuiControl Enable, serverTokenEdit
+			GuiControl Enable, serverUpdateEdit
+			GuiControl Enable, %tokenButtonHandle%
+			GuiControl Enable, rebuildButton
+
+			GuiControlGet serverUpdateEdit
+
+			if (serverUpdateEdit = "")
+				GuiControl, , serverUpdateEdit, 10
+		}
+		else {
+			GuiControl Disable, serverURLEdit
+			GuiControl Disable, serverTokenEdit
+			GuiControl Disable, serverUpdateEdit
+			GuiControl Disable, %tokenButtonHandle%
+			GuiControl Disable, rebuildButton
+
+			serverURLEdit := ""
+			serverTokenEdit := ""
+			serverUpdateEdit := ""
+
+			GuiControl, , serverURLEdit, %serverURLEdit%
+			GuiControl, , serverTokenEdit, %serverTokenEdit%
+			GuiControl, , serverUpdateEdit, %serverUpdateEdit%
+		}
+	}
+	else {
+		result := false
+		sessionDB := editorOrCommand.SessionDatabase
+
+		window := "SE"
+
+		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+		databaseLocationEdit := normalizeDirectoryPath(getConfigurationValue(configuration, "Database", "Path", kDatabaseDirectory))
+
+		replication := getConfigurationValue(configuration, "Team Server", "Replication", false)
+		groups := string2Values(",", getConfigurationValue(configuration, "Team Server", "Groups", ""))
+
+		if (groups.Length() > 0) {
+			synchTelemetryCheck := (inList(groups, "Telemetry") != false)
+			synchPressuresCheck := (inList(groups, "Pressures") != false)
+		}
+		else {
+			synchTelemetryCheck := (replication != false)
+			synchPressuresCheck := (replication != false)
+		}
+
+		if (synchTelemetryCheck || synchPressuresCheck) {
+			serverURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "")
+			serverTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
+			serverUpdateEdit := replication
+		}
+		else {
+			serverURLEdit := ""
+			serverTokenEdit := ""
+			serverUpdateEdit := ""
+		}
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, s10 Bold, Arial
+
+		Gui %window%:Add, Text, w394 Center gmoveSettings, % translate("Modular Simulator Controller System")
+
+		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
+
+		Gui %window%:Add, Text, x133 YP+20 w144 cBlue Center gopenSettingsDocumentation, % translate("Database Settings")
+
+		Gui %window%:Font, s8 Norm, Arial
+
+		Gui %window%:Add, Text, x16 y60 w90 h23 +0x200, % translate("Database Folder")
+		Gui %window%:Add, Edit, x146 yp w234 h21 VdatabaseLocationEdit, %databaseLocationEdit%
+		Gui %window%:Add, Button, x382 yp-1 w23 h23 gchooseDatabaseLocation, % translate("...")
+
+		Gui %window%:Font, Italic, Arial
+
+		Gui %window%:Add, GroupBox, x16 yp+30 w388 h156 Section, % translate("Team Server")
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Synchronization")
+		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vsynchTelemetryCheck gupdateSettingsState, % translate("Telemetry Data")
+		Gui %window%:Add, CheckBox, x146 yp+24 w246 h21 vsynchPressuresCheck gupdateSettingsState, % translate("Pressures Data")
+
+		GuiControl, , synchTelemetryCheck, %synchTelemetryCheck%
+		GuiControl, , synchPressuresCheck, %synchPressuresCheck%
+
+		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Server URL")
+		Gui %window%:Add, Edit, x146 yp+1 w246 vserverURLEdit, %serverURLEdit%
+
+		Gui %window%:Add, Text, x24 yp+23 w90 h23 +0x200, % translate("Data Token")
+		Gui %window%:Add, Edit, x146 yp w246 h21 vserverTokenEdit, %serverTokenEdit%
+		Gui %window%:Add, Button, x122 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gvalidateServerToken
+		setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Text, x24 yp+25 w110 h23 +0x200, % translate("Synchronize each")
+		Gui %window%:Add, Edit, x146 yp w40 Number Limit2 vserverUpdateEdit, %serverUpdateEdit%
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range10-90, %serverUpdateEdit%
+		Gui %window%:Add, Text, x190 yp w90 h23 +0x200, % translate("Minutes")
+
+		Gui %window%:Add, Button, x312 yp+2 w80 vrebuildButton grebuildDatabase, % translate("Rebuild...")
+
+		Gui %window%:Add, Button, x122 ys+174 w80 h23 gacceptSettings, % translate("Ok")
+		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
+
+		updateSettingsState()
+
+		if getWindowPosition("Session Database.Settings", x, y)
+			Gui %window%:Show, x%x% y%y%
+		else
+			Gui %window%:Show, AutoSize Center
+
+		done := false
+
+		while !done {
+			result := false
+
+			while !result
+				Sleep 100
+
+			if (result == kCancel)
+				done := true
+			else if (result == kOk) {
+				GuiControlGet databaseLocationEdit
+				GuiControlGet synchTelemetryCheck
+				GuiControlGet synchPressuresCheck
+				GuiControlGet serverURLEdit
+				GuiControlGet serverTokenEdit
+				GuiControlGet serverUpdateEdit
+
+				changed := false
+
+				if (databaseLocationEdit = "") {
+					title := translate("Error")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+					OnMessage(0x44, "")
+
+					continue
+				}
+				else if (normalizeDirectoryPath(databaseLocationEdit) != normalizeDirectoryPath(kDatabaseDirectory)) {
+					if !FileExist(databaseLocationEdit)
+						try {
+							FileCreateDir %databaseLocationEdit%
+						}
+						catch exception {
+							title := translate("Error")
+
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+							MsgBox 262160, %title%, % translate("You must enter a valid directory.")
+							OnMessage(0x44, "")
+
+							continue
+						}
+
+					SoundPlay *32
+
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
+					title := translate("Session Database")
+					MsgBox 262179, %title%, % translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
+					OnMessage(0x44, "")
+
+					IfMsgBox Cancel
+						continue
+
+					IfMsgBox Yes
+					{
+						empty := true
+
+						loop Files, %databaseLocationEdit%\*.*, FD
+						{
+							empty := false
+
+							break
+						}
+
+						if !empty {
+							title := translate("Error")
+
+							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+							MsgBox 262160, %title%, % translate("The new database folder must be empty.")
+							OnMessage(0x44, "")
+
+							continue
+						}
+
+						original := normalizeDirectoryPath(kDatabaseDirectory)
+
+						showProgress({color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
+
+						copyFiles(original, databaseLocationEdit)
+
+						showProgress({progress: 100, message: translate("Finished...")})
+
+						Sleep 200
+
+						hideProgress()
+					}
+
+					sessionDB.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit) . "\")
+
+					title := translate("Information")
+
+					changed := true
+				}
+
+				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+
+				if !changed {
+					groups := getConfigurationValue(configuration, "Team Server", "Groups", kUndefined)
+
+					if (groups != kUndefined) {
+						groups := string2Values(",", groups)
+
+						if (synchTelemetryCheck && synchPressuresCheck)
+							changed := (!inList(groups, "Telemetry") || !inList(groups, "Pressures"))
+						else if synchTelemetryCheck
+							changed := !inList(groups, "Telemetry")
+						else if synchPressuresCheck
+							changed := !inList(groups, "Pressures")
+						else
+							changed := (groups.Length() != 0)
+					}
+					else
+						changed := ((getConfigurationValue(configuration, "Team Server", "Replication", false) != false) != synchTelemetryCheck)
+				}
+
+				if (changed || (getConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
+							|| (getConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
+					changed := true
+
+					setConfigurationValue(configuration, "Team Server", "Synchronization", false)
+
+					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
+
+					setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
+				}
+
+				groups := []
+
+				if synchTelemetryCheck
+					groups.Push("Telemetry")
+
+				if synchPressuresCheck
+					groups.Push("Pressures")
+
+				replication := (synchTelemetryCheck || synchPressuresCheck)
+
+				setConfigurationValue(configuration, "Team Server", "Groups", values2String(",", groups*))
+				setConfigurationValue(configuration, "Team Server", "Replication", replication ? serverUpdateEdit : false)
+				setConfigurationValue(configuration, "Team Server", "Server.URL", replication ? serverURLEdit : "")
+				setConfigurationValue(configuration, "Team Server", "Server.Token", replication ? serverTokenEdit : "")
+
+				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+				if changed {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
+					OnMessage(0x44, "")
+
+					ExitApp 0
+				}
+
+				done := true
+			}
+		}
+
+		Gui %window%:Destroy
+	}
+}
+
+acceptSettings() {
+	editSettings(kOk)
+}
+
+cancelSettings() {
+	editSettings(kCancel)
+}
+
+chooseDatabaseLocation() {
+	editSettings("DatabaseLocation")
+}
+
+rebuildDatabase() {
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+	title := translate("Team Server")
+	MsgBox 262436, %title%, % translate("Do you really want to rebuild the local database?")
+	OnMessage(0x44, "")
+
+	IfMsgBox Yes
+		editSettings("Rebuild")
+}
+
+validateServerToken() {
+	editSettings("ValidateToken")
+}
+
+updateSettingsState() {
+	editSettings("UpdateState")
+}
+
+moveSettings() {
+	moveByMouse("SE", "Session Database.Settings")
+}
+
+openSettingsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration
+}
+
+loginDialog(connectorOrCommand := false, teamServerURL := false) {
+	local window := "TSL"
+	local title
+
+	static result := false
+	static nameEdit := ""
+	static passwordEdit := ""
+
+	if (connectorOrCommand == kOk)
+		result := kOk
+	else if (connectorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, Norm, Arial
+
+		Gui %window%:Add, Text, x16 y16 w90 h23 +0x200, % translate("Server URL")
+		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
+
+		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 VnameEdit, %nameEdit%
+		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
+		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
+
+		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptLogin, % translate("Ok")
+		Gui %window%:Add, Button, x146 yp w80 h23 gcancelLogin, % translate("&Cancel")
+
+		Gui %window%:Show, AutoSize Center
+
+		while !result
+			Sleep 100
+
+		Gui %window%:Submit
+		Gui %window%:Destroy
+
+		if (result == kCancel)
+			return false
+		else if (result == kOk) {
+			try {
+				connectorOrCommand.Initialize(teamServerURL)
+
+				connectorOrCommand.Login(nameEdit, passwordEdit)
+
+				return connectorOrCommand.GetDataToken()
+			}
+			catch exception {
+				title := translate("Error")
+
+				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
+				OnMessage(0x44, "")
+
+				return false
+			}
+		}
+	}
+}
+
+acceptLogin() {
+	loginDialog(kOk)
+}
+
+cancelLogin() {
+	loginDialog(kCancel)
+}
+
 moveSessionDatabaseEditor() {
 	moveByMouse(SessionDatabaseEditor.Instance.Window, "Session Database")
 }
@@ -3578,6 +4179,9 @@ copyFiles(source, destination) {
 	local progress := 0
 	local step := 0
 
+	source := normalizeDirectoryPath(source)
+	destination := normalizeDirectoryPath(destination)
+
 	showProgress({color: "Blue"})
 
 	loop Files, %source%\*, DFR
@@ -3595,96 +4199,6 @@ copyFiles(source, destination) {
 	showProgress({progress: 50, color: "Green"})
 
 	copyDirectory(source, destination, 50 / count, step)
-}
-
-chooseDatabasePath() {
-	local directory, title, empty, original, x, y, configuration
-
-	protectionOn()
-
-	try {
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
-		OnMessage(0x44, "")
-
-		if ((directory != "") && (normalizeDirectoryPath(directory) != normalizeDirectoryPath(kDatabaseDirectory))) {
-			if !FileExist(directory)
-				try {
-					FileCreateDir %directory%
-				}
-				catch exception {
-					title := translate("Error")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
-					OnMessage(0x44, "")
-
-					return
-				}
-
-			SoundPlay *32
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
-			title := translate("Session Database")
-			MsgBox 262179, %title%, % translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
-			OnMessage(0x44, "")
-
-			IfMsgBox Cancel
-				return
-
-			IfMsgBox Yes
-			{
-				empty := true
-
-				loop Files, %directory%\*.*, FD
-				{
-					empty := false
-
-					break
-				}
-
-				if !empty {
-					title := translate("Error")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262160, %title%, % translate("The new database folder must be empty.")
-					OnMessage(0x44, "")
-
-					return
-				}
-
-				original := normalizeDirectoryPath(kDatabaseDirectory)
-
-				x := Round((A_ScreenWidth - 300) / 2)
-				y := A_ScreenHeight - 150
-
-				showProgress({x: x, y: y, color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
-
-				copyFiles(original, directory)
-
-				showProgress({progress: 100, message: translate("Finished...")})
-
-				Sleep 200
-
-				hideProgress()
-			}
-
-			new SessionDatabase().DatabasePath := normalizeDirectoryPath(directory)
-
-			title := translate("Information")
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262192, %title%, % translate("The session database location has been updated and the application will exit now. Make sure to restart all other applications as well.")
-			OnMessage(0x44, "")
-
-			ExitApp 0
-		}
-	}
-	finally {
-		protectionOff()
-	}
 }
 
 chooseSimulator() {

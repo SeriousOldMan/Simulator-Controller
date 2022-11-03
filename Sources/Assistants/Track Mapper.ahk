@@ -87,6 +87,8 @@ createTrackImage(trackMap) {
 
 		lastX := x
 		lastY := y
+
+		Sleep 1
 	}
 
 	Gdip_DrawLine(graphics, pen, lastX, lastY, firstX, firstY)
@@ -105,20 +107,40 @@ createTrackImage(trackMap) {
 }
 
 createTrackMap(simulator, track, fileName) {
+	local sessionDB := new SessionDatabase()
+	local trackMapperState := newConfiguration()
 	local trackMap := newConfiguration()
 	local coordinates := []
 	local exact, xIndex, yIndex, xMin, xMax, yMin, yMax, points, ignore, coordinate, width, height
-	local sessionDB, trackData, normalized
+	local trackData, normalized
 
 	setConfigurationValue(trackMap, "General", "Simulator", simulator)
 	setConfigurationValue(trackMap, "General", "Track", track)
+
+	setConfigurationValue(trackMapperState, "Track Mapper", "State", "Active")
+	setConfigurationValue(trackMapperState, "Track Mapper", "Simulator", sessionDB.getSimulatorName(simulator))
+	setConfigurationValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+	setConfigurationValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Creating track map..."))
+	setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Reading")
+	setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
+
+	writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 	loop Read, %fileName%
 	{
 		coordinates.Push(string2Values(",", A_LoopReadLine))
 
 		Sleep 1
+
+		if (Mod(A_Index, 100) = 0) {
+			setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+
+			writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+		}
 	}
+
+	setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Analyzing")
+	setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
 
 	if (coordinates.Length() > 0) {
 		if (coordinates[1].Length() = 2) {
@@ -150,6 +172,12 @@ createTrackMap(simulator, track, fileName) {
 			points += 1
 
 			Sleep 1
+
+			if (Mod(A_Index, 100) = 0) {
+				setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+
+				writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+			}
 		}
 
 		width := (Ceil(xMax) - Floor(xMin))
@@ -176,13 +204,25 @@ createTrackMap(simulator, track, fileName) {
 
 			normalized[1] := [0.0, 0.0]
 
+			setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Normalizing")
+			setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
+
 			for ignore, coordinate in coordinates {
 				normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
 
 				Sleep 1
+
+				if (Mod(A_Index, 100) = 0) {
+					setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+
+					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+				}
 			}
 
 			trackData := ""
+
+			setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Transforming")
+			setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
 
 			loop 1000 {
 				coordinate := normalized[A_Index]
@@ -199,13 +239,20 @@ createTrackMap(simulator, track, fileName) {
 				trackData .= (coordinate[1] . A_Space . coordinate[2])
 
 				Sleep 1
+
+				if (Mod(A_Index, 100) = 0) {
+					setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+
+					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+				}
 			}
 
 			coordinates := normalized
 			points := 1000
 		}
 
-		sessionDB := new SessionDatabase()
+		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Processing")
+		setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
 
 		simulator := sessionDB.getSimulatorName(simulator)
 
@@ -217,6 +264,12 @@ createTrackMap(simulator, track, fileName) {
 			setConfigurationValue(trackMap, "Points", A_Index . ".Y", coordinates[A_Index][2])
 
 			Sleep 1
+
+			if (Mod(A_Index, 100) = 0) {
+				setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+
+				writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+			}
 		}
 
 		if trackData {
@@ -227,7 +280,14 @@ createTrackMap(simulator, track, fileName) {
 			trackData := (kTempDirectory . track . ".data")
 		}
 
+		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Image")
+		removeConfigurationValue(trackMapperState, "Track Mapper", "Points")
+		writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+
 		fileName := createTrackImage(trackMap)
+
+		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Metadata")
+		writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 		sessionDB.updateTrackMap(simulator, track, trackMap, fileName, trackData)
 
@@ -235,6 +295,15 @@ createTrackMap(simulator, track, fileName) {
 
 		if trackData
 			deleteFile(fileName)
+
+		Sleep 10000
+
+		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Finished")
+		writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+
+		Sleep 10000
+
+		deleteFile(kTempDirectory . "Track Mapper.state")
 	}
 }
 

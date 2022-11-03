@@ -6,8 +6,18 @@ using TeamServer.Model;
 using TeamServer.Model.Access;
 
 namespace TeamServer.Server {
-    public class AccountManager : ManagerBase {
-        public AccountManager(ObjectManager objectManager, Token token) : base(objectManager, token) {
+    public class AccountManager : ManagerBase
+    {
+        public AccountManager(ObjectManager objectManager, Token token) : base(objectManager, token)
+        {
+        }
+
+        public AccountManager(ObjectManager objectManager, Guid token) : base(objectManager, token)
+        {
+        }
+
+        public AccountManager(ObjectManager objectManager, string token) : base(objectManager, token)
+        {
         }
 
         public string CreatePassword(int length) {
@@ -23,6 +33,16 @@ namespace TeamServer.Server {
         }
 
         #region Validation
+        public override Token ValidateToken(Token token)
+        {
+            token = base.ValidateToken(token);
+
+            if (!token.HasAccess(Token.TokenType.Account))
+                throw new Exception("Account does not support account access...");
+
+            return token;
+        }
+
         public void ValidateAccount(Account account) {
             if (account == null)
                 throw new Exception("Not a valid account...");
@@ -83,6 +103,7 @@ namespace TeamServer.Server {
 
         #region CRUD
         public Account CreateAccount(string name, string eMail = "", string password = null, int initialMinutes = 0,
+                                     bool sessionAccess = false, bool dataAccess = false,
                                      Account.ContractType contract = Account.ContractType.OneTime, int renewalMinutes = 0) {
             if (FindAccount(name) == null) {
                 bool virgin = false;
@@ -95,7 +116,7 @@ namespace TeamServer.Server {
 
                 Account account = new Account {
                     Name = name, EMail = eMail, Password = password, Virgin = virgin, AvailableMinutes = initialMinutes,
-                    Contract = contract, ContractMinutes = renewalMinutes
+                    Contract = contract, ContractMinutes = renewalMinutes, SessionAccess = sessionAccess, DataAccess = dataAccess
                 };
 
                 account.Save();
@@ -187,8 +208,8 @@ namespace TeamServer.Server {
 
             await ObjectManager.Connection.QueryAsync<Account>(
                 @"
-                    Select * From Access_Accounts
-                ").ContinueWith(t => t.Result.ForEach(a => {
+                    Select * From Access_Accounts Where UseData = ?
+                ", false).ContinueWith(t => t.Result.ForEach(a => {
                     if (!a.Administrator)
                         if (a.Contract == Account.ContractType.Expired)
                             a.Delete();

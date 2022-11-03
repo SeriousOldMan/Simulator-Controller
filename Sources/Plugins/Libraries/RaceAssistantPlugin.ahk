@@ -723,6 +723,71 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.logFunctionNotFound(actionFunction)
 	}
 
+	writePluginState(configuration) {
+		local session, information
+
+		if this.Active {
+			if this.RaceAssistantEnabled {
+				if (this.RaceAssistant && !this.RaceAssistantActive) {
+					setConfigurationValue(configuration, "Race Assistants", this.Plugin, "Waiting")
+
+					setConfigurationValue(configuration, this.Plugin, "State", "Active")
+
+					setConfigurationValue(configuration, this.Plugin, "Information"
+										, values2String("; ", translate("Started: ") . translate("Yes")
+															, translate("Session: ") . translate("Waiting...")))
+				}
+				else if this.RaceAssistantActive {
+					setConfigurationValue(configuration, "Race Assistants", this.Plugin, "Active")
+					setConfigurationValue(configuration, "Race Assistants", "Mode", this.TeamSessionActive ? "Team" : "Solo")
+
+					setConfigurationValue(configuration, this.Plugin, "State", "Active")
+
+					switch this.Session {
+						case kSessionQualification:
+							session := "Qualification"
+						case kSessionPractice:
+							session := "Practice"
+						case kSessionRace:
+							session := "Race"
+						default:
+							session := "Unknown"
+					}
+
+					setConfigurationValue(configuration, "Race Assistants", "Session", session)
+
+					information := values2String("; ", translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No")
+													 , translate("Session: ") . translate(session)
+													 , translate("Laps: ") . this.LastLap
+													 , translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo"))
+
+					if !this.RaceAssistantSpeaker {
+						information .= ("; " . translate("Muted: ") . translate("Yes"))
+
+						setConfigurationValue(configuration, this.Plugin, "Muted", true)
+					}
+
+					setConfigurationValue(configuration, this.Plugin, "Information", information)
+				}
+				else {
+					setConfigurationValue(configuration, "Assistants", this.Plugin, "Passive")
+
+					if this.WaitForShutdown {
+						setConfigurationValue(configuration, this.Plugin, "State", "Warning")
+
+						setConfigurationValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("Waiting for shutdown..."))
+					}
+					else
+						setConfigurationValue(configuration, this.Plugin, "State", "Passive")
+				}
+			}
+			else
+				setConfigurationValue(configuration, this.Plugin, "State", "Disabled")
+		}
+		else
+			base.writePluginState(configuration)
+	}
+
 	startSimulation(simulator) {
 		if (RaceAssistantPlugin.Simulator && (RaceAssistantPlugin.Simulator != simulator))
 			RaceAssistantPlugin.stopSimulation(RaceAssistantPlugin.Simulator)
@@ -840,6 +905,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
+		local session := this.Session
 		local ignore, assistant
 
 		RaceAssistantPlugin.initializeAssistantsState()
@@ -861,7 +927,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			RaceAssistantPlugin.disconnectTeamSession()
 
-			if (this.Session == kSessionRace)
+			if (session == kSessionRace)
 				RaceAssistantPlugin.WaitForShutdown[true] := true
 		}
 
@@ -869,8 +935,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		RaceAssistantPlugin.updateAssistantsSession(kSessionFinished)
 
-		RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
-		RaceAssistantPlugin.CollectorTask.Sleep := 1000
+		if RaceAssistantPlugin.CollectorTask {
+			RaceAssistantPlugin.CollectorTask.Priority := kHighPriority
+			RaceAssistantPlugin.CollectorTask.Sleep := 1000
+		}
 	}
 
 	addAssistantsLap(data, telemetryData, positionsData) {
@@ -1432,9 +1500,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	currentLap(data) {
-		loop % getConfigurationValue(data, "Position Data", "Car.Count")
-			if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
-				return getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
+		if (this.Session == kSessionRace)
+			loop % getConfigurationValue(data, "Position Data", "Car.Count")
+				if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
+					return getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
 
 		return getConfigurationValue(data, "Stint Data", "Laps", 0)
 	}
@@ -1499,6 +1568,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					session := kSessionRace
 
 					setConfigurationValue(data, "Session Data", "Session", "Race")
+
+					if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
+						if !RaceAssistantPlugin.Finished
+							RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
+
+						finished := false
+					}
 				}
 
 				RaceAssistantPlugin.updateAssistantsSession(session)
@@ -1560,6 +1636,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								if (teamSessionActive && RaceAssistantPlugin.TeamServer.Connected) {
 									if !RaceAssistantPlugin.driverActive(data) {
+										RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
+
 										logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
 
 										return ; Still a different driver, might happen in some simulations
@@ -1574,6 +1652,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								; Regained the car after a driver swap, new stint
 
 								if !RaceAssistantPlugin.driverActive(data) {
+									RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
+
 									logMessage(kLogWarn, translate("Cannot join team session. Driver names in team session and in simulation do not match."))
 
 									return ; Still a different driver, might happen in some simulations
@@ -1647,6 +1727,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 								}
 								else {
 									; Wrong Driver - no team session
+
+									RaceAssistantPlugin.TeamServer.State["Driver"] := "Mismatch"
 
 									RaceAssistantPlugin.disconnectTeamSession()
 

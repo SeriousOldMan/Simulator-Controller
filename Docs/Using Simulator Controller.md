@@ -6,6 +6,8 @@ Once you have configured everything for your simulation rig, there are two appli
 
 This window will give you access to all applications of Simulator Controller. You will get some information about a given application, when you hover with the mouse above the icon. Beside starting any of the applications and tools of Simulator Controller, you can continue the startup process of all the components you need, when running a simulation, by clicking on the top left icon. Depending on your concrete configuration, *Simulator Startup* will then start all the configured component applications including *Simulator Controller.exe*, which will be responsible for the essential part, the control of all your simulation applications and simulator games using your hardware controller. Put a check mark in the check box in the lower left corner, when you want the launch window to be closed automatically, when you enter your simulation.
 
+The two applications on the right side of the launch pad are a little bit special. With the top icon, you can run the [monitoring dashboard](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities) which will normally be configured in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-startup-configuration) to start automatically, when starting the simulation. The icon below lets you start the update process, which checks whether a newer version of Simulator Controller is available and installs it for you. This check is done automatically once per day, so under normal circumstances there is no need to trigger it manually.
+
 If you want to download and install a new version of Simulator Controller, it is important that none of the applications of the suite is running during the update. Please use the button "Close All..." in the lower right corner just before running the update.
 
 Note: If you don't want to use the launch window and want *Simulator Startup* to run through, create a shortcut and add the option "-NoLaunchPad" to the *Target* field. When you use this shortcut file, no launch window will be shown, unless you hold down the Shift key, while running *Simulator Startup*. The other way around can also be used: If you press the Shift key while running *Simulator Startup* normally, no launch window will be shown and the startup process will run directly.
@@ -16,19 +18,21 @@ Before starting up, *Simulator Startup* checks the configuration information. If
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Settings%20Editor.JPG)
 
-With this editor, which can also be opened by clicking on the small button with the gear icon in the upper right corner of the window of *Simulator Startup*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
+With this editor, which can also be opened by clicking on the small button with the cog wheel icon in the upper right corner of the window of *Simulator Startup*, you can change the runtime settings for Simulator Controller. In contrast to the general configuration, which configures all required and optional components of your simulation rig, you decide here which of them you want to use for the next run and onward and how they should behave. Please note, that you can click on the blue label of the dialog title, which will open this documentation in your browser.
 
 Beside maintaining this startup settings, you can jump to the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) by clicking on the button "Configuration...". This might be helpful, if you detect an error in your simulation rig configuration or if you want to add a new simulation game, you just installed on your PC.
 
 ### Customizing Startup Configuration
 
-In the first group, you can decide which of the core applications configured in the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications) of the configuration tool should be started during the startup process. Normally you want to start all of them, after all they are core applications, right? But there can be situations, where things might look a little bit different and these application are not needed or even would create problems. For example, you want to deactivate a voice control software, if you're taking part in an 24h race event and will have a voice chat with your team colleagues. It might not be helpful, if your voice control software would kick in and will stop your simulation while you are on your best lap of your life.
+In the first group, you can decide which of the core applications configured in the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications) of the configuration tool should be started during the startup process. Normally you want to start all of them, after all they are core applications, right? A special case might be the ["System Monitor"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities), which gives you a great overview of the health state and the activities of all system components, but it needs some screen space and can therefore only be used during a simulation, if you have a second monitor in your setup.
 
 The second group lets you decide whether to start the different feedback components of your simulation rig. In the configuration, that is part of the standard distribution of Simulator Controller, feedback is handled by the ["Tactile Feedback"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-tactile-feedback) and ["Motion Feedback"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-motion-feedback) plugins, which on their side will use the [SimHub](https://www.simhubdash.com/) and [SimFeedback](https://www.opensfx.com/) applications to implement their functionalities. These two applications may be started in advance during the startup process, but they also can be started later from your hardware controller. Me, myself and I, for example, almost always start *SimHub* in advance, since I will always use vibration effects to get a better understanding about what my tyres are doing, but I will start motion feedback later depending on the track and the kind of driving, I am in (training, racing, having fun with friends, and so on).
 
 ### Customizing Controller Notifications
 
 In the next group, you can decide, how Simulator Controller will notify you about state changes in your simulation rig or in the applications under control of Simulator Controller. Two types of notifications are supported, for Tray Tips (small message windows popping up in lower right corner of your main screen) and for Button Boxes, the visual representation of your controller hardware. Depending on the situation you are in (in simulation game or not), you might want to use different notifications or no notifications at all. You can configure, how long in milliseconds the Tray Tip or the Button Box windows will stay open. For the Button Boxes, a duration of 9999 ms will be interpreted as *forever*, so the window will be kept open all the time. Also, you can decide where the Button Boxes will appear. To do that, choose one of the corners of your main screen in the dropdown list below the notification duration input fields.
+
+Some applications of Simulator Controller show you the progress of long-running tasks with a progress bar or popup some information windows as overlays in the foreground. You can choose the position where the overlays appear on your screen in the correspondinig dropdown list. If you are using a hardware dashboard, which hides the lower part of your screen, you can choose the "Top" position, for example.
 
 ### Configuration of the Controller Mode automation
 
@@ -72,7 +76,7 @@ After the startup process has completed, the splash screen of *Simulator Startup
 
 Normally, the active mode on your hardware controller will be the "Launch" mode, so that you can launch additional applications by the touch of a button. For a complete documentation on everything available in the "Simulator Controller" application, please consult the documentation about [Plugins & Modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes).
 
-Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small silverish gear, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
+Normally, it is not necessary to close *Simulator Controller.exe*, since it is very efficient and does not use many system resources. But if necessary, you can locate its icon, a small orange cog wheel, in the System Tray (at the lower right side of the Windows taskbar), right click the icon and choose Exit.
 
 ### Enabling and disabling features
 
@@ -148,7 +152,51 @@ There is also the possibility to trigger actions in Simulator Controller from ot
    This will achieve the same effect as pushing or rotating the corresponding controls on your hardware controller. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) to see which controller functions (*1WayToggle*, *2WayToggle*, *Button*, *Dial* and *Custom*) are available and especially how to define *Custom* controller functions (which are typically not assiciated with a Button Box or a Stream Deck) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). As you have seen in the above example, you must use *On* and *Off* as a second argument for *2WayToggle*, and *Increase* and *Decrease* for *Dial*, to specify the desired change.
 
    A last note for experienced users: Together with the [*execute* controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller), you can create powerful macros. Create a *Custom* controller function, which can be triggered by a button, for example on your steering wheel. This *Custom* function *executes* a Windows command script wich the writes a "Controller.cmd" file as described above.
+   
+## Monitoring health and activities
+
+Simulator Controller is a complex system with lots of different processes and even uses cloud-based servers when you are using the [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server). In such a complex system, lots of things can go wrong and it is therefore important to understand the internal state and activities of all parts of the system. This is, where the "System Monitor" comes into play.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%201.JPG)
+
+This tool, which either can be startet on demand by using the launch pad described above or automatically whenever you enter a simulation with Simualtor Controller (check "System Monitor" in the *Core* section of the settings as described above), provides you complete information about all the components of Simulator Controller. In order to give you a quick graphical clue, "System Monitor" uses color-coded traffic lights for each component and process.
+
+| Color                                                                                           | Meaning                                                                                                                              |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Black.png)  | Not started currently. An example is the current simulation, if no simulation game is currently running.                             |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Gray.png)   | Started, but waiting to become active. For example, you have started the game but you are in the main menus.                             |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Green.png)  | Component is up and running. No known operation problems.                                                                              |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Yellow.png) | Component is up, but no normal operation is possible. Example: The Race Assistants have a cool down time after the end of a session. |
+| ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Icons/Red.png)    | Somthing is wrong and might need your attention. Example: The connection to the Team Server cannot be established.                   |
+
+The "System Monitor" is divided into several pages of information:
+
+  1. Dashboard
+  
+     This page gives an overview over the most important functions and background processes. You can see, when a running simulation has been detected, whether the Race Assistants are active, whether the connection to the Team Server has been sucessfully established and so on. The *traffic lights* will show you the health state at a glance using the color coding described above and a couple of important detail informations will be provided as well.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%202.JPG)
+
+  2. Modules
+  
+     A more detailed view than the Dashboard, since a list of **all** components of Simulator Controller and their current health state will be shown here. In the "Information" column, you will get a short summary of the current state of operation, but you will also see detailed error messages here, when a component is in a critical state.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%203.JPG)
+
+  3. Team Session
+  
+     Since it is such an important part of the operation in team events, the connection to the Team Server has its own page of information. Beside monitoring your own connection to the Team Server you will see which other drivers are currently successfully connected to the Team Server and who is currently driving the car. You will also be warned if there is a mismatch in driver names, since driver name match is a very important aspect of the operation of the Team Server.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%204.JPG)
+
+  4. Logs
+  
+     Provides a very low level view into the operation of Simulator Controller. All applications write log information, especially when errors or other unexpected situations occur. The recent log entries of all applications will be displayed here in this list. You can switch between log levels for all currently running applications with the dropdown menu in the lower right corner, but be aware that chossing "Info" might slow down the applications significantly. So use this only when tracking down problems. 
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%205.JPG)
+
+Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problem will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued.
 
 ## And now it's time
 
-...to have some fun. If you like Simulator Controller and find it useful, I would be very happy about a small donation, which will help in further development of this software. Please see the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) for the donation link. Thanks and see you on the track...
+...to have some fun. If you like Simulator Controller and find it useful, I would be very happy about a small donation, which will help in the further development of this software. Please see the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) for the donation link. Thanks and see you on the track...

@@ -16,7 +16,7 @@ Thank you very much for your support!
 
 ### Download and Installation
 
-Installation is very easy. For first time users I recommand using the automated installer below. But there are different download and installation options available. Please see the complete documentation about [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for more information.
+Installation is very easy. For first time users I recommand using the automated installer below. But there are different download and installation options available. Please see the complete documentation on [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration), where you also will find a quick start guide for new users, for more information.
 
 #### Antivirus Warnings
 
@@ -33,15 +33,15 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.3.5.0-release](https://cutt.ly/ZBYdiqF) (New features: Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods.)
+[4.4.5.0-release](https://cutt.ly/YNk3Msn) (New features: New monitoring tool for integrated health and activity control, Separate telemetry and pressures synchronization can be choosen in the "Session Database", Fixed community database upload / download, Implemented support for Caster and ECU Map in "Setup Advisor", Increased reliability of telemetry data synchronization, Fallback for offscreen window positions, 2nd screen position settings for status windows (Progress Bar, Message), New car models for "Setup Advisor", New quick start guide for Beginners.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-435) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-445) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[4.3.4.1-release](https://cutt.ly/XBo2nvL) (New features: Full control over sound post processing, Default value handling for raceAssistantVocalics plugin arguments, Increased reliability for pitstop handover in "Race Center", Increased reliability of race report creation in team races, New car models for "Setup Advisor", New tyre compound data for R3E (Chris Matthews).)
+[4.4.0.0-release](https://cutt.ly/DB3goy2) (New features: Full revision of Team Server, Telemetry data can be synchronized with the Team Server, Position settings for status windows (Progress Bar, Message), Actice connections to the Team Server can be listed in "Server Administration", Session synchronization in "Race Center" can be disabled using a menu command, New car models for "Setup Advisor", Refactoring of the translation framework to support the upcoming Spanish translation, Initial version of a Spanish translation, Choose driver in "Session Database" for tyre pressures.)
 
-[4.3.3.0-release](https://cutt.ly/EVn9i5Q) (New features: Fixed in infinite loop in "Race Center" track map update, Fixed some false attack alerts for the Spotter, Fixed lapped car being reported with the wrong delta, New settings for Assistant late joining, Fixed pitstop management in "Race Center", Fixed volume control for voice output, when SoX is used, Additional car models for "Setup Advisor", More precise session end detection in ACC races, Even more new tyre compound data for Automobilista 2 (Chris Matthews).)
+[4.3.5.0-release](https://cutt.ly/ZBYdiqF) (New features: Added settings button to "Simulator Startup", New configuration option for the Race Spotter to select between gap calculation methods.)
 
 #### Latest development build
 
@@ -125,7 +125,7 @@ Another capability of the Virtual Race Strategist is to support you during the [
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 
-You can even use all these functionalities during multiplayer team races using the [*Team Server*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server), which handles the state and knowledge of the Race Assistants and share this information between all participating drivers. The Team Server also supports a so called "Race Center", a console, which can be used by any team member (even if not an active driver) to gather all kind of session data and remote control various aspects of the session, for example the settings for an upcoming pitstop.
+You can even use all these functionalities during multiplayer team races using the [*Team Server*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server), which handles the state and knowledge of the Race Assistants and share this information between all participating drivers. The Team Server is the backend for the so called "Race Center", a console, which can be used by any team member (even if not an active driver) to gather all kind of session data and remote control various aspects of the session, for example the settings for an upcoming pitstop.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%201.JPG)
 
@@ -152,6 +152,10 @@ Another very useful tool of the Simulator Controller suite is the Setup Advisor.
   - Fully graphical configuration utilities
   
   ![](./Docs/Images/Settings%20Editor.JPG) ![](./Docs/Images/Configuration%20Editor.JPG)
+  
+  - Last, but not least, a versatile monitoring tool, which gives you insights into the current operation and the health state of all components
+
+  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%201.JPG)
 
 Simulator Controller has been implemented to great extent in AutoHotkey, a very sophisticated and object-oriented Windows automation and scripting language, which is capable to connect keyboard and other input devices to functions in the script with a simple macro language. On the other hand, AutoHotkey also has a lot of robotics capabilities to automate software packages, which do not provide external APIs, by simulating mouse clicks and keyboard input. You can write your own plugins using the AutoHotkey language. To get you started, full source code for all bundled plugins with different complexity from simple to advanced is included.
 

@@ -58,6 +58,28 @@ global vHasTrayMenu := false
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+doApplications(applications, callback) {
+	local ignore, application
+
+	for ignore, application in applications {
+		if !InStr(application, ".exe")
+			application .= ".exe"
+
+		Process Exist, %application%
+
+		if ErrorLevel
+			%callback%(ErrorLevel)
+	}
+}
+
+broadcastMessage(applications, message, arguments*) {
+	if (arguments.Length() > 0)
+		doApplications(applications, Func("sendMessage").Bind(kFileMessage, "Core", message . ":" . values2String(";", arguments*)))
+	else
+		doApplications(applications, Func("sendMessage").Bind(kFileMessage, "Core", message))
+
+}
+
 exitApplication() {
 	ExitApp 0
 }
@@ -71,7 +93,7 @@ dismissHTMLViewer() {
 }
 
 consentDialog(id, consent := false) {
-	local language, texts, chosen, x, y
+	local language, texts, chosen, x, y, rootDirectory, ignore, section, keyValues, key, value
 
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
@@ -85,12 +107,20 @@ consentDialog(id, consent := false) {
 	else
 		closed := false
 
-	language := getLanguage()
+	texts := false
 
-	if ((language != "en") && (language != "de"))
-		language := "en"
+	for language, ignore in availableLanguages()
+		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
+			if FileExist(rootDirectory . "Consent." . language)
+				if !texts
+					texts := readConfiguration(rootDirectory . "Consent." . language)
+				else
+					for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
+						for key, value in keyValues
+							setConfigurationValue(texts, section, key, value)
 
-	texts := readConfiguration(kTranslationsDirectory . "Consent.ini")
+	if !texts
+		texts := readConfiguration(kTranslationsDirectory . "Consent.en")
 
 	Gui CNS:-Border ; -Caption
 	Gui CNS:Color, D0D0D0, D8D8D8
@@ -99,7 +129,7 @@ consentDialog(id, consent := false) {
 	Gui CNS:Font, Norm, Arial
 	Gui CNS:Add, Text, x0 y32 w800 h23 +0x200 +0x1 BackgroundTrans, % translate("Declaration of consent")
 
-	Gui CNS:Add, Text, x8 y70 w784 h180 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Introduction"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y70 w784 h180 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Introduction"), "``n", "`n"), "\<>", "=")
 
 	Gui CNS:Add, Text, x8 y260 w450 h23 +0x200, % translate("Your database identification key is:")
 	Gui CNS:Add, Edit, x460 y260 w332 h23 -VScroll ReadOnly Center, % id
@@ -114,9 +144,9 @@ consentDialog(id, consent := false) {
 	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided"))
 	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose%chosen% VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 
-	Gui CNS:Add, Text, x8 y364 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Information"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y364 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "=")
 
-	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, language, "Warning"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "=")
 
 	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
 
@@ -271,26 +301,28 @@ requestShareSessionDatabaseConsent() {
 	}
 }
 
-shareSessionDatabase() {
+startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options, consent
 
-	if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database"], StrSplit(A_ScriptName, ".")[1]) {
-		idFileName := kUserConfigDirectory . "ID"
+	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
+		Process Exist, Database Synchronizer.exe
 
-		FileReadLine ID, %idFileName%, 1
+		if !ErrorLevel {
+			idFileName := kUserConfigDirectory . "ID"
 
-		dbIDFileName := kDatabaseDirectory . "ID"
+			FileReadLine ID, %idFileName%, 1
 
-		FileReadLine dbID, %dbIDFileName%, 1
+			dbIDFileName := kDatabaseDirectory . "ID"
 
-		if (ID = dbID) {
-			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			FileReadLine dbID, %dbIDFileName%, 1
 
-			shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-			shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+			if (ID = dbID) {
+				consent := readConfiguration(kUserConfigDirectory . "CONSENT")
 
-			if (shareTyrePressures || shareCarSetups) {
-				options := ("-ID " . ID)
+				shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+				shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+
+				options := ("-ID """ . ID . """ -Synchronize " . true)
 
 				if shareTyrePressures
 					options .= " -Pressures"
@@ -429,7 +461,7 @@ checkForUpdates() {
 						automaticUpdates := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
 
 						if automaticUpdates
-							Run *RunAs %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%"
+							Run %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%" ; *RunAs
 						else
 							Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
 
@@ -524,17 +556,17 @@ loadSimulatorConfiguration() {
 	section := getConfigurationValue(version, "Current", "Type", false)
 
 	if section
-		kVersion := getConfigurationValue(version, section, "Version", "0.0.0-dev")
+		kVersion := getConfigurationValue(version, section, "Version", "0.0.0.0-dev")
 	else
-		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0-dev"))
+		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0.0-dev"))
 
 	Process Exist
 
 	pid := ErrorLevel
 
-	logMessage(kLogCritical, "---------------------------------------------------------------")
-	logMessage(kLogCritical, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
-	logMessage(kLogCritical, "---------------------------------------------------------------")
+	logMessage(kLogOff, "---------------------------------------------------------------")
+	logMessage(kLogOff, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
+	logMessage(kLogOff, "---------------------------------------------------------------")
 
 	if (kSimulatorConfiguration.Count() == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))
@@ -692,6 +724,7 @@ initializeEnvironment() {
 	}
 
 	if newID {
+		/*
 		ticks := A_TickCount
 
 		Random wait, 0, 100
@@ -705,6 +738,9 @@ initializeEnvironment() {
 		Random minor, 0, 10000
 
 		ID := values2String(".", A_TickCount, major, minor)
+		*/
+
+		ID := createGUID()
 
 		deleteFile(kUserConfigDirectory . "ID")
 
@@ -716,6 +752,8 @@ initializeEnvironment() {
 
 	if (!FileExist(kUserConfigDirectory . "UPDATES") && FileExist(kResourcesDirectory . "Templates"))
 		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
+
+	registerMessageHandler("Core", "functionMessageHandler")
 }
 
 getControllerActionDefinitions(type) {
@@ -738,6 +776,24 @@ getControllerActionDefinitions(type) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+createGUID() {
+	local guid, pGuid, sGuid, size
+
+    VarSetCapacity(pGuid, 16, 0)
+
+	if !(DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid)) {
+        size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
+
+        if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {
+			guid := StrGet(&sGuid)
+
+            return SubStr(SubStr(guid, 1, StrLen(guid) - 1), 2)
+		}
+    }
+
+    return ""
+}
 
 setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	local ptrSize, button_il, normal_il, L, T, R, B, A, W, H, S, DW, PTR
@@ -1126,7 +1182,7 @@ hideSplashTheme() {
 		try {
 			SoundPlay NonExistent.avi
 		}
-		catch ignore {
+		catch exception {
 			logError(exception)
 		}
 
@@ -1134,11 +1190,36 @@ hideSplashTheme() {
 }
 
 showProgress(options) {
-	local x, y, w, h, color
+	local x, y, w, h, color, count
+	local secondScreen, secondScreenLeft, secondScreenRight, secondScreenTop, secondScreenBottom
+
+	static popupPosition := false
 
 	if !vProgressIsOpen {
-		x := options.X
-		y := options.Y
+		if !popupPosition
+			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+												 , "General", "Popup Position", "Bottom")
+
+		if options.HasKey("X")
+			x := options.X
+		else
+			x := Round((A_ScreenWidth - 300) / 2)
+
+		if options.HasKey("Y")
+			y := options.Y
+		else {
+			SysGet count, MonitorCount
+
+			if (count > 1)
+				SysGet, secondScreen, MonitorWorkArea, 2
+
+			if ((count > 1) && (popupPosition = "2nd Screen Top"))
+				y := (secondScreenTop + 150)
+			else if ((count > 1) && (popupPosition = "2nd Screen Bottom"))
+				y := (secondScreenTop + (secondScreenBottom - secondScreenTop) - 150)
+			else
+				y := ((popupPosition = "Top") ? 150 : A_ScreenHeight - 150)
+		}
 
 		if options.HasKey("Width")
 			w := (options.Width - 20)
@@ -1211,9 +1292,19 @@ getAllThemes(configuration := false) {
 }
 
 showMessage(message, title := false, icon := "__Undefined__", duration := 1000
-		  , x := "Center", y := "Bottom", width := 400, height := 100) {
+		  , x := "Center", y := "__Undefined__", width := 400, height := 100) {
 	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 	local innerWidth := width - 16
+
+	static popupPosition := false
+
+	if (y = kUndefined) {
+		if !popupPosition
+			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+																   , "General", "Popup Position", "Bottom")
+
+		y := popupPosition
+	}
 
 	if (icon = kUndefined)
 		icon := "Information.png"
@@ -1221,21 +1312,21 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 	if (!title || (title = ""))
 		title := translate("Modular Simulator Controller System")
 
-	Gui SM:-Border -Caption
-	Gui SM:Color, D0D0D0, D8D8D8
-	Gui SM:Font, s10 Bold
-	Gui SM:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
-	Gui SM:Font
+	Gui MSGW:-Border -Caption
+	Gui MSGW:Color, D0D0D0, D8D8D8
+	Gui MSGW:Font, s10 Bold
+	Gui MSGW:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
+	Gui MSGW:Font
 
 	if icon {
-		Gui SM:Add, Picture, w50 h50, % kIconsDirectory . Icon
+		Gui MSGW:Add, Picture, w50 h50, % kIconsDirectory . Icon
 
 		innerWidth -= 66
 
-		Gui SM:Add, Text, X74 YP+5 W%innerWidth% H%height%, % message
+		Gui MSGW:Add, Text, X74 YP+5 W%innerWidth% H%height%, % message
 	}
 	else
-		Gui SM:Add, Text, X8 YP+30 W%innerWidth% H%height%, % message
+		Gui MSGW:Add, Text, X8 YP+30 W%innerWidth% H%height%, % message
 
 	SysGet mainScreen, MonitorWorkArea
 
@@ -1259,12 +1350,12 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 				y := "Center"
 		}
 
-	Gui SM:+AlwaysOnTop
-	Gui SM:Show, X%x% Y%y% W%width% H%height% NoActivate
+	Gui MSGW:+AlwaysOnTop
+	Gui MSGW:Show, X%x% Y%y% W%width% H%height% NoActivate
 
 	Sleep %duration%
 
-	Gui SM:Destroy
+	Gui MSGW:Destroy
 }
 
 moveByMouse(window, descriptor := false) {
@@ -1312,14 +1403,26 @@ getWindowPosition(descriptor, ByRef x, ByRef y) {
 	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 	local posX := getConfigurationValue(settings, "Window Positions", descriptor . ".X", kUndefined)
 	local posY := getConfigurationValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
+	local count, screen, screenLeft, screenRight, screenTop, screenBottom
+
 
 	if ((posX == kUndefined) || (posY == kUndefined))
 		return false
 	else {
-		x := posX
-		y := posY
+		SysGet count, MonitorCount
 
-		return true
+		loop %count% {
+			SysGet, screen, MonitorWorkArea, %A_Index%
+
+			if ((posX >= screenLeft) && (posX <= screenRight) && (posY >= screenTop) && (posY <= screenBottom)) {
+				x := posX
+				y := posY
+
+				return true
+			}
+		}
+
+		return false
 	}
 }
 
@@ -1329,7 +1432,7 @@ isNull(value) {
 
 reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
 	if isDebug()
-		showMessage("The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
+		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
 				  , false, kUndefined, 5000)
 
 	return false
@@ -1344,7 +1447,11 @@ getLogLevel() {
 }
 
 logMessage(logLevel, message) {
-	local level, fileName, directory, tries
+	local script := StrSplit(A_ScriptName, ".")[1]
+	local time := A_Now
+	local level, fileName, directory, tries, logTime, logLine
+
+	static sending := false
 
 	if (logLevel >= vLogLevel) {
 		level := ""
@@ -1362,8 +1469,10 @@ logMessage(logLevel, message) {
 				throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
 		}
 
-		fileName := kLogsDirectory . StrSplit(A_ScriptName, ".")[1] . " Logs.txt"
-		message := "[" level . " - " . A_Now . "]: " . message . "`n"
+		FormatTime, logTime, %time%, dd.MM.yy hh:mm:ss tt
+
+		fileName := kLogsDirectory . script . " Logs.txt"
+		logLine := "[" level . " - " . logTime . "]: " . message . "`n"
 
 		SplitPath fileName, , directory
 		FileCreateDir %directory%
@@ -1372,7 +1481,7 @@ logMessage(logLevel, message) {
 
 		while (tries > 0)
 			try {
-				FileAppend %message%, %fileName%, UTF-16
+				FileAppend %logLine%, %fileName%, UTF-16
 
 				break
 			}
@@ -1381,6 +1490,21 @@ logMessage(logLevel, message) {
 
 				tries -= 1
 			}
+
+		if (!sending && (script != "System Monitor")) {
+			Process Exist, System Monitor.exe
+
+			if ErrorLevel {
+				sending := true
+
+				try {
+					sendMessage(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), ErrorLevel)
+				}
+				finally {
+					sending := false
+				}
+			}
+		}
 	}
 }
 
@@ -1401,8 +1525,6 @@ logError(exception, unhandled := false) {
 
 	return (isDebug() ? false : true)
 }
-
-
 
 availableLanguages() {
 	local translations := {en: "English"}
@@ -2004,39 +2126,59 @@ newConfiguration() {
 readConfiguration(configFile) {
 	local configuration := {}
 	local section := false
+	local file := false
+	local tries := 2
 	local currentLine, firstChar, keyValue, key, value
 
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
-	loop Read, %configFile%
-	{
-		currentLine := LTrim(A_LoopReadLine)
+	loop
+		try {
+			file := FileOpen(configFile, "r")
 
-		if (StrLen(currentLine) == 0)
-			continue
-
-		firstChar := SubStr(currentLine, 1, 1)
-
-		if (firstChar = ";")
-			continue
-		else if (firstChar = "[") {
-			section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
-
-			configuration[section] := {}
+			break
 		}
-		else if section {
-			keyValue := LTrim(A_LoopReadLine)
+		catch exception {
+			if !FileExist(configFile)
+				if (tries-- <= 0)
+					return configuration
+				else
+					Sleep 50
+		}
 
-			if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
-				keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
-								   , "=", "", 2)
+	if file {
+		loop Read, %configFile%
+		{
+			currentLine := LTrim(A_LoopReadLine)
 
-				key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
-				value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+			if (StrLen(currentLine) == 0)
+				continue
 
-				configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+			firstChar := SubStr(currentLine, 1, 1)
+
+			if (firstChar = ";")
+				continue
+			else if (firstChar = "[") {
+				section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
+
+				configuration[section] := {}
+			}
+			else if section {
+				keyValue := LTrim(A_LoopReadLine)
+
+				if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
+					keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
+									   , "=", "", 2)
+
+					key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+					value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+
+					configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+				}
 			}
 		}
+
+		file.Close()
 	}
 
 	return configuration
@@ -2056,13 +2198,12 @@ parseConfiguration(text) {
 }
 
 writeConfiguration(configFile, configuration) {
+	local tempFile := temporaryFileName("Config", "ini")
 	local directory, section, keyValues, key, value, pairs
 
-	configFile := getFileName(configFile, kUserConfigDirectory)
+	deleteFile(tempFile)
 
-	deleteFile(configFile)
-
-	SplitPath configFile, , directory
+	SplitPath tempFile, , directory
 	FileCreateDir %directory%
 
 	for section, keyValues in configuration {
@@ -2078,8 +2219,20 @@ writeConfiguration(configFile, configuration) {
 
 		section := "[" . section . "]" . pairs . "`n"
 
-		FileAppend %section%, %configFile%, UTF-16
+		FileAppend %section%, %tempFile%, UTF-16
 	}
+
+	configFile := getFileName(configFile, kUserConfigDirectory)
+
+	loop
+		try {
+			FileMove %tempFile%, %configFile%, 1
+
+			break
+		}
+		catch exception {
+			logError(exception)
+		}
 }
 
 printConfiguration(configuration) {
@@ -2145,26 +2298,20 @@ removeConfigurationSection(configuration, section) {
 		configuration.Delete(section)
 }
 
-getControllerConfiguration(configuration := false) {
+getControllerState(configuration := "__Undefined__") {
+	local load := true
 	local pid, tries, options, exePath, fileName
+
+	if (configuration == false)
+		load := false
+	else if (configuration = kUndefined)
+		configuration := false
 
 	Process Exist, Simulator Controller.exe
 
 	pid := ErrorLevel
 
-	if (pid && !configuration && !FileExist(kUserConfigDirectory . "Simulator Controller.config")) {
-		sendMessage(kFileMessage, "Controller", "writeControllerConfiguration", pid)
-
-		tries := 10
-
-		while (tries > 0) {
-			Sleep 200
-
-			if FileExist(kUserConfigDirectory . "Simulator Controller.config")
-				break
-		}
-	}
-	else if (!pid && (configuration || !FileExist(kUserConfigDirectory . "Simulator Controller.config")))
+	if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
 		try {
 			if configuration {
 				fileName := temporaryFileName("Config", "ini")
@@ -2204,7 +2351,7 @@ getControllerConfiguration(configuration := false) {
 		}
 
 
-	return readConfiguration(kUserConfigDirectory . "Simulator Controller.config")
+	return readConfiguration(kTempDirectory . "Simulator Controller.state")
 }
 
 getControllerActionLabels() {
@@ -2312,9 +2459,9 @@ loadSimulatorConfiguration()
 if !vDetachedInstallation {
 	checkForUpdates()
 
-	if !isDebug() {
+	if true || !isDebug() {
 		requestShareSessionDatabaseConsent()
-		shareSessionDatabase()
+		startDatabaseSynchronizer()
 		checkForNews()
 	}
 }

@@ -874,9 +874,11 @@ installTrayMenu(update := false) {
 	local label := translate("Exit")
 	local levels, level, ignore, oldLabel, label, handler
 
-	Menu Tray, Icon, %icon%, , 1
+	if !update {
+		Menu Tray, Icon, %icon%, , 1
 
-	Sleep 50
+		Sleep 50
+	}
 
 	if (update && vHasTrayMenu) {
 		oldLabel := translate("Exit", vHasTrayMenu)

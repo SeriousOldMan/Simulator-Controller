@@ -2318,7 +2318,7 @@ getControllerState(configuration := "__Undefined__") {
 
 	pid := ErrorLevel
 
-	if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
+	if (load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
 		try {
 			if configuration {
 				fileName := temporaryFileName("Config", "ini")

@@ -3137,14 +3137,11 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Default
 
 		if compound {
-			if (compoundColor != "Black")
-				compound := compound(compound, compoundColor)
-
 			if this.TyrePressureMode
 				this.adjustPitstopTyrePressures(this.TyrePressureMode, this.Weather, this.AirTemperature, this.TrackTemperature
 											  , compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure)
 
-			chosen := inList(concatenate(["No Tyre Change"], this.TyreCompounds), compound)
+			chosen := inList(concatenate(["No Tyre Change"], this.TyreCompounds), compound(compound, compoundColor))
 
 			GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
 

@@ -18,7 +18,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace"]
+global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Performance"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -970,6 +970,113 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	editPaceReportSettings() {
+		return this.editReportSettings("Laps", "Cars")
+	}
+
+	showPerformanceReport() {
+		local drawChartFunction := "function drawChart() {`n"
+		local report := this.Report
+		local raceData, drivers, positions, times, selectedCars, cars, laps, lapTimes, driverTimes, length
+		local ignore, car, carTimes, index, dIndex, time, text, columns, lap
+		local sessionDB, simulator
+
+		if report {
+			raceData := true
+			drivers := false
+			positions := false
+			times := true
+
+			this.loadReportData(false, raceData, drivers, positions, times)
+
+			selectedCars := this.getReportDrivers(raceData)
+			cars := []
+
+			laps := this.getReportLaps(raceData)
+			lapTimes := []
+
+			driverTimes := {}
+			length := 20000
+
+			for ignore, car in selectedCars {
+				carTimes := this.getDriverTimes(raceData, times, car)
+
+				if (carTimes.Length() > 0) {
+					length := Min(length, carTimes.Length())
+
+					driverTimes[car] := carTimes
+				}
+			}
+
+			if (length == 20000)
+				length := false
+
+			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			sessionDB := new SessionDatabase()
+			columns := ["'" . translate("Lap") . "'"]
+
+			for index, car in selectedCars {
+				if driverTimes.HasKey(car) {
+					columns.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
+									  . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
+
+					carTimes := []
+
+					for dIndex, time in driverTimes[car]
+						if (dIndex > length)
+							break
+						else
+							carTimes.Push(time)
+
+					lapTimes.Push(carTimes)
+				}
+			}
+
+			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+			drawChartFunction .= "`n[" . values2String(", ", columns*) . "]"
+
+			loop % Min(length, laps.Length())
+			{
+				lap := A_Index
+				drawChartFunction .= ",`n[" . laps[lap]
+
+				for index, driverTimes in lapTimes
+					drawChartFunction .= ", " . driverTimes[lap]
+
+				drawChartFunction .= "]"
+			}
+
+			drawChartFunction .= "]);"
+
+			text =
+			(
+			var options = {
+				backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '20`%', bottom: '20`%' },
+				legend: { position: 'right' }, curveType: 'function',
+			)
+
+			drawChartFunction .= "`n" . text
+
+			text =
+			(
+				hAxis: { title: '`%lap`%', gridlines: {count: 0} },
+				vAxis: { title: '`%seconds`%', gridlines: {count: 0} }
+			};
+			)
+
+			drawChartFunction .= ("`n" . substituteVariables(text, {lap: translate("Lap"), seconds: translate("Seconds")}))
+
+			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
+
+			this.showReportChart(drawChartFunction)
+			this.showReportInfo(raceData)
+		}
+		else {
+			this.showReportChart(false)
+			this.showReportInfo(false)
+		}
+	}
+
+	editPerformanceReportSettings() {
 		return this.editReportSettings("Laps", "Cars")
 	}
 }

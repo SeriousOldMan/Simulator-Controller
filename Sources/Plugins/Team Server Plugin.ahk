@@ -411,7 +411,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	writeStintState(state) {
 		local stint, lap, driver
 
-		if this.SessionActive
+		if this.Connected
 			try {
 				stint := this.Connector.GetSessionCurrentStint(this.Session)
 

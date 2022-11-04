@@ -27,7 +27,7 @@
 
 global kWeatherConditions := ["Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain", "Thunderstorm"]
 
-global kTyreCompounds := ["Wet", "Intermediate", "Dry"
+global kTyreCompounds := ["Wet (Black)", "Intermediate (Black)", "Dry (Black)"
 						, "Wet (S)", "Wet (M)", "Wet (H)"
 						, "Intermediate (S)", "Intermediate (M)", "Intermediate (H)"
 						, "Dry (S+)", "Dry (S)", "Dry (M)", "Dry (H)", "Dry (H+)"
@@ -942,7 +942,7 @@ class SessionDatabase extends ConfigurationItem {
 				compound := string2Values("->", compound)
 
 				cds.Push(compound[1])
-				nms.Push(compound[2])
+				nms.Push(normalizeCompound(compound[2]))
 			}
 
 			if codes
@@ -968,6 +968,9 @@ class SessionDatabase extends ConfigurationItem {
 
 	getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
 		local index, name, code
+
+		if compound
+			compound := normalizeCompound(compound)
 
 		for index, name in this.getTyreCompounds(simulator, car, track)
 			if (name = compound) {
@@ -1008,7 +1011,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !availableTyreCompounds
 			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
 
-		compounds := map(availableTyreCompounds, "compound")
+		  := map(availableTyreCompounds, "compound")
 
 		switch weather {
 			case "Dry":
@@ -1019,24 +1022,24 @@ class SessionDatabase extends ConfigurationItem {
 				compound := "Wet"
 		}
 
-		index := inList(compounds, compound)
+		index := inList(compounds, normalizeCompound(compound))
 
 		if index
 			return availableTyreCompounds[index]
 		else if ((compound = "Intermediate") && (weather = "Drizzle")) {
-			index := inList(compounds, "Dry")
+			index := inList(compounds, normalizeCompound("Dry"))
 
 			if index
 				return availableTyreCompounds[index]
 		}
 		else if ((compound = "Intermediate") && (weather = "LightRain")) {
-			index := inList(compounds, "Wet")
+			index := inList(compounds, normalizeCompound("Wet"))
 
 			if index
 				return availableTyreCompounds[index]
 		}
 		else {
-			index := inList(compounds, "Dry")
+			index := inList(compounds, normalizeCompound("Dry"))
 
 			if index
 				return availableTyreCompounds[index]
@@ -1304,9 +1307,11 @@ class SessionDatabase extends ConfigurationItem {
 
 compound(compound, color := false) {
 	if color {
+		/*
 		if (color = "Black")
 			return compound
 		else
+		*/
 			return (compound . " (" . color . ")")
 	}
 	else
@@ -1325,6 +1330,14 @@ compoundColor(compound) {
 splitCompound(qualifiedCompound, ByRef compound, ByRef compoundColor) {
 	compound := compound(qualifiedCompound)
 	compoundColor := compoundColor(qualifiedCompound)
+}
+
+normalizeCompound(qualifiedCompound) {
+	local compound, compoundColor
+
+	splitCompound(qualifiedCompound, compound, compoundColor)
+
+	return compound(compound, compoundColor)
 }
 
 parseDriverName(fullName, ByRef forName, ByRef surName, ByRef nickName) {

@@ -534,11 +534,11 @@ class RaceEngineer extends RaceAssistant {
 		else {
 			compound := false
 
-			if inList(words, fragments["Wet"])
+			if inList(words, fragments["WetTyre"])
 				compound := "Wet"
-			else if inList(words, fragments["Intermediate"])
+			else if inList(words, fragments["IntermediateTyre"])
 				compound := "Intermediate"
-			else if inList(words, fragments["Dry"])
+			else if inList(words, fragments["DryTyre"])
 				compound := "Dry"
 
 			if compound {
@@ -548,12 +548,12 @@ class RaceEngineer extends RaceAssistant {
 					if (InStr(candidate, compound) = 1) {
 						splitCompound(compound, compound, compoundColor)
 
-						speaker.speakPhrase("ConfirmCompoundChange", {compound: fragments[compound]}, true)
+						speaker.speakPhrase("ConfirmCompoundChange", {compound: fragments[compound . "Tyre"]}, true)
 
 						this.setContinuation(ObjBindMethod(this, "updatePitstopTyreCompound", compound, compoundColor))
 					}
 					else
-						speaker.speakPhrase("CompoundNotAvailable", {compound: fragments[compound]})
+						speaker.speakPhrase("CompoundNotAvailable", {compound: fragments[compound . "Tyre"]})
 			}
 			else
 				speaker.speakPhrase("Repeat")
@@ -1640,9 +1640,9 @@ class RaceEngineer extends RaceAssistant {
 						tyreSet := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0)
 
 						if (compound = "Dry")
-							speaker.speakPhrase(!tyreSet ? "DryTyresNoSet" : "DryTyres", {compound: fragments[compound], color: color, set: tyreSet})
+							speaker.speakPhrase(!tyreSet ? "DryTyresNoSet" : "DryTyres", {compound: fragments[compound . "Tyre"], color: color, set: tyreSet})
 						else
-							speaker.speakPhrase(!tyreSet ? "WetTyresNoSet" : "WetTyres", {compound: fragments[compound], color: color, set: tyreSet})
+							speaker.speakPhrase(!tyreSet ? "WetTyresNoSet" : "WetTyres", {compound: fragments[compound . "Tyre"], color: color, set: tyreSet})
 					}
 					else {
 						if (knowledgeBase.getValue("Lap.Remaining.Stint") > 5)
@@ -2118,7 +2118,7 @@ class RaceEngineer extends RaceAssistant {
 				try {
 					speaker.speakPhrase(((recommendedCompound = "Wet") || (recommendedCompound = "Intermediate")) ? "WeatherRainChange"
 																												  : "WeatherDryChange"
-									  , {minutes: minutes, compound: fragments[recommendedCompound]})
+									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 					if this.supportsPitstop() {
 						speaker.speakPhrase("ConfirmPlan", false, true)

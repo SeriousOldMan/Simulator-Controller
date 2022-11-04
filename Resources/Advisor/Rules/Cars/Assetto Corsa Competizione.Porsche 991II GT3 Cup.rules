@@ -12,7 +12,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 991II GT3 Cup",
-										[Electronics.TC, Aero.Splitter.Front,
+										[Electronics.Map, Electronics.TC, Aero.Splitter.Front,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
 										 Differential.Preload]))

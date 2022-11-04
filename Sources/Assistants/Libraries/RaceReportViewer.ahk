@@ -18,7 +18,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace"]
+global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Performance"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -341,7 +341,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				nr := StrReplace(cars[A_Index][1], """", "")
 
-				rows.Push(Array(nr, "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+				rows.Push(Array("'" . nr . "'", "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
 			}
 
@@ -355,12 +355,13 @@ class RaceReportViewer extends RaceReportReader {
 				rows[A_Index] := ("[" . values2String(", ", row*) . "]")
 			}
 
-			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
+			drawChartFunction .= "`ndata.addColumn('string', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Avg Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result") . "');"
+
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 
@@ -923,6 +924,7 @@ class RaceReportViewer extends RaceReportReader {
 			data.addColumn({id:'min', type:'number', role:'interval'});
 			data.addColumn({id:'firstQuartile', type:'number', role:'interval'});
 			data.addColumn({id:'median', type:'number', role:'interval'});
+			data.addColumn({id:'mean', type:'number', role:'interval'});
 			data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
 			)
 
@@ -949,7 +951,8 @@ class RaceReportViewer extends RaceReportReader {
 				series: [ { 'color': 'D8D8D8' } ],
 				intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
 				interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
-							min: { style: 'bars', fillOpacity: 1, color: '#777' } }
+							min: { style: 'bars', fillOpacity: 1, color: '#777' },
+							mean: { style: 'points', color: 'grey', pointsize: 5 } }
 			};
 			)
 
@@ -967,6 +970,113 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	editPaceReportSettings() {
+		return this.editReportSettings("Laps", "Cars")
+	}
+
+	showPerformanceReport() {
+		local drawChartFunction := "function drawChart() {`n"
+		local report := this.Report
+		local raceData, drivers, positions, times, selectedCars, cars, laps, lapTimes, driverTimes, length
+		local ignore, car, carTimes, index, dIndex, time, text, columns, lap
+		local sessionDB, simulator
+
+		if report {
+			raceData := true
+			drivers := false
+			positions := false
+			times := true
+
+			this.loadReportData(false, raceData, drivers, positions, times)
+
+			selectedCars := this.getReportDrivers(raceData)
+			cars := []
+
+			laps := this.getReportLaps(raceData)
+			lapTimes := []
+
+			driverTimes := {}
+			length := 20000
+
+			for ignore, car in selectedCars {
+				carTimes := this.getDriverTimes(raceData, times, car)
+
+				if (carTimes.Length() > 0) {
+					length := Min(length, carTimes.Length())
+
+					driverTimes[car] := carTimes
+				}
+			}
+
+			if (length == 20000)
+				length := false
+
+			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			sessionDB := new SessionDatabase()
+			columns := ["'" . translate("Lap") . "'"]
+
+			for index, car in selectedCars {
+				if driverTimes.HasKey(car) {
+					columns.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
+									  . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
+
+					carTimes := []
+
+					for dIndex, time in driverTimes[car]
+						if (dIndex > length)
+							break
+						else
+							carTimes.Push(time)
+
+					lapTimes.Push(carTimes)
+				}
+			}
+
+			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+			drawChartFunction .= "`n[" . values2String(", ", columns*) . "]"
+
+			loop % Min(length, laps.Length())
+			{
+				lap := A_Index
+				drawChartFunction .= ",`n[" . laps[lap]
+
+				for index, driverTimes in lapTimes
+					drawChartFunction .= ", " . driverTimes[lap]
+
+				drawChartFunction .= "]"
+			}
+
+			drawChartFunction .= "]);"
+
+			text =
+			(
+			var options = {
+				backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '20`%', bottom: '20`%' },
+				legend: { position: 'right' }, curveType: 'function',
+			)
+
+			drawChartFunction .= "`n" . text
+
+			text =
+			(
+				hAxis: { title: '`%lap`%', gridlines: {count: 0} },
+				vAxis: { title: '`%seconds`%', gridlines: {count: 0} }
+			};
+			)
+
+			drawChartFunction .= ("`n" . substituteVariables(text, {lap: translate("Lap"), seconds: translate("Seconds")}))
+
+			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
+
+			this.showReportChart(drawChartFunction)
+			this.showReportInfo(raceData)
+		}
+		else {
+			this.showReportChart(false)
+			this.showReportInfo(false)
+		}
+	}
+
+	editPerformanceReportSettings() {
 		return this.editReportSettings("Laps", "Cars")
 	}
 }
@@ -995,24 +1105,26 @@ getPaceJSFunctions() {
 			var max = arr[arr.length - 1];
 			var min = arr[0];
 			var median = getMedian(arr);
+			var average = getAverage(arr);
 
 			if (arr.length `% 2 === 0) {
 				var midUpper = arr.length / 2;
 				var midLower = midUpper - 1;
 
 				array[i][base + 2] = getMedian(arr.slice(0, midUpper));
-				array[i][base + 4] = getMedian(arr.slice(midLower));
+				array[i][base + 5] = getMedian(arr.slice(midLower));
 			}
 			else {
 				var index = Math.floor(arr.length / 2);
 
 				array[i][base + 2] = getMedian(arr.slice(0, index + 1));
-				array[i][base + 4] = getMedian(arr.slice(index));
+				array[i][base + 5] = getMedian(arr.slice(index));
 			}
 
 			array[i][base] = max;
 			array[i][base + 1] = min
 			array[i][base + 3] = median;
+			array[i][base + 4] = average;
 		}
 
 		return array;
@@ -1038,6 +1150,23 @@ getPaceJSFunctions() {
 		}
 		else {
 			return array[Math.floor(length / 2)];
+		}
+	}
+
+	/*
+	* Takes an array and returns
+	* the average value.
+	*/
+	function getAverage(array) {
+		var value = 0;
+
+		if (array.length == 0)
+			return 0;
+		else {
+			for (var i = 0; i < array.length; i++)
+				value = value + array[i];
+
+			return value / array.length;
 		}
 	}
 	)

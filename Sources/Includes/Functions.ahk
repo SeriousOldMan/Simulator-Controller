@@ -874,9 +874,11 @@ installTrayMenu(update := false) {
 	local label := translate("Exit")
 	local levels, level, ignore, oldLabel, label, handler
 
-	Menu Tray, Icon, %icon%, , 1
+	if !update {
+		Menu Tray, Icon, %icon%, , 1
 
-	Sleep 50
+		Sleep 50
+	}
 
 	if (update && vHasTrayMenu) {
 		oldLabel := translate("Exit", vHasTrayMenu)
@@ -1431,9 +1433,12 @@ isNull(value) {
 }
 
 reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
-	if isDebug()
+	if isDebug() {
 		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
 				  , false, kUndefined, 5000)
+
+		ListLines
+	}
 
 	return false
 }
@@ -2132,53 +2137,55 @@ readConfiguration(configFile) {
 
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
 
-	loop
-		try {
-			file := FileOpen(configFile, "r")
+	if FileExist(configFile) {
+		loop
+			try {
+				file := FileOpen(configFile, "r")
 
-			break
-		}
-		catch exception {
-			if !FileExist(configFile)
-				if (tries-- <= 0)
-					return configuration
-				else
-					Sleep 50
-		}
-
-	if file {
-		loop Read, %configFile%
-		{
-			currentLine := LTrim(A_LoopReadLine)
-
-			if (StrLen(currentLine) == 0)
-				continue
-
-			firstChar := SubStr(currentLine, 1, 1)
-
-			if (firstChar = ";")
-				continue
-			else if (firstChar = "[") {
-				section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
-
-				configuration[section] := {}
+				break
 			}
-			else if section {
-				keyValue := LTrim(A_LoopReadLine)
+			catch exception {
+				if !FileExist(configFile)
+					if (tries-- <= 0)
+						return configuration
+					else
+						Sleep 50
+			}
 
-				if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
-					keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
-									   , "=", "", 2)
+		if file {
+			loop Read, %configFile%
+			{
+				currentLine := LTrim(A_LoopReadLine)
 
-					key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
-					value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+				if (StrLen(currentLine) == 0)
+					continue
 
-					configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+				firstChar := SubStr(currentLine, 1, 1)
+
+				if (firstChar = ";")
+					continue
+				else if (firstChar = "[") {
+					section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
+
+					configuration[section] := {}
+				}
+				else if section {
+					keyValue := LTrim(A_LoopReadLine)
+
+					if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
+						keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
+										   , "=", "", 2)
+
+						key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+						value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
+
+						configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+					}
 				}
 			}
-		}
 
-		file.Close()
+			file.Close()
+		}
 	}
 
 	return configuration
@@ -2311,7 +2318,7 @@ getControllerState(configuration := "__Undefined__") {
 
 	pid := ErrorLevel
 
-	if (!pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
+	if (load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
 		try {
 			if configuration {
 				fileName := temporaryFileName("Config", "ini")

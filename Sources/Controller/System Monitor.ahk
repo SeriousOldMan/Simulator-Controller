@@ -271,27 +271,29 @@ systemMonitor(command := false, arguments*) {
 
 				messages.Push(getConfigurationValue(databaseState, "Database Synchronizer", "Information", ""))
 
-				state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
+				if (controllerState.Count() > 0) {
+					state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
 
-				if stateIcons.HasKey(state)
-					icons.Push(stateIcons[state])
-				else
-					icons.Push(stateIcons["Unknown"])
+					if stateIcons.HasKey(state)
+						icons.Push(stateIcons[state])
+					else
+						icons.Push(stateIcons["Unknown"])
 
-				modules.Push(translate("Track Mapping"))
+					modules.Push(translate("Track Mapping"))
 
-				messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
+					messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
 
-				state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
+					state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
 
-				if stateIcons.HasKey(state)
-					icons.Push(stateIcons[state])
-				else
-					icons.Push(stateIcons["Unknown"])
+					if stateIcons.HasKey(state)
+						icons.Push(stateIcons[state])
+					else
+						icons.Push(stateIcons["Unknown"])
 
-				modules.Push(translate("Track Automation"))
+					modules.Push(translate("Track Automation"))
 
-				messages.Push(getConfigurationValue(controllerState, "Track Automation", "Information", ""))
+					messages.Push(getConfigurationValue(controllerState, "Track Automation", "Information", ""))
+				}
 
 				if (!stateModules || !listEqual(modules, stateModules)) {
 					LV_Delete()
@@ -964,6 +966,24 @@ updateMapperState(trackMapperState) {
 	updateDashboard(mapperDashboard, html)
 }
 
+clearOrphaneStateFiles() {
+	local ignore, fileName, modTime
+
+	static stateFiles := {}
+
+	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
+		if !stateFiles.HasKey(fileName)
+			stateFiles[fileName] := 0
+
+		FileGetTime modTime, %fileName%, M
+
+		if (stateFiles[fileName] != modTime)
+			stateFiles[fileName] := modTime
+		else
+			deleteFile(fileName)
+	}
+}
+
 startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch
@@ -980,6 +1000,8 @@ startSystemMonitor() {
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")
+
+	new PeriodicTask(Func("clearOrphaneStateFiles"), 60000, kLowPriority).start()
 
 	systemMonitor()
 

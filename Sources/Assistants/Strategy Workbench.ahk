@@ -151,9 +151,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	iSelectedTrack := false
 	iSelectedWeather := "Dry"
 
-	iTyreCompounds := ["Dry"]
+	iTyreCompounds := [normalizeCompound("Dry")]
 
-	iAvailableCompounds := ["Dry"]
+	iAvailableCompounds := [normalizeCompound("Dry")]
 
 	iSelectedCompound := "Dry"
 	iSelectedCompoundColor := "Black"
@@ -474,8 +474,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x250 yp w130 AltSubmit gchooseDriver vdriverDropDown
 
 		compound := this.SelectedCompound[true]
-		choices := map(["Dry"], "translate")
-		chosen := inList(["Dry"], compound)
+		choices := map([normalizeCompound("Dry")], "translate")
+		chosen := inList([normalizeCompound("Dry")], compound)
 
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
@@ -617,7 +617,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		x13 := (x7 + w12 + 5)
 
-		Gui %window%:Add, DropDownList, x%x13% yp w116 AltSubmit Choose0 vtyreSetDropDown gupdateTyreSet, % values2String("|", map(["Dry"], "translate")*)
+		Gui %window%:Add, DropDownList, x%x13% yp w116 AltSubmit Choose0 vtyreSetDropDown gupdateTyreSet, % values2String("|", map([normalizeCompound("Dry")], "translate")*)
 
 		Gui %window%:Add, Edit, x%x13% yp+24 w40 h20 Limit2 Number vtyreSetCountEdit gupdateTyreSet
 		Gui %window%:Add, UpDown, x%x13% yp w18 h20 0x80
@@ -748,8 +748,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w85 h23 +0x200, % translate("Compound")
 
 		compound := this.SelectedCompound[true]
-		choices := map(["Dry"], "translate")
-		chosen := inList(["Dry"], compound)
+		choices := map([normalizeCompound("Dry")], "translate")
+		chosen := inList([normalizeCompound("Dry")], compound)
 
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
@@ -899,8 +899,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w65 h23 +0x200, % translate("Compound")
 
 		compound := this.SelectedCompound[true]
-		choices := map(["Dry"], "translate")
-		chosen := inList(["Dry"], compound)
+		choices := map([normalizeCompound("Dry")], "translate")
+		chosen := inList([normalizeCompound("Dry")], compound)
 
 		if (!chosen && (choices.Length() > 0)) {
 			compound := choices[1]
@@ -1639,6 +1639,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	loadCompound(compound, force := false) {
 		local window
 		local compoundColor
+		
+		if compound
+			compound := normalizeCompound(compound)
 
 		if (force || (this.SelectedCompound[true] != compound)) {
 			window := this.Window
@@ -2532,11 +2535,23 @@ class StrategyWorkbench extends ConfigurationItem {
 								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
 								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)
 								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)]
+			else if (tyreCompound = "Intermediate") {
+				if (getConfigurationValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", kUndefined) != kUndefined)
+					tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", 29.0)
+									, getConfigurationValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FR", 29.0)
+									, getConfigurationValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.RL", 29.0)
+									, getConfigurationValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.RR", 29.0)]
+				else
+					tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)
+									, getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)
+									, getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
+									, getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)]
+			}
 			else
-				tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 30.0)
-								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 30.0)
-								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 30.0)
-								, getConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 30.0)]
+				tyrePressures := [getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
+								, getConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)]
 		}
 	}
 
@@ -3589,6 +3604,9 @@ chooseTyreSet() {
 
 		LV_GetText(compound, A_EventInfo, 1)
 		LV_GetText(count, A_EventInfo, 2)
+		
+		if compound
+			compound := normalizeCompound(compound)
 
 		GuiControl Choose, tyreSetDropDown, % inList(map(workbench.TyreCompounds, "translate"), compound)
 		GuiControl, , tyreSetCountEdit, %count%
@@ -3627,7 +3645,7 @@ addTyreSet() {
 
 	Gui ListView, % workbench.TyreSetListView
 
-	index := inList(workbench.TyreCompounds, "Dry")
+	index := inList(workbench.TyreCompounds, normalizeCompound("Dry"))
 
 	if !index
 		index := 1

@@ -1,3 +1,8 @@
+## 4.4.7.0-release 11/11/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. New remarks field for driver specific car setups in "Race Center".
+
 ## 4.4.6.0-release 11/04/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always

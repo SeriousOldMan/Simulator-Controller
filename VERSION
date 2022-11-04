@@ -1,16 +1,16 @@
 [Development]
-Version=4.4.6.0-release
-Target=4.4.6.0-release
+Version=4.4.7.0-dev
+Target=4.4.7.0-release
 Date=11/04/2022
-Download=https://cutt.ly/UNLf1ii
-Changes=Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)", Both median and mean values are now shown in the pace report, New alternative pace report in "Race Reports"
+Download=
+Changes=New remarks field for car setups in "Race Center"
 [Release]
 Version=4.4.6.0-release
 Date=11/04/2022
 Download=https://cutt.ly/UNLf1ii
 Changes=Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)", Both median and mean values are now shown in the pace report, New alternative pace report in "Race Reports"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.4.6.0-release
-Development=4.4.6.0-release
+Development=4.4.7.0-dev

@@ -782,7 +782,7 @@ createGUID() {
 
     VarSetCapacity(pGuid, 16, 0)
 
-	if !(DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid)) {
+	if !DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid) {
         size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
 
         if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {

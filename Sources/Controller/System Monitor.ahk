@@ -271,27 +271,29 @@ systemMonitor(command := false, arguments*) {
 
 				messages.Push(getConfigurationValue(databaseState, "Database Synchronizer", "Information", ""))
 
-				state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
+				if (controllerState.Count() > 0) {
+					state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
 
-				if stateIcons.HasKey(state)
-					icons.Push(stateIcons[state])
-				else
-					icons.Push(stateIcons["Unknown"])
+					if stateIcons.HasKey(state)
+						icons.Push(stateIcons[state])
+					else
+						icons.Push(stateIcons["Unknown"])
 
-				modules.Push(translate("Track Mapping"))
+					modules.Push(translate("Track Mapping"))
 
-				messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
+					messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
 
-				state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
+					state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
 
-				if stateIcons.HasKey(state)
-					icons.Push(stateIcons[state])
-				else
-					icons.Push(stateIcons["Unknown"])
+					if stateIcons.HasKey(state)
+						icons.Push(stateIcons[state])
+					else
+						icons.Push(stateIcons["Unknown"])
 
-				modules.Push(translate("Track Automation"))
+					modules.Push(translate("Track Automation"))
 
-				messages.Push(getConfigurationValue(controllerState, "Track Automation", "Information", ""))
+					messages.Push(getConfigurationValue(controllerState, "Track Automation", "Information", ""))
+				}
 
 				if (!stateModules || !listEqual(modules, stateModules)) {
 					LV_Delete()

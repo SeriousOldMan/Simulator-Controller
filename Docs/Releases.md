@@ -1,4 +1,4 @@
-## 4.4.6.0-release 11/04/22 (planned)
+## 4.4.6.0-release 11/04/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Fixed a bug for occasional crashes during update installations.

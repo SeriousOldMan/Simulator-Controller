@@ -9129,6 +9129,7 @@ class RaceCenter extends ConfigurationItem {
 		data.addColumn({id:'min', type:'number', role:'interval'});
 		data.addColumn({id:'firstQuartile', type:'number', role:'interval'});
 		data.addColumn({id:'median', type:'number', role:'interval'});
+		data.addColumn({id:'mean', type:'number', role:'interval'});
 		data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
 		)
 
@@ -9158,7 +9159,8 @@ class RaceCenter extends ConfigurationItem {
 			series: [ { 'color': 'D8D8D8' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
 			interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
-						min: { style: 'bars', fillOpacity: 1, color: '#777' } }
+						min: { style: 'bars', fillOpacity: 1, color: '#777' },
+						mean: { style: 'points', color: 'grey', pointsize: 5 } }
 		};
 		)
 

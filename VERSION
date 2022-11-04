@@ -3,7 +3,7 @@ Version=4.4.7.0-dev
 Target=4.4.7.0-release
 Date=11/04/2022
 Download=
-Changes=New remarks field for car setups in "Race Center"
+Changes=New remarks field for car setups in "Race Center", Fixed driver statistics regression in "Race Center"
 [Release]
 Version=4.4.6.0-release
 Date=11/04/2022

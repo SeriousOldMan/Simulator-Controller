@@ -637,7 +637,28 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		return lastCarName
 	}
 
+	getClassName(classID) {
+		static classDB := false
+		static lastClassID := false
+		static lastClassName := false
+
+		if !classDB {
+			FileRead script, %kResourcesDirectory%Simulator Data\R3E\r3e-data.json
+
+			classDB := JSON.parse(script)["classes"]
+		}
+
+		if (classID != lastClassID) {
+			lastClassID := classID
+			lastClassName := (classDB.HasKey(classID) ? classDB[classID]["Name"] : "Unknown")
+		}
+
+		return lastClassName
+	}
+
 	updatePositionsData(data) {
+		local carID
+
 		base.updatePositionsData(data)
 
 		loop {
@@ -645,8 +666,12 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 			if (carID == kUndefined)
 				break
-			else
+			else {
 				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
+
+				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class"
+									, this.getClassName(getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class")))
+			}
 		}
 	}
 

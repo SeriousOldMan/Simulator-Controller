@@ -256,7 +256,9 @@ class RaceReportViewer extends RaceReportReader {
 	showOverviewReport() {
 		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 		local report := this.Report
-		local raceData, drivers, positions, times, cars, carsCount, lapsCount, simulator, sessionDB, car, valid
+		local classes := {}
+		local raceData, drivers, positions, times, cars, carsCount, lapsCount, simulator, sessionDB, car
+		local class, hasClasses, classResults, valid
 		local ignore, lap, rows, hasDNF, result, lapTimes, hasNull, lapTime, min, avg, filteredLapTimes, nr, row
 
 		if report {
@@ -341,27 +343,67 @@ class RaceReportViewer extends RaceReportReader {
 
 				nr := StrReplace(cars[A_Index][1], """", "")
 
-				rows.Push(Array("'" . nr . "'", "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
-							  , "'" . this.lapTimeDisplayValue(min) . "'", "'" . this.lapTimeDisplayValue(avg) . "'", result))
+				class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", "Unknown")
+
+				if !classes.HasKey(class)
+					classes[class] := [Array(A_Index, result)]
+				else
+					classes[class].Push(Array(A_Index, result))
+
+				rows.Push(Array("'" . class . "'", "'" . nr . "'"
+							  , "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+							  , "'" . this.lapTimeDisplayValue(min) . "'"
+							  , "'" . this.lapTimeDisplayValue(avg) . "'", result, result))
+			}
+
+			hasClasses := (classes.Count() > 1)
+
+			if hasClasses {
+				classResults := {}
+
+				for ignore, class in classes {
+					bubbleSort(class, "comparePositions")
+
+					for ignore, car in class {
+						result := car[2]
+
+						classResults[car[1]] := ((result = "DNF") ? result : A_Index)
+					}
+				}
 			}
 
 			loop % carsCount
 			{
 				row := rows[A_Index]
 
-				if hasDNF
-					row[6] := ("'" . row[6] . "'")
+				if hasClasses
+					row[8] := classResults[A_Index]
+
+				if hasDNF {
+					row[7] := ("'" . row[7] . "'")
+					row[8] := ("'" . row[8] . "'")
+				}
+
+				if !hasClasses {
+					row.RemoveAt(1)
+					row.RemoveAt(row.Length())
+				}
 
 				rows[A_Index] := ("[" . values2String(", ", row*) . "]")
 			}
+
+			if hasClasses
+				drawChartFunction .= "`ndata.addColumn('string', '" . translate("Class") . "');"
 
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("#") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Driver (Start)") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Best Lap Time") . "');"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Avg Lap Time") . "');"
-			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result") . "');"
+			drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate(hasClasses ? "Result (Overall)" : "Result") . "');"
 
+			if hasClasses
+				drawChartFunction .= "`ndata.addColumn('" . (hasDNF ? "string" : "number") . "', '" . translate("Result (Class)") . "');"
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 
@@ -1178,6 +1220,19 @@ getPaceJSFunctions() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+comparePositions(c1, c2) {
+	local pos1 := c1[2]
+	local pos2 := c2[2]
+
+	if pos1 is not Number
+		pos1 := 999
+
+	if pos2 is not Number
+		pos2 := 999
+
+	return (pos1 > pos2)
+}
 
 global rangeLapsEdit
 global driverSelectCheck

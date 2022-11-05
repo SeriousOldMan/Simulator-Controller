@@ -146,10 +146,9 @@ namespace RF2SHMProvider {
 			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
 				rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(vehicle.mID);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
 
@@ -161,12 +160,13 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
-
-				string carModel = GetCarName(GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
-				string carNr = GetCarNr(vehicle.mID, GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
+				string carClass = GetStringFromBytes(vehicle.mVehicleClass);
+                string carModel = GetCarName(carClass, GetStringFromBytes(vehicle.mVehicleName));
+				string carNr = GetCarNr(vehicle.mID, carClass, GetStringFromBytes(vehicle.mVehicleName));
 				
 				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(carNr);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Class="); Console.WriteLine(carClass);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));

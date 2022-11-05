@@ -619,8 +619,12 @@ void writePositions(const irsdk_header *header, const char* data)
 					printf("Car.%s.Lap.Running=%f\n", carIdx1, ((float*)trackPositions)[carIndex]);
 
 				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarScreenName:", carIdx);
-				
+
 				printf("Car.%s.Car=%s\n", carIdx1, result);
+
+				getYamlValue(result, sessionInfo, "DriverInfo:Drivers:CarIdx:{%s}CarClassShortName:", carIdx);
+
+				printf("Car.%s.Class=%s\n", carIdx1, result);
 
 				char forName[100];
 				char surName[100];

@@ -435,6 +435,29 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
+	updatePositionsData(data) {
+		local classID
+
+		base.updatePositionsData(data)
+
+		loop {
+			classID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)
+
+			if (classID == kUndefined)
+				break
+			else {
+				switch classID {
+					case 2:
+						classID := "GT3"
+					default:
+						classID := "Unknown"
+				}
+
+				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", classID)
+			}
+		}
+	}
+
 	updateTelemetryData(data) {
 		local brakePadThickness, frontBrakePadCompound, rearBrakePadCompound, brakePadWear
 

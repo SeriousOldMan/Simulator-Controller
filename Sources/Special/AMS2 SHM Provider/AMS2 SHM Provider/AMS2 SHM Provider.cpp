@@ -163,6 +163,7 @@ int main(int argc, char* argv[]) {
 				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
 
 				printf("Car.%d.Nr=%d\n", i, i);
+				printf("Car.%d.Class=%s\n", i, localCopy->mCarClassNames[i - 1]);
 				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
 				printf("Car.%d.Lap=%d\n", i, vehicle.mLapsCompleted);
 				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);

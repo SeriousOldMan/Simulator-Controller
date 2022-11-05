@@ -2427,7 +2427,8 @@ class RaceStrategist extends RaceAssistant {
 	updateRaceInfo(raceData) {
 		local raceInfo := {}
 		local grid := []
-		local carNr, carID, carPosition
+		local class := []
+		local carNr, carID, carClass, carPosition
 
 		raceInfo["Driver"] := getConfigurationValue(raceData, "Cars", "Driver")
 		raceInfo["Cars"] := getConfigurationValue(raceData, "Cars", "Count")
@@ -2436,15 +2437,18 @@ class RaceStrategist extends RaceAssistant {
 		{
 			carNr := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
 			carID := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
+			carClass := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", "Unknown")
 			carPosition := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position")
 
 			grid.Push(carPosition)
+			class.Push(carClass)
 
 			raceInfo["#" . carNr] := A_Index
 			raceInfo["!" . carID] := A_Index
 		}
 
 		raceInfo["Grid"] := grid
+		raceInfo["Class"] := class
 
 		this.updateSessionValues({RaceInfo: raceInfo})
 	}
@@ -2489,6 +2493,8 @@ class RaceStrategist extends RaceAssistant {
 
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".ID", carID)
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Class"
+										, knowledgeBase.getValue("Car." . A_Index . ".Class", "Unknown"))
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
 										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
 

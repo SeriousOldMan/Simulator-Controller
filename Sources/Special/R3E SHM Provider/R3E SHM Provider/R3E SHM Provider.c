@@ -170,6 +170,7 @@ int main(int argc, char* argv[])
 
 				wprintf_s(L"Car.%d.ID=%d\n", i, vehicle.driver_info.slot_id);
 				wprintf_s(L"Car.%d.Nr=%d\n", i, vehicle.driver_info.car_number);
+				wprintf_s(L"Car.%d.Class=%d\n", i, vehicle.driver_info.class_id);
 				wprintf_s(L"Car.%d.Position=%d\n", i, position);
 				wprintf_s(L"Car.%d.Lap=%d\n", i, vehicle.completed_laps);
 				wprintf_s(L"Car.%d.Lap.Running=%f\n", i, (float)((double)(vehicle.lap_distance / map_buffer->lap_distance) * map_buffer->lap_distance_fraction));

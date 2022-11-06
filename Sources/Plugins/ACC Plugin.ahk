@@ -450,7 +450,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					case 2:
 						classID := "GT3"
 					default:
-						classID := "Unknown"
+						classID := translate("Unknown")
 				}
 
 				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", classID)

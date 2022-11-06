@@ -169,7 +169,7 @@ class DatabaseCreator {
 				this.TyresDatabase.updatePressure(simulator, car, track, row.Weather
 												, row["Temperature.Air"], row["Temperature.Track"]
 												, compound, color, row.Type, row.Tyre
-												, row.Pressure, row.Count, false, true, "Community")
+												, row.Pressure, row.Count, false, true, "Community", kNull)
 			}
 
 			this.TyresDatabase.flush()

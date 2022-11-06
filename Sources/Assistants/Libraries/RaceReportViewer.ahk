@@ -1315,19 +1315,17 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 		LV_Delete()
 
-		for ignore, driver in allDrivers {
-			if (selectedClass && (selectedClass != getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
-				continue
+		for ignore, driver in allDrivers
+			if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown))) {
+				if inList(options, "Cars")
+					column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+				else
+					column1 := driver
 
-			if inList(options, "Cars")
-				column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
-			else
-				column1 := driver
+				column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
-			column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
-
-			LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
-		}
+				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
+			}
 
 		if (!selectedDrivers || (selectedDrivers.Length() == LV_GetCount()))
 			GuiControl, , driverSelectCheck, 1
@@ -1530,6 +1528,27 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 					result["Classes"] := [raceReport.getReportClasses(raceData, true)[classesDropDownMenu - 1]]
 
 			if (inList(options, "Drivers") || inList(options, "Cars")) {
+				allDrivers := reportViewer.getReportDrivers(raceData, drivers)
+				selectedDrivers := {}
+
+				sessionDB := new SessionDatabase()
+				simulator := getConfigurationValue(raceData, "Session", "Simulator")
+
+				if inList(options, "Classes") {
+					GuiControlGet classesDropDownMenu
+
+					if (classesDropDownMenu > 1)
+						selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu - 1]
+					else
+						selectedClass := false
+				}
+				else
+					selectedClass := false
+
+				for ignore, driver in allDrivers
+					if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
+						selectedDrivers[inList(options, "Cars") ? getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") : driver] := A_Index
+
 				newDrivers := []
 
 				rowNumber := 0
@@ -1539,8 +1558,11 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 					if !rowNumber
 						break
-					else
-						newDrivers.Push(rowNumber)
+					else {
+						LV_GetText(column1, rowNumber)
+
+						newDrivers.Push(selectedDrivers[column1])
+					}
 				}
 
 				result["Drivers"] := newDrivers

@@ -7186,7 +7186,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editDriverReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
 	}
 
 	showPositionsReport() {
@@ -7198,7 +7198,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPositionsReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps")
+		return this.ReportViewer.editReportSettings("Laps", "Classes")
 	}
 
 	showLapTimesReport() {
@@ -7210,7 +7210,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editLapTimesReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showConsistencyReport() {
@@ -7222,7 +7222,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editConsistencyReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showPaceReport() {
@@ -7234,7 +7234,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPaceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showPerformanceReport() {
@@ -7246,7 +7246,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPerformanceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showTrackMap() {

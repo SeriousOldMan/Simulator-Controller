@@ -296,7 +296,7 @@ class RaceReports extends ConfigurationItem {
 	editDriverReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
 	}
 
 	showPositionsReport(reportDirectory) {
@@ -319,7 +319,7 @@ class RaceReports extends ConfigurationItem {
 	editPositionsReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps")
+		return this.ReportViewer.editReportSettings("Laps", "Classes")
 	}
 
 	showLapTimesReport(reportDirectory) {
@@ -342,7 +342,7 @@ class RaceReports extends ConfigurationItem {
 	editLapTimesReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showConsistencyReport(reportDirectory) {
@@ -365,7 +365,7 @@ class RaceReports extends ConfigurationItem {
 	editConsistencyReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showPaceReport(reportDirectory) {
@@ -388,7 +388,7 @@ class RaceReports extends ConfigurationItem {
 	editPaceReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showPerformanceReport(reportDirectory) {
@@ -411,7 +411,7 @@ class RaceReports extends ConfigurationItem {
 	editPerformanceReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	getSimulators() {
@@ -599,7 +599,7 @@ class RaceReports extends ConfigurationItem {
 
 	loadRace(raceNr) {
 		if (raceNr != this.SelectedRace) {
-			this.iSettings := {}
+			this.Settings := {}
 
 			if raceNr {
 				GuiControl Enable, reportsDropDown

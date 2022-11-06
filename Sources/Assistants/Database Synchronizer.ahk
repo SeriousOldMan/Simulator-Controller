@@ -50,6 +50,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
 	local upload, now, simulator, car, track, distFile, directoryName
+	local directory, sourceDB, targetDB, ignore, row, compound, compoundColor
 
 	if FileExist(uploadTimeStamp) {
 		FileReadLine upload, %uploadTimeStamp%, 1
@@ -97,10 +98,30 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 								FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
 
 								if uploadPressures {
-									distFile := (sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\Tyres.Pressures.Distribution.CSV")
+									directory := (sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\")
 
-									if FileExist(distFile)
-										FileCopy %distFile%, %kTempDirectory%Shared Database\%simulator%\%car%\%track%
+									if FileExist(directory . "Tyres.Pressures.Distribution.CSV") {
+										sourceDB := new Database(directory, kTyresSchemas)
+										targetDB := new Database(kTempDirectory . "Shared Database\" . simulator . "\" . car . "\" . track . "\", kTyresSchema)
+
+										for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: sessionDB.ID} }) {
+											compound := row.Compound
+											compoundColor := row["Compound.Color"]
+
+											if ((compound = kNull) || !compound || (StrLen(compound) = 0))
+												compound := "Dry"
+
+											if ((compoundColor = kNull) || !compoundColor || (StrLen(compoundColor) = 0))
+												compoundColor := "Black"
+
+											targetDB.updatePressure(simulator, car, track, row.Weather
+																  , row["Temperature.Air"], row["Temperature.Track"]
+																  , compound, compoundColor, row.Type, row.Tyre
+																  , row.Pressure, row.Count, false, true, "Community", kNull)
+										}
+
+										targetDB.flush()
+									}
 								}
 
 								if uploadSetups {

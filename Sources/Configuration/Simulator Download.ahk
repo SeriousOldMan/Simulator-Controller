@@ -184,7 +184,7 @@ downloadSimulatorController() {
 			try {
 				SetWorkingDir %directory%
 
-				RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
+				RunWait *RunAs Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
 			}
 			finally {
 				SetWorkingDir %currentDirectory%
@@ -204,10 +204,10 @@ downloadSimulatorController() {
 				if index {
 					start := A_Args[index + 1]
 
-					Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%start%"
+					Run *RunAs "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install -Start "%start%"
 				}
 				else
-					Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
+					Run *RunAs "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
 			}
 			catch exception {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))

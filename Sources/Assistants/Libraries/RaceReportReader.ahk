@@ -43,6 +43,21 @@ class RaceReportReader {
 		return laps
 	}
 
+	getClasses(raceData) {
+		local classes := []
+		local class
+
+		loop % getConfigurationValue(raceData, "Cars", "Count")
+		{
+			class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", translate("Unknown"))
+
+			if !inList(classes, class)
+				classes.Push(class)
+		}
+
+		return classes
+	}
+
 	getDrivers(raceData) {
 		local cars := []
 

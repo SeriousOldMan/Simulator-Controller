@@ -1288,58 +1288,60 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 	else if (raceReport = kOk)
 		result := kOk
 	else if (raceReport = "UpdateDrivers") {
-		allDrivers := reportViewer.getReportDrivers(raceData, drivers)
-		selectedDrivers := []
+		if (inList(options, "Drivers") || inList(options, "Cars")) {
+			allDrivers := reportViewer.getReportDrivers(raceData, drivers)
+			selectedDrivers := []
 
-		if reportViewer.Settings.HasKey("Drivers")
-			selectedDrivers := reportViewer.Settings["Drivers"]
-		else
-			loop % allDrivers.Length()
-				selectedDrivers.Push(A_Index)
+			if reportViewer.Settings.HasKey("Drivers")
+				selectedDrivers := reportViewer.Settings["Drivers"]
+			else
+				loop % allDrivers.Length()
+					selectedDrivers.Push(A_Index)
 
-		sessionDB := new SessionDatabase()
-		simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			sessionDB := new SessionDatabase()
+			simulator := getConfigurationValue(raceData, "Session", "Simulator")
 
-		if inList(options, "Classes") {
-			GuiControlGet classesDropDownMenu
+			if inList(options, "Classes") {
+				GuiControlGet classesDropDownMenu
 
-			if (classesDropDownMenu > 1)
-				selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu - 1]
+				if (classesDropDownMenu > 1)
+					selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu - 1]
+				else
+					selectedClass := false
+			}
 			else
 				selectedClass := false
+
+			Gui ListView, %driversListView%
+
+			LV_Delete()
+
+			for ignore, driver in allDrivers
+				if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown))) {
+					if inList(options, "Cars")
+						column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+					else
+						column1 := driver
+
+					column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+
+					LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
+				}
+
+			if (!selectedDrivers || (selectedDrivers.Length() == LV_GetCount()))
+				GuiControl, , driverSelectCheck, 1
+			else if ((selectedDrivers.Length() > 0) && (selectedDrivers.Length() != LV_GetCount()))
+				GuiControl, , driverSelectCheck, -1
+			else
+				GuiControl, , driverSelectCheck, 0
+
+			if inList(options, "Cars")
+				LV_ModifyCol(1, "AutoHdr Right")
+			else
+				LV_ModifyCol(1, "AutoHdr")
+
+			LV_ModifyCol(2, "AutoHdr")
 		}
-		else
-			selectedClass := false
-
-		Gui ListView, %driversListView%
-
-		LV_Delete()
-
-		for ignore, driver in allDrivers
-			if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown))) {
-				if inList(options, "Cars")
-					column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
-				else
-					column1 := driver
-
-				column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
-
-				LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
-			}
-
-		if (!selectedDrivers || (selectedDrivers.Length() == LV_GetCount()))
-			GuiControl, , driverSelectCheck, 1
-		else if ((selectedDrivers.Length() > 0) && (selectedDrivers.Length() != LV_GetCount()))
-			GuiControl, , driverSelectCheck, -1
-		else
-			GuiControl, , driverSelectCheck, 0
-
-		if inList(options, "Cars")
-			LV_ModifyCol(1, "AutoHdr Right")
-		else
-			LV_ModifyCol(1, "AutoHdr")
-
-		LV_ModifyCol(2, "AutoHdr")
 	}
 	else {
 		reportViewer := raceReport

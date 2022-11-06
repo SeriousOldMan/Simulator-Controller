@@ -1447,6 +1447,10 @@ isDebug() {
 	return vDebug
 }
 
+isDevelopment() {
+	return (vBuildConfiguration = "Development")
+}
+
 getLogLevel() {
 	return vLogLevel
 }

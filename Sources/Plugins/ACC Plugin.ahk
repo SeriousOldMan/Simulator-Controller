@@ -436,25 +436,22 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		local classID
+		local car
+
+		static carCategories := false
 
 		base.updatePositionsData(data)
 
+		if !carCategories
+			carCategories := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Categories")
+
 		loop {
-			classID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUndefined)
+			car := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
-			if (classID == kUndefined)
+			if (car == kUndefined)
 				break
-			else {
-				switch classID {
-					case 2:
-						classID := "GT3"
-					default:
-						classID := "Unknown"
-				}
-
-				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", classID)
-			}
+			else
+				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.HasKey(car) ? carCategories[car] : "Unknown")
 		}
 	}
 

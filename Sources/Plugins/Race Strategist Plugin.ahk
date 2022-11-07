@@ -671,7 +671,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 								leader := candidate[1]
 
 							if (candidate[1] = driver) {
-								position := candidate[2]
+								position := car
 
 								break
 							}

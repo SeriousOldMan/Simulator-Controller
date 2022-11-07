@@ -103,7 +103,7 @@ class RaceReportReader {
 	}
 
 	getStandings(lap, ByRef cars, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
-			   , ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
+					, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
 		local raceData := true
 		local drivers := true
 		local tPositions := true
@@ -181,8 +181,8 @@ class RaceReportReader {
 				for ignore, class in classes {
 					bubbleSort(class, "comparePositions")
 
-					for ignore, car in class
-						classPositions[car[1]] := car[2]
+					for position, car in class
+						classPositions[car[1]] := position
 				}
 
 				return true

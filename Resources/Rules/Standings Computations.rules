@@ -104,39 +104,39 @@ updateStandingsOverallLeader(?, ?car, ?distance, ?delta) <= carPosition(?car, 1)
 															Set(Position.Standings.Overall.Leader.Delta, ?delta)
 updateStandingsOverallLeader(?, ?, ?, ?)
 
-updateStandingsClassAhead(?, ?car, ?distance, ?delta) <= ?delta > 0, unbound?(!Position.Standings.Ahead.Car), !,
+updateStandingsClassAhead(?, ?car, ?distance, ?delta) <= ?delta > 0, unbound?(!Position.Standings.Class.Ahead.Car), !,
 														 carClass(?car, ?carClass), carClass(!Driver.Car, ?driverClass),
 														 ?carClass = ?driverClass,
-														 Set(Position.Standings.Ahead.Car, ?car),
-														 Set(Position.Standings.Ahead.Distance, ?distance),
-														 Set(Position.Standings.Ahead.Delta, ?delta)
-updateStandingsClassAhead(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Standings.Ahead.Delta, ?curDelta), ?delta < ?curDelta,
+														 Set(Position.Standings.Class.Ahead.Car, ?car),
+														 Set(Position.Standings.Class.Ahead.Distance, ?distance),
+														 Set(Position.Standings.Class.Ahead.Delta, ?delta)
+updateStandingsClassAhead(?, ?car, ?distance, ?delta) <= ?delta > 0, Get(Position.Standings.Class.Ahead.Delta, ?curDelta), ?delta < ?curDelta,
 														 carClass(?car, ?carClass), carClass(!Driver.Car, ?driverClass),
 														 ?carClass = ?driverClass,
-														 Set(Position.Standings.Ahead.Car, ?car),
-														 Set(Position.Standings.Ahead.Distance, ?distance),
-														 Set(Position.Standings.Ahead.Delta, ?delta)
+														 Set(Position.Standings.Class.Ahead.Car, ?car),
+														 Set(Position.Standings.Class.Ahead.Distance, ?distance),
+														 Set(Position.Standings.Class.Ahead.Delta, ?delta)
 updateStandingsClassAhead(?, ?, ?, ?)
 
-updateStandingsClassBehind(?, ?car, ?distance, ?delta) <= ?delta < 0, unbound?(!Position.Standings.Behind.Car), !,
+updateStandingsClassBehind(?, ?car, ?distance, ?delta) <= ?delta < 0, unbound?(!Position.Standings.Class.Behind.Car), !,
 														  carClass(?car, ?carClass), carClass(!Driver.Car, ?driverClass),
 														  ?carClass = ?driverClass,
-														  Set(Position.Standings.Behind.Car, ?car),
-														  Set(Position.Standings.Behind.Distance, ?distance),
-														  Set(Position.Standings.Behind.Delta, ?delta)
-updateStandingsClassBehind(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Standings.Behind.Delta, ?curDelta), ?delta > ?curDelta,
+														  Set(Position.Standings.Class.Behind.Car, ?car),
+														  Set(Position.Standings.Class.Behind.Distance, ?distance),
+														  Set(Position.Standings.Class.Behind.Delta, ?delta)
+updateStandingsClassBehind(?, ?car, ?distance, ?delta) <= ?delta < 0, Get(Position.Standings.Class.Behind.Delta, ?curDelta), ?delta > ?curDelta,
 														  carClass(?car, ?carClass), carClass(!Driver.Car, ?driverClass),
 														  ?carClass = ?driverClass,
-														  Set(Position.Standings.Behind.Car, ?car),
-														  Set(Position.Standings.Behind.Distance, ?distance),
-														  Set(Position.Standings.Behind.Delta, ?delta)
+														  Set(Position.Standings.Class.Behind.Car, ?car),
+														  Set(Position.Standings.Class.Behind.Distance, ?distance),
+														  Set(Position.Standings.Class.Behind.Delta, ?delta)
 updateStandingsClassBehind(?, ?, ?, ?)
 
-updateStandingsClassLeader(?, ?car, ?distance, ?delta) <= carPosition(?car, 1), !, Set(Position.Standings.Leader.Car, ?car),
+updateStandingsClassLeader(?, ?car, ?distance, ?delta) <= carPosition(?car, 1), !, Set(Position.Standings.Class.Leader.Car, ?car),
 														  carClass(?car, ?carClass), carClass(!Driver.Car, ?driverClass),
 														  ?carClass = ?driverClass,
-														  Set(Position.Standings.Leader.Distance, ?distance),
-														  Set(Position.Standings.Leader.Delta, ?delta)
+														  Set(Position.Standings.Class.Leader.Distance, ?distance),
+														  Set(Position.Standings.Class.Leader.Delta, ?delta)
 updateStandingsClassLeader(?, ?, ?, ?)
 						
 updateTrackAhead(?, ?car, ?distance, ?delta) <= ?distance < 0, unbound?(!Position.Track.Ahead.Car), !, Set(Position.Track.Ahead.Car, ?car),

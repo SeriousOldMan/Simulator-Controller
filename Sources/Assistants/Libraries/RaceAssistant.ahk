@@ -1290,7 +1290,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	getClasses() {
-		local knowledgbase := this.Knowledgebase
+		local knowledgebase := this.Knowledgebase
 		local classes := {}
 
 		loop % knowledgeBase.getValue("Car.Count")
@@ -1305,15 +1305,14 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	getPosition(car := false, forClass := false) {
-		local classes, class, positions, position, candidate
+		local knowledgebase := this.Knowledgebase
+		local class, positions, position, candidate
 
 		if !car
 			car := knowledgeBase.getValue("Driver.Car", false)
 
-		if forClass {
-			classes := this.getClasses()
-
-			if (classes.Length() > 1) {
+		if forClass
+			if (this.getClasses().Length() > 1) {
 				class := knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
 				positions := []
 
@@ -1327,7 +1326,6 @@ class RaceAssistant extends ConfigurationItem {
 					if (candidate[1] = car)
 						return position
 			}
-		}
 
 		return (car ? knowledgeBase.getValue("Car." . car . ".Position", car) : false)
 	}

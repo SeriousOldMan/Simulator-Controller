@@ -2,12 +2,12 @@
 Version=4.4.6.0-release
 Target=4.4.6.0-release
 Date=11/04/2022
-Download=https://cutt.ly/UNLf1ii
+Download=https://cutt.ly/UNLf1ii;https://www.dropbox.com/s/jkdh2kee83md8w9/Simulator%20Controller%204.4.6.0-release.zip?dl=1
 Changes=Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)", Both median and mean values are now shown in the pace report, New alternative pace report in "Race Reports"
 [Release]
 Version=4.4.6.0-release
 Date=11/04/2022
-Download=https://cutt.ly/UNLf1ii
+Download=https://cutt.ly/UNLf1ii;https://www.dropbox.com/s/jkdh2kee83md8w9/Simulator%20Controller%204.4.6.0-release.zip?dl=1
 Changes=Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)", Both median and mean values are now shown in the pace report, New alternative pace report in "Race Reports"
 [Current]
 Type=Release

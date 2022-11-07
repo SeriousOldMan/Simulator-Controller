@@ -620,7 +620,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	reviewRace() {
+		local multiClass := false
 		local report, reader, raceData, drivers, positions, times, cars, driver, laps, position
+		local class, classCars, classPositions
 		local leader, car, candidate, min, max, leaderAvgLapTime, stdDev
 		local driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev
 
@@ -643,19 +645,61 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
 				laps := getConfigurationValue(raceData, "Laps", "Count", 0)
 
-				if laps
-					position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
-				else
-					position := cars
+				if (reader.getClasses().Length() > 1) {
+					class := getConfigurationValue(raceData, "Cars", "Car." . driver . ".Class", false)
 
-				leader := 0
+					if class {
+						classCars := 0
+						classPositions := []
 
-				for car, candidate in positions[laps]
-					if (candidate = 1) {
-						leader := car
+						loop %cars%
+							if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class") = class) {
+								classCars += 1
 
-						break
+								if laps
+									position := (positions[laps].HasKey(A_Index) ? positions[laps][A_Index] : cars)
+								else
+									position := cars
+
+								classPositions.Push(Array(A_Index, position))
+							}
+
+						bubbleSort(classPositions, "comparePositions")
+
+						for car, candidate in classPositions {
+							if (car = 1)
+								leader := candidate[1]
+
+							if (candidate[1] = driver) {
+								position := candidate[2]
+
+								break
+							}
+						}
+
+						if (position = cars)
+							position := classCars
+
+						cars := classCars
+						multiClass := true
 					}
+				}
+
+				if !multiClass {
+					if laps
+						position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
+					else
+						position := cars
+
+					leader := 0
+
+					for car, candidate in positions[laps]
+						if (candidate = 1) {
+							leader := car
+
+							break
+						}
+				}
 
 				min := false
 				max := false
@@ -672,10 +716,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
 
 				this.RaceAssistant["Ghost"].reviewRace(cars, laps, position, leaderAvgLapTime
-													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
+													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev
+													 , multiClass)
 			}
 			catch exception {
-				this.RaceAssistant["Ghost"].reviewRace(0, 0, 0, 0, 0, 0, 0, 0)
+				this.RaceAssistant["Ghost"].reviewRace(0, 0, 0, 0, 0, 0, 0, 0, multiClass)
 			}
 		}
 		finally {

@@ -5956,23 +5956,29 @@ class RaceCenter extends ConfigurationItem {
 		this.ReportViewer.getCar(lap.Nr, car, carNumber, carName, driverForname, driverSurname, driverNickname)
 	}
 
-	getStandings(lap, ByRef cars, ByRef positions, ByRef carNumbers, ByRef carNames, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
+	getStandings(lap, ByRef cars, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
+					, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
 		local tCars := true
-		local tPositions := true
+		local tOPositions := true
+		local tCPositions := true
 		local tCarNumbers := carNumbers
 		local tCarNames := carNames
 		local tDriverFornames := driverFornames
 		local tDriverSurnames := driverSurnames
 		local tDriverNicknames := driverNicknames
-		local index
+		local index, multiClass
 
-		this.ReportViewer.getStandings(lap.Nr, tCars, tPositions, tCarNumbers, tCarNames, tDriverFornames, tDriverSurnames, tDriverNicknames)
+		multiClass := this.ReportViewer.getStandings(lap.Nr, tCars, tOPositions, tCPositions, tCarNumbers, tCarNames
+												   , tDriverFornames, tDriverSurnames, tDriverNicknames)
 
 		if cars
 			cars := []
 
-		if positions
-			positions := []
+		if overallPositions
+			overallPositions := []
+
+		if classPositions
+			classPositions := []
 
 		if carNumbers
 			carNumbers := []
@@ -5990,15 +5996,18 @@ class RaceCenter extends ConfigurationItem {
 			driverNicknames := []
 
 		if (tCars.Length() > 0)
-			loop % tPositions.Length()
+			loop % tOPositions.Length()
 			{
-				index := inList(tPositions, A_Index)
+				index := inList(tOPositions, A_Index)
 
 				if cars
 					cars.Push(tCars[index])
 
-				if positions
-					positions.Push(tPositions[index])
+				if overallPositions
+					overallPositions.Push(tOPositions[index])
+
+				if classPositions
+					classPositions.Push(tCPositions[index])
 
 				if carNumbers
 					carNumbers.Push(tCarNumbers[index])
@@ -6015,6 +6024,8 @@ class RaceCenter extends ConfigurationItem {
 				if driverNicknames
 					driverNicknames.Push(tDriverNicknames[index])
 			}
+
+		return multiClass
 	}
 
 	computeDuration(stint) {
@@ -8054,17 +8065,17 @@ class RaceCenter extends ConfigurationItem {
 
 					if (standingsData.Count() > 0) {
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Behind"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Distance"), 2)})
+													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Behind.Car")
+													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Behind.Delta") / 1000, 2)
+													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Behind.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Ahead"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Distance"), 2)})
+													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Ahead.Car")
+													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Ahead.Delta") / 1000, 2)
+													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Ahead.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Distance"), 2)})
+													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Leader.Car")
+													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Leader.Delta") / 1000, 2)
+													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Leader.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Behind"
 													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
 													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
@@ -8550,26 +8561,31 @@ class RaceCenter extends ConfigurationItem {
 		local telemetryDB := this.TelemetryDatabase
 		local html := "<table class=""table-std"">"
 		local cars := true
-		local positions := true
+		local overallPositions := true
+		local classPositions := true
 		local carNumbers := true
 		local carNames := true
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
-		local index, position, lapTime, laps, delta, result
+		local index, position, lapTime, laps, delta, result, multiClass
+
+		multiClass := this.getStandings(lap, cars, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
 
 		html .= ("<tr><th class=""th-std"">" . translate("#") . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
 			   . "<th class=""th-std"">" . translate("Driver") . "</th>"
-			   . "<th class=""th-std"">" . translate("Car") . "</th>"
-			   . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
+			   . "<th class=""th-std"">" . translate("Car") . "</th>")
+
+		if multiClass
+			html .= ("<th class=""th-std"">" . translate("Position") . "</th>")
+
+		html .= ("<th class=""th-std"">" . translate("Lap Time") . "</th>"
 			   . "<th class=""th-std"">" . translate("Laps") . "</th>"
 			   . "<th class=""th-std"">" . translate("Delta") . "</th>"
 			   . "</tr>")
 
-		this.getStandings(lap, cars, positions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
-
-		for index, position in positions {
+		for index, position in overallPositions {
 			lapTime := "-"
 			laps := "-"
 			delta := "-"
@@ -8582,13 +8598,18 @@ class RaceCenter extends ConfigurationItem {
 				delta := Round(result[1].Delta, 1)
 			}
 
-			html .= ("<tr><th class=""th-std"">" . position . "</td>"
-				   . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index]
+			html .= ("<tr><th class=""th-std"">" . position . "</th>")
+			html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index]
 																						 , computeDriverName(driverFornames[index]
 																										   , driverSurnames[index]
 																										   , driverNickNames[index])
-																						 ,  telemetryDB.getCarName(this.Simulator, carNames[index])
-																						 , lapTimeDisplayValue(lapTime), laps, delta)
+																						 , telemetryDB.getCarName(this.Simulator, carNames[index]))
+				   . "</td>")
+
+			if multiClass
+				html .= ("<td class=""td-std"">" . classPositions[index] . "</td>")
+
+			html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", lapTimeDisplayValue(lapTime), laps, delta)
 				   . "</td></tr>")
 		}
 

@@ -42,6 +42,8 @@ global kAsk := "Ask"
 global kAlways := "Always"
 global kNever := "Never"
 
+global kUnknown := false
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -389,6 +391,9 @@ class RaceAssistant extends ConfigurationItem {
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
 	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		local options
+
+		if !kUnknown
+			kUnknown := translate("Unknown")
 
 		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
 		this.iAssistantType := assistantType
@@ -1284,6 +1289,49 @@ class RaceAssistant extends ConfigurationItem {
 		return result
 	}
 
+	getClasses() {
+		local knowledgbase := this.Knowledgebase
+		local classes := {}
+
+		loop % knowledgeBase.getValue("Car.Count")
+		{
+			class := knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
+
+			if !classes.HasKey(class)
+				classes[class] := true
+		}
+
+		return getKeys(classes)
+	}
+
+	getPosition(car := false, forClass := false) {
+		local classes, class, positions, position, candidate
+
+		if !car
+			car := knowledgeBase.getValue("Driver.Car", false)
+
+		if forClass {
+			classes := this.getClasses()
+
+			if (classes.Length() > 1) {
+				class := knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
+				positions := []
+
+				loop % knowledgeBase.getValue("Car.Count")
+					if (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
+						positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
+
+				bubbleSort(positions, "compareClassPositions")
+
+				for position, candidate in positions
+					if (candidate[1] = car)
+						return position
+			}
+		}
+
+		return (car ? knowledgeBase.getValue("Car." . car . ".Position", car) : false)
+	}
+
 	performPitstop(lapNumber := false) {
 		if !lapNumber
 			lapNumber := this.KnowledgeBase.getValue("Lap")
@@ -1423,6 +1471,19 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+compareClassPositions(c1, c2) {
+	local pos1 := c1[2]
+	local pos2 := c2[2]
+
+	if pos1 is not Number
+		pos1 := 999
+
+	if pos2 is not Number
+		pos2 := 999
+
+	return (pos1 > pos2)
+}
 
 matchFragment(words, fragment) {
 	local score := 0

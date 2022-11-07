@@ -28,8 +28,6 @@ global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", 
 global kOk := "Ok"
 global kCancel := "Cancel"
 
-global kUnknown := false
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -82,9 +80,6 @@ class RaceReportViewer extends RaceReportReader {
 		this.iWindow := window
 		this.iChartViewer := chartViewer
 		this.iInfoViewer := infoViewer
-
-		if !kUnknown
-			kUnknown := translate("Unknown")
 	}
 
 	lapTimeDisplayValue(lapTime) {
@@ -1249,19 +1244,6 @@ getPaceJSFunctions() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-comparePositions(c1, c2) {
-	local pos1 := c1[2]
-	local pos2 := c2[2]
-
-	if pos1 is not Number
-		pos1 := 999
-
-	if pos2 is not Number
-		pos2 := 999
-
-	return (pos1 > pos2)
-}
 
 global rangeLapsEdit
 global driverSelectCheck

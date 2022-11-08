@@ -427,7 +427,7 @@ exitProcesses(silent := false, force := false) {
 				return false
 
 		if hasBGProcesses
-			broadcastMessage(remove(kBackgroundApps, ["Simulator Tools"]), "exitApplication")
+			broadcastMessage(remove(kBackgroundApps, "Simulator Tools"), "exitApplication")
 
 		return true
 	}

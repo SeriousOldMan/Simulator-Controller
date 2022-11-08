@@ -626,7 +626,7 @@ class RaceStrategist extends RaceAssistant {
 			return
 
 		speaker := this.getSpeaker()
-		position := Round(knowledgeBase.getValue("Position", 0))
+		position := knowledgeBase.getValue("Position")
 
 		if (position == 0)
 			speaker.speakPhrase("Later")
@@ -759,7 +759,7 @@ class RaceStrategist extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, lap, car, inPit, speaker
 
-		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+		if (this.getPosition(false, true) = 1)
 			speaker.speakPhrase("NoGapToAhead")
 		else {
 			speaker.beginTalk()
@@ -923,8 +923,8 @@ class RaceStrategist extends RaceAssistant {
 
 		car := knowledgeBase.getValue("Driver.Car")
 		lap := knowledgeBase.getValue("Lap", 0)
-		position := Round(knowledgeBase.getValue("Position"))
-		cars := Round(knowledgeBase.getValue("Car.Count"))
+		position := this.getPosition(false, true)
+		cars := knowledgeBase.getValue("Car.Count")
 
 		driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
 

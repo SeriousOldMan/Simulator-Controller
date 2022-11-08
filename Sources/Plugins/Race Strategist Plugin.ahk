@@ -645,7 +645,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
 				laps := getConfigurationValue(raceData, "Laps", "Count", 0)
 
-				if (reader.getClasses().Length() > 1) {
+				if (reader.getClasses(raceData).Length() > 1) {
 					class := getConfigurationValue(raceData, "Cars", "Car." . driver . ".Class", false)
 
 					if class {

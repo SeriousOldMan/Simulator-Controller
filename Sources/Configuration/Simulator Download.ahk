@@ -55,7 +55,6 @@ downloadSimulatorController() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Download
 
-	/*
 	if !A_IsAdmin {
 		options := ""
 
@@ -88,7 +87,6 @@ downloadSimulatorController() {
 
 		ExitApp 0
 	}
-	*/
 
 	cState := GetKeyState("Control", "P")
 	sState := GetKeyState("Shift", "P")

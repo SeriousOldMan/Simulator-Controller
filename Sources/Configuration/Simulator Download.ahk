@@ -132,7 +132,7 @@ downloadSimulatorController() {
 
 			for ignore, url in string2Values(";", download)
 				try {
-					URLDownloadToFile %download%, %A_Temp%\Simulator Controller.zip
+					URLDownloadToFile %url%, %A_Temp%\Simulator Controller.zip
 
 					if ErrorLevel {
 						error := true
@@ -182,9 +182,12 @@ downloadSimulatorController() {
 			currentDirectory := A_WorkingDir
 
 			try {
-				SetWorkingDir %directory%
+				SetWorkingDir %directory%\Binaries
 
-				RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
+				RunWait Powershell -Command Get-ChildItem -Path '.' | Unblock-File, , Hide
+			}
+			catch exception {
+				logError(exception, true)
 			}
 			finally {
 				SetWorkingDir %currentDirectory%

@@ -620,13 +620,13 @@ class RaceStrategist extends RaceAssistant {
 
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, position, positionClass
+		local speaker, overallPosition, classPosition
 
 		if ((this.Session != kSessionRace) && !this.hasEnoughData())
 			return
 
 		speaker := this.getSpeaker()
-		position := knowledgeBase.getValue("Position")
+		position := this.getPosition()
 
 		if (position == 0)
 			speaker.speakPhrase("Later")
@@ -637,12 +637,12 @@ class RaceStrategist extends RaceAssistant {
 
 			try {
 				if (this.getClasses().Length() > 1) {
-					positionClass := this.getPosition(false, true)
+					classPosition := this.getPosition(false, true)
 
-					if (position != positionClass) {
-						speaker.speakPhrase("PositionClass", {positionOverall: position, positionClass: positionClass})
+					if (position != classPosition) {
+						speaker.speakPhrase("PositionClass", {positionOverall: position, positionClass: classPosition})
 
-						position := positionClass
+						position := classPosition
 					}
 					else
 						speaker.speakPhrase("Position", {position: position})
@@ -837,7 +837,7 @@ class RaceStrategist extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
+		if (this.getPosition(false, true) = knowledgeBase.getValue("Car.Count", 0))
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker.beginTalk()
@@ -879,7 +879,7 @@ class RaceStrategist extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 
-		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+		if (this.getPosition(false, true) = 1)
 			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
@@ -1020,7 +1020,6 @@ class RaceStrategist extends RaceAssistant {
 	reviewRace(cars, laps, position, leaderAvgLapTime
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev, multiClass := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local positionClass := false
 		local class := ""
 		local speaker, continuation, only, driver, goodPace
 

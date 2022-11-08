@@ -1306,10 +1306,15 @@ class RaceAssistant extends ConfigurationItem {
 
 	getPosition(car := false, forClass := false) {
 		local knowledgebase := this.Knowledgebase
+		local position := false
 		local class, positions, position, candidate
 
 		if !car
-			car := knowledgeBase.getValue("Driver.Car", false)
+			if forClass
+				car := knowledgeBase.getValue("Driver.Car", false)
+			else
+				return knowledgeBase.getValue("Position")
+
 
 		if forClass
 			if (this.getClasses().Length() > 1) {
@@ -1467,7 +1472,7 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
+;;;                  Internal Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 compareClassPositions(c1, c2) {
@@ -1482,6 +1487,11 @@ compareClassPositions(c1, c2) {
 
 	return (pos1 > pos2)
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
 
 matchFragment(words, fragment) {
 	local score := 0

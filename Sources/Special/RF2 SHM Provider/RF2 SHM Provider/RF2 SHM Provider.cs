@@ -153,7 +153,11 @@ namespace RF2SHMProvider {
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
 
 				int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
-				int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
+
+				if (lapTime == 0)
+					lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
+
+                int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
 				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
 				int sector3Time = lapTime - sector1Time - sector2Time;
 
@@ -253,7 +257,8 @@ namespace RF2SHMProvider {
 
 				Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag > 0) ? "true" : "false");
 				
-				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime) * 1000));
+				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
+																													 : playerScoring.mBestLapTime) * 1000));
 				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 				Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
@@ -375,7 +380,7 @@ namespace RF2SHMProvider {
 				if (playerScoring.mLastLapTime > 0)
 					return (long)Math.Round(GetRemainingTime(ref playerScoring) / (Normalize(playerScoring.mLastLapTime) * 1000)) + 1;
 				else
-					return 0;
+					return 1;
 			}
 		}
 
@@ -385,15 +390,20 @@ namespace RF2SHMProvider {
 
 			if (scoring.mScoringInfo.mEndET > 0.0)
 			{
+				/*
 				long time = (long)((scoring.mScoringInfo.mEndET - (Normalize(playerScoring.mLastLapTime) * playerScoring.mTotalLaps)) * 1000);
 
 				if (time > 0)
 					return time;
 				else
 					return 0;
+				*/
+
+				return (long)Math.Max(0, scoring.mScoringInfo.mEndET - scoring.mScoringInfo.mCurrentET);
 			}
 			else
-				return (long)(GetRemainingLaps(ref playerScoring) * Normalize(playerScoring.mLastLapTime) * 1000);
+				return (long)(GetRemainingLaps(ref playerScoring) *
+							  Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime : playerScoring.mBestLapTime) * 1000);
 		}
 
 		private static string GetWeather(double cloudLevel, double rainLevel) {

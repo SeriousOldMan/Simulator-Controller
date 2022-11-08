@@ -388,7 +388,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getAllDrivers(simulator, names := false) {
-		local sessionDB, ids, index, row, ignore, id
+		local sessionDB, ids, index, row, ignore, id, result, candidate
 
 		if simulator {
 			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
@@ -402,15 +402,23 @@ class SessionDatabase extends ConfigurationItem {
 				names := []
 
 				for ignore, id in ids
-					names.Push(this.getDriverNames(simulator, id))
+					names.Push(this.getDriverNames(simulator, id, sessionDB))
 
 				return names
 			}
 			else
 				return ids
 		}
-		else
-			return []
+		else {
+			result := []
+
+			for ignore, simulator in this.getSimulators()
+				for ignore, candidate in this.getAllDrivers(simulator, names)
+					if !inList(result, candidate)
+						result.Push(candidate)
+
+			return result
+		}
 	}
 
 	getUserName() {
@@ -444,8 +452,8 @@ class SessionDatabase extends ConfigurationItem {
 		return this.getDriverNames(simulator, id)[1]
 	}
 
-	getDriverIDs(simulator, name) {
-		local sessionDB, forName, surName, nickName, ids, ignore, entry
+	getDriverIDs(simulator, name, sessionDB := false) {
+		local forName, surName, nickName, ids, ignore, entry
 
 		if (simulator && name) {
 			forName := false
@@ -454,7 +462,8 @@ class SessionDatabase extends ConfigurationItem {
 
 			parseDriverName(name, forName, surName, nickName)
 
-			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+			if !sessionDB
+				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			ids := []
 
@@ -467,11 +476,12 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 	}
 
-	getDriverNames(simulator, id) {
-		local sessionDB, drivers, ignore, driver
+	getDriverNames(simulator, id, sessionDB := false) {
+		local drivers, ignore, driver
 
 		if (simulator && id) {
-			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+			if !sessionDB
+				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			drivers := []
 
@@ -1492,7 +1502,7 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 						}
 					}
 
-					for ignore, driver in db.query("Drivers", {Where: force ? {Driver: sessionDB.ID} : {Synchronized: kNull, Driver: sessionDB.ID} }) {
+					for ignore, driver in db.query("Drivers", {Where: force ? {ID: sessionDB.ID} : {Synchronized: kNull, ID: sessionDB.ID} }) {
 						if (driver.Identifier = kNull)
 							driver.Identifier := createGUID()
 

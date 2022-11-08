@@ -229,7 +229,9 @@ downloadUserDatabases(directory) {
 		deleteFile(directory . fileName)
 
 		if FileExist(directory . "Shared Database")
-			FileMoveDir %directory%DBase, %directory%%idName%, R
+			FileMoveDir %directory%Shared Database, %directory%%idName%, R
+		if FileExist(directory . "Community")
+			FileMoveDir %directory%Community, %directory%%idName%, R
 		else if FileExist(directory . "DBase")
 			FileMoveDir %directory%DBase, %directory%%idName%, R
 		else if FileExist(directory . "Dabase")

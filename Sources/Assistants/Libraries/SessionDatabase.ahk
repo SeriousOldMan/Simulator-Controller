@@ -1271,7 +1271,7 @@ class SessionDatabase extends ConfigurationItem {
 				setConfigurationValue(configuration, "Database Synchronizer", "Information"
 									, translate("Message: ") . translate("Waiting for next synchronization..."))
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Waiting")
+				setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Waiting")
 			}
 		}
 		else if (info = "Synchronize") {
@@ -1385,15 +1385,16 @@ updateSynchronizationState(sessionDB, rebuild) {
 	sessionDB.writeDatabaseState("Synchronize", rebuild, synchronizeDatabase("Counter"))
 }
 
-synchronizeDatabase(rebuild := false) {
+synchronizeDatabase(command := false) {
 	local sessionDB := new SessionDatabase()
 	local connector := sessionDB.Connector
+	local rebuild := (command = "Rebuild")
 	local timestamp, simulators, ignore, synchronizer, synchronizeTask
 
 	static stateTask := false
 	static counter := 0
 
-	if (rebuild = "Counter")
+	if (command = "Counter")
 		return counter
 
 	if !stateTask {
@@ -1402,11 +1403,22 @@ synchronizeDatabase(rebuild := false) {
 		stateTask.start()
 	}
 
+	if (command = "Stop") {
+		stateTask.stop()
+
+		return
+	}
+	else if (command = "Start") {
+		stateTask.start()
+
+		return
+	}
+
 	sessionDB.UseCommunity := false
 
 	if ((sessionDB.ID = sessionDB.DatabaseID) && connector) {
 		try {
-			stateTask.stop()
+			stateTask.pause()
 
 			counter := 0
 
@@ -1427,7 +1439,7 @@ synchronizeDatabase(rebuild := false) {
 			finally {
 				synchronizeTask.stop()
 
-				Task.startTask(ObjBindMethod(stateTask, "start"), 10000)
+				Task.startTask(ObjBindMethod(stateTask, "resume"), 10000)
 			}
 		}
 		catch exception {

@@ -266,7 +266,7 @@ requestShareSessionDatabaseConsent() {
 				setConfigurationValue(newConsent, "General", "ID", id)
 				setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 
-				if FileExist(kTranslationsDirectory . "Consent.ini")
+				if (getFileNames("Consent.*", kTranslationsDirectory).Length() > 0)
 					result := consentDialog(id, consent)
 				else {
 					result := {}

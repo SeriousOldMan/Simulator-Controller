@@ -49,7 +49,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	local sessionDB := new SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
-	local upload, now, simulator, car, track, distFile, directoryName
+	local targetDB := new TyresDatabase()
+	local upload, now, simulator, car, track, distFile, directoryName, configuration
 	local directory, sourceDB, targetDB, ignore, row, compound, compoundColor
 
 	if FileExist(uploadTimeStamp) {
@@ -63,7 +64,23 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 			return
 	}
 
+	targetDB.DatabaseDirectory := (kTempDirectory . "Shared Database\")
+
 	try {
+		configuration := newConfiguration()
+
+		setConfigurationValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
+		setConfigurationValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
+
+		setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+							, translate("Message: ") . translate("Uploading community database..."))
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
+
+		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+
 		deleteDirectory(kTempDirectory . "Shared Database")
 
 		loop Files, %sessionDBPath%User\*.*, D									; Simulator
@@ -71,7 +88,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 			simulator := A_LoopFileName
 
 			if (simulator != "Unknown") {
-				FileCreateDir %kTempDirectory%Shared Database\%simulator%
+				FileCreateDir %kTempDirectory%Shared Database\Community\%simulator%
 
 				loop Files, %sessionDBPath%User\%simulator%\*.*, D					; Car
 				{
@@ -83,7 +100,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 						deleteDirectory(directoryName)
 					}
 					else {
-						FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%
+						FileCreateDir %kTempDirectory%Shared Database\Community\%simulator%\%car%
 
 						loop Files, %sessionDBPath%User\%simulator%\%car%\*.*, D			; Track
 						{
@@ -95,14 +112,13 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 								deleteDirectory(directoryName)
 							}
 							else {
-								FileCreateDir %kTempDirectory%Shared Database\%simulator%\%car%\%track%
+								FileCreateDir %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%
 
 								if uploadPressures {
 									directory := (sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\")
 
 									if FileExist(directory . "Tyres.Pressures.Distribution.CSV") {
 										sourceDB := new Database(directory, kTyresSchemas)
-										targetDB := new Database(kTempDirectory . "Shared Database\" . simulator . "\" . car . "\" . track . "\", kTyresSchema)
 
 										for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: sessionDB.ID} }) {
 											compound := row.Compound
@@ -118,6 +134,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 																  , row["Temperature.Air"], row["Temperature.Track"]
 																  , compound, compoundColor, row.Type, row.Tyre
 																  , row.Pressure, row.Count, false, true, "Community", kNull)
+
+											Sleep 1
 										}
 
 										targetDB.flush()
@@ -126,7 +144,10 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 
 								if uploadSetups {
 									try {
-										FileCopyDir %sessionDBPath%User\%simulator%\%car%\%track%\Car Setups, %kTempDirectory%Shared Database\%simulator%\%car%\%track%\Car Setups
+										directory = %sessionDBPath%User\%simulator%\%car%\%track%\Car Setups
+
+										if FileExist(directory)
+											FileCopyDir %directory%, %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Car Setups
 									}
 									catch exception {
 										logError(exception)
@@ -139,7 +160,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 			}
 		}
 
-		RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%Shared Database' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Shared Database\Database.%id%.zip', , Hide
+		RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%Shared Database\Community' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Shared Database\Database.%id%.zip', , Hide
 
 		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "simulator-controller/database-uploads/Database." . id . ".zip")
 
@@ -148,25 +169,25 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 
 		FileAppend %A_Now%, %sessionDBPath%UPLOAD
 
+		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+							, translate("Message: ") . translate("Synchronization finished..."))
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
+
+		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+
 		logMessage(kLogInfo, translate("Database successfully uploaded"))
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
-
-		showMessage(translate("Error while uploading database - please check your internet connection...")
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
-
-	Task.CurrentTask.Sleep := (24 * 60 * 60 * 1000)
-
-	return Task.CurrentTask
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 	local sessionDB := new SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
-	local download, now, ignore, fileName, type, databaseDirectory
+	local download, now, ignore, fileName, type, databaseDirectory, configuration
 
 	if FileExist(downloadTimeStamp) {
 		FileReadLine download, %downloadTimeStamp%, 1
@@ -186,6 +207,20 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 		catch exception {
 			logError(exception)
 		}
+
+		configuration := newConfiguration()
+
+		setConfigurationValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
+		setConfigurationValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
+
+		setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+							, translate("Message: ") . translate("Downloading community database..."))
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
+
+		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
 
 		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
 			SplitPath fileName, , , , databaseDirectory
@@ -218,13 +253,31 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 
 		FileAppend %A_Now%, %sessionDBPath%DOWNLOAD
 
+		setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+							, translate("Message: ") . translate("Synchronization finished..."))
+
+		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
+
+		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+
 		logMessage(kLogInfo, translate("Database successfully downloaded"))
 	}
 	catch exception {
 		logMessage(kLogCritical, translate("Error while downloading database - please check your internet connection..."))
+	}
+}
 
-		showMessage(translate("Error while downloading database - please check your internet connection...")
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+synchronizeCommunityDatabase(id, usePressures, useSetups) {
+	synchronizeDatabase("Stop")
+
+	try {
+		uploadSessionDatabase(id, usePressures, useSetups)
+		downloadSessionDatabase(id, usePressures, useSetups)
+	}
+	finally {
+		synchronizeDatabase("Start")
 	}
 
 	Task.CurrentTask.Sleep := (24 * 60 * 60 * 1000)
@@ -260,8 +313,7 @@ updateSessionDatabase() {
 	if id {
 		id := A_Args[id + 1]
 
-		new PeriodicTask(Func("uploadSessionDatabase").Bind(id, usePressures, useSetups)).start()
-		new PeriodicTask(Func("downloadSessionDatabase").Bind(id, usePressures, useSetups)).start()
+		new PeriodicTask(Func("synchronizeCommunityDatabase").Bind(id, usePressures, useSetups), 10000, kLowPriority).start()
 	}
 
 	minutes := inList(A_Args, "-Synchronize")

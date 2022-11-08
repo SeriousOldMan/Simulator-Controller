@@ -2462,7 +2462,7 @@ class RaceSpotter extends RaceAssistant {
 
 					if (driver && position)
 						speaker.speakPhrase("GreetingPosition"
-										  , {position: position, overall: (this.getClasses().Length() > 1) ? speaker.Fragments["Overall"] : ""})
+										  , {position: position, overall: (this.getClasses(data).Length() > 1) ? fragments["Overall"] : ""})
 
 					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
 						length := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)

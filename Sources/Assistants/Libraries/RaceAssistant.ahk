@@ -1289,16 +1289,29 @@ class RaceAssistant extends ConfigurationItem {
 		return result
 	}
 
-	getClasses() {
-		local knowledgebase := this.Knowledgebase
+	getClasses(data := false) {
+		local knowledgebase
 		local classes := {}
 
-		loop % knowledgeBase.getValue("Car.Count")
-		{
-			class := knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
+		if data {
+			loop % getConfigurationValue(data, "Position Data", "Car.Count")
+			{
+				class := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)
 
-			if !classes.HasKey(class)
-				classes[class] := true
+				if !classes.HasKey(class)
+					classes[class] := true
+			}
+		}
+		else {
+			knowledgeBase := this.Knowledgebase
+
+			loop % knowledgeBase.getValue("Car.Count")
+			{
+				class := knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
+
+				if !classes.HasKey(class)
+					classes[class] := true
+			}
 		}
 
 		return getKeys(classes)

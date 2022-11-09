@@ -18,7 +18,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Performance"]
+global kRaceReports := ["Overview", "Car", "Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace"]
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -15,6 +15,7 @@ carID(?car, ?id) <= Get(Car, ?car, ID, ?id), !
 carID(?car, ?car)
 
 carClass(?car, ?class) <= Get(Car, ?car, Class, ?class)
+carClass(?car, Unknown)
 
 carDriverForname(?car, ?forname) <= Get(Car, ?car, Driver.Forname, ?forname)
 carDriverSurname(?car, ?surname) <= Get(Car, ?car, Driver.Surname, ?surname)

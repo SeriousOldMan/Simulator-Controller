@@ -1017,19 +1017,17 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 
-	reviewRace(cars, laps, position, leaderAvgLapTime
-			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev, multiClass := false) {
+	reviewRace(multiClass, cars, laps, position, leaderAvgLapTime
+			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
-		local class := ""
-		local speaker, continuation, only, driver, goodPace
+		local class, speaker, continuation, only, driver, goodPace
 
 		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
 			speaker := this.getSpeaker()
 
 			speaker.beginTalk()
 
-			if multiClass
-				class := speaker.Fragments["Class"]
+			class := (multiClass ? speaker.Fragments["Class"] : "")
 
 			try {
 				if (position <= (cars / 5))

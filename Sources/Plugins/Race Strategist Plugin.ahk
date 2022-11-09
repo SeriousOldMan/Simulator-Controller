@@ -715,12 +715,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				reader.getDriverPace(raceData, times, driver, driverMinLapTime, driverMaxLapTime, driverAvgLapTime, driverLapTimeStdDev)
 
-				this.RaceAssistant["Ghost"].reviewRace(cars, laps, position, leaderAvgLapTime
-													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev
-													 , multiClass)
+				this.RaceAssistant["Ghost"].reviewRace(multiclass, cars, laps, position, leaderAvgLapTime
+													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
 			}
 			catch exception {
-				this.RaceAssistant["Ghost"].reviewRace(0, 0, 0, 0, 0, 0, 0, 0, multiClass)
+				logError(exception)
+
+				this.RaceAssistant["Ghost"].reviewRace(false, 0, 0, 0, 0, 0, 0, 0, 0)
 			}
 		}
 		finally {

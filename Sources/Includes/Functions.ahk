@@ -109,15 +109,16 @@ consentDialog(id, consent := false) {
 
 	texts := false
 
-	for language, ignore in availableLanguages()
-		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
-			if FileExist(rootDirectory . "Consent." . language)
-				if !texts
-					texts := readConfiguration(rootDirectory . "Consent." . language)
-				else
-					for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
-						for key, value in keyValues
-							setConfigurationValue(texts, section, key, value)
+	language := getLanguage()
+
+	for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
+		if FileExist(rootDirectory . "Consent." . language)
+			if !texts
+				texts := readConfiguration(rootDirectory . "Consent." . language)
+			else
+				for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
+					for key, value in keyValues
+						setConfigurationValue(texts, section, key, value)
 
 	if !texts
 		texts := readConfiguration(kTranslationsDirectory . "Consent.en")

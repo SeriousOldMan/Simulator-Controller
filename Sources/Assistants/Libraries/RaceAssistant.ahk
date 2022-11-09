@@ -316,6 +316,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	MultiClass[data := false] {
+		Get {
+			return (this.getClasses(data).Length() > 1)
+		}
+	}
+
 	SessionDuration[] {
 		Get {
 			return this.iSessionDuration
@@ -1289,50 +1295,125 @@ class RaceAssistant extends ConfigurationItem {
 		return result
 	}
 
-	getClasses() {
+	getClasses(data := false) {
 		local knowledgebase := this.Knowledgebase
-		local classes := {}
+		local class
 
-		loop % knowledgeBase.getValue("Car.Count")
-		{
-			class := knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)
+		static classes := false
+		static lastKnowledgeBase := false
 
-			if !classes.HasKey(class)
-				classes[class] := true
+		if (data || !lastKnowledgeBase || (lastKnowledgebase != knowledgeBase) || !classes) {
+			classes := {}
+
+			loop % (data ? getConfigurationValue(data, "Position Data", "Car.Count") : knowledgeBase.getValue("Car.Count"))
+			{
+				class := (data ? getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+							   : knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
+
+				if !classes.HasKey(class)
+					classes[class] := true
+			}
+
+			lastKnowledgeBase := (data ? false : knowledgeBase)
+
+			classes := getKeys(classes)
 		}
 
-		return getKeys(classes)
+		return classes
 	}
 
-	getPosition(car := false, forClass := false) {
-		local knowledgebase := this.Knowledgebase
-		local position := false
-		local class, positions, position, candidate
-
+	getClass(car := false, data := false) {
 		if !car
-			if forClass
-				car := knowledgeBase.getValue("Driver.Car", false)
-			else
-				return knowledgeBase.getValue("Position")
+			car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") ? this.KnowledgeBase("Driver.Car", false))
 
+		if data
+			return getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+		else
+			return this.KnowledgeBase.getValue("Car." . car . ".Class", kUnknown)
+	}
 
-		if forClass
-			if (this.getClasses().Length() > 1) {
-				class := knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
+	getGrid(class := "Overall", data := false, sorted := false) {
+		local knowledgebase := this.Knowledgebase
+		local positions, ignore, position
+
+		static classGrid := false
+		static lastClass := false
+		static lastKnowledgeBase := false
+
+		if (!class || (class = "Class"))
+			class := this.getClass()
+		else if (class = "Overall")
+			class := false
+
+		if (data || !lastKnowledgeBase || sorted || (lastKnowledgebase != knowledgeBase) || !class || (lastClass != class)) {
+			classGrid := []
+
+			if sorted {
 				positions := []
 
-				loop % knowledgeBase.getValue("Car.Count")
-					if (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
-						positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
+				if data
+					loop % getConfigurationValue(data, "Position Data", "Car.Count")
+						if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+							positions.Push(Array(A_Index, getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")))
+				else
+					loop % knowledgeBase.getValue("Car.Count")
+						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
+							positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
 
 				bubbleSort(positions, "compareClassPositions")
 
-				for position, candidate in positions
-					if (candidate[1] = car)
-						return position
+				for ignore, position in positions
+					classGrid.Push(position[1])
+			}
+			else {
+				if data
+					loop % getConfigurationValue(data, "Position Data", "Car.Count")
+						if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+							classGrid.Push(A_Index)
+				else
+					loop % knowledgeBase.getValue("Car.Count")
+						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
+							classGrid.Push(A_Index)
 			}
 
-		return (car ? knowledgeBase.getValue("Car." . car . ".Position", car) : false)
+			if (data || !class) {
+				lastKnowledgeBase := false
+				lastClass := false
+			}
+			else {
+				lastKnowledgeBase := knowledgeBase
+				lastClass := class
+			}
+		}
+
+		return classGrid
+	}
+
+	getPosition(car := false, type := "Overall", data := false) {
+		local knowledgebase := this.Knowledgebase
+		local position, candidate
+
+		if !car
+			if (type = "Overall") {
+				if data
+					return getConfigurationValue(data, "Position Data", "Car." . getConfigurationValue(data, "Position Data", "Driver.Car") . ".Position", false)
+				else
+					return knowledgeBase.getValue("Position")
+			}
+			else
+				car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") ? knowledgeBase.getValue("Driver.Car", false))
+
+		if (type != "Overall")
+			for position, candidate in this.getGrid(data ? getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+														 : knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
+												  , data, true)
+				if (candidate = car)
+					return position
+
+		if data
+			return getConfigurationValue(data, "Position Data", "Car." . car . ".Position", false)
+		else
+			return (car ? knowledgeBase.getValue("Car." . car . ".Position", car) : false)
 	}
 
 	performPitstop(lapNumber := false) {

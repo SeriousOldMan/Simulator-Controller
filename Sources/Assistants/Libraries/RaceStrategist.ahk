@@ -636,8 +636,8 @@ class RaceStrategist extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				if (this.getClasses().Length() > 1) {
-					classPosition := this.getPosition(false, true)
+				if this.MultiClass {
+					classPosition := this.getPosition(false, "Class")
 
 					if (position != classPosition) {
 						speaker.speakPhrase("PositionClass", {positionOverall: position, positionClass: classPosition})
@@ -759,7 +759,7 @@ class RaceStrategist extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, lap, car, inPit, speaker
 
-		if (this.getPosition(false, true) = 1)
+		if (this.getPosition(false, "Class") = 1)
 			speaker.speakPhrase("NoGapToAhead")
 		else {
 			speaker.beginTalk()
@@ -837,7 +837,7 @@ class RaceStrategist extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (this.getPosition(false, true) = knowledgeBase.getValue("Car.Count", 0))
+		if (this.getPosition(false, "Class") = this.getGrid("Class").Length())
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker.beginTalk()
@@ -879,7 +879,7 @@ class RaceStrategist extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 
-		if (this.getPosition(false, true) = 1)
+		if (this.getPosition(false, "Class") = 1)
 			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
@@ -923,7 +923,7 @@ class RaceStrategist extends RaceAssistant {
 
 		car := knowledgeBase.getValue("Driver.Car")
 		lap := knowledgeBase.getValue("Lap", 0)
-		position := this.getPosition(false, true)
+		position := this.getPosition(false, "Class")
 		cars := knowledgeBase.getValue("Car.Count")
 
 		driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
@@ -1179,7 +1179,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	prepareSession(settings, data) {
-		local raceData, carCount,  carNr, carID
+		local raceData, carCount,  carNr
 
 		this.updateSessionValues({RaceInfo: false})
 
@@ -1194,14 +1194,17 @@ class RaceStrategist extends RaceAssistant {
 
 		loop %carCount% {
 			carNr := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr")
-			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 
 			if InStr(carNr, """")
 				carNr := StrReplace(carNr, """", "")
 
 			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", carNr)
-			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", carID)
-			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID"
+										  , getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class"
+										  , getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown))
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position"
+										  , getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
 		}
 
 		this.updateRaceInfo(raceData)
@@ -1492,7 +1495,7 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({StrategyReported: lapNumber})
 		}
 
-		if (this.getClasses() <= 1) {
+		if !this.MultiClass {
 			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
 			if ((gapAhead != kUndefined) && (gapAhead != 0)) {
@@ -2445,7 +2448,7 @@ class RaceStrategist extends RaceAssistant {
 	updateRaceInfo(raceData) {
 		local raceInfo := {}
 		local grid := []
-		local class := []
+		local classes := []
 		local carNr, carID, carClass, carPosition
 
 		raceInfo["Driver"] := getConfigurationValue(raceData, "Cars", "Driver")
@@ -2459,14 +2462,14 @@ class RaceStrategist extends RaceAssistant {
 			carPosition := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position")
 
 			grid.Push(carPosition)
-			class.Push(carClass)
+			classes.Push(carClass)
 
 			raceInfo["#" . carNr] := A_Index
 			raceInfo["!" . carID] := A_Index
 		}
 
 		raceInfo["Grid"] := grid
-		raceInfo["Class"] := class
+		raceInfo["Classes"] := classes
 
 		this.updateSessionValues({RaceInfo: raceInfo})
 	}

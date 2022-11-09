@@ -1816,6 +1816,74 @@ class RaceCenter extends ConfigurationItem {
 		return driver
 	}
 
+	getClasses(data) {
+		local classes := {}
+
+		loop % getConfigurationValue(data, "Position Data", "Car.Count")
+		{
+			class := getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+
+			if !classes.HasKey(class)
+				classes[class] := true
+		}
+
+		return getKeys(classes)
+	}
+
+	getClass(data, car := false) {
+		if !car
+			car := getConfigurationValue(data, "Position Data", "Driver.Car")
+
+		return getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+	}
+
+	getGrid(data, class := "Overall", sorted := false) {
+		local classGrid := []
+		local positions, ignore, position
+
+		if (!class || (class = "Class"))
+			class := this.getClass(data)
+		else if (class = "Overall")
+			class := false
+
+		if sorted {
+			positions := []
+
+			loop % getConfigurationValue(data, "Position Data", "Car.Count")
+				if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+					positions.Push(Array(A_Index, getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")))
+
+			bubbleSort(positions, "compareClassPositions")
+
+			for ignore, position in positions
+				classGrid.Push(position[1])
+		}
+		else
+			loop % getConfigurationValue(data, "Position Data", "Car.Count")
+				if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+					classGrid.Push(A_Index)
+
+		return classGrid
+	}
+
+	getPosition(data, type := "Overall", car := false) {
+		local knowledgebase := this.Knowledgebase
+		local position, candidate
+
+		if !car
+			if (type = "Overall")
+				return getConfigurationValue(data, "Position Data", "Car." . getConfigurationValue(data, "Position Data", "Driver.Car") . ".Position", false)
+			else
+				car := getConfigurationValue(data, "Position Data", "Driver.Car")
+
+		if (type != "Overall")
+			for position, candidate in this.getGrid(data, getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown), true)
+				if (candidate = car)
+					return position
+
+		return getConfigurationValue(data, "Position Data", "Car." . car . ".Position", false)
+	}
+
 	updateState() {
 		local window := this.Window
 		local currentListView, selected, stint
@@ -7268,7 +7336,8 @@ class RaceCenter extends ConfigurationItem {
 		local hasBehind := false
 		local sessionDB, trackMap, fileName, width, height, scale, offsetX, offsetY, marginX, marginY
 		local imgWidth, imgHeight, imgScale, telemetry, positions, token, bitmap, graphics, brushCar, brushGray
-		local carIndices, driverIndex, driverID, driverPosition, leaderBrush, aheadBrush, behindBrush
+		local carIndices, driverIndex, driverID, driverOverallPosition, driverClassPosition
+		local leaderBrush, aheadBrush, behindBrush
 		local r, coordinates, carID, carIndex, carPosition, x, y, brush
 		local imageAreaWidth, hWidth, tableCSS, script
 
@@ -7325,7 +7394,8 @@ class RaceCenter extends ConfigurationItem {
 
 							driverIndex := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
 							driverID := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".ID", driverIndex)
-							driverPosition := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".Position", 0)
+							driverOverallPosition := this.getPosition(positions)
+							driverClassPosition := this.getPosition(positions, "Class")
 
 							leaderBrush := Gdip_BrushCreateSolid(0xff0000ff)
 							aheadBrush := Gdip_BrushCreateSolid(0xff006400)
@@ -7334,7 +7404,7 @@ class RaceCenter extends ConfigurationItem {
 						else {
 							driverIndex := false
 							driverID := false
-							driverPosition := false
+							driverOverallPosition := false
 						}
 
 						r := Round(15 / (imgScale * 3))
@@ -7357,34 +7427,29 @@ class RaceCenter extends ConfigurationItem {
 
 								brush := brushGray
 
-								if (!hasLeader && positions && driverPosition && carIndex) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
+								if ((!hasLeader || !hasAhead || !hasBehind) && positions && driverClassPosition && carIndex) {
+									carPosition := this.getPosition(positions, "Class", carIndex)
 
-									if ((carPosition == 1) && (driverPosition != 1)) {
-										brush := leaderBrush
+									if !hasLeader
+										if ((carPosition == 1) && (driverClassPosition != 1)) {
+											brush := leaderBrush
 
-										hasLeader := true
-									}
-								}
+											hasLeader := true
+										}
 
-								if (!hasAhead && positions && driverPosition && carIndex) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
+									if !hasAhead
+										if ((carPosition + 1) = driverClassPosition) {
+											brush := aheadBrush
 
-									if ((carPosition + 1) = driverPosition) {
-										brush := aheadBrush
+											hasAhead := true
+										}
 
-										hasAhead := true
-									}
-								}
+									if !hasBehind
+										if ((carPosition - 1) = driverClassPosition) {
+											brush := behindBrush
 
-								if (!hasBehind && positions && driverPosition && carIndex) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
-
-									if ((carPosition - 1) = driverPosition) {
-										brush := behindBrush
-
-										hasBehind := true
-									}
+											hasBehind := true
+										}
 								}
 
 								Gdip_FillEllipse(graphics, brush, x - r, y - r, r * 2, r * 2)
@@ -7412,7 +7477,7 @@ class RaceCenter extends ConfigurationItem {
 						Gdip_DeleteBrush(brushGray)
 						Gdip_DeleteBrush(brushCar)
 
-						if driverPosition {
+						if driverOverallPosition {
 							Gdip_DeleteBrush(leaderBrush)
 							Gdip_DeleteBrush(aheadBrush)
 							Gdip_DeleteBrush(behindBrush)
@@ -8065,17 +8130,32 @@ class RaceCenter extends ConfigurationItem {
 
 					if (standingsData.Count() > 0) {
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Behind"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Behind.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Behind.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Behind.Distance"), 2)})
+													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																						   , "Position.Standings.Class.Behind.Car", "Position.Standings.Behind.Car")
+													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																								   , "Position.Standings.Class.Behind.Delta"
+																								   , "Position.Standings.Behind.Delta") / 1000, 2)
+													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									  , "Position.Standings.Class.Behind.Distance"
+																									  , "Position.Standings.Behind.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Ahead"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Ahead.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Ahead.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Ahead.Distance"), 2)})
+													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																						   , "Position.Standings.Class.Ahead.Car", "Position.Standings.Ahead.Car")
+													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																								   , "Position.Standings.Class.Ahead.Delta"
+																								   , "Position.Standings.Ahead.Delta") / 1000, 2)
+													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									  , "Position.Standings.Class.Ahead.Distance"
+																									  , "Position.Standings.Ahead.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Leader.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Leader.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Class.Leader.Distance"), 2)})
+													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																						   , "Position.Standings.Class.Leader.Car", "Position.Standings.Leader.Car")
+													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																								   , "Position.Standings.Class.Leader.Delta"
+																								   , "Position.Standings.Leader.Delta") / 1000, 2)
+													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									  , "Position.Standings.Class.Leader.Distance"
+																									  , "Position.Standings.Leader.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Behind"
 													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
 													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
@@ -9714,6 +9794,28 @@ class RaceCenter extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+getDeprecatedConfigurationValue(data, section, newKey, oldKey, default := false) {
+	local value := getConfigurationValue(data, section, newKey, kUndefined)
+
+	if (value != kUndefined)
+		return value
+	else
+		return getConfigurationValue(data, section, oldKey, default)
+}
+
+compareClassPositions(c1, c2) {
+	local pos1 := c1[2]
+	local pos2 := c2[2]
+
+	if pos1 is not Number
+		pos1 := 999
+
+	if pos2 is not Number
+		pos2 := 999
+
+	return (pos1 > pos2)
+}
 
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	local x, y, row, driver, owner, ignore, name, connection

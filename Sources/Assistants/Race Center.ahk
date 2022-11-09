@@ -7336,9 +7336,9 @@ class RaceCenter extends ConfigurationItem {
 		local hasBehind := false
 		local sessionDB, trackMap, fileName, width, height, scale, offsetX, offsetY, marginX, marginY
 		local imgWidth, imgHeight, imgScale, telemetry, positions, token, bitmap, graphics, brushCar, brushGray
-		local carIndices, driverIndex, driverID, driverOverallPosition, driverClassPosition
+		local carIndices, driverIndex, driverID, driverOverallPosition, driverClassPosition, driverClass
 		local leaderBrush, aheadBrush, behindBrush
-		local r, coordinates, carID, carIndex, carPosition, x, y, brush
+		local r, coordinates, carID, carIndex, carPosition, carClass, x, y, brush
 		local imageAreaWidth, hWidth, tableCSS, script
 
 		this.initializeReport()
@@ -7396,6 +7396,7 @@ class RaceCenter extends ConfigurationItem {
 							driverID := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".ID", driverIndex)
 							driverOverallPosition := this.getPosition(positions)
 							driverClassPosition := this.getPosition(positions, "Class")
+							driverClass := this.getClass(positions)
 
 							leaderBrush := Gdip_BrushCreateSolid(0xff0000ff)
 							aheadBrush := Gdip_BrushCreateSolid(0xff006400)
@@ -7428,28 +7429,29 @@ class RaceCenter extends ConfigurationItem {
 								brush := brushGray
 
 								if ((!hasLeader || !hasAhead || !hasBehind) && positions && driverClassPosition && carIndex) {
-									carPosition := this.getPosition(positions, "Class", carIndex)
+									carClass := this.getClass(positions, carIndex)
 
-									if !hasLeader
-										if ((carPosition == 1) && (driverClassPosition != 1)) {
+									if (driverClass = carClass) {
+										carPosition := this.getPosition(positions, "Class", carIndex)
+
+										if (!hasLeader && (carPosition == 1) && (driverClassPosition != 1)) {
 											brush := leaderBrush
 
 											hasLeader := true
 										}
 
-									if !hasAhead
-										if ((carPosition + 1) = driverClassPosition) {
+										if (!hasAhead && (carPosition + 1) = driverClassPosition) {
 											brush := aheadBrush
 
 											hasAhead := true
 										}
 
-									if !hasBehind
-										if ((carPosition - 1) = driverClassPosition) {
+										if (!hasBehind && (carPosition - 1) = driverClassPosition) {
 											brush := behindBrush
 
 											hasBehind := true
 										}
+									}
 								}
 
 								Gdip_FillEllipse(graphics, brush, x - r, y - r, r * 2, r * 2)

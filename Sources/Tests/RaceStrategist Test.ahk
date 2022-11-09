@@ -128,23 +128,23 @@ class BasicReporting extends Assert {
 
 class GapReporting extends Assert {
 	checkGap(knowledgeBase, type, behindCar, behindDelta, frontCar, frontDelta, leaderCar := false, leaderGap := false) {
-		if (behindCar != knowledgeBase.getValue("Position." . type . ".Behind.Car", false))
+		if (behindCar != knowledgeBase.getValue("Position." . type . ".Class.Behind.Car", false))
 			return false
 
-		if (behindDelta != Round(knowledgeBase.getValue("Position." . type . ".Behind.Delta", false)))
+		if (behindDelta != Round(knowledgeBase.getValue("Position." . type . ".Class.Behind.Delta", false)))
 			return false
 
-		if (frontCar != knowledgeBase.getValue("Position." . type . ".Ahead.Car", knowledgeBase.getValue("Position." . type . ".Front.Car", false)))
+		if (frontCar != knowledgeBase.getValue("Position." . type . ".Class.Ahead.Car", knowledgeBase.getValue("Position." . type . ".Front.Car", false)))
 			return false
 
-		if (frontDelta != Round(knowledgeBase.getValue("Position." . type . ".Ahead.Delta", knowledgeBase.getValue("Position." . type . ".Front.Delta", false))))
+		if (frontDelta != Round(knowledgeBase.getValue("Position." . type . ".Class.Ahead.Delta", knowledgeBase.getValue("Position." . type . ".Front.Delta", false))))
 			return false
 
 		if ((type = "Standings") && leaderCar) {
-			if (leaderCar != knowledgeBase.getValue("Position." . type . ".Leader.Car", false))
+			if (leaderCar != knowledgeBase.getValue("Position." . type . ".Class.Leader.Car", false))
 				return false
 
-			if (leaderGap != Round(knowledgeBase.getValue("Position." . type . ".Leader.Delta", false)))
+			if (leaderGap != Round(knowledgeBase.getValue("Position." . type . ".Class.Leader.Delta", false)))
 				return false
 		}
 

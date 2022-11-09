@@ -1,9 +1,9 @@
 [Development]
 Version=4.4.7.0-dev
 Target=4.4.7.0-release
-Date=11/04/2022
+Date=11/09/2022
 Download=
-Changes=New remarks field for car setups in "Race Center", Fixed driver statistics regression in "Race Center"
+Changes=New remarks field for car setups in "Race Center", Fixed driver statistics regression in "Race Center", Full support for multi-class races in all tools of Simulator Controller
 [Release]
 Version=4.4.6.0-release
 Date=11/04/2022

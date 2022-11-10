@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.4.7.0-dev](https://www.dropbox.com/s/amxxfehb2pm5tp1/Simulator%20Controller%204.4.7.0-dev.zip?dl=1) (Early build for 4.4.7. New features: New notes field for car setups in "Race Center", Fixed driver statistics regression in "Race Center", Full support for multi-class races in all tools of Simulator Controller, "Server Administration" remembers server URL and login name.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-447) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

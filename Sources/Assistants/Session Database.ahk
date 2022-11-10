@@ -1694,22 +1694,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	deleteEntries(connector, database, localTable, serverTable, driver) {
-		local ignore, row
+	deleteEntries(connectors, database, localTable, serverTable, driver) {
+		local ignore, connector, row
 
 		database.lock(localTable)
 
 		try {
-			if connector {
-				try {
-					for ignore, row in database.query(localTable, {Where: {Driver: driver}})
-						if (row.Identifier != kNull)
-							connector.DeleteData(serverTable, row.Identifier)
-				}
-				catch exception {
-					logError(exception, true)
-				}
-			}
+			if (driver = this.SessionDatabase.ID)
+				for ignore, connector in connectors
+					try {
+						for ignore, row in database.query(localTable, {Where: {Driver: driver}})
+							if (row.Identifier != kNull)
+								connector.DeleteData(serverTable, row.Identifier)
+					}
+					catch exception {
+						logError(exception, true)
+					}
 
 			database.remove(localTable, {Driver: driver}, Func("always").Bind(true))
 		}
@@ -1720,10 +1720,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 
 	deleteData() {
+		local connectors := this.SessionDatabase.Connectors
 		local window := this.Window
 		local progressWindow, defaultListView, simulator, count, row, type, data, car, track
 		local driver, telemetryDB, tyresDB, code, candidate, progress
-		local connector, ignore, identifier, identifiers
+		local ignore, identifier, identifiers
 
 		Gui %window%:Default
 
@@ -1780,19 +1781,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				car := this.getCarCode(simulator, car)
 				track := this.getTrackCode(simulator, track)
 
-				connector := this.SessionDatabase.Connector
-
 				switch type {
 					case translate("Telemetry"):
 						telemetryDB := new TelemetryDatabase(simulator, car, track).Database
 
-						this.deleteEntries(connector, telemetryDB, "Electronics", "Electronics", driver)
-						this.deleteEntries(connector, telemetryDB, "Tyres", "Tyres", driver)
+						this.deleteEntries(connectors, telemetryDB, "Electronics", "Electronics", driver)
+						this.deleteEntries(connectors, telemetryDB, "Tyres", "Tyres", driver)
 					case translate("Pressures"):
 						tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
 
-						this.deleteEntries(connector, tyresDB, "Tyres.Pressures", "TyresPressures", driver)
-						this.deleteEntries(connector, tyresDB, "Tyres.Pressures.Distribution", "TyresPressuresDistribution", driver)
+						this.deleteEntries(connectors, tyresDB, "Tyres.Pressures", "TyresPressures", driver)
+						this.deleteEntries(connectors, tyresDB, "Tyres.Pressures.Distribution", "TyresPressuresDistribution", driver)
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -3630,6 +3629,7 @@ showSettings() {
 editSettings(editorOrCommand) {
 	local title, window, x, y, done, configuration, dllName, dllFile, connector, connection
 	local directory, empty, original, changed, groups, replication
+	local oldServerURL, oldServerToken
 
 	static result := false
 	static sessionDB := false
@@ -3650,7 +3650,7 @@ editSettings(editorOrCommand) {
 	else if (editorOrCommand = "Rebuild") {
 		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-		setConfigurationValue(configuration, "Team Server", "Synchronization", false)
+		setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {Standard: 0}))
 
 		writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 	}
@@ -3790,8 +3790,12 @@ editSettings(editorOrCommand) {
 		}
 
 		if (synchTelemetryCheck || synchPressuresCheck) {
-			serverURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "")
-			serverTokenEdit := getConfigurationValue(configuration, "Team Server", "Server.Token", "")
+			serverURLEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
+			serverURLEdit := (serverURLEdit.HasKey("Standard") ? serverURLEdit["Standard"] : "")
+
+			serverTokenEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
+			serverTokenEdit := (serverTokenEdit.HasKey("Standard") ? serverTokenEdit["Standard"] : "")
+
 			serverUpdateEdit := replication
 		}
 		else {
@@ -3978,11 +3982,16 @@ editSettings(editorOrCommand) {
 						changed := ((getConfigurationValue(configuration, "Team Server", "Replication", false) != false) != synchTelemetryCheck)
 				}
 
-				if (changed || (getConfigurationValue(configuration, "Team Server", "Server.URL", "") != serverURLEdit)
-							|| (getConfigurationValue(configuration, "Team Server", "Server.Token", "") != serverTokenEdit)) {
+				oldServerURL := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
+				oldServerURL := (oldServerURL.HasKey("Standard") ? oldServerURL["Standard"] : "")
+
+				oldServerToken := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
+				oldServerToken := (oldServerToken.HasKey("Standard") ? oldServerToken["Standard"] : "")
+
+				if (changed || (oldServerURL != serverURLEdit) || (oldServerToken != serverTokenEdit)) {
 					changed := true
 
-					setConfigurationValue(configuration, "Team Server", "Synchronization", false)
+					setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {Standard: 0}))
 
 					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
@@ -4001,8 +4010,8 @@ editSettings(editorOrCommand) {
 
 				setConfigurationValue(configuration, "Team Server", "Groups", values2String(",", groups*))
 				setConfigurationValue(configuration, "Team Server", "Replication", replication ? serverUpdateEdit : false)
-				setConfigurationValue(configuration, "Team Server", "Server.URL", replication ? serverURLEdit : "")
-				setConfigurationValue(configuration, "Team Server", "Server.Token", replication ? serverTokenEdit : "")
+				setConfigurationValue(configuration, "Team Server", "Server.URL", replication ? map2String("|", "->", {Standard: serverURLEdit}) : "")
+				setConfigurationValue(configuration, "Team Server", "Server.Token", replication ? map2String("|", "->", {Standard: serverTokenEdit}) : "")
 
 				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 

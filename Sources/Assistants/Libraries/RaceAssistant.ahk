@@ -1307,7 +1307,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			loop % (data ? getConfigurationValue(data, "Position Data", "Car.Count") : knowledgeBase.getValue("Car.Count"))
 			{
-				class := (data ? getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+				class := (data ? getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)
 							   : knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
 
 				if !classes.HasKey(class)
@@ -1324,7 +1324,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	getClass(car := false, data := false) {
 		if !car
-			car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") ? this.KnowledgeBase("Driver.Car", false))
+			car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") : this.KnowledgeBase.getValue("Driver.Car", false))
 
 		if data
 			return getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
@@ -1340,21 +1340,22 @@ class RaceAssistant extends ConfigurationItem {
 		static lastClass := false
 		static lastKnowledgeBase := false
 
-		if (!class || (class = "Class"))
+		if (class = "Class")
 			class := this.getClass()
 		else if (class = "Overall")
 			class := false
 
-		if (data || !lastKnowledgeBase || sorted || (lastKnowledgebase != knowledgeBase) || !class || (lastClass != class)) {
+		if (data || sorted || !lastKnowledgeBase || (lastKnowledgebase != knowledgeBase) || !class || (lastClass != class)) {
 			classGrid := []
 
 			if sorted {
 				positions := []
 
-				if data
+				if data {
 					loop % getConfigurationValue(data, "Position Data", "Car.Count")
 						if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
 							positions.Push(Array(A_Index, getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")))
+				}
 				else
 					loop % knowledgeBase.getValue("Car.Count")
 						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
@@ -1366,10 +1367,11 @@ class RaceAssistant extends ConfigurationItem {
 					classGrid.Push(position[1])
 			}
 			else {
-				if data
+				if data {
 					loop % getConfigurationValue(data, "Position Data", "Car.Count")
 						if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
 							classGrid.Push(A_Index)
+				}
 				else
 					loop % knowledgeBase.getValue("Car.Count")
 						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
@@ -1393,7 +1395,7 @@ class RaceAssistant extends ConfigurationItem {
 		local knowledgebase := this.Knowledgebase
 		local position, candidate
 
-		if !car
+		if !car {
 			if (type = "Overall") {
 				if data
 					return getConfigurationValue(data, "Position Data", "Car." . getConfigurationValue(data, "Position Data", "Driver.Car") . ".Position", false)
@@ -1401,19 +1403,21 @@ class RaceAssistant extends ConfigurationItem {
 					return knowledgeBase.getValue("Position")
 			}
 			else
-				car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") ? knowledgeBase.getValue("Driver.Car", false))
+				car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") : knowledgeBase.getValue("Driver.Car", false))
+		}
 
-		if (type != "Overall")
+		if (type != "Overall") {
 			for position, candidate in this.getGrid(data ? getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
 														 : knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
 												  , data, true)
 				if (candidate = car)
 					return position
+		}
 
 		if data
-			return getConfigurationValue(data, "Position Data", "Car." . car . ".Position", false)
+			return getConfigurationValue(data, "Position Data", "Car." . car . ".Position", car)
 		else
-			return (car ? knowledgeBase.getValue("Car." . car . ".Position", car) : false)
+			return knowledgeBase.getValue("Car." . car . ".Position", car)
 	}
 
 	performPitstop(lapNumber := false) {

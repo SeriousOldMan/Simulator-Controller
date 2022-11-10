@@ -398,9 +398,9 @@ class PositionInfo {
 		Get {
 			local driverCar := this.Spotter.DriverCar
 			local lastLap := driverCar.LastLap
-			local position := this.Spotter.Positions["Position"]
+			local position := this.Spotter.Positions["Position.Overall"]
 
-			if (((Abs(this.Delta[sector, true, 1]) * 2) < driverCar.LapTime[true]) || (Abs(position - this.Car.Position["Class"]) == 1))
+			if (((Abs(this.Delta[sector, true, 1]) * 2) < driverCar.LapTime[true]) || (Abs(position - this.Car.Position["Overall"]) == 1))
 				return "Position"
 			else if (lastLap > this.Car.LastLap)
 				return "LapDown"
@@ -532,7 +532,7 @@ class PositionInfo {
 	}
 
 	isLeader() {
-		return (this.Car.Position["Class"] == 1)
+		return ((this.Car.Position["Class"] == 1) && (this.Car.Class = this.Spotter.DriverCar.Class))
 	}
 
 	inFront(standings := true) {
@@ -540,7 +540,7 @@ class PositionInfo {
 		local frontCar
 
 		if standings
-			return (this.Car.Position["Class"] < positions["Position"])
+			return (this.Car.Position["Overall"] < positions["Position.Overall"])
 		else {
 			frontCar := positions["TrackAhead"]
 
@@ -553,7 +553,7 @@ class PositionInfo {
 		local behindCar
 
 		if standings
-			return (this.Car.Position["Class"] > positions["Position"])
+			return (this.Car.Position["Overall"] > positions["Position.Overall"])
 		else {
 			behindCar := positions["TrackBehind"]
 
@@ -565,7 +565,7 @@ class PositionInfo {
 		local spotter := this.Spotter
 		local car := this.Car
 		local positions := spotter.Positions
-		local position := positions["Position"]
+		local position := positions["Position.Class"]
 
 		if (car.Class = spotter.DriverCar.Class) {
 			if ((position - car.Position["Class"]) == 1)
@@ -1363,7 +1363,7 @@ class RaceSpotter extends RaceAssistant {
 			driver := positions["Driver"]
 
 			if driver {
-				currentPosition := positions["Position"]
+				currentPosition := positions["Position.Class"]
 
 				speaker.beginTalk()
 
@@ -1417,7 +1417,7 @@ class RaceSpotter extends RaceAssistant {
 			try {
 				speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
 													, laps: remainingSessionLaps
-													, position: Round(positions["Position"])})
+													, position: Round(positions["Position.Class"])})
 
 				remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
@@ -1448,7 +1448,7 @@ class RaceSpotter extends RaceAssistant {
 
 	announceFinalLaps(lastLap, sector, positions) {
 		local speaker := this.getSpeaker(true)
-		local position := positions["Position"]
+		local position := positions["Position.Class"]
 
 		speaker.beginTalk()
 
@@ -2273,14 +2273,13 @@ class RaceSpotter extends RaceAssistant {
 	blueFlag() {
 		local positions := this.Positions
 		local knowledgeBase := this.KnowledgeBase
-		local position, delta
+		local delta
 
 		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running) {
 			this.SpotterSpeaking := true
 
 			try {
-				if (positions.HasKey("Position") && positions.HasKey("StandingsBehind")) {
-					position := positions["Position"]
+				if positions.HasKey("StandingsBehind") {
 					delta := Abs(positions[positions["StandingsBehind"]][8])
 
 					if (delta && (delta < 2000))
@@ -2483,7 +2482,7 @@ class RaceSpotter extends RaceAssistant {
 
 					if (driver && position)
 						speaker.speakPhrase("GreetingPosition"
-										  , {position: position, overall: this.MultiClass ? speaker.Fragments["Overall"] : ""})
+										  , {position: position, overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
 
 					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
 						length := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
@@ -2893,7 +2892,8 @@ class RaceSpotter extends RaceAssistant {
 						positions[trackBehind][8] := gapBehind
 				}
 
-				positions["Position"] := position
+				positions["Position.Overall"] := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+				positions["Position.Class"] := position
 				positions["Leader"] := leader
 				positions["StandingsAhead"] := standingsAhead
 				positions["StandingsBehind"] := standingsBehind

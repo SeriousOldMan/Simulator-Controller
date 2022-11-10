@@ -1841,7 +1841,7 @@ class RaceCenter extends ConfigurationItem {
 		local classGrid := []
 		local positions, ignore, position
 
-		if (!class || (class = "Class"))
+		if (class = "Class")
 			class := this.getClass(data)
 		else if (class = "Overall")
 			class := false

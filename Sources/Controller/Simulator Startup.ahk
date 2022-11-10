@@ -734,7 +734,9 @@ cancelStartup() {
 	protectionOn()
 
 	try {
-		if startupManager
+		if startupManager {
+			startupManager.hideSplashTheme()
+
 			if !startupManager.Finished {
 				SoundPlay *32
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
@@ -754,10 +756,11 @@ cancelStartup() {
 				if (startupManager.ControllerPID != 0)
 					sendMessage(kFileMessage, "Startup", "stopStartupSong", startupManager.ControllerPID)
 
-				SimulatorStartup.Instance.hideSplashTheme()
+				startupManager.hideSplashTheme()
 
 				exitStartup(true)
 			}
+		}
 	}
 	finally {
 		protectionOff()

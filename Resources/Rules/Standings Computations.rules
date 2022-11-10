@@ -59,6 +59,9 @@ updatePositions(?lap, !Driver.Car, ?driverLaps, ?driverRunning) <=
 		Set(Position, ?position), Set(Standings.Lap, ?lap, Position, ?position),
 		Append(Standings.Lap., ?lap, .Car., !Driver.Car, ?prefix),
 		Set(?prefix, Time, ?lapTime), Set(?prefix, Delta, 0), Set(?prefix, Laps, ?driverLaps), Set(?prefix, Position, ?position),
+		carClass(!Driver.Car, ?class),
+		updateStandingsClassLeader(?class, ?lap, !Driver.Car, 0, 0),
+		updateStandingsOverallLeader(?lap, !Driver.Car, 0, 0),
 		?nextCar = !Driver.Car - 1, updatePositions(?lap, ?nextCar, ?driverLaps, ?driverRunning), !
 updatePositions(?lap, ?car, ?driverLaps, ?driverRunning) <=
 		carLapTime(?car, ?carLapTime), lapTime(?lap, ?lapTime), carPosition(?car, ?position),

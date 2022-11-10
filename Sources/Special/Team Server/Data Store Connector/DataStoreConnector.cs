@@ -286,6 +286,23 @@ namespace TeamServer {
         {
 			return Post("data/" + table.ToLower(), body: properties);
 		}
-		#endregion
-	}
+
+        public string GetDataValue(string table, string identifier, string name)
+        {
+            return Get("data/" + table.ToLower() + "/" + identifier + "/value",
+                       arguments: new Parameters() { { "name", name } });
+        }
+
+        public void SetDataValue(string table, string identifier, string name, string value)
+        {
+            Put("data/" + table.ToLower() + "/" + identifier + "/value",
+                arguments: new Parameters() { { "name", name } }, body: value);
+        }
+
+        public void DeleteDataValue(string table, string identifier, string name)
+        {
+            Delete("data/" + table.ToLower() + "/" + identifier + "/value", arguments: new Parameters() { { "name", name } });
+        }
+        #endregion
+    }
 }

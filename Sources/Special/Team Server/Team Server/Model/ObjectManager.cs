@@ -425,6 +425,23 @@ namespace TeamServer.Model {
         }
         #endregion
 
+        #region Data.Document
+        public Task<Data.Document> GetDocumentAsync(int id)
+        {
+            return Connection.Table<Data.Document>().Where(d => d.ID == id).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Document> GetDocumentAsync(Guid identifier)
+        {
+            return Connection.Table<Data.Document>().Where(d => d.Identifier == identifier).FirstOrDefaultAsync();
+        }
+
+        public Task<Data.Document> GetDocumentAsync(string identifier)
+        {
+            return GetDocumentAsync(new Guid(identifier));
+        }
+        #endregion
+
         #region Data.License
         public Task<Data.License> GetLicenseAsync(int id)
         {

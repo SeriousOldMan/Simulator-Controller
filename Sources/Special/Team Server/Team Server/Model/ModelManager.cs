@@ -54,6 +54,7 @@ namespace TeamServer.Model {
 
         protected void CreateDataTables()
         {
+            Connection.CreateTableAsync<Data.Document>().Wait();
             Connection.CreateTableAsync<Data.License>().Wait();
             Connection.CreateTableAsync<Data.Electronics>().Wait();
             Connection.CreateTableAsync<Data.Tyres>().Wait();

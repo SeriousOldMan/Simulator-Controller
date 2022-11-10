@@ -304,7 +304,7 @@ class TelemetryDatabase extends SessionDatabase {
 						identifiers := []
 
 						for ignore, row in rows
-							if (%filter%(row) && (row.Identifier != kNull))
+							if (%filter%(row) && (row.Identifier != kNull) && (row.Driver = this.ID))
 								identifiers.Push(row.Identifier)
 					}
 

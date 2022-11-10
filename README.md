@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.4.7.0-dev](https://www.dropbox.com/s/amxxfehb2pm5tp1/Simulator%20Controller%204.4.7.0-dev.zip?dl=1) (Early build for 4.4.7. New features: New notes field for car setups in "Race Center", Fixed driver statistics regression in "Race Center", Full support for multi-class races in all tools of Simulator Controller, "Server Administration" remembers server URL and login name.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-447) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -80,6 +82,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 11. [Track Mapping and Track Automation](https://youtu.be/QWJyUYdjlFg) - This video shows you how to create a track map for any track in any simulator and where you can use these track maps. A special usage is the automation of in-car settings like traction control or ABS depending on your location on the track, which will be demonstrated on-track at the end of the video.
 
 12. [Tyre Compounds and Weather Model](https://youtu.be/KFyhVuqojVk) - This session covers the handling of simulator specific tyre compounds. You will learn how to configure the available compounds for your car of choice and we will take a look at the weather model of Simulator Controller and learn how this is used together with the tyre compounds in strategy simulations.
+
+13. [Team Data Replication](https://youtu.be/KgZ86YIBMOQ) - This video shows you how to share telemetry and other data in your team using the Team Server. This data can then be used to create team strategies or lookup tyre pressures for an unplanned pitstop in a team race and so on.
 
 This list will be extended from time to time to cover new functionalities.
 

@@ -163,6 +163,7 @@ int main(int argc, char* argv[]) {
 				ParticipantInfo vehicle = localCopy->mParticipantInfo[i - 1];
 
 				printf("Car.%d.Nr=%d\n", i, i);
+				printf("Car.%d.Class=%s\n", i, localCopy->mCarClassNames[i - 1]);
 				printf("Car.%d.Position=%d\n", i, vehicle.mRacePosition);
 				printf("Car.%d.Lap=%d\n", i, vehicle.mLapsCompleted);
 				printf("Car.%d.Lap.Running=%f\n", i, vehicle.mCurrentLapDistance / localCopy->mTrackLength);
@@ -242,8 +243,8 @@ int main(int argc, char* argv[]) {
 		}
 		else {
 		*/
-			printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
-			printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
+		printf("SessionTimeRemaining=%ld\n", getRemainingTime(localCopy));
+		printf("SessionLapsRemaining=%ld\n", getRemainingLaps(localCopy));
 		/*
 		}
 		*/
@@ -262,7 +263,7 @@ int main(int argc, char* argv[]) {
 
 		double engineDamage = normalizeDamage(localCopy->mEngineDamage);
 
-		printf("EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10: 0);
+		printf("EngineDamage=%f\n", (engineDamage > 20) ? round(engineDamage / 10) * 10 : 0);
 		printf("FuelRemaining=%f\n", localCopy->mFuelLevel * localCopy->mFuelCapacity);
 
 		printf("TyreTemperature=%f,%f,%f,%f\n", localCopy->mTyreTemp[TYRE_FRONT_LEFT],
@@ -292,7 +293,9 @@ int main(int argc, char* argv[]) {
 
 		printf("[Stint Data]\n");
 
-		char* name = localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName;
+		char name[100];
+
+		strcpy(name, localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mName);
 
 		if (strchr(name, ' ')) {
 			char forName[100];

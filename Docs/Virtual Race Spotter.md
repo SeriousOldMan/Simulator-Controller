@@ -36,6 +36,10 @@ To reactivate the Assistant use:
 
 	I can listen now
 
+### Multi-class support
+
+Elisa *understands* multi-class races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Elisa will phrase it in a way, so that you understand, that information is related to the whole grid.
+
 ## Alerts & Information
 
 The Spotter will give you critical and in most cases real time information about the current race situation. This helps you to keep track and stay out of trouble. In detail:

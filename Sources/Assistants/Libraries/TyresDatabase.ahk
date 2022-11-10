@@ -486,6 +486,9 @@ class TyresDatabase extends SessionDatabase {
 }
 
 synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
+	local lastSimulator := false
+	local lastCar := false
+	local lastTrack := false
 	local ignore, simulator, car, track, db, modified, identifier, pressures, properties, count
 
 	if inList(groups, "Pressures")
@@ -499,7 +502,13 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 					car := pressures.Car
 					track := pressures.Track
 
-					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
+						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+
+						lastSimulator := simulator
+						lastCar := car
+						lastTrack := track
+					}
 
 					if (db.query("Tyres.Pressures", {Where: {Identifier: identifier} }).Length() = 0) {
 						counter += 1
@@ -540,7 +549,13 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 
 					count := pressures.Count
 
-					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
+						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+
+						lastSimulator := simulator
+						lastCar := car
+						lastTrack := track
+					}
 
 					properties := {Identifier: pressures.Identifier, Synchronized: timestamp
 								 , Driver: pressures.Driver, Weather: pressures.Weather

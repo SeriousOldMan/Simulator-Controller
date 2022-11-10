@@ -620,13 +620,13 @@ class RaceStrategist extends RaceAssistant {
 
 	positionRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, position
+		local speaker, overallPosition, classPosition
 
 		if ((this.Session != kSessionRace) && !this.hasEnoughData())
 			return
 
 		speaker := this.getSpeaker()
-		position := Round(knowledgeBase.getValue("Position", 0))
+		position := this.getPosition()
 
 		if (position == 0)
 			speaker.speakPhrase("Later")
@@ -636,7 +636,19 @@ class RaceStrategist extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("Position", {position: position})
+				if this.MultiClass {
+					classPosition := this.getPosition(false, "Class")
+
+					if (position != classPosition) {
+						speaker.speakPhrase("PositionClass", {positionOverall: position, positionClass: classPosition})
+
+						position := classPosition
+					}
+					else
+						speaker.speakPhrase("Position", {position: position})
+				}
+				else
+					speaker.speakPhrase("Position", {position: position})
 
 				if (position <= 3)
 					speaker.speakPhrase("Great")
@@ -688,7 +700,7 @@ class RaceStrategist extends RaceAssistant {
 					position := knowledgeBase.getValue("Standings.Extrapolated." . lap . ".Car." . car . ".Position", false)
 
 					if position
-						speaker.speakPhrase("FuturePosition", {position: position})
+						speaker.speakPhrase("FuturePosition", {position: position, class: ""})
 					else
 						speaker.speakPhrase("NoFuturePosition")
 				}
@@ -747,15 +759,15 @@ class RaceStrategist extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, lap, car, inPit, speaker
 
-		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+		if (this.getPosition(false, "Class") = 1)
 			speaker.speakPhrase("NoGapToAhead")
 		else {
 			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
-				car := knowledgeBase.getValue("Position.Standings.Ahead.Car")
-				delta := Abs(knowledgeBase.getValue("Position.Standings.Ahead.Delta", 0) / 1000)
+				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car")
+				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
 				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
 
 				if (delta = 0) {
@@ -825,15 +837,15 @@ class RaceStrategist extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (Round(knowledgeBase.getValue("Position", 0)) = Round(knowledgeBase.getValue("Car.Count", 0)))
+		if (this.getPosition(false, "Class") = this.getGrid("Class").Length())
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker.beginTalk()
 
 			try {
 				lap := knowledgeBase.getValue("Lap")
-				car := knowledgeBase.getValue("Position.Standings.Behind.Car")
-				delta := Abs(knowledgeBase.getValue("Position.Standings.Behind.Delta", 0) / 1000)
+				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
+				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
 				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
 				lapped := false
 
@@ -867,10 +879,10 @@ class RaceStrategist extends RaceAssistant {
 		if !this.hasEnoughData()
 			return
 
-		if (Round(knowledgeBase.getValue("Position", 0)) = 1)
+		if (this.getPosition(false, "Class") = 1)
 			this.getSpeaker().speakPhrase("NoGapToAhead")
 		else {
-			delta := Abs(knowledgeBase.getValue("Position.Standings.Leader.Delta", 0) / 1000)
+			delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
 
 			this.getSpeaker().speakPhrase("GapToLeader", {delta: printNumber(delta, 1)})
 		}
@@ -911,8 +923,8 @@ class RaceStrategist extends RaceAssistant {
 
 		car := knowledgeBase.getValue("Driver.Car")
 		lap := knowledgeBase.getValue("Lap", 0)
-		position := Round(knowledgeBase.getValue("Position"))
-		cars := Round(knowledgeBase.getValue("Car.Count"))
+		position := this.getPosition(false, "Class")
+		cars := knowledgeBase.getValue("Car.Count")
 
 		driverLapTime := (knowledgeBase.getValue("Car." . car . ".Time") / 1000)
 
@@ -930,13 +942,13 @@ class RaceStrategist extends RaceAssistant {
 				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
 
 				if (position > 2)
-					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
+					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
 
 				if (position < cars)
-					this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
+					this.reportLapTime("LapTimeBehind", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
 
 				if (position > 1)
-					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Leader.Car", 0))
+					this.reportLapTime("LapTimeLeader", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Leader.Car", 0))
 			}
 			finally {
 				speaker.endTalk()
@@ -1005,23 +1017,25 @@ class RaceStrategist extends RaceAssistant {
 		this.recommendPitstop(lap)
 	}
 
-	reviewRace(cars, laps, position, leaderAvgLapTime
+	reviewRace(multiClass, cars, laps, position, leaderAvgLapTime
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
-		local speaker, continuation, only, driver, goodPace
+		local class, speaker, continuation, only, driver, goodPace
 
 		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
 			speaker := this.getSpeaker()
 
 			speaker.beginTalk()
 
+			class := (multiClass ? speaker.Fragments["Class"] : "")
+
 			try {
 				if (position <= (cars / 5))
-					speaker.speakPhrase("GreatRace", {position: position})
+					speaker.speakPhrase("GreatRace", {position: position, class: class})
 				else if (position <= ((cars / 5) * 3))
-					speaker.speakPhrase("MediocreRace", {position: position})
+					speaker.speakPhrase("MediocreRace", {position: position, class: class})
 				else
-					speaker.speakPhrase("CatastrophicRace", {position: position})
+					speaker.speakPhrase("CatastrophicRace", {position: position, class: class})
 
 				if (position > 1) {
 					only := ""
@@ -1163,7 +1177,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	prepareSession(settings, data) {
-		local raceData, carCount,  carNr, carID
+		local raceData, carCount,  carNr
 
 		this.updateSessionValues({RaceInfo: false})
 
@@ -1178,14 +1192,17 @@ class RaceStrategist extends RaceAssistant {
 
 		loop %carCount% {
 			carNr := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr")
-			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
 
 			if InStr(carNr, """")
 				carNr := StrReplace(carNr, """", "")
 
 			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr", carNr)
-			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", carID)
-			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position", getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID"
+										  , getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class"
+										  , getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown))
+			setConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position"
+										  , getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position"))
 		}
 
 		this.updateRaceInfo(raceData)
@@ -1433,7 +1450,7 @@ class RaceStrategist extends RaceAssistant {
 		local driverNickname := ""
 		local compound, result, exists, gapAhead, gapBehind, validLaps, lap, simulator, car, track
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
-		local fuelConsumption, fuelRemaining, lapTime, map, tc, abs, pressures, temperatures, wear
+		local fuelConsumption, fuelRemaining, lapTime, map, tc, abs, pressures, temperatures, wear, multiClass
 
 		static lastLap := 0
 
@@ -1476,22 +1493,24 @@ class RaceStrategist extends RaceAssistant {
 			this.updateDynamicValues({StrategyReported: lapNumber})
 		}
 
-		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
+		if !this.MultiClass {
+			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
-		if ((gapAhead != kUndefined) && (gapAhead != 0)) {
-			knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
+			if ((gapAhead != kUndefined) && (gapAhead != 0)) {
+				knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
 
-			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
-		}
+				if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+					knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+			}
 
-		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 
-		if ((gapBehind != kUndefined) && (gapBehind != 0)) {
-			knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
+			if ((gapBehind != kUndefined) && (gapBehind != 0)) {
+				knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
 
-			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+				if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+					knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+			}
 		}
 
 		loop % knowledgeBase.getValue("Car.Count")
@@ -1586,18 +1605,18 @@ class RaceStrategist extends RaceAssistant {
 		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
 		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Standings.Ahead.Delta", gapAhead)
+			knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
 
-			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Ahead.Car", 0))
+			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
 				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
 		}
 
 		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 
 		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Standings.Behind.Delta", gapBehind)
+			knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
 
-			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Behind.Car", 0))
+			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
 				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
 		}
 
@@ -2427,7 +2446,8 @@ class RaceStrategist extends RaceAssistant {
 	updateRaceInfo(raceData) {
 		local raceInfo := {}
 		local grid := []
-		local carNr, carID, carPosition
+		local classes := []
+		local carNr, carID, carClass, carPosition
 
 		raceInfo["Driver"] := getConfigurationValue(raceData, "Cars", "Driver")
 		raceInfo["Cars"] := getConfigurationValue(raceData, "Cars", "Count")
@@ -2436,15 +2456,18 @@ class RaceStrategist extends RaceAssistant {
 		{
 			carNr := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
 			carID := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
+			carClass := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", "Unknown")
 			carPosition := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position")
 
 			grid.Push(carPosition)
+			classes.Push(carClass)
 
 			raceInfo["#" . carNr] := A_Index
 			raceInfo["!" . carID] := A_Index
 		}
 
 		raceInfo["Grid"] := grid
+		raceInfo["Classes"] := classes
 
 		this.updateSessionValues({RaceInfo: raceInfo})
 	}
@@ -2489,6 +2512,8 @@ class RaceStrategist extends RaceAssistant {
 
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".ID", carID)
+					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Class"
+										, knowledgeBase.getValue("Car." . A_Index . ".Class", "Unknown"))
 					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
 										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
 
@@ -2497,8 +2522,7 @@ class RaceStrategist extends RaceAssistant {
 					if ((grid != false) && raceInfo.HasKey(key))
 						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[raceInfo[key]])
 					else
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position"
-											, knowledgeBase.getValue("Car." . A_Index . ".Position", A_Index))
+						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", this.getPosition(A_Index))
 				}
 
 				fileName := temporaryFileName("Race Strategist Race", "info")

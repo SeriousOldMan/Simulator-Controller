@@ -14,3 +14,5 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 
 SetBatchLines -1				; Maximize CPU utilization
 ListLines Off					; Disable execution history
+
+global vBuildConfiguration := "Production"

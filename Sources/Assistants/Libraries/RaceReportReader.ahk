@@ -14,6 +14,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Public Constants Section                        ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kUnknown := false
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -28,6 +35,9 @@ class RaceReportReader {
 
 	__New(report := false) {
 		this.iReport := report
+
+		if !kUnknown
+			kUnknown := translate("Unknown")
 	}
 
 	setReport(report) {
@@ -41,6 +51,21 @@ class RaceReportReader {
 			laps.Push(A_Index)
 
 		return laps
+	}
+
+	getClasses(raceData) {
+		local classes := []
+		local class
+
+		loop % getConfigurationValue(raceData, "Cars", "Count")
+		{
+			class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", translate("Unknown"))
+
+			if !inList(classes, class)
+				classes.Push(class)
+		}
+
+		return classes
 	}
 
 	getDrivers(raceData) {
@@ -77,21 +102,25 @@ class RaceReportReader {
 		}
 	}
 
-	getStandings(lap, ByRef cars, ByRef positions, ByRef carNumbers, ByRef carNames
-			   , ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
+	getStandings(lap, ByRef cars, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
+					, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
 		local raceData := true
 		local drivers := true
 		local tPositions := true
 		local times := false
-		local forName, surName, nickName
+		local classes := {}
+		local forName, surName, nickName, position
 
 		this.loadData(Array(lap), raceData, drivers, tPositions, times)
 
 		if cars
 			cars := []
 
-		if positions
-			positions := []
+		if overallPositions
+			overallPositions := []
+
+		if classPositions
+			classPositions := []
 
 		if carNumbers
 			carNumbers := []
@@ -108,12 +137,21 @@ class RaceReportReader {
 		if driverNicknames
 			driverNicknames := []
 
-		if cars
+		if cars {
 			loop % getConfigurationValue(raceData, "Cars", "Count", 0) {
 				cars.Push(A_Index)
 
-				if positions
-					positions.Push(tPositions[1][A_Index])
+				position := tPositions[1][A_Index]
+
+				if overallPositions
+					overallPositions.Push(position)
+
+				class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
+
+				if !classes.HasKey(class)
+					classes[class] := [Array(A_Index, position)]
+				else
+					classes[class].Push(Array(A_Index, position))
 
 				if carNumbers
 					carNumbers.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
@@ -136,6 +174,27 @@ class RaceReportReader {
 				if driverNicknames
 					driverNicknames.Push(nickName)
 			}
+
+			if (classes.Count() > 1) {
+				classPositions := overallPositions.Clone()
+
+				for ignore, class in classes {
+					bubbleSort(class, "comparePositions")
+
+					for position, car in class
+						classPositions[car[1]] := position
+				}
+
+				return true
+			}
+			else {
+				classPositions := overallPositions
+
+				return false
+			}
+		}
+		else
+			return false
 	}
 
 	getDriverPositions(raceData, positions, car) {
@@ -432,4 +491,17 @@ correctEmptyValues(table, default := "__Undefined__") {
 	}
 
 	return table
+}
+
+comparePositions(c1, c2) {
+	local pos1 := c1[2]
+	local pos2 := c2[2]
+
+	if pos1 is not Number
+		pos1 := 999
+
+	if pos2 is not Number
+		pos2 := 999
+
+	return (pos1 > pos2)
 }

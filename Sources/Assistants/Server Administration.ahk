@@ -172,7 +172,7 @@ global teamServerPasswordEdit := ""
 
 administrationEditor(configurationOrCommand, arguments*) {
 	local task, title, prompt, locale, minutes, ignore, identifier, type, which, contract
-	local dllName, dllFile, sessionDB, connection
+	local dllName, dllFile, sessionDB, connection, administrationConfig
 	local x, y, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 
 	static connector := false
@@ -236,6 +236,13 @@ administrationEditor(configurationOrCommand, arguments*) {
 				sessionDB := new SessionDatabase()
 
 				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Admin")
+
+				administrationConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				setConfigurationValue(administrationConfig, "Server Administration", "ServerURL", teamServerURLEdit)
+				setConfigurationValue(administrationConfig, "Server Administration", "Login", teamServerNameEdit)
+
+				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", administrationConfig)
 
 				if keepAliveTask
 					keepAliveTask.stop()
@@ -581,6 +588,11 @@ administrationEditor(configurationOrCommand, arguments*) {
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
+
+		administrationConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		teamServerURLEdit := getConfigurationValue(administrationConfig, "Server Administration", "ServerURL", "https://localhost:5001")
+		teamServerNameEdit := getConfigurationValue(administrationConfig, "Server Administration", "Login", "")
 
 		Gui ADM:Default
 

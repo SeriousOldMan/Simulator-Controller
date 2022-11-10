@@ -4,6 +4,7 @@
   3. New notes field for driver specific car setups in "Race Center".
   4. Fixed regression of the driver statistics report in "Race Center", which was introduced by the new mean and median calculation.
   5. Full support for multi-class races. The Race Assistants are aware of your specific class and will all information like standings, gaps, lap times, and so on, in a class-specific way. Tools like "Race Reports" and "Race Center" are also aware of multi-class races and will show you additional information, if necessary.
+  6. The "Server Administration" tool now remembers server URL and login name.
 
 ## 4.4.6.0-release 11/04/22
   1. Minor bugfixes, as always

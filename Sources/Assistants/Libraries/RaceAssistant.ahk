@@ -1415,7 +1415,7 @@ class RaceAssistant extends ConfigurationItem {
 				car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") : knowledgeBase.getValue("Driver.Car", false))
 		}
 
-		if ((type != "Overall") && this.MultiClass) {
+		if ((type != "Overall") && this.MultiClass[data]) {
 			for position, candidate in this.getCars(data ? getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
 														 : knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
 												  , data, true)

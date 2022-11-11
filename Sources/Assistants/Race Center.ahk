@@ -7434,12 +7434,6 @@ class RaceCenter extends ConfigurationItem {
 									if (driverClass = carClass) {
 										carPosition := this.getPosition(positions, "Class", carIndex)
 
-										if (!hasLeader && (carPosition == 1) && (driverClassPosition != 1)) {
-											brush := leaderBrush
-
-											hasLeader := true
-										}
-
 										if (!hasAhead && (carPosition + 1) = driverClassPosition) {
 											brush := aheadBrush
 
@@ -7450,6 +7444,12 @@ class RaceCenter extends ConfigurationItem {
 											brush := behindBrush
 
 											hasBehind := true
+										}
+
+										if (!hasLeader && (carPosition == 1) && (driverClassPosition != 1)) {
+											brush := leaderBrush
+
+											hasLeader := true
 										}
 									}
 								}

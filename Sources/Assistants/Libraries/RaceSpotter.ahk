@@ -871,9 +871,6 @@ class RaceSpotter extends RaceAssistant {
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
 			this.iLastDeltaInformationLap := 0
 
-			this.iOverallGridPosition := false
-			this.iClassGridPosition := false
-
 			this.iRunning := false
 			this.iDriverCar := false
 			this.OtherCars := {}
@@ -2421,7 +2418,7 @@ class RaceSpotter extends RaceAssistant {
 	initializeGridPosition(data, force := false) {
 		local driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
-		if ((force || !this.GridPosition) && (driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1))) {
+		if ((force || !this.GridPosition) && driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)) {
 			this.iOverallGridPosition := this.getPosition(driver, "Overall", data)
 			this.iClassGridPosition := this.getPosition(driver, "Class", data)
 		}

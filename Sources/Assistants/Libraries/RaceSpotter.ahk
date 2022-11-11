@@ -2769,12 +2769,12 @@ class RaceSpotter extends RaceAssistant {
 			loop %count%
 			{
 				class := this.getClass(A_Index, data) ; getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", "Unknown")
-				position := this.getPosition(A_Index, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")
+				; position := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")
 
 				if !classes.HasKey(class)
-					classes[class] := [Array(A_Index, position)]
+					classes[class] := [Array(A_Index, this.getPosition(A_Index, "Overall", data))]
 				else
-					classes[class].Push(Array(A_Index, position))
+					classes[class].Push(Array(A_Index, this.getPosition(A_Index, "Overall", data)))
 
 				classPositions.Push(false)
 			}

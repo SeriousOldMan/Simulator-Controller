@@ -2759,7 +2759,7 @@ class RaceSpotter extends RaceAssistant {
 		local leader := false
 		local hasDriver := false
 		local index, car, prefix, position, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
-		local carOverllPosition, carClassPosition, carDelta, carAheadDelta, carBehindDelta
+		local driverClassPosition, carOverallPosition, carClassPosition, carDelta, carAheadDelta, carBehindDelta
 		local classes, class, classPositions, ignore
 
 		if (driver && count) {
@@ -2768,8 +2768,8 @@ class RaceSpotter extends RaceAssistant {
 
 			loop %count%
 			{
-				class := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", "Unknown")
-				position := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")
+				class := this.getClass(A_Index, data) ; getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", "Unknown")
+				position := this.getPosition(A_Index, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")
 
 				if !classes.HasKey(class)
 					classes[class] := [Array(A_Index, position)]
@@ -2807,8 +2807,8 @@ class RaceSpotter extends RaceAssistant {
 				positions["Driver"] := driver
 				positions["Count"] := count
 
-				position := classPositions[driver]
-				class := getConfigurationValue(data, "Position Data", "Car." . driver . ".Class", "Unknown")
+				driverClassPosition := classPositions[driver]
+				class := this.getClass(driver, data)
 				lapTime := getConfigurationValue(data, "Position Data", "Car." . driver . ".Time")
 
 				for index, car in carPositions {
@@ -2818,7 +2818,7 @@ class RaceSpotter extends RaceAssistant {
 
 					prefix := ("Car." . carIndex)
 
-					carOverallPosition := getConfigurationValue(data, "Position Data", prefix . ".Position")
+					carOverallPosition := this.getPosition(carIndex, "Overall", data) ; getConfigurationValue(data, "Position Data", prefix . ".Position")
 					carClassPosition := classPositions[carIndex]
 					carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
 
@@ -2833,7 +2833,7 @@ class RaceSpotter extends RaceAssistant {
 
 					positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")
 											   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
-											   , getConfigurationValue(data, "Position Data", prefix . ".Class", kUnknown)
+											   , this.getClass(carIndex, data) ; getConfigurationValue(data, "Position Data", prefix . ".Class", kUnknown)
 											   , computeDriverName(getConfigurationValue(data, "Position Data", prefix . ".Driver.Forname", "John")
 																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
 																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
@@ -2846,13 +2846,13 @@ class RaceSpotter extends RaceAssistant {
 											   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
 											   , getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false))
 
-					if (class = getConfigurationValue(data, "Position Data", "Car." . prefix . ".Class", "Unknown")) {
+					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)
 							leader := carIndex
 
-						if (carClassPosition = (position - 1))
+						if (carClassPosition = (driverClassPosition - 1))
 							standingsAhead := carIndex
-						else if (carClassPosition = (position + 1))
+						else if (carClassPosition = (driverClassPosition + 1))
 							standingsBehind := carIndex
 					}
 
@@ -2889,8 +2889,8 @@ class RaceSpotter extends RaceAssistant {
 						positions[trackBehind][8] := gapBehind
 				}
 
-				positions["Position.Overall"] := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
-				positions["Position.Class"] := position
+				positions["Position.Overall"] := this.getPosition(driver, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+				positions["Position.Class"] := driverClassPosition
 				positions["Leader"] := leader
 				positions["StandingsAhead"] := standingsAhead
 				positions["StandingsBehind"] := standingsBehind

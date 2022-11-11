@@ -2277,7 +2277,7 @@ class RaceSpotter extends RaceAssistant {
 
 			try {
 				if positions.HasKey("StandingsBehind") {
-					delta := Abs(positions[positions["StandingsBehind"]][8])
+					delta := Abs(positions[positions["StandingsBehind"]][10])
 
 					if (delta && (delta < 2000))
 						this.getSpeaker(true).speakPhrase("BlueForPosition", false, false, "BlueForPosition")
@@ -2875,17 +2875,17 @@ class RaceSpotter extends RaceAssistant {
 				trackBehind := carPositions[trackBehind][1]
 
 				if (gapAhead && standingsAhead) {
-					positions[standingsAhead][8] := gapAhead
+					positions[standingsAhead][10] := gapAhead
 
 					if (standingsAhead = trackAhead)
-						positions[trackAhead][8] := gapAhead
+						positions[trackAhead][10] := gapAhead
 				}
 
 				if (gapBehind && standingsBehind) {
-					positions[standingsBehind][8] := gapBehind
+					positions[standingsBehind][10] := gapBehind
 
 					if (standingsBehind = trackBehind)
-						positions[trackBehind][8] := gapBehind
+						positions[trackBehind][10] := gapBehind
 				}
 
 				positions["Position.Overall"] := this.getPosition(driver, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")

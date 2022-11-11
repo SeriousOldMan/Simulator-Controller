@@ -554,7 +554,18 @@ launchPad(command := false, arguments*) {
 }
 
 closeLaunchPad() {
-	launchPad(kClose, GetKeyState("Ctrl", "P"))
+	local title := translate("Modular Simulator Controller System")
+
+	if GetKeyState("Ctrl", "P") {
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		MsgBox 262436, %title%, % translate("Do you really want to close all currently running applications? Unsaved data might be lost.")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+			launchPad(kClose, true)
+	}
+	else
+		launchPad(kClose)
 }
 
 closeAll() {

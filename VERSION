@@ -1,16 +1,17 @@
 [Development]
-Version=4.4.7.0-dev
+Version=4.4.7.0-release
 Target=4.4.7.0-release
-Date=11/09/2022
-Download=https://www.dropbox.com/s/amxxfehb2pm5tp1/Simulator%20Controller%204.4.7.0-dev.zip?dl=1
+Date=11/11/2022
+Download=https://cutt.ly/kMoBACn
 Changes=New notes field for car setups in "Race Center", Fixed driver statistics regression in "Race Center", Full support for multi-class races in all tools of Simulator Controller, "Server Administration" remembers server URL and login name
 [Release]
-Version=4.4.6.0-release
-Date=11/04/2022
-Download=https://cutt.ly/UNLf1ii
-Changes=Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)", Both median and mean values are now shown in the pace report, New alternative pace report in "Race Reports"
+Version=4.4.7.0-release
+Date=11/11/2022
+Download=https://cutt.ly/kMoBACn
+Changes=New notes field for car setups in "Race Center", Fixed driver statistics regression in "Race Center", Full support for multi-class races in all tools of Simulator Controller, "Server Administration" remembers server URL and login name
+[Release]
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.4.6.0-release
-Development=4.4.7.0-dev
+Release=4.4.7.0-release
+Development=4.4.7.0-release

@@ -318,7 +318,16 @@ class RaceAssistant extends ConfigurationItem {
 
 	MultiClass[data := false] {
 		Get {
-			return (this.getClasses(data).Length() > 1)
+			static knowledgeBase := false
+			static multiClass := false
+
+			if (!knowledgeBase || (knowledgeBase != this.KnowledgeBase)) {
+				knowledgaBase := this.KnowledgeBase
+
+				multiClass := (this.getClasses(data).Length() > 1)
+			}
+
+			return multiClass
 		}
 	}
 
@@ -1332,7 +1341,7 @@ class RaceAssistant extends ConfigurationItem {
 			return this.KnowledgeBase.getValue("Car." . car . ".Class", kUnknown)
 	}
 
-	getGrid(class := "Overall", data := false, sorted := false) {
+	getCars(class := "Overall", data := false, sorted := false) {
 		local knowledgebase := this.Knowledgebase
 		local positions, ignore, position
 
@@ -1406,8 +1415,8 @@ class RaceAssistant extends ConfigurationItem {
 				car := (data ? getConfigurationValue(data, "Position Data", "Driver.Car") : knowledgeBase.getValue("Driver.Car", false))
 		}
 
-		if (type != "Overall") {
-			for position, candidate in this.getGrid(data ? getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+		if ((type != "Overall") && this.MultiClass) {
+			for position, candidate in this.getCars(data ? getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
 														 : knowledgeBase.getValue("Car." . car . ".Class", kUnknown)
 												  , data, true)
 				if (candidate = car)

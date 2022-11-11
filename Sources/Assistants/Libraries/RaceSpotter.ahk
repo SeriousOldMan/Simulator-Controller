@@ -1087,7 +1087,7 @@ class RaceSpotter extends RaceAssistant {
 		local talking := false
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (this.getPosition(false, "Class") = this.getGrid("Class").Length())
+		if (this.getPosition(false, "Class") = this.getCars("Class").Length())
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker := this.getSpeaker()

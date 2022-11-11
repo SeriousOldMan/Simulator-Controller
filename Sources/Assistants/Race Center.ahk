@@ -1837,7 +1837,7 @@ class RaceCenter extends ConfigurationItem {
 		return getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
 	}
 
-	getGrid(data, class := "Overall", sorted := false) {
+	getCars(data, class := "Overall", sorted := false) {
 		local classGrid := []
 		local positions, ignore, position
 
@@ -1877,7 +1877,7 @@ class RaceCenter extends ConfigurationItem {
 				car := getConfigurationValue(data, "Position Data", "Driver.Car")
 
 		if (type != "Overall")
-			for position, candidate in this.getGrid(data, getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown), true)
+			for position, candidate in this.getCars(data, getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown), true)
 				if (candidate = car)
 					return position
 

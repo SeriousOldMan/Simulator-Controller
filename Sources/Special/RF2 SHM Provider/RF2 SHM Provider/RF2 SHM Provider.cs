@@ -5,6 +5,7 @@ Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.o
 */
 using RF2SHMProvider.rFactor2Data;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using static RF2SHMProvider.rFactor2Constants;
@@ -81,11 +82,8 @@ namespace RF2SHMProvider {
 		public string GetSurname(byte[] name) {
 			string forName = GetStringFromBytes(name);
 
-			if (forName.Contains(" ")) {
-				string[] names = forName.Split(' ');
-
-				return names[1];
-			}
+			if (forName.Contains(" "))
+				return string.Join(" ", forName.Split(' ').Skip(1));
 			else
 				return "";
 		}

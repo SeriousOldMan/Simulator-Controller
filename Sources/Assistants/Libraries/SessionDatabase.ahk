@@ -1189,7 +1189,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	readSetup(simulator, car, track, type, name, ByRef size) {
+	readSetup(simulator, car, track, type, name, ByRef size, ByRef info) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local data, fileName, file
 
@@ -1209,18 +1209,22 @@ class SessionDatabase extends ConfigurationItem {
 
 			file.Close()
 
+			info := readConfiguration(fileName . ".info")
+
 			return data
 		}
 		else {
 			size := 0
 
+			info := newConfiguration()
+
 			return ""
 		}
 	}
 
-	writeSetup(simulator, car, track, type, name, setup, size) {
+	writeSetup(simulator, car, track, type, name, setup, size, synchronize, share, driver := false) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local fileName, file
+		local fileName, file, info
 
 		car := this.getCarCode(simulator, car)
 
@@ -1237,15 +1241,50 @@ class SessionDatabase extends ConfigurationItem {
 		file.RawWrite(setup, size)
 
 		file.Close()
+
+		if !driver
+			driver := this.ID
+
+		info := newConfiguration()
+
+		setConfigurationValue(info, "General", "Name", name)
+		setConfigurationValue(info, "General", "Type", type)
+
+		setConfigurationValue(info, "Setup", "Simulator", this.getSimulatorName(simulator))
+		setConfigurationValue(info, "Setup", "Car", car)
+		setConfigurationValue(info, "Setup", "Track", track)
+
+		setConfigurationValue(info, "Access", "Driver", driver)
+		setConfigurationValue(info, "Access", "Share", share)
+		setConfigurationValue(info, "Access", "Synchronize", synchronize)
+
+		writeConfiguration(fileName . ".info", info)
 	}
 
 	renameSetup(simulator, car, track, type, oldName, newName) {
 		local simulatorCode := this.getSimulatorCode(simulator)
+		local oldFileName, newFileName
 
 		car := this.getCarCode(simulator, car)
 
+		oldFileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%oldName%
+		newFileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%newName%
+
 		try {
-			FileMove %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%oldName%, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%newName%, 1
+			FileMove %oldFileName%, %newFileName%, 1
+
+			info := readConfiguration(oldFileName . ".info")
+
+			deleteFile(oldFileName . ".info")
+
+			setConfigurationValue(info, "General", "Name", newName)
+			setConfigurationValue(info, "General", "Type", type)
+
+			setConfigurationValue(info, "Setup", "Simulator", this.getSimulatorName(simulator))
+			setConfigurationValue(info, "Setup", "Car", car)
+			setConfigurationValue(info, "Setup", "Track", track)
+
+			writeConfiguration(newFileName . ".info", info)
 		}
 		catch exception {
 			logError(exception)
@@ -1261,6 +1300,7 @@ class SessionDatabase extends ConfigurationItem {
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 
 		deleteFile(fileName)
+		deleteFile(fileName . ".info")
 	}
 
 	writeDatabaseState(identifier, info, arguments*) {

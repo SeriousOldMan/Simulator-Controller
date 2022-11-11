@@ -3021,7 +3021,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			SplitPath fileName, fileName
 
-			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size)
+			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, true, true)
 
 			this.loadSetups(this.SelectedSetupType, true)
 		}
@@ -3030,7 +3030,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	downloadSetup(setupType, setupName) {
 		local window := this.Window
 		local title := translate("Download Setup File...")
-		local fileName, setupData, file, size
+		local fileName, setupData, file, size, info
 
 		Gui %window%:Default
 		Gui +OwnDialogs
@@ -3042,7 +3042,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (fileName != "") {
 			size := false
 
-			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
+			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size, info)
 
 			deleteFile(fileName)
 

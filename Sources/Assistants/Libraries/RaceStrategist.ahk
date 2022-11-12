@@ -837,7 +837,7 @@ class RaceStrategist extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (this.getPosition(false, "Class") = this.getGrid("Class").Length())
+		if (this.getPosition(false, "Class") = this.getCars("Class").Length())
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker.beginTalk()
@@ -1602,22 +1602,24 @@ class RaceStrategist extends RaceAssistant {
 
 		result := base.updateLap(lapNumber, data)
 
-		gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
+		if !this.MultiClass {
+			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 
-		if (gapAhead != kUndefined) {
-			knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
+			if (gapAhead != kUndefined) {
+				knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
 
-			if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-				knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
-		}
+				if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+					knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+			}
 
-		gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
 
-		if (gapBehind != kUndefined) {
-			knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
+			if (gapBehind != kUndefined) {
+				knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
 
-			if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-				knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+				if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+					knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+			}
 		}
 
 		return result

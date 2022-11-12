@@ -734,7 +734,7 @@ updateAssistantsState(controllerState) {
 			if (state = "Active") {
 				overallState := "Active"
 
-				state := "Active"
+				state := translate("Active")
 
 				if getConfigurationValue(controllerState, key, "Muted", false)
 					state .= translate(" (Muted)")

@@ -398,9 +398,9 @@ class PositionInfo {
 		Get {
 			local driverCar := this.Spotter.DriverCar
 			local lastLap := driverCar.LastLap
-			local position := this.Spotter.Positions["Position"]
+			local position := this.Spotter.Positions["Position.Overall"]
 
-			if (((Abs(this.Delta[sector, true, 1]) * 2) < driverCar.LapTime[true]) || (Abs(position - this.Car.Position["Class"]) == 1))
+			if (((Abs(this.Delta[sector, true, 1]) * 2) < driverCar.LapTime[true]) || (Abs(position - this.Car.Position["Overall"]) == 1))
 				return "Position"
 			else if (lastLap > this.Car.LastLap)
 				return "LapDown"
@@ -532,7 +532,7 @@ class PositionInfo {
 	}
 
 	isLeader() {
-		return (this.Car.Position["Class"] == 1)
+		return ((this.Car.Position["Class"] == 1) && (this.Car.Class = this.Spotter.DriverCar.Class))
 	}
 
 	inFront(standings := true) {
@@ -540,7 +540,7 @@ class PositionInfo {
 		local frontCar
 
 		if standings
-			return (this.Car.Position["Class"] < positions["Position"])
+			return (this.Car.Position["Overall"] < positions["Position.Overall"])
 		else {
 			frontCar := positions["TrackAhead"]
 
@@ -553,7 +553,7 @@ class PositionInfo {
 		local behindCar
 
 		if standings
-			return (this.Car.Position["Class"] > positions["Position"])
+			return (this.Car.Position["Overall"] > positions["Position.Overall"])
 		else {
 			behindCar := positions["TrackBehind"]
 
@@ -565,7 +565,7 @@ class PositionInfo {
 		local spotter := this.Spotter
 		local car := this.Car
 		local positions := spotter.Positions
-		local position := positions["Position"]
+		local position := positions["Position.Class"]
 
 		if (car.Class = spotter.DriverCar.Class) {
 			if ((position - car.Position["Class"]) == 1)
@@ -871,9 +871,6 @@ class RaceSpotter extends RaceAssistant {
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
 			this.iLastDeltaInformationLap := 0
 
-			this.iOverallGridPosition := false
-			this.iClassGridPosition := false
-
 			this.iRunning := false
 			this.iDriverCar := false
 			this.OtherCars := {}
@@ -1087,7 +1084,7 @@ class RaceSpotter extends RaceAssistant {
 		local talking := false
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (this.getPosition(false, "Class") = this.getGrid("Class").Length())
+		if (this.getPosition(false, "Class") = this.getCars("Class").Length())
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker := this.getSpeaker()
@@ -1363,7 +1360,7 @@ class RaceSpotter extends RaceAssistant {
 			driver := positions["Driver"]
 
 			if driver {
-				currentPosition := positions["Position"]
+				currentPosition := positions["Position.Class"]
 
 				speaker.beginTalk()
 
@@ -1417,7 +1414,7 @@ class RaceSpotter extends RaceAssistant {
 			try {
 				speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
 													, laps: remainingSessionLaps
-													, position: Round(positions["Position"])})
+													, position: Round(positions["Position.Class"])})
 
 				remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
@@ -1448,7 +1445,7 @@ class RaceSpotter extends RaceAssistant {
 
 	announceFinalLaps(lastLap, sector, positions) {
 		local speaker := this.getSpeaker(true)
-		local position := positions["Position"]
+		local position := positions["Position.Class"]
 
 		speaker.beginTalk()
 
@@ -2273,15 +2270,14 @@ class RaceSpotter extends RaceAssistant {
 	blueFlag() {
 		local positions := this.Positions
 		local knowledgeBase := this.KnowledgeBase
-		local position, delta
+		local delta
 
 		if (this.Announcements["BlueFlags"] && this.Speaker[false] && this.Running) {
 			this.SpotterSpeaking := true
 
 			try {
-				if (positions.HasKey("Position") && positions.HasKey("StandingsBehind")) {
-					position := positions["Position"]
-					delta := Abs(positions[positions["StandingsBehind"]][8])
+				if positions.HasKey("StandingsBehind") {
+					delta := Abs(positions[positions["StandingsBehind"]][10])
 
 					if (delta && (delta < 2000))
 						this.getSpeaker(true).speakPhrase("BlueForPosition", false, false, "BlueForPosition")
@@ -2422,7 +2418,7 @@ class RaceSpotter extends RaceAssistant {
 	initializeGridPosition(data, force := false) {
 		local driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
-		if ((force || !this.GridPosition) && (driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1))) {
+		if ((force || !this.GridPosition) && driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)) {
 			this.iOverallGridPosition := this.getPosition(driver, "Overall", data)
 			this.iClassGridPosition := this.getPosition(driver, "Class", data)
 		}
@@ -2479,11 +2475,11 @@ class RaceSpotter extends RaceAssistant {
 
 				if (this.Session = kSessionRace) {
 					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
-					position := getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+					position := this.getPosition(driver, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
 
 					if (driver && position)
 						speaker.speakPhrase("GreetingPosition"
-										  , {position: position, overall: this.MultiClass ? speaker.Fragments["Overall"] : ""})
+										  , {position: position, overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
 
 					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
 						length := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
@@ -2765,32 +2761,31 @@ class RaceSpotter extends RaceAssistant {
 		local standingsBehind := false
 		local leader := false
 		local hasDriver := false
-		local index, car, prefix, position, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
-		local carOverllPosition, carClassPosition, carDelta, carAheadDelta, carBehindDelta
-		local classes, class, classPositions, ignore
+		local index, car, prefix, lapTime, driverLaps, driverRunning, carIndex, carLaps, carRunning
+		local driverClassPosition, carOverallPosition, carClassPosition, carDelta, carAheadDelta, carBehindDelta
+		local classes, class, carClassPositions, ignore
 
 		if (driver && count) {
 			classes := {}
-			classPositions := []
+			carClassPositions := []
 
 			loop %count%
 			{
-				class := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", "Unknown")
-				position := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")
+				class := this.getClass(A_Index, data) ; getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", "Unknown")
 
 				if !classes.HasKey(class)
-					classes[class] := [Array(A_Index, position)]
+					classes[class] := [Array(A_Index, this.getPosition(A_Index, "Overall", data))]
 				else
-					classes[class].Push(Array(A_Index, position))
+					classes[class].Push(Array(A_Index, this.getPosition(A_Index, "Overall", data)))
 
-				classPositions.Push(false)
+				carClassPositions.Push(false)
 			}
 
 			for ignore, class in classes {
 				bubbleSort(class, "compareClassPositions")
 
-				for position, car in class
-					classPositions[car[1]] := position
+				for carClassPosition, car in class
+					carClassPositions[car[1]] := carClassPosition
 			}
 
 			loop %count%
@@ -2814,8 +2809,8 @@ class RaceSpotter extends RaceAssistant {
 				positions["Driver"] := driver
 				positions["Count"] := count
 
-				position := classPositions[driver]
-				class := getConfigurationValue(data, "Position Data", "Car." . driver . ".Class", "Unknown")
+				driverClassPosition := carClassPositions[driver]
+				class := this.getClass(driver, data)
 				lapTime := getConfigurationValue(data, "Position Data", "Car." . driver . ".Time")
 
 				for index, car in carPositions {
@@ -2825,8 +2820,8 @@ class RaceSpotter extends RaceAssistant {
 
 					prefix := ("Car." . carIndex)
 
-					carOverallPosition := getConfigurationValue(data, "Position Data", prefix . ".Position")
-					carClassPosition := classPositions[carIndex]
+					carOverallPosition := this.getPosition(carIndex, "Overall", data) ; getConfigurationValue(data, "Position Data", prefix . ".Position")
+					carClassPosition := carClassPositions[carIndex]
 					carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
 
 					if (driverRunning < carRunning) {
@@ -2840,7 +2835,7 @@ class RaceSpotter extends RaceAssistant {
 
 					positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")
 											   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
-											   , getConfigurationValue(data, "Position Data", prefix . ".Class", kUnknown)
+											   , this.getClass(carIndex, data) ; getConfigurationValue(data, "Position Data", prefix . ".Class", kUnknown)
 											   , computeDriverName(getConfigurationValue(data, "Position Data", prefix . ".Driver.Forname", "John")
 																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
 																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
@@ -2853,13 +2848,13 @@ class RaceSpotter extends RaceAssistant {
 											   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
 											   , getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false))
 
-					if (class = getConfigurationValue(data, "Position Data", "Car." . prefix . ".Class", "Unknown")) {
+					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)
 							leader := carIndex
 
-						if (carClassPosition = (position - 1))
+						if (carClassPosition = (driverClassPosition - 1))
 							standingsAhead := carIndex
-						else if (carClassPosition = (position + 1))
+						else if (carClassPosition = (driverClassPosition + 1))
 							standingsBehind := carIndex
 					}
 
@@ -2883,20 +2878,21 @@ class RaceSpotter extends RaceAssistant {
 				trackBehind := carPositions[trackBehind][1]
 
 				if (gapAhead && standingsAhead) {
-					positions[standingsAhead][8] := gapAhead
+					positions[standingsAhead][10] := gapAhead
 
 					if (standingsAhead = trackAhead)
-						positions[trackAhead][8] := gapAhead
+						positions[trackAhead][10] := gapAhead
 				}
 
 				if (gapBehind && standingsBehind) {
-					positions[standingsBehind][8] := gapBehind
+					positions[standingsBehind][10] := gapBehind
 
 					if (standingsBehind = trackBehind)
-						positions[trackBehind][8] := gapBehind
+						positions[trackBehind][10] := gapBehind
 				}
 
-				positions["Position"] := position
+				positions["Position.Overall"] := this.getPosition(driver, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+				positions["Position.Class"] := driverClassPosition
 				positions["Leader"] := leader
 				positions["StandingsAhead"] := standingsAhead
 				positions["StandingsBehind"] := standingsBehind

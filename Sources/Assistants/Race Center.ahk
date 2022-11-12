@@ -1837,11 +1837,11 @@ class RaceCenter extends ConfigurationItem {
 		return getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
 	}
 
-	getGrid(data, class := "Overall", sorted := false) {
+	getCars(data, class := "Overall", sorted := false) {
 		local classGrid := []
 		local positions, ignore, position
 
-		if (!class || (class = "Class"))
+		if (class = "Class")
 			class := this.getClass(data)
 		else if (class = "Overall")
 			class := false
@@ -1877,7 +1877,7 @@ class RaceCenter extends ConfigurationItem {
 				car := getConfigurationValue(data, "Position Data", "Driver.Car")
 
 		if (type != "Overall")
-			for position, candidate in this.getGrid(data, getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown), true)
+			for position, candidate in this.getCars(data, getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown), true)
 				if (candidate = car)
 					return position
 
@@ -7434,12 +7434,6 @@ class RaceCenter extends ConfigurationItem {
 									if (driverClass = carClass) {
 										carPosition := this.getPosition(positions, "Class", carIndex)
 
-										if (!hasLeader && (carPosition == 1) && (driverClassPosition != 1)) {
-											brush := leaderBrush
-
-											hasLeader := true
-										}
-
 										if (!hasAhead && (carPosition + 1) = driverClassPosition) {
 											brush := aheadBrush
 
@@ -7450,6 +7444,12 @@ class RaceCenter extends ConfigurationItem {
 											brush := behindBrush
 
 											hasBehind := true
+										}
+
+										if (!hasLeader && (carPosition == 1) && (driverClassPosition != 1)) {
+											brush := leaderBrush
+
+											hasLeader := true
 										}
 									}
 								}

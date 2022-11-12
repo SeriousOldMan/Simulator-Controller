@@ -3828,7 +3828,7 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x16 yp+30 w388 h156 Section, % translate("Team Server")
+		Gui %window%:Add, GroupBox, x16 yp+30 w388 h186 Section, % translate("Team Server")
 
 		Gui %window%:Font, Norm, Arial
 
@@ -3852,9 +3852,18 @@ editSettings(editorOrCommand) {
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range10-90, %serverUpdateEdit%
 		Gui %window%:Add, Text, x190 yp w90 h23 +0x200, % translate("Minutes")
 
-		Gui %window%:Add, Button, x312 yp+2 w80 vrebuildButton grebuildDatabase, % translate("Rebuild...")
+		Gui %window%:Add, Button, x146 yp+30 w96 vrebuildButton grebuildDatabase, % translate("Rebuild...")
 
-		Gui %window%:Add, Button, x122 ys+174 w80 h23 gacceptSettings, % translate("Ok")
+		Gui %window%:Add, Button, x296 yp w23 h23 Center +0x200 HWNDbuttonHandle
+		setButtonIcon(buttonHandle, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle
+		setButtonIcon(buttonHandle, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle
+		setButtonIcon(buttonHandle, kIconsDirectory . "Previous.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle
+		setButtonIcon(buttonHandle, kIconsDirectory . "Next.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Button, x122 ys+194 w80 h23 gacceptSettings, % translate("Ok")
 		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
 
 		updateSettingsState()

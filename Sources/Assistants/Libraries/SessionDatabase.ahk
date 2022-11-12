@@ -1222,7 +1222,8 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	writeSetup(simulator, car, track, type, name, setup, size, synchronize, share, driver := false) {
+	writeSetup(simulator, car, track, type, name, setup, size, synchronize, share
+			 , driver := false, identifier := false, synchronized := false) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
@@ -1247,8 +1248,13 @@ class SessionDatabase extends ConfigurationItem {
 
 		info := newConfiguration()
 
+		if !identifier
+			identifier := createGuid()
+
 		setConfigurationValue(info, "General", "Name", name)
 		setConfigurationValue(info, "General", "Type", type)
+		setConfigurationValue(info, "General", "Identifier", identifier)
+		setConfigurationValue(info, "General", "Synchronized", synchronized)
 
 		setConfigurationValue(info, "Setup", "Simulator", this.getSimulatorName(simulator))
 		setConfigurationValue(info, "Setup", "Car", car)
@@ -1278,7 +1284,12 @@ class SessionDatabase extends ConfigurationItem {
 			deleteFile(oldFileName . ".info")
 
 			setConfigurationValue(info, "General", "Name", newName)
+
+			if !getConfigurationValue(info, "General", "OriginalName", false)
+				setConfigurationValue(info, "General", "OriginalName", oldName)
+
 			setConfigurationValue(info, "General", "Type", type)
+			setConfigurationValue(info, "General", "Synchronized", false)
 
 			setConfigurationValue(info, "Setup", "Simulator", this.getSimulatorName(simulator))
 			setConfigurationValue(info, "Setup", "Car", car)
@@ -1293,14 +1304,27 @@ class SessionDatabase extends ConfigurationItem {
 
 	removeSetup(simulator, car, track, type, name) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local fileName
+		local fileName, info, identifier, ignore, connector
 
 		car := this.getCarCode(simulator, car)
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 
+		info := readConfiguration(fileName . ".info")
+
 		deleteFile(fileName)
 		deleteFile(fileName . ".info")
+
+		identifier := getConfigurationValue(info, "General", "Identifier", false)
+
+		if identifier
+			for ignore, connector in this.Connectors
+				try {
+					connector.DeleteData("Document", identifier)
+				}
+				catch exception {
+					logError(exception, true)
+				}
 	}
 
 	writeDatabaseState(identifier, info, arguments*) {
@@ -1657,6 +1681,55 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 	}
 }
 
+synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
+	local start, ignore, identifier, document, name, type, info
+
+	if inList(groups, "Setups") {
+		start := A_Now
+
+		try {
+			for ignore, identifier in string2Values(";", connector.QueryData("Document", "Modified > " . lastSynchronization)) {
+				document := parseData(connector.GetData("Document", identifier))
+
+				simulator := document.Simulator
+
+				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+					setup := connector.GetDataValue("Document", identifier, "Setup")
+					info := parseConfiguration(connector.GetDataValue("Document", identifier, "Info"))
+
+					car := document.Car
+					track := document.Track
+
+					sessionDB.writeSetup(simulator, car, track,
+									   , getConfigurationValue(info, "General", "Type")
+									   , getConfigurationValue(info, "General", "Name")
+									   , setup
+									   , getConfigurationValue(info, "Setup", "Size")
+									   , getConfigurationValue(info, "Access", "Synchronize")
+									   , getConfigurationValue(info, "Access", "Share")
+									   , getConfigurationValue(info, "Access", "Driver")
+									   , true)
+				}
+			}
+		}
+		finally {
+			info := readConfiguration(kDatabaseDirectory . "SYNCHRONIZE")
+
+			setConfigurationValue(info, "Setups", "Synchronization", start)
+
+			writeConfiguration(kDatabaseDirectory . "SYNCHRONIZE", info)
+		}
+	}
+}
+
+synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
+	local ignore, simulator, db, modified, identifier, driver, drivers
+
+	if inList(groups, "Strategies") {
+
+	}
+}
+
 keepAlive(identifier, connector, connection) {
 	SessionDatabase.Connected[identifier] := connector.KeepAlive(connection)
 }
@@ -1667,3 +1740,5 @@ keepAlive(identifier, connector, connection) {
 ;;;-------------------------------------------------------------------------;;;
 
 SessionDatabase.registerSynchronizer("synchronizeDrivers")
+SessionDatabase.registerSynchronizer("synchronizeSetups")
+SessionDatabase.registerSynchronizer("synchronizeStrategies")

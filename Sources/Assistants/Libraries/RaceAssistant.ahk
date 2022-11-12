@@ -649,8 +649,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	accept() {
-		if this.Continuation {
-			if this.VoiceManager
+		local continuation := this.Continuation
+
+		if continuation {
+			if isInstance(continuation, VoiceManager.VoiceContinuation)
+				this.handleVoiceCommand("Yes", ["Yes"])
+			else if this.VoiceManager
 				this.VoiceManager.phraseRecognized("Yes", ["Yes"])
 			else
 				this.handleVoiceCommand("Yes", ["Yes"])
@@ -660,8 +664,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	reject() {
-		if this.Continuation {
-			if this.VoiceManager
+		local continuation := this.Continuation
+
+		if continuation {
+			if isInstance(continuation, VoiceManager.VoiceContinuation)
+				this.handleVoiceCommand("Yes", ["Yes"])
+			else if this.VoiceManager
 				this.VoiceManager.phraseRecognized("No", ["No"])
 			else
 				this.handleVoiceCommand("No", ["No"])

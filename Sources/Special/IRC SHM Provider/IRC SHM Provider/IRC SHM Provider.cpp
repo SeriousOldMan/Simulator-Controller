@@ -769,8 +769,10 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 
 			if (!practice && sessionLaps > 0 && (long)(sessionLaps - laps) <= 0)
 				printf("Session=Finished\n");
+			/*
 			else if (flags & irsdk_checkered)
 				printf("Session=Finished\n");
+			*/
 			else if (getYamlValue(result, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}SessionType:", sessionID)) {
 				if (practice)
 					printf("Session=Practice\n");

@@ -254,12 +254,16 @@ class RaceReportViewer extends RaceReportReader {
 		local result := editReportSettings(this, this.Report, settings)
 		local setting, values
 
-		if result
+		if result {
 			for setting, values in result
 				if ((setting = "Laps") && (values == true))
 					this.Settings.Delete("Laps")
 				else
 					this.Settings[setting] := values
+
+			if !result.HasKey("Classes")
+				this.Settings.Delete("Classes")
+		}
 
 		return (result != false)
 	}

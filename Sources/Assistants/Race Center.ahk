@@ -2247,7 +2247,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(conditions, row, 2)
 				LV_GetText(compound, row, 3)
 				LV_GetText(pressures, row, 4)
-				LV_GetText(notes, row, 4)
+				LV_GetText(notes, row, 5)
 
 				LV_Modify(LV_Add("Select", driver, conditions, compound, pressures, notes), "Vis")
 

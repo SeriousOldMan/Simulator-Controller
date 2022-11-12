@@ -1980,6 +1980,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			writeConfiguration(directory . "\Export.info", info)
 		}
+		catch exception {
+			logError(exception)
+		}
 		finally {
 			Gui ListView, %defaultListView%
 			Gui %window%:-Disabled
@@ -2172,6 +2175,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							}
 						}
 					}
+			}
+			catch exception {
+				logError(exception)
 			}
 			finally {
 				Gui %window%:-Disabled

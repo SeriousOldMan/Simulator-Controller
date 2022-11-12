@@ -1639,7 +1639,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	loadCompound(compound, force := false) {
 		local window
 		local compoundColor
-		
+
 		if compound
 			compound := normalizeCompound(compound)
 
@@ -3396,7 +3396,7 @@ filterSchema(schema) {
 	local ignore, column
 
 	for ignore, column in schema
-		if !inList(["Driver", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
+		if !inList(["Driver", "Identifier", "Synchronized", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
 			newSchema.Push(column)
 
 	return newSchema
@@ -3604,7 +3604,7 @@ chooseTyreSet() {
 
 		LV_GetText(compound, A_EventInfo, 1)
 		LV_GetText(count, A_EventInfo, 2)
-		
+
 		if compound
 			compound := normalizeCompound(compound)
 

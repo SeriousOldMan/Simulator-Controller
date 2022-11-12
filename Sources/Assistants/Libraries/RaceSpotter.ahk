@@ -2494,6 +2494,9 @@ class RaceSpotter extends RaceAssistant {
 					else {
 						length := this.SessionLaps
 
+						if (length = 0)
+							length := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
+
 						if (length > 0)
 							speaker.speakPhrase("GreetingLaps", {laps: length})
 					}

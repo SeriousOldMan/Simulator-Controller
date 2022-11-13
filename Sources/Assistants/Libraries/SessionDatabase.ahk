@@ -1227,13 +1227,34 @@ class SessionDatabase extends ConfigurationItem {
 
 	readSetupInfo(simulator, car, track, type, name) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local fileName
+		local fileName, info
 
 		car := this.getCarCode(simulator, car)
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%.info
 
-		return (FileExist(fileName) ? readConfiguration(fileName) : false)
+		if !FileExist(fileName) {
+			info := newConfiguration()
+
+			setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+			setConfigurationValue(info, "Origin", "Car", car)
+			setConfigurationValue(info, "Origin", "Track", track)
+			setConfigurationValue(info, "Origin", "Driver", this.ID)
+
+			setConfigurationValue(info, "Setup", "Name", name)
+			setConfigurationValue(info, "Setup", "Type", type)
+			setConfigurationValue(info, "Setup", "Identifier", createGuid())
+			setConfigurationValue(info, "Setup", "Synchronized", false)
+
+			setConfigurationValue(info, "Access", "Share", false)
+			setConfigurationValue(info, "Access", "Synchronize", false)
+
+			writeConfiguration(fileName, info)
+
+			return info
+		}
+		else
+			return readConfiguration(fileName)
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
@@ -1260,18 +1281,10 @@ class SessionDatabase extends ConfigurationItem {
 		if !driver
 			driver := this.ID
 
-		info := newConfiguration()
+		info := this.readSetupInfo(simulator, car, track, type, name)
 
-		if !identifier
-			identifier := createGuid()
-
-		setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-		setConfigurationValue(info, "Origin", "Car", car)
-		setConfigurationValue(info, "Origin", "Track", track)
 		setConfigurationValue(info, "Origin", "Driver", driver)
 
-		setConfigurationValue(info, "Setup", "Name", name)
-		setConfigurationValue(info, "Setup", "Type", type)
 		setConfigurationValue(info, "Setup", "Identifier", identifier)
 		setConfigurationValue(info, "Setup", "Synchronized", synchronized)
 		setConfigurationValue(info, "Setup", "Size", size)
@@ -1310,7 +1323,7 @@ class SessionDatabase extends ConfigurationItem {
 
 				deleteFile(oldFileName . ".info")
 
-				setConfigurationValue(info, "Setup", "Name", false)
+				setConfigurationValue(info, "Setup", "Name", newName)
 				setConfigurationValue(info, "Setup", "Synchronized", false)
 
 				writeConfiguration(newFileName . ".info", info)
@@ -1334,9 +1347,9 @@ class SessionDatabase extends ConfigurationItem {
 		deleteFile(fileName)
 		deleteFile(fileName . ".info")
 
-		identifier := getConfigurationValue(info, "General", "Identifier", false)
+		identifier := getConfigurationValue(info, "Setup", "Identifier", false)
 
-		if identifier
+		if (identifier && (getConfigurationValue(info, "Origin", "Driver", false) = this.ID))
 			for ignore, connector in this.Connectors
 				try {
 					connector.DeleteData("Document", identifier)
@@ -1344,6 +1357,48 @@ class SessionDatabase extends ConfigurationItem {
 				catch exception {
 					logError(exception, true)
 				}
+	}
+
+	readStrategyInfo(simulator, car, track, name) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName, info
+
+		car := this.getCarCode(simulator, car)
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%.info
+
+		if !FileExist(fileName) {
+			info := newConfiguration()
+
+			setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+			setConfigurationValue(info, "Origin", "Car", car)
+			setConfigurationValue(info, "Origin", "Track", track)
+			setConfigurationValue(info, "Origin", "Driver", this.ID)
+
+			setConfigurationValue(info, "Setup", "Name", name)
+			setConfigurationValue(info, "Setup", "Identifier", createGuid())
+			setConfigurationValue(info, "Setup", "Synchronized", false)
+
+			setConfigurationValue(info, "Access", "Share", false)
+			setConfigurationValue(info, "Access", "Synchronize", true)
+
+			writeConfiguration(fileName, info)
+
+			return info
+		}
+		else
+			return readConfiguration(fileName)
+	}
+
+	writeStrategyInfo(simulator, car, track, name, info) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
+
+		car := this.getCarCode(simulator, car)
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%.info
+
+		writeConfiguration(fileName, info)
 	}
 
 	writeDatabaseState(identifier, info, arguments*) {
@@ -1762,14 +1817,8 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 																  , getConfigurationValue(info, "Setup", "Type")
 																  , getConfigurationValue(info, "Setup", "Name"))
 
-									if (setup && (size > 0) && info) {
-										identifier := getConfigurationValue(info, "Setup", "Identifier", false)
-
-										if !identifier {
-											identifier := createGuid()
-
-											setConfigurationValue(info, "Setup", "Identifier", identifier)
-										}
+									if (setup && (size > 0)) {
+										identifier := getConfigurationValue(info, "Setup", "Identifier")
 
 										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
 											connector.CreateData("Document"

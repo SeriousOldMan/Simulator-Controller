@@ -2209,12 +2209,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		local simulator := this.SelectedSimulator
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
+		local sessionDB := new SessionDatabase()
 		local strategy, strategies, simulatorCode, dirName, fileName, configuration, title, name, files, directory
-		local sessionDB
 
 		if (simulator && car && track) {
-			sessionDB := new SessionDatabase()
-
 			directory := sessionDB.DatabasePath
 			simulatorCode := sessionDB.getSimulatorCode(simulator)
 
@@ -2282,6 +2280,14 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.SelectedStrategy.saveToConfiguration(configuration)
 
 						writeConfiguration(fileName, configuration)
+
+						if ((StrLen(dirName) > 0) && (InStr(fileName, dirName) = 1)) {
+							info := sessionDB.readStrategyInfo(simulator, car, track, name . ".strategy")
+
+							setConfigurationValue(info, "Strategy", "Synchronized", false)
+
+							sessionDB.writeStrategyInfo(simulator, car, track, name . ".strategy", info)
+						}
 					}
 				}
 			case 7: ; "Compare Strategies..."

@@ -553,8 +553,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(deleteSetupButtonHandle, kIconsDirectory . "Minus.ico", 1)
 
 		Gui %window%:Add, Text, x296 yp w80 h23 +0x200, % translate("Share")
-		Gui %window%:Add, CheckBox, -Theme xp+90 yp+4 w140 vshareWithCommunityCheck gupdateAccess, % translate("with Community")
-		Gui %window%:Add, CheckBox, -Theme xp yp+24 w140 vshareWithTeamServerCheck gupdateAccess, % translate("on Team Server")
+		Gui %window%:Add, CheckBox, xp+90 yp+4 w140 vshareWithCommunityCheck gupdateAccess, % translate("with Community") ; -Theme
+		Gui %window%:Add, CheckBox, xp yp+24 w140 vshareWithTeamServerCheck gupdateAccess, % translate("on Team Server") ; -Theme
 
 		Gui Tab, 3
 
@@ -865,16 +865,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				if (type != translate("Community")) {
 					GuiControlGet setupTypeDropDown
+
 					info := this.SessionDatabase.readSetupInfo(simulator, car, track, kSetupTypes[setupTypeDropDown], name)
 
+					GuiControl Enable, deleteSetupButton
+
 					if (!info || (getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
-						GuiControl Enable, deleteSetupButton
 						GuiControl Enable, renameSetupButton
 						GuiControl Enable, shareWithCommunityCheck
 						GuiControl Enable, shareWithTeamServerCheck
 					}
 					else {
-						GuiControl Disable, deleteSetupButton
 						GuiControl Disable, renameSetupButton
 						GuiControl Disable, shareWithCommunityCheck
 						GuiControl Disable, shareWithTeamServerCheck
@@ -3396,7 +3397,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 		Gui IDS:Add, Text, x8 yp+30 w410 0x10
 
-		Gui IDS:Add, CheckBox, +Theme Check3 x16 yp+12 w15 h23 vimportSelectCheck gselectAllImportEntries
+		Gui IDS:Add, CheckBox, Check3 x16 yp+12 w15 h23 vimportSelectCheck gselectAllImportEntries ; +Theme
 
 		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
@@ -4827,18 +4828,6 @@ updateAccess() {
 		LV_GetText(name, selected, 2)
 
 		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
-
-		if !info {
-			info := newConfiguration()
-
-			setConfigurationValue(info, "Origin", "Simulator", sessionDB.getSimulatorName(editor.SelectedSimulator))
-			setConfigurationValue(info, "Origin", "Car", editor.SelectedCar)
-			setConfigurationValue(info, "Origin", "Track", editor.SelectedTrack)
-			setConfigurationValue(info, "Origin", "Driver", sessionDB.ID)
-
-			setConfigurationValue(info, "Strategy", "Name", name)
-			setConfigurationValue(info, "Strategy", "Identifier", createGuid())
-		}
 
 		setConfigurationValue(info, "Strategy", "Synchronized", false)
 		setConfigurationValue(info, "Access", "Share", shareWithCommunityCheck)

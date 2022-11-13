@@ -107,6 +107,9 @@ global downloadSetupButton
 global renameSetupButton
 global deleteSetupButton
 
+global shareWithCommunityCheck
+global shareWithTeamServerCheck
+
 global dryQualificationDropDown
 global uploadDryQualificationButton
 global downloadDryQualificationButton
@@ -549,6 +552,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(renameSetupButtonHandle, kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(deleteSetupButtonHandle, kIconsDirectory . "Minus.ico", 1)
 
+		Gui %window%:Add, Text, x296 yp w80 h23 +0x200, % translate("Share")
+		Gui %window%:Add, CheckBox, -Theme xp+90 yp+4 w140 vshareWithCommunityCheck gupdateAccess, % translate("with Community")
+		Gui %window%:Add, CheckBox, -Theme xp yp+24 w140 vshareWithTeamServerCheck gupdateAccess, % translate("on Team Server")
+
 		Gui Tab, 3
 
 		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Driver")
@@ -744,6 +751,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	updateState() {
 		local window := this.Window
 		local simulator, car, track, defaultListView, selected, selectedEntries, row, type
+		local name, info
 
 		Gui %window%:Default
 
@@ -851,22 +859,49 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if selected {
 				LV_GetText(type, selected, 1)
+				LV_GetText(name, selected, 2)
 
 				GuiControl Enable, downloadSetupButton
 
-				if (type = translate("User")) {
-					GuiControl Enable, deleteSetupButton
-					GuiControl Enable, renameSetupButton
+				if (type != translate("Community")) {
+					GuiControlGet setupTypeDropDown
+					info := this.SessionDatabase.readSetupInfo(simulator, car, track, kSetupTypes[setupTypeDropDown], name)
+
+					if (!info || (getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+						GuiControl Enable, deleteSetupButton
+						GuiControl Enable, renameSetupButton
+						GuiControl Enable, shareWithCommunityCheck
+						GuiControl Enable, shareWithTeamServerCheck
+					}
+					else {
+						GuiControl Disable, deleteSetupButton
+						GuiControl Disable, renameSetupButton
+						GuiControl Disable, shareWithCommunityCheck
+						GuiControl Disable, shareWithTeamServerCheck
+
+						GuiControl, , shareWithCommunityCheck, 0
+						GuiControl, , shareWithTeamServerCheck, 0
+					}
 				}
 				else {
 					GuiControl Disable, deleteSetupButton
 					GuiControl Disable, renameSetupButton
+					GuiControl Disable, shareWithCommunityCheck
+					GuiControl Disable, shareWithTeamServerCheck
+
+					GuiControl, , shareWithCommunityCheck, 0
+					GuiControl, , shareWithTeamServerCheck, 0
 				}
 			}
 			else {
 				GuiControl Disable, downloadSetupButton
 				GuiControl Disable, deleteSetupButton
 				GuiControl Disable, renameSetupButton
+				GuiControl Disable, shareWithCommunityCheck
+				GuiControl Disable, shareWithTeamServerCheck
+
+				GuiControl, , shareWithCommunityCheck, 0
+				GuiControl, , shareWithTeamServerCheck, 0
 			}
 
 			Gui ListView, % this.SettingsListView
@@ -1048,7 +1083,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSetups(setupType, force := false) {
-		local window, defaultListView, userSetups, communitySetups, ignore, name
+		local window, defaultListView, userSetups, communitySetups, ignore, name, info, origin
 
 		if (force || (setupType != this.SelectedSetupType)) {
 			window := this.Window
@@ -1075,8 +1110,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				Gui ListView, % this.SetupListView
 
-				for ignore, name in userSetups
-					LV_Add("", translate("User"), name)
+				for ignore, name in userSetups {
+					info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, name)
+
+					if !info
+						origin := translate("User")
+					else {
+						origin := getConfigurationValue(info, "Origin", "Driver", this.SessionDatabase.ID)
+
+						origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+					}
+
+					LV_Add("", origin, name)
+				}
 
 				if communitySetups
 					for ignore, name in communitySetups[setupType]
@@ -2438,6 +2484,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	selectSetups() {
 		local window := this.Window
 		local defaultListView, ignore, column, userSetups, communitySetups, type, setups
+		local info, origin
 
 		Gui %window%:Default
 
@@ -3027,7 +3074,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			SplitPath fileName, fileName
 
-			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, true, true)
+			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, false, true)
 
 			this.loadSetups(this.SelectedSetupType, true)
 		}
@@ -3036,7 +3083,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	downloadSetup(setupType, setupName) {
 		local window := this.Window
 		local title := translate("Download Setup File...")
-		local fileName, setupData, file, size, info
+		local fileName, setupData, file, size
 
 		Gui %window%:Default
 		Gui +OwnDialogs
@@ -3048,7 +3095,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (fileName != "") {
 			size := false
 
-			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size, info)
+			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
 
 			deleteFile(fileName)
 
@@ -4037,7 +4084,7 @@ editSettings(editorOrCommand) {
 					MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
 					OnMessage(0x44, "")
 
-					ExitApp 0
+					broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitApplication")
 				}
 
 				done := true
@@ -4731,8 +4778,74 @@ chooseSetupType() {
 }
 
 chooseSetup() {
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
-		SessionDatabaseEditor.Instance.updateState()
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local name, type, info
+
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
+		Gui %window%:Default
+
+		GuiControlGet setupTypeDropDown
+
+		type := kSetupTypes[setupTypeDropDown]
+
+		Gui ListView, % editor.SetupListView
+
+		LV_GetText(name, A_EventInfo, 2)
+
+		info := editor.SessionDatabase.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
+
+		if (info && getConfigurationValue(info, "Origin", "Driver", false) = editor.SessionDatabase.ID) {
+			GuiControl, , shareWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
+			GuiControl, , shareWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
+		}
+		else {
+			GuiControl, , shareWithCommunityCheck, 0
+			GuiControl, , shareWithTeamServerCheck, 0
+		}
+
+		editor.updateState()
+	}
+}
+
+updateAccess() {
+	local editor := SessionDatabaseEditor.Instance
+	local sessionDB := editor.SessionDatabase
+	local selected, type, name
+
+	GuiControlGet shareWithCommunityCheck
+	GuiControlGet shareWithTeamServerCheck
+	GuiControlGet setupTypeDropDown
+
+	type := kSetupTypes[setupTypeDropDown]
+
+	Gui ListView, % editor.SetupListView
+
+	selected := LV_GetNext(0)
+
+	if selected {
+		LV_GetText(name, selected, 2)
+
+		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
+
+		if !info {
+			info := newConfiguration()
+
+			setConfigurationValue(info, "Origin", "Simulator", sessionDB.getSimulatorName(editor.SelectedSimulator))
+			setConfigurationValue(info, "Origin", "Car", editor.SelectedCar)
+			setConfigurationValue(info, "Origin", "Track", editor.SelectedTrack)
+			setConfigurationValue(info, "Origin", "Driver", sessionDB.ID)
+
+			setConfigurationValue(info, "Strategy", "Name", name)
+			setConfigurationValue(info, "Strategy", "Identifier", createGuid())
+		}
+
+		setConfigurationValue(info, "Strategy", "Synchronized", false)
+		setConfigurationValue(info, "Access", "Share", shareWithCommunityCheck)
+		setConfigurationValue(info, "Access", "Synchronize", shareWithTeamServerCheck)
+
+		sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
+	}
 }
 
 uploadSetup() {

@@ -1155,7 +1155,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	getSetupNames(simulator, car, track, ByRef userSetups, ByRef communitySetups) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local ignore, type, setups, name
+		local ignore, type, setups, name, extension
 
 		car := this.getCarCode(simulator, car)
 
@@ -1165,11 +1165,12 @@ class SessionDatabase extends ConfigurationItem {
 			for ignore, type in kSetupTypes {
 				setups := []
 
-				loop Files, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
+				loop Files, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*, F
 				{
-					SplitPath A_LoopFileName, name
+					SplitPath A_LoopFileName, name, , extension
 
-					setups.Push(name)
+					if (extension != "info")
+						setups.Push(name)
 				}
 
 				userSetups[type] := setups
@@ -1184,9 +1185,10 @@ class SessionDatabase extends ConfigurationItem {
 
 				loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
 				{
-					SplitPath A_LoopFileName, name
+					SplitPath A_LoopFileName, name, , extension
 
-					setups.Push(name)
+					if (extension != "info")
+						setups.Push(name)
 				}
 
 				communitySetups[type] := setups
@@ -1194,7 +1196,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	readSetup(simulator, car, track, type, name, ByRef size, ByRef info) {
+	readSetup(simulator, car, track, type, name, ByRef size) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local data, fileName, file
 
@@ -1214,20 +1216,27 @@ class SessionDatabase extends ConfigurationItem {
 
 			file.Close()
 
-			info := readConfiguration(fileName . ".info")
-
 			return data
 		}
 		else {
 			size := 0
 
-			info := newConfiguration()
-
 			return ""
 		}
 	}
 
-	writeSetup(simulator, car, track, type, name, setup, size, synchronize, share
+	readSetupInfo(simulator, car, track, type, name) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
+
+		car := this.getCarCode(simulator, car)
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%.info
+
+		return (FileExist(fileName) ? readConfiguration(fileName) : false)
+	}
+
+	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
 			 , driver := false, identifier := false, synchronized := false) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
@@ -1270,7 +1279,18 @@ class SessionDatabase extends ConfigurationItem {
 		setConfigurationValue(info, "Access", "Share", share)
 		setConfigurationValue(info, "Access", "Synchronize", synchronize)
 
-		writeConfiguration(fileName . ".info", info)
+		this.writeSetupInfo(simulator, car, track, type, name, info)
+	}
+
+	writeSetupInfo(simulator, car, track, type, name, info) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName
+
+		car := this.getCarCode(simulator, car)
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%.info
+
+		writeConfiguration(fileName, info)
 	}
 
 	renameSetup(simulator, car, track, type, oldName, newName) {
@@ -1737,9 +1757,12 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 									setup := sessionDB.readSetup(simulator, car, track
 															   , getConfigurationValue(info, "Setup", "Type")
 															   , getConfigurationValue(info, "Setup", "Name")
-															   , size, info)
+															   , size)
+									info := sessionDB.readSetupInfo(simulator, car, track
+																  , getConfigurationValue(info, "Setup", "Type")
+																  , getConfigurationValue(info, "Setup", "Name"))
 
-									if (setup && (size > 0) && (info.Count() > 0)) {
+									if (setup && (size > 0) && info) {
 										identifier := getConfigurationValue(info, "Setup", "Identifier", false)
 
 										if !identifier {
@@ -1807,6 +1830,9 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 					counter += 1
 
 					directory = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\
+
+					FileCreateDir %directory%
+
 					name := getConfigurationValue(info, "Strategy", "Name")
 
 					writeConfiguration(directory . name, strategy)
@@ -1844,7 +1870,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 								setConfigurationValue(info, "Strategy", "Identifier", createGuid())
 								setConfigurationValue(info, "Strategy", "Synchronized", false)
 
-								setConfigurationValue(info, "Access", "Share", true)
+								setConfigurationValue(info, "Access", "Share", false)
 								setConfigurationValue(info, "Access", "Synchronize", true)
 
 								writeConfiguration(directory . A_LoopFileName . ".info", info)

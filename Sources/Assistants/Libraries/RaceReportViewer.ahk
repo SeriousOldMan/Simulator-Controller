@@ -602,8 +602,10 @@ class RaceReportViewer extends RaceReportReader {
 			selectedClasses := this.getReportClasses(raceData)
 
 			loop % carsCount
+			{
+				car := A_Index
+
 				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)) {
-					car := A_Index
 					valid := false
 
 					for ignore, lap in this.getReportLaps(raceData)
@@ -616,7 +618,7 @@ class RaceReportViewer extends RaceReportReader {
 								break
 							}
 							else
-								positions[A_Index][car] := kNull ; carsCount
+								positions[lap][car] := kNull ; carsCount
 
 					if valid {
 						carIndices.Push(car)
@@ -624,11 +626,16 @@ class RaceReportViewer extends RaceReportReader {
 						cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
 									   . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
-					else
-						for ignore, lap in this.getReportLaps(raceData)
-							if positions.HasKey(lap)
-								positions[lap].RemoveAt(car)
 				}
+			}
+
+			for ignore, lap in this.getReportLaps(raceData)
+				loop % carsCount {
+					car := (carsCount - A_Index + 1)
+
+					if (!inList(carIndices, car) && positions.HasKey(lap) && positions[lap].HasKey(car))
+						positions[lap].RemoveAt(car)
+			}
 
 			drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 

@@ -509,8 +509,13 @@ class PositionInfo {
 		return (Abs(delta) <= threshold)
 	}
 
-	isFaster(sector) {
-		return (this.LapTimeDifference[true] > 0)
+	isFaster(sector, percentage := false) {
+		local difference := this.LapTimeDifference[true]
+
+		if (difference > 0)
+			return (percentage ? (difference > (this.Spotter.DriverCar.AverageLapTime / 100 * percentage)) : true)
+		else
+			return false
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -1775,7 +1780,8 @@ class RaceSpotter extends RaceAssistant {
 						return true
 					}
 				}
-				else if ((opponentType = "LapDown") || (opponentType = "LapUp")) {
+				else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
+					  && trackBehind.isFaster(sector, 1)) {
 					situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
 					if !this.TacticalAdvices.HasKey(situation) {

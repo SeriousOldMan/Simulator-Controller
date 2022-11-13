@@ -208,14 +208,14 @@ class SessionDatabase extends ConfigurationItem {
 
 	Connectors[] {
 		Get {
-			local result := []
+			local result := {}
 			local connector
 
 			for identifier, serverURL in string2Map("|", "->", getConfigurationValue(this.Configuration, "Team Server", "Server.URL", ""), "Standard") {
 				connector := this.Connector[identifier]
 
 				if connector
-					result.Push(connector)
+					result[identifier] := connector
 			}
 
 			return result
@@ -1700,6 +1700,8 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 					car := document.Car
 					track := document.Track
 
+					counter += 1
+
 					sessionDB.writeSetup(simulator, car, track,
 									   , getConfigurationValue(info, "Setup", "Type")
 									   , getConfigurationValue(info, "Setup", "Name")
@@ -1754,6 +1756,8 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 																					, Driver: getConfigurationValue(info, "Origin", "Driver")
 																					, Simulator: simulator, Car: car, Track: track}))
 
+										counter += 1
+
 										connector.SetDataValue("Document", identifier, "Setup", setup)
 
 										setConfigurationValue(info, "Setup", "Synchronized", true)
@@ -1799,6 +1803,8 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 
 					car := document.Car
 					track := document.Track
+
+					counter += 1
 
 					directory = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\
 					name := getConfigurationValue(info, "Strategy", "Name")
@@ -1872,6 +1878,8 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 																				   , {Identifier: identifier
 																					, Driver: getConfigurationValue(info, "Access", "Driver")
 																					, Simulator: simulator, Car: car, Track: track}))
+
+										counter += 1
 
 										connector.SetDataValue("Document", identifier, "Strategy", printConfiguration(strategy))
 

@@ -1083,7 +1083,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	loadSetups(setupType, force := false) {
+	loadSetups(setupType, force := false, select := false) {
 		local window, defaultListView, userSetups, communitySetups, ignore, name, info, origin
 
 		if (force || (setupType != this.SelectedSetupType)) {
@@ -1122,7 +1122,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
 					}
 
-					LV_Add("", origin, name)
+					if (select = name) {
+						LV_Add("Select Vis", origin, name)
+
+						select := LV_GetCount()
+					}
+					else
+						LV_Add("", origin, name)
 				}
 
 				if communitySetups
@@ -1135,7 +1141,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				loop 2
 					LV_ModifyCol(A_Index, "AutoHdr")
 
-				this.updateState()
+				if select
+					this.selectSetup(select)
+				else
+					this.updateState()
 			}
 			finally {
 				Gui ListView, %defaultListView%
@@ -1765,13 +1774,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-
 	deleteData() {
 		local connectors := this.SessionDatabase.Connectors
 		local window := this.Window
 		local progressWindow, defaultListView, simulator, count, row, type, data, car, track
 		local driver, telemetryDB, tyresDB, code, candidate, progress
-		local ignore, identifier, identifiers
+		local ignore, identifier, identifiers, name, extension
 
 		Gui %window%:Default
 
@@ -1842,8 +1850,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
-							deleteFile(A_LoopFileLongPath)
+						loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.strategy, F
+							this.SessionDatabase.removeStrategy(simulator, car, track, A_LoopFileName)
+					case translate("Setups"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						for ignore, type in kSetupTypes
+							loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Car Setups\%type%\*.*, F
+							{
+								SplitPath A_LoopFileName, name, , extension
+
+								if (extension != "info")
+									this.SessionDatabase.removeSetup(simulator, car, track, type, name)
+							}
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -1879,7 +1898,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local progressWindow := showProgress({color: "Green", title: translate("Exporting Data")})
 		local defaultListView, simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
-		local targetDirectory, sourceDB, targetDB, ignore, entry, code, candidate
+		local targetDirectory, sourceDB, targetDB, ignore, type, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
 
 		directory := normalizeDirectoryPath(directory)
@@ -1984,6 +2003,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							catch exception {
 								logError(exception)
 							}
+					case translate("Setups"):
+						code := this.SessionDatabase.getSimulatorCode(simulator)
+
+						for ignore, type in kSetupTypes
+							loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Car Setups\%type%\*.*, F
+							{
+								FileCreateDir %targetDirectory%Car Setups\%type%
+
+								try {
+									FileCopy %A_LoopFileLongPath%, %targetDirectory%Car Setups\%type%\%A_LoopFileName%
+								}
+								catch exception {
+									logError(exception)
+								}
+							}
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
@@ -2044,7 +2078,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local info := readConfiguration(directory . "\Export.info")
 		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
-		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName
+		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName, extension
 
 		directory := normalizeDirectoryPath(directory)
 
@@ -2190,7 +2224,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								FileCreateDir %targetDirectory%
 
-								loop Files, %sourceDirectory%\Race Strategies\*.*, F
+								loop Files, %sourceDirectory%\Race Strategies\*.strategy, F
 								{
 									fileName := A_LoopFileName
 									targetName := fileName
@@ -2202,6 +2236,31 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									}
 
 									FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+
+									if FileExist(A_LoopFilePath . ".info")
+										FileCopy %A_LoopFilePath%.info, %targetDirectory%\%targetName%.info
+								}
+							}
+
+							if (selection.HasKey(key . "Setups") && FileExist(sourceDirectory . "\Car Setups")) {
+								code := this.SessionDatabase.getSimulatorCode(simulator)
+
+								for ignore, type in kSetupTypes {
+									targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Car Setups\" . type)
+
+									FileCreateDir %targetDirectory%
+
+									loop Files, %sourceDirectory%\Car Setups\%type%\*.*, F
+									{
+										SplitPath A_LoopFileName, , , extension
+
+										if (extension != "info") {
+											FileCopy %A_LoopFilePath%, %targetDirectory%\%A_LoopFileName%
+
+											if FileExist(A_LoopFilePath . ".info")
+												FileCopy %A_LoopFilePath%.info, %targetDirectory%\%A_LoopFileName%.info
+										}
+									}
 								}
 							}
 
@@ -2241,7 +2300,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local defaultListView, selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
 		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, count, strategies
-		local automations, trackName
+		local automations, trackName, setups, ignore, type, extension
 
 		Gui %progressWindow%:+Owner%window%
 		Gui %window%:Default
@@ -2337,11 +2396,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									strategies := 0
 
-									loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
+									loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.strategy, F		; Strategies
 										strategies += 1
 
 									if (strategies > 0)
 										LV_Add("", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
+
+									setups := 0
+
+									for ignore, type in kSetupTypes
+										loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\%type%\*.*, F		; Setups
+										{
+											SplitPath A_LoopFileName, , , extension
+
+											if (extension != "info")
+												setups += 1
+										}
+
+									if (setups > 0)
+										LV_Add("", translate("Setups"), (carName . " / " . trackName), "-", setups)
 
 									automations := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length()
 
@@ -2372,6 +2445,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local defaultListView, ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
 		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory, count
+		local ignore, type, extension, setups
 
 		Gui %window%:Default
 
@@ -2398,6 +2472,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				telemetry := 0
 				pressures := 0
 				strategies := 0
+				setups := 0
 				automations := 0
 				tracks := 0
 
@@ -2447,6 +2522,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										strategies += 1
 									}
 
+									for ignore, type in kSetupTypes
+										loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\%type%\*.*, F		; Setups
+										{
+											SplitPath A_LoopFileName, , , extension
+
+											if (extension != "info")
+												setups += 1
+										}
+
 									count := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length()
 
 									if (count > 0) {
@@ -2468,6 +2552,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				LV_Add("", translate("Telemetry"), telemetry)
 				LV_Add("", translate("Pressures"), pressures)
 				LV_Add("", translate("Strategies"), strategies)
+				LV_Add("", translate("Setups"), setups)
 
 				LV_ModifyCol()
 				LV_ModifyCol(1, "AutoHdr")
@@ -3053,6 +3138,34 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	selectSetup(row) {
+		local window := this.Window
+		local type, name, info
+
+		Gui %window%:Default
+
+		GuiControlGet setupTypeDropDown
+
+		type := kSetupTypes[setupTypeDropDown]
+
+		Gui ListView, % this.SetupListView
+
+		LV_GetText(name, row, 2)
+
+		info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, name)
+
+		if (info && getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
+			GuiControl, , shareWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
+			GuiControl, , shareWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
+		}
+		else {
+			GuiControl, , shareWithCommunityCheck, 0
+			GuiControl, , shareWithTeamServerCheck, 0
+		}
+
+		this.updateState()
+	}
+
 	uploadSetup(setupType) {
 		local window := this.Window
 		local title := translate("Upload Setup File...")
@@ -3077,7 +3190,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, false, true)
 
-			this.loadSetups(this.SelectedSetupType, true)
+			this.loadSetups(this.SelectedSetupType, true, fileName)
 		}
 	}
 
@@ -3680,33 +3793,145 @@ showSettings() {
 	}
 }
 
-editSettings(editorOrCommand) {
+editSettings(editorOrCommand, arguments*) {
 	local title, window, x, y, done, configuration, dllName, dllFile, connector, connection
-	local directory, empty, original, changed, groups, replication
-	local oldServerURL, oldServerToken
+	local directory, empty, original, changed, restart, groups, replication
+	local oldConnections, ignore, group, enabled
+	local identifier, serverURL, serverToken, serverURLs, serverTokens
 
 	static result := false
 	static sessionDB := false
+
+	static connections := []
+	static currentConnection := 0
+
+	static addConnectionButton
+	static deleteConnectionButton
+	static nextConnectionButton
+	static previousConnectionButton
 
 	static databaseLocationEdit := ""
 	static synchTelemetryCheck
 	static synchPressuresCheck
 	static synchSetupsCheck
 	static synchStrategiesCheck
+	static serverIdentifierEdit := ""
 	static serverURLEdit := ""
 	static serverTokenEdit := ""
 	static serverUpdateEdit := 0
 	static tokenButtonHandle
 	static rebuildButton
 
-	if (editorOrCommand == kOk)
-		result := kOk
+	if (editorOrCommand == kOk) {
+		if currentConnection
+			editSettings("SaveConnection")
+
+		serverURLs := {}
+		serverTokens := {}
+		groups := {}
+
+		for ignore, connection in connections {
+			serverURLs[connection[1]] := connection[2]
+			serverTokens[connection[1]] := connection[3]
+			groups[connection[1]] := values2String(",", connection[4]*)
+		}
+
+		if ((groups.Count() != connections.Length()) || (serverURLs.Count() != connections.Length()) || (serverTokens.Count() != connections.Length())) {
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+			title := translate("Error")
+			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
+			OnMessage(0x44, "")
+		}
+		else
+			result := kOk
+	}
 	else if (editorOrCommand == kCancel)
 		result := kCancel
+	else if (editorOrCommand == "AddConnection") {
+		editSettings("SaveConnection")
+
+		connections.Push([translate("Standard"), "https://localhost:5001", "", ["Telemetry"]])
+
+		editSettings("LoadConnection", connections.Length())
+	}
+	else if (editorOrCommand == "DeleteConnection") {
+		connections.RemoveAt(currentConnection)
+
+		if (connections.Length() > 0)
+			editSettings("LoadConnection", 1)
+		else {
+			currentConnection := false
+
+			editSettings("UpdateState")
+		}
+	}
+	else if (editorOrCommand == "NextConnection") {
+		editSettings("SaveConnection")
+
+		currentConnection += 1
+
+		editSettings("LoadConnection", currentConnection)
+	}
+	else if (editorOrCommand == "PreviousConnection") {
+		editSettings("SaveConnection")
+
+		currentConnection -= 1
+
+		editSettings("LoadConnection", currentConnection)
+	}
+	else if (editorOrCommand == "LoadConnection") {
+		currentConnection := arguments[1]
+
+		serverIdentifierEdit := connections[currentConnection][1]
+		serverURLEdit := connections[currentConnection][2]
+		serverTokenEdit := connections[currentConnection][3]
+
+		GuiControl, , serverIdentifierEdit, %serverIdentifierEdit%
+		GuiControl, , serverURLEdit, %serverURLEdit%
+		GuiControl, , serverTokenEdit, %serverTokenEdit%
+
+		groups := connections[currentConnection][4]
+
+		synchTelemetryCheck := (inList(groups, "Telemetry") != false)
+		synchPressuresCheck := (inList(groups, "Pressures") != false)
+		synchSetupsCheck := (inList(groups, "Setups") != false)
+		synchStrategiesCheck := (inList(groups, "Strategies") != false)
+
+		GuiControl, , synchTelemetryCheck, %synchTelemetryCheck%
+		GuiControl, , synchPressuresCheck, %synchPressuresCheck%
+		GuiControl, , synchSetupsCheck, %synchSetupsCheck%
+		GuiControl, , synchStrategiesCheck, %synchStrategiesCheck%
+
+		editSettings("UpdateState")
+	}
+	else if (editorOrCommand == "SaveConnection") {
+		if currentConnection {
+			GuiControlGet serverIdentifierEdit
+			GuiControlGet serverURLEdit
+			GuiControlGet serverTokenEdit
+			GuiControlGet synchTelemetryCheck
+			GuiControlGet synchPressuresCheck
+			GuiControlGet synchSetupsCheck
+			GuiControlGet synchStrategiesCheck
+
+			connections[currentConnection][1] := serverIdentifierEdit
+			connections[currentConnection][2] := serverURLEdit
+			connections[currentConnection][3] := serverTokenEdit
+
+			groups := []
+
+			for group, enabled in {Telemetry: synchTelemetryCheck, Pressures: synchPressuresCheck
+								 , Setups: synchSetupsCheck, Strategies: synchStrategiesCheck}
+				if enabled
+					groups.Push(group)
+
+			connections[currentConnection][4] := groups
+		}
+	}
 	else if (editorOrCommand = "Rebuild") {
 		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-		setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {Standard: 0}))
+		setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {}))
 
 		writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 	}
@@ -3794,8 +4019,60 @@ editSettings(editorOrCommand) {
 	else if (editorOrCommand = "UpdateState") {
 		GuiControlGet synchTelemetryCheck
 		GuiControlGet synchPressuresCheck
+		GuiControlGet synchSetupsCheck
+		GuiControlGet synchStrategiesCheck
 
-		if (synchTelemetryCheck || synchPressuresCheck) {
+		GuiControl Enable, addConnectionButton
+
+		if (connections.Length() > 0) {
+			GuiControl Enable, deleteConnectionButton
+			GuiControl Enable, synchTelemetryCheck
+			GuiControl Enable, synchPressuresCheck
+			GuiControl Enable, synchSetupsCheck
+			GuiControl Enable, synchStrategiesCheck
+		}
+		else {
+			GuiControl Disable, deleteConnectionButton
+			GuiControl Disable, synchTelemetryCheck
+			GuiControl Disable, synchPressuresCheck
+			GuiControl Disable, synchSetupsCheck
+			GuiControl Disable, synchStrategiesCheck
+
+			GuiControl, , synchTelemetryCheck, 0
+			GuiControl, , synchPressuresCheck, 0
+			GuiControl, , synchSetupsCheck, 0
+			GuiControl, , synchStrategiesCheck, 0
+
+			synchTelemetryCheck := false
+			synchPressuresCheck := false
+			synchSetupsCheck := false
+			synchStrategiesCheck := false
+		}
+
+		if (connections.Length() > 1) {
+			if (currentConnection = 1)
+				GuiControl Disable, previousConnectionButton
+			else
+				GuiControl Enable, previousConnectionButton
+
+			if (currentConnection = connections.Length())
+				GuiControl Disable, nextConnectionButton
+			else
+				GuiControl Enable, nextConnectionButton
+		}
+		else {
+			GuiControl Disable, nextConnectionButton
+			GuiControl Disable, previousConnectionButton
+		}
+
+		if ((connections.Length() > 0) && !synchTelemetryCheck && !synchPressuresCheck && !synchSetupsCheck && !synchStrategiesCheck) {
+			synchTelemetryCheck := true
+
+			GuiControl, , synchTelemetryCheck, 1
+		}
+
+		if (synchTelemetryCheck || synchPressuresCheck || synchSetupsCheck || synchStrategiesCheck) {
+			GuiControl Enable, serverIdentifierEdit
 			GuiControl Enable, serverURLEdit
 			GuiControl Enable, serverTokenEdit
 			GuiControl Enable, serverUpdateEdit
@@ -3808,53 +4085,80 @@ editSettings(editorOrCommand) {
 				GuiControl, , serverUpdateEdit, 10
 		}
 		else {
+			GuiControl Disable, serverIdentifierEdit
 			GuiControl Disable, serverURLEdit
 			GuiControl Disable, serverTokenEdit
 			GuiControl Disable, serverUpdateEdit
 			GuiControl Disable, %tokenButtonHandle%
 			GuiControl Disable, rebuildButton
 
+			serverIdentifierEdit := ""
 			serverURLEdit := ""
 			serverTokenEdit := ""
 			serverUpdateEdit := ""
 
+			GuiControl, , serverIdentifierEdit, %serverIdentifierEdit%
 			GuiControl, , serverURLEdit, %serverURLEdit%
 			GuiControl, , serverTokenEdit, %serverTokenEdit%
 			GuiControl, , serverUpdateEdit, %serverUpdateEdit%
 		}
 	}
 	else {
+		connections := []
 		result := false
 		sessionDB := editorOrCommand.SessionDatabase
 
 		window := "SE"
+
+		for identifier, serverURL in sessionDB.ServerURLs
+			connections.Push([identifier, serverURL, sessionDB.ServerToken[identifier], sessionDB.Groups[identifier]])
+
+		currentConnection := ((connections.Length() = 0) ? 0 : 1)
 
 		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
 		databaseLocationEdit := normalizeDirectoryPath(getConfigurationValue(configuration, "Database", "Path", kDatabaseDirectory))
 
 		replication := getConfigurationValue(configuration, "Team Server", "Replication", false)
-		groups := string2Values(",", getConfigurationValue(configuration, "Team Server", "Groups", ""))
+
+		if currentConnection
+			groups := connections[currentConnection][4]
+		else
+			groups := []
 
 		if (groups.Length() > 0) {
 			synchTelemetryCheck := (inList(groups, "Telemetry") != false)
 			synchPressuresCheck := (inList(groups, "Pressures") != false)
+			synchSetupsCheck := (inList(groups, "Setups") != false)
+			synchStrategiesCheck := (inList(groups, "Strategies") != false)
 		}
 		else {
 			synchTelemetryCheck := (replication != false)
 			synchPressuresCheck := (replication != false)
+			synchSetupsCheck := (replication != false)
+			synchStrategiesCheck := (replication != false)
 		}
 
-		if (synchTelemetryCheck || synchPressuresCheck) {
-			serverURLEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
-			serverURLEdit := (serverURLEdit.HasKey("Standard") ? serverURLEdit["Standard"] : "")
+		if (synchTelemetryCheck || synchPressuresCheck || synchSetupsCheck || synchStrategiesCheck) {
+			if currentConnection {
+				serverIdentifierEdit := connections[currentConnection][1]
+				serverURLEdit := connections[currentConnection][2]
+				serverTokenEdit := connections[currentConnection][3]
+			}
+			else {
+				serverIdentifierEdit := "Standard"
 
-			serverTokenEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
-			serverTokenEdit := (serverTokenEdit.HasKey("Standard") ? serverTokenEdit["Standard"] : "")
+				serverURLEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
+				serverURLEdit := (serverURLEdit.HasKey("Standard") ? serverURLEdit["Standard"] : "")
 
-			serverUpdateEdit := replication
+				serverTokenEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
+				serverTokenEdit := (serverTokenEdit.HasKey("Standard") ? serverTokenEdit["Standard"] : "")
+
+				serverUpdateEdit := replication
+			}
 		}
 		else {
+			serverIdentifierEdit := ""
 			serverURLEdit := ""
 			serverTokenEdit := ""
 			serverUpdateEdit := ""
@@ -3884,18 +4188,23 @@ editSettings(editorOrCommand) {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x16 yp+30 w388 h186 Section, % translate("Team Server")
+		Gui %window%:Add, GroupBox, x16 yp+30 w388 h216 Section, % translate("Team Server")
 
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Synchronization")
 		Gui %window%:Add, CheckBox, x146 yp+2 w120 h21 vsynchTelemetryCheck gupdateSettingsState, % translate("Telemetry Data")
-		Gui %window%:Add, CheckBox, x266 yp w120 h21 vsynchStratgiesCheck gupdateSettingsState, % translate("Race Strategies")
+		Gui %window%:Add, CheckBox, x266 yp w120 h21 vsynchStrategiesCheck gupdateSettingsState, % translate("Race Strategies")
 		Gui %window%:Add, CheckBox, x146 yp+24 w120 h21 vsynchPressuresCheck gupdateSettingsState, % translate("Pressures Data")
 		Gui %window%:Add, CheckBox, x266 yp w120 h21 vsynchSetupsCheck gupdateSettingsState, % translate("Car Setups")
 
 		GuiControl, , synchTelemetryCheck, %synchTelemetryCheck%
 		GuiControl, , synchPressuresCheck, %synchPressuresCheck%
+		GuiControl, , synchSetupsCheck, %synchSetupsCheck%
+		GuiControl, , synchStrategiesCheck, %synchStrategiesCheck%
+
+		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Name")
+		Gui %window%:Add, Edit, x146 yp+1 w246 vserverIdentifierEdit, %serverIdentifierEdit%
 
 		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Server URL")
 		Gui %window%:Add, Edit, x146 yp+1 w246 vserverURLEdit, %serverURLEdit%
@@ -3905,23 +4214,23 @@ editSettings(editorOrCommand) {
 		Gui %window%:Add, Button, x122 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gvalidateServerToken
 		setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, Text, x24 yp+25 w110 h23 +0x200, % translate("Synchronize each")
+		Gui %window%:Add, Button, x296 yp+30 w23 h23 Center +0x200 HWNDbuttonHandle vaddConnectionButton gaddConnection
+		setButtonIcon(buttonHandle, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle vdeleteConnectionButton gdeleteConnection
+		setButtonIcon(buttonHandle, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle vpreviousConnectionButton gpreviousConnection
+		setButtonIcon(buttonHandle, kIconsDirectory . "Previous.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle vnextConnectionButton gnextConnection
+		setButtonIcon(buttonHandle, kIconsDirectory . "Next.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Text, x24 yp+30 w110 h23 +0x200, % translate("Synchronize each")
 		Gui %window%:Add, Edit, x146 yp w40 Number Limit2 vserverUpdateEdit, %serverUpdateEdit%
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range10-90, %serverUpdateEdit%
 		Gui %window%:Add, Text, x190 yp w90 h23 +0x200, % translate("Minutes")
 
-		Gui %window%:Add, Button, x146 yp+30 w96 vrebuildButton grebuildDatabase, % translate("Rebuild...")
+		Gui %window%:Add, Button, x296 yp w96 vrebuildButton grebuildDatabase, % translate("Rebuild...")
 
-		Gui %window%:Add, Button, x296 yp w23 h23 Center +0x200 HWNDbuttonHandle
-		setButtonIcon(buttonHandle, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle
-		setButtonIcon(buttonHandle, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle
-		setButtonIcon(buttonHandle, kIconsDirectory . "Previous.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle
-		setButtonIcon(buttonHandle, kIconsDirectory . "Next.ico", 1, "L4 T4 R4 B4")
-
-		Gui %window%:Add, Button, x122 ys+194 w80 h23 gacceptSettings, % translate("Ok")
+		Gui %window%:Add, Button, x122 ys+224 w80 h23 gacceptSettings, % translate("Ok")
 		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
 
 		updateSettingsState()
@@ -3945,11 +4254,15 @@ editSettings(editorOrCommand) {
 				GuiControlGet databaseLocationEdit
 				GuiControlGet synchTelemetryCheck
 				GuiControlGet synchPressuresCheck
+				GuiControlGet synchSetupsCheck
+				GuiControlGet synchStrategiesCheck
+				GuiControlGet serverIdentifierEdit
 				GuiControlGet serverURLEdit
 				GuiControlGet serverTokenEdit
 				GuiControlGet serverUpdateEdit
 
 				changed := false
+				restart := false
 
 				if (databaseLocationEdit = "") {
 					title := translate("Error")
@@ -4026,71 +4339,80 @@ editSettings(editorOrCommand) {
 					title := translate("Information")
 
 					changed := true
+					restart := true
+				}
+
+				if !changed {
+					oldConnections := []
+
+					for identifier, serverURL in sessionDB.ServerURLs
+						oldConnections.Push([identifier, serverURL, sessionDB.ServerToken[identifier], sessionDB.Groups[identifier]])
+
+					if (oldConnections.Length() != connections.Length()) {
+						changed := true
+						restart := true
+					}
+					else
+						loop % connections.Length()
+						{
+							currentConnection := A_Index
+
+							loop 3
+								if (oldConnections[currentConnection][A_Index] != connections[currentConnection][A_Index]) {
+									changed := true
+
+									if (A_Index > 1)
+										restart := true
+								}
+
+							if (!changed && (values2String(",", oldConnections[currentConnection][4]*) != values2String(",", connections[currentConnection][4]*))) {
+								changed := true
+								restart := true
+							}
+						}
 				}
 
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-				if !changed {
-					groups := getConfigurationValue(configuration, "Team Server", "Groups", kUndefined)
+				setConfigurationValue(configuration, "Team Server", "Replication", serverUpdateEdit)
 
-					if (groups != kUndefined) {
-						groups := string2Values(",", groups)
-
-						if (synchTelemetryCheck && synchPressuresCheck)
-							changed := (!inList(groups, "Telemetry") || !inList(groups, "Pressures"))
-						else if synchTelemetryCheck
-							changed := !inList(groups, "Telemetry")
-						else if synchPressuresCheck
-							changed := !inList(groups, "Pressures")
-						else
-							changed := (groups.Length() != 0)
-					}
-					else
-						changed := ((getConfigurationValue(configuration, "Team Server", "Replication", false) != false) != synchTelemetryCheck)
-				}
-
-				oldServerURL := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
-				oldServerURL := (oldServerURL.HasKey("Standard") ? oldServerURL["Standard"] : "")
-
-				oldServerToken := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
-				oldServerToken := (oldServerToken.HasKey("Standard") ? oldServerToken["Standard"] : "")
-
-				if (changed || (oldServerURL != serverURLEdit) || (oldServerToken != serverTokenEdit)) {
-					changed := true
-
-					setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {Standard: 0}))
+				if changed {
+					setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {}))
 
 					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
 					setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
+
+					serverURLs := {}
+					serverTokens := {}
+					groups := {}
+
+					for ignore, connection in connections {
+						serverURLs[connection[1]] := connection[2]
+						serverTokens[connection[1]] := connection[3]
+						groups[connection[1]] := values2String(",", connection[4]*)
+					}
+
+					setConfigurationValue(configuration, "Team Server", "Groups", map2String("|", "->", groups))
+					setConfigurationValue(configuration, "Team Server", "Server.URL", map2String("|", "->", serverURLs))
+					setConfigurationValue(configuration, "Team Server", "Server.Token", map2String("|", "->", serverTokens))
+
+					writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+
+					if restart {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
+						OnMessage(0x44, "")
+
+						broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitApplication")
+					}
 				}
+				else
+					writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
-				groups := []
-
-				if synchTelemetryCheck
-					groups.Push("Telemetry")
-
-				if synchPressuresCheck
-					groups.Push("Pressures")
-
-				replication := (synchTelemetryCheck || synchPressuresCheck)
-
-				setConfigurationValue(configuration, "Team Server", "Groups", values2String(",", groups*))
-				setConfigurationValue(configuration, "Team Server", "Replication", replication ? serverUpdateEdit : false)
-				setConfigurationValue(configuration, "Team Server", "Server.URL", replication ? map2String("|", "->", {Standard: serverURLEdit}) : "")
-				setConfigurationValue(configuration, "Team Server", "Server.Token", replication ? map2String("|", "->", {Standard: serverTokenEdit}) : "")
-
-				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
-
-				if changed {
-					title := translate("Information")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
-					OnMessage(0x44, "")
-
-					broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitApplication")
-				}
+				SessionDatabase.reloadConfiguration()
 
 				done := true
 			}
@@ -4110,6 +4432,22 @@ cancelSettings() {
 
 chooseDatabaseLocation() {
 	editSettings("DatabaseLocation")
+}
+
+addConnection() {
+	editSettings("AddConnection")
+}
+
+deleteConnection() {
+	editSettings("DeleteConnection")
+}
+
+nextConnection() {
+	editSettings("NextConnection")
+}
+
+previousConnection() {
+	editSettings("PreviousConnection")
 }
 
 rebuildDatabase() {
@@ -4784,33 +5122,9 @@ chooseSetupType() {
 
 chooseSetup() {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local name, type, info
 
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
-		Gui %window%:Default
-
-		GuiControlGet setupTypeDropDown
-
-		type := kSetupTypes[setupTypeDropDown]
-
-		Gui ListView, % editor.SetupListView
-
-		LV_GetText(name, A_EventInfo, 2)
-
-		info := editor.SessionDatabase.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
-
-		if (info && getConfigurationValue(info, "Origin", "Driver", false) = editor.SessionDatabase.ID) {
-			GuiControl, , shareWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
-			GuiControl, , shareWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
-		}
-		else {
-			GuiControl, , shareWithCommunityCheck, 0
-			GuiControl, , shareWithTeamServerCheck, 0
-		}
-
-		editor.updateState()
-	}
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
+		editor.selectSetup(A_EventInfo)
 }
 
 updateAccess() {

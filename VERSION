@@ -1,9 +1,9 @@
 [Development]
 Version=4.4.8.0-dev
 Target=4.4.8.0-release
-Date=11/12/2022
+Date=11/14/2022
 Download=
-Changes=
+Changes=New synchronization support for car setups and race strategies in the Team Server data connection, Multiple data connections are now supported for Team Server, Fixed end of race detection for fixed-lap races in rFactor 2
 [Release]
 Version=4.4.7.0-release
 Date=11/11/2022

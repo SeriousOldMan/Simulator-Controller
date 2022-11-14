@@ -99,7 +99,7 @@ class SessionDatabase extends ConfigurationItem {
 			value := (normalizeDirectoryPath(value) . "\")
 
 			setConfigurationValue(configuration, "Database", "Path", value)
-			setConfigurationValue(this.Configuration, "Database", "Path", value)
+			setConfigurationValue(SessionDatabase.sConfiguration, "Database", "Path", value)
 
 			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
@@ -117,7 +117,7 @@ class SessionDatabase extends ConfigurationItem {
 			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
 			setConfigurationValue(configuration, "Database", "Version", value)
-			setConfigurationValue(this.Configuration, "Database", "Version", value)
+			setConfigurationValue(SessionDatabase.sConfiguration, "Database", "Version", value)
 
 			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
@@ -211,7 +211,7 @@ class SessionDatabase extends ConfigurationItem {
 			local result := {}
 			local connector
 
-			for identifier, serverURL in string2Map("|", "->", getConfigurationValue(this.Configuration, "Team Server", "Server.URL", ""), "Standard") {
+			for identifier, serverURL in string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard") {
 				connector := this.Connector[identifier]
 
 				if connector
@@ -232,41 +232,37 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	ServerURL[identifier] {
+	ServerURLs[identifier := false] {
 		Get {
 			local serverURL
 
-			if !SessionDatabase.sServerURLs.HasKey(identifier) {
-				serverURL := string2Map("|", "->", getConfigurationValue(this.Configuration, "Team Server", "Server.URL", ""), "Standard")
+			if !SessionDatabase.sServerURLs.HasKey(identifier)
+				SessionDatabase.sServerURLs := string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
-				SessionDatabase.sServerURLs[identifier] := ((this.ID = this.DatabaseID)
-														  ? (serverURL.HasKey("Standard") ? serverURL["Standard"] : false)
-														  : false)
+			return (identifier ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
+		}
+	}
 
-				if (SessionDatabase.sServerURLs[identifier] = "")
-					SessionDatabase.sServerURLs[identifier] := false
-			}
+	ServerURL[identifier] {
+		Get {
+			return this.ServerURLs[identifier]
+		}
+	}
 
-			return SessionDatabase.sServerURLs[identifier]
+	ServerTokens[identifier := false] {
+		Get {
+			local serverToken
+
+			if !SessionDatabase.sServerTokens.HasKey(identifier)
+				SessionDatabase.sServerTokens := string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.Token", ""), "Standard")
+
+			return (identifier ? SessionDatabase.sServerTokens[identifier] : SessionDatabase.sServerTokens)
 		}
 	}
 
 	ServerToken[identifier] {
 		Get {
-			local serverToken
-
-			if !SessionDatabase.sServerTokens.HasKey(identifier) {
-				serverToken := string2Map("|", "->", getConfigurationValue(this.Configuration, "Team Server", "Server.Token", ""), "Standard")
-
-				SessionDatabase.sServerTokens[identifier] := ((this.ID = this.DatabaseID)
-															? (serverToken.HasKey("Standard") ? serverToken["Standard"] : false)
-															: false)
-
-				if (SessionDatabase.sServerTokens[identifier] = "")
-					SessionDatabase.sServerTokens[identifier] := false
-			}
-
-			return SessionDatabase.sServerTokens[identifier]
+			return this.ServerTokens[identifier]
 		}
 	}
 
@@ -296,15 +292,23 @@ class SessionDatabase extends ConfigurationItem {
 
 			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 
-			setConfigurationValue(this.Configuration, "Team Server", "Synchronization", synchronization)
+			setConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Synchronization", synchronization)
 
 			return value
 		}
 	}
 
-	Groups[] {
+	Groups[identifier] {
 		Get {
-			return string2Values(",", getConfigurationValue(this.Configuration, "Team Server", "Groups", "Telemetry, Pressures"))
+			local groups := getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Groups", "Telemetry, Pressures")
+
+			if InStr(groups, "->") {
+				groups := string2Map("|", "->", groups)
+
+				return (groups.HasKey(identifier) ? string2Values(",", groups[identifier]) : [])
+			}
+			else
+				return string2Values(",", groups)
 		}
 	}
 
@@ -326,7 +330,7 @@ class SessionDatabase extends ConfigurationItem {
 				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
 				setConfigurationValue(configuration, "Scope", "Community", value)
-				setConfigurationValue(this.Configuration, "Scope", "Community", value)
+				setConfigurationValue(SessionDatabase.sConfiguration, "Scope", "Community", value)
 
 				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 			}
@@ -361,6 +365,14 @@ class SessionDatabase extends ConfigurationItem {
 
 	loadFromConfiguration(configuration) {
 		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
+	}
+
+	reloadConfiguration() {
+		SessionDatabase.sConnectors := {}
+		SessionDatabase.sServerURLs := {}
+		SessionDatabase.sServerTokens := {}
+
+		SessionDatabase.sConfiguration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 	}
 
 	prepareDatabase(simulator, car, track, data := false) {
@@ -1059,7 +1071,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !availableTyreCompounds
 			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
 
-		  := map(availableTyreCompounds, "compound")
+		compounds := map(availableTyreCompounds, "compound")
 
 		switch weather {
 			case "Dry":
@@ -1401,6 +1413,31 @@ class SessionDatabase extends ConfigurationItem {
 		writeConfiguration(fileName, info)
 	}
 
+	removeStrategy(simulator, car, track, name) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName, info, identifier, ignore, connector
+
+		car := this.getCarCode(simulator, car)
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%
+
+		info := readConfiguration(fileName . ".info")
+
+		deleteFile(fileName)
+		deleteFile(fileName . ".info")
+
+		identifier := getConfigurationValue(info, "Setup", "Identifier", false)
+
+		if (identifier && (getConfigurationValue(info, "Origin", "Driver", false) = this.ID))
+			for ignore, connector in this.Connectors
+				try {
+					connector.DeleteData("Document", identifier)
+				}
+				catch exception {
+					logError(exception, true)
+				}
+	}
+
 	writeDatabaseState(identifier, info, arguments*) {
 		local configuration := newConfiguration()
 		local exception, rebuild
@@ -1456,6 +1493,7 @@ class SessionDatabase extends ConfigurationItem {
 								, translate("Message: ") . (rebuild ? translate("Rebuilding database...")
 																	: translate("Synchronizing database...")))
 
+			setConfigurationValue(configuration, "Database Synchronizer", "Identifier", identifier)
 			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Running")
 			setConfigurationValue(configuration, "Database Synchronizer", "Counter", (arguments.Length() > 1) ? arguments[2] : false)
 		}
@@ -1642,7 +1680,7 @@ synchronizeDatabase(command := false) {
 					lastSynchronization := (!rebuild ? sessionDB.Synchronization[identifier] : false)
 
 					for ignore, synchronizer in sessionDB.Synchronizers
-						%synchronizer%(sessionDB.Groups, sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, counter)
+						%synchronizer%(sessionDB.Groups[identifier], sessionDB, connector, simulators, timestamp, lastSynchronization, !lastSynchronization, counter)
 
 					sessionDB.Synchronization[identifier] := timestamp
 				}
@@ -1800,49 +1838,50 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 					{
 						track := A_LoopFileName
 
-						loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\*.info, F
-						{
-							FileGetTime lastModified, %A_LoopFilePath%, M
+						for ignore, type in kSetupTypes
+							loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\%type%\*.info, F
+							{
+								FileGetTime lastModified, %A_LoopFilePath%, M
 
-							if (lastModified > lastRun) {
-								info := readConfiguration(A_LoopFilePath)
+								if (lastModified > lastRun) {
+									info := readConfiguration(A_LoopFilePath)
 
-								if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
-								 && getConfigurationValue(info, "Access", "Synchronize", false)
-								 && !getConfigurationValue(info, "Setup", "Synchronized", false)) {
-									setup := sessionDB.readSetup(simulator, car, track
-															   , getConfigurationValue(info, "Setup", "Type")
-															   , getConfigurationValue(info, "Setup", "Name")
-															   , size)
-									info := sessionDB.readSetupInfo(simulator, car, track
-																  , getConfigurationValue(info, "Setup", "Type")
-																  , getConfigurationValue(info, "Setup", "Name"))
+									if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
+									 && getConfigurationValue(info, "Access", "Synchronize", false)
+									 && !getConfigurationValue(info, "Setup", "Synchronized", false)) {
+										setup := sessionDB.readSetup(simulator, car, track
+																   , getConfigurationValue(info, "Setup", "Type")
+																   , getConfigurationValue(info, "Setup", "Name")
+																   , size)
+										info := sessionDB.readSetupInfo(simulator, car, track
+																	  , getConfigurationValue(info, "Setup", "Type")
+																	  , getConfigurationValue(info, "Setup", "Name"))
 
-									if (setup && (size > 0)) {
-										identifier := getConfigurationValue(info, "Setup", "Identifier")
+										if (setup && (size > 0)) {
+											identifier := getConfigurationValue(info, "Setup", "Identifier")
 
-										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
-											connector.CreateData("Document"
-															   , substituteVariables("Type=Setup`n"
-																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
-																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
-																				   , {Identifier: identifier
-																					, Driver: getConfigurationValue(info, "Origin", "Driver")
-																					, Simulator: simulator, Car: car, Track: track}))
+											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
+												connector.CreateData("Document"
+																   , substituteVariables("Type=Setup`n"
+																					   . "Identifier=%Identifier%`nDriver=%Driver%`n"
+																					   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
+																					   , {Identifier: identifier
+																						, Driver: getConfigurationValue(info, "Origin", "Driver")
+																						, Simulator: simulator, Car: car, Track: track}))
 
-										counter += 1
+											counter += 1
 
-										connector.SetDataValue("Document", identifier, "Setup", setup)
+											connector.SetDataValue("Document", identifier, "Setup", setup)
 
-										setConfigurationValue(info, "Setup", "Synchronized", true)
+											setConfigurationValue(info, "Setup", "Synchronized", true)
 
-										connector.SetDataValue("Document", identifier, "Info", printConfiguration(info))
+											connector.SetDataValue("Document", identifier, "Info", printConfiguration(info))
 
-										writeConfiguration(A_LoopFilePath, info)
+											writeConfiguration(A_LoopFilePath, info)
+										}
 									}
 								}
 							}
-						}
 					}
 				}
 			}

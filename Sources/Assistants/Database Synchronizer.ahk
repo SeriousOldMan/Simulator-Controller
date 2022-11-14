@@ -50,8 +50,8 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
 	local targetDB := new TyresDatabase()
-	local upload, now, simulator, car, track, distFile, directoryName, configuration
-	local directory, sourceDB, targetDB, ignore, row, compound, compoundColor
+	local upload, now, simulator, car, track, distFile, configuration
+	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
 
 	if FileExist(uploadTimeStamp) {
 		FileReadLine upload, %uploadTimeStamp%, 1
@@ -94,10 +94,10 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 				{
 					car := A_LoopFileName
 
-					if (car = "1") {
-						directoryName = %sessionDBPath%User\%simulator%\%car%
+					if ((car = "1") || (car = "Unknown")) {
+						directory = %sessionDBPath%User\%simulator%\%car%
 
-						deleteDirectory(directoryName)
+						deleteDirectory(directory)
 					}
 					else {
 						FileCreateDir %kTempDirectory%Shared Database\Community\%simulator%\%car%
@@ -106,10 +106,10 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 						{
 							track := A_LoopFileName
 
-							if (track = "1") {
-								directoryName = %sessionDBPath%User\%simulator%\%car%\%track%
+							if ((track = "1") || (track = "Unknown")) {
+								directory = %sessionDBPath%User\%simulator%\%car%\%track%
 
-								deleteDirectory(directoryName)
+								deleteDirectory(directory)
 							}
 							else {
 								FileCreateDir %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%
@@ -149,20 +149,23 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 										if FileExist(directory)
 											FileCopyDir %directory%, %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Car Setups
 
-											directory := %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Car Setups\
+											directory = %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Car Setups\
 
-											loop Files, %directory%*.info, F
-											{
-												SplitPath A_LoopFileName, , , , name
+											for ignore, type in kSetupTypes
+												loop Files, %directory%%type%\*.info, F
+												{
+													SplitPath A_LoopFileName, , , , name
 
-												info := sessionDB.readSetupInfo(simulator, car, track, name)
+													info := sessionDB.readSetupInfo(simulator, car, track, name)
 
-												if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
-												 || !getConfigurationValue(info, "Access", "Share", false) {
+													if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
+													 || !getConfigurationValue(info, "Access", "Share", false))
+														deleteFile(directory . getConfigurationValue(info, "Strategy", "Name"))
+
 													deleteFile(A_LoopFilePath)
-													deleteFile(directory . getConfigurationValue(info, "Strategy", "Name"))
+
+													Sleep 1
 												}
-											}
 									}
 									catch exception {
 										logError(exception)

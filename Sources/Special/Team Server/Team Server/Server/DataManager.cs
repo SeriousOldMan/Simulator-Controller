@@ -115,7 +115,28 @@ namespace TeamServer.Server
 				return "AccountID = '" + Token.AccountID + "'";
 			else
 				return "AccountID = '" + Token.AccountID + "' And " + where;
-		}
+        }
+
+        public string GetDataValue(CarObject carObject, string name)
+        {
+            ValidateObject(carObject);
+
+            return ObjectManager.GetAttribute(carObject, name);
+        }
+
+        public void SetDataValue(CarObject carObject, string name, string value)
+        {
+            ValidateObject(carObject);
+
+            ObjectManager.SetAttribute(carObject, name, value);
+        }
+
+        public void DeleteDataValue(CarObject carObject, string name)
+        {
+            ValidateObject(carObject);
+
+            ObjectManager.DeleteAttribute(carObject, name);
+        }
         #endregion
 
         #region Validation
@@ -136,15 +157,27 @@ namespace TeamServer.Server
 					throw new Exception("Account is no longer valid...");
 				else if (!Token.Account.DataAccess)
 					throw new Exception("Account does not support data storage...");
-		}
+        }
 
-		public void ValidateLicense(License license)
-		{
-			if (license == null)
-				throw new Exception("No valid license data...");
-		}
+        public void ValidateObject(CarObject carObject)
+        {
+            if (carObject == null)
+                throw new Exception("No valid data...");
+        }
 
-		public void ValidateElectronics(Electronics electronics)
+        public void ValidateDocument(Document document)
+        {
+            if (document == null)
+                throw new Exception("No valid document data...");
+        }
+
+        public void ValidateLicense(License license)
+        {
+            if (license == null)
+                throw new Exception("No valid license data...");
+        }
+
+        public void ValidateElectronics(Electronics electronics)
 		{
 			if (electronics == null)
 				throw new Exception("No valid electronics data...");
@@ -173,11 +206,91 @@ namespace TeamServer.Server
 			if (tyresPressuresDistribution == null)
 				throw new Exception("No valid tyres pressures distribution data...");
 		}
-		#endregion
+        #endregion
 
-		#region License
-		#region Query
-		public IEnumerable<Guid> QueryLicenses(string where)
+        #region Document
+        #region Query
+        public IEnumerable<Guid> QueryDocuments(string where)
+        {
+
+            return ObjectManager.Connection.QueryAsync<License>(
+                @"Select Identifier From Data_Documents Where " + CreateSelection(where)).Result.Select(d => d.Identifier);
+        }
+
+        public int CountDocuments(string where)
+        {
+            return ObjectManager.Connection.ExecuteScalarAsync<int>(
+                @"Select Count(ID) From Data_Documents Where " + CreateSelection(where)).Result;
+        }
+
+        public Document LookupDocument(Guid identifier)
+        {
+            Document document = FindDocument(identifier);
+
+            ValidateDocument(document);
+
+            return document;
+        }
+
+        public Document LookupDocument(string identifier)
+        {
+            return LookupDocument(new Guid(identifier));
+        }
+
+        public Document FindDocument(Guid identifier)
+        {
+            return ObjectManager.GetDocumentAsync(identifier).Result;
+        }
+
+        public Document FindDocument(string identifier)
+        {
+            return FindDocument(new Guid(identifier));
+        }
+        #endregion
+
+        #region CRUD
+        public Document CreateDocument(Dictionary<string, string> values)
+        {
+            Document document = new Document() { AccountID = Token.AccountID };
+
+            SetProperties(document, values);
+
+            ValidateDocument(document);
+
+            document.Save();
+
+            return document;
+        }
+
+        public void UpdateDocument(Document document, Dictionary<string, string> values)
+        {
+            ValidateDocument(document);
+
+            SetProperties(document, values);
+
+            document.Save();
+        }
+        public void DeleteDocument(Document document)
+        {
+            if (document != null)
+                document.Delete();
+        }
+
+        public void DeleteDocument(Guid identifier)
+        {
+            DeleteDocument(ObjectManager.GetDocumentAsync(identifier).Result);
+        }
+
+        public void DeleteDocument(string identifier)
+        {
+            DeleteDocument(new Guid(identifier));
+        }
+        #endregion
+        #endregion
+
+        #region License
+        #region Query
+        public IEnumerable<Guid> QueryLicenses(string where)
 		{
 
 			return ObjectManager.Connection.QueryAsync<License>(

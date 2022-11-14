@@ -1807,7 +1807,8 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 							if (lastModified > lastRun) {
 								info := readConfiguration(A_LoopFilePath)
 
-								if (getConfigurationValue(info, "Access", "Synchronize", false)
+								if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
+								 && getConfigurationValue(info, "Access", "Synchronize", false)
 								 && !getConfigurationValue(info, "Setup", "Synchronized", false)) {
 									setup := sessionDB.readSetup(simulator, car, track
 															   , getConfigurationValue(info, "Setup", "Type")
@@ -1822,7 +1823,8 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 
 										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
 											connector.CreateData("Document"
-															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
+															   , substituteVariables("Type=Setup`n"
+																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																				   , {Identifier: identifier
 																					, Driver: getConfigurationValue(info, "Origin", "Driver")
@@ -1906,49 +1908,30 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 						directory = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\
 
 						loop Files, %directory%*.strategy, F
-						{
-							if !FileExist(directory . A_LoopFileName . ".info") {
-								info := newConfiguration()
-
-								setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-								setConfigurationValue(info, "Origin", "Car", car)
-								setConfigurationValue(info, "Origin", "Track", track)
-								setConfigurationValue(info, "Origin", "Driver", sessionDB.ID)
-
-								setConfigurationValue(info, "Strategy", "Name", A_LoopFileName)
-								setConfigurationValue(info, "Strategy", "Identifier", createGuid())
-								setConfigurationValue(info, "Strategy", "Synchronized", false)
-
-								setConfigurationValue(info, "Access", "Share", false)
-								setConfigurationValue(info, "Access", "Synchronize", true)
-
-								writeConfiguration(directory . A_LoopFileName . ".info", info)
-							}
-						}
+							if !FileExist(directory . A_LoopFileName . ".info")
+								sessionDB.readStrategyInfo(simulator, car, track, A_LoopFileName)
 
 						loop Files, %directory%*.info, F
 						{
 							FileGetTime lastModified, %A_LoopFilePath%, M
 
 							if (lastModified > lastRun) {
-								info := readConfiguration(A_LoopFilePath)
+								SplitPath A_LoopFileName, , , , name
 
-								if (getConfigurationValue(info, "Access", "Synchronize", false)
+								info := sessionDB.readStrategyInfo(simulator, car, track, name)
+
+								if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
+								 && getConfigurationValue(info, "Access", "Synchronize", false)
 								 && !getConfigurationValue(info, "Strategy", "Synchronized", false)) {
 									strategy := readConfiguration(directory . getConfigurationValue(info, "Strategy", "Name"))
 
 									if (strategy.Count() > 0) {
 										identifier := getConfigurationValue(info, "Strategy", "Identifier", false)
 
-										if !identifier {
-											identifier := createGuid()
-
-											setConfigurationValue(info, "Strategy", "Identifier", identifier)
-										}
-
 										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
 											connector.CreateData("Document"
-															   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
+															   , substituteVariables("Type=Strategy`n"
+																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
 																				   , {Identifier: identifier
 																					, Driver: getConfigurationValue(info, "Access", "Driver")

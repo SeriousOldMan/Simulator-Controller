@@ -3691,6 +3691,8 @@ editSettings(editorOrCommand) {
 	static databaseLocationEdit := ""
 	static synchTelemetryCheck
 	static synchPressuresCheck
+	static synchSetupsCheck
+	static synchStrategiesCheck
 	static serverURLEdit := ""
 	static serverTokenEdit := ""
 	static serverUpdateEdit := 0
@@ -3887,8 +3889,10 @@ editSettings(editorOrCommand) {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Synchronization")
-		Gui %window%:Add, CheckBox, x146 yp+2 w246 h21 vsynchTelemetryCheck gupdateSettingsState, % translate("Telemetry Data")
-		Gui %window%:Add, CheckBox, x146 yp+24 w246 h21 vsynchPressuresCheck gupdateSettingsState, % translate("Pressures Data")
+		Gui %window%:Add, CheckBox, x146 yp+2 w120 h21 vsynchTelemetryCheck gupdateSettingsState, % translate("Telemetry Data")
+		Gui %window%:Add, CheckBox, x266 yp w120 h21 vsynchStratgiesCheck gupdateSettingsState, % translate("Race Strategies")
+		Gui %window%:Add, CheckBox, x146 yp+24 w120 h21 vsynchPressuresCheck gupdateSettingsState, % translate("Pressures Data")
+		Gui %window%:Add, CheckBox, x266 yp w120 h21 vsynchSetupsCheck gupdateSettingsState, % translate("Car Setups")
 
 		GuiControl, , synchTelemetryCheck, %synchTelemetryCheck%
 		GuiControl, , synchPressuresCheck, %synchPressuresCheck%

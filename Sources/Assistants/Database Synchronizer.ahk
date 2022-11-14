@@ -148,6 +148,21 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 
 										if FileExist(directory)
 											FileCopyDir %directory%, %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Car Setups
+
+											directory := %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Car Setups\
+
+											loop Files, %directory%*.info, F
+											{
+												SplitPath A_LoopFileName, , , , name
+
+												info := sessionDB.readSetupInfo(simulator, car, track, name)
+
+												if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
+												 || !getConfigurationValue(info, "Access", "Share", false) {
+													deleteFile(A_LoopFilePath)
+													deleteFile(directory . getConfigurationValue(info, "Strategy", "Name"))
+												}
+											}
 									}
 									catch exception {
 										logError(exception)

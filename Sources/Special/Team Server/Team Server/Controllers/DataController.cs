@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using TeamServer.Model;
 using TeamServer.Model.Access;
 using TeamServer.Server;
@@ -69,6 +70,8 @@ namespace TeamServer.Controllers
 
                 switch (table.ToLower())
                 {
+                    case "document":
+                        return String.Join(";", dataManager.QueryDocuments(where));
                     case "license":
                         return String.Join(";", dataManager.QueryLicenses(where));
                     case "electronics":
@@ -104,6 +107,8 @@ namespace TeamServer.Controllers
 
                 switch (table.ToLower())
                 {
+                    case "document":
+                        return dataManager.CountDocuments(where).ToString();
                     case "license":
                         return dataManager.CountLicenses(where).ToString();
                     case "electronics":
@@ -128,6 +133,12 @@ namespace TeamServer.Controllers
             {
                 return "Error: " + exception.Message;
             }
+        }
+
+        [HttpGet("document/{identifier}")]
+        public string GetDocument([FromQuery(Name = "token")] string token, string table, string identifier)
+        {
+            return GetTable(token, "document", identifier);
         }
 
         [HttpGet("license/{identifier}")]
@@ -174,6 +185,10 @@ namespace TeamServer.Controllers
 
                 switch (table.ToLower())
                 {
+                    case "document":
+                        return ControllerUtils.SerializeObject(dataManager.LookupDocument(identifier),
+                                                               new List<string>(new string[] { "Identifier", "Modified", "Type",
+                                                                                               "Driver", "Simulator", "Car", "Track" }));
                     case "license":
                         return ControllerUtils.SerializeObject(dataManager.LookupLicense(identifier),
                                                                new List<string>(new string[] { "Identifier", "Modified",
@@ -250,6 +265,13 @@ namespace TeamServer.Controllers
             }
         }
 
+        [HttpPut("document/{identifier}")]
+        public string PutDocument([FromQuery(Name = "token")] string token, string table, string identifier,
+                                  [FromBody] string keyValues)
+        {
+            return PutTable(token, "document", identifier, keyValues);
+        }
+
         [HttpPut("license/{identifier}")]
         public string PutLicense([FromQuery(Name = "token")] string token, string table, string identifier,
                                  [FromBody] string keyValues)
@@ -301,6 +323,9 @@ namespace TeamServer.Controllers
 
                 switch (table.ToLower())
                 {
+                    case "document":
+                        dataManager.UpdateDocument(dataManager.LookupDocument(identifier), properties);
+                        return "Ok";
                     case "license":
                         dataManager.UpdateLicense(dataManager.LookupLicense(identifier), properties);
                         return "Ok";
@@ -332,6 +357,13 @@ namespace TeamServer.Controllers
             {
                 return "Error: " + exception.Message;
             }
+        }
+
+        [HttpPost("document")]
+        public string PostDocument([FromQuery(Name = "token")] string token, string table,
+                                   [FromBody] string keyValues)
+        {
+            return PostTable(token, "document", keyValues);
         }
 
         [HttpPost("license")]
@@ -385,6 +417,8 @@ namespace TeamServer.Controllers
             {
                 switch (table.ToLower())
                 {
+                    case "document":
+                        return dataManager.CreateDocument(properties).Identifier.ToString();
                     case "license":
                         return dataManager.CreateLicense(properties).Identifier.ToString();
                     case "electronics":
@@ -411,38 +445,44 @@ namespace TeamServer.Controllers
             }
         }
 
+        [HttpDelete("document/{identifier}")]
+        public string DeleteDocument([FromQuery(Name = "token")] string token, string identifier)
+        {
+            return DeleteTable(token, "license", identifier);
+        }
+
         [HttpDelete("license/{identifier}")]
-        public string DeleteLicense([FromQuery(Name = "token")] string token, string table, string identifier)
+        public string DeleteLicense([FromQuery(Name = "token")] string token, string identifier)
         {
             return DeleteTable(token, "license", identifier);
         }
 
         [HttpDelete("electronics/{identifier}")]
-        public string DeleteElectronics([FromQuery(Name = "token")] string token, string table, string identifier)
+        public string DeleteElectronics([FromQuery(Name = "token")] string token, string identifier)
         {
             return DeleteTable(token, "electronics", identifier);
         }
 
         [HttpDelete("tyres/{identifier}")]
-        public string DeleteTyres([FromQuery(Name = "token")] string token, string table, string identifier)
+        public string DeleteTyres([FromQuery(Name = "token")] string token, string identifier)
         {
             return DeleteTable(token, "tyres", identifier);
         }
 
         [HttpDelete("brakes/{identifier}")]
-        public string DeleteBrakes([FromQuery(Name = "token")] string token, string table, string identifier)
+        public string DeleteBrakes([FromQuery(Name = "token")] string token, string identifier)
         {
             return DeleteTable(token, "brakes", identifier);
         }
 
         [HttpDelete("tyrespressures/{identifier}")]
-        public string DeleteTyresPressures([FromQuery(Name = "token")] string token, string table, string identifier)
+        public string DeleteTyresPressures([FromQuery(Name = "token")] string token, string identifier)
         {
             return DeleteTable(token, "tyrespressures", identifier);
         }
 
         [HttpDelete("tyrespressuresdistribution/{identifier}")]
-        public string DeleteTyresPressuresDistribution([FromQuery(Name = "token")] string token, string table, string identifier)
+        public string DeleteTyresPressuresDistribution([FromQuery(Name = "token")] string token, string identifier)
         {
             return DeleteTable(token, "tyrespressuresdistribution", identifier);
         }
@@ -477,6 +517,266 @@ namespace TeamServer.Controllers
                     default:
                         throw new Exception("Unknown table detected...");
                 }
+
+                return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpGet("document/{identifier}/value")]
+        public string GetDocumentValue([FromQuery(Name = "token")] string token, string identifier, [FromQuery(Name = "name")] string name)
+        {
+            return GetTableValue(token, "document", identifier, name);
+        }
+
+        [HttpGet("electronics/{identifier}/value")]
+        public string GetElectronicsValue([FromQuery(Name = "token")] string token, string identifier, [FromQuery(Name = "name")] string name)
+        {
+            return GetTableValue(token, "electronics", identifier, name);
+        }
+
+        [HttpGet("tyres/{identifier}/value")]
+        public string GetTyresValue([FromQuery(Name = "token")] string token, string identifier, [FromQuery(Name = "name")] string name)
+        {
+            return GetTableValue(token, "tyres", identifier, name);
+        }
+
+        [HttpGet("brakes/{identifier}/value")]
+        public string GetBrakesValue([FromQuery(Name = "token")] string token, string identifier, [FromQuery(Name = "name")] string name)
+        {
+            return GetTableValue(token, "brakes", identifier, name);
+        }
+
+        [HttpGet("tyrespressures/{identifier}/value")]
+        public string GetTyresPressuresValue([FromQuery(Name = "token")] string token, string identifier, [FromQuery(Name = "name")] string name)
+        {
+            return GetTableValue(token, "tyrespressures", identifier, name);
+        }
+
+        [HttpGet("tyrespressuresdistribution/{identifier}/value")]
+        public string GetTyresPressuresDistributionValue([FromQuery(Name = "token")] string token, string identifier,
+                                                         [FromQuery(Name = "name")] string name)
+        {
+            return GetTableValue(token, "tyrespressuresdistribution", identifier, name);
+        }
+
+        public string GetTableValue(string token, string table, string identifier, string name)
+        {
+            DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
+
+            try
+            {
+                Model.Data.CarObject dataObject;
+
+                switch (table.ToLower())
+                {
+                    case "document":
+                        dataObject = dataManager.LookupDocument(identifier);
+                        break;
+                        break;
+                    case "electronics":
+                        dataObject = dataManager.LookupElectronics(identifier);
+                        break;
+                    case "tyres":
+                        dataObject = dataManager.LookupTyres(identifier);
+                        break;
+                    case "brakes":
+                        dataObject = dataManager.LookupBrakes(identifier);
+                        break;
+                    case "tyrespressures":
+                        dataObject = dataManager.LookupTyresPressures(identifier);
+                        break;
+                    case "tyrespressuresdistribution":
+                        dataObject = dataManager.LookupTyresPressuresDistribution(identifier);
+                        break;
+                    default:
+                        throw new Exception("Unknown table detected...");
+                }
+
+                return dataManager.GetDataValue(dataObject, name);
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpPut("document/{identifier}/value")]
+        public string PutDocumentValue([FromQuery(Name = "token")] string token, string identifier,
+                                       [FromQuery(Name = "name")] string name, [FromBody] string value)
+        {
+            return PutTableValue(token, "document", identifier, name, value);
+        }
+
+        [HttpPut("electronics/{identifier}/value")]
+        public string PutElectronicsValue([FromQuery(Name = "token")] string token, string identifier,
+                                          [FromQuery(Name = "name")] string name, [FromBody] string value)
+        {
+            return PutTableValue(token, "electronics", identifier, name, value);
+        }
+
+        [HttpPut("tyres/{identifier}/value")]
+        public string PutTyresValue([FromQuery(Name = "token")] string token, string identifier,
+                                    [FromQuery(Name = "name")] string name, [FromBody] string value)
+        {
+            return PutTableValue(token, "tyres", identifier, name, value);
+        }
+
+        [HttpPut("brakes/{identifier}/value")]
+        public string PutBrakesValue([FromQuery(Name = "token")] string token, string identifier,
+                                     [FromQuery(Name = "name")] string name, [FromBody] string value)
+        {
+            return PutTableValue(token, "brakes", identifier, name, value);
+        }
+
+        [HttpPut("tyrespressures/{identifier}/value")]
+        public string PutTyresPressuresValue([FromQuery(Name = "token")] string token, string identifier,
+                                             [FromQuery(Name = "name")] string name, [FromBody] string value)
+        {
+            return PutTableValue(token, "tyrespressures", identifier, name, value);
+        }
+
+        [HttpPut("tyrespressuresdistribution/{identifier}/value")]
+        public string PutTyresPressuresDistributionValue([FromQuery(Name = "token")] string token, string identifier,
+                                                         [FromQuery(Name = "name")] string name, [FromBody] string value)
+        {
+            return PutTableValue(token, "tyrespressuresdistribution", identifier, name, value);
+        }
+
+        public string PutTableValue(string token, string table, string identifier, string name, string value)
+        {
+            DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
+
+            try
+            {
+                Model.Data.CarObject dataObject;
+
+                switch (table.ToLower())
+                {
+                    case "document":
+                        dataObject = dataManager.LookupDocument(identifier);
+                        break;
+                        break;
+                    case "electronics":
+                        dataObject = dataManager.LookupElectronics(identifier);
+                        break;
+                    case "tyres":
+                        dataObject = dataManager.LookupTyres(identifier);
+                        break;
+                    case "brakes":
+                        dataObject = dataManager.LookupBrakes(identifier);
+                        break;
+                    case "tyrespressures":
+                        dataObject = dataManager.LookupTyresPressures(identifier);
+                        break;
+                    case "tyrespressuresdistribution":
+                        dataObject = dataManager.LookupTyresPressuresDistribution(identifier);
+                        break;
+                    default:
+                        throw new Exception("Unknown table detected...");
+                }
+
+                dataManager.SetDataValue(dataObject, name, value);
+
+                return "Ok";
+            }
+            catch (AggregateException exception)
+            {
+                return "Error: " + exception.InnerException.Message;
+            }
+            catch (Exception exception)
+            {
+                return "Error: " + exception.Message;
+            }
+        }
+
+        [HttpDelete("document/{identifier}/value")]
+        public string DeleteDocumentValue([FromQuery(Name = "token")] string token, string identifier,
+                                          [FromQuery(Name = "name")] string name)
+        {
+            return DeleteTableValue(token, "document", identifier, name);
+        }
+
+        [HttpDelete("electronics/{identifier}/value")]
+        public string DeleteElectronicsValue([FromQuery(Name = "token")] string token, string identifier,
+                                             [FromQuery(Name = "name")] string name)
+        {
+            return DeleteTableValue(token, "electronics", identifier, name);
+        }
+
+        [HttpDelete("tyres/{identifier}/value")]
+        public string DeleteTyresValue([FromQuery(Name = "token")] string token, string identifier,
+                                       [FromQuery(Name = "name")] string name)
+        {
+            return DeleteTableValue(token, "tyres", identifier, name);
+        }
+
+        [HttpDelete("brakes/{identifier}/value")]
+        public string DeleteBrakesValue([FromQuery(Name = "token")] string token, string identifier,
+                                        [FromQuery(Name = "name")] string name)
+        {
+            return DeleteTableValue(token, "brakes", identifier, name);
+        }
+
+        [HttpDelete("tyrespressures/{identifier}/value")]
+        public string DeleteTyresPressuresValue([FromQuery(Name = "token")] string token, string identifier,
+                                             [FromQuery(Name = "name")] string name, [FromBody] string value)
+        {
+            return DeleteTableValue(token, "tyrespressures", identifier, name);
+        }
+
+        [HttpDelete("tyrespressuresdistribution/{identifier}/value")]
+        public string DeleteTyresPressuresDistributionValue([FromQuery(Name = "token")] string token, string identifier,
+                                                            [FromQuery(Name = "name")] string name)
+        {
+            return DeleteTableValue(token, "tyrespressuresdistribution", identifier, name);
+        }
+
+        public string DeleteTableValue(string token, string table, string identifier, string name)
+        {
+            DataManager dataManager = new DataManager(Server.TeamServer.ObjectManager, token);
+
+            try
+            {
+                Model.Data.CarObject dataObject;
+
+                switch (table.ToLower())
+                {
+                    case "document":
+                        dataObject = dataManager.LookupDocument(identifier);
+                        break;
+                        break;
+                    case "electronics":
+                        dataObject = dataManager.LookupElectronics(identifier);
+                        break;
+                    case "tyres":
+                        dataObject = dataManager.LookupTyres(identifier);
+                        break;
+                    case "brakes":
+                        dataObject = dataManager.LookupBrakes(identifier);
+                        break;
+                    case "tyrespressures":
+                        dataObject = dataManager.LookupTyresPressures(identifier);
+                        break;
+                    case "tyrespressuresdistribution":
+                        dataObject = dataManager.LookupTyresPressuresDistribution(identifier);
+                        break;
+                    default:
+                        throw new Exception("Unknown table detected...");
+                }
+
+                dataManager.DeleteDataValue(dataObject, name);
 
                 return "Ok";
             }

@@ -59,6 +59,13 @@ namespace TeamServer.Model.Data
         public string Driver { get; set; }
     }
 
+    [Table("Data_Documents")]
+    public class Document : TelemetryObject
+    {
+        [Indexed]
+        public string Type { get; set; }
+    }
+
     public abstract class TelemetryObject : CarObject
     {
         public string Weather { get; set; }

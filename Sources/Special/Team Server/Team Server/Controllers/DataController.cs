@@ -187,7 +187,7 @@ namespace TeamServer.Controllers
                 {
                     case "document":
                         return ControllerUtils.SerializeObject(dataManager.LookupDocument(identifier),
-                                                               new List<string>(new string[] { "Identifier", "Modified",
+                                                               new List<string>(new string[] { "Identifier", "Modified", "Type",
                                                                                                "Driver", "Simulator", "Car", "Track" }));
                     case "license":
                         return ControllerUtils.SerializeObject(dataManager.LookupLicense(identifier),

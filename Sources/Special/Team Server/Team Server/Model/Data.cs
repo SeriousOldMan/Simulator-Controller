@@ -62,6 +62,8 @@ namespace TeamServer.Model.Data
     [Table("Data_Documents")]
     public class Document : TelemetryObject
     {
+        [Indexed]
+        public string Type { get; set; }
     }
 
     public abstract class TelemetryObject : CarObject

@@ -1246,31 +1246,37 @@ class SessionDatabase extends ConfigurationItem {
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%.info
 
 		if !FileExist(fileName) {
-			info := newConfiguration()
+			fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 
-			setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-			setConfigurationValue(info, "Origin", "Car", car)
-			setConfigurationValue(info, "Origin", "Track", track)
-			setConfigurationValue(info, "Origin", "Driver", this.ID)
+			if FileExist(fileName) {
+				info := newConfiguration()
 
-			setConfigurationValue(info, "Setup", "Name", name)
-			setConfigurationValue(info, "Setup", "Type", type)
-			setConfigurationValue(info, "Setup", "Identifier", createGuid())
-			setConfigurationValue(info, "Setup", "Synchronized", false)
+				setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+				setConfigurationValue(info, "Origin", "Car", car)
+				setConfigurationValue(info, "Origin", "Track", track)
+				setConfigurationValue(info, "Origin", "Driver", this.ID)
 
-			setConfigurationValue(info, "Access", "Share", false)
-			setConfigurationValue(info, "Access", "Synchronize", false)
+				setConfigurationValue(info, "Setup", "Name", name)
+				setConfigurationValue(info, "Setup", "Type", type)
+				setConfigurationValue(info, "Setup", "Identifier", createGuid())
+				setConfigurationValue(info, "Setup", "Synchronized", false)
 
-			writeConfiguration(fileName, info)
+				setConfigurationValue(info, "Access", "Share", false)
+				setConfigurationValue(info, "Access", "Synchronize", false)
 
-			return info
+				writeConfiguration(fileName . ".info", info)
+
+				return info
+			}
+			else
+				return false
 		}
 		else
 			return readConfiguration(fileName)
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
-			 , driver := false, identifier := false, synchronized := false) {
+			 , driver := "__Undefined__", identifier := "__Undefined__", synchronized := "__Undefined__") {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
@@ -1295,10 +1301,15 @@ class SessionDatabase extends ConfigurationItem {
 
 		info := this.readSetupInfo(simulator, car, track, type, name)
 
-		setConfigurationValue(info, "Origin", "Driver", driver)
+		if (driver != kUndefined)
+			setConfigurationValue(info, "Origin", "Driver", driver)
 
-		setConfigurationValue(info, "Setup", "Identifier", identifier)
-		setConfigurationValue(info, "Setup", "Synchronized", synchronized)
+		if (identifier != kUndefined)
+			setConfigurationValue(info, "Setup", "Identifier", identifier)
+
+		if (synchronized != kUndefined)
+			setConfigurationValue(info, "Setup", "Synchronized", synchronized)
+
 		setConfigurationValue(info, "Setup", "Size", size)
 
 		setConfigurationValue(info, "Access", "Share", share)
@@ -1380,23 +1391,29 @@ class SessionDatabase extends ConfigurationItem {
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%.info
 
 		if !FileExist(fileName) {
-			info := newConfiguration()
+			fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%
 
-			setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-			setConfigurationValue(info, "Origin", "Car", car)
-			setConfigurationValue(info, "Origin", "Track", track)
-			setConfigurationValue(info, "Origin", "Driver", this.ID)
+			if FileExist(fileName) {
+				info := newConfiguration()
 
-			setConfigurationValue(info, "Setup", "Name", name)
-			setConfigurationValue(info, "Setup", "Identifier", createGuid())
-			setConfigurationValue(info, "Setup", "Synchronized", false)
+				setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+				setConfigurationValue(info, "Origin", "Car", car)
+				setConfigurationValue(info, "Origin", "Track", track)
+				setConfigurationValue(info, "Origin", "Driver", this.ID)
 
-			setConfigurationValue(info, "Access", "Share", false)
-			setConfigurationValue(info, "Access", "Synchronize", true)
+				setConfigurationValue(info, "Strategy", "Name", name)
+				setConfigurationValue(info, "Strategy", "Identifier", createGuid())
+				setConfigurationValue(info, "Strategy", "Synchronized", false)
 
-			writeConfiguration(fileName, info)
+				setConfigurationValue(info, "Access", "Share", false)
+				setConfigurationValue(info, "Access", "Synchronize", true)
 
-			return info
+				writeConfiguration(fileName . ".info", info)
+
+				return info
+			}
+			else
+				return false
 		}
 		else
 			return readConfiguration(fileName)
@@ -1800,99 +1817,102 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 		lastRun := getConfigurationValue(readConfiguration(kDatabaseDirectory . "SYNCHRONIZE"), "Setups", "Synchronization", "")
 		start := A_Now
 
-		try {
-			for ignore, identifier in string2Values(";", connector.QueryData("Document", "Type = 'Setup' And Modified > " . lastSynchronization)) {
-				document := parseData(connector.GetData("Document", identifier))
+		for ignore, identifier in string2Values(";", connector.QueryData("Document", "Type = 'Setup' And Modified > " . lastSynchronization)) {
+			document := parseData(connector.GetData("Document", identifier))
 
-				simulator := document.Simulator
+			simulator := document.Simulator
 
-				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+			if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+				info := parseConfiguration(connector.GetDataValue("Document", identifier, "Info"))
+
+				car := document.Car
+				track := document.Track
+
+				if !sessionDB.readSetupInfo(simulator, car, track
+										  , getConfigurationValue(info, "Setup", "Type")
+										  , getConfigurationValue(info, "Setup", "Name")) {
 					setup := connector.GetDataValue("Document", identifier, "Setup")
-					info := parseConfiguration(connector.GetDataValue("Document", identifier, "Info"))
-
-					car := document.Car
-					track := document.Track
 
 					counter += 1
 
-					sessionDB.writeSetup(simulator, car, track,
+					sessionDB.writeSetup(simulator, car, track
 									   , getConfigurationValue(info, "Setup", "Type")
 									   , getConfigurationValue(info, "Setup", "Name")
 									   , setup
 									   , getConfigurationValue(info, "Setup", "Size")
-									   , getConfigurationValue(info, "Access", "Synchronize")
 									   , getConfigurationValue(info, "Access", "Share")
+									   , getConfigurationValue(info, "Access", "Synchronize")
 									   , getConfigurationValue(info, "Origin", "Driver")
+									   , getConfigurationValue(info, "Origin", "Identifier")
 									   , true)
 				}
 			}
+		}
 
-			for ignore, simulator in simulators {
-				simulator := sessionDB.getSimulatorCode(simulator)
+		for ignore, simulator in simulators {
+			simulator := sessionDB.getSimulatorCode(simulator)
 
-				loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+			{
+				car := A_LoopFileName
+
+				loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
 				{
-					car := A_LoopFileName
+					track := A_LoopFileName
 
-					loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
-					{
-						track := A_LoopFileName
+					for ignore, type in kSetupTypes
+						loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\%type%\*.info, F
+						{
+							FileGetTime lastModified, %A_LoopFilePath%, M
 
-						for ignore, type in kSetupTypes
-							loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\%type%\*.info, F
-							{
-								FileGetTime lastModified, %A_LoopFilePath%, M
+							if (lastModified > lastRun) {
+								info := readConfiguration(A_LoopFilePath)
 
-								if (lastModified > lastRun) {
-									info := readConfiguration(A_LoopFilePath)
+								if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
+								 && getConfigurationValue(info, "Access", "Synchronize", false)
+								 && !getConfigurationValue(info, "Setup", "Synchronized", false)) {
+									setup := sessionDB.readSetup(simulator, car, track
+															   , getConfigurationValue(info, "Setup", "Type")
+															   , getConfigurationValue(info, "Setup", "Name")
+															   , size)
+									info := sessionDB.readSetupInfo(simulator, car, track
+																  , getConfigurationValue(info, "Setup", "Type")
+																  , getConfigurationValue(info, "Setup", "Name"))
 
-									if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
-									 && getConfigurationValue(info, "Access", "Synchronize", false)
-									 && !getConfigurationValue(info, "Setup", "Synchronized", false)) {
-										setup := sessionDB.readSetup(simulator, car, track
-																   , getConfigurationValue(info, "Setup", "Type")
-																   , getConfigurationValue(info, "Setup", "Name")
-																   , size)
-										info := sessionDB.readSetupInfo(simulator, car, track
-																	  , getConfigurationValue(info, "Setup", "Type")
-																	  , getConfigurationValue(info, "Setup", "Name"))
+									if (setup && (size > 0)) {
+										identifier := getConfigurationValue(info, "Setup", "Identifier")
 
-										if (setup && (size > 0)) {
-											identifier := getConfigurationValue(info, "Setup", "Identifier")
+										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
+											connector.CreateData("Document"
+															   , substituteVariables("Type=Setup`n"
+																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
+																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
+																				   , {Identifier: identifier
+																					, Driver: getConfigurationValue(info, "Origin", "Driver")
+																					, Simulator: simulator, Car: car, Track: track}))
 
-											if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
-												connector.CreateData("Document"
-																   , substituteVariables("Type=Setup`n"
-																					   . "Identifier=%Identifier%`nDriver=%Driver%`n"
-																					   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
-																					   , {Identifier: identifier
-																						, Driver: getConfigurationValue(info, "Origin", "Driver")
-																						, Simulator: simulator, Car: car, Track: track}))
+										counter += 1
 
-											counter += 1
+										connector.SetDataValue("Document", identifier, "Setup", setup)
 
-											connector.SetDataValue("Document", identifier, "Setup", setup)
+										setConfigurationValue(info, "Setup", "Synchronized", true)
 
-											setConfigurationValue(info, "Setup", "Synchronized", true)
+										connector.SetDataValue("Document", identifier, "Info", printConfiguration(info))
 
-											connector.SetDataValue("Document", identifier, "Info", printConfiguration(info))
-
-											writeConfiguration(A_LoopFilePath, info)
-										}
+										writeConfiguration(A_LoopFilePath, info)
 									}
 								}
 							}
-					}
+						}
 				}
 			}
 		}
-		finally {
-			info := readConfiguration(kDatabaseDirectory . "SYNCHRONIZE")
 
-			setConfigurationValue(info, "Setups", "Synchronization", start)
+		info := readConfiguration(kDatabaseDirectory . "SYNCHRONIZE")
 
-			writeConfiguration(kDatabaseDirectory . "SYNCHRONIZE", info)
-		}
+		setConfigurationValue(info, "Setups", "Synchronization", start)
+
+		writeConfiguration(kDatabaseDirectory . "SYNCHRONIZE", info)
 	}
 }
 
@@ -1911,25 +1931,28 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 				simulator := document.Simulator
 
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
-					strategy := parseConfiguration(connector.GetDataValue("Document", identifier, "Strategy"))
 					info := parseConfiguration(connector.GetDataValue("Document", identifier, "Info"))
 
 					car := document.Car
 					track := document.Track
 
-					counter += 1
+					if !sessionDB.readStrategyInfo(simulator, car, track, getConfigurationValue(info, "Strategy", "Name")) {
+						counter += 1
 
-					directory = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\
+						strategy := parseConfiguration(connector.GetDataValue("Document", identifier, "Strategy"))
 
-					FileCreateDir %directory%
+						directory = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\
 
-					name := getConfigurationValue(info, "Strategy", "Name")
+						FileCreateDir %directory%
 
-					writeConfiguration(directory . name, strategy)
+						name := getConfigurationValue(info, "Strategy", "Name")
 
-					setConfigurationValue(info, "Strategy", "Synchronized", true)
+						writeConfiguration(directory . name, strategy)
 
-					writeConfiguration(directory . name . ".info", info)
+						setConfigurationValue(info, "Strategy", "Synchronized", true)
+
+						writeConfiguration(directory . name . ".info", info)
+					}
 				}
 			}
 
@@ -1971,7 +1994,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 											connector.CreateData("Document"
 															   , substituteVariables("Type=Strategy`n"
 																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
-																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
+																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
 																				   , {Identifier: identifier
 																					, Driver: getConfigurationValue(info, "Access", "Driver")
 																					, Simulator: simulator, Car: car, Track: track}))
@@ -1993,13 +2016,12 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 				}
 			}
 		}
-		finally {
-			info := readConfiguration(kDatabaseDirectory . "SYNCHRONIZE")
 
-			setConfigurationValue(info, "Strategies", "Synchronization", start)
+		info := readConfiguration(kDatabaseDirectory . "SYNCHRONIZE")
 
-			writeConfiguration(kDatabaseDirectory . "SYNCHRONIZE", info)
-		}
+		setConfigurationValue(info, "Strategies", "Synchronization", start)
+
+		writeConfiguration(kDatabaseDirectory . "SYNCHRONIZE", info)
 	}
 }
 

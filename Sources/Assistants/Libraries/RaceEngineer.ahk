@@ -128,8 +128,11 @@ class RaceEngineer extends RaceAssistant {
 		if values.HasKey("AdjustLapTime")
 			this.iAdjustLapTime := values["AdjustLapTime"]
 
-		if values.HasKey("SaveTyrePressures")
+		if values.HasKey("SaveTyrePressures") {
 			this.iSaveTyrePressures := values["SaveTyrePressures"]
+
+			logMessage(kLogDebug, "SaveTyrePressures is now " . this.iSaveTyrePressures)
+		}
 	}
 
 	updateSessionValues(values) {
@@ -139,8 +142,11 @@ class RaceEngineer extends RaceAssistant {
 	updateDynamicValues(values) {
 		base.updateDynamicValues(values)
 
-		if values.HasKey("HasPressureData")
+		if values.HasKey("HasPressureData") {
 			this.iHasPressureData := values["HasPressureData"]
+
+			logMessage(kLogDebug, "HasPressureData is now " . this.iHasPressureData)
+		}
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -1138,6 +1144,12 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 
 		if knowledgeBase {
+			logMessage(kLogDebug, "Finish: Speaker is " . this.Speaker)
+			logMessage(kLogDebug, "Finish: Listener is " . this.Listener)
+			logMessage(kLogDebug, "Finish: SaveTyrePressures is " . this.SaveTyrePressures)
+			logMessage(kLogDebug, "Finish: HasPressureData is " . this.HasPressureData)
+			logMessage(kLogDebug, "Finish: collectTyrePressures() is " . this.collectTyrePressures())
+
 			if (this.Session == kSessionRace) {
 				Process Exist, Race Strategist.exe
 
@@ -1151,8 +1163,7 @@ class RaceEngineer extends RaceAssistant {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if (this.Listener && (((this.SaveTyrePressures == kAsk) && this.collectTyrePressures() && this.HasPressureData)
-								   || (this.SaveSettings == kAsk))) {
+				if (((this.SaveTyrePressures == kAsk) && this.collectTyrePressures() && this.HasPressureData) || (this.SaveSettings == kAsk)) {
 					this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
@@ -1320,6 +1331,8 @@ class RaceEngineer extends RaceAssistant {
 						trackTemperature := Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
 
 					weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
+
+					logMessage(kLogDebug, "Saving pressures for " . lapNumber)
 
 					this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
 										, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")

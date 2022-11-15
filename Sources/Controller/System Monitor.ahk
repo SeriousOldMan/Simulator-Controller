@@ -440,6 +440,8 @@ systemMonitor(command := false, arguments*) {
 			logLevel := arguments[3]
 
 			switch logLevel {
+				case kLogDebug:
+					logLevel := "Debug"
 				case kLogInfo:
 					logLevel := "Info"
 				case kLogWarn:
@@ -626,7 +628,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x590 yp w95 h23 +0x200, % translate("Log Level")
 
-		choices := ["Info", "Warn", "Critical", "Off"]
+		choices := ["Debug", "Info", "Warn", "Critical", "Off"]
 		chosen := getLogLevel()
 
 		Gui SM:Add, DropDownList, x689 yp-1 w91 AltSubmit Choose%chosen% VlogLevelDropDown gchooseLogLevel, % values2String("|", map(choices, "translate")*)

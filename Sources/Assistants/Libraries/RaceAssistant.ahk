@@ -668,7 +668,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if continuation {
 			if isInstance(continuation, VoiceManager.VoiceContinuation)
-				this.handleVoiceCommand("Yes", ["Yes"])
+				this.handleVoiceCommand("No", ["No"])
 			else if this.VoiceManager
 				this.VoiceManager.phraseRecognized("No", ["No"])
 			else

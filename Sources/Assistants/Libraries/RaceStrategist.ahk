@@ -1342,21 +1342,17 @@ class RaceStrategist extends RaceAssistant {
 			if (shutdown && (lastLap > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if this.Listener {
-					asked := true
+				asked := true
 
-					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
+				if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
+				  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
+				 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
+					this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
+				else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
+					this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+				else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
 					  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
-					 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
-					else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
-						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
-					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
-						  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
-					else
-						asked := false
-				}
+					this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 				else
 					asked := false
 

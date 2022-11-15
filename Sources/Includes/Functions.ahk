@@ -625,7 +625,7 @@ loadSimulatorConfiguration() {
 	if (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 		setDebug(true)
 
-	vLogLevel := inList(["Debug", "Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
+	vLogLevel := inList(kLogLevelNames, getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
 }
 
 initializeEnvironment() {
@@ -896,7 +896,7 @@ installTrayMenu(update := false) {
 
 	levels := kLogLevels
 
-	for ignore, label in getKeys(kLogLevels) {
+	for ignore, label in kLogLevelNames {
 		level := levels[label]
 
 		label := translate(label)

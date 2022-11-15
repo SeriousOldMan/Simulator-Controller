@@ -92,3 +92,4 @@ global kLogCritical := 4
 global kLogOff := 5
 
 global kLogLevels := {Off: kLogOff, Debug: kLogDebug, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]

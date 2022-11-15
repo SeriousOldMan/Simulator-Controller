@@ -628,7 +628,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x590 yp w95 h23 +0x200, % translate("Log Level")
 
-		choices := ["Debug", "Info", "Warn", "Critical", "Off"]
+		choices := kLogLevelNames
 		chosen := getLogLevel()
 
 		Gui SM:Add, DropDownList, x689 yp-1 w91 AltSubmit Choose%chosen% VlogLevelDropDown gchooseLogLevel, % values2String("|", map(choices, "translate")*)
@@ -825,16 +825,13 @@ updateDataState(databaseState) {
 	GuiControl, , dataState, %icon%
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		if !getConfigurationValue(databaseState, "Database Synchronizer", "Connected", true) {
-			serverURL := translate("Not valid")
-			serverToken := translate("Not valid")
-		}
-		else {
-			serverURL := getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
-			serverToken := getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined)
-		}
+		serverURL := getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
+		serverToken := getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined)
 
-		action := getConfigurationValue(databaseState, "Database Synchronizer", "Synchronization", false)
+		if !getConfigurationValue(databaseState, "Database Synchronizer", "Connected", true)
+			action := "Disconnected"
+		else
+			action := getConfigurationValue(databaseState, "Database Synchronizer", "Synchronization", false)
 
 		html := "<table>"
 
@@ -875,6 +872,8 @@ updateDataState(databaseState) {
 					action := translate("Uploading community database...")
 				case "Downloading":
 					action := translate("Downloading community database...")
+				case "Disconnected":
+					action := (translate("Lost connection to the Team Server (URL: ") . serverURL . translate(")"))
 				default:
 					throw "Unknown action detected in updateDataState..."
 			}

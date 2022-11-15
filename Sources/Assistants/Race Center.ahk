@@ -9716,8 +9716,14 @@ class RaceCenter extends ConfigurationItem {
 							if (rnd < (randomFactor / 100))
 								lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 						}
-						else if ((A_Index == driver) && ((startLap + curLap) == targetLap))
-							lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
+						else if ((A_Index == driver) && ((startLap + curLap) == targetLap)) {
+							if pitstopFuelService is Number
+								lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
+							else if (pitstopFuelService[1] = "Fixed")
+								lapTime += (pitstopDelta + pitstopFuelService[2] + pitstopTyreService)
+							else
+								lapTime += (pitstopDelta + (pitstopFuelService[2] * fuelCapacity) + pitstopTyreService)
+						}
 
 						delta := (((avgLapTime + lapTime) / lapTime) - 1)
 

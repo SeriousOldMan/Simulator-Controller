@@ -1167,6 +1167,8 @@ class RaceStrategist extends RaceAssistant {
 					  , "Session.Settings.Strategy.Traffic.Considered": (getConfigurationValue(settings, "Strategy Settings"
 																							 , "Traffic.Considered", 5) / 100)
 					  , "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings"
+																					   , "Service.Refuel.Rule", "Dynamic")
+					  , "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings"
 																					   , "Service.Refuel", 1.5)
 					  , "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings"
 																					  , "Service.Tyres", 30)

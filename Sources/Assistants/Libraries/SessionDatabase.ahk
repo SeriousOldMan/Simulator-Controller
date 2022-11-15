@@ -1591,14 +1591,8 @@ map2String(elementSeparator, valueSeparator, map) {
 ;;;-------------------------------------------------------------------------;;;
 
 compound(compound, color := false) {
-	if color {
-		/*
-		if (color = "Black")
-			return compound
-		else
-		*/
-			return (compound . " (" . color . ")")
-	}
+	if color
+		return (compound . " (" . color . ")")
 	else
 		return string2Values(A_Space, compound)[1]
 }

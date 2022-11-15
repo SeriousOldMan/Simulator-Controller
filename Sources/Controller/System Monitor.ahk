@@ -734,7 +734,7 @@ updateAssistantsState(controllerState) {
 			if (state = "Active") {
 				overallState := "Active"
 
-				state := "Active"
+				state := translate("Active")
 
 				if getConfigurationValue(controllerState, key, "Muted", false)
 					state .= translate(" (Muted)")
@@ -835,8 +835,13 @@ updateDataState(databaseState) {
 		action := getConfigurationValue(databaseState, "Database Synchronizer", "Synchronization", false)
 
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . serverURL . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
+
+		if (getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined) != kUndefined)
+			html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . serverURL . "</td></tr>")
+
+		if (getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined) != kUndefined)
+			html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
+
 		html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>"
 							   . getConfigurationValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Database:") . "</b></td><td>"
@@ -857,6 +862,10 @@ updateDataState(databaseState) {
 					action := translate("Waiting for next synchronization...")
 				case "Failed":
 					action := translate("Synchronization failed")
+				case "Uploading":
+					action := translate("Uploading community database...")
+				case "Downloading":
+					action := translate("Downloading community database...")
 				default:
 					throw "Unknown action detected in updateDataState..."
 			}

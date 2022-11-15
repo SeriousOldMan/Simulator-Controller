@@ -435,6 +435,26 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 	}
 
+	updatePositionsData(data) {
+		local car
+
+		static carCategories := false
+
+		base.updatePositionsData(data)
+
+		if !carCategories
+			carCategories := getConfigurationSectionValues(readConfiguration(kResourcesDirectory . "Simulator Data\ACC\Car Data.ini"), "Car Categories")
+
+		loop {
+			car := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+
+			if (car == kUndefined)
+				break
+			else
+				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", carCategories.HasKey(car) ? carCategories[car] : "Unknown")
+		}
+	}
+
 	updateTelemetryData(data) {
 		local brakePadThickness, frontBrakePadCompound, rearBrakePadCompound, brakePadWear
 

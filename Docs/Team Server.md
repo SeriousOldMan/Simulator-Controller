@@ -142,6 +142,10 @@ All data of an active session is stored on the Team Server. It is therefore poss
 
 A public test server is available for your first test ride with "Race Center". Use the Server URL "https://sc-teamserver-test.azurewebsites.net" and connect to the "demo" account using the password "demo". The generated token, which is valid for seven days, can be used in the "Race Center" together with the Server URL to open the demo session. The server also has ten slots ("test1" - "test10", all with an empty password), which you can use to run your own tests. Only two hours of session time are available on each account but this is enough for a short test race. The accounts will be reset each day.
 
+### Multi-class support
+
+The "Race Center" *understands* multi-class races. Please see in the sections below, where information is shown differently, when you are in a multi-class race. For the most part, class-specific information will be shon in the different reports.
+
 ### Data Analysis
 
 "Race Center" supplies you with a couple of reports, which you can use to analyse the performance of your team drivers, compare them to your oponnents and dig deeper into the telemetry data of the car. Choose one of the reports in the reports list and this report will be shown in the report area on the top right of "Race Center" window.
@@ -160,7 +164,7 @@ A very special report is the live track view, which is available for all race si
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2020.JPG)
 
-Your own car will be marked by a black dot, whereas most other cars will be displayed as gray dots on the map, except your direct opponents and the race leader, for which the positions will be color coded. All positions will be updated every couple of seconds.
+Your own car will be marked by a black dot, whereas most other cars will be displayed as gray dots on the map, except your direct opponents and the race leader, for which the positions will be color coded. All positions will be updated every couple of seconds. Please note, that when you are in a multi-class race, this information is class-specific.
 
 Beside all that, you can request several context specific data, which will be shown in the "Output" area in the lower right of the "Race Center" window.
 
@@ -183,6 +187,8 @@ Beside all that, you can request several context specific data, which will be sh
      When you select a lap in the *Laps* tab, you will get a detailed table of the standings and the gaps to the cars in front of and behind the drivers car, as well as to the leader.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%209.JPG)
+	 
+	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, beside their overall position in the race. In a multi-class race, the gaps shown in the first table will always be specific for the own class.
 
   6. Details for a given pitstop
   

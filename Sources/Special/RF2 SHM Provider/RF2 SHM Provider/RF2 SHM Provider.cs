@@ -5,6 +5,7 @@ Small parts original by: The Iron Wolf (vleonavicius@hotmail.com; thecrewchief.o
 */
 using RF2SHMProvider.rFactor2Data;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using static RF2SHMProvider.rFactor2Constants;
@@ -81,11 +82,8 @@ namespace RF2SHMProvider {
 		public string GetSurname(byte[] name) {
 			string forName = GetStringFromBytes(name);
 
-			if (forName.Contains(" ")) {
-				string[] names = forName.Split(' ');
-
-				return names[1];
-			}
+			if (forName.Contains(" "))
+				return string.Join(" ", forName.Split(' ').Skip(1));
 			else
 				return "";
 		}
@@ -146,27 +144,31 @@ namespace RF2SHMProvider {
 			for (int i = 1; i <= scoring.mScoringInfo.mNumVehicles; ++i) {
 				rF2VehicleScoring vehicle = scoring.mVehicles[i - 1];
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(vehicle.mID);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Position="); Console.WriteLine(vehicle.mPlace);
 
-				Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
 
 				int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
-				int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
+
+				if (lapTime == 0)
+					lapTime = (int)Math.Round(Normalize(vehicle.mBestLapTime) * 1000);
+
+                int sector1Time = (int)Math.Round(Normalize(vehicle.mLastSector1) * 1000);
 				int sector2Time = (int)Math.Round(Normalize(vehicle.mLastSector2) * 1000);
 				int sector3Time = lapTime - sector1Time - sector2Time;
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time="); Console.WriteLine(lapTime);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Time.Sectors="); Console.WriteLine(sector1Time + "," + sector2Time + "," + sector3Time);
 
-
-				string carModel = GetCarName(GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
-				string carNr = GetCarNr(vehicle.mID, GetStringFromBytes(vehicle.mVehicleClass), GetStringFromBytes(vehicle.mVehicleName));
+				string carClass = GetStringFromBytes(vehicle.mVehicleClass);
+                string carModel = GetCarName(carClass, GetStringFromBytes(vehicle.mVehicleName));
+				string carNr = GetCarNr(vehicle.mID, carClass, GetStringFromBytes(vehicle.mVehicleName));
 				
 				Console.Write("Car."); Console.Write(i); Console.Write(".Nr="); Console.WriteLine(carNr);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Class="); Console.WriteLine(carClass);
+                Console.Write("Car."); Console.Write(i); Console.Write(".Car="); Console.WriteLine(carModel);
 
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Forname="); Console.WriteLine(GetForname(vehicle.mDriverName));
 				Console.Write("Car."); Console.Write(i); Console.Write(".Driver.Surname="); Console.WriteLine(GetSurname(vehicle.mDriverName));
@@ -253,7 +255,8 @@ namespace RF2SHMProvider {
 
 				Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag > 0) ? "true" : "false");
 				
-				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime) * 1000));
+				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
+																													 : playerScoring.mBestLapTime) * 1000));
 				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
 				Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
@@ -375,7 +378,7 @@ namespace RF2SHMProvider {
 				if (playerScoring.mLastLapTime > 0)
 					return (long)Math.Round(GetRemainingTime(ref playerScoring) / (Normalize(playerScoring.mLastLapTime) * 1000)) + 1;
 				else
-					return 0;
+					return 1;
 			}
 		}
 
@@ -385,15 +388,20 @@ namespace RF2SHMProvider {
 
 			if (scoring.mScoringInfo.mEndET > 0.0)
 			{
+				/*
 				long time = (long)((scoring.mScoringInfo.mEndET - (Normalize(playerScoring.mLastLapTime) * playerScoring.mTotalLaps)) * 1000);
 
 				if (time > 0)
 					return time;
 				else
 					return 0;
+				*/
+
+				return (long)Math.Max(0, scoring.mScoringInfo.mEndET - scoring.mScoringInfo.mCurrentET);
 			}
 			else
-				return (long)(GetRemainingLaps(ref playerScoring) * Normalize(playerScoring.mLastLapTime) * 1000);
+				return (long)(GetRemainingLaps(ref playerScoring) *
+							  Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime : playerScoring.mBestLapTime) * 1000);
 		}
 
 		private static string GetWeather(double cloudLevel, double rainLevel) {

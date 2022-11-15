@@ -555,6 +555,9 @@ removeInvalidLaps(rows) {
 }
 
 synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
+	local lastSimulator := false
+	local lastCar := false
+	local lastTrack := false
 	local ignore, simulator, car, track, db, modified, identifier, telemetry, properties
 
 	if inList(groups, "Telemetry")
@@ -568,7 +571,13 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 					car := telemetry.Car
 					track := telemetry.Track
 
-					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
+						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+
+						lastSimulator := simulator
+						lastCar := car
+						lastTrack := track
+					}
 
 					if (db.query("Electronics", {Where: {Identifier: identifier} }).Length() = 0) {
 						counter += 1
@@ -599,7 +608,13 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 					car := telemetry.Car
 					track := telemetry.Track
 
-					db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
+						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+
+						lastSimulator := simulator
+						lastCar := car
+						lastTrack := track
+					}
 
 					if (db.query("Tyres", {Where: {Identifier: identifier} }).Length() = 0) {
 						counter += 1

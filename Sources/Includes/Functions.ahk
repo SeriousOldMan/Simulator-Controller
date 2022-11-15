@@ -109,15 +109,16 @@ consentDialog(id, consent := false) {
 
 	texts := false
 
-	for language, ignore in availableLanguages()
-		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
-			if FileExist(rootDirectory . "Consent." . language)
-				if !texts
-					texts := readConfiguration(rootDirectory . "Consent." . language)
-				else
-					for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
-						for key, value in keyValues
-							setConfigurationValue(texts, section, key, value)
+	language := getLanguage()
+
+	for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
+		if FileExist(rootDirectory . "Consent." . language)
+			if !texts
+				texts := readConfiguration(rootDirectory . "Consent." . language)
+			else
+				for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
+					for key, value in keyValues
+						setConfigurationValue(texts, section, key, value)
 
 	if !texts
 		texts := readConfiguration(kTranslationsDirectory . "Consent.en")
@@ -266,7 +267,7 @@ requestShareSessionDatabaseConsent() {
 				setConfigurationValue(newConsent, "General", "ID", id)
 				setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 
-				if FileExist(kTranslationsDirectory . "Consent.ini")
+				if (getFileNames("Consent.*", kTranslationsDirectory).Length() > 0)
 					result := consentDialog(id, consent)
 				else {
 					result := {}
@@ -782,7 +783,7 @@ createGUID() {
 
     VarSetCapacity(pGuid, 16, 0)
 
-	if !(DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid)) {
+	if !DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid) {
         size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
 
         if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {
@@ -1445,6 +1446,10 @@ reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
 
 isDebug() {
 	return vDebug
+}
+
+isDevelopment() {
+	return (vBuildConfiguration = "Development")
 }
 
 getLogLevel() {

@@ -102,7 +102,8 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 							 , "Setups.Data": ["Driver", "Weather", "Temperature.Air", "Temperature.Track"
 											 , "Tyre.Compound", "Tyre.Compound.Color"
 											 , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
-											 , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"]}
+											 , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
+											 , "Notes"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -209,6 +210,7 @@ global setupBasePressureFLEdit
 global setupBasePressureFrEdit
 global setupBasePressureRLEdit
 global setupBasePressureRREdit
+global setupNotesEdit
 
 global addSetupButton
 global copySetupButton
@@ -1406,7 +1408,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui Tab, 5
 
-		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseSetup, % values2String("|", map(["Driver", "Conditions", "Compound", "Pressures"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseSetup, % values2String("|", map(["Driver", "Conditions", "Compound", "Pressures", "Notes"], "translate")*)
 
 		this.iSetupsListView := listHandle
 
@@ -1433,23 +1435,20 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x474 yp+1 w126 AltSubmit Choose0 vsetupCompoundDropDownMenu gupdateSetup, % values2String("|", choices*)
 
-		Gui %window%:Add, Text, x378 yp+30 w90 h23 +0x200, % translate("Pressure FL")
+		Gui %window%:Add, Text, x378 yp+30 w90 h23 +0x200, % translate("Pressure Front")
 		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureFLEdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		Gui %window%:Add, Edit, xp+52 yp w50 h23 vsetupBasePressureFREdit gupdateSetup
+		Gui %window%:Add, Text, xp+52 yp+3 w30 h20, % translate("PSI")
 
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure FR")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureFREdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
-
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RL")
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure Rear")
 		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRLEdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		Gui %window%:Add, Edit, xp+52 yp w50 h23 vsetupBasePressureRREdit gupdateSetup
+		Gui %window%:Add, Text, xp+52 yp+3 w30 h20, % translate("PSI")
 
-		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure RR")
-		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRREdit gupdateSetup
-		Gui %window%:Add, Text, x527 yp+3 w30 h20, % translate("PSI")
+		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Notes")
+		Gui %window%:Add, Edit, x474 yp+1 w126 h46 vsetupNotesEdit gupdateSetup
 
-		Gui %window%:Add, Button, x525 yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
+		Gui %window%:Add, Button, x525 yp+50 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
 		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x550 yp w23 h23 Center +0x200 HWNDcopyButton vcopySetupButton gcopySetup
 		setButtonIcon(copyButton, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
@@ -1817,6 +1816,74 @@ class RaceCenter extends ConfigurationItem {
 		return driver
 	}
 
+	getClasses(data) {
+		local classes := {}
+
+		loop % getConfigurationValue(data, "Position Data", "Car.Count")
+		{
+			class := getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+
+			if !classes.HasKey(class)
+				classes[class] := true
+		}
+
+		return getKeys(classes)
+	}
+
+	getClass(data, car := false) {
+		if !car
+			car := getConfigurationValue(data, "Position Data", "Driver.Car")
+
+		return getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown)
+	}
+
+	getCars(data, class := "Overall", sorted := false) {
+		local classGrid := []
+		local positions, ignore, position
+
+		if (class = "Class")
+			class := this.getClass(data)
+		else if (class = "Overall")
+			class := false
+
+		if sorted {
+			positions := []
+
+			loop % getConfigurationValue(data, "Position Data", "Car.Count")
+				if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+					positions.Push(Array(A_Index, getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Position")))
+
+			bubbleSort(positions, "compareClassPositions")
+
+			for ignore, position in positions
+				classGrid.Push(position[1])
+		}
+		else
+			loop % getConfigurationValue(data, "Position Data", "Car.Count")
+				if (!class || (class = getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
+					classGrid.Push(A_Index)
+
+		return classGrid
+	}
+
+	getPosition(data, type := "Overall", car := false) {
+		local knowledgebase := this.Knowledgebase
+		local position, candidate
+
+		if !car
+			if (type = "Overall")
+				return getConfigurationValue(data, "Position Data", "Car." . getConfigurationValue(data, "Position Data", "Driver.Car") . ".Position", false)
+			else
+				car := getConfigurationValue(data, "Position Data", "Driver.Car")
+
+		if (type != "Overall")
+			for position, candidate in this.getCars(data, getConfigurationValue(data, "Position Data", "Car." . car . ".Class", kUnknown), true)
+				if (candidate = car)
+					return position
+
+		return getConfigurationValue(data, "Position Data", "Car." . car . ".Position", false)
+	}
+
 	updateState() {
 		local window := this.Window
 		local currentListView, selected, stint
@@ -1851,7 +1918,7 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl Disable, dataY6DropDown
 
 		if this.HasData {
-			if inList(["Drivers", "Positions", "Lap Times", "Consistency", "Pace", "Performance", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
+			if inList(["Drivers", "Positions", "Lap Times", "Performance", "Consistency", "Pace", "Pressures", "Brakes", "Temperatures", "Free"], this.SelectedReport)
 				GuiControl Enable, reportSettingsButton
 			else
 				GuiControl Disable, reportSettingsButton
@@ -1937,6 +2004,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Enable, setupBasePressureFREdit
 				GuiControl Enable, setupBasePressureRLEdit
 				GuiControl Enable, setupBasePressureRREdit
+				GuiControl Enable, setupNotesEdit
 
 				GuiControl Enable, copySetupButton
 				GuiControl Enable, deleteSetupButton
@@ -1953,6 +2021,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, setupBasePressureFREdit
 				GuiControl Disable, setupBasePressureRLEdit
 				GuiControl Disable, setupBasePressureRREdit
+				GuiControl Disable, setupNotesEdit
 
 				GuiControl Disable, copySetupButton
 				GuiControl Disable, deleteSetupButton
@@ -1966,6 +2035,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl, , setupBasePressureFREdit, % ""
 				GuiControl, , setupBasePressureRLEdit, % ""
 				GuiControl, , setupBasePressureRREdit, % ""
+				GuiControl, , setupNotesEdit, % ""
 			}
 
 			Gui ListView, % this.PlanListView
@@ -2130,13 +2200,15 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl, , setupBasePressureFREdit, %setupBasePressureFREdit%
 				GuiControl, , setupBasePressureRLEdit, %setupBasePressureRLEdit%
 				GuiControl, , setupBasePressureRREdit, %setupBasePressureRREdit%
+				GuiControl, , setupNotesEdit, % ""
 
 				LV_Modify(LV_Add("Select", getKeys(this.SessionDrivers)[1]
 										 , translate("Dry") . A_Space . translate("(") . setupAirTemperatureEdit
 															. ", " . setupTrackTemperatureEdit . translate(")")
 										 , translate(normalizeCompound("Dry"))
 										 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit
-															 , setupBasePressureRLEdit, setupBasePressureRREdit)), "Vis")
+															 , setupBasePressureRLEdit, setupBasePressureRREdit)
+										 , ""), "Vis")
 
 				this.iSelectedSetup := LV_GetCount()
 
@@ -2158,7 +2230,7 @@ class RaceCenter extends ConfigurationItem {
 
 	copySetup() {
 		local window := this.Window
-		local driver, conditions, compound, pressures
+		local driver, conditions, compound, pressures, notes
 		local currentListView, row
 
 		Gui %window%:Default
@@ -2175,8 +2247,9 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(conditions, row, 2)
 				LV_GetText(compound, row, 3)
 				LV_GetText(pressures, row, 4)
+				LV_GetText(notes, row, 4)
 
-				LV_Modify(LV_Add("Select", driver, conditions, compound, pressures), "Vis")
+				LV_Modify(LV_Add("Select", driver, conditions, compound, pressures, notes), "Vis")
 
 				this.iSelectedSetup := LV_GetCount()
 
@@ -5951,23 +6024,29 @@ class RaceCenter extends ConfigurationItem {
 		this.ReportViewer.getCar(lap.Nr, car, carNumber, carName, driverForname, driverSurname, driverNickname)
 	}
 
-	getStandings(lap, ByRef cars, ByRef positions, ByRef carNumbers, ByRef carNames, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
+	getStandings(lap, ByRef cars, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
+					, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
 		local tCars := true
-		local tPositions := true
+		local tOPositions := true
+		local tCPositions := true
 		local tCarNumbers := carNumbers
 		local tCarNames := carNames
 		local tDriverFornames := driverFornames
 		local tDriverSurnames := driverSurnames
 		local tDriverNicknames := driverNicknames
-		local index
+		local index, multiClass
 
-		this.ReportViewer.getStandings(lap.Nr, tCars, tPositions, tCarNumbers, tCarNames, tDriverFornames, tDriverSurnames, tDriverNicknames)
+		multiClass := this.ReportViewer.getStandings(lap.Nr, tCars, tOPositions, tCPositions, tCarNumbers, tCarNames
+												   , tDriverFornames, tDriverSurnames, tDriverNicknames)
 
 		if cars
 			cars := []
 
-		if positions
-			positions := []
+		if overallPositions
+			overallPositions := []
+
+		if classPositions
+			classPositions := []
 
 		if carNumbers
 			carNumbers := []
@@ -5985,15 +6064,18 @@ class RaceCenter extends ConfigurationItem {
 			driverNicknames := []
 
 		if (tCars.Length() > 0)
-			loop % tPositions.Length()
+			loop % tOPositions.Length()
 			{
-				index := inList(tPositions, A_Index)
+				index := inList(tOPositions, A_Index)
 
 				if cars
 					cars.Push(tCars[index])
 
-				if positions
-					positions.Push(tPositions[index])
+				if overallPositions
+					overallPositions.Push(tOPositions[index])
+
+				if classPositions
+					classPositions.Push(tCPositions[index])
 
 				if carNumbers
 					carNumbers.Push(tCarNumbers[index])
@@ -6010,6 +6092,8 @@ class RaceCenter extends ConfigurationItem {
 				if driverNicknames
 					driverNicknames.Push(tDriverNicknames[index])
 			}
+
+		return multiClass
 	}
 
 	computeDuration(stint) {
@@ -6264,7 +6348,7 @@ class RaceCenter extends ConfigurationItem {
 
 	saveSetups(flush := false) {
 		local sessionStore := this.SessionStore
-		local compound, window, currentListView, driver, conditions, compound, pressures, temperatures, compoundColor
+		local compound, window, currentListView, driver, conditions, compound, pressures, notes, temperatures, compoundColor
 
 		sessionStore.clear("Setups.Data")
 
@@ -6283,6 +6367,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(conditions, A_Index, 2)
 				LV_GetText(compound, A_Index, 3)
 				LV_GetText(pressures, A_Index, 4)
+				LV_GetText(notes, A_Index, 5)
 
 				conditions := string2Values(translate("("), conditions)
 				temperatures := string2Values(", ", StrReplace(conditions[2], translate(")"), ""))
@@ -6299,7 +6384,8 @@ class RaceCenter extends ConfigurationItem {
 											   , "Temperature.Air": temperatures[1], "Temperature.Track": temperatures[2]
 											   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 											   , "Tyre.Pressure.Front.Left": pressures[1], "Tyre.Pressure.Front.Right": pressures[2]
-											   , "Tyre.Pressure.Rear.Left": pressures[3], "Tyre.Pressure.Rear.Right": pressures[4]})
+											   , "Tyre.Pressure.Rear.Left": pressures[3], "Tyre.Pressure.Rear.Right": pressures[4]
+											   , Notes: StrReplace(StrReplace(StrReplace(notes, "`n", A_Space), "`t", A_Space), ";", ",")})
 			}
 		}
 		finally {
@@ -6642,7 +6728,8 @@ class RaceCenter extends ConfigurationItem {
 				LV_Add("", setup.Driver, conditions
 						 , translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
 						 , values2String(", ", setup["Tyre.Pressure.Front.Left"], setup["Tyre.Pressure.Front.Right"]
-											 , setup["Tyre.Pressure.Rear.Left"], setup["Tyre.Pressure.Rear.Right"]))
+											 , setup["Tyre.Pressure.Rear.Left"], setup["Tyre.Pressure.Rear.Right"])
+						 , displayValue(setup.Notes, ""))
 			}
 
 			LV_ModifyCol()
@@ -7178,7 +7265,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editDriverReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Drivers")
+		return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
 	}
 
 	showPositionsReport() {
@@ -7190,7 +7277,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPositionsReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps")
+		return this.ReportViewer.editReportSettings("Laps", "Classes")
 	}
 
 	showLapTimesReport() {
@@ -7202,7 +7289,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editLapTimesReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showConsistencyReport() {
@@ -7214,7 +7301,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editConsistencyReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showPaceReport() {
@@ -7226,7 +7313,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPaceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showPerformanceReport() {
@@ -7238,7 +7325,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPerformanceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars")
+		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
 	}
 
 	showTrackMap() {
@@ -7249,8 +7336,9 @@ class RaceCenter extends ConfigurationItem {
 		local hasBehind := false
 		local sessionDB, trackMap, fileName, width, height, scale, offsetX, offsetY, marginX, marginY
 		local imgWidth, imgHeight, imgScale, telemetry, positions, token, bitmap, graphics, brushCar, brushGray
-		local carIndices, driverIndex, driverID, driverPosition, leaderBrush, aheadBrush, behindBrush
-		local r, coordinates, carID, carIndex, carPosition, x, y, brush
+		local carIndices, driverIndex, driverID, driverOverallPosition, driverClassPosition, driverClass
+		local leaderBrush, aheadBrush, behindBrush
+		local r, coordinates, carID, carIndex, carPosition, carClass, x, y, brush
 		local imageAreaWidth, hWidth, tableCSS, script
 
 		this.initializeReport()
@@ -7306,7 +7394,9 @@ class RaceCenter extends ConfigurationItem {
 
 							driverIndex := getConfigurationValue(positions, "Position Data", "Driver.Car", 0)
 							driverID := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".ID", driverIndex)
-							driverPosition := getConfigurationValue(positions, "Position Data", "Car." . driverIndex . ".Position", 0)
+							driverOverallPosition := this.getPosition(positions)
+							driverClassPosition := this.getPosition(positions, "Class")
+							driverClass := this.getClass(positions)
 
 							leaderBrush := Gdip_BrushCreateSolid(0xff0000ff)
 							aheadBrush := Gdip_BrushCreateSolid(0xff006400)
@@ -7315,7 +7405,7 @@ class RaceCenter extends ConfigurationItem {
 						else {
 							driverIndex := false
 							driverID := false
-							driverPosition := false
+							driverOverallPosition := false
 						}
 
 						r := Round(15 / (imgScale * 3))
@@ -7338,33 +7428,29 @@ class RaceCenter extends ConfigurationItem {
 
 								brush := brushGray
 
-								if (!hasLeader && positions && driverPosition && carIndex) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
+								if ((!hasLeader || !hasAhead || !hasBehind) && positions && driverClassPosition && carIndex) {
+									carClass := this.getClass(positions, carIndex)
 
-									if ((carPosition == 1) && (driverPosition != 1)) {
-										brush := leaderBrush
+									if (driverClass = carClass) {
+										carPosition := this.getPosition(positions, "Class", carIndex)
 
-										hasLeader := true
-									}
-								}
+										if (!hasAhead && (carPosition + 1) = driverClassPosition) {
+											brush := aheadBrush
 
-								if (!hasAhead && positions && driverPosition && carIndex) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
+											hasAhead := true
+										}
 
-									if ((carPosition + 1) = driverPosition) {
-										brush := aheadBrush
+										if (!hasBehind && (carPosition - 1) = driverClassPosition) {
+											brush := behindBrush
 
-										hasAhead := true
-									}
-								}
+											hasBehind := true
+										}
 
-								if (!hasBehind && positions && driverPosition && carIndex) {
-									carPosition := getConfigurationValue(positions, "Position Data", "Car." . carIndex . ".Position", 0)
+										if (!hasLeader && (carPosition == 1) && (driverClassPosition != 1)) {
+											brush := leaderBrush
 
-									if ((carPosition - 1) = driverPosition) {
-										brush := behindBrush
-
-										hasBehind := true
+											hasLeader := true
+										}
 									}
 								}
 
@@ -7393,7 +7479,7 @@ class RaceCenter extends ConfigurationItem {
 						Gdip_DeleteBrush(brushGray)
 						Gdip_DeleteBrush(brushCar)
 
-						if driverPosition {
+						if driverOverallPosition {
 							Gdip_DeleteBrush(leaderBrush)
 							Gdip_DeleteBrush(aheadBrush)
 							Gdip_DeleteBrush(behindBrush)
@@ -8046,17 +8132,32 @@ class RaceCenter extends ConfigurationItem {
 
 					if (standingsData.Count() > 0) {
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Behind"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Behind.Distance"), 2)})
+													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																						   , "Position.Standings.Class.Behind.Car", "Position.Standings.Behind.Car")
+													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																								   , "Position.Standings.Class.Behind.Delta"
+																								   , "Position.Standings.Behind.Delta") / 1000, 2)
+													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									  , "Position.Standings.Class.Behind.Distance"
+																									  , "Position.Standings.Behind.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Ahead"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Ahead.Distance"), 2)})
+													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																						   , "Position.Standings.Class.Ahead.Car", "Position.Standings.Ahead.Car")
+													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																								   , "Position.Standings.Class.Ahead.Delta"
+																								   , "Position.Standings.Ahead.Delta") / 1000, 2)
+													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									  , "Position.Standings.Class.Ahead.Distance"
+																									  , "Position.Standings.Ahead.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Standings.Leader.Distance"), 2)})
+													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																						   , "Position.Standings.Class.Leader.Car", "Position.Standings.Leader.Car")
+													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																								   , "Position.Standings.Class.Leader.Delta"
+																								   , "Position.Standings.Leader.Delta") / 1000, 2)
+													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									  , "Position.Standings.Class.Leader.Distance"
+																									  , "Position.Standings.Leader.Distance"), 2)})
 						sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Behind"
 													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
 													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
@@ -8542,26 +8643,31 @@ class RaceCenter extends ConfigurationItem {
 		local telemetryDB := this.TelemetryDatabase
 		local html := "<table class=""table-std"">"
 		local cars := true
-		local positions := true
+		local overallPositions := true
+		local classPositions := true
 		local carNumbers := true
 		local carNames := true
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
-		local index, position, lapTime, laps, delta, result
+		local index, position, lapTime, laps, delta, result, multiClass
+
+		multiClass := this.getStandings(lap, cars, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
 
 		html .= ("<tr><th class=""th-std"">" . translate("#") . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
 			   . "<th class=""th-std"">" . translate("Driver") . "</th>"
-			   . "<th class=""th-std"">" . translate("Car") . "</th>"
-			   . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
+			   . "<th class=""th-std"">" . translate("Car") . "</th>")
+
+		if multiClass
+			html .= ("<th class=""th-std"">" . translate("Position") . "</th>")
+
+		html .= ("<th class=""th-std"">" . translate("Lap Time") . "</th>"
 			   . "<th class=""th-std"">" . translate("Laps") . "</th>"
 			   . "<th class=""th-std"">" . translate("Delta") . "</th>"
 			   . "</tr>")
 
-		this.getStandings(lap, cars, positions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
-
-		for index, position in positions {
+		for index, position in overallPositions {
 			lapTime := "-"
 			laps := "-"
 			delta := "-"
@@ -8574,13 +8680,18 @@ class RaceCenter extends ConfigurationItem {
 				delta := Round(result[1].Delta, 1)
 			}
 
-			html .= ("<tr><th class=""th-std"">" . position . "</td>"
-				   . "<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index]
+			html .= ("<tr><th class=""th-std"">" . position . "</th>")
+			html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index]
 																						 , computeDriverName(driverFornames[index]
 																										   , driverSurnames[index]
 																										   , driverNickNames[index])
-																						 ,  telemetryDB.getCarName(this.Simulator, carNames[index])
-																						 , lapTimeDisplayValue(lapTime), laps, delta)
+																						 , telemetryDB.getCarName(this.Simulator, carNames[index]))
+				   . "</td>")
+
+			if multiClass
+				html .= ("<td class=""td-std"">" . classPositions[index] . "</td>")
+
+			html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", lapTimeDisplayValue(lapTime), laps, delta)
 				   . "</td></tr>")
 		}
 
@@ -8713,9 +8824,9 @@ class RaceCenter extends ConfigurationItem {
 		if (damage < 15)
 			return "bgcolor=""Green"" style=""color:#FFFFFF"""
 		else if (damage < 25)
-			return "bgcolor=""Yellow"""
+			return "bgcolor=""Yellow"" style=""color:#000000"""
 		else if (damage < 50)
-			return "bgcolor=""Orange"""
+			return "bgcolor=""Orange"" style=""color:#000000"""
 		else if (damage < 70)
 			return "bgcolor=""Red"" style=""color:#FFFFFF"""
 		else
@@ -8726,9 +8837,9 @@ class RaceCenter extends ConfigurationItem {
 		if ((damage = "-") || (damage < 15))
 			return "bgcolor=""Green"" style=""color:#FFFFFF"""
 		else if (damage < 25)
-			return "bgcolor=""Yellow"" style=""color:#FFFFFF"""
+			return "bgcolor=""Yellow"" style=""color:#000000"""
 		else if (damage < 40)
-			return "bgcolor=""Orange"" style=""color:#FFFFFF"""
+			return "bgcolor=""Orange"" style=""color:#000000"""
 		else if (damage < 80)
 			return "bgcolor=""Red"" style=""color:#FFFFFF"""
 		else
@@ -9121,6 +9232,7 @@ class RaceCenter extends ConfigurationItem {
 		data.addColumn({id:'min', type:'number', role:'interval'});
 		data.addColumn({id:'firstQuartile', type:'number', role:'interval'});
 		data.addColumn({id:'median', type:'number', role:'interval'});
+		data.addColumn({id:'mean', type:'number', role:'interval'});
 		data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
 		)
 
@@ -9150,7 +9262,8 @@ class RaceCenter extends ConfigurationItem {
 			series: [ { 'color': 'D8D8D8' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
 			interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
-						min: { style: 'bars', fillOpacity: 1, color: '#777' } }
+						min: { style: 'bars', fillOpacity: 1, color: '#777' },
+						mean: { style: 'points', color: 'grey', pointsize: 5 } }
 		};
 		)
 
@@ -9409,7 +9522,7 @@ class RaceCenter extends ConfigurationItem {
 	showSetupsDetails() {
 		local html := ("<div id=""header""><b>" . translate("Setups Summary") . "</b></div>")
 		local window := this.Window
-		local currentListView, driver, conditions, compound, pressures
+		local currentListView, driver, conditions, compound, pressures, notes
 
 		Gui %window%:Default
 
@@ -9427,6 +9540,7 @@ class RaceCenter extends ConfigurationItem {
 				   . "<th class=""th-std"">" . translate("Prs. FR") . "</th>"
 				   . "<th class=""th-std"">" . translate("Prs. RL") . "</th>"
 				   . "<th class=""th-std"">" . translate("Prs. RR") . "</th>"
+				   . "<th class=""th-std"">" . translate("Notes") . "</th>"
 				   . "</tr>")
 
 			loop % LV_GetCount()
@@ -9435,6 +9549,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(conditions, A_Index, 2)
 				LV_GetText(compound, A_Index, 3)
 				LV_GetText(pressures, A_Index, 4)
+				LV_GetText(notes, A_Index, 5)
 
 				pressures := string2Values(",", pressures)
 
@@ -9445,6 +9560,7 @@ class RaceCenter extends ConfigurationItem {
 					   . "<td class=""td-std"">" . pressures[2] . "</td>"
 					   . "<td class=""td-std"">" . pressures[3] . "</td>"
 					   . "<td class=""td-std"">" . pressures[4] . "</td>"
+					   . "<td class=""td-std"">" . notes . "</td>"
 					   . "</tr>")
 			}
 
@@ -9680,6 +9796,28 @@ class RaceCenter extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+getDeprecatedConfigurationValue(data, section, newKey, oldKey, default := false) {
+	local value := getConfigurationValue(data, section, newKey, kUndefined)
+
+	if (value != kUndefined)
+		return value
+	else
+		return getConfigurationValue(data, section, oldKey, default)
+}
+
+compareClassPositions(c1, c2) {
+	local pos1 := c1[2]
+	local pos2 := c2[2]
+
+	if pos1 is not Number
+		pos1 := 999
+
+	if pos2 is not Number
+		pos2 := 999
+
+	return (pos1 > pos2)
+}
 
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	local x, y, row, driver, owner, ignore, name, connection
@@ -10043,8 +10181,8 @@ lapTimeDisplayValue(lapTime) {
 	return RaceReportViewer.lapTimeDisplayValue(lapTime)
 }
 
-displayValue(value) {
-	return (isNull(value) ? "-" : value)
+displayValue(value, null := "-") {
+	return (isNull(value) ? null : value)
 }
 
 chartValue(value) {
@@ -10358,6 +10496,7 @@ chooseSetup() {
 			LV_GetText(conditions, A_EventInfo, 2)
 			LV_GetText(compound, A_EventInfo, 3)
 			LV_GetText(pressures, A_EventInfo, 4)
+			LV_GetText(setupNotesEdit, A_EventInfo, 5)
 
 			conditions := string2Values(translate("("), conditions)
 			temperatures := string2Values(", ", StrReplace(conditions[2], translate(")"), ""))
@@ -10384,6 +10523,7 @@ chooseSetup() {
 			GuiControl, , setupBasePressureFREdit, %setupBasePressureFREdit%
 			GuiControl, , setupBasePressureRLEdit, %setupBasePressureRLEdit%
 			GuiControl, , setupBasePressureRREdit, %setupBasePressureRREdit%
+			GuiControl, , setupNotesEdit, %setupNotesEdit%
 
 			rCenter.updateState()
 		}
@@ -10450,12 +10590,14 @@ updateSetupAsync() {
 			GuiControlGet setupAirTemperatureEdit
 			GuiControlGet setupTrackTemperatureEdit
 			GuiControlGet setupCompoundDropDownMenu
+			GuiControlGet setupNotesEdit
 
 			LV_Modify(row, "", getKeys(rCenter.SessionDrivers)[setupDriverDropDownMenu]
 							 , translate(kWeatherConditions[setupWeatherDropDownMenu]) . A_Space
 									   . translate("(") . setupAirTemperatureEdit . ", " . setupTrackTemperatureEdit . translate(")")
 							 , translate(rCenter.TyreCompounds[setupCompoundDropDownMenu])
-							 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit, setupBasePressureRLEdit, setupBasePressureRREdit))
+							 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit, setupBasePressureRLEdit, setupBasePressureRREdit)
+							 , setupNotesEdit)
 		}
 
 		if (rCenter.SelectedDetailReport = "Setups")

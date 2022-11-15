@@ -169,7 +169,7 @@ class DatabaseCreator {
 				this.TyresDatabase.updatePressure(simulator, car, track, row.Weather
 												, row["Temperature.Air"], row["Temperature.Track"]
 												, compound, color, row.Type, row.Tyre
-												, row.Pressure, row.Count, false, true, "Community")
+												, row.Pressure, row.Count, false, true, "Community", kNull)
 			}
 
 			this.TyresDatabase.flush()
@@ -229,7 +229,9 @@ downloadUserDatabases(directory) {
 		deleteFile(directory . fileName)
 
 		if FileExist(directory . "Shared Database")
-			FileMoveDir %directory%DBase, %directory%%idName%, R
+			FileMoveDir %directory%Shared Database, %directory%%idName%, R
+		if FileExist(directory . "Community")
+			FileMoveDir %directory%Community, %directory%%idName%, R
 		else if FileExist(directory . "DBase")
 			FileMoveDir %directory%DBase, %directory%%idName%, R
 		else if FileExist(directory . "Dabase")

@@ -104,6 +104,10 @@ Cato will always be active during a race, even if you have disabled data collect
 
 Important: In the default configuration, Cato will be activated in the first lap of a session. This is necessary, so that Cato can setup the initial knowledge (starting grid, your position, the initial strategy, etc.). If you join a session later than during the first lap, Cato will refuse to work. This behaviour can be changed with the setting "Strategist: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database), but the behaviour of Cato may be somewhat confusing.
 
+### Multi-class support
+
+Cato *understands* multi-class races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Cato will phrase it in a way, so that you understand, that information is related to the whole grid. Support tools like "Race Reports" also *understand* multi-class races and will give you related information with a class-specific focus as well, or you can choose, at which class you want to look, for example in a report.
+
 ### Race Settings
 
 Cato shares many settings with Jona. Therefore consult the documentation on the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings) in the documentation for Jona for the general use of the settings tool and the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database).
@@ -158,6 +162,8 @@ After a given race report has been selected, the "Race Reports" tool offers you 
 	 The overview list all drivers / cars with their starting positions, the best and average lap times, as well as the race results.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%203.JPG)
+	 
+	 For multi-class sessions, two result columns with the overall result and the class-specific result will be available.
 
   2. Car Report
   
@@ -191,7 +197,13 @@ After a given race report has been selected, the "Race Reports" tool offers you 
 	 
 	 Impotant: The laps will be always the last lap of you and your car. The report does not perform any lap up or lap down correction, take the lap number for your opponents with a grain of salt.
 
-  6. Consistency Report
+  6. Performance Report
+  
+     This report provides a different view on the lap times of all drivers / cars. It can show you the lap times for a selected group of drivers / cars and laps graphically which makes it very easy to compare their respective performance.
+	 
+	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%209.JPG)
+
+  7. Consistency Report
   
      The Consistency Report will give you a graphical representation of the lap times of a couple of cars and therefore is an addition to the Lap Times Report at the first look.
 	 
@@ -201,21 +213,17 @@ After a given race report has been selected, the "Race Reports" tool offers you 
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%208.JPG)
 
-  7. Pace Report
+  8. Pace Report
   
      If you want to analyze lap times and consistency of the different drivers, this report is for you. The small rectangle marks the range of typical lap times of the different drivers. The smaller and further down the small rectangle, the faster and the more consistent the corresponding driver is. If there are small lines above or below the rectangle, these marks lap times, which are outside of the standard deviation, for example a slow lap time after a crash. Inside the reactangle you may find a horizontal dividing line which represents the median of all lap times and a small grey dot, which shows the average or mean value of all lap times.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%202.JPG)
 
-  8. Performance Report
-  
-     This report provides a different view on the lap times of all drivers / cars. It can show you the lap times for a selected group of drivers / cars and laps graphically which makes it very easy to compare their respective performance.
-	 
-	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Reports%209.JPG)
-
 Some reports allow you to control the amount and type of data, which will be included in the report. Please click on the small button with the cog wheel in the upper right corner of the window to open the settings dialog, with which you can change the settings for the report. The following window will open up:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Report%20Settings.JPG)
+
+Beside restricting the laps which will be included in the report, you can also choose the drivers / cars for which data will be shown, or you can even restrict the report to a given class in a multi-class race.
 
 ## Strategy Development
 

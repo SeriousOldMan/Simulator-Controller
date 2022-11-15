@@ -57,7 +57,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local x0, x1, x2, x3, w1, w3, choices, chosen
+		local x0, x1, x2, x3, x4, w1, w2, w3, choices, chosen
 
 		Gui %window%:Font, Norm, Arial
 
@@ -67,6 +67,8 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		x3 := x + 176
 
 		w1 := width - (x1 - x + 8)
+		w2 := w1 - 24
+		x4 := x1 + w2 + 1
 		w3 := width - (x3 - x + 16) + 10
 
 		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
@@ -77,7 +79,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
  		choices := this.iSimulators
 		chosen := (choices.Length() > 0) ? 1 : 0
 
-		Gui %window%:Add, DropDownList, x%x1% y%y% w%w1% Choose%chosen% gchooseRaceEngineerSimulator vreSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% y%y% w%w2% Choose%chosen% gchooseRaceEngineerSimulator vreSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+
+		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 greplicateRESettings HWNDwidget31 Hidden
+		setButtonIcon(widget31, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -139,7 +144,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget29 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp-2 w%w3% h23 +0x200 HWNDwidget30 Hidden, % translate("Laps after Incident")
 
-		loop 30
+		loop 31
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()
@@ -303,12 +308,30 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	getSimulators() {
 		return this.Editor.getSimulators()
 	}
+
+	replicateSettings() {
+		local configuration, simulator, simulatorConfiguration
+
+		this.saveSimulatorConfiguration()
+
+		configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
+
+		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
+			if (simulator != this.iCurrentSimulator)
+				for ignore, key in ["LoadSettings", "SaveSettings", "LoadTyrePressures", "SaveTyrePressures"
+								  , "LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
+					simulatorConfiguration[key] := configuration[key]
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+replicateRESettings() {
+	RaceEngineerConfigurator.Instance.replicateSettings()
+}
 
 validateREDampingFactor() {
 	local oldValue := reDampingFactorEdit

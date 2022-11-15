@@ -4,6 +4,11 @@
   3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](*).
   4. Multiple data connections are now supported for the [Team Server data replication](*) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
   5. Fixed end of race detection for fixed-lap races in rFactor 2.
+  6. Race Assistant configurations can be [synchronized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) by a click of a button.
+  7. Optical enhancements for the launch pad of "Simulator Startup".
+  8. "Simulator Setup" can be configured to [jump to a specific page on startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool).
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
 
 ## 4.4.7.0-release 11/11/22
   1. Minor bugfixes, as always

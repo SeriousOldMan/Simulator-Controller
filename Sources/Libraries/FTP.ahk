@@ -386,6 +386,32 @@ ftpClearDirectory(server, user, password, directory) {
 	FTP.close(hFTP)
 }
 
+ftpCreateDirectory(server, user, password, directory, subdirectory) {
+	local hFTP := FTP.open("AHK-FTP")
+	local hSession := FTP.connect(hFTP, server, user, password)
+	local ignore, file
+
+	for ignore, file in FTP.findFiles(hSession, directory)
+		FTP.createDirectory(hSession, directory . "\" . subdirectory)
+
+	FTP.disconnect(hSession)
+
+	FTP.close(hFTP)
+}
+
+ftpRemoveDirectory(server, user, password, directory, subdirectory) {
+	local hFTP := FTP.open("AHK-FTP")
+	local hSession := FTP.connect(hFTP, server, user, password)
+	local ignore, file
+
+	for ignore, file in FTP.findFiles(hSession, directory)
+		FTP.removeDirectory(hSession, directory . "\" . subdirectory)
+
+	FTP.disconnect(hSession)
+
+	FTP.close(hFTP)
+}
+
 ftpUpload(server, user, password, localFile, remoteFile) {
 	local m, h, f
 

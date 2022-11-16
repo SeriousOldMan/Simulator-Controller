@@ -509,8 +509,13 @@ class PositionInfo {
 		return (Abs(delta) <= threshold)
 	}
 
-	isFaster(sector) {
-		return (this.LapTimeDifference[true] > 0)
+	isFaster(sector, percentage := false) {
+		local difference := this.LapTimeDifference[true]
+
+		if (difference > 0)
+			return (percentage ? (difference > (this.Spotter.DriverCar.AverageLapTime / 100 * percentage)) : true)
+		else
+			return false
 	}
 
 	closingIn(sector, threshold := 0.5) {
@@ -1775,7 +1780,8 @@ class RaceSpotter extends RaceAssistant {
 						return true
 					}
 				}
-				else if ((opponentType = "LapDown") || (opponentType = "LapUp")) {
+				else if (((opponentType = "LapDown") || (opponentType = "LapUp"))
+					  && trackBehind.isFaster(sector, 1)) {
 					situation := (opponentType . "Faster " . trackBehind.Car.Nr)
 
 					if !this.TacticalAdvices.HasKey(situation) {
@@ -2490,6 +2496,9 @@ class RaceSpotter extends RaceAssistant {
 					else {
 						length := this.SessionLaps
 
+						if (length = 0)
+							length := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
+
 						if (length > 0)
 							speaker.speakPhrase("GreetingLaps", {laps: length})
 					}
@@ -2574,24 +2583,14 @@ class RaceSpotter extends RaceAssistant {
 
 	finishSession(shutdown := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local asked
 
 		if knowledgeBase {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if this.Listener {
-					asked := true
+				if ((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) {
+					this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 
-					if ((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
-					else
-						asked := false
-				}
-				else
-					asked := false
-
-				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
 					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)

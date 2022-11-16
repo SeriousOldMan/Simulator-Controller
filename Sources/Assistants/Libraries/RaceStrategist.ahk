@@ -1167,6 +1167,8 @@ class RaceStrategist extends RaceAssistant {
 					  , "Session.Settings.Strategy.Traffic.Considered": (getConfigurationValue(settings, "Strategy Settings"
 																							 , "Traffic.Considered", 5) / 100)
 					  , "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings"
+																					   , "Service.Refuel.Rule", "Dynamic")
+					  , "Session.Settings.Pitstop.Service.Refuel": getConfigurationValue(settings, "Strategy Settings"
 																					   , "Service.Refuel", 1.5)
 					  , "Session.Settings.Pitstop.Service.Tyres": getConfigurationValue(settings, "Strategy Settings"
 																					  , "Service.Tyres", 30)
@@ -1293,7 +1295,7 @@ class RaceStrategist extends RaceAssistant {
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
 									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
-									  , SaveRaceReport: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", false)
+									  , SaveRaceReport: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveRaceReport", kNever)
 									  , RaceReview: (getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".RaceReview", "Yes") = "Yes")
 									  , SaveSettings: saveSettings})
 
@@ -1340,21 +1342,17 @@ class RaceStrategist extends RaceAssistant {
 			if (shutdown && (lastLap > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if this.Listener {
-					asked := true
+				asked := true
 
-					if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
+				if ((((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
+				  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
+				 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
+					this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
+				else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
+					this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
+				else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
 					  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
-					 && ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace)))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettingsAndRaceReport", false, true)
-					else if ((this.SaveRaceReport == kAsk) && (this.Session == kSessionRace))
-						this.getSpeaker().speakPhrase("ConfirmSaveRaceReport", false, true)
-					else if (((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
-						  || (this.collectTelemetryData() && (this.SaveTelemetry == kAsk) && this.HasTelemetryData))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
-					else
-						asked := false
-				}
+					this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 				else
 					asked := false
 

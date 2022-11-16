@@ -307,16 +307,21 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						temperatures := string2Values(",", telemetryData[17])
 						wear := string2Values(",", telemetryData[18])
 
-						telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
-													 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
-													 , telemetryData[9], driverID, telemetryData.HasKey(19) ? telemetryData[19] : false)
+						try {
+							telemetryDB.addElectronicEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15]
+														 , telemetryData[11], telemetryData[12], telemetryData[13], telemetryData[7], telemetryData[8]
+														 , telemetryData[9], driverID, telemetryData.HasKey(19) ? telemetryData[19] : false)
 
-						telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
-											   , pressures[1], pressures[2], pressures[4], pressures[4]
-											   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-											   , wear[1], wear[2], wear[3], wear[4]
-											   , telemetryData[7], telemetryData[8], telemetryData[9], driverID
-											   , telemetryData.HasKey(20) ? telemetryData[20] : false)
+							telemetryDB.addTyreEntry(telemetryData[4], telemetryData[5], telemetryData[6], telemetryData[14], telemetryData[15], runningLap
+												   , pressures[1], pressures[2], pressures[4], pressures[4]
+												   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+												   , wear[1], wear[2], wear[3], wear[4]
+												   , telemetryData[7], telemetryData[8], telemetryData[9], driverID
+												   , telemetryData.HasKey(20) ? telemetryData[20] : false)
+						}
+						catch exception {
+							logError(exception)
+						}
 					}
 				}
 				catch exception {
@@ -334,21 +339,26 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				runningLap += 1
 
-				telemetryDB.addElectronicEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-											 , telemetryData.Compound, telemetryData["Compound.Color"]
-											 , telemetryData.Map, telemetryData.TC, telemetryData.ABS
-											 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+				try {
+					telemetryDB.addElectronicEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+												 , telemetryData.Compound, telemetryData["Compound.Color"]
+												 , telemetryData.Map, telemetryData.TC, telemetryData.ABS
+												 , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
 
-				pressures := string2Values(",", telemetryData.Pressures)
-				temperatures := string2Values(",", telemetryData.Temperatures)
-				wear := string2Values(",", telemetryData.Wear)
+					pressures := string2Values(",", telemetryData.Pressures)
+					temperatures := string2Values(",", telemetryData.Temperatures)
+					wear := string2Values(",", telemetryData.Wear)
 
-				telemetryDB.addTyreEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
-									   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
-									   , pressures[1], pressures[2], pressures[4], pressures[4]
-									   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
-									   , wear[1], wear[2], wear[3], wear[4]
-									   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+					telemetryDB.addTyreEntry(telemetryData.Weather, telemetryData["Temperature.Air"], telemetryData["Temperature.Track"]
+										   , telemetryData.Compound, telemetryData["Compound.Color"], runningLap
+										   , pressures[1], pressures[2], pressures[4], pressures[4]
+										   , temperatures[1], temperatures[2], temperatures[3], temperatures[4]
+										   , wear[1], wear[2], wear[3], wear[4]
+										   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
+				}
+				catch exception {
+					logError(exception)
+				}
 			}
 	}
 

@@ -85,7 +85,11 @@ global kDeactivate := "deactivate"
 global kIncrease := "increase"
 global kDecrease := "decrease"
 
-global kLogInfo := 1
-global kLogWarn := 2
-global kLogCritical := 3
-global kLogOff := 4
+global kLogDebug := 1
+global kLogInfo := 2
+global kLogWarn := 3
+global kLogCritical := 4
+global kLogOff := 5
+
+global kLogLevels := {Off: kLogOff, Debug: kLogDebug, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]

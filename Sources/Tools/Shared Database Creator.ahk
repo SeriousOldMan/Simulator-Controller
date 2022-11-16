@@ -121,14 +121,14 @@ class DatabaseCreator {
 			{
 				car := A_LoopFileName
 
-				if (car = "1")
+				if ((car = "1") || (car = "Unknown"))
 					deleteDirectory(databaseDirectory . simulator . "\" . car)
 				else
 					loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
 					{
 						track := A_LoopFileName
 
-						if (track = "1")
+						if ((track = "1") || (track = "Unknown"))
 							deleteDirectory(databaseDirectory . simulator . "\" . car . "\" . track)
 						else {
 							directory = %databaseDirectory%%simulator%\%car%\%track%\

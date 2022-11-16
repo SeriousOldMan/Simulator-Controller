@@ -54,7 +54,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local x0, x1, x2, x3, x4, x5, w1, w2, w3, choices, chosen, lineX, lineW
+		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, choices, chosen, lineX, lineW
 
 		Gui %window%:Font, Norm, Arial
 
@@ -68,6 +68,9 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 		w2 := w1 - 24
 		x4 := x1 + w2 + 1
+
+		w4 := w1 - 24
+		x6 := x1 + w4 + 1
 
 		Gui %window%:Add, Text, x%x0% y%y% w160 h23 +0x200 HWNDwidget15 Hidden, % translate("Race Reports Folder")
 		Gui %window%:Add, Edit, x%x1% yp w%w2% h21 VraceReportsPathEdit HWNDwidget16 Hidden, %raceReportsPathEdit%
@@ -86,7 +89,10 @@ class RaceStrategistConfigurator extends ConfigurationItem {
  		choices := this.iSimulators
 		chosen := (choices.Length() > 0) ? 1 : 0
 
-		Gui %window%:Add, DropDownList, x%x1% yp w%w1% Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w%w4% Choose%chosen% gchooseRaceStrategistSimulator vrsSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+
+		Gui %window%:Add, Button, x%x6% yp w23 h23 Center +0x200 greplicateRSSettings HWNDwidget29 Hidden
+		setButtonIcon(widget29, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -136,7 +142,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x5% yp+3 w110 h20 HWNDwidget27 Hidden, % translate("@ Session End")
 
-		loop 28
+		loop 29
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()
@@ -272,12 +278,29 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	getSimulators() {
 		return this.Editor.getSimulators()
 	}
+
+	replicateSettings() {
+		local configuration, simulator, simulatorConfiguration
+
+		this.saveSimulatorConfiguration()
+
+		configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
+
+		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
+			if (simulator != this.iCurrentSimulator)
+				for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "SaveRaceReport", "SaveTelemetry", "RaceReview"]
+					simulatorConfiguration[key] := configuration[key]
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+replicateRSSettings() {
+	RaceStrategistConfigurator.Instance.replicateSettings()
+}
 
 validateRSDampingFactor() {
 	local oldValue := rsDampingFactorEdit

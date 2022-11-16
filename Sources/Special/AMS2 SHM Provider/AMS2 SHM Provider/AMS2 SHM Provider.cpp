@@ -219,8 +219,10 @@ int main(int argc, char* argv[]) {
 		if (localCopy->mSessionState != SESSION_PRACTICE && localCopy->mLapsInEvent > 0 &&
 			(localCopy->mLapsInEvent - localCopy->mParticipantInfo[localCopy->mViewedParticipantIndex].mLapsCompleted) <= 0)
 			printf("Session=Finished\n");
+		/*
 		else if (localCopy->mHighestFlagColour == FLAG_COLOUR_CHEQUERED)
 			printf("Session=Finished\n");
+		*/
 		else if ((localCopy->mSessionState == SESSION_FORMATION_LAP) || (localCopy->mSessionState == SESSION_RACE))
 			printf("Session=Race\n");
 		else if (localCopy->mSessionState == SESSION_QUALIFY)

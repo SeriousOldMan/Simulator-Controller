@@ -335,7 +335,17 @@ pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=
 		?sessionFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),
 		?neededFuel = ?sessionFuel + ?safetyFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
 		min(?refillAmount, !Session.Settings.Fuel.Max, ?temp2), max(0, ?temp2, ?adjustedRefillAmount),
-		?refillIncrements = ?adjustedRefillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel
+		pitstopRefillServiceTime(?adjustedRefillAmount, ?refillTime)
+
+pitstopRefillServiceTime(?refillAmount, ?refillTime) <=
+		bound?(!Session.Settings.Pitstop.Service.Refuel.Rule), !,
+		pitstopRefillServiceTime(!Session.Settings.Pitstop.Service.Refuel.Rule, ?refillAmount, ?refillTime)
+pitstopRefillServiceTime(?refillAmount, ?refillTime) <= pitstopRefillServiceTime(Dynamic, ?refillAmount, ?refillTime)
+
+pitstopRefillServiceTime(Fixed, ?refillAmount, !Session.Settings.Pitstop.Service.Refuel)
+pitstopRefillServiceTime(?, ?refillAmount, ?refillTime) <=
+		?refillIncrements = ?refillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel
+
 
 pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres) <=
 		?deltaLaps = ?targetLap - ?lap,

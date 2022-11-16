@@ -236,8 +236,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 	cleanupData(weather, compound, compoundColor, drivers := "__Undefined__") {
 		local database := this.Database
-		local connector := this.Connector
-		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row
+		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, ignore, connector
 
 		if database {
 			where := {Weather: weather, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor}
@@ -258,25 +257,27 @@ class TelemetryDatabase extends SessionDatabase {
 
 					filter := Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers)
 
-					if connector {
+					if this.Shared {
 						identifiers := []
 
 						for ignore, row in rows
-							if (%filter%(row) && (row.Identifier != kNull))
+							if (%filter%(row) && (row.Identifier != kNull) && (row.Driver = this.ID))
 								identifiers.Push(row.Identifier)
 					}
-					else
-						identifiers := false
 
 					this.Database.remove("Electronics", where, filter, true)
 
-					if identifiers
-						try {
-							connector.DeleteData("Electronics", values2String(";", identifiers*))
-						}
-						catch exception {
-							logError(exception, true)
-						}
+					if this.Shared
+						for ignore, connector in this.Connectors
+							try {
+								if IsObject(identifiers)
+									identifiers := values2String(";", identifiers*)
+
+								connector.DeleteData("Electronics", identifiers)
+							}
+							catch exception {
+								logError(exception, true)
+							}
 				}
 				finally {
 					if this.Shared
@@ -299,25 +300,27 @@ class TelemetryDatabase extends SessionDatabase {
 
 					filter := Func("invalidLap").Bind(ltAvg, ltStdDev, cAvg, cStdDev, drivers)
 
-					if connector {
+					if this.Shared {
 						identifiers := []
 
 						for ignore, row in rows
-							if (%filter%(row) && (row.Identifier != kNull))
+							if (%filter%(row) && (row.Identifier != kNull) && (row.Driver = this.ID))
 								identifiers.Push(row.Identifier)
 					}
-					else
-						identifiers := false
 
 					this.Database.remove("Tyres", where, filter, true)
 
-					if identifiers
-						try {
-							connector.DeleteData("Tyres", values2String(";", identifiers*))
-						}
-						catch exception {
-							logError(exception, true)
-						}
+					if this.Shared
+						for ignore, connector in this.Connectors
+							try {
+								if IsObject(identifiers)
+									identifiers := values2String(";", identifiers*)
+
+								connector.DeleteData("Tyres", identifiers)
+							}
+							catch exception {
+								logError(exception, true)
+							}
 				}
 				finally {
 					if this.Shared

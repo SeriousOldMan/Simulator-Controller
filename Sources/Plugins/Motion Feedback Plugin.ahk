@@ -693,7 +693,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 				result := ErrorLevel
 
-				logMessage(kLogInfo, "Invoking SimFeedback connector with arguments: " . arguments . " => " . result)
+				logMessage(kLogInfo, translate("Invoking SimFeedback connector with arguments: ") . arguments . " => " . result)
 
 				return result
 			}

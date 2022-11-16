@@ -254,12 +254,16 @@ class RaceReportViewer extends RaceReportReader {
 		local result := editReportSettings(this, this.Report, settings)
 		local setting, values
 
-		if result
+		if result {
 			for setting, values in result
 				if ((setting = "Laps") && (values == true))
 					this.Settings.Delete("Laps")
 				else
 					this.Settings[setting] := values
+
+			if !result.HasKey("Classes")
+				this.Settings.Delete("Classes")
+		}
 
 		return (result != false)
 	}
@@ -575,7 +579,8 @@ class RaceReportViewer extends RaceReportReader {
 
 	showPositionsReport() {
 		local report := this.Report
-		local raceData, drivers, positions, times, cars, carsCount, simulator, sessionDB, carIndices, maxPosition
+		local raceData, drivers, positions, times, cars, carsCount, simulator, sessionDB
+		local carIndices, minPosition, maxPosition
 		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions, selectedClasses
 
 		if report {
@@ -593,13 +598,16 @@ class RaceReportViewer extends RaceReportReader {
 
 			sessionDB := new SessionDatabase()
 			carIndices := []
+			minPosition := 9999
 			maxPosition := 0
 
 			selectedClasses := this.getReportClasses(raceData)
 
 			loop % carsCount
+			{
+				car := A_Index
+
 				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)) {
-					car := A_Index
 					valid := false
 
 					for ignore, lap in this.getReportLaps(raceData)
@@ -607,12 +615,13 @@ class RaceReportViewer extends RaceReportReader {
 							if (positions[lap].HasKey(car) && (positions[lap][car] != kNull) && (positions[lap][car] > 0)) {
 								valid := true
 
+								minPosition := Min(minPosition, positions[lap][car])
 								maxPosition := Max(maxPosition, positions[lap][car])
 
 								break
 							}
 							else
-								positions[A_Index][car] := kNull ; carsCount
+								positions[lap][car] := kNull ; carsCount
 
 					if valid {
 						carIndices.Push(car)
@@ -620,11 +629,16 @@ class RaceReportViewer extends RaceReportReader {
 						cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
 									   . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
-					else
-						for ignore, lap in this.getReportLaps(raceData)
-							if positions.HasKey(lap)
-								positions[lap].RemoveAt(car)
 				}
+			}
+
+			for ignore, lap in this.getReportLaps(raceData)
+				loop % carsCount {
+					car := (carsCount - A_Index + 1)
+
+					if (!inList(carIndices, car) && positions.HasKey(lap) && positions[lap].HasKey(car))
+						positions[lap].RemoveAt(car)
+			}
 
 			drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 
@@ -670,7 +684,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			if hasData {
 				drawChartFunction := drawChartFunction . ("]);`nvar options = { legend: { position: 'right' }, chartArea: { left: '5%', top: '5%', right: '20%', bottom: '10%' }, ")
-				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { viewWindow: {min: 1, max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
+				drawChartFunction := drawChartFunction . ("hAxis: { title: '" . translate("Laps") . "', gridlines: {count: 0} }, vAxis: { viewWindow: {min: " . (minPosition - 1) . ", max: " . (maxPosition + 1) . "}, direction: -1, ticks: [], title: '" . translate("Cars") . "', baselineColor: 'D0D0D0', gridlines: {count: 0} }, backgroundColor: 'D8D8D8' };`n")
 
 				drawChartFunction := drawChartFunction . "var chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 			}

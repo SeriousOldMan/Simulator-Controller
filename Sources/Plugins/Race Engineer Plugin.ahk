@@ -372,15 +372,22 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 											  , string2Values(",", lapPressures[10]), false, driverID)
 					}
 					catch exception {
+						logError(exception)
+						
 						break
 					}
 			}
 			else
-				for ignore, lapData in this.LapDatabase.Tables["Pressures"]
-					tyresDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather
-										  , lapData["Temperature.Air"], lapData["Temperature.Track"]
-										  , lapData.Compound, lapData["Compound.Color"]
-										  , string2Values(",", lapData["Pressures.Cold"]), string2Values(",", lapData["Pressures.Hot"]), false)
+				try {
+					for ignore, lapData in this.LapDatabase.Tables["Pressures"]
+						tyresDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather
+											  , lapData["Temperature.Air"], lapData["Temperature.Track"]
+											  , lapData.Compound, lapData["Compound.Color"]
+											  , string2Values(",", lapData["Pressures.Cold"]), string2Values(",", lapData["Pressures.Hot"]), false)
+				}
+				catch exception {
+					logError(exception)
+				}
 		}
 		finally {
 			tyresDB.unlock()

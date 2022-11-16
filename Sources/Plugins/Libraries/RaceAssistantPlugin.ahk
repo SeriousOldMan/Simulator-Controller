@@ -179,7 +179,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			local action := this.Action
 			local enabled
 
-			if ((action = "Accept") || (action = "Reject"))
+			if ((action = "Accept") || (action = "Reject") || (action = "Call"))
 				enabled := (this.Plugin.RaceAssistant[true] != false)
 			else
 				enabled := (this.Plugin.RaceAssistant != false)
@@ -1015,10 +1015,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if (compound != kUndefined) {
 			compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, kUndefined)
-			
+
 			if (compound = kUndefined)
 				compound := normalizeCompound("Dry")
-				
+
 			compoundColor := false
 
 			splitCompound(compound, compound, compoundColor)
@@ -1093,7 +1093,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				}
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceAssistantAction)
-				if (((theAction.Action = "Accept") || (theAction.Action = "Reject")) && (this.RaceAssistant[true] != false)) {
+				if (((theAction.Action = "Accept") || (theAction.Action = "Reject") || (theAction.Action = "Call"))
+				 && (this.RaceAssistant[true] != false)) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
 				}
@@ -1402,8 +1403,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	call() {
-		if this.RaceAssistant
-			this.RaceAssistant.call()
+		if this.RaceAssistant[true]
+			this.RaceAssistant[true].call()
 	}
 
 	accept() {
@@ -1550,7 +1551,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if (RaceAssistantPlugin.runningSession(data) && (RaceAssistantPlugin.LastLap == 0))
 				prepareSessionDatabase(data)
 
-			if isDebug() {
+			if false && isDebug() {
 				testData := getConfigurationSectionValues(data, "Test Data", Object())
 
 				if (testData.Count() > 0) {

@@ -45,6 +45,16 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.4.7
 
+Updates are handled automatically. Beside that:
+
+1. If you are hosting your own Team Server, you **must** update your installation before you connect with a version 4.4.8 to the new Team Server. You can continue to use your current *.db database file, schema updates will be handled automatically.
+2. If you are using a managed instance of Team Server because of your Patreon membership, please make sure, that you don't connect with a version prior to 4.4.8 to this instance, since it has been ugraded to the new release.
+3. When you have already configured a data replication with the Team Server for the session database, you might want to visit the settings in "Session Database", since there are new replication options available for strategies and car setups.
+
+***
+
+## Release 4.4.7
+
 No manual updates necessary.
 
 ***

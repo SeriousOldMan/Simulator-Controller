@@ -2247,7 +2247,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(conditions, row, 2)
 				LV_GetText(compound, row, 3)
 				LV_GetText(pressures, row, 4)
-				LV_GetText(notes, row, 4)
+				LV_GetText(notes, row, 5)
 
 				LV_Modify(LV_Add("Select", driver, conditions, compound, pressures, notes), "Vis")
 
@@ -9716,8 +9716,14 @@ class RaceCenter extends ConfigurationItem {
 							if (rnd < (randomFactor / 100))
 								lapTime += strategy.calcPitstopDuration(fuelCapacity, true)
 						}
-						else if ((A_Index == driver) && ((startLap + curLap) == targetLap))
-							lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
+						else if ((A_Index == driver) && ((startLap + curLap) == targetLap)) {
+							if pitstopFuelService is Number
+								lapTime += (pitstopDelta + (pitstopFuelService * fuelCapacity) + pitstopTyreService)
+							else if (pitstopFuelService[1] = "Fixed")
+								lapTime += (pitstopDelta + pitstopFuelService[2] + pitstopTyreService)
+							else
+								lapTime += (pitstopDelta + (pitstopFuelService[2] * fuelCapacity) + pitstopTyreService)
+						}
 
 						delta := (((avgLapTime + lapTime) / lapTime) - 1)
 

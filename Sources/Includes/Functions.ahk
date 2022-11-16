@@ -582,18 +582,7 @@ loadSimulatorConfiguration() {
 		logMessage(kLogInfo, translate("Session database path set to ") . path)
 	}
 
-    /*
-	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "Home Path")
-	if path {
-		kHomeDirectory := path . "\"
-
-		logMessage(kLogInfo, translate("Installation path set to ") . path)
-	}
-	else
-		logMessage(kLogWarn, translate("Installation path not set"))
-	*/
-
-	logMessage(kLogInfo, translate("Installation path set to ") . kHomeDirectory)
+    logMessage(kLogInfo, translate("Installation path set to ") . kHomeDirectory)
 
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path")
 	if path {
@@ -636,7 +625,7 @@ loadSimulatorConfiguration() {
 	if (!A_IsCompiled || getConfigurationValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 		setDebug(true)
 
-	vLogLevel := inList(["Info", "Warn", "Critical", "Off"], getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
+	vLogLevel := inList(kLogLevelNames, getConfigurationValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn"))
 }
 
 initializeEnvironment() {
@@ -905,9 +894,9 @@ installTrayMenu(update := false) {
 		logError(exception)
 	}
 
-	levels := {Off: kLogOff, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+	levels := kLogLevels
 
-	for ignore, label in ["Off", "Info", "Warn", "Critical"] {
+	for ignore, label in kLogLevelNames {
 		level := levels[label]
 
 		label := translate(label)
@@ -1467,6 +1456,8 @@ logMessage(logLevel, message) {
 		level := ""
 
 		switch logLevel {
+			case kLogDebug:
+				level := "Debug   "
 			case kLogInfo:
 				level := "Info    "
 			case kLogWarn:
@@ -1525,12 +1516,12 @@ logError(exception, unhandled := false) {
 		message := exception.Message
 
 		if message is not Number
-			logMessage(unhandled ? kLogCritical : kLogInfo
+			logMessage(unhandled ? kLogCritical : kLogDebug
 					 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
 					 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
 	}
 	else if exception is not Number
-		logMessage(unhandled ? kLogCritical : kLogInfo
+		logMessage(unhandled ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
 	return (isDebug() ? false : true)
@@ -2419,6 +2410,8 @@ setLogLevel(level) {
 		}
 
 	switch level {
+		case "Debug":
+			level := kLogDebug
 		case "Info":
 			level := kLogInfo
 		case "Warn":
@@ -2429,11 +2422,13 @@ setLogLevel(level) {
 			level := kLogOff
 	}
 
-	vLogLevel := Min(kLogOff, Max(level, kLogInfo))
+	vLogLevel := Min(kLogOff, Max(level, kLogDebug))
 
 	state := translate("Unknown")
 
 	switch vLogLevel {
+		case kLogDebug:
+			state := translate("Debug")
 		case kLogInfo:
 			state := translate("Info")
 		case kLogWarn:

@@ -2583,24 +2583,14 @@ class RaceSpotter extends RaceAssistant {
 
 	finishSession(shutdown := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local asked
 
 		if knowledgeBase {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if this.Listener {
-					asked := true
+				if ((this.SaveSettings == kAsk) && (this.Session == kSessionRace)) {
+					this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
 
-					if ((this.SaveSettings == kAsk) && (this.Session == kSessionRace))
-						this.getSpeaker().speakPhrase("ConfirmSaveSettings", false, true)
-					else
-						asked := false
-				}
-				else
-					asked := false
-
-				if asked {
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))
 
 					Task.startTask(ObjBindMethod(this, "forceFinishSession"), 120000, kLowPriority)

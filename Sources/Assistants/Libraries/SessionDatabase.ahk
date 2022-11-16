@@ -134,7 +134,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			if (this.ServerURL[identifier] && SessionDatabase.sConnectors.HasKey(identifier)
 										   && !SessionDatabase.sConnectors[identifier] && (A_TickCount > retry))
-				SessionDatabase.sConnectors.Delete(identifier) := kUndefined
+				SessionDatabase.sConnectors.Delete(identifier)
 
 			if (!SessionDatabase.sConnectors.HasKey(identifier)) {
 				if this.ServerURL[identifier] {
@@ -1492,6 +1492,22 @@ class SessionDatabase extends ConfigurationItem {
 									, translate("Message: ") . translate("Lost connection to the Team Server (URL: ") . this.ServerURL[identifier]
 															 . translate(", Token: ") . this.ServerToken[identifier] . translate(")"))
 			}
+			else if (this.Connectors.Count() != this.ServerURLs.Count()) {
+				for identifier, serverURL in this.ServerURLs
+					if !this.Connectors.HasKey(identifier) {
+						setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+
+						setConfigurationValue(configuration, "Database Synchronizer", "ServerURL", serverURL)
+						setConfigurationValue(configuration, "Database Synchronizer", "ServerToken", this.ServerToken[identifier])
+						setConfigurationValue(configuration, "Database Synchronizer", "Connected", this.Connected[identifier])
+
+						setConfigurationValue(configuration, "Database Synchronizer", "Information"
+											, translate("Message: ") . translate("Lost connection to the Team Server (URL: ") . serverURL
+																	 . translate(", Token: ") . this.ServerToken[identifier] . translate(")"))
+
+						break
+					}
+			}
 			else {
 				setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
 
@@ -1575,14 +1591,8 @@ map2String(elementSeparator, valueSeparator, map) {
 ;;;-------------------------------------------------------------------------;;;
 
 compound(compound, color := false) {
-	if color {
-		/*
-		if (color = "Black")
-			return compound
-		else
-		*/
-			return (compound . " (" . color . ")")
-	}
+	if color
+		return (compound . " (" . color . ")")
 	else
 		return string2Values(A_Space, compound)[1]
 }

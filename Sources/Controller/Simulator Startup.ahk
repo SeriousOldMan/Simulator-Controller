@@ -412,10 +412,15 @@ launchPad(command := false, arguments*) {
 	else if (command = "Launch") {
 		application := arguments[1]
 
-		Run %kBinariesDirectory%%application%
+		Process Exist, %application%
+
+		if ErrorLevel
+			WinActivate ahk_exe %application%
+		else
+			Run %kBinariesDirectory%%application%
 
 		if arguments[2]
-		 	ExitApp 0
+			ExitApp 0
 	}
 	else if (command = "Startup") {
 		GuiControlGet closeCheckBox

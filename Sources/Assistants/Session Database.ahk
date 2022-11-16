@@ -4188,7 +4188,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, x16 yp+30 w388 h216 Section, % translate("Team Server")
+		Gui %window%:Add, GroupBox, x16 yp+30 w388 h216 Section, % translate("Team Data")
 
 		Gui %window%:Font, Norm, Arial
 

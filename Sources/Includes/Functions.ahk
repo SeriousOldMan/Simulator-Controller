@@ -97,6 +97,7 @@ consentDialog(id, consent := false) {
 
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
+	static raceStrategiesConsentDropDown
 	static closed
 
 	if (id = "Close") {
@@ -145,11 +146,16 @@ consentDialog(id, consent := false) {
 	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided"))
 	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose%chosen% VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 
-	Gui CNS:Add, Text, x8 y364 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "=")
+	Gui CNS:Add, Text, x8 y348 w450 h23 +0x200, % translate("Do you want to share your race strategies?")
 
-	Gui CNS:Add, Link, x8 y434 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "=")
+	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Race Strategies", "Undecided"))
+	Gui CNS:Add, DropDownList, x460 y348 w332 AltSubmit Choose%chosen% VraceStrategiesConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 
-	Gui CNS:Add, Button, x368 y490 w80 h23 Default gcloseConsentDialog, % translate("Save")
+	Gui CNS:Add, Text, x8 y388 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "=")
+
+	Gui CNS:Add, Link, x8 y458 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "=")
+
+	Gui CNS:Add, Button, x368 y514 w80 h23 Default gcloseConsentDialog, % translate("Save")
 
 	Gui CNS:+AlwaysOnTop
 
@@ -166,10 +172,11 @@ consentDialog(id, consent := false) {
 
 	GuiControlGet tyrePressuresConsentDropDown
 	GuiControlGet carSetupsConsentDropDown
+	GuiControlGet raceStrategiesConsentDropDown
 
 	Gui CNS:Destroy
 
-	return {TyrePressures: ["Yes", "No", "Retry"][tyrePressuresConsentDropDown], CarSetups: ["Yes", "No", "Retry"][carSetupsConsentDropDown]}
+	return {TyrePressures: ["Yes", "No", "Retry"][tyrePressuresConsentDropDown], CarSetups: ["Yes", "No", "Retry"][carSetupsConsentDropDown], RaceStrategies: ["Yes", "No", "Retry"][raceStrategiesConsentDropDown]}
 }
 
 closeConsentDialog() {

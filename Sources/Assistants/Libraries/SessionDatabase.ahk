@@ -209,7 +209,7 @@ class SessionDatabase extends ConfigurationItem {
 	Connectors[] {
 		Get {
 			local result := {}
-			local connector
+			local connector, identifier, serverURL
 
 			for identifier, serverURL in string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard") {
 				connector := this.Connector[identifier]
@@ -234,8 +234,6 @@ class SessionDatabase extends ConfigurationItem {
 
 	ServerURLs[identifier := false] {
 		Get {
-			local serverURL
-
 			if !SessionDatabase.sServerURLs.HasKey(identifier)
 				SessionDatabase.sServerURLs := string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
@@ -251,8 +249,6 @@ class SessionDatabase extends ConfigurationItem {
 
 	ServerTokens[identifier := false] {
 		Get {
-			local serverToken
-
 			if !SessionDatabase.sServerTokens.HasKey(identifier)
 				SessionDatabase.sServerTokens := string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.Token", ""), "Standard")
 

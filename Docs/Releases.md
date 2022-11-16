@@ -1,8 +1,8 @@
 ## 4.4.8.0-release 11/18/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](*).
-  4. Multiple data connections are now supported for the [Team Server data replication](*) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
+  3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration).
+  4. Multiple data connections are now supported for the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
   5. Fixed end of race detection for fixed-lap races in rFactor 2.
   6. Race Assistant configurations can be [synchronized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) by a click of a button.
   7. Optical enhancements for the launch pad of "Simulator Startup".

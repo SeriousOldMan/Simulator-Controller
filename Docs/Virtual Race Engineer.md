@@ -563,7 +563,7 @@ This tab allows you to store your preferred car setup files for different condit
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.jpg)
 
-Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download, rename or delete a setup file from your simulator.
+Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download, rename or delete a setup file from your simulator. Once you have uploaded a setup you can decide whether you want to share this setup potentially with the community (if you have given consent to share setups) and/or you want to synchronize the setup with any [connected Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) (see below).
 
 ##### Naming conventions
 

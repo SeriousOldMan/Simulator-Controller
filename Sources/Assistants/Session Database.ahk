@@ -5147,7 +5147,7 @@ updateAccess() {
 
 		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
 
-		setConfigurationValue(info, "Strategy", "Synchronized", false)
+		setConfigurationValue(info, "Setup", "Synchronized", false)
 		setConfigurationValue(info, "Access", "Share", shareWithCommunityCheck)
 		setConfigurationValue(info, "Access", "Synchronize", shareWithTeamServerCheck)
 

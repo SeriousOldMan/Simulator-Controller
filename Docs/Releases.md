@@ -11,6 +11,10 @@
   10. Support for fixed refueling time during pitstops has been added to all applications. See for example the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop--service) of "Strategy Workbench" for more information.
   12. Fixed installation of Spanish speech recognition library.
   13. Introduced a new log level "Debug" to track down really complex problems.
+  14. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Ferrari F40
+		- KTM X-Bow R
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
 

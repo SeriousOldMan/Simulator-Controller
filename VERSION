@@ -3,7 +3,7 @@ Version=4.4.8.0-dev
 Target=4.4.8.0-release
 Date=11/16/2022
 Download=https://www.dropbox.com/s/z9nfy9hi2eaaeix/Simulator%20Controller%204.4.8.0-dev.zip?dl=1
-Changes=New synchronization support for car setups and race strategies in the Team Server data connection, Multiple data connections are now supported for Team Server, Fixed end of race detection for fixed-lap races in rFactor 2, Race Assistant configuration can be synchronized by a click of a button, Optical enhancements for the launch pad of "Simulator Startup", "Simulator Setup" can be configured to jump to a specific page on startup, Support for fixed refueling time in all applications, Introduced new "Debug" log level, Fixed installation of Spanish speech recognition library
+Changes=New synchronization support for car setups and race strategies in the Team Server data connection, Multiple data connections are now supported for Team Server, Fixed end of race detection for fixed-lap races in rFactor 2, Race Assistant configuration can be synchronized by a click of a button, Optical enhancements for the launch pad of "Simulator Startup", "Simulator Setup" can be configured to jump to a specific page on startup, Support for fixed refueling time in all applications, Introduced new "Debug" log level, Fixed installation of Spanish speech recognition library, New car models for "Setup Advisor"
 [Release]
 Version=4.4.7.0-release
 Date=11/11/2022

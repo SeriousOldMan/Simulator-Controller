@@ -1191,7 +1191,7 @@ class SessionDatabase extends ConfigurationItem {
 			for ignore, type in kSetupTypes {
 				setups := []
 
-				loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*
+				loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Car Setups\%type%\*.*, F
 				{
 					SplitPath A_LoopFileName, name, , extension
 
@@ -1272,7 +1272,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
-			 , driver := "__Undefined__", identifier := "__Undefined__", synchronized := "__Undefined__") {
+			 , driver := "__Undefined__", identifier := "__Undefined__", synchronized := false) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
@@ -1303,8 +1303,7 @@ class SessionDatabase extends ConfigurationItem {
 		if (identifier != kUndefined)
 			setConfigurationValue(info, "Setup", "Identifier", identifier)
 
-		if (synchronized != kUndefined)
-			setConfigurationValue(info, "Setup", "Synchronized", synchronized)
+		setConfigurationValue(info, "Setup", "Synchronized", synchronized)
 
 		setConfigurationValue(info, "Setup", "Size", size)
 
@@ -1378,6 +1377,51 @@ class SessionDatabase extends ConfigurationItem {
 				}
 	}
 
+	getStrategyNames(simulator, car, track, ByRef userStrategies, ByRef communityStrategies) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local ignore, strategies, name, extension
+
+		car := this.getCarCode(simulator, car)
+
+		if userStrategies {
+			userStrategies := []
+
+			loop Files, %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\*.*, F
+			{
+				SplitPath A_LoopFileName, name, , extension
+
+				if (extension != "info")
+					userStrategies.Push(name)
+			}
+		}
+
+		if communityStrategies {
+			communityStrategies := []
+
+			loop Files, %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Race Strategies\*.*, F
+			{
+				SplitPath A_LoopFileName, name, , extension
+
+				if (extension != "info")
+					communityStrategies.Push(name)
+			}
+		}
+	}
+
+	readStrategy(simulator, car, track, name) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local data, fileName
+
+		car := this.getCarCode(simulator, car)
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%
+
+		if !FileExist(fileName)
+			fileName = %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Race Strategies\%name%
+
+		return readConfiguration(fileName)
+	}
+
 	readStrategyInfo(simulator, car, track, name) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, info
@@ -1415,6 +1459,42 @@ class SessionDatabase extends ConfigurationItem {
 			return readConfiguration(fileName)
 	}
 
+	writeStrategy(simulator, car, track, name, strategy, share, synchronize
+			    , driver := "__Undefined__", identifier := "__Undefined__", synchronized := false) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName, file, info
+
+		car := this.getCarCode(simulator, car)
+
+		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies
+
+		FileCreateDir %fileName%
+
+		fileName := (fileName . "\" . name)
+
+		deleteFile(fileName)
+
+		writeConfiguration(fileName, strategy)
+
+		if !driver
+			driver := this.ID
+
+		info := this.readStrategyInfo(simulator, car, track, name)
+
+		if (driver != kUndefined)
+			setConfigurationValue(info, "Origin", "Driver", driver)
+
+		if (identifier != kUndefined)
+			setConfigurationValue(info, "Strategy", "Identifier", identifier)
+
+		setConfigurationValue(info, "Strategy", "Synchronized", synchronized)
+
+		setConfigurationValue(info, "Access", "Share", share)
+		setConfigurationValue(info, "Access", "Synchronize", synchronize)
+
+		this.writeSetupInfo(simulator, car, track, type, name, info)
+	}
+
 	writeStrategyInfo(simulator, car, track, name, info) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName
@@ -1424,6 +1504,34 @@ class SessionDatabase extends ConfigurationItem {
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%.info
 
 		writeConfiguration(fileName, info)
+	}
+
+	renameStrategy(simulator, car, track, oldName, newName) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local oldFileName, newFileName
+
+		car := this.getCarCode(simulator, car)
+
+		oldFileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%oldName%
+		newFileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%newName%
+
+		try {
+			FileMove %oldFileName%, %newFileName%, 1
+
+			if FileExist(oldFileName . ".info") {
+				info := readConfiguration(oldFileName . ".info")
+
+				deleteFile(oldFileName . ".info")
+
+				setConfigurationValue(info, "Strategy", "Name", newName)
+				setConfigurationValue(info, "Strategy", "Synchronized", false)
+
+				writeConfiguration(newFileName . ".info", info)
+			}
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	removeStrategy(simulator, car, track, name) {

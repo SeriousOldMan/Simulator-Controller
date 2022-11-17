@@ -71,11 +71,13 @@ global settingsImg2
 global settingsImg3
 global settingsImg4
 global settingsImg5
+global settingsImg6
 global settingsTab1
 global settingsTab2
 global settingsTab3
 global settingsTab4
 global settingsTab5
+global settingsTab6
 
 global settingDropDown
 global settingValueDropDown
@@ -101,14 +103,22 @@ global addTrackAutomationButton
 global deleteTrackAutomationButton
 global saveTrackAutomationButton
 
+global uploadStrategyButton
+global downloadStrategyButton
+global renameStrategyButton
+global deleteStrategyButton
+
+global shareStrategyWithCommunityCheck
+global shareStrategyWithTeamServerCheck
+
 global setupTypeDropDown
 global uploadSetupButton
 global downloadSetupButton
 global renameSetupButton
 global deleteSetupButton
 
-global shareWithCommunityCheck
-global shareWithTeamServerCheck
+global shareSetupWithCommunityCheck
+global shareSetupWithTeamServerCheck
 
 global dryQualificationDropDown
 global uploadDryQualificationButton
@@ -183,6 +193,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	iDataListView := false
 	iSettingsListView := false
+	iStrategyListView := false
 	iSetupListView := false
 	iAdministrationListView := false
 	iTrackAutomationsListView := false
@@ -305,6 +316,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	SettingsListView[] {
 		Get {
 			return this.iSettingsListView
+		}
+	}
+
+	StrategyListView[] {
+		Get {
+			return this.iStrategyListView
 		}
 	}
 
@@ -474,50 +491,58 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold cGray, Arial
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg2 gchooseTab2, %kIconsDirectory%Tools BW.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab2 gchooseTab2, % translate("Setup Repository")
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg2 gchooseTab2, %kIconsDirectory%Strategy.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab2 gchooseTab2, % translate("Strategy Repository")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold cGray, Arial
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg3 gchooseTab3, %kIconsDirectory%Pressure.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab3 gchooseTab3, % translate("Tyre Pressure Advisor")
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg3 gchooseTab3, %kIconsDirectory%Tools BW.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab3 gchooseTab3, % translate("Setup Repository")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold cGray, Arial
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Road.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Automation")
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Pressure.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Tyre Pressure Advisor")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
 		Gui %window%:Font, Norm
 		Gui %window%:Font, s10 Bold cGray, Arial
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg5 gchooseTab5, %kIconsDirectory%Sensor.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab5 gchooseTab5, % translate("Administration")
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg5 gchooseTab5, %kIconsDirectory%Road.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab5 gchooseTab5, % translate("Automation")
+
+		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+
+		Gui %window%:Font, Norm
+		Gui %window%:Font, s10 Bold cGray, Arial
+
+		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg6 gchooseTab6, %kIconsDirectory%Sensor.ico
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab6 gchooseTab6, % translate("Administration")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
 		Gui %window%:Font, s8 Norm cBlack, Arial
 
-		Gui %window%:Add, GroupBox, x280 ys-8 w390 h429
+		Gui %window%:Add, GroupBox, x280 ys-8 w390 h476
 
-		tabs := map(["Settings", "Setups", "Pressures", "Automation", "Data"], "translate")
+		tabs := map(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], "translate")
 
 		Gui %window%:Add, Tab2, x296 ys+16 w0 h0 -Wrap vsettingsTab Section, % values2String("|", tabs*)
 
 		Gui Tab, 1
 
-		Gui %window%:Add, ListView, x296 ys w360 h279 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", map(["Setting", "Value"], "translate")*)
+		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", map(["Setting", "Value"], "translate")*)
 
 		this.iSettingsListView := settingsListViewHandle
 
-		Gui %window%:Add, Text, x296 yp+285 w80 h23 +0x200, % translate("Setting")
+		Gui %window%:Add, Text, x296 yp+332 w80 h23 +0x200, % translate("Setting")
 		Gui %window%:Add, DropDownList, xp+90 yp w270 vsettingDropDown gselectSetting
 
 		Gui %window%:Add, Text, x296 yp+24 w80 h23 +0x200, % translate("Value")
@@ -535,15 +560,34 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 2
 
+		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseStrategy, % values2String("|", map(["Source", "Name"], "translate")*)
+
+		this.iStrategyListView := listViewHandle
+
+		Gui %window%:Add, Button, xp+260 yp+304 w23 h23 HwnduploadStrategyButtonHandle guploadStrategy vuploadStrategyButton
+		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadStrategyButtonHandle gdownloadStrategy vdownloadStrategyButton
+		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameStrategyButtonHandle grenameStrategy vrenameStrategyButton
+		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteStrategyButtonHandle gdeleteStrategy vdeleteStrategyButton
+		setButtonIcon(uploadStrategyButtonHandle, kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(downloadStrategyButtonHandle, kIconsDirectory . "Download.ico", 1)
+		setButtonIcon(renameStrategyButtonHandle, kIconsDirectory . "Pencil.ico", 1)
+		setButtonIcon(deleteStrategyButtonHandle, kIconsDirectory . "Minus.ico", 1)
+
+		Gui %window%:Add, Text, x296 yp w80 h23 +0x200, % translate("Share")
+		Gui %window%:Add, CheckBox, xp+90 yp+4 w140 vshareStrategyWithCommunityCheck gupdateStrategyAccess, % translate("with Community") ; -Theme
+		Gui %window%:Add, CheckBox, xp yp+24 w140 vshareStrategyWithTeamServerCheck gupdateStrategyAccess, % translate("on Team Server") ; -Theme
+
+		Gui Tab, 3
+
 		Gui %window%:Add, Text, x296 ys w80 h23 +0x200, % translate("Purpose")
 		Gui %window%:Add, DropDownList, xp+90 yp w270 AltSubmit Choose2 vsetupTypeDropDown gchooseSetupType, % values2String("|", map(["Qualification (Dry)", "Race (Dry)", "Qualification (Wet)", "Race (Wet)"], "translate")*)
 
-		Gui %window%:Add, ListView, x296 yp+24 w360 h255 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", map(["Source", "Name"], "translate")*)
+		Gui %window%:Add, ListView, x296 yp+24 w360 h302 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", map(["Source", "Name"], "translate")*)
 
 		this.iSetupListView := listViewHandle
 		this.iSelectedSetupType := kDryRaceSetup
 
-		Gui %window%:Add, Button, xp+260 yp+257 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
+		Gui %window%:Add, Button, xp+260 yp+304 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadSetupButtonHandle gdownloadSetup vdownloadSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameSetupButtonHandle grenameSetup vrenameSetupButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSetupButtonHandle gdeleteSetup vdeleteSetupButton
@@ -553,10 +597,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(deleteSetupButtonHandle, kIconsDirectory . "Minus.ico", 1)
 
 		Gui %window%:Add, Text, x296 yp w80 h23 +0x200, % translate("Share")
-		Gui %window%:Add, CheckBox, xp+90 yp+4 w140 vshareWithCommunityCheck gupdateAccess, % translate("with Community") ; -Theme
-		Gui %window%:Add, CheckBox, xp yp+24 w140 vshareWithTeamServerCheck gupdateAccess, % translate("on Team Server") ; -Theme
+		Gui %window%:Add, CheckBox, xp+90 yp+4 w140 vshareSetupWithCommunityCheck gupdateSetupAccess, % translate("with Community") ; -Theme
+		Gui %window%:Add, CheckBox, xp yp+24 w140 vshareSetupWithTeamServerCheck gupdateSetupAccess, % translate("on Team Server") ; -Theme
 
-		Gui Tab, 3
+		Gui Tab, 4
 
 		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Driver")
 		Gui %window%:Add, DropDownList, x386 yp w100 vdriverDropDown gloadPressures
@@ -611,16 +655,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if this.RequestorPID
 			Gui %window%:Add, Button, x440 yp+50 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
 
-		Gui Tab, 4
+		Gui Tab, 5
 
 		this.iTrackDisplayArea := [297, 239, 358, 303, 0, 0]
 
-		Gui %window%:Add, Picture, x296 y238 w360 h305 Border
-		Gui %window%:Add, Picture, x297 y239 w358 h303 HWNDtrackDisplay vtrackDisplay gselectTrackAction
+		Gui %window%:Add, Picture, x296 y238 w360 h352 Border
+		Gui %window%:Add, Picture, x297 y239 w358 h350 HWNDtrackDisplay vtrackDisplay gselectTrackAction
 
 		this.iTrackDisplay := trackDisplay
 
-		Gui %window%:Add, ListView, x296 y550 w110 h85 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "#"], "translate")*)
+		Gui %window%:Add, ListView, x296 y597 w110 h85 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "#"], "translate")*)
 
 		this.iTrackAutomationsListView := trackAutomationsListViewHandle
 
@@ -637,33 +681,33 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x415 yp+24 w60 h23 +0x200, % translate("Actions")
 		Gui %window%:Add, Edit, xp+60 yp w181 h61 ReadOnly -Wrap vtrackAutomationInfoEdit
 
-		Gui Tab, 5
+		Gui Tab, 6
 
 		Gui %window%:Add, CheckBox, +Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck gselectAllData
 
-		Gui %window%:Add, ListView, x314 ys w342 h357 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
+		Gui %window%:Add, ListView, x314 ys w342 h404 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
 		this.iAdministrationListView := administrationListViewHandle
 
-		Gui %window%:Add, Button, x314 yp+372 w90 h23 vexportDataButton gexportData, % translate("Export...")
+		Gui %window%:Add, Button, x314 yp+419 w90 h23 vexportDataButton gexportData, % translate("Export...")
 		Gui %window%:Add, Button, xp+95 yp w90 h23 vimportDataButton gimportData, % translate("Import...")
 
 		Gui %window%:Add, Button, x566 yp w90 h23 vdeleteDataButton gdeleteData, % translate("Delete...")
 
 		Gui Tab
 
-		Gui %window%:Add, Text, x16 ys+230 w100 h23 +0x200, % translate("Available Data")
+		Gui %window%:Add, Text, x16 ys+277 w100 h23 +0x200, % translate("Available Data")
 
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
 		Gui %window%:Add, DropDownList, x120 yp w140 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
 
-		Gui %window%:Add, ListView, x16 ys+254 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+301 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
 
 		this.iDataListView := listViewHandle
 
-		Gui %window%:Add, Text, x8 y653 w670 0x10
+		Gui %window%:Add, Text, x8 y700 w670 0x10
 
 		/*
 		choices := ["User", "User & Community"]
@@ -674,7 +718,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		*/
 
 
-		Gui %window%:Add, Button, x304 y661 w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
+		Gui %window%:Add, Button, x304 y708 w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
 
 		this.loadSimulator(simulator, true)
 		this.loadCar(car, true)
@@ -761,7 +805,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if simulator {
 			if !((car && (car != true)) && (track && (track != true)))
-				if ((this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
+				if ((this.SelectedModule = "Strategies") || (this.SelectedModule = "Setups") || (this.SelectedModule = "Pressures"))
 					this.selectModule("Settings")
 		}
 
@@ -778,57 +822,70 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		GuiControl Font, settingsTab1
 
-		if this.moduleAvailable("Setups") {
+		if this.moduleAvailable("Strategies") {
 			GuiControl Enable, settingsImg2
-			GuiControl, , settingsImg2, %kIconsDirectory%Tools BW.ico
+			GuiControl, , settingsImg2, %kIconsDirectory%Strategy.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
-			GuiControl Disable, settingsImg2
-			GuiControl, , settingsImg2, %kIconsDirectory%Tools Gray.ico
+			GuiControl Disable, settingsImg3
+			GuiControl, , settingsImg2, %kIconsDirectory%Strategy Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 
 		GuiControl Font, settingsTab2
 
-		if this.moduleAvailable("Pressures") {
+		if this.moduleAvailable("Setups") {
 			GuiControl Enable, settingsImg3
-			GuiControl, , settingsImg3, %kIconsDirectory%Pressure.ico
+			GuiControl, , settingsImg3, %kIconsDirectory%Tools BW.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg3
-			GuiControl, , settingsImg3, %kIconsDirectory%Pressure Gray.ico
+			GuiControl, , settingsImg3, %kIconsDirectory%Tools Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 
 		GuiControl Font, settingsTab3
 
-		if this.moduleAvailable("Automation") {
+		if this.moduleAvailable("Pressures") {
 			GuiControl Enable, settingsImg4
-			GuiControl, , settingsImg4, %kIconsDirectory%Road.ico
+			GuiControl, , settingsImg4, %kIconsDirectory%Pressure.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg4
-			GuiControl, , settingsImg4, %kIconsDirectory%Road Gray.ico
+			GuiControl, , settingsImg4, %kIconsDirectory%Pressure Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 
 		GuiControl Font, settingsTab4
 
-		if this.moduleAvailable("Data") {
+		if this.moduleAvailable("Automation") {
 			GuiControl Enable, settingsImg5
-			GuiControl, , settingsImg5, %kIconsDirectory%Sensor.ico
+			GuiControl, , settingsImg5, %kIconsDirectory%Road.ico
 			Gui Font, s10 Bold cGray, Arial
 		}
 		else {
 			GuiControl Disable, settingsImg5
-			GuiControl, , settingsImg5, %kIconsDirectory%Sensor Gray.ico
+			GuiControl, , settingsImg5, %kIconsDirectory%Road Gray.ico
 			Gui Font, s10 Bold cSilver, Arial
 		}
 
 		GuiControl Font, settingsTab5
+
+		if this.moduleAvailable("Data") {
+			GuiControl Enable, settingsImg6
+			GuiControl, , settingsImg6, %kIconsDirectory%Sensor.ico
+			Gui Font, s10 Bold cGray, Arial
+		}
+		else {
+			GuiControl Disable, settingsImg6
+			GuiControl, , settingsImg6, %kIconsDirectory%Sensor Gray.ico
+			Gui Font, s10 Bold cSilver, Arial
+		}
+
+		GuiControl Font, settingsTab6
 
 		Gui Font, s10 Bold cBlack, Arial
 
@@ -836,23 +893,76 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			case "Settings":
 				GuiControl Font, settingsTab1
 				GuiControl Choose, settingsTab, 1
-			case "Setups":
+			case "Strategies":
 				GuiControl Font, settingsTab2
 				GuiControl Choose, settingsTab, 2
-			case "Pressures":
+			case "Setups":
 				GuiControl Font, settingsTab3
 				GuiControl Choose, settingsTab, 3
-			case "Automation":
+			case "Pressures":
 				GuiControl Font, settingsTab4
 				GuiControl Choose, settingsTab, 4
-			case "Data":
+			case "Automation":
 				GuiControl Font, settingsTab5
 				GuiControl Choose, settingsTab, 5
+			case "Data":
+				GuiControl Font, settingsTab6
+				GuiControl Choose, settingsTab, 6
 		}
 
 		defaultListView := A_DefaultListView
 
 		try {
+			Gui ListView, % this.StrategyListView
+
+			selected := LV_GetNext(0)
+
+			if selected {
+				LV_GetText(type, selected, 1)
+				LV_GetText(name, selected, 2)
+
+				GuiControl Enable, downloadStrategyButton
+
+				if (type != translate("Community")) {
+					info := this.SessionDatabase.readStrategyInfo(simulator, car, track, name)
+
+					GuiControl Enable, deleteStrategyButton
+
+					if (!info || (getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+						GuiControl Enable, renameStrategyButton
+						GuiControl Enable, shareStrategyWithCommunityCheck
+						GuiControl Enable, shareStrategyWithTeamServerCheck
+					}
+					else {
+						GuiControl Disable, renameStrategyButton
+						GuiControl Disable, shareStrategyWithCommunityCheck
+						GuiControl Disable, shareStrategyWithTeamServerCheck
+
+						GuiControl, , shareStrategyWithCommunityCheck, 0
+						GuiControl, , shareStrategyWithTeamServerCheck, 0
+					}
+				}
+				else {
+					GuiControl Disable, deleteStrategyButton
+					GuiControl Disable, renameStrategyButton
+					GuiControl Disable, shareStrategyWithCommunityCheck
+					GuiControl Disable, shareStrategyWithTeamServerCheck
+
+					GuiControl, , shareStrategyWithCommunityCheck, 0
+					GuiControl, , shareStrategyWithTeamServerCheck, 0
+				}
+			}
+			else {
+				GuiControl Disable, downloadStrategyButton
+				GuiControl Disable, deleteStrategyButton
+				GuiControl Disable, renameStrategyButton
+				GuiControl Disable, shareStrategyWithCommunityCheck
+				GuiControl Disable, shareStrategyWithTeamServerCheck
+
+				GuiControl, , shareStrategyWithCommunityCheck, 0
+				GuiControl, , shareStrategyWithTeamServerCheck, 0
+			}
+
 			Gui ListView, % this.SetupListView
 
 			selected := LV_GetNext(0)
@@ -872,37 +982,37 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					if (!info || (getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
 						GuiControl Enable, renameSetupButton
-						GuiControl Enable, shareWithCommunityCheck
-						GuiControl Enable, shareWithTeamServerCheck
+						GuiControl Enable, shareSetupWithCommunityCheck
+						GuiControl Enable, shareSetupWithTeamServerCheck
 					}
 					else {
 						GuiControl Disable, renameSetupButton
-						GuiControl Disable, shareWithCommunityCheck
-						GuiControl Disable, shareWithTeamServerCheck
+						GuiControl Disable, shareSetupWithCommunityCheck
+						GuiControl Disable, shareSetupWithTeamServerCheck
 
-						GuiControl, , shareWithCommunityCheck, 0
-						GuiControl, , shareWithTeamServerCheck, 0
+						GuiControl, , shareSetupWithCommunityCheck, 0
+						GuiControl, , shareSetupWithTeamServerCheck, 0
 					}
 				}
 				else {
 					GuiControl Disable, deleteSetupButton
 					GuiControl Disable, renameSetupButton
-					GuiControl Disable, shareWithCommunityCheck
-					GuiControl Disable, shareWithTeamServerCheck
+					GuiControl Disable, shareSetupWithCommunityCheck
+					GuiControl Disable, shareSetupWithTeamServerCheck
 
-					GuiControl, , shareWithCommunityCheck, 0
-					GuiControl, , shareWithTeamServerCheck, 0
+					GuiControl, , shareSetupWithCommunityCheck, 0
+					GuiControl, , shareSetupWithTeamServerCheck, 0
 				}
 			}
 			else {
 				GuiControl Disable, downloadSetupButton
 				GuiControl Disable, deleteSetupButton
 				GuiControl Disable, renameSetupButton
-				GuiControl Disable, shareWithCommunityCheck
-				GuiControl Disable, shareWithTeamServerCheck
+				GuiControl Disable, shareSetupWithCommunityCheck
+				GuiControl Disable, shareSetupWithTeamServerCheck
 
-				GuiControl, , shareWithCommunityCheck, 0
-				GuiControl, , shareWithTeamServerCheck, 0
+				GuiControl, , shareSetupWithCommunityCheck, 0
+				GuiControl, , shareSetupWithTeamServerCheck, 0
 			}
 
 			Gui ListView, % this.SettingsListView
@@ -1080,6 +1190,67 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Choose, weatherDropDown, % inList(kWeatherConditions, weather) + 1
 
 			this.updateModules()
+		}
+	}
+
+	loadStrategies(select := false) {
+		local window, defaultListView, userStrategies, communityStrategies, ignore, name, info, origin
+
+		window := this.Window
+
+		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.StrategyListView
+
+			LV_Delete()
+
+			userStrategies := true
+			communityStrategies := this.UseCommunity
+
+			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userStrategies, communityStrategies)
+
+			Gui ListView, % this.StrategyListView
+
+			for ignore, name in userStrategies {
+				info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+
+				if !info
+					origin := translate("User")
+				else {
+					origin := getConfigurationValue(info, "Origin", "Driver", this.SessionDatabase.ID)
+
+					origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+				}
+
+				if (select = name) {
+					LV_Add("Select Vis", origin, name)
+
+					select := LV_GetCount()
+				}
+				else
+					LV_Add("", origin, name)
+			}
+
+			if communityStrategies
+				for ignore, name in communityStrategies
+					if !inList(userStrategies, name)
+						LV_Add("", translate("Community"), name)
+
+			LV_ModifyCol()
+
+			loop 2
+				LV_ModifyCol(A_Index, "AutoHdr")
+
+			if select
+				this.selectStrategy(select)
+			else
+				this.updateState()
+		}
+		finally {
+			Gui ListView, %defaultListView%
 		}
 	}
 
@@ -2567,6 +2738,47 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	selectStrategies() {
+		local window := this.Window
+		local defaultListView, ignore, column, userSetups, communitySetups, type, setups
+		local info, origin
+
+		Gui %window%:Default
+
+		defaultListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.DataListView
+
+			LV_Delete()
+
+			while LV_DeleteCol(1)
+				ignore := 1
+
+			for ignore, column in map(["Source", "#"], "translate")
+				LV_InsertCol(A_Index, "", column)
+
+			userStrategies := true
+			communityStrategies := true
+
+			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userStrategies, communityStrategies)
+
+			LV_Add("", translate("User"), userStrategies.Length())
+
+			LV_Add("", translate("Community"), communityStrategies.Length())
+
+			LV_ModifyCol()
+
+			loop 2
+				LV_ModifyCol(A_Index, "AutoHdr")
+
+			this.loadStrategies()
+		}
+		finally {
+			Gui ListView, %defaultListView%
+		}
+	}
+
 	selectSetups() {
 		local window := this.Window
 		local defaultListView, ignore, column, userSetups, communitySetups, type, setups
@@ -2657,11 +2869,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.iAvailableModules["Data"] := true
 
 			if ((car && (car != true)) && (track && (track != true))) {
+				this.iAvailableModules["Strategies"] := true
 				this.iAvailableModules["Setups"] := true
 				this.iAvailableModules["Pressures"] := true
 				this.iAvailableModules["Automation"] := this.SessionDatabase.hasTrackMap(simulator, track)
 			}
 			else {
+				this.iAvailableModules["Strategies"] := false
 				this.iAvailableModules["Setups"] := false
 				this.iAvailableModules["Pressures"] := false
 				this.iAvailableModules["Automation"] := false
@@ -2670,6 +2884,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else {
 			this.iAvailableModules["Settings"] := false
 			this.iAvailableModules["Data"] := false
+			this.iAvailableModules["Strategies"] := false
 			this.iAvailableModules["Setups"] := false
 			this.iAvailableModules["Pressures"] := false
 			this.iAvailableModules["Automation"] := false
@@ -2700,6 +2915,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.selectSettings()
 					case "Data":
 						this.selectData()
+					case "Strategies":
+						this.selectStrategies()
 					case "Setups":
 						this.selectSetups()
 					case "Automation":
@@ -3138,6 +3355,30 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	selectStrategy(row) {
+		local window := this.Window
+		local name, info
+
+		Gui %window%:Default
+
+		Gui ListView, % this.StrategyListView
+
+		LV_GetText(name, row, 2)
+
+		info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+
+		if (info && getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
+			GuiControl, , shareStrategyWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
+			GuiControl, , shareStrategyWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
+		}
+		else {
+			GuiControl, , shareStrategyWithCommunityCheck, 0
+			GuiControl, , shareStrategyWithTeamServerCheck, 0
+		}
+
+		this.updateState()
+	}
+
 	selectSetup(row) {
 		local window := this.Window
 		local type, name, info
@@ -3155,15 +3396,98 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, name)
 
 		if (info && getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
-			GuiControl, , shareWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
-			GuiControl, , shareWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
+			GuiControl, , shareSetupWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
+			GuiControl, , shareSetupWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
 		}
 		else {
-			GuiControl, , shareWithCommunityCheck, 0
-			GuiControl, , shareWithTeamServerCheck, 0
+			GuiControl, , shareSetupWithCommunityCheck, 0
+			GuiControl, , shareSetupWithTeamServerCheck, 0
 		}
 
 		this.updateState()
+	}
+
+	uploadStrategy() {
+		local window := this.Window
+		local title := translate("Upload Strategy File...")
+		local fileName, strategy
+
+		Gui %window%:Default
+		Gui +OwnDialogs
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+		FileSelectFile fileName, 1, , %title%, , Strategy (*.strategy)
+		OnMessage(0x44, "")
+
+		if (fileName != "") {
+			strategy := readConfiguration(fileName)
+
+			SplitPath fileName, fileName
+
+			this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy, false, true)
+
+			this.loadStrategies(fileName)
+		}
+	}
+
+	downloadStrategy(strategyName) {
+		local window := this.Window
+		local title := translate("Download Strategy File...")
+		local fileName
+
+		Gui %window%:Default
+		Gui +OwnDialogs
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
+		FileSelectFile fileName, S16, %strategyName%, %title%, Strategy (*.strategy)
+		OnMessage(0x44, "")
+
+		if (fileName != "") {
+			deleteFile(fileName)
+
+			writeConfiguration(fileName, this.SessionDatabase.readStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName))
+		}
+	}
+
+	deleteStrategy(strategyName) {
+		local window := this.Window
+		local title := translate("Delete")
+
+		Gui %window%:Default
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+		MsgBox 262436, %title%, % translate("Do you really want to delete the selected strategy?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Yes
+		{
+			this.SessionDatabase.removeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName)
+
+			this.loadStrategies()
+		}
+	}
+
+	renameStrategy(strategyName) {
+		local window := this.Window
+		local title := translate("Rename")
+		local prompt := translate("Please enter the new name for the selected strategy:")
+		local locale := ((getLanguage() = "en") ? "" : "Locale")
+		local newName, curExtension, curName
+
+		Gui %window%:Default
+
+		SplitPath strategyName, , , curExtension, curName
+
+		InputBox newName, %title%, %prompt%, , 300, 200, , , %locale%, , % curName
+
+		if !ErrorLevel {
+			if (StrLen(curExtension) > 0)
+				newName .= ("." . curExtension)
+
+			this.SessionDatabase.renameStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName, newName)
+
+			this.loadStrategies(newName)
+		}
 	}
 
 	uploadSetup(setupType) {
@@ -3242,7 +3566,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	renameSetup(setupType, setupName) {
 		local window := this.Window
-		local title := translate("Delete")
+		local title := translate("Rename")
 		local prompt := translate("Please enter the new name for the selected setup:")
 		local locale := ((getLanguage() = "en") ? "" : "Locale")
 		local newName, curExtension, curName
@@ -3259,7 +3583,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.SessionDatabase.renameSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, newName)
 
-			this.loadSetups(this.SelectedSetupType, true)
+			this.loadSetups(this.SelectedSetupType, true, newName)
 		}
 	}
 }
@@ -5109,6 +5433,110 @@ changeSetting() {
 	}
 }
 
+chooseStrategy() {
+	local editor := SessionDatabaseEditor.Instance
+
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
+		editor.selectStrategy(A_EventInfo)
+}
+
+updateStrategyAccess() {
+	local editor := SessionDatabaseEditor.Instance
+	local sessionDB := editor.SessionDatabase
+	local selected, type, name
+
+	GuiControlGet shareStrategyWithCommunityCheck
+	GuiControlGet shareStrategyWithTeamServerCheck
+
+	Gui ListView, % editor.StrategyListView
+
+	selected := LV_GetNext(0)
+
+	if selected {
+		LV_GetText(name, selected, 2)
+
+		info := sessionDB.readStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
+
+		setConfigurationValue(info, "Strategy", "Synchronized", false)
+		setConfigurationValue(info, "Access", "Share", shareStrategyWithCommunityCheck)
+		setConfigurationValue(info, "Access", "Synchronize", shareStrategyWithTeamServerCheck)
+
+		sessionDB.writeStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
+	}
+}
+
+uploadStrategy() {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+
+	Gui %window%:Default
+
+	editor.uploadStrategy()
+}
+
+downloadStrategy() {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, name
+
+	Gui %window%:Default
+
+	defaultListView := A_DefaultListView
+
+	try {
+		Gui ListView, % editor.StrategyListView
+
+		LV_GetText(name, LV_GetNext(0), 2)
+
+		editor.downloadStrategy(name)
+	}
+	finally {
+		Gui ListView, %defaultListView%
+	}
+}
+
+renameStrategy() {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, name
+
+	Gui %window%:Default
+
+	defaultListView := A_DefaultListView
+
+	try {
+		Gui ListView, % editor.StrategyListView
+
+		LV_GetText(name, LV_GetNext(0), 2)
+
+		editor.renameStrategy(name)
+	}
+	finally {
+		Gui ListView, %defaultListView%
+	}
+}
+
+deleteStrategy() {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, name
+
+	Gui %window%:Default
+
+	defaultListView := A_DefaultListView
+
+	try {
+		Gui ListView, % editor.StrategyListView
+
+		LV_GetText(name, LV_GetNext(0), 2)
+
+		editor.deleteStrategy(name)
+	}
+	finally {
+		Gui ListView, %defaultListView%
+	}
+}
+
 chooseSetupType() {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
@@ -5117,7 +5545,7 @@ chooseSetupType() {
 
 	GuiControlGet setupTypeDropDown
 
-	SessionDatabaseEditor.Instance.loadSetups(kSetupTypes[setupTypeDropDown])
+	editor.loadSetups(kSetupTypes[setupTypeDropDown])
 }
 
 chooseSetup() {
@@ -5127,13 +5555,13 @@ chooseSetup() {
 		editor.selectSetup(A_EventInfo)
 }
 
-updateAccess() {
+updateSetupAccess() {
 	local editor := SessionDatabaseEditor.Instance
 	local sessionDB := editor.SessionDatabase
 	local selected, type, name
 
-	GuiControlGet shareWithCommunityCheck
-	GuiControlGet shareWithTeamServerCheck
+	GuiControlGet shareSetupWithCommunityCheck
+	GuiControlGet shareSetupWithTeamServerCheck
 	GuiControlGet setupTypeDropDown
 
 	type := kSetupTypes[setupTypeDropDown]
@@ -5147,9 +5575,9 @@ updateAccess() {
 
 		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
 
-		setConfigurationValue(info, "Strategy", "Synchronized", false)
-		setConfigurationValue(info, "Access", "Share", shareWithCommunityCheck)
-		setConfigurationValue(info, "Access", "Synchronize", shareWithTeamServerCheck)
+		setConfigurationValue(info, "Setup", "Synchronized", false)
+		setConfigurationValue(info, "Access", "Share", shareSetupWithCommunityCheck)
+		setConfigurationValue(info, "Access", "Synchronize", shareSetupWithTeamServerCheck)
 
 		sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
 	}
@@ -5163,7 +5591,7 @@ uploadSetup() {
 
 	GuiControlGet setupTypeDropDown
 
-	SessionDatabaseEditor.Instance.uploadSetup(kSetupTypes[setupTypeDropDown])
+	editor.uploadSetup(kSetupTypes[setupTypeDropDown])
 }
 
 downloadSetup() {
@@ -5182,7 +5610,7 @@ downloadSetup() {
 
 		LV_GetText(name, LV_GetNext(0), 2)
 
-		SessionDatabaseEditor.Instance.downloadSetup(kSetupTypes[setupTypeDropDown], name)
+		editor.downloadSetup(kSetupTypes[setupTypeDropDown], name)
 	}
 	finally {
 		Gui ListView, %defaultListView%
@@ -5205,7 +5633,7 @@ renameSetup() {
 
 		LV_GetText(name, LV_GetNext(0), 2)
 
-		SessionDatabaseEditor.Instance.renameSetup(kSetupTypes[setupTypeDropDown], name)
+		editor.renameSetup(kSetupTypes[setupTypeDropDown], name)
 	}
 	finally {
 		Gui ListView, %defaultListView%
@@ -5228,7 +5656,7 @@ deleteSetup() {
 
 		LV_GetText(name, LV_GetNext(0), 2)
 
-		SessionDatabaseEditor.Instance.deleteSetup(kSetupTypes[setupTypeDropDown], name)
+		editor.deleteSetup(kSetupTypes[setupTypeDropDown], name)
 	}
 	finally {
 		Gui ListView, %defaultListView%
@@ -5513,25 +5941,32 @@ chooseTab1() {
 chooseTab2() {
 	local editor := SessionDatabaseEditor.Instance
 
+	if editor.moduleAvailable("Strategies")
+		editor.selectModule("Strategies")
+}
+
+chooseTab3() {
+	local editor := SessionDatabaseEditor.Instance
+
 	if editor.moduleAvailable("Setups")
 		editor.selectModule("Setups")
 }
 
-chooseTab3() {
+chooseTab4() {
 	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Pressures")
 		editor.selectModule("Pressures")
 }
 
-chooseTab4() {
+chooseTab5() {
 	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Automation")
 		editor.selectModule("Automation")
 }
 
-chooseTab5() {
+chooseTab6() {
 	local editor := SessionDatabaseEditor.Instance
 
 	if editor.moduleAvailable("Data")

@@ -97,12 +97,12 @@ class DatabaseCreator {
 		}
 	}
 
-	__New(sourceDirectory, targetDirectory, includePressures, includeStrategies, includeSetups) {
+	__New(sourceDirectory, targetDirectory, includePressures, includeSetups, includeStrategies) {
 		this.iSourceDirectory := sourceDirectory
 		this.iTargetDirectory := targetDirectory
 		this.iIncludePressures := includePressures
-		this.iIncludeStratgies := includeStrategies
 		this.iIncludeSetups := includeSetups
+		this.iIncludeStratgies := includeStrategies
 	}
 
 	createDatabase() {
@@ -275,71 +275,39 @@ createDatabases(inputDirectory, outputDirectory) {
 	Random version1, 1, 1000
 	Random version2, 1, 1000
 
-	updateProgress("Processing [Strategies | Setups | No Pressures]...")
+	for strategiesLabel, strategiesEnabled in {Strategies: true, "No Strategies": false}
+		for setupsLabel, setupsEnabled in {Setups: true, "No Setups": false}
+			for pressuresLabel, pressuresEnabled in {Pressures: true, "No Pressures": false}
+				if (pressuresEnabled || setupsEnabled || strategiesEnabled) {
+					updateProgress("Processing [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
 
-	database := (outputDirectory . "011." . version1 . "." . version2)
+					type := (pressuresEnabled . setupsEnabled . strategiesEnabled)
 
-	new DatabaseCreator(inputDirectory, database . "\", false, true, true).createDatabase()
+					database := (outputDirectory . type . "." . version1 . "." . version2)
 
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+					new DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, strategiesEnabled).createDatabase()
 
-	if FileExist(database ".zip")
-		archives.Push(database ".zip")
+					RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
 
-	updateProgress("Processing [Strategies | No Setups | Pressures]...")
+					if FileExist(database ".zip")
+						archives.Push(database ".zip")
+				}
 
-	database := (outputDirectory . "101." . version1 . "." . version2)
+	for setupsLabel, setupsEnabled in {Setups: true, "No Setups": false}
+		for pressuresLabel, pressuresEnabled in {Pressures: true, "No Pressures": false} {
+			updateProgress("Processing [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
 
-	new DatabaseCreator(inputDirectory, database . "\", true, true, false).createDatabase()
+			type := (pressuresEnabled . setupsEnabled)
 
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+			database := (outputDirectory . type . "." . version1 . "." . version2)
 
-	if FileExist(database ".zip")
-		archives.Push(database ".zip")
+			new DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, false).createDatabase()
 
-	updateProgress("Processing [Strategies | Setups | Pressures]...")
+			RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
 
-	database := (outputDirectory . "111." . version1 . "." . version2)
-
-	new DatabaseCreator(inputDirectory, database . "\", true, true, true).createDatabase()
-
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
-
-	if FileExist(database ".zip")
-		archives.Push(database ".zip")
-
-	updateProgress("Processing [No Strategies | Setups | No Pressures]...")
-
-	database := (outputDirectory . "010." . version1 . "." . version2)
-
-	new DatabaseCreator(inputDirectory, database . "\", false, false, true).createDatabase()
-
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
-
-	if FileExist(database ".zip")
-		archives.Push(database ".zip")
-
-	updateProgress("Processing [No Strategies | No Setups | Pressures]...")
-
-	database := (outputDirectory . "100." . version1 . "." . version2)
-
-	new DatabaseCreator(inputDirectory, database . "\", true, false, false).createDatabase()
-
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
-
-	if FileExist(database ".zip")
-		archives.Push(database ".zip")
-
-	updateProgress("Processing [No Strategies | Setups | Pressures]...")
-
-	database := (outputDirectory . "110." . version1 . "." . version2)
-
-	new DatabaseCreator(inputDirectory, database . "\", true, false, true).createDatabase()
-
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
-
-	if FileExist(database ".zip")
-		archives.Push(database ".zip")
+			if FileExist(database ".zip")
+				archives.Push(database ".zip")
+	}
 
 	return archives
 }
@@ -383,10 +351,7 @@ quit
 
 		deleteFile(A_Temp . "\clearRemoteDirectory.bat")
 
-		command =
-(
-ftp -s:clearRemoteDirectory.txt
-)
+		command = "ftp -s:clearRemoteDirectory.txt"
 
 		FileAppend %command%, %A_Temp%\clearRemoteDirectory.bat
 

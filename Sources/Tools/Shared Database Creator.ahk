@@ -56,6 +56,7 @@ class DatabaseCreator {
 	iTargetDirectory := false
 
 	iIncludePressures := false
+	iIncludeStratgies := false
 	iIncludeSetups := false
 
 	iTyresDatabase := false
@@ -78,6 +79,12 @@ class DatabaseCreator {
 		}
 	}
 
+	IncludeStrategies[] {
+		Get {
+			return this.iIncludeStrategies
+		}
+	}
+
 	IncludeSetups[] {
 		Get {
 			return this.iIncludeSetups
@@ -90,10 +97,11 @@ class DatabaseCreator {
 		}
 	}
 
-	__New(sourceDirectory, targetDirectory, includePressures, includeSetups) {
+	__New(sourceDirectory, targetDirectory, includePressures, includeStrategies, includeSetups) {
 		this.iSourceDirectory := sourceDirectory
 		this.iTargetDirectory := targetDirectory
 		this.iIncludePressures := includePressures
+		this.iIncludeStratgies := includeStrategies
 		this.iIncludeSetups := includeSetups
 	}
 
@@ -142,6 +150,9 @@ class DatabaseCreator {
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 									this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
 
+								loop Files, %databaseDirectory%%simulator%\%car%\Race Strategies\*.*
+									this.loadRaceStrategy(simulator, car, track, A_LoopFilePath)
+
 								loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
 								{
 									type := A_LoopFileName
@@ -176,6 +187,18 @@ class DatabaseCreator {
 			}
 
 			this.TyresDatabase.flush()
+		}
+	}
+
+	loadRaceStrategy(simulator, car, track, strategyFile) {
+		local directory := new SessionDatabase.DatabasePath
+
+		if this.IncludeStrategies {
+			updateProgress("Strategies: " simulator . " / " . car . " / " . track . "...")
+
+			FileCreateDir %directory%Community\%simulator%\%car%\Race Strategies
+
+			FileCopy %strategyFile%, %directory%Community\%simulator%\%car%\Race Strategies, 1
 		}
 	}
 
@@ -252,33 +275,66 @@ createDatabases(inputDirectory, outputDirectory) {
 	Random version1, 1, 1000
 	Random version2, 1, 1000
 
-	updateProgress("Processing [Setups | No Pressures]...")
+	updateProgress("Processing [Strategies | Setups | No Pressures]...")
 
-	database := (outputDirectory . "01." . version1 . "." . version2)
+	database := (outputDirectory . "011." . version1 . "." . version2)
 
-	new DatabaseCreator(inputDirectory, database . "\", false, true).createDatabase()
-
-	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
-
-	if FileExist(database ".zip")
-		archives.Push(database ".zip")
-
-	updateProgress("Processing [No Setups | Pressures]...")
-
-	database := (outputDirectory . "10." . version1 . "." . version2)
-
-	new DatabaseCreator(inputDirectory, database . "\", true, false).createDatabase()
+	new DatabaseCreator(inputDirectory, database . "\", false, true, true).createDatabase()
 
 	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
 
 	if FileExist(database ".zip")
 		archives.Push(database ".zip")
 
-	updateProgress("Processing [Setups | Pressures]...")
+	updateProgress("Processing [Strategies | No Setups | Pressures]...")
 
-	database := (outputDirectory . "11." . version1 . "." . version2)
+	database := (outputDirectory . "101." . version1 . "." . version2)
 
-	new DatabaseCreator(inputDirectory, database . "\", true, true).createDatabase()
+	new DatabaseCreator(inputDirectory, database . "\", true, true, false).createDatabase()
+
+	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+
+	if FileExist(database ".zip")
+		archives.Push(database ".zip")
+
+	updateProgress("Processing [Strategies | Setups | Pressures]...")
+
+	database := (outputDirectory . "111." . version1 . "." . version2)
+
+	new DatabaseCreator(inputDirectory, database . "\", true, true, true).createDatabase()
+
+	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+
+	if FileExist(database ".zip")
+		archives.Push(database ".zip")
+
+	updateProgress("Processing [No Strategies | Setups | No Pressures]...")
+
+	database := (outputDirectory . "010." . version1 . "." . version2)
+
+	new DatabaseCreator(inputDirectory, database . "\", false, false, true).createDatabase()
+
+	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+
+	if FileExist(database ".zip")
+		archives.Push(database ".zip")
+
+	updateProgress("Processing [No Strategies | No Setups | Pressures]...")
+
+	database := (outputDirectory . "100." . version1 . "." . version2)
+
+	new DatabaseCreator(inputDirectory, database . "\", true, false, false).createDatabase()
+
+	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+
+	if FileExist(database ".zip")
+		archives.Push(database ".zip")
+
+	updateProgress("Processing [No Strategies | Setups | Pressures]...")
+
+	database := (outputDirectory . "110." . version1 . "." . version2)
+
+	new DatabaseCreator(inputDirectory, database . "\", true, false, true).createDatabase()
 
 	RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
 

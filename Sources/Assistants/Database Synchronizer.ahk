@@ -165,7 +165,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 
 													if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
 													 || !getConfigurationValue(info, "Access", "Share", false))
-														deleteFile(directory . getConfigurationValue(info, "Strategy", "Name"))
+														deleteFile(directory . getConfigurationValue(info, "Setup", "Name"))
 
 													deleteFile(A_LoopFilePath)
 
@@ -274,14 +274,14 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
 
+		sessionDB := new SessionDatabase()
+
 		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
 			SplitPath fileName, , , , databaseDirectory
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
-			if (type = (downloadPressures . downloadSetups)) {
-				sessionDB := new SessionDatabase()
-
+			if ((type = (downloadPressures . downloadSetups . downloadStrategies)) || (type = (downloadPressures . downloadSetups))) {
 				if (sessionDB.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 

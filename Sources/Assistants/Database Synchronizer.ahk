@@ -45,7 +45,7 @@
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-uploadSessionDatabase(id, uploadPressures, uploadSetups) {
+uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 	local sessionDB := new SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
@@ -176,6 +176,35 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 										logError(exception)
 									}
 								}
+
+								if uploadStrategies {
+									try {
+										directory = %sessionDBPath%User\%simulator%\%car%\%track%\Race Strategies
+
+										if FileExist(directory)
+											FileCopyDir %directory%, %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Race Strategies
+
+											directory = %kTempDirectory%Shared Database\Community\%simulator%\%car%\%track%\Race Strategies\
+
+											loop Files, %directory%*.info, F
+											{
+												SplitPath A_LoopFileName, , , , name
+
+												info := sessionDB.readStrategyInfo(simulator, car, track, name)
+
+												if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
+												 || !getConfigurationValue(info, "Access", "Share", false))
+													deleteFile(directory . getConfigurationValue(info, "Strategy", "Name"))
+
+												deleteFile(A_LoopFilePath)
+
+												Sleep 1
+											}
+									}
+									catch exception {
+										logError(exception)
+									}
+								}
 							}
 						}
 					}
@@ -206,7 +235,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 	}
 }
 
-downloadSessionDatabase(id, downloadPressures, downloadSetups) {
+downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies) {
 	local sessionDB := new SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
@@ -292,12 +321,12 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups) {
 	}
 }
 
-synchronizeCommunityDatabase(id, usePressures, useSetups) {
+synchronizeCommunityDatabase(id, usePressures, useSetups, useStrategies) {
 	synchronizeDatabase("Stop")
 
 	try {
-		uploadSessionDatabase(id, usePressures, useSetups)
-		downloadSessionDatabase(id, usePressures, useSetups)
+		uploadSessionDatabase(id, usePressures, useSetups, useStrategies)
+		downloadSessionDatabase(id, usePressures, useSetups, useStrategies)
 	}
 	finally {
 		synchronizeDatabase("Start")
@@ -323,20 +352,21 @@ synchronizeSessionDatabase(minutes) {
 
 updateSessionDatabase() {
 	local icon := kIconsDirectory . "Database Update.ico"
-	local usePressures, useSetups, id, minutes, configuration
+	local usePressures, useSetups, useStrategies, id, minutes, configuration
 
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Database Synchronizer
 
 	usePressures := (inList(A_Args, "-Pressures") != 0)
 	useSetups := (inList(A_Args, "-Setups") != 0)
+	useStrategies := (inList(A_Args, "-Strategies") != 0)
 
 	id := inList(A_Args, "-ID")
 
 	if id {
 		id := A_Args[id + 1]
 
-		new PeriodicTask(Func("synchronizeCommunityDatabase").Bind(id, usePressures, useSetups), 10000, kLowPriority).start()
+		new PeriodicTask(Func("synchronizeCommunityDatabase").Bind(id, usePressures, useSetups, useStrategies), 10000, kLowPriority).start()
 	}
 
 	minutes := inList(A_Args, "-Synchronize")

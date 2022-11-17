@@ -1492,7 +1492,7 @@ class SessionDatabase extends ConfigurationItem {
 		setConfigurationValue(info, "Access", "Share", share)
 		setConfigurationValue(info, "Access", "Synchronize", synchronize)
 
-		this.writeSetupInfo(simulator, car, track, type, name, info)
+		this.writeSetupInfo(simulator, car, track, name, info)
 	}
 
 	writeStrategyInfo(simulator, car, track, name, info) {

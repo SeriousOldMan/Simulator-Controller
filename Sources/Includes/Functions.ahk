@@ -310,7 +310,7 @@ requestShareSessionDatabaseConsent() {
 }
 
 startDatabaseSynchronizer() {
-	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, options, consent
+	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, shareRaceStrategies, options, consent
 
 	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
 		Process Exist, Database Synchronizer.exe
@@ -329,6 +329,7 @@ startDatabaseSynchronizer() {
 
 				shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
 				shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+				shareRaceStrategies := (getConfigurationValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
 
 				options := ("-ID """ . ID . """ -Synchronize " . true)
 
@@ -337,6 +338,9 @@ startDatabaseSynchronizer() {
 
 				if shareCarSetups
 					options .= " -Setups"
+
+				if shareRaceStrategies
+					options .= " -Strategies"
 
 				try {
 					Run %kBinariesDirectory%Database Synchronizer.exe %options%

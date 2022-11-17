@@ -564,7 +564,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iStrategyListView := listViewHandle
 
-		Gui %window%:Add, Button, xp+260 yp+304 w23 h23 HwnduploadStrategyButtonHandle guploadStrategy vuploadStrategyButton
+		Gui %window%:Add, Button, xp+260 yp+328 w23 h23 HwnduploadStrategyButtonHandle guploadStrategy vuploadStrategyButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadStrategyButtonHandle gdownloadStrategy vdownloadStrategyButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameStrategyButtonHandle grenameStrategy vrenameStrategyButton
 		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteStrategyButtonHandle gdeleteStrategy vdeleteStrategyButton

@@ -1272,7 +1272,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
-			 , driver := "__Undefined__", identifier := "__Undefined__", synchronized := "__Undefined__") {
+			 , driver := "__Undefined__", identifier := "__Undefined__", synchronized := false) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
@@ -1303,8 +1303,7 @@ class SessionDatabase extends ConfigurationItem {
 		if (identifier != kUndefined)
 			setConfigurationValue(info, "Setup", "Identifier", identifier)
 
-		if (synchronized != kUndefined)
-			setConfigurationValue(info, "Setup", "Synchronized", synchronized)
+		setConfigurationValue(info, "Setup", "Synchronized", synchronized)
 
 		setConfigurationValue(info, "Setup", "Size", size)
 

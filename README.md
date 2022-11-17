@@ -33,19 +33,19 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.4.7.0-release](https://cutt.ly/kMoBACn) (New features: New notes field for car setups in "Race Center", Fixed driver statistics regression in "Race Center", Full support for multi-class races in all tools of Simulator Controller, "Server Administration" remembers server URL and login name.)
+[4.4.8.0-release](https://www.dropbox.com/s/10ugm2q3ya0aek0/Simulator%20Controller%204.4.8.0-release.zip?dl=1) (New features: New synchronization support for car setups and race strategies in the Team Server data connection, Multiple data connections are now supported for Team Server, Fixed end of race detection for fixed-lap races in rFactor 2, Race Assistant configuration can be synchronized by a click of a button, Optical enhancements for the launch pad of "Simulator Startup", "Simulator Setup" can be configured to jump to a specific page on startup, Support for fixed refueling time in all applications, Introduced new "Debug" log level, Fixed installation of Spanish speech recognition library, New car models for "Setup Advisor".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-447) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
+
+[4.4.7.0-release](https://cutt.ly/kMoBACn) (New features: New notes field for car setups in "Race Center", Fixed driver statistics regression in "Race Center", Full support for multi-class races in all tools of Simulator Controller, "Server Administration" remembers server URL and login name.)
 
 [4.4.6.0-release](https://cutt.ly/UNLf1ii) (New features: Spanish grammars for all Race Assistants thanks to Jose Krilin, All map and caster values are now available in "Setup Advisor" for *Assetto Corsa Competizione* cars, Fixed a download error in automated update procedure, Updated speech synthesizier and recognizer libraries, Simple tyre compounds now all use the suffix "(Black)", Both median and mean values are now shown in the pace report, New alternative pace report in "Race Reports".)
 
 #### Latest development build
 
-[4.4.8.0-beta](https://www.dropbox.com/s/mcj1dj1kl5o2mo0/Simulator%20Controller%204.4.8.0-beta.zip?dl=1) (Test build for 4.4.8. New features: New synchronization support for car setups and race strategies in the Team Server data connection, Multiple data connections are now supported for Team Server, Fixed end of race detection for fixed-lap races in rFactor 2, Race Assistant configuration can be synchronized by a click of a button, Optical enhancements for the launch pad of "Simulator Startup", "Simulator Setup" can be configured to jump to a specific page on startup, Support for fixed refueling time in all applications, Introduced new "Debug" log level, Fixed installation of Spanish speech recognition library, New car models for "Setup Advisor".)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

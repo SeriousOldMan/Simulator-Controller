@@ -657,7 +657,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 5
 
-		this.iTrackDisplayArea := [297, 239, 358, 303, 0, 0]
+		this.iTrackDisplayArea := [297, 239, 358, 350, 0, 0]
 
 		Gui %window%:Add, Picture, x296 y238 w360 h352 Border
 		Gui %window%:Add, Picture, x297 y239 w358 h350 HWNDtrackDisplay vtrackDisplay gselectTrackAction

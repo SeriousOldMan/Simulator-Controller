@@ -227,8 +227,10 @@ int main(int argc, char* argv[])
 			if (map_buffer->session_type != R3E_SESSION_PRACTICE && map_buffer->session_length_format == R3E_SESSION_LENGTH_LAP_BASED &&
 				map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps) <= 0)
 				wprintf_s(L"Session=Finished\n");
+			/*
 			else if (map_buffer->flags.checkered)
 				wprintf_s(L"Session=Finished\n");
+			*/
 			else if (map_buffer->session_type == R3E_SESSION_QUALIFY)
 				wprintf_s(L"Session=Qualification\n");
 			else if (map_buffer->session_type == R3E_SESSION_RACE)

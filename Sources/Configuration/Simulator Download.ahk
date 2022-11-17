@@ -215,6 +215,8 @@ downloadSimulatorController() {
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")
 				OnMessage(0x44, "")
+
+				Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
 			}
 
 			Sleep 1000

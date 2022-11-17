@@ -137,6 +137,13 @@ Three files will be created by the *Simulator Setup* tool at the end of the inst
 
 As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by "Simulator Setup". Please note, that each configuration change that you make with the "Simulator Configuration" tool, which is described in the following sections, will be overwritten, if you ever use "Simulator Setup" afterwards.
 
+Good to know: As said, you can run "Simulator Setup" as often as necessary. During later configuration sessions it might be benefical to skip the initial pages automatically on startup. To do this, you can enter the following two lines into the file "Application Settings.ini" in the *Simulator Controller\Config* folder which resides in the user *Documents* folder:
+
+	[Simulator Setup]
+	StartPage=X
+
+Replace *X* with the number of the page you want to jump to on startup.
+
 ### Presets & Special Configurations
 
 "Simulator Setup" provides a selection of presets for otherwise time-consuming configuration steps. These are mostly pre-configured layouts for Button Boxes and Stream Decks. Even if you do not find your particular layout here, it might be even helpful to start with one of these preconfigured layouts instead of starting from scratch. Simply select the one that fits best.
@@ -418,6 +425,8 @@ Choose the simulator with the topmost dropdown menu, before you change one of th
 
 The third group allows you to customize some parts of the statistical algorithms of Jona, the Virtual Race Engineer. The first field defines the number of laps, Jona uses to populate its data collection. During this period, most of the functions of Jona are not available, but the predictions of dynamic values, like cold tyre pressures, will be much more precise afterwards. The second field, *Statistical Window*, is also quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of tyre pressures. If you set this to **0**, almost all statistical calculations will fail, what e.g. means that tyre pressures will not be adjusted during a pitstop. The next field, *Damping Factor*, can be used to influence the calculation weight for each of those recent laps. If you want all laps to be considered with equal weight, set this to *0*, whereas a value o *0.2* will weigh each lap with *20%* less than the more recent lap before. *Adjust Lap Time* will inform Jona to use the lap time from the *Race Settings* for special laps like the first one or the lap after a pitstop and the last field *Damage Analysis* defines the number of laps, Jona oberves your lap times after you collected some damage.
 
+Good to know: The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators. But be aware, that not all simulators might supprt all settings combinations, for example, loading of tyre pressures from the simulation is only supported by *Assetto Corsa Competizione* and *rFactor 2*.
+
 ### Tab *Race Strategist*
 
 Similar as with the tab for the *Race Engineer*, the dynamic behaviour of the [Virtual Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist) can be customized here. All options can be chosen independently for each configured simulation game.
@@ -428,6 +437,8 @@ In the first field, you can select a folder, where the *Race Strategist* will sa
 With the "Save Telemetry" setting you specify, whether the telemetry data of the last session will be saved for further analysis in the "Strategy Workbench" tool. Although possible, I do not recommend to use “Ask” here, since it might interfere with a similar question by the Race Engineer to save your tyre pressures. Last, but not least, the "Race Review" drop down allows you to enable or disable a spoken review issued by the Race Strategist, when you have finished your race.
 
 Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the Virtual Race Strategist as well, as long as no other Assistants are active.
+
+Good to know: The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators.
 
 ### Tab *Race Spotter*
 
@@ -440,6 +451,8 @@ You can customize some parts of the statistical algorithms of Elisa, the Virtual
 Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the Virtual Race Spotter as well, as long as no other Assistants are active.
 
 In the second group of fields labeled *Announcements*, you can enable or disable the individual messages and announcements of Elisa for the driver. If you don't like, for example, the alerts of Elisa that another car is directly behind you, you can simply switch it off. Most announcements can only be enabled or disabled, but for the periodic distance information regarding your direct opponents you can set the number of laps between each update as well. You can even choose an update each sector, if you want the Spotter to be really verbose. For more information about the individual announcements and alerts, please see the [Spotter documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#alerts--information).
+
+Good to know: The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators.
 
 ### Tab *Team Server*
 

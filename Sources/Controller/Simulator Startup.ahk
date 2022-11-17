@@ -412,10 +412,15 @@ launchPad(command := false, arguments*) {
 	else if (command = "Launch") {
 		application := arguments[1]
 
-		Run %kBinariesDirectory%%application%
+		Process Exist, %application%
+
+		if ErrorLevel
+			WinActivate ahk_exe %application%
+		else
+			Run %kBinariesDirectory%%application%
 
 		if arguments[2]
-		 	ExitApp 0
+			ExitApp 0
 	}
 	else if (command = "Startup") {
 		GuiControlGet closeCheckBox
@@ -501,6 +506,8 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Text, x8 yp+26 w590 0x10
 
+		Gui LP:Font, s7 Norm, Arial
+
 		Gui LP:Add, Picture, x16 yp+24 w60 h60 Section vStartup glaunchStartup, % kIconsDirectory . "Startup.ico"
 
 		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceReports glaunchApplication, % kIconsDirectory . "Chart.ico"
@@ -510,8 +517,15 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Picture, xp+150 yp w60 h60 vSystemMonitor glaunchApplication, % kIconsDirectory . "Monitoring.ico"
 
+		Gui LP:Add, Text, x16 yp+64 w60 h40 Center, Startup
+		Gui LP:Add, Text, xp+90 yp w60 h40 Center, Race Reports
+		Gui LP:Add, Text, xp+74 yp w60 h40 Center, Strategy Workbench
+		Gui LP:Add, Text, xp+110 yp w60 h40 Center, Race Center
+		Gui LP:Add, Text, xp+74 yp w60 h40 Center, Server Administration
+		Gui LP:Add, Text, xp+150 yp w60 h40 Center, System Monitor
+
 		; Gui LP:Add, Picture, x16 ys+74 w60 h60 vSimulatorSettings glaunchApplication, % kIconsDirectory . "Settings.ico"
-		Gui LP:Add, Picture, x16 ys+74 w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
+		Gui LP:Add, Picture, x16 ys+104 w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
 		Gui LP:Add, Picture, xp+90 yp w60 h60 vRaceSettings glaunchApplication, % kIconsDirectory . "Race Settings.ico"
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vSessionDatabase glaunchApplication, % kIconsDirectory . "Session Database.ico"
 		; Gui LP:Add, Picture, xp+164 yp w60 h60 vSetupAdvisor glaunchApplication, % kIconsDirectory . "Setup.ico"
@@ -520,9 +534,16 @@ launchPad(command := false, arguments*) {
 		Gui LP:Add, Picture, xp+74 yp w60 h60 vSimulatorConfiguration glaunchApplication, % kIconsDirectory . "Configuration.ico"
 		Gui LP:Add, Picture, xp+150 yp w60 h60 vSimulatorDownload glaunchSimulatorDownload, % kIconsDirectory . "Installer.ico"
 
+		Gui LP:Add, Text, x16 yp+64 w60 h40 Center, Setup Advisor
+		Gui LP:Add, Text, xp+90 yp w60 h40 Center, Race Settings
+		Gui LP:Add, Text, xp+74 yp w60 h40 Center, Session Database
+		Gui LP:Add, Text, xp+110 yp w60 h40 Center, Simulator Setup
+		Gui LP:Add, Text, xp+74 yp w60 h40 Center, Simulator Configuration
+		Gui LP:Add, Text, xp+150 yp w60 h40 Center, Simulator Download
+
 		Gui LP:Font, s8 Norm, Arial
 
-		Gui LP:Add, Text, x8 yp+80 w590 0x10
+		Gui LP:Add, Text, x8 yp+40 w590 0x10
 
 		startupConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 

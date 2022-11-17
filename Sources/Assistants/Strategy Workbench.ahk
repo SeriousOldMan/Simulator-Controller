@@ -96,7 +96,9 @@ global tyreSetDeleteButton
 
 global pitstopDeltaEdit := 60
 global pitstopTyreServiceEdit := 30
+global pitstopFuelServiceRuleDropDown := "Dynamic"
 global pitstopFuelServiceEdit := 1.2
+global pitstopFuelServiceLabel
 global pitstopServiceDropDown
 global fuelCapacityEdit := 125
 global safetyFuelEdit := 5
@@ -636,14 +638,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		x := 32
 		x0 := x - 4
-		x1 := x + 94
+		x1 := x + 114
 		x2 := x1 + 32
 		x3 := x2 + 26
 		x4 := x1 + 16
 
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w390 h171, % translate("Pitstop")
+		Gui %window%:Add, GroupBox, -Theme x24 ys+34 w410 h171, % translate("Pitstop")
 
 		Gui %window%:Font, Norm, Arial
 
@@ -657,9 +659,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80, %pitstopTyreServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Seconds (Change four tyres)")
 
-		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Refuel Service")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VpitstopFuelServiceEdit gvalidatePitstopFuelService, %pitstopFuelServiceEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Seconds (Refuel of 10 litres)")
+		Gui %window%:Add, DropDownList, x%x0% yp+20 w110 AltSubmit Choose2 VpitstopFuelServiceRuleDropdown gchooseRefuelService, % values2String("|", map(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
+
+		Gui %window%:Add, Edit, x%x1% yp w50 h20 VpitstopFuelServiceEdit gvalidatePitstopFuelService, %pitstopFuelServiceEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w220 h20 VpitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
 
 		Gui %window%:Add, Text, x%x% yp+24 w160 h23, % translate("Service")
 		Gui %window%:Add, DropDownList, x%x1% yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
@@ -1639,7 +1642,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	loadCompound(compound, force := false) {
 		local window
 		local compoundColor
-		
+
 		if compound
 			compound := normalizeCompound(compound)
 
@@ -1755,8 +1758,21 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , pitstopTyreServiceEdit, % strategy.PitstopTyreService
 
 							pitstopFuelServiceEdit := strategy.PitstopFuelService
-							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 
+							if IsObject(pitstopFuelServiceEdit) {
+								pitstopFuelServiceRuleDropDown := (1 + (pitstopFuelServiceEdit[1] != "Fixed"))
+								GuiControl Choose, pitstopFuelServiceRuleDropDown, % pitstopFuelServiceRuleDropDown
+
+								GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopFuelServiceRuleDropDown])
+
+								pitstopFuelServiceEdit := pitstopFuelServiceEdit[2]
+							}
+							else {
+								GuiControl Choose, pitstopFuelServiceRuleDropDown, % 2
+								GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
+							}
+
+							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 							GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2
 							GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
 							GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
@@ -1949,9 +1965,24 @@ class StrategyWorkbench extends ConfigurationItem {
 								GuiControl, , pitstopDeltaEdit, % getConfigurationValue(settings, "Strategy Settings", "Pitstop.Delta", 60)
 								GuiControl, , pitstopTyreServiceEdit, % getConfigurationValue(settings, "Strategy Settings", "Service.Tyres", 30)
 
-								pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5)
-								GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+								pitstopFuelServiceEdit := string2Values(":", getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", 1.5))
 
+								if (pitstopFuelServiceEdit.Length() = 1) {
+									pitstopFuelServiceEdit := pitstopFuelServiceEdit[1]
+
+									GuiControl Choose, pitstopFuelServiceRuleDropDown, % 2
+									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
+								}
+								else {
+									pitstopFuelServiceRuleDropDown := (1 + (pitstopFuelServiceEdit[1] != "Fixed"))
+
+									GuiControl Choose, pitstopFuelServiceRuleDropDown, % pitstopFuelServiceRuleDropDown
+									GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopFuelServiceRuleDropDown])
+
+									pitstopFuelServiceEdit := pitstopFuelServiceEdit[2]
+								}
+
+								GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 								GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2
 								GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
 
@@ -2002,6 +2033,15 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							if (getConfigurationValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined) {
 								pitstopFuelServiceEdit := getConfigurationValue(settings, "Strategy Settings", "Service.Refuel")
+
+								if (getConfigurationValue(settings, "Strategy Settings", "Service.Refuel.Rule", false) = "Fixed") {
+									GuiControl Choose, pitstopFuelServiceRuleDropDown, % 1
+									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds")
+								}
+								else {
+									GuiControl Choose, pitstopFuelServiceRuleDropDown, % 2
+									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
+								}
 
 								GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
 							}
@@ -2209,12 +2249,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		local simulator := this.SelectedSimulator
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
+		local sessionDB := new SessionDatabase()
 		local strategy, strategies, simulatorCode, dirName, fileName, configuration, title, name, files, directory
-		local sessionDB
 
 		if (simulator && car && track) {
-			sessionDB := new SessionDatabase()
-
 			directory := sessionDB.DatabasePath
 			simulatorCode := sessionDB.getSimulatorCode(simulator)
 
@@ -2282,6 +2320,14 @@ class StrategyWorkbench extends ConfigurationItem {
 						this.SelectedStrategy.saveToConfiguration(configuration)
 
 						writeConfiguration(fileName, configuration)
+
+						if ((StrLen(dirName) > 0) && (InStr(fileName, dirName) = 1)) {
+							info := sessionDB.readStrategyInfo(simulator, car, track, name . ".strategy")
+
+							setConfigurationValue(info, "Strategy", "Synchronized", false)
+
+							sessionDB.writeStrategyInfo(simulator, car, track, name . ".strategy", info)
+						}
 					}
 				}
 			case 7: ; "Compare Strategies..."
@@ -2639,6 +2685,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		GuiControlGet pitstopDeltaEdit
 		GuiControlGet pitstopTyreServiceEdit
+		GuiControlGet pitstopFuelServiceRuleDropDown
 		GuiControlGet pitstopFuelServiceEdit
 		GuiControlGet pitstopServiceDropDown
 
@@ -2648,7 +2695,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		fuelCapacity := fuelCapacityEdit
 		safetyFuel := safetyFuelEdit
 		pitstopDelta := pitstopDeltaEdit
-		pitstopFuelService := pitstopFuelServiceEdit
+		pitstopFuelService := [["Fixed", "Dynamic"][pitstopFuelServiceRuleDropDown], pitstopFuelServiceEdit]
 		pitstopTyreService := pitstopTyreServiceEdit
 		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
@@ -2939,6 +2986,12 @@ readSimulatorData(simulator) {
 		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration..."), {simulator: simulator, protocol: "SHM", exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
+}
+
+chooseRefuelService() {
+	GuiControlGet pitstopFuelServiceRuleDropdown
+
+	GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopFuelServiceRuleDropdown])
 }
 
 validatePitstopRule(full := false) {
@@ -3396,7 +3449,7 @@ filterSchema(schema) {
 	local ignore, column
 
 	for ignore, column in schema
-		if !inList(["Driver", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
+		if !inList(["Driver", "Identifier", "Synchronized", "Weather", "Tyre.Compound", "Tyre.Compound.Color"], column)
 			newSchema.Push(column)
 
 	return newSchema
@@ -3604,7 +3657,7 @@ chooseTyreSet() {
 
 		LV_GetText(compound, A_EventInfo, 1)
 		LV_GetText(count, A_EventInfo, 2)
-		
+
 		if compound
 			compound := normalizeCompound(compound)
 

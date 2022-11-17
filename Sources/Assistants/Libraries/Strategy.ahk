@@ -2355,7 +2355,11 @@ class Strategy extends ConfigurationItem {
 		this.iStintLength := getConfigurationValue(configuration, "Session", "StintLength", 0)
 
 		this.iPitstopDelta := getConfigurationValue(configuration, "Settings", "PitstopDelta", 0)
-		this.iPitstopFuelService := getConfigurationValue(configuration, "Settings", "PitstopFuelService", 0.0)
+		this.iPitstopFuelService := string2Values(":", getConfigurationValue(configuration, "Settings", "PitstopFuelService", 0.0))
+
+		if (this.iPitstopFuelService.Length() = 1)
+			this.iPitstopFuelService := this.iPitstopFuelService[1]
+
 		this.iPitstopTyreService := getConfigurationValue(configuration, "Settings", "PitstopTyreService", 0.0)
 		this.iPitstopServiceOrder := getConfigurationValue(configuration, "Settings", "PitstopServiceOrder", "Simultaneous")
 
@@ -2448,7 +2452,12 @@ class Strategy extends ConfigurationItem {
 		setConfigurationValue(configuration, "Settings", "SafetyFuel", this.SafetyFuel)
 
 		setConfigurationValue(configuration, "Settings", "PitstopDelta", this.PitstopDelta)
-		setConfigurationValue(configuration, "Settings", "PitstopFuelService", this.PitstopFuelService)
+
+		if IsObject(this.PitstopFuelService)
+			setConfigurationValue(configuration, "Settings", "PitstopFuelService", values2String(":", this.PitstopFuelService*))
+		else
+			setConfigurationValue(configuration, "Settings", "PitstopFuelService", this.PitstopFuelService)
+
 		setConfigurationValue(configuration, "Settings", "PitstopTyreService", this.PitstopTyreService)
 		setConfigurationValue(configuration, "Settings", "PitstopServiceOrder", this.PitstopServiceOrder)
 
@@ -2709,7 +2718,14 @@ class Strategy extends ConfigurationItem {
 
 	calcPitstopDuration(refuelAmount, changeTyres) {
 		local tyreService := (changeTyres ? this.PitstopTyreService : 0)
-		local refuelService := ((refuelAmount / 10) * this.PitstopFuelService)
+		local refuelService := this.PitstopFuelService
+
+		if refuelService is Number
+			refuelService := ((refuelAmount / 10) * refuelService)
+		else if (refuelService[1] = "Fixed")
+			refuelService := refuelService[2]
+		else
+			refuelService := ((refuelAmount / 10) * refuelService[2])
 
 		return (this.PitstopDelta + ((this.PitstopServiceOrder = "Simultaneous") ? Max(tyreService, refuelService) : (tyreService + refuelService)))
 	}

@@ -204,8 +204,10 @@ namespace RF2SHMProvider {
 
 				if (scoring.mScoringInfo.mEndET <= 0.0 && (scoring.mScoringInfo.mMaxLaps - playerScoring.mTotalLaps) <= 0)
 					session = "Finished";
+				/*
 				else if (scoring.mScoringInfo.mGamePhase == (byte)SessionOver)
 					session = "Finished";
+				*/
 				else if (scoring.mScoringInfo.mSession >= 10 && scoring.mScoringInfo.mSession <= 13)
 					session = "Race";
 				else if (scoring.mScoringInfo.mSession >= 0 && scoring.mScoringInfo.mSession <= 4)
@@ -377,7 +379,9 @@ namespace RF2SHMProvider {
 			else {
 				if (playerScoring.mLastLapTime > 0)
 					return (long)Math.Round(GetRemainingTime(ref playerScoring) / (Normalize(playerScoring.mLastLapTime) * 1000)) + 1;
-				else
+				else if (playerScoring.mEstimatedLapTime > 0)
+                    return (long)Math.Round(GetRemainingTime(ref playerScoring) / (Normalize(playerScoring.mEstimatedLapTime) * 1000)) + 1;
+                else
 					return 1;
 			}
 		}
@@ -400,8 +404,14 @@ namespace RF2SHMProvider {
 				return (long)Math.Max(0, scoring.mScoringInfo.mEndET - scoring.mScoringInfo.mCurrentET);
 			}
 			else
-				return (long)(GetRemainingLaps(ref playerScoring) *
-							  Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime : playerScoring.mBestLapTime) * 1000);
+			{
+				if (playerScoring.mLastLapTime > 0)
+                    return (long)(GetRemainingLaps(ref playerScoring) * playerScoring.mLastLapTime * 1000);
+				else if (playerScoring.mEstimatedLapTime > 0)
+                    return (long)(GetRemainingLaps(ref playerScoring) * playerScoring.mEstimatedLapTime * 1000);
+                else
+                    return (long)(GetRemainingLaps(ref playerScoring) * playerScoring.mBestLapTime * 1000);
+            }
 		}
 
 		private static string GetWeather(double cloudLevel, double rainLevel) {

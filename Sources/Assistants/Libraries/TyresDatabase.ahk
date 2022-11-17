@@ -469,11 +469,16 @@ class TyresDatabase extends SessionDatabase {
 				database.changed("Tyres.Pressures.Distribution")
 		}
 		else
-			database.add("Tyres.Pressures.Distribution"
-					   , {Driver: driver, Weather: weather
-					    , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-					    , Compound: compound, "Compound.Color": compoundColor
-						, Type: type, Tyre: tyre, "Pressure": pressure, Count: count})
+			try {
+				database.add("Tyres.Pressures.Distribution"
+						   , {Driver: driver, Weather: weather
+							, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+							, Compound: compound, "Compound.Color": compoundColor
+							, Type: type, Tyre: tyre, "Pressure": pressure, Count: count})
+			}
+			catch exception {
+				logError(exception)
+			}
 	}
 
 	flush() {

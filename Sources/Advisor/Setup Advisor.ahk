@@ -2673,12 +2673,16 @@ class SetupComparator extends ConfigurationItem {
 							if ((lastValueAB + (delta / 2)) > targetAB)
 								valueAB := lastValueAB
 						}
+
 						break
 					}
 					else {
 						lastValueAB := valueAB
 
 						valueAB := handler.increaseValue(valueAB)
+
+						if (valueAB = lastValueAB)
+							break
 					}
 				}
 

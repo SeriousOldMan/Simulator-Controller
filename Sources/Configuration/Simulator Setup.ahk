@@ -588,7 +588,7 @@ class SetupWizard extends ConfigurationItem {
 	show(reset := false) {
 		local wizardWindow := this.WizardWindow
 		local helpWindow := this.HelpWindow
-		local x, y, posX
+		local x, y, posX, settings
 
 		if getWindowPosition("Simulator Setup", x, y)
 			Gui %wizardWindow%:Show, x%x% y%y%
@@ -605,6 +605,11 @@ class SetupWizard extends ConfigurationItem {
 
 			Gui %helpWindow%:Show, x800 x%posX% yCenter h610
 		}
+
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		loop % getConfigurationValue(settings, "Simulator Setup", "StartPage", 0)
+			this.nextPage()
 	}
 
 	hide() {
@@ -2548,7 +2553,6 @@ initializeSimulatorSetup() {
 
 startupSimulatorSetup() {
 	local wizard := SetupWizard.Instance
-	local preset, previous
 
 	wizard.loadDefinition()
 

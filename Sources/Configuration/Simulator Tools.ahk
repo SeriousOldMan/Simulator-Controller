@@ -1651,6 +1651,29 @@ updateInstallationForV392() {
 	}
 }
 
+updateConfigurationForV448() {
+	local data, count
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		data := readConfiguration(kUserHomeDirectory . "Setup\Setup.data")
+		count := getConfigurationValue(data, "Setup", "Module.Voice Control.Components", 0)
+
+		loop %count%
+			if (getConfigurationValue(data, "Setup", "Module.Voice Control.Component." . A_Index, false) = "MSSpeechLibrary_es-ES")
+				return
+
+		setConfigurationValue(data, "Setup", "Module.Voice Control.Component." . ++count, "MSSpeechLibrary_es-ES")
+		setConfigurationValue(data, "Setup", "Module.Voice Control.Component." . ++count, "NirCmd")
+		setConfigurationValue(data, "Setup", "Module.Voice Control.Components", count)
+		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.MSSpeechLibrary_es-ES.Optional", true)
+		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.MSSpeechLibrary_es-ES.Required", false)
+		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.NirCmd.Optional", true)
+		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.NirCmd.Required", false)
+
+		writeConfiguration(kUserHomeDirectory . "Setup\Setup.data", data)
+	}
+}
+
 updateConfigurationForV441() {
 	deleteFile(kUserConfigDirectory . "Simulator Controller.config")
 	deleteFile(kUserConfigDirectory . "Simulator Controller.status")

@@ -117,38 +117,41 @@ class DatabaseCreator {
 		{
 			simulator := A_LoopFileName
 
-			loop Files, %databaseDirectory%%simulator%\*.*, D					; Car
-			{
-				car := A_LoopFileName
+			if ((simulator = "1") || (simulator = "Unknown"))
+				deleteDirectory(databaseDirectory . simulator)
+			else
+				loop Files, %databaseDirectory%%simulator%\*.*, D					; Car
+				{
+					car := A_LoopFileName
 
-				if (car = "1")
-					deleteDirectory(databaseDirectory . simulator . "\" . car)
-				else
-					loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
-					{
-						track := A_LoopFileName
+					if ((car = "1") || (car = "Unknown"))
+						deleteDirectory(databaseDirectory . simulator . "\" . car)
+					else
+						loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
+						{
+							track := A_LoopFileName
 
-						if (track = "1")
-							deleteDirectory(databaseDirectory . simulator . "\" . car . "\" . track)
-						else {
-							directory = %databaseDirectory%%simulator%\%car%\%track%\
+							if ((track = "1") || (track = "Unknown"))
+								deleteDirectory(databaseDirectory . simulator . "\" . car . "\" . track)
+							else {
+								directory = %databaseDirectory%%simulator%\%car%\%track%\
 
-							if FileExist(directory . "Setup.Pressures.Distribution.CSV")
-								FileMove %directory%Setup.Pressures.Distribution.CSV, %directory%Tyres.Pressures.Distribution.CSV
+								if FileExist(directory . "Setup.Pressures.Distribution.CSV")
+									FileMove %directory%Setup.Pressures.Distribution.CSV, %directory%Tyres.Pressures.Distribution.CSV
 
-							if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
-								this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
+								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
+									this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
 
-							loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
-							{
-								type := A_LoopFileName
+								loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
+								{
+									type := A_LoopFileName
 
-								loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
-									this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
+									loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
+										this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
+								}
 							}
 						}
-					}
-			}
+				}
 		}
 	}
 
@@ -286,6 +289,8 @@ createDatabases(inputDirectory, outputDirectory) {
 }
 
 createSharedDatabases() {
+	local command, ignore, file
+
 	vProgressCount := 0
 
 	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database..."})
@@ -302,8 +307,40 @@ createSharedDatabases() {
 	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Creating Shared Database", message: "Cleaning remote repository..."})
 
 	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads")
+	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
+	ftpCreateDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
 
-	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "Cleaning remote repository..."})
+	for ignore, file in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
+		deleteFile(A_Temp . "\clearRemoteDirectory.txt")
+
+		command =
+(
+open ftpupload.net
+epiz_32854064
+d5NW1ps6jX6Lk
+cd simulator-controller
+cd database-downloads
+del %file%
+quit
+)
+		FileAppend %command%, %A_Temp%\clearRemoteDirectory.txt
+
+		deleteFile(A_Temp . "\clearRemoteDirectory.bat")
+
+		command =
+(
+ftp -s:clearRemoteDirectory.txt
+)
+
+		FileAppend %command%, %A_Temp%\clearRemoteDirectory.bat
+
+		RunWait "%A_Temp%\clearRemoteDirectory.bat", %A_Temp%, Hide
+	}
+
+	deleteFile(A_Temp . "\clearRemoteDirectory.txt")
+	deleteFile(A_Temp . "\clearRemoteDirectory.bat")
+
+	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
 
 	downloadUserDatabases(databaseDirectory . "\Input\")
 

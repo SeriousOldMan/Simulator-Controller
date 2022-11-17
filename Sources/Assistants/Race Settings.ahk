@@ -97,7 +97,9 @@ global spPitstopTyreSetEdit
 
 global fuelConsumptionEdit
 global tyrePressureDeviationEdit
+global pitstopRefuelServiceRuleDropDown
 global pitstopRefuelServiceEdit
+global pitstopRefuelServiceLabel
 
 global tpDryFrontLeftEdit
 global tpDryFrontRightEdit
@@ -703,12 +705,12 @@ restart:
 
 		newSettings := newConfiguration()
 
-		if (!isPositiveFloat(tyrePressureDeviationEdit, pitstopRefuelServiceEdit
+		if (!isPositiveFloat(tyrePressureDeviationEdit
 						   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
 						   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit
 						   , spDryFrontLeftEdit, spDryFrontRightEdit, spDryRearLeftEdit, spDryRearRightEdit
 						   , spWetFrontLeftEdit, spWetFrontRightEdit, spWetRearLeftEdit, spWetRearRightEdit)
-		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit
+		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit, pitstopRefuelServiceEdit
 							, repairBodyworkThresholdEdit, repairEngineThresholdEdit)
 		 || (trafficConsideredEdit < 1) || (trafficConsideredEdit > 100)) {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -777,6 +779,7 @@ restart:
 
 		setConfigurationValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Tyres", pitstopTyreServiceEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel.Rule", ["Fixed", "Dynamic"][pitstopRefuelServiceRuleDropDown])
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel", pitstopRefuelServiceEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Order", (pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 		setConfigurationValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
@@ -864,6 +867,7 @@ restart:
 
 		pitstopDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
 		pitstopTyreServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
+		pitstopRefuelServiceRuleDropDown := inList(["Fixed", "Dynamic"], getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
 		pitstopRefuelServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5)
 		pitstopServiceDropDown := ((getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
 		extrapolationLapsEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
@@ -1208,9 +1212,10 @@ restart:
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopTyreServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Change four tyres)")
 
-		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Refuel Service")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Refuel of 10 litres)")
+		Gui RES:Add, DropDownList, x12 yp+21 w110 AltSubmit Choose%pitstopRefuelServiceRuleDropdown% VpitstopRefuelServiceRuleDropdown gchooseRefuelService, % values2String("|", map(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
+
+		Gui RES:Add, Edit, x126 yp w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
+		Gui RES:Add, Text, x184 yp+4 w290 h20 VpitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopRefuelServiceRuleDropdown])
 
 
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
@@ -1340,6 +1345,12 @@ restart:
 
 		return result
 	}
+}
+
+chooseRefuelService() {
+	GuiControlGet pitstopRefuelServiceRuleDropdown
+
+	GuiControl, , pitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopRefuelServiceRuleDropdown])
 }
 
 validateNumber(field) {

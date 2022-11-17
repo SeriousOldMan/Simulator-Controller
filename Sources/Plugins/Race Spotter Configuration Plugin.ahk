@@ -59,7 +59,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local x0, x1, x2, x3, w1, w3, w2, x4, x5, choices, chosen
+		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, choices, chosen
 
 		Gui %window%:Font, Norm, Arial
 
@@ -74,6 +74,9 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		w2 := w1 - 24
 		x4 := x1 + w2 + 1
 
+		w4 := w1 - 24
+		x6 := x1 + w4 + 1
+
 		Gui %window%:Add, Text, x%x0% y%y% w120 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
 
 		if (this.Simulators.Length() = 0)
@@ -82,7 +85,10 @@ class RaceSpotterConfigurator extends ConfigurationItem {
  		choices := this.iSimulators
 		chosen := (choices.Length() > 0) ? 1 : 0
 
-		Gui %window%:Add, DropDownList, x%x1% yp w%w1% Choose%chosen% gchooseRaceSpotterSimulator vrspSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%x1% yp w%w4% Choose%chosen% gchooseRaceSpotterSimulator vrspSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+
+		Gui %window%:Add, Button, x%x6% yp w23 h23 Center +0x200 greplicateRSPSettings HWNDwidget31 Hidden
+		setButtonIcon(widget31, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
@@ -139,7 +145,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 
 		Gui %window%:Font, Norm, Arial
 
-		loop 30
+		loop 31
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()
@@ -188,7 +194,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 				setConfigurationValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-							  , "SessionInformation", "DeltaInformation", "TacticalAdvices", "PitWindow"]
+							  , "SessionInformation", "DeltaInformation", "DeltaInformationMethod", "TacticalAdvices", "PitWindow"]
 				setConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
@@ -310,12 +316,31 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	getSimulators() {
 		return this.Editor.getSimulators()
 	}
+
+	replicateSettings() {
+		local configuration, simulator, simulatorConfiguration
+
+		this.saveSimulatorConfiguration()
+
+		configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
+
+		for simulator, simulatorConfiguration in this.iSimulatorConfigurations
+			if (simulator != this.iCurrentSimulator)
+				for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"
+								  , "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
+								  , "SessionInformation", "DeltaInformation", "DeltaInformationMethod", "TacticalAdvices", "PitWindow"]
+					simulatorConfiguration[key] := configuration[key]
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+replicateRSPSettings() {
+	RaceSpotterConfigurator.Instance.replicateSettings()
+}
 
 validateRSPDampingFactor() {
 	local oldValue := rspDampingFactorEdit

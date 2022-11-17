@@ -1,0 +1,27 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         KTM X-Bow R                     ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "KTM X-Bow R",
+										[Electronics.TC,
+										 Aero.Wing.Front, Aero.Wing.Rear,
+										 Brake.Balance, Differential.Preload, AntiRollBar.Front, AntiRollBar.Rear,
+										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
+										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,
+										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
+										 Damper.Compression.Slow.Front.Left, Damper.Compression.Slow.Front.Right,
+										 Damper.Compression.Slow.Rear.Left, Damper.Compression.Slow.Rear.Right,
+										 Damper.Rebound.Slow.Front.Left, Damper.Rebound.Slow.Front.Right,
+										 Damper.Rebound.Slow.Rear.Left, Damper.Rebound.Slow.Rear.Right]))

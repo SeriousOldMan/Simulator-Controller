@@ -440,6 +440,8 @@ systemMonitor(command := false, arguments*) {
 			logLevel := arguments[3]
 
 			switch logLevel {
+				case kLogDebug:
+					logLevel := "Debug"
 				case kLogInfo:
 					logLevel := "Info"
 				case kLogWarn:
@@ -626,7 +628,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x590 yp w95 h23 +0x200, % translate("Log Level")
 
-		choices := ["Info", "Warn", "Critical", "Off"]
+		choices := kLogLevelNames
 		chosen := getLogLevel()
 
 		Gui SM:Add, DropDownList, x689 yp-1 w91 AltSubmit Choose%chosen% VlogLevelDropDown gchooseLogLevel, % values2String("|", map(choices, "translate")*)
@@ -813,7 +815,7 @@ updateSessionState(controllerState) {
 
 updateDataState(databaseState) {
 	local state := getConfigurationValue(databaseState, "Database Synchronizer", "State", "Disabled")
-	local html, icon, serverURL, serverToken, action, counter
+	local html, icon, serverURL, serverToken, action, counter, identifier
 
 	if kStateIcons.HasKey(state)
 		icon := kStateIcons[state]
@@ -823,23 +825,27 @@ updateDataState(databaseState) {
 	GuiControl, , dataState, %icon%
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		if !getConfigurationValue(databaseState, "Database Synchronizer", "Connected", true) {
-			serverURL := translate("Not valid")
-			serverToken := translate("Not valid")
-		}
-		else {
-			serverURL := getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL")
-			serverToken := getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken")
-		}
+		serverURL := getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
+		serverToken := getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined)
 
-		action := getConfigurationValue(databaseState, "Database Synchronizer", "Synchronization", false)
+		if !getConfigurationValue(databaseState, "Database Synchronizer", "Connected", true)
+			action := "Disconnected"
+		else
+			action := getConfigurationValue(databaseState, "Database Synchronizer", "Synchronization", false)
 
 		html := "<table>"
 
-		if (getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined) != kUndefined)
+		/*
+		identifier := getConfigurationValue(databaseState, "Database Synchronizer", "Identifier", false)
+
+		if identifier
+			html .= ("<tr><td><b>" . translate("Name:") . "</b></td><td>" . identifier . "</td></tr>")
+		*/
+
+		if (serverURL != kUndefined)
 			html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . serverURL . "</td></tr>")
 
-		if (getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined) != kUndefined)
+		if (serverToken != kUndefined)
 			html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
 
 		html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>"
@@ -866,6 +872,8 @@ updateDataState(databaseState) {
 					action := translate("Uploading community database...")
 				case "Downloading":
 					action := translate("Downloading community database...")
+				case "Disconnected":
+					action := (translate("Lost connection to the Team Server (URL: ") . serverURL . translate(")"))
 				default:
 					throw "Unknown action detected in updateDataState..."
 			}

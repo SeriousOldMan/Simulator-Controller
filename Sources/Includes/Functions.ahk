@@ -280,28 +280,21 @@ requestShareSessionDatabaseConsent() {
 					result := {}
 
 					result["TyrePressures"] := "Retry"
+					result["RaceStrategies"] := "Retry"
 					result["CarSetups"] := "Retry"
 				}
 
-				switch result["TyrePressures"] {
-					case "Yes":
-						setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Yes")
-					case "No":
-						setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "No")
-					case "Retry":
-						setConfigurationValue(newConsent, "Consent", "Share Tyre Pressures", "Undecided")
-						setConfigurationValue(newConsent, "General", "Countdown", 10)
-				}
-
-				switch result["CarSetups"] {
-					case "Yes":
-						setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Yes")
-					case "No":
-						setConfigurationValue(newConsent, "Consent", "Share Car Setups", "No")
-					case "Retry":
-						setConfigurationValue(newConsent, "Consent", "Share Car Setups", "Undecided")
-						setConfigurationValue(newConsent, "General", "Countdown", 10)
-				}
+				for type, key in {TyrePressures: "Share Tyre Pressures", RaceStrategies: "Share Race Strategies"
+																	   , CarSetups: "Share Car Setups"}
+					switch result[type] {
+						case "Yes":
+							setConfigurationValue(newConsent, "Consent", key, "Yes")
+						case "No":
+							setConfigurationValue(newConsent, "Consent", key, "No")
+						case "Retry":
+							setConfigurationValue(newConsent, "Consent", key, "Undecided")
+							setConfigurationValue(newConsent, "General", "Countdown", 10)
+					}
 
 				writeConfiguration(kUserConfigDirectory . "CONSENT", newConsent)
 			}

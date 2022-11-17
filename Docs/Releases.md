@@ -1,15 +1,20 @@
 ## 4.4.8.0-release 11/18/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration).
-  4. Multiple data connections are now supported for the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
-  5. Fixed end of race detection for fixed-lap races in rFactor 2.
-  6. Race Assistant configurations can be [synchronized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) by a click of a button.
-  7. Optical enhancements for the launch pad of "Simulator Startup".
-  8. "Simulator Setup" can be configured to [jump to a specific page on startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool).
-  9. Support for fixed refueling time during pitstops has been added to all applications. See for example the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop--service) of "Strategy Workbench" for more information.
-  11. Fixed installation of Spanish speech recognition library.
-  12. Introduced a new log level "Debug" to track down really complex problems.
+  3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration). Attention: Using this feature requires an update of the Team Server. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), if you are hosting your own Team Server.
+  4. You can now decide for each car setup individually, whether it will be [shared with the community](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#setup-repository). But as before, sharing of setups with the community generally requires your consent. If you want to review your consent, simply delete the file "CONSENT", which can be found in the *Simulator Controller\Config* folder, which is located in your user *Documents* folder. And you can also decide inidividually, whether a car setup will be synchronized with any of the connected Team Server databases (see 3. above).
+  5. Multiple data connections are now supported for the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
+  6. Fixed end of race detection for fixed-lap races in rFactor 2.
+  7. Race Assistant configurations can be [synchronized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) by a click of a button.
+  8. Optical enhancements for the launch pad of "Simulator Startup".
+  9. "Simulator Setup" can be configured to [jump to a specific page on startup](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#running-the-setup-tool).
+  10. Support for fixed refueling time during pitstops has been added to all applications. See for example the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#pitstop--service) of "Strategy Workbench" for more information.
+  12. Fixed installation of Spanish speech recognition library.
+  13. Introduced a new log level "Debug" to track down really complex problems.
+  14. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Ferrari F40
+		- KTM X-Bow R
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
 

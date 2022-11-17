@@ -136,12 +136,12 @@ consentDialog(id, consent := false) {
 	Gui CNS:Add, Text, x8 y260 w450 h23 +0x200, % translate("Your database identification key is:")
 	Gui CNS:Add, Edit, x460 y260 w332 h23 -VScroll ReadOnly Center, % id
 
-	Gui CNS:Add, Text, x8 y300 w450 h23 +0x200, % translate("Do you want to share your local tyre pressure data?")
+	Gui CNS:Add, Text, x8 y300 w450 h23 +0x200, % translate("Do you want to share your tyre pressure data?")
 
 	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Undecided"))
 	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose%chosen% VtyrePressuresConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
 
-	Gui CNS:Add, Text, x8 y324 w450 h23 +0x200, % translate("Do you want to share your local car setup data?")
+	Gui CNS:Add, Text, x8 y324 w450 h23 +0x200, % translate("Do you want to share your car setup data?")
 
 	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided"))
 	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose%chosen% VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)

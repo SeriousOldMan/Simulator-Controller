@@ -87,7 +87,12 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 		{
 			simulator := A_LoopFileName
 
-			if (simulator != "Unknown") {
+			if ((simulator = "1") || (simulator = "Unknown")) {
+				directory = %sessionDBPath%User\%simulator%
+
+				deleteDirectory(directory)
+			}
+			else {
 				FileCreateDir %kTempDirectory%Shared Database\Community\%simulator%
 
 				loop Files, %sessionDBPath%User\%simulator%\*.*, D					; Car

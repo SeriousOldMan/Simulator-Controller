@@ -161,11 +161,11 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups) {
 												{
 													SplitPath A_LoopFileName, , , , name
 
-													info := sessionDB.readSetupInfo(simulator, car, track, name)
+													info := sessionDB.readSetupInfo(simulator, car, track, type, name)
 
 													if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
 													 || !getConfigurationValue(info, "Access", "Share", false))
-														deleteFile(directory . getConfigurationValue(info, "Strategy", "Name"))
+														deleteFile(directory . getConfigurationValue(info, "Setup", "Name"))
 
 													deleteFile(A_LoopFilePath)
 

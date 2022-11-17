@@ -294,20 +294,21 @@ createDatabases(inputDirectory, outputDirectory) {
 				}
 
 	for setupsLabel, setupsEnabled in {Setups: true, "No Setups": false}
-		for pressuresLabel, pressuresEnabled in {Pressures: true, "No Pressures": false} {
-			updateProgress("Processing [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
+		for pressuresLabel, pressuresEnabled in {Pressures: true, "No Pressures": false}
+			if (pressuresEnabled || setupsEnabled) {
+				updateProgress("Processing [" . setupsLabel . " | " . pressuresLabel . "]...")
 
-			type := (pressuresEnabled . setupsEnabled)
+				type := (pressuresEnabled . setupsEnabled)
 
-			database := (outputDirectory . type . "." . version1 . "." . version2)
+				database := (outputDirectory . type . "." . version1 . "." . version2)
 
-			new DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, false).createDatabase()
+				new DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, false).createDatabase()
 
-			RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
 
-			if FileExist(database ".zip")
-				archives.Push(database ".zip")
-	}
+				if FileExist(database ".zip")
+					archives.Push(database ".zip")
+			}
 
 	return archives
 }
@@ -351,7 +352,7 @@ quit
 
 		deleteFile(A_Temp . "\clearRemoteDirectory.bat")
 
-		command = "ftp -s:clearRemoteDirectory.txt"
+		command := "ftp -s:clearRemoteDirectory.txt"
 
 		FileAppend %command%, %A_Temp%\clearRemoteDirectory.bat
 

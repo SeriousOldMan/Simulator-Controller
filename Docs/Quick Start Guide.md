@@ -24,7 +24,7 @@ You propably already have understood, that Simulator Controller is a quite sophi
    
    - SoX - Although optional, I strongly recommend installing SoX for an immersive soud experience.
    
-   - NirCmd - Also optional, but strongly recommend. It used to control sound volumes, when more than one assistant tries to talk to you at the same time.
+   - NirCmd - Also optional, but strongly recommend. It is used to control sound volumes, when more than one assistant tries to talk to you at the same time.
    
    - Speech Runtime and libraries - Runtime and at least the English library should be installed.
    

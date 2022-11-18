@@ -1,4 +1,4 @@
-## 4.4.8.0-release 11/18/22 (planned)
+## 4.4.8.0-release 11/18/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration). Attention: Using this feature requires an update of the Team Server. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), if you are hosting your own Team Server.

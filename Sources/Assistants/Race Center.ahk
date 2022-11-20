@@ -5606,11 +5606,11 @@ class RaceCenter extends ConfigurationItem {
 		return newData
 	}
 
-	syncPitstopsDetails() {
+	syncPitstopsDetails(initial := false) {
 		local sessionStore := this.SessionStore
 		local lastPitstop := sessionStore.Tables["Pitstop.Data"].Length()
 		local newData := false
-		local compound, hasServiceData, hasTyreData, lastLap, startLap, state, pitstop
+		local compound, hasServiceData, hasTyreData, lastLap, startLap, startLapCandidate, state, pitstop
 		local driver, laps, compound, compoundColor, tyreSet, ignore, tyre
 
 		if (lastPitstop != 0) {
@@ -5623,13 +5623,13 @@ class RaceCenter extends ConfigurationItem {
 				if lastLap
 					lastLap := lastLap.Nr
 
-				startLap := Max(1, sessionStore.Tables["Pitstop.Data"][lastPitstop].Lap - 1)
+				startLap := (initial ? 1 : Max(1, sessionStore.Tables["Pitstop.Data"][lastPitstop].Lap - 1))
 
 				loop {
 					if ((startLap + A_Index) > lastLap)
 						break
 
-					if (hasServiceData && hasTyreData)
+					if (!initial && hasServiceData && hasTyreData)
 						break
 
 					state := false
@@ -5646,8 +5646,9 @@ class RaceCenter extends ConfigurationItem {
 
 						pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
 
-						if (pitstop = lastPitstop) {
-							if (!hasServiceData && (getConfigurationValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
+						if (pitstop <= lastPitstop) {
+							if ((initial || !hasServiceData)
+							 && (getConfigurationValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
 								hasServiceData := true
 								newData := true
 
@@ -5667,7 +5668,8 @@ class RaceCenter extends ConfigurationItem {
 												, "Engine.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Engine.Repair", false)})
 							}
 
-							if (!hasTyreData && (getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
+							if ((initial || !hasTyreData)
+							 && (getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
 								hasTyreData := true
 								newData := true
 
@@ -5902,6 +5904,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	syncSession() {
+		local initial := !this.LastLap
 		local strategy, session, window, lastLap, simulator, car, track, newLaps, newData, finished, message
 
 		static hadLastLap := false
@@ -5975,7 +5978,7 @@ class RaceCenter extends ConfigurationItem {
 				if (newLaps && this.syncPitstops())
 					newData := true
 
-				if this.syncPitstopsDetails()
+				if this.syncPitstopsDetails(initial)
 					newData := true
 
 				if (this.LastLap && (this.SelectedReport == "Track"))

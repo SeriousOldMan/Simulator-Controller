@@ -314,9 +314,11 @@ You can also choose between two different methods to further adjust tyre pressur
 
   2. Relative
   
-     Using this method will use the target pressures derived by the Virtual Race Engineer, but these values will corrected by applying the temperature corrected difference between the base pressures of the current driver and the next driver according to the stint plan. This will work best, when the reference pressures have been entered for very similar conditions.
+     Using this method will use the target pressures derived by the Virtual Race Engineer, but these values will be corrected by applying the temperature corrected difference between the base pressures of the current driver and the next driver according to the stint plan. This will work best, when the reference pressures have been entered for very similar conditions.
 
 Important: The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
+
+Also important: "Race Center" will try to guess the best possible tyre pressures using input from the AI and also from the calculation methods discussed above. But you need to take a look as well, since the software can't cope with everything, like slow punctures or sudden pressure losses cause of collisions with curbs, and so on. In these cases you might have to correct some of the recommended pressures manually to compensate for bad decisisions made by the software.
 
 #### Automatically select the next driver
 

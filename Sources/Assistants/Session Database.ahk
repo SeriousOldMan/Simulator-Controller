@@ -492,7 +492,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, s10 Bold cGray, Arial
 
 		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg2 gchooseTab2, %kIconsDirectory%Strategy.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab2 gchooseTab2, % translate("Strategy Repository")
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab2 gchooseTab2, % translate("Strategies")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
@@ -500,7 +500,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, s10 Bold cGray, Arial
 
 		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg3 gchooseTab3, %kIconsDirectory%Tools BW.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab3 gchooseTab3, % translate("Setup Repository")
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab3 gchooseTab3, % translate("Setups")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
@@ -508,7 +508,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, s10 Bold cGray, Arial
 
 		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Pressure.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Tyre Pressure Advisor")
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Tyre Pressures")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 
@@ -516,7 +516,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, s10 Bold cGray, Arial
 
 		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg5 gchooseTab5, %kIconsDirectory%Road.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab5 gchooseTab5, % translate("Automation")
+		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab5 gchooseTab5, % translate("Automations")
 
 		Gui %window%:Add, Text, x16 yp+32 w267 0x10
 

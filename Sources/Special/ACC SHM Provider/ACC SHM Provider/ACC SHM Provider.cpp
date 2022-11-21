@@ -277,9 +277,11 @@ int main(int argc, char* argv[])
 
 		double timeLeft = gf->sessionTimeLeft;
 
-		if (timeLeft < 0) {
-			timeLeft = 3600.0 * 1000;
-		}
+		if (timeLeft < 0)
+			if (gf->session == AC_PRACTICE)
+				timeLeft = 3600.0 * 1000;
+			else
+				timeLeft = 0.0;
 
 		printData("StintTimeRemaining", gf->DriverStintTimeLeft < 0 ? timeLeft : gf->DriverStintTimeLeft);
 		printData("DriverTimeRemaining", gf->DriverStintTotalTimeLeft < 0 ? timeLeft : gf->DriverStintTotalTimeLeft);
@@ -337,7 +339,10 @@ int main(int argc, char* argv[])
 		double timeLeft = gf->sessionTimeLeft;
 
 		if (timeLeft < 0)
-			timeLeft = 0;
+			if (gf->session == AC_PRACTICE)
+				timeLeft = 3600.0 * 1000;
+			else
+				timeLeft = 0.0;
 
 		printData("SessionTimeRemaining", timeLeft);
 		printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);

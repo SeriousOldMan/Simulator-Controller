@@ -242,7 +242,7 @@ initializeLoggingSystem() {
 }
 
 requestShareSessionDatabaseConsent() {
-	local idFileName, ID, consent, request, countdown, newConsent, result
+	local idFileName, ID, consent, request, countdown, newConsent, result, type, key
 
 	if !inList(A_Args, "-Install") {
 		if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database", "Simulator Setup"], StrSplit(A_ScriptName, ".")[1]) {

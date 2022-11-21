@@ -2250,7 +2250,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
 		local sessionDB := new SessionDatabase()
-		local strategy, strategies, simulatorCode, dirName, fileName, configuration, title, name, files, directory
+		local strategy, strategies, simulatorCode, dirName, fileName, configuration, title
+		local info, name, files, directory
 
 		if (simulator && car && track) {
 			directory := sessionDB.DatabasePath
@@ -2702,7 +2703,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	getSessionWeather(minute, ByRef weather, ByRef airTemperature, ByRef trackTemperature) {
 		local window := this.Window
-		local rows, ignore, time, tWeather, tAirTemperature, tTrackTemperature, candidate, weathers, cHour, cMinute
+		local rows, ignore, time, tWeather, tAirTemperature, tTrackTemperature, candidate, weathers
+		local hour, cHour, cMinute
 
 		weather := this.SelectedWeather
 		airTemperature := this.AirTemperature

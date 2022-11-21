@@ -1326,7 +1326,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	renameSetup(simulator, car, track, type, oldName, newName) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local oldFileName, newFileName
+		local oldFileName, newFileName, info
 
 		car := this.getCarCode(simulator, car)
 
@@ -1508,7 +1508,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	renameStrategy(simulator, car, track, oldName, newName) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local oldFileName, newFileName
+		local oldFileName, newFileName, info
 
 		car := this.getCarCode(simulator, car)
 

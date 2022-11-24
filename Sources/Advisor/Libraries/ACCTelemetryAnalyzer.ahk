@@ -32,8 +32,8 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 	iDataFile := false
 
 	createCharacteristics() {
-		local data := {}
-		local line, corner, oversteer, understeer, ignore, speed
+		local corners := []
+		local line, corner, oversteer, understeer, ignore, fast
 		local usSlowImportance, usSlowSeverity, usFastImportance, usFastSeverity
 		local osSlowImportance, osSlowSeverity, osFastImportance, osFastSeverity
 
@@ -49,28 +49,18 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 				{
 					line := string2Values(";", A_LoopReadLine)
 
-					if (line.Length() = 3) {
+					if (line.Length() = 4) {
 						corner := Round(line[1])
-						understeer := Round(line[2])
-						oversteer := Round(line[3])
-						speed := line[4]
+						fast := line[2]
 
-						if !data.HasKey(corner)
-							data[corner] := {Speed: [], Oversteer: {}, Understeer: {}}
+						if (fast = kTrue)
+							fast := true
+						else if (fast = kFalse)
+							fast := false
 
-						corner := data[corner]
-
-						corner.Speed.Push(speed)
-
-						if !corner.Understeer.HasKey(underSteer)
-							corner.Understeer[understeer] := 0
-
-						corner.Understeer[understeer] := (corner.Understeer[understeer] + 1)
-
-						if !corner.Oversteer.HasKey(overSteer)
-							corner.Oversteer[oversteer] := 0
-
-						corner.Oversteer[oversteer] := (corner.Oversteer[oversteer] + 1)
+						corners.Push({Corner: corner, Fast: fast
+									, Understeer: string2Values(",", line[3])
+									, Oversteer: {}, string2Values(",", line[4])})
 					}
 				}
 

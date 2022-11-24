@@ -595,6 +595,10 @@ bool greenFlag() {
 		return false;
 }
 
+bool writeTelemetry() {
+	return true;
+}
+
 float initialX = 0.0;
 float initialY = 0.0;
 int coordCount = 0;
@@ -696,9 +700,11 @@ int main(int argc, char* argv[])
 	
 	bool running = false;
 	bool mapTrack = false;
+	bool analyzeTelemetry = false;
 	bool positionTrigger = false;
 
 	if (argc > 1) {
+		analyzeTelemetry = (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
@@ -723,6 +729,10 @@ int main(int argc, char* argv[])
 	while (true) {
 		bool wait = true;
 
+		if (analyzeTelemetry) {
+			if (!writeTelemetry())
+				break;
+		}
 		if (mapTrack) {
 			if (!writeCoordinates())
 				break;

@@ -302,7 +302,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	startupTrackAutomation() {
 		local trackAutomation, ignore, action, positions, simulator, track, sessionDB, code, data, exePath, pid
 
-		if !this.iAutomationPID && this.Simulator {
+		if (!this.iAutomationPID && this.Simulator) {
 			trackAutomation := this.Simulator.TrackAutomation
 
 			if trackAutomation {

@@ -1199,6 +1199,13 @@ class SetupAdvisor extends ConfigurationItem {
 	loadWeather(weather, force := false) {
 	}
 
+	startTelemetryAnalyzer() {
+		local analyzerClass := getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+
+		if analyzerClass
+			new %analyzerClass%(this, simulator).createCharacteristics()
+	}
+
 	clearCharacteristics() {
 		while (this.SelectedCharacteristics.Length() > 0)
 			this.deleteCharacteristic(this.SelectedCharacteristics[this.SelectedCharacteristics.Length()], false)
@@ -1398,6 +1405,16 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 		}
 
+		Menu CharacteristicsMenu, Add
+
+		label := translate("Telemetry Analyzer...")
+		handler := ObjBindMethod(this, "startTelemetryAnalyzer")
+
+		Menu CharacteristicsMenu, Add, %label%, %handler%
+
+		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Setup", "Analyzer", false))
+			Menu CharacteristicsMenu, Disable, %label%
+
 		Menu CharacteristicsMenu, Show
 	}
 
@@ -1492,6 +1509,38 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 }
+
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; TelemetryAnalyzer                                                       ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class TelemetryAnalyzer {
+	iAdvisor := false
+	iSimulator := false
+
+	Advisor[] {
+		Get {
+			return this.iAdvisor
+		}
+	}
+
+	Simulator[] {
+		Get {
+			return this.iSimulator
+		}
+	}
+
+	__New(advisor, simulator) {
+		this.iAdvisor := advisor
+		this.iSimulator := simulator
+	}
+
+	createCharacteristics() {
+		throw "Virtual method TelemetryAnalyzer.createCharacteristics must be implemented in a subclass..."
+	}
+}
+
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Setup                                                                   ;;;
@@ -3267,6 +3316,7 @@ runSetupAdvisor() {
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Libraries\ACCSetupEditor.ahk
+#Include Libraries\ACCTelemetryAnalyzer.ahk
 #Include Libraries\ACSetupEditor.ahk
 
 

@@ -30,8 +30,8 @@ global kClose := "close"
 class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 	iSelectedCar := false
 
-	iUndersteerThreshold := [12, 24, 36]
-	iOversteerThreshold := [2, -4, -12]
+	iUndersteerThresholds := [12, 24, 36]
+	iOversteerThresholds := [2, -4, -12]
 	iLowspeedThreshold := 100
 
 	iSteerLock := 900
@@ -80,8 +80,8 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			try {
 				options := ("-Analyze """ . dataFile . """")
-				options .= (A_Space . this.iUndersteerThreshold)
-				options .= (A_Space . this.iOversteerThreshold)
+				options .= (A_Space . values2String(A_Space, this.iUndersteerThresholds*))
+				options .= (A_Space . values2String(A_Space, this.iOversteerThresholds*))
 				options .= (A_Space . this.iLowspeedThreshold)
 				options .= (A_Space . this.iSteerLock)
 				options .= (A_Space . this.iSteerRatio)

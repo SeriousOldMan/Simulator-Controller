@@ -8824,13 +8824,13 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	computeTyreWearColor(damage) {
-		if (damage < 15)
+		if (damage < 50)
 			return "bgcolor=""Green"" style=""color:#FFFFFF"""
-		else if (damage < 25)
-			return "bgcolor=""Yellow"" style=""color:#000000"""
-		else if (damage < 50)
-			return "bgcolor=""Orange"" style=""color:#000000"""
 		else if (damage < 70)
+			return "bgcolor=""Yellow"" style=""color:#000000"""
+		else if (damage < 80)
+			return "bgcolor=""Orange"" style=""color:#000000"""
+		else if (damage < 90)
 			return "bgcolor=""Red"" style=""color:#FFFFFF"""
 		else
 			return "bgcolor=""DarkRed"" style=""color:#FFFFFF"""

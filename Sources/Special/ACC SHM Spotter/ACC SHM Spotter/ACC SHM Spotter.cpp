@@ -8,6 +8,7 @@
 #include <iostream>
 #include "SharedFileOut.h"
 #include <codecvt>
+#include <vector>
 
 #pragma optimize("",off)
 using namespace std;
@@ -595,18 +596,256 @@ bool greenFlag() {
 		return false;
 }
 
-bool writeTelemetry(string fileName) {
-	ofstream output;
+class CornerDynamics {
+public:
+	float speed;
+	float usos;
+	int completedLaps;
+	int phase;
+public:
+	CornerDynamics(float speed, float usos, int completedLaps, int phase) :
+		speed(speed),
+		usos(usos),
+		completedLaps(completedLaps),
+		phase(phase) {}
+};
 
-	output.open(fileName, ios::out, ios::trunc);
+std::vector<float> recentSteerAngles;
+const int numRecentSteerAngles = 5;
 
-	output << "1;20;0;110" << endl;
-	output << "2;4;34;80" << endl;
-	output << "3;0;0;197" << endl;
+std::vector<float> recentGLongs;
+const int numRecentGLongs = 5;
 
-	output.close();
+std::vector<CornerDynamics> cornerDynamicsList;
+
+string dataFile = "";
+int understeerLowThreshold = 12;
+int understeerMediumThreshold = 20;
+int understeerHighThreshold = 35;
+int oversteerLowThreshold = 2;
+int oversteerMediumThreshold = 6;
+int oversteerHighThreshold = 10;
+int lowspeedThreshold = 100;
+int steerLock = 900;
+int steerRatio = 14;
+int lastCompletedLaps = 0;
+
+bool collectTelemetry() {
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	if (pf && gf) {
+		if ((gf->status != AC_LIVE) || gf->isInPit || gf->isInPitLane)
+			return true;
+
+		recentSteerAngles.push_back(pf->steerAngle);
+		if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
+			recentSteerAngles.erase(recentSteerAngles.begin());
+		}
+
+		recentGLongs.push_back(pf->accG[2]);
+		if ((int)recentGLongs.size() > numRecentGLongs) {
+			recentGLongs.erase(recentGLongs.begin());
+		}
+
+		if (fabs(pf->localAngularVel[1]) > 0.1) {
+			float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
+			
+			if (fabs(steeredAngleDegs) > 0.33f) {
+				float usos = -steeredAngleDegs / pf->localAngularVel[1];
+				
+				// Get the average recent steering angle
+				//vector <float>::iterator angleIter;
+				//float sumAngle = 0.0;
+				//int numAngle = 0;
+				//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
+				//	sumAngle += *angleIter;
+				//	numAngle++;
+				//}
+
+				// Get the average recent GLong
+				vector <float>::iterator glongIter;
+				float sumGLong = 0.0;
+				int numGLong = 0;
+				for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
+					sumGLong += *glongIter;
+					numGLong++;
+				}
+
+				int phase = 0;
+				if (numGLong > 0) {
+					//float recentAngle = (float)(fabs(sumAngle) / numAngle);
+					//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
+					//	// Increasing steer angle
+					//	phase = -1;
+					//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
+					//	// Decreasing steer angle
+					//	phase = 1;
+					//}
+					float recentGLong = sumGLong / numGLong;
+					if (recentGLong < -0.2) {
+						// Braking
+						phase = -1;
+					}
+					else if (recentGLong > 0.1) {
+						// Accelerating
+						phase = 1;
+					}
+				}
+
+				cornerDynamicsList.push_back(CornerDynamics(pf->speedKmh, usos, gf->completedLaps, phase));
+			}
+		}
+
+		int completedLaps = gf->completedLaps;
+
+		if (lastCompletedLaps != completedLaps) {
+			lastCompletedLaps = completedLaps;
+
+			// Delete all corner data nore than 2 laps old.
+			cornerDynamicsList.erase(
+				std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
+					[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
+				cornerDynamicsList.end());
+		}
+	}
 
 	return true;
+}
+
+void writeTelemetry() {
+	ofstream output;
+
+	try {
+		output.open(dataFile + ".tmp", ios::out, ios::trunc);
+
+		int slowLowUSNum[] = { 0, 0, 0 };
+		int slowMediumUSNum[] = { 0, 0, 0 };
+		int slowHighUSNum[] = { 0, 0, 0 };
+		int slowLowOSNum[] = { 0, 0, 0 };
+		int slowMediumOSNum[] = { 0, 0, 0 };
+		int slowHighOSNum[] = { 0, 0, 0 };
+		int slowTotalNum = 0;
+		int fastLowUSNum[] = { 0, 0, 0 };
+		int fastMediumUSNum[] = { 0, 0, 0 };
+		int fastHighUSNum[] = { 0, 0, 0 };
+		int fastLowOSNum[] = { 0, 0, 0 };
+		int fastMediumOSNum[] = { 0, 0, 0 };
+		int fastHighOSNum[] = { 0, 0, 0 };
+		int fastTotalNum = 0;
+
+		vector <CornerDynamics>::iterator cornerIter;
+		for (cornerIter = cornerDynamicsList.begin(); cornerIter != cornerDynamicsList.end(); cornerIter++) {
+			CornerDynamics corner = *cornerIter;
+			int phase = corner.phase + 1;
+
+			if (corner.speed < lowspeedThreshold) {
+				slowTotalNum++;
+				if (corner.usos < oversteerHighThreshold) {
+					slowHighOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerMediumThreshold) {
+					slowMediumOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerLowThreshold) {
+					slowLowOSNum[phase]++;
+				}
+				else if (corner.usos > understeerHighThreshold) {
+					slowHighUSNum[phase]++;
+				}
+				else if (corner.usos > understeerMediumThreshold) {
+					slowMediumUSNum[phase]++;
+				}
+				else if (corner.usos > understeerLowThreshold) {
+					slowLowUSNum[phase]++;
+				}
+			}
+			else {
+				fastTotalNum++;
+				if (corner.usos < oversteerHighThreshold) {
+					fastHighOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerMediumThreshold) {
+					fastMediumOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerLowThreshold) {
+					fastLowOSNum[phase]++;
+				}
+				else if (corner.usos > understeerHighThreshold) {
+					fastHighUSNum[phase]++;
+				}
+				else if (corner.usos > understeerMediumThreshold) {
+					fastMediumUSNum[phase]++;
+				}
+				else if (corner.usos > understeerLowThreshold) {
+					fastLowUSNum[phase]++;
+				}
+			}
+		}
+
+		output << "[Understeer.Slow.Low]" << endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" + (int)(100.0f * slowLowUSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" + (int)(100.0f * slowLowUSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" + (int)(100.0f * slowLowUSNum[2] / slowTotalNum) << endl;
+		}
+
+		output << "[Understeer.Slow.Medium]" << endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" + (int)(100.0f * slowMediumUSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" + (int)(100.0f * slowMediumUSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" + (int)(100.0f * slowMediumUSNum[2] / slowTotalNum) << endl;
+		}
+
+		output << "[Understeer.Slow.High]" << endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" + (int)(100.0f * slowHighUSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" + (int)(100.0f * slowHighUSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" + (int)(100.0f * slowHighUSNum[2] / slowTotalNum) << endl;
+		}
+
+		output << "[Understeer.Fast.Low]" << endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" + (int)(100.0f * fastLowUSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" + (int)(100.0f * fastLowUSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" + (int)(100.0f * fastLowUSNum[2] / fastTotalNum) << endl;
+		}
+
+		output << "[Understeer.Fast.Medium]" << endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" + (int)(100.0f * fastMediumUSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" + (int)(100.0f * fastMediumUSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" + (int)(100.0f * fastMediumUSNum[2] / fastTotalNum) << endl;
+		}
+
+		output << "[Understeer.Fast.High]" << endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" + (int)(100.0f * fastHighUSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" + (int)(100.0f * fastHighUSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" + (int)(100.0f * fastHighUSNum[2] / fastTotalNum) << endl;
+		}
+
+		output.close();
+
+		remove(dataFile.c_str());
+
+		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
+	}
+	catch (...) {
+		try {
+			output.close();
+		}
+		catch (...) {
+		}
+
+		// retry next round...
+	}
 }
 
 float initialX = 0.0;
@@ -716,10 +955,22 @@ int main(int argc, char* argv[])
 	if (argc > 1) {
 		analyzeTelemetry = (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
-
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
 
-		if (positionTrigger) {
+		if (analyzeTelemetry) {
+			dataFile = argv[2];
+
+			understeerLowThreshold = atoi(argv[3]);
+			understeerMediumThreshold = atoi(argv[4]);
+			understeerHighThreshold = atoi(argv[5]);
+			oversteerLowThreshold = atoi(argv[6]);
+			oversteerMediumThreshold = atoi(argv[7]);
+			oversteerHighThreshold = atoi(argv[8]);
+			lowspeedThreshold = atoi(argv[9]);
+			steerLock = atoi(argv[10]);
+			steerRatio = atoi(argv[11]);
+		}
+		else if (positionTrigger) {
 			for (int i = 2; i < (argc - 1); i = i + 2) {
 				xCoordinates[numCoordinates] = (float)atof(argv[i]);
 				yCoordinates[numCoordinates] = (float)atof(argv[i + 1]);
@@ -735,12 +986,17 @@ int main(int argc, char* argv[])
 
 	int countdown = 4000;
 	int safety = 200;
+	int counter = 0;
 
-	while (true) {
+	while (++counter) {
 		bool wait = true;
 
 		if (analyzeTelemetry) {
-			if (!writeTelemetry(argv[2]))
+			if (collectTelemetry()) {
+				if (remainder(counter, 20) == 0)
+					writeTelemetry();
+			}
+			else
 				break;
 		}
 		else if (mapTrack) {
@@ -798,7 +1054,9 @@ int main(int argc, char* argv[])
 			}
 		}
 		
-		if (positionTrigger)
+		if (analyzeTelemetry)
+			Sleep(100);
+		else if (positionTrigger)
 			Sleep(10);
 		else if (wait)
 			Sleep(50);

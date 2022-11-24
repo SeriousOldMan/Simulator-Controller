@@ -28,14 +28,26 @@ global kClose := "close"
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
+	iSelectedCar := false
+
+	iUndersteerThreshold := [12, 24, 36]
+	iOversteerThreshold := [2, -4, -12]
+	iLowspeedThreshold := 100
+
+	iSteerLock := 900
+	iSteerRatio := 14
+
 	iAnalyzerPID := false
 	iDataFile := false
 
+	__New(advisor, simulator) {
+		this.iSelectedCar := advisor.SelectedCar
+
+		base.__New(advisor, simulator)
+	}
+
 	createCharacteristics() {
-		local corners := []
-		local line, corner, oversteer, understeer, ignore, fast
-		local usSlowImportance, usSlowSeverity, usFastImportance, usFastSeverity
-		local osSlowImportance, osSlowSeverity, osFastImportance, osFastSeverity
+		local telemetry
 
 		OnExit(ObjBindMethod(this, "shutdownTelemetryAnalyzer", true))
 
@@ -45,32 +57,9 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 			analyzerPopup()
 
 			if this.iDataFile {
-				loop Read, % this.iDataFile
-				{
-					line := string2Values(";", A_LoopReadLine)
-
-					if (line.Length() = 4) {
-						corner := Round(line[1])
-						fast := line[2]
-
-						if (fast = kTrue)
-							fast := true
-						else if (fast = kFalse)
-							fast := false
-
-						corners.Push({Corner: corner, Fast: fast
-									, Understeer: string2Values(",", line[3])
-									, Oversteer: {}, string2Values(",", line[4])})
-					}
-				}
+				telemetry := readConfiguration(this.iDataFile)
 
 				this.Advisor.clearCharacteristics()
-
-				for corner, data in data {
-					speed := average(data.Speed)
-
-					; if (speed > 140)
-				}
 			}
 		}
 		catch exception {
@@ -91,6 +80,11 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			try {
 				options := ("-Analyze """ . dataFile . """")
+				options .= (A_Space . this.iUndersteerThreshold)
+				options .= (A_Space . this.iOversteerThreshold)
+				options .= (A_Space . this.iLowspeedThreshold)
+				options .= (A_Space . this.iSteerLock)
+				options .= (A_Space . this.iSteerRatio)
 
 				Run %kBinariesDirectory%ACC SHM Spotter.exe %options%, %kBinariesDirectory%, UserErrorLevel Hide, pid
 			}

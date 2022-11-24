@@ -595,7 +595,7 @@ bool greenFlag() {
 		return false;
 }
 
-bool writeTelemetry() {
+bool writeTelemetry(string fileName) {
 	return true;
 }
 
@@ -730,10 +730,10 @@ int main(int argc, char* argv[])
 		bool wait = true;
 
 		if (analyzeTelemetry) {
-			if (!writeTelemetry())
+			if (!writeTelemetry(argv[2]))
 				break;
 		}
-		if (mapTrack) {
+		else if (mapTrack) {
 			if (!writeCoordinates())
 				break;
 		}

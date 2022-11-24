@@ -79,7 +79,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 				for corner, data in data {
 					speed := average(data.Speed)
 
-					if (speed > 140)
+					; if (speed > 140)
 				}
 			}
 		}
@@ -92,7 +92,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	startupTelemetryAnalyzer() {
-		local dataFile, pid
+		local dataFile, pid, options
 
 		if (!this.iAnalyzerPID && this.Simulator) {
 			dataFile := temporaryFileName("Telemetry", "data")
@@ -100,7 +100,9 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 			deleteFile(dataFile)
 
 			try {
-				Run %ComSpec% /c ""%kBinariesDirectory%ACC SHM Spotter.exe" -Analyze  > "%dataFile%"", %kBinariesDirectory%, UserErrorLevel Hide, pid
+				options := ("-Analyze """ . dataFile . """")
+
+				Run %kBinariesDirectory%ACC SHM Spotter.exe %options%, %kBinariesDirectory%, UserErrorLevel Hide, pid
 			}
 			catch exception {
 				logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
@@ -173,11 +175,17 @@ analyzerPopup(command := false) {
 		Gui %window%:-Border ; -Caption
 		Gui %window%:Color, D0D0D0, D8D8D8
 
-		Gui %window%:Font, Norm, Arial
+		Gui %window%:Font, Bold s10, Arial
 
-		Gui %window%:Add, Text, x16 y16 w220 h23 +0x200 Center gmoveAnalyzerPopup, % translate("Scanning telemetry data...")
+		Gui %window%:Add, Text, x16 y16 w320 h23 Center gmoveAnalyzerPopup, % translate("Scanning telemetry data.")
 
-		Gui %window%:Add, Button, x86 yp+35 w80 h23 Default gstopAnalyzer, % translate("Stop")
+		Gui %window%:Font, Norm s10, Arial
+
+		Gui %window%:Add, Text, x16 y40 w320 h23 Center gmoveAnalyzerPopup, % translate("Go to the track and drive some laps.")
+
+		Gui %window%:Font, Norm s8, Arial
+
+		Gui %window%:Add, Button, x136 yp+30 w80 h23 Default gstopAnalyzer, % translate("Done")
 
 		Gui %window%:+Owner%aWindow%
 		Gui %aWindow%:+Disabled

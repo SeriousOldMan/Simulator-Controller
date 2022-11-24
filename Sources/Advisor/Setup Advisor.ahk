@@ -1203,7 +1203,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local analyzerClass := getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
 		if analyzerClass
-			new %analyzerClass%(this, simulator).createCharacteristics()
+			new %analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
 	}
 
 	clearCharacteristics() {
@@ -1407,12 +1407,12 @@ class SetupAdvisor extends ConfigurationItem {
 
 		Menu CharacteristicsMenu, Add
 
-		label := translate("Telemetry Analyzer...")
+		label := translate("Analyzer...")
 		handler := ObjBindMethod(this, "startTelemetryAnalyzer")
 
 		Menu CharacteristicsMenu, Add, %label%, %handler%
 
-		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Setup", "Analyzer", false))
+		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false))
 			Menu CharacteristicsMenu, Disable, %label%
 
 		Menu CharacteristicsMenu, Show

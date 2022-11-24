@@ -1,9 +1,9 @@
 [Development]
 Version=4.4.9.0-dev
 Target=4.4.9.0-release
-Date=11/18/2022
+Date=11/24/2022
 Download=
-Changes=Included race strategies in the "Session Database" browser, Support for sharing race strategies with the community
+Changes=Included race strategies in the "Session Database" browser, Support for sharing race strategies with the community, Fixed post pitstop tyre analysis in "Race Center", Fixed unlimited practice mode for *Assetto Corsa Competizione*, Updated color coding of used tyres in "Race Center"
 [Release]
 Version=4.4.8.0-release
 Date=11/18/2022

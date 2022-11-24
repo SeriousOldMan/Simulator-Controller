@@ -41,7 +41,18 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 	iDataFile := false
 
 	__New(advisor, simulator) {
-		this.iSelectedCar := advisor.SelectedCar
+		local selectedCar := advisor.SelectedCar[false]
+		local fileName, configuration
+
+		this.iSelectedCar := selectedCar
+
+		if (selectedCar && (selectedCar != true)) {
+			fileName := ("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini")
+
+			configuration := readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
+
+			this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", 900)
+		}
 
 		base.__New(advisor, simulator)
 	}

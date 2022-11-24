@@ -623,8 +623,8 @@ int understeerLowThreshold = 12;
 int understeerMediumThreshold = 20;
 int understeerHighThreshold = 35;
 int oversteerLowThreshold = 2;
-int oversteerMediumThreshold = 6;
-int oversteerHighThreshold = 10;
+int oversteerMediumThreshold = -6;
+int oversteerHighThreshold = -10;
 int lowspeedThreshold = 100;
 int steerLock = 900;
 int steerRatio = 14;
@@ -786,54 +786,102 @@ void writeTelemetry() {
 		output << "[Understeer.Slow.Low]" << endl;
 
 		if (slowTotalNum > 0) {
-			output << "Entry=" + (int)(100.0f * slowLowUSNum[0] / slowTotalNum) << endl;
-			output << "Apex=" + (int)(100.0f * slowLowUSNum[1] / slowTotalNum) << endl;
-			output << "Exit=" + (int)(100.0f * slowLowUSNum[2] / slowTotalNum) << endl;
+			output << "Entry=" << (int)(100.0f * slowLowUSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * slowLowUSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * slowLowUSNum[2] / slowTotalNum) << endl;
 		}
 
 		output << "[Understeer.Slow.Medium]" << endl;
 
 		if (slowTotalNum > 0) {
-			output << "Entry=" + (int)(100.0f * slowMediumUSNum[0] / slowTotalNum) << endl;
-			output << "Apex=" + (int)(100.0f * slowMediumUSNum[1] / slowTotalNum) << endl;
-			output << "Exit=" + (int)(100.0f * slowMediumUSNum[2] / slowTotalNum) << endl;
+			output << "Entry=" << (int)(100.0f * slowMediumUSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * slowMediumUSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * slowMediumUSNum[2] / slowTotalNum) << endl;
 		}
 
 		output << "[Understeer.Slow.High]" << endl;
 
 		if (slowTotalNum > 0) {
-			output << "Entry=" + (int)(100.0f * slowHighUSNum[0] / slowTotalNum) << endl;
-			output << "Apex=" + (int)(100.0f * slowHighUSNum[1] / slowTotalNum) << endl;
-			output << "Exit=" + (int)(100.0f * slowHighUSNum[2] / slowTotalNum) << endl;
+			output << "Entry=" << (int)(100.0f * slowHighUSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * slowHighUSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * slowHighUSNum[2] / slowTotalNum) << endl;
 		}
 
 		output << "[Understeer.Fast.Low]" << endl;
 
-		if (slowTotalNum > 0) {
-			output << "Entry=" + (int)(100.0f * fastLowUSNum[0] / fastTotalNum) << endl;
-			output << "Apex=" + (int)(100.0f * fastLowUSNum[1] / fastTotalNum) << endl;
-			output << "Exit=" + (int)(100.0f * fastLowUSNum[2] / fastTotalNum) << endl;
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastLowUSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * fastLowUSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * fastLowUSNum[2] / fastTotalNum) << endl;
 		}
 
 		output << "[Understeer.Fast.Medium]" << endl;
 
 		if (fastTotalNum > 0) {
-			output << "Entry=" + (int)(100.0f * fastMediumUSNum[0] / fastTotalNum) << endl;
-			output << "Apex=" + (int)(100.0f * fastMediumUSNum[1] / fastTotalNum) << endl;
-			output << "Exit=" + (int)(100.0f * fastMediumUSNum[2] / fastTotalNum) << endl;
+			output << "Entry=" << (int)(100.0f * fastMediumUSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * fastMediumUSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * fastMediumUSNum[2] / fastTotalNum) << endl;
 		}
 
 		output << "[Understeer.Fast.High]" << endl;
 
 		if (fastTotalNum > 0) {
-			output << "Entry=" + (int)(100.0f * fastHighUSNum[0] / fastTotalNum) << endl;
-			output << "Apex=" + (int)(100.0f * fastHighUSNum[1] / fastTotalNum) << endl;
-			output << "Exit=" + (int)(100.0f * fastHighUSNum[2] / fastTotalNum) << endl;
+			output << "Entry=" << (int)(100.0f * fastHighUSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * fastHighUSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * fastHighUSNum[2] / fastTotalNum) << endl;
+		}
+
+		output << "[Oversteer.Slow.Low]" << endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowLowOSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * slowLowOSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * slowLowOSNum[2] / slowTotalNum) << endl;
+		}
+
+		output << "[Oversteer.Slow.Medium]" << endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowMediumOSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * slowMediumOSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * slowMediumOSNum[2] / slowTotalNum) << endl;
+		}
+
+		output << "[Oversteer.Slow.High]" << endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowHighOSNum[0] / slowTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * slowHighOSNum[1] / slowTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * slowHighOSNum[2] / slowTotalNum) << endl;
+		}
+
+		output << "[Oversteer.Fast.Low]" << endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastLowOSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * fastLowOSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * fastLowOSNum[2] / fastTotalNum) << endl;
+		}
+
+		output << "[Oversteer.Fast.Medium]" << endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastMediumOSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * fastMediumOSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * fastMediumOSNum[2] / fastTotalNum) << endl;
+		}
+
+		output << "[Oversteer.Fast.High]" << endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastHighOSNum[0] / fastTotalNum) << endl;
+			output << "Apex=" << (int)(100.0f * fastHighOSNum[1] / fastTotalNum) << endl;
+			output << "Exit=" << (int)(100.0f * fastHighOSNum[2] / fastTotalNum) << endl;
 		}
 
 		output.close();
 
-		remove(dataFile.c_str());
+ 		remove(dataFile.c_str());
 
 		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
 	}

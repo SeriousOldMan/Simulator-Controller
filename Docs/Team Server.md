@@ -14,7 +14,13 @@ Disclaimer: Although the current version of the *Team Server* is no longer to be
 
 The *Team Server* requires you to run a Web API server process, which has been developed using .NET Core 3.1. Applications developed using this multi-plattform server framework from Micorsoft can be hosted on Windows, Linux and even macOS operating systems. You can find the *Team Server* in the *Binaries* folder - please copy this directory to your favorite hosting environment. If you want to set up your own host or if you want to test the *Team Server* on your local PC, you will have to install the .NET Core 3.1 framework. All required resources can be found on this [dedicated website](https://dotnet.microsoft.com/download/dotnet/3.1) from Microsoft.
 
-To start the *Team Server*, you simply start the "Team Server.exe" from the corresponding directory. But before you do that, take a look at the "Settings.json" file, which is located in the same folder.
+After you have installed .NET Core 3.1 and the Team Server, you have to configure the URL, where the server listens. Default is "https://localhost:5001" or "http://localhost:5000". But, when you want to setup a server which is available on the network, you have to setup a different URL. Information about this can be found in this [short article](https://andrewlock.net/5-ways-to-set-the-urls-for-an-aspnetcore-app/). The easiest way will be to supply the URL using a command line argument, for example:
+
+	TeamServer.exe --urls "http://yourip:5100;https://yourip:5101"
+
+with *yourip* substituted with the IP, where your server should be available. And you have to make sure that this IP is visible to the public, of course.
+
+Then you can start the *Team Server* by running "TeamServer.exe" (with the required options) from the corresponding directory. But before you do that, take a look at the "Settings.json" file, which is located in the same folder.
 
 	{
 	  "DBPath": ":memory:",

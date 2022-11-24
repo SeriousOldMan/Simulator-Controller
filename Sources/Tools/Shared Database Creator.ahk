@@ -329,7 +329,15 @@ createSharedDatabases() {
 	FileCreateDir %databaseDirectory%\Input
 	FileCreateDir %databaseDirectory%\Output
 
-	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Creating Shared Database", message: "Cleaning remote repository..."})
+	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
+
+	downloadUserDatabases(databaseDirectory . "\Input\")
+
+	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
+
+	archives := createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\")
+
+	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "Cleaning remote repository..."})
 
 	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads")
 	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
@@ -361,16 +369,6 @@ quit
 
 	deleteFile(A_Temp . "\clearRemoteDirectory.txt")
 	deleteFile(A_Temp . "\clearRemoteDirectory.bat")
-
-	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
-
-	downloadUserDatabases(databaseDirectory . "\Input\")
-
-	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
-
-	archives := createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\")
-
-	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "..."})
 
 	for ignore, filePath in archives {
 		SplitPath filePath, fileName

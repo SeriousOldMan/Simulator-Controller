@@ -254,9 +254,11 @@ downloadUserDatabases(directory) {
 
 		deleteFile(directory . fileName)
 
-		if FileExist(directory . "Shared Database")
+		if FileExist(directory . "Shared Database Creator")
+			FileMoveDir %directory%Shared Database Creator, %directory%%idName%, R
+		else if FileExist(directory . "Shared Database")
 			FileMoveDir %directory%Shared Database, %directory%%idName%, R
-		if FileExist(directory . "Community")
+		else if FileExist(directory . "Community")
 			FileMoveDir %directory%Community, %directory%%idName%, R
 		else if FileExist(directory . "DBase")
 			FileMoveDir %directory%DBase, %directory%%idName%, R
@@ -322,7 +324,7 @@ createSharedDatabases() {
 
 	Sleep 500
 
-	databaseDirectory := (kTempDirectory . "Shared Database")
+	databaseDirectory := (kTempDirectory . "Shared Database Creator")
 
 	deleteDirectory(databaseDirectory)
 

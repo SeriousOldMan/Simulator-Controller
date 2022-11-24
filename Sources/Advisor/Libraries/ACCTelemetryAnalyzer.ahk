@@ -49,7 +49,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 				{
 					line := string2Values(";", A_LoopReadLine)
 
-					if (line.Length() = 3) {
+					if (line.Length() = 4) {
 						corner := Round(line[1])
 						understeer := Round(line[2])
 						oversteer := Round(line[3])

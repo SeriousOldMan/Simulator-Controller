@@ -596,6 +596,16 @@ bool greenFlag() {
 }
 
 bool writeTelemetry(string fileName) {
+	ofstream output;
+
+	output.open(fileName, ios::out, ios::trunc);
+
+	output << "1;20;0;110" << endl;
+	output << "2;4;34;80" << endl;
+	output << "3;0;0;197" << endl;
+
+	output.close();
+
 	return true;
 }
 

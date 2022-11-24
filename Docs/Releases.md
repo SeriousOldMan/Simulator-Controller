@@ -1,8 +1,18 @@
+## 4.4.9.0-release 11/25/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Tweaked colord coding of used tyres in "Race Center".
+  4. Race strategies are now included in the "Session Database" browser and can be [managed there](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#strategies).
+  5. Support for sharing race strategies with the community (your [sharing consent](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) will popup for review again).
+  6. Fixed post pitstop tyre analysis in "Race Center".
+  7. Updated color coding of used tyres in "Race Center".
+  8. Fixed unlimited practice mode for *Assetto Corsa Competizione*.
+
 ## 4.4.8.0-release 11/18/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Support for replication of car setups as well as race strategies has been added to the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration). Attention: Using this feature requires an update of the Team Server. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-448), if you are hosting your own Team Server.
-  4. You can now decide for each car setup individually, whether it will be [shared with the community](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#setup-repository). But as before, sharing of setups with the community generally requires your consent. If you want to review your consent, simply delete the file "CONSENT", which can be found in the *Simulator Controller\Config* folder, which is located in your user *Documents* folder. And you can also decide inidividually, whether a car setup will be synchronized with any of the connected Team Server databases (see 3. above).
+  4. You can now decide for each car setup individually, whether it will be [shared with the community](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#setups). But as before, sharing of setups with the community generally requires your consent. If you want to review your consent, simply delete the file "CONSENT", which can be found in the *Simulator Controller\Config* folder, which is located in your user *Documents* folder. And you can also decide inidividually, whether a car setup will be synchronized with any of the connected Team Server databases (see 3. above).
   5. Multiple data connections are now supported for the [Team Server data replication](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) which allows you to use telemetry data, pressures data and so on from multiple differen teams.
   6. Fixed end of race detection for fixed-lap races in rFactor 2.
   7. Race Assistant configurations can be [synchronized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) by a click of a button.
@@ -61,7 +71,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   3. The position on the screen where info and progress overlays are displayed, can now be configured in the [UI settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#customizing-controller-notifications).
   4. The session synchronization can be [temporarily disabled](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#connecting-to-a-session) in the "Race Center", while you are working with the data.
   5. The Team Server now supports synchronization of telemetry data between different members of a team. The documentation for [team management](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-teams) of the Team server itself, as well as the [database configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) of the "Session Database" has been heavily revised.
-  6. A driver may be selected in "Session Database" when [looking for tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressure-advisor). This very helpful when looking for cold tyre pressures for your team mate during a team race.
+  6. A driver may be selected in "Session Database" when [looking for tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tyre-pressures). This very helpful when looking for cold tyre pressures for your team mate during a team race.
   7. Refactoring of the translation framework to better support the new Spanish translation.
   8. Thanks to the great work of Jose Krilin, we have an initial version of a Spanish translation. The UI has been translated for the most part and will be polished in the next weeks and you can also expect a working version of the voice generation and recognition soon.
   9. Fixed startup of Race Spotter in situations with a very short rolling or even a standing start.
@@ -295,7 +305,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New options in pitstop rules for always refueling and always changing tyres in strategy simulation.
   4. Introducing track automation, which let you automate your car settings like TC and ABS depending on track location.
-     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#automation) for a specific simulator / car / track combination.
+     - A new page has been added to "Session Database", which allows you to specify [location specific actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#automations) for a specific simulator / car / track combination.
      - Added the ["TrackAutomation" action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter) to the "Race Spotter" plugin which let's you enable or disable location specific actions when you are out on the track.
 	 - New ["enableTrackAutomation", "disableTrackAutomations" and "selectTrackAutomation"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#choosing-between-different-track-automations), which let you control the track automationsm while on the track.
      - Added a new icon to the Stream Deck icon set for the "TrackAutomation" action.

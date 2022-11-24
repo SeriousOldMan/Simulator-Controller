@@ -491,7 +491,7 @@ When your data is transferred, no direct or indirect personal data is involved. 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Consent.JPG)
 
-Note: You can give separate consents for sharing your tyre pressure setups and your mechanical and aerodynamic car setups, since the later might be considered to be some sort of private secret, for example. Furthermore, you must explicitly upload car setup data to include it to the session database, so you can decide which data you want to share. On the other hand, tyre pressures will be collected automatically by Jona, but you will be asked whether to include them in the session database (see below).
+Note: You can give separate consents for sharing your tyre pressure setups, your race strategies and your mechanical and aerodynamic car setups. Since car setups and race strategies might be considered kind of a secret, you must declare, whether you want to share the given strategy or setup individually for each item and you must explicitly upload car setup data to be shared to the session database. On the other hand, tyre pressures will be collected automatically by Jona, but you will be asked whether to include them in the session database (see below).
 
 If you have given your consents, the data collected in your local sessions will be transferred to a cloud database once a week. You will get a payback in terms of a consolidated database of all contributors and Jona will use the data to help you in your setup task in the pit, but also during a race, when radical weather changes are upcoming. This community database will be updated on your local PC every two days, so you will always get the latest and greatest setup data. The update process works completely in the background, so nothing to do on your side.
 
@@ -557,13 +557,21 @@ Important note: The value for the setting "Race Duration" is stored in seconds, 
 
 The default values for all these settings may not only be used to initialize the race settings for an upcoming session, but they may also be used in the "Strategy Workbench" to provide values for many [settings for strategy simulation & planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings).
 
-#### Setup Repository
+#### Strategies
+
+This tab shows you a list of race stratagies, which are stored in the database. Note: Race strategies can be created and stored in the session database using the "Strategy Workbench".
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2015.jpg)
+
+You can use the buttons below the list to upload, download, rename or delete a strategy, but you can also use the "Strategy Workbench" to create a strategy and store it on the database. Once you have selected a strategy in the list above, you can decide whether you want to share this strategy potentially with the community (if you have given consent to share strategies) and/or whether you want to synchronize the strategy with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) (see below).
+
+#### Setups
 
 This tab allows you to store your preferred car setup files for different conditions (Wet vs. Dry) and different Sessions (Qualification vs. Race) in the session database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%206.jpg)
 
-Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download, rename or delete a setup file from your simulator. Once you have uploaded a setup you can decide whether you want to share this setup potentially with the community (if you have given consent to share setups) and/or you want to synchronize the setup with any [connected Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) (see below).
+Use the drop down menu at the top to select the type of setup, you want to store or retrieve. After you have done that, you can use the buttons below the list to upload, download, rename or delete a setup file from your simulator. Once you have selected a setup in the list above, you can decide whether you want to share this setup potentially with the community (if you have given consent to share setups) and/or whether you want to synchronize the setup with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration) (see below).
 
 ##### Naming conventions
 
@@ -577,7 +585,7 @@ Why so complex? There is a strong dependency between the track surface state, ai
 
 Please note, that you can use the "Pencil" button to rename an already uploaded setup file to follow the above conventions, if necessary.
 
-#### Tyre Pressure Advisor
+#### Tyre Pressures
 
 Here you will get a recommendation for initial cold tyre pressures, if a matching setup is available in the session database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 
@@ -591,7 +599,7 @@ Notes:
 
   3. You can configure using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) the session types, from which tyre pressure data will be collected and stored into the database by Jona. Default is to collect tyre pressure data during practice and race sessions.
 
-#### Automation
+#### Automations
 
 At this page, you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.
 

@@ -399,7 +399,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		return text
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
-		return runAnalyzer("FilterTelemetry")
+		result := runAnalyzer("FilterTelemetry")
 	else {
 		analyzer := commandOrAnalyzer
 

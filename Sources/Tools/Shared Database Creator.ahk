@@ -56,7 +56,7 @@ class DatabaseCreator {
 	iTargetDirectory := false
 
 	iIncludePressures := false
-	iIncludeStratgies := false
+	iIncludeStrategies := false
 	iIncludeSetups := false
 
 	iTyresDatabase := false
@@ -102,7 +102,7 @@ class DatabaseCreator {
 		this.iTargetDirectory := targetDirectory
 		this.iIncludePressures := includePressures
 		this.iIncludeSetups := includeSetups
-		this.iIncludeStratgies := includeStrategies
+		this.iIncludeStrategies := includeStrategies
 	}
 
 	createDatabase() {
@@ -150,10 +150,10 @@ class DatabaseCreator {
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 									this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
 
-								loop Files, %databaseDirectory%%simulator%\%car%\Race Strategies\*.*
+								loop Files, %databaseDirectory%%simulator%\%car%\%track%\Race Strategies\*.*
 									this.loadRaceStrategy(simulator, car, track, A_LoopFilePath)
 
-								loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
+								loop Files, %databaseDirectory%%simulator%\%car%\%track%\Car Setups\*.*, D
 								{
 									type := A_LoopFileName
 
@@ -191,26 +191,26 @@ class DatabaseCreator {
 	}
 
 	loadRaceStrategy(simulator, car, track, strategyFile) {
-		local directory := new SessionDatabase.DatabasePath
+		local directory := this.TargetDirectory
 
 		if this.IncludeStrategies {
 			updateProgress("Strategies: " simulator . " / " . car . " / " . track . "...")
 
-			FileCreateDir %directory%Community\%simulator%\%car%\Race Strategies
+			FileCreateDir %directory%Community\%simulator%\%car%\%track%\Race Strategies
 
-			FileCopy %strategyFile%, %directory%Community\%simulator%\%car%\Race Strategies, 1
+			FileCopy %strategyFile%, %directory%Community\%simulator%\%car%\%track%\Race Strategies, 1
 		}
 	}
 
 	loadCarSetup(simulator, car, track, type, setupFile) {
-		local directory := new SessionDatabase.DatabasePath
+		local directory := this.TargetDirectory
 
 		if this.IncludeSetups {
 			updateProgress("Setups: " simulator . " / " . car . " / " . track . "...")
 
-			FileCreateDir %directory%Community\%simulator%\%car%\Car Setups
+			FileCreateDir %directory%Community\%simulator%\%car%\%track%\Car Setups\%type%
 
-			FileCopy %setupFile%, %directory%Community\%simulator%\%car%\Car Setups\%type%, 1
+			FileCopy %setupFile%, %directory%Community\%simulator%\%car%\%track%\Car Setups\%type%, 1
 		}
 	}
 }

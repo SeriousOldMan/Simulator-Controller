@@ -2208,7 +2208,7 @@ parseConfiguration(text) {
 	return configuration
 }
 
-writeConfiguration(configFile, configuration) {
+writeConfiguration(configFile, configuration, symbolic := true) {
 	local tempFile := temporaryFileName("Config", "ini")
 	local directory, section, keyValues, key, value, pairs
 
@@ -2225,7 +2225,7 @@ writeConfiguration(configFile, configuration) {
 			value := StrReplace(value, "=", "\=")
 			value := StrReplace(value, "`n", "\n")
 
-			pairs := (pairs . "`n" . key . "=" . ((value == true) ? kTrue : ((value == false) ? kFalse : value)))
+			pairs := (pairs . "`n" . key . "=" . (symbolic ? ((value == true) ? kTrue : ((value == false) ? kFalse : value)) : value))
 		}
 
 		section := "[" . section . "]" . pairs . "`n"
@@ -2246,11 +2246,11 @@ writeConfiguration(configFile, configuration) {
 		}
 }
 
-printConfiguration(configuration) {
+printConfiguration(configuration, symbolic := true) {
 	local fileName := temporaryFileName("Config", "ini")
 	local text
 
-	writeConfiguration(fileName, configuration)
+	writeConfiguration(fileName, configuration, symbolic)
 
 	try {
 		FileRead text, %fileName%

@@ -308,11 +308,13 @@ runAnalyzer(commandOrAnalyzer := false) {
 
 		GuiControl, , activateButton, % translate("Apply")
 
-		GuiControl, , resultEdit, % printConfiguration(readConfiguration(dataFile))
+		GuiControl, , resultEdit, % printConfiguration(runAnalyzer("FilterTelemetry"), false)
 
 		state := "Analyze"
 	}
-	else if (commandOrAnalyzer == "Threshold") {
+	else if (commandOrAnalyzer == "Threshold")
+		GuiControl, , resultEdit, % printConfiguration(runAnalyzer("FilterTelemetry"), false)
+	else if (commandOrAnalyzer == "FilterTelemetry") {
 		GuiControlGet applyThresholdSlider
 
 		data := readConfiguration(dataFile)
@@ -327,25 +329,10 @@ runAnalyzer(commandOrAnalyzer := false) {
 							setConfigurationValue(data, type . "." . speed . "." . weight, key, 0)
 					}
 
-		GuiControl, , resultEdit, % printConfiguration(data)
+		return data
 	}
-	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze")) {
-		GuiControlGet applyThresholdSlider
-
-		data := readConfiguration(dataFile)
-
-		for ignore, type in ["Oversteer", "Understeer"]
-			for ignore, speed in ["Slow", "Fast"]
-				for ignore, weight in ["Low", "Medium", "High"]
-					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getConfigurationValue(data, type . "." . speed . "." . weight, key, kUndefined)
-
-						if ((value != kUndefined) && (value < applyThresholdSlider))
-							setConfigurationValue(data, type . "." . speed . "." . weight, key, 0)
-					}
-
-		result := data
-	}
+	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
+		return runAnalyzer("FilterTelemetry")
 	else {
 		analyzer := commandOrAnalyzer
 
@@ -395,9 +382,9 @@ runAnalyzer(commandOrAnalyzer := false) {
 
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, Text, x24 yp+21 w100 h23 +0x200 HWNDwidget6, % translate("Low Speed <")
+		Gui %window%:Add, Text, x24 yp+21 w100 h23 +0x200 HWNDwidget6, % translate("Consider less than")
 		Gui %window%:Add, Edit, x128 yp w35 h23 +0x200 HWNDwidget7 vlowspeedThresholdEdit, % analyzer.LowspeedThreshold
-		Gui %window%:Add, Text, x167 yp w100 h23 +0x200 HWNDwidget8, % translate("km/h")
+		Gui %window%:Add, Text, x167 yp w100 h23 +0x200 HWNDwidget8, % translate("km/h as low speed")
 
 		Gui %window%:Add, Text, x24 yp+30 w100 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
 		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget10 vheavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
@@ -432,7 +419,7 @@ runAnalyzer(commandOrAnalyzer := false) {
 		Gui %window%:Add, Edit, x16 ys w320 h200 ReadOnly HWNDwidget1 vresultEdit Hidden
 
 		Gui %window%:Add, Text, x16 yp+208 w100 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
-		Gui %window%:Add, Slider, x128 yp w60 0x10 Range5-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 10
+		Gui %window%:Add, Slider, x128 yp w60 0x10 Range0-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 0
 		Gui %window%:Add, Text, x190 yp+3 HWNDwidget4 Hidden, % translate("%")
 
 		loop 4

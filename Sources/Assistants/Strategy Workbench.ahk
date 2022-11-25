@@ -942,7 +942,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+21 w216 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView, % values2String("|", map(["Lap", "Driver", "Fuel", "Tyres", "Map"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+21 w216 h139 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDpitstopListView gnoSelect, % values2String("|", map(["Lap", "Driver", "Fuel", "Tyres", "Map"], "translate")*)
 
 		this.iPitstopListView := pitstopListView
 
@@ -2994,6 +2994,11 @@ chooseRefuelService() {
 	GuiControlGet pitstopFuelServiceRuleDropdown
 
 	GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopFuelServiceRuleDropdown])
+}
+
+noSelect() {
+	loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
 }
 
 validatePitstopRule(full := false) {

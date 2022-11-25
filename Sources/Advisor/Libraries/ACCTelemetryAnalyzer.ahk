@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Math.ahk
 
 
@@ -156,16 +157,18 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
 	}
 
-	createCharacteristics() {
-		local advisor := this.Advisor
-		local telemetry := runAnalyzer(this)
-		local characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
-		local severities := {Low: 33, Medium: 50, High: 66}
-		local count := 0
-		local maxValue := 0
-		local characteristic, ignore, type, severity, speed, key, value
+	createCharacteristics(telemetry := false) {
+		local advisor, severities, count, maxValue
+		local characteristicLabels, characteristic, characteristics, ignore, type, severity, speed, key, value
 
 		if telemetry {
+			advisor := this.Advisor
+			characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
+			severities := {Low: 33, Medium: 50, High: 66}
+			characteristics := {}
+			count := 0
+			maxValue := 0
+
 			advisor.clearCharacteristics()
 
 			advisor.ProgressCount := 0
@@ -178,22 +181,33 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 						for ignore, key in ["Entry", "Apex", "Exit"]
 							maxValue := Max(maxValue, getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, 0))
 
-			Sleep 500
-
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, severity in ["Low", "Medium", "High"]
 						for ignore, key in ["Entry", "Apex", "Exit"] {
 							value := getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, false)
 
-							if (value && (count++ < 10)) {
+							if value {
 								characteristic := (type . ".Corner." . key . "." . speed)
 
-								showProgress({progress: (advisor.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
+								if !characteristics.HasKey(characteristic)
+									characteristics[characteristic] := [Round(value / maxValue * 66), severities[severity]]
+								else {
+									characteristic := characteristics[characteristic]
 
-								advisor.addCharacteristic(characteristic, Round(value / maxValue * 66), severities[severity], false)
+									characteristic[1] := Max(characteristic[1], Round(value / maxValue * 66))
+									characteristic[2] := Max(characteristic[2], severities[severity])
+								}
 							}
 						}
+
+			Sleep 500
+
+			for characteristic, value in characteristics {
+				showProgress({progress: (advisor.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
+
+				advisor.addCharacteristic(characteristic, value[1], value[2], false)
+			}
 
 			advisor.updateRecommendations()
 
@@ -204,6 +218,12 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 			Sleep 500
 
 			hideProgress()
+		}
+		else {
+			telemetry := runAnalyzer(this)
+
+			if telemetry
+				Task.startTask(ObjBindMethod(this, "createCharacteristics", telemetry), 100)
 		}
 	}
 
@@ -392,7 +412,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						if value {
 							characteristic := (type . ".Corner." . key . "." . speed)
 
-							LV_Add("", characteristicLabels[characteristic], value)
+							LV_Add("", characteristicLabels[characteristic], translate(severity), value)
 						}
 					}
 
@@ -486,7 +506,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 1
 			runWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h200 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Frequency (%)"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys w320 h200 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
 
 		resultListView := widget1
 

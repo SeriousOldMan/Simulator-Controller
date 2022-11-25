@@ -233,7 +233,8 @@ setAnalyzerSetting(key, value) {
 }
 
 runAnalyzer(commandOrAnalyzer := false) {
-	local window, aWindow, x, y
+	local window, aWindow, x, y, ignore, widget
+	local data, type, speed, weight, key, value
 
 	static activateButton
 
@@ -311,8 +312,39 @@ runAnalyzer(commandOrAnalyzer := false) {
 
 		state := "Analyze"
 	}
+	else if (commandOrAnalyzer == "Threshold") {
+		GuiControlGet applyThresholdSlider
+
+		data := readConfiguration(dataFile)
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, speed in ["Slow", "Fast"]
+				for ignore, weight in ["Low", "Medium", "High"]
+					for ignore, key in ["Entry", "Apex", "Exit"] {
+						value := getConfigurationValue(data, type . "." . speed . "." . weight, key, kUndefined)
+
+						if ((value != kUndefined) && (value < applyThresholdSlider))
+							setConfigurationValue(data, type . "." . speed . "." . weight, key, 0)
+					}
+
+		GuiControl, , resultEdit, % printConfiguration(data)
+	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze")) {
-		result := readConfiguration(dataFile)
+		GuiControlGet applyThresholdSlider
+
+		data := readConfiguration(dataFile)
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, speed in ["Slow", "Fast"]
+				for ignore, weight in ["Low", "Medium", "High"]
+					for ignore, key in ["Entry", "Apex", "Exit"] {
+						value := getConfigurationValue(data, type . "." . speed . "." . weight, key, kUndefined)
+
+						if ((value != kUndefined) && (value < applyThresholdSlider))
+							setConfigurationValue(data, type . "." . speed . "." . weight, key, 0)
+					}
+
+		result := data
 	}
 	else {
 		analyzer := commandOrAnalyzer
@@ -400,7 +432,7 @@ runAnalyzer(commandOrAnalyzer := false) {
 		Gui %window%:Add, Edit, x16 ys w320 h200 ReadOnly HWNDwidget1 vresultEdit Hidden
 
 		Gui %window%:Add, Text, x16 yp+208 w100 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
-		Gui %window%:Add, Slider, x128 yp w60 0x10 Range0-100 ToolTip HWNDwidget3 vapplyThresholdSlider Hidden, 10
+		Gui %window%:Add, Slider, x128 yp w60 0x10 Range5-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 10
 		Gui %window%:Add, Text, x190 yp+3 HWNDwidget4 Hidden, % translate("%")
 
 		loop 4
@@ -440,6 +472,10 @@ activateAnalyzer() {
 
 cancelAnalyzer() {
 	runAnalyzer(kCancel)
+}
+
+updateThreshold() {
+	runAnalyzer("Threshold")
 }
 
 moveAnalyzer() {

@@ -157,10 +157,53 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	createCharacteristics() {
+		local advisor := this.Advisor
 		local telemetry := runAnalyzer(this)
+		local characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
+		local severities := {Low: 33, Medium: 50, High: 66}
+		local count := 0
+		local maxValue := 0
+		local characteristic, ignore, type, severity, speed, key, value
 
 		if telemetry {
-			this.Advisor.clearCharacteristics()
+			advisor.clearCharacteristics()
+
+			advisor.ProgressCount := 0
+
+			showProgress({color: "Green", width: 350, title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
+
+			for ignore, type in ["Oversteer", "Understeer"]
+				for ignore, speed in ["Slow", "Fast"]
+					for ignore, severity in ["Low", "Medium", "High"]
+						for ignore, key in ["Entry", "Apex", "Exit"]
+							maxValue := Max(maxValue, getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, 0))
+
+			Sleep 500
+
+			for ignore, type in ["Oversteer", "Understeer"]
+				for ignore, speed in ["Slow", "Fast"]
+					for ignore, severity in ["Low", "Medium", "High"]
+						for ignore, key in ["Entry", "Apex", "Exit"] {
+							value := getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, false)
+
+							if (value && (count++ < 10)) {
+								characteristic := (type . ".Corner." . key . "." . speed)
+
+								showProgress({progress: (advisor.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
+
+								advisor.addCharacteristic(characteristic, Round(value / maxValue * 66), severities[severity], false)
+							}
+						}
+
+			advisor.updateRecommendations()
+
+			advisor.updateState()
+
+			showProgress({progress: 100, message: translate("Finished...")})
+
+			Sleep 500
+
+			hideProgress()
 		}
 	}
 
@@ -232,9 +275,9 @@ setAnalyzerSetting(key, value) {
 	writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 }
 
-runAnalyzer(commandOrAnalyzer := false) {
-	local window, aWindow, x, y, ignore, widget
-	local data, type, speed, weight, key, value
+runAnalyzer(commandOrAnalyzer := false, arguments*) {
+	local window, aWindow, x, y, ignore, widget, advisor
+	local data, type, speed, severity, key, value, text, characteristic, characteristicLabels
 
 	static activateButton
 
@@ -308,12 +351,12 @@ runAnalyzer(commandOrAnalyzer := false) {
 
 		GuiControl, , activateButton, % translate("Apply")
 
-		GuiControl, , resultEdit, % printConfiguration(runAnalyzer("FilterTelemetry"), false)
+		GuiControl, , resultEdit, % runAnalyzer("FormatTelemetry", runAnalyzer("FilterTelemetry"))
 
 		state := "Analyze"
 	}
 	else if (commandOrAnalyzer == "Threshold")
-		GuiControl, , resultEdit, % printConfiguration(runAnalyzer("FilterTelemetry"), false)
+		GuiControl, , resultEdit, % runAnalyzer("FormatTelemetry", runAnalyzer("FilterTelemetry"))
 	else if (commandOrAnalyzer == "FilterTelemetry") {
 		GuiControlGet applyThresholdSlider
 
@@ -321,15 +364,39 @@ runAnalyzer(commandOrAnalyzer := false) {
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
-				for ignore, weight in ["Low", "Medium", "High"]
+				for ignore, severity in ["Low", "Medium", "High"]
 					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getConfigurationValue(data, type . "." . speed . "." . weight, key, kUndefined)
+						value := getConfigurationValue(data, type . "." . speed . "." . severity, key, kUndefined)
 
 						if ((value != kUndefined) && (value < applyThresholdSlider))
-							setConfigurationValue(data, type . "." . speed . "." . weight, key, 0)
+							setConfigurationValue(data, type . "." . speed . "." . severity, key, 0)
 					}
 
 		return data
+	}
+	else if (commandOrAnalyzer == "FormatTelemetry") {
+		advisor := analyzer.Advisor
+		characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
+		data := arguments[1]
+		text := ""
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, speed in ["Slow", "Fast"]
+				for ignore, severity in ["Low", "Medium", "High"]
+					for ignore, key in ["Entry", "Apex", "Exit"] {
+						value := getConfigurationValue(data, type . "." . speed . "." . severity, key, false)
+
+						if value {
+							characteristic := (type . ".Corner." . key . "." . speed)
+
+							if (StrLen(text) > 0)
+								text .= "`n"
+
+							text .= (characteristicLabels[characteristic] . translate(":") . "`t" . value . "`t" . translate("%"))
+						}
+					}
+
+		return text
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
 		return runAnalyzer("FilterTelemetry")
@@ -416,7 +483,7 @@ runAnalyzer(commandOrAnalyzer := false) {
 		loop 1
 			runWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, Edit, x16 ys w320 h200 ReadOnly HWNDwidget1 vresultEdit Hidden
+		Gui %window%:Add, Edit, x16 ys w320 h200 T128 T138 ReadOnly HWNDwidget1 vresultEdit Hidden
 
 		Gui %window%:Add, Text, x16 yp+208 w100 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
 		Gui %window%:Add, Slider, x128 yp w60 0x10 Range0-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 0

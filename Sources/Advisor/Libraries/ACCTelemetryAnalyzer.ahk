@@ -277,7 +277,7 @@ setAnalyzerSetting(key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local window, aWindow, x, y, ignore, widget, advisor
-	local data, type, speed, severity, key, value, text, characteristic, characteristicLabels
+	local data, type, speed, severity, key, value, characteristic, characteristicLabels
 
 	static activateButton
 
@@ -291,7 +291,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static mediumUndersteerThresholdSlider
 	static lightUndersteerThresholdSlider
 
-	static resultEdit
+	static resultListView
 	static applyThresholdSlider
 
 	static result := false
@@ -351,12 +351,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		GuiControl, , activateButton, % translate("Apply")
 
-		GuiControl, , resultEdit, % runAnalyzer("FormatTelemetry", runAnalyzer("FilterTelemetry"))
+		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
 
 		state := "Analyze"
 	}
 	else if (commandOrAnalyzer == "Threshold")
-		GuiControl, , resultEdit, % runAnalyzer("FormatTelemetry", runAnalyzer("FilterTelemetry"))
+		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
 	else if (commandOrAnalyzer == "FilterTelemetry") {
 		GuiControlGet applyThresholdSlider
 
@@ -374,11 +374,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		return data
 	}
-	else if (commandOrAnalyzer == "FormatTelemetry") {
+	else if (commandOrAnalyzer == "UpdateTelemetry") {
 		advisor := analyzer.Advisor
 		characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
 		data := arguments[1]
-		text := ""
+
+		Gui ListView, % resultListView
+
+		LV_Delete()
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
@@ -389,14 +392,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						if value {
 							characteristic := (type . ".Corner." . key . "." . speed)
 
-							if (StrLen(text) > 0)
-								text .= "`n"
-
-							text .= (characteristicLabels[characteristic] . translate(":") . "`t" . value . "`t" . translate("%"))
+							LV_Add("", characteristicLabels[characteristic], value)
 						}
 					}
 
-		return text
+		LV_ModifyCol()
+
+		loop 2
+			LV_ModifyCol(A_Index, "AutoHdr")
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
 		result := runAnalyzer("FilterTelemetry")
@@ -438,7 +441,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Car")
 		Gui %window%:Add, Text, x128 yp w100 h23 +0x200, % (analyzer.Car ? analyzer.Car : translate("Unknown"))
 
-		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
+		Gui %window%:Add, Text, x16 yp+30 w100 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
 		Gui %window%:Add, Edit, x128 yp w40 h23 +0x200 HWNDwidget2 vsteerLockEdit, % analyzer.SteerLock
 		Gui %window%:Add, Edit, x173 yp w40 h23 Limit4 Number HWNDwidget3 vsteerRatioEdit, % analyzer.SteerRatio
 		Gui %window%:Add, UpDown, x198 yp w18 h23 Range1-20 HWNDwidget4, % analyzer.SteerRatio
@@ -483,7 +486,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 1
 			runWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, Edit, x16 ys w320 h200 T128 T138 ReadOnly HWNDwidget1 vresultEdit Hidden
+		Gui %window%:Add, ListView, x16 ys w320 h200 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Frequency (%)"], "translate")*)
+
+		resultListView := widget1
 
 		Gui %window%:Add, Text, x16 yp+208 w100 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
 		Gui %window%:Add, Slider, x128 yp w60 0x10 Range0-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 0
@@ -518,6 +523,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		return ((result == kCancel) ? false : result)
 	}
+}
+
+noSelect() {
+	loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
 }
 
 activateAnalyzer() {

@@ -1,12 +1,11 @@
-## 4.4.9.0-release 11/25/22 (planned)
+## 4.4.9.0-release 11/25/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. Tweaked colord coding of used tyres in "Race Center".
-  4. Race strategies are now included in the "Session Database" browser and can be [managed there](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#strategies).
-  5. Support for sharing race strategies with the community (your [sharing consent](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) will popup for review again).
-  6. Fixed post pitstop tyre analysis in "Race Center".
-  7. Updated color coding of used tyres in "Race Center".
-  8. Fixed unlimited practice mode for *Assetto Corsa Competizione*.
+  3. Race strategies are now included in the "Session Database" browser and can be [managed there](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#strategies).
+  4. Support for sharing race strategies with the community (your [sharing consent](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) will popup for review again).
+  5. Fixed post pitstop tyre analysis in "Race Center".
+  6. Tweaked color coding of used tyres in "Race Center".
+  7. Fixed unlimited practice mode for *Assetto Corsa Competizione*.
 
 ## 4.4.8.0-release 11/18/22
   1. Minor bugfixes, as always

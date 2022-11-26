@@ -24,7 +24,7 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 "Setup Advisor" provides a special tool, which analyzes the telemetry data while you are driving to detect over- or understeering corner by corner. Handling issues can then be autmatically generated from this information. To start the analyzer, which is not available for every simulator, choose the "Analyzer..." item from the "Problem..." menu. The following window appears.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
 In this dialog you can initialize the analyzer for your car and you targeted driving style. It is absolutely cruicial, that the steeriing lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering. Examples:
 
@@ -39,7 +39,7 @@ Note: It is recommended to choose a car before entering the analyzer mode, since
 
 Once you have dialed your settings, you can click on "Start"
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%202.JPG)
 
 Go to the track and drive acouple of laps. Always the last 2 laps will be considered by the analyzer, therefore you can "Stop", the analyzer, when have run two consecutive decent laps. The analyzer will show you now, which handling events it detected.
 

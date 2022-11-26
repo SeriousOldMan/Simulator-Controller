@@ -1,3 +1,6 @@
+## 4.4.9.1-release 11/26/22
+  1. Fixed a critical bug in the tyres database, where under specific conditions cold pressure from the last session was lost.
+
 ## 4.4.9.0-release 11/25/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always

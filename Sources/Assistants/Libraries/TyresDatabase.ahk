@@ -393,8 +393,19 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	unlock() {
-		this.Database.unlock("Tyres.Pressures")
-		this.Database.unlock("Tyres.Pressures.Distribution")
+		try {
+			this.Database.unlock("Tyres.Pressures")
+		}
+		catch exception {
+			logError(exception)
+		}
+
+		try {
+			this.Database.unlock("Tyres.Pressures.Distribution")
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
@@ -407,7 +418,7 @@ class TyresDatabase extends SessionDatabase {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 
-		database := ((this.Shared && flush) ? this.lock() : this.requireDatabase(simulator, car, track))
+		database := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
 
 		database.add("Tyres.Pressures", {Driver: driver, Weather: weather
 									   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature

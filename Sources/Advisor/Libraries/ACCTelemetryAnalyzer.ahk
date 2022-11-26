@@ -11,6 +11,7 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Math.ahk
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -55,12 +56,12 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 			if key {
 				this.iUndersteerThresholds[key] := value
 
-				setAnalyzerSetting("ACCUndersteerThresholds", values2String(",", this.iUndersteerThresholds*))
+				setAnalyzerSetting(this, "ACCUndersteerThresholds", values2String(",", this.iUndersteerThresholds*))
 
 				return value
 			}
 			else {
-				setAnalyzerSetting("ACCUndersteerThresholds", values2String(",", value*))
+				setAnalyzerSetting(this, "ACCUndersteerThresholds", values2String(",", value*))
 
 				return (this.iUndersteerThresholds := value)
 			}
@@ -76,12 +77,12 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 			if key {
 				this.iOversteerThresholds[key] := value
 
-				setAnalyzerSetting("ACCOversteerThresholds", values2String(",", this.iOversteerThresholds*))
+				setAnalyzerSetting(this, "ACCOversteerThresholds", values2String(",", this.iOversteerThresholds*))
 
 				return value
 			}
 			else {
-				setAnalyzerSetting("ACCOversteerThresholds", values2String(",", value*))
+				setAnalyzerSetting(this, "ACCOversteerThresholds", values2String(",", value*))
 
 				return (this.iOversteerThresholds := value)
 			}
@@ -94,7 +95,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		Set {
-			setAnalyzerSetting("ACCLowspeedThreshold", value)
+			setAnalyzerSetting(this, "ACCLowspeedThreshold", value)
 
 			return (this.iLowspeedThreshold := value)
 		}
@@ -106,7 +107,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		Set {
-			setAnalyzerSetting("ACCSteerLock", value)
+			setAnalyzerSetting(this, "ACCSteerLock", value)
 
 			return (this.iSteerLock := value)
 		}
@@ -118,7 +119,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		Set {
-			setAnalyzerSetting("ACCSteerRatio", value)
+			setAnalyzerSetting(this, "ACCSteerRatio", value)
 
 			return (this.iSteerRatio := value)
 		}
@@ -126,7 +127,9 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	__New(advisor, simulator) {
 		local selectedCar := advisor.SelectedCar[false]
-		local fileName, configuration, settings
+		local fileName, configuration, settings, prefix
+
+		simulator := new SessionDatabase().getSimulatorName(simulator)
 
 		if (selectedCar == true)
 			selectedCar := false
@@ -135,7 +138,9 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
-		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", "ACCSteerLock", 900)
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".")
+
+		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "ACCSteerLock", 900)
 
 		if selectedCar {
 			fileName := ("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini")
@@ -146,11 +151,11 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		this.iUndersteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
-																					   , "ACCUndersteerThresholds", "12,16,20"))
+																					   , prefix . "ACCUndersteerThresholds", "12,16,20"))
 		this.iOversteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
-																					  , "ACCOversteerThresholds", "2,-4,-12"))
-		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", "ACCLowspeedThreshold", 100)
-		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", "ACCSteerRatio", 12)
+																					  , prefix . "ACCOversteerThresholds", "2,-4,-12"))
+		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "ACCLowspeedThreshold", 100)
+		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "ACCSteerRatio", 12)
 
 		base.__New(advisor, simulator)
 
@@ -287,10 +292,12 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setAnalyzerSetting(key, value) {
+setAnalyzerSetting(analyzer, key, value) {
+	local car := analyzer.Car
+	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . ".")
 	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
-	setConfigurationValue(settings, "Setup Advisor", key, value)
+	setConfigurationValue(settings, "Setup Advisor", prefix . key, value)
 
 	writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 }

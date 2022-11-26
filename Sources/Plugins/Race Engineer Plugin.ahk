@@ -337,9 +337,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local tyresDB := new TyresDatabase()
 		local teamServer := this.TeamServer
 		local session := this.TeamSession
+		local first := true
 		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData
-
-		tyresDB.lock()
 
 		try {
 			if (teamServer && teamServer.Active && session) {
@@ -367,30 +366,48 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						if (newStint && driverID)
 							tyresDB.registerDriver(lapPressures[1], driverID, teamServer.getStintDriverName(stint))
 
+						if first {
+							first := false
+
+							tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3])
+						}
+
 						tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 											  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
 											  , string2Values(",", lapPressures[10]), false, driverID)
 					}
 					catch exception {
 						logError(exception)
-						
+
 						break
 					}
 			}
 			else
 				try {
-					for ignore, lapData in this.LapDatabase.Tables["Pressures"]
+					for ignore, lapData in this.LapDatabase.Tables["Pressures"] {
+						if first {
+							first := false
+
+							tyresDB.lock(lapData.Simulator, lapData.Car, lapData.Track)
+						}
+
 						tyresDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather
 											  , lapData["Temperature.Air"], lapData["Temperature.Track"]
 											  , lapData.Compound, lapData["Compound.Color"]
 											  , string2Values(",", lapData["Pressures.Cold"]), string2Values(",", lapData["Pressures.Hot"]), false)
+					}
 				}
 				catch exception {
 					logError(exception)
 				}
 		}
 		finally {
-			tyresDB.unlock()
+			try {
+				tyresDB.unlock()
+			}
+			catch exception {
+				logError(exception)
+			}
 		}
 	}
 }

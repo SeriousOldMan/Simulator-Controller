@@ -611,10 +611,10 @@ public:
 };
 
 std::vector<float> recentSteerAngles;
-const int numRecentSteerAngles = 5;
+const int numRecentSteerAngles = 6;
 
 std::vector<float> recentGLongs;
-const int numRecentGLongs = 5;
+const int numRecentGLongs = 6;
 
 std::vector<CornerDynamics> cornerDynamicsList;
 

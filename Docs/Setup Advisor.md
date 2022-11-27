@@ -33,7 +33,7 @@ In this dialog you can initialize the analyzer for your car and you targeted dri
   - If you don't like understeering, move the corresponding sliders to the left.
   - And so on...
   
-You must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer events, which you want to *report*. The settings you choose, will be remembered for each simulator / track / car combination, so you have to dial them only once.
+You must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer issues, which you want to *report*. The settings you choose, will be remembered for each simulator / track / car combination, so you have to dial them only once.
 
 Note: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data.
 
@@ -41,13 +41,13 @@ Once you have dialed your settings, you can click on "Start"
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%202.JPG)
 
-Go to the track and drive acouple of laps. Always the last 2 laps will be considered by the analyzer, therefore you can "Stop", the analyzer, when have run two consecutive decent laps. The analyzer will show you now, which handling events it detected.
+Go to the track and drive acouple of laps. Always the last 2 laps will be considered by the analyzer, therefore you can "Stop" the recording, when you have run two consecutive decent laps. The analyzer will show you now, which handling issues it detected.
 
 ![](*)
 
-You can use the threshold slider here to *filter* unimportant events, which you don't want to be considered. Moving the slider to the right will remove all events, whose frequency percentage is below the set threshold. If you want to include all events, set the slider completely to the left.
+For each individual handling issue category, for example *low speed corner entry understeering*, the "Frequency" shows how often this happens related to the overall track length and the "Intensity" shows the category (*Light*, *Medium* or *Heavy*) according to your initial settings. You can use the threshold slider here to *filter* unimportant issues, which you don't want to be considered. Moving the slider to the right will remove all issues, whose frequency percentage is below the set threshold. If you want to include all issues, set the slider completely to the left.
 
-When you are satiesfied with the displayed handling events, click on "Apply". The analyzer will clear all current handling issues from "Setup Advisor" and will create new ones for the selected events. Please note, that all events for a given issue category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
+When you are satiesfied with the displayed handling issues, click on "Apply". The analyzer will clear all current handling issues from the left pane of the "Setup Advisor" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
 
 Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the analyzer.
 

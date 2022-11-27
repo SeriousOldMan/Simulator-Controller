@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.5.0
 
-No manual updates necessary.
+No manual tasks required.
 
 ***
 

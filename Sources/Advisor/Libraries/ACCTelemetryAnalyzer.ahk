@@ -169,7 +169,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		if telemetry {
 			advisor := this.Advisor
 			characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
-			severities := {Low: 33, Medium: 50, High: 66}
+			severities := {Light: 33, Medium: 50, Heavy: 66}
 			characteristics := {}
 			count := 0
 			maxValue := 0
@@ -182,13 +182,13 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, severity in ["Low", "Medium", "High"]
+					for ignore, severity in ["Light", "Medium", "Heavy"]
 						for ignore, key in ["Entry", "Apex", "Exit"]
 							maxValue := Max(maxValue, getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, 0))
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
-					for ignore, severity in ["Low", "Medium", "High"]
+					for ignore, severity in ["Light", "Medium", "Heavy"]
 						for ignore, key in ["Entry", "Apex", "Exit"] {
 							value := getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, false)
 
@@ -391,7 +391,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
-				for ignore, severity in ["Low", "Medium", "High"]
+				for ignore, severity in ["Light", "Medium", "Heavy"]
 					for ignore, key in ["Entry", "Apex", "Exit"] {
 						value := getConfigurationValue(data, type . "." . speed . "." . severity, key, kUndefined)
 
@@ -412,7 +412,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
-				for ignore, severity in ["Low", "Medium", "High"]
+				for ignore, severity in ["Light", "Medium", "Heavy"]
 					for ignore, key in ["Entry", "Apex", "Exit"] {
 						value := getConfigurationValue(data, type . "." . speed . "." . severity, key, false)
 
@@ -486,7 +486,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, Text, x24 yp+30 w100 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
 		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget10 vheavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
 
-		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget11, % translate("Normal Oversteer")
+		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
 		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget12 vmediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
@@ -495,7 +495,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, Text, x24 yp+30 w100 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
 		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget16 vlightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
 
-		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget17, % translate("Normal Understeer")
+		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
 		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")

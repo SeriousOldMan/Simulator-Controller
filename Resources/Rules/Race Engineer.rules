@@ -67,8 +67,9 @@
 
 {Any: [?Lap], {None: [?Fuel.Amount.Target]}} => (Prove: updateFuelTarget(?Lap))
 
-updateFuelTarget(?lap) <= lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?remainingFuel), remainingSessionLaps(?lap, ?remainingLaps),
-						  ?sessionFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),
+updateFuelTarget(?lap) <= lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?remainingFuel),
+						  remainingSessionLaps(?lap, ?remainingLaps),
+						  ?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel),
 						  ?neededFuel = ?sessionFuel + ?safetyFuel, ?neededFuel > ?remainingFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
 						  min(?refillAmount, !Session.Settings.Fuel.Max, ?temp), max(0, ?temp, ?adjustedRefillAmount),
 						  Set(Fuel.Amount.Target, ?adjustedRefillAmount), !

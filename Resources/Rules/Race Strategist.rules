@@ -296,13 +296,19 @@ priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap)
 
 priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan)
 
+plannedPitstopLap(!Strategy.Pitstop.Lap)
+plannedPitstopLap(?pitstopLap) <= remainingStintLaps(!Lap, Fuel, ?fuelLaps, true), ?pitstopLap = !Lap + ?fuelLaps
+
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
-updatePitstopStrategy(!Lap) <= !, lapAvgFuel(!Lap, ?avgFuel),
-							   ?temp = !Lap.Remaining - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
-							   ?targetLap != !Lap, updatePitstopStrategy(?targetLap)
+updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
+							   ?temp = ?pitstopLap - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
+							   ?targetLap != !Lap, !, updatePitstopStrategy(?targetLap)
+updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
+							   ?temp = ?pitstopLap - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
+							   ?targetLap = !Lap, !, Set(Pitstop.Strategy.Lap, ?pitstopLap)
 updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining - ?deltaLaps, round(?temp, ?remainingLaps), ?remainingLaps > 0,
 							   updatePitstopStrategy(?lap, ?remainingLaps)
-
+							   
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= ?remainingLaps < 3, Set(Pitstop.Strategy.Lap, ?targetLap), !
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), >=(?toLap, ?fromLap),
 													 updatePitstopStrategy(!Lap, ?fromLap, ?toLap)
@@ -330,9 +336,10 @@ pitstopDeltaTime(?lap, ?targetLap, ?pitstopDeltaTime) <= pitstopRefuelServiceTim
 
 pitstopRefuelServiceTime(?lap, ?targetLap, ?refillTime) <=
 		?deltaLaps = ?targetLap - ?lap,
-		lapAvgFuel(?lap, ?avgFuel), lapRemainingFuel(?lap, ?temp1), ?correction = ?deltaLaps * ?avgFuel, ?remainingFuel = ?temp1 - ?correction,
+		lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?temp1),
+		?correction = ?deltaLaps * ?avgConsumption, ?remainingFuel = ?temp1 - ?correction,
 		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
-		?sessionFuel = ?avgFuel * ?remainingLaps, safetyFuel(?avgFuel, ?safetyFuel),
+		?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel),
 		?neededFuel = ?sessionFuel + ?safetyFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
 		min(?refillAmount, !Session.Settings.Fuel.Max, ?temp2), max(0, ?temp2, ?adjustedRefillAmount),
 		pitstopRefillServiceTime(?adjustedRefillAmount, ?refillTime)

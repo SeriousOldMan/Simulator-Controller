@@ -50,7 +50,8 @@ lapDamage(?lap, Bodywork, ?damage) <= lapDamage(?lap, Bodywork, Front, ?frontDmg
 									  Set(Lap, ?lap, Damage.Bodywork, ?damage)
 lapDamage(?lap, Engine, ?damage) <= Get(Lap, ?lap, Damage.Engine, ?damage)
 									  
-lapAvgFuel(?lap, ?avgFuel) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgFuel), ?avgFuel > 0
+lapAvgConsumption(?lap, ?avgConsumption) <= Get(Lap, ?lap, Fuel.AvgConsumption, ?avgConsumption), ?avgConsumption > 0, !
+lapAvgConsumption(?lap, !Session.Settings.Fuel.AvgConsumption)
 
 lapRemainingFuel(?lap, ?remainingFuel) <= Get(Lap, ?lap, Fuel.Remaining, ?remainingFuel)
 

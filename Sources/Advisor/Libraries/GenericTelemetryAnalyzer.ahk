@@ -143,10 +143,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", 900)
 
 		if selectedCar {
-			fileName := ("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini")
+			fileName := getFileName("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
 
 			if FileExist(fileName) {
-				configuration := readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
+				configuration := readConfiguration(fileName)
 
 				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.iSteerLock)
 			}
@@ -431,7 +431,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		LV_ModifyCol()
 
-		loop 2
+		loop 3
 			LV_ModifyCol(A_Index, "AutoHdr")
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))

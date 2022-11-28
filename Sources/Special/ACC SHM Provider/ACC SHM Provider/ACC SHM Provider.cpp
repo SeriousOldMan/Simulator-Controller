@@ -76,15 +76,30 @@ void dismiss(SMElement element)
 	CloseHandle(element.hMapFile);
 }
 
-void printData(string name, float value)
-{
-	wcout << name.c_str() << "=" << value << endl;
-}
-
 void printNAData(string name, long value)
 {
 	if (value == -1)
 		wcout << name.c_str() << "=" << "n/a" << endl;
+	else {
+		wcout << name.c_str() << "=" << fixed << value << endl;
+
+		wcout.setf(0, ios::floatfield);
+	}
+}
+
+void printData(string name, float value)
+{
+	if (round(value) == value) {
+		int old_precision = wcout.precision();
+		
+		wcout.precision(0);
+
+		wcout << name.c_str() << "=" << fixed << value << endl;
+
+		wcout.setf(0, ios::floatfield);
+
+		wcout.precision(old_precision);
+	}
 	else
 		wcout << name.c_str() << "=" << value << endl;
 }
@@ -275,11 +290,11 @@ int main(int argc, char* argv[])
 		}
 		*/
 
-		double timeLeft = gf->sessionTimeLeft;
+		long timeLeft = (long)gf->sessionTimeLeft;
 
 		if (timeLeft < 0)
 			if (gf->session == AC_PRACTICE)
-				timeLeft = 3600.0 * 1000;
+				timeLeft = 3600 * 1000;
 			else
 				timeLeft = 0.0;
 
@@ -336,11 +351,11 @@ int main(int argc, char* argv[])
 		wcout << "SessionFormat=Time" << endl;
 		printData("FuelAmount", sf->maxFuel);
 
-		double timeLeft = gf->sessionTimeLeft;
+		long timeLeft = gf->sessionTimeLeft;
 
 		if (timeLeft < 0)
 			if (gf->session == AC_PRACTICE)
-				timeLeft = 3600.0 * 1000;
+				timeLeft = 3600 * 1000;
 			else
 				timeLeft = 0.0;
 

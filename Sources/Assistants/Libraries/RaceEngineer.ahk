@@ -1163,7 +1163,7 @@ class RaceEngineer extends RaceAssistant {
 			if (shutdown && (knowledgeBase.getValue("Lap", 0) > this.LearningLaps)) {
 				this.shutdownSession("Before")
 
-				if (((this.SaveTyrePressures == kAsk) && this.collectTyrePressures() && this.HasPressureData) || (this.SaveSettings == kAsk)) {
+				if (((this.SaveTyrePressures = kAsk) && this.collectTyrePressures() && this.HasPressureData) || (this.SaveSettings = kAsk)) {
 					this.getSpeaker().speakPhrase("ConfirmDataUpdate", false, true)
 
 					this.setContinuation(ObjBindMethod(this, "shutdownSession", "After"))

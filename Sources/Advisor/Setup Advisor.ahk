@@ -854,7 +854,7 @@ class SetupAdvisor extends ConfigurationItem {
 		compiler.compileRules(rules, productions, reductions)
 
 		simulator := this.SelectedSimulator
-		car := this.SelectedCar
+		car := this.SelectedCar[false]
 
 		this.compileRules(getFileName("Advisor\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
 		this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
@@ -1203,7 +1203,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local analyzerClass := getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
 		if analyzerClass
-			new %analyzerClass%(this, simulator).createCharacteristics()
+			new %analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
 	}
 
 	clearCharacteristics() {
@@ -1407,12 +1407,12 @@ class SetupAdvisor extends ConfigurationItem {
 
 		Menu CharacteristicsMenu, Add
 
-		label := translate("Telemetry Analyzer...")
+		label := translate("Analyzer...")
 		handler := ObjBindMethod(this, "startTelemetryAnalyzer")
 
 		Menu CharacteristicsMenu, Add, %label%, %handler%
 
-		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Setup", "Analyzer", false))
+		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false))
 			Menu CharacteristicsMenu, Disable, %label%
 
 		Menu CharacteristicsMenu, Show
@@ -1954,7 +1954,7 @@ class SetupEditor extends ConfigurationItem {
 
 		if !configuration {
 			simulator := advisor.SelectedSimulator
-			car := advisor.SelectedCar
+			car := advisor.SelectedCar[false]
 
 			configuration := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
 
@@ -1965,7 +1965,7 @@ class SetupEditor extends ConfigurationItem {
 			if (car != true) {
 				fileName := ("Advisor\Definitions\Cars\" . simulator . "." . car . ".ini")
 
-				for section, values in readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory . "Advisor\"))
+				for section, values in readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
 					for key, value in values
 						setConfigurationValue(configuration, section, key, value)
 			}
@@ -2552,7 +2552,7 @@ class SetupComparator extends ConfigurationItem {
 			advisor := this.Advisor
 
 			simulator := advisor.SelectedSimulator
-			car := advisor.SelectedCar
+			car := advisor.SelectedCar[false]
 
 			configuration := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
 
@@ -2563,7 +2563,7 @@ class SetupComparator extends ConfigurationItem {
 			if (car != true) {
 				fileName := ("Advisor\Definitions\Cars\" . simulator . "." . car . ".ini")
 
-				for section, values in readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory . "Advisor\"))
+				for section, values in readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
 					for key, value in values
 						setConfigurationValue(configuration, section, key, value)
 			}

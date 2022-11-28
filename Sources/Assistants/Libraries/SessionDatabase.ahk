@@ -1445,7 +1445,7 @@ class SessionDatabase extends ConfigurationItem {
 				setConfigurationValue(info, "Strategy", "Identifier", createGuid())
 				setConfigurationValue(info, "Strategy", "Synchronized", false)
 
-				setConfigurationValue(info, "Access", "Share", false)
+				setConfigurationValue(info, "Access", "Share", true)
 				setConfigurationValue(info, "Access", "Synchronize", true)
 
 				writeConfiguration(fileName . ".info", info)

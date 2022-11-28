@@ -120,33 +120,37 @@ class Database {
 			throw "Inconsistent parameters detected in Database.lock..."
 
 		if name {
-			while !done {
-				directory := this.Directory
+			if !this.Files.HasKey(name) {
+				while !done {
+					directory := this.Directory
 
-				FileCreateDir %directory%
+					FileCreateDir %directory%
 
-				try {
-					file := FileOpen(directory . name . ".CSV", "rw-rwd")
+					try {
+						file := FileOpen(directory . name . ".CSV", "rw-rwd")
+					}
+					catch exception {
+						logError(exception)
+
+						file := false
+					}
+
+					if (!file && wait)
+						Sleep 100
+					else
+						done := true
 				}
-				catch exception {
-					logError(exception)
 
-					file := false
+				if file {
+					this.Files[name] := file
+
+					return true
 				}
-
-				if (!file && wait)
-					Sleep 100
 				else
-					done := true
-			}
-
-			if file {
-				this.Files[name] := file
-
-				return true
+					return false
 			}
 			else
-				return false
+				return true
 		}
 		else
 			for name, ignore in getKeys(this.Schemas)

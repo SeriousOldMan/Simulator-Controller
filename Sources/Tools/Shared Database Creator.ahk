@@ -56,7 +56,7 @@ class DatabaseCreator {
 	iTargetDirectory := false
 
 	iIncludePressures := false
-	iIncludeStratgies := false
+	iIncludeStrategies := false
 	iIncludeSetups := false
 
 	iTyresDatabase := false
@@ -102,7 +102,7 @@ class DatabaseCreator {
 		this.iTargetDirectory := targetDirectory
 		this.iIncludePressures := includePressures
 		this.iIncludeSetups := includeSetups
-		this.iIncludeStratgies := includeStrategies
+		this.iIncludeStrategies := includeStrategies
 	}
 
 	createDatabase() {
@@ -150,10 +150,10 @@ class DatabaseCreator {
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 									this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
 
-								loop Files, %databaseDirectory%%simulator%\%car%\Race Strategies\*.*
+								loop Files, %databaseDirectory%%simulator%\%car%\%track%\Race Strategies\*.*
 									this.loadRaceStrategy(simulator, car, track, A_LoopFilePath)
 
-								loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\*.*, D
+								loop Files, %databaseDirectory%%simulator%\%car%\%track%\Car Setups\*.*, D
 								{
 									type := A_LoopFileName
 
@@ -191,26 +191,26 @@ class DatabaseCreator {
 	}
 
 	loadRaceStrategy(simulator, car, track, strategyFile) {
-		local directory := new SessionDatabase.DatabasePath
+		local directory := this.TargetDirectory
 
 		if this.IncludeStrategies {
 			updateProgress("Strategies: " simulator . " / " . car . " / " . track . "...")
 
-			FileCreateDir %directory%Community\%simulator%\%car%\Race Strategies
+			FileCreateDir %directory%Community\%simulator%\%car%\%track%\Race Strategies
 
-			FileCopy %strategyFile%, %directory%Community\%simulator%\%car%\Race Strategies, 1
+			FileCopy %strategyFile%, %directory%Community\%simulator%\%car%\%track%\Race Strategies, 1
 		}
 	}
 
 	loadCarSetup(simulator, car, track, type, setupFile) {
-		local directory := new SessionDatabase.DatabasePath
+		local directory := this.TargetDirectory
 
 		if this.IncludeSetups {
 			updateProgress("Setups: " simulator . " / " . car . " / " . track . "...")
 
-			FileCreateDir %directory%Community\%simulator%\%car%\Car Setups
+			FileCreateDir %directory%Community\%simulator%\%car%\%track%\Car Setups\%type%
 
-			FileCopy %setupFile%, %directory%Community\%simulator%\%car%\Car Setups\%type%, 1
+			FileCopy %setupFile%, %directory%Community\%simulator%\%car%\%track%\Car Setups\%type%, 1
 		}
 	}
 }
@@ -254,9 +254,11 @@ downloadUserDatabases(directory) {
 
 		deleteFile(directory . fileName)
 
-		if FileExist(directory . "Shared Database")
+		if FileExist(directory . "Shared Database Creator")
+			FileMoveDir %directory%Shared Database Creator, %directory%%idName%, R
+		else if FileExist(directory . "Shared Database")
 			FileMoveDir %directory%Shared Database, %directory%%idName%, R
-		if FileExist(directory . "Community")
+		else if FileExist(directory . "Community")
 			FileMoveDir %directory%Community, %directory%%idName%, R
 		else if FileExist(directory . "DBase")
 			FileMoveDir %directory%DBase, %directory%%idName%, R
@@ -322,14 +324,22 @@ createSharedDatabases() {
 
 	Sleep 500
 
-	databaseDirectory := (kTempDirectory . "Shared Database")
+	databaseDirectory := (kTempDirectory . "Shared Database Creator")
 
 	deleteDirectory(databaseDirectory)
 
 	FileCreateDir %databaseDirectory%\Input
 	FileCreateDir %databaseDirectory%\Output
 
-	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Creating Shared Database", message: "Cleaning remote repository..."})
+	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
+
+	downloadUserDatabases(databaseDirectory . "\Input\")
+
+	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
+
+	archives := createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\")
+
+	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "Cleaning remote repository..."})
 
 	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads")
 	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
@@ -361,16 +371,6 @@ quit
 
 	deleteFile(A_Temp . "\clearRemoteDirectory.txt")
 	deleteFile(A_Temp . "\clearRemoteDirectory.bat")
-
-	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
-
-	downloadUserDatabases(databaseDirectory . "\Input\")
-
-	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
-
-	archives := createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\")
-
-	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "..."})
 
 	for ignore, filePath in archives {
 		SplitPath filePath, fileName

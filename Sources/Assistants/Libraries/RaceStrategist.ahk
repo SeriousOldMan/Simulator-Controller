@@ -2197,7 +2197,7 @@ class RaceStrategist extends RaceAssistant {
 	}
 
 	recommendPitstop(lap := false) {
-		local knowledgeBase := this.KnowledgeBases
+		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local plannedLap
 

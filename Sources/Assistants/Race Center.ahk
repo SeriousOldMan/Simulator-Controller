@@ -2145,7 +2145,7 @@ class RaceCenter extends ConfigurationItem {
 		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
 		use4 := (this.UseTraffic ? "(x) Analyze Traffic" : "      Analyze Traffic")
 
-		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Release Strategy", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 
 		GuiControl Choose, strategyMenuDropDown, 1
 
@@ -3235,7 +3235,7 @@ class RaceCenter extends ConfigurationItem {
 		this.updateState()
 	}
 
-	updateStrategy() {
+	updateStrategy(instruct := false, verbose := true) {
 		local strategy, session, lap
 
 		if (this.Strategy && this.SessionActive)
@@ -3253,13 +3253,19 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Race Strategy", strategy)
 				this.Connector.SetSessionValue(session, "Race Strategy Version", this.Strategy.Version)
 
-				lap := this.Connector.GetSessionLastLap(session)
+				if verbose
+					showMessage(translate("Strategy has been saved for this Session."))
 
-				this.Connector.SetLapValue(lap, "Race Strategy", strategy)
-				this.Connector.SetLapValue(lap, "Strategy Update", strategy)
-				this.Connector.SetSessionValue(session, "Strategy Update", lap)
+				if instruct {
+					lap := this.Connector.GetSessionLastLap(session)
 
-				showMessage(translate("Race Strategist will be instructed as fast as possible."))
+					this.Connector.SetLapValue(lap, "Race Strategy", strategy)
+					this.Connector.SetLapValue(lap, "Strategy Update", strategy)
+					this.Connector.SetSessionValue(session, "Strategy Update", lap)
+
+					if verbose
+						showMessage(translate("Race Strategist will be instructed as fast as possible."))
+				}
 			}
 			catch exception {
 				showMessage(translate("Session has not been started yet."))
@@ -3627,7 +3633,26 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 16: ; Discard Strategy
+			case 16, 19: ; Release Strategy
+				if this.Strategy {
+					if this.SessionActive
+						this.updateStrategy(line == 19)
+					else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+						OnMessage(0x44, "")
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no current Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 17: ; Discard Strategy
 				if this.Strategy {
 					if this.SessionActive {
 						title := translate("Strategy")
@@ -3644,25 +3669,6 @@ class RaceCenter extends ConfigurationItem {
 								this.showDetails(false, false)
 						}
 					}
-					else {
-						title := translate("Information")
-
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
-						OnMessage(0x44, "")
-					}
-				}
-				else {
-					title := translate("Information")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("There is no current Strategy.")
-					OnMessage(0x44, "")
-				}
-			case 18: ; Instruct Strategist
-				if this.Strategy {
-					if this.SessionActive
-						this.updateStrategy()
 					else {
 						title := translate("Information")
 

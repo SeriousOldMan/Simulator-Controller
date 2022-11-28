@@ -1,4 +1,9 @@
-## 4.4.9.0-release 11/25/22 (planned)
+## 4.5.0.0-release 12/06/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Introduced new "Release Strategy" command in "Race Center" which saves the current strategy to the Team Server without instructing the Race Strategist at the same time.
+
+## 4.4.9.0-release 11/25/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Tweaked colord coding of used tyres in "Race Center".

@@ -5988,7 +5988,9 @@ class RaceCenter extends ConfigurationItem {
 				if (newData || newLaps)
 					this.updateReports()
 
-				if (!newLaps && !this.SessionFinished) {
+				if newLaps
+					this.saveSession()
+				else if (!newLaps && !this.SessionFinished) {
 					finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
 
 					if (finished && (finished = "true")) {

@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Telemetry Analyzer for ACC      ;;;
+;;;   Modular Simulator Controller System - Generic Telemetry Analyzer      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
@@ -26,10 +26,10 @@ global kClose := "close"
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ACCTelemetryAnalyzer                                                    ;;;
+;;; GenericTelemetryAnalyzer                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
+class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iCar := false
 
 	iUndersteerThresholds := [12, 16, 20]
@@ -56,12 +56,12 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 			if key {
 				this.iUndersteerThresholds[key] := value
 
-				setAnalyzerSetting(this, "ACCUndersteerThresholds", values2String(",", this.iUndersteerThresholds*))
+				setAnalyzerSetting(this, "UndersteerThresholds" . code, values2String(",", this.iUndersteerThresholds*))
 
 				return value
 			}
 			else {
-				setAnalyzerSetting(this, "ACCUndersteerThresholds", values2String(",", value*))
+				setAnalyzerSetting(this, "UndersteerThresholds", values2String(",", value*))
 
 				return (this.iUndersteerThresholds := value)
 			}
@@ -77,12 +77,12 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 			if key {
 				this.iOversteerThresholds[key] := value
 
-				setAnalyzerSetting(this, "ACCOversteerThresholds", values2String(",", this.iOversteerThresholds*))
+				setAnalyzerSetting(this, "OversteerThresholds", values2String(",", this.iOversteerThresholds*))
 
 				return value
 			}
 			else {
-				setAnalyzerSetting(this, "ACCOversteerThresholds", values2String(",", value*))
+				setAnalyzerSetting(this, "OversteerThresholds", values2String(",", value*))
 
 				return (this.iOversteerThresholds := value)
 			}
@@ -95,7 +95,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		Set {
-			setAnalyzerSetting(this, "ACCLowspeedThreshold", value)
+			setAnalyzerSetting(this, "LowspeedThreshold", value)
 
 			return (this.iLowspeedThreshold := value)
 		}
@@ -107,7 +107,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		Set {
-			setAnalyzerSetting(this, "ACCSteerLock", value)
+			setAnalyzerSetting(this, "SteerLock", value)
 
 			return (this.iSteerLock := value)
 		}
@@ -119,7 +119,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 
 		Set {
-			setAnalyzerSetting(this, "ACCSteerRatio", value)
+			setAnalyzerSetting(this, "SteerRatio", value)
 
 			return (this.iSteerRatio := value)
 		}
@@ -140,22 +140,24 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".")
 
-		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "ACCSteerLock", 900)
+		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", 900)
 
 		if selectedCar {
 			fileName := ("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini")
 
-			configuration := readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
+			if FileExist(fileName) {
+				configuration := readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
 
-			this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.iSteerLock)
+				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.iSteerLock)
+			}
 		}
 
 		this.iUndersteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
-																					   , prefix . "ACCUndersteerThresholds", "12,16,20"))
+																					   , prefix . "UndersteerThresholds", "12,16,20"))
 		this.iOversteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
-																					  , prefix . "ACCOversteerThresholds", "2,-4,-12"))
-		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "ACCLowspeedThreshold", 100)
-		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "ACCSteerRatio", 12)
+																					  , prefix . "OversteerThresholds", "2,-4,-12"))
+		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", 100)
+		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", 12)
 
 		base.__New(advisor, simulator)
 
@@ -233,7 +235,7 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	startTelemetryAnalyzer(dataFile) {
-		local pid, options
+		local pid, options, code, message
 
 		this.stopTelemetryAnalyzer()
 
@@ -246,13 +248,17 @@ class ACCTelemetryAnalyzer extends TelemetryAnalyzer {
 				options .= (A_Space . this.SteerLock)
 				options .= (A_Space . this.SteerRatio)
 
-				Run %kBinariesDirectory%ACC SHM Spotter.exe %options%, %kBinariesDirectory%, UserErrorLevel Hide, pid
+				code := new SessionDatabase().getSimulatorCode(this.Simulator)
+
+				Run %kBinariesDirectory%%code% SHM Spotter.exe %options%, %kBinariesDirectory%, UserErrorLevel Hide, pid
 			}
 			catch exception {
-				logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
+				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
+													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
 
-				showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				logMessage(kLogCritical, message)
+
+				showMessage(message, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 				pid := false
 			}
@@ -574,5 +580,5 @@ moveAnalyzer() {
 }
 
 openAnalyzerDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#telemetry-analyzer
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real--time-telemetry-analyzer
 }

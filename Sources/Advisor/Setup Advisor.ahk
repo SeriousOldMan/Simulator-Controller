@@ -3315,8 +3315,8 @@ runSetupAdvisor() {
 ;;;                          Editor Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include Libraries\GenericTelemetryAnalyzer.ahk
 #Include Libraries\ACCSetupEditor.ahk
-#Include Libraries\ACCTelemetryAnalyzer.ahk
 #Include Libraries\ACSetupEditor.ahk
 
 

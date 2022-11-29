@@ -584,6 +584,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			GuiControl, , lightUndersteerThresholdSlider, 0
 		}
 
+		if !analyzer.settingAvailable("SteerLock")
+			GuiControl Disable, steerRatioEdit
+
 		loop 20
 			prepareWidgets.Push(widget%A_Index%)
 

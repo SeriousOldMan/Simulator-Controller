@@ -3316,6 +3316,8 @@ runSetupAdvisor() {
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Libraries\GenericTelemetryAnalyzer.ahk
+#Include Libraries\IRCTelemetryAnalyzer.ahk
+#Include Libraries\R3ETelemetryAnalyzer.ahk
 #Include Libraries\ACCSetupEditor.ahk
 #Include Libraries\ACSetupEditor.ahk
 

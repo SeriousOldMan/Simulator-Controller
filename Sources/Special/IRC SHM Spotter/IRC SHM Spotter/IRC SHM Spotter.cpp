@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "yaml_parser.h"
 #include <cmath>
 #include <fstream>
+#include <vector>
 
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
@@ -589,6 +590,348 @@ bool greenFlag(const irsdk_header* header, const char* data) {
 	}
 }
 
+class CornerDynamics {
+public:
+	float speed;
+	float usos;
+	int completedLaps;
+	int phase;
+public:
+	CornerDynamics(float speed, float usos, int completedLaps, int phase) :
+		speed(speed),
+		usos(usos),
+		completedLaps(completedLaps),
+		phase(phase) {}
+};
+
+std::vector<float> recentSteerAngles;
+const int numRecentSteerAngles = 6;
+
+std::vector<float> recentGLongs;
+const int numRecentGLongs = 6;
+
+std::vector<CornerDynamics> cornerDynamicsList;
+
+std::string dataFile = "";
+int understeerLightThreshold = 12;
+int understeerMediumThreshold = 20;
+int understeerHeavyThreshold = 35;
+int oversteerLightThreshold = 2;
+int oversteerMediumThreshold = -6;
+int oversteerHeavyThreshold = -10;
+int lowspeedThreshold = 100;
+int steerRatio = 14;
+int lastCompletedLaps = 0;
+
+bool collectTelemetry(const irsdk_header* header, const char* data) {
+	char result[64];
+	bool onTrack = true;
+
+	getDataValue(result, header, data, "IsInGarage");
+	if (atoi(result))
+		onTrack = false;
+
+	getDataValue(result, header, data, "IsReplayPlaying");
+	if (atoi(result))
+		onTrack = false;
+
+	bool inPit = false;
+
+	char* rawValue;
+	char playerCarIdx[10] = "";
+
+	getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
+
+	int playerCarIndex = atoi(playerCarIdx);
+
+	getRawDataValue(rawValue, header, data, "CarIdxOnPitRoad");
+
+	if (((bool*)rawValue)[playerCarIndex])
+		inPit = true;
+
+	if (!onTrack || inPit)
+		return true;
+
+	getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
+
+	float steerAngle = atof(rawValue);
+
+	getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax");
+
+	float steerLock = atof(rawValue);
+
+	steerAngle = steerAngle / steerLock;
+	steerLock = steerLock * 57.2958;
+
+	recentSteerAngles.push_back(steerAngle);
+	if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
+		recentSteerAngles.erase(recentSteerAngles.begin());
+	}
+
+	getRawDataValue(rawValue, header, data, "LongAccel");
+
+	float acceleration = atof(rawValue);
+
+	recentGLongs.push_back(acceleration);
+	if ((int)recentGLongs.size() > numRecentGLongs) {
+		recentGLongs.erase(recentGLongs.begin());
+	}
+
+	getRawDataValue(rawValue, header, data, "YawRate");
+
+	float yawRate = atof(rawValue) * 57.2958;
+
+	getRawDataValue(rawValue, header, data, "Lap");
+
+	int completedLaps = atoi(rawValue);
+
+	if (fabs(yawRate) > 0.1) {
+		float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+
+		if (fabs(steeredAngleDegs) > 0.33f) {
+			float usos = -steeredAngleDegs / yawRate;
+
+			// Get the average recent steering angle
+			//vector <float>::iterator angleIter;
+			//float sumAngle = 0.0;
+			//int numAngle = 0;
+			//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
+			//	sumAngle += *angleIter;
+			//	numAngle++;
+			//}
+
+			// Get the average recent GLong
+			std::vector<float>::iterator glongIter;
+			float sumGLong = 0.0;
+			int numGLong = 0;
+			for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
+				sumGLong += *glongIter;
+				numGLong++;
+			}
+
+			int phase = 0;
+			if (numGLong > 0) {
+				//float recentAngle = (float)(fabs(sumAngle) / numAngle);
+				//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
+				//	// Increasing steer angle
+				//	phase = -1;
+				//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
+				//	// Decreasing steer angle
+				//	phase = 1;
+				//}
+				float recentGLong = sumGLong / numGLong;
+				if (recentGLong < -0.2) {
+					// Braking
+					phase = -1;
+				}
+				else if (recentGLong > 0.1) {
+					// Accelerating
+					phase = 1;
+				}
+			}
+
+			getRawDataValue(rawValue, header, data, "Speed");
+
+			cornerDynamicsList.push_back(CornerDynamics(atof(rawValue) * 3.6, usos, completedLaps, phase));
+		}
+	}
+
+	if (lastCompletedLaps != completedLaps) {
+		lastCompletedLaps = completedLaps;
+
+		// Delete all corner data nore than 2 laps old.
+		cornerDynamicsList.erase(
+			std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
+				[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
+			cornerDynamicsList.end());
+	}
+
+	return true;
+}
+
+void writeTelemetry(const irsdk_header* header, const char* data) {
+	std::ofstream output;
+
+	try {
+		output.open(dataFile + ".tmp", std::ios::out, std::ios::trunc);
+
+		int slowLightUSNum[] = { 0, 0, 0 };
+		int slowMediumUSNum[] = { 0, 0, 0 };
+		int slowHeavyUSNum[] = { 0, 0, 0 };
+		int slowLightOSNum[] = { 0, 0, 0 };
+		int slowMediumOSNum[] = { 0, 0, 0 };
+		int slowHeavyOSNum[] = { 0, 0, 0 };
+		int slowTotalNum = 0;
+		int fastLightUSNum[] = { 0, 0, 0 };
+		int fastMediumUSNum[] = { 0, 0, 0 };
+		int fastHeavyUSNum[] = { 0, 0, 0 };
+		int fastLightOSNum[] = { 0, 0, 0 };
+		int fastMediumOSNum[] = { 0, 0, 0 };
+		int fastHeavyOSNum[] = { 0, 0, 0 };
+		int fastTotalNum = 0;
+
+		std::vector<CornerDynamics>::iterator cornerIter;
+		for (cornerIter = cornerDynamicsList.begin(); cornerIter != cornerDynamicsList.end(); cornerIter++) {
+			CornerDynamics corner = *cornerIter;
+			int phase = corner.phase + 1;
+
+			if (corner.speed < lowspeedThreshold) {
+				slowTotalNum++;
+				if (corner.usos < oversteerHeavyThreshold) {
+					slowHeavyOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerMediumThreshold) {
+					slowMediumOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerLightThreshold) {
+					slowLightOSNum[phase]++;
+				}
+				else if (corner.usos > understeerHeavyThreshold) {
+					slowHeavyUSNum[phase]++;
+				}
+				else if (corner.usos > understeerMediumThreshold) {
+					slowMediumUSNum[phase]++;
+				}
+				else if (corner.usos > understeerLightThreshold) {
+					slowLightUSNum[phase]++;
+				}
+			}
+			else {
+				fastTotalNum++;
+				if (corner.usos < oversteerHeavyThreshold) {
+					fastHeavyOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerMediumThreshold) {
+					fastMediumOSNum[phase]++;
+				}
+				else if (corner.usos < oversteerLightThreshold) {
+					fastLightOSNum[phase]++;
+				}
+				else if (corner.usos > understeerHeavyThreshold) {
+					fastHeavyUSNum[phase]++;
+				}
+				else if (corner.usos > understeerMediumThreshold) {
+					fastMediumUSNum[phase]++;
+				}
+				else if (corner.usos > understeerLightThreshold) {
+					fastLightUSNum[phase]++;
+				}
+			}
+		}
+
+		output << "[Understeer.Slow.Light]" << std::endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowLightUSNum[0] / slowTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * slowLightUSNum[1] / slowTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * slowLightUSNum[2] / slowTotalNum) << std::endl;
+		}
+
+		output << "[Understeer.Slow.Medium]" << std::endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowMediumUSNum[0] / slowTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * slowMediumUSNum[1] / slowTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * slowMediumUSNum[2] / slowTotalNum) << std::endl;
+		}
+
+		output << "[Understeer.Slow.Heavy]" << std::endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowHeavyUSNum[0] / slowTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * slowHeavyUSNum[1] / slowTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * slowHeavyUSNum[2] / slowTotalNum) << std::endl;
+		}
+
+		output << "[Understeer.Fast.Light]" << std::endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastLightUSNum[0] / fastTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * fastLightUSNum[1] / fastTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * fastLightUSNum[2] / fastTotalNum) << std::endl;
+		}
+
+		output << "[Understeer.Fast.Medium]" << std::endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastMediumUSNum[0] / fastTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * fastMediumUSNum[1] / fastTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * fastMediumUSNum[2] / fastTotalNum) << std::endl;
+		}
+
+		output << "[Understeer.Fast.Heavy]" << std::endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastHeavyUSNum[0] / fastTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * fastHeavyUSNum[1] / fastTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * fastHeavyUSNum[2] / fastTotalNum) << std::endl;
+		}
+
+		output << "[Oversteer.Slow.Light]" << std::endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowLightOSNum[0] / slowTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * slowLightOSNum[1] / slowTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * slowLightOSNum[2] / slowTotalNum) << std::endl;
+		}
+
+		output << "[Oversteer.Slow.Medium]" << std::endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowMediumOSNum[0] / slowTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * slowMediumOSNum[1] / slowTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * slowMediumOSNum[2] / slowTotalNum) << std::endl;
+		}
+
+		output << "[Oversteer.Slow.Heavy]" << std::endl;
+
+		if (slowTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * slowHeavyOSNum[0] / slowTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * slowHeavyOSNum[1] / slowTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * slowHeavyOSNum[2] / slowTotalNum) << std::endl;
+		}
+
+		output << "[Oversteer.Fast.Light]" << std::endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastLightOSNum[0] / fastTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * fastLightOSNum[1] / fastTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * fastLightOSNum[2] / fastTotalNum) << std::endl;
+		}
+
+		output << "[Oversteer.Fast.Medium]" << std::endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastMediumOSNum[0] / fastTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * fastMediumOSNum[1] / fastTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * fastMediumOSNum[2] / fastTotalNum) << std::endl;
+		}
+
+		output << "[Oversteer.Fast.Heavy]" << std::endl;
+
+		if (fastTotalNum > 0) {
+			output << "Entry=" << (int)(100.0f * fastHeavyOSNum[0] / fastTotalNum) << std::endl;
+			output << "Apex=" << (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum) << std::endl;
+			output << "Exit=" << (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum) << std::endl;
+		}
+
+		output.close();
+
+		remove(dataFile.c_str());
+
+		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
+	}
+	catch (...) {
+		try {
+			output.close();
+		}
+		catch (...) {
+		}
+
+		// retry next round...
+	}
+}
+
 float initialX = 0.0;
 float initialY = 0.0;
 float lastX = 0.0;
@@ -764,13 +1107,26 @@ int main(int argc, char* argv[])
 	int countdown = 1000;
 	bool mapTrack = false;
 	bool positionTrigger = false;
+	bool analyzeTelemetry = false;
 
 	if (argc > 1) {
+		analyzeTelemetry = (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
-
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
 
-		if (positionTrigger) {
+		if (analyzeTelemetry) {
+			dataFile = argv[2];
+
+			understeerLightThreshold = atoi(argv[3]);
+			understeerMediumThreshold = atoi(argv[4]);
+			understeerHeavyThreshold = atoi(argv[5]);
+			oversteerLightThreshold = atoi(argv[6]);
+			oversteerMediumThreshold = atoi(argv[7]);
+			oversteerHeavyThreshold = atoi(argv[8]);
+			lowspeedThreshold = atoi(argv[9]);
+			steerRatio = atoi(argv[10]);
+		}
+		else if (positionTrigger) {
 			loadTrackCoordinates(argv[2]);
 
 			for (int i = 3; i < (argc - 2); i = i + 2) {
@@ -811,10 +1167,13 @@ int main(int argc, char* argv[])
 	while (!done) {
 		g_data = NULL;
 		int tries = 3;
+		long counter = 0;
 
 		bool wait = true;
 
 		while (tries-- > 0) {
+			counter++;
+
 			// wait for new data and copy it into the g_data buffer, if g_data is not null
 			if (irsdk_waitForDataReady(TIMEOUT, g_data)) {
 				const irsdk_header* pHeader = irsdk_getHeader();
@@ -839,7 +1198,15 @@ int main(int argc, char* argv[])
 						trackLength = atof(buffer) * 1000;
 					}
 
-					if (mapTrack) {
+					if (analyzeTelemetry) {
+						if (collectTelemetry(pHeader, g_data)) {
+							if (remainder(counter, 20) == 0)
+								writeTelemetry(pHeader, g_data);
+						}
+						else
+							break;
+					}
+					else if (mapTrack) {
 						if (!writeCoordinates(pHeader, g_data)) {
 							done = true;
 
@@ -931,7 +1298,9 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		if (mapTrack)
+		if (analyzeTelemetry)
+			Sleep(100);
+		else if (mapTrack)
 			Sleep(1);
 		else if (positionTrigger)
 			Sleep(10);

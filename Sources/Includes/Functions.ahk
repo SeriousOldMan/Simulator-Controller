@@ -1361,7 +1361,6 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 moveByMouse(window, descriptor := false) {
 	local curCoordMode := A_CoordModeMouse
 	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
-
 	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
 
 	if window is not Alpha
@@ -2472,9 +2471,9 @@ initializeEnvironment()
 loadSimulatorConfiguration()
 
 if !vDetachedInstallation {
-	checkForUpdates()
+	if !isDebug() {
+		checkForUpdates()
 
-	if true || !isDebug() {
 		requestShareSessionDatabaseConsent()
 		startDatabaseSynchronizer()
 		checkForNews()

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -528,7 +530,7 @@ namespace ACSHMSpotter {
 				}
 				else {
 					longitudinalRearDistance = 5;
-					
+
 					if (carBehind)
 					{
 						if (!carBehindReported)
@@ -551,7 +553,7 @@ namespace ACSHMSpotter {
 			else
 			{
 				longitudinalRearDistance = 5;
-					
+
 				lastSituation = CLEAR;
 				carBehind = false;
 				carBehindLeft = false;
@@ -652,7 +654,342 @@ namespace ACSHMSpotter {
 			return false;
 		}
 
-		float initialX = 0.0f;
+		class CornerDynamics
+		{
+			public float Speed;
+			public float Usos;
+			public int CompletedLaps;
+			public int Phase;
+
+			public CornerDynamics(float speed, float usos, int completedLaps, int phase)
+			{
+				Speed = speed;
+				Usos = usos;
+				CompletedLaps = completedLaps;
+				Phase = phase;
+			}
+		}
+
+		List<float> recentSteerAngles;
+		const int numRecentSteerAngles = 6;
+
+		List<float> recentGLongs;
+		const int numRecentGLongs = 6;
+
+		List<CornerDynamics> cornerDynamicsList;
+
+		string dataFile = "";
+		int understeerLightThreshold = 12;
+		int understeerMediumThreshold = 20;
+		int understeerHeavyThreshold = 35;
+		int oversteerLightThreshold = 2;
+		int oversteerMediumThreshold = -6;
+		int oversteerHeavyThreshold = -10;
+		int lowspeedThreshold = 100;
+		int steerLock = 900;
+		int steerRatio = 14;
+		int lastCompletedLaps = 0;
+
+		bool collectTelemetry()
+		{
+			if ((graphics.Status != AC_STATUS.AC_LIVE) || graphics.IsInPit != 0 || graphics.IsInPitLane != 0)
+				return true;
+
+			recentSteerAngles.Add(physics.SteerAngle);
+
+			if (recentSteerAngles.Count > numRecentSteerAngles)
+			{
+				recentSteerAngles.RemoveAt(0);
+			}
+
+			recentGLongs.Add(physics.AccG[2]);
+			if (recentGLongs.Count > numRecentGLongs)
+			{
+				recentGLongs.RemoveAt(0);
+			}
+
+			if (Math.Abs(physics.LocalAngularVelocity[1]) > 0.1)
+			{
+				float steeredAngleDegs = physics.SteerAngle * steerLock / 2.0f / steerRatio;
+
+				if (Math.Abs(steeredAngleDegs) > 0.33f)
+				{
+					float usos = -steeredAngleDegs / physics.LocalAngularVelocity[1];
+
+					// Get the average recent steering angle
+					//vector <float>::iterator angleIter;
+					//float sumAngle = 0.0;
+					//int numAngle = 0;
+					//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
+					//	sumAngle += *angleIter;
+					//	numAngle++;
+					//}
+
+					// Get the average recent GLong
+					float sumGLong = 0.0f;
+					int numGLong = 0;
+
+					foreach (float gLong in recentGLongs)
+					{
+						sumGLong += gLong;
+						numGLong++;
+
+					}
+
+					int phase = 0;
+					if (numGLong > 0)
+					{
+						//float recentAngle = (float)(fabs(sumAngle) / numAngle);
+						//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
+						//	// Increasing steer angle
+						//	phase = -1;
+						//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
+						//	// Decreasing steer angle
+						//	phase = 1;
+						//}
+						float recentGLong = sumGLong / numGLong;
+						if (recentGLong < -0.2)
+						{
+							// Braking
+							phase = -1;
+						}
+						else if (recentGLong > 0.1)
+						{
+							// Accelerating
+							phase = 1;
+						}
+					}
+
+					cornerDynamicsList.Add(new CornerDynamics(physics.SpeedKmh, usos, graphics.CompletedLaps, phase));
+				}
+			}
+
+			int completedLaps = graphics.CompletedLaps;
+
+			if (lastCompletedLaps != completedLaps)
+				while (true)
+					if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
+						cornerDynamicsList.RemoveAt(0);
+					else
+						break;
+
+			return true;
+		}
+
+		void writeTelemetry()
+		{
+			StreamWriter output = new StreamWriter(dataFile + ".tmp", false);
+
+			try
+			{
+				int[] slowLightUSNum = { 0, 0, 0 };
+				int[] slowMediumUSNum = { 0, 0, 0 };
+				int[] slowHeavyUSNum = { 0, 0, 0 };
+				int[] slowLightOSNum = { 0, 0, 0 };
+				int[] slowMediumOSNum = { 0, 0, 0 };
+				int[] slowHeavyOSNum = { 0, 0, 0 };
+				int slowTotalNum = 0;
+				int[] fastLightUSNum = { 0, 0, 0 };
+				int[] fastMediumUSNum = { 0, 0, 0 };
+				int[] fastHeavyUSNum = { 0, 0, 0 };
+				int[] fastLightOSNum = { 0, 0, 0 };
+				int[] fastMediumOSNum = { 0, 0, 0 };
+				int[] fastHeavyOSNum = { 0, 0, 0 };
+				int fastTotalNum = 0;
+
+				foreach (CornerDynamics corner in cornerDynamicsList)
+				{
+					int phase = corner.Phase + 1;
+
+					if (corner.Speed < lowspeedThreshold)
+					{
+						slowTotalNum++;
+						if (corner.Usos < oversteerHeavyThreshold)
+						{
+							slowHeavyOSNum[phase]++;
+						}
+						else if (corner.Usos < oversteerMediumThreshold)
+						{
+							slowMediumOSNum[phase]++;
+						}
+						else if (corner.Usos < oversteerLightThreshold)
+						{
+							slowLightOSNum[phase]++;
+						}
+						else if (corner.Usos > understeerHeavyThreshold)
+						{
+							slowHeavyUSNum[phase]++;
+						}
+						else if (corner.Usos > understeerMediumThreshold)
+						{
+							slowMediumUSNum[phase]++;
+						}
+						else if (corner.Usos > understeerLightThreshold)
+						{
+							slowLightUSNum[phase]++;
+						}
+					}
+					else
+					{
+						fastTotalNum++;
+						if (corner.Usos < oversteerHeavyThreshold)
+						{
+							fastHeavyOSNum[phase]++;
+						}
+						else if (corner.Usos < oversteerMediumThreshold)
+						{
+							fastMediumOSNum[phase]++;
+						}
+						else if (corner.Usos < oversteerLightThreshold)
+						{
+							fastLightOSNum[phase]++;
+						}
+						else if (corner.Usos > understeerHeavyThreshold)
+						{
+							fastHeavyUSNum[phase]++;
+						}
+						else if (corner.Usos > understeerMediumThreshold)
+						{
+							fastMediumUSNum[phase]++;
+						}
+						else if (corner.Usos > understeerLightThreshold)
+						{
+							fastLightUSNum[phase]++;
+						}
+					}
+				}
+
+				output.WriteLine("[Understeer.Slow.Light]");
+
+				if (slowTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * slowLightUSNum[0] / slowTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * slowLightUSNum[1] / slowTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * slowLightUSNum[2] / slowTotalNum));
+				}
+
+				output.WriteLine("[Understeer.Slow.Medium]");
+
+				if (slowTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * slowMediumUSNum[0] / slowTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * slowMediumUSNum[1] / slowTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * slowMediumUSNum[2] / slowTotalNum));
+				}
+
+				output.WriteLine("[Understeer.Slow.Heavy]");
+
+				if (slowTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * slowHeavyUSNum[0] / slowTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * slowHeavyUSNum[1] / slowTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * slowHeavyUSNum[2] / slowTotalNum));
+				}
+
+				output.WriteLine("[Understeer.Fast.Light]");
+
+				if (fastTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * fastLightUSNum[0] / fastTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * fastLightUSNum[1] / fastTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * fastLightUSNum[2] / fastTotalNum));
+				}
+
+				output.WriteLine("[Understeer.Fast.Medium]");
+
+				if (fastTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * fastMediumUSNum[0] / fastTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * fastMediumUSNum[1] / fastTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * fastMediumUSNum[2] / fastTotalNum));
+				}
+
+				output.WriteLine("[Understeer.Fast.Heavy]");
+
+				if (fastTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * fastHeavyUSNum[0] / fastTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * fastHeavyUSNum[1] / fastTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * fastHeavyUSNum[2] / fastTotalNum));
+				}
+
+				output.WriteLine("[Oversteer.Slow.Light]");
+
+				if (slowTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * slowLightOSNum[0] / slowTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * slowLightOSNum[1] / slowTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * slowLightOSNum[2] / slowTotalNum));
+				}
+
+				output.WriteLine("[Oversteer.Slow.Medium]");
+
+				if (slowTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * slowMediumOSNum[0] / slowTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * slowMediumOSNum[1] / slowTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * slowMediumOSNum[2] / slowTotalNum));
+				}
+
+				output.WriteLine("[Oversteer.Slow.Heavy]");
+
+				if (slowTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * slowHeavyOSNum[0] / slowTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * slowHeavyOSNum[1] / slowTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * slowHeavyOSNum[2] / slowTotalNum));
+				}
+
+				output.WriteLine("[Oversteer.Fast.Light]");
+
+				if (fastTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * fastLightOSNum[0] / fastTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * fastLightOSNum[1] / fastTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * fastLightOSNum[2] / fastTotalNum));
+				}
+
+				output.WriteLine("[Oversteer.Fast.Medium]");
+
+				if (fastTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * fastMediumOSNum[0] / fastTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * fastMediumOSNum[1] / fastTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * fastMediumOSNum[2] / fastTotalNum));
+				}
+
+				output.WriteLine("[Oversteer.Fast.Heavy]");
+
+				if (fastTotalNum > 0)
+				{
+					output.WriteLine("Entry=" + (int)(100.0f * fastHeavyOSNum[0] / fastTotalNum));
+					output.WriteLine("Apex=" + (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
+					output.WriteLine("Exit=" + (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
+				}
+
+				output.Close();
+
+				FileInfo info = new FileInfo(dataFile);
+
+				info.Delete();
+
+				info = new FileInfo(dataFile + ".tmp");
+
+				info.MoveTo(dataFile);
+			}
+			catch (Exception) {
+				try
+				{
+					output.Close();
+				}
+				catch (Exception) {
+				}
+
+				// retry next round...
+			}
+		}
+
+        float initialX = 0.0f;
 		float initialY = 0.0f;
 		int coordCount = 0;
 
@@ -721,30 +1058,48 @@ namespace ACSHMSpotter {
 						}
 				}
 			}
-		}
+        }
 
-		public void initializeTrigger(string[] args)
-		{
-			for (int i = 1; i < (args.Length - 1); i += 2)
-			{
-				xCoordinates[numCoordinates] = float.Parse(args[i]);
-				yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
+        public void initializeTrigger(string[] args)
+        {
+            for (int i = 1; i < (args.Length - 1); i += 2)
+            {
+                xCoordinates[numCoordinates] = float.Parse(args[i]);
+                yCoordinates[numCoordinates] = float.Parse(args[i + 1]);
 
-				numCoordinates += 1;
-			}
-		}
+                numCoordinates += 1;
+            }
+        }
 
-		public void Run(bool mapTrack, bool positionTrigger)
+        public void initializeAnalyzer(string[] args)
+        {
+            dataFile = args[1];
+
+            understeerLightThreshold = int.Parse(args[2]);
+            understeerMediumThreshold = int.Parse(args[3]);
+            understeerHeavyThreshold = int.Parse(args[4]);
+            oversteerLightThreshold = int.Parse(args[5]);
+            oversteerMediumThreshold = int.Parse(args[6]);
+            oversteerHeavyThreshold = int.Parse(args[7]);
+            lowspeedThreshold = int.Parse(args[8]);
+            steerLock = int.Parse(args[9]);
+            steerRatio = int.Parse(args[10]);
+        }
+
+        public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry)
 		{
 			bool running = false;
 
 			int countdown = 4000;
 			int safety = 200;
+			long counter = 0;
 
 			float lastTime = graphics.SessionTimeLeft;
 
 			while (true)
 			{
+				counter++;
+
 				physics = ReadPhysics();
 				graphics = ReadGraphics();
 				staticInfo = ReadStaticInfo();
@@ -752,7 +1107,17 @@ namespace ACSHMSpotter {
 
 				bool wait = true;
 
-				if (mapTrack)
+                if (analyzeTelemetry)
+                {
+                    if (collectTelemetry())
+					{
+                        if (counter % 20 == 0)
+                            writeTelemetry();
+                    }
+                    else
+                        break;
+                }
+                else if (mapTrack)
 				{
 					if (!writeCoordinates())
 						break;
@@ -802,9 +1167,11 @@ namespace ACSHMSpotter {
 					}
 				}
 
-				if (positionTrigger)
-					Thread.Sleep(10);
-				else if (wait)
+                if (analyzeTelemetry)
+                    Thread.Sleep(100);
+                else if (positionTrigger)
+                    Thread.Sleep(10);
+                else if (wait)
 					Thread.Sleep(50);
 			}
 

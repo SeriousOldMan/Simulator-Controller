@@ -15,10 +15,16 @@ namespace ACSHMSpotter {
             {
                 spotter.initializeTrigger(args);
 
-                spotter.Run(false, true);
+                spotter.Run(false, true, false);
+            }
+            else if (args.Length > 0 && args[0] == "-Analyze")
+            {
+                spotter.initializeAnalyzer(args);
+
+                spotter.Run(false, false, true);
             }
             else
-                new SHMSpotter().Run(args.Length > 0 && args[0] == "-Map", false);
+                new SHMSpotter().Run(args.Length > 0 && args[0] == "-Map", false, false);
         }
     }
 }

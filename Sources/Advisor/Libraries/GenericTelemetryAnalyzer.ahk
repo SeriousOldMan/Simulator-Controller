@@ -324,7 +324,7 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local window, aWindow, x, y, ignore, widget, advisor
-	local data, type, speed, severity, key, value, characteristic, characteristicLabels
+	local tries, data, type, speed, severity, key, value, characteristic, characteristicLabels
 
 	static activateButton
 
@@ -431,8 +431,21 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 	else if (commandOrAnalyzer == "Threshold")
 		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
-	else if (commandOrAnalyzer == "UpdateIssues")
-		runAnalyzer("UpdateTelemetry", readConfiguration(dataFile))
+	else if (commandOrAnalyzer == "UpdateIssues") {
+		tries := 10
+
+		while (tries++ > 0) {
+			data := readConfiguration(dataFile)
+
+			if (data.Count() > 0) {
+				runAnalyzer("UpdateTelemetry", data)
+
+				break
+			}
+			else
+				Sleep 20
+		}
+	}
 	else if (commandOrAnalyzer == "FilterTelemetry") {
 		GuiControlGet applyThresholdSlider
 
@@ -522,8 +535,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		Gui %window%:Add, Text, x16 yp+30 w100 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
 		Gui %window%:Add, Edit, x128 yp w40 h23 +0x200 HWNDwidget2 vsteerLockEdit, % analyzer.SteerLock
-		Gui %window%:Add, Edit, x173 yp w40 h23 Limit4 Number HWNDwidget3 vsteerRatioEdit, % analyzer.SteerRatio
-		Gui %window%:Add, UpDown, x198 yp w18 h23 Range1-20 HWNDwidget4, % analyzer.SteerRatio
+		Gui %window%:Add, Edit, x173 yp w40 h23 Limit2 Number HWNDwidget3 vsteerRatioEdit, % analyzer.SteerRatio
+		Gui %window%:Add, UpDown, x198 yp w18 h23 Range1-99 HWNDwidget4, % analyzer.SteerRatio
 
 		if !analyzer.settingAvailable("SteerLock") {
 			GuiControl Disable, steerLockEdit

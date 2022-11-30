@@ -2143,7 +2143,7 @@ readConfiguration(configFile) {
 	if FileExist(configFile) {
 		loop
 			try {
-				file := FileOpen(configFile, "r")
+				file := FileOpen(configFile, "r-rwd")
 
 				break
 			}

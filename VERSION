@@ -3,7 +3,7 @@ Version=4.5.0.0-dev
 Target=4.5.0.0-release
 Date=12/06/2022
 Download=
-Changes=Splitted "Release Strategy" from "Instruct Strategist" in "Race Center"
+Changes=Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications
 [Release]
 Version=4.4.8.0-release
 Date=11/18/2022

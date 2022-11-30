@@ -902,7 +902,10 @@ class RaceReportViewer extends RaceReportReader {
 			min := Max(avg - (3 * delta), 0)
 			max := Min(avg + (2 * delta), max)
 
-			window := window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
+			if (min = 0)
+				min := (avg / 3)
+
+			window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
 			series := ""
 			title := ""
 

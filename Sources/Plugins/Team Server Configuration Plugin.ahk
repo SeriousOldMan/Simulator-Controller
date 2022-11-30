@@ -159,6 +159,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 		local x0, x1, w1, w2, x2, w4, x4, w3, x3, x5, w5, x6, x7, lineX, lineW
+		local settings, serverURLs, choosen
 
 		Gui %window%:Font, Norm, Arial
 
@@ -191,8 +192,16 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%lineX% yp+30 w%lineW% 0x10 HWNDwidget30 Hidden
 
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+		chosen := inList(serverURLs, teamServerURLEdit)
+		if (!chosen && ((serverURLs.Length() > 0) || (StrLen(teamServerURLEdit) > 0)))
+			chosen := 1
+
 		Gui %window%:Add, Text, x%x0% yp+10 w90 h23 +0x200 HWNDwidget1 Hidden, % translate("Server URL")
-		Gui %window%:Add, Edit, x%x1% yp+1 w%w4% h21 VteamServerURLEdit HWNDwidget2 Hidden, %teamServerURLEdit%
+		Gui %window%:Add, ComboBox, x%x1% yp+1 w%w4% Choose%chosen% VteamServerURLEdit HWNDwidget2 Hidden, % values2String("|", serverURLs*)
 		Gui %window%:Add, Button, x%x4% yp-1 w23 h23 Center +0x200 gcopyURL HWNDwidget26 Hidden
 		setButtonIcon(widget26, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 
@@ -342,6 +351,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		local connector := this.Connector
 		local window := this.Editor.Window
 		local token, availableMinutes, title, sessionDB, connection
+		local settings, serverURLs, chosen
 
 		static keepAliveTask := false
 
@@ -393,6 +403,21 @@ class TeamServerConfigurator extends ConfigurationItem {
 				}
 				catch exception {
 					teamServerDataTokenEdit := ""
+				}
+
+				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+				if !inList(serverURLs, teamServerURLEdit) {
+					serverURLs.Push(teamServerURLEdit)
+
+					setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
+
+					writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+
+					GuiControl, , teamServerURLEdit, % ("|" . values2String("|", serverURLs*))
+					GuiControl Choose, teamServerURLEdit, % inList(serverURLs, teamServerURLEdit)
 				}
 
 				GuiControl Text, teamServerSessionTokenEdit, %teamServerSessionTokenEdit%

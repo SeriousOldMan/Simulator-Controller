@@ -1146,7 +1146,7 @@ class RaceCenter extends ConfigurationItem {
 
 	createGui(configuration) {
 		local window := this.Window
-		local x, y, width, ignore, report, choices
+		local x, y, width, ignore, report, choices, serverURLs, settings
 
 		Gui %window%:Default
 
@@ -1176,8 +1176,19 @@ class RaceCenter extends ConfigurationItem {
 		y := 70
 		width := 388
 
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+		if (!inList(serverURLs, this.ServerURL) && StrLen(this.ServerURL) > 0)
+			serverURLs.Push(this.ServerURL)
+
+		chosen := inList(serverURLs, this.ServerURL)
+		if (!chosen && (serverURLs.Length() > 0))
+			chosen := 1
+
 		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Server URL")
-		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverURLEdit, % this.ServerURL
+		Gui %window%:Add, ComboBox, x141 yp+1 w245 Choose%chosen% VserverURLEdit, % values2String("|", serverURLs*)
 
 		Gui %window%:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Session Token")
 		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverTokenEdit, % this.ServerToken
@@ -1522,7 +1533,7 @@ class RaceCenter extends ConfigurationItem {
 
 	connectAsync(silent) {
 		local window := this.Window
-		local token, title, sessionDB, connection
+		local token, title, sessionDB, connection, serverURLs, settings, chosen
 
 		if (!silent && GetKeyState("Ctrl", "P")) {
 			Gui TSL:+Owner%window%
@@ -1570,6 +1581,21 @@ class RaceCenter extends ConfigurationItem {
 
 			if connection {
 				this.iConnection := connection
+
+				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+				if !inList(serverURLs, this.ServerURL) {
+					serverURLs.Push(this.ServerURL)
+
+					setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
+
+					writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+
+					GuiControl, , serverURLEdit, % ("|" . values2String("|", serverURLs*))
+					GuiControl Choose, serverURLEdit, % inList(serverURLs, this.ServerURL)
+				}
 
 				showMessage(translate("Successfully connected to the Team Server."))
 
@@ -8419,6 +8445,9 @@ class RaceCenter extends ConfigurationItem {
 
 		min := Max(avg - (3 * delta), 0)
 		max := Min(avg + (2 * delta), max)
+
+		if (min = 0)
+			min := (avg / 3)
 
 		window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
 		consistency := 0

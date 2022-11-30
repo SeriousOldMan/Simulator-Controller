@@ -899,7 +899,7 @@ void writeTelemetry() {
 			output << "Steer Lock=" << steerLock << std::endl;
 			output << "Steer Ratio=" << steerRatio << std::endl;
 			output << "Steer Angle=" << (pf->steerAngle * steerLock / steerRatio) << std::endl;
-			output << "Yaw Rate=" << pf->localAngularVel[1] << std::endl;
+			output << "Yaw Rate=" << -pf->localAngularVel[1] << std::endl;
 			output << "Speed=" << pf->speedKmh << std::endl;
 			output << "Acceleration=" << pf->accG[2] << std::endl;
 

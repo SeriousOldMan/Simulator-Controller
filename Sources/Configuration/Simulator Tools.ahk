@@ -2341,9 +2341,7 @@ checkDirectoryDependency(directory, modification) {
 	logMessage(kLogInfo, translate("Checking all files in ") . directory)
 
 	loop Files, % directory . "*.ahk", R
-	{
 		files.Push(A_LoopFilePath)
-	}
 
 	for ignore, file in files
 		if checkFileDependency(file, modification)

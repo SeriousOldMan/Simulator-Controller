@@ -425,9 +425,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		GuiControl, , activateButton, % translate("Apply")
 
-		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
-
 		state := "Analyze"
+
+		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
 	}
 	else if (commandOrAnalyzer == "Threshold")
 		runAnalyzer("UpdateTelemetry", runAnalyzer("FilterTelemetry"))
@@ -454,6 +454,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		advisor := analyzer.Advisor
 		characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
 		data := arguments[1]
+
+		Gui TAN:Default
 
 		Gui ListView, % ((state = "Run") ? issuesListView : resultListView)
 

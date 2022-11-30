@@ -1146,7 +1146,7 @@ class RaceCenter extends ConfigurationItem {
 
 	createGui(configuration) {
 		local window := this.Window
-		local x, y, width, ignore, report, choices
+		local x, y, width, ignore, report, choices, serverURLs, settings
 
 		Gui %window%:Default
 
@@ -1176,8 +1176,19 @@ class RaceCenter extends ConfigurationItem {
 		y := 70
 		width := 388
 
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+		if (!inList(serverURLs, this.ServerURL) && StrLen(this.ServerURL) > 0)
+			serverURLs.Push(this.ServerURL)
+
+		chosen := inList(serverURLs, this.ServerURL)
+		if (!chosen && (serverURLs.Length() > 0))
+			chosen := 1
+
 		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Server URL")
-		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverURLEdit, % this.ServerURL
+		Gui %window%:Add, ComboBox, x141 yp+1 w245 Choose%chosen% VserverURLEdit, % values2String("|", serverURLs*)
 
 		Gui %window%:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Session Token")
 		Gui %window%:Add, Edit, x141 yp+1 w245 h21 VserverTokenEdit, % this.ServerToken
@@ -1522,7 +1533,7 @@ class RaceCenter extends ConfigurationItem {
 
 	connectAsync(silent) {
 		local window := this.Window
-		local token, title, sessionDB, connection
+		local token, title, sessionDB, connection, serverURLs, settings, chosen
 
 		if (!silent && GetKeyState("Ctrl", "P")) {
 			Gui TSL:+Owner%window%
@@ -1570,6 +1581,21 @@ class RaceCenter extends ConfigurationItem {
 
 			if connection {
 				this.iConnection := connection
+
+				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+				if !inList(serverURLs, this.ServerURL) {
+					serverURLs.Push(this.ServerURL)
+
+					setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
+
+					writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+
+					GuiControl, , serverURLEdit, % ("|" . values2String("|", serverURLs*))
+					GuiControl Choose, serverURLEdit, % inList(serverURLs, this.ServerURL)
+				}
 
 				showMessage(translate("Successfully connected to the Team Server."))
 
@@ -2145,7 +2171,7 @@ class RaceCenter extends ConfigurationItem {
 		use3 := (this.UseCurrentMap ? "(x) Keep current Map" : "      Keep current Map")
 		use4 := (this.UseTraffic ? "(x) Analyze Traffic" : "      Analyze Traffic")
 
-		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
+		GuiControl, , strategyMenuDropDown, % "|" . values2String("|", map(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Strategy Summary", "---------------------------------------------", use1, use2, use3, use4, "---------------------------------------------", "Adjust Strategy (Simulation)", "---------------------------------------------", "Release Strategy", "Discard Strategy", "---------------------------------------------", "Instruct Strategist"], "translate")*)
 
 		GuiControl Choose, strategyMenuDropDown, 1
 
@@ -3235,7 +3261,7 @@ class RaceCenter extends ConfigurationItem {
 		this.updateState()
 	}
 
-	updateStrategy() {
+	updateStrategy(instruct := false, verbose := true) {
 		local strategy, session, lap
 
 		if (this.Strategy && this.SessionActive)
@@ -3253,13 +3279,19 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetSessionValue(session, "Race Strategy", strategy)
 				this.Connector.SetSessionValue(session, "Race Strategy Version", this.Strategy.Version)
 
-				lap := this.Connector.GetSessionLastLap(session)
+				if verbose
+					showMessage(translate("Strategy has been saved for this Session."))
 
-				this.Connector.SetLapValue(lap, "Race Strategy", strategy)
-				this.Connector.SetLapValue(lap, "Strategy Update", strategy)
-				this.Connector.SetSessionValue(session, "Strategy Update", lap)
+				if instruct {
+					lap := this.Connector.GetSessionLastLap(session)
 
-				showMessage(translate("Race Strategist will be instructed as fast as possible."))
+					this.Connector.SetLapValue(lap, "Race Strategy", strategy)
+					this.Connector.SetLapValue(lap, "Strategy Update", strategy)
+					this.Connector.SetSessionValue(session, "Strategy Update", lap)
+
+					if verbose
+						showMessage(translate("Race Strategist will be instructed as fast as possible."))
+				}
 			}
 			catch exception {
 				showMessage(translate("Session has not been started yet."))
@@ -3627,7 +3659,26 @@ class RaceCenter extends ConfigurationItem {
 					MsgBox 262192, %title%, % translate("There is no current Strategy.")
 					OnMessage(0x44, "")
 				}
-			case 16: ; Discard Strategy
+			case 16, 19: ; Release Strategy
+				if this.Strategy {
+					if this.SessionActive
+						this.updateStrategy(line == 19)
+					else {
+						title := translate("Information")
+
+						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
+						OnMessage(0x44, "")
+					}
+				}
+				else {
+					title := translate("Information")
+
+					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
+					MsgBox 262192, %title%, % translate("There is no current Strategy.")
+					OnMessage(0x44, "")
+				}
+			case 17: ; Discard Strategy
 				if this.Strategy {
 					if this.SessionActive {
 						title := translate("Strategy")
@@ -3644,25 +3695,6 @@ class RaceCenter extends ConfigurationItem {
 								this.showDetails(false, false)
 						}
 					}
-					else {
-						title := translate("Information")
-
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						MsgBox 262192, %title%, % translate("You are not connected to an active session.")
-						OnMessage(0x44, "")
-					}
-				}
-				else {
-					title := translate("Information")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262192, %title%, % translate("There is no current Strategy.")
-					OnMessage(0x44, "")
-				}
-			case 18: ; Instruct Strategist
-				if this.Strategy {
-					if this.SessionActive
-						this.updateStrategy()
 					else {
 						title := translate("Information")
 
@@ -8415,6 +8447,9 @@ class RaceCenter extends ConfigurationItem {
 
 		min := Max(avg - (3 * delta), 0)
 		max := Min(avg + (2 * delta), max)
+
+		if (min = 0)
+			min := (avg / 3)
 
 		window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
 		consistency := 0

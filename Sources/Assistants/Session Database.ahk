@@ -4122,6 +4122,7 @@ editSettings(editorOrCommand, arguments*) {
 	local directory, empty, original, changed, restart, groups, replication
 	local oldConnections, ignore, group, enabled
 	local identifier, serverURL, serverToken, serverURLs, serverTokens
+	local availableServerURLs, settings, chosen
 
 	static result := false
 	static sessionDB := false
@@ -4211,7 +4212,20 @@ editSettings(editorOrCommand, arguments*) {
 		serverTokenEdit := connections[currentConnection][3]
 
 		GuiControl, , serverIdentifierEdit, %serverIdentifierEdit%
-		GuiControl, , serverURLEdit, %serverURLEdit%
+
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		availableServerURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+		if (!inList(availableServerURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
+			availableServerURLs.Push(serverURLEdit)
+
+		chosen := inList(availableServerURLs, serverURLEdit)
+		if (!chosen && (availableServerURLs.Length() > 0))
+			chosen := 1
+
+		GuiControl, , serverURLEdit, % ("|" . values2String("|", availableServerURLs*))
+		GuiControl Choose, serverURLEdit, %chosen%
 		GuiControl, , serverTokenEdit, %serverTokenEdit%
 
 		groups := connections[currentConnection][4]
@@ -4327,6 +4341,21 @@ editSettings(editorOrCommand, arguments*) {
 			if (connection && (connection != "")) {
 				connector.ValidateDataToken()
 
+				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				availableServerURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+				if !inList(availableServerURLs, serverURLEdit) {
+					availableServerURLs.Push(serverURLEdit)
+
+					setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", availableServerURLs*))
+
+					writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+
+					GuiControl, , serverURLEdit, % ("|" . values2String("|", availableServerURLs*))
+					GuiControl Choose, serverURLEdit, % inList(availableServerURLs, serverURLEdit)
+				}
+
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
@@ -4422,7 +4451,7 @@ editSettings(editorOrCommand, arguments*) {
 			serverUpdateEdit := ""
 
 			GuiControl, , serverIdentifierEdit, %serverIdentifierEdit%
-			GuiControl, , serverURLEdit, %serverURLEdit%
+			GuiControl Choose, serverURLEdit, 0
 			GuiControl, , serverTokenEdit, %serverTokenEdit%
 			GuiControl, , serverUpdateEdit, %serverUpdateEdit%
 		}
@@ -4530,8 +4559,19 @@ editSettings(editorOrCommand, arguments*) {
 		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Name")
 		Gui %window%:Add, Edit, x146 yp+1 w246 vserverIdentifierEdit, %serverIdentifierEdit%
 
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		availableServerURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+		if (!inList(availableServerURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
+			availableServerURLs.Push(serverURLEdit)
+
+		chosen := inList(availableServerURLs, serverURLEdit)
+		if (!chosen && (availableServerURLs.Length() > 0))
+			chosen := 1
+
 		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Server URL")
-		Gui %window%:Add, Edit, x146 yp+1 w246 vserverURLEdit, %serverURLEdit%
+		Gui %window%:Add, ComboBox, x146 yp+1 w246 Choose%chosen% vserverURLEdit, % values2String("|", availableServerURLs*)
 
 		Gui %window%:Add, Text, x24 yp+23 w90 h23 +0x200, % translate("Data Token")
 		Gui %window%:Add, Edit, x146 yp w246 h21 vserverTokenEdit, %serverTokenEdit%

@@ -488,7 +488,7 @@ loadSessions(connector, team) {
 editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
 	local dirName, simulatorCode, title, file, compound, compoundColor, fileName, token
-	local x, y, e, sessionDB, directory, connection
+	local x, y, e, sessionDB, directory, connection, settings, serverURLs
 
 	static result
 	static newSettings
@@ -653,6 +653,21 @@ restart:
 											  , "Driver")
 
 				if (connection && (connection != "")) {
+					settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+					serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+
+					if !inList(serverURLs, serverURLEdit) {
+						serverURLs.Push(serverURLEdit)
+
+						setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
+
+						writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+
+						GuiControl, , serverURLEdit, % ("|" . values2String("|", serverURLs*))
+						GuiControl Choose, serverURLEdit, % inList(serverURLs, serverURLEdit)
+					}
+
 					connector.ValidateSessionToken()
 
 					if keepAliveTask
@@ -886,6 +901,10 @@ restart:
 			driverIdentifier := getConfigurationValue(settingsOrCommand, "Team Settings", "Driver.Identifier", false)
 			sessionName := getConfigurationValue(settingsOrCommand, "Team Settings", "Session.Name", "")
 			sessionIdentifier := getConfigurationValue(settingsOrCommand, "Team Settings", "Session.Identifier", false)
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
 		}
 
 		Gui RES:Default
@@ -1230,7 +1249,15 @@ restart:
 			Gui RES:Tab, 4
 
 			Gui RES:Add, Text, x16 y82 w90 h23 +0x200, % translate("Server URL")
-			Gui RES:Add, Edit, x126 yp+1 w256 vserverURLEdit, %serverURLEdit%
+
+			if (!inList(serverURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
+				serverURLs.Push(serverURLEdit)
+
+			chosen := inList(serverURLs, serverURLEdit)
+			if (!chosen && (serverURLs.Length() > 0))
+				chosen := 1
+
+			Gui RES:Add, ComboBox, x126 yp+1 w256 Choose%chosen% vserverURLEdit, % values2String("|", serverURLs*)
 
 			Gui RES:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Session Token")
 			Gui RES:Add, Edit, x126 yp w256 h21 vserverTokenEdit, %serverTokenEdit%

@@ -883,6 +883,8 @@ void writeTelemetry() {
 
  		remove(dataFile.c_str());
 
+		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
+
 		if (false) {
 			ofstream output;
 			

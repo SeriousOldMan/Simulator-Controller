@@ -33,7 +33,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iCar := false
 
 	iUndersteerThresholds := [12, 16, 20]
-	iOversteerThresholds := [2, -4, -12]
+	iOversteerThresholds := [0, -6, -12]
 	iLowspeedThreshold := 100
 
 	iSteerLock := 900
@@ -155,7 +155,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iUndersteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
 																					   , prefix . "UndersteerThresholds", "12,16,20"))
 		this.iOversteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
-																					  , prefix . "OversteerThresholds", "2,-4,-12"))
+																					  , prefix . "OversteerThresholds", "0,-6,-12"))
 		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", 100)
 		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", 12)
 

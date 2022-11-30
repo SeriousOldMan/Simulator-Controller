@@ -717,7 +717,7 @@ void writeTelemetry() {
 	ofstream output;
 
 	try {
-		output.open(dataFile + ".tmp", ios::out, ios::trunc);
+		output.open(dataFile + ".tmp", ios::out | ios::trunc);
 
 		int slowLightUSNum[] = { 0, 0, 0 };
 		int slowMediumUSNum[] = { 0, 0, 0 };
@@ -883,7 +883,26 @@ void writeTelemetry() {
 
  		remove(dataFile.c_str());
 
-		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
+		if (false) {
+			ofstream output;
+			
+			output.open(dataFile + ".trace", ios::out | ios::app);
+
+			output << "[Debug]" << std::endl;
+
+			SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+			SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+			output << "Steering=" << pf->steerAngle << std::endl;
+			output << "Steer Lock=" << steerLock << std::endl;
+			output << "Steer Ratio=" << steerRatio << std::endl;
+			output << "Steer Angle=" << (pf->steerAngle * steerLock / steerRatio) << std::endl;
+			output << "Yaw Rate=" << pf->localAngularVel[1] << std::endl;
+			output << "Speed=" << pf->speedKmh << std::endl;
+			output << "Acceleration=" << pf->accG[2] << std::endl;
+
+			output.close();
+		}
 	}
 	catch (...) {
 		try {

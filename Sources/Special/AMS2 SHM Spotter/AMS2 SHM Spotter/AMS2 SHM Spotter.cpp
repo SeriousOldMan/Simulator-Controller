@@ -472,9 +472,6 @@ bool greenFlag(SharedMemory* shm) {
 		return false;
 }
 
-
-
-
 class CornerDynamics {
 public:
 	float speed;
@@ -518,16 +515,18 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 		recentSteerAngles.erase(recentSteerAngles.begin());
 	}
 
-	recentGLongs.push_back(sharedData->mLocalAcceleration[2]);
+	recentGLongs.push_back(-sharedData->mLocalAcceleration[VEC_Z]);
 	if ((int)recentGLongs.size() > numRecentGLongs) {
 		recentGLongs.erase(recentGLongs.begin());
 	}
 
-	if (fabs(sharedData->mAngularVelocity[1]) > 0.1) {
+	double yawRate = sharedData->mAngularVelocity[VEC_Y] * 57.2958;
+
+	if (fabs(yawRate) > 0.1) {
 		float steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
 
 		if (fabs(steeredAngleDegs) > 0.33f) {
-			float usos = -steeredAngleDegs / sharedData->mAngularVelocity[1];
+			float usos = -steeredAngleDegs / yawRate;
 
 			// Get the average recent steering angle
 			//vector <float>::iterator angleIter;
@@ -592,7 +591,7 @@ void writeTelemetry(const SharedMemory* sharedData) {
 	std::ofstream output;
 
 	try {
-		output.open(dataFile + ".tmp", std::ios::out, std::ios::trunc);
+		output.open(dataFile + ".tmp", std::ios::out | std::ios::trunc);
 
 		int slowLightUSNum[] = { 0, 0, 0 };
 		int slowMediumUSNum[] = { 0, 0, 0 };
@@ -616,6 +615,7 @@ void writeTelemetry(const SharedMemory* sharedData) {
 
 			if (corner.speed < lowspeedThreshold) {
 				slowTotalNum++;
+
 				if (corner.usos < oversteerHeavyThreshold) {
 					slowHeavyOSNum[phase]++;
 				}
@@ -637,6 +637,7 @@ void writeTelemetry(const SharedMemory* sharedData) {
 			}
 			else {
 				fastTotalNum++;
+				
 				if (corner.usos < oversteerHeavyThreshold) {
 					fastHeavyOSNum[phase]++;
 				}
@@ -759,6 +760,24 @@ void writeTelemetry(const SharedMemory* sharedData) {
 		remove(dataFile.c_str());
 
 		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
+
+		if (false) {
+			std::ofstream output;
+
+			output.open(dataFile + ".trace", std::ios::out | std::ios::app);
+
+			output << "[Debug]" << std::endl;
+
+			output << "Steering=" << sharedData->mSteering << std::endl;
+			output << "Steer Lock=" << steerLock << std::endl;
+			output << "Steer Ratio=" << steerRatio << std::endl;
+			output << "Steer Angle=" << (sharedData->mSteering * steerLock / 2.0f / steerRatio) << std::endl;
+			output << "Yaw Rate=" << (sharedData->mAngularVelocity[VEC_Y] * 57.2958) << std::endl;
+			output << "Speed=" << sharedData->mSpeed * 3.6 << std::endl;
+			output << "Acceleration=" << -sharedData->mLocalAcceleration[VEC_Z] << std::endl;
+
+			output.close();
+		}
 	}
 	catch (...) {
 		try {

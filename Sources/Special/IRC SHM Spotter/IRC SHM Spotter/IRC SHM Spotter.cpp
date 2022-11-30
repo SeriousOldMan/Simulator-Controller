@@ -920,6 +920,54 @@ void writeTelemetry(const irsdk_header* header, const char* data) {
 		remove(dataFile.c_str());
 
 		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
+
+		if (true) {
+			char* rawValue;
+			char playerCarIdx[10] = "";
+
+			getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
+
+			int playerCarIndex = atoi(playerCarIdx);
+
+			getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
+
+			float steerAngle = atof(rawValue);
+
+			getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax");
+
+			float steerLock = atof(rawValue);
+
+			steerAngle = steerAngle / steerLock;
+			steerLock = steerLock * 57.2958;
+
+			getRawDataValue(rawValue, header, data, "LongAccel");
+
+			float acceleration = atof(rawValue);
+
+			getRawDataValue(rawValue, header, data, "YawRate");
+
+			float yawRate = atof(rawValue) * 57.2958;
+
+			getRawDataValue(rawValue, header, data, "Speed");
+
+			float speed = atof(rawValue) * 3.6;
+
+			std::ofstream output;
+
+			output.open(dataFile + ".trace", std::ios::out | std::ios::app);
+
+			output << "[Debug]" << std::endl;
+
+			output << "Steering=n/a" << std::endl;
+			output << "Steer Lock=" << steerLock << std::endl;
+			output << "Steer Ratio=" << steerRatio << std::endl;
+			output << "Steer Angle=" << steerAngle << std::endl;
+			output << "Yaw Rate=" << yawRate << std::endl;
+			output << "Speed=" << speed << std::endl;
+			output << "Acceleration=" << acceleration << std::endl;
+
+			output.close();
+		}
 	}
 	catch (...) {
 		try {
@@ -1163,11 +1211,11 @@ int main(int argc, char* argv[])
 
 	float trackLength = 0.0;
 	bool done = false;
+	long counter = 0;
 
 	while (!done) {
 		g_data = NULL;
 		int tries = 3;
-		long counter = 0;
 
 		bool wait = true;
 

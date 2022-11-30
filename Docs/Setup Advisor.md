@@ -26,16 +26,22 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
-In this dialog you can initialize the analyzer for your car and you targeted driving style. It is absolutely cruicial, that the steeriing lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering. Examples:
+In this dialog you can initialize the analyzer for your car and you targeted driving style.
 
-  - If you prefer a more loose rear, move the top three sliders a little bit to the left.
-  - If you prefer a safe and stable, move all sliders a little bit to the center.
-  - If you don't like understeering, move the corresponding sliders to the left.
-  - And so on...
+  1. It is absolutely cruicial, that the steeriing lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner. For *Assetto Corsa Competizione*, the value for "Steer Lock" is taken from the meta data of a given car, and the value for "Steer Ratio" must be taken from the currently chosen setup. For *RaceRoom Racing Experience* these values are fixed and will be taken directly from the simulator. For all other simulators and their cars, correspondind information or calculation rules can be found on the internet in most cases.
+
+  2. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering.
+
+  3. The thresholds are also very specific for a given simulator and a given car and also for your preferred driving style. Therefore you have to experiment a little bit to find the best settings here. But some general rules apply:
+
+     - If you prefer a more loose rear, move the top three sliders a little bit to the left.
+     - If you prefer a safe and stable, move all sliders a little bit to the center.
+     - If you don't like understeering, move the corresponding sliders to the left.
+     - And so on...
   
-You must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer issues, which you want to *report*. The settings you choose, will be remembered for each simulator / track / car combination, so you have to dial them only once.
+     As said, you must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer issues, which you want to *report*. The settings you choose, will be remembered for each simulator / track / car combination, so you have to dial them only once.
 
-Note: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data.
+Note: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator.
 
 Once you have dialed your settings, you can click on "Start"
 

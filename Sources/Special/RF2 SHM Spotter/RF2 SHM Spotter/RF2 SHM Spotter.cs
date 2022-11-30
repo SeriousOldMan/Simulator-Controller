@@ -15,6 +15,7 @@ using System.Threading;
 using static RF2SHMSpotter.rFactor2Constants;
 using static RF2SHMSpotter.rFactor2Constants.rF2GamePhase;
 using static RF2SHMSpotter.rFactor2Constants.rF2PitState;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace RF2SHMSpotter {
 	public class SHMSpotter {
@@ -23,7 +24,7 @@ namespace RF2SHMSpotter {
 		// Read buffers:
 		MappedBuffer<rF2Scoring> scoringBuffer = new MappedBuffer<rF2Scoring>(rFactor2Constants.MM_SCORING_FILE_NAME, true /*partial*/, true /*skipUnchanged*/);
         MappedBuffer<rF2Extended> extendedBuffer = new MappedBuffer<rF2Extended>(rFactor2Constants.MM_EXTENDED_FILE_NAME, false /*partial*/, true /*skipUnchanged*/);
-        MappedBuffer<rF2Telemetry> telemetryBuffer = new MappedBuffer<rF2Telemetry>(rFactor2Constants.MM_TELEMETRY_FILE_NAME, false /*partial*/, true /*skipUnchanged*/);
+        MappedBuffer<rF2Telemetry> telemetryBuffer = new MappedBuffer<rF2Telemetry>(rFactor2Constants.MM_TELEMETRY_FILE_NAME, true /*partial*/, true /*skipUnchanged*/);
 
         // Marshalled views:
         rF2Scoring scoring;
@@ -751,19 +752,21 @@ namespace RF2SHMSpotter {
                 recentSteerAngles.RemoveAt(0);
             }
 
-            recentGLongs.Add(telemetry.mVehicles[carID].mLocalAccel.z);
+            recentGLongs.Add(telemetry.mVehicles[carID].mLocalAccel.y);
             if (recentGLongs.Count > numRecentGLongs)
             {
                 recentGLongs.RemoveAt(0);
             }
 
-            if (Math.Abs(telemetry.mVehicles[carID].mLocalRot.y) > 0.1)
+			double yawRate = telemetry.mVehicles[carID].mLocalRot.z * 57.2958;
+
+            if (Math.Abs(yawRate) > 0.1)
             {
                 double steeredAngleDegs = telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio;
 
                 if (Math.Abs(steeredAngleDegs) > 0.33f)
                 {
-                    double usos = -steeredAngleDegs / telemetry.mVehicles[carID].mLocalRot.y;
+                    double usos = -steeredAngleDegs / yawRate;
 
                     // Get the average recent steering angle
                     //vector <float>::iterator angleIter;
@@ -1028,6 +1031,37 @@ namespace RF2SHMSpotter {
                 info = new FileInfo(dataFile + ".tmp");
 
                 info.MoveTo(dataFile);
+
+                if (true)
+                {
+					int carID = 0;
+
+                    for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+                        if (scoring.mVehicles[i].mIsPlayer != 0)
+                        {
+                            carID = i;
+
+                            break;
+                        }
+
+                    StreamWriter trace = new StreamWriter(dataFile + ".trace", true);
+
+                    trace.WriteLine("[Debug]");
+
+                    trace.WriteLine("Steering=" + telemetry.mVehicles[carID].mFilteredSteering);
+                    trace.WriteLine("Steer Lock=" + steerLock);
+                    trace.WriteLine("Steer Ratio=" + steerRatio);
+                    trace.WriteLine("Steer Angle=" + telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio);
+                    trace.WriteLine("Yaw Rate=" + telemetry.mVehicles[carID].mLocalRot.z * 57.2958);
+
+                    rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
+                    double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+
+                    trace.WriteLine("Speed=" + speed);
+                    trace.WriteLine("Acceleration=" + telemetry.mVehicles[carID].mLocalAccel.y);
+
+                    trace.Close();
+                }
             }
             catch (Exception)
             {

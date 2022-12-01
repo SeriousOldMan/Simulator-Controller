@@ -2136,7 +2136,7 @@ readConfiguration(configFile) {
 	local configuration := {}
 	local section := false
 	local file := false
-	local tries := 2
+	local tries := 20
 	local currentLine, firstChar, keyValue, key, value
 
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
@@ -2153,7 +2153,7 @@ readConfiguration(configFile) {
 					if (tries-- <= 0)
 						return configuration
 					else
-						Sleep 50
+						Sleep 10
 			}
 
 		if file {

@@ -1986,6 +1986,9 @@ externalCommandManager() {
 
 		try {
 			file := FileOpen(fileName, "rw-rwd")
+			
+			if !file
+				return
 		}
 		catch exception {
 			return

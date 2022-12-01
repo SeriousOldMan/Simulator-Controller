@@ -1223,13 +1223,21 @@ class SessionDatabase extends ConfigurationItem {
 
 		if FileExist(fileName) {
 			file := FileOpen(fileName, "r")
-			size := file.Length
+			
+			if file {
+				size := file.Length
 
-			file.RawRead(data, size)
+				file.RawRead(data, size)
 
-			file.Close()
+				file.Close()
 
-			return data
+				return data
+			}
+			else {
+				size := 0
+
+				return ""
+			}
 		}
 		else {
 			size := 0
@@ -1291,31 +1299,33 @@ class SessionDatabase extends ConfigurationItem {
 
 		deleteFile(fileName)
 
-		file := FileOpen(fileName, "w", "")
+		file := FileOpen(fileName, "w")
 
-		file.RawWrite(setup, size)
+		if file {
+			file.RawWrite(setup, size)
 
-		file.Close()
+			file.Close()
 
-		if !driver
-			driver := this.ID
+			if !driver
+				driver := this.ID
 
-		info := this.readSetupInfo(simulator, car, track, type, name)
+			info := this.readSetupInfo(simulator, car, track, type, name)
 
-		if (driver != kUndefined)
-			setConfigurationValue(info, "Origin", "Driver", driver)
+			if (driver != kUndefined)
+				setConfigurationValue(info, "Origin", "Driver", driver)
 
-		if (identifier != kUndefined)
-			setConfigurationValue(info, "Setup", "Identifier", identifier)
+			if (identifier != kUndefined)
+				setConfigurationValue(info, "Setup", "Identifier", identifier)
 
-		setConfigurationValue(info, "Setup", "Synchronized", synchronized)
+			setConfigurationValue(info, "Setup", "Synchronized", synchronized)
 
-		setConfigurationValue(info, "Setup", "Size", size)
+			setConfigurationValue(info, "Setup", "Size", size)
 
-		setConfigurationValue(info, "Access", "Share", share)
-		setConfigurationValue(info, "Access", "Synchronize", synchronize)
+			setConfigurationValue(info, "Access", "Share", share)
+			setConfigurationValue(info, "Access", "Synchronize", synchronize)
 
-		this.writeSetupInfo(simulator, car, track, type, name, info)
+			this.writeSetupInfo(simulator, car, track, type, name, info)
+		}
 	}
 
 	writeSetupInfo(simulator, car, track, type, name, info) {

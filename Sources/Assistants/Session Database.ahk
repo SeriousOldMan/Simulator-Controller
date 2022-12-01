@@ -3504,17 +3504,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if (fileName != "") {
 			file := FileOpen(fileName, "r")
-			size := file.Length
+			
+			if file {
+				size := file.Length
 
-			file.RawRead(setup, size)
+				file.RawRead(setup, size)
 
-			file.Close()
+				file.Close()
 
-			SplitPath fileName, fileName
+				SplitPath fileName, fileName
 
-			this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, false, true)
+				this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, false, true)
 
-			this.loadSetups(this.SelectedSetupType, true, fileName)
+				this.loadSetups(this.SelectedSetupType, true, fileName)
+			}
 		}
 	}
 
@@ -3539,10 +3542,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			file := FileOpen(fileName, "w", "")
 
-			file.Length := size
-			file.RawWrite(setupData, size)
+			if file {
+				file.Length := size
+				file.RawWrite(setupData, size)
 
-			file.Close()
+				file.Close()
+			}
 		}
 	}
 

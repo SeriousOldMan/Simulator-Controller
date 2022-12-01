@@ -200,6 +200,9 @@ class MessageManager extends PeriodicTask {
 
 			try {
 				file := FileOpen(fileName, "rw-rwd")
+				
+				if !file
+					return result
 			}
 			catch exception {
 				return result

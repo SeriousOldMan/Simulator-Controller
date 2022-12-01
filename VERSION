@@ -1,9 +1,9 @@
 [Development]
 Version=4.5.0.0-dev
 Target=4.5.0.0-release
-Date=11/30/2022
+Date=12/01/2022
 Download=
-Changes=Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications
+Changes=Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, On-track telemetry analyzer for "Setup Advisor"
 [Release]
 Version=4.4.8.0-release
 Date=11/18/2022
@@ -12,5 +12,5 @@ Changes=New synchronization support for car setups and race strategies in the Te
 [Current]
 Type=Development
 [Version]
-Release=4.5.0.0-release
+Release=4.4.8.0-release
 Development=4.5.0.0-dev

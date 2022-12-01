@@ -875,6 +875,8 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Car Data.ini")
 		local carData := readConfiguration(fileName)
 
+		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+
 		if (getConfigurationValue(carData, "Car Names", car, kUndefined) == kUndefined) {
 			setConfigurationValue(carData, "Car Names", car, name)
 			setConfigurationValue(carData, "Car Codes", name, car)
@@ -887,7 +889,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	getCarName(simulator, car) {
 		local name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									, "Car Names", car, car)
+										  , "Car Names", car, car)
 
 		if (!name || (name = ""))
 			name := car
@@ -905,9 +907,12 @@ class SessionDatabase extends ConfigurationItem {
 		return code
 	}
 
-	registerTrack(simulator, track, shortName, longName) {
-		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Track Data.ini")
+	registerTrack(simulator, car, track, shortName, longName) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
 		local trackData := readConfiguration(fileName)
+
+		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
 
 		if (getConfigurationValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
 			setConfigurationValue(trackData, "Track Names Long", track, longName)
@@ -1218,13 +1223,21 @@ class SessionDatabase extends ConfigurationItem {
 
 		if FileExist(fileName) {
 			file := FileOpen(fileName, "r")
-			size := file.Length
+			
+			if file {
+				size := file.Length
 
-			file.RawRead(data, size)
+				file.RawRead(data, size)
 
-			file.Close()
+				file.Close()
 
-			return data
+				return data
+			}
+			else {
+				size := 0
+
+				return ""
+			}
 		}
 		else {
 			size := 0
@@ -1286,31 +1299,33 @@ class SessionDatabase extends ConfigurationItem {
 
 		deleteFile(fileName)
 
-		file := FileOpen(fileName, "w", "")
+		file := FileOpen(fileName, "w")
 
-		file.RawWrite(setup, size)
+		if file {
+			file.RawWrite(setup, size)
 
-		file.Close()
+			file.Close()
 
-		if !driver
-			driver := this.ID
+			if !driver
+				driver := this.ID
 
-		info := this.readSetupInfo(simulator, car, track, type, name)
+			info := this.readSetupInfo(simulator, car, track, type, name)
 
-		if (driver != kUndefined)
-			setConfigurationValue(info, "Origin", "Driver", driver)
+			if (driver != kUndefined)
+				setConfigurationValue(info, "Origin", "Driver", driver)
 
-		if (identifier != kUndefined)
-			setConfigurationValue(info, "Setup", "Identifier", identifier)
+			if (identifier != kUndefined)
+				setConfigurationValue(info, "Setup", "Identifier", identifier)
 
-		setConfigurationValue(info, "Setup", "Synchronized", synchronized)
+			setConfigurationValue(info, "Setup", "Synchronized", synchronized)
 
-		setConfigurationValue(info, "Setup", "Size", size)
+			setConfigurationValue(info, "Setup", "Size", size)
 
-		setConfigurationValue(info, "Access", "Share", share)
-		setConfigurationValue(info, "Access", "Synchronize", synchronize)
+			setConfigurationValue(info, "Access", "Share", share)
+			setConfigurationValue(info, "Access", "Synchronize", synchronize)
 
-		this.writeSetupInfo(simulator, car, track, type, name, info)
+			this.writeSetupInfo(simulator, car, track, type, name, info)
+		}
 	}
 
 	writeSetupInfo(simulator, car, track, type, name, info) {

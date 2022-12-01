@@ -204,13 +204,14 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		return true
 	}
 
-	startSession(settings, data) {
-		base.startSession(settings, data)
-
+	prepareSession(settings, data) {
 		new SessionDatabase().registerTrack(getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+										  , getConfigurationValue(data, "Session Data", "Car", "Unknown")
 										  , getConfigurationValue(data, "Session Data", "Track", "Unknown")
 										  , getConfigurationValue(data, "Session Data", "TrackShortName", "Unknown")
 										  , getConfigurationValue(data, "Session Data", "TrackLongName", "Unknown"))
+	
+		base.prepareSession(settings, data)
 	}
 
 	startPitstopSetup(pitstopNumber) {

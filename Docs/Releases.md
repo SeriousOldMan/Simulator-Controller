@@ -4,6 +4,7 @@
   3. The "Setup Advisor" now supports a telemetry data analyzer, which derives handling issue entries from actual over- or understeering, while you are driving. See the all new [documentation](*) for more information.
   4. Introduced new "Release Strategy" command in "Race Center" which saves the current strategy to the Team Server without instructing the Race Strategist at the same time.
   5. Valid Team Server URLs are remembered in all applications, so that you can choose them from a list instead of retyping them all the time.
+  5. Creating teams, drivers and sessions for the Team Server with "empty" names is no longer possible. Old "zombies" will be deleted automatically.
 
 ## 4.4.9.0-release 11/25/22
   1. Minor bugfixes, as always

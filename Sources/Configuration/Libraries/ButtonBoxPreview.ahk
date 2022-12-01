@@ -463,7 +463,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		if (GetKeyState("Ctrl", "P") && !isEmpty)
 			LayoutsList.Instance.changeControl(row, column, "__Number__", false)
 		else {
-			menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
+			menuItem := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
 
 			try {
 				Menu MainMenu, DeleteAll

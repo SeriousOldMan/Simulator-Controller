@@ -4,6 +4,11 @@
   3. Introduced new "Release Strategy" command in "Race Center" which saves the current strategy to the Team Server without instructing the Race Strategist at the same time.
   4. Valid Team Server URLs are remembered in all applications, so that you can choose them from a list instead of retyping them all the time.
   5. Creating teams, drivers and sessions for the Team Server with "empty" names is no longer possible. Old "zombies" will be deleted automatically.
+  6. New controller actions to "Mute" and "Unmute" for the [Race Assistant plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer).
+  7. New icons for Stream Deck for the "Mute" and "Unmute" controller actions.
+  8. The Stream Deck Icons preset has been updated as well.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-450), especially if you want to use the "Mute" and "Unmute" controller actions.
 
 ## 4.4.9.0-release 11/25/22
   1. Minor bugfixes, as always

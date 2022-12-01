@@ -678,6 +678,15 @@ class RaceAssistant extends ConfigurationItem {
 			this.VoiceManager.recognizeCommand("No", ["No"])
 	}
 
+	mute() {
+		this.activateRecognized([])
+	}
+
+	unmute() {
+		this.deactivateRecognized([])
+	}
+
+
 	nameRecognized(words) {
 		this.getSpeaker().speakPhrase("IHearYou")
 	}

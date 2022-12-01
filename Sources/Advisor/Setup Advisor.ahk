@@ -759,7 +759,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 	getCars(simulator) {
 		local cars := []
-		local car, descriptor
+		local sessionDB, ignore, car, descriptor
 
 		if ((simulator != true) && (simulator != "*")) {
 			loop Files, %kResourcesDirectory%Advisor\Definitions\Cars\%simulator%.*.ini, F
@@ -780,6 +780,17 @@ class SetupAdvisor extends ConfigurationItem {
 
 				if ((car != "Generic") && !inList(cars, car))
 					cars.Push(car)
+			}
+
+			if (this.SimulatorDefinition && (getConfigurationValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
+				sessionDB := new SessionDatabase()
+
+				for ignore, car in sessionDB.getCars(simulator) {
+					car := sessionDB.getCarName(simulator, car)
+
+					if !inList(cars, car)
+						cars.Push(car)
+				}
 			}
 		}
 

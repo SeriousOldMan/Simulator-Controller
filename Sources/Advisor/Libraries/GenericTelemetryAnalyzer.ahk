@@ -531,7 +531,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, Text, x128 yp w180 h23 +0x200, % analyzer.Simulator
 
 		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Car")
-		Gui %window%:Add, Text, x128 yp w100 h23 +0x200, % (analyzer.Car ? analyzer.Car : translate("Unknown"))
+		Gui %window%:Add, Text, x128 yp w180 h23 +0x200, % (analyzer.Car ? analyzer.Car : translate("Unknown"))
 
 		Gui %window%:Add, Text, x16 yp+30 w100 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
 		Gui %window%:Add, Edit, x128 yp w40 h23 +0x200 HWNDwidget2 vsteerLockEdit, % analyzer.SteerLock

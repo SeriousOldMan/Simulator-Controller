@@ -40,10 +40,12 @@ In this dialog you can initialize the analyzer for your car and you targeted dri
      - And so on...
   
      As said, you must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer issues, which you want to *report*. The settings you choose, will be remembered for each simulator / track / car combination, so you have to dial them only once.
+	 
+	 Technical: The sliders indicate from which value a deviation of the ideal yaw angle is considered light, medium or heavy. If there is no glide angle at all, this value is 0. In the case of oversteer, the value is negative (the larger, the more drift angle) and in the case of understeer, the value is positive, the larger, the more understeer.
 
 Note: It is recommended to choose a car before entering the analyzer mode, since then some of the values in this dialog will be initialized with car specific data, depending on the chosen simulator.
 
-Once you have dialed your settings, you can click on "Start"
+Once you have dialed your settings, you can click on "Start".
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%202.JPG)
 

@@ -872,7 +872,8 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	registerCar(simulator, car, name) {
-		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Car Data.ini")
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
 		local carData := readConfiguration(fileName)
 
 		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
@@ -1223,7 +1224,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if FileExist(fileName) {
 			file := FileOpen(fileName, "r")
-			
+
 			if file {
 				size := file.Length
 

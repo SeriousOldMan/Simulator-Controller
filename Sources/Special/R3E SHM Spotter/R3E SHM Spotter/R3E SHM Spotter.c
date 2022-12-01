@@ -58,13 +58,23 @@ void map_close()
 }
 
 int getPlayerID() {
-    for (int i = 0; i < map_buffer->num_cars; i++) {
-        if (map_buffer->all_drivers_data_1[i].place == map_buffer->position) {
-            return map_buffer->all_drivers_data_1[i].driver_info.user_id;
-         }
-    }
+	for (int i = 0; i < map_buffer->num_cars; i++) {
+		if (map_buffer->all_drivers_data_1[i].place == map_buffer->position) {
+			return map_buffer->all_drivers_data_1[i].driver_info.user_id;
+		}
+	}
 
-    return -1;
+	return -1;
+}
+
+int getPlayerIndex() {
+	for (int i = 0; i < map_buffer->num_cars; i++) {
+		if (map_buffer->all_drivers_data_1[i].place == map_buffer->position) {
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 int sendStringMessage(HWND hWnd, int wParam, char* msg) {
@@ -650,22 +660,19 @@ typedef struct {
 corner_dynamics cornerDynamicsRing[NumCornerDynamics];
 int cornerDynamicsStart = 0;
 int cornerDynamicsEnd = 0;
-int cornerDynamicsCount = 0;
 
 void appendCornerDynamics(corner_dynamics* cd) {
+	cornerDynamicsRing[cornerDynamicsEnd] = *cd;
+
 	if (cornerDynamicsStart <= cornerDynamicsEnd) {
 		if (++cornerDynamicsEnd == NumCornerDynamics) {
 			cornerDynamicsEnd = 0;
 			cornerDynamicsStart++;
 		}
-
-		cornerDynamicsRing[cornerDynamicsEnd] = *cd;
 	}
 	else {
 		if (++cornerDynamicsEnd == NumCornerDynamics)
 			cornerDynamicsEnd = 0;
-
-		cornerDynamicsRing[cornerDynamicsEnd] = *cd;
 
 		if (++cornerDynamicsStart == NumCornerDynamics)
 			cornerDynamicsStart = 0;
@@ -682,7 +689,7 @@ corner_dynamics* nextCornerDynamics(int* index) {
 		if (*index == NumCornerDynamics)
 			*index = 0;
 		else {
-			result = &cornerDynamicsRing[*index++];
+			result = &cornerDynamicsRing[(*index)++];
 
 			if (result->speed != 0)
 				return result;
@@ -714,8 +721,10 @@ int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
 int lastCompletedLaps = 0;
 
-BOOL collectTelemetry(int playerID) {
-	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerID].in_pitlane != 0))
+BOOL collectTelemetry() {
+	int playerIdx = getPlayerIndex();
+
+	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
 		return TRUE;
 
 	r3e_float32 steerAngle = map_buffer->steer_input_raw;
@@ -789,7 +798,7 @@ void writeTelemetry() {
 	strcpy_s(fileName, 512, dataFile);
 	strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".tmp");
 
-	if (!fopen_s(&output, fileName, "W")) {
+	if (!fopen_s(&output, fileName, "w")) {
 		int slowLightUSNum[] = { 0, 0, 0 };
 		int slowMediumUSNum[] = { 0, 0, 0 };
 		int slowHeavyUSNum[] = { 0, 0, 0 };
@@ -960,7 +969,7 @@ void writeTelemetry() {
 			strcpy_s(fileName, 512, dataFile);
 			strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".trace");
 
-			if (!fopen_s(&output, fileName, "W")) {
+			if (!fopen_s(&output, fileName, "a")) {
 				fprintf(output, "[Debug]\n");
 
 				r3e_float32 steerAngle = map_buffer->steer_input_raw;
@@ -1119,9 +1128,9 @@ int main(int argc, char* argv[])
 
 		if (mapped_r3e) {
 			if (analyzeTelemetry) {
-				if (collectTelemetry(playerID)) {
+				if (collectTelemetry()) {
 					if (remainder(counter, 20) == 0)
-						writeTelemetry(playerID);
+						writeTelemetry();
 				}
 				else
 					break;

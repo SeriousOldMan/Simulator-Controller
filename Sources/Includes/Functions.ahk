@@ -2145,7 +2145,10 @@ readConfiguration(configFile) {
 			try {
 				file := FileOpen(configFile, "r-wd")
 
-				break
+				if file
+					break
+				else
+					throw "File not found..."
 			}
 			catch exception {
 				if !FileExist(configFile)

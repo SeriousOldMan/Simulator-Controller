@@ -15,7 +15,7 @@
 
 class R3ETelemetryAnalyzer extends GenericTelemetryAnalyzer {
 	settingAvailable(setting) {
-		if ((setting = "SteerLock") || (seting = "SteerRatio"))
+		if ((setting = "SteerLock") || (setting = "SteerRatio"))
 			return false
 		else
 			return base.settingAvailable(setting)

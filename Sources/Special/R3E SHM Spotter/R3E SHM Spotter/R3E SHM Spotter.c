@@ -728,7 +728,7 @@ BOOL collectTelemetry() {
 		return TRUE;
 
 	r3e_float32 steerAngle = map_buffer->steer_input_raw;
-	r3e_float32 steerLock = map_buffer->steer_wheel_range_degrees;
+	r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
 	r3e_float32 steerRatio = map_buffer->steer_lock_degrees * 2.0f;
 	// r3e_float32 steerLock = map_buffer->steer_lock_degrees * 2.0f;
 	// r3e_float32 steerRatio = steerLock / map_buffer->steer_wheel_range_degrees;
@@ -975,7 +975,7 @@ void writeTelemetry() {
 				fprintf(output, "[Debug]\n");
 
 				r3e_float32 steerAngle = map_buffer->steer_input_raw;
-				r3e_float32 steerLock = map_buffer->steer_wheel_range_degrees;
+				r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
 				r3e_float32 steerRatio = map_buffer->steer_lock_degrees * 2.0f;
 				// r3e_float32 steerLock = map_buffer->steer_lock_degrees * 2.0f;
 				// r3e_float32 steerRatio = steerLock / map_buffer->steer_wheel_range_degrees;
@@ -983,7 +983,7 @@ void writeTelemetry() {
 				r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958;
 
 				fprintf(output, "Steering=%f\n", steerAngle);
-				fprintf(output, "Steer Lock=%f\n", steerLock);
+				fprintf(output, "Steer Lock=%d\n", steerLock);
 				fprintf(output, "Steer Ratio=%f\n", steerRatio);
 				fprintf(output, "Steer Angle=%f\n", (steerAngle * steerLock / steerRatio));
 				fprintf(output, "Yaw Rate=%lf\n", -angularVelocity);

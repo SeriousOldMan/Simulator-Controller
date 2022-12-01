@@ -561,7 +561,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 				try {
 					team := this.parseObject(connector.GetTeam(identifier))
 
-					this.iTeams[team.Name] := team.Identifier
+					if (StrLen(Trim(team.Name)) = 0)
+						connector.DeleteTeam(identifier)
+					else
+						this.iTeams[team.Name] := team.Identifier
 				}
 				catch exception {
 					logError(exception)
@@ -605,7 +608,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 					name := computeDriverName(driver.ForName, driver.SurName, driver.NickName)
 
-					this.iDrivers[name] := driver.Identifier
+					if (StrLen(Trim(name)) = 0)
+						connector.DeleteDriver(identifier)
+					else
+						this.iDrivers[name] := driver.Identifier
 				}
 				catch exception {
 					logError(exception)
@@ -646,7 +652,10 @@ class TeamServerConfigurator extends ConfigurationItem {
 				try {
 					session := this.parseObject(connector.GetSession(identifier))
 
-					this.iSessions[session.Name] := session.Identifier
+					if (StrLen(Trim(session.Name)) = 0)
+						connector.DeleteSession(identifier)
+					else
+						this.iSessions[session.Name] := session.Identifier
 				}
 				catch exception {
 					logError(exception)
@@ -1051,7 +1060,7 @@ newTeam() {
 
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
 
-	if !ErrorLevel
+	if (!ErrorLevel && (StrLen(Trim(name)) > 0))
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "addTeam"), name)
 }
 
@@ -1080,7 +1089,7 @@ renameTeam() {
 
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedTeam
 
-	if !ErrorLevel
+	if (!ErrorLevel && (StrLen(Trim(name)) > 0))
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "renameTeam"), configurator.SelectedTeam, name)
 }
 
@@ -1114,7 +1123,7 @@ newDriver() {
 
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
 
-	if !ErrorLevel
+	if (!ErrorLevel && (StrLen(Trim(name)) > 0))
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "addDriver"), name)
 }
 
@@ -1143,7 +1152,7 @@ renameDriver() {
 
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedDriver
 
-	if !ErrorLevel
+	if (!ErrorLevel && (StrLen(Trim(name)) > 0))
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "renameDriver"), configurator.SelectedDriver, name)
 }
 
@@ -1177,7 +1186,7 @@ newSession() {
 
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%
 
-	if !ErrorLevel
+	if (!ErrorLevel && (StrLen(Trim(name)) > 0))
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "addSession"), name)
 }
 
@@ -1194,7 +1203,7 @@ renameSession() {
 
 	InputBox name, %title%, %prompt%, , 300, 200, , , %locale%, , % configurator.SelectedSession
 
-	if !ErrorLevel
+	if (!ErrorLevel && (StrLen(Trim(name)) > 0))
 		configurator.withExceptionHandler(ObjBindMethod(configurator, "renameSession"), configurator.SelectedSession, name)
 }
 

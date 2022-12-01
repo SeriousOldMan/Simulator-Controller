@@ -863,6 +863,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceSpotter.reject()
 	}
 
+	prepareSession(settings, data) {
+		local sessionDB := new SessionDatabase()
+		local simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		local car := getConfigurationValue(data, "Session Data", "Car", "Unknown")
+		local track := getConfigurationValue(data, "Session Data", "Track", "Unknown")
+
+		sessionDB.registerCar(simulator, car, sessionDB.getCarName(simulator, car))
+
+		sessionDB.registerTrack(simulator, car, track
+							  , sessionDB.getTrackName(simulator, track, false), sessionDB.getTrackName(simulator, track, true))
+	}
+
 	startSession(settings, data) {
 		local compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		local compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
@@ -873,6 +885,8 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		this.CurrentTyreCompound := compound(compound, compoundColor)
 
 		this.updateTyreCompound(data)
+
+		this.prepareSession(settings, data)
 	}
 
 	finishSession() {

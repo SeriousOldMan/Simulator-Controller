@@ -875,6 +875,8 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Car Data.ini")
 		local carData := readConfiguration(fileName)
 
+		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+
 		if (getConfigurationValue(carData, "Car Names", car, kUndefined) == kUndefined) {
 			setConfigurationValue(carData, "Car Names", car, name)
 			setConfigurationValue(carData, "Car Codes", name, car)
@@ -887,7 +889,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	getCarName(simulator, car) {
 		local name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
-									, "Car Names", car, car)
+										  , "Car Names", car, car)
 
 		if (!name || (name = ""))
 			name := car
@@ -905,9 +907,12 @@ class SessionDatabase extends ConfigurationItem {
 		return code
 	}
 
-	registerTrack(simulator, track, shortName, longName) {
-		local fileName := (kUserHomeDirectory . "Simulator Data\" . this.getSimulatorCode(simulator) . "\" . "Track Data.ini")
+	registerTrack(simulator, car, track, shortName, longName) {
+		local simulatorCode := this.getSimulatorCode(simulator)
+		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
 		local trackData := readConfiguration(fileName)
+
+		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
 
 		if (getConfigurationValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
 			setConfigurationValue(trackData, "Track Names Long", track, longName)

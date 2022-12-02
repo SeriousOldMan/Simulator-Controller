@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.5.0
 
-New controller actions ["Mute" and "Unmute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) have been introduced for all Race Assistants. If you want to use this new commands and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icons for the new actions are available.
+New controller actions ["Mute" and "Unmute"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) have been introduced for all Race Assistants. If you want to use this new commands and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icons for the new actions are available. There are also special icons "Mute_ASSISTANTS.png" and "Unmute_ASSISTANTS.png" available, if you want to create a Stream Deck action, which mutes/unmutes all Assistants with one button press.
 
 ***
 

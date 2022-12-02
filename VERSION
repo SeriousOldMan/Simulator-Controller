@@ -10,7 +10,7 @@ Date=11/26/2022
 Download=https://cutt.ly/I1dTTpR;https://www.dropbox.com/s/emctj6dpw24glvm/Simulator%20Controller%204.4.9.1-release.zip?dl=1
 Changes=Included race strategies in the "Session Database" browser, Support for sharing race strategies with the community, Fixed post pitstop tyre analysis in "Race Center", Fixed unlimited practice mode for *Assetto Corsa Competizione*, Updated color coding of used tyres in "Race Center"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.4.9.1-release
 Development=4.5.0.0-dev

@@ -708,13 +708,13 @@ namespace RF2SHMSpotter {
             }
         }
 
-        List<double> recentSteerAngles;
+        List<double> recentSteerAngles = new List<double>();
         const int numRecentSteerAngles = 6;
 
-        List<double> recentGLongs;
+        List<double> recentGLongs = new List<double>();
         const int numRecentGLongs = 6;
 
-        List<CornerDynamics> cornerDynamicsList;
+        List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
 
         string dataFile = "";
         int understeerLightThreshold = 12;
@@ -1027,7 +1027,7 @@ namespace RF2SHMSpotter {
 
                 info.MoveTo(dataFile);
 
-                if (true)
+                if (false)
                 {
 					int carID = 0;
 
@@ -1195,7 +1195,7 @@ namespace RF2SHMSpotter {
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {
-			bool running = false;
+            bool running = false;
 			int countdown = 4000;
 			long counter = 0;
 

@@ -434,7 +434,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	else if (commandOrAnalyzer == "UpdateIssues") {
 		tries := 10
 
-		while (tries++ > 0) {
+		while (tries-- > 0) {
 			data := readConfiguration(dataFile)
 
 			if (data.Count() > 0) {

@@ -876,7 +876,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
 		local carData := readConfiguration(fileName)
 
-		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
+		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%
 
 		if (getConfigurationValue(carData, "Car Names", car, kUndefined) == kUndefined) {
 			setConfigurationValue(carData, "Car Names", car, name)

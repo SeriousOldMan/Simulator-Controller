@@ -670,13 +670,13 @@ namespace ACSHMSpotter {
 			}
 		}
 
-		List<float> recentSteerAngles;
+		List<float> recentSteerAngles = new List<float>();
 		const int numRecentSteerAngles = 6;
 
-		List<float> recentGLongs;
+		List<float> recentGLongs = new List<float>();
 		const int numRecentGLongs = 6;
 
-		List<CornerDynamics> cornerDynamicsList;
+		List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
 
 		string dataFile = "";
 		int understeerLightThreshold = 12;

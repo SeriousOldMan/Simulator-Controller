@@ -2151,11 +2151,10 @@ readConfiguration(configFile) {
 					throw "File not found..."
 			}
 			catch exception {
-				if !FileExist(configFile)
-					if (tries-- <= 0)
-						return configuration
-					else
-						Sleep 10
+				if (tries-- <= 0)
+					return configuration
+				else
+					Sleep 10
 			}
 
 		if file {

@@ -2211,11 +2211,11 @@ parseConfiguration(text) {
 
 writeConfiguration(configFile, configuration, symbolic := true) {
 	local tempFile := temporaryFileName("Config", "ini")
-	local directory, section, keyValues, key, value, pairs
+	local directory, section, keyValues, key, value, pairs, tries
 
 	deleteFile(tempFile)
 
-	SplitPath tempFile, , directory
+	SplitPath configFile, , directory
 	FileCreateDir %directory%
 
 	for section, keyValues in configuration {
@@ -2235,6 +2235,7 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 	}
 
 	configFile := getFileName(configFile, kUserConfigDirectory)
+	tries := 10
 
 	loop
 		try {
@@ -2244,6 +2245,9 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 		}
 		catch exception {
 			logError(exception)
+
+			if (tries-- <= 0)
+				break
 		}
 }
 

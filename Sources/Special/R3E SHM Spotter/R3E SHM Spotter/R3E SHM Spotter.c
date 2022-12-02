@@ -629,10 +629,10 @@ void appendSteerAngle(float steerAngle) {
 		for (int i = 1; i < steerAngleCount; i++)
 			recentSteerAngles[i - 1] = recentSteerAngles[i];
 
-		steerAngleCount = 0;
+		steerAngleCount--;
 	}
 
-	recentSteerAngles[steerAngleCount] = steerAngle;
+	recentSteerAngles[steerAngleCount++] = steerAngle;
 }
 
 #define NumRecentGLongs 6
@@ -644,10 +644,10 @@ void appendRecentGLong(float recentGLong) {
 		for (int i = 1; i < recentGLongsCount; i++)
 			recentGLongs[i - 1] = recentGLongs[i];
 
-		recentGLongsCount = 0;
+		recentGLongsCount--;
 	}
 
-	recentGLongs[recentGLongsCount] = recentGLong;
+	recentGLongs[recentGLongsCount++] = recentGLong;
 }
 
 #define NumCornerDynamics 4096

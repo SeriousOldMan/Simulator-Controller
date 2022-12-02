@@ -578,7 +578,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		if (element[1] = "Control") {
 			if (!this.iPendingFunctionRegistration && !applicationRegistration) {
-				menuItem := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
+				menuItem := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
 
 				try {
 					Menu ContextMenu, DeleteAll

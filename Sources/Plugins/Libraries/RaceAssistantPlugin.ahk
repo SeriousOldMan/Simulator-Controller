@@ -130,6 +130,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.callRemote("reject", arguments*)
 		}
 
+		mute(arguments*) {
+			this.callRemote("mute", arguments*)
+		}
+
+		unmute(arguments*) {
+			this.callRemote("unmute", arguments*)
+		}
+
 		requestInformation(arguments*) {
 			this.callRemote("requestInformation", arguments*)
 		}
@@ -194,6 +202,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 						this.Plugin.accept()
 					case "Reject":
 						this.Plugin.reject()
+					case "Mute":
+						this.Plugin.mute()
+					case "Unmute":
+						this.Plugin.unmute()
 					default:
 						throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
 				}
@@ -694,7 +706,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
-			else if inList(["Call", "Accept", "Reject"], action) {
+			else if inList(["Call", "Accept", "Reject", "Mute", "Unmute"], action) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
 				this.registerAction(new this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))

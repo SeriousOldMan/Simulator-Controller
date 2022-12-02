@@ -1445,7 +1445,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				return
 
 			if (!this.iPendingFunctionRegistration && !actionRegistration) {
-				title := (translate(element[1]) . translate(": ") . element[2] . " (" . row . " x " . column . ")")
+				title := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
 
 				controlMenu := this.createControlMenu(title, preview, element, function, row, column)
 
@@ -1505,7 +1505,7 @@ updateActionFunction(wizard) {
 					action := wizard.getAction(row)
 					label := wizard.getActionLabel(row)
 
-					contextMenu := wizard.createActionsMenu(action . ": " . label, row)
+					contextMenu := wizard.createActionsMenu(action . ": " . StrReplace(label, "`n", A_Space), row)
 
 					Menu %contextMenu%, Show
 				}

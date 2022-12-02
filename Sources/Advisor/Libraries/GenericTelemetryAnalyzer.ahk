@@ -184,7 +184,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			advisor.ProgressCount := 0
 
-			showProgress({color: "Green", width: 350, title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
+			showProgress({color: "Green", width: 350, title: translate("Creating Problems"), message: translate("Preparing Characteristics...")})
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
@@ -215,7 +215,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			Sleep 500
 
 			for characteristic, value in characteristics {
-				showProgress({progress: (advisor.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
+				showProgress({progress: (advisor.ProgressCount += 10), message: translate("Create ") . characteristicLabels[characteristic] . translate("...")})
 
 				advisor.addCharacteristic(characteristic, value[1], value[2], false)
 			}
@@ -527,16 +527,16 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, Text, x16 yp+30 w180 h23 +0x200, % translate("Simulator")
-		Gui %window%:Add, Text, x128 yp w180 h23 +0x200, % analyzer.Simulator
+		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200, % translate("Simulator")
+		Gui %window%:Add, Text, x158 yp w180 h23 +0x200, % analyzer.Simulator
 
-		Gui %window%:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Car")
-		Gui %window%:Add, Text, x128 yp w180 h23 +0x200, % (analyzer.Car ? analyzer.Car : translate("Unknown"))
+		Gui %window%:Add, Text, x16 yp+24 w130 h23 +0x200, % translate("Car")
+		Gui %window%:Add, Text, x158 yp w180 h23 +0x200, % (analyzer.Car ? analyzer.Car : translate("Unknown"))
 
-		Gui %window%:Add, Text, x16 yp+30 w100 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
-		Gui %window%:Add, Edit, x128 yp w40 h23 +0x200 HWNDwidget2 vsteerLockEdit, % analyzer.SteerLock
-		Gui %window%:Add, Edit, x173 yp w40 h23 Limit2 Number HWNDwidget3 vsteerRatioEdit, % analyzer.SteerRatio
-		Gui %window%:Add, UpDown, x198 yp w18 h23 Range1-99 HWNDwidget4, % analyzer.SteerRatio
+		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
+		Gui %window%:Add, Edit, x158 yp w40 h23 +0x200 HWNDwidget2 vsteerLockEdit, % analyzer.SteerLock
+		Gui %window%:Add, Edit, x203 yp w40 h23 Limit2 Number HWNDwidget3 vsteerRatioEdit, % analyzer.SteerRatio
+		Gui %window%:Add, UpDown, x228 yp w18 h23 Range1-99 HWNDwidget4, % analyzer.SteerRatio
 
 		if !analyzer.settingAvailable("SteerLock") {
 			GuiControl Disable, steerLockEdit
@@ -554,32 +554,32 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, Text, x24 yp+21 w100 h23 +0x200 HWNDwidget6, % translate("Consider less than")
-		Gui %window%:Add, Edit, x128 yp w35 h23 +0x200 HWNDwidget7 vlowspeedThresholdEdit, % analyzer.LowspeedThreshold
-		Gui %window%:Add, Text, x167 yp w100 h23 +0x200 HWNDwidget8, % translate("km/h as low speed")
+		Gui %window%:Add, Text, x24 yp+21 w130 h23 +0x200 HWNDwidget6, % translate("Consider less than")
+		Gui %window%:Add, Edit, x158 yp w35 h23 +0x200 HWNDwidget7 vlowspeedThresholdEdit, % analyzer.LowspeedThreshold
+		Gui %window%:Add, Text, x197 yp w130 h23 +0x200 HWNDwidget8, % translate("km/h as low speed")
 
 		if !analyzer.settingAvailable("LowspeedThreshold") {
 			GuiControl Disable, lowspeedThresholdEdit
 			GuiControl, , lowspeedThresholdEdit, % ""
 		}
 
-		Gui %window%:Add, Text, x24 yp+30 w100 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget10 vheavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget10 vheavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
 
-		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget12 vmediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget12 vmediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
 
-		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget14 vlightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget14 vlightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
 
-		Gui %window%:Add, Text, x24 yp+30 w100 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget16 vlightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget16 vlightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
 
-		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
 
-		Gui %window%:Add, Text, x24 yp+22 w100 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x128 yp+2 w200 0x10 Range-25-25 ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			GuiControl Disable, heavyOversteerThresholdSlider
@@ -619,9 +619,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		resultListView := widget1
 
-		Gui %window%:Add, Text, x16 yp+208 w100 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
-		Gui %window%:Add, Slider, x128 yp w60 0x10 Range0-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 0
-		Gui %window%:Add, Text, x190 yp+3 HWNDwidget4 Hidden, % translate("%")
+		Gui %window%:Add, Text, x16 yp+208 w130 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
+		Gui %window%:Add, Slider, x158 yp w60 0x10 Range0-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 0
+		Gui %window%:Add, Text, x220 yp+3 HWNDwidget4 Hidden, % translate("%")
 
 		loop 4
 			analyzeWidgets.Push(widget%A_Index%)

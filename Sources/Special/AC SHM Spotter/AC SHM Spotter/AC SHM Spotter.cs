@@ -696,17 +696,12 @@ namespace ACSHMSpotter {
 				return true;
 
 			recentSteerAngles.Add(physics.SteerAngle);
-
 			if (recentSteerAngles.Count > numRecentSteerAngles)
-			{
 				recentSteerAngles.RemoveAt(0);
-			}
 
 			recentGLongs.Add(physics.AccG[2]);
 			if (recentGLongs.Count > numRecentGLongs)
-			{
 				recentGLongs.RemoveAt(0);
-			}
 
 			if (Math.Abs(physics.LocalAngularVelocity[1]) > 0.1)
 			{

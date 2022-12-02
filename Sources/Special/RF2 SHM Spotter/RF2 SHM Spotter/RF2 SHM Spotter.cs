@@ -746,19 +746,14 @@ namespace RF2SHMSpotter {
                 return true;
 
 			recentSteerAngles.Add(telemetry.mVehicles[carID].mFilteredSteering);
-
             if (recentSteerAngles.Count > numRecentSteerAngles)
-            {
                 recentSteerAngles.RemoveAt(0);
-            }
 
             recentGLongs.Add(telemetry.mVehicles[carID].mLocalAccel.y);
             if (recentGLongs.Count > numRecentGLongs)
-            {
                 recentGLongs.RemoveAt(0);
-            }
 
-			double yawRate = telemetry.mVehicles[carID].mLocalRot.z * 57.2958;
+			double yawRate = telemetry.mVehicles[carID].mLocalRot.y * 57.2958;
 
             if (Math.Abs(yawRate) > 0.1)
             {
@@ -1052,7 +1047,7 @@ namespace RF2SHMSpotter {
                     trace.WriteLine("Steer Lock=" + steerLock);
                     trace.WriteLine("Steer Ratio=" + steerRatio);
                     trace.WriteLine("Steer Angle=" + telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio);
-                    trace.WriteLine("Yaw Rate=" + telemetry.mVehicles[carID].mLocalRot.z * 57.2958);
+                    trace.WriteLine("Yaw Rate=" + telemetry.mVehicles[carID].mLocalRot.y * 57.2958);
 
                     rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
                     double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;

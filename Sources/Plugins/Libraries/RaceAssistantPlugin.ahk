@@ -1429,6 +1429,16 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.RaceAssistant[true].reject()
 	}
 
+	mute() {
+		if this.RaceAssistant
+			this.RaceAssistant.mute()
+	}
+
+	unmute() {
+		if this.RaceAssistant
+			this.RaceAssistant.unmute()
+	}
+
 	getSession(data := false) {
 		local ignore
 

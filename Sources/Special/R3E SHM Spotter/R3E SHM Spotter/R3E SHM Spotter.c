@@ -721,6 +721,8 @@ int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
 int lastCompletedLaps = 0;
 
+r3e_float32 lastSpeed = 0.0f;
+
 BOOL collectTelemetry() {
 	int playerIdx = getPlayerIndex();
 
@@ -733,16 +735,48 @@ BOOL collectTelemetry() {
 	// r3e_float32 steerLock = map_buffer->steer_lock_degrees * 2.0f;
 	// r3e_float32 steerRatio = steerLock / map_buffer->steer_wheel_range_degrees;
 
-	appendSteerAngle(steerAngle);
-	appendRecentGLong(map_buffer->local_acceleration.z);
+	r3e_float32 acceleration = map_buffer->car_speed * 3.6f - lastSpeed;
 
-	r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958 / 10;
+	lastSpeed = map_buffer->car_speed * 3.6f;
+
+	appendSteerAngle(steerAngle);
+	appendRecentGLong(acceleration);
+
+	// Get the average recent GLong
+	float sumGLong = 0.0;
+	for (int i = 0; i < recentGLongsCount; i++)
+		sumGLong = sumGLong + recentGLongs[i];
+
+	int phase = 0;
+	if (recentGLongsCount > 0) {
+		//float recentAngle = (float)(fabs(sumAngle) / numAngle);
+		//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
+		//	// Increasing steer angle
+		//	phase = -1;
+		//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
+		//	// Decreasing steer angle
+		//	phase = 1;
+		//}
+		float recentGLong = sumGLong / recentGLongsCount;
+		if (recentGLong < -0.2) {
+			// Braking
+			phase = -1;
+		}
+		else if (recentGLong > 0.1) {
+			// Accelerating
+			phase = 1;
+		}
+	}
+
+	corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
+
+	r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958;
 
 	if (fabs(angularVelocity) > 0.1) {
 		float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 
 		if (fabs(steeredAngleDegs) > 0.33f) {
-			r3e_float64 usos = -steeredAngleDegs / angularVelocity;
+			r3e_float64 usos = steeredAngleDegs / angularVelocity;
 
 			// Get the average recent steering angle
 			//vector <float>::iterator angleIter;
@@ -753,37 +787,12 @@ BOOL collectTelemetry() {
 			//	numAngle++;
 			//}
 
-			// Get the average recent GLong
-			float sumGLong = 0.0;
-			for (int i = 0; i < recentGLongsCount; i++)
-				sumGLong = sumGLong + recentGLongs[i];
 
-			int phase = 0;
-			if (recentGLongsCount > 0) {
-				//float recentAngle = (float)(fabs(sumAngle) / numAngle);
-				//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
-				//	// Increasing steer angle
-				//	phase = -1;
-				//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
-				//	// Decreasing steer angle
-				//	phase = 1;
-				//}
-				float recentGLong = sumGLong / recentGLongsCount;
-				if (recentGLong < -0.2) {
-					// Braking
-					phase = -1;
-				}
-				else if (recentGLong > 0.1) {
-					// Accelerating
-					phase = 1;
-				}
-			}
-
-			corner_dynamics cd = { map_buffer->car_speed * 3.6f, usos, map_buffer->completed_laps, phase };
-
-			appendCornerDynamics(&cd);
+			cd.usos = usos;
 		}
 	}
+
+	appendCornerDynamics(&cd);
 
 	int completedLaps = map_buffer->completed_laps;
 
@@ -967,7 +976,7 @@ void writeTelemetry() {
 
 		rename(fileName, dataFile);
 
-		if (FALSE) {
+		if (TRUE) {
 			strcpy_s(fileName, 512, dataFile);
 			strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".trace");
 
@@ -980,7 +989,7 @@ void writeTelemetry() {
 				// r3e_float32 steerLock = map_buffer->steer_lock_degrees * 2.0f;
 				// r3e_float32 steerRatio = steerLock / map_buffer->steer_wheel_range_degrees;
 
-				r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958 / 10;
+				r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958;
 
 				fprintf(output, "Steering=%f\n", steerAngle);
 				fprintf(output, "Steer Lock=%d\n", steerLock);
@@ -988,7 +997,6 @@ void writeTelemetry() {
 				fprintf(output, "Steer Angle=%f\n", (steerAngle * steerLock / steerRatio));
 				fprintf(output, "Yaw Rate=%lf\n", -angularVelocity);
 				fprintf(output, "Speed=%f\n", map_buffer->car_speed * 3.6);
-				fprintf(output, "Acceleration=%f\n", map_buffer->local_acceleration.z);
 
 				fclose(output);
 			}

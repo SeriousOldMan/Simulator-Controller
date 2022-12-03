@@ -690,6 +690,8 @@ namespace ACSHMSpotter {
 		int steerRatio = 14;
 		int lastCompletedLaps = 0;
 
+		float lastSpeed = 0.0f;
+
 		bool collectTelemetry()
 		{
 			if ((graphics.Status != AC_STATUS.AC_LIVE) || graphics.IsInPit != 0 || graphics.IsInPitLane != 0)
@@ -699,67 +701,55 @@ namespace ACSHMSpotter {
 			if (recentSteerAngles.Count > numRecentSteerAngles)
 				recentSteerAngles.RemoveAt(0);
 
-			recentGLongs.Add(physics.AccG[2]);
+            float acceleration = physics.SpeedKmh - lastSpeed;
+
+            lastSpeed = physics.SpeedKmh;
+
+            recentGLongs.Add(acceleration);
 			if (recentGLongs.Count > numRecentGLongs)
 				recentGLongs.RemoveAt(0);
 
-			if (Math.Abs(physics.LocalAngularVelocity[1]) > 0.1)
+
+            // Get the average recent GLong
+            float sumGLong = 0.0f;
+            int numGLong = 0;
+
+            foreach (float gLong in recentGLongs)
+            {
+                sumGLong += gLong;
+                numGLong++;
+
+            }
+
+            int phase = 0;
+            if (numGLong > 0)
+            {
+                float recentGLong = sumGLong / numGLong;
+                if (recentGLong < -0.2)
+                {
+                    // Braking
+                    phase = -1;
+                }
+                else if (recentGLong > 0.1)
+                {
+                    // Accelerating
+                    phase = 1;
+                }
+            }
+
+			CornerDynamics cd = new CornerDynamics(physics.SpeedKmh, 0, graphics.CompletedLaps, phase);
+
+            if (Math.Abs(physics.LocalAngularVelocity[1]) > 0.1)
 			{
 				float steeredAngleDegs = physics.SteerAngle * steerLock / 2.0f / steerRatio;
 
 				if (Math.Abs(steeredAngleDegs) > 0.33f)
-				{
-					float usos = -steeredAngleDegs / physics.LocalAngularVelocity[1];
+					cd.Usos = -steeredAngleDegs / physics.LocalAngularVelocity[1];
+            }
 
-					// Get the average recent steering angle
-					//vector <float>::iterator angleIter;
-					//float sumAngle = 0.0;
-					//int numAngle = 0;
-					//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
-					//	sumAngle += *angleIter;
-					//	numAngle++;
-					//}
+            cornerDynamicsList.Add(cd);
 
-					// Get the average recent GLong
-					float sumGLong = 0.0f;
-					int numGLong = 0;
-
-					foreach (float gLong in recentGLongs)
-					{
-						sumGLong += gLong;
-						numGLong++;
-
-					}
-
-					int phase = 0;
-					if (numGLong > 0)
-					{
-						//float recentAngle = (float)(fabs(sumAngle) / numAngle);
-						//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
-						//	// Increasing steer angle
-						//	phase = -1;
-						//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
-						//	// Decreasing steer angle
-						//	phase = 1;
-						//}
-						float recentGLong = sumGLong / numGLong;
-						if (recentGLong < -0.2)
-						{
-							// Braking
-							phase = -1;
-						}
-						else if (recentGLong > 0.1)
-						{
-							// Accelerating
-							phase = 1;
-						}
-					}
-
-					cornerDynamicsList.Add(new CornerDynamics(physics.SpeedKmh, usos, graphics.CompletedLaps, phase));
-				}
-			}
-
-			int completedLaps = graphics.CompletedLaps;
+            int completedLaps = graphics.CompletedLaps;
 
 			if (lastCompletedLaps != completedLaps)
 				while (true)

@@ -2136,6 +2136,7 @@ readConfiguration(configFile) {
 	local section := false
 	local file := false
 	local tries := 20
+	local data := false
 	local currentLine, firstChar, keyValue, key, value
 
 	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
@@ -2145,8 +2146,13 @@ readConfiguration(configFile) {
 			try {
 				file := FileOpen(configFile, "r-wd")
 
-				if file
+				if file {
+					FileRead data, %configFile%
+
+					file.Close()
+
 					break
+				}
 				else
 					throw "File not found..."
 			}
@@ -2157,10 +2163,10 @@ readConfiguration(configFile) {
 					Sleep 10
 			}
 
-		if file {
-			loop Read, %configFile%
+		if (data && (data != "")) {
+			loop Parse, data, `n, `r
 			{
-				currentLine := LTrim(A_LoopReadLine)
+				currentLine := LTrim(A_LoopField)
 
 				if (StrLen(currentLine) == 0)
 					continue
@@ -2175,7 +2181,7 @@ readConfiguration(configFile) {
 					configuration[section] := {}
 				}
 				else if section {
-					keyValue := LTrim(A_LoopReadLine)
+					keyValue := LTrim(currentLine)
 
 					if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
 						keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
@@ -2188,8 +2194,6 @@ readConfiguration(configFile) {
 					}
 				}
 			}
-
-			file.Close()
 		}
 	}
 

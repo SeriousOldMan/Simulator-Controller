@@ -630,6 +630,8 @@ int steerLock = 900;
 int steerRatio = 14;
 int lastCompletedLaps = 0;
 
+float lastSpeed = 0.0;
+
 bool collectTelemetry() {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
@@ -643,59 +645,47 @@ bool collectTelemetry() {
 			recentSteerAngles.erase(recentSteerAngles.begin());
 		}
 
-		recentGLongs.push_back(pf->accG[2]);
+		float acceleration = pf->speedKmh - lastSpeed;
+		
+		lastSpeed = pf->speedKmh;
+
+		recentGLongs.push_back(acceleration);
 		if ((int)recentGLongs.size() > numRecentGLongs) {
 			recentGLongs.erase(recentGLongs.begin());
 		}
 
+		// Get the average recent GLong
+		vector <float>::iterator glongIter;
+		float sumGLong = 0.0;
+		int numGLong = 0;
+		for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
+			sumGLong += *glongIter;
+			numGLong++;
+		}
+
+		int phase = 0;
+		if (numGLong > 0) {
+			float recentGLong = sumGLong / numGLong;
+			if (recentGLong < -0.2) {
+				// Braking
+				phase = -1;
+			}
+			else if (recentGLong > 0.1) {
+				// Accelerating
+				phase = 1;
+			}
+		}
+
+		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
+
 		if (fabs(pf->localAngularVel[1]) > 0.1) {
 			float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
 			
-			if (fabs(steeredAngleDegs) > 0.33f) {
-				float usos = -steeredAngleDegs / pf->localAngularVel[1];
-				
-				// Get the average recent steering angle
-				//vector <float>::iterator angleIter;
-				//float sumAngle = 0.0;
-				//int numAngle = 0;
-				//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
-				//	sumAngle += *angleIter;
-				//	numAngle++;
-				//}
-
-				// Get the average recent GLong
-				vector <float>::iterator glongIter;
-				float sumGLong = 0.0;
-				int numGLong = 0;
-				for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
-					sumGLong += *glongIter;
-					numGLong++;
-				}
-
-				int phase = 0;
-				if (numGLong > 0) {
-					//float recentAngle = (float)(fabs(sumAngle) / numAngle);
-					//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
-					//	// Increasing steer angle
-					//	phase = -1;
-					//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
-					//	// Decreasing steer angle
-					//	phase = 1;
-					//}
-					float recentGLong = sumGLong / numGLong;
-					if (recentGLong < -0.2) {
-						// Braking
-						phase = -1;
-					}
-					else if (recentGLong > 0.1) {
-						// Accelerating
-						phase = 1;
-					}
-				}
-
-				cornerDynamicsList.push_back(CornerDynamics(pf->speedKmh, usos, gf->completedLaps, phase));
-			}
+			if (fabs(steeredAngleDegs) > 0.33f)
+				cd.usos = -steeredAngleDegs / pf->localAngularVel[1];
 		}
+
+		cornerDynamicsList.push_back(cd);
 
 		int completedLaps = gf->completedLaps;
 
@@ -901,7 +891,10 @@ void writeTelemetry() {
 			output << "Steer Angle=" << (pf->steerAngle * steerLock / steerRatio) << std::endl;
 			output << "Yaw Rate=" << -pf->localAngularVel[1] << std::endl;
 			output << "Speed=" << pf->speedKmh << std::endl;
-			output << "Acceleration=" << pf->accG[2] << std::endl;
+
+			double acceleration = sqrt(pf->accG[0] * pf->accG[0] + pf->accG[1] * pf->accG[1] + pf->accG[2] * pf->accG[2]);
+
+			output << "Acceleration=" << acceleration << std::endl;
 
 			output.close();
 		}

@@ -679,11 +679,11 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	mute() {
-		this.activateRecognized([])
+		this.deactivateRecognized([])
 	}
 
 	unmute() {
-		this.deactivateRecognized([])
+		this.activateRecognized([])
 	}
 
 

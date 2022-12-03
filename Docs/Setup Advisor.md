@@ -51,7 +51,7 @@ Once you have dialed your settings, you can click on "Start".
 
 Go to the track and drive acouple of laps. Always the last 2 laps will be considered by the analyzer, therefore you can "Stop" the recording, when you have run two consecutive decent laps. The analyzer will show you now, which handling issues it detected.
 
-![](*)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%203.JPG)
 
 For each individual handling issue category, for example *low speed corner entry understeering*, the "Frequency" shows how often this happens related to the overall track length and the "Intensity" shows the category (*Light*, *Medium* or *Heavy*) according to your initial settings. You can use the threshold slider here to *filter* unimportant issues, which you don't want to be considered. Moving the slider to the right will remove all issues, whose frequency percentage is below the set threshold. If you want to include all issues, set the slider completely to the left.
 

@@ -692,5 +692,5 @@ moveAnalyzer() {
 }
 
 openAnalyzerDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real--time-telemetry-analyzer
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer
 }

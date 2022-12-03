@@ -1,7 +1,7 @@
 ## 4.5.0.0-release 12/06/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. The "Setup Advisor" now supports a telemetry data analyzer, which derives handling issue entries from actual over- or understeering, while you are driving. See the all new [documentation](*) for more information.
+  3. The "Setup Advisor" now supports a telemetry data analyzer, which derives handling issue entries from actual over- or understeering, while you are driving. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer) for more information.
   4. Introduced new "Release Strategy" command in "Race Center" which saves the current strategy to the Team Server without instructing the Race Strategist at the same time.
   5. Valid Team Server URLs are remembered in all applications, so that you can choose them from a list instead of retyping them all the time.
   5. Creating teams, drivers and sessions for the Team Server with "empty" names is no longer possible. Old "zombies" will be deleted automatically.

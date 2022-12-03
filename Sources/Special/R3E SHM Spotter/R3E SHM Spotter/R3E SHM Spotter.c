@@ -749,14 +749,6 @@ BOOL collectTelemetry() {
 
 	int phase = 0;
 	if (recentGLongsCount > 0) {
-		//float recentAngle = (float)(fabs(sumAngle) / numAngle);
-		//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
-		//	// Increasing steer angle
-		//	phase = -1;
-		//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
-		//	// Decreasing steer angle
-		//	phase = 1;
-		//}
 		float recentGLong = sumGLong / recentGLongsCount;
 		if (recentGLong < -0.2) {
 			// Braking
@@ -775,21 +767,8 @@ BOOL collectTelemetry() {
 	if (fabs(angularVelocity) > 0.1) {
 		float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 
-		if (fabs(steeredAngleDegs) > 0.33f) {
-			r3e_float64 usos = steeredAngleDegs / angularVelocity;
-
-			// Get the average recent steering angle
-			//vector <float>::iterator angleIter;
-			//float sumAngle = 0.0;
-			//int numAngle = 0;
-			//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
-			//	sumAngle += *angleIter;
-			//	numAngle++;
-			//}
-
-
-			cd.usos = usos;
-		}
+		if (fabs(steeredAngleDegs) > 0.33f)
+			cd.usos = steeredAngleDegs / angularVelocity;
 	}
 
 	appendCornerDynamics(&cd);

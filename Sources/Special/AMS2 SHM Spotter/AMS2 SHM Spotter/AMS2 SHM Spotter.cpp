@@ -506,6 +506,8 @@ int steerLock = 900;
 int steerRatio = 14;
 int lastCompletedLaps = 0;
 
+float lastSpeed = 0.0;
+
 bool collectTelemetry(const SharedMemory* sharedData) {
 	if (sharedData->mGameState == GAME_INGAME_PAUSED && sharedData->mPitMode != PIT_MODE_NONE)
 		return true;
@@ -515,62 +517,50 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 		recentSteerAngles.erase(recentSteerAngles.begin());
 	}
 
-	recentGLongs.push_back(-sharedData->mLocalAcceleration[VEC_Z]);
+	float acceleration = sharedData->mSpeed * 3.6 - lastSpeed;
+
+	lastSpeed = sharedData->mSpeed * 3.6;
+
+	recentGLongs.push_back(acceleration);
 	if ((int)recentGLongs.size() > numRecentGLongs) {
 		recentGLongs.erase(recentGLongs.begin());
 	}
 
+	// Get the average recent GLong
+	std::vector<float>::iterator glongIter;
+	float sumGLong = 0.0;
+	int numGLong = 0;
+	for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
+		sumGLong += *glongIter;
+		numGLong++;
+	}
+
+	int phase = 0;
+	if (numGLong > 0) {
+		float recentGLong = sumGLong / numGLong;
+		if (recentGLong < -0.2) {
+			// Braking
+			phase = -1;
+		}
+		else if (recentGLong > 0.1) {
+			// Accelerating
+			phase = 1;
+		}
+	}
+
 	double yawRate = sharedData->mAngularVelocity[VEC_Y] * 57.2958;
+	CornerDynamics cd = CornerDynamics(sharedData->mSpeed * 3.6, 0,
+									   sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted,
+									   phase);
 
 	if (fabs(yawRate) > 0.1) {
 		float steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
 
-		if (fabs(steeredAngleDegs) > 0.33f) {
-			float usos = -steeredAngleDegs / yawRate;
-
-			// Get the average recent steering angle
-			//vector <float>::iterator angleIter;
-			//float sumAngle = 0.0;
-			//int numAngle = 0;
-			//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
-			//	sumAngle += *angleIter;
-			//	numAngle++;
-			//}
-
-			// Get the average recent GLong
-			std::vector<float>::iterator glongIter;
-			float sumGLong = 0.0;
-			int numGLong = 0;
-			for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
-				sumGLong += *glongIter;
-				numGLong++;
-			}
-
-			int phase = 0;
-			if (numGLong > 0) {
-				//float recentAngle = (float)(fabs(sumAngle) / numAngle);
-				//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
-				//	// Increasing steer angle
-				//	phase = -1;
-				//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
-				//	// Decreasing steer angle
-				//	phase = 1;
-				//}
-				float recentGLong = sumGLong / numGLong;
-				if (recentGLong < -0.2) {
-					// Braking
-					phase = -1;
-				}
-				else if (recentGLong > 0.1) {
-					// Accelerating
-					phase = 1;
-				}
-			}
-
-			cornerDynamicsList.push_back(CornerDynamics(sharedData->mSpeed * 3.6, usos,
-														sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted, phase));
-		}
+		if (fabs(steeredAngleDegs) > 0.33f)
+			cd.usos = -steeredAngleDegs / yawRate;
 	}
+
+	cornerDynamicsList.push_back(cd);
 
 	int completedLaps = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted;
 
@@ -774,7 +764,6 @@ void writeTelemetry(const SharedMemory* sharedData) {
 			output << "Steer Angle=" << (sharedData->mSteering * steerLock / 2.0f / steerRatio) << std::endl;
 			output << "Yaw Rate=" << (sharedData->mAngularVelocity[VEC_Y] * 57.2958) << std::endl;
 			output << "Speed=" << sharedData->mSpeed * 3.6 << std::endl;
-			output << "Acceleration=" << -sharedData->mLocalAcceleration[VEC_Z] << std::endl;
 
 			output.close();
 		}

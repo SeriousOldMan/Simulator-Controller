@@ -694,15 +694,15 @@ namespace RF2SHMSpotter {
 
         class CornerDynamics
         {
-            public float Speed;
-            public float Usos;
+            public double Speed;
+            public double Usos;
             public int CompletedLaps;
             public int Phase;
 
             public CornerDynamics(double speed, double usos, int completedLaps, int phase)
             {
-                Speed = (float)speed;
-                Usos = (float)usos;
+                Speed = speed;
+                Usos = usos;
                 CompletedLaps = completedLaps;
                 Phase = phase;
             }
@@ -728,6 +728,8 @@ namespace RF2SHMSpotter {
         int steerRatio = 14;
 		int lastCompletedLaps = 0;
 
+		double lastSpeed = 0.0;
+
 		bool collectTelemetry()
 		{
             int carID = 0;
@@ -749,70 +751,55 @@ namespace RF2SHMSpotter {
             if (recentSteerAngles.Count > numRecentSteerAngles)
                 recentSteerAngles.RemoveAt(0);
 
-            recentGLongs.Add(telemetry.mVehicles[carID].mLocalAccel.y);
+            rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
+            double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
+			double acceleration = speed - lastSpeed;
+
+			lastSpeed = speed;
+
+            recentGLongs.Add(acceleration);
             if (recentGLongs.Count > numRecentGLongs)
                 recentGLongs.RemoveAt(0);
 
-			double yawRate = telemetry.mVehicles[carID].mLocalRot.y * 57.2958 / 10;
+            // Get the average recent GLong
+            float sumGLong = 0.0f;
+            int numGLong = 0;
+
+            foreach (float gLong in recentGLongs)
+            {
+                sumGLong += gLong;
+                numGLong++;
+
+            }
+
+            int phase = 0;
+            if (numGLong > 0)
+            {
+                float recentGLong = sumGLong / numGLong;
+                if (recentGLong < -0.2)
+                {
+                    // Braking
+                    phase = -1;
+                }
+                else if (recentGLong > 0.1)
+                {
+                    // Accelerating
+                    phase = 1;
+                }
+            }
+
+            double yawRate = telemetry.mVehicles[carID].mLocalRot.y * 57.2958;
+			CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
 
             if (Math.Abs(yawRate) > 0.1)
             {
                 double steeredAngleDegs = telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio;
 
                 if (Math.Abs(steeredAngleDegs) > 0.33f)
-                {
-                    double usos = steeredAngleDegs / yawRate;
-
-                    // Get the average recent steering angle
-                    //vector <float>::iterator angleIter;
-                    //float sumAngle = 0.0;
-                    //int numAngle = 0;
-                    //for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
-                    //	sumAngle += *angleIter;
-                    //	numAngle++;
-                    //}
-
-                    // Get the average recent GLong
-                    float sumGLong = 0.0f;
-                    int numGLong = 0;
-
-                    foreach (float gLong in recentGLongs)
-                    {
-                        sumGLong += gLong;
-                        numGLong++;
-
-                    }
-
-                    int phase = 0;
-                    if (numGLong > 0)
-                    {
-                        //float recentAngle = (float)(fabs(sumAngle) / numAngle);
-                        //if (recentAngle - fabs(physics->steerAngle) > 0.02) {
-                        //	// Increasing steer angle
-                        //	phase = -1;
-                        //} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
-                        //	// Decreasing steer angle
-                        //	phase = 1;
-                        //}
-                        float recentGLong = sumGLong / numGLong;
-                        if (recentGLong < -0.2)
-                        {
-                            // Braking
-                            phase = -1;
-                        }
-                        else if (recentGLong > 0.1)
-                        {
-                            // Accelerating
-                            phase = 1;
-                        }
-					}
-
-					rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
-                    double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
-
-                    cornerDynamicsList.Add(new CornerDynamics(speed, usos, playerScoring.mTotalLaps, phase));
-                }
+                    cd.Usos = -steeredAngleDegs / yawRate;
 			}
+
+            cornerDynamicsList.Add(cd);
 
             int completedLaps = playerScoring.mTotalLaps;
 
@@ -1047,13 +1034,12 @@ namespace RF2SHMSpotter {
                     trace.WriteLine("Steer Lock=" + steerLock);
                     trace.WriteLine("Steer Ratio=" + steerRatio);
                     trace.WriteLine("Steer Angle=" + telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio);
-                    trace.WriteLine("Yaw Rate=" + telemetry.mVehicles[carID].mLocalRot.y * 57.2958 / 10);
+                    trace.WriteLine("Yaw Rate=" + telemetry.mVehicles[carID].mLocalRot.y * 57.2958);
 
                     rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
                     double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
 
                     trace.WriteLine("Speed=" + speed);
-                    trace.WriteLine("Acceleration=" + telemetry.mVehicles[carID].mLocalAccel.y);
 
                     trace.Close();
                 }

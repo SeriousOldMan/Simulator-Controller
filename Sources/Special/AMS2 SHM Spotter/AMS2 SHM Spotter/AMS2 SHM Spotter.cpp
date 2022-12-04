@@ -557,7 +557,7 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 		float steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
 
 		if (fabs(steeredAngleDegs) > 0.33f)
-			cd.usos = -steeredAngleDegs / yawRate;
+			cd.usos = 100 * -steeredAngleDegs / yawRate;
 	}
 
 	cornerDynamicsList.push_back(cd);

@@ -796,7 +796,7 @@ namespace RF2SHMSpotter {
                 double steeredAngleDegs = telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio;
 
                 if (Math.Abs(steeredAngleDegs) > 0.33f)
-                    cd.Usos = -steeredAngleDegs / yawRate;
+                    cd.Usos = 200 * steeredAngleDegs / yawRate;
 			}
 
             cornerDynamicsList.Add(cd);
@@ -1014,7 +1014,7 @@ namespace RF2SHMSpotter {
 
                 info.MoveTo(dataFile);
 
-                if (true)
+                if (false)
                 {
 					int carID = 0;
 

@@ -731,9 +731,7 @@ BOOL collectTelemetry() {
 
 	r3e_float32 steerAngle = map_buffer->steer_input_raw;
 	r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
-	r3e_float32 steerRatio = map_buffer->steer_lock_degrees * 2.0f;
-	// r3e_float32 steerLock = map_buffer->steer_lock_degrees * 2.0f;
-	// r3e_float32 steerRatio = steerLock / map_buffer->steer_wheel_range_degrees;
+	r3e_float32 steerRatio = (float)steerLock / map_buffer->steer_lock_degrees;
 
 	r3e_float32 acceleration = map_buffer->car_speed * 3.6f - lastSpeed;
 
@@ -768,7 +766,7 @@ BOOL collectTelemetry() {
 		float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 
 		if (fabs(steeredAngleDegs) > 0.33f)
-			cd.usos = steeredAngleDegs / angularVelocity;
+			cd.usos = 10 * -steeredAngleDegs / angularVelocity;
 	}
 
 	appendCornerDynamics(&cd);
@@ -955,7 +953,7 @@ void writeTelemetry() {
 
 		rename(fileName, dataFile);
 
-		if (TRUE) {
+		if (FALSE) {
 			strcpy_s(fileName, 512, dataFile);
 			strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".trace");
 
@@ -964,9 +962,7 @@ void writeTelemetry() {
 
 				r3e_float32 steerAngle = map_buffer->steer_input_raw;
 				r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
-				r3e_float32 steerRatio = map_buffer->steer_lock_degrees * 2.0f;
-				// r3e_float32 steerLock = map_buffer->steer_lock_degrees * 2.0f;
-				// r3e_float32 steerRatio = steerLock / map_buffer->steer_wheel_range_degrees;
+				r3e_float32 steerRatio = (float)steerLock / map_buffer->steer_lock_degrees;
 
 				r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958;
 

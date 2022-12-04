@@ -56,7 +56,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			if key {
 				this.iUndersteerThresholds[key] := value
 
-				setAnalyzerSetting(this, "UndersteerThresholds" . code, values2String(",", this.iUndersteerThresholds*))
+				setAnalyzerSetting(this, "UndersteerThresholds", values2String(",", this.iUndersteerThresholds*))
 
 				return value
 			}
@@ -573,22 +573,22 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget10 vheavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget10 vheavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget12 vmediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget12 vmediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget14 vlightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget14 vlightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget16 vlightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget16 vlightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-25-25 ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			GuiControl Disable, heavyOversteerThresholdSlider

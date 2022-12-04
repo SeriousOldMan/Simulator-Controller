@@ -682,7 +682,7 @@ bool collectTelemetry() {
 			float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
 			
 			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = -steeredAngleDegs / pf->localAngularVel[1];
+				cd.usos = 10 * -steeredAngleDegs / pf->localAngularVel[1];
 		}
 
 		cornerDynamicsList.push_back(cd);

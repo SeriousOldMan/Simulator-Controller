@@ -623,6 +623,8 @@ int lowspeedThreshold = 100;
 int steerRatio = 14;
 int lastCompletedLaps = 0;
 
+float lastSpeed = 0.0;
+
 bool collectTelemetry(const irsdk_header* header, const char* data) {
 	char result[64];
 	bool onTrack = true;
@@ -668,9 +670,12 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 		recentSteerAngles.erase(recentSteerAngles.begin());
 	}
 
-	getRawDataValue(rawValue, header, data, "LongAccel");
+	getRawDataValue(rawValue, header, data, "Speed");
 
-	float acceleration = atof(rawValue);
+	float speed = atof(rawValue);
+	float acceleration = speed - lastSpeed;
+
+	lastSpeed = speed;
 
 	recentGLongs.push_back(acceleration);
 	if ((int)recentGLongs.size() > numRecentGLongs) {
@@ -685,56 +690,38 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 	int completedLaps = atoi(rawValue);
 
+	// Get the average recent GLong
+	std::vector<float>::iterator glongIter;
+	float sumGLong = 0.0;
+	int numGLong = 0;
+	for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
+		sumGLong += *glongIter;
+		numGLong++;
+	}
+
+	int phase = 0;
+	if (numGLong > 0) {
+		float recentGLong = sumGLong / numGLong;
+		if (recentGLong < -0.2) {
+			// Braking
+			phase = -1;
+		}
+		else if (recentGLong > 0.1) {
+			// Accelerating
+			phase = 1;
+		}
+	}
+
+	CornerDynamics cd = CornerDynamics(atof(rawValue) * 3.6, 0, completedLaps, phase);
+
 	if (fabs(yawRate) > 0.1) {
 		float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 
-		if (fabs(steeredAngleDegs) > 0.33f) {
-			float usos = -steeredAngleDegs / yawRate;
-
-			// Get the average recent steering angle
-			//vector <float>::iterator angleIter;
-			//float sumAngle = 0.0;
-			//int numAngle = 0;
-			//for (angleIter = recentSteerAngles.begin(); angleIter != recentSteerAngles.end(); angleIter++) {
-			//	sumAngle += *angleIter;
-			//	numAngle++;
-			//}
-
-			// Get the average recent GLong
-			std::vector<float>::iterator glongIter;
-			float sumGLong = 0.0;
-			int numGLong = 0;
-			for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
-				sumGLong += *glongIter;
-				numGLong++;
-			}
-
-			int phase = 0;
-			if (numGLong > 0) {
-				//float recentAngle = (float)(fabs(sumAngle) / numAngle);
-				//if (recentAngle - fabs(physics->steerAngle) > 0.02) {
-				//	// Increasing steer angle
-				//	phase = -1;
-				//} else if (fabs(physics->steerAngle) - recentAngle > 0.02) {
-				//	// Decreasing steer angle
-				//	phase = 1;
-				//}
-				float recentGLong = sumGLong / numGLong;
-				if (recentGLong < -0.2) {
-					// Braking
-					phase = -1;
-				}
-				else if (recentGLong > 0.1) {
-					// Accelerating
-					phase = 1;
-				}
-			}
-
-			getRawDataValue(rawValue, header, data, "Speed");
-
-			cornerDynamicsList.push_back(CornerDynamics(atof(rawValue) * 3.6, usos, completedLaps, phase));
-		}
+		if (fabs(steeredAngleDegs) > 0.33f)
+			cd.usos = 10 * -steeredAngleDegs / yawRate;
 	}
+
+	cornerDynamicsList.push_back(cd);
 
 	if (lastCompletedLaps != completedLaps) {
 		lastCompletedLaps = completedLaps;
@@ -940,10 +927,6 @@ void writeTelemetry(const irsdk_header* header, const char* data) {
 			steerAngle = steerAngle / steerLock;
 			steerLock = steerLock * 57.2958;
 
-			getRawDataValue(rawValue, header, data, "LongAccel");
-
-			float acceleration = atof(rawValue);
-
 			getRawDataValue(rawValue, header, data, "YawRate");
 
 			float yawRate = atof(rawValue) * 57.2958;
@@ -964,8 +947,7 @@ void writeTelemetry(const irsdk_header* header, const char* data) {
 			output << "Steer Angle=" << steerAngle << std::endl;
 			output << "Yaw Rate=" << yawRate << std::endl;
 			output << "Speed=" << speed << std::endl;
-			output << "Acceleration=" << acceleration << std::endl;
-
+			
 			output.close();
 		}
 	}

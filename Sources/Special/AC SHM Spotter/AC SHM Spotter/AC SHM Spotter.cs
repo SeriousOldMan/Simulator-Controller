@@ -744,7 +744,7 @@ namespace ACSHMSpotter {
 				float steeredAngleDegs = physics.SteerAngle * steerLock / 2.0f / steerRatio;
 
 				if (Math.Abs(steeredAngleDegs) > 0.33f)
-					cd.Usos = -steeredAngleDegs / physics.LocalAngularVelocity[1];
+					cd.Usos = 10 * -steeredAngleDegs / physics.LocalAngularVelocity[1];
             }
 
             cornerDynamicsList.Add(cd);

@@ -34,9 +34,9 @@ In this dialog you can initialize the analyzer for your car and you targeted dri
   
      In *Assetto Corsa Competizione*, the value for "Steer Lock" is taken from the meta data of a given car, and the value for "Steer Ratio" can be set in the currently chosen setup. For *RaceRoom Racing Experience* these values are fixed and will be taken directly from the simulator. For all other simulators and their cars, correspondind information or calculation rules can be found on the internet in most cases or you can derive them as described above.
 
-  2. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering.
+  2. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field.
 
-  3. The thresholds are also **very** specific for a given simulator and a given car and also for your preferred driving style. Therefore you have to experiment a little bit to find the best settings here. But some general rules apply:
+  3. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering. The thresholds are also **very** specific for a given simulator and a given car and also for your preferred driving style. Therefore you have to experiment a little bit to find the best settings here. But some general rules apply:
 
      - If you prefer a more loose rear, move the top three sliders a little bit to the left.
      - If you prefer a safe and stable, move all sliders a little bit to the center.
@@ -57,7 +57,7 @@ Go to the track and drive acouple of laps. Always the last 2 laps will be consid
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%203.JPG)
 
-For each individual handling issue category, for example *low speed corner entry understeering*, the "Frequency" shows how often this happens related to the overall track length and the "Intensity" shows the category (*Light*, *Medium* or *Heavy*) according to your initial settings. You can use the threshold slider here to *filter* unimportant issues, which you don't want to be considered. Moving the slider to the right will remove all issues, whose frequency percentage is below the set threshold. If you want to include all issues, set the slider completely to the left.
+For each individual handling issue category, for example *low speed corner entry understeering*, the "Frequency" shows how often this happens related to the overall track length and the "Intensity" shows the category (*Light*, *Medium* or *Heavy*) according to your initial settings. You can use the threshold slider here to *filter* unimportant issues, which you don't want to be considered. Moving the slider to the right will remove all issues, whose frequency percentage is below the set threshold. If you want to include all issues, set the slider completely to the left. You can additionally remove those issues, which resulted from a driver error, by unchecking the check box in the issue list, before proceeding.
 
 When you are satiesfied with the displayed handling issues, click on "Apply". The analyzer will clear all current handling issues from the left pane of the "Setup Advisor" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
 

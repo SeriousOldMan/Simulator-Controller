@@ -620,7 +620,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget29, 270
 		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget28 Number, 150
 		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-999 HWNDwidget29, 150
-		Gui %window%:Add, Text, x257 yp w130 h23 +0x200 HWNDwidget30, % translate("cm")
+		Gui %window%:Add, Text, x257 yp w50 h23 +0x200 HWNDwidget30, % translate("cm")
 
 		if !analyzer.settingAvailable("SteerLock") {
 			GuiControl Disable, steerLockEdit

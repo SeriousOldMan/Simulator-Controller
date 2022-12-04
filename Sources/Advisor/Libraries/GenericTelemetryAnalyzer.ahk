@@ -20,6 +20,9 @@
 
 global kClose := "close"
 
+global kMinThreshold := -180
+global kMaxThreshold := 180
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -333,7 +336,7 @@ setAnalyzerSetting(analyzer, key, value) {
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local window, aWindow, x, y, ignore, widget, advisor
-	local tries, data, type, speed, severity, key, value, characteristic, characteristicLabels
+	local tries, data, type, speed, severity, key, value, characteristic, characteristicLabels, fromEdit
 
 	static activateButton
 
@@ -346,6 +349,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static heavyUndersteerThresholdSlider
 	static mediumUndersteerThresholdSlider
 	static lightUndersteerThresholdSlider
+	static heavyOversteerThresholdEdit
+	static mediumOversteerThresholdEdit
+	static lightOversteerThresholdEdit
+	static heavyUndersteerThresholdEdit
+	static mediumUndersteerThresholdEdit
+	static lightUndersteerThresholdEdit
 
 	static issuesListView
 
@@ -370,6 +379,21 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		analyzer.stopTelemetryAnalyzer()
 
 		result := kCancel
+	}
+	else if (commandOrAnalyzer == "UpdateSlider") {
+		fromEdit := ((arguments.Length() > 0) && arguments[1])
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, severity in ["Light", "Medium", "Heavy"]
+			if fromEdit {
+				GuiControlGet value, , %severity%%type%ThresholdEdit
+
+				value := Min(value, Max(value,
+			}
+			else {
+			}
+	}
+	else if (commandOrAnalyzer == "UpdateSlider") {
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
 		GuiControlGet steerLockEdit

@@ -676,27 +676,29 @@ bool collectTelemetry() {
 			}
 		}
 
-		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
+		if (pf->steerAngle > 0.1 && pf->speedKmh > 50) {
+			CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
 
-		if (fabs(pf->localAngularVel[1]) > 0.1) {
-			float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
-			
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 10 * -steeredAngleDegs / pf->localAngularVel[1];
-		}
+			if (fabs(pf->localAngularVel[1]) > 0.1) {
+				float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
 
-		cornerDynamicsList.push_back(cd);
+				if (fabs(steeredAngleDegs) > 0.33f)
+					cd.usos = 10 * -steeredAngleDegs / pf->localAngularVel[1];
+			}
 
-		int completedLaps = gf->completedLaps;
+			cornerDynamicsList.push_back(cd);
 
-		if (lastCompletedLaps != completedLaps) {
-			lastCompletedLaps = completedLaps;
+			int completedLaps = gf->completedLaps;
 
-			// Delete all corner data nore than 2 laps old.
-			cornerDynamicsList.erase(
-				std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
-					[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
-				cornerDynamicsList.end());
+			if (lastCompletedLaps != completedLaps) {
+				lastCompletedLaps = completedLaps;
+
+				// Delete all corner data nore than 2 laps old.
+				cornerDynamicsList.erase(
+					std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
+						[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
+					cornerDynamicsList.end());
+			}
 		}
 	}
 

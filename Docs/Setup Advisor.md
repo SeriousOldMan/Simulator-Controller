@@ -28,7 +28,11 @@ Using the "Load..." and "Save..." buttons in the lower left corner of the window
 
 In this dialog you can initialize the analyzer for your car and you targeted driving style.
 
-  1. It is absolutely cruicial, that the steeriing lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner. For *Assetto Corsa Competizione*, the value for "Steer Lock" is taken from the meta data of a given car, and the value for "Steer Ratio" must be taken from the currently chosen setup. For *RaceRoom Racing Experience* these values are fixed and will be taken directly from the simulator. For all other simulators and their cars, correspondind information or calculation rules can be found on the internet in most cases.
+  1. It is absolutely cruicial, that the steering lock and steering ratio information is correct, since a calculated combination of these values together with the angular velocity are used to detect over- or understeer in a corner.
+  
+     If you don't know the steerin lock of your car, you can activate the steering wheel on screen, count full and fractional rotation from full left to full right and multiply this by 360. So, if have two and a half rounds from left to right, the steering lock is 900. The steering ratio on the other hand determines the amount of truning of your front wheels, when you turn your steering wheels. Higher number means less turning, so a lower number creates a more direct steering. It is equally important, that this number is correct, or the analayzer will report a lot of understeer events, that are simply not there. A typical number for the steering ratio of GT cars is 12, for open wheelers or even carts, the number is much smaller.
+  
+     In *Assetto Corsa Competizione*, the value for "Steer Lock" is taken from the meta data of a given car, and the value for "Steer Ratio" can be set in the currently chosen setup. For *RaceRoom Racing Experience* these values are fixed and will be taken directly from the simulator. For all other simulators and their cars, correspondind information or calculation rules can be found on the internet in most cases or you can derive them as described above.
 
   2. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering.
 

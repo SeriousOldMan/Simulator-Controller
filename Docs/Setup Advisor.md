@@ -36,7 +36,7 @@ In this dialog you can initialize the analyzer for your car and you targeted dri
 
   2. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering.
 
-  3. The thresholds are also very specific for a given simulator and a given car and also for your preferred driving style. Therefore you have to experiment a little bit to find the best settings here. But some general rules apply:
+  3. The thresholds are also **very** specific for a given simulator and a given car and also for your preferred driving style. Therefore you have to experiment a little bit to find the best settings here. But some general rules apply:
 
      - If you prefer a more loose rear, move the top three sliders a little bit to the left.
      - If you prefer a safe and stable, move all sliders a little bit to the center.

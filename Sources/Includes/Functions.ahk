@@ -1202,8 +1202,10 @@ showProgress(options) {
 
 		if options.HasKey("X")
 			x := options.X
+		else if options.HasKey("Width")
+			x := Round((A_ScreenWidth - options.Width) / 2)
 		else
-			x := Round((A_ScreenWidth - 300) / 2)
+			x := Round((A_ScreenWidth - 280) / 2)
 
 		if options.HasKey("Y")
 			y := options.Y

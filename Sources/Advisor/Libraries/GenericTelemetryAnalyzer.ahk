@@ -227,7 +227,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			Sleep 500
 
 			for characteristic, value in characteristics {
-				if (A_Index > 8)
+				if (A_Index > kMaxCharacteristics)
 					break
 
 				showProgress({progress: (advisor.ProgressCount += 10), message: translate("Create ") . characteristicLabels[characteristic] . translate("...")})

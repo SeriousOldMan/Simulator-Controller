@@ -227,6 +227,9 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			Sleep 500
 
 			for characteristic, value in characteristics {
+				if (A_Index > 8)
+					break
+
 				showProgress({progress: (advisor.ProgressCount += 10), message: translate("Create ") . characteristicLabels[characteristic] . translate("...")})
 
 				advisor.addCharacteristic(characteristic, value[1], value[2], false)
@@ -335,8 +338,8 @@ setAnalyzerSetting(analyzer, key, value) {
 }
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
-	local window, aWindow, x, y, ignore, widget, advisor
-	local tries, data, type, speed, severity, key, value, characteristic, characteristicLabels, fromEdit
+	local window, aWindow, x, y, ignore, widget, advisor, row, include
+	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
 
 	static activateButton
 
@@ -381,16 +384,27 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		result := kCancel
 	}
 	else if (commandOrAnalyzer == "UpdateSlider") {
+		Gui TAN:Default
+
 		fromEdit := ((arguments.Length() > 0) && arguments[1])
 
 		for ignore, type in ["Oversteer", "Understeer"]
-			for ignore, severity in ["Light", "Medium", "Heavy"]
-			if fromEdit {
-				GuiControlGet value, , %severity%%type%ThresholdEdit
+			for ignore, severity in ["Light", "Medium", "Heavy"] {
+				if fromEdit {
+					GuiControlGet value, , %severity%%type%ThresholdEdit
 
-				value := Min(value, Max(value,
-			}
-			else {
+					newValue := Min(Max(value, kMinThreshold), kMaxThreshold)
+
+					GuiControl, , %severity%%type%ThresholdSlider, %newValue%
+
+					if (newValue != value)
+						GuiControl, , %severity%%type%ThresholdEdit, %newValue%
+				}
+				else {
+					GuiControlGet value, , %severity%%type%ThresholdSlider
+
+					GuiControl, , %severity%%type%ThresholdEdit, %value%
+				}
 			}
 	}
 	else if (commandOrAnalyzer == "UpdateSlider") {
@@ -480,6 +494,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 	}
 	else if (commandOrAnalyzer == "FilterTelemetry") {
+		advisor := analyzer.Advisor
+		characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
+		final := ((arguments.Length() > 0) && arguments[1])
+
+		Gui TAN:Default
+
+		Gui ListView, % resultListView
+
 		GuiControlGet applyThresholdSlider
 
 		data := readConfiguration(dataFile)
@@ -490,7 +512,29 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					for ignore, key in ["Entry", "Apex", "Exit"] {
 						value := getConfigurationValue(data, type . "." . speed . "." . severity, key, kUndefined)
 
-						if ((value != kUndefined) && (value < applyThresholdSlider))
+						include := ((value != kUndefined) && (value < applyThresholdSlider))
+
+						if (include && final) {
+							include := false
+
+							characteristic := characteristicLabels[type . ".Corner." . key . "." . speed]
+
+							row := LV_GetNext(0, "C")
+
+							while row {
+								LV_GetText(value, row)
+
+								if (value = characteristic) {
+									include := true
+
+									break
+								}
+								else
+									row := LV_GetNext(0, "C")
+							}
+						}
+
+						if !include
 							setConfigurationValue(data, type . "." . speed . "." . severity, key, 0)
 					}
 
@@ -516,7 +560,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						if value {
 							characteristic := (type . ".Corner." . key . "." . speed)
 
-							LV_Add("", characteristicLabels[characteristic], translate(severity), value)
+							LV_Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic], translate(severity), value)
 						}
 					}
 
@@ -526,7 +570,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			LV_ModifyCol(A_Index, "AutoHdr")
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
-		result := runAnalyzer("FilterTelemetry")
+		result := runAnalyzer("FilterTelemetry", true)
 	else {
 		analyzer := commandOrAnalyzer
 		updateTask := false
@@ -597,22 +641,28 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget10 vheavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget10 vheavyOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget21 vheavyOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[3]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget12 vmediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget12 vmediumOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget22 vmediumOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget14 vlightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget14 vlightOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget23 vlightOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget16 vlightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget16 vlightUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget24 vlightUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget25 vmediumUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w170 0x10 Range-180-180 ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget26 vheavyUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[3]
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			GuiControl Disable, heavyOversteerThresholdSlider
@@ -632,7 +682,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			GuiControl, , lightUndersteerThresholdSlider, 0
 		}
 
-		loop 20
+		loop 26
 			prepareWidgets.Push(widget%A_Index%)
 
 		Gui %window%:Add, ListView, x16 ys w320 h160 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
@@ -648,7 +698,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 2
 			runWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h200 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys w320 h200 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
 
 		resultListView := widget1
 
@@ -697,6 +747,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 noSelect() {
 	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
+}
+
+updateThresholdSlider() {
+	runAnalyzer("UpdateSlider")
+}
+
+updateThresholdEdit() {
+	runAnalyzer("UpdateSlider", true)
 }
 
 activateAnalyzer() {

@@ -1,8 +1,8 @@
 [Development]
-Version=4.5.0.0-dev
+Version=4.5.0.0-beta
 Target=4.5.0.0-release
 Date=12/05/2022
-Download=
+Download=https://www.dropbox.com/s/v9p9fbcequksp03/Simulator%20Controller%204.5.0.0-beta.zip?dl=1
 Changes=On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, Assistants can be muted and unmuted using a Button Box or Stream Deck, New icons in the Stream Deck icon set
 [Release]
 Version=4.4.9.1-release
@@ -13,4 +13,4 @@ Changes=Included race strategies in the "Session Database" browser, Support for 
 Type=Development
 [Version]
 Release=4.4.9.1-release
-Development=4.5.0.0-dev
+Development=4.5.0.0-beta

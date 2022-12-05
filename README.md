@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.5.0.0-beta](https://www.dropbox.com/s/v9p9fbcequksp03/Simulator%20Controller%204.5.0.0-beta.zip?dl=1) (Test build for 4.5.0. New features: On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, Assistants can be muted and unmuted using a Button Box or Stream Deck, New icons in the Stream Deck icon set.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-450) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

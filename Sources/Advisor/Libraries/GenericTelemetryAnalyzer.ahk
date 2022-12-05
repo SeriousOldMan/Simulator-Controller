@@ -42,6 +42,9 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iSteerLock := 900
 	iSteerRatio := 12
 
+	iWheelBase := 270
+	iTrackWidth := 150
+
 	iAnalyzerPID := false
 
 	Car[] {
@@ -128,6 +131,30 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
+	Wheelbase[] {
+		Get {
+			return this.iWheelbase
+		}
+
+		Set {
+			setAnalyzerSetting(this, "Wheelbase", value)
+
+			return (this.iWheelbase := value)
+		}
+	}
+
+	TrackWidth[] {
+		Get {
+			return this.iTrackWidth
+		}
+
+		Set {
+			setAnalyzerSetting(this, "TrackWidth", value)
+
+			return (this.iTrackWidth := value)
+		}
+	}
+
 	__New(advisor, simulator) {
 		local selectedCar := advisor.SelectedCar[false]
 		local fileName, configuration, settings, prefix
@@ -149,6 +176,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".")
 
 		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", 900)
+		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", 270)
+		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", 150)
 
 		if selectedCar {
 			fileName := getFileName("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
@@ -157,6 +186,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				configuration := readConfiguration(fileName)
 
 				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.iSteerLock)
+				this.iWheelbase := getConfigurationValue(configuration, "Setup.General", "Wheelbase", this.iWheelbase)
+				this.iTrackWidth := getConfigurationValue(configuration, "Setup.General", "TrackWidth", this.iTrackWidth)
 
 				defaultUndersteerThresholds := getConfigurationValue(configuration, "Analyzer", "UndersteerThresholds", defaultUndersteerThresholds)
 				defaultOversteerThresholds := getConfigurationValue(configuration, "Analyzer", "OversteerThresholds", defaultOversteerThresholds)
@@ -277,6 +308,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable("SteerRatio")
 					options .= (A_Space . this.SteerRatio)
 
+				if this.settingAvailable("Wheelbase")
+					options .= (A_Space . this.Wheelbase)
+
+				if this.settingAvailable("TrackWidth")
+					options .= (A_Space . this.TrackWidth)
+
 				code := new SessionDatabase().getSimulatorCode(this.Simulator)
 
 				Run %kBinariesDirectory%%code% SHM Spotter.exe %options%, %kBinariesDirectory%, UserErrorLevel Hide, pid
@@ -345,6 +382,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static steerLockEdit
 	static steerRatioEdit
+	static wheelbaseEdit
+	static trackWidthEdit
 	static lowspeedThresholdEdit
 	static heavyOversteerThresholdSlider
 	static mediumOversteerThresholdSlider
@@ -412,6 +451,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
 		GuiControlGet steerLockEdit
 		GuiControlGet steerRatioEdit
+		GuiControlGet wheelbaseEdit
+		GuiControlGet trackWidthEdit
 		GuiControlGet lowspeedThresholdEdit
 		GuiControlGet heavyOversteerThresholdSlider
 		GuiControlGet mediumOversteerThresholdSlider
@@ -425,6 +466,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		if analyzer.settingAvailable("SteerRatio")
 			analyzer.SteerRatio := steerRatioEdit
+
+		if analyzer.settingAvailable("Wheelbase")
+			analyzer.Wheelbase := wheelbaseEdit
+
+		if analyzer.settingAvailable("TrackWidth")
+			analyzer.TrackWidth := trackWidthEdit
 
 		if analyzer.settingAvailable("LowspeedThreshold")
 			analyzer.LowspeedThreshold := lowspeedThresholdEdit
@@ -616,10 +663,10 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-99 HWNDwidget4, % analyzer.SteerRatio
 
 		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 Section HWNDwidget27, % translate("Wheelbase / Track Width")
-		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget28 Number, 270
-		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget29, 270
-		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget30 Number, 150
-		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-999 HWNDwidget31, 150
+		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget28 Number vwheelbaseEdit, % analyzer.Wheelbase
+		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget29, % analyzer.Wheelbase
+		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget30 Number vtrackWidthEdit, % analyzer.TrackWidth
+		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-999 HWNDwidget31, % analyzer.TrackWidth
 		Gui %window%:Add, Text, x257 yp w50 h23 +0x200 HWNDwidget32, % translate("cm")
 
 		if !analyzer.settingAvailable("SteerLock") {
@@ -630,6 +677,16 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		if !analyzer.settingAvailable("SteerRatio") {
 			GuiControl Disable, steerRatioEdit
 			GuiControl, , steerRatioEdit, % ""
+		}
+
+		if !analyzer.settingAvailable("Wheelbase") {
+			GuiControl Disable, wheelbaseEdit
+			GuiControl, , wheelbaseEdit, % ""
+		}
+
+		if !analyzer.settingAvailable("TrackWidth") {
+			GuiControl Disable, trackWidthEdit
+			GuiControl, , trackWidthEdit, % ""
 		}
 
 		Gui %window%:Font, Italic, Arial

@@ -620,9 +620,12 @@ int oversteerLightThreshold = 2;
 int oversteerMediumThreshold = -6;
 int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
+int steerLock = 900;
 int steerRatio = 14;
-int lastCompletedLaps = 0;
+int wheelbase = 270;
+int trackWidth = 150;
 
+int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 
 bool collectTelemetry(const irsdk_header* header, const char* data) {
@@ -656,14 +659,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 	getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
 
-	float steerAngle = atof(rawValue);
-
-	getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax");
-
-	float steerLock = atof(rawValue);
-
-	steerAngle = steerAngle / steerLock;
-	steerLock = steerLock * 57.2958;
+	float steerAngle = -atof(rawValue) * 57.2958;
 
 	recentSteerAngles.push_back(steerAngle);
 	if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
@@ -672,7 +668,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 	getRawDataValue(rawValue, header, data, "Speed");
 
-	float speed = atof(rawValue);
+	float speed = atof(rawValue) * 3.6;
 	float acceleration = speed - lastSpeed;
 
 	lastSpeed = speed;
@@ -681,14 +677,6 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 	if ((int)recentGLongs.size() > numRecentGLongs) {
 		recentGLongs.erase(recentGLongs.begin());
 	}
-
-	getRawDataValue(rawValue, header, data, "YawRate");
-
-	float yawRate = atof(rawValue) * 57.2958;
-
-	getRawDataValue(rawValue, header, data, "Lap");
-
-	int completedLaps = atoi(rawValue);
 
 	// Get the average recent GLong
 	std::vector<float>::iterator glongIter;
@@ -712,25 +700,70 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 		}
 	}
 
-	CornerDynamics cd = CornerDynamics(atof(rawValue) * 3.6, 0, completedLaps, phase);
+	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
+		getRawDataValue(rawValue, header, data, "Lap");
 
-	if (fabs(yawRate) > 0.1) {
-		float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+		int completedLaps = atoi(rawValue);
 
-		if (fabs(steeredAngleDegs) > 0.33f)
-			cd.usos = 10 * -steeredAngleDegs / yawRate;
-	}
+		getRawDataValue(rawValue, header, data, "YawRate");
 
-	cornerDynamicsList.push_back(cd);
+		float angularVelocity = atof(rawValue);
 
-	if (lastCompletedLaps != completedLaps) {
-		lastCompletedLaps = completedLaps;
+		CornerDynamics cd = CornerDynamics(atof(rawValue) * 3.6, 0, completedLaps, phase);
 
-		// Delete all corner data nore than 2 laps old.
-		cornerDynamicsList.erase(
-			std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
-				[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
-			cornerDynamicsList.end());
+		if (fabs(angularVelocity * 57.2958) > 0.1) {
+			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+
+			/*
+			if (fabs(steeredAngleDegs) > 0.33f)
+				cd.usos = 10 * -steeredAngleDegs / angularVelocity;
+			*/
+
+			float steerAngleRadians = -steeredAngleDegs / 57.2958;
+			float wheelBaseMeter = (float)wheelbase / 10;
+			float radius = wheelBaseMeter / steerAngleRadians;
+
+			float perimeter = radius * PI * 2;
+			float perimeterSpeed = lastSpeed / 3.6;
+			float idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+
+			float slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+
+			if (steerAngle > 0) {
+				if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
+
+			cd.usos = slip * 57.2989 * 10;
+
+			if (false) {
+				std::ofstream output;
+
+				output.open(dataFile + ".trace", std::ios::out | std::ios::app);
+
+				output << steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
+						  lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
+						  cd.usos << std::endl;
+
+				output.close();
+			}
+		}
+
+		cornerDynamicsList.push_back(cd);
+
+		if (lastCompletedLaps != completedLaps) {
+			lastCompletedLaps = completedLaps;
+
+			// Delete all corner data nore than 2 laps old.
+			cornerDynamicsList.erase(
+				std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
+					[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
+				cornerDynamicsList.end());
+		}
 	}
 
 	return true;
@@ -905,51 +938,8 @@ void writeTelemetry(const irsdk_header* header, const char* data) {
 		output.close();
 
 		remove(dataFile.c_str());
-
+		
 		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
-
-		if (true) {
-			char* rawValue;
-			char playerCarIdx[10] = "";
-
-			getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");
-
-			int playerCarIndex = atoi(playerCarIdx);
-
-			getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
-
-			float steerAngle = atof(rawValue);
-
-			getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax");
-
-			float steerLock = atof(rawValue);
-
-			steerAngle = steerAngle / steerLock;
-			steerLock = steerLock * 57.2958;
-
-			getRawDataValue(rawValue, header, data, "YawRate");
-
-			float yawRate = atof(rawValue) * 57.2958;
-
-			getRawDataValue(rawValue, header, data, "Speed");
-
-			float speed = atof(rawValue) * 3.6;
-
-			std::ofstream output;
-
-			output.open(dataFile + ".trace", std::ios::out | std::ios::app);
-
-			output << "[Debug]" << std::endl;
-
-			output << "Steering=n/a" << std::endl;
-			output << "Steer Lock=" << steerLock << std::endl;
-			output << "Steer Ratio=" << steerRatio << std::endl;
-			output << "Steer Angle=" << steerAngle << std::endl;
-			output << "Yaw Rate=" << yawRate << std::endl;
-			output << "Speed=" << speed << std::endl;
-			
-			output.close();
-		}
 	}
 	catch (...) {
 		try {
@@ -1154,7 +1144,10 @@ int main(int argc, char* argv[])
 			oversteerMediumThreshold = atoi(argv[7]);
 			oversteerHeavyThreshold = atoi(argv[8]);
 			lowspeedThreshold = atoi(argv[9]);
-			steerRatio = atoi(argv[10]);
+			steerLock = atoi(argv[10]);
+			steerRatio = atoi(argv[11]);
+			wheelbase = atoi(argv[12]);
+			trackWidth = atoi(argv[13]);
 		}
 		else if (positionTrigger) {
 			loadTrackCoordinates(argv[2]);

@@ -628,77 +628,113 @@ int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
 int steerLock = 900;
 int steerRatio = 14;
-int lastCompletedLaps = 0;
+int wheelbase = 270;
+int trackWidth = 150;
 
+int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 
 bool collectTelemetry() {
 	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
 	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
 
-	if (pf && gf) {
-		if ((gf->status != AC_LIVE) || gf->isInPit || gf->isInPitLane)
-			return true;
+	if ((gf->status != AC_LIVE) || gf->isInPit || gf->isInPitLane)
+		return true;
 
-		recentSteerAngles.push_back(pf->steerAngle);
-		if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
-			recentSteerAngles.erase(recentSteerAngles.begin());
-		}
+	recentSteerAngles.push_back(pf->steerAngle);
+	if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
+		recentSteerAngles.erase(recentSteerAngles.begin());
+	}
 
-		float acceleration = pf->speedKmh - lastSpeed;
+	float acceleration = pf->speedKmh - lastSpeed;
 		
-		lastSpeed = pf->speedKmh;
+	lastSpeed = pf->speedKmh;
 
-		recentGLongs.push_back(acceleration);
-		if ((int)recentGLongs.size() > numRecentGLongs) {
-			recentGLongs.erase(recentGLongs.begin());
+	recentGLongs.push_back(acceleration);
+	if ((int)recentGLongs.size() > numRecentGLongs) {
+		recentGLongs.erase(recentGLongs.begin());
+	}
+
+	// Get the average recent GLong
+	vector <float>::iterator glongIter;
+	float sumGLong = 0.0;
+	int numGLong = 0;
+	for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
+		sumGLong += *glongIter;
+		numGLong++;
+	}
+
+	int phase = 0;
+	if (numGLong > 0) {
+		float recentGLong = sumGLong / numGLong;
+		if (recentGLong < -0.2) {
+			// Braking
+			phase = -1;
+		}
+		else if (recentGLong > 0.1) {
+			// Accelerating
+			phase = 1;
+		}
+	}
+
+	if (fabs(pf->steerAngle) > 0.1 && pf->speedKmh > 60) {
+		float angularVelocity = pf->localAngularVel[2];
+		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
+
+		if (fabs(angularVelocity * 57.2958) > 0.1) {
+			float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
+
+			/*
+			if (fabs(steeredAngleDegs) > 0.33f)
+				cd.usos = 10 * -steeredAngleDegs / pf->localAngularVel[1];
+			*/
+
+			double steerAngleRadians = -steeredAngleDegs / 57.2958;
+			double wheelBaseMeter = (float)wheelbase / 10;
+			double radius = wheelBaseMeter / steerAngleRadians;
+
+			double perimeter = radius * PI * 2;
+			double perimeterSpeed = lastSpeed / 3.6;
+			double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+
+			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+
+			if (pf->steerAngle > 0) {
+				if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
+
+			cd.usos = slip * 57.2989 * 10;
+
+			if (false) {
+				std::ofstream output;
+
+				output.open(dataFile + ".trace", std::ios::out | std::ios::app);
+
+				output << pf->steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
+							lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
+							cd.usos << std::endl;
+
+				output.close();
+			}
 		}
 
-		// Get the average recent GLong
-		vector <float>::iterator glongIter;
-		float sumGLong = 0.0;
-		int numGLong = 0;
-		for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
-			sumGLong += *glongIter;
-			numGLong++;
-		}
+		cornerDynamicsList.push_back(cd);
 
-		int phase = 0;
-		if (numGLong > 0) {
-			float recentGLong = sumGLong / numGLong;
-			if (recentGLong < -0.2) {
-				// Braking
-				phase = -1;
-			}
-			else if (recentGLong > 0.1) {
-				// Accelerating
-				phase = 1;
-			}
-		}
+		int completedLaps = gf->completedLaps;
 
-		if (pf->steerAngle > 0.1 && pf->speedKmh > 50) {
-			CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
+		if (lastCompletedLaps != completedLaps) {
+			lastCompletedLaps = completedLaps;
 
-			if (fabs(pf->localAngularVel[1]) > 0.1) {
-				float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
-
-				if (fabs(steeredAngleDegs) > 0.33f)
-					cd.usos = 10 * -steeredAngleDegs / pf->localAngularVel[1];
-			}
-
-			cornerDynamicsList.push_back(cd);
-
-			int completedLaps = gf->completedLaps;
-
-			if (lastCompletedLaps != completedLaps) {
-				lastCompletedLaps = completedLaps;
-
-				// Delete all corner data nore than 2 laps old.
-				cornerDynamicsList.erase(
-					std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
-						[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
-					cornerDynamicsList.end());
-			}
+			// Delete all corner data nore than 2 laps old.
+			cornerDynamicsList.erase(
+				std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
+					[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
+				cornerDynamicsList.end());
 		}
 	}
 
@@ -876,30 +912,6 @@ void writeTelemetry() {
  		remove(dataFile.c_str());
 
 		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
-
-		if (false) {
-			ofstream output;
-			
-			output.open(dataFile + ".trace", ios::out | ios::app);
-
-			output << "[Debug]" << std::endl;
-
-			SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
-			SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
-
-			output << "Steering=" << pf->steerAngle << std::endl;
-			output << "Steer Lock=" << steerLock << std::endl;
-			output << "Steer Ratio=" << steerRatio << std::endl;
-			output << "Steer Angle=" << (pf->steerAngle * steerLock / steerRatio) << std::endl;
-			output << "Yaw Rate=" << -pf->localAngularVel[1] << std::endl;
-			output << "Speed=" << pf->speedKmh << std::endl;
-
-			double acceleration = sqrt(pf->accG[0] * pf->accG[0] + pf->accG[1] * pf->accG[1] + pf->accG[2] * pf->accG[2]);
-
-			output << "Acceleration=" << acceleration << std::endl;
-
-			output.close();
-		}
 	}
 	catch (...) {
 		try {
@@ -1033,6 +1045,8 @@ int main(int argc, char* argv[])
 			lowspeedThreshold = atoi(argv[9]);
 			steerLock = atoi(argv[10]);
 			steerRatio = atoi(argv[11]);
+			wheelbase = atoi(argv[12]);
+			trackWidth = atoi(argv[13]);
 		}
 		else if (positionTrigger) {
 			for (int i = 2; i < (argc - 1); i = i + 2) {

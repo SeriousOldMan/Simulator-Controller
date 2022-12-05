@@ -504,10 +504,10 @@ int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
 int steerLock = 900;
 int steerRatio = 14;
-int lastCompletedLaps = 0;
 int wheelbase = 270;
 int trackWidth = 150;
 
+int lastCompletedLaps = 0;
 float lastSpeed = 0.0;
 
 bool collectTelemetry(const SharedMemory* sharedData) {

@@ -656,8 +656,8 @@ namespace ACSHMSpotter {
 
 		class CornerDynamics
 		{
-			public float Speed;
-			public float Usos;
+			public double Speed;
+			public double Usos;
 			public int CompletedLaps;
 			public int Phase;
 
@@ -688,16 +688,20 @@ namespace ACSHMSpotter {
 		int lowspeedThreshold = 100;
 		int steerLock = 900;
 		int steerRatio = 14;
-		int lastCompletedLaps = 0;
+        int wheelbase = 270;
+        int trackWidth = 150;
 
-		float lastSpeed = 0.0f;
+        int lastCompletedLaps = 0;
+        float lastSpeed = 0.0f;
 
 		bool collectTelemetry()
 		{
 			if ((graphics.Status != AC_STATUS.AC_LIVE) || graphics.IsInPit != 0 || graphics.IsInPitLane != 0)
 				return true;
 
-			recentSteerAngles.Add(physics.SteerAngle);
+			float steerAngle = physics.SteerAngle;
+
+            recentSteerAngles.Add(steerAngle);
 			if (recentSteerAngles.Count > numRecentSteerAngles)
 				recentSteerAngles.RemoveAt(0);
 
@@ -737,26 +741,71 @@ namespace ACSHMSpotter {
                 }
             }
 
-			CornerDynamics cd = new CornerDynamics(physics.SpeedKmh, 0, graphics.CompletedLaps, phase);
-
-            if (Math.Abs(physics.LocalAngularVelocity[1]) > 0.1)
+			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
 			{
-				float steeredAngleDegs = physics.SteerAngle * steerLock / 2.0f / steerRatio;
+				double angularVelocity = physics.LocalAngularVelocity[2];
+                CornerDynamics cd = new CornerDynamics(physics.SpeedKmh, 0, graphics.CompletedLaps, phase);
 
-				if (Math.Abs(steeredAngleDegs) > 0.33f)
-					cd.Usos = 10 * -steeredAngleDegs / physics.LocalAngularVelocity[1];
-            }
+				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
+				{
+					float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 
-            cornerDynamicsList.Add(cd);
+                    /*
+					if (Math.Abs(steeredAngleDegs) > 0.33f)
+						cd.Usos = 10 * -steeredAngleDegs / physics.LocalAngularVelocity[1];
+					*/
 
-            int completedLaps = graphics.CompletedLaps;
+                    double steerAngleRadians = -steeredAngleDegs / 57.2958;
+                    double wheelBaseMeter = (float)wheelbase / 10;
+                    double radius = wheelBaseMeter / steerAngleRadians;
 
-			if (lastCompletedLaps != completedLaps)
-				while (true)
-					if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
-						cornerDynamicsList.RemoveAt(0);
-					else
-						break;
+                    double perimeter = radius * PI * 2;
+                    double perimeterSpeed = lastSpeed / 3.6;
+                    double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+
+                    double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
+
+                    if (steerAngle > 0)
+                    {
+                        if (angularVelocity < idealAngularVelocity)
+                            slip *= -1;
+                    }
+                    else
+                    {
+                        if (angularVelocity > idealAngularVelocity)
+                            slip *= -1;
+                    }
+
+                    cd.Usos = slip * 57.2989 * 10;
+
+                    if (false)
+                    {
+                        StreamWriter output = new StreamWriter(dataFile + ".trace", true);
+
+                        output.Write(steerAngle + "  ");
+                        output.Write(steeredAngleDegs + "  ");
+                        output.Write(steerAngleRadians + "  ");
+                        output.Write(lastSpeed + "  ");
+                        output.Write(idealAngularVelocity + "  ");
+                        output.Write(angularVelocity + "  ");
+                        output.Write(slip + "  ");
+                        output.WriteLine(cd.Usos);
+
+                        output.Close();
+                    }
+                }
+
+				cornerDynamicsList.Add(cd);
+
+				int completedLaps = graphics.CompletedLaps;
+
+				if (lastCompletedLaps != completedLaps)
+					while (true)
+						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
+							cornerDynamicsList.RemoveAt(0);
+						else
+							break;
+			}
 
 			return true;
 		}
@@ -1069,6 +1118,8 @@ namespace ACSHMSpotter {
             lowspeedThreshold = int.Parse(args[8]);
             steerLock = int.Parse(args[9]);
             steerRatio = int.Parse(args[10]);
+            wheelbase = int.Parse(args[11]);
+            trackWidth = int.Parse(args[12]);
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry)

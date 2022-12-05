@@ -719,15 +719,11 @@ int oversteerLightThreshold = 2;
 int oversteerMediumThreshold = -6;
 int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
-int lastCompletedLaps = 0;
 int wheelbase = 270;
 int trackWidth = 150;
 
+int lastCompletedLaps = 0;
 r3e_float32 lastSpeed = 0.0f;
-
-inline int sign(double number) {
-	return (number < 0) ? -1 : 1;
-}
 
 BOOL collectTelemetry() {
 	int playerIdx = getPlayerIndex();

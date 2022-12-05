@@ -727,10 +727,10 @@ namespace RF2SHMSpotter {
         int lowspeedThreshold = 100;
         int steerLock = 900;
         int steerRatio = 14;
-		int lastCompletedLaps = 0;
         int wheelbase = 270;
         int trackWidth = 150;
 
+        int lastCompletedLaps = 0;
         double lastSpeed = 0.0;
 
 		bool collectTelemetry()
@@ -1062,36 +1062,6 @@ namespace RF2SHMSpotter {
                 info = new FileInfo(dataFile + ".tmp");
 
                 info.MoveTo(dataFile);
-
-                if (false)
-                {
-					int carID = 0;
-
-                    for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
-                        if (scoring.mVehicles[i].mIsPlayer != 0)
-                        {
-                            carID = i;
-
-                            break;
-                        }
-
-                    StreamWriter trace = new StreamWriter(dataFile + ".trace", true);
-
-                    trace.WriteLine("[Debug]");
-
-                    trace.WriteLine("Steering=" + telemetry.mVehicles[carID].mFilteredSteering);
-                    trace.WriteLine("Steer Lock=" + steerLock);
-                    trace.WriteLine("Steer Ratio=" + steerRatio);
-                    trace.WriteLine("Steer Angle=" + telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio);
-                    trace.WriteLine("Yaw Rate=" + telemetry.mVehicles[carID].mLocalRot.y * 57.2958);
-
-                    rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
-                    double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
-
-                    trace.WriteLine("Speed=" + speed);
-
-                    trace.Close();
-                }
             }
             catch (Exception)
             {

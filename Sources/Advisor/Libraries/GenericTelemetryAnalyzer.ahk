@@ -35,9 +35,9 @@ global kMaxThreshold := 180
 class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iCar := false
 
-	iUndersteerThresholds := [12, 16, 20]
-	iOversteerThresholds := [0, -6, -12]
-	iLowspeedThreshold := 100
+	iUndersteerThresholds := [40, 70, 100]
+	iOversteerThresholds := [-20, -30, -40]
+	iLowspeedThreshold := 120
 
 	iSteerLock := 900
 	iSteerRatio := 12
@@ -165,8 +165,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		if (selectedCar == true)
 			selectedCar := false
 
-		defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "12,16,20")
-		defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "0,-6,-12")
+		defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
+		defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-20,-30,-40")
 		defaultLowspeedThreshold := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", "120")
 
 		this.iCar := selectedCar

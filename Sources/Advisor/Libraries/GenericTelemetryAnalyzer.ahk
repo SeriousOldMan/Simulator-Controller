@@ -618,9 +618,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 Section HWNDwidget27, % translate("Wheelbase / Track Width")
 		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget28 Number, 270
 		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget29, 270
-		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget28 Number, 150
-		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-999 HWNDwidget29, 150
-		Gui %window%:Add, Text, x257 yp w50 h23 +0x200 HWNDwidget30, % translate("cm")
+		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget30 Number, 150
+		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-999 HWNDwidget31, 150
+		Gui %window%:Add, Text, x257 yp w50 h23 +0x200 HWNDwidget32, % translate("cm")
 
 		if !analyzer.settingAvailable("SteerLock") {
 			GuiControl Disable, steerLockEdit
@@ -640,7 +640,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		Gui %window%:Add, Text, x24 yp+21 w130 h23 +0x200 HWNDwidget6, % translate("Consider less than")
 		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget7 vlowspeedThresholdEdit, % analyzer.LowspeedThreshold
-		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget31, % analyzer.LowspeedThreshold
+		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget33, % analyzer.LowspeedThreshold
 		Gui %window%:Add, Text, x207 yp w120 h23 +0x200 HWNDwidget8, % translate("km/h as low speed")
 
 		if !analyzer.settingAvailable("LowspeedThreshold") {
@@ -690,7 +690,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			GuiControl, , lightUndersteerThresholdSlider, 0
 		}
 
-		loop 31
+		loop 33
 			prepareWidgets.Push(widget%A_Index%)
 
 		Gui %window%:Add, ListView, x16 ys w320 h160 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)

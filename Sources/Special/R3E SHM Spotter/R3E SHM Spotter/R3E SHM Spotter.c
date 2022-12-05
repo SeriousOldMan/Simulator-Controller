@@ -783,6 +783,20 @@ BOOL collectTelemetry() {
 			r3e_float64 slip = ((idealAngularVelocity > 0) ? -idealAngularVelocity : idealAngularVelocity) + angularVelocity;
 
 			cd.usos = slip * 57,2989 * idealAngularVelocity / 2 / PI * 10;
+
+			if (TRUE) {
+				char fileName[512];
+				FILE* output;
+
+				strcpy_s(fileName, 512, dataFile);
+				strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".trace");
+
+				if (!fopen_s(&output, fileName, "a")) {
+					fprintf(output, "%f  %f  %f  %f  %f  %f  %f", steerAngle, steerAngleRadians, lastSpeed, idealAngularVelocity, angularVelocity, slip, cd.usos);
+
+					fclose(output);
+				}
+			}
 		}
 
 		appendCornerDynamics(&cd);
@@ -969,30 +983,6 @@ void writeTelemetry() {
 		remove(dataFile);
 
 		rename(fileName, dataFile);
-
-		if (FALSE) {
-			strcpy_s(fileName, 512, dataFile);
-			strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".trace");
-
-			if (!fopen_s(&output, fileName, "a")) {
-				fprintf(output, "[Debug]\n");
-
-				r3e_float32 steerAngle = map_buffer->steer_input_raw;
-				r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
-				r3e_float32 steerRatio = (float)steerLock / map_buffer->steer_lock_degrees;
-
-				r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958;
-
-				fprintf(output, "Steering=%f\n", steerAngle);
-				fprintf(output, "Steer Lock=%d\n", steerLock);
-				fprintf(output, "Steer Ratio=%f\n", steerRatio);
-				fprintf(output, "Steer Angle=%f\n", (steerAngle * steerLock / steerRatio));
-				fprintf(output, "Yaw Rate=%lf\n", -angularVelocity);
-				fprintf(output, "Speed=%f\n", map_buffer->car_speed * 3.6);
-
-				fclose(output);
-			}
-		}
 	}
 }
 

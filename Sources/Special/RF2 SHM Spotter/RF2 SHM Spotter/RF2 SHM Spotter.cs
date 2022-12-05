@@ -1287,7 +1287,7 @@ namespace RF2SHMSpotter {
 						}
 
                         if (analyzeTelemetry)
-                            Thread.Sleep(100);
+                            Thread.Sleep(10);
                         else if (positionTrigger)
                             Thread.Sleep(10);
                         else if (wait)

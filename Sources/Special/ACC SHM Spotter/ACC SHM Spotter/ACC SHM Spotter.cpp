@@ -1133,7 +1133,7 @@ int main(int argc, char* argv[])
 		}
 		
 		if (analyzeTelemetry)
-			Sleep(100);
+			Sleep(10);
 		else if (positionTrigger)
 			Sleep(10);
 		else if (wait)

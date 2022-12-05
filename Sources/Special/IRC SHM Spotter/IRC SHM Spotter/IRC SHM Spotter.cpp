@@ -1322,7 +1322,7 @@ int main(int argc, char* argv[])
 		}
 
 		if (analyzeTelemetry)
-			Sleep(100);
+			Sleep(10);
 		else if (mapTrack)
 			Sleep(1);
 		else if (positionTrigger)

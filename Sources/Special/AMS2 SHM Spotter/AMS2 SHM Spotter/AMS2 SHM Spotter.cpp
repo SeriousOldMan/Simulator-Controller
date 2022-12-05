@@ -505,6 +505,8 @@ int lowspeedThreshold = 100;
 int steerLock = 900;
 int steerRatio = 14;
 int lastCompletedLaps = 0;
+int wheelbase = 270;
+int trackWidth = 150;
 
 float lastSpeed = 0.0;
 
@@ -548,30 +550,68 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 		}
 	}
 
-	double yawRate = sharedData->mAngularVelocity[VEC_Y] * 57.2958;
-	CornerDynamics cd = CornerDynamics(sharedData->mSpeed * 3.6, 0,
-									   sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted,
-									   phase);
+	if (fabs(sharedData->mSteering) > 0.1 && lastSpeed > 60) {
+		double angularVelocity = sharedData->mAngularVelocity[VEC_Z];
 
-	if (fabs(yawRate) > 0.1) {
-		float steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
+		CornerDynamics cd = CornerDynamics(sharedData->mSpeed * 3.6, 0,
+			sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted,
+			phase);
 
-		if (fabs(steeredAngleDegs) > 0.33f)
-			cd.usos = 100 * -steeredAngleDegs / yawRate;
-	}
+		if (fabs(angularVelocity * 57.2958) > 0.1) {
+			float steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
 
-	cornerDynamicsList.push_back(cd);
+			/*
+			if (fabs(steeredAngleDegs) > 0.33f)
+				cd.usos = 100 * -steeredAngleDegs / angularVelocity;
+			*/
+			
+			double steerAngleRadians = -steeredAngleDegs / 57.2958;
+			double wheelBaseMeter = (float)wheelbase / 10;
+			double radius = wheelBaseMeter / steerAngleRadians;
 
-	int completedLaps = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted;
+			double perimeter = radius * PI * 2;
+			double perimeterSpeed = lastSpeed / 3.6;
+			double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
 
-	if (lastCompletedLaps != completedLaps) {
-		lastCompletedLaps = completedLaps;
+			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-		// Delete all corner data nore than 2 laps old.
-		cornerDynamicsList.erase(
-			std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
-				[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
-			cornerDynamicsList.end());
+			if (sharedData->mSteering > 0) {
+				if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
+
+			cd.usos = slip * 57.2989 * 10;
+
+			if (false) {
+				std::ofstream output;
+
+				output.open(dataFile + ".trace", std::ios::out | std::ios::app);
+
+				output << sharedData->mSteering << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
+					      lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
+						  cd.usos << std::endl;
+
+				output.close();
+			}
+		}
+
+		cornerDynamicsList.push_back(cd);
+
+		int completedLaps = sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted;
+
+		if (lastCompletedLaps != completedLaps) {
+			lastCompletedLaps = completedLaps;
+
+			// Delete all corner data nore than 2 laps old.
+			cornerDynamicsList.erase(
+				std::remove_if(cornerDynamicsList.begin(), cornerDynamicsList.end(),
+					[completedLaps](const CornerDynamics& o) { return o.completedLaps < completedLaps - 1; }),
+				cornerDynamicsList.end());
+		}
 	}
 
 	return true;
@@ -750,23 +790,6 @@ void writeTelemetry(const SharedMemory* sharedData) {
 		remove(dataFile.c_str());
 
 		rename((dataFile + ".tmp").c_str(), dataFile.c_str());
-
-		if (false) {
-			std::ofstream output;
-
-			output.open(dataFile + ".trace", std::ios::out | std::ios::app);
-
-			output << "[Debug]" << std::endl;
-
-			output << "Steering=" << sharedData->mSteering << std::endl;
-			output << "Steer Lock=" << steerLock << std::endl;
-			output << "Steer Ratio=" << steerRatio << std::endl;
-			output << "Steer Angle=" << (sharedData->mSteering * steerLock / 2.0f / steerRatio) << std::endl;
-			output << "Yaw Rate=" << (sharedData->mAngularVelocity[VEC_Y] * 57.2958) << std::endl;
-			output << "Speed=" << sharedData->mSpeed * 3.6 << std::endl;
-
-			output.close();
-		}
 	}
 	catch (...) {
 		try {
@@ -879,6 +902,8 @@ int main(int argc, char* argv[]) {
 			lowspeedThreshold = atoi(argv[9]);
 			steerLock = atoi(argv[10]);
 			steerRatio = atoi(argv[11]);
+			wheelbase = atoi(argv[12]);
+			trackWidth = atoi(argv[13]);
 		}
 		else if (positionTrigger) {
 			for (int i = 2; i < (argc - 1); i = i + 2) {

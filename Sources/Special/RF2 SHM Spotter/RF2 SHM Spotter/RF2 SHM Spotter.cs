@@ -15,6 +15,7 @@ using System.Threading;
 using static RF2SHMSpotter.rFactor2Constants;
 using static RF2SHMSpotter.rFactor2Constants.rF2GamePhase;
 using static RF2SHMSpotter.rFactor2Constants.rF2PitState;
+using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace RF2SHMSpotter {
@@ -727,8 +728,10 @@ namespace RF2SHMSpotter {
         int steerLock = 900;
         int steerRatio = 14;
 		int lastCompletedLaps = 0;
+        int wheelbase = 270;
+        int trackWidth = 150;
 
-		double lastSpeed = 0.0;
+        double lastSpeed = 0.0;
 
 		bool collectTelemetry()
 		{
@@ -747,7 +750,9 @@ namespace RF2SHMSpotter {
             if (extended.mSessionStarted == 0 || scoring.mScoringInfo.mGamePhase >= (byte)SessionStopped && playerScoring.mPitState >= (byte)Entering)
                 return true;
 
-			recentSteerAngles.Add(telemetry.mVehicles[carID].mFilteredSteering);
+			double steerAngle = telemetry.mVehicles[carID].mFilteredSteering;
+
+            recentSteerAngles.Add(steerAngle);
             if (recentSteerAngles.Count > numRecentSteerAngles)
                 recentSteerAngles.RemoveAt(0);
 
@@ -788,27 +793,71 @@ namespace RF2SHMSpotter {
                 }
             }
 
-            double yawRate = telemetry.mVehicles[carID].mLocalRot.y * 57.2958;
-			CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
+			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
+			{
+				double angularVelocity = telemetry.mVehicles[carID].mLocalRot.z;
+				CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
 
-            if (Math.Abs(yawRate) > 0.1)
-            {
-                double steeredAngleDegs = telemetry.mVehicles[carID].mFilteredSteering * steerLock / 2.0f / steerRatio;
+				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
+				{
+					double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 
-                if (Math.Abs(steeredAngleDegs) > 0.33f)
-                    cd.Usos = 200 * steeredAngleDegs / yawRate;
-			}
+                    /*
+					if (Math.Abs(steeredAngleDegs) > 0.33f)
+						cd.Usos = 200 * steeredAngleDegs / angularVelocity;
+					*/
 
-            cornerDynamicsList.Add(cd);
+                    double steerAngleRadians = -steeredAngleDegs / 57.2958;
+                    double wheelBaseMeter = (float)wheelbase / 10;
+                    double radius = wheelBaseMeter / steerAngleRadians;
 
-            int completedLaps = playerScoring.mTotalLaps;
+                    double perimeter = radius * PI * 2;
+                    double perimeterSpeed = lastSpeed / 3.6;
+                    double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
 
-            if (lastCompletedLaps != completedLaps)
-                while (true)
-                    if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
-                        cornerDynamicsList.RemoveAt(0);
+                    double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
+
+                    if (steerAngle > 0)
+                    {
+                        if (angularVelocity < idealAngularVelocity)
+                            slip *= -1;
+                    }
                     else
-                        break;
+                    {
+                        if (angularVelocity > idealAngularVelocity)
+                            slip *= -1;
+                    }
+
+                    cd.Usos = slip * 57.2989 * 10;
+
+                    if (true)
+                    {
+                        StreamWriter output = new StreamWriter(dataFile + ".trace", true);
+
+						output.Write(steerAngle + "  ");
+						output.Write(steeredAngleDegs + "  ");
+						output.Write(steerAngleRadians + "  ");
+						output.Write(lastSpeed + "  ");
+						output.Write(idealAngularVelocity + "  ");
+						output.Write(angularVelocity + "  ");
+						output.Write(slip + "  ");
+                        output.WriteLine(cd.Usos);
+
+                        output.Close();
+                    }
+                }
+
+				cornerDynamicsList.Add(cd);
+
+				int completedLaps = playerScoring.mTotalLaps;
+
+				if (lastCompletedLaps != completedLaps)
+					while (true)
+						if (cornerDynamicsList[0].CompletedLaps < completedLaps - 2)
+							cornerDynamicsList.RemoveAt(0);
+						else
+							break;
+			}
 
             return true;
         }
@@ -1178,6 +1227,8 @@ namespace RF2SHMSpotter {
             lowspeedThreshold = int.Parse(args[8]);
             steerLock = int.Parse(args[9]);
             steerRatio = int.Parse(args[10]);
+            wheelbase = int.Parse(args[11]);
+            trackWidth = int.Parse(args[12]);
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {

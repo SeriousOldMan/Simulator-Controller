@@ -720,10 +720,14 @@ int oversteerMediumThreshold = -6;
 int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
 int lastCompletedLaps = 0;
-int wheelbase = 0;
-int trackWidth = 0;
+int wheelbase = 270;
+int trackWidth = 150;
 
 r3e_float32 lastSpeed = 0.0f;
+
+inline int sign(double number) {
+	return (number < 0) ? -1 : 1;
+}
 
 BOOL collectTelemetry() {
 	int playerIdx = getPlayerIndex();
@@ -733,7 +737,7 @@ BOOL collectTelemetry() {
 
 	r3e_float32 steerAngle = map_buffer->steer_input_raw;
 	r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
-	r3e_float32 steerRatio = (float)steerLock / map_buffer->steer_lock_degrees;
+	r3e_float32 steerRatio = ((float)steerLock / 2) / map_buffer->steer_lock_degrees;
 
 	r3e_float32 acceleration = map_buffer->car_speed * 3.6f - lastSpeed;
 
@@ -760,12 +764,12 @@ BOOL collectTelemetry() {
 		}
 	}
 
-	if (steerAngle > 0.1 && lastSpeed > 50) {
+	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
 		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
 
 		r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z;
 
-		if (fabs(angularVelocity) > 0.1) {
+		if (fabs(angularVelocity * 57.2958) > 0.1) {
 			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 			/*
 			if (fabs(steeredAngleDegs) > 0.33f)
@@ -780,11 +784,20 @@ BOOL collectTelemetry() {
 			r3e_float64 perimeterSpeed = lastSpeed / 3.6;
 			r3e_float64 idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
 
-			r3e_float64 slip = ((idealAngularVelocity > 0) ? -idealAngularVelocity : idealAngularVelocity) + angularVelocity;
+			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			cd.usos = slip * 57,2989 * idealAngularVelocity / 2 / PI * 10;
+			if (steerAngle > 0) {
+				if (angularVelocity < idealAngularVelocity)
+					slip *= -1;
+			}
+			else {
+				if (angularVelocity > idealAngularVelocity)
+					slip *= -1;
+			}
 
-			if (TRUE) {
+			cd.usos = slip * 57.2989 * 10;
+
+			if (FALSE) {
 				char fileName[512];
 				FILE* output;
 
@@ -792,7 +805,7 @@ BOOL collectTelemetry() {
 				strcpy_s(fileName + strlen(dataFile), 512 - strlen(dataFile), ".trace");
 
 				if (!fopen_s(&output, fileName, "a")) {
-					fprintf(output, "%f  %f  %f  %f  %f  %f  %f", steerAngle, steerAngleRadians, lastSpeed, idealAngularVelocity, angularVelocity, slip, cd.usos);
+					fprintf(output, "%f  %f  %f  %f  %f  %f  %f  %f\n", steerAngle, steeredAngleDegs, steerAngleRadians, lastSpeed, idealAngularVelocity, angularVelocity, slip, cd.usos);
 
 					fclose(output);
 				}

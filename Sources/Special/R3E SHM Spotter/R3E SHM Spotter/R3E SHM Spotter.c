@@ -720,6 +720,8 @@ int oversteerMediumThreshold = -6;
 int oversteerHeavyThreshold = -10;
 int lowspeedThreshold = 100;
 int lastCompletedLaps = 0;
+int wheelbase = 0;
+int trackWidth = 0;
 
 r3e_float32 lastSpeed = 0.0f;
 
@@ -758,23 +760,38 @@ BOOL collectTelemetry() {
 		}
 	}
 
-	corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
+	if (steerAngle > 0.1 && lastSpeed > 50) {
+		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
 
-	r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z * 57.2958;
+		r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z;
 
-	if (fabs(angularVelocity) > 0.1) {
-		float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+		if (fabs(angularVelocity) > 0.1) {
+			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+			/*
+			if (fabs(steeredAngleDegs) > 0.33f)
+				cd.usos = 10 * -steeredAngleDegs / (angularVelocity  * 57.2958);
+			*/
 
-		if (fabs(steeredAngleDegs) > 0.33f)
-			cd.usos = 10 * -steeredAngleDegs / angularVelocity;
+			r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
+			r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
+			r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
+
+			r3e_float64 perimeter = radius * PI * 2;
+			r3e_float64 perimeterSpeed = lastSpeed / 3.6;
+			r3e_float64 idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+
+			r3e_float64 slip = ((idealAngularVelocity > 0) ? -idealAngularVelocity : idealAngularVelocity) + angularVelocity;
+
+			cd.usos = slip * 57,2989 * idealAngularVelocity / 2 / PI * 10;
+		}
+
+		appendCornerDynamics(&cd);
+
+		int completedLaps = map_buffer->completed_laps;
+
+		if (lastCompletedLaps != completedLaps)
+			clearCornerDynamics(map_buffer->completed_laps);
 	}
-
-	appendCornerDynamics(&cd);
-
-	int completedLaps = map_buffer->completed_laps;
-
-	if (lastCompletedLaps != completedLaps)
-		clearCornerDynamics(map_buffer->completed_laps);
 
 	return TRUE;
 }
@@ -1092,6 +1109,8 @@ int main(int argc, char* argv[])
 			oversteerMediumThreshold = atoi(argv[7]);
 			oversteerHeavyThreshold = atoi(argv[8]);
 			lowspeedThreshold = atoi(argv[9]);
+			wheelbase = atoi(argv[10]);
+			trackWidth = atoi(argv[11]);
 		}
 		else if (positionTrigger) {
 			for (int i = 2; i < (argc - 1); i = i + 2) {

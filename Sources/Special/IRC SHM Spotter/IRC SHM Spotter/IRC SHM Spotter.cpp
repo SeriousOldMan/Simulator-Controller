@@ -713,12 +713,6 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
 			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-
-			/*
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 10 * -steeredAngleDegs / angularVelocity;
-			*/
-
 			float steerAngleRadians = -steeredAngleDegs / 57.2958;
 			float wheelBaseMeter = (float)wheelbase / 10;
 			float radius = wheelBaseMeter / steerAngleRadians;

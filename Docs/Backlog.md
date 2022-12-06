@@ -28,7 +28,7 @@
   1. Suppress interaction while reports are being loaded
   2. Optimization of the reports database to increase loading performance
 
-#### Tema Server
+#### Team Server
   1. Incorporate tyre pressure loss as detected by the Race Engineer (see above) into pitstop recommendations
 
 #### Plugins

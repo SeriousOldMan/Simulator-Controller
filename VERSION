@@ -1,16 +1,16 @@
 [Development]
-Version=4.5.0.0-beta
+Version=4.5.0.0-release
 Target=4.5.0.0-release
-Date=12/05/2022
-Download=https://www.dropbox.com/s/v9p9fbcequksp03/Simulator%20Controller%204.5.0.0-beta.zip?dl=1
+Date=12/06/2022
+Download=https://cutt.ly/M11r58W;https://www.dropbox.com/s/p2vsziaqv1r2xj1/Simulator%20Controller%204.5.0.0-release.zip?dl=1
 Changes=On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, Assistants can be muted and unmuted using a Button Box or Stream Deck, New icons in the Stream Deck icon set
 [Release]
-Version=4.4.9.1-release
-Date=11/26/2022
-Download=https://cutt.ly/I1dTTpR;https://www.dropbox.com/s/emctj6dpw24glvm/Simulator%20Controller%204.4.9.1-release.zip?dl=1
-Changes=Included race strategies in the "Session Database" browser, Support for sharing race strategies with the community, Fixed post pitstop tyre analysis in "Race Center", Fixed unlimited practice mode for *Assetto Corsa Competizione*, Updated color coding of used tyres in "Race Center"
+Version=4.5.0.0-release
+Date=12/06/2022
+Download=https://cutt.ly/M11r58W;https://www.dropbox.com/s/p2vsziaqv1r2xj1/Simulator%20Controller%204.5.0.0-release.zip?dl=1
+Changes=On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, Assistants can be muted and unmuted using a Button Box or Stream Deck, New icons in the Stream Deck icon set
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.4.9.1-release
-Development=4.5.0.0-beta
+Release=4.5.0.0-release
+Development=4.5.0.0-release

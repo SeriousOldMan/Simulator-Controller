@@ -2221,9 +2221,6 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 
 	deleteFile(tempFile)
 
-	SplitPath configFile, , directory
-	FileCreateDir %directory%
-
 	for section, keyValues in configuration {
 		pairs := ""
 
@@ -2241,6 +2238,10 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 	}
 
 	configFile := getFileName(configFile, kUserConfigDirectory)
+
+	SplitPath configFile, , directory
+	FileCreateDir %directory%
+
 	tries := 10
 
 	loop

@@ -36,6 +36,8 @@ To reactivate the Assistant use:
 
 	I can listen now
 
+These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
+
 ### Multi-class support
 
 Elisa *understands* multi-class races. Position evaluation and gap and lap time information will be always focused on your own class. Where it is necessary to mention, for example, the overall position, Elisa will phrase it in a way, so that you understand, that information is related to the whole grid.

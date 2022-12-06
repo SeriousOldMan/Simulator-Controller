@@ -1,4 +1,4 @@
-## 4.5.0.0-release 12/06/22 (planned)
+## 4.5.0.0-release 12/06/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. The "Setup Advisor" now supports a telemetry data analyzer, which derives handling issue entries from actual over- or understeering, while you are driving. See the all new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer) for more information.

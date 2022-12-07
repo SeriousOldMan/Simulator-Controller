@@ -662,7 +662,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, Edit, x208 yp w45 h23 Limit2 Number HWNDwidget3 vsteerRatioEdit, % analyzer.SteerRatio
 		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-99 HWNDwidget4, % analyzer.SteerRatio
 
-		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 Section HWNDwidget27, % translate("Wheelbase / Track Width")
+		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 HWNDwidget27, % translate("Wheelbase / Track Width")
 		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget28 Number vwheelbaseEdit, % analyzer.Wheelbase
 		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget29, % analyzer.Wheelbase
 		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget30 Number vtrackWidthEdit, % analyzer.TrackWidth
@@ -750,31 +750,31 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 33
 			prepareWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h160 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
 
 		issuesListView := widget1
 
 		Gui %window%:Font, s14, Arial
 
-		Gui %window%:Add, Text, x16 ys+170 w320 h200 HWNDwidget2 Wrap Hidden, % translate("Go to the track and run some decent laps. Then click on ""Stop"" to analyze the telemetry data.")
+		Gui %window%:Add, Text, x16 ys+200 w320 h200 HWNDwidget2 Wrap Hidden, % translate("Go to the track and run some decent laps. Then click on ""Stop"" to analyze the telemetry data.")
 
 		Gui %window%:Font, Norm s8, Arial
 
 		loop 2
 			runWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h200 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys w320 h230 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
 
 		resultListView := widget1
 
-		Gui %window%:Add, Text, x16 yp+208 w130 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
+		Gui %window%:Add, Text, x16 yp+238 w130 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
 		Gui %window%:Add, Slider, x158 yp w60 0x10 Range0-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 0
 		Gui %window%:Add, Text, x220 yp+3 HWNDwidget4 Hidden, % translate("%")
 
 		loop 4
 			analyzeWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, Button, x92 ys+260 w80 h23 Default vactivateButton gactivateAnalyzer, % translate("Start")
+		Gui %window%:Add, Button, x92 ys+290 w80 h23 Default vactivateButton gactivateAnalyzer, % translate("Start")
 		Gui %window%:Add, Button, xp+100 yp w80 h23 gcancelAnalyzer, % translate("Cancel")
 
 		Gui %window%:+Owner%aWindow%

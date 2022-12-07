@@ -1497,11 +1497,11 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	saveSessionSettings() {
-		local knowledgeBase := this.KnowledgeBase
-		local compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
+		local knowledgeBase, compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
 		local loadSettings, lapTime, fileName, settings
 
-		if knowledgeBase {
+		if this.hasEnoughData(false) {
+			knowledgeBase := this.KnowledgeBase
 			settingsDB := this.SettingsDatabase
 
 			simulator := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
@@ -1518,7 +1518,8 @@ class RaceAssistant extends ConfigurationItem {
 			lapTime := Round(this.BestLapTime / 1000)
 
 			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase")) {
-				settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+				if (this.AvgFuelConsumption > 0)
+					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
 
 				if (settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
 					settingsDB.setSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
@@ -1531,7 +1532,8 @@ class RaceAssistant extends ConfigurationItem {
 
 				settings := readConfiguration(fileName)
 
-				setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+				if (this.AvgFuelConsumption > 0)
+					setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
 
 				if (lapTime > 10)
 					setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))

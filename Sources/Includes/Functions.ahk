@@ -1842,12 +1842,12 @@ deleteFile(fileName) {
 	}
 }
 
-deleteDirectory(directoryName, includeDirectory := true) {
+deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 	local files, ignore, fileName, result
 
 	if includeDirectory {
 		try {
-			FileRemoveDir %directoryName%, 1
+			FileRemoveDir %directoryName%, %recurse%
 
 			return !ErrorLevel
 		}

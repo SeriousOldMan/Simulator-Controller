@@ -30,6 +30,7 @@ Release 4.4.1=Release 4.3.0 -> updateConfigurationForV441
 Release 4.4.8=Release 4.4.1 -> updateConfigurationForV448
 Release 4.4.9=Release 4.4.8 -> renewConsent
 Release 4.5.0=Release 4.4.9 -> updateStreamDeckIconPreset
+Release 4.5.0.1=Release 4.5.0 -> updateConfigurationForV4501
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

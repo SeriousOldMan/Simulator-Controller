@@ -1651,6 +1651,30 @@ updateInstallationForV392() {
 	}
 }
 
+updateConfigurationForV4501() {
+	local directory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
+	local sessionDB := new SessionDatabase()
+	local raceData, simulator, car, track
+
+	if directory
+		loop Files, %directory%\*.*, D
+		{
+			simulator := A_LoopFileName
+
+			loop Files, %directory%\%simulator%\*.*, D
+				if FileExist(A_LoopFilePath . "\Race.data") {
+					raceData := readConfiguration(A_LoopFilePath . "\Race.data")
+
+					car := sessionDB.getCarCode(simulator, getConfigurationValue(raceData, "Session", "Car"))
+					track := sessionDB.getTrackCode(simulator, getConfigurationValue(raceData, "Session", "Track"))
+
+					FileCreateDir %directory%\%simulator%\%car%\%track%
+
+					FileMoveDir %A_LoopFilePath%, %directory%\%simulator%\%car%\%track%\%A_LoopFileName%
+				}
+		}
+}
+
 updateConfigurationForV448() {
 	local data, count
 

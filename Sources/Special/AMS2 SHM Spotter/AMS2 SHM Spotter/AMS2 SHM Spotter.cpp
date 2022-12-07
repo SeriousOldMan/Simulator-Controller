@@ -558,13 +558,7 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 			phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			float steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
-
-			/*
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 100 * -steeredAngleDegs / angularVelocity;
-			*/
-			
+			double steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
 			double steerAngleRadians = -steeredAngleDegs / 57.2958;
 			double wheelBaseMeter = (float)wheelbase / 10;
 			double radius = wheelBaseMeter / steerAngleRadians;

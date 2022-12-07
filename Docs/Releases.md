@@ -4,7 +4,8 @@
   3. Fixed a bug, where an entry in the race settings could have been created automaticllay with an average fuel consumption of zero.
   4. Added the *rFactor 2* shared memory interface plugin to the installation plugins.
   5. Overhaul of the race reports database which provide a much improved performance when loading reports.
-  6. Optimized display of boolean values in "Session Database"
+  6. Optimized display of boolean values in "Session Database".
+  7. Massive performance improvements in handling of settings in "Session Database".
 
 ## 4.5.0.0-release 12/06/22
   1. Minor bugfixes, as always

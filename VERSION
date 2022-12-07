@@ -3,7 +3,7 @@ Version=4.5.0.1-dev
 Target=4.5.0.0-release
 Date=12/09/2022
 Download=
-Changes=Rework of race reports database structure, Fix for unnecessary race settings with zero fuel consumption, Added *rFactor 2* shared memory interface plugin to installation process
+Changes=Rework of race reports database structure, Fix for unnecessary race settings with zero fuel consumption, Added *rFactor 2* shared memory interface plugin to installation process, Optimized display of boolean values in "Session Database"
 [Release]
 Version=4.5.0.0-release
 Date=12/06/2022

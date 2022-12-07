@@ -138,6 +138,7 @@ Team Server.1=%kBinariesDirectory%Team Server Connector.dll <- %kSourcesDirector
 Team Server.2=%kBinariesDirectory%Data Store Connector.dll <- %kSourcesDirectory%Special\Team Server\Release\\net471\Data Store Connector.dll
 Team Server.3=%kBinariesDirectory%Team Server <- %kSourcesDirectory%Special\Team Server\Release\\netcoreapp3.1
 AC Plugin.1=%kHomeDirectory%Utilities\Plugins\SimulatorController <- %kSourcesDirectory%Special\AC Plugin
+RF2 Plugin.1=%kHomeDirectory%Utilities\Plugins\ <- %kHomeDirectory%Utilities\3rd Party\Shared Memory Interfaces\rFactor2SharedMemoryMapPlugin64.dll
 [Build]
 Special Applications && DLLs=Special
 Simulator Startup=%kBinariesDirectory%Simulator Startup.exe <- %kSourcesDirectory%Controller\Simulator Startup.ahk; %kIncludesDirectory%, %kLibrariesDirectory%, %kSourcesDirectory%Configuration\Libraries\SettingsEditor.ahk, %kHomeDirectory%VERSION

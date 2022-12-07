@@ -112,7 +112,7 @@ Not much to do here, since Jona is a fully integrated component of the Simulator
 
 Jona acquires telemetry data from the different simulation games using so called telemtry providers, which in most cases read the [required data](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#telemetry-integration) from a shared memory interface. In general these are already included in Simulator Controller and there is nothing to do, but for *Assetto Corsa* and *rFactor 2*, you need to install a plugin into a special location for the telemetry interface to work and for *Automobilista 2* and *Project CARS 2* a change in the settings is necessary.
 
-Please, note that all of this also applices to all other Virtual Race Assistants, but  you have to do it only once, of course.
+Please, note that all of this also applies to all other Virtual Race Assistants, but you have to do it only once, of course.
 
   1. *Assetto Corsa*
   

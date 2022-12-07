@@ -1497,11 +1497,11 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	saveSessionSettings() {
-		local knowledgeBase := this.KnowledgeBase
-		local compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
+		local knowledgeBase, compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
 		local loadSettings, lapTime, fileName, settings
 
-		if knowledgeBase {
+		if this.hasEnoughData(false) {
+			knowledgeBase := this.KnowledgeBase
 			settingsDB := this.SettingsDatabase
 
 			simulator := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))

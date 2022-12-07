@@ -227,22 +227,32 @@ class SettingsDatabase extends SessionDatabase {
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
 
-		database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
-								  , Func("always").Bind(true))
+		if database.lock("Settings")
+			try {
+				database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
+										  , Func("always").Bind(true))
 
-		database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
-
-		database.flush()
+				database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
+			}
+			finally {
+				database.unlock("Settings")
+			}
 	}
 
 	removeSettingValue(simulator, car, track, weather, section, key) {
+		local database := this.getSettingsDatabase(simulator, "User")
+
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
 
-		this.getSettingsDatabase(simulator, "User").remove("Settings", {Owner: this.ID
-																	  , Car: car, Track: track, Weather: weather
-																	  , Section: section, Key: key}
-																	 , Func("always").Bind(true), true)
+		if database.lock("Settings")
+			try {
+				database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
+										  , Func("always").Bind(true), true)
+			}
+			finally {
+				database.unlock("Settings")
+			}
 	}
 }
 

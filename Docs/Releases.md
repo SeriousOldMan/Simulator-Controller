@@ -4,7 +4,8 @@
   3. Fixed a bug, where an entry in the race settings could have been created automaticllay with an average fuel consumption of zero.
   4. Added the *rFactor 2* shared memory interface plugin to the installation plugins.
   5. Reorganization of the race reports database which provide a much improved performance when loading reports. Please make a backup copy before running the update, just in case.
-  6. Optimized display of boolean values in "Session Database"
+  6. Optimized display of boolean values in "Session Database".
+  7. Massive performance improvements in handling of settings in "Session Database".
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-451).
 

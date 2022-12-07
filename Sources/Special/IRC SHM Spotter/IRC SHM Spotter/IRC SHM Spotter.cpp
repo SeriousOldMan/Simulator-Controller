@@ -657,9 +657,29 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 	if (!onTrack || inPit)
 		return true;
 
-	getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
+	float steerAngle = 0.0;
 
-	float steerAngle = -atof(rawValue) * 57.2958;
+	if (false) {
+		getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
+
+		steerAngle = atof(rawValue) * 57.2958;
+	}
+	else {
+		char* steerAngles;
+
+		if (getRawDataValue(steerAngles, header, data, "CarIdxSteer"))
+			steerAngle = ((float*)steerAngles)[playerCarIndex] * 57.2958;
+	}
+
+	if (false) {
+		getRawDataValue(rawValue, header, data, "YawRate");
+
+		std::ofstream output;
+
+		output.open(dataFile + ".trace", std::ios::out | std::ios::app);
+
+		output << steerAngle << "  " << atof(rawValue) << std::endl;
+	}
 
 	recentSteerAngles.push_back(steerAngle);
 	if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
@@ -713,12 +733,6 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
 			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-
-			/*
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 10 * -steeredAngleDegs / angularVelocity;
-			*/
-
 			float steerAngleRadians = -steeredAngleDegs / 57.2958;
 			float wheelBaseMeter = (float)wheelbase / 10;
 			float radius = wheelBaseMeter / steerAngleRadians;

@@ -1,16 +1,16 @@
 [Development]
-Version=4.5.0.0-release
+Version=4.5.0.1-dev
 Target=4.5.0.0-release
-Date=12/06/2022
-Download=https://cutt.ly/M11r58W;https://www.dropbox.com/s/p2vsziaqv1r2xj1/Simulator%20Controller%204.5.0.0-release.zip?dl=1
-Changes=On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, Assistants can be muted and unmuted using a Button Box or Stream Deck, New icons in the Stream Deck icon set
+Date=12/09/2022
+Download=
+Changes=Rework of race reports database structure, Fix for unnecessary race settings with zero fuel consumption, Added *rFactor 2* shared memory interface plugin to installation process
 [Release]
 Version=4.5.0.0-release
 Date=12/06/2022
 Download=https://cutt.ly/M11r58W;https://www.dropbox.com/s/p2vsziaqv1r2xj1/Simulator%20Controller%204.5.0.0-release.zip?dl=1
 Changes=On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, Assistants can be muted and unmuted using a Button Box or Stream Deck, New icons in the Stream Deck icon set
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.5.0.0-release
-Development=4.5.0.0-release
+Development=4.5.0.1-dev

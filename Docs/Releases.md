@@ -1,3 +1,10 @@
+## 4.5.0.1-release 12/09/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Fixed a bug, where an entry in the race settings could have been created automaticllay with an average fuel consumption of zero.
+  4. Added the *rFactor 2* shared memory interface plugin to the installation plugins.
+  5. Overhaul of the race reports database which provide a much improved performance when loading reports.
+
 ## 4.5.0.0-release 12/06/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always

@@ -659,10 +659,10 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 	float steerAngle = 0.0;
 
-	if (false) {
+	if (true) {
 		getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
 
-		steerAngle = atof(rawValue) * 57.2958;
+		steerAngle = *((float*)rawValue) * 57.2958;
 	}
 	else {
 		char* steerAngles;
@@ -678,7 +678,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 		output.open(dataFile + ".trace", std::ios::out | std::ios::app);
 
-		output << steerAngle << "  " << atof(rawValue) << std::endl;
+		output << steerAngle << "  " << *((float*)rawValue) << std::endl;
 	}
 
 	recentSteerAngles.push_back(steerAngle);
@@ -688,7 +688,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 	getRawDataValue(rawValue, header, data, "Speed");
 
-	float speed = atof(rawValue) * 3.6;
+	float speed = *((float*)rawValue) * 3.6;
 	float acceleration = speed - lastSpeed;
 
 	lastSpeed = speed;
@@ -723,11 +723,11 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
 		getRawDataValue(rawValue, header, data, "Lap");
 
-		int completedLaps = atoi(rawValue);
+		int completedLaps = *((int*)rawValue);
 
 		getRawDataValue(rawValue, header, data, "YawRate");
 
-		float angularVelocity = atof(rawValue);
+		float angularVelocity = *((float*)rawValue);
 
 		CornerDynamics cd = CornerDynamics(atof(rawValue) * 3.6, 0, completedLaps, phase);
 
@@ -1267,6 +1267,7 @@ int main(int argc, char* argv[])
 						}
 
 						if (running) {
+							char* rawValue;
 							bool onTrack = true;
 
 							getDataValue(result, pHeader, g_data, "IsInGarage");
@@ -1277,19 +1278,16 @@ int main(int argc, char* argv[])
 							if (atoi(result))
 								onTrack = false;
 
-							/*
-							getDataValue(result, pHeader, g_data, "IsOnTrack");
-							if (!atoi(result))
+							getRawDataValue(rawValue, pHeader, g_data, "IsOnTrack");
+							if (!*(bool*)rawValue)
 								onTrack = false;
 
-							getDataValue(result, pHeader, g_data, "IsOnTrackCar");
-							if (atoi(result))
-								onTrack = true;
-							*/
+							getRawDataValue(rawValue, pHeader, g_data, "IsOnTrackCar");
+							if (!*(bool*)rawValue)
+								onTrack = false;
 
 							bool inPit = false;
 
-							char* rawValue;
 							char playerCarIdx[10] = "";
 
 							getYamlValue(playerCarIdx, irsdk_getSessionInfoStr(), "DriverInfo:DriverCarIdx:");

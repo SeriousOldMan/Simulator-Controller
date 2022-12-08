@@ -1502,8 +1502,8 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 							startLap := lap[1]
 							endLap := lap[2]
 
-							if startLap is integer
-								if endLap is integer
+							if startLap is Integer
+								if endLap is Integer
 									if (endLap + 0) > (startLap + 0)
 										loop {
 											index := startLap + A_Index - 1
@@ -1512,8 +1512,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 										} until (index = endLap)
 						}
 						else if lap is Integer
-							if laps.HasKey(lap)
-								laps[lap] := lap
+							laps[lap] := lap
 
 					newlaps := []
 

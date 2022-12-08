@@ -6,6 +6,7 @@
   5. Reorganization of the race reports database which provide a much improved performance when loading reports. Please make a backup copy before running the update, just in case.
   6. Optimized display of boolean values in "Session Database".
   7. Massive performance improvements in handling of settings in "Session Database".
+  8. Fixed lap range selection in race reports.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-451).
 

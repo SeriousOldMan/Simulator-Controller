@@ -1,8 +1,8 @@
 [Development]
-Version=4.5.0.1-dev
-Target=4.5.0.0-release
-Date=12/09/2022
-Download=
+Version=4.5.1.0-beta
+Target=4.5.1.0-release
+Date=12/08/2022
+Download=https://www.dropbox.com/s/dc799g3slwjssyx/Simulator%20Controller%204.5.1.0-beta.zip?dl=1
 Changes=Rework of race reports database structure, Fix for unnecessary race settings with zero fuel consumption, Added *rFactor 2* shared memory interface plugin to installation process, Optimized display of boolean values in "Session Database", Massive performance improvements in handling of settings in "Session Database"
 [Release]
 Version=4.5.0.0-release
@@ -13,4 +13,4 @@ Changes=On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strat
 Type=Development
 [Version]
 Release=4.5.0.0-release
-Development=4.5.0.1-dev
+Development=4.5.1.0-beta

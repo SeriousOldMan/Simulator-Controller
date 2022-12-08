@@ -45,7 +45,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.5.1.0-beta](https://www.dropbox.com/s/dc799g3slwjssyx/Simulator%20Controller%204.5.1.0-beta.zip?dl=1) (Test build for 4.5.1. New features: Rework of race reports database structure, Fix for unnecessary race settings with zero fuel consumption, Added *rFactor 2* shared memory interface plugin to installation process, Optimized display of boolean values in "Session Database", Massive performance improvements in handling of settings in "Session Database".)
+[4.5.1.0-beta](https://www.dropbox.com/s/dc799g3slwjssyx/Simulator%20Controller%204.5.1.0-beta.zip?dl=1) (Test build for 4.5.1. New features: Rework of race reports database structure, Fix for unnecessary race settings with zero fuel consumption, Added *rFactor 2* shared memory interface plugin to installation process, Optimized display of boolean values in "Session Database", Massive performance improvements in handling of settings in "Session Database", Fixed lap range selection in race reports.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-451) of this version and all the versions you might have skipped, before installing and using this version.
 

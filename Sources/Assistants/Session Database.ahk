@@ -3079,9 +3079,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	addSetting(section, key, value) {
 		local window := this.Window
-		local defaultListView, ignore
+		local defaultListView, type, ignore, display
 
 		Gui %window%:Default
+		Gui %window%:+Disabled
 
 		defaultListView := A_DefaultListView
 
@@ -3092,8 +3093,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			ignore := false
 
-			LV_Modify(LV_Add("Select", this.getSettingLabel(section, key)
-						   , IsObject(this.getSettingType(section, key, ignore)) ? translate(value) : value), "Vis")
+			type := this.getSettingType(section, key, ignore)
+
+			if IsObject(type)
+				display := translate(value)
+			else if (type = "Boolean")
+				display := (value ? "x" : "")
+			else if (type = "Text")
+				display := StrReplace(value, "`n", A_Space)
+			else
+				display := value
+
+			LV_Modify(LV_Add("Select", this.getSettingLabel(section, key), display), "Vis")
 
 			LV_ModifyCol()
 
@@ -3108,6 +3119,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.updateState()
 		}
 		finally {
+			Gui %window%:-Disabled
 			Gui ListView, %defaultListView%
 		}
 	}
@@ -3117,6 +3129,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local defaultListView, selected
 
 		Gui %window%:Default
+		Gui %window%:+Disabled
 
 		defaultListView := A_DefaultListView
 
@@ -3142,6 +3155,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.updateState()
 		}
 		finally {
+			Gui %window%:-Disabled
 			Gui ListView, %defaultListView%
 		}
 	}
@@ -3151,6 +3165,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local defaultListView, selected, type, ignore, display, settingsDB
 
 		Gui %window%:Default
+		Gui %window%:+Disabled
 
 		defaultListView := A_DefaultListView
 
@@ -3196,6 +3211,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.updateState()
 		}
 		finally {
+			Gui %window%:-Disabled
 			Gui ListView, %defaultListView%
 		}
 	}
@@ -3504,7 +3520,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if (fileName != "") {
 			file := FileOpen(fileName, "r")
-			
+
 			if file {
 				size := file.Length
 

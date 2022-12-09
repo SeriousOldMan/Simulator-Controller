@@ -610,11 +610,41 @@ public:
 		phase(phase) {}
 };
 
-std::vector<float> recentSteerAngles;
-const int numRecentSteerAngles = 6;
+const int MAXVALUES = 6;
 
+std::vector<float> recentSteerAngles;
 std::vector<float> recentGLongs;
-const int numRecentGLongs = 6;
+std::vector<float> recentIdealAngVels;
+std::vector<float> recentRealAngVels;
+
+void pushValue(std::vector<float>& values, float value) {
+	values.push_back(value);
+
+	if ((int)values.size() > MAXVALUES)
+		values.erase(values.begin());
+}
+
+float averageValue(std::vector<float>& values, int& num) {
+	vector <float>::iterator iter;
+	float sum = 0.0;
+
+	num = 0;
+
+	for (iter = values.begin(); iter != values.end(); iter++) {
+		sum += *iter;
+		num++;
+	}
+
+	return (num > 0) ? sum / num : 0.0;
+}
+
+float smoothValue(std::vector<float>& values, float value) {
+	int ignore;
+
+	pushValue(values, value);
+
+	return averageValue(values, ignore);
+}
 
 std::vector<CornerDynamics> cornerDynamicsList;
 
@@ -641,53 +671,36 @@ bool collectTelemetry() {
 	if ((gf->status != AC_LIVE) || gf->isInPit || gf->isInPitLane)
 		return true;
 
-	recentSteerAngles.push_back(pf->steerAngle);
-	if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
-		recentSteerAngles.erase(recentSteerAngles.begin());
-	}
-
+	float steerAngle = smoothValue(recentSteerAngles, pf->steerAngle);
 	float acceleration = pf->speedKmh - lastSpeed;
 		
 	lastSpeed = pf->speedKmh;
 
-	recentGLongs.push_back(acceleration);
-	if ((int)recentGLongs.size() > numRecentGLongs) {
-		recentGLongs.erase(recentGLongs.begin());
-	}
+	pushValue(recentGLongs, acceleration);
 
 	// Get the average recent GLong
-	vector <float>::iterator glongIter;
-	float sumGLong = 0.0;
 	int numGLong = 0;
-	for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
-		sumGLong += *glongIter;
-		numGLong++;
-	}
+	float glongAverage = averageValue(recentGLongs, numGLong);
 
 	int phase = 0;
 	if (numGLong > 0) {
-		float recentGLong = sumGLong / numGLong;
-		if (recentGLong < -0.2) {
+		if (glongAverage < -0.2) {
 			// Braking
 			phase = -1;
 		}
-		else if (recentGLong > 0.1) {
+		else if (glongAverage > 0.1) {
 			// Accelerating
 			phase = 1;
 		}
 	}
 
-	if (fabs(pf->steerAngle) > 0.1 && pf->speedKmh > 60) {
-		float angularVelocity = pf->localAngularVel[2];
+	if (fabs(steerAngle) > 0.1 && pf->speedKmh > 60) {
+		float angularVelocity = smoothValue(recentRealAngVels, pf->localAngularVel[2]);
+
 		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
-
-			/*
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 10 * -steeredAngleDegs / pf->localAngularVel[1];
-			*/
+			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 
 			double steerAngleRadians = -steeredAngleDegs / 57.2958;
 			double wheelBaseMeter = (float)wheelbase / 10;
@@ -695,18 +708,19 @@ bool collectTelemetry() {
 
 			double perimeter = radius * PI * 2;
 			double perimeterSpeed = lastSpeed / 3.6;
-			double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+			float idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 
 			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (pf->steerAngle > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (false)
+				if (steerAngle > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 
@@ -715,9 +729,9 @@ bool collectTelemetry() {
 
 				output.open(dataFile + ".trace", std::ios::out | std::ios::app);
 
-				output << pf->steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
-							lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
-							cd.usos << std::endl;
+				output << steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
+						  lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
+						  cd.usos << std::endl;
 
 				output.close();
 			}
@@ -1028,7 +1042,7 @@ int main(int argc, char* argv[])
 	bool analyzeTelemetry = false;
 	bool positionTrigger = false;
 
-	if (argc > 1) {
+	if (true || argc > 1) {
 		analyzeTelemetry = (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);

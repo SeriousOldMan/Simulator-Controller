@@ -709,11 +709,41 @@ namespace RF2SHMSpotter {
             }
         }
 
-        List<double> recentSteerAngles = new List<double>();
-        const int numRecentSteerAngles = 6;
+        const int MAXVALUES = 6;
 
-        List<double> recentGLongs = new List<double>();
-        const int numRecentGLongs = 6;
+        List<float> recentSteerAngles = new List<float>();
+        List<float> recentGLongs = new List<float>();
+        List<float> recentIdealAngVels = new List<float>();
+        List<float> recentRealAngVels = new List<float>();
+
+        void pushValue(List<float> values, float value)
+        {
+            values.Add(value);
+
+            if ((int)values.Count > MAXVALUES)
+                values.RemoveAt(0);
+        }
+
+        float averageValue(List<float> values, ref int num)
+        {
+            float sum = 0.0f;
+
+            foreach (float value in values)
+                sum += value;
+
+            num = values.Count;
+
+            return (num > 0) ? sum / num : 0.0f;
+        }
+
+        float smoothValue(List<float> values, float value)
+        {
+            int ignore = 0;
+
+            pushValue(values, value);
+
+            return averageValue(values, ref ignore);
+        }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
 
@@ -731,7 +761,7 @@ namespace RF2SHMSpotter {
         int trackWidth = 150;
 
         int lastCompletedLaps = 0;
-        double lastSpeed = 0.0;
+        float lastSpeed = 0.0f;
 
 		bool collectTelemetry()
 		{
@@ -750,83 +780,62 @@ namespace RF2SHMSpotter {
             if (extended.mSessionStarted == 0 || scoring.mScoringInfo.mGamePhase >= (byte)SessionStopped && playerScoring.mPitState >= (byte)Entering)
                 return true;
 
-			double steerAngle = telemetry.mVehicles[carID].mFilteredSteering;
-
-            recentSteerAngles.Add(steerAngle);
-            if (recentSteerAngles.Count > numRecentSteerAngles)
-                recentSteerAngles.RemoveAt(0);
+			float steerAngle = smoothValue(recentSteerAngles, (float)telemetry.mVehicles[carID].mFilteredSteering);
 
             rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
-            double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
-			double acceleration = speed - lastSpeed;
+            float speed = (float)Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6f;
+			float acceleration = (float)speed - lastSpeed;
 
 			lastSpeed = speed;
 
-            recentGLongs.Add(acceleration);
-            if (recentGLongs.Count > numRecentGLongs)
-                recentGLongs.RemoveAt(0);
+            pushValue(recentGLongs, acceleration);
 
             // Get the average recent GLong
-            float sumGLong = 0.0f;
             int numGLong = 0;
-
-            foreach (float gLong in recentGLongs)
-            {
-                sumGLong += gLong;
-                numGLong++;
-
-            }
+            float glongAverage = averageValue(recentGLongs, ref numGLong);
 
             int phase = 0;
             if (numGLong > 0)
-            {
-                float recentGLong = sumGLong / numGLong;
-                if (recentGLong < -0.2)
+                if (glongAverage < -0.2)
                 {
                     // Braking
                     phase = -1;
                 }
-                else if (recentGLong > 0.1)
+                else if (glongAverage > 0.1)
                 {
                     // Accelerating
                     phase = 1;
                 }
-            }
 
-			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
+            if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
 			{
-				double angularVelocity = telemetry.mVehicles[carID].mLocalRot.z;
+				double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
 				CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
 					double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-
-                    /*
-					if (Math.Abs(steeredAngleDegs) > 0.33f)
-						cd.Usos = 200 * steeredAngleDegs / angularVelocity;
-					*/
-
                     double steerAngleRadians = -steeredAngleDegs / 57.2958;
                     double wheelBaseMeter = (float)wheelbase / 10;
                     double radius = wheelBaseMeter / steerAngleRadians;
 
                     double perimeter = radius * PI * 2;
                     double perimeterSpeed = lastSpeed / 3.6;
-                    double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+                    double idealAngularVelocity = smoothValue(recentIdealAngVels, (float)(perimeterSpeed / perimeter * 2 * PI));
 
                     double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
 
-                    if (steerAngle > 0)
-                    {
-                        if (angularVelocity < idealAngularVelocity)
-                            slip *= -1;
-                    }
-                    else
-                    {
-                        if (angularVelocity > idealAngularVelocity)
-                            slip *= -1;
-                    }
+					if (false)
+						if (steerAngle > 0)
+						{
+							if (angularVelocity < idealAngularVelocity)
+								slip *= -1;
+						}
+						else
+						{
+							if (angularVelocity > idealAngularVelocity)
+								slip *= -1;
+						}
 
                     cd.Usos = slip * 57.2989 * 10;
 

@@ -1398,7 +1398,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			Gui RRS:Add, Radio, x90 yp+4 w80 Group vallLapsRadio gchooseLapSelection, % translate(" All")
 			Gui RRS:Add, Radio, x90 yp+24 w80 vrangeLapsRadio gchooseLapSelection, % translate(" Range:")
 			Gui RRS:Add, Edit, x170 yp-3 w80 vrangeLapsEdit
-			Gui RRS:Add, Text, x255 yp+3 w140, % translate("(e.g.: 1-5;8;12)")
+			Gui RRS:Add, Text, x255 yp+3 w110, % translate("(e.g.: 1-5;8;12)")
 
 			if !raceReport.Settings.HasKey("Laps") {
 				GuiControl, , allLapsRadio, 1
@@ -1502,8 +1502,8 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 							startLap := lap[1]
 							endLap := lap[2]
 
-							if startLap is integer
-								if endLap is integer
+							if startLap is Integer
+								if endLap is Integer
 									if (endLap + 0) > (startLap + 0)
 										loop {
 											index := startLap + A_Index - 1
@@ -1512,8 +1512,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 										} until (index = endLap)
 						}
 						else if lap is Integer
-							if laps.HasKey(lap)
-								laps[lap] := lap
+							laps[lap] := lap
 
 					newlaps := []
 

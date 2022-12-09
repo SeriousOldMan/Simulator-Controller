@@ -670,13 +670,43 @@ namespace ACSHMSpotter {
 			}
 		}
 
+		const int MAXVALUES = 6;
+
 		List<float> recentSteerAngles = new List<float>();
-		const int numRecentSteerAngles = 6;
-
 		List<float> recentGLongs = new List<float>();
-		const int numRecentGLongs = 6;
+		List<float> recentIdealAngVels = new List<float>();
+        List<float> recentRealAngVels = new List<float>();
 
-		List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
+        void pushValue(List<float> values, float value)
+        {
+            values.Add(value);
+
+            if ((int)values.Count > MAXVALUES)
+                values.RemoveAt(0);
+        }
+
+        float averageValue(List<float> values, ref int num)
+        {
+			float sum = 0.0f;
+
+			foreach (float value in values)
+				sum += value;
+
+            num = values.Count;
+
+            return (num > 0) ? sum / num : 0.0f;
+        }
+
+        float smoothValue(List<float> values, float value)
+        {
+            int ignore = 0;
+
+            pushValue(values, value);
+
+            return averageValue(values, ref ignore);
+        }
+
+        List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
 
 		string dataFile = "";
 		int understeerLightThreshold = 12;
@@ -699,82 +729,60 @@ namespace ACSHMSpotter {
 			if ((graphics.Status != AC_STATUS.AC_LIVE) || graphics.IsInPit != 0 || graphics.IsInPitLane != 0)
 				return true;
 
-			float steerAngle = physics.SteerAngle;
-
-            recentSteerAngles.Add(steerAngle);
-			if (recentSteerAngles.Count > numRecentSteerAngles)
-				recentSteerAngles.RemoveAt(0);
+			float steerAngle = smoothValue(recentSteerAngles, physics.SteerAngle);
 
             float acceleration = physics.SpeedKmh - lastSpeed;
 
             lastSpeed = physics.SpeedKmh;
 
-            recentGLongs.Add(acceleration);
-			if (recentGLongs.Count > numRecentGLongs)
-				recentGLongs.RemoveAt(0);
-
+			pushValue(recentGLongs, acceleration);
 
             // Get the average recent GLong
-            float sumGLong = 0.0f;
             int numGLong = 0;
-
-            foreach (float gLong in recentGLongs)
-            {
-                sumGLong += gLong;
-                numGLong++;
-
-            }
+            float glongAverage = averageValue(recentGLongs, ref numGLong);
 
             int phase = 0;
             if (numGLong > 0)
-            {
-                float recentGLong = sumGLong / numGLong;
-                if (recentGLong < -0.2)
+                if (glongAverage < -0.2)
                 {
                     // Braking
                     phase = -1;
                 }
-                else if (recentGLong > 0.1)
+                else if (glongAverage > 0.1)
                 {
                     // Accelerating
                     phase = 1;
                 }
-            }
 
 			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
 			{
-				double angularVelocity = physics.LocalAngularVelocity[2];
+				float angularVelocity = smoothValue(recentRealAngVels, physics.LocalAngularVelocity[2]);
                 CornerDynamics cd = new CornerDynamics(physics.SpeedKmh, 0, graphics.CompletedLaps, phase);
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
 					float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+                    float steerAngleRadians = -steeredAngleDegs / 57.2958f;
+                    float wheelBaseMeter = wheelbase / 10f;
+                    float radius = wheelBaseMeter / steerAngleRadians;
 
-                    /*
-					if (Math.Abs(steeredAngleDegs) > 0.33f)
-						cd.Usos = 10 * -steeredAngleDegs / physics.LocalAngularVelocity[1];
-					*/
-
-                    double steerAngleRadians = -steeredAngleDegs / 57.2958;
-                    double wheelBaseMeter = (float)wheelbase / 10;
-                    double radius = wheelBaseMeter / steerAngleRadians;
-
-                    double perimeter = radius * PI * 2;
-                    double perimeterSpeed = lastSpeed / 3.6;
-                    double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+                    float perimeter = radius * (float)PI * 2;
+                    float perimeterSpeed = lastSpeed / 3.6f;
+                    double idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * (float)PI);
 
                     double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
 
-                    if (steerAngle > 0)
-                    {
-                        if (angularVelocity < idealAngularVelocity)
-                            slip *= -1;
-                    }
-                    else
-                    {
-                        if (angularVelocity > idealAngularVelocity)
-                            slip *= -1;
-                    }
+					if (false)
+						if (steerAngle > 0)
+						{
+							if (angularVelocity < idealAngularVelocity)
+								slip *= -1;
+						}
+						else
+						{
+							if (angularVelocity > idealAngularVelocity)
+								slip *= -1;
+						}
 
                     cd.Usos = slip * 57.2989 * 10;
 

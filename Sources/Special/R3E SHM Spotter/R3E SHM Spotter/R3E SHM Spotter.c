@@ -620,34 +620,43 @@ BOOL greenFlag() {
 		return FALSE;
 }
 
-#define NumRecentSteerAngles 6
-float recentSteerAngles[NumRecentSteerAngles] = { 0, 0, 0, 0, 0, 0 };
-int steerAngleCount = 0;
+#define MAXVALUES 6
 
-void appendSteerAngle(float steerAngle) {
-	if (steerAngleCount == NumRecentSteerAngles) {
-		for (int i = 1; i < steerAngleCount; i++)
-			recentSteerAngles[i - 1] = recentSteerAngles[i];
+float recentSteerAngles[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
+int recentSteerAnglesCount = 0;
 
-		steerAngleCount--;
-	}
-
-	recentSteerAngles[steerAngleCount++] = steerAngle;
-}
-
-#define NumRecentGLongs 6
-float recentGLongs[NumRecentGLongs] = {0, 0, 0, 0, 0, 0};
+float recentGLongs[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
 int recentGLongsCount = 0;
 
-void appendRecentGLong(float recentGLong) {
-	if (recentGLongsCount == NumRecentGLongs) {
-		for (int i = 1; i < recentGLongsCount; i++)
-			recentGLongs[i - 1] = recentGLongs[i];
+float recentRealAngVels[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
+int recentRealAngVelsCount = 0;
 
-		recentGLongsCount--;
+float recentIdealAngVels[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
+int recentIdealAngVelsCount = 0;
+
+void pushValue(float* values, int* count, float value) {
+	if (*count == MAXVALUES) {
+		for (int i = 1; i < *count; i++)
+			values[i - 1] = values[i];
+
+		(*count)--;
 	}
 
-	recentGLongs[recentGLongsCount++] = recentGLong;
+	values[(*count)++] = value;
+}
+
+float averageValue(float* values, int count) {
+	float sum = 0.0;
+	for (int i = 0; i < count; i++)
+		sum += values[i];
+
+	return (count > 0) ? sum / count : 0.0f;
+}
+
+float smoothValue(float* values, int* count, float value) {
+	pushValue(values, count, value);
+
+	return averageValue(values, *count);
 }
 
 #define NumCornerDynamics 4096
@@ -731,7 +740,7 @@ BOOL collectTelemetry() {
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
 		return TRUE;
 
-	r3e_float32 steerAngle = map_buffer->steer_input_raw;
+	r3e_float32 steerAngle = smoothValue(recentSteerAngles, &recentSteerAnglesCount, map_buffer->steer_input_raw);
 	r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
 	r3e_float32 steerRatio = ((float)steerLock / 2) / map_buffer->steer_lock_degrees;
 
@@ -739,57 +748,50 @@ BOOL collectTelemetry() {
 
 	lastSpeed = map_buffer->car_speed * 3.6f;
 
-	appendSteerAngle(steerAngle);
-	appendRecentGLong(acceleration);
+	smoothValue(recentGLongs, &recentGLongsCount, acceleration);
 
 	// Get the average recent GLong
-	float sumGLong = 0.0;
-	for (int i = 0; i < recentGLongsCount; i++)
-		sumGLong = sumGLong + recentGLongs[i];
+	float glongAverage = averageValue(recentGLongs, recentGLongsCount);
 
 	int phase = 0;
-	if (recentGLongsCount > 0) {
-		float recentGLong = sumGLong / recentGLongsCount;
-		if (recentGLong < -0.2) {
+	if (recentGLongsCount > 0)
+		if (glongAverage < -0.2) {
 			// Braking
 			phase = -1;
 		}
-		else if (recentGLong > 0.1) {
+		else if (glongAverage > 0.1) {
 			// Accelerating
 			phase = 1;
 		}
-	}
 
 	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
 		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
 
-		r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z;
+		r3e_float64 angularVelocity = smoothValue(recentRealAngVels, &recentRealAngVelsCount,
+												  (float)map_buffer->player.local_angular_velocity.z);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-			/*
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 10 * -steeredAngleDegs / (angularVelocity  * 57.2958);
-			*/
-
+			r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 			r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
 			r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
 			r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
 
 			r3e_float64 perimeter = radius * PI * 2;
 			r3e_float64 perimeterSpeed = lastSpeed / 3.6;
-			r3e_float64 idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+			r3e_float64 idealAngularVelocity = smoothValue(recentIdealAngVels, &recentIdealAngVelsCount,
+														   (float)(perimeterSpeed / perimeter * 2 * PI));
 
 			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (steerAngle > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (FALSE)
+				if (steerAngle > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 

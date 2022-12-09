@@ -466,7 +466,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	createRaceReport(targetDirectory := false) {
 		local reportsDirectory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
 		local teamServer, session, runningLap, raceInfo, count, pitstops, lapData, data, key, value
-		local times, positions, laps, drivers, newLine, line, fileName, directory, simulatorCode
+		local times, positions, laps, drivers, newLine, line, fileName, directory
+		local sessionDB, simulatorCode, carCode, trackCode
 
 		if (targetDirectory || reportsDirectory) {
 			teamServer := this.TeamServer
@@ -548,10 +549,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
 
-				simulatorCode := new SessionDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+				if !targetDirectory {
+					sessionDB := new SessionDatabase()
 
-				if !targetDirectory
-					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+					simulatorCode := sessionDB.getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+					carCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Car"))
+					trackCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Track"))
+
+					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getConfigurationValue(data, "Session", "Time"))
+				}
 
 				FileCopyDir %kTempDirectory%Race Report, %targetDirectory%, 1
 			}
@@ -619,10 +625,15 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				writeConfiguration(kTempDirectory . "Race Report\Output\Race.data", data)
 
-				simulatorCode := new SessionDatabase().getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+				if !targetDirectory {
+					sessionDB := new SessionDatabase()
 
-				if !targetDirectory
-					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . getConfigurationValue(data, "Session", "Time"))
+					simulatorCode := sessionDB.getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
+					carCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Car"))
+					trackCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Track"))
+
+					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getConfigurationValue(data, "Session", "Time"))
+				}
 
 				FileCopyDir %kTempDirectory%Race Report\Output, %targetDirectory%, 1
 			}

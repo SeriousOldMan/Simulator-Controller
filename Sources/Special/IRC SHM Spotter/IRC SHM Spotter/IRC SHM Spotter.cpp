@@ -660,6 +660,8 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 	getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax");
 
 	float maxSteerAngle = *((float*)rawValue);
+	
+	steerLock = maxSteerAngle * 2 * 57.2958;
 
 	getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
 
@@ -1144,10 +1146,9 @@ int main(int argc, char* argv[])
 			oversteerMediumThreshold = atoi(argv[7]);
 			oversteerHeavyThreshold = atoi(argv[8]);
 			lowspeedThreshold = atoi(argv[9]);
-			steerLock = atoi(argv[10]);
-			steerRatio = atoi(argv[11]);
-			wheelbase = atoi(argv[12]);
-			trackWidth = atoi(argv[13]);
+			steerRatio = atoi(argv[10]);
+			wheelbase = atoi(argv[11]);
+			trackWidth = atoi(argv[12]);
 		}
 		else if (positionTrigger) {
 			loadTrackCoordinates(argv[2]);

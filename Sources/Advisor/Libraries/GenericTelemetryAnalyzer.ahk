@@ -36,7 +36,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iCar := false
 
 	iUndersteerThresholds := [40, 70, 100]
-	iOversteerThresholds := [-20, -30, -40]
+	iOversteerThresholds := [-40, -70, -100]
 	iLowspeedThreshold := 120
 
 	iSteerLock := 900
@@ -166,7 +166,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			selectedCar := false
 
 		defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
-		defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-20,-30,-40")
+		defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
 		defaultLowspeedThreshold := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", "120")
 
 		this.iCar := selectedCar
@@ -706,28 +706,28 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget10 vheavyOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[3]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget21 vheavyOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget10 vheavyOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget21 vheavyOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[3]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget12 vmediumOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[2]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget22 vmediumOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget12 vmediumOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget22 vmediumOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget14 vlightOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[1]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget23 vlightOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget14 vlightOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget23 vlightOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget16 vlightUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[1]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget24 vlightUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget16 vlightUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget24 vlightUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[2]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget25 vmediumUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget25 vmediumUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[3]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget26 vheavyUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget26 vheavyUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[3]
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			GuiControl Disable, heavyOversteerThresholdSlider

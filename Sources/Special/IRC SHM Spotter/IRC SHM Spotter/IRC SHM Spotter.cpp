@@ -657,29 +657,15 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 	if (!onTrack || inPit)
 		return true;
 
-	float steerAngle = 0.0;
+	getRawDataValue(rawValue, header, data, "SteeringWheelAngleMax");
 
-	if (true) {
-		getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
+	float maxSteerAngle = *((float*)rawValue);
 
-		steerAngle = *((float*)rawValue) * 57.2958;
-	}
-	else {
-		char* steerAngles;
+	getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
 
-		if (getRawDataValue(steerAngles, header, data, "CarIdxSteer"))
-			steerAngle = ((float*)steerAngles)[playerCarIndex] * 57.2958;
-	}
+	float rawSteerAngle = -*((float*)rawValue);
 
-	if (false) {
-		getRawDataValue(rawValue, header, data, "YawRate");
-
-		std::ofstream output;
-
-		output.open(dataFile + ".trace", std::ios::out | std::ios::app);
-
-		output << steerAngle << "  " << *((float*)rawValue) << std::endl;
-	}
+	float steerAngle = rawSteerAngle / maxSteerAngle;
 
 	recentSteerAngles.push_back(steerAngle);
 	if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
@@ -729,7 +715,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 		float angularVelocity = *((float*)rawValue);
 
-		CornerDynamics cd = CornerDynamics(atof(rawValue) * 3.6, 0, completedLaps, phase);
+		CornerDynamics cd = CornerDynamics(lastSpeed, 0, completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
 			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
@@ -760,7 +746,7 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 				output.open(dataFile + ".trace", std::ios::out | std::ios::app);
 
-				output << steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
+				output << rawSteerAngle << "  " << maxSteerAngle << "  " << steerAngle << "  " << steeredAngleDegs << "  " << steerAngleRadians << "  " <<
 						  lastSpeed << "  " << idealAngularVelocity << "  " << angularVelocity << "  " << slip << "  " <<
 						  cd.usos << std::endl;
 

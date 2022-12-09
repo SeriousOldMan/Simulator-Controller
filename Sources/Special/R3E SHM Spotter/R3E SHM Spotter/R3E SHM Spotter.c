@@ -750,37 +750,36 @@ BOOL collectTelemetry() {
 
 	smoothValue(recentGLongs, &recentGLongsCount, acceleration);
 
-	// Get the average recent GLong
-	float glongAverage = averageValue(recentGLongs, recentGLongsCount);
-
-	int phase = 0;
-	if (recentGLongsCount > 0)
-		if (glongAverage < -0.2) {
-			// Braking
-			phase = -1;
-		}
-		else if (glongAverage > 0.1) {
-			// Accelerating
-			phase = 1;
-		}
+	r3e_float64 angularVelocity = smoothValue(recentRealAngVels, &recentRealAngVelsCount,
+		(float)map_buffer->player.local_angular_velocity.z);
+	r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+	r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
+	r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
+	r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
+	r3e_float64 perimeter = radius * PI * 2;
+	r3e_float64 perimeterSpeed = lastSpeed / 3.6;
+	r3e_float64 idealAngularVelocity = smoothValue(recentIdealAngVels, &recentIdealAngVelsCount,
+		(float)(perimeterSpeed / perimeter * 2 * PI));
 
 	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
+		// Get the average recent GLong
+		float glongAverage = averageValue(recentGLongs, recentGLongsCount);
+
+		int phase = 0;
+		if (recentGLongsCount > 0)
+			if (glongAverage < -0.2) {
+				// Braking
+				phase = -1;
+			}
+			else if (glongAverage > 0.1) {
+				// Accelerating
+				phase = 1;
+			}
+		
 		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
 
-		r3e_float64 angularVelocity = smoothValue(recentRealAngVels, &recentRealAngVelsCount,
-												  (float)map_buffer->player.local_angular_velocity.z);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-			r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
-			r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
-			r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
-
-			r3e_float64 perimeter = radius * PI * 2;
-			r3e_float64 perimeterSpeed = lastSpeed / 3.6;
-			r3e_float64 idealAngularVelocity = smoothValue(recentIdealAngVels, &recentIdealAngVelsCount,
-														   (float)(perimeterSpeed / perimeter * 2 * PI));
-
 			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
 			if (FALSE)

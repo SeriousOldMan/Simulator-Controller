@@ -790,40 +790,39 @@ namespace RF2SHMSpotter {
 
             pushValue(recentGLongs, acceleration);
 
-            // Get the average recent GLong
-            int numGLong = 0;
-            float glongAverage = averageValue(recentGLongs, ref numGLong);
-
-            int phase = 0;
-            if (numGLong > 0)
-                if (glongAverage < -0.2)
-                {
-                    // Braking
-                    phase = -1;
-                }
-                else if (glongAverage > 0.1)
-                {
-                    // Accelerating
-                    phase = 1;
-                }
-
-            if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
+            double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+            double steerAngleRadians = -steeredAngleDegs / 57.2958;
+            double wheelBaseMeter = (float)wheelbase / 10;
+            double radius = wheelBaseMeter / steerAngleRadians;
+            double perimeter = radius * PI * 2;
+            double perimeterSpeed = lastSpeed / 3.6;
+            double idealAngularVelocity = smoothValue(recentIdealAngVels, (float)(perimeterSpeed / perimeter * 2 * PI));
+            
+			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
 			{
-				double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
-				CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
+                // Get the average recent GLong
+                int numGLong = 0;
+                float glongAverage = averageValue(recentGLongs, ref numGLong);
+
+                int phase = 0;
+                if (numGLong > 0)
+                    if (glongAverage < -0.2)
+                    {
+                        // Braking
+                        phase = -1;
+                    }
+                    else if (glongAverage > 0.1)
+                    {
+                        // Accelerating
+                        phase = 1;
+                    }
+
+                CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-					double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-                    double steerAngleRadians = -steeredAngleDegs / 57.2958;
-                    double wheelBaseMeter = (float)wheelbase / 10;
-                    double radius = wheelBaseMeter / steerAngleRadians;
-
-                    double perimeter = radius * PI * 2;
-                    double perimeterSpeed = lastSpeed / 3.6;
-                    double idealAngularVelocity = smoothValue(recentIdealAngVels, (float)(perimeterSpeed / perimeter * 2 * PI));
-
-                    double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
+					double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
 
 					if (false)
 						if (steerAngle > 0)

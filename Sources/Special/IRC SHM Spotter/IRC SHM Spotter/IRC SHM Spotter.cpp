@@ -695,8 +695,6 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 	
 	steerLock = maxSteerAngle * 2 * 57.2958;
 
-	steerLock = maxSteerAngle * 2 * 57.2958;
-
 	getRawDataValue(rawValue, header, data, "SteeringWheelAngle");
 
 	float rawSteerAngle = -*((float*)rawValue);
@@ -716,44 +714,43 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 	float lateralAcceleration = smoothValue(recentLatAccels, *((float*)rawValue));
 
-	// Get the average recent GLong
-	int numGLong = 0;
-	float glongAverage = averageValue(recentGLongs, numGLong);
+	getRawDataValue(rawValue, header, data, "Lap");
 
-	int phase = 0;
-	if (numGLong > 0) {
-		if (glongAverage < -0.2) {
-			// Braking
-			phase = -1;
-		}
-		else if (glongAverage > 0.1) {
-			// Accelerating
-			phase = 1;
-		}
-	}
+	int completedLaps = *((int*)rawValue);
+
+	getRawDataValue(rawValue, header, data, "YawRate");
+
+	float angularVelocity = smoothValue(recentRealAngVels, *((float*)rawValue));
+
+	float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+	float steerAngleRadians = -steeredAngleDegs / 57.2958;
+	float wheelBaseMeter = (float)wheelbase / 10;
+	float radius = wheelBaseMeter / steerAngleRadians;
+	float perimeter = radius * PI * 2;
+	float perimeterSpeed = lastSpeed / 3.6;
+	float idealAngularVelocity;
+	float slip;
 
 	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
-		getRawDataValue(rawValue, header, data, "Lap");
+		// Get the average recent GLong
+		int numGLong = 0;
+		float glongAverage = averageValue(recentGLongs, numGLong);
 
-		int completedLaps = *((int*)rawValue);
-
-		getRawDataValue(rawValue, header, data, "YawRate");
-
-		float angularVelocity = smoothValue(recentRealAngVels, *((float*)rawValue));
+		int phase = 0;
+		if (numGLong > 0) {
+			if (glongAverage < -0.2) {
+				// Braking
+				phase = -1;
+			}
+			else if (glongAverage > 0.1) {
+				// Accelerating
+				phase = 1;
+			}
+		}
 
 		CornerDynamics cd = CornerDynamics(lastSpeed, 0, completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-			float steerAngleRadians = -steeredAngleDegs / 57.2958;
-			float wheelBaseMeter = (float)wheelbase / 10;
-			float radius = wheelBaseMeter / steerAngleRadians;
-
-			float perimeter = radius * PI * 2;
-			float perimeterSpeed = lastSpeed / 3.6;
-			float idealAngularVelocity;
-			float slip;
-
 			if (false) {
 				idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 				slip = fabs(idealAngularVelocity) - fabs(angularVelocity);

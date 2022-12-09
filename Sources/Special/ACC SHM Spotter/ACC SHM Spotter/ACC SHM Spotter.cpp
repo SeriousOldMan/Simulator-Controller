@@ -678,38 +678,35 @@ bool collectTelemetry() {
 
 	pushValue(recentGLongs, acceleration);
 
-	// Get the average recent GLong
-	int numGLong = 0;
-	float glongAverage = averageValue(recentGLongs, numGLong);
-
-	int phase = 0;
-	if (numGLong > 0) {
-		if (glongAverage < -0.2) {
-			// Braking
-			phase = -1;
-		}
-		else if (glongAverage > 0.1) {
-			// Accelerating
-			phase = 1;
-		}
-	}
+	float angularVelocity = smoothValue(recentRealAngVels, pf->localAngularVel[2]);
+	float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+	double steerAngleRadians = -steeredAngleDegs / 57.2958;
+	double wheelBaseMeter = (float)wheelbase / 10;
+	double radius = wheelBaseMeter / steerAngleRadians;
+	double perimeter = radius * PI * 2;
+	double perimeterSpeed = lastSpeed / 3.6;
+	float idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 
 	if (fabs(steerAngle) > 0.1 && pf->speedKmh > 60) {
-		float angularVelocity = smoothValue(recentRealAngVels, pf->localAngularVel[2]);
+		// Get the average recent GLong
+		int numGLong = 0;
+		float glongAverage = averageValue(recentGLongs, numGLong);
+
+		int phase = 0;
+		if (numGLong > 0) {
+			if (glongAverage < -0.2) {
+				// Braking
+				phase = -1;
+			}
+			else if (glongAverage > 0.1) {
+				// Accelerating
+				phase = 1;
+			}
+		}
 
 		CornerDynamics cd = CornerDynamics(pf->speedKmh, 0, gf->completedLaps, phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-
-			double steerAngleRadians = -steeredAngleDegs / 57.2958;
-			double wheelBaseMeter = (float)wheelbase / 10;
-			double radius = wheelBaseMeter / steerAngleRadians;
-
-			double perimeter = radius * PI * 2;
-			double perimeterSpeed = lastSpeed / 3.6;
-			float idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
-
 			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
 			if (false)

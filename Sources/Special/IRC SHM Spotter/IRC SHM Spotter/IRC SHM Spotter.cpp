@@ -610,6 +610,9 @@ const int numRecentSteerAngles = 6;
 std::vector<float> recentGLongs;
 const int numRecentGLongs = 6;
 
+std::vector<float> recentLatAccels;
+const int numRecentrecentLatAccels = 6;
+
 std::vector<CornerDynamics> cornerDynamicsList;
 
 std::string dataFile = "";
@@ -684,6 +687,15 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 		recentGLongs.erase(recentGLongs.begin());
 	}
 
+	getRawDataValue(rawValue, header, data, "LatAccel");
+
+	float lateralAcceleration = *((float*)rawValue);
+
+	recentLatAccels.push_back(lateralAcceleration);
+	if ((int)recentGLongs.size() > numRecentGLongs) {
+		recentGLongs.erase(recentGLongs.begin());
+	}
+
 	// Get the average recent GLong
 	std::vector<float>::iterator glongIter;
 	float sumGLong = 0.0;
@@ -725,21 +737,45 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 			float perimeter = radius * PI * 2;
 			float perimeterSpeed = lastSpeed / 3.6;
-			float idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+			float idealAngularVelocity;
+			float slip;
 
-			float slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
+			if (true) {
+				idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
+				slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (false)
-				if (steerAngle > 0) {
-					if (angularVelocity < idealAngularVelocity)
-						slip *= -1;
+				if (false)
+					if (steerAngle > 0) {
+						if (angularVelocity < idealAngularVelocity)
+							slip *= -1;
+					}
+					else {
+						if (angularVelocity > idealAngularVelocity)
+							slip *= -1;
+					}
+
+				cd.usos = slip * 57.2989 * 10;
+			}
+			else {
+				// Get the average recent lateral acceleration
+				std::vector<float>::iterator glatAccelIter;
+				float sumLatAccel = 0.0;
+				int numLatAccel = 0;
+				for (glatAccelIter = recentLatAccels.begin(); glatAccelIter != recentLatAccels.end(); glatAccelIter++) {
+					sumLatAccel += *glatAccelIter;
+					numLatAccel++;
 				}
-				else {
-					if (angularVelocity > idealAngularVelocity)
-						slip *= -1;
-				}
 
-			cd.usos = slip * 57.2989 * 10;
+				if (numLatAccel > 0)
+					lateralAcceleration = (sumLatAccel / numLatAccel);
+				else
+					lateralAcceleration = 0.0;
+
+				idealAngularVelocity = lateralAcceleration / max(0.01f, lastSpeed / 3.6);
+				slip = fabs(idealAngularVelocity / max(0.01f, angularVelocity));
+
+				cd.usos = slip * 57.2989 * 10;
+			}
 
 			if (false) {
 				std::ofstream output;

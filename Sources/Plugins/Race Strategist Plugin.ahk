@@ -553,8 +553,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					sessionDB := new SessionDatabase()
 
 					simulatorCode := sessionDB.getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Track"))
+					carCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Car"))
+					trackCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Track"))
 
 					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getConfigurationValue(data, "Session", "Time"))
 				}
@@ -629,8 +629,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					sessionDB := new SessionDatabase()
 
 					simulatorCode := sessionDB.getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(getConfigurationValue(data, "Session", "Track"))
+					carCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Car"))
+					trackCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Track"))
 
 					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getConfigurationValue(data, "Session", "Time"))
 				}

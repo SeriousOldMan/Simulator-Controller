@@ -1,4 +1,4 @@
-## 4.5.1.0-release 12/09/22 (planned)
+## 4.5.1.0-release 12/09/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Fixed a bug, where an entry in the race settings could have been created automaticllay with an average fuel consumption of zero.

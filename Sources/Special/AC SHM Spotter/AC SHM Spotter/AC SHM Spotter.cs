@@ -765,16 +765,17 @@ namespace ACSHMSpotter {
 
                     double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
 
-                    if (steerAngle > 0)
-                    {
-                        if (angularVelocity < idealAngularVelocity)
-                            slip *= -1;
-                    }
-                    else
-                    {
-                        if (angularVelocity > idealAngularVelocity)
-                            slip *= -1;
-                    }
+					if (false)
+						if (steerAngle > 0)
+						{
+							if (angularVelocity < idealAngularVelocity)
+								slip *= -1;
+						}
+						else
+						{
+							if (angularVelocity > idealAngularVelocity)
+								slip *= -1;
+						}
 
                     cd.Usos = slip * 57.2989 * 10;
 

@@ -575,14 +575,15 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 
 			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (sharedData->mSteering > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (false)
+				if (sharedData->mSteering > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 

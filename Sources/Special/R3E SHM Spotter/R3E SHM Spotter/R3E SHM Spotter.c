@@ -782,14 +782,15 @@ BOOL collectTelemetry() {
 
 			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (steerAngle > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (FALSE)
+				if (steerAngle > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 

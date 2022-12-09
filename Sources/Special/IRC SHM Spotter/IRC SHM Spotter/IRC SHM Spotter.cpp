@@ -743,14 +743,15 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 
 			float slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (steerAngle > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (false)
+				if (steerAngle > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 

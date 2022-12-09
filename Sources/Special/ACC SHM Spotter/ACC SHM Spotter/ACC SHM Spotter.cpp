@@ -699,14 +699,15 @@ bool collectTelemetry() {
 
 			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (pf->steerAngle > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (false)
+				if (pf->steerAngle > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 

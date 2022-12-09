@@ -684,11 +684,6 @@ bool collectTelemetry() {
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
 			float steeredAngleDegs = pf->steerAngle * steerLock / 2.0f / steerRatio;
 
-			/*
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 10 * -steeredAngleDegs / pf->localAngularVel[1];
-			*/
-
 			double steerAngleRadians = -steeredAngleDegs / 57.2958;
 			double wheelBaseMeter = (float)wheelbase / 10;
 			double radius = wheelBaseMeter / steerAngleRadians;

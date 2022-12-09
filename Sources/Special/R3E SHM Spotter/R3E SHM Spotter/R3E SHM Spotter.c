@@ -766,12 +766,7 @@ BOOL collectTelemetry() {
 		r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z;
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-			/*
-			if (fabs(steeredAngleDegs) > 0.33f)
-				cd.usos = 10 * -steeredAngleDegs / (angularVelocity  * 57.2958);
-			*/
-
+			r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
 			r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
 			r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
 			r3e_float64 radius = wheelBaseMeter / steerAngleRadians;

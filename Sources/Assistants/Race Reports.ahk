@@ -61,6 +61,8 @@ global deleteRaceReportButtonHandle
 class RaceReports extends ConfigurationItem {
 	iDatabase := false
 
+	iSessionDatabase := new SessionDatabase()
+
 	iSelectedSimulator := false
 	iSelectedCar := false
 	iSelectedTrack := false
@@ -88,6 +90,12 @@ class RaceReports extends ConfigurationItem {
 	Database[] {
 		Get {
 			return this.iDatabase
+		}
+	}
+
+	SessionDatabase[] {
+		Get {
+			return this.iSessionDatabase
 		}
 	}
 
@@ -418,10 +426,10 @@ class RaceReports extends ConfigurationItem {
 		local simulators := []
 		local ignore, simulator, hasReports
 
-		for ignore, simulator in new SessionDatabase().getSimulators() {
+		for ignore, simulator in this.SessionDatabase.getSimulators() {
 			hasReports := false
 
-			loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
+			loop Files, % this.Database . "\" . this.SessionDatabase.getSimulatorCode(simulator) . "\*.*", D
 			{
 				hasReports := true
 
@@ -435,68 +443,43 @@ class RaceReports extends ConfigurationItem {
 		return simulators
 	}
 
-	getSimulatorName(simulatorCode) {
-		return new SessionDatabase().getSimulatorName(simulatorCode)
-	}
-
-	getSimulatorCode(simulatorName) {
-		return new SessionDatabase().getSimulatorCode(simulatorName)
-	}
-
 	getCars(simulator) {
+		local database := this.Database
 		local result := []
-		local cars := {}
-		local raceData, car, ignore
 
-		loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
-		{
-			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
-			car := getConfigurationValue(raceData, "Session", "Car")
+		simulator := this.SessionDatabase.getSimulatorCode(simulator)
 
-			cars[car] := car
-		}
-
-		for car, ignore in cars
-			result.Push(car)
+		loop Files, %database%\%simulator%\*.*, D
+			result.Push(A_LoopFileName)
 
 		return result
 	}
 
 	getTracks(simulator, car) {
+		local database := this.Database
+		local sessionDB := this.SessionDatabase
 		local result := []
-		local tracks := {}
-		local raceData, track, ignore
 
-		loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
-		{
-			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
+		simulator := sessionDB.getSimulatorCode(simulator)
+		car := sessionDB.getCarCode(simulator, car)
 
-			if (getConfigurationValue(raceData, "Session", "Car") = car) {
-				track := getConfigurationValue(raceData, "Session", "Track")
-
-				tracks[track] := track
-			}
-		}
-
-		result := []
-
-		for track, ignore in tracks
-			result.Push(track)
+		loop Files, %database%\%simulator%\%car%\*.*, D
+			result.Push(A_LoopFileName)
 
 		return result
 	}
 
 	getReports(simulator, car, track) {
+		local database := this.Database
+		local sessionDB := this.SessionDatabase
 		local reports := []
-		local raceData
 
-		loop Files, % this.Database . "\" . this.getSimulatorCode(simulator) . "\*.*", D
-		{
-			raceData := readConfiguration(A_LoopFilePath . "\Race.data")
+		simulator := sessionDB.getSimulatorCode(simulator)
+		car := sessionDB.getCarCode(simulator, car)
+		track := sessionDB.getTrackCode(simulator, track)
 
-			if ((getConfigurationValue(raceData, "Session", "Car") = car) && (getConfigurationValue(raceData, "Session", "Track") = track))
-				reports.Push(A_LoopFilePath)
-		}
+		loop Files, %database%\%simulator%\%car%\%track%\*.*, D
+			reports.Push(A_LoopFilePath)
 
 		return reports
 	}
@@ -511,7 +494,7 @@ class RaceReports extends ConfigurationItem {
 
 			this.iSelectedSimulator := simulator
 
-			sessionDB := new SessionDatabase()
+			sessionDB := this.SessionDatabase
 
 			cars := this.getCars(simulator)
 			carNames := cars.Clone()
@@ -539,7 +522,7 @@ class RaceReports extends ConfigurationItem {
 			tracks := this.getTracks(this.SelectedSimulator, car)
 
 			GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car)
-			GuiControl, , trackDropDown, % "|" . values2String("|", map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", this.SelectedSimulator))*)
+			GuiControl, , trackDropDown, % "|" . values2String("|", map(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator))*)
 
 			this.loadTrack((tracks.Length() > 0) ? tracks[1] : false, true)
 		}
@@ -627,7 +610,7 @@ class RaceReports extends ConfigurationItem {
 
 	deleteRace() {
 		local title := translate("Delete")
-		local raceDirectory, simulators, window
+		local raceDirectory, simulators, window, prefix, simulator, car, track
 
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
 		MsgBox 262436, %title%, % translate("Do you really want to delete the selected report?")
@@ -635,37 +618,45 @@ class RaceReports extends ConfigurationItem {
 
 		IfMsgBox Yes
 		{
-			raceDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
+			simulator := this.SessionDatabase.getSimulatorCode(this.SelectedSimulator)
+			car := this.SessionDatabase.getCarCode(this.SelectedSimulator, this.SelectedCar)
+			track := this.SessionDatabase.getTrackCode(this.SelectedSimulator, this.SelectedTrack)
 
-			deleteDirectory(raceDirectory)
+			prefix := (this.Database . "\" . simulator . "\")
+
+			deleteDirectory(prefix . car . "\" . track . "\" . this.AvailableRaces[this.SelectedRace])
+			deleteDirectory(prefix . car . "\" . track, true, false)
+			deleteDirectory(prefix . car, true, false)
 
 			if (this.getReports(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).Length() > 0)
 				this.loadTrack(this.SelectedTrack, true)
-			else if (this.getTracks(this.SelectedSimulator, this.SelectedCar).Length() > 0)
-				this.loadCar(this.SelectedCar, true)
 			else {
-				simulators := this.getSimulators()
-
-				if inList(simulators, this.SelectedSimulator)
-					this.loadSimulator(this.SelectedSimulator, true)
+				if (this.getTracks(this.SelectedSimulator, this.SelectedCar).Length() > 0)
+					this.loadCar(this.SelectedCar, true)
 				else {
-					window := this.Window
+					simulators := this.getSimulators()
 
-					Gui %window%:Default
+					if inList(simulators, this.SelectedSimulator)
+						this.loadSimulator(this.SelectedSimulator, true)
+					else {
+						window := this.Window
 
-					GuiControl, , simulatorDropDown, % ("|" . values2String("|", simulators*))
+						Gui %window%:Default
 
-					if (simulators.Length() > 0)
-						this.loadSimulator(simulators[1], true)
-					else
-						GuiControl Choose, simulatorDropDown, 0
+						GuiControl, , simulatorDropDown, % ("|" . values2String("|", simulators*))
+
+						if (simulators.Length() > 0)
+							this.loadSimulator(simulators[1], true)
+						else
+							GuiControl Choose, simulatorDropDown, 0
+					}
 				}
 			}
 		}
 	}
 
 	loadReport(report) {
-		local reportDirectory, raceData, drivers
+		local reportDirectory, raceData, drivers, simulator, car, track
 
 		if (report != this.SelectedReport) {
 			if report {
@@ -676,7 +667,11 @@ class RaceReports extends ConfigurationItem {
 				GuiControl Choose, reportsDropDown, % inList(kRaceReports, report)
 				GuiControl Disable, reportSettingsButton
 
-				reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
+				simulator := this.SessionDatabase.getSimulatorCode(this.SelectedSimulator)
+				car := this.SessionDatabase.getCarCode(this.SelectedSimulator, this.SelectedCar)
+				track := this.SessionDatabase.getTrackCode(this.SelectedSimulator, this.SelectedTrack)
+
+				reportDirectory := (this.Database . "\" . simulator . "\" . car . "\" . track . "\" . this.AvailableRaces[this.SelectedRace])
 
 				switch report {
 					case "Overview":
@@ -735,7 +730,10 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	reportSettings(report) {
-		local reportDirectory := (this.Database . "\" . this.getSimulatorCode(this.SelectedSimulator) . "\" . this.AvailableRaces[this.SelectedRace])
+		local simulator := this.SessionDatabase.getSimulatorCode(this.SelectedSimulator)
+		local car := this.SessionDatabase.getCarCode(this.SelectedSimulator, this.SelectedCar)
+		local track := this.SessionDatabase.getTrackCode(this.SelectedSimulator, this.SelectedTrack)
+		local reportDirectory := (this.Database . "\" . simulator . "\" . car . "\" . track . "\" . this.AvailableRaces[this.SelectedRace])
 
 		switch report {
 			case "Drivers":
@@ -786,8 +784,8 @@ chooseSimulator() {
 }
 
 chooseCar() {
-	local sessionDB := new SessionDatabase()
 	local reports := RaceReports.Instance
+	local sessionDB := reports.SessionDatabase
 	local simulator := reports.SelectedSimulator
 	local index, car
 
@@ -802,7 +800,7 @@ chooseTrack() {
 	local reports := RaceReports.Instance
 	local simulator := reports.SelectedSimulator
 	local tracks := reports.getTracks(simulator, reports.SelectedCar)
-	local trackNames := map(tracks, ObjBindMethod(new SessionDatabase(), "getTrackName", simulator))
+	local trackNames := map(tracks, ObjBindMethod(reports.SessionDatabase, "getTrackName", simulator))
 
 	GuiControlGet trackDropDown
 

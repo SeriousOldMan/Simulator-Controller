@@ -801,12 +801,6 @@ namespace RF2SHMSpotter {
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
 					double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-
-                    /*
-					if (Math.Abs(steeredAngleDegs) > 0.33f)
-						cd.Usos = 200 * steeredAngleDegs / angularVelocity;
-					*/
-
                     double steerAngleRadians = -steeredAngleDegs / 57.2958;
                     double wheelBaseMeter = (float)wheelbase / 10;
                     double radius = wheelBaseMeter / steerAngleRadians;

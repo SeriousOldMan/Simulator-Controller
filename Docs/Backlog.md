@@ -23,10 +23,6 @@
   1. General detection of counter steering in the telemetry analyzer
   2. Support for iRacing for the telemetry analyzer
   3. Collect telemetry data from multiple drivers and generate combined setup recommendations
-  
-#### Race Reports
-  1. Suppress interaction while reports are being loaded
-  2. Optimization of the reports database to increase loading performance
 
 #### Team Server
   1. Incorporate tyre pressure loss as detected by the Race Engineer (see above) into pitstop recommendations

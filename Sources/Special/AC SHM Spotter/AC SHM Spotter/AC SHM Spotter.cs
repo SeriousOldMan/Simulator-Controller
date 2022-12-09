@@ -748,13 +748,7 @@ namespace ACSHMSpotter {
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-					float steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-
-                    /*
-					if (Math.Abs(steeredAngleDegs) > 0.33f)
-						cd.Usos = 10 * -steeredAngleDegs / physics.LocalAngularVelocity[1];
-					*/
-
+					double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
                     double steerAngleRadians = -steeredAngleDegs / 57.2958;
                     double wheelBaseMeter = (float)wheelbase / 10;
                     double radius = wheelBaseMeter / steerAngleRadians;

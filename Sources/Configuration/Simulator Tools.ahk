@@ -1651,6 +1651,10 @@ updateInstallationForV392() {
 	}
 }
 
+updateConfigurationForV452() {
+	updateConfigurationForV451()
+}
+
 updateConfigurationForV451() {
 	local directory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
 	local sessionDB := new SessionDatabase()

@@ -486,11 +486,41 @@ public:
 		phase(phase) {}
 };
 
-std::vector<float> recentSteerAngles;
-const int numRecentSteerAngles = 6;
+const int MAXVALUES = 6;
 
+std::vector<float> recentSteerAngles;
 std::vector<float> recentGLongs;
-const int numRecentGLongs = 6;
+std::vector<float> recentIdealAngVels;
+std::vector<float> recentRealAngVels;
+
+void pushValue(std::vector<float>& values, float value) {
+	values.push_back(value);
+
+	if ((int)values.size() > MAXVALUES)
+		values.erase(values.begin());
+}
+
+float averageValue(std::vector<float>& values, int& num) {
+	std::vector <float>::iterator iter;
+	float sum = 0.0;
+
+	num = 0;
+
+	for (iter = values.begin(); iter != values.end(); iter++) {
+		sum += *iter;
+		num++;
+	}
+
+	return (num > 0) ? sum / num : 0.0;
+}
+
+float smoothValue(std::vector<float>& values, float value) {
+	int ignore;
+
+	pushValue(values, value);
+
+	return averageValue(values, ignore);
+}
 
 std::vector<CornerDynamics> cornerDynamicsList;
 
@@ -514,69 +544,56 @@ bool collectTelemetry(const SharedMemory* sharedData) {
 	if (sharedData->mGameState == GAME_INGAME_PAUSED && sharedData->mPitMode != PIT_MODE_NONE)
 		return true;
 
-	recentSteerAngles.push_back(sharedData->mSteering);
-	if ((int)recentSteerAngles.size() > numRecentSteerAngles) {
-		recentSteerAngles.erase(recentSteerAngles.begin());
-	}
+	float steerAngle = smoothValue(recentSteerAngles, sharedData->mSteering);
 
 	float acceleration = sharedData->mSpeed * 3.6 - lastSpeed;
 
 	lastSpeed = sharedData->mSpeed * 3.6;
 
-	recentGLongs.push_back(acceleration);
-	if ((int)recentGLongs.size() > numRecentGLongs) {
-		recentGLongs.erase(recentGLongs.begin());
-	}
+	pushValue(recentGLongs, acceleration);
 
-	// Get the average recent GLong
-	std::vector<float>::iterator glongIter;
-	float sumGLong = 0.0;
-	int numGLong = 0;
-	for (glongIter = recentGLongs.begin(); glongIter != recentGLongs.end(); glongIter++) {
-		sumGLong += *glongIter;
-		numGLong++;
-	}
-
-	int phase = 0;
-	if (numGLong > 0) {
-		float recentGLong = sumGLong / numGLong;
-		if (recentGLong < -0.2) {
-			// Braking
-			phase = -1;
-		}
-		else if (recentGLong > 0.1) {
-			// Accelerating
-			phase = 1;
-		}
-	}
+	double angularVelocity = smoothValue(recentRealAngVels, sharedData->mAngularVelocity[VEC_Z]);
+	double steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
+	double steerAngleRadians = -steeredAngleDegs / 57.2958;
+	double wheelBaseMeter = (float)wheelbase / 10;
+	double radius = wheelBaseMeter / steerAngleRadians;
+	double perimeter = radius * PI * 2;
+	double perimeterSpeed = lastSpeed / 3.6;
+	double idealAngularVelocity = smoothValue(recentIdealAngVels, perimeterSpeed / perimeter * 2 * PI);
 
 	if (fabs(sharedData->mSteering) > 0.1 && lastSpeed > 60) {
-		double angularVelocity = sharedData->mAngularVelocity[VEC_Z];
+		// Get the average recent GLong
+		int numGLong = 0;
+		float glongAverage = averageValue(recentGLongs, numGLong);
+
+		int phase = 0;
+		if (numGLong > 0) {
+			if (glongAverage < -0.2) {
+				// Braking
+				phase = -1;
+			}
+			else if (glongAverage > 0.1) {
+				// Accelerating
+				phase = 1;
+			}
+		}
 
 		CornerDynamics cd = CornerDynamics(sharedData->mSpeed * 3.6, 0,
 			sharedData->mParticipantInfo[sharedData->mViewedParticipantIndex].mLapsCompleted,
 			phase);
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			double steeredAngleDegs = sharedData->mSteering * steerLock / 2.0f / steerRatio;
-			double steerAngleRadians = -steeredAngleDegs / 57.2958;
-			double wheelBaseMeter = (float)wheelbase / 10;
-			double radius = wheelBaseMeter / steerAngleRadians;
-
-			double perimeter = radius * PI * 2;
-			double perimeterSpeed = lastSpeed / 3.6;
-			double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
-
 			double slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (sharedData->mSteering > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (false)
+				if (sharedData->mSteering > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 

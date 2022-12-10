@@ -906,7 +906,7 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 			char* trackPositions;
 
 			if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct")) 
-				printf("Sector=%d\n", max(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)])));
+				printf("Sector=%d\n", (int)max(3, 1 + floor(3 * ((float*)trackPositions)[atoi(playerCarIdx)])));
 			
 			printf("Laps=%s\n", itoa(laps, result, 10));
 

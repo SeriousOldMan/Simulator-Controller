@@ -771,19 +771,15 @@ bool collectTelemetry(const irsdk_header* header, const char* data) {
 				idealAngularVelocity = smoothValue(recentIdealAngVels, lateralAcceleration / max(0.01f, lastSpeed / 3.6));
 				slip = fabs(idealAngularVelocity) / max(0.01f, fabs(angularVelocity));
 
-				if (steerAngle > 0) {
-					if (angularVelocity < idealAngularVelocity)
-						slip *= -1;
-				}
-				else {
-					if (angularVelocity > idealAngularVelocity)
-						slip *= -1;
-				}
+				if (slip < 1)
+					slip = -(fabs(idealAngularVelocity) - fabs(angularVelocity));
+				else
+					slip = fabs(angularVelocity) - fabs(idealAngularVelocity);
 
-				cd.usos = slip * 57.2958;
+				cd.usos = slip * 57.2958 * 10;
 			}
 
-			if (true) {
+			if (false) {
 				std::ofstream output;
 
 				output.open(dataFile + ".trace", std::ios::out | std::ios::app);

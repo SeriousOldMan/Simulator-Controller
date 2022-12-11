@@ -1,3 +1,11 @@
+## 4.5.2.0-release 12/16/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. *iRacing* is now supported the telemetry analyzer of the "Setup Advisor".
+  4. The oversteer calculation has been revised for the telemetry analyzer. You may have to adjust your thresholds to higher values.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-452).
+
 ## 4.5.1.0-release 12/09/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always

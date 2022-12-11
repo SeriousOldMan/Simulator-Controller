@@ -71,8 +71,6 @@ When you are satiesfied with the displayed handling issues, click on "Apply". Th
 
 Please be aware that not every handling issue is related to problems with the car setup. Equally often they arise when you are not used to specific characteristics of the car and you are kind of *overdriving* it. The analyzer can help you here as well. Try to drive clean laps as without too much detected over- or understeering events. You will see, that this will feel slower most of the time, but in the end you will be faster.
 
-Note: *iRacing* is not yet supported.
-
 Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the analyzer.
 
 #### Installation of Telemetry Providers

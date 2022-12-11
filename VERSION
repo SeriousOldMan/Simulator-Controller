@@ -1,9 +1,9 @@
 [Development]
 Version=4.5.2.0-dev
 Target=4.5.2.0-release
-Date=12/10/2022
+Date=12/11/2022
 Download=
-Changes=Integrated iRacing for the telemetry analyzer of "Setup Advisor"
+Changes=Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer
 [Release]
 Version=4.5.1.0-release
 Date=12/09/2022

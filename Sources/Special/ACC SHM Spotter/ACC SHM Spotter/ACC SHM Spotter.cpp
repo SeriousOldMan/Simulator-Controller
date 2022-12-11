@@ -1039,7 +1039,7 @@ int main(int argc, char* argv[])
 	bool analyzeTelemetry = false;
 	bool positionTrigger = false;
 
-	if (true || argc > 1) {
+	if (argc > 1) {
 		analyzeTelemetry = (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);

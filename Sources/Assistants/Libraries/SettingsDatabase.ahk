@@ -112,12 +112,24 @@ class SettingsDatabase extends SessionDatabase {
 	loadSettings(simulator, car, track, weather, community := "__Undefined__") {
 		local settings := newConfiguration()
 		local id := this.ID
+		local dryPressure, wetPressure, ignore, tyre
 
 		if (community = kUndefined)
 			community := this.UseCommunity
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
+
+		dryPressure := this.optimalTyrePressure(simulator, car, "Dry")
+		wetPressure := this.optimalTyrePressure(simulator, car, "Wet")
+
+		if dryPressure
+			for ignore, tyre in ["FL", "FR", "RL", "RR"]
+				setConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target." . tyre, dryPressure)
+
+		if wetPressure
+			for ignore, tyre in ["FL", "FR", "RL", "RR"]
+				setConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target." . tyre, wetPressure)
 
 		loadSettings(this, simulator, settings, id, true, community, "*", "*", "*")
 		loadSettings(this, simulator, settings, id, true, community, car, "*", "*")

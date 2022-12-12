@@ -1110,6 +1110,14 @@ class SessionDatabase extends ConfigurationItem {
 		return false
 	}
 
+	optimalTyrePressure(simulator, car, compound, default := false) {
+		car := this.getCarCode(simulator, car)
+		compound := compound(compound)
+
+		return getConfigurationValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
+								   , "Pressures", car . ";" . compound, default)
+	}
+
 	readNotes(simulator, car, track) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local notes

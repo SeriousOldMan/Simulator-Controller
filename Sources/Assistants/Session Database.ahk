@@ -3031,6 +3031,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		else if (default = kFalse)
 			default := false
 
+		if (this.SelectedSimulator && (this.SelectedSimulator != true)
+		 && this.SelectedCar && (this.SelectedCar != true) && (section = "Session Settings")) {
+			if (InStr(key, "Tyre.Dry.Pressure.Target") = 1)
+				default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Dry", default)
+			else if (InStr(key, "Tyre.Wet.Pressure.Target") = 1)
+				default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Wet", default)
+		}
+
 		return type
 	}
 

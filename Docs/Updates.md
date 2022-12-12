@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.5.2
 
-Since the oversteer detection has been revised for the telemetry analyzer of the "Setup Advisor", you have to adjust the detection thresholds to higher values.
+Since the oversteer detection has been revised for the telemetry analyzer of the "Setup Advisor", you have to adjust the detection thresholds to higher values. Maybe you want to use the new calibration support.
 
 ***
 

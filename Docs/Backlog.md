@@ -21,8 +21,7 @@
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer
-  2. Support for iRacing for the telemetry analyzer
-  3. Collect telemetry data from multiple drivers and generate combined setup recommendations
+  2. Collect telemetry data from multiple drivers and generate combined setup recommendations
 
 #### Team Server
   1. Incorporate tyre pressure loss as detected by the Race Engineer (see above) into pitstop recommendations

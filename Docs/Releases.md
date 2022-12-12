@@ -3,6 +3,8 @@
   2. Documentation updates, as always
   3. *iRacing* is now supported the telemetry analyzer of the "Setup Advisor".
   4. The oversteer calculation has been revised for the telemetry analyzer. You may have to adjust your thresholds to higher values.
+  5. The telemetry analyzer in the "Setup Advisor" now supports an auto calibration mode. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer) for more information.
+  6. Handling of tyre pressures has been optimized in the "Session Database" in cases where pressure data from multiple drivers are present in your database.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-452).
 

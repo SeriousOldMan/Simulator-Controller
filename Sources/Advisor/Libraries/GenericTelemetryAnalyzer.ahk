@@ -284,20 +284,22 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	startTelemetryAnalyzer(dataFile) {
+	startTelemetryAnalyzer(dataFile, calibrate := false) {
 		local pid, options, code, message
 
 		this.stopTelemetryAnalyzer()
 
 		if !this.iAnalyzerPID {
 			try {
-				options := ("-Analyze """ . dataFile . """")
+				options := ((calibrate ? "-Calibrate""" : "-Analyze """) . dataFile . """")
 
-				if this.settingAvailable("UndersteerThresholds")
-					options .= (A_Space . values2String(A_Space, this.UndersteerThresholds*))
+				if !calibrate {
+					if this.settingAvailable("UndersteerThresholds")
+						options .= (A_Space . values2String(A_Space, this.UndersteerThresholds*))
 
-				if this.settingAvailable("OversteerThresholds")
-					options .= (A_Space . values2String(A_Space, this.OversteerThresholds*))
+					if this.settingAvailable("OversteerThresholds")
+						options .= (A_Space . values2String(A_Space, this.OversteerThresholds*))
+				}
 
 				if this.settingAvailable("LowspeedThreshold")
 					options .= (A_Space . this.LowspeedThreshold)
@@ -379,6 +381,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
 
 	static activateButton
+	static calibrateButton
 
 	static steerLockEdit
 	static steerRatioEdit
@@ -446,7 +449,32 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				}
 			}
 	}
-	else if (commandOrAnalyzer == "UpdateSlider") {
+	else if (commandOrAnalyzer == "Calibrate") {
+		Gui TAN:+Disabled
+		Gui CAN:+OwnerTAN
+
+		try {
+			if runCalibrater(analyzer) {
+				Gui TAN:Default
+
+			}
+		}
+		finally {
+			Gui TAN:-Disabled
+
+			GuiControl, , heavyOversteerThresholdSlider, analyzer.OversteerThresholds[3]
+			GuiControl, , heavyOversteerThresholdEdit, analyzer.OversteerThresholds[3]
+			GuiControl, , mediumOversteerThresholdSlider, analyzer.OversteerThresholds[2]
+			GuiControl, , mediumOversteerThresholdEdit, analyzer.OversteerThresholds[2]
+			GuiControl, , lightOversteerThresholdSlider, analyzer.OversteerThresholds[1]
+			GuiControl, , lightOversteerThresholdEdit, analyzer.OversteerThresholds[1]
+			GuiControl, , lightUndersteerThresholdSlider, analyzer.UndersteerThresholds[1]
+			GuiControl, , lightUndersteerThresholdEdit, analyzer.UndersteerThresholds[1]
+			GuiControl, , mediumUndersteerThresholdSlider, analyzer.UndersteerThresholds[2]
+			GuiControl, , mediumUndersteerThresholdEdit, analyzer.UndersteerThresholds[2]
+			GuiControl, , heavyUndersteerThresholdSlider, analyzer.UndersteerThresholds[3]
+			GuiControl, , heavyUndersteerThresholdEdit, analyzer.UndersteerThresholds[3]
+		}
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
 		GuiControlGet steerLockEdit
@@ -460,6 +488,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		GuiControlGet heavyUndersteerThresholdSlider
 		GuiControlGet mediumUndersteerThresholdSlider
 		GuiControlGet lightUndersteerThresholdSlider
+
+		GuiControl Disable, calibrateButton
 
 		if analyzer.settingAvailable("SteerLock")
 			analyzer.SteerLock := steerLockEdit
@@ -774,8 +804,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 4
 			analyzeWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, Button, x92 ys+290 w80 h23 Default vactivateButton gactivateAnalyzer, % translate("Start")
-		Gui %window%:Add, Button, xp+100 yp w80 h23 gcancelAnalyzer, % translate("Cancel")
+		Gui %window%:Add, Button, x16 ys+290 w80 h23 vcalibrateButton gcalibrateAnalyzer, % translate("Calibrate...")
+		Gui %window%:Add, Button, x158 yp w80 h23 Default vactivateButton gactivateAnalyzer, % translate("Start")
+		Gui %window%:Add, Button, xp+98 yp w80 h23 gcancelAnalyzer, % translate("Cancel")
 
 		Gui %window%:+Owner%aWindow%
 		Gui %aWindow%:+Disabled
@@ -824,6 +855,10 @@ updateThresholdEdit() {
 
 activateAnalyzer() {
 	runAnalyzer("Activate")
+}
+
+calibrateAnalyzer() {
+	runAnalyzer("Calibrate")
 }
 
 cancelAnalyzer() {

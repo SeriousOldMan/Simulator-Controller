@@ -291,7 +291,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		if !this.iAnalyzerPID {
 			try {
-				options := ((calibrate ? "-Calibrate""" : "-Analyze """) . dataFile . """")
+				options := ((calibrate ? "-Calibrate """ : "-Analyze """) . dataFile . """")
 
 				if !calibrate {
 					if this.settingAvailable("UndersteerThresholds")
@@ -847,11 +847,10 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 runCalibrator(commandOrAnalyzer) {
 	local lightOversteerThreshold := 0
-	local mediumOversteerThreshold := 0
 	local heavyOversteerThreshold := 0
 	local lightUndersteerThreshold := 0
-	local mediumUndersteerThreshold := 0
 	local heavyUndersteerThreshold := 0
+	local mediumOversteerThreshold, mediumUndersteerThreshold
 	local window, x, y, ignore, type, speed, key, value, variable
 
 	static activateButton
@@ -889,6 +888,8 @@ runCalibrator(commandOrAnalyzer) {
 		GuiControl, , activateButton, % translate("Finish")
 
 		state := "Push"
+
+		dataFile := temporaryFileName("Calibrator", "data")
 
 		analyzer.startTelemetryAnalyzer(dataFile, true)
 	}
@@ -945,8 +946,8 @@ runCalibrator(commandOrAnalyzer) {
 				Sleep 100
 		}
 		finally {
-			if dataFile
-				deleteFile(dataFile)
+			; if dataFile
+			; 	deleteFile(dataFile)
 
 			analyzer.stopTelemetryAnalyzer()
 		}
@@ -961,7 +962,7 @@ runCalibrator(commandOrAnalyzer) {
 					for ignore, key in ["Entry", "Apex", "Exit"] {
 						value := getConfigurationValue(result[1], type . "." . speed, key, kUndefined)
 
-						if (value != kUndefined)
+						if (value && (value != kUndefined))
 							if (type = "Understeer")
 								%variable% := Max(%variable%, value)
 							else
@@ -976,7 +977,7 @@ runCalibrator(commandOrAnalyzer) {
 					for ignore, key in ["Entry", "Apex", "Exit"] {
 						value := getConfigurationValue(result[2], type . "." . speed, key, kUndefined)
 
-						if (value != kUndefined)
+						if (value && (value != kUndefined))
 							if (type = "Understeer")
 								%variable% := Max(%variable%, value)
 							else
@@ -984,8 +985,16 @@ runCalibrator(commandOrAnalyzer) {
 					}
 			}
 
+			value := Max(lightOversteerThreshold, heavyOversteerThreshold, kMinThreshold)
+			heavyOversteerThreshold := Min(lightOversteerThreshold, heavyOversteerThreshold, 0)
+			lightOversteerThreshold := value
+
+			value := Min(lightUndersteerThreshold, heavyUndersteerThreshold, kMaxThreshold)
+			heavyUndersteerThreshold := Max(lightUndersteerThreshold, heavyUndersteerThreshold, 0)
+			lightUndersteerThreshold := value
+
 			heavyOversteerThreshold := Round(heavyOversteerThreshold * 0.9)
-			heavyUndersteerThreshold := Round(heavyOversteerThreshold * 0.9)
+			heavyUndersteerThreshold := Round(heavyUndersteerThreshold * 0.9)
 			mediumOversteerThreshold := Round(lightOversteerThreshold + (heavyOversteerThreshold - lightOversteerThreshold) / 2)
 			mediumUndersteerThreshold := Round(lightUndersteerThreshold + (heavyUndersteerThreshold - lightUndersteerThreshold) / 2)
 

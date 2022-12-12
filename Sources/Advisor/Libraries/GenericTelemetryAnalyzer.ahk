@@ -379,6 +379,7 @@ setAnalyzerSetting(analyzer, key, value) {
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local window, aWindow, x, y, ignore, widget, advisor, row, include
 	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
+	local calibration
 
 	static activateButton
 	static calibrateButton
@@ -454,26 +455,30 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui CAN:+OwnerTAN
 
 		try {
-			if runCalibrater(analyzer) {
+			calibration := runCalibrator(analyzer)
+
+			if calibration {
+				analyzer.UnderSteerThresholds := calibration[1]
+				analyzer.OverSteerThresholds := calibration[2]
+
 				Gui TAN:Default
 
+				GuiControl, , heavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
+				GuiControl, , heavyOversteerThresholdEdit, % analyzer.OversteerThresholds[3]
+				GuiControl, , mediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
+				GuiControl, , mediumOversteerThresholdEdit, % analyzer.OversteerThresholds[2]
+				GuiControl, , lightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
+				GuiControl, , lightOversteerThresholdEdit, % analyzer.OversteerThresholds[1]
+				GuiControl, , lightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
+				GuiControl, , lightUndersteerThresholdEdit, % analyzer.UndersteerThresholds[1]
+				GuiControl, , mediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
+				GuiControl, , mediumUndersteerThresholdEdit, % analyzer.UndersteerThresholds[2]
+				GuiControl, , heavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
+				GuiControl, , heavyUndersteerThresholdEdit, % analyzer.UndersteerThresholds[3]
 			}
 		}
 		finally {
 			Gui TAN:-Disabled
-
-			GuiControl, , heavyOversteerThresholdSlider, analyzer.OversteerThresholds[3]
-			GuiControl, , heavyOversteerThresholdEdit, analyzer.OversteerThresholds[3]
-			GuiControl, , mediumOversteerThresholdSlider, analyzer.OversteerThresholds[2]
-			GuiControl, , mediumOversteerThresholdEdit, analyzer.OversteerThresholds[2]
-			GuiControl, , lightOversteerThresholdSlider, analyzer.OversteerThresholds[1]
-			GuiControl, , lightOversteerThresholdEdit, analyzer.OversteerThresholds[1]
-			GuiControl, , lightUndersteerThresholdSlider, analyzer.UndersteerThresholds[1]
-			GuiControl, , lightUndersteerThresholdEdit, analyzer.UndersteerThresholds[1]
-			GuiControl, , mediumUndersteerThresholdSlider, analyzer.UndersteerThresholds[2]
-			GuiControl, , mediumUndersteerThresholdEdit, analyzer.UndersteerThresholds[2]
-			GuiControl, , heavyUndersteerThresholdSlider, analyzer.UndersteerThresholds[3]
-			GuiControl, , heavyUndersteerThresholdEdit, analyzer.UndersteerThresholds[3]
 		}
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
@@ -840,6 +845,158 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 }
 
+runCalibrator(commandOrAnalyzer) {
+	local lightOversteerThreshold := 0
+	local mediumOversteerThreshold := 0
+	local heavyOversteerThreshold := 0
+	local lightUndersteerThreshold := 0
+	local mediumUndersteerThreshold := 0
+	local heavyUndersteerThreshold := 0
+	local window, x, y, ignore, type, speed, key, value, variable
+
+	static activateButton
+	static infoText
+
+	static result := false
+	static analyzer := false
+	static state := "Start"
+	static dataFile := false
+
+	static cleanValues := {}
+	static overValues := {}
+
+	if (commandOrAnalyzer == kCancel) {
+		analyzer.stopTelemetryAnalyzer()
+
+		result := kCancel
+	}
+	else if ((commandOrAnalyzer == "Activate") && (state = "Start")) {
+		GuiControl, , infoText, % translate("Drive at least two consecutive clean laps without under- or oversteering the car. Then press ""Next"".")
+		GuiControl, , activateButton, % translate("Next")
+
+		dataFile := temporaryFileName("Calibrator", "data")
+
+		state := "Clean"
+
+		analyzer.startTelemetryAnalyzer(dataFile, true)
+	}
+	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
+		analyzer.stopTelemetryAnalyzer()
+
+		cleanValues := readConfiguration(dataFile)
+
+		GuiControl, , infoText, % translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press ""Finish"".")
+		GuiControl, , activateButton, % translate("Finish")
+
+		state := "Push"
+
+		analyzer.startTelemetryAnalyzer(dataFile, true)
+	}
+	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
+		analyzer.stopTelemetryAnalyzer()
+
+		overValues := readConfiguration(dataFile)
+
+		result := [cleanValues, overValues]
+	}
+	else {
+		analyzer := commandOrAnalyzer
+
+		state := "Start"
+		dataFile := false
+		result := false
+
+		cleanValues := {}
+		overValues := {}
+		window := "CAN"
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, s10 Bold, Arial
+
+		Gui %window%:Add, Text, w324 Center gmoveCalibrator, % translate("Modular Simulator Controller System")
+
+		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
+
+		Gui %window%:Add, Text, x78 YP+20 w184 cBlue Center gopenAnalyzerDocumentation, % translate("Telemetry Analyzer")
+
+		Gui %window%:Font, Norm s14, Arial
+
+		Gui %window%:Add, Text, x16 yp+30 w320 h140 Wrap vinfoText, % translate("Start a practice session and prepare for a run. Then press ""Start"".")
+
+		Gui %window%:Font, Norm s8, Arial
+
+		Gui %window%:Add, Button, x92 yp+145 w80 h23 Default vactivateButton gactivateCalibrator, % translate("Start")
+		Gui %window%:Add, Button, xp+100 yp w80 h23 gcancelCalibrator, % translate("Cancel")
+
+		try {
+			if getWindowPosition("Setup Advisor.Calibrator", x, y)
+				Gui %window%:Show, AutoSize x%x% y%y%
+			else
+				Gui %window%:Show, AutoSize Center
+
+			while !result
+				Sleep 100
+		}
+		finally {
+			if dataFile
+				deleteFile(dataFile)
+
+			analyzer.stopTelemetryAnalyzer()
+		}
+
+		Gui %window%:Destroy
+
+		if (result != kCancel) {
+			for ignore, type in ["Oversteer", "Understeer"] {
+				variable := ("light" . type . "Threshold")
+
+				for ignore, speed in ["Slow", "Fast"]
+					for ignore, key in ["Entry", "Apex", "Exit"] {
+						value := getConfigurationValue(result[1], type . "." . speed, key, kUndefined)
+
+						if (value != kUndefined)
+							if (type = "Understeer")
+								%variable% := Max(%variable%, value)
+							else
+								%variable% := Min(%variable%, value)
+					}
+			}
+
+			for ignore, type in ["Oversteer", "Understeer"] {
+				variable := ("heavy" . type . "Threshold")
+
+				for ignore, speed in ["Slow", "Fast"]
+					for ignore, key in ["Entry", "Apex", "Exit"] {
+						value := getConfigurationValue(result[2], type . "." . speed, key, kUndefined)
+
+						if (value != kUndefined)
+							if (type = "Understeer")
+								%variable% := Max(%variable%, value)
+							else
+								%variable% := Min(%variable%, value)
+					}
+			}
+
+			heavyOversteerThreshold := Round(heavyOversteerThreshold * 0.9)
+			heavyUndersteerThreshold := Round(heavyOversteerThreshold * 0.9)
+			mediumOversteerThreshold := Round(lightOversteerThreshold + (heavyOversteerThreshold - lightOversteerThreshold) / 2)
+			mediumUndersteerThreshold := Round(lightUndersteerThreshold + (heavyUndersteerThreshold - lightUndersteerThreshold) / 2)
+
+			return [[lightUndersteerThreshold, mediumUndersteerThreshold, heavyUndersteerThreshold]
+				  , [lightOversteerThreshold, mediumOversteerThreshold, heavyOversteerThreshold]]
+		}
+		else
+			return false
+	}
+}
+
 noSelect() {
 	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
@@ -875,4 +1032,16 @@ moveAnalyzer() {
 
 openAnalyzerDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer
+}
+
+moveCalibrator() {
+	moveByMouse("CAN", "Setup Advisor.Calibrator")
+}
+
+activateCalibrator() {
+	runCalibrator("Activate")
+}
+
+cancelCalibrator() {
+	runCalibrator(kCancel)
 }

@@ -212,6 +212,7 @@ global setupBasePressureRLEdit
 global setupBasePressureRREdit
 global setupNotesEdit
 
+global loadSetupButton
 global addSetupButton
 global copySetupButton
 global deleteSetupButton
@@ -1459,7 +1460,10 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Notes")
 		Gui %window%:Add, Edit, x474 yp+1 w126 h46 vsetupNotesEdit gupdateSetup
 
-		Gui %window%:Add, Button, x525 yp+50 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
+		Gui %window%:Add, Button, x474 yp+50 w23 h23 Center +0x200 HWNDdatabaseButton vloadSetupButton gloadSetup
+		setButtonIcon(databaseButton, kIconsDirectory . "Database Settings.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Button, x525 yp w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
 		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x550 yp w23 h23 Center +0x200 HWNDcopyButton vcopySetupButton gcopySetup
 		setButtonIcon(copyButton, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
@@ -2032,6 +2036,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Enable, setupBasePressureRREdit
 				GuiControl Enable, setupNotesEdit
 
+				GuiControl Enable, loadSetupButton
 				GuiControl Enable, copySetupButton
 				GuiControl Enable, deleteSetupButton
 
@@ -2049,6 +2054,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, setupBasePressureRREdit
 				GuiControl Disable, setupNotesEdit
 
+				GuiControl Disable, loadSetupButton
 				GuiControl Disable, copySetupButton
 				GuiControl Disable, deleteSetupButton
 
@@ -10439,6 +10445,9 @@ updateTime() {
 	}
 }
 
+loadSetup() {
+}
+
 addSetup() {
 	local rCenter := RaceCenter.Instance
 	local title
@@ -10988,7 +10997,6 @@ reportSettings() {
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "reportSettings", rCenter.SelectedReport))
 }
-
 
 chooseSimulationSettings() {
 	local rCenter := RaceCenter.Instance

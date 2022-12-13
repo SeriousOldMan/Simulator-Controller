@@ -1668,7 +1668,7 @@ updateConfigurationForV452() {
 
 		for ignore, subkey in [".LowspeedThreshold", ".OversteerThresholds", ".UndersteerThresholds"
 							 , ".SteerLock", ".SteerRatio", ".Wheelbase", ".TrackWidth"]
-			if InStr(key, subkey) {
+			if (InStr(key, subkey) && (string2Values(".", key).Length() < 4)) {
 				newValues[StrReplace(key, subkey, ".*" . subkey)] := value
 
 				found := true

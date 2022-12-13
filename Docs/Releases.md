@@ -5,7 +5,9 @@
   4. The oversteer calculation has been revised for the telemetry analyzer. You may have to adjust your thresholds to higher values.
   5. The telemetry analyzer in the "Setup Advisor" now supports an auto calibration mode. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer) for more information.
   6. Handling of tyre pressures has been optimized in the "Session Database" in cases where pressure data from multiple drivers are present in your database.
-  7. Ideal tyre pressures are now supported for dry and wet tyres in the car specific meta data. If this information is present, it is used rather and will supersede teh information entered in "Race Settings". You may however still overwrite it in the "Session Database".
+  7. Ideal tyre pressures are now supported for dry and wet tyres in the car specific meta data. If this information is present, it is used rather and will supersede the information entered in "Race Settings". You may however still overwrite it in the "Session Database".
+  8. Tyre pressure setups can [now be initialized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) from data in the "Session Database" in "Race Center".
+  9. Tons of internal code tweaks.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-452).
 

@@ -608,11 +608,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
-		Gui %window%:Add, Edit, x494 yp w40 -Background gloadPressures vairTemperatureEdit
+		Gui %window%:Add, Edit, x494 yp w40 -Background gloadPressures vairTemperatureEdit, % this.iAirTemperature
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20, % this.iAirTemperature
 		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Air (Celsius)")
 
-		Gui %window%:Add, Edit, x494 yp+24 w40 -Background gloadPressures vtrackTemperatureEdit
+		Gui %window%:Add, Edit, x494 yp+24 w40 -Background gloadPressures vtrackTemperatureEdit, % this.iTrackTemperature
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20, % this.iTrackTemperature
 		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Track (Celsius)")
 
@@ -6101,7 +6101,7 @@ transferPressures() {
 	if (driverDropDown = translate("All"))
 		driver := [true]
 	else
-		driver := [sessionDB.getDriverID(this.SelectedSimulator, driverDropDown)]
+		driver := [sessionDB.getDriverID(editor.SelectedSimulator, driverDropDown)]
 
 	tyrePressures := []
 

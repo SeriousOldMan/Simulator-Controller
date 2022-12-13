@@ -34,6 +34,7 @@ global kMaxThreshold := 180
 
 class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iCar := false
+	iTrack := false
 
 	iUndersteerThresholds := [40, 70, 100]
 	iOversteerThresholds := [-40, -70, -100]
@@ -50,6 +51,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	Car[] {
 		Get {
 			return this.iCar
+		}
+	}
+
+	Track[] {
+		Get {
+			return this.iTrack
 		}
 	}
 
@@ -157,6 +164,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	__New(advisor, simulator) {
 		local selectedCar := advisor.SelectedCar[false]
+		local selectedTrack := advisor.SelectedTrack[false]
 		local fileName, configuration, settings, prefix
 		local defaultOversteerThresholds, defaultUndersteerThresholds, defaultLowspeedThreshold
 
@@ -164,6 +172,9 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		if (selectedCar == true)
 			selectedCar := false
+
+		if (selectedTrack == true)
+			selectedTrack := false
 
 		defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
 		defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
@@ -173,11 +184,17 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
-		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".")
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".*.")
 
 		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", 900)
 		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", 270)
 		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", 150)
+
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
+
+		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
+		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
 
 		if selectedCar {
 			fileName := getFileName("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
@@ -368,7 +385,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 setAnalyzerSetting(analyzer, key, value) {
 	local car := analyzer.Car
-	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . ".")
+	local track := analyzer.Track
+	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . "." . (track ? track : "*") . ".")
 	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
 	setConfigurationValue(settings, "Setup Advisor", prefix . key, value)

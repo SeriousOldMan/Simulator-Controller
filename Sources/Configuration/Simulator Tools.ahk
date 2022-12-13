@@ -1652,7 +1652,19 @@ updateInstallationForV392() {
 }
 
 updateConfigurationForV452() {
+	local newValues := {}
+	local settings, key, value
+
 	updateConfigurationForV451()
+
+	settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+	for key, value in getConfigurationSectionValues(settings, "Setup Advisor", Object())
+		newValues[StrReplace(key, ".Unknown", ".*")] := value
+
+	setConfigurationSectionValues(settings, "Setup Advisor", newValues)
+
+	writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 }
 
 updateConfigurationForV451() {

@@ -304,6 +304,8 @@ A typical problem in team races is the different driving styles of the team memb
 
 You can enter as many setups here as you like for different weather conditions, temperatures and used tyre compounds. The more you have at your finger tips, the better are the chances that you can't be catched off guard by a sudden weather change. See the next section, how this data can be used to automatically adjust the tyre pressures, when planning an upcoming pitstop.
 
+Beside using the typical "+" and "-" buttons here to create and delete a tyre pressure setups, you can use the button with the copy symbol to clone the currently selected setup. And you can use the button with the database symbol to open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) to look up pressure information recorded in previous sessions.
+
 ### Planning a Pitstop
 
 Using the elements on the "Pitstops" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of the Virtual Race Assistants in an endurance race, where currently passive team members or even a dedicated Race Engineer are part of the crew supporting the active driver.

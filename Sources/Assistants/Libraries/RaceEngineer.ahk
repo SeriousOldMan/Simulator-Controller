@@ -119,7 +119,7 @@ class RaceEngineer extends RaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
 		base.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
 
-		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, WeatherUpdate: true}})
+		this.updateConfigurationValues({Announcements: {FuelWarning: true, DamageReporting: true, DamageAnalysis: true, PressureReporting: true, WeatherUpdate: true}})
 	}
 
 	updateConfigurationValues(values) {
@@ -1001,6 +1001,8 @@ class RaceEngineer extends RaceAssistant {
 																									 , "Tyre.Pressure.Correction.Temperature", true)
 					  , "Session.Settings.Tyre.Pressure.Correction.Setup": getConfigurationValue(settings, "Session Settings"
 																							   , "Tyre.Pressure.Correction.Setup", true)
+					  , "Session.Settings.Tyre.Pressure.Correction.Pressure": getConfigurationValue(settings, "Session Settings"
+																								  , "Tyre.Pressure.Correction.Pressure", true)
 					  , "Session.Settings.Tyre.Dry.Pressure.Target.FL": getDeprecatedConfigurationValue(settings, "Session Settings"
 																									  , "Race Settings"
 																									  , "Tyre.Dry.Pressure.Target.FL", 27.7)
@@ -1520,7 +1522,7 @@ class RaceEngineer extends RaceAssistant {
 		local plannedLap := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
-		local temperatureDelta, debug
+		local temperatureDelta, debug, tyre, fact, lostPressure
 
 		if (optionsOrLap != true)
 			if optionsOrLap is Number
@@ -1704,6 +1706,16 @@ class RaceEngineer extends RaceAssistant {
 										  , {value: printNumber(Abs(pressureCorrection), 1), unit: fragments["PSI"]
 										   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
 										   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
+					}
+
+					for tyre, fact in {FrontLeft: "Pitstop.Planned.Tyre.Pressure.Lost.Front.Left"
+									 , FrontRight: "Pitstop.Planned.Tyre.Pressure.Lost.Front.Right"
+									 , RearLeft: "Pitstop.Planned.Tyre.Pressure.Lost.Rear.Left"
+									 , RearRight: "Pitstop.Planned.Tyre.Pressure.Lost.Rear.Right"} {
+						lostPressure := knowledgeBase.getValue(fact, false)
+
+						if lostPressure
+							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre], lost: lostPressure, unit: fragments["PSI"]})
 					}
 				}
 
@@ -2099,6 +2111,18 @@ class RaceEngineer extends RaceAssistant {
 				else if (repair == false)
 					speaker.speakPhrase((Abs(delta) < 0.2) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
 			}
+	}
+
+	pressureLossWarning(tyre, lostPressure) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker, fragments
+
+		if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
+			speaker := this.getSpeaker()
+			fragments := speaker.Fragments
+
+			speaker.speakPhrase("PressureLoss", {tyre: fragments[tyre], lost: lostPressure, unit: fragments["PSI"]})
+		}
 	}
 
 	weatherChangeNotification(change, minutes) {

@@ -501,6 +501,7 @@ editRaceSettings(ByRef settingsOrCommand, arguments*) {
 
 	static temperatureCorrectionCheck
 	static setupPressureCompareCheck
+	static pressureLossCorrectionCheck
 
 	static raceDurationEdit
 	static avgLaptimeEdit
@@ -757,6 +758,7 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", tyrePressureDeviationEdit)
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", temperatureCorrectionCheck)
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", setupPressureCompareCheck)
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Pressure", pressureLossCorrectionCheck)
 
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", Round(tpDryFrontLeftEdit, 1))
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", Round(tpDryFrontRightEdit, 1))
@@ -862,6 +864,7 @@ restart:
 		tyrePressureDeviationEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2)
 		temperatureCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
 		setupPressureCompareCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", true)
+		pressureLossCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", true)
 
 		tpDryFrontLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
 		tpDryFrontRightEdit:= getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
@@ -924,21 +927,21 @@ restart:
 		Gui RES:Font, Norm, Arial
 
 		if !vTestMode {
-			Gui RES:Add, Button, x228 y475 w80 h23 Default gacceptRaceSettings, % translate("Ok")
-			Gui RES:Add, Button, x316 y475 w80 h23 gcancelRaceSettings, % translate("&Cancel")
+			Gui RES:Add, Button, x228 y499 w80 h23 Default gacceptRaceSettings, % translate("Ok")
+			Gui RES:Add, Button, x316 y499 w80 h23 gcancelRaceSettings, % translate("&Cancel")
 		}
 		else
-			Gui RES:Add, Button, x316 y475 w80 h23 Default gcancelRaceSettings, % translate("Close")
+			Gui RES:Add, Button, x316 y499 w80 h23 Default gcancelRaceSettings, % translate("Close")
 
-		Gui RES:Add, Button, x8 y475 w77 h23 gloadRaceSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y475 w77 h23 gsaveRaceSettings, % translate("&Save...")
+		Gui RES:Add, Button, x8 y499 w77 h23 gloadRaceSettings, % translate("&Load...")
+		Gui RES:Add, Button, x90 y499 w77 h23 gsaveRaceSettings, % translate("&Save...")
 
 		if vTeamMode
 			tabs := map(["Race", "Pitstop", "Strategy", "Team"], "translate")
 		else
 			tabs := map(["Race", "Pitstop", "Strategy"], "translate")
 
-		Gui RES:Add, Tab3, x8 y48 w388 h420 -Wrap, % values2String("|", tabs*)
+		Gui RES:Add, Tab3, x8 y48 w388 h444 -Wrap, % values2String("|", tabs*)
 
 		Gui Tab, 2
 
@@ -986,8 +989,6 @@ restart:
 
 		updateRepairEngineState()
 
-
-
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
 
 		choices := map(["Never", "Tyre Temperature", "Weather"], "translate")
@@ -1020,6 +1021,10 @@ restart:
 		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
 		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%setupPressureCompareCheck% VsetupPressureCompareCheck, %setupPressureCompareCheck%
 		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on database values")
+
+		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
+		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%pressureLossCorrectionCheck% VpressureLossCorrectionCheck, %pressureLossCorrectionCheck%
+		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on pressure loss")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial

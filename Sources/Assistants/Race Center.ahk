@@ -212,6 +212,7 @@ global setupBasePressureRLEdit
 global setupBasePressureRREdit
 global setupNotesEdit
 
+global loadSetupButton
 global addSetupButton
 global copySetupButton
 global deleteSetupButton
@@ -350,6 +351,8 @@ class RaceCenter extends ConfigurationItem {
 	iStrategyViewer := false
 
 	iTasks := []
+
+	iPressuresRequest := false
 
 	class RaceCenterTelemetryDatabase extends TelemetryDatabase {
 		iRaceCenter := false
@@ -1459,7 +1462,10 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Notes")
 		Gui %window%:Add, Edit, x474 yp+1 w126 h46 vsetupNotesEdit gupdateSetup
 
-		Gui %window%:Add, Button, x525 yp+50 w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
+		Gui %window%:Add, Button, x474 yp+50 w23 h23 Center +0x200 HWNDdatabaseButton vloadSetupButton gloadSetup
+		setButtonIcon(databaseButton, kIconsDirectory . "Database.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Button, x525 yp w23 h23 Center +0x200 HWNDplusButton vaddSetupButton gaddSetup
 		setButtonIcon(plusButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 		Gui %window%:Add, Button, x550 yp w23 h23 Center +0x200 HWNDcopyButton vcopySetupButton gcopySetup
 		setButtonIcon(copyButton, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
@@ -2032,6 +2038,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Enable, setupBasePressureRREdit
 				GuiControl Enable, setupNotesEdit
 
+				GuiControl Enable, loadSetupButton
 				GuiControl Enable, copySetupButton
 				GuiControl Enable, deleteSetupButton
 
@@ -2049,6 +2056,7 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, setupBasePressureRREdit
 				GuiControl Disable, setupNotesEdit
 
+				GuiControl Disable, loadSetupButton
 				GuiControl Disable, copySetupButton
 				GuiControl Disable, deleteSetupButton
 
@@ -2193,6 +2201,46 @@ class RaceCenter extends ConfigurationItem {
 		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
 
 		GuiControl Choose, pitstopMenuDropDown, 1
+	}
+
+	initializeSetup(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
+		local window := this.Window
+		local currentListView, chosen, row
+
+		Gui %window%:Default
+
+		currentListView := A_DefaultListView
+
+		try {
+			Gui ListView, % this.SetupsListView
+
+			row := LV_GetNext(0)
+
+			if row {
+				setupBasePressureFLEdit := Round(flPressure, 1)
+				setupBasePressureFREdit := Round(frPressure, 1)
+				setupBasePressureRLEdit := Round(rlPressure, 1)
+				setupBasePressureRREdit := Round(rrPressure, 1)
+
+				GuiControl, , setupBasePressureFLEdit, %setupBasePressureFLEdit%
+				GuiControl, , setupBasePressureFREdit, %setupBasePressureFREdit%
+				GuiControl, , setupBasePressureRLEdit, %setupBasePressureRLEdit%
+				GuiControl, , setupBasePressureRREdit, %setupBasePressureRREdit%
+
+				chosen := inList(new SessionDatabase().getTyreCompounds(this.Simulator, this.Car, this.Track), compound(compound, compoundColor))
+
+				if chosen
+					GuiControl Choose, setupCompoundDropDownMenu, %chosen%
+
+				LV_Modify(row, "Col3", translate(compound(compound, compoundColor))
+									 , values2String(", ", setupBasePressureFLEdit, setupBasePressureFREdit
+														 , setupBasePressureRLEdit, setupBasePressureRREdit))
+				this.updateState()
+			}
+		}
+		finally {
+			Gui ListView, %currentListView%
+		}
 	}
 
 	addSetup() {
@@ -3748,6 +3796,8 @@ class RaceCenter extends ConfigurationItem {
 				this.initializePitstopFromSession()
 			case 6:
 				exePath := kBinariesDirectory . "Session Database.exe"
+
+				this.iPressuresRequest := "Pitstop"
 
 				try {
 					Process Exist
@@ -10439,6 +10489,65 @@ updateTime() {
 	}
 }
 
+loadSetup() {
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local exePath := kBinariesDirectory . "Session Database.exe"
+	local pid, options, compound
+
+	local currentListView, row
+
+	Gui %window%:Default
+
+	currentListView := A_DefaultListView
+
+	try {
+		Gui ListView, % rCenter.SetupsListView
+
+		row := LV_GetNext(0)
+
+		if (row = rCenter.SelectedSetup) {
+			rCenter.iPressuresRequest := row
+
+			try {
+				Process Exist
+
+				pid := ErrorLevel
+
+				options := ["-Setup", pid]
+
+				if (rCenter.Simulator && rCenter.Car && rCenter.Track) {
+					simulator := new SessionDatabase().getSimulatorName(rCenter.Simulator)
+
+					GuiControlGet setupAirTemperatureEdit
+					GuiControlGet setupTrackTemperatureEdit
+					GuiControlGet setupCompoundDropDownMenu
+
+					compound := rCenter.TyreCompounds[setupCompoundDropDownMenu]
+
+					options := concatenate(options, ["-Simulator", """" . simulator . """", "-Car", """" . rCenter.Car . """", "-Track", """" . rCenter.Track . """"
+												   , "-Weather", rCenter.Weather
+												   , "-AirTemperature", Round(setupAirTemperatureEdit), "-TrackTemperature", Round(setupTrackTemperatureEdit)
+												   , "-Compound", compound(compound), "-CompoundColor", compoundColor(compound)])
+				}
+
+				options := values2String(A_Space, options*)
+
+				Run "%exePath%" %options%, %kBinariesDirectory%
+			}
+			catch exception {
+				logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+
+				showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+	}
+	finally {
+		Gui ListView, %currentListView%
+	}
+}
+
 addSetup() {
 	local rCenter := RaceCenter.Instance
 	local title
@@ -10989,7 +11098,6 @@ reportSettings() {
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "reportSettings", rCenter.SelectedReport))
 }
 
-
 chooseSimulationSettings() {
 	local rCenter := RaceCenter.Instance
 
@@ -11008,8 +11116,26 @@ chooseSimulationSettings() {
 
 setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
 	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView
 
-	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure))
+	if (rCenter.iPressuresRequest = "Pitstop")
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure))
+	else {
+		Gui %window%:Default
+
+		currentListView := A_DefaultListView
+
+		try {
+			Gui ListView, % rCenter.SetupsListView
+
+			if (LV_GetNext(0) = rCenter.iPressuresRequest)
+				rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure))
+		}
+		finally {
+			Gui ListView, %currentListView%
+		}
+	}
 
 	return false
 }

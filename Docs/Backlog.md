@@ -8,8 +8,7 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
-  2. Defaults for car-specific ideal tyre pressures in the meta data
-  3. Make selection of repair settings more reliable in ACC
+  2. Make selection of repair settings more reliable in ACC
 
 #### Assistants
   1. Overhaul (shortening) of Assistant phrases
@@ -21,8 +20,7 @@
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer
-  2. Support for iRacing for the telemetry analyzer
-  3. Collect telemetry data from multiple drivers and generate combined setup recommendations
+  2. Collect telemetry data from multiple drivers and generate combined setup recommendations
 
 #### Team Server
   1. Incorporate tyre pressure loss as detected by the Race Engineer (see above) into pitstop recommendations

@@ -43,6 +43,12 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you might want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars* and *Simulator Controller\Rules* folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on your own. But be sure to make a backup copy of all the files, just for peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
+## Release 4.5.2
+
+Since the oversteer detection has been revised for the telemetry analyzer of the "Setup Advisor", you have to adjust the detection thresholds to higher values. Maybe you want to use the new calibration support.
+
+***
+
 ## Release 4.5.1
 
 Nothing to do manually, but the reorganization of the race reports database might run quite a long time depending of the number of reports you already have. Please make a backup copy, before running the update.

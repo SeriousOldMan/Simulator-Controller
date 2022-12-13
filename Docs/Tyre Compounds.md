@@ -90,6 +90,22 @@ Here is another example, this time for *rFactor 2*:
 	McLaren 720S GT3;*=GT3
 	Formula ISI 2012;*=F1 2012
 
+#### Default target pressures
+
+For some simulators, a third section is part of the "Tyre Data.ini" file.
+
+	[Pressures]
+	porsche_991_gt3_r;Dry=27.6
+	mercedes_amg_gt3;Dry=27.6
+	ferrari_488_gt3;Dry=27.6
+	...
+	porsche_991_gt3_r;Wet=30.1
+	mercedes_amg_gt3;Wet=30.1
+	ferrari_488_gt3;Wet=30.1
+	...
+
+In this section, tyre compound specific target pressures for hot tyres are configured. This information, if available, will be used by various parts of the Simulator Controller suite, for example the Race Engineer, and it will overwrite the information provided in the "Race Settings".
+
 ### Creating own Compound Rules
 
 In the most likely case, that your preffered cars are not available in the predefined set of tyre compound and car rules, you can create your own ones. There are two different ways to do this.

@@ -27,9 +27,15 @@ namespace RF2SHMSpotter {
 
                 spotter.Run(false, true, false);
             }
+            else if (args.Length > 0 && args[0] == "-Calibrate")
+            {
+                spotter.initializeAnalyzer(true, args);
+
+                spotter.Run(false, false, true);
+            }
             else if (args.Length > 0 && args[0] == "-Analyze")
             {
-                spotter.initializeAnalyzer(args);
+                spotter.initializeAnalyzer(false, args);
 
                 spotter.Run(false, false, true);
             }

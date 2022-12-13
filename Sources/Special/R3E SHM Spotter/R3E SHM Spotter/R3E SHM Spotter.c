@@ -620,34 +620,43 @@ BOOL greenFlag() {
 		return FALSE;
 }
 
-#define NumRecentSteerAngles 6
-float recentSteerAngles[NumRecentSteerAngles] = { 0, 0, 0, 0, 0, 0 };
-int steerAngleCount = 0;
+#define MAXVALUES 6
 
-void appendSteerAngle(float steerAngle) {
-	if (steerAngleCount == NumRecentSteerAngles) {
-		for (int i = 1; i < steerAngleCount; i++)
-			recentSteerAngles[i - 1] = recentSteerAngles[i];
+float recentSteerAngles[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
+int recentSteerAnglesCount = 0;
 
-		steerAngleCount--;
-	}
-
-	recentSteerAngles[steerAngleCount++] = steerAngle;
-}
-
-#define NumRecentGLongs 6
-float recentGLongs[NumRecentGLongs] = {0, 0, 0, 0, 0, 0};
+float recentGLongs[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
 int recentGLongsCount = 0;
 
-void appendRecentGLong(float recentGLong) {
-	if (recentGLongsCount == NumRecentGLongs) {
-		for (int i = 1; i < recentGLongsCount; i++)
-			recentGLongs[i - 1] = recentGLongs[i];
+float recentRealAngVels[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
+int recentRealAngVelsCount = 0;
 
-		recentGLongsCount--;
+float recentIdealAngVels[MAXVALUES] = { 0, 0, 0, 0, 0, 0 };
+int recentIdealAngVelsCount = 0;
+
+void pushValue(float* values, int* count, float value) {
+	if (*count == MAXVALUES) {
+		for (int i = 1; i < *count; i++)
+			values[i - 1] = values[i];
+
+		(*count)--;
 	}
 
-	recentGLongs[recentGLongsCount++] = recentGLong;
+	values[(*count)++] = value;
+}
+
+float averageValue(float* values, int count) {
+	float sum = 0.0;
+	for (int i = 0; i < count; i++)
+		sum += values[i];
+
+	return (count > 0) ? sum / count : 0.0f;
+}
+
+float smoothValue(float* values, int* count, float value) {
+	pushValue(values, count, value);
+
+	return averageValue(values, *count);
 }
 
 #define NumCornerDynamics 4096
@@ -731,7 +740,7 @@ BOOL collectTelemetry() {
 	if (map_buffer->game_paused || (map_buffer->all_drivers_data_1[playerIdx].in_pitlane != 0))
 		return TRUE;
 
-	r3e_float32 steerAngle = map_buffer->steer_input_raw;
+	r3e_float32 steerAngle = smoothValue(recentSteerAngles, &recentSteerAnglesCount, map_buffer->steer_input_raw);
 	r3e_int32 steerLock = map_buffer->steer_wheel_range_degrees;
 	r3e_float32 steerRatio = ((float)steerLock / 2) / map_buffer->steer_lock_degrees;
 
@@ -739,52 +748,49 @@ BOOL collectTelemetry() {
 
 	lastSpeed = map_buffer->car_speed * 3.6f;
 
-	appendSteerAngle(steerAngle);
-	appendRecentGLong(acceleration);
+	smoothValue(recentGLongs, &recentGLongsCount, acceleration);
 
-	// Get the average recent GLong
-	float sumGLong = 0.0;
-	for (int i = 0; i < recentGLongsCount; i++)
-		sumGLong = sumGLong + recentGLongs[i];
-
-	int phase = 0;
-	if (recentGLongsCount > 0) {
-		float recentGLong = sumGLong / recentGLongsCount;
-		if (recentGLong < -0.2) {
-			// Braking
-			phase = -1;
-		}
-		else if (recentGLong > 0.1) {
-			// Accelerating
-			phase = 1;
-		}
-	}
+	r3e_float64 angularVelocity = smoothValue(recentRealAngVels, &recentRealAngVelsCount,
+		(float)map_buffer->player.local_angular_velocity.z);
+	r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+	r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
+	r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
+	r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
+	r3e_float64 perimeter = radius * PI * 2;
+	r3e_float64 perimeterSpeed = lastSpeed / 3.6;
+	r3e_float64 idealAngularVelocity = smoothValue(recentIdealAngVels, &recentIdealAngVelsCount,
+		(float)(perimeterSpeed / perimeter * 2 * PI));
 
 	if (fabs(steerAngle) > 0.1 && lastSpeed > 60) {
+		// Get the average recent GLong
+		float glongAverage = averageValue(recentGLongs, recentGLongsCount);
+
+		int phase = 0;
+		if (recentGLongsCount > 0)
+			if (glongAverage < -0.2) {
+				// Braking
+				phase = -1;
+			}
+			else if (glongAverage > 0.1) {
+				// Accelerating
+				phase = 1;
+			}
+		
 		corner_dynamics cd = { map_buffer->car_speed * 3.6f, 0, map_buffer->completed_laps, phase };
 
-		r3e_float64 angularVelocity = map_buffer->player.local_angular_velocity.z;
 
 		if (fabs(angularVelocity * 57.2958) > 0.1) {
-			r3e_float64 steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-			r3e_float64 steerAngleRadians = -steeredAngleDegs / 57.2958;
-			r3e_float64 wheelBaseMeter = (float)wheelbase / 10;
-			r3e_float64 radius = wheelBaseMeter / steerAngleRadians;
-
-			r3e_float64 perimeter = radius * PI * 2;
-			r3e_float64 perimeterSpeed = lastSpeed / 3.6;
-			r3e_float64 idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
-
 			r3e_float64 slip = fabs(idealAngularVelocity) - fabs(angularVelocity);
 
-			if (steerAngle > 0) {
-				if (angularVelocity < idealAngularVelocity)
-					slip *= -1;
-			}
-			else {
-				if (angularVelocity > idealAngularVelocity)
-					slip *= -1;
-			}
+			if (FALSE)
+				if (steerAngle > 0) {
+					if (angularVelocity < idealAngularVelocity)
+						slip *= -1;
+				}
+				else {
+					if (angularVelocity > idealAngularVelocity)
+						slip *= -1;
+				}
 
 			cd.usos = slip * 57.2989 * 10;
 
@@ -814,7 +820,7 @@ BOOL collectTelemetry() {
 	return TRUE;
 }
 
-void writeTelemetry() {
+void writeTelemetry(BOOL calibrate) {
 	char fileName[512];
 	FILE* output;
 
@@ -836,150 +842,194 @@ void writeTelemetry() {
 		int fastMediumOSNum[] = { 0, 0, 0 };
 		int fastHeavyOSNum[] = { 0, 0, 0 };
 		int fastTotalNum = 0;
+		
+		int slowOSMin[] = { 0, 0, 0 };
+		int fastOSMin[] = { 0, 0, 0 };
+		int slowUSMax[] = { 0, 0, 0 };
+		int fastUSMax[] = { 0, 0, 0 };
 
 		int index = 0;
 
 		for (corner_dynamics* corner = firstCornerDynamics(&index); corner != NULL; corner = nextCornerDynamics(&index)) {
 			int phase = corner->phase + 1;
 
-			if (corner->speed < lowspeedThreshold) {
-				slowTotalNum++;
-				if (corner->usos < oversteerHeavyThreshold) {
-					slowHeavyOSNum[phase]++;
+			if (calibrate) {
+				if (corner->speed < lowspeedThreshold) {
+					slowOSMin[phase] = min(slowOSMin[phase], (int)corner->usos);
+					slowUSMax[phase] = max(slowUSMax[phase], (int)corner->usos);
 				}
-				else if (corner->usos < oversteerMediumThreshold) {
-					slowMediumOSNum[phase]++;
-				}
-				else if (corner->usos < oversteerLightThreshold) {
-					slowLightOSNum[phase]++;
-				}
-				else if (corner->usos > understeerHeavyThreshold) {
-					slowHeavyUSNum[phase]++;
-				}
-				else if (corner->usos > understeerMediumThreshold) {
-					slowMediumUSNum[phase]++;
-				}
-				else if (corner->usos > understeerLightThreshold) {
-					slowLightUSNum[phase]++;
+				else {
+					fastOSMin[phase] = min(fastOSMin[phase], (int)corner->usos);
+					fastUSMax[phase] = max(fastUSMax[phase], (int)corner->usos);
 				}
 			}
 			else {
-				fastTotalNum++;
-				if (corner->usos < oversteerHeavyThreshold) {
-					fastHeavyOSNum[phase]++;
+				if (corner->speed < lowspeedThreshold) {
+					slowTotalNum++;
+					if (corner->usos < oversteerHeavyThreshold) {
+						slowHeavyOSNum[phase]++;
+					}
+					else if (corner->usos < oversteerMediumThreshold) {
+						slowMediumOSNum[phase]++;
+					}
+					else if (corner->usos < oversteerLightThreshold) {
+						slowLightOSNum[phase]++;
+					}
+					else if (corner->usos > understeerHeavyThreshold) {
+						slowHeavyUSNum[phase]++;
+					}
+					else if (corner->usos > understeerMediumThreshold) {
+						slowMediumUSNum[phase]++;
+					}
+					else if (corner->usos > understeerLightThreshold) {
+						slowLightUSNum[phase]++;
+					}
 				}
-				else if (corner->usos < oversteerMediumThreshold) {
-					fastMediumOSNum[phase]++;
-				}
-				else if (corner->usos < oversteerLightThreshold) {
-					fastLightOSNum[phase]++;
-				}
-				else if (corner->usos > understeerHeavyThreshold) {
-					fastHeavyUSNum[phase]++;
-				}
-				else if (corner->usos > understeerMediumThreshold) {
-					fastMediumUSNum[phase]++;
-				}
-				else if (corner->usos > understeerLightThreshold) {
-					fastLightUSNum[phase]++;
+				else {
+					fastTotalNum++;
+					if (corner->usos < oversteerHeavyThreshold) {
+						fastHeavyOSNum[phase]++;
+					}
+					else if (corner->usos < oversteerMediumThreshold) {
+						fastMediumOSNum[phase]++;
+					}
+					else if (corner->usos < oversteerLightThreshold) {
+						fastLightOSNum[phase]++;
+					}
+					else if (corner->usos > understeerHeavyThreshold) {
+						fastHeavyUSNum[phase]++;
+					}
+					else if (corner->usos > understeerMediumThreshold) {
+						fastMediumUSNum[phase]++;
+					}
+					else if (corner->usos > understeerLightThreshold) {
+						fastLightUSNum[phase]++;
+					}
 				}
 			}
 		}
 
-		fprintf(output, "[Understeer.Slow.Light]\n");
+		if (calibrate) {
+			fprintf(output, "[Understeer.Slow]");
 
-		if (slowTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * slowLightUSNum[0] / slowTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * slowLightUSNum[1] / slowTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * slowLightUSNum[2] / slowTotalNum));
+			fprintf(output, "Entry=%d", slowUSMax[0]);
+			fprintf(output, "Apex=%d", slowUSMax[1]);
+			fprintf(output, "Exit=%d", slowUSMax[2]);
+			
+			fprintf(output, "[Understeer.Fast]");
+
+			fprintf(output, "Entry=%d", fastUSMax[0]);
+			fprintf(output, "Apex=%d", fastUSMax[1]);
+			fprintf(output, "Exit=%d", fastUSMax[2]);
+			
+			fprintf(output, "[Oversteer.Slow]");
+
+			fprintf(output, "Entry=%d", slowOSMin[0]);
+			fprintf(output, "Apex=%d", slowOSMin[1]);
+			fprintf(output, "Exit=%d", slowOSMin[2]);
+			
+			fprintf(output, "[Oversteer.Fast]");
+
+			fprintf(output, "Entry=%d", fastOSMin[0]);
+			fprintf(output, "Apex=%d", fastOSMin[1]);
+			fprintf(output, "Exit=%d", fastOSMin[2]);
 		}
+		else {
+			fprintf(output, "[Understeer.Slow.Light]\n");
 
-		fprintf(output, "[Understeer.Slow.Medium]\n");
+			if (slowTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * slowLightUSNum[0] / slowTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * slowLightUSNum[1] / slowTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * slowLightUSNum[2] / slowTotalNum));
+			}
 
-		if (slowTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * slowMediumUSNum[0] / slowTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * slowMediumUSNum[1] / slowTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * slowMediumUSNum[2] / slowTotalNum));
-		}
+			fprintf(output, "[Understeer.Slow.Medium]\n");
 
-		fprintf(output, "[Understeer.Slow.Heavy]\n");
+			if (slowTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * slowMediumUSNum[0] / slowTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * slowMediumUSNum[1] / slowTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * slowMediumUSNum[2] / slowTotalNum));
+			}
 
-		if (slowTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * slowHeavyUSNum[0] / slowTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * slowHeavyUSNum[1] / slowTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * slowHeavyUSNum[2] / slowTotalNum));
-		}
+			fprintf(output, "[Understeer.Slow.Heavy]\n");
 
-		fprintf(output, "[Understeer.Fast.Light]\n");
+			if (slowTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * slowHeavyUSNum[0] / slowTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * slowHeavyUSNum[1] / slowTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * slowHeavyUSNum[2] / slowTotalNum));
+			}
 
-		if (fastTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * fastLightUSNum[0] / fastTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * fastLightUSNum[1] / fastTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * fastLightUSNum[2] / fastTotalNum));
-		}
+			fprintf(output, "[Understeer.Fast.Light]\n");
 
-		fprintf(output, "[Understeer.Fast.Medium]\n");
+			if (fastTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * fastLightUSNum[0] / fastTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * fastLightUSNum[1] / fastTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * fastLightUSNum[2] / fastTotalNum));
+			}
 
-		if (fastTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * fastMediumUSNum[0] / fastTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * fastMediumUSNum[1] / fastTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * fastMediumUSNum[2] / fastTotalNum));
-		}
+			fprintf(output, "[Understeer.Fast.Medium]\n");
 
-		fprintf(output, "[Understeer.Fast.Heavy]\n");
+			if (fastTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * fastMediumUSNum[0] / fastTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * fastMediumUSNum[1] / fastTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * fastMediumUSNum[2] / fastTotalNum));
+			}
 
-		if (fastTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * fastHeavyUSNum[0] / fastTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * fastHeavyUSNum[1] / fastTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * fastHeavyUSNum[2] / fastTotalNum));
-		}
+			fprintf(output, "[Understeer.Fast.Heavy]\n");
 
-		fprintf(output, "[Oversteer.Slow.Light]\n");
+			if (fastTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * fastHeavyUSNum[0] / fastTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * fastHeavyUSNum[1] / fastTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * fastHeavyUSNum[2] / fastTotalNum));
+			}
 
-		if (slowTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * slowLightOSNum[0] / slowTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * slowLightOSNum[1] / slowTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * slowLightOSNum[2] / slowTotalNum));
-		}
+			fprintf(output, "[Oversteer.Slow.Light]\n");
 
-		fprintf(output, "[Oversteer.Slow.Medium]\n");
+			if (slowTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * slowLightOSNum[0] / slowTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * slowLightOSNum[1] / slowTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * slowLightOSNum[2] / slowTotalNum));
+			}
 
-		if (slowTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * slowMediumOSNum[0] / slowTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * slowMediumOSNum[1] / slowTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * slowMediumOSNum[2] / slowTotalNum));
-		}
+			fprintf(output, "[Oversteer.Slow.Medium]\n");
 
-		fprintf(output, "[Oversteer.Slow.Heavy]\n");
+			if (slowTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * slowMediumOSNum[0] / slowTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * slowMediumOSNum[1] / slowTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * slowMediumOSNum[2] / slowTotalNum));
+			}
 
-		if (slowTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * slowHeavyOSNum[0] / slowTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * slowHeavyOSNum[1] / slowTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * slowHeavyOSNum[2] / slowTotalNum));
-		}
+			fprintf(output, "[Oversteer.Slow.Heavy]\n");
 
-		fprintf(output, "[Oversteer.Fast.Light]\n");
+			if (slowTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * slowHeavyOSNum[0] / slowTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * slowHeavyOSNum[1] / slowTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * slowHeavyOSNum[2] / slowTotalNum));
+			}
 
-		if (fastTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * fastLightOSNum[0] / fastTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * fastLightOSNum[1] / fastTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * fastLightOSNum[2] / fastTotalNum));
-		}
+			fprintf(output, "[Oversteer.Fast.Light]\n");
 
-		fprintf(output, "[Oversteer.Fast.Medium]\n");
+			if (fastTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * fastLightOSNum[0] / fastTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * fastLightOSNum[1] / fastTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * fastLightOSNum[2] / fastTotalNum));
+			}
 
-		if (fastTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * fastMediumOSNum[0] / fastTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * fastMediumOSNum[1] / fastTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * fastMediumOSNum[2] / fastTotalNum));
-		}
+			fprintf(output, "[Oversteer.Fast.Medium]\n");
 
-		fprintf(output, "[Oversteer.Fast.Heavy]\n");
+			if (fastTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * fastMediumOSNum[0] / fastTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * fastMediumOSNum[1] / fastTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * fastMediumOSNum[2] / fastTotalNum));
+			}
 
-		if (fastTotalNum > 0) {
-			fprintf(output, "Entry=%d\n", (int)(100.0f * fastHeavyOSNum[0] / fastTotalNum));
-			fprintf(output, "Apex=%d\n", (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
-			fprintf(output, "Exit=%d\n", (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
+			fprintf(output, "[Oversteer.Fast.Heavy]\n");
+
+			if (fastTotalNum > 0) {
+				fprintf(output, "Entry=%d\n", (int)(100.0f * fastHeavyOSNum[0] / fastTotalNum));
+				fprintf(output, "Apex=%d\n", (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
+				fprintf(output, "Exit=%d\n", (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
+			}
 		}
 
 		fclose(output);
@@ -1085,26 +1135,35 @@ int main(int argc, char* argv[])
 	int countdown = 4000;
 	BOOL mapTrack = FALSE;
 	BOOL positionTrigger = FALSE;
+	BOOL calibrateTelemetry = FALSE;
 	BOOL analyzeTelemetry = FALSE;
 	long counter = 0;
 
 	if (argc > 1) {
 		mapTrack = (strcmp(argv[1], "-Map") == 0);
-		analyzeTelemetry = (strcmp(argv[1], "-Analyze") == 0);
+		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
+		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
 
 		if (analyzeTelemetry) {
 			strcpy_s(dataFile, 512, argv[2]);
 
-			understeerLightThreshold = atoi(argv[3]);
-			understeerMediumThreshold = atoi(argv[4]);
-			understeerHeavyThreshold = atoi(argv[5]);
-			oversteerLightThreshold = atoi(argv[6]);
-			oversteerMediumThreshold = atoi(argv[7]);
-			oversteerHeavyThreshold = atoi(argv[8]);
-			lowspeedThreshold = atoi(argv[9]);
-			wheelbase = atoi(argv[10]);
-			trackWidth = atoi(argv[11]);
+			if (calibrateTelemetry) {
+				lowspeedThreshold = atoi(argv[3]);
+				wheelbase = atoi(argv[4]);
+				trackWidth = atoi(argv[5]);
+			}
+			else {
+				understeerLightThreshold = atoi(argv[3]);
+				understeerMediumThreshold = atoi(argv[4]);
+				understeerHeavyThreshold = atoi(argv[5]);
+				oversteerLightThreshold = atoi(argv[6]);
+				oversteerMediumThreshold = atoi(argv[7]);
+				oversteerHeavyThreshold = atoi(argv[8]);
+				lowspeedThreshold = atoi(argv[9]);
+				wheelbase = atoi(argv[10]);
+				trackWidth = atoi(argv[11]);
+			}
 		}
 		else if (positionTrigger) {
 			for (int i = 2; i < (argc - 1); i = i + 2) {
@@ -1130,7 +1189,7 @@ int main(int argc, char* argv[])
 			if (analyzeTelemetry) {
 				if (collectTelemetry()) {
 					if (remainder(counter, 20) == 0)
-						writeTelemetry();
+						writeTelemetry(calibrateTelemetry);
 				}
 				else
 					break;

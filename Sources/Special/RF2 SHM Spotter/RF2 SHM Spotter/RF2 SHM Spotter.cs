@@ -709,11 +709,41 @@ namespace RF2SHMSpotter {
             }
         }
 
-        List<double> recentSteerAngles = new List<double>();
-        const int numRecentSteerAngles = 6;
+        const int MAXVALUES = 6;
 
-        List<double> recentGLongs = new List<double>();
-        const int numRecentGLongs = 6;
+        List<float> recentSteerAngles = new List<float>();
+        List<float> recentGLongs = new List<float>();
+        List<float> recentIdealAngVels = new List<float>();
+        List<float> recentRealAngVels = new List<float>();
+
+        void pushValue(List<float> values, float value)
+        {
+            values.Add(value);
+
+            if ((int)values.Count > MAXVALUES)
+                values.RemoveAt(0);
+        }
+
+        float averageValue(List<float> values, ref int num)
+        {
+            float sum = 0.0f;
+
+            foreach (float value in values)
+                sum += value;
+
+            num = values.Count;
+
+            return (num > 0) ? sum / num : 0.0f;
+        }
+
+        float smoothValue(List<float> values, float value)
+        {
+            int ignore = 0;
+
+            pushValue(values, value);
+
+            return averageValue(values, ref ignore);
+        }
 
         List<CornerDynamics> cornerDynamicsList = new List<CornerDynamics>();
 
@@ -731,7 +761,9 @@ namespace RF2SHMSpotter {
         int trackWidth = 150;
 
         int lastCompletedLaps = 0;
-        double lastSpeed = 0.0;
+        float lastSpeed = 0.0f;
+		
+		bool calibrate = false;
 
 		bool collectTelemetry()
 		{
@@ -750,77 +782,61 @@ namespace RF2SHMSpotter {
             if (extended.mSessionStarted == 0 || scoring.mScoringInfo.mGamePhase >= (byte)SessionStopped && playerScoring.mPitState >= (byte)Entering)
                 return true;
 
-			double steerAngle = telemetry.mVehicles[carID].mFilteredSteering;
-
-            recentSteerAngles.Add(steerAngle);
-            if (recentSteerAngles.Count > numRecentSteerAngles)
-                recentSteerAngles.RemoveAt(0);
+			float steerAngle = smoothValue(recentSteerAngles, (float)telemetry.mVehicles[carID].mFilteredSteering);
 
             rF2Vec3 localVel = telemetry.mVehicles[carID].mLocalVel;
-            double speed = Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6;
-			double acceleration = speed - lastSpeed;
+            float speed = (float)Math.Sqrt(localVel.x * localVel.x + localVel.y * localVel.y + localVel.z * localVel.z) * 3.6f;
+			float acceleration = (float)speed - lastSpeed;
 
 			lastSpeed = speed;
 
-            recentGLongs.Add(acceleration);
-            if (recentGLongs.Count > numRecentGLongs)
-                recentGLongs.RemoveAt(0);
+            pushValue(recentGLongs, acceleration);
 
-            // Get the average recent GLong
-            float sumGLong = 0.0f;
-            int numGLong = 0;
-
-            foreach (float gLong in recentGLongs)
-            {
-                sumGLong += gLong;
-                numGLong++;
-
-            }
-
-            int phase = 0;
-            if (numGLong > 0)
-            {
-                float recentGLong = sumGLong / numGLong;
-                if (recentGLong < -0.2)
-                {
-                    // Braking
-                    phase = -1;
-                }
-                else if (recentGLong > 0.1)
-                {
-                    // Accelerating
-                    phase = 1;
-                }
-            }
-
+            double angularVelocity = smoothValue(recentRealAngVels, (float)telemetry.mVehicles[carID].mLocalRot.z);
+            double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
+            double steerAngleRadians = -steeredAngleDegs / 57.2958;
+            double wheelBaseMeter = (float)wheelbase / 10;
+            double radius = wheelBaseMeter / steerAngleRadians;
+            double perimeter = radius * PI * 2;
+            double perimeterSpeed = lastSpeed / 3.6;
+            double idealAngularVelocity = smoothValue(recentIdealAngVels, (float)(perimeterSpeed / perimeter * 2 * PI));
+            
 			if (Math.Abs(steerAngle) > 0.1 && lastSpeed > 60)
 			{
-				double angularVelocity = telemetry.mVehicles[carID].mLocalRot.z;
-				CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
+                // Get the average recent GLong
+                int numGLong = 0;
+                float glongAverage = averageValue(recentGLongs, ref numGLong);
+
+                int phase = 0;
+                if (numGLong > 0)
+                    if (glongAverage < -0.2)
+                    {
+                        // Braking
+                        phase = -1;
+                    }
+                    else if (glongAverage > 0.1)
+                    {
+                        // Accelerating
+                        phase = 1;
+                    }
+
+                CornerDynamics cd = new CornerDynamics(speed, 0, playerScoring.mTotalLaps, phase);
 
 				if (Math.Abs(angularVelocity * 57.2958) > 0.1)
 				{
-					double steeredAngleDegs = steerAngle * steerLock / 2.0f / steerRatio;
-                    double steerAngleRadians = -steeredAngleDegs / 57.2958;
-                    double wheelBaseMeter = (float)wheelbase / 10;
-                    double radius = wheelBaseMeter / steerAngleRadians;
+					double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
 
-                    double perimeter = radius * PI * 2;
-                    double perimeterSpeed = lastSpeed / 3.6;
-                    double idealAngularVelocity = perimeterSpeed / perimeter * 2 * PI;
-
-                    double slip = Math.Abs(idealAngularVelocity) - Math.Abs(angularVelocity);
-
-                    if (steerAngle > 0)
-                    {
-                        if (angularVelocity < idealAngularVelocity)
-                            slip *= -1;
-                    }
-                    else
-                    {
-                        if (angularVelocity > idealAngularVelocity)
-                            slip *= -1;
-                    }
+					if (false)
+						if (steerAngle > 0)
+						{
+							if (angularVelocity < idealAngularVelocity)
+								slip *= -1;
+						}
+						else
+						{
+							if (angularVelocity > idealAngularVelocity)
+								slip *= -1;
+						}
 
                     cd.Usos = slip * 57.2989 * 10;
 
@@ -876,176 +892,220 @@ namespace RF2SHMSpotter {
                 int[] fastMediumOSNum = { 0, 0, 0 };
                 int[] fastHeavyOSNum = { 0, 0, 0 };
                 int fastTotalNum = 0;
+		
+				int[] slowOSMin = { 0, 0, 0 };
+				int[] fastOSMin = { 0, 0, 0 };
+				int[] slowUSMax = { 0, 0, 0 };
+				int[] fastUSMax = { 0, 0, 0 };
 
                 foreach (CornerDynamics corner in cornerDynamicsList)
                 {
                     int phase = corner.Phase + 1;
 
-                    if (corner.Speed < lowspeedThreshold)
-                    {
-                        slowTotalNum++;
-                        if (corner.Usos < oversteerHeavyThreshold)
-                        {
-                            slowHeavyOSNum[phase]++;
-                        }
-                        else if (corner.Usos < oversteerMediumThreshold)
-                        {
-                            slowMediumOSNum[phase]++;
-                        }
-                        else if (corner.Usos < oversteerLightThreshold)
-                        {
-                            slowLightOSNum[phase]++;
-                        }
-                        else if (corner.Usos > understeerHeavyThreshold)
-                        {
-                            slowHeavyUSNum[phase]++;
-                        }
-                        else if (corner.Usos > understeerMediumThreshold)
-                        {
-                            slowMediumUSNum[phase]++;
-                        }
-                        else if (corner.Usos > understeerLightThreshold)
-                        {
-                            slowLightUSNum[phase]++;
-                        }
-                    }
-                    else
-                    {
-                        fastTotalNum++;
-                        if (corner.Usos < oversteerHeavyThreshold)
-                        {
-                            fastHeavyOSNum[phase]++;
-                        }
-                        else if (corner.Usos < oversteerMediumThreshold)
-                        {
-                            fastMediumOSNum[phase]++;
-                        }
-                        else if (corner.Usos < oversteerLightThreshold)
-                        {
-                            fastLightOSNum[phase]++;
-                        }
-                        else if (corner.Usos > understeerHeavyThreshold)
-                        {
-                            fastHeavyUSNum[phase]++;
-                        }
-                        else if (corner.Usos > understeerMediumThreshold)
-                        {
-                            fastMediumUSNum[phase]++;
-                        }
-                        else if (corner.Usos > understeerLightThreshold)
-                        {
-                            fastLightUSNum[phase]++;
-                        }
-                    }
+                    if (calibrate) {
+						if (corner.Speed < lowspeedThreshold) {
+							slowOSMin[phase] = Math.Min(slowOSMin[phase], (int)corner.Usos);
+							slowUSMax[phase] = Math.Max(slowUSMax[phase], (int)corner.Usos);
+						}
+						else {
+							fastOSMin[phase] = Math.Min(fastOSMin[phase], (int)corner.Usos);
+							fastUSMax[phase] = Math.Max(fastUSMax[phase], (int)corner.Usos);
+						}
+					}
+					else {
+						if (corner.Speed < lowspeedThreshold)
+						{
+							slowTotalNum++;
+							if (corner.Usos < oversteerHeavyThreshold)
+							{
+								slowHeavyOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerMediumThreshold)
+							{
+								slowMediumOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerLightThreshold)
+							{
+								slowLightOSNum[phase]++;
+							}
+							else if (corner.Usos > understeerHeavyThreshold)
+							{
+								slowHeavyUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerMediumThreshold)
+							{
+								slowMediumUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerLightThreshold)
+							{
+								slowLightUSNum[phase]++;
+							}
+						}
+						else
+						{
+							fastTotalNum++;
+							if (corner.Usos < oversteerHeavyThreshold)
+							{
+								fastHeavyOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerMediumThreshold)
+							{
+								fastMediumOSNum[phase]++;
+							}
+							else if (corner.Usos < oversteerLightThreshold)
+							{
+								fastLightOSNum[phase]++;
+							}
+							else if (corner.Usos > understeerHeavyThreshold)
+							{
+								fastHeavyUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerMediumThreshold)
+							{
+								fastMediumUSNum[phase]++;
+							}
+							else if (corner.Usos > understeerLightThreshold)
+							{
+								fastLightUSNum[phase]++;
+							}
+						}
+					}
                 }
 
-                output.WriteLine("[Understeer.Slow.Light]");
+                if (calibrate) {
+					output.WriteLine("[Understeer.Slow]");
 
-                if (slowTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * slowLightUSNum[0] / slowTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * slowLightUSNum[1] / slowTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * slowLightUSNum[2] / slowTotalNum));
-                }
+					output.WriteLine("Entry=" + slowUSMax[0]);
+					output.WriteLine("Apex=" + slowUSMax[1]);
+					output.WriteLine("Exit=" + slowUSMax[2]);
+					
+					output.WriteLine("[Understeer.Fast]");
 
-                output.WriteLine("[Understeer.Slow.Medium]");
+					output.WriteLine("Entry=" + fastUSMax[0]);
+					output.WriteLine("Apex=" + fastUSMax[1]);
+					output.WriteLine("Exit=" + fastUSMax[2]);
+					
+					output.WriteLine("[Oversteer.Slow]");
 
-                if (slowTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * slowMediumUSNum[0] / slowTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * slowMediumUSNum[1] / slowTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * slowMediumUSNum[2] / slowTotalNum));
-                }
+					output.WriteLine("Entry=" + slowOSMin[0]);
+					output.WriteLine("Apex=" + slowOSMin[1]);
+					output.WriteLine("Exit=" + slowOSMin[2]);
+					
+					output.WriteLine("[Oversteer.Fast]");
 
-                output.WriteLine("[Understeer.Slow.Heavy]");
+					output.WriteLine("Entry=" + fastOSMin[0]);
+					output.WriteLine("Apex=" + fastOSMin[1]);
+					output.WriteLine("Exit=" + fastOSMin[2]);
+				}
+				else {
+					output.WriteLine("[Understeer.Slow.Light]");
 
-                if (slowTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * slowHeavyUSNum[0] / slowTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * slowHeavyUSNum[1] / slowTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * slowHeavyUSNum[2] / slowTotalNum));
-                }
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowLightUSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowLightUSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowLightUSNum[2] / slowTotalNum));
+					}
 
-                output.WriteLine("[Understeer.Fast.Light]");
+					output.WriteLine("[Understeer.Slow.Medium]");
 
-                if (fastTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * fastLightUSNum[0] / fastTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * fastLightUSNum[1] / fastTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * fastLightUSNum[2] / fastTotalNum));
-                }
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowMediumUSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowMediumUSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowMediumUSNum[2] / slowTotalNum));
+					}
 
-                output.WriteLine("[Understeer.Fast.Medium]");
+					output.WriteLine("[Understeer.Slow.Heavy]");
 
-                if (fastTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * fastMediumUSNum[0] / fastTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * fastMediumUSNum[1] / fastTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * fastMediumUSNum[2] / fastTotalNum));
-                }
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowHeavyUSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowHeavyUSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowHeavyUSNum[2] / slowTotalNum));
+					}
 
-                output.WriteLine("[Understeer.Fast.Heavy]");
+					output.WriteLine("[Understeer.Fast.Light]");
 
-                if (fastTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * fastHeavyUSNum[0] / fastTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * fastHeavyUSNum[1] / fastTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * fastHeavyUSNum[2] / fastTotalNum));
-                }
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastLightUSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastLightUSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastLightUSNum[2] / fastTotalNum));
+					}
 
-                output.WriteLine("[Oversteer.Slow.Light]");
+					output.WriteLine("[Understeer.Fast.Medium]");
 
-                if (slowTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * slowLightOSNum[0] / slowTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * slowLightOSNum[1] / slowTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * slowLightOSNum[2] / slowTotalNum));
-                }
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastMediumUSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastMediumUSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastMediumUSNum[2] / fastTotalNum));
+					}
 
-                output.WriteLine("[Oversteer.Slow.Medium]");
+					output.WriteLine("[Understeer.Fast.Heavy]");
 
-                if (slowTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * slowMediumOSNum[0] / slowTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * slowMediumOSNum[1] / slowTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * slowMediumOSNum[2] / slowTotalNum));
-                }
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastHeavyUSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastHeavyUSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastHeavyUSNum[2] / fastTotalNum));
+					}
 
-                output.WriteLine("[Oversteer.Slow.Heavy]");
+					output.WriteLine("[Oversteer.Slow.Light]");
 
-                if (slowTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * slowHeavyOSNum[0] / slowTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * slowHeavyOSNum[1] / slowTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * slowHeavyOSNum[2] / slowTotalNum));
-                }
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowLightOSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowLightOSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowLightOSNum[2] / slowTotalNum));
+					}
 
-                output.WriteLine("[Oversteer.Fast.Light]");
+					output.WriteLine("[Oversteer.Slow.Medium]");
 
-                if (fastTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * fastLightOSNum[0] / fastTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * fastLightOSNum[1] / fastTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * fastLightOSNum[2] / fastTotalNum));
-                }
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowMediumOSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowMediumOSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowMediumOSNum[2] / slowTotalNum));
+					}
 
-                output.WriteLine("[Oversteer.Fast.Medium]");
+					output.WriteLine("[Oversteer.Slow.Heavy]");
 
-                if (fastTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * fastMediumOSNum[0] / fastTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * fastMediumOSNum[1] / fastTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * fastMediumOSNum[2] / fastTotalNum));
-                }
+					if (slowTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * slowHeavyOSNum[0] / slowTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * slowHeavyOSNum[1] / slowTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * slowHeavyOSNum[2] / slowTotalNum));
+					}
 
-                output.WriteLine("[Oversteer.Fast.Heavy]");
+					output.WriteLine("[Oversteer.Fast.Light]");
 
-                if (fastTotalNum > 0)
-                {
-                    output.WriteLine("Entry=" + (int)(100.0f * fastHeavyOSNum[0] / fastTotalNum));
-                    output.WriteLine("Apex=" + (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
-                    output.WriteLine("Exit=" + (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
-                }
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastLightOSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastLightOSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastLightOSNum[2] / fastTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Fast.Medium]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastMediumOSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastMediumOSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastMediumOSNum[2] / fastTotalNum));
+					}
+
+					output.WriteLine("[Oversteer.Fast.Heavy]");
+
+					if (fastTotalNum > 0)
+					{
+						output.WriteLine("Entry=" + (int)(100.0f * fastHeavyOSNum[0] / fastTotalNum));
+						output.WriteLine("Apex=" + (int)(100.0f * fastHeavyOSNum[1] / fastTotalNum));
+						output.WriteLine("Exit=" + (int)(100.0f * fastHeavyOSNum[2] / fastTotalNum));
+					}
+				}
 
                 output.Close();
 
@@ -1178,21 +1238,32 @@ namespace RF2SHMSpotter {
 			}
         }
 
-        public void initializeAnalyzer(string[] args)
+        public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
         {
             dataFile = args[1];
-
-            understeerLightThreshold = int.Parse(args[2]);
-            understeerMediumThreshold = int.Parse(args[3]);
-            understeerHeavyThreshold = int.Parse(args[4]);
-            oversteerLightThreshold = int.Parse(args[5]);
-            oversteerMediumThreshold = int.Parse(args[6]);
-            oversteerHeavyThreshold = int.Parse(args[7]);
-            lowspeedThreshold = int.Parse(args[8]);
-            steerLock = int.Parse(args[9]);
-            steerRatio = int.Parse(args[10]);
-            wheelbase = int.Parse(args[11]);
-            trackWidth = int.Parse(args[12]);
+			
+			calibrate = calibrateTelemetry;
+			
+			if (calibrate) {
+				lowspeedThreshold = int.Parse(args[2]);
+				steerLock = int.Parse(args[3]);
+				steerRatio = int.Parse(args[4]);
+				wheelbase = int.Parse(args[5]);
+				trackWidth = int.Parse(args[6]);
+			}
+			else {
+				understeerLightThreshold = int.Parse(args[2]);
+				understeerMediumThreshold = int.Parse(args[3]);
+				understeerHeavyThreshold = int.Parse(args[4]);
+				oversteerLightThreshold = int.Parse(args[5]);
+				oversteerMediumThreshold = int.Parse(args[6]);
+				oversteerHeavyThreshold = int.Parse(args[7]);
+				lowspeedThreshold = int.Parse(args[8]);
+				steerLock = int.Parse(args[9]);
+				steerRatio = int.Parse(args[10]);
+				wheelbase = int.Parse(args[11]);
+				trackWidth = int.Parse(args[12]);
+			}
         }
 
         public void Run(bool mapTrack, bool positionTrigger, bool analyzeTelemetry) {

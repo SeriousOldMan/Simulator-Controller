@@ -34,9 +34,10 @@ global kMaxThreshold := 180
 
 class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	iCar := false
+	iTrack := false
 
 	iUndersteerThresholds := [40, 70, 100]
-	iOversteerThresholds := [-20, -30, -40]
+	iOversteerThresholds := [-40, -70, -100]
 	iLowspeedThreshold := 120
 
 	iSteerLock := 900
@@ -50,6 +51,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	Car[] {
 		Get {
 			return this.iCar
+		}
+	}
+
+	Track[] {
+		Get {
+			return this.iTrack
 		}
 	}
 
@@ -157,27 +164,26 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	__New(advisor, simulator) {
 		local selectedCar := advisor.SelectedCar[false]
+		local selectedTrack := advisor.SelectedTrack[false]
+		local defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
+		local defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
+		local defaultLowspeedThreshold := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
-		local defaultOversteerThresholds, defaultUndersteerThresholds, defaultLowspeedThreshold
 
 		simulator := new SessionDatabase().getSimulatorName(simulator)
 
 		if (selectedCar == true)
 			selectedCar := false
 
-		defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
-		defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-20,-30,-40")
-		defaultLowspeedThreshold := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", "120")
+		if (selectedTrack == true)
+			selectedTrack := false
 
 		this.iCar := selectedCar
 
-		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-
-		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".")
-
-		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", 900)
-		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", 270)
-		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", 150)
+		this.iSteerLock := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerLock", 900)
+		this.iSteerRatio := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerRatio", 12)
+		this.iWheelbase := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "Wheelbase", 270)
+		this.iTrackWidth := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
 
 		if selectedCar {
 			fileName := getFileName("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
@@ -185,9 +191,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			if FileExist(fileName) {
 				configuration := readConfiguration(fileName)
 
-				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.iSteerLock)
-				this.iWheelbase := getConfigurationValue(configuration, "Setup.General", "Wheelbase", this.iWheelbase)
-				this.iTrackWidth := getConfigurationValue(configuration, "Setup.General", "TrackWidth", this.iTrackWidth)
+				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.SteerLock)
+				this.iSteerRatio := getConfigurationValue(configuration, "Setup.General", "SteerRatio", this.SteerRatio)
+				this.iWheelbase := getConfigurationValue(configuration, "Setup.General", "Wheelbase", this.Wheelbase)
+				this.iTrackWidth := getConfigurationValue(configuration, "Setup.General", "TrackWidth", this.TrackWidth)
 
 				defaultUndersteerThresholds := getConfigurationValue(configuration, "Analyzer", "UndersteerThresholds", defaultUndersteerThresholds)
 				defaultOversteerThresholds := getConfigurationValue(configuration, "Analyzer", "OversteerThresholds", defaultOversteerThresholds)
@@ -195,12 +202,31 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			}
 		}
 
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".*.")
+
+		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+
+		defaultUndersteerThresholds := getConfigurationValue(settings, "Setup Advisor", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
+		defaultOversteerThresholds := getConfigurationValue(settings, "Setup Advisor", prefix . "OversteerThresholds", defaultOversteerThresholds)
+		defaultLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
+
+		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+
 		this.iUndersteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
 																					   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
 		this.iOversteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
 																					  , prefix . "OversteerThresholds", defaultOversteerThresholds))
 		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
-		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", 12)
 
 		base.__New(advisor, simulator)
 
@@ -284,20 +310,22 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	startTelemetryAnalyzer(dataFile) {
+	startTelemetryAnalyzer(dataFile, calibrate := false) {
 		local pid, options, code, message
 
 		this.stopTelemetryAnalyzer()
 
 		if !this.iAnalyzerPID {
 			try {
-				options := ("-Analyze """ . dataFile . """")
+				options := ((calibrate ? "-Calibrate """ : "-Analyze """) . dataFile . """")
 
-				if this.settingAvailable("UndersteerThresholds")
-					options .= (A_Space . values2String(A_Space, this.UndersteerThresholds*))
+				if !calibrate {
+					if this.settingAvailable("UndersteerThresholds")
+						options .= (A_Space . values2String(A_Space, this.UndersteerThresholds*))
 
-				if this.settingAvailable("OversteerThresholds")
-					options .= (A_Space . values2String(A_Space, this.OversteerThresholds*))
+					if this.settingAvailable("OversteerThresholds")
+						options .= (A_Space . values2String(A_Space, this.OversteerThresholds*))
+				}
 
 				if this.settingAvailable("LowspeedThreshold")
 					options .= (A_Space . this.LowspeedThreshold)
@@ -366,7 +394,8 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 setAnalyzerSetting(analyzer, key, value) {
 	local car := analyzer.Car
-	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . ".")
+	local track := analyzer.Track
+	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . "." . (track ? track : "*") . ".")
 	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
 	setConfigurationValue(settings, "Setup Advisor", prefix . key, value)
@@ -377,8 +406,10 @@ setAnalyzerSetting(analyzer, key, value) {
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	local window, aWindow, x, y, ignore, widget, advisor, row, include
 	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
+	local calibration
 
 	static activateButton
+	static calibrateButton
 
 	static steerLockEdit
 	static steerRatioEdit
@@ -446,7 +477,36 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				}
 			}
 	}
-	else if (commandOrAnalyzer == "UpdateSlider") {
+	else if (commandOrAnalyzer == "Calibrate") {
+		Gui TAN:+Disabled
+		Gui CAN:+OwnerTAN
+
+		try {
+			calibration := runCalibrator(analyzer)
+
+			if calibration {
+				analyzer.UnderSteerThresholds := calibration[1]
+				analyzer.OverSteerThresholds := calibration[2]
+
+				Gui TAN:Default
+
+				GuiControl, , heavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
+				GuiControl, , heavyOversteerThresholdEdit, % analyzer.OversteerThresholds[3]
+				GuiControl, , mediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
+				GuiControl, , mediumOversteerThresholdEdit, % analyzer.OversteerThresholds[2]
+				GuiControl, , lightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
+				GuiControl, , lightOversteerThresholdEdit, % analyzer.OversteerThresholds[1]
+				GuiControl, , lightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
+				GuiControl, , lightUndersteerThresholdEdit, % analyzer.UndersteerThresholds[1]
+				GuiControl, , mediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
+				GuiControl, , mediumUndersteerThresholdEdit, % analyzer.UndersteerThresholds[2]
+				GuiControl, , heavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
+				GuiControl, , heavyUndersteerThresholdEdit, % analyzer.UndersteerThresholds[3]
+			}
+		}
+		finally {
+			Gui TAN:-Disabled
+		}
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
 		GuiControlGet steerLockEdit
@@ -460,6 +520,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		GuiControlGet heavyUndersteerThresholdSlider
 		GuiControlGet mediumUndersteerThresholdSlider
 		GuiControlGet lightUndersteerThresholdSlider
+
+		GuiControl Disable, calibrateButton
 
 		if analyzer.settingAvailable("SteerLock")
 			analyzer.SteerLock := steerLockEdit
@@ -706,28 +768,28 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget10 vheavyOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[3]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget21 vheavyOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget10 vheavyOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[3]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget21 vheavyOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[3]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget12 vmediumOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[2]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget22 vmediumOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget12 vmediumOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[2]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget22 vmediumOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget14 vlightOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[1]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget23 vlightOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget14 vlightOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[1]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget23 vlightOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget16 vlightUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[1]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget24 vlightUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget16 vlightUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[1]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget24 vlightUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[1]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[2]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget25 vmediumUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[2]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget25 vmediumUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[2]
 
 		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w137 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[3]
-		Gui %window%:Add, Edit, x298 yp w30 +0x200 HWNDwidget26 vheavyUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[3]
+		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget26 vheavyUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[3]
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
 			GuiControl Disable, heavyOversteerThresholdSlider
@@ -774,8 +836,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 4
 			analyzeWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, Button, x92 ys+290 w80 h23 Default vactivateButton gactivateAnalyzer, % translate("Start")
-		Gui %window%:Add, Button, xp+100 yp w80 h23 gcancelAnalyzer, % translate("Cancel")
+		Gui %window%:Add, Button, x16 ys+290 w80 h23 vcalibrateButton gcalibrateAnalyzer, % translate("Calibrate...")
+		Gui %window%:Add, Button, x158 yp w80 h23 Default vactivateButton gactivateAnalyzer, % translate("Start")
+		Gui %window%:Add, Button, xp+98 yp w80 h23 gcancelAnalyzer, % translate("Cancel")
 
 		Gui %window%:+Owner%aWindow%
 		Gui %aWindow%:+Disabled
@@ -809,6 +872,167 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 }
 
+runCalibrator(commandOrAnalyzer) {
+	local lightOversteerThreshold := 0
+	local heavyOversteerThreshold := 0
+	local lightUndersteerThreshold := 0
+	local heavyUndersteerThreshold := 0
+	local mediumOversteerThreshold, mediumUndersteerThreshold
+	local window, x, y, ignore, type, speed, key, value, variable
+
+	static activateButton
+	static infoText
+
+	static result := false
+	static analyzer := false
+	static state := "Start"
+	static dataFile := false
+
+	static cleanValues := {}
+	static overValues := {}
+
+	if (commandOrAnalyzer == kCancel) {
+		analyzer.stopTelemetryAnalyzer()
+
+		result := kCancel
+	}
+	else if ((commandOrAnalyzer == "Activate") && (state = "Start")) {
+		GuiControl, , infoText, % translate("Drive at least two consecutive clean laps without under- or oversteering the car. Then press ""Next"".")
+		GuiControl, , activateButton, % translate("Next")
+
+		dataFile := temporaryFileName("Calibrator", "data")
+
+		state := "Clean"
+
+		analyzer.startTelemetryAnalyzer(dataFile, true)
+	}
+	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
+		analyzer.stopTelemetryAnalyzer()
+
+		cleanValues := readConfiguration(dataFile)
+
+		GuiControl, , infoText, % translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press ""Finish"".")
+		GuiControl, , activateButton, % translate("Finish")
+
+		state := "Push"
+
+		dataFile := temporaryFileName("Calibrator", "data")
+
+		analyzer.startTelemetryAnalyzer(dataFile, true)
+	}
+	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
+		analyzer.stopTelemetryAnalyzer()
+
+		overValues := readConfiguration(dataFile)
+
+		result := [cleanValues, overValues]
+	}
+	else {
+		analyzer := commandOrAnalyzer
+
+		state := "Start"
+		dataFile := false
+		result := false
+
+		cleanValues := {}
+		overValues := {}
+		window := "CAN"
+
+		Gui %window%:New
+
+		Gui %window%:Default
+
+		Gui %window%:-Border ; -Caption
+		Gui %window%:Color, D0D0D0, D8D8D8
+
+		Gui %window%:Font, s10 Bold, Arial
+
+		Gui %window%:Add, Text, w324 Center gmoveCalibrator, % translate("Modular Simulator Controller System")
+
+		Gui %window%:Font, s9 Norm, Arial
+		Gui %window%:Font, Italic Underline, Arial
+
+		Gui %window%:Add, Text, x78 YP+20 w184 cBlue Center gopenAnalyzerDocumentation, % translate("Telemetry Analyzer")
+
+		Gui %window%:Font, Norm s14, Arial
+
+		Gui %window%:Add, Text, x16 yp+30 w320 h140 Wrap vinfoText, % translate("Start a practice session and prepare for a run. Then press ""Start"".")
+
+		Gui %window%:Font, Norm s8, Arial
+
+		Gui %window%:Add, Button, x92 yp+145 w80 h23 Default vactivateButton gactivateCalibrator, % translate("Start")
+		Gui %window%:Add, Button, xp+100 yp w80 h23 gcancelCalibrator, % translate("Cancel")
+
+		try {
+			if getWindowPosition("Setup Advisor.Calibrator", x, y)
+				Gui %window%:Show, AutoSize x%x% y%y%
+			else
+				Gui %window%:Show, AutoSize Center
+
+			while !result
+				Sleep 100
+		}
+		finally {
+			; if dataFile
+			; 	deleteFile(dataFile)
+
+			analyzer.stopTelemetryAnalyzer()
+		}
+
+		Gui %window%:Destroy
+
+		if (result != kCancel) {
+			for ignore, type in ["Oversteer", "Understeer"] {
+				variable := ("light" . type . "Threshold")
+
+				for ignore, speed in ["Slow", "Fast"]
+					for ignore, key in ["Entry", "Apex", "Exit"] {
+						value := getConfigurationValue(result[1], type . "." . speed, key, kUndefined)
+
+						if (value && (value != kUndefined))
+							if (type = "Understeer")
+								%variable% := Max(%variable%, value)
+							else
+								%variable% := Min(%variable%, value)
+					}
+			}
+
+			for ignore, type in ["Oversteer", "Understeer"] {
+				variable := ("heavy" . type . "Threshold")
+
+				for ignore, speed in ["Slow", "Fast"]
+					for ignore, key in ["Entry", "Apex", "Exit"] {
+						value := getConfigurationValue(result[2], type . "." . speed, key, kUndefined)
+
+						if (value && (value != kUndefined))
+							if (type = "Understeer")
+								%variable% := Max(%variable%, value)
+							else
+								%variable% := Min(%variable%, value)
+					}
+			}
+
+			value := Max(lightOversteerThreshold, heavyOversteerThreshold, kMinThreshold)
+			heavyOversteerThreshold := Min(lightOversteerThreshold, heavyOversteerThreshold, 0)
+			lightOversteerThreshold := value
+
+			value := Min(lightUndersteerThreshold, heavyUndersteerThreshold, kMaxThreshold)
+			heavyUndersteerThreshold := Max(lightUndersteerThreshold, heavyUndersteerThreshold, 0)
+			lightUndersteerThreshold := value
+
+			heavyOversteerThreshold := Round(heavyOversteerThreshold * 0.9)
+			heavyUndersteerThreshold := Round(heavyUndersteerThreshold * 0.9)
+			mediumOversteerThreshold := Round(lightOversteerThreshold + (heavyOversteerThreshold - lightOversteerThreshold) / 2)
+			mediumUndersteerThreshold := Round(lightUndersteerThreshold + (heavyUndersteerThreshold - lightUndersteerThreshold) / 2)
+
+			return [[lightUndersteerThreshold, mediumUndersteerThreshold, heavyUndersteerThreshold]
+				  , [lightOversteerThreshold, mediumOversteerThreshold, heavyOversteerThreshold]]
+		}
+		else
+			return false
+	}
+}
+
 noSelect() {
 	loop % LV_GetCount()
 		LV_Modify(A_Index, "-Select")
@@ -826,6 +1050,10 @@ activateAnalyzer() {
 	runAnalyzer("Activate")
 }
 
+calibrateAnalyzer() {
+	runAnalyzer("Calibrate")
+}
+
 cancelAnalyzer() {
 	runAnalyzer(kCancel)
 }
@@ -840,4 +1068,16 @@ moveAnalyzer() {
 
 openAnalyzerDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer
+}
+
+moveCalibrator() {
+	moveByMouse("CAN", "Setup Advisor.Calibrator")
+}
+
+activateCalibrator() {
+	runCalibrator("Activate")
+}
+
+cancelCalibrator() {
+	runCalibrator(kCancel)
 }

@@ -304,7 +304,7 @@ A typical problem in team races is the different driving styles of the team memb
 
 You can enter as many setups here as you like for different weather conditions, temperatures and used tyre compounds. The more you have at your finger tips, the better are the chances that you can't be catched off guard by a sudden weather change. See the next section, how this data can be used to automatically adjust the tyre pressures, when planning an upcoming pitstop.
 
-Beside using the typical "+" and "-" buttons here to create and delete a tyre pressure setups, you can use the button with the copy symbol to clone the currently selected setup. And you can use the button with the database symbol to open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) to look up pressure information recorded in previous sessions.
+Beside using the typical "+" and "-" buttons here to create and delete a tyre pressure setups, you can use the button with the copy icon to clone the currently selected setup. Furthermore, you can use the button with the database icon to open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) to look up and load pressure information recorded in previous sessions.
 
 ### Planning a Pitstop
 

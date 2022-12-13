@@ -165,8 +165,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	__New(advisor, simulator) {
 		local selectedCar := advisor.SelectedCar[false]
 		local selectedTrack := advisor.SelectedTrack[false]
+		local defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
+		local defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
+		local defaultLowspeedThreshold := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
-		local defaultOversteerThresholds, defaultUndersteerThresholds, defaultLowspeedThreshold
 
 		simulator := new SessionDatabase().getSimulatorName(simulator)
 
@@ -176,25 +178,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		if (selectedTrack == true)
 			selectedTrack := false
 
-		defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
-		defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
-		defaultLowspeedThreshold := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", "120")
-
 		this.iCar := selectedCar
 
-		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-
-		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".*.")
-
-		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", 900)
-		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", 270)
-		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", 150)
-
-		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
-
-		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
-		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
-		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+		this.iSteerLock := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerLock", 900)
+		this.iSteerRatio := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerRatio", 12)
+		this.iWheelbase := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "Wheelbase", 270)
+		this.iTrackWidth := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
 
 		if selectedCar {
 			fileName := getFileName("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
@@ -202,9 +191,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			if FileExist(fileName) {
 				configuration := readConfiguration(fileName)
 
-				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.iSteerLock)
-				this.iWheelbase := getConfigurationValue(configuration, "Setup.General", "Wheelbase", this.iWheelbase)
-				this.iTrackWidth := getConfigurationValue(configuration, "Setup.General", "TrackWidth", this.iTrackWidth)
+				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.SteerLock)
+				this.iSteerRatio := getConfigurationValue(configuration, "Setup.General", "SteerRatio", this.SteerRatio)
+				this.iWheelbase := getConfigurationValue(configuration, "Setup.General", "Wheelbase", this.Wheelbase)
+				this.iTrackWidth := getConfigurationValue(configuration, "Setup.General", "TrackWidth", this.TrackWidth)
 
 				defaultUndersteerThresholds := getConfigurationValue(configuration, "Analyzer", "UndersteerThresholds", defaultUndersteerThresholds)
 				defaultOversteerThresholds := getConfigurationValue(configuration, "Analyzer", "OversteerThresholds", defaultOversteerThresholds)
@@ -212,12 +202,31 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			}
 		}
 
+		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".*.")
+
+		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+
+		defaultUndersteerThresholds := getConfigurationValue(settings, "Setup Advisor", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
+		defaultOversteerThresholds := getConfigurationValue(settings, "Setup Advisor", prefix . "OversteerThresholds", defaultOversteerThresholds)
+		defaultLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+
+		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
+
+		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+
 		this.iUndersteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
 																					   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
 		this.iOversteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
 																					  , prefix . "OversteerThresholds", defaultOversteerThresholds))
 		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
-		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", 12)
 
 		base.__New(advisor, simulator)
 

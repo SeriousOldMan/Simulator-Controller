@@ -1652,15 +1652,33 @@ updateInstallationForV392() {
 }
 
 updateConfigurationForV452() {
+	local tempValues := {}
 	local newValues := {}
-	local settings, key, value
+	local settings, key, value, found
 
 	updateConfigurationForV451()
 
 	settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 
 	for key, value in getConfigurationSectionValues(settings, "Setup Advisor", Object())
-		newValues[StrReplace(key, ".Unknown", ".*")] := value
+		tempValues[StrReplace(key, ".Unknown", ".*")] := value
+
+	for key, value in tempValues {
+		found := false
+
+		for ignore, subkey in [".LowspeedThreshold", ".OversteerThresholds", ".UndersteerThresholds"
+							 , ".SteerLock", ".SteerRatio", ".Wheelbase", ".TrackWidth"]
+			if InStr(key, subkey) {
+				newValues[StrReplace(key, subkey, ".*" . subkey)] := value
+
+				found := true
+
+				break
+			}
+
+		if !found
+			newValues[key] := value
+	}
 
 	setConfigurationSectionValues(settings, "Setup Advisor", newValues)
 

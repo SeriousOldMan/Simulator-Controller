@@ -1,9 +1,9 @@
 [Development]
 Version=4.5.2.0-dev
 Target=4.5.2.0-release
-Date=12/12/2022
+Date=12/13/2022
 Download=
-Changes=Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer, Optimized handling of tyre pressures for multiple drivers in the "Session Database", Support for tyre pressure meta data
+Changes=Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer, Optimized handling of tyre pressures for multiple drivers in the "Session Database", Support for tyre pressure meta data, Load tyre pressure setups in "Race Center" from the "Session Database"
 [Release]
 Version=4.5.1.0-release
 Date=12/09/2022

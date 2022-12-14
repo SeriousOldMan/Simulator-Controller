@@ -92,6 +92,7 @@
 ------
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#introduction)
   - [Describing Setup Issues](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#describing-setup-issues)
+    - [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer)
   - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#understanding-the-recommendations)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#how-it-works)
   - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups)

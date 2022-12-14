@@ -137,7 +137,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x3% yp+2 w%w3% h20 HWNDwidget24 Hidden, % translate("p. Lap")
 
 		Gui %window%:Add, Text, x%x0% ys+30 w160 h23 +0x200 Section HWNDwidget25 Hidden, % translate("Adjust Lap Time")
-		Gui %window%:Add, CheckBox, x%x1% yp w%w1% h23 VreAdjustLapTimeCheck HWNDwidget26 Hidden, % translate("for Start, Pitstop or imcomplete Laps (use from Settings)")
+		Gui %window%:Add, CheckBox, x%x1% yp w%w1% h23 VreAdjustLapTimeCheck HWNDwidget26 Hidden, % translate("for Start, Pitstop or incomplete Laps (use from Settings)")
 
 		Gui %window%:Add, Text, x%x0% ys+30 w120 h23 +0x200 Section HWNDwidget27 Hidden, % translate("Damage Analysis for")
 		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number VreDamageAnalysisLapsEdit HWNDwidget28 Hidden

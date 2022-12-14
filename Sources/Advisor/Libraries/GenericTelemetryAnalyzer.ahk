@@ -179,6 +179,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			selectedTrack := false
 
 		this.iCar := selectedCar
+		this.iTrack := selectedTrack
 
 		this.iSteerLock := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerLock", 900)
 		this.iSteerRatio := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerRatio", 12)
@@ -718,6 +719,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		Gui %window%:Add, Text, x16 yp+24 w130 h23 +0x200, % translate("Car")
 		Gui %window%:Add, Text, x158 yp w180 h23 +0x200, % (analyzer.Car ? analyzer.Car : translate("Unknown"))
+
+		if analyzer.Track {
+			Gui %window%:Add, Text, x16 yp+24 w130 h23 +0x200, % translate("Track")
+			Gui %window%:Add, Text, x158 yp w180 h23 +0x200, % new SessionDatabase().getTrackName(analyzer.Simulator, analyzer.Track)
+		}
 
 		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
 		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget2 vsteerLockEdit, % analyzer.SteerLock

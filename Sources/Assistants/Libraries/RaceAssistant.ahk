@@ -1111,6 +1111,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
+		local adjustedLapTime := false
 		local driver, driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
@@ -1189,8 +1190,11 @@ class RaceAssistant extends ConfigurationItem {
 		if ((lapNumber <= 2) && this.AdjustLapTime) {
 			settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 
-			if ((lapTime / settingsLapTime) > 1.2)
+			if ((lapTime / settingsLapTime) > 1.2) {
 				lapTime := settingsLapTime
+
+				adjustedLapTime := true
+			}
 		}
 
 		if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
@@ -1215,7 +1219,7 @@ class RaceAssistant extends ConfigurationItem {
 		values := {OverallTime: overallTime}
 
 		if (lapTime > 0) {
-			if ((lapNumber > 1) && lapValid)
+			if ((lapNumber > this.LearningLaps) && lapValid && !adjustedLapTime)
 				values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
 
 			this.updateDynamicValues(values)

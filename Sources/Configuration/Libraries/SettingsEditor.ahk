@@ -630,7 +630,7 @@ restartSettings:
 		if ((chosen == 0) && (simulators.Length() > 0))
 			chosen := 1
 
-		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartOption, % values2String("|", simulators*)
+		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartupOption, % values2String("|", simulators*)
 
 		if !fromSetup {
 			Gui SE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")

@@ -67,6 +67,14 @@ class TestRaceEngineer extends RaceEngineer {
 		this.updateConfigurationValues({Settings: settings})
 	}
 
+	createKnowledgeBase(facts) {
+		local knowledgeBase := base.createKnowledgeBase(facts)
+
+		; knowledgeBase.setFact("Session.Settings.Tyre.Pressure.Correction.Pressure", false)
+
+		return knowledgeBase
+	}
+
 	supportsPitstop() {
 		return true
 	}
@@ -85,6 +93,17 @@ class TestRaceEngineer extends RaceEngineer {
 
 		if isDebug()
 			showMessage("Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? " Bodywork" : "") . (newEngineDamage ? " Engine" : ""))
+
+		vSuspensionDamage := newSuspensionDamage
+		vBodyworkDamage := newBodyworkDamage
+		vEngineDamage := newEngineDamage
+	}
+
+	pressureLossWarning(tyre, lostPressure) {
+		base.pressureLossWarning(tyre, lostPressure)
+
+		if isDebug()
+			showMessage("Pressure loss warning for " . tyre . ": " . lostPressure)
 
 		vSuspensionDamage := newSuspensionDamage
 		vBodyworkDamage := newBodyworkDamage
@@ -911,9 +930,9 @@ setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknow
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	AHKUnit.AddTestClass(FuelReporting)
-	AHKUnit.AddTestClass(DamageReporting)
-	AHKUnit.AddTestClass(DamageAnalysis)
+	;~ AHKUnit.AddTestClass(FuelReporting)
+	;~ AHKUnit.AddTestClass(DamageReporting)
+	;~ AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

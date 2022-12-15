@@ -863,8 +863,8 @@ restart:
 
 		tyrePressureDeviationEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2)
 		temperatureCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
-		setupPressureCompareCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", true)
-		pressureLossCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", true)
+		setupPressureCompareCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", false)
+		pressureLossCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", false)
 
 		tpDryFrontLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
 		tpDryFrontRightEdit:= getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)

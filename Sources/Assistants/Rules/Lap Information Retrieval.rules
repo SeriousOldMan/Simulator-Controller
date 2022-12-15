@@ -170,4 +170,4 @@ clearLap(?lap) <= Append(Lap., ?lap, .Driver.Forname, ?fact), fact?(?fact), !,
 clearLap(?)
 
 clearLap(?, []) <= !
-clearLap(?lap, [?name | ?names]) <= Append(Lap., ?lap, ., ?name, ?fact), Clear(?fact), clearLap(?lap, ?names)
+clearLap(?lap, [?name | ?names]) <= Clear(Lap, ?lap, ?name), clearLap(?lap, ?names)

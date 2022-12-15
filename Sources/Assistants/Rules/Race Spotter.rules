@@ -120,9 +120,7 @@ clearStandings(?lap) <= ?lap < 0, !
 clearStandings(?lap) <= clearStanding(?lap), ?pLap = ?lap - 1, clearStandings(?pLap)
 
 clearStanding(?lap) <= Append(Standings.Lap., ?lap, .Car.Count, ?fact), fact?(?fact), !, Get(?fact, ?carCount), Clear(?fact),
-					   Append(Standings.Lap., ?lap, .Time, ?timeFact), Clear(?timeFact),
-					   Append(Standings.Lap., ?lap, .Position, ?positionFact), Clear(?positionFact),
-					   Append(Standings.Lap., ?lap, .Weather, ?weatherFact), Clear(?weatherFact),
+					   Clear(Standings.Lap, ?lap, Time), Clear(Standings.Lap, ?lap, Position), Clear(Standings.Lap, ?lap, Weather),
 					   clearStanding(?lap, ?carCount), clearExtrapolatedLap(?lap, ?carCount)
 clearStanding(?)
 
@@ -133,7 +131,7 @@ clearStanding(?lap, ?car) <= clearStanding(?lap, ?car, [Nr, ID, Delta, Laps, Tim
 							 ?pCar = ?car - 1, clearStanding(?lap, ?pCar)
 
 clearStanding(?, ?, []) <= !
-clearStanding(?lap, ?car, [?name | ?names]) <= Append(Standings.Lap., ?lap, .Car., ?car, ., ?name, ?fact), Clear(?fact),
+clearStanding(?lap, ?car, [?name | ?names]) <= Clear(Standings.Lap, ?lap, Car, ?car, ?name),
 											   clearStanding(?lap, ?car, ?names)
 
 

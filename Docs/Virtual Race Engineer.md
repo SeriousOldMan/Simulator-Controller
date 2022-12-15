@@ -194,7 +194,7 @@ Jona will give you a lot of information about fuel level, damages after an accid
 
 	[Please] No more *warning* [please]
 
-As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "weather warnings" (when the Assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *warning* are: "fuel warnings", "damage warnings", "damage analysis", "pressure warnings" and "weather warnings" (when the Assistant Cato is active, it will take the duty for weather warnings). After you have disabled one of the warnings (all are enabled by default), you can reenable it with the following command:
 
 	[Please] Give me *warning* [please]
 

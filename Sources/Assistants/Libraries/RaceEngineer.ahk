@@ -1000,9 +1000,9 @@ class RaceEngineer extends RaceAssistant {
 					  , "Session.Settings.Tyre.Pressure.Correction.Temperature": getConfigurationValue(settings, "Session Settings"
 																									 , "Tyre.Pressure.Correction.Temperature", true)
 					  , "Session.Settings.Tyre.Pressure.Correction.Setup": getConfigurationValue(settings, "Session Settings"
-																							   , "Tyre.Pressure.Correction.Setup", true)
+																							   , "Tyre.Pressure.Correction.Setup", false)
 					  , "Session.Settings.Tyre.Pressure.Correction.Pressure": getConfigurationValue(settings, "Session Settings"
-																								  , "Tyre.Pressure.Correction.Pressure", true)
+																								  , "Tyre.Pressure.Correction.Pressure", false)
 					  , "Session.Settings.Tyre.Dry.Pressure.Target.FL": getDeprecatedConfigurationValue(settings, "Session Settings"
 																									  , "Race Settings"
 																									  , "Tyre.Dry.Pressure.Target.FL", 27.7)
@@ -1522,7 +1522,7 @@ class RaceEngineer extends RaceAssistant {
 		local plannedLap := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
-		local temperatureDelta, debug, tyre, fact, lostPressure
+		local temperatureDelta, debug, tyre, tyreType, lostPressure
 
 		if (optionsOrLap != true)
 			if optionsOrLap is Number
@@ -1708,14 +1708,11 @@ class RaceEngineer extends RaceAssistant {
 										   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
 					}
 
-					for tyre, fact in {FrontLeft: "Pitstop.Planned.Tyre.Pressure.Lost.Front.Left"
-									 , FrontRight: "Pitstop.Planned.Tyre.Pressure.Lost.Front.Right"
-									 , RearLeft: "Pitstop.Planned.Tyre.Pressure.Lost.Rear.Left"
-									 , RearRight: "Pitstop.Planned.Tyre.Pressure.Lost.Rear.Right"} {
-						lostPressure := knowledgeBase.getValue(fact, false)
+					for tyre, tyreType in {FrontLeft: "FL", FrontRight: "FR", RearLeft: "RL", RearRight: "RR"} {
+						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
 
 						if lostPressure
-							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre], lost: lostPressure, unit: fragments["PSI"]})
+							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre], lost: Round(lostPressure, 1), unit: fragments["PSI"]})
 					}
 				}
 
@@ -2121,7 +2118,8 @@ class RaceEngineer extends RaceAssistant {
 			speaker := this.getSpeaker()
 			fragments := speaker.Fragments
 
-			speaker.speakPhrase("PressureLoss", {tyre: fragments[tyre], lost: lostPressure, unit: fragments["PSI"]})
+			speaker.speakPhrase("PressureLoss", {tyre: fragments[{FL: "FrontLeft", FR: "FrontRight", RL: "RearLeft", RR: "RearRight"}[tyre]]
+											   , lost: Round(lostPressure, 1), unit: fragments["PSI"]})
 		}
 	}
 

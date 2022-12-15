@@ -8,7 +8,7 @@
   7. Ideal tyre pressures are now supported for dry and wet tyres in the car specific meta data. If this information is present, it is used rather and will supersede the information entered in "Race Settings". You may however still overwrite it in the "Session Database".
   8. Tyre pressure setups can [now be initialized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) from data in the "Session Database" in "Race Center".
   9. Fixed a rare situation, where lap times are reported way too low during the first laps.
-  10. Tons of internal code tweaks.
+  10. Updated *RaceRoom Racing Experience* meta data to the latest version.
   11. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - BMW M3 GT2

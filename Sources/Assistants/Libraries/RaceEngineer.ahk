@@ -2239,6 +2239,12 @@ reportDamageAnalysis(context, repair, stintLaps, delta) {
 	return true
 }
 
+pressureLossWarning(context, tyre, lostPressure) {
+	context.KnowledgeBase.RaceAssistant.pressureLossWarning(tyre, lostPressure)
+
+	return true
+}
+
 weatherChangeNotification(context, change, minutes) {
 	context.KnowledgeBase.RaceAssistant.weatherChangeNotification(change, minutes)
 

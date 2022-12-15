@@ -70,7 +70,7 @@ class TestRaceEngineer extends RaceEngineer {
 	createKnowledgeBase(facts) {
 		local knowledgeBase := base.createKnowledgeBase(facts)
 
-		; knowledgeBase.setFact("Session.Settings.Tyre.Pressure.Correction.Pressure", false)
+		knowledgeBase.setFact("Session.Settings.Tyre.Pressure.Correction.Pressure", true)
 
 		return knowledgeBase
 	}
@@ -104,10 +104,6 @@ class TestRaceEngineer extends RaceEngineer {
 
 		if isDebug()
 			showMessage("Pressure loss warning for " . tyre . ": " . lostPressure)
-
-		vSuspensionDamage := newSuspensionDamage
-		vBodyworkDamage := newBodyworkDamage
-		vEngineDamage := newEngineDamage
 	}
 
 	reportDamageAnalysis(repair, stintLaps, delta) {
@@ -930,9 +926,9 @@ setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknow
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(FuelReporting)
-	;~ AHKUnit.AddTestClass(DamageReporting)
-	;~ AHKUnit.AddTestClass(DamageAnalysis)
+	AHKUnit.AddTestClass(FuelReporting)
+	AHKUnit.AddTestClass(DamageReporting)
+	AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

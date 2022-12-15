@@ -5,7 +5,7 @@ FuelRemaining=3.89206
 RoadTemperature=31.814
 SuspensionDamage=1.2, 1.9, 0, 0
 TyreCompound=Dry
-TyrePressure=27.0268, 27.3407, 27.1353, 27.5696
+TyrePressure=27.0268, 27.3407, 27.1353, 26.5696
 TyreTemperature=82.2605, 71.4664, 87.193, 78.0173
 [Session Data]
 Car=mclaren_720s_gt3

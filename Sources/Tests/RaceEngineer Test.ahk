@@ -609,7 +609,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(26.7, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), "Unexpected tyre pressure target for FL...")
 		this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), "Unexpected tyre pressure target for FR...")
 		this.AssertEqual(26.6, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), "Unexpected tyre pressure target for RL...")
-		this.AssertEqual(26.1, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), "Unexpected tyre pressure target for RR...")
+		this.AssertEqual(26.0, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), "Unexpected tyre pressure target for RR...")
 
 		this.AssertEqual(false, vCompletedActions.HasKey("pitstopPrepared"), "Unexpected pitstop action pitstopPrepared reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("pitstopFinished"), "Unexpected pitstop action pitstopFinished reported...")
@@ -658,7 +658,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(26.6, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1), "Unexpected tyre pressure target for FL...")
 		this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1), "Unexpected tyre pressure target for FR...")
 		this.AssertEqual(26.6, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1), "Unexpected tyre pressure target for RL...")
-		this.AssertEqual(26.1, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), "Unexpected tyre pressure target for RR...")
+		this.AssertEqual(26.3, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1), "Unexpected tyre pressure target for RR...")
 
 		this.AssertEqual(false, vCompletedActions.HasKey("pitstopPrepared"), "Unexpected pitstop action pitstopPrepared reported...")
 		this.AssertEqual(false, vCompletedActions.HasKey("pitstopFinished"), "Unexpected pitstop action pitstopFinished reported...")
@@ -779,7 +779,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vPitstopRepairBodywork, "Expected bodywork repair...")
 		this.AssertEqual(false, vPitstopRepairEngine, "Expected no engine repair...")
 
-		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.3, 26.6, 26.1]), "Unexpected tyre pressures...")
+		this.AssertEqual(true, this.equalLists(vPitstopTyrePressures, [26.6, 26.3, 26.6, 26.3]), "Unexpected tyre pressures...")
 
 		engineer.finishSession(false)
 	}
@@ -822,7 +822,7 @@ class PitstopHandling extends Assert {
 					this.AssertEqual(26.7, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FL"), 1), "Pitstop tyre pressure FL not in history memory...")
 					this.AssertEqual(26.4, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.FR"), 1), "Pitstop tyre pressure FR not in history memory...")
 					this.AssertEqual(26.6, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RL"), 1), "Pitstop tyre pressure RL not in history memory...")
-					this.AssertEqual(26.1, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
+					this.AssertEqual(26.0, Round(engineer.KnowledgeBase.getValue("Pitstop.1.Tyre.Pressure.RR"), 1), "Pitstop tyre pressure RR not in history memory...")
 
 					engineer.planPitstop()
 
@@ -926,9 +926,9 @@ setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknow
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	AHKUnit.AddTestClass(FuelReporting)
-	AHKUnit.AddTestClass(DamageReporting)
-	AHKUnit.AddTestClass(DamageAnalysis)
+	;~ AHKUnit.AddTestClass(FuelReporting)
+	;~ AHKUnit.AddTestClass(DamageReporting)
+	;~ AHKUnit.AddTestClass(DamageAnalysis)
 	AHKUnit.AddTestClass(PitstopHandling)
 
 	AHKUnit.Run()

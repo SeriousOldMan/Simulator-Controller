@@ -701,7 +701,7 @@ computePressureCorrections([], Pressure, [])
 computePressureCorrections([?tyreType | ?tyreTypes], Pressure, [?correction | ?corrections]) <=
 		Get(Tyre.Pressure.Loss, ?tyreType, ?temp), !, ?correction = ?temp * -1,
 		computePressureCorrections(?tyreTypes, Pressure, ?corrections)
-computePressureCorrections([? | ?tyreTypes], Pressure, [1 | ?corrections])
+computePressureCorrections([? | ?tyreTypes], Pressure, [0 | ?corrections]) <= computePressureCorrections(?tyreTypes, Pressure, ?corrections)
 
 priority: 20, {All: [?Pitstop.Plan = true], [?Tyre.Compound.Target],
 					[?Session.Settings.Tyre.Pressure.Correction.Setup = true]} => (Prove: updateTyrePressureTarget(!Lap, Setup))

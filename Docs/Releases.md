@@ -1,4 +1,4 @@
-## 4.5.2.1-release 12/16/22 (planned)
+## 4.5.2.1-release 12/16/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. *iRacing* is now supported for the telemetry analyzer of "Setup Advisor".

@@ -1260,7 +1260,7 @@ class RaceEngineer extends RaceAssistant {
 		local driverSurname := ""
 		local driverNickname := ""
 		local result, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor, prefix
-		local coldPressures, hotPressures, airTemperature, trackTemperature, weatherNow
+		local coldPressures, hotPressures, pressureLosses, airTemperature, trackTemperature, weatherNow
 
 		static lastLap := 0
 
@@ -1323,6 +1323,13 @@ class RaceEngineer extends RaceAssistant {
 													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RL"), 1)
 													 , Round(knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Pressure.RR"), 1))
 
+					prefix := "Tyre.Pressure.Loss."
+
+					pressureLosses := values2String(",", Round(knowledgeBase.getValue(prefix . "FL", 0), 1)
+													   , Round(knowledgeBase.getValue(prefix . "FR", 0), 1)
+													   , Round(knowledgeBase.getValue(prefix . "RL", 0), 1)
+													   , Round(knowledgeBase.getValue(prefix . "RR", 0), 1))
+
 					airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
 					trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
 
@@ -1339,7 +1346,7 @@ class RaceEngineer extends RaceAssistant {
 					this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
 										, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
 										, weatherNow, airTemperature, trackTemperature
-										, currentCompound, currentCompoundColor, coldPressures, hotPressures)
+										, currentCompound, currentCompoundColor, coldPressures, hotPressures, pressureLosses)
 				}
 			}
 		}

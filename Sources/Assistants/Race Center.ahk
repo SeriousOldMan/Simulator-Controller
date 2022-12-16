@@ -85,7 +85,9 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 										  , "Brake.Wear.Rear.Left", "Brake.Wear.Rear.Right",
 										  , "EngineDamage"
 										  , "Brake.Temperature.Average"
-										  , "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"]
+										  , "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
+										  , "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
+										  , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"]
 							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -104,6 +106,12 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 											 , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
 											 , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
 											 , "Notes"]}
+
+global kRCTyresSchemas = kTyresSchemas.Clone()
+
+kRCTyresSchemas["Tyres.Pressures"] := concatenate(kRCTyresSchemas["Tyres.Pressures"].Clone()
+												, ["Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
+												 , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"])
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -579,17 +587,17 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		__New(rCenter) {
-			this.iDatabase := new Database(rCenter.SessionDirectory, kTyresSchemas)
+			this.iDatabase := new Database(rCenter.SessionDirectory, kRCTyresSchemas)
 		}
 
-		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, flush := true) {
+		updatePressures(weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures, pressuresLosses, driver, flush) {
 			local tyres, types, typeIndex, tPressures, tyreIndex, pressure
 
 			if (!compoundColor || (compoundColor = ""))
 				compoundColor := "Black"
 
 			this.Database.add("Tyres.Pressures", {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-												, Compound: compound, "Compound.Color": compoundColor
+												, Compound: compound, "Compound.Color": compoundColor, Driver: driver
 												, "Tyre.Pressure.Cold.Front.Left": null(coldPressures[1])
 												, "Tyre.Pressure.Cold.Front.Right": null(coldPressures[2])
 												, "Tyre.Pressure.Cold.Rear.Left": null(coldPressures[3])
@@ -597,7 +605,11 @@ class RaceCenter extends ConfigurationItem {
 												, "Tyre.Pressure.Hot.Front.Left": null(hotPressures[1])
 												, "Tyre.Pressure.Hot.Front.Right": null(hotPressures[2])
 												, "Tyre.Pressure.Hot.Rear.Left": null(hotPressures[3])
-												, "Tyre.Pressure.Hot.Rear.Right": null(hotPressures[4])}
+												, "Tyre.Pressure.Hot.Rear.Right": null(hotPressures[4])
+												, "Tyre.Pressure.Loss.Front.Left": null(pressuresLosses[1])
+												, "Tyre.Pressure.Loss.Front.Right": null(pressuresLosses[2])
+												, "Tyre.Pressure.Loss.Rear.Left": null(pressuresLosses[3])
+												, "Tyre.Pressure.Loss.Rear.Right": null(pressuresLosses[4])}
 												, flush)
 
 			tyres := ["FL", "FR", "RL", "RR"]
@@ -606,11 +618,11 @@ class RaceCenter extends ConfigurationItem {
 			for typeIndex, tPressures in [coldPressures, hotPressures]
 				for tyreIndex, pressure in tPressures
 					this.updatePressure(weather, airTemperature, trackTemperature, compound, compoundColor
-									  , types[typeIndex], tyres[tyreIndex], pressure, 1, flush, false)
+									  , types[typeIndex], tyres[tyreIndex], pressure, 1, driver, flush)
 		}
 
 		updatePressure(weather, airTemperature, trackTemperature, compound, compoundColor
-					 , type, tyre, pressure, count := 1, flush := true) {
+					 , type, tyre, pressure, count, driver, flush) {
 			local rows
 
 			if (isNull(null(pressure)))
@@ -620,14 +632,14 @@ class RaceCenter extends ConfigurationItem {
 				compoundColor := "Black"
 
 			rows := this.Database.query("Tyres.Pressures.Distribution"
-									  , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+									  , {Where: {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature, Driver: driver
 											   , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure}})
 
 			if (rows.Length() > 0)
 				rows[1].Count := rows[1].Count + count
 			else
 				this.Database.add("Tyres.Pressures.Distribution"
-								, {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+								, {Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature, Driver: driver
 								 , Compound: compound, "Compound.Color": compoundColor, Type: type, Tyre: tyre, "Pressure": pressure, Count: count}, flush)
 		}
 	}
@@ -5383,7 +5395,7 @@ class RaceCenter extends ConfigurationItem {
 	syncTyrePressures(load := false) {
 		local lastLap, tyresTable, ignore, pressureData, pressureFL, pressureFR, pressureRL, pressureRR, tyres
 		local currentListView, row, session, pressuresDB, message, newData, lap, flush, driverID, tries
-		local lapPressures, coldPressures, hotPressures, pressuresTable
+		local lapPressures, coldPressures, hotPressures, pressuresLosses, pressuresTable
 
 		if load {
 			lastLap := this.LastLap
@@ -5498,7 +5510,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 				catch exception {
-					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-")
+					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-", "-,-,-,-")
 				}
 
 				lapPressures := string2Values(";", lapPressures)
@@ -5508,12 +5520,14 @@ class RaceCenter extends ConfigurationItem {
 
 				coldPressures := string2Values(",", lapPressures[9])
 				hotPressures := string2Values(",", lapPressures[10])
+				pressuresLosses := string2Values(",", lapPressures[11])
 
 				coldPressures := map(coldPressures, kNull)
 				hotPressures := map(hotPressures, kNull)
+				pressuresLosses := map(pressuresLosses, kNull)
 
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
-										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, flush, driverID)
+										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, pressuresLosses, driverID, flush)
 
 				currentListView := A_DefaultListView
 
@@ -7758,6 +7772,7 @@ class RaceCenter extends ConfigurationItem {
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right", "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+							, "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right", "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
 							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
 							, "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right", "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right"]
 
@@ -7788,6 +7803,7 @@ class RaceCenter extends ConfigurationItem {
 				y1Choices := ["Temperature.Air", "Temperature.Track", "Fuel.Remaining", "Tyre.Laps"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+							, "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right", "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
 							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
 							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
@@ -7810,6 +7826,7 @@ class RaceCenter extends ConfigurationItem {
 							, "Tyre.Pressure.Cold.Average", "Tyre.Pressure.Cold.Front.Average", "Tyre.Pressure.Cold.Rear.Average"
 							, "Tyre.Pressure.Hot.Average", "Tyre.Pressure.Hot.Front.Average", "Tyre.Pressure.Hot.Rear.Average"
 							, "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right", "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right"
+							, "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right", "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
 							, "Tyre.Temperature.Average", "Tyre.Temperature.Front.Average", "Tyre.Temperature.Rear.Average"
 							, "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right", "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
 							, "Tyre.Wear.Average", "Tyre.Wear.Front.Average", "Tyre.Wear.Rear.Average"
@@ -7955,6 +7972,7 @@ class RaceCenter extends ConfigurationItem {
 		local lastLap := this.LastLap
 		local pressuresTable, tyresTable, newLap, lap, lapData, pressures, tyres
 		local pressureFL, pressureFR, pressureRL, pressureRR
+		local pressureLossFL, pressureLossFR, pressureLossRL, pressureLossRR
 		local temperatureFL, temperatureFR, temperatureRL, temperatureRR
 		local wearFL, wearFR, wearRL, wearRR
 		local telemetry, brakeTemperatures, ignore, field, brakeWears
@@ -8026,6 +8044,16 @@ class RaceCenter extends ConfigurationItem {
 				lapData["Tyre.Pressure.Hot.Average"] := null(average([pressureFL, pressureFR, pressureRL, pressureRR]))
 				lapData["Tyre.Pressure.Hot.Front.Average"] := null(average([pressureFL, pressureFR]))
 				lapData["Tyre.Pressure.Hot.Rear.Average"] := null(average([pressureRL, pressureRR]))
+
+				pressureLossFL := pressures["Tyre.Pressure.Loss.Front.Left"]
+				pressureLossFR := pressures["Tyre.Pressure.Loss.Front.Right"]
+				pressureLossRL := pressures["Tyre.Pressure.Loss.Rear.Left"]
+				pressureLossRR := pressures["Tyre.Pressure.Loss.Rear.Right"]
+
+				lapData["Tyre.Pressure.Loss.Front.Left"] := null(pressureLossFL)
+				lapData["Tyre.Pressure.Loss.Front.Right"] := null(pressureLossFR)
+				lapData["Tyre.Pressure.Loss.Rear.Left"] := null(pressureLossRL)
+				lapData["Tyre.Pressure.Loss.Rear.Right"] := null(pressureLossRR)
 
 				tyres := tyresTable[newLap]
 
@@ -8571,7 +8599,7 @@ class RaceCenter extends ConfigurationItem {
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
 		local pressuresDB := this.PressuresDatabase
-		local pressuresTable, pressures, coldPressures, hotPressures, tyresTable, tyres
+		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
 
 		if pressuresDB {
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
@@ -8584,6 +8612,9 @@ class RaceCenter extends ConfigurationItem {
 
 				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
 												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
+
+				pressuresLosses := values2String(", ", displayValue(pressures["Tyre.Pressure.Loss.Front.Left"]), displayValue(pressures["Tyre.Pressure.Loss.Front.Right"])
+												     , displayValue(pressures["Tyre.Pressure.Loss.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Loss.Rear.Right"]))
 
 				if (hotPressures = "-, -, -, -") {
 					tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
@@ -8607,6 +8638,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . lap.AirTemperature . ", " . lap.TrackTemperature . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (cold):") . "</b></td><td>" . coldPressures . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Pressures (loss):") . "</b></td><td>" . pressuresLosses . "</td></tr>")
 		html .= "</table>"
 
 		return html

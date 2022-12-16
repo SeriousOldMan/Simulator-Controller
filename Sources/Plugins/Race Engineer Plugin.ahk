@@ -27,7 +27,7 @@ global kRaceEngineerPlugin := "Race Engineer"
 
 class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
-										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot"]}
+										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot", "Pressures.Losses"]}
 
 	iPitstopPending := false
 
@@ -320,17 +320,18 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-				   , compound, compoundColor, coldPressures, hotPressures) {
+				   , compound, compoundColor, coldPressures, hotPressures, pressureLosses) {
 		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Pressures"
-								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures))
+								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+													, coldPressures, hotPressures, pressuresLosses))
 		else
 			this.LapDatabase.add("Pressures", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , "Compound": compound, "Compound.Color": compoundColor
-											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures})
+											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures, "Pressures.Losses": pressureLosses})
 	}
 
 	updateTyresDatabase() {
@@ -339,6 +340,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local session := this.TeamSession
 		local first := true
 		local stint, lastStint, newStint, driverID, lapPressures, ignore, lapData
+		local coldPressures, pressureLosses
 
 		try {
 			if (teamServer && teamServer.Active && session) {
@@ -372,9 +374,14 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 							tyresDB.lock(lapPressures[1], lapPressures[2], lapPressures[3])
 						}
 
+						coldPressures := string2Values(",", lapPressures[9])
+						pressureLosses := string2Values(",", lapPressures[11])
+
+						loop 4
+							coldPressures[A_Index] -= pressureLosses[A_Index]
+
 						tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
-											  , lapPressures[7], lapPressures[8], string2Values(",", lapPressures[9])
-											  , string2Values(",", lapPressures[10]), false, driverID)
+											  , lapPressures[7], lapPressures[8], coldPressures, string2Values(",", lapPressures[10]), false, driverID)
 					}
 					catch exception {
 						logError(exception)
@@ -391,10 +398,16 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 							tyresDB.lock(lapData.Simulator, lapData.Car, lapData.Track)
 						}
 
+						coldPressures := string2Values(",", lapData["Pressures.Cold"])
+						pressureLosses := string2Values(",", lapData["Pressures.Losses"])
+
+						loop 4
+							coldPressures[A_Index] -= pressureLosses[A_Index]
+
 						tyresDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather
 											  , lapData["Temperature.Air"], lapData["Temperature.Track"]
 											  , lapData.Compound, lapData["Compound.Color"]
-											  , string2Values(",", lapData["Pressures.Cold"]), string2Values(",", lapData["Pressures.Hot"]), false)
+											  , coldPressures, string2Values(",", lapData["Pressures.Hot"]), false)
 					}
 				}
 				catch exception {

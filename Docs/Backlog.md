@@ -16,14 +16,10 @@
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Simulation and information by the Race Strategist of the position and situation (traffic density, backmarkers in front, etc.), when coming back on the track after a pitstop
   5. Information by the Spotter about track cuts and penalties issued by race control
-  6. General detection of tyre pressure loss, either sudden or over time, by the Race Engineer
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer
   2. Collect telemetry data from multiple drivers and generate combined setup recommendations
-
-#### Team Server
-  1. Incorporate tyre pressure loss as detected by the Race Engineer (see above) into pitstop recommendations
 
 #### Plugins
   1. Definition of motion feedback settings for different tracks and cars, selectable by the touch of a button

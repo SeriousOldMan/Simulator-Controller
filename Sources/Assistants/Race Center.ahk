@@ -3002,7 +3002,7 @@ class RaceCenter extends ConfigurationItem {
 
 	initializePitstopFromSession() {
 		local stint := this.CurrentStint
-		local window, drivers, index, pressuresDB, pressuresTable, last, pressures
+		local window, drivers, index, key, pressuresDB, pressuresTable, last, pressures, coldPressures, pressuresLosses
 		local lap, refuel, compound, compoundColor
 
 		if stint {
@@ -3040,9 +3040,16 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl, , pitstopLapEdit, %lap%
 				GuiControl, , pitstopRefuelEdit, %refuel%
 
-				this.initializePitstopTyreSetup(compound, compoundColor
-											  , displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
-											  , displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"]))
+				coldPressures := [displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
+								, displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
+
+				for index, key in ["Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
+								 , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"]
+					if ((coldPressures[index] != "-") && !isNull(pressures[key]))
+						coldPressures[index] -= pressures[key]
+
+
+				this.initializePitstopTyreSetup(compound, compoundColor, coldPressures*)
 			}
 		}
 	}

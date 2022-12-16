@@ -124,6 +124,12 @@ class RaceAssistant extends ConfigurationItem {
 	class RaceVoiceManager extends VoiceManager {
 		iRaceAssistant := false
 
+		Routing[] {
+			Get {
+				return this.RaceAssistant.AssistantType
+			}
+		}
+
 		RaceAssistant[] {
 			Get {
 				return this.iRaceAssistant

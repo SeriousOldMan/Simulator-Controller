@@ -77,6 +77,12 @@ class SpeechSynthesizer {
 		}
 	}
 
+	Routing[] {
+		Get {
+			return "Standard"
+		}
+	}
+
 	Voices[language := false] {
 		Get {
 			local voices, voice, lcid, ignore, candidate, name
@@ -158,7 +164,7 @@ class SpeechSynthesizer {
 
 	__New(synthesizer, voice := false, language := false) {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
-		local player, copied, configuration, audioDevice, audioDriver
+		local player, copied, configuration
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -264,20 +270,8 @@ class SpeechSynthesizer {
 
 				configuration := readConfiguration(kUserConfigDirectory . "Audio Processing.ini")
 
-				audioDriver := getConfigurationValue(configuration, "Output", "AudioDriver", kUndefined)
-				audioDevice := getConfigurationValue(configuration, "Output", "AudioDevice", kUndefined)
-
-				if (audioDriver != kUndefined) {
-					EnvSet AUDIODRIVER, %audioDriver%
-
-					this.iAudioDriver := audioDriver
-				}
-
-				if (audioDevice != kUndefined) {
-					EnvSet AUDIODEV, %audioDevice%
-
-					this.iAudioDevice := audioDevice
-				}
+				this.iAudioDriver := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDriver", false)
+				this.iAudioDevice := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
 
 			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]

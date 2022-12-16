@@ -868,7 +868,7 @@ class SimulatorController extends ConfigurationItem {
 				if !registered {
 					activationCommand := getConfigurationValue(this.Configuration, "Voice Control", "ActivationCommand", false)
 
-					sendMessage(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", pid
+					sendMessage(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
 																								 , activationCommand, "activationCommand", false
 																								 , false, false, false, true, true)
 							  , this.VoiceServer)

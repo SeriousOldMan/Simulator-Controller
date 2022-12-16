@@ -9,7 +9,8 @@
   8. Tyre pressure setups can [now be initialized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) from data in the "Session Database" in "Race Center".
   9. Fixed a rare situation, where lap times are reported way too low during the first laps.
   10. Updated *RaceRoom Racing Experience* meta data to the latest version.
-  11. New car models for "Setup Advisor":
+  11. The selection of simulator, car and track are now remembered in many applications
+  12. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - BMW M3 GT2
 		- Mercedes-Benz 190E EVO II

@@ -1112,7 +1112,7 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local window, simulators
+		local window, simulators, settings
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
@@ -1122,6 +1122,15 @@ class SetupAdvisor extends ConfigurationItem {
 
 			try {
 				this.iSelectedSimulator := simulator
+
+				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				if (simulator == true)
+					removeConfigurationValue(settings, "Setup Advisor", "Simulator")
+				else
+					setConfigurationValue(settings, "Setup Advisor", "Simulator", simulator)
+
+				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				this.initializeSimulator((simulator == true) ? "Generic" : simulator)
 
@@ -1157,7 +1166,7 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
-		local window, tracks, trackNames
+		local window, tracks, trackNames, settings
 
 		if (force || (car != this.SelectedCar[false])) {
 			window := this.Window
@@ -1167,6 +1176,15 @@ class SetupAdvisor extends ConfigurationItem {
 
 			try {
 				this.iSelectedCar := car
+
+				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				if (car == true)
+					removeConfigurationValue(settings, "Setup Advisor", "Car")
+				else
+					setConfigurationValue(settings, "Setup Advisor", "Car", car)
+
+				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				GuiControl Choose, carDropDown, % inList(this.AvailableCars, this.SelectedCar)
 
@@ -1185,7 +1203,7 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local window
+		local window, settings
 
 		if (force || (track != this.SelectedTrack[false])) {
 			window := this.Window
@@ -1195,6 +1213,15 @@ class SetupAdvisor extends ConfigurationItem {
 
 			try {
 				this.iSelectedTrack := track
+
+				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+				if (track == true)
+					removeConfigurationValue(settings, "Setup Advisor", "Track")
+				else
+					setConfigurationValue(settings, "Setup Advisor", "Track", track)
+
+				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				if (track == true)
 					GuiControl Choose, trackDropDown, 1
@@ -3242,9 +3269,10 @@ chooseCharacteristic() {
 
 runSetupAdvisor() {
 	local icon := kIconsDirectory . "Setup.ico"
-	local simulator := false
-	local car := false
-	local track := false
+	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getConfigurationValue(settings, "Setup Advisor", "Simulator", false)
+	local car := getConfigurationValue(settings, "Setup Advisor", "Car", false)
+	local track := getConfigurationValue(settings, "Setup Advisor", "Track", false)
 	local weather := false
 	local index := 1
 	local advisor, label, callback

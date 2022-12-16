@@ -1100,7 +1100,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local window, choices, index, car
+		local window, choices, index, car, settings
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
@@ -1108,6 +1108,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gui %window%:Default
 
 			this.iSelectedSimulator := simulator
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Session Database", "Simulator", simulator)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+
 			this.iAllTracks := []
 
 			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
@@ -1126,10 +1133,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
-		local window, tracks, trackNames
+		local window, tracks, trackNames, settings
 
 		if (force || (car != this.SelectedCar)) {
 			this.iSelectedCar := car
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Session Database", "Car", car)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			window := this.Window
 
@@ -1153,10 +1166,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local window
+		local window, settings
 
 		if (force || (track != this.SelectedTrack)) {
 			this.iSelectedTrack := track
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Session Database", "Track", track)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			window := this.Window
 
@@ -6160,9 +6179,10 @@ testSettings() {
 
 showSessionDatabaseEditor() {
 	local icon := kIconsDirectory . "Session Database.ico"
-	local simulator := false
-	local car := false
-	local track := false
+	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getConfigurationValue(settings, "Session Database", "Simulator", false)
+	local car := getConfigurationValue(settings, "Session Database", "Car", false)
+	local track := getConfigurationValue(settings, "Session Database", "Track", false)
 	local weather := false
 	local airTemperature := 23
 	local trackTemperature:= 27

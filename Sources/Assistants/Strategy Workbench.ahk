@@ -1340,7 +1340,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local window, sessionDB, drivers, ignore, id, index, car, carNames, cars
+		local window, sessionDB, drivers, ignore, id, index, car, carNames, cars, settings
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
@@ -1348,6 +1348,12 @@ class StrategyWorkbench extends ConfigurationItem {
 			Gui %window%:Default
 
 			this.iSelectedSimulator := simulator
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Strategy Workbench", "Simulator", simulator)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			sessionDB := new SessionDatabase()
 
@@ -1392,7 +1398,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
-		local window, tracks
+		local window, tracks, settings
 
 		if (force || (car != this.SelectedCar)) {
 			window := this.Window
@@ -1400,6 +1406,12 @@ class StrategyWorkbench extends ConfigurationItem {
 			Gui %window%:Default
 
 			this.iSelectedCar := car
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Strategy Workbench", "Car", car)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			tracks := this.getTracks(this.SelectedSimulator, car)
 
@@ -1411,7 +1423,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local window, simulator, car
+		local window, simulator, car, settings
 
 		if (force || (track != this.SelectedTrack)) {
 			window := this.Window
@@ -1422,6 +1434,12 @@ class StrategyWorkbench extends ConfigurationItem {
 			car := this.SelectedCar
 
 			this.iSelectedTrack := track
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Strategy Workbench", "Track", track)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, car), track)
 
@@ -3775,9 +3793,10 @@ runSimulation() {
 
 runStrategyWorkbench() {
 	local icon := kIconsDirectory . "Dashboard.ico"
-	local simulator := false
-	local car := false
-	local track := false
+	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getConfigurationValue(settings, "Strategy Workbench", "Simulator", false)
+	local car := getConfigurationValue(settings, "Strategy Workbench", "Car", false)
+	local track := getConfigurationValue(settings, "Strategy Workbench", "Track", false)
 	local weather := "Dry"
 	local airTemperature := 23
 	local trackTemperature:= 27

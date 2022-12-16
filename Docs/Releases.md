@@ -1,3 +1,22 @@
+## 4.5.2.1-release 12/16/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. *iRacing* is now supported for the telemetry analyzer of "Setup Advisor".
+  4. The oversteer calculation has been revised for the telemetry analyzer. You may have to adjust your thresholds to higher values.
+  5. The telemetry analyzer in the "Setup Advisor" now supports an auto calibration mode. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer) for more information.
+  6. Handling of tyre pressures has been optimized in the "Session Database" in cases where pressure data from multiple drivers are present in your database.
+  7. Ideal tyre pressures are now supported for dry and wet tyres in the car specific meta data. If this information is present, it is used rather and will supersede the information entered in "Race Settings". You may however still overwrite it in the "Session Database".
+  8. Tyre pressure setups can [now be initialized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) from data in the "Session Database" in "Race Center".
+  9. Fixed a rare situation, where lap times are reported way too low during the first laps.
+  10. Tons of internal code tweaks.
+  12. The selection of simulator, car and track are now remembered in many applications
+  13. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - BMW M3 GT2
+		- Mercedes-Benz 190E EVO II
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-452).
+
 ## 4.5.1.0-release 12/09/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always

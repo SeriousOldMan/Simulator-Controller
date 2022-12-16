@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.5.2.1-dev](https://www.dropbox.com/s/umhwexv16ygw19l/Simulator%20Controller%204.5.2.1-dev.zip?dl=1) (Early build for 4.5.2. New features: Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer, Optimized handling of tyre pressures for multiple drivers in the "Session Database", Support for tyre pressure meta data, Load tyre pressure setups in "Race Center" from the "Session Database", New car models for "Setup Advisor", Remember selection of simulator, car and track in many applications.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-452) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

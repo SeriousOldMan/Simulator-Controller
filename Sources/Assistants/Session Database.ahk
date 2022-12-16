@@ -608,11 +608,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
-		Gui %window%:Add, Edit, x494 yp w40 -Background gloadPressures vairTemperatureEdit
+		Gui %window%:Add, Edit, x494 yp w40 -Background gloadPressures vairTemperatureEdit, % this.iAirTemperature
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20, % this.iAirTemperature
 		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Air (Celsius)")
 
-		Gui %window%:Add, Edit, x494 yp+24 w40 -Background gloadPressures vtrackTemperatureEdit
+		Gui %window%:Add, Edit, x494 yp+24 w40 -Background gloadPressures vtrackTemperatureEdit, % this.iTrackTemperature
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20, % this.iTrackTemperature
 		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Track (Celsius)")
 
@@ -1100,7 +1100,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local window, choices, index, car
+		local window, choices, index, car, settings
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
@@ -1108,6 +1108,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			Gui %window%:Default
 
 			this.iSelectedSimulator := simulator
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Session Database", "Simulator", simulator)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+
 			this.iAllTracks := []
 
 			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
@@ -1126,10 +1133,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
-		local window, tracks, trackNames
+		local window, tracks, trackNames, settings
 
 		if (force || (car != this.SelectedCar)) {
 			this.iSelectedCar := car
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Session Database", "Car", car)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			window := this.Window
 
@@ -1153,10 +1166,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local window
+		local window, settings
 
 		if (force || (track != this.SelectedTrack)) {
 			this.iSelectedTrack := track
+
+			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+			setConfigurationValue(settings, "Session Database", "Track", track)
+
+			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			window := this.Window
 
@@ -2824,7 +2843,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	selectPressures() {
 		local window := this.Window
-		local defaultListView, ignore, column, info
+		local defaultListView, ignore, column, info, source, simulator
 
 		Gui %window%:Default
 
@@ -2841,11 +2860,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
 				LV_InsertCol(A_Index, "", column)
 
-			for ignore, info in new this.EditorTyresDatabase().getPressureInfo(this.SelectedSimulator, this.SelectedCar
-																			 , this.SelectedTrack, this.SelectedWeather)
-				LV_Add("", translate((info.Source = "User") ? "User" : "Community")
+			sessionDB := this.SessionDatabase
+			simulator := this.SelectedSimulator
+
+			for ignore, info in new this.EditorTyresDatabase().getPressureInfo(simulator, this.SelectedCar
+																			 , this.SelectedTrack, this.SelectedWeather) {
+				if (info.Source = "User") {
+					if (info.Driver = kNull)
+						source := translate("User")
+					else
+						source := sessionDB.getDriverName(simulator, info.Driver)
+				}
+				else
+					source := translate("Community")
+
+				LV_Add("", source
 						 , translate(info.Weather), info.AirTemperature, info.TrackTemperature
 						 , translate(info.Compound), info.Count)
+			}
 
 			LV_ModifyCol()
 
@@ -3017,6 +3049,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			default := true
 		else if (default = kFalse)
 			default := false
+
+		if (this.SelectedSimulator && (this.SelectedSimulator != true)
+		 && this.SelectedCar && (this.SelectedCar != true) && (section = "Session Settings")) {
+			if (InStr(key, "Tyre.Dry.Pressure.Target") = 1)
+				default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Dry", default)
+			else if (InStr(key, "Tyre.Wet.Pressure.Target") = 1)
+				default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Wet", default)
+		}
 
 		return type
 	}
@@ -3218,13 +3258,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadPressures() {
 		local sessionDB := this.SessionDatabase
-		local window, compounds, chosen, compound, compoundColor, pressureInfos, index
+		local window, compounds, chosenCompound, compound, compoundColor, pressureInfos, index
 		local ignore, tyre, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
-		local drivers, driver
+		local drivers, driver, selectedDriver
 
 		static lastSimulator := false
 		static lastCar := false
 		static lastTrack := false
+		static lastCommunity := "__Undefined__"
 
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
@@ -3244,61 +3285,62 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				GuiControl, , tyreCompoundDropDown, % ("|" . values2String("|", map(compounds, "translate")*))
 
-				chosen := 0
+				chosenCompound := 0
 
 				if ((this.SelectedSimulator = lastSimulator) && (this.SelectedCar = lastCar) && (this.SelectedTrack = lastTrack))
-					chosen := tyreCompoundDropDown
+					chosenCompound := tyreCompoundDropDown
 				else if this.iTyreCompound
-					chosen := inList(compounds, compound(this.iTyreCompound, this.iTyreCompoundColor))
+					chosenCompound := inList(compounds, compound(this.iTyreCompound, this.iTyreCompoundColor))
 
-				if ((chosen == 0) && (compounds.Length() > 0))
-					chosen := 1
+				if ((chosenCompound == 0) && (compounds.Length() > 0))
+					chosenCompound := 1
 
-				GuiControl Choose, tyreCompoundDropDown, %chosen%
+				GuiControl Choose, tyreCompoundDropDown, %chosenCompound%
 
-				if (this.SelectedSimulator != lastSimulator) {
+				if ((this.SelectedSimulator != lastSimulator) || (this.UseCommunity != lastCommunity)) {
 					drivers := [translate("All")]
+					selectedDriver := false
 
-					chosen := false
+					if !this.UseCommunity
+						for ignore, driver in sessionDB.getAllDrivers(this.SelectedSimulator) {
+							if (driver = sessionDB.ID)
+								selectedDriver := driver
 
-					for ignore, driver in sessionDB.getAllDrivers(this.SelectedSimulator) {
-						if (driver = sessionDB.ID)
-							chosen := driver
-
-						drivers.Push(sessionDB.getDriverName(this.SelectedSimulator, driver))
-					}
+							drivers.Push(sessionDB.getDriverName(this.SelectedSimulator, driver))
+						}
 
 					GuiControl, , driverDropDown, % "|" . values2String("|", drivers*)
 
-					if chosen {
-						GuiControl Choose, driverDropDown, % inList(sessionDB.getAllDrivers(this.SelectedSimulator), chosen) + 1
+					if selectedDriver {
+						GuiControl Choose, driverDropDown, % inList(sessionDB.getAllDrivers(this.SelectedSimulator), selectedDriver) + 1
 
-						driver := [chosen]
+						driver := [[selectedDriver]]
 					}
 					else {
 						GuiControl Choose, driverDropDown, 1
 
-						driver := []
+						driver := [true]
 					}
 				}
 				else {
 					GuiControlGet driverDropDown
 
 					if (driverDropDown = translate("All"))
-						driver := []
+						driver := [true]
 					else
-						driver := [sessionDB.getDriverID(this.SelectedSimulator, driverDropDown)]
+						driver := [[sessionDB.getDriverID(this.SelectedSimulator, driverDropDown)]]
 				}
 
 				lastSimulator := this.SelectedSimulator
 				lastCar := this.SelectedCar
 				lastTrack := this.SelectedTrack
+				lastCommunity := this.UseCommunity
 
-				if chosen {
+				if chosenCompound {
 					compound := false
 					compoundColor := false
 
-					splitCompound(compounds[chosen], compound, compoundColor)
+					splitCompound(compounds[chosenCompound], compound, compoundColor)
 
 					this.iTyreCompound := compound
 					this.iTyreCompoundColor := compoundColor
@@ -6064,18 +6106,25 @@ chooseDatabaseScope() {
 
 transferPressures() {
 	local editor := SessionDatabaseEditor.Instance
+	local sessionDB := editor.SessionDatabase
 	local window := editor.Window
-	local tyrePressures, compounds, compound, compoundColor, ignore, pressureInfo
+	local tyrePressures, compounds, compound, compoundColor, ignore, pressureInfo, driver
 
 	Gui %window%:Default
 
 	GuiControlGet airTemperatureEdit
 	GuiControlGet trackTemperatureEdit
 	GuiControlGet tyreCompoundDropDown
+	GuiControlGet driverDropDown
+
+	if (driverDropDown = translate("All"))
+		driver := [true]
+	else
+		driver := [sessionDB.getDriverID(editor.SelectedSimulator, driverDropDown)]
 
 	tyrePressures := []
 
-	compounds := editor.SessionDatabase.getTyreCompounds(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack)
+	compounds := sessionDB.getTyreCompounds(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack)
 
 	compound := false
 	compoundColor := false
@@ -6085,7 +6134,7 @@ transferPressures() {
 	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
 																			, editor.SelectedTrack, editor.SelectedWeather
 																			, airTemperatureEdit, trackTemperatureEdit
-																			, compound, compoundColor)
+																			, compound, compoundColor, driver*)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 
 	sendMessage(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)
@@ -6130,9 +6179,10 @@ testSettings() {
 
 showSessionDatabaseEditor() {
 	local icon := kIconsDirectory . "Session Database.ico"
-	local simulator := false
-	local car := false
-	local track := false
+	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getConfigurationValue(settings, "Session Database", "Simulator", false)
+	local car := getConfigurationValue(settings, "Session Database", "Car", false)
+	local track := getConfigurationValue(settings, "Session Database", "Track", false)
 	local weather := false
 	local airTemperature := 23
 	local trackTemperature:= 27

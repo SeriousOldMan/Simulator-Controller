@@ -2220,7 +2220,7 @@ class RaceEngineer extends RaceAssistant {
 
 		return this.TyresDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator")
 											 , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-											 , weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty)
+											 , weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty, true)
 	}
 }
 

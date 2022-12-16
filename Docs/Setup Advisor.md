@@ -51,7 +51,7 @@ In this dialog you can initialize the analyzer for your car and you targeted dri
      - If you don't like understeering, move the corresponding sliders to the left.
      - And so on...
   
-     As said, you must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer issues, which you want to *report*. The settings you choose, will be remembered for each simulator / track / car combination, so you have to dial them only once.
+     As said, you must experiment with the positions of the thresholds, until the analyzer will *reflect* your desired driving style and will only collect those over- and understeer issues, which you want to *report*. If you want the analyzer to detect those values for you, you can use a special calibration mode. If you click on "Calibrate..." you will be aksed to first drive a couple of laps as clean as possible (without over- or understeering the car) and then drive as dirty as possible, but without loosing control and going off-track. The analyzer will then use the collected data  to come up with some decent settings for the thresholds to work with. Whatever way you choose, the position of the sliders and all other values will be remembered for each simulator, car and possibly track combination, so you have to go through this process only once.
 	 
 	 Technical: The sliders indicate from which value a deviation of the ideal yaw angle is considered light, medium or heavy. If there is no glide angle at all, this value is 0. In the case of oversteer, the value is negative (the larger, the more drift angle) and in the case of understeer, the value is positive, the larger, the more understeer. If the wheelbase and the track width has been set exactly as known to the simulator, the values used here are ten times that of the slip angle (aka deviation of the ideal yaw angle). Therefore an oversteer angle by 3 degrees will have a value of -30.
 
@@ -70,8 +70,6 @@ For each individual handling issue category, for example *low speed corner entry
 When you are satiesfied with the displayed handling issues, click on "Apply". The analyzer will clear all current handling issues from the left pane of the "Setup Advisor" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
 
 Please be aware that not every handling issue is related to problems with the car setup. Equally often they arise when you are not used to specific characteristics of the car and you are kind of *overdriving* it. The analyzer can help you here as well. Try to drive clean laps as without too much detected over- or understeering events. You will see, that this will feel slower most of the time, but in the end you will be faster.
-
-Note: *iRacing* is not yet supported.
 
 Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the analyzer.
 

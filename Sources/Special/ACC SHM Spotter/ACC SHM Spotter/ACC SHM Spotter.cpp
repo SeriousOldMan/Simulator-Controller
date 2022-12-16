@@ -1084,7 +1084,7 @@ int main(int argc, char* argv[])
 	bool analyzeTelemetry = false;
 	bool positionTrigger = false;
 
-	if (true || argc > 1) {
+	if (argc > 1) {
 		calibrateTelemetry = (strcmp(argv[1], "-Calibrate") == 0);
 		analyzeTelemetry = calibrateTelemetry || (strcmp(argv[1], "-Analyze") == 0);
 		mapTrack = (strcmp(argv[1], "-Map") == 0);

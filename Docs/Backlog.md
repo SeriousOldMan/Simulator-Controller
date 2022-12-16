@@ -8,21 +8,19 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
-  2. Defaults for car-specific ideal tyre pressures in the meta data
-  3. Make selection of repair settings more reliable in ACC
+  2. Make selection of repair settings more reliable in ACC
 
 #### Assistants
   1. Overhaul (shortening) of Assistant phrases
   2. Support for Full Course Yellow rules in the Assistants
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Simulation and information by the Race Strategist of the position and situation (traffic density, backmarkers in front, etc.), when coming back on the track after a pitstop
-  5. Information by the Spotter about track cuts and penalties issued by rece control
+  5. Information by the Spotter about track cuts and penalties issued by race control
   6. General detection of tyre pressure loss, either sudden or over time, by the Race Engineer
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer
-  2. Support for iRacing for the telemetry analyzer
-  3. Collect telemetry data from multiple drivers and generate combined setup recommendations
+  2. Collect telemetry data from multiple drivers and generate combined setup recommendations
 
 #### Team Server
   1. Incorporate tyre pressure loss as detected by the Race Engineer (see above) into pitstop recommendations

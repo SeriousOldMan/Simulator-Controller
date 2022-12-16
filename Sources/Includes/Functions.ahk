@@ -2300,6 +2300,8 @@ setConfigurationValue(configuration, section, key, value) {
 setConfigurationSectionValues(configuration, section, values) {
 	local key, value
 
+	removeConfigurationSection(configuration, section)
+
 	for key, value in values
 		setConfigurationValue(configuration, section, key, value)
 }

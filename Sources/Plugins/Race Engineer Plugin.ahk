@@ -130,7 +130,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			pressures := {}
 			certainty := 1.0
 
-			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty, true) {
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 

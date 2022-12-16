@@ -283,9 +283,10 @@ class TyresDatabase extends SessionDatabase {
 		database := this.requireDatabase(simulator, car, track)
 
 		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
-																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
+																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color", "Driver"]
 																		 , Where: where})
-			info.Push({Source: "User", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+			info.Push({Source: "User", Driver: row.Driver
+					 , Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
 					 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
 
 		if this.UseCommunity {
@@ -293,7 +294,8 @@ class TyresDatabase extends SessionDatabase {
 
 			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
-				info.Push({Source: "Community", Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+				info.Push({Source: "Community", Driver: false
+						 , Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
 						 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
 		}
 
@@ -307,7 +309,9 @@ class TyresDatabase extends SessionDatabase {
 		local bestPressure, bestCount, pressure, pressureCount, tyrePressures
 
 		if !driver
-			driver := this.ID
+			driver := [this.ID]
+		else if (driver == true)
+			driver := []
 
 		if (weather != true) {
 			weatherBaseIndex := inList(kWeatherConditions, weather)
@@ -336,7 +340,7 @@ class TyresDatabase extends SessionDatabase {
 					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
 
 					this.getPressureDistributions(localTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta
-												, compound, compoundColor, distributions, driver)
+												, compound, compoundColor, distributions, driver*)
 
 					if this.UseCommunity
 						this.getPressureDistributions(globalTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta

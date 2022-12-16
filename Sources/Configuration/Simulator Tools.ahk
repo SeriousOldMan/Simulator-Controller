@@ -1651,6 +1651,40 @@ updateInstallationForV392() {
 	}
 }
 
+updateConfigurationForV452() {
+	local tempValues := {}
+	local newValues := {}
+	local settings, key, value, found
+
+	updateConfigurationForV451()
+
+	settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+
+	for key, value in getConfigurationSectionValues(settings, "Setup Advisor", Object())
+		tempValues[StrReplace(key, ".Unknown", ".*")] := value
+
+	for key, value in tempValues {
+		found := false
+
+		for ignore, subkey in [".LowspeedThreshold", ".OversteerThresholds", ".UndersteerThresholds"
+							 , ".SteerLock", ".SteerRatio", ".Wheelbase", ".TrackWidth"]
+			if (InStr(key, subkey) && (string2Values(".", key).Length() < 4)) {
+				newValues[StrReplace(key, subkey, ".*" . subkey)] := value
+
+				found := true
+
+				break
+			}
+
+		if !found
+			newValues[key] := value
+	}
+
+	setConfigurationSectionValues(settings, "Setup Advisor", newValues)
+
+	writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+}
+
 updateConfigurationForV451() {
 	local directory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
 	local sessionDB := new SessionDatabase()

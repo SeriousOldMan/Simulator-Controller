@@ -190,7 +190,7 @@ updatePressureReference(?, [])
 updatePressureReference(?lap, [?tyreType | ?tyreTypes]) <=
 		lapTyrePressure(?lap, ?tyreType, ?pressure), Set(Tyre.Pressure.Reference, ?tyreType, ?pressure),
 		updatePressureReference(?lap, ?tyreTypes)
-
+ 
 [?Lap > ?Tyre.Pressure.Reference.Lap] => (Prove: updatePressureLoss(?Lap))
 
 updatePressureLoss(?lap) <=
@@ -770,13 +770,13 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 {All: [?Pitstop.Plan], [?Pitstop.Plan.Driver.Request],
 	  {None: [?Pitstop.Planned.Driver.Request]}} => (Set: Pitstop.Planned.Driver.Request, ?Pitstop.Plan.Driver.Request)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Loss.FL],
-	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.FL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.FL, 0)
+	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.FL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.FL, ?Tyre.Pressure.Loss.FL)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Loss.FR],
-	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.FR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.FR, 0)
+	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.FR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.FR, ?Tyre.Pressure.Loss.FR)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Loss.RL],
-	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.RL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RL, 0)
+	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.RL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RL, ?Tyre.Pressure.Loss.RL)
 {All: [?Pitstop.Plan], [?Tyre.Pressure.Loss.RR],
-	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RR, 0)
+	  {None: [?Pitstop.Planned.Tyre.Pressure.Lost.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RR, ?Tyre.Pressure.Loss.RR)
 {All: [?Pitstop.Plan], [?Tyre.Compound.Target],	{None: [?Pitstop.Planned.Tyre.Compound], [?Pitstop.Planned.Tyre.Compound = false]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, ?Tyre.Compound.Target), (Set: Pitstop.Planned.Tyre.Compound.Color, !Tyre.Compound.Color.Target)
 {All: [?Pitstop.Plan], [?Tyre.Set.Target], {None: [?Pitstop.Planned.Tyre.Set], [?Pitstop.Planned.Tyre.Compound = false]}} =>

@@ -66,6 +66,9 @@ class SpeechSynthesizer {
 	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
 
+	iAudioDriver := false
+	iAudioDevice := false
+
 	iSpeechStatusCallback := false
 
 	Synthesizer[] {
@@ -264,11 +267,17 @@ class SpeechSynthesizer {
 				audioDriver := getConfigurationValue(configuration, "Output", "AudioDriver", kUndefined)
 				audioDevice := getConfigurationValue(configuration, "Output", "AudioDevice", kUndefined)
 
-				if (audioDriver != kUndefined)
+				if (audioDriver != kUndefined) {
 					EnvSet AUDIODRIVER, %audioDriver%
 
-				if (audioDevice != kUndefined)
+					this.iAudioDriver := audioDriver
+				}
+
+				if (audioDevice != kUndefined) {
 					EnvSet AUDIODEV, %audioDevice%
+
+					this.iAudioDevice := audioDevice
+				}
 			}
 
 			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
@@ -339,7 +348,7 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback, player, pid, workingDirectory, level
+		local callback, player, pid, workingDirectory, level, option
 
 		callback := this.SpeechStatusCallback
 
@@ -348,7 +357,9 @@ class SpeechSynthesizer {
 
 			SplitPath kSox, , workingDirectory
 
-			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio -d, %workingDirectory%, HIDE, pid
+			option := (this.iAudioDevice ? ("""" . this.iAudioDevice . """") : "")
+
+			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio %option% -d, %workingDirectory%, HIDE, pid
 
 			if callback
 				%callback%("Start")

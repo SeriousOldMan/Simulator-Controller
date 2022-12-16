@@ -359,7 +359,7 @@ class SpeechSynthesizer {
 
 			option := (this.iAudioDevice ? ("""" . this.iAudioDevice . """") : "")
 
-			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio %option% -d, %workingDirectory%, HIDE, pid
+			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio %option%, %workingDirectory%, HIDE, pid
 
 			if callback
 				%callback%("Start")

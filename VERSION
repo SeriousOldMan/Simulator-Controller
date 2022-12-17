@@ -1,9 +1,9 @@
 [Development]
 Version=4.5.3.0-dev
 Target=4.5.3.0-release
-Date=12/16/2022
+Date=12/17/2022
 Download=
-Changes=Pressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center"
+Changes=Pressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center", Support for audio device selection for voice ouput
 [Release]
 Version=4.5.1.0-release
 Date=12/09/2022

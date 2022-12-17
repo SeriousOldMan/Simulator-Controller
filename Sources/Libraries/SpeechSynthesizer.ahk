@@ -268,7 +268,7 @@ class SpeechSynthesizer {
 			if !SpeechSynthesizer.sSoundPlayerInitialized {
 				SpeechSynthesizer.sSoundPlayerInitialized := true
 
-				configuration := readConfiguration(kUserConfigDirectory . "Audio Processing.ini")
+				configuration := readConfiguration(kUserConfigDirectory . "Audio Settings.ini")
 
 				this.iAudioDriver := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDriver", false)
 				this.iAudioDevice := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDevice", false)

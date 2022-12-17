@@ -78,6 +78,8 @@ class VoiceServer extends ConfigurationItem {
 	iLastCommand := A_TickCount
 
 	class VoiceClient {
+		iRouting := false
+
 		iCounter := 1
 
 		iVoiceServer := false
@@ -106,6 +108,34 @@ class VoiceServer extends ConfigurationItem {
 		iActivationCallback := false
 		iDeactivationCallback := false
 		iVoiceCommands := {}
+
+		class ClientSpeechSynthesizer extends SpeechSynthesizer {
+			iVoiceClient := false
+
+			Routing[] {
+				Get {
+					return this.VoiceClient.Routing
+				}
+			}
+
+			VoiceClient[] {
+				Get {
+					return this.iVoiceClient
+				}
+			}
+
+			__New(voiceClient, synthesizer, speaker, language) {
+				this.iVoiceClient := voiceClient
+
+				base.__New(synthesizer, speaker, language)
+			}
+		}
+
+		Routing[] {
+			Get {
+				return this.iRouting
+			}
+		}
 
 		VoiceServer[] {
 			Get {
@@ -216,7 +246,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechSynthesizer[create := false] {
 			Get {
 				if (!this.iSpeechSynthesizer && create && this.Speaker) {
-					this.iSpeechSynthesizer := new SpeechSynthesizer(this.Synthesizer, this.Speaker, this.Language)
+					this.iSpeechSynthesizer := new this.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language)
 
 					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -254,9 +284,12 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		__New(voiceServer, descriptor, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
+		__New(voiceServer, descriptor, routing, pid
+			, language, synthesizer, speaker, recognizer, listener
+			, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
+			this.iRouting := routing
 			this.iPID := pid
 			this.iLanguage := language
 			this.iSynthesizer := synthesizer
@@ -860,7 +893,10 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	registerVoiceClient(descriptor, pid, activationCommand := false, activationCallback := false, deactivationCallback := false, language := false, synthesizer := true, speaker := true, recognizer := false, listener := false, speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+	registerVoiceClient(descriptor, routing, pid
+					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
+					  , synthesizer := true, speaker := true, recognizer := false, listener := false
+					  , speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
 		local grammar, client, nextCharIndex, command, theDescriptor, ignore
 
 		static counter := 1
@@ -894,7 +930,7 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := new this.VoiceClient(this, descriptor, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		client := new this.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 
 		this.VoiceClients[descriptor] := client
 

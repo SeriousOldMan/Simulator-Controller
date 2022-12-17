@@ -186,6 +186,12 @@ class VoiceManager {
 		iText := ""
 		iFocus := false
 
+		Routing[] {
+			Get {
+				return this.VoiceManager.Routing
+			}
+		}
+
 		VoiceManager[] {
 			Get {
 				return this.iVoiceManager
@@ -394,6 +400,12 @@ class VoiceManager {
 	Name[] {
 		Get {
 			return this.iName
+		}
+	}
+
+	Routing[] {
+		Get {
+			throw "Virtual property VoiceManager.Routing must be implemented in a subclass..."
 		}
 	}
 
@@ -607,12 +619,12 @@ class VoiceManager {
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
 				sendMessage(kFileMessage, "Voice"
-						  , "registerVoiceClient:" . values2String(";", this.Name, pid
-																 , activationCommand
-																 , "remoteActivationRecognized", "remoteDeactivationRecognized"
-																 , this.Language, this.Synthesizer, this.Speaker
-																 , this.Recognizer, this.Listener
-																 , this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
+						  , "registerVoiceClient:" . values2String(";", this.Name, this.Routing, pid
+																	  , activationCommand
+																	  , "remoteActivationRecognized", "remoteDeactivationRecognized"
+																	  , this.Language, this.Synthesizer, this.Speaker
+																	  , this.Recognizer, this.Listener
+																	  , this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
 						  , this.VoiceServer)
 
 				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
@@ -796,10 +808,10 @@ class VoiceManager {
 		else
 			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 		*/
-		
+
 		if !speechRecognizer
 			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
-		
+
 	}
 
 	raisePhraseRecognized(grammar, words) {

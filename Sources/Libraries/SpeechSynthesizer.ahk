@@ -66,11 +66,20 @@ class SpeechSynthesizer {
 	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
 
+	iAudioDriver := false
+	iAudioDevice := false
+
 	iSpeechStatusCallback := false
 
 	Synthesizer[] {
 		Get {
 			return this.iSynthesizer
+		}
+	}
+
+	Routing[] {
+		Get {
+			return "Standard"
 		}
 	}
 
@@ -155,7 +164,7 @@ class SpeechSynthesizer {
 
 	__New(synthesizer, voice := false, language := false) {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
-		local player, copied, configuration, audioDevice, audioDriver
+		local player, copied, configuration
 
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
@@ -259,16 +268,10 @@ class SpeechSynthesizer {
 			if !SpeechSynthesizer.sSoundPlayerInitialized {
 				SpeechSynthesizer.sSoundPlayerInitialized := true
 
-				configuration := readConfiguration(kUserConfigDirectory . "Audio Processing.ini")
+				configuration := readConfiguration(kUserConfigDirectory . "Audio Settings.ini")
 
-				audioDriver := getConfigurationValue(configuration, "Output", "AudioDriver", kUndefined)
-				audioDevice := getConfigurationValue(configuration, "Output", "AudioDevice", kUndefined)
-
-				if (audioDriver != kUndefined)
-					EnvSet AUDIODRIVER, %audioDriver%
-
-				if (audioDevice != kUndefined)
-					EnvSet AUDIODEV, %audioDevice%
+				this.iAudioDriver := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDriver", false)
+				this.iAudioDevice := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
 
 			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
@@ -339,7 +342,7 @@ class SpeechSynthesizer {
 	}
 
 	playSound(soundFile, wait := true) {
-		local callback, player, pid, workingDirectory, level
+		local callback, player, pid, workingDirectory, level, option
 
 		callback := this.SpeechStatusCallback
 
@@ -348,7 +351,9 @@ class SpeechSynthesizer {
 
 			SplitPath kSox, , workingDirectory
 
-			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio -d, %workingDirectory%, HIDE, pid
+			option := (this.iAudioDevice ? ("""" . this.iAudioDevice . """") : "")
+
+			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio %option%, %workingDirectory%, HIDE, pid
 
 			if callback
 				%callback%("Start")

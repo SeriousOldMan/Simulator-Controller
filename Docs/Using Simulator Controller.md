@@ -197,6 +197,17 @@ The "System Monitor" is divided into several pages of information:
 
 Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problem will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued.
 
+## Managing voice output and audio devices
+
+Simulator Controller allows you to direct voice output to different audio devices. This is mainly of interested to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this, but a simple text file. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
+
+	[Output]
+	Race Spotter.AudioDevice=*Headphone*
+	Race Engineer.AudioDevice=*Headphone*
+	Race Strategist.AudioDevice=*Headphone*
+
+*Headphone* is only an example for any audio device configured and name in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
+
 ## And now it's time
 
 ...to have some fun. If you like Simulator Controller and find it useful, I would be very happy about a small donation, which will help in the further development of this software. Please see the [README](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/README.md) for the donation link. Thanks and see you on the track...

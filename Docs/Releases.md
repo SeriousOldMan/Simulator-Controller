@@ -2,9 +2,9 @@
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. The AI now detects pressure loss - either sudden or even a kreeping puncture, as long as not all tires are affected at the same time. The Race Engineer will inform you about pressure losses and he as well as the "Race Center" will try to compensate for that when planning and preparing pitstop. See the [revised documentation](*) for more information.
+  4. It is now possible to configure the [audio routing](*) for the voice output. This is an interesting feature for streamers or when you want to use your headphones and a 5.1 sound equipment at the same time.
 
-
-## 4.5.2.1-release 12/16/22 (planned)
+## 4.5.2.1-release 12/16/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. *iRacing* is now supported for the telemetry analyzer of "Setup Advisor".
@@ -14,9 +14,9 @@
   7. Ideal tyre pressures are now supported for dry and wet tyres in the car specific meta data. If this information is present, it is used rather and will supersede the information entered in "Race Settings". You may however still overwrite it in the "Session Database".
   8. Tyre pressure setups can [now be initialized](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) from data in the "Session Database" in "Race Center".
   9. Fixed a rare situation, where lap times are reported way too low during the first laps.
-  10. Tons of internal code tweaks.
-  12. The selection of simulator, car and track are now remembered in many applications
-  13. New car models for "Setup Advisor":
+  10. Updated *RaceRoom Racing Experience* meta data to the latest version.
+  11. The selection of simulator, car and track are now remembered in many applications
+  12. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - BMW M3 GT2
 		- Mercedes-Benz 190E EVO II

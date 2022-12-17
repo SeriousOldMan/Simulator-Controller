@@ -6962,6 +6962,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			this.initializeSession()
+			this.updateState()
 		}
 	}
 

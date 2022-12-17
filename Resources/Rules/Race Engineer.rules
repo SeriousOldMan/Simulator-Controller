@@ -196,16 +196,18 @@ updatePressureReference(?lap, [?tyreType | ?tyreTypes]) <=
 updatePressureLoss(?lap) <=
 		computePressureLoss(?lap, [FL, FR, RL, RR], ?tyrePressureLosses),
 		average(?tyrePressureLosses, ?avg), stdDeviation(?tyrePressureLosses, ?stdDev),
-		updatePressureLoss(?lap, ?avg, ?stdDev, [FL, FR, RL, RR], ?tyrePressureLosses)
+		updatePressureLoss(?lap, ?avg, ?stdDev, [FL, FR, RL, RR], ?tyrePressureLosses, ?tyrePressureLosses)
 
-updatePressureLoss(?, ?, ?, [], [])
-updatePressureLoss(?lap, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [0 | ?losses]) <=
-		!, Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)
-updatePressureLoss(?, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [?loss | ?losses]) <=
+updatePressureLoss(?, ?, ?, [], [], ?)
+updatePressureLoss(?lap, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [0 | ?losses], ?allLosses) <=
+		!, Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses, ?allLosses)
+updatePressureLoss(?, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [?loss | ?losses], ?allLosses) <=
 		?temp = ?avg + ?stdDev, ?loss > ?temp,	?loss > !Session.Settings.Tyre.Pressure.Deviation, !,
-		Set(Tyre.Pressure.Loss, ?tyreType, ?loss), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)
+		remove(?allLosses, ?loss, ?otherLosses), average(?otherLosses, ?otherAvg),
+		?correctedLoss = ?loss - ?otherAvg, Set(Tyre.Pressure.Loss, ?tyreType, ?correctedLoss),
+		updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses, ?allLosses)
 updatePressureLoss(?lap, ?avg, ?stdDev, [? | ?tyreTypes], [? | ?losses]) <=
-		Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)
+		Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses, ?allLosses)
 
 computePressureLoss(?, [], [])
 computePressureLoss(?lap, [?tyreType | ?tyreTypes], [?loss | ?losses]) <=

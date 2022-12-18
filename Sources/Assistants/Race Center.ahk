@@ -1327,13 +1327,13 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x378 yp+28 w90 h20, % translate("Lap (est. / act.)")
 		Gui %window%:Add, Edit, x474 yp-2 w50 h20 Limit3 Number vplanLapEdit gupdatePlan
-		Gui %window%:Add, UpDown, x506 yp w18 h20
+		Gui %window%:Add, UpDown, x506 yp w18 h20 Range1-999
 		Gui %window%:Add, Edit, x528 yp w50 h20 Limit3 Number vactLapEdit gupdatePlan
 		Gui %window%:Add, UpDown, x560 yp w18 h20
 
 		Gui %window%:Add, Text, x378 yp+30 w85 h20, % translate("Refuel")
 		Gui %window%:Add, Edit, x474 yp-2 w50 h20 Limit3 Number vplanRefuelEdit gupdatePlan
-		Gui %window%:Add, UpDown, x506 yp-2 w18 h20
+		Gui %window%:Add, UpDown, x506 yp-2 w18 h20 Range1-999
 		Gui %window%:Add, Text, x528 yp+2 w30 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x378 yp+24 w85 h23 +0x200, % translate("Tyre Change")
@@ -1370,17 +1370,17 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Random Factor")
 		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number VrandomFactorEdit, %randomFactorEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20, %randomFactorEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20 Range0-99, %randomFactorEdit%
 		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("%")
 
 		Gui %window%:Add, Text, x32 yp+22 w85 h23 +0x200, % translate("# Scenarios")
 		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number VnumScenariosEdit, %numScenariosEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20, %numScenariosEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20 Range1-99, %numScenariosEdit%
 
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Variation")
 		Gui %window%:Add, Text, x150 yp w18 h23 +0x200, % translate("+/-")
 		Gui %window%:Add, Edit, x170 yp w50 h20 Limit2 Number VvariationWindowEdit, %variationWindowEdit%
-		Gui %window%:Add, UpDown, x202 yp w18 h20, %variationWindowEdit%
+		Gui %window%:Add, UpDown, x202 yp w18 h20 Range1-99, %variationWindowEdit%
 		Gui %window%:Add, Text, x228 yp+2 w50 h20, % translate("laps")
 
 		Gui %window%:Font, Norm, Arial
@@ -1423,12 +1423,12 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x32 yp+24 w85 h23 +0x200, % translate("Overtake")
 		Gui %window%:Add, Text, x132 yp w28 h23 +0x200, % translate("Abs(")
-		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number VovertakeDeltaEdit, %overtakeDeltaEdit%
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number Limit2 VovertakeDeltaEdit, %overtakeDeltaEdit%
 		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-99 0x80, %overtakeDeltaEdit%
 		Gui %window%:Add, Text, x220 yp+4 w340 h20, % translate("/ laptime difference) = additional seconds for each passed car")
 
 		Gui %window%:Add, Text, x32 yp+20 w85 h23 +0x200, % translate("Traffic")
-		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number VtrafficConsideredEdit, %trafficConsideredEdit%
+		Gui %window%:Add, Edit, x162 yp w50 h20 Limit2 Number Limit2 VtrafficConsideredEdit, %trafficConsideredEdit%
 		Gui %window%:Add, UpDown, x194 yp-2 w18 h20 Range1-99 0x80, %trafficConsideredEdit%
 		Gui %window%:Add, Text, x220 yp+4 w290 h20, % translate("% track length")
 
@@ -1449,11 +1449,11 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x378 yp+24 w70 h23 +0x200, % translate("Temperatures")
 
-		Gui %window%:Add, Edit, x474 yp w40 vsetupAirTemperatureEdit gupdateSetup, % ""
-		Gui %window%:Add, UpDown, x476 yp w18 h20
+		Gui %window%:Add, Edit, x474 yp w40 Number Limit2 vsetupAirTemperatureEdit gupdateSetup, % ""
+		Gui %window%:Add, UpDown, x476 yp w18 h20 Range0-99
 
-		Gui %window%:Add, Edit, x521 yp w40 vsetupTrackTemperatureEdit gupdateSetup, % ""
-		Gui %window%:Add, UpDown, x523 yp w18 h20
+		Gui %window%:Add, Edit, x521 yp w40 Number Limit2 vsetupTrackTemperatureEdit gupdateSetup, % ""
+		Gui %window%:Add, UpDown, x523 yp w18 h20 Range0-99
 		Gui %window%:Add, Text, x563 yp w35 h23 +0x200, % translate("A / T")
 
 		choices := map([normalizeCompound("Dry")], "translate")
@@ -1490,14 +1490,14 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x24 ys+36 w85 h20, % translate("Lap")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
-		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
+		Gui %window%:Add, UpDown, x138 yp-2 w18 h20 Range1-999
 
 		Gui %window%:Add, Text, x24 yp+30 w80 h23 +0x200, % translate("Driver")
 		Gui %window%:Add, DropDownList, x106 yp w157 vpitstopDriverDropDownMenu
 
 		Gui %window%:Add, Text, x24 yp+30 w85 h20, % translate("Refuel")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit
-		Gui %window%:Add, UpDown, x138 yp-2 w18 h20
+		Gui %window%:Add, UpDown, x138 yp-2 w18 h20 Range0-999
 		Gui %window%:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Tyre Change")
@@ -1506,7 +1506,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x24 yp+26 w85 h20, % translate("Tyre Set")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit
-		Gui %window%:Add, UpDown, x138 yp w18 h20
+		Gui %window%:Add, UpDown, x138 yp w18 h20 Range0-99
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h20, % translate("Pressures")
 

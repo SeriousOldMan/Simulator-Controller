@@ -731,9 +731,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-99 HWNDwidget4, % analyzer.SteerRatio
 
 		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 HWNDwidget27, % translate("Wheelbase / Track Width")
-		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget28 Number vwheelbaseEdit, % analyzer.Wheelbase
+		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget28 Number Limit3 vwheelbaseEdit, % analyzer.Wheelbase
 		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget29, % analyzer.Wheelbase
-		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget30 Number vtrackWidthEdit, % analyzer.TrackWidth
+		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget30 Number Limit3 vtrackWidthEdit, % analyzer.TrackWidth
 		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-999 HWNDwidget31, % analyzer.TrackWidth
 		Gui %window%:Add, Text, x257 yp w50 h23 +0x200 HWNDwidget32, % translate("cm")
 
@@ -764,7 +764,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x24 yp+21 w130 h23 +0x200 HWNDwidget6, % translate("Consider less than")
-		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget7 vlowspeedThresholdEdit, % analyzer.LowspeedThreshold
+		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 Number Limit3 HWNDwidget7 vlowspeedThresholdEdit, % analyzer.LowspeedThreshold
 		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget33, % analyzer.LowspeedThreshold
 		Gui %window%:Add, Text, x207 yp w120 h23 +0x200 HWNDwidget8, % translate("km/h as low speed")
 

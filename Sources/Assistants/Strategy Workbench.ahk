@@ -448,11 +448,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		airTemperature := this.AirTemperature
 		trackTemperature := this.TrackTemperature
 
-		Gui %window%:Add, Edit, x215 yp w40 vairTemperatureEdit gupdateTemperatures
-		Gui %window%:Add, UpDown, x242 yp-2 w18 h20, % airTemperature
+		Gui %window%:Add, Edit, x215 yp w40 Number Limit2 vairTemperatureEdit gupdateTemperatures
+		Gui %window%:Add, UpDown, x242 yp-2 w18 h20 Range0-99, % airTemperature
 
-		Gui %window%:Add, Edit, x262 yp w40 vtrackTemperatureEdit gupdateTemperatures
-		Gui %window%:Add, UpDown, x289 yp w18 h20, % trackTemperature
+		Gui %window%:Add, Edit, x262 yp w40 Number Limit2 vtrackTemperatureEdit gupdateTemperatures
+		Gui %window%:Add, UpDown, x289 yp w18 h20 Range0-99, % trackTemperature
 		Gui %window%:Add, Text, x304 yp w90 h23 +0x200, % translate("Air / Track")
 
 		this.setTemperatures(airTemperature, trackTemperature)
@@ -622,7 +622,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x13% yp w116 AltSubmit Choose0 vtyreSetDropDown gupdateTyreSet, % values2String("|", map([normalizeCompound("Dry")], "translate")*)
 
 		Gui %window%:Add, Edit, x%x13% yp+24 w40 h20 Limit2 Number vtyreSetCountEdit gupdateTyreSet
-		Gui %window%:Add, UpDown, x%x13% yp w18 h20 0x80
+		Gui %window%:Add, UpDown, x%x13% yp w18 h20 0x80 Range0-99
 
 		x13 := (x7 + w12 + 5 + 116 - 48)
 
@@ -651,12 +651,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x% yp+21 w105 h20 +0x200, % translate("Pitlane Delta")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
-		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80, %pitstopDeltaEdit%
+		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80 Range0-99, %pitstopDeltaEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Seconds (Drive through - Drive by)")
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Tyre Service")
 		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Limit2 Number VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
-		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80, %pitstopTyreServiceEdit%
+		Gui %window%:Add, UpDown, x%x2% yp w18 h20 0x80 Range0-99, %pitstopTyreServiceEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Seconds (Change four tyres)")
 
 		Gui %window%:Add, DropDownList, x%x0% yp+20 w110 AltSubmit Choose2 VpitstopFuelServiceRuleDropdown gchooseRefuelService, % values2String("|", map(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
@@ -673,7 +673,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %safetyFuelEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range0-99, %safetyFuelEdit%
 		Gui %window%:Add, Text, x%x3% yp+2 w130 h20, % translate("Liter")
 
 		Gui %window%:Tab, 3
@@ -720,11 +720,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x2% yp+24 w70 h23 +0x200, % translate("Weather")
 		Gui %window%:Add, DropDownList, x%x3% yp w%w3% AltSubmit vsimWeatherDropDown gupdateSimWeather, % values2String("|", map(kWeatherConditions, "translate")*)
 
-		Gui %window%:Add, Edit, x%x6% yp w40 vsimWeatherAirTemperatureEdit gupdateSimWeather
-		Gui %window%:Add, UpDown, x%x6% yp-2 w18 h20, % airTemperature
+		Gui %window%:Add, Edit, x%x6% yp w40 Number Limit2 vsimWeatherAirTemperatureEdit gupdateSimWeather
+		Gui %window%:Add, UpDown, x%x6% yp-2 w18 h20 Range0-99, % airTemperature
 
-		Gui %window%:Add, Edit, x%x7% yp w40 vsimWeatherTrackTemperatureEdit gupdateSimWeather
-		Gui %window%:Add, UpDown, x%x7% yp w18 h20, % trackTemperature
+		Gui %window%:Add, Edit, x%x7% yp w40 Number Limit2 vsimWeatherTrackTemperatureEdit gupdateSimWeather
+		Gui %window%:Add, UpDown, x%x7% yp w18 h20 Range0-99, % trackTemperature
 		Gui %window%:Add, Text, x%x8% yp w70 h23 +0x200, % translate("Air / Track")
 
 		Gui %window%:Add, Button, x%x8% yp+30 w23 h23 Center +0x200 HWNDplusButton vaddSimWeatherButton gaddSimWeather
@@ -762,18 +762,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x1% yp w84 AltSubmit Choose%chosen% VsimCompoundDropDown, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("Tyre Usage")
-		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimMaxTyreLapsEdit gvalidateSimMaxTyreLaps, %simMaxTyreLapsEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-99, %simMaxTyreLapsEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number Limit3 VsimMaxTyreLapsEdit gvalidateSimMaxTyreLaps, %simMaxTyreLapsEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999, %simMaxTyreLapsEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % translate("Laps")
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Initial Fuel")
-		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number VsimInitialFuelAmountEdit gvalidateSimInitialFuelAmount, %simInitialFuelAmountEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit gvalidateSimInitialFuelAmount, %simInitialFuelAmountEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999, %simInitialFuelAmountEdit%
 		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % translate("Liter")
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
-		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 VsimMapEdit, %simMapEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20, %simMapEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number Limit2 VsimMapEdit, %simMapEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range0-99 , %simMapEdit%
 
 		Gui %window%:Add, Text, x%x% yp+23 w85 h23 +0x200, % translate("Avg. Lap Time")
 		Gui %window%:Add, Edit, x%x1% yp w45 h20 VsimAvgLapTimeEdit gvalidateSimAvgLapTime, %simAvgLapTimeEdit%
@@ -875,16 +875,16 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartMapEdit Disabled, %strategyStartMapEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Disabled, %strategyStartMapEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number Limit2 VstrategyStartMapEdit Disabled, %strategyStartMapEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range0-99 Disabled, %strategyStartMapEdit%
 
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("TC")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartTCEdit Disabled, %strategyStartTCEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Disabled, %strategyStartTCEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number Limit2 VstrategyStartTCEdit Disabled, %strategyStartTCEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range0-99 Disabled, %strategyStartTCEdit%
 
 		Gui %window%:Add, Text, x%x% yp+25 w70 h20 +0x200, % translate("ABS")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VstrategyStartABSEdit Disabled, %strategyStartABSEdit%
-		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Disabled, %strategyStartABSEdit%
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number Limit2 VstrategyStartABSEdit Disabled, %strategyStartABSEdit%
+		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range0-99 Disabled, %strategyStartABSEdit%
 
 		x := 186
 		x0 := x + 50

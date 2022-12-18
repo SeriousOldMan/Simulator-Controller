@@ -48,8 +48,8 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		Gui %window%:Add, Text, x16 y295 w86 h23 +0x200, % translate("Button")
 		Gui %window%:Add, Text, x95 y295 w23 h23 +0x200, % translate("#")
-		Gui %window%:Add, Edit, x110 y295 w40 h21 Number VchatMessageNumberEdit, %chatMessageNumberEdit%
-		Gui %window%:Add, UpDown, x150 y295 w17 h21, 1
+		Gui %window%:Add, Edit, x110 y295 w40 h21 Number Limit3 VchatMessageNumberEdit, %chatMessageNumberEdit%
+		Gui %window%:Add, UpDown, x150 y295 w17 h21 Range1-999, 1
 
 		Gui %window%:Add, Text, x16 y319 w86 h23 +0x200, % translate("Label")
 		Gui %window%:Add, Edit, x110 y319 w80 h21 VchatMessageLabelEdit, %chatMessageLabelEdit%

@@ -123,13 +123,13 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x0% yp+17 w80 h23 +0x200 HWNDwidget14 Hidden, % translate("Learn for")
-		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number vreLearningLapsEdit HWNDwidget15 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget16 Hidden, 1
+		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number Limit1 vreLearningLapsEdit HWNDwidget15 Hidden
+		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget16 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget17 Hidden, % translate("Laps after Start or Pitstop")
 
 		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget18 Hidden, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number vreLapsConsideredEdit HWNDwidget19 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget20 Hidden, 1
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number Limit1 vreLapsConsideredEdit HWNDwidget19 Hidden
+		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget20 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp+2 w%w3% h20 HWNDwidget21 Hidden, % translate("Laps")
 
 		Gui %window%:Add, Text, x%x0% ys+24 w105 h20 Section HWNDwidget22 Hidden, % translate("Damping Factor")
@@ -140,8 +140,8 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Add, CheckBox, x%x1% yp w%w1% h23 VreAdjustLapTimeCheck HWNDwidget26 Hidden, % translate("for Start, Pitstop or incomplete Laps (use from Settings)")
 
 		Gui %window%:Add, Text, x%x0% ys+30 w120 h23 +0x200 Section HWNDwidget27 Hidden, % translate("Damage Analysis for")
-		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number VreDamageAnalysisLapsEdit HWNDwidget28 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget29 Hidden, 1
+		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number Limit1 VreDamageAnalysisLapsEdit HWNDwidget28 Hidden
+		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget29 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp-2 w%w3% h23 +0x200 HWNDwidget30 Hidden, % translate("Laps after Incident")
 
 		loop 31

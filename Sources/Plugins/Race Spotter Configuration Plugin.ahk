@@ -98,13 +98,13 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x0% yp+17 w80 h23 +0x200 HWNDwidget4 Hidden, % translate("Learn for")
-		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number vrspLearningLapsEdit HWNDwidget5 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget6 Hidden, 1
+		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number Limit1 vrspLearningLapsEdit HWNDwidget5 Hidden
+		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget6 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget7 Hidden, % translate("Laps after Start or Pitstop")
 
 		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget8 Hidden, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number vrspLapsConsideredEdit HWNDwidget9 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 HWNDwidget10 Hidden, 1
+		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number Limit1 vrspLapsConsideredEdit HWNDwidget9 Hidden
+		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget10 Hidden, 1
 		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget11 Hidden, % translate("Laps")
 
 		Gui %window%:Add, Text, x%x0% ys+24 w120 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")

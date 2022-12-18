@@ -947,7 +947,7 @@ restart:
 
 		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Pitstop Warning")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number VpitstopWarningEdit, %pitstopWarningEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %pitstopWarningEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9, %pitstopWarningEdit%
 		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("Laps")
 
 		Gui RES:Add, Text, x16 yp+30 w105 h23 +0x200, % translate("Repair Suspension")
@@ -1035,22 +1035,18 @@ restart:
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit gvalidateTPDryFrontLeft, %tpDryFrontLeftEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit gvalidateTPDryFrontRight, %tpDryFrontRightEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit gvalidateTPDryRearLeft, %tpDryRearLeftEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit gvalidateTPDryRearRight, %tpDryRearRightEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Font, Norm, Arial
@@ -1062,22 +1058,18 @@ restart:
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit gvalidateTPWetFrontLeft, %tpWetFrontLeftEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit gvalidateTPWetFrontRight, %tpWetFrontRightEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit gvalidateTPWetRearLeft, %tpWetRearLeftEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit gvalidateTPWetRearRight, %tpWetRearRightEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui Tab, 1
@@ -1125,11 +1117,11 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+26 w90 h20, % translate("Start Tyre Set")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit, %spSetupTyreSetEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20, %spSetupTyreSetEdit%
+		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range0-99, %spSetupTyreSetEdit%
 
 		Gui RES:Add, Text, x16 yp+24 w95 h20, % translate("Pitstop Tyre Set")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit, %spPitstopTyreSetEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20, %spPitstopTyreSetEdit%
+		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range0-99, %spPitstopTyreSetEdit%
 
 		import := false
 
@@ -1156,22 +1148,18 @@ restart:
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit gvalidateSPDryFrontLeft, %spDryFrontLeftEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit gvalidateSPDryFrontRight, %spDryFrontRightEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit gvalidateSPDryRearLeft, %spDryRearLeftEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit gvalidateSPDryRearRight, %spDryRearRightEdit%
-		; Gui RES:Add, UpDown, x138 yp-2 w18 h20
 		Gui RES:Add, Text, x164 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Font, Norm, Arial
@@ -1183,35 +1171,31 @@ restart:
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit gvalidateSPWetFrontLeft, %spWetFrontLeftEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit gvalidateSPWetFrontRight, %spWetFrontRightEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit gvalidateSPWetRearLeft, %spWetRearLeftEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit gvalidateSPWetRearRight, %spWetRearRightEdit%
-		; Gui RES:Add, UpDown, x324 yp-2 w18 h20
 		Gui RES:Add, Text, x350 yp+2 w30 h20, % translate("PSI")
 
 		Gui Tab, 3
 
 		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Race positions")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit, %extrapolationLapsEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %extrapolationLapsEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9, %extrapolationLapsEdit%
 		Gui RES:Add, Text, x184 yp+2 w290 h20, % translate("simulated future laps")
 
 		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Overtake")
 		Gui RES:Add, Text, x100 yp w28 h23 +0x200, % translate("Abs(")
-		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number VovertakeDeltaEdit, %overtakeDeltaEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-999 0x80, %overtakeDeltaEdit%
+		Gui RES:Add, Edit, x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit, %overtakeDeltaEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-99 0x80, %overtakeDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("/ laptime difference) Seconds")
 
 		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Traffic")
@@ -1228,12 +1212,12 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+22 w105 h20 +0x200, % translate("Pitlane Delta")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopDeltaEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80 Range0-99, %pitstopDeltaEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Drive through - Drive by)")
 
 		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Tyre Service")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80, %pitstopTyreServiceEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80 Range0-99, %pitstopTyreServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Change four tyres)")
 
 		Gui RES:Add, DropDownList, x12 yp+21 w110 AltSubmit Choose%pitstopRefuelServiceRuleDropdown% VpitstopRefuelServiceRuleDropdown gchooseRefuelService, % values2String("|", map(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
@@ -1246,8 +1230,8 @@ restart:
 		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose%pitstopServiceDropDown% vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui RES:Add, Edit, x126 yp w50 h20 VsafetyFuelEdit, %safetyFuelEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20, %safetyFuelEdit%
+		Gui RES:Add, Edit, x126 yp w50 h20 Numnber Limit2 VsafetyFuelEdit, %safetyFuelEdit%
+		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range0-99, %safetyFuelEdit%
 		Gui RES:Add, Text, x184 yp+2 w90 h20, % translate("Ltr.")
 
 		if vTeamMode {

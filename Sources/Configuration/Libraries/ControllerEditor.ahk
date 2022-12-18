@@ -723,11 +723,11 @@ class LayoutsList extends ConfigurationItemList {
 		Gui CTRLE:Add, Text, x16 y517 w133 h21 hwndbbWidget4, % translate("(R x C, Margins)")
 		Gui CTRLE:Font
 
-		Gui CTRLE:Add, Edit, x102 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutRowsEdit hwndbbWidget5, %layoutRowsEdit%
-		Gui CTRLE:Add, UpDown, x125 y493 w17 h21 hwndbbWidget6, 1
+		Gui CTRLE:Add, Edit, x102 y493 w40 h21 Limit1 Number Limit2 gupdateLayoutRowEditor VlayoutRowsEdit hwndbbWidget5, %layoutRowsEdit%
+		Gui CTRLE:Add, UpDown, x125 y493 w17 h21 Range1-99 hwndbbWidget6, 1
 		Gui CTRLE:Add, Text, x147 y493 w20 h23 +0x200 Center hwndbbWidget7, % translate("x")
-		Gui CTRLE:Add, Edit, x172 y493 w40 h21 Limit1 Number gupdateLayoutRowEditor VlayoutColumnsEdit hwndbbWidget8, %layoutColumnsEdit%
-		Gui CTRLE:Add, UpDown, x195 y493 w17 h21 hwndbbWidget9, 1
+		Gui CTRLE:Add, Edit, x172 y493 w40 h21 Limit1 Number Limit2 gupdateLayoutRowEditor VlayoutColumnsEdit hwndbbWidget8, %layoutColumnsEdit%
+		Gui CTRLE:Add, UpDown, x195 y493 w17 h21 Range1-99 hwndbbWidget9, 1
 
 		Gui CTRLE:Font, c505050 s7
 

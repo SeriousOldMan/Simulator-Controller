@@ -1230,7 +1230,7 @@ restart:
 		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose%pitstopServiceDropDown% vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui RES:Add, Edit, x126 yp w50 h20 Numnber Limit2 VsafetyFuelEdit, %safetyFuelEdit%
+		Gui RES:Add, Edit, x126 yp w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range0-99, %safetyFuelEdit%
 		Gui RES:Add, Text, x184 yp+2 w90 h20, % translate("Ltr.")
 

@@ -95,7 +95,7 @@ class StrategyViewer {
 	createSetupInfo(strategy) {
 		local html := "<table>"
 
-		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . Round(strategy.RemainingFuel, 1) . A_Space . translate("Liter") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . Round(strategy.StartFuel, 1) . A_Space . translate("Liter") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Compound:") . "</b></td><td>" . translate(compound(strategy.TyreCompound, strategy.TyreCompoundColor)) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . strategy.TyrePressures[true] . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Map:") . "</b></td><td>" . strategy.Map . "</td></tr>")

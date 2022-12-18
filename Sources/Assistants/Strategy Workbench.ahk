@@ -1912,7 +1912,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							GuiControl, , simMaxTyreLapsEdit, % Round(strategy.MaxTyreLaps)
 
-							GuiControl, , simInitialFuelAmountEdit, % Round(strategy.RemainingFuel)
+							GuiControl, , simInitialFuelAmountEdit, % Round(strategy.StartFuel)
 							GuiControl, , simMapEdit, % strategy.Map
 
 							GuiControl, , simConsumptionVariation, % strategy.ConsumptionVariation
@@ -2931,7 +2931,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		if strategy {
 			numPitstops := 0
 			numTyreChanges := 0
-			consumedFuel := strategy.RemainingFuel
+			consumedFuel := strategy.StartFuel
 			avgLapTimes := [strategy.AvgLapTime]
 
 			for ignore, pitstop in strategy.Pitstops {

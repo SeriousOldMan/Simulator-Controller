@@ -3,6 +3,8 @@
   2. Documentation updates, as always
   3. The AI now detects pressure loss - either sudden or even a kreeping puncture, as long as not all tires are affected at the same time. The Race Engineer will inform you about pressure losses and he as well as the "Race Center" will try to compensate for that when planning and preparing pitstop. See the [revised documentation](*) for more information.
   4. It is now possible to configure the [audio routing](*) for the voice output. This is an interesting feature for streamers or when you want to use your headphones and a 5.1 sound equipment at the same time.
+  5. The input ranges of many integer fields have been tweaked to reflect the required number ranges.
+  6. The handling of initial fuel in races with a formation lap has been optimized.
 
 ## 4.5.2.1-release 12/16/22
   1. Minor bugfixes, as always

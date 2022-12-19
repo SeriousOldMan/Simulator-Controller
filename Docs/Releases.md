@@ -5,7 +5,9 @@
   4. It is now possible to configure the [audio routing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for the voice output. This is an interesting feature for streamers or when you want to use your headphones and a 5.1 sound equipment at the same time.
   5. The input ranges of many integer fields have been tweaked to reflect the required number ranges.
   6. The handling of initial fuel in races with a formation lap has been optimized.
-  7. A couple of rare update problems in "Race Center" has been fixed. 
+  7. A couple of rare update problems in "Race Center" has been fixed.
+  8. Found and fixed (potentially) a rare bug, when the Spotter announces race half time at a totally wrong point in time. Happens only in team races.
+  9. Update of the Spanish translations by J. Krilin, so that all recent changes and additions are covered.
 
 ## 4.5.2.1-release 12/16/22
   1. Minor bugfixes, as always

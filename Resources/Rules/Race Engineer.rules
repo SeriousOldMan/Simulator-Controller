@@ -215,7 +215,6 @@ computePressureLoss(?lap, [?tyreType | ?tyreTypes], [?loss | ?losses]) <=
 		computePressureLoss(?lap, ?tyreTypes, ?losses)
 computePressureLoss(?lap, [? | ?tyreTypes], [0 | ?losses]) <= computePressureLoss(?lap, ?tyreTypes, ?losses)
 
-
 ;;;-------------------------------------------------------------------------;;;
 ;;;            Target pressure calculation without compound change          ;;;
 ;;;-------------------------------------------------------------------------;;;

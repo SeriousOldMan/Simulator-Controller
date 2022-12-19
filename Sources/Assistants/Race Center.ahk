@@ -5709,97 +5709,117 @@ class RaceCenter extends ConfigurationItem {
 		return newData
 	}
 
-	syncPitstopsDetails(initial := false) {
+	syncPitstopsDetails(full := false) {
 		local sessionStore := this.SessionStore
+		local lastlap := this.LastLap
 		local lastPitstop := sessionStore.Tables["Pitstop.Data"].Length()
+		local startLap := 1
 		local newData := false
-		local compound, hasServiceData, hasTyreData, lastLap, startLap, startLapCandidate, state, pitstop
-		local driver, laps, compound, compoundColor, tyreSet, ignore, tyre
+		local compound, hasServiceData, hasTyreData, nextLap, startLapCandidate, state, pitstop
+		local driver, laps, compound, compoundColor, tyreSet, ignore, tyre, nextPitstop, nextLap
 
-		if (lastPitstop != 0) {
-			hasServiceData := (sessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: lastPitstop}}).Length() > 0)
-			hasTyreData := (sessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: lastPitstop}}).Length() > 0)
+		if lastLap
+			lastLap := lastLap.Nr
 
-			if (!hasServiceData || !hasTyreData) {
-				lastlap := this.LastLap
+		loop {
+			if (!full && (A_Index > 1))
+				break
+			else if full {
+				nextPitstop := A_Index
 
-				if lastLap
-					lastLap := lastLap.Nr
+				if (nextPitstop > lastPitstop)
+					break
+			}
+			else
+				nextPitstop := lastPitstop
 
-				startLap := (initial ? 1 : Max(1, sessionStore.Tables["Pitstop.Data"][lastPitstop].Lap - 1))
+			if (nextPitstop != 0) {
+				hasServiceData := (sessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: nextPitstop}}).Length() > 0)
+				hasTyreData := (sessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: nextPitstop}}).Length() > 0)
 
-				loop {
-					if ((startLap + A_Index) > lastLap)
-						break
+				if (!hasServiceData || !hasTyreData) {
+					nextLap := (full ? startLap : Max(startLap, sessionStore.Tables["Pitstop.Data"][nextPitstop].Lap - 1))
 
-					if (!initial && hasServiceData && hasTyreData)
-						break
+					loop {
+						startLap := nextLap
+						nextLap += 1
 
-					state := false
+						if (nextLap > lastLap)
+							break
 
-					try {
-						state := this.Connector.GetLapValue(this.Laps[startLap + A_Index].Identifier, "Race Engineer Pitstop State")
-					}
-					catch exception {
-						logError(exception)
-					}
+						if (!full && hasServiceData && hasTyreData)
+							break
 
-					if (state && (state != "")) {
-						state := parseConfiguration(state)
+						state := false
 
-						pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
+						try {
+							state := this.Connector.GetLapValue(this.Laps[nextLap].Identifier, "Race Engineer Pitstop State")
+						}
+						catch exception {
+							logError(exception)
+						}
 
-						if (pitstop <= lastPitstop) {
-							if ((initial || !hasServiceData)
-							 && (getConfigurationValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
-								hasServiceData := true
-								newData := true
+						if (state && (state != "")) {
+							state := parseConfiguration(state)
 
-								sessionStore.add("Pitstop.Service.Data"
-											   , {Pitstop: pitstop
-												, Lap: getConfigurationValue(state, "Pitstop Data", "Service.Lap", false)
-												, Time: getConfigurationValue(state, "Pitstop Data", "Service.Time", false)
-												, "Driver.Previous": getConfigurationValue(state, "Pitstop Data", "Service.Driver.Previous", false)
-												, "Driver.Next": getConfigurationValue(state, "Pitstop Data", "Service.Driver.Next", false)
-												, Fuel: getConfigurationValue(state, "Pitstop Data", "Service.Refuel", 0)
-												, "Tyre.Compound": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
-												, "Tyre.Compound.Color": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
-												, "Tyre.Set": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Set", false)
-												, "Tyre.Pressures": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
-												, "Bodywork.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
-												, "Suspension.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
-												, "Engine.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Engine.Repair", false)})
-							}
+							pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
 
-							if ((initial || !hasTyreData)
-							 && (getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
-								hasTyreData := true
-								newData := true
+							if (pitstop <= nextPitstop) {
+								if ((full || !hasServiceData)
+								 && (getConfigurationValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
+									hasServiceData := true
+									newData := true
 
-								driver := getConfigurationValue(state, "Pitstop Data", "Tyre.Driver")
-								laps := getConfigurationValue(state, "Pitstop Data", "Tyre.Laps", false)
-								compound := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", "Dry")
-								compoundColor := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound.Color", "Black")
-								tyreSet := getConfigurationValue(state, "Pitstop Data", "Tyre.Set", false)
+									sessionStore.add("Pitstop.Service.Data"
+												   , {Pitstop: pitstop
+													, Lap: getConfigurationValue(state, "Pitstop Data", "Service.Lap", false)
+													, Time: getConfigurationValue(state, "Pitstop Data", "Service.Time", false)
+													, "Driver.Previous": getConfigurationValue(state, "Pitstop Data", "Service.Driver.Previous", false)
+													, "Driver.Next": getConfigurationValue(state, "Pitstop Data", "Service.Driver.Next", false)
+													, Fuel: getConfigurationValue(state, "Pitstop Data", "Service.Refuel", 0)
+													, "Tyre.Compound": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound", false)
+													, "Tyre.Compound.Color": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Compound.Color", false)
+													, "Tyre.Set": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Set", false)
+													, "Tyre.Pressures": getConfigurationValue(state, "Pitstop Data", "Service.Tyre.Pressures", "")
+													, "Bodywork.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Bodywork.Repair", false)
+													, "Suspension.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Suspension.Repair", false)
+													, "Engine.Repair": getConfigurationValue(state, "Pitstop Data", "Service.Engine.Repair", false)})
+								}
 
-								for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
-									sessionStore.add("Pitstop.Tyre.Data"
-												   , {Pitstop: pitstop, Driver: driver, Laps: laps
-													, Compound: compound, "Compound.Color": compoundColor
-													, Set: tyreSet, Tyre: tyre
-													, Tread: getConfigurationValue(state, "Pitstop Data", "Tyre.Tread." . tyre, "-")
-													, Wear: getConfigurationValue(state, "Pitstop Data", "Tyre.Wear." . tyre, 0)
-													, Grain: getConfigurationValue(state, "Pitstop Data", "Tyre.Grain." . tyre, "-")
-													, Blister: getConfigurationValue(state, "Pitstop Data", "Tyre.Blister." . tyre, "-")
-													, FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre.FlatSpot." . tyre, "-")})
+								if ((full || !hasTyreData)
+								 && (getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
+									hasTyreData := true
+									newData := true
+
+									driver := getConfigurationValue(state, "Pitstop Data", "Tyre.Driver")
+									laps := getConfigurationValue(state, "Pitstop Data", "Tyre.Laps", false)
+									compound := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", "Dry")
+									compoundColor := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound.Color", "Black")
+									tyreSet := getConfigurationValue(state, "Pitstop Data", "Tyre.Set", false)
+
+									for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
+										sessionStore.add("Pitstop.Tyre.Data"
+													   , {Pitstop: pitstop, Driver: driver, Laps: laps
+														, Compound: compound, "Compound.Color": compoundColor
+														, Set: tyreSet, Tyre: tyre
+														, Tread: getConfigurationValue(state, "Pitstop Data", "Tyre.Tread." . tyre, "-")
+														, Wear: getConfigurationValue(state, "Pitstop Data", "Tyre.Wear." . tyre, 0)
+														, Grain: getConfigurationValue(state, "Pitstop Data", "Tyre.Grain." . tyre, "-")
+														, Blister: getConfigurationValue(state, "Pitstop Data", "Tyre.Blister." . tyre, "-")
+														, FlatSpot: getConfigurationValue(state, "Pitstop Data", "Tyre.FlatSpot." . tyre, "-")})
+								}
+
+								startLap += 1
+
+								break
 							}
 						}
 					}
-				}
 
-				if (this.SelectedDetailReport = "Pitstops")
-					if (hasServiceData && hasTyreData)
-						this.showPitstopsDetails()
+					if (this.SelectedDetailReport = "Pitstops")
+						if (hasServiceData && hasTyreData)
+							this.showPitstopsDetails()
+				}
 			}
 		}
 
@@ -6008,9 +6028,10 @@ class RaceCenter extends ConfigurationItem {
 
 	syncSession() {
 		local initial := !this.LastLap
-		local strategy, session, window, lastLap, simulator, car, track, newLaps, newData, finished, message
+		local strategy, session, window, lastLap, simulator, car, track, newLaps, newData, finished, message, forcePitstopUpdate
 
 		static hadLastLap := false
+		static nextPitstopUpdate := false
 
 		if (this.SessionActive && this.Synchronize) {
 			session := this.SelectedSession[true]
@@ -6040,6 +6061,7 @@ class RaceCenter extends ConfigurationItem {
 					this.initializeSession()
 
 					hadLastLap := false
+					nextPitstopUpdate := false
 
 					return
 				}
@@ -6078,11 +6100,20 @@ class RaceCenter extends ConfigurationItem {
 				if this.syncTyrePressures()
 					newData := true
 
-				if (newLaps && this.syncPitstops())
+				if newLaps
+					if this.syncPitstops() {
+						newData := true
+
+						nextPitstopUpdate := (this.LastLap.Nr + 2)
+					}
+
+				forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
+
+				if this.syncPitstopsDetails(forcePitstopUpdate || initial)
 					newData := true
 
-				if this.syncPitstopsDetails(initial)
-					newData := true
+				if forcePitstopUpdate
+					nextPitstopUpdate := false
 
 				if (this.LastLap && (this.SelectedReport == "Track"))
 					if this.syncTrackMap()

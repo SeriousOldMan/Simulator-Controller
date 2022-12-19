@@ -1,10 +1,11 @@
 ## 4.5.3.0-release 12/23/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. The AI now detects pressure loss - either sudden or even a kreeping puncture, as long as not all tires are affected at the same time. The Race Engineer will inform you about pressure losses and he as well as the "Race Center" will try to compensate for that when planning and preparing pitstop. See the [revised documentation](*) for more information.
-  4. It is now possible to configure the [audio routing](*) for the voice output. This is an interesting feature for streamers or when you want to use your headphones and a 5.1 sound equipment at the same time.
+  3. The AI now detects pressure loss - either sudden or even a kreeping puncture, as long as not all tires are affected at the same time. The Race Engineer will inform you about pressure losses and he as well as the "Race Center" will try to compensate for that when planning and preparing pitstop. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for more information.
+  4. It is now possible to configure the [audio routing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) for the voice output. This is an interesting feature for streamers or when you want to use your headphones and a 5.1 sound equipment at the same time.
   5. The input ranges of many integer fields have been tweaked to reflect the required number ranges.
   6. The handling of initial fuel in races with a formation lap has been optimized.
+  7. A couple of rare update problems in "Race Center" has been fixed. 
 
 ## 4.5.2.1-release 12/16/22
   1. Minor bugfixes, as always

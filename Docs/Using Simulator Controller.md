@@ -152,6 +152,17 @@ There is also the possibility to trigger actions in Simulator Controller from ot
    This will achieve the same effect as pushing or rotating the corresponding controls on your hardware controller. See the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) to see which controller functions (*1WayToggle*, *2WayToggle*, *Button*, *Dial* and *Custom*) are available and especially how to define *Custom* controller functions (which are typically not assiciated with a Button Box or a Stream Deck) using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). As you have seen in the above example, you must use *On* and *Off* as a second argument for *2WayToggle*, and *Increase* and *Decrease* for *Dial*, to specify the desired change.
 
    A last note for experienced users: Together with the [*execute* controller action function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller), you can create powerful macros. Create a *Custom* controller function, which can be triggered by a button, for example on your steering wheel. This *Custom* function *executes* a Windows command script wich the writes a "Controller.cmd" file as described above.
+
+### Audio routing
+
+Simulator Controller allows you to direct voice output to different audio devices. This is mainly of interested to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this, but a simple text file. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
+
+	[Output]
+	Race Spotter.AudioDevice=*Headphone*
+	Race Engineer.AudioDevice=*Headphone*
+	Race Strategist.AudioDevice=*Headphone*
+
+*Headphone* is only an example for any audio device configured and name in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
    
 ## Monitoring health and activities
 
@@ -196,17 +207,6 @@ The "System Monitor" is divided into several pages of information:
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%205.JPG)
 
 Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problem will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued.
-
-## Managing voice output and audio devices
-
-Simulator Controller allows you to direct voice output to different audio devices. This is mainly of interested to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this, but a simple text file. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
-
-	[Output]
-	Race Spotter.AudioDevice=*Headphone*
-	Race Engineer.AudioDevice=*Headphone*
-	Race Strategist.AudioDevice=*Headphone*
-
-*Headphone* is only an example for any audio device configured and name in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
 
 ## And now it's time
 

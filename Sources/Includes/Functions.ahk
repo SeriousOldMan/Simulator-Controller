@@ -1533,7 +1533,7 @@ logError(exception, unhandled := false) {
 		logMessage(unhandled ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
-	return (isDebug() ? false : true)
+	return ((isDevelopment() || isDebug()) ? false : true)
 }
 
 availableLanguages() {

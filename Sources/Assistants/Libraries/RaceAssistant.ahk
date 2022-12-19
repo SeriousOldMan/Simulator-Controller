@@ -971,13 +971,21 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		if isInstance(facts, KnowledgeBase) {
-			facts.setValue("Session.Duration", duration)
-			facts.setValue("Session.Laps", laps)
+			if (facts.getValue("Session.Duration", 0) == 0)
+				facts.setValue("Session.Duration", duration)
+
+			if (facts.getValue("Session.Laps", 0) == 0)
+				facts.setValue("Session.Laps", laps)
+
 			facts.setValue("Session.Format", sessionFormat)
 		}
 		else {
-			facts["Session.Duration"] := duration
-			facts["Session.Laps"] := laps
+			if (!facts.HasKey("Session.Duration") || (facts["Session.Duration"] == 0))
+				facts["Session.Duration"] := duration
+
+			if (!facts.HasKey("Session.Laps") || (facts["Session.Laps"] == 0))
+				facts["Session.Laps"] := laps
+
 			facts["Session.Format"] := sessionFormat
 		}
 

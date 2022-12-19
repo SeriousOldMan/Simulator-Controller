@@ -431,7 +431,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	restoreRaceInfo() {
+	restoreRaceInfo(data) {
 		local teamServer := this.TeamServer
 		local raceInfo, fileName
 
@@ -454,13 +454,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	restoreSessionState() {
+	restoreSessionState(data) {
 		local teamServer := this.TeamServer
 
 		if (this.RaceStrategist && teamServer && teamServer.Active)
-			this.restoreRaceInfo()
+			this.restoreRaceInfo(data)
 
-		base.restoreSessionState()
+		base.restoreSessionState(data)
 	}
 
 	createRaceReport(targetDirectory := false) {

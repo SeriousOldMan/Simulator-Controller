@@ -316,6 +316,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	class RestoreSessionStateTask extends PeriodicTask {
 		iRaceAssistant := false
+		iData := false
 		iTries := 50
 
 		RaceAssistant[] {
@@ -324,8 +325,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 		}
 
-		__New(raceAssistant) {
+		Data[] {
+			Get {
+				return this.iData
+			}
+		}
+
+		__New(raceAssistant, data) {
 			this.iRaceAssistant := raceAssistant
+			this.iData := data
 
 			base.__New(false, 0, kHighPriority)
 		}
@@ -335,19 +343,28 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			local teamServer := raceAssistant.TeamServer
 			local sessionSettings := this.getData(teamServer, "Settings")
 			local sessionState := this.getData(teamServer, "State")
+			local stateLap, dataLap
 
 			if (sessionSettings && sessionState) {
-				if isDebug()
-					showMessage("Restoring session state for " . raceAssistant.Plugin)
+				stateLap := getConfigurationValue(sessionState, "Session State", "Lap", 0)
+				dataLap := getConfigurationValue(this.Data, "Stint Data", "Laps", 0)
 
-				raceAssistant.Simulator.restoreSessionState(sessionSettings, sessionState)
+				if (Abs(dataLap - stateLap) <= 5) {
+					if isDebug()
+						showMessage("Restoring session state for " . raceAssistant.Plugin)
 
-				raceAssistant.RaceAssistant.restoreSessionState(this.createDataFile(sessionSettings, "settings")
-															  , this.createDataFile(sessionState, "state"))
+					raceAssistant.Simulator.restoreSessionState(sessionSettings, sessionState)
 
-				this.stop()
+					raceAssistant.RaceAssistant.restoreSessionState(this.createDataFile(sessionSettings, "settings")
+																  , this.createDataFile(sessionState, "state"))
+
+					this.stop()
+
+					return
+				}
 			}
-			else if (this.iTries-- > 0)
+
+			if (this.iTries-- > 0)
 				this.Sleep := 1000
 			else
 				this.stop()
@@ -980,12 +997,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.performPitstop(lapNumber)
 	}
 
-	restoreAssistantsSessionState() {
+	restoreAssistantsSessionState(data) {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
-				assistant.restoreSessionState()
+				assistant.restoreSessionState(data)
 	}
 
 	updateAssistantsSession(session := "__Undefined__") {
@@ -1511,9 +1528,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	restoreSessionState() {
+	restoreSessionState(data) {
 		if (this.RaceAssistant && this.TeamSessionActive)
-			new this.RestoreSessionStateTask(this).start()
+			new this.RestoreSessionStateTask(this, data).start()
 	}
 
 	driverActive(data) {
@@ -1690,7 +1707,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								RaceAssistantPlugin.sInPit := false
 
-								RaceAssistantPlugin.restoreAssistantsSessionState()
+								RaceAssistantPlugin.restoreAssistantsSessionState(data)
 							}
 							else ; (this.LastLap == (dataLastLap - 1))
 								if !RaceAssistantPlugin.driverActive(data)
@@ -1773,7 +1790,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								RaceAssistantPlugin.startAssistantsSession(data)
 
-								RaceAssistantPlugin.restoreAssistantsSessionState()
+								RaceAssistantPlugin.restoreAssistantsSessionState(data)
 							}
 							else
 								RaceAssistantPlugin.startAssistantsSession(data)

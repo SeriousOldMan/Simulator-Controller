@@ -195,6 +195,8 @@ Beside all that, you can request several context specific data, which will be sh
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%209.JPG)
 	 
 	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, beside their overall position in the race. In a multi-class race, the gaps shown in the first table will always be specific for the own class.
+	 
+	 Some basic data is shown in the header of the lap details as well. Important are here the ambient temperatures and the tyre pressure information. You can see the current hot pressures, recommend cold pressures (incl. a potential correction factor compared to the pressure setup at the beginning of the stint) and information about tyre pressure losses, if there are any.
 
   6. Details for a given pitstop
   

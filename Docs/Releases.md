@@ -9,6 +9,10 @@
   8. Found and fixed (potentially) a rare bug, when the Spotter announces race half time at a totally wrong point in time. Happens only in team races.
   10. The "Race Center" now show target pressure deviations from the ideal setup in the lap report.
   11. Update of the Spanish translations by J. Krilin, so that all recent changes and additions are covered.
+  12. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Audi Sport Quattro S1 E2
+		- RUF CTR Yellowbird
 
 ## 4.5.2.1-release 12/16/22
   1. Minor bugfixes, as always

@@ -8767,7 +8767,7 @@ class RaceCenter extends ConfigurationItem {
 		local pressuresLosses := "-, -, -, -"
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
-		local stintNr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
+		local stintNr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections
 
 		if pressuresDB {
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
@@ -8780,20 +8780,28 @@ class RaceCenter extends ConfigurationItem {
 
 				this.getStintSetup(lap.Stint.Nr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures)
 
-				if tyrePressures
+				if tyrePressures {
 					loop 4 {
 						coldPressure := coldPressures[A_Index]
 
-						if (coldPressure != "-")
-							coldPressure := Round(coldPressure - tyrePressures[A_Index], 1)
+						if (coldPressure != "-") {
+							tyrePressures[A_Index] := Round(coldPressure - tyrePressures[A_Index], 1)
 
-						if (coldPressure != 0)
-							coldPressures[A_Index] := (coldPressures[A_Index] . translate(" (")
-																			  . ((coldPressure > 0) ? ("+" . coldPressure) : coldPressure)
-																			  . translate(")"))
+							if (tyrePressures[A_Index] = 0)
+								tyrePressures[A_Index] := displayValue(kNull)
+							else if (tyrePressures[A_Index] > 0)
+								tyrePressures[A_Index] := ("+" . tyrePressures[A_Index])
+						}
+						else
+							tyrePressures[A_Index] := displayValue(kNull)
 					}
 
-				coldPressures := values2String(", ", coldPressures*)
+					pressureCorrections := (translate(" (") . values2String(", ", tyrePressures*) . translate(")"))
+				}
+				else
+					pressureCorrections := ""
+
+				coldPressures := (values2String(", ", coldPressures*) . pressureCorrections)
 
 				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
 												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
@@ -8826,7 +8834,7 @@ class RaceCenter extends ConfigurationItem {
 			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
 
 		if (coldPressures != "-, -, -, -")
-			html .= ("<tr><td><b>" . translate("Pressures (cold):") . "</b></td><td>" . coldPressures . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Pressures (cold, recommended):") . "</b></td><td>" . coldPressures . "</td></tr>")
 
 		if (pressuresLosses != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (loss):") . "</b></td><td>" . pressuresLosses . "</td></tr>")

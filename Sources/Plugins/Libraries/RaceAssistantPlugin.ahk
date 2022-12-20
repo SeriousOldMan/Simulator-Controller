@@ -346,10 +346,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			local stateLap, dataLap
 
 			if (sessionSettings && sessionState) {
-				stateLap := getConfigurationValue(sessionState, "Session State", "Lap", 0)
-				dataLap := getConfigurationValue(this.Data, "Stint Data", "Laps", 0)
+				stateLap := getConfigurationValue(sessionState, "Session State", "Lap", false)
+				dataLap := getConfigurationValue(this.Data, "Stint Data", "Laps", false)
 
-				if (Abs(dataLap - stateLap) <= 5) {
+				if (!dataLap || !stateLap || Abs(dataLap - stateLap) <= 5) {
 					if isDebug()
 						showMessage("Restoring session state for " . raceAssistant.Plugin)
 

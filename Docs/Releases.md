@@ -7,7 +7,8 @@
   6. The handling of initial fuel in races with a formation lap has been optimized.
   7. A couple of rare update problems in "Race Center" has been fixed.
   8. Found and fixed (potentially) a rare bug, when the Spotter announces race half time at a totally wrong point in time. Happens only in team races.
-  9. Update of the Spanish translations by J. Krilin, so that all recent changes and additions are covered.
+  10. The "Race Center" now show target pressure deviations from the ideal setup in the lap report.
+  11. Update of the Spanish translations by J. Krilin, so that all recent changes and additions are covered.
 
 ## 4.5.2.1-release 12/16/22
   1. Minor bugfixes, as always

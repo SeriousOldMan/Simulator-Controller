@@ -3990,6 +3990,74 @@ class RaceCenter extends ConfigurationItem {
 		return false
 	}
 
+	getStintSetup(stintNr, ByRef fuel, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyreSet, ByRef tyrePressures) {
+		local lap := this.Stints[stintNr].Laps[1]
+		local pressureTable, pressures, window, currentListView, compound
+
+		tyrePressures := false
+		fuel := lap.FuelRemaining
+
+		splitCompound(lap.Compound, tyreCompound, tyreCompoundColor)
+
+		if lap.Telemetry
+			tyreSet := getConfigurationValue(parseConfiguration(lap.Telemetry), "Car Data", "TyreSet", false)
+		else
+			tyreSet := false
+
+		loop {
+			if (stintNr <= 1) {
+				pressuresTable := this.PressuresDatabase.Database.Tables["Tyres.Pressures"]
+
+				if (pressuresTable.Length() >= 1) {
+					pressures := pressuresTable[1]
+
+					tyrePressures := [pressures["Tyre.Pressure.Cold.Front.Left"], pressures["Tyre.Pressure.Cold.Front.Right"]
+									, pressures["Tyre.Pressure.Cold.Rear.Left"], pressures["Tyre.Pressure.Cold.Rear.Right"]]
+
+					loop 4
+						if isNull(tyrePressures[A_Index]) {
+							tyrePressures := false
+
+							break
+						}
+				}
+
+				break
+			}
+			else {
+				window := this.Window
+
+				Gui %window%:Default
+
+				currentListView := A_DefaultListView
+
+				try {
+					Gui ListView, % this.PitstopsListView
+
+					if (LV_GetCount() >= (stintNr - 1)) {
+						LV_GetText(compound, stintNr - 1, 4)
+
+						if (compound != "-") {
+							if !tyreSet
+								LV_GetText(tyreSet, stintNr - 1, 5)
+
+							LV_GetText(pressures, stintNr - 1, 6)
+
+							tyrePressures := string2Values(",", pressures)
+
+							break
+						}
+					}
+
+					stintNr -= 1
+				}
+				finally {
+					Gui ListView, %currentListView%
+				}
+			}
+		}
+	}
+
 	getStrategySettings(ByRef simulator, ByRef car, ByRef track, ByRef weather, ByRef airTemperature, ByRef trackTemperature
 					  , ByRef sessionType, ByRef sessionLength
 					  , ByRef maxTyreLaps, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyrePressures) {
@@ -5649,7 +5717,7 @@ class RaceCenter extends ConfigurationItem {
 					if lap {
 						fuel := Round(getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
 						compound := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
-						compoundColor := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color")
+						compoundColor := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color", false)
 						tyreSet := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
 						pressureFL := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-")
 						pressureFR := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-")
@@ -5671,7 +5739,7 @@ class RaceCenter extends ConfigurationItem {
 
 						Gui ListView, % this.PitstopsListView
 
-						LV_Add("", nextStop, lap + 1, fuel, translate(compound(compound, compoundColor)), tyreSet
+						LV_Add("", nextStop, lap + 1, fuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
 								 , pressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 						if (nextStop = 1) {
@@ -6944,6 +7012,7 @@ class RaceCenter extends ConfigurationItem {
 	loadPitstops() {
 		local window := this.Window
 		local currentListView, ignore, pitstop, repairBodywork, repairSuspension, repairEngine, pressures
+		local compound, compoundColor
 
 		Gui %window%:Default
 
@@ -6959,10 +7028,18 @@ class RaceCenter extends ConfigurationItem {
 				pressures := values2String(", ", pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
 											   , pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"])
 
+				compound := pitstop["Tyre.Compound"]
+				compoundColor := pitstop["Tyre.Compound.Color"]
+
+				if (!compound || (compound = "-")) {
+					compound := "-"
+					compoundColor := false
+				}
+
 				Gui ListView, % this.PitstopsListView
 
 				LV_Add("", A_Index, pitstop.Lap + 1, pitstop.Fuel
-						 , translate(compound(pitstop["Tyre.Compound"], pitstop["Tyre.Compound.Color"]))
+						 , (compound = "-") ? compound : translate(compound(compound, compoundColor))
 						 , pitstop["Tyre.Set"], pressures
 						 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 			}
@@ -8687,8 +8764,10 @@ class RaceCenter extends ConfigurationItem {
 		local html := "<table>"
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
+		local pressuresLosses := "-, -, -, -"
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
+		local stintNr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures
 
 		if pressuresDB {
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
@@ -8696,8 +8775,25 @@ class RaceCenter extends ConfigurationItem {
 			if (pressuresTable.Length() >= lap.Nr) {
 				pressures := pressuresTable[lap.Nr]
 
-				coldPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
-												   , displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"]))
+				coldPressures := [displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
+								, displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
+
+				this.getStintSetup(lap.Stint.Nr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures)
+
+				if tyrePressures
+					loop 4 {
+						coldPressure := coldPressures[A_Index]
+
+						if (coldPressure != "-")
+							coldPressure := Round(coldPressure - tyrePressures[A_Index], 1)
+
+						if (coldPressure != 0)
+							coldPressures[A_Index] := (coldPressures[A_Index] . translate(" (")
+																			  . ((coldPressure > 0) ? ("+" . coldPressure) : coldPressure)
+																			  . translate(")"))
+					}
+
+				coldPressures := values2String(", ", coldPressures*)
 
 				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
 												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
@@ -8725,9 +8821,16 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . lap.FuelConsumption . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . lap.FuelRemaining . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . lap.AirTemperature . ", " . lap.TrackTemperature . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Pressures (cold):") . "</b></td><td>" . coldPressures . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Pressures (loss):") . "</b></td><td>" . pressuresLosses . "</td></tr>")
+
+		if (hotPressures != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
+
+		if (coldPressures != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Pressures (cold):") . "</b></td><td>" . coldPressures . "</td></tr>")
+
+		if (pressuresLosses != "-, -, -, -")
+			html .= ("<tr><td><b>" . translate("Pressures (loss):") . "</b></td><td>" . pressuresLosses . "</td></tr>")
+
 		html .= "</table>"
 
 		return html

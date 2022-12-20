@@ -2121,13 +2121,14 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
-			speaker := this.getSpeaker()
-			fragments := speaker.Fragments
+		if (this.Session == kSessionRace)
+			if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
+				speaker := this.getSpeaker()
+				fragments := speaker.Fragments
 
-			speaker.speakPhrase("PressureLoss", {tyre: fragments[{FL: "FrontLeft", FR: "FrontRight", RL: "RearLeft", RR: "RearRight"}[tyre]]
-											   , lost: Round(lostPressure, 1), unit: fragments["PSI"]})
-		}
+				speaker.speakPhrase("PressureLoss", {tyre: fragments[{FL: "FrontLeft", FR: "FrontRight", RL: "RearLeft", RR: "RearRight"}[tyre]]
+												   , lost: Round(lostPressure, 1), unit: fragments["PSI"]})
+			}
 	}
 
 	weatherChangeNotification(change, minutes) {

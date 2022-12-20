@@ -1020,7 +1020,7 @@ class RaceStrategist extends RaceAssistant {
 	reviewRace(multiClass, cars, laps, position, leaderAvgLapTime
 			 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev) {
 		local knowledgeBase := this.KnowledgeBase
-		local class, speaker, continuation, only, driver, goodPace
+		local split, class, speaker, continuation, only, driver, goodPace
 
 		if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0)) {
 			speaker := this.getSpeaker()
@@ -1030,9 +1030,11 @@ class RaceStrategist extends RaceAssistant {
 			class := (multiClass ? speaker.Fragments["Class"] : "")
 
 			try {
-				if (position <= (cars / 5))
+				split := Max(1, (cars / 5))
+
+				if (position <= split)
 					speaker.speakPhrase("GreatRace", {position: position, class: class})
-				else if (position <= ((cars / 5) * 3))
+				else if (position <= (split * 3))
 					speaker.speakPhrase("MediocreRace", {position: position, class: class})
 				else
 					speaker.speakPhrase("CatastrophicRace", {position: position, class: class})

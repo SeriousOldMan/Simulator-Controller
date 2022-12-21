@@ -45,9 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-[4.5.2.1-release](https://cutt.ly/Q0mcGMU) (New features: Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer, Optimized handling of tyre pressures for multiple drivers in the "Session Database", Support for tyre pressure meta data, Load tyre pressure setups in "Race Center" from the "Session Database", New car models for "Setup Advisor", Remember selection of simulator, car and track in many applications.)
+[4.5.3.0-dev](https://www.dropbox.com/s/dz4api4afbjpy33/Simulator%20Controller%204.5.3.0-dev.zip?dl=1) (Early build for 4.5.3. New features: IPressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center", Support for audio device selection for voice ouput, Tweaked the range of all integer input fields, Better handling of initial fuel in strategy simulation and display, Fixed race condition for pitstop details synchronization in "Race Center", "Race Center" show tyre pressure target deviations, New car models for "Setup Advisor".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-452) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-453) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

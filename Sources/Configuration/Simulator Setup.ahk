@@ -1676,8 +1676,9 @@ class SetupWizard extends ConfigurationItem {
 		for index, action in actions
 			knowledgeBase.addFact("Module." . module . modeClause . ".Action." . index, action)
 
-		knowledgeBase.setFact("Module." . module . modeClause . ".Action.Count", count + 1)
 		knowledgeBase.setFact("Module." . module . modeClause . ".Action.Count", actions.Length())
+
+		this.iCachedActions.Delete(module . mode)
 
 		this.updateState()
 	}

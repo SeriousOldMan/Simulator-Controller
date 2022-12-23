@@ -1,4 +1,4 @@
-## 4.5.3.0-release 12/23/22 (planned)
+## 4.5.3.0-release 12/23/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. The AI now detects pressure loss - either sudden or even a kreeping puncture, as long as not all tires are affected at the same time. The Race Engineer will inform you about pressure losses and he as well as the "Race Center" will try to compensate for that when planning and preparing pitstop. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#how-it-works) for more information.

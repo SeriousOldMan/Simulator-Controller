@@ -33,6 +33,8 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Private Variables Section                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global vBuildConfiguration := "Development"
+
 global vIncomingValues := []
 
 

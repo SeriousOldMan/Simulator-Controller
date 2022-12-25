@@ -1925,7 +1925,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsAhead.Reported := true
 
-					standingsAhead.reset(sector)
+					standingsAhead.reset(sector, false, true)
 
 					spoken := true
 				}
@@ -1944,7 +1944,7 @@ class RaceSpotter extends RaceAssistant {
 
 					informed := true
 
-					standingsAhead.reset(sector)
+					standingsAhead.reset(sector, false, true)
 
 					spoken := true
 				}
@@ -1953,7 +1953,7 @@ class RaceSpotter extends RaceAssistant {
 													, lost: printNumber(deltaDifference, 1)
 													, lapTime: printNumber(lapTimeDifference, 1)})
 
-					standingsAhead.reset(sector, true)
+					standingsAhead.reset(sector, true, true)
 
 					spoken := true
 				}
@@ -1996,7 +1996,7 @@ class RaceSpotter extends RaceAssistant {
 
 					standingsBehind.Reported := true
 
-					standingsBehind.reset(sector)
+					standingsBehind.reset(sector, false, true)
 
 					spoken := true
 				}
@@ -2008,7 +2008,7 @@ class RaceSpotter extends RaceAssistant {
 					if !informed
 						speaker.speakPhrase("Focus")
 
-					standingsBehind.reset(sector)
+					standingsBehind.reset(sector, false, true)
 
 					spoken := true
 				}
@@ -2017,7 +2017,7 @@ class RaceSpotter extends RaceAssistant {
 													   , gained: printNumber(deltaDifference, 1)
 													   , lapTime: printNumber(lapTimeDifference, 1)})
 
-					standingsBehind.reset(sector, true)
+					standingsBehind.reset(sector, true, true)
 
 					spoken := true
 				}

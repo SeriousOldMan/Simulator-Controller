@@ -370,6 +370,8 @@ class PositionInfo {
 
 	iBaseLap := false
 	iObserved := ""
+
+	iInitialLaps := {}
 	iInitialDeltas := {}
 
 	iReported := false
@@ -417,6 +419,12 @@ class PositionInfo {
 		}
 	}
 
+	InitialLap[sector] {
+		Get {
+			return (this.iInitialLaps.HasKey(sector) ? this.iInitialLaps[sector] : false)
+		}
+	}
+
 	InitialDelta[sector] {
 		Get {
 			local delta
@@ -426,6 +434,7 @@ class PositionInfo {
 			else {
 				delta := this.Delta[sector]
 
+				this.iInitialLaps[sector] := this.Car.LastLap
 				this.iInitialDeltas[sector] := delta
 
 				return delta
@@ -436,6 +445,14 @@ class PositionInfo {
 	Delta[sector, average := false, count := 3] {
 		Get {
 			return this.Car.Delta[sector, average, count]
+		}
+	}
+
+	LapDifference[sector] {
+		Get {
+			local initialLap := this.InitialLap[sector]
+
+			return (initialLap ? (this.Car.LastLap - initialLap) : false)
 		}
 	}
 
@@ -590,17 +607,24 @@ class PositionInfo {
 			this.iBaseLap := this.Car.LastLap
 		}
 
+		this.iInitialLaps := {}
 		this.iInitialDeltas := {}
 
-		if !full
+		if !full {
+			this.iInitialLaps[sector] := this.Car.LastLap
 			this.iInitialDeltas[sector] := this.Delta[sector]
+		}
 	}
 
 	rebase(sector) {
-		if (this.Car.LastLap >= (this.iBaseLap + 3))
+		local lastLap := this.Car.LastLap
+
+		if (lastLap >= (this.iBaseLap + 3))
 			this.reset(sector, true)
-		else
+		else {
+			this.iInitialLaps[sector] := lastLap
 			this.iInitialDeltas[sector] := this.Delta[sector]
+		}
 	}
 
 	checkpoint(sector) {
@@ -1932,7 +1956,8 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
 					speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													  , gained: printNumber(deltaDifference, 1)
-													  , lapTime: printNumber(lapTimeDifference, 1)})
+													  , lapTime: printNumber(lapTimeDifference, 1)
+													  , laps: standingsAhead.LapDifference[sector]})
 
 					remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
@@ -1951,7 +1976,8 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsAhead.runningAway(sector, frontLostThreshold)) {
 					speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													, lost: printNumber(deltaDifference, 1)
-													, lapTime: printNumber(lapTimeDifference, 1)})
+													, lapTime: printNumber(lapTimeDifference, 1)
+													, laps: standingsAhead.LapDifference[sector]})
 
 					standingsAhead.reset(sector, true, true)
 
@@ -2003,7 +2029,8 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
 					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													 , lost: printNumber(deltaDifference, 1)
-													 , lapTime: printNumber(lapTimeDifference, 1)})
+													 , lapTime: printNumber(lapTimeDifference, 1)
+													 , laps: standingsBehind.LapDifference[sector]})
 
 					if !informed
 						speaker.speakPhrase("Focus")
@@ -2015,7 +2042,8 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsBehind.runningAway(sector, behindGainThreshold)) {
 					speaker.speakPhrase("GainedBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
 													   , gained: printNumber(deltaDifference, 1)
-													   , lapTime: printNumber(lapTimeDifference, 1)})
+													   , lapTime: printNumber(lapTimeDifference, 1)
+													   , laps: standingsBehind.LapDifference[sector]})
 
 					standingsBehind.reset(sector, true, true)
 

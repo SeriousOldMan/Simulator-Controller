@@ -10,11 +10,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Includes\Development.ahk
+#Include ..\Framework\Development.ahk
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Includes\Production.ahk
+;@SC #Include ..\Framework\Production.ahk
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Session Database.ico
@@ -25,7 +25,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -4833,7 +4833,7 @@ editSettings(editorOrCommand, arguments*) {
 						MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
 						OnMessage(0x44, "")
 
-						broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitApplication")
+						broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exit")
 					}
 				}
 				else

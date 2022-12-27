@@ -23,12 +23,14 @@ ListLines Off					; Disable execution history
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Engine.ico
 ;@Ahk2Exe-ExeName ACC UDP Tester.exe
 
+global vBuildConfiguration := "Development"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -45,44 +47,44 @@ global vUDPClient := false
 viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
 	static hasWindow := false
 	static dismissed := false
-	
+
 	static titleField
 	static textField
-	
+
 	dismissed := false
-	
+
 	if !fileName {
 		dismissed := true
-	
+
 		return
 	}
-	
+
 	FileRead text, %fileName%
-	
+
 	Gui FV:Default
-	
+
 	if hasWindow {
 		GuiControl Text, titleField, %title%
 		GuiControl Text, textField, %text%
-		
+
 		Gui FV:Show
 	}
 	else {
 		hasWindow := true
-	
+
 		innerWidth := width - 16
-		
+
 		Gui FV:-Border -Caption
 		Gui FV:Color, D0D0D0, D8D8D8
 		Gui FV:Font, s10 Bold
 		Gui FV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveFileViewer, % translate("Modular Simulator Controller System")
 		Gui FV:Font
 		Gui FV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans vtitleField, %title%
-		
+
 		editHeight := height - 102
-		
+
 		Gui FV:Add, Edit, X8 YP+26 W%innerWidth% H%editHeight% vtextField, % text
-		
+
 		SysGet mainScreen, MonitorWorkArea
 
 		if x is not integer
@@ -104,19 +106,19 @@ viewFile(fileName, title := "", x := "Center", y := "Center", width := 800, heig
 				default:
 					y := "Center"
 			}
-		
+
 		buttonX := Round(width / 2) - 90
-		
+
 		Gui FV:Add, Button, Default X%buttonX% y+10 w80 gdismissFileViewer, % translate("Continue")
 		Gui FV:Add, Button, Default XP+90 yp w80 gexitACCUDPTester, % translate("Exit")
-		
+
 		Gui FV:+AlwaysOnTop
 		Gui FV:Show, X%x% Y%y% W%width% H%height% NoActivate
 	}
-	
+
 	while !dismissed
 		Sleep 100
-	
+
 	Gui FV:Hide
 }
 
@@ -134,18 +136,18 @@ exitACCUDPTester() {
 
 startUDPClient() {
 	exePath := kBinariesDirectory . "ACC UDP Provider.exe"
-			
+
 	try {
 		if FileExist(kTempDirectory . "ACCUDP.cmd")
 			deleteFile(kTempDirectory . "ACCUDP.cmd")
-			
+
 		if FileExist(kTempDirectory . "ACCUDP.out")
 			deleteFile(kTempDirectory . "ACCUDP.out")
-		
+
 		Run %ComSpec% /c ""%exePath%" "%kTempDirectory%ACCUDP.cmd" "%kTempDirectory%ACCUDP.out"", , Hide
-		
+
 		vUDPClient := "stopUDPClient"
-		
+
 		OnExit(vUDPClient)
 	}
 }
@@ -153,42 +155,42 @@ startUDPClient() {
 stopUDPClient() {
 	if vUDPClient {
 		FileAppend Exit, %kTempDirectory%ACCUDP.cmd
-				
+
 		OnExit(vUDPClient, 0)
-		
+
 		vUDPClient := false
 	}
-	
+
 	return false
 }
 
 readUDPData() {
 	fileName := kTempDirectory . "ACCUDP.cmd"
-		
+
 	FileAppend Read, %fileName%
-	
+
 	tries := 10
-	
+
 	while FileExist(fileName) {
 		Sleep 200
-	
+
 		if (--tries <= 0)
 			break
 	}
-	
+
 	static traceFileSize := 0
-	
+
 	if (tries > 0) {
 		traceFile := kTempDirectory . "ACCUDP.out.Trace"
-		
+
 		if FileExist(traceFile) {
 			FileGetSize lastSize, %traceFile%
-			
+
 			if (lastSize > traceFileSize) {
 				traceFileSize := lastSize
-				
+
 				viewFile(traceFile, "Invalid - Error Trace")
-				
+
 				deleteFile(traceFile)
 			}
 			else
@@ -196,27 +198,27 @@ readUDPData() {
 		}
 		else
 			viewFile(kTempDirectory . "ACCUDP.out", "Valid - Car Positions")
-		
+
 		return true
 	}
 	else {
 		Process Exist, ACC UDP Provider.exe
-	
+
 		if ErrorLevel
 			MsgBox No data returned - UDP provider is frozen...
 		else
 			MsgBox No data returned - UDP provider has crashed...
-	
+
 		return false
 	}
 }
 
 runACCUDPTester() {
 	icon := kIconsDirectory . "Engine.ico"
-	
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, ACC UDP Tester
-	
+
 	startUDPClient()
 
 	Sleep 5000

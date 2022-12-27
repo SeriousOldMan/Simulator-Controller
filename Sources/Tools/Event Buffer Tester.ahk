@@ -23,18 +23,27 @@ ListLines Off					; Disable execution history
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
 ;@Ahk2Exe-ExeName Event Buffer Tester.exe
 
+global vBuildConfiguration := "Development"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include ..\Assistants\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-	
+
 global selectedSimulator
 global eventMode
 global hotkey
@@ -48,46 +57,46 @@ global dismissed
 
 selectCommand(title := "Event Buffer Tester", x := "Center", y := "Center", width := 300, height := 200) {
 	static hasWindow := false
-	
+
 	static titleField
-	
+
 	dismissed := false
-	
+
 	Gui EBT:Default
-	
+
 	if hasWindow {
 		GuiControl Text, titleField, %title%
-		
+
 		Gui EBT:Show
 	}
 	else {
 		hasWindow := true
-	
+
 		innerWidth := width - 16
-		
+
 		Gui EBT:-Border -Caption
 		Gui EBT:Color, D0D0D0, D8D8D8
 		Gui EBT:Font, s10 Bold
 		Gui EBT:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveEventBufferTester, % translate("Modular Simulator Controller System")
 		Gui EBT:Font
 		Gui EBT:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans vtitleField, %title%
-		
+
 		Gui EBT:Add, Text, x16 yp+40 w70 h23 +0x200, % translate("Simulator")
-		
+
 		simulators := new SessionDatabase().getSimulators()
 		simulator := 0
-		
+
 		if (simulators.Length() > 0)
 			simulator := 1
-	
+
 		Gui EBT:Add, DropDownList, x100 yp w191 Choose%simulator% vselectedSimulator, % values2String("|", simulators*)
-		
+
 		Gui EBT:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Event Mode")
 		Gui EBT:Add, DropDownList, x100 yp w191 AltSubmit Choose1 veventMode, Event|Input|Play|Raw|Default
-		
+
 		Gui EBT:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Hotkey")
 		Gui EBT:Add, Edit, x100 yp w50 vhotKey
-		
+
 		SysGet mainScreen, MonitorWorkArea
 
 		if x is not integer
@@ -109,38 +118,38 @@ selectCommand(title := "Event Buffer Tester", x := "Center", y := "Center", widt
 				default:
 					y := "Center"
 			}
-		
+
 		buttonX := Round(width / 2) - 90
-		
+
 		Gui EBT:Add, Button, Default X%buttonX% y+20 w80 gsendCommand, % translate("Send")
 		Gui EBT:Add, Button, Default XP+90 yp w80 gexitEventBufferTester, % translate("Exit")
-		
+
 		Gui EBT:+AlwaysOnTop
 		Gui EBT:Show, X%x% Y%y% W%width% H%height% NoActivate
 	}
-	
+
 	while !dismissed
 		Sleep 100
-	
+
 	GUI EBT:Hide
-	
+
 	Sleep 2500
-	
+
 	selectCommand()
 }
 
 activateSimulatorWindow(selectedSimulator) {
 	window := new Application(selectedSimulator, kSimulatorConfiguration).WindowTitle
-		
+
 	if !WinExist(window) {
 		showMessage(selectedSimulator . " not found...")
-		
+
 		return false
 	}
-	
+
 	if !WinActive(window)
 		WinActivate %window%
-	
+
 	return true
 }
 
@@ -161,13 +170,13 @@ sendSimulatorCommand(eventMode, command) {
 
 sendCommand() {
 	Gui EBT:Default
-	
+
 	GuiControlGet selectedSimulator
 	GuiControlGet eventMode
 	GuiControlGet hotkey
-	
+
 	dismissed := true
-	
+
 	if activateSimulatorWindow(selectedSimulator)
 		sendSimulatorCommand(["Event", "Input", "Play", "Raw", "Default"][eventMode], hotkey)
 }
@@ -182,10 +191,10 @@ exitEventBufferTester() {
 
 runEventBufferTester() {
 	icon := kIconsDirectory . "Tools.ico"
-	
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Event Buffer Tester
-	
+
 	selectCommand()
 
 	return

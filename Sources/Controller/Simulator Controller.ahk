@@ -10,11 +10,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Includes\Development.ahk
+#Include ..\Framework\Development.ahk
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Includes\Production.ahk
+;@SC #Include ..\Framework\Production.ahk
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Gear.ico
@@ -25,7 +25,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1986,7 +1986,7 @@ externalCommandManager() {
 
 		try {
 			file := FileOpen(fileName, "rw-rwd")
-			
+
 			if !file
 				return
 		}

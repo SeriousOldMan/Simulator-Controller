@@ -6,19 +6,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                       Global Declaration Section                        ;;;
-;;;-------------------------------------------------------------------------;;;
-
-; #Warn ClassOverwrite, Off
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Constants.ahk
-#Include ..\Includes\Variables.ahk
-#Include ..\Includes\Functions.ahk
+#Include ..\Framework\Constants.ahk
+#Include ..\Framework\Variables.ahk
+#Include ..\Framework\Debug.ahk
+#Include ..\Framework\Collections.ahk
+#Include ..\Framework\Configuration.ahk
+#Include ..\Framework\Message.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

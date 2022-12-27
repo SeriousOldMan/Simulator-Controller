@@ -16,11 +16,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Includes\Development.ahk
+#Include ..\Framework\Development.ahk
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Includes\Production.ahk
+;@SC #Include ..\Framework\Production.ahk
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Startup.ico
@@ -31,7 +31,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -381,7 +381,7 @@ launchPad(command := false, arguments*) {
 		result := kClose
 	}
 	else if (command = "Close All") {
-		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "Simulator Startup")), "exitApplication")
+		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "Simulator Startup")), "exit")
 
 		Sleep 2000
 

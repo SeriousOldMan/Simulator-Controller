@@ -21,19 +21,15 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ; ListLines Off					; Disable execution history
 
 
+global vBuildConfiguration := "Development"
+
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include AHKUnit\AHKUnit.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Private Variables Section                       ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vBuildConfiguration := "Development"
 
 
 ;;;-------------------------------------------------------------------------;;;

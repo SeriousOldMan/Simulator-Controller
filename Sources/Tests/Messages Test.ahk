@@ -21,6 +21,9 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ; ListLines Off					; Disable execution history
 
 
+global vBuildConfiguration := "Development"
+
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -33,14 +36,16 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;                         Private Variables Section                       ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vBuildConfiguration := "Development"
-
 global vIncomingValues := []
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                              Test Section                               ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+exit() {
+	ExitApp 0
+}
 
 class MessagesTest extends Assert {
 	listEqual(list1, list2) {

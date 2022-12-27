@@ -21,11 +21,14 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ; SetBatchLines -1				; Maximize CPU utilization
 ; ListLines Off					; Disable execution history
 
+global vBuildConfiguration := "Development"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include ..\Framework\Startup.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceEngineer.ahk
 #Include AHKUnit\AHKUnit.ahk
@@ -34,8 +37,6 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-global vBuildConfiguration := "Development"
 
 global vFuelWarnings := {}
 

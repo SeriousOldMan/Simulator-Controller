@@ -1,4 +1,4 @@
-## Configurations ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Configurations ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Configuration.ahk))
 Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
 
 #### *newConfiguration()* 
@@ -37,12 +37,12 @@ Stores a configuration map in the given file. All previous content of the file w
 #### *printConfiguration(configuration :: ConfigurationMap)*
 Simular to *writeConfiguration*, but returns the textual configuration as a string.
 
-#### *getControllerStatus()*
+#### *getControllerState()*
 This function returns a representation of the file *Simulator Controller.status* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The configuration object consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller as well as a lot of information about the internal status of all components. This file is created by the *Simulator Controller.exe* application and is updated periodically.
 
 ***
 
-## Tray Messages ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Tray Messages ([TrayMenu.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/TrayMenu.ahk))
 Tray messages or TrayTips are small popup windows in the lower right corner of the main screen used by applications or the Windows operating system to inform the user about an important event. Tray messages can be displayed by the Simulator Controller for almost every change in the controller state.
 
 #### *trayMessage(title :: String, message :: String, duration :: Integer := false)*
@@ -94,7 +94,7 @@ Sends the given message. The first parameter defines the delivery method, where 
 
 ***
 
-## File Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## File Handling ([Files.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Files.ahk))
 A small collection of functions to deal with files and directories. Note: All the directory names used with these functions must contain a trailing backslash "\", since this is standard in the Simulator Controller code.
 
 #### *getFileName*(fileName :: String, #rest directories :: String)*
@@ -102,6 +102,9 @@ If *fileName* contains an absolute path, itself will be returned. Otherwise, all
 
 #### *getFileNames*(filePattern :: String, #rest directories :: String)*
 Returns a list of absolute paths for all files in the given directories satisfying *filePattern*.
+
+#### *temporaryFileName(name :: String, extension :: String)*
+Creates a unique file name for a file located in the *Temp* folder. *name* will be followed by a unique number and the file will have an extension as defined by the second parameter.
 
 #### *normalizeFilePath(filePath :: String)*
 Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this simplified file path.
@@ -120,7 +123,7 @@ Deletes the directory with the given name incl. all current content. Returns *tr
 
 ***
 
-## Collection & String Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Collection & String Helper Functions ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Collections.ahk))
 Often used collection functions, that are not part of the AutoHotkey language.
 
 #### *substituteVariables(string :: String, values :: Map := {})*
@@ -170,7 +173,7 @@ Sorts the given array in place, using *comparator* to define the order of the el
 
 ***
 
-## Localization & Translation ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Localization & Translation ([Localization.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Localization.ahk))
 A simple translation support is built into Simulator Controller. Every text, that appears in the different screens and system messages may translated to a different language than standard English. To support this, a single tranlation file (see the [translation file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Translations.de) for German for an example) must exist for each target language in one of the *Simulator Controller\Translations* folder in you user *Documents* folder.
 
 #### *availableLanguages()*
@@ -191,15 +194,10 @@ Returns the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_
 #### *translate(string :: String)*
 *string* is a text in English. *translate* reads the translations for the current target language and returns the translated text, or *string* itself, if no translation can be found.
 
-#### *translateMsgBoxButtons(buttonLabels :: Array)*
-This function helps you to translate the button labels for standard dialogs like those of the AutoHotkey *MsgBox* command: A typical usage looks like this:
+#### *registerLocalizationCallback(callback :: Function)*
+Registers a callback, which will be invoked, whenever a part of the localization is changed. A map is passed to this function which contains information about the changes. It contains one or more of the following key / value pairs:
 
-	OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No", "Never"]))
-	title := translate("Modular Simulator Controller System")
-	MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
-	OnMessage(0x44, "")
-
-As you can see, this dialog will show three buttons which will be labeled "Yes", "No" and "Never" in the English language setting. *translateMsgBoxButtons* will call the *translate* function automatically for these labels, before they will be set as labels for the different buttons.
+	*Language:* languageCode
  
 ***
 
@@ -234,7 +232,7 @@ Closes the currently open progress window.
 
 ***
 
-## GUI Tools ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## GUI Tools ([GUI.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/GUI.ahk))
 Miscellaneous helper functions for GUI programming.
 
 #### *moveByMouse(guiPrefix :: String, descriptor :: String := false)*
@@ -246,9 +244,19 @@ Retrieves the position of a window identified by the given *descriptor*, once it
 #### *setButtonIcon(buttonHandle :: Handle, file :: String)*
 Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.
 
+#### *translateMsgBoxButtons(buttonLabels :: Array)*
+This function helps you to translate the button labels for standard dialogs like those of the AutoHotkey *MsgBox* command: A typical usage looks like this:
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").bind(["Yes", "No", "Never"]))
+	title := translate("Modular Simulator Controller System")
+	MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
+	OnMessage(0x44, "")
+
+As you can see, this dialog will show three buttons which will be labeled "Yes", "No" and "Never" in the English language setting. *translateMsgBoxButtons* will call the *translate* function automatically for these labels, before they will be set as labels for the different buttons.
+
 ***
 
-## Thread Protection ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Thread Protection ([Task.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Task.ahk))
 In AutoHotkey scripts, running threads may be interrupted by other events, such as keyboard events or timer functions. Using the functions below, it is possible to create protected sections of code, which may not be interrupted.
 
 #### *protectionOn()*
@@ -262,8 +270,11 @@ Convenience function to call a given function with supplied parameters in a prot
 
 ***
 
-## Debugging and Logging ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Debugging and Logging ([Debug.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Debug.ahk))
 Essential support for tracking down coding errors. Since AutoHotkey is a weakly typed programming language, it is sometimes very difficult to get to the root cause of an error. Especially the tracing and logging capabilities may help here. All log files are located in the *Simulator Controller\Logs* folder found in your user *Documents* folder.
+
+#### *isDevelopment()*
+Returns *true*, if the current application was compiled for the development enviroment. This enables additonal debug support for the underlying language runtime system.
 
 #### *isDebug()*
 Returns *true*, if debugging is currently enabled. The Simulator Controller uses debug mode to handle things differently, for example all plugins and modes will be active, even if they declare to be not.

@@ -3,7 +3,7 @@ Version=4.5.3.1-dev
 Target=4.5.3.1-release
 Date=12/23/2022
 Download=
-Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Ptential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements
+Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Ptential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, FUll refactoring of fundamental framework
 [Release]
 Version=4.5.2.1-release
 Date=12/16/2022

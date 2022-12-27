@@ -23,12 +23,14 @@ ListLines Off					; Disable execution history
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Engine.ico
 ;@Ahk2Exe-ExeName Team Session Logger.exe
 
+global vBuildConfiguration := "Development"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -37,11 +39,11 @@ ListLines Off					; Disable execution history
 
 readSimulatorData(simulator, options := "", protocol := "SHM") {
 	exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
-	
+
 	FileCreateDir %kTempDirectory%%simulator% Data
-	
+
 	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
-	
+
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
@@ -49,32 +51,32 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: protocol})
 												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 												   . kBinariesDirectory . translate(")"))
-			
+
 		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 									  , {exePath: exePath, simulator: simulator, protocol: protocol})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
-	
+
 	data := readConfiguration(dataFile)
-	
+
 	deleteFile(dataFile)
-	
+
 	setConfigurationValue(data, "Session Data", "Simulator", simulator)
-	
+
 	return data
 }
 
 runTeamSessionLogger() {
 	icon := kIconsDirectory . "Engine.ico"
-	
+
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Team Session Logger
-	
+
 	deleteFile(kTempDirectory . "Team Session.log")
-	
+
 	loop {
 		data := readSimulatorData("ACC")
-	
+
 		info := values2String("; ", A_Now,
 								  , getConfigurationValue(data, "Session Data", "Active", "?")
 								  , getConfigurationValue(data, "Session Data", "Paused", "?")
@@ -86,9 +88,9 @@ runTeamSessionLogger() {
 								  , getConfigurationValue(data, "Stint Data", "DriverNickName", "?")
 								  , getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", "?")
 								  , getConfigurationValue(data, "Stint Data", "StintTimeRemaining", "?")) . "`n"
-								  
+
 		FileAppend %info%, %kTempDirectory%Team Session.log
-		
+
 		Sleep 10000
 	}
 

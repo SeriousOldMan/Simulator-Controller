@@ -1,58 +1,130 @@
-## Configurations ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
+## Thread Protection ([Task.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Libraries/Task.ahk))
+In AutoHotkey scripts, running threads may be interrupted by other events, such as keyboard events or timer functions. Using the functions below, it is possible to create protected sections of code, which may not be interrupted.
 
-#### *newConfiguration()* 
-Returns a new empty configuration map. The configuration map is not derived from a public class and may be accessed only through the functions given below. 
+#### *protectionOn()*
+Starts a protected section of code. Calls to protectionOn() may be nested.
 
-#### *getConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, default := false)*
-Returns the value defined for the given key or the *default*, if no such key has been defined.
+#### *protectionOff()*
+Finishes a protected section of code. Only if the outermost section has been finished, the current thread becomes interruptable again.
 
-#### *setConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, value)*
-Stores the given value for the given key in the configuration map. The value must be convertible to a String representation.
-
-#### *getConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, default := false)*
-Retrieves all key / value pairs for a given section as a map. Returns *default*, if the section does not exist.
-
-#### *setConfigurationValues(configuration, otherConfiguration)*
-This function takes all key / value pairs from all sections in *otherConfiguration* and copies them to *configuration*.
-
-#### *setConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, values :: Object)*
-Stores all the key / value pairs in the configuration map under the given section.
-
-#### *removeConfigurationValue(configuration :: ConfigurationMao, section :: String, key :: String)*
-Removes the given key and its value from the configuration map.
-
-#### *removeConfigurationSection(configuration :: ConfigurationMao, section :: String)*
-Removes the given section including all keys and values from the configuration map.
-
-#### *readConfiguration(configFile :: String)*
-Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file. If *configFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
-
-#### *parseConfiguration(text :: String)*
-Simular to *readConfiguration*, but reads the configuration from a string instead of a file.
-
-#### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
-Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file. If *configFile* denotes an absolute path, the configuration will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
-
-#### *printConfiguration(configuration :: ConfigurationMap)*
-Simular to *writeConfiguration*, but returns the textual configuration as a string.
-
-#### *getControllerStatus()*
-This function returns a representation of the file *Simulator Controller.status* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The configuration object consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller as well as a lot of information about the internal status of all components. This file is created by the *Simulator Controller.exe* application and is updated periodically.
+#### *withProtection(function :: TypeUnion(String, FuncObj), #rest params)*
+Convenience function to call a given function with supplied parameters in a protected section.
 
 ***
 
-## Tray Messages ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Tray messages or TrayTips are small popup windows in the lower right corner of the main screen used by applications or the Windows operating system to inform the user about an important event. Tray messages can be displayed by the Simulator Controller for almost every change in the controller state.
+## Debugging and Logging ([Debug.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Debug.ahk))
+Essential support for tracking down coding errors. Since AutoHotkey is a weakly typed programming language, it is sometimes very difficult to get to the root cause of an error. Especially the tracing and logging capabilities may help here. All log files are located in the *Simulator Controller\Logs* folder found in your user *Documents* folder.
 
-#### *trayMessage(title :: String, message :: String, duration :: Integer := false)*
-Popups a tray message. If *duration* is supplied, it must be an integer defining the number of milliseconds, the popup will be visible. If not given, a default period may apply (see below).
+#### *isDevelopment()*
+Returns *true*, if the current application was compiled for the development enviroment. This enables additonal debug support for the underlying language runtime system.
 
-#### *disableTrayMessages()*
-Diasables all tray messages from now on. Every following call to *trayMessage* will have no effect.
+#### *isDebug()*
+Returns *true*, if debugging is currently enabled. The Simulator Controller uses debug mode to handle things differently, for example all plugins and modes will be active, even if they declare to be not.
 
-#### *enableTrayMessages(duration :: Integer := 1500)*
-(Re-)enables tray messages, if previously been disabled by *disableTrayMessages*. A default for the number of milliseconds the popups will be visible, may be supplied.
+#### *setDebug(debug :: Boolean)*
+Enables or disables debug mode. The default value for non compiled scripts is *ture*, but you can also define debug mode for compiled scripts using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
+
+#### *getLogLevel()*
+Return the current log level. May be one of: *kLogInfo*, *kLogWarn*, *kLogCritical* or *kLogOff*.
+
+#### *setLogLevel(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff))*
+Sets the current log level. If *logLevel* is *kLogOff*, logging will normally be fully supressed.
+
+#### *increaseLogLevel()*
+Increases the current log level.
+
+#### *decreaseLogLevel()*
+Reduces the current log level.
+
+#### *logMessage(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff), message :: String)*
+Sends the given message to the log file, if the supplied log level is at the same or a more critical level than the current log level. If *logLevel* is *kLogOff*, the message will be written to the log file, even if logging has been disabled completely by *setLogLevel(kLogOff)* previously.
+
+#### *logError(exception)*
+Writes information about the exception to the log file and continues.
+
+***
+
+## String Helper Functions ([Strings.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Strings.ahk))
+Often used string functions, that are not part of the AutoHotkey language.
+
+#### *substituteVariables(string :: String, values :: Map := {})*
+Substitutes all variables enclosed by "%" with their values and returns the modified string. The values are lookedup from the supplied values map. If not found there, the global name space is used.
+
+#### *string2Values(delimiter :: String, string :: String, count :: Integer := false)*
+Splits *string* apart using the supplied delimiter and returns the parts as an array. If *count* is supplied, only that much parts are splitted and all remaining ocurrencies of *delimiter* are ignored.
+
+#### *values2String(delimiter :: String, #rest values)*
+Joins the given unlimited number of values using *delimiter* into one string. *values* must have a string representation.
+
+***
+
+## Collection Helper Functions ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Often used collection functions, that are not part of the AutoHotkey language.
+
+#### *inList(list :: Array, value)*
+Returns the position of *value* in the given list or array, or *false*, if not found.
+
+#### *listEqual(list1 :: Array, list2 :: Array)*
+Returns *true*, if the given lists are identical in size and contain the same elements.
+
+#### *concatenate(#rest lists :: Array)*
+Returns a freshly allocated list containing all the elements contained in the supplied lists. The global order is preserved.
+
+#### *reverse(list :: Array)*
+Returns a freshly allocated list containing all the elements of the supplied list in reversed order.
+
+#### *map(list :: Array, function :: TypeUnion(String, FuncObj))*
+Returns a new list with the result of *function* applied to each element in *list*, while preserving the order of elements.
+
+#### *remove(list :: Array, object :: Object)*
+Returns a new list with all occurencies of *object* removed from the original list.
+
+#### *removeDuplicates(list :: Array)*
+Returns a new list with all duplicate values removed.
+
+#### *do(list :: Array, function :: TypeUnion(String, FuncObj))*
+Applies the given function to each element in *list* in the order of elements without collecting the results.
+
+#### *getKeys(map :: Map)*
+Returns a list of all keys in the given map.
+
+#### *getValues(map :: Map)*
+Returns a list of all values in the given map in the order of their keys.
+
+#### *combine(#rest maps :: Map)*
+Returns a freshly allocated map containing all the key/value pairs of all supplied maps. The maps are processed from left to right, which is important in case of duplicate keys.
+
+#### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
+Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
+
+***
+
+## File Handling ([Files.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Files.ahk))
+A small collection of functions to deal with files and directories. Note: All the directory names used with these functions must contain a trailing backslash "\", since this is standard in the Simulator Controller code.
+
+#### *getFileName*(fileName :: String, #rest directories :: String)*
+If *fileName* contains an absolute path, itself will be returned. Otherwise, all directories will be checked, if a file with the (partial) path can be found, and this file path will be returned. If not found, a path consisting of the first supplied directory and *fileName* will be returned.
+
+#### *getFileNames*(filePattern :: String, #rest directories :: String)*
+Returns a list of absolute paths for all files in the given directories satisfying *filePattern*.
+
+#### *temporaryFileName(name :: String, extension :: String)*
+Creates a unique file name for a file located in the *Temp* folder. *name* will be followed by a unique number and the file will have an extension as defined by the second parameter.
+
+#### *normalizeFilePath(filePath :: String)*
+Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this simplified file path.
+
+#### *normalizeDirectoryPath(directoryPath :: String)*
+Assures that a trailing "\" is present at the end of the directory path.
+
+#### *temporaryFileName(name :: String, extension :: String)*
+Creates and returns a unique file name in the temporary folder by adding a random number between 1 and 100000 to the name.
+
+#### *deleteFile(fileName :: String)*
+Deletes the file with the given name. Returns *true*, if the file was deleted, otherwise *false*.
+
+#### *deleteDirectory(directoryName :: String)*
+Deletes the directory with the given name incl. all current content. Returns *true*, if the directory was deleted, otherwise *false*.
 
 ***
 
@@ -94,83 +166,51 @@ Sends the given message. The first parameter defines the delivery method, where 
 
 ***
 
-## File Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-A small collection of functions to deal with files and directories. Note: All the directory names used with these functions must contain a trailing backslash "\", since this is standard in the Simulator Controller code.
+## Configurations ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
+Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
 
-#### *getFileName*(fileName :: String, #rest directories :: String)*
-If *fileName* contains an absolute path, itself will be returned. Otherwise, all directories will be checked, if a file with the (partial) path can be found, and this file path will be returned. If not found, a path consisting of the first supplied directory and *fileName* will be returned.
+#### *newConfiguration()* 
+Returns a new empty configuration map. The configuration map is not derived from a public class and may be accessed only through the functions given below. 
 
-#### *getFileNames*(filePattern :: String, #rest directories :: String)*
-Returns a list of absolute paths for all files in the given directories satisfying *filePattern*.
+#### *getConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, default := false)*
+Returns the value defined for the given key or the *default*, if no such key has been defined.
 
-#### *normalizeFilePath(filePath :: String)*
-Removes all "\\*directory*\\.." occurrencies from *filePath* and returns this simplified file path.
+#### *setConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, value)*
+Stores the given value for the given key in the configuration map. The value must be convertible to a String representation.
 
-#### *normalizeDirectoryPath(directoryPath :: String)*
-Assures that a trailing "\" is present at the end of the directory path.
+#### *getConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, default := false)*
+Retrieves all key / value pairs for a given section as a map. Returns *default*, if the section does not exist.
 
-#### *temporaryFileName(name :: String, extension :: String)*
-Creates and returns a unique file name in the temporary folder by adding a random number between 1 and 100000 to the name.
+#### *setConfigurationValues(configuration, otherConfiguration)*
+This function takes all key / value pairs from all sections in *otherConfiguration* and copies them to *configuration*.
 
-#### *deleteFile(fileName :: String)*
-Deletes the file with the given name. Returns *true*, if the file was deleted, otherwise *false*.
+#### *setConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, values :: Object)*
+Stores all the key / value pairs in the configuration map under the given section.
 
-#### *deleteDirectory(directoryName :: String)*
-Deletes the directory with the given name incl. all current content. Returns *true*, if the directory was deleted, otherwise *false*.
+#### *removeConfigurationValue(configuration :: ConfigurationMao, section :: String, key :: String)*
+Removes the given key and its value from the configuration map.
 
-***
+#### *removeConfigurationSection(configuration :: ConfigurationMao, section :: String)*
+Removes the given section including all keys and values from the configuration map.
 
-## Collection & String Helper Functions ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Often used collection functions, that are not part of the AutoHotkey language.
+#### *readConfiguration(configFile :: String)*
+Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file. If *configFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
 
-#### *substituteVariables(string :: String, values :: Map := {})*
-Substitutes all variables enclosed by "%" with their values and returns the modified string. The values are lookedup from the supplied values map. If not found there, the global name space is used.
+#### *parseConfiguration(text :: String)*
+Simular to *readConfiguration*, but reads the configuration from a string instead of a file.
 
-#### *string2Values(delimiter :: String, string :: String, count :: Integer := false)*
-Splits *string* apart using the supplied delimiter and returns the parts as an array. If *count* is supplied, only that much parts are splitted and all remaining ocurrencies of *delimiter* are ignored.
+#### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
+Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file. If *configFile* denotes an absolute path, the configuration will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
 
-#### *values2String(delimiter :: String, #rest values)*
-Joins the given unlimited number of values using *delimiter* into one string. *values* must have a string representation.
+#### *printConfiguration(configuration :: ConfigurationMap)*
+Simular to *writeConfiguration*, but returns the textual configuration as a string.
 
-#### *inList(list :: Array, value)*
-Returns the position of *value* in the given list or array, or *false*, if not found.
-
-#### *listEqual(list1 :: Array, list2 :: Array)*
-Returns *true*, if the given lists are identical in size and contain the same elements.
-
-#### *concatenate(#rest lists :: Array)*
-Returns a freshly allocated list containing all the elements contained in the supplied lists. The global order is preserved.
-
-#### *reverse(list :: Array)*
-Returns a freshly allocated list containing all the elements of the supplied list in reversed order.
-
-#### *map(list :: Array, function :: TypeUnion(String, FuncObj))*
-Returns a new list with the result of *function* applied to each element in *list*, while preserving the order of elements.
-
-#### *remove(list :: Array, object :: Object)*
-Returns a new list with all occurencies of *object* removed from the original list.
-
-#### *removeDuplicates(list :: Array)*
-Returns a new list with all duplicate values removed.
-
-#### *do(list :: Array, function :: TypeUnion(String, FuncObj))*
-Applies the given function to each element in *list* in the order of elements without collecting the results.
-
-#### *getKeys(map :: Map)*
-Returns a list of all keys in the given map.
-
-#### *getValues(map :: Map)*
-Returns a list of all values in the given map in the order of their keys.
-
-#### *combine(#rest maps :: Map)*
-Returns a freshly allocated map containing all the key/value pairs of all supplied maps. The maps are processed from left to right, which is important in case of duplicate keys.
-
-#### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
-Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
+#### *getControllerState()*
+This function returns a representation of the file *Simulator Controller.status* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The configuration object consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller as well as a lot of information about the internal status of all components. This file is created by the *Simulator Controller.exe* application and is updated periodically. Note: This function is actually not part of the *Configuration* library, but is referenced here for completeness.
 
 ***
 
-## Localization & Translation ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Localization & Translation ([Localization.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Localization.ahk))
 A simple translation support is built into Simulator Controller. Every text, that appears in the different screens and system messages may translated to a different language than standard English. To support this, a single tranlation file (see the [translation file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Translations.de) for German for an example) must exist for each target language in one of the *Simulator Controller\Translations* folder in you user *Documents* folder.
 
 #### *availableLanguages()*
@@ -191,6 +231,25 @@ Returns the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_
 #### *translate(string :: String)*
 *string* is a text in English. *translate* reads the translations for the current target language and returns the translated text, or *string* itself, if no translation can be found.
 
+#### *registerLocalizationCallback(callback :: Function)*
+Registers a callback, which will be invoked, whenever a part of the localization is changed. A map is passed to this function which contains information about the changes. It contains one or more of the following key / value pairs:
+
+	*Language:* languageCode
+ 
+***
+
+## GUI Tools ([GUI.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/GUI.ahk))
+Miscellaneous helper functions for GUI programming.
+
+#### *moveByMouse(guiPrefix :: String, descriptor :: String := false)*
+You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command. If *descriptor* is supplied, the resulting new position is stored in the configuration and can be retrieved using [getWindowPosition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#getwindowpositiondescriptor--string-byref-x--integer-byref-y--integer).
+
+#### *getWindowPosition(descriptor :: String, ByRef x :: Integer, ByRef y :: Integer)*
+Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.
+
+#### *setButtonIcon(buttonHandle :: Handle, file :: String)*
+Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.
+
 #### *translateMsgBoxButtons(buttonLabels :: Array)*
 This function helps you to translate the button labels for standard dialogs like those of the AutoHotkey *MsgBox* command: A typical usage looks like this:
 
@@ -200,10 +259,10 @@ This function helps you to translate the button labels for standard dialogs like
 	OnMessage(0x44, "")
 
 As you can see, this dialog will show three buttons which will be labeled "Yes", "No" and "Never" in the English language setting. *translateMsgBoxButtons* will call the *translate* function automatically for these labels, before they will be set as labels for the different buttons.
- 
+
 ***
 
-## Splash Screen Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Splash Screens ([Splash.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Splash.ahk))
 Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All required resources, that are part of the Simulator Controller distribution, are normally loacated in the *Resources/Splash Media* folder. An additional location for user supplied media exists in the *Simulator Controller\Splash Media* folder in the user *Documents* folder. The user can define several themes with rotating pictures or a GIF animation with the help of the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor).
 
 #### *showSplash(image :: String, alwaysOnTop :: Boolean := true)*
@@ -222,72 +281,39 @@ Themes are a collection of pictures or a GIF animation possibly combined with a 
 
 #### *hideSplashTheme()*
 Closes the current theme based splash window.
+ 
+***
 
-#### *showMessage(message :: String, title :: String := "Modular Simulator Controller System", icon :: String := "Information.png", duration :: Integer := 5000, x :: TypeUnion(String, Integer) := "Center", y :: TypeUnion(String, Integer) := "Bottom", width :: Integer := 400, height :: Integer := 100)*
-Displays a message box on the main screen. *duration* defines the number of milliseconds, the message box will be shown. Beside giving normal screen coordinates for *x* and *y*, you can supply "Left", "Center" or "Right" for the horizontal and "Top", "Center" or "Bottom" for the vertical position.
+## Progress Bar ([Progress.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Progress.ahk))
+This module provides a simple to use, but customizeable progress bar, which can be positioned by the user.
 
 #### *showProgress(options :: Map(X, Y, Width := 300, Title, Message, Color, Progress))*
 Opens or updates a progress bar window. For the initial call, when the progress window is opened, the parameters *X* and *Y* must and *Width* may be supplied. The arguments for *Title*, *Messsage*, *Color* and *Progress* will be used in every call and will update those aspects of the progress bar window accordingly. The argument for the *Color* of the progress bar must be a HTML color name as described in the [Autohotkey documentation](https://www.autohotkey.com/docs/commands/Progress.htm#colors) and *Progress* must be an integer between 0 and 100. *showProgress* returns the name of the window to be used to own it by another window.
 
 #### *hideProgress()*
 Closes the currently open progress window.
+ 
+***
+
+## Message Box ([Message.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Message.ahk))
+As an addition to the progress bar, you can use the message notification box to show short messages to the user, which will be shown for a specific number of millisecends and than will disappear automatically.
+
+#### *showMessage(message :: String, title :: String := "Modular Simulator Controller System", icon :: String := "Information.png", duration :: Integer := 5000, x :: TypeUnion(String, Integer) := "Center", y :: TypeUnion(String, Integer) := "Bottom", width :: Integer := 400, height :: Integer := 100)*
+Displays a message box on the main screen. *duration* defines the number of milliseconds, the message box will be shown. Beside giving normal screen coordinates for *x* and *y*, you can supply "Left", "Center" or "Right" for the horizontal and "Top", "Center" or "Bottom" for the vertical position.
 
 ***
 
-## GUI Tools ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Miscellaneous helper functions for GUI programming.
+## Tray Popups ([TrayMenu.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/TrayMenu.ahk))
+Tray messages or TrayTips are small popup windows in the lower right corner of the main screen used by applications or the Windows operating system to inform the user about an important event. Tray messages can be displayed by the Simulator Controller for almost every change in the controller state.
 
-#### *moveByMouse(guiPrefix :: String, descriptor :: String := false)*
-You can call this function from a click handler of a GUI element. It will move the underlying window by following the mouse cursor. *guiPrefix* must be the [prefix](https://www.autohotkey.com/docs/commands/Gui.htm#MultiWin) used, while creating the GUI elements using the AutoHotkey [*GUI Add, ...*](https://www.autohotkey.com/docs/commands/Gui.htm#Add) command. If *descriptor* is supplied, the resulting new position is stored in the configuration and can be retrieved using [getWindowPosition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#getwindowpositiondescriptor--string-byref-x--integer-byref-y--integer).
+#### *trayMessage(title :: String, message :: String, duration :: Integer := false)*
+Popups a tray message. If *duration* is supplied, it must be an integer defining the number of milliseconds, the popup will be visible. If not given, a default period may apply (see below).
 
-#### *getWindowPosition(descriptor :: String, ByRef x :: Integer, ByRef y :: Integer)*
-Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.
+#### *disableTrayMessages()*
+Diasables all tray messages from now on. Every following call to *trayMessage* will have no effect.
 
-#### *setButtonIcon(buttonHandle :: Handle, file :: String)*
-Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.
-
-***
-
-## Thread Protection ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-In AutoHotkey scripts, running threads may be interrupted by other events, such as keyboard events or timer functions. Using the functions below, it is possible to create protected sections of code, which may not be interrupted.
-
-#### *protectionOn()*
-Starts a protected section of code. Calls to protectionOn() may be nested.
-
-#### *protectionOff()*
-Finishes a protected section of code. Only if the outermost section has been finished, the current thread becomes interruptable again.
-
-#### *withProtection(function :: TypeUnion(String, FuncObj), #rest params)*
-Convenience function to call a given function with supplied parameters in a protected section.
-
-***
-
-## Debugging and Logging ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
-Essential support for tracking down coding errors. Since AutoHotkey is a weakly typed programming language, it is sometimes very difficult to get to the root cause of an error. Especially the tracing and logging capabilities may help here. All log files are located in the *Simulator Controller\Logs* folder found in your user *Documents* folder.
-
-#### *isDebug()*
-Returns *true*, if debugging is currently enabled. The Simulator Controller uses debug mode to handle things differently, for example all plugins and modes will be active, even if they declare to be not.
-
-#### *setDebug(debug :: Boolean)*
-Enables or disables debug mode. The default value for non compiled scripts is *ture*, but you can also define debug mode for compiled scripts using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
-
-#### *getLogLevel()*
-Return the current log level. May be one of: *kLogInfo*, *kLogWarn*, *kLogCritical* or *kLogOff*.
-
-#### *setLogLevel(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff))*
-Sets the current log level. If *logLevel* is *kLogOff*, logging will normally be fully supressed.
-
-#### *increaseLogLevel()*
-Increases the current log level.
-
-#### *decreaseLogLevel()*
-Reduces the current log level.
-
-#### *logMessage(logLevel :: OneOf(kLogInfo, kLogWarn, kLogCritical, kLogOff), message :: String)*
-Sends the given message to the log file, if the supplied log level is at the same or a more critical level than the current log level. If *logLevel* is *kLogOff*, the message will be written to the log file, even if logging has been disabled completely by *setLogLevel(kLogOff)* previously.
-
-#### *logError(exception)*
-Writes information about the exception to the log file and continues.
+#### *enableTrayMessages(duration :: Integer := 1500)*
+(Re-)enables tray messages, if previously been disabled by *disableTrayMessages*. A default for the number of milliseconds the popups will be visible, may be supplied.
 
 ***
 

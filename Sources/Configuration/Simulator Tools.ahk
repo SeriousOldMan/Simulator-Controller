@@ -10,11 +10,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Includes\Development.ahk
+#Include ..\Framework\Development.ahk
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Includes\Production.ahk
+;@SC #Include ..\Framework\Production.ahk
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
@@ -25,7 +25,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -422,12 +422,12 @@ exitProcesses(silent := false, force := false) {
 
 		if hasFGProcesses
 			if force
-				broadcastMessage(concatenate(kForegroundApps, ["Race Settings"]), "exitApplication")
+				broadcastMessage(concatenate(kForegroundApps, ["Race Settings"]), "exit")
 			else
 				return false
 
 		if hasBGProcesses
-			broadcastMessage(remove(kBackgroundApps, "Simulator Tools"), "exitApplication")
+			broadcastMessage(remove(kBackgroundApps, "Simulator Tools"), "exit")
 
 		return true
 	}
@@ -2751,9 +2751,9 @@ runBuildTargets(ByRef buildProgress) {
 
 					FileRead sourceCode, %targetSource%
 
-					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include ..\Includes\Development.ahk`r`n;@SC-EndIF", "")
+					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include ..\Framework\Development.ahk`r`n;@SC-EndIF", "")
 
-					sourceCode := StrReplace(sourceCode, ";@SC #Include ..\Includes\Production.ahk", "#Include ..\Includes\Production.ahk")
+					sourceCode := StrReplace(sourceCode, ";@SC #Include ..\Framework\Production.ahk", "#Include ..\Framework\Production.ahk")
 
 					deleteFile(sourceDirectory . "\compile.ahk")
 

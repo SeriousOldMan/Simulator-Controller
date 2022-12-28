@@ -1999,6 +1999,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		base.restoreSessionState(sessionSettings, sessionState)
 
+		/*
 		if sessionState {
 			sessionState := getConfigurationSectionValues(sessionState, "Session State")
 
@@ -2019,6 +2020,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					this.iRepairBodyworkChosen := false
 			}
 		}
+		*/
 	}
 }
 

@@ -23,12 +23,14 @@ ListLines Off					; Disable execution history
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
 ;@Ahk2Exe-ExeName Shared Database Creator.exe
 
+global vBuildConfiguration := "Development"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -21,6 +21,9 @@ SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
 ; ListLines Off					; Disable execution history
 
 
+global vBuildConfiguration := "Development"
+
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;

@@ -9,7 +9,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Framework.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -200,7 +200,7 @@ class MessageManager extends PeriodicTask {
 
 			try {
 				file := FileOpen(fileName, "rw-rwd")
-				
+
 				if !file
 					return result
 			}

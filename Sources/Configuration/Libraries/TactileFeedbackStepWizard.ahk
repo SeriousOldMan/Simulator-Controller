@@ -215,12 +215,15 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	getActions(mode := false) {
-		local wizard := this.SetupWizard
-		local actions := wizard.moduleAvailableActions("Tactile Feedback", mode)
+		local wizard, actions
 
 		if this.iCachedActions.HasKey(mode)
 			return this.iCachedActions[mode]
 		else {
+			wizard := this.SetupWizard
+
+			actions := wizard.moduleAvailableActions("Tactile Feedback", mode)
+
 			if (actions.Length() == 0) {
 				if mode
 					actions := concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Effects", ""))

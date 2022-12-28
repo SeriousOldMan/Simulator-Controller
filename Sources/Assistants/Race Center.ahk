@@ -10,11 +10,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Includes\Development.ahk
+#Include ..\Framework\Development.ahk
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Includes\Production.ahk
+;@SC #Include ..\Framework\Production.ahk
 ;@SC-EndIf
 
 #MaxMem 128
@@ -27,7 +27,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Application.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

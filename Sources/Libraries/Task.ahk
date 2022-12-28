@@ -9,7 +9,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Includes\Includes.ahk
+#Include ..\Framework\Framework.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -519,6 +519,31 @@ class Continuation extends Task {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+changeProtection(up, critical := false, block := false) {
+	static level := 0
+
+	if (critical || block) {
+		level += (up ? 1 : -1)
+
+		if (level > 0) {
+			if critical
+				Critical 100
+
+			if block
+				BlockInput On
+		}
+		else if (level == 0) {
+			if block
+				BlockInput Off
+
+			if critical
+				Critical Off
+		}
+		else if (level <= 0)
+			throw "Nesting error detected in changeProtection..."
+	}
+}
+
 initializeTasks() {
 	schedule := ObjBindMethod(Task, "schedule", kLowPriority)
 
@@ -535,6 +560,30 @@ initializeTasks() {
 	schedule := ObjBindMethod(Task, "schedule", kInterruptPriority)
 
 	SetTimer %schedule%, % Task.sInterrupt
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Public Function Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+protectionOn(critical := false, block := false) {
+	changeProtection(true, critical, block)
+}
+
+protectionOff(critical := false, block := false) {
+	changeProtection(false, critical, block)
+}
+
+withProtection(function, params*) {
+	protectionOn()
+
+	try {
+		return %function%(params*)
+	}
+	finally {
+		protectionOff()
+	}
 }
 
 

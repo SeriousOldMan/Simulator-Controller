@@ -376,11 +376,11 @@ updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine,
 	  {All: [?Session.Settings.Damage.Bodywork.Repair = Impact],
 			[?Damage.Bodywork.Lap.Delta < ?Session.Settings.Damage.Bodywork.Repair.Threshold]}} => (Clear: Damage.Repair.Bodywork.Target)
 
-{Any: {All: [?Session.Settings.Damage.Suspension.Repair = Always], [?Damage.Suspension > 0]},
-	  {All: [?Session.Settings.Damage.Suspension.Repair = Threshold],
-			[?Damage.Suspension >= ?Session.Settings.Damage.Suspension.Repair.Threshold]},
-	  {All: [?Session.Settings.Damage.Suspension.Repair = Impact],
-			[?Damage.Suspension.Lap.Delta >= ?Session.Settings.Damage.Suspension.Repair.Threshold]}} => (Set: Damage.Repair.Suspension.Target)
+{Any: {All: [?Session.Settings.Damage.Engine.Repair = Always], [?Damage.Engine > 0]},
+	  {All: [?Session.Settings.Damage.Engine.Repair = Threshold],
+			[?Damage.Engine >= ?Session.Settings.Damage.Engine.Repair.Threshold]},
+	  {All: [?Session.Settings.Damage.Engine.Repair = Impact],
+			[?Damage.Engine.Lap.Delta >= ?Session.Settings.Damage.Engine.Repair.Threshold]}} => (Set: Damage.Repair.Engine.Target)
 			
 {Any: [?Session.Settings.Damage.Engine.Repair = Never], [?Damage.Engine = 0],
 	  {All: [?Session.Settings.Damage.Engine.Repair = Threshold],

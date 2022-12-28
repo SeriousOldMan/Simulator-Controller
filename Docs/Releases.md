@@ -4,7 +4,7 @@
   3. Fixed handling of custom motion and tactile effects in "Simulator Setup".
   4. Potential fix for repair settings handling in Assetto Corsa Competizione.
   5. Optimized Spotter gap and delta announcements.
-  6. [Developer] Full refactoring of fundamental framework in preparation for the integration of the unit and time/number format handling.
+  6. [Developer] Full refactoring of core framework in preparation for the integration of the unit and time/number format handling.
 
 ## 4.5.3.0-release 12/23/22
   1. Minor bugfixes, as always

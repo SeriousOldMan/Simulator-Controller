@@ -1,4 +1,4 @@
-## Configurations ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Configuration.ahk))
+## Configurations ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
 
 #### *newConfiguration()* 
@@ -42,7 +42,7 @@ This function returns a representation of the file *Simulator Controller.status*
 
 ***
 
-## Tray Messages ([TrayMenu.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/TrayMenu.ahk))
+## Tray Messages ([TrayMenu.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/TrayMenu.ahk))
 Tray messages or TrayTips are small popup windows in the lower right corner of the main screen used by applications or the Windows operating system to inform the user about an important event. Tray messages can be displayed by the Simulator Controller for almost every change in the controller state.
 
 #### *trayMessage(title :: String, message :: String, duration :: Integer := false)*
@@ -94,7 +94,7 @@ Sends the given message. The first parameter defines the delivery method, where 
 
 ***
 
-## File Handling ([Files.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Files.ahk))
+## File Handling ([Files.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Files.ahk))
 A small collection of functions to deal with files and directories. Note: All the directory names used with these functions must contain a trailing backslash "\", since this is standard in the Simulator Controller code.
 
 #### *getFileName*(fileName :: String, #rest directories :: String)*
@@ -123,8 +123,8 @@ Deletes the directory with the given name incl. all current content. Returns *tr
 
 ***
 
-## Collection & String Helper Functions ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Collections.ahk))
-Often used collection functions, that are not part of the AutoHotkey language.
+## String Helper Functions ([Strings.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Strings.ahk))
+Often used string functions, that are not part of the AutoHotkey language.
 
 #### *substituteVariables(string :: String, values :: Map := {})*
 Substitutes all variables enclosed by "%" with their values and returns the modified string. The values are lookedup from the supplied values map. If not found there, the global name space is used.
@@ -134,6 +134,11 @@ Splits *string* apart using the supplied delimiter and returns the parts as an a
 
 #### *values2String(delimiter :: String, #rest values)*
 Joins the given unlimited number of values using *delimiter* into one string. *values* must have a string representation.
+
+***
+
+## Collection Helper Functions ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Often used collection functions, that are not part of the AutoHotkey language.
 
 #### *inList(list :: Array, value)*
 Returns the position of *value* in the given list or array, or *false*, if not found.
@@ -173,7 +178,7 @@ Sorts the given array in place, using *comparator* to define the order of the el
 
 ***
 
-## Localization & Translation ([Localization.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Localization.ahk))
+## Localization & Translation ([Localization.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Localization.ahk))
 A simple translation support is built into Simulator Controller. Every text, that appears in the different screens and system messages may translated to a different language than standard English. To support this, a single tranlation file (see the [translation file](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Resources/Templates/Translations.de) for German for an example) must exist for each target language in one of the *Simulator Controller\Translations* folder in you user *Documents* folder.
 
 #### *availableLanguages()*
@@ -201,7 +206,7 @@ Registers a callback, which will be invoked, whenever a part of the localization
  
 ***
 
-## Splash Screen Handling ([Functions.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Functions.ahk))
+## Splash Screen Handling ([Splash.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Splash.ahk))
 Several applications of Simulator Controller uses a splash window to entertain the user while performing their operations. The splash screen shows different pictures or even an animation using a GIF. All required resources, that are part of the Simulator Controller distribution, are normally loacated in the *Resources/Splash Media* folder. An additional location for user supplied media exists in the *Simulator Controller\Splash Media* folder in the user *Documents* folder. The user can define several themes with rotating pictures or a GIF animation with the help of the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor).
 
 #### *showSplash(image :: String, alwaysOnTop :: Boolean := true)*
@@ -220,19 +225,29 @@ Themes are a collection of pictures or a GIF animation possibly combined with a 
 
 #### *hideSplashTheme()*
 Closes the current theme based splash window.
+ 
+***
 
-#### *showMessage(message :: String, title :: String := "Modular Simulator Controller System", icon :: String := "Information.png", duration :: Integer := 5000, x :: TypeUnion(String, Integer) := "Center", y :: TypeUnion(String, Integer) := "Bottom", width :: Integer := 400, height :: Integer := 100)*
-Displays a message box on the main screen. *duration* defines the number of milliseconds, the message box will be shown. Beside giving normal screen coordinates for *x* and *y*, you can supply "Left", "Center" or "Right" for the horizontal and "Top", "Center" or "Bottom" for the vertical position.
+## Progress Bar ([Progress.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Progress.ahk))
+This module provides a simple to use, but customizeable progress bar, which can be positioned by the user.
 
 #### *showProgress(options :: Map(X, Y, Width := 300, Title, Message, Color, Progress))*
 Opens or updates a progress bar window. For the initial call, when the progress window is opened, the parameters *X* and *Y* must and *Width* may be supplied. The arguments for *Title*, *Messsage*, *Color* and *Progress* will be used in every call and will update those aspects of the progress bar window accordingly. The argument for the *Color* of the progress bar must be a HTML color name as described in the [Autohotkey documentation](https://www.autohotkey.com/docs/commands/Progress.htm#colors) and *Progress* must be an integer between 0 and 100. *showProgress* returns the name of the window to be used to own it by another window.
 
 #### *hideProgress()*
 Closes the currently open progress window.
+ 
+***
+
+## Message Box ([Message.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Message.ahk))
+As an addition to the progress bar, you can use the message notification box to show short messages to the user, which will be shown for a specific number of millisecends and than will disappear automatically.
+
+#### *showMessage(message :: String, title :: String := "Modular Simulator Controller System", icon :: String := "Information.png", duration :: Integer := 5000, x :: TypeUnion(String, Integer) := "Center", y :: TypeUnion(String, Integer) := "Bottom", width :: Integer := 400, height :: Integer := 100)*
+Displays a message box on the main screen. *duration* defines the number of milliseconds, the message box will be shown. Beside giving normal screen coordinates for *x* and *y*, you can supply "Left", "Center" or "Right" for the horizontal and "Top", "Center" or "Bottom" for the vertical position.
 
 ***
 
-## GUI Tools ([GUI.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/GUI.ahk))
+## GUI Tools ([GUI.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/GUI.ahk))
 Miscellaneous helper functions for GUI programming.
 
 #### *moveByMouse(guiPrefix :: String, descriptor :: String := false)*
@@ -270,7 +285,7 @@ Convenience function to call a given function with supplied parameters in a prot
 
 ***
 
-## Debugging and Logging ([Debug.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Debug.ahk))
+## Debugging and Logging ([Debug.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Debug.ahk))
 Essential support for tracking down coding errors. Since AutoHotkey is a weakly typed programming language, it is sometimes very difficult to get to the root cause of an error. Especially the tracing and logging capabilities may help here. All log files are located in the *Simulator Controller\Logs* folder found in your user *Documents* folder.
 
 #### *isDevelopment()*

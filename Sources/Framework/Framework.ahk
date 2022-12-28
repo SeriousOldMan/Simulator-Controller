@@ -10,7 +10,7 @@
 #Include ..\Framework\Utils.ahk
 #Include ..\Framework\Debug.ahk
 #Include ..\Framework\Files.ahk
+#Include ..\Framework\Strings.ahk
 #Include ..\Framework\Collections.ahk
 #Include ..\Framework\Configuration.ahk
 #Include ..\Framework\Localization.ahk
-#Include ..\Framework\Classes.ahk

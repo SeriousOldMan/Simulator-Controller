@@ -20,9 +20,27 @@ global vLogLevel := kLogWarn
 #Include ..\Framework\Constants.ahk
 #Include ..\Framework\Variables.ahk
 #Include ..\Framework\Files.ahk
+#Include ..\Framework\Strings.ahk
 #Include ..\Framework\Localization.ahk
 #Include ..\Framework\TrayMenu.ahk
 #Include ..\Framework\Message.ahk
+#Include ..\Libraries\Messages.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Public Constants Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+/* Must be defined in Constants.ahk due to circular loading problems...
+global kLogDebug := 1
+global kLogInfo := 2
+global kLogWarn := 3
+global kLogCritical := 4
+global kLogOff := 5
+
+global kLogLevels := {Off: kLogOff, Debug: kLogDebug, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
+*/
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -3031,6 +3031,11 @@ class RaceCenter extends ConfigurationItem {
 				compound := pressures["Compound"]
 				compoundColor := pressures["Compound.Color"]
 
+				if ((compound = "-") || (compoundColor = "-")) {
+					compound := false
+					compoundColor := false
+				}
+
 				this.initializePitstopSettings(lap, refuel, compound, compoundColor)
 
 				window := this.Window
@@ -8765,6 +8770,7 @@ class RaceCenter extends ConfigurationItem {
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
 		local pressuresLosses := "-, -, -, -"
+		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
 		local stintNr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections
@@ -8791,6 +8797,8 @@ class RaceCenter extends ConfigurationItem {
 								tyrePressures[A_Index] := displayValue(kNull)
 							else if (tyrePressures[A_Index] > 0)
 								tyrePressures[A_Index] := ("+" . tyrePressures[A_Index])
+
+							hasColdPressures := true
 						}
 						else
 							tyrePressures[A_Index] := displayValue(kNull)
@@ -8801,7 +8809,11 @@ class RaceCenter extends ConfigurationItem {
 				else
 					pressureCorrections := ""
 
-				coldPressures := (values2String(", ", coldPressures*) . pressureCorrections)
+				coldPressures := values2String(", ", coldPressures*)
+
+				hasColdPressures := (hasColdPressures || (coldPressures != "-, -, -, -"))
+
+				coldPressures := (coldPressures . pressureCorrections)
 
 				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
 												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
@@ -8833,7 +8845,7 @@ class RaceCenter extends ConfigurationItem {
 		if (hotPressures != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
 
-		if (coldPressures != "-, -, -, -")
+		if hasColdPressures
 			html .= ("<tr><td><b>" . translate("Pressures (cold, recommended):") . "</b></td><td>" . coldPressures . "</td></tr>")
 
 		if (pressuresLosses != "-, -, -, -")

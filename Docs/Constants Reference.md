@@ -24,7 +24,7 @@ The global configuration map, which is read from *kSimulatorConfigurationFile*. 
 ***
 
 ## Log Levels ([Debug.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Debug.ahk))
-See the dcoumentation about [Debugging & Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) for more information.
+See the dcoumentation about [Debugging & Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) for more information.
 
 #### *kLogInfo, kLogWarn, kLogCritical, kLogOff*
 Define the various log levels used by the logging functions. These are numerical values where *kLogInfo* < *kLogWarn* < *kLogCritical* < *kLogOff*.

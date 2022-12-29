@@ -321,16 +321,16 @@ Diasables all tray messages from now on. Every following call to *trayMessage* w
 The functions in this section are a little bit special. Although they can be called from your code as well, they are meant to be used as [actions for controller functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions). Therefore, they will be configured for controller functions using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *setDebug(debug :: Boolean)*
-Enables or disables debugging. *debug* must be either *true* or *false*. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+Enables or disables debugging. *debug* must be either *true* or *false*. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
-#### *setLogLevel(logLevel :: OneOf("Info", "Warn", "Critical", "Off"))*
-Sets the log level. *logLevel* must be one of "Info", "Warn", "Critical" or "Off", where "Info" is the most verbose one. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+#### *setLogLevel(logLevel :: OneOf("Debug", "Info", "Warn", "Critical", "Off"))*
+Sets the log level. *logLevel* must be one of "Info", "Warn", "Critical" or "Off", where "Info" is the most verbose one. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
 #### *increaseLogLevel()*
-Increases the log level, i.e. makes the log information more verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+Increases the log level, i.e. makes the log information more verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
 #### *decreaseLogLevel()*
-Decreases the log level, i.e. makes the log information less verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) section.
+Decreases the log level, i.e. makes the log information less verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
 #### *pushButton(number :: Integer)*
 Virtually pushes the button with the given number.

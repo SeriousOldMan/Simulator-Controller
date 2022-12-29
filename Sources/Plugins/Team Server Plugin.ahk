@@ -79,7 +79,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (plugin.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TeamServerEnabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
 				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")

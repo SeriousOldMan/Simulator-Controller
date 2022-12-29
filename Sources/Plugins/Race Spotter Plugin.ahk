@@ -57,7 +57,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (plugin.TrackAutomationEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TrackAutomationEnabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
 				plugin.disableTrackAutomation(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")

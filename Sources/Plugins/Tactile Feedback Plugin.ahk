@@ -171,7 +171,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (this.Active && ((trigger = "Off") || (trigger == "Push")))
+			if (this.Active && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
 				switch this.Action {
 					case "PedalVibration":
 						plugin.disablePedalVibration()

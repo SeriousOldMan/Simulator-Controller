@@ -205,7 +205,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (this.Active && ((trigger = "Off") || (trigger == "Push")))
+			if (this.Active && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
 				plugin.stopMotion(plugin.actionLabel(this))
 			else if (!this.Active && ((trigger = "On") || (trigger == "Push")))
 				plugin.startMotion(plugin.actionLabel(this))
@@ -298,7 +298,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			else {
 				if (!this.Active && ((trigger = "On") || (trigger == "Push")))
 					this.Plugin.unmuteEffect(this.Effect)
-				else if (this.Active && ((trigger = "Off") || (trigger == "Push")))
+				else if (this.Active && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
 					this.Plugin.muteEffect(this.Effect)
 
 				trayMessage(translate("Motion"), translate("Effect: ") . translate(this.Effect) . ", " . translate("State: ") . (this.Active ? translate("On") : translate("Off")))

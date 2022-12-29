@@ -273,6 +273,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.startupUDPClient(restart)
 	}
 
+	driverActive(data, driverForName, driverSurName) {
+		return this.sessionActive(data)
+	}
+
 	updateSession(session) {
 		local lastSession := this.Session
 		local activeModes

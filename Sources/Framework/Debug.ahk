@@ -182,12 +182,14 @@ setDebug(debug) {
 		else
 			Menu SupportMenu, Uncheck, %label%
 
+	if (vDebug || debug) {
+		title := translate("Modular Simulator Controller System")
+		state := (debug ? translate("Enabled") : translate("Disabled"))
+
+		TrayTip %title%, Debug: %state%
+	}
+
 	vDebug := debug
-
-	title := translate("Modular Simulator Controller System")
-	state := (debug ? translate("Enabled") : translate("Disabled"))
-
-	TrayTip %title%, Debug: %state%
 }
 
 setLogLevel(level) {
@@ -211,13 +213,16 @@ setLogLevel(level) {
 			level := kLogCritical
 		case "Off":
 			level := kLogOff
+		default:
+			if level is not Integer
+				level := kLogWarn
 	}
 
-	vLogLevel := Min(kLogOff, Max(level, kLogDebug))
+	level := Min(kLogOff, Max(level, kLogDebug))
 
 	state := translate("Unknown")
 
-	switch vLogLevel {
+	switch level {
 		case kLogDebug:
 			state := translate("Debug")
 		case kLogInfo:
@@ -230,12 +235,16 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
+	if (vLogLevel != level) {
+		vLogLevel := level
+
+		title := translate("Modular Simulator Controller System")
+
+		TrayTip %title%, % translate("Log Level: ") . state
+	}
+
 	if hasTrayMenu()
 		Menu LogMenu, Check, %state%
-
-	title := translate("Modular Simulator Controller System")
-
-	TrayTip %title%, % translate("Log Level: ") . state
 }
 
 increaseLogLevel() {

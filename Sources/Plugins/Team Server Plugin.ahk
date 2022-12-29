@@ -1199,7 +1199,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug() {
 					showMessage("Updating lap for team session: " . lapNumber)
 
-					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
+					if (isDevelopment() && ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName)))
 						throw Exception("Driver inconsistency detected...")
 				}
 

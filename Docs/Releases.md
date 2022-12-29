@@ -7,7 +7,8 @@
   6. Fixed loading and visualization of tyre pressures in "Race Center".
   7. Introduced a "Reconnect" button in "Race Center".
   8. Introduced a "No driver change" option for pitstop plans in "Race Center".
-  9. [Developer] Full refactoring of core framework in preparation for the integration of the unit and time/number format handling.
+  9. Made active driver detection for *Assetto Corsa Competizione* in team races more robust.
+  10. [Developer] Full refactoring of core framework in preparation for the integration of the unit and time/number format handling.
 
 ## 4.5.3.0-release 12/23/22
   1. Minor bugfixes, as always

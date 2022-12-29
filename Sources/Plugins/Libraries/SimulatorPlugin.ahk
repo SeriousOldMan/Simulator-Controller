@@ -863,6 +863,16 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceSpotter.reject()
 	}
 
+	sessionActive(data) {
+		return (getConfigurationValue(data, "Session Data", "Active", false) && !getConfigurationValue(data, "Session Data", "Paused", false))
+	}
+
+	driverActive(data, driverForName, driverSurName) {
+		return (this.sessionActive(data)
+			 && (getConfigurationValue(data, "Stint Data", "DriverForname") = driverForName)
+			 && (getConfigurationValue(data, "Stint Data", "DriverSurname") = driverSurName))
+	}
+
 	prepareSession(settings, data) {
 		local sessionDB := new SessionDatabase()
 		local simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")

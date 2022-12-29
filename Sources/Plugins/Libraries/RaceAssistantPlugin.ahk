@@ -1537,8 +1537,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local teamServer := RaceAssistantPlugin.TeamServer
 
 		if RaceAssistantPlugin.TeamSessionActive
-			return ((getConfigurationValue(data, "Stint Data", "DriverForname") = teamServer.DriverForName)
-				 && (getConfigurationValue(data, "Stint Data", "DriverSurname") = teamServer.DriverSurName))
+			return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
 		else
 			return true
 	}

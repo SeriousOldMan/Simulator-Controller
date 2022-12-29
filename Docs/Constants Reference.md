@@ -1,7 +1,7 @@
 ## Installation Paths ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Constants.ahk))
 The following constants may be used to refer to all the relevant locations of the Simulator Controller distribution.
 
-#### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kIncludesDirectory, kLibrariesDirectory, kPluginsDirectory, kBinariesDirectory, kConfigDirectory*, *kRulesDirectory*, *kGrammarsDirectory*, *kTranslationsDirectory* 
+#### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kFrameworkDirectory, kLibrariesDirectory, kPluginsDirectory, kBinariesDirectory, kConfigDirectory*, *kRulesDirectory*, *kGrammarsDirectory*, *kTranslationsDirectory* 
 All these constants define paths pointing to a specific folder in the Simulator Controller distribution. In deviation to Windows standards, the paths contain a trailing backslash, since in allmost all cases, a filename will be concatenated to one of these constants in order to access this file.
 
 #### *kSplashMediaDirectory, kScreenImagesDirectory, kButtonBoxImagesDirectory, kStreamDeckImagesDirectory*

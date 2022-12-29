@@ -158,9 +158,9 @@ There is also the possibility to trigger actions in Simulator Controller from ot
 Simulator Controller allows you to direct voice output to different audio devices. This is mainly of interested to those of you, who are streaming their races, or when you want maximum immersion by directing car sound to a 5.1 sound system, but the assistant voices to your headphone. Since this if not of widespread use, there is no user interface to configure this, but a simple text file. If you want to configure your audio routing, create a text file with the name "Audio Settings.ini" and place it in the *Config* folder which is located in your user *Documents* folder. Open it with a text editor and enter the following content:
 
 	[Output]
-	Race Spotter.AudioDevice=*Headphone*
-	Race Engineer.AudioDevice=*Headphone*
-	Race Strategist.AudioDevice=*Headphone*
+	Race Spotter.AudioDevice=Headphone
+	Race Engineer.AudioDevice=Headphone
+	Race Strategist.AudioDevice=Headphone
 
 *Headphone* is only an example for any audio device configured and name in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
    

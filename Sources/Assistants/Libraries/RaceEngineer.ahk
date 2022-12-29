@@ -1448,7 +1448,8 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 
-	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures, hotPressures) {
+	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
+				   , compound, compoundColor, coldPressures, hotPressures, pressureLosses) {
 		this.iSessionDataActive := true
 
 		try {
@@ -1456,7 +1457,7 @@ class RaceEngineer extends RaceAssistant {
 				this.updateDynamicValues({HasPressureData: true})
 
 				this.RemoteHandler.savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-												  , compound, compoundColor, coldPressures, hotPressures)
+												  , compound, compoundColor, coldPressures, hotPressures, pressureLosses)
 			}
 		}
 		finally {

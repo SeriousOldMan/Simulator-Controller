@@ -33,21 +33,17 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.5.1.0-release](https://cutt.ly/i0yeeHw) (New features: Rework of race reports database structure, Fix for unnecessary race settings with zero fuel consumption, Added *rFactor 2* shared memory interface plugin to installation process, Optimized display of boolean values in "Session Database", Massive performance improvements in handling of settings in "Session Database", Fixed lap range selection in race reports.)
+[4.5.3.0-release](https://cutt.ly/D0XSWo5) (New features: IPressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center", Support for audio device selection for voice ouput, Tweaked the range of all integer input fields, Better handling of initial fuel in strategy simulation and display, Fixed race condition for pitstop details synchronization in "Race Center", "Race Center" show tyre pressure target deviations, New car models for "Setup Advisor".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-451) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-453) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[4.5.0.0-release](https://cutt.ly/M11r58W) (New features: On-track telemetry analyzer for "Setup Advisor", Splitted "Release Strategy" from "Instruct Strategist" in "Race Center", Valid Team Server URLs are remembered in all applications, Prevent empty names in Team Server, Assistants can be muted and unmuted using a Button Box or Stream Deck, New icons in the Stream Deck icon set.)
-
-[4.4.9.1-release](https://cutt.ly/I1dTTpR) (New features: Included race strategies in the "Session Database" browser, Support for sharing race strategies with the community, Fixed post pitstop tyre analysis in "Race Center", Fixed unlimited practice mode for *Assetto Corsa Competizione*, Updated color coding of used tyres in "Race Center". First fix for 4.4.9.)
+[4.5.2.1-release](https://cutt.ly/Q0mcGMU) (New features: Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer, Optimized handling of tyre pressures for multiple drivers in the "Session Database", Support for tyre pressure meta data, Load tyre pressure setups in "Race Center" from the "Session Database", New car models for "Setup Advisor", Remember selection of simulator, car and track in many applications.)
 
 #### Latest development build
 
-[4.5.2.1-release](https://cutt.ly/Q0mcGMU) (New features: Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer, Optimized handling of tyre pressures for multiple drivers in the "Session Database", Support for tyre pressure meta data, Load tyre pressure setups in "Race Center" from the "Session Database", New car models for "Setup Advisor", Remember selection of simulator, car and track in many applications.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-452) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

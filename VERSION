@@ -1,16 +1,16 @@
 [Development]
-Version=4.5.3.1-dev
+Version=4.5.3.1-release
 Target=4.5.3.1-release
-Date=12/28/2022
-Download=
-Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center"
+Date=12/30/2022
+Download=https://cutt.ly/I2rkC77;https://www.dropbox.com/s/cgf1isb4m9et32i/Simulator%20Controller%204.5.3.1-release.zip?dl=1
+Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races
 [Release]
-Version=4.5.3.0-release
-Date=12/23/2022
-Download=https://cutt.ly/D0XSWo5;https://www.dropbox.com/s/4xeidhdk10huw6i/Simulator%20Controller%204.5.3.0-release.zip?dl=1
-Changes=Pressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center", Support for audio device selection for voice ouput, Tweaked the range of all integer input fields, Better handling of initial fuel in strategy simulation and display, Fixed race condition for pitstop details synchronization in "Race Center", "Race Center" show tyre pressure target deviations, New car models for "Setup Advisor"
+Version=4.5.3.1-release
+Date=12/30/2022
+Download=https://cutt.ly/I2rkC77;https://www.dropbox.com/s/cgf1isb4m9et32i/Simulator%20Controller%204.5.3.1-release.zip?dl=1
+Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.5.3.0-release
-Development=4.5.3.1-dev
+Release=4.5.3.1-release
+Development=4.5.3.1-release

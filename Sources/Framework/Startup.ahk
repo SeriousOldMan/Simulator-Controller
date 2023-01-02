@@ -63,9 +63,9 @@ loadSimulatorConfiguration() {
 
 	pid := ErrorLevel
 
-	logMessage(kLogOff, "---------------------------------------------------------------")
+	logMessage(kLogOff, "-----------------------------------------------------------------")
 	logMessage(kLogOff, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
-	logMessage(kLogOff, "---------------------------------------------------------------")
+	logMessage(kLogOff, "-----------------------------------------------------------------")
 
 	if (kSimulatorConfiguration.Count() == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))
@@ -88,8 +88,10 @@ loadSimulatorConfiguration() {
 
 		logMessage(kLogInfo, translate("AutoHotkey path set to ") . path)
 	}
+	/*
 	else
 		logMessage(kLogWarn, translate("AutoHotkey path not set"))
+	*/
 
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "MSBuild Path")
 	if path {
@@ -97,8 +99,10 @@ loadSimulatorConfiguration() {
 
 		logMessage(kLogInfo, translate("MSBuild path set to ") . path)
 	}
+	/*
 	else
 		logMessage(kLogWarn, translate("MSBuild path not set"))
+	*/
 
 	path := getConfigurationValue(kSimulatorConfiguration, "Configuration", "NirCmd Path")
 	if path {

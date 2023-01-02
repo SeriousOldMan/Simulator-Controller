@@ -303,12 +303,10 @@ plannedPitstopLap(!Strategy.Pitstop.Lap) <= !
 plannedPitstopLap(?pitstopLap) <= remainingStintLaps(!Lap, Fuel, ?fuelLaps, true), ?pitstopLap = !Lap + ?fuelLaps
 
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
+updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap != !Lap, !, updatePitstopStrategy(?pitstopLap)
 updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
 							   ?temp = ?pitstopLap - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
 							   ?targetLap != !Lap, !, updatePitstopStrategy(?targetLap)
-updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
-							   ?temp = ?pitstopLap - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
-							   ?targetLap = !Lap, !, Set(Pitstop.Strategy.Lap, ?pitstopLap)
 updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining - ?deltaLaps, round(?temp, ?remainingLaps), ?remainingLaps > 0,
 							   updatePitstopStrategy(?lap, ?remainingLaps)
 							   
@@ -334,7 +332,7 @@ updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?carsInFront, ?
 		updatePitstopStrategy(?lap, ?nextLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities)
 
 pitstopWindow(?lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap) <=
-		?maxLap = ?targetLap + ?remainingLaps,
+		?temp = ?targetLap + ?remainingLaps, ?maxLap = ?temp - 1,
 		?tempSL = ?targetLap - !Session.Settings.Pitstop.Strategy.Window.Considered, max(?lap, ?tempSL, ?fromLap),
 		?tempTL = ?targetLap + !Session.Settings.Pitstop.Strategy.Window.Considered, min(?maxLap, ?tempTL, ?toLap)
 

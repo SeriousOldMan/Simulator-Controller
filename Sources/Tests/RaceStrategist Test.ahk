@@ -286,7 +286,7 @@ class PitstopRecommendation extends Assert {
 
 				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
-				this.AssertEqual(4, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 3...")
+				this.AssertEqual(5, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 3...")
 			}
 
 			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)

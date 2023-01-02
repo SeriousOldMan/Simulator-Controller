@@ -289,14 +289,17 @@ currentTyreCompound() <= currentTyreCompound(?compound, ?color), Set(Tyre.Compou
 
 priority: 5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Lap)
 
-{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan = true]} => (Prove: updatePitstopStrategy(!Lap))
-{All: [?Lap.Remaining.Session > ?Lap.Remaining.Fuel], [?Pitstop.Strategy.Plan > 1]} => (Prove: updatePitstopStrategy(!Pitstop.Strategy.Plan))
+{All: [?Pitstop.Strategy.Plan = true], {Prove: pitstopRequired(!Lap)}} => (Prove: updatePitstopStrategy(!Lap))
+{All: [?Pitstop.Strategy.Plan > 1], {Prove: pitstopRequired(!Lap)}} => (Prove: updatePitstopStrategy(!Pitstop.Strategy.Plan))
 
 {All: {None: [?Pitstop.Strategy.Lap]}, [?Lap.Remaining.Session < ?Lap.Remaining.Fuel]} => (Set: Pitstop.Strategy.Lap, false)
 
 priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan)
 
-plannedPitstopLap(!Strategy.Pitstop.Lap)
+pitstopRequired(?lap) <= Get(Strategy.Pitstop.Lap, ?strategyLap)
+pitstopRequired(?lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap =< !Lap.Remaining.Session
+
+plannedPitstopLap(!Strategy.Pitstop.Lap) <= !
 plannedPitstopLap(?pitstopLap) <= remainingStintLaps(!Lap, Fuel, ?fuelLaps, true), ?pitstopLap = !Lap + ?fuelLaps
 
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
@@ -310,19 +313,25 @@ updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining 
 							   updatePitstopStrategy(?lap, ?remainingLaps)
 							   
 updatePitstopStrategy(?targetLap, ?remainingLaps) <= ?remainingLaps < 3, Set(Pitstop.Strategy.Lap, ?targetLap), !
-updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), >=(?toLap, ?fromLap),
+updatePitstopStrategy(?targetLap, ?remainingLaps) <= pitstopWindow(!Lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap), ?toLap >= ?fromLap,
 													 updatePitstopStrategy(!Lap, ?fromLap, ?toLap)
 
 updatePitstopStrategy(?lap, ?fromLap, ?fromLap) <= !, Set(Pitstop.Strategy.Lap, ?fromLap)
-updatePitstopStrategy(?lap, ?fromLap, ?toLap) <= updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?trafficDensities),
-												 bestPitstopLap(?laps, ?positions, ?trafficDensities, ?targetLap),
-												 Set(Pitstop.Strategy.Lap, ?targetLap)
+updatePitstopStrategy(?lap, ?fromLap, ?toLap) <= updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities),
+												 bestPitstopLap(?laps, ?positions, ?carsInFront, ?trafficDensities,
+																?targetLap, ?position, ?carsAhead),
+												 Set(Pitstop.Strategy.Lap, ?targetLap), Set(Pitstop.Strategy.Position, ?position),
+												 Set(Pitstop.Strategy.Traffic, ?carsAhead)
 
-updatePitstopStrategy(?lap, ?fromLap, ?fromLap, [], [], []) <= !
-updatePitstopStrategy(?lap, ?fromLap, ?toLap, [?fromLap | ?laps], [?position | ?positions], [?trafficDensity | ?trafficDensities]) <=
-		pitstopDeltaTime(?lap, ?fromLap, ?pitDelta), extrapolateLap(?lap, ?fromLap, ?pitDelta),
-		evaluatePosition(?fromLap, ?position, ?trafficDensity),
-		?nextLap = ?fromLap + 1, updatePitstopStrategy(?lap, ?nextLap, ?toLap, ?laps, ?positions, ?trafficDensities)
+updatePitstopStrategy(?lap, ?fromLap, ?toLap, [], [], [], []) <= ?fromLap > ?toLap, !
+updatePitstopStrategy(?lap, ?fromLap, ?toLap, [?fromLap | ?laps], [?position | ?positions],
+											  [?carsAhead | ?carsInFront], [?trafficDensity | ?trafficDensities]) <=
+		pitstopDeltaTime(?lap, ?fromLap, ?pitDelta), extrapolateLap(?lap, ?fromLap, ?pitDelta), !,
+		evaluatePosition(?fromLap, ?position, ?carsAhead, ?trafficDensity),
+		?nextLap = ?fromLap + 1, updatePitstopStrategy(?lap, ?nextLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities)
+updatePitstopStrategy(?lap, ?fromLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities) <=
+		?fromLap =< ?toLap, ?nextLap = ?fromLap + 1,
+		updatePitstopStrategy(?lap, ?nextLap, ?toLap, ?laps, ?positions, ?carsInFront, ?trafficDensities)
 
 pitstopWindow(?lap, ?targetLap, ?remainingLaps, ?fromLap, ?toLap) <=
 		?maxLap = ?targetLap + ?remainingLaps,
@@ -353,7 +362,6 @@ pitstopRefillServiceTime(Fixed, ?refillAmount, !Session.Settings.Pitstop.Service
 pitstopRefillServiceTime(?, ?refillAmount, ?refillTime) <=
 		?refillIncrements = ?refillAmount / 10, ?refillTime = ?refillIncrements * !Session.Settings.Pitstop.Service.Refuel
 
-
 pitstopTyreServiceTime(?lap, ?targetLap, !Session.Settings.Pitstop.Service.Tyres) <=
 		?deltaLaps = ?targetLap - ?lap,
 		remainingSessionLaps(?lap, ?tempLaps), ?remainingLaps = ?tempLaps - ?deltaLaps,
@@ -365,33 +373,38 @@ pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Sessi
 pitstopServiceTime(?refuelServiceTime, ?tyreServiceTime, ?serviceTime) <= !Session.Settings.Pitstop.Service.Order = Sequential,
 																		  ?serviceTime = ?refuelServiceTime + ?tyreServiceTime
 
-evaluatePosition(?lap, ?position, ?density) <= Get(Standings.Extrapolated, ?lap, Car, !Driver.Car, Position, ?position),
-											   trafficDensity(?lap, ?density)
+evaluatePosition(?lap, ?position, ?carsAhead, ?density) <= Get(Standings.Extrapolated, ?lap, Car, !Driver.Car, Position, ?position),
+														   trafficDensity(?lap, ?carsAhead, ?density)
 
-trafficDensity(?lap, ?density) <= Get(Standings.Extrapolated, ?lap, Car, !Driver.Car, Laps, ?temp1), round(?temp1, ?temp2),
-								  ?from = ?temp1 - ?temp2, ?to = ?from + !Session.Settings.Strategy.Traffic.Considered,
-								  trafficDensity(?lap, !Car.Count, ?from, ?to, ?density)
+trafficDensity(?lap, ?carsAhead, ?density) <= Get(Standings.Extrapolated, ?lap, Car, !Driver.Car, Laps, ?temp1), round(?temp1, ?temp2),
+											  ?from = ?temp1 - ?temp2, ?to = ?from + !Session.Settings.Strategy.Traffic.Considered,
+											  trafficDensity(?lap, !Car.Count, ?from, ?to, ?carsAhead, ?density)
 
-trafficDensity(?, ?car, ?, ?, 0) <= =<(?car, 0), !
-trafficDensity(?lap, ?car, ?from, ?to, ?count) <= Get(Standings.Extrapolated, ?lap, Car, ?car, Laps, ?temp1), round(?temp1, ?temp2),
-												  ?position = ?temp1 - ?temp2, ?position > ?from, ?position < ?to, !,
-												  ?nextCar = ?car - 1, trafficDensity(?lap, ?nextCar, ?from, ?to, ?temp3), ?count = ?temp3 + 1
-trafficDensity(?lap, ?car, ?from, ?to, ?count) <= ?nextCar = ?car - 1, trafficDensity(?lap, ?nextCar, ?from, ?to, ?count)
+trafficDensity(?, ?car, ?, ?, [], 0) <= ?car =< 0, !
+trafficDensity(?lap, ?car, ?from, ?to, [?car | ?carsAhead], ?count) <=
+		Get(Standings.Extrapolated, ?lap, Car, ?car, Laps, ?temp1), round(?temp1, ?temp2),
+		?position = ?temp1 - ?temp2, ?position > ?from, ?position < ?to, !,
+		?nextCar = ?car - 1, trafficDensity(?lap, ?nextCar, ?from, ?to, ?carsAhead, ?temp3), ?count = ?temp3 + 1
+trafficDensity(?lap, ?car, ?from, ?to, ?carsAhead, ?count) <=
+		?nextCar = ?car - 1, trafficDensity(?lap, ?nextCar, ?from, ?to, ?carsAhead, ?count)
 
-bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cTrafficDensity | ?trafficDensities], ?lap) <=
-		bestPitstopLap(?laps, ?positions, ?trafficDensities, ?cLap, ?cPosition, ?cTrafficDensity, ?lap)
-
-bestPitstopLap([], [], [], ?candidateLap, ?, ?, ?candidateLap)
-bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cDensity | ?densities], ?bestLap, ?bestPosition, ?bestDensity, ?lap) <=
-		?cPosition < ?bestPosition, !, bestPitstopLap(?laps, ?positions, ?densities, ?cLap, ?cPosition, ?cDensity, ?lap)
-bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cDensity | ?densities], ?bestLap, ?bestPosition, ?bestDensity, ?lap) <=
-		?cPosition = ?bestPosition, ?cDensity < ?bestDensity, !,
-		bestPitstopLap(?laps, ?positions, ?densities, ?cLap, ?cPosition, ?cDensity, ?lap)
-bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions], [?cDensity | ?densities], ?bestLap, ?bestPosition, ?bestDensity, ?lap) <=
-		?cPosition = ?bestPosition, ?cDensity = ?bestDensity, !,
-		bestPitstopLap(?laps, ?positions, ?densities, ?cLap, ?cPosition, ?cDensity, ?lap)
-bestPitstopLap([? | ?laps], [? | ?positions], [? | ?densities], ?bestLap, ?bestPosition, ?bestDensity, ?lap) <=
-		bestPitstopLap(?laps, ?positions, ?densities, ?bestLap, ?bestPosition, ?bestDensity, ?lap)
+bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions],
+			   [?cCarsInFront | ?carsInFront], [?cDensity | ?densities], ?lap, ?position, ?carsAhead) <=
+		bestPitstopLap(?laps, ?positions, ?carsInFront, ?densities, ?cLap, ?cPosition, ?cCarsInFront, ?cDensity, ?lap, ?position, ?carsAhead)
+bestPitstopLap([], [], [], [], ?cLap, ?cPosition, ?cCarsAhead, ?, ?cLap, ?cPosition, ?cCarsAhead)
+bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions],
+			   [?cCarsInFront | ?carsInFront], [?cDensity | ?densities],
+			   ?bestLap, ?bestPosition, ?bestCarsAhead, ?bestDensity, ?lap, ?position, ?carsAhead) <=
+		?cPosition < ?bestPosition, !,
+		bestPitstopLap(?laps, ?positions, ?carsInFront, ?densities, ?cLap, ?cPosition, ?cCarsInFront, ?cDensity, ?lap, ?position, ?carsAhead)
+bestPitstopLap([?cLap | ?laps], [?cPosition | ?positions],
+			   [?cCarsInFront | ?carsInFront], [?cDensity | ?densities],
+			   ?bestLap, ?bestPosition, ?bestCarsAhead, ?bestDensity, ?lap, ?position, ?carsAhead) <=
+		?cPosition = ?bestPosition, ?cDensity =< ?bestDensity, !,
+		bestPitstopLap(?laps, ?positions, ?carsInFront, ?densities, ?cLap, ?cPosition, ?cCarsInFront, ?cDensity, ?lap, ?position, ?carsAhead)
+bestPitstopLap([? | ?laps], [? | ?positions], [? | ?carsInFront], [? | ?densities],
+			   ?bestLap, ?bestPosition, ?bestCarsInFront, ?bestDensity, ?lap, ?position, ?carsAhead) <=
+		bestPitstopLap(?laps, ?positions, ?carsInFront, ?densities, ?bestLap, ?bestPosition, ?bestCarsInFront, ?bestDensity, ?lap, ?position, ?carsAhead)
 
 
 ;;;-------------------------------------------------------------------------;;;

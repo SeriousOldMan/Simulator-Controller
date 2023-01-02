@@ -38,9 +38,9 @@ global kProveAll := "ProveAll:"
 global kSet := "Set:"
 global kClear := "Clear:"
 
-global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions := ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
+global kBuiltinFunctions := ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "lessEqual", "greaterEqual", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -3502,13 +3502,15 @@ class RuleCompiler {
 			else {
 				this.skipWhiteSpace(text, nextCharIndex)
 
-				if (SubStr(text, nextCharIndex, 2) = "!=") {
-					; r != x
+				operation := SubStr(text, nextCharIndex, 2)
+
+				if inList(["!=", "=<", ">="], operation) {
+					; r op x
 					nextCharIndex += 2
 
 					xOperand := this.readCompoundArgument(text, nextCharIndex)
 
-					return Array("!=", functor, xOperand)
+					return Array(operation, functor, xOperand)
 				}
 				else if (SubStr(text, nextCharIndex, 1) = "=") {
 					; r = x op y OR x = y
@@ -3534,8 +3536,8 @@ class RuleCompiler {
 					else
 						return Array("=", functor, xOperand)
 				}
-				else if InStr("<>", SubStr(text, nextCharIndex, 1)) {
-					 ; x op y
+				else if InStr("<>", SubStr(text, nextCharIndex, 1))  {
+					; x op y
 
 					operation := SubStr(text, nextCharIndex, 1)
 
@@ -3856,7 +3858,7 @@ class RuleCompiler {
 			return new CutParser(this, variables)
 		else if ((term = "fail") && !forArguments)
 			return new FailParser(this, variables)
-		else if ((term == "[]") && forArguments)
+		else if ((StrReplace(term, A_Space, "") == "[]") && forArguments)
 			return new NilParser(this, variables)
 		else if (!IsObject(term) && forArguments)
 			return new PrimaryParser(this, variables)
@@ -4685,6 +4687,52 @@ less(choicePoint, operand1, operand2) {
 			return false
 
 		return (value1 < value2)
+	}
+}
+
+lessEqual(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	local value1, value2
+
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+		return false
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+
+		if value1 is not Number
+			return false
+
+		if value2 is not Number
+			return false
+
+		return (value1 <= value2)
+	}
+}
+
+greaterEqual(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	local value1, value2
+
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+		return false
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+
+		if value1 is not Number
+			return false
+
+		if value2 is not Number
+			return false
+
+		return (value1 >= value2)
 	}
 }
 

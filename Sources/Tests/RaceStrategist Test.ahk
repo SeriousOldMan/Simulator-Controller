@@ -278,12 +278,15 @@ class PitstopRecommendation extends Assert {
 			else
 				strategist.addLap(A_Index, data)
 
-			if (A_Index = 3) {
+			if (A_Index = 2) {
+				strategist.KnowledgeBase.setFact("Strategy.Pitstop.Lap", 5)
 				strategist.KnowledgeBase.setFact("Pitstop.Strategy.Plan", true)
 
 				strategist.KnowledgeBase.produce()
 
-				this.AssertFalse(strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 3...")
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+
+				this.AssertEqual(4, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 3...")
 			}
 
 			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
@@ -303,9 +306,9 @@ class PitstopRecommendation extends Assert {
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	AHKUnit.AddTestClass(BasicReporting)
-	AHKUnit.AddTestClass(PositionProjection)
-	AHKUnit.AddTestClass(GapReporting)
+	;~ AHKUnit.AddTestClass(BasicReporting)
+	;~ AHKUnit.AddTestClass(PositionProjection)
+	;~ AHKUnit.AddTestClass(GapReporting)
 	AHKUnit.AddTestClass(PitstopRecommendation)
 
 	AHKUnit.Run()

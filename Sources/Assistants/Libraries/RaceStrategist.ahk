@@ -103,6 +103,34 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
+	class ExplainPitstopContinuation extends VoiceManager.ReplyContinuation {
+		iPlannedLap := false
+
+		PlannedLap[] {
+			Get {
+				return this.iPlannedLap
+			}
+		}
+
+		__New(manager, plannedLap, arguments*) {
+			this.iPlannedLap := plannedLap
+
+			base.__New(manager, arguments*)
+		}
+
+		cancel() {
+			Process Exist, Race Engineer.exe
+
+			if ErrorLevel {
+				this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
+
+				this.Manager.setContinuation(ObjBindMethod(this, "planPitstop", this.PlannedLap))
+			}
+			else
+				base.cancel()
+		}
+	}
+
 	class RaceReviewContinuation extends VoiceManager.VoiceContinuation {
 	}
 
@@ -2220,7 +2248,7 @@ class RaceStrategist extends RaceAssistant {
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
-		plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
+		plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
 		if (plannedLap == kUndefined)
 			speaker.speakPhrase("NoPlannedPitstop")
@@ -2232,6 +2260,65 @@ class RaceStrategist extends RaceAssistant {
 			try {
 				speaker.speakPhrase("PitstopLap", {lap: plannedLap})
 
+				speaker.speakPhrase("Explain", false, true)
+
+				Process Exist, Race Engineer.exe
+
+				if ErrorLevel
+					this.setContinuation(new this.ExplainPitstopContinuation(this, ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
+																		  , "Confirm", "Okay"))
+				else
+					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, false))
+			}
+			finally {
+				speaker.endTalk()
+			}
+		}
+	}
+
+	explainPitstopRecommendation(plannedLap, instructEngineer := true) {
+		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
+		local position := knowledgeBase.getValue("Pitstop.Strategy.Position", false)
+		local traffic := parseList(knowledgeBase.getValue("Pitstop.Strategy.Traffic", "[]"))
+		local driver := knowledgeBase.getValue("Driver.Car")
+		local driverLaps := knowledgeBase.getValue("Standings.Extrapolated." . plannedLap . ".Car." . driver . ".Laps")
+		local backmarkers := 0
+		local laps, positions, traffics
+
+		if position {
+			laps := parseList(knowledgeBase.getValue("Pitstop.Strategy.Evaluation.Laps", "[]"))
+			positions := parseList(knowledgeBase.getValue("Pitstop.Strategy.Evaluation.Positions", "[]"))
+			traffics := parseList(knowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics", "[]"))
+
+			speaker.beginTalk()
+
+			try {
+				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length(), first: laps[1], last: laps[laps.Length()]})
+
+				if (position = Min(positions*))
+					speaker.speakPhrase("EvaluatedSimilarPosition", {position: position})
+				else
+					speaker.speakPhrase("EvaluatedBestPosition", {lap: plannedLap, position: position})
+
+				if (traffic.Length() > 0) {
+					speaker.speakPhrase("EvaluatedTraffic", {traffic: traffic.Length()})
+
+					for ignore, car in traffic
+						if (knowledgeBase.getValue("Standings.Extrapolated." . plannedLap . ".Car." . car . ".Laps", kUndefined) < driverLaps)
+							backmarkers += 1
+
+					if (backmarkers > 0)
+						speaker.speakPhrase((backmarkers > 1) ? "EvaluatedBackmarkers" : "EvaluatedBackmarker", {backmarkers: backmarkers})
+				}
+				else
+					speaker.speakPhrase("EvaluatedNoTraffic")
+			}
+			finally {
+				speaker.endTalk()
+			}
+
+			if instructEngineer {
 				Process Exist, Race Engineer.exe
 
 				if ErrorLevel {
@@ -2239,9 +2326,6 @@ class RaceStrategist extends RaceAssistant {
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
 				}
-			}
-			finally {
-				speaker.endTalk()
 			}
 		}
 	}
@@ -2377,7 +2461,7 @@ class RaceStrategist extends RaceAssistant {
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledgeBase(this.KnowledgeBase)
 
-				plannedLap := knowledgebase.getValue("Pitstop.Strategy.Lap", kUndefined)
+				plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
 				if (plannedLap && (plannedLap != kUndefined))
 					plannedPitstopLap := plannedLap
@@ -2395,7 +2479,7 @@ class RaceStrategist extends RaceAssistant {
 				if ErrorLevel {
 					speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-					nextPitstop := knowledgebase.getValue("Strategy.Pitstop.Next")
+					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")
 
 					refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
@@ -2691,7 +2775,7 @@ class RaceStrategist extends RaceAssistant {
 parseList(list) {
 	local compiler := new RuleCompiler()
 	local nextCharIndex := 1
-	local term := compiler.readList(strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics", "[]"), nextCharIndex)
+	local term := compiler.readList(list, nextCharIndex)
 
 	return compiler.createTermParser(term).parse(term).toObject()
 }

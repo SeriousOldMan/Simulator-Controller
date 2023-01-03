@@ -2201,7 +2201,7 @@ class RaceStrategist extends RaceAssistant {
 	recommendPitstop(lap := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local plannedLap
+		local plannedLap, position, traffic
 
 		if !this.hasEnoughData()
 			return
@@ -2687,6 +2687,14 @@ class RaceStrategist extends RaceAssistant {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+parseList(list) {
+	local compiler := new RuleCompiler()
+	local nextCharIndex := 1
+	local term := compiler.readList(strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics", "[]"), nextCharIndex)
+
+	return compiler.createTermParser(term).parse(term).toObject()
+}
 
 getTime() {
 	return A_Now

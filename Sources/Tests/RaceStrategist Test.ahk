@@ -310,9 +310,9 @@ class PitstopRecommendation extends Assert {
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(BasicReporting)
-	;~ AHKUnit.AddTestClass(PositionProjection)
-	;~ AHKUnit.AddTestClass(GapReporting)
+	AHKUnit.AddTestClass(BasicReporting)
+	AHKUnit.AddTestClass(PositionProjection)
+	AHKUnit.AddTestClass(GapReporting)
 	AHKUnit.AddTestClass(PitstopRecommendation)
 
 	AHKUnit.Run()

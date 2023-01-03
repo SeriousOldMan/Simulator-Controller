@@ -2265,7 +2265,8 @@ class RaceStrategist extends RaceAssistant {
 				Process Exist, Race Engineer.exe
 
 				if ErrorLevel
-					this.setContinuation(new this.ExplainPitstopContinuation(this, ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
+					this.setContinuation(new this.ExplainPitstopContinuation(this, plannedLap
+																		  , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
 																		  , "Confirm", "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, false))

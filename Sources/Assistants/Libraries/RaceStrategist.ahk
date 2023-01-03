@@ -96,7 +96,7 @@ class RaceStrategist extends RaceAssistant {
 			if ErrorLevel {
 				this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
 
-				this.Manager.setContinuation(ObjBindMethod(this, "planPitstop"))
+				this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop"))
 			}
 			else
 				base.cancel()
@@ -124,7 +124,7 @@ class RaceStrategist extends RaceAssistant {
 			if ErrorLevel {
 				this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
 
-				this.Manager.setContinuation(ObjBindMethod(this, "planPitstop", this.PlannedLap))
+				this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop", this.PlannedLap))
 			}
 			else
 				base.cancel()

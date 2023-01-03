@@ -320,7 +320,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	savePressureData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-				   , compound, compoundColor, coldPressures, hotPressures, pressureLosses) {
+				   , compound, compoundColor, coldPressures, hotPressures, pressuresLosses) {
 		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive)
@@ -331,7 +331,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			this.LapDatabase.add("Pressures", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
 											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
 											 , "Compound": compound, "Compound.Color": compoundColor
-											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures, "Pressures.Losses": pressureLosses})
+											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures, "Pressures.Losses": pressuresLosses})
 	}
 
 	updateTyresDatabase() {

@@ -12,6 +12,7 @@
 #Include ..\Framework\Constants.ahk
 #Include ..\Framework\Variables.ahk
 #Include ..\Framework\Debug.ahk
+#Include ..\Framework\Strings.ahk
 #Include ..\Framework\Collections.ahk
 #Include ..\Framework\Configuration.ahk
 #Include ..\Framework\Message.ahk

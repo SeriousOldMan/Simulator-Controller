@@ -270,7 +270,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			local plugin := this.Plugin
 
 			if plugin.RaceAssistantName
-				if (plugin.RaceAssistantEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+				if (plugin.RaceAssistantEnabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
 					plugin.disableRaceAssistant(plugin.actionLabel(this))
 
 					function.setLabel(plugin.actionLabel(this), "Black")
@@ -301,7 +301,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (plugin.TeamServer.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TeamServer.TeamServerEnabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
 				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
@@ -1537,8 +1537,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local teamServer := RaceAssistantPlugin.TeamServer
 
 		if RaceAssistantPlugin.TeamSessionActive
-			return ((getConfigurationValue(data, "Stint Data", "DriverForname") = teamServer.DriverForName)
-				 && (getConfigurationValue(data, "Stint Data", "DriverSurname") = teamServer.DriverSurName))
+			return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
 		else
 			return true
 	}

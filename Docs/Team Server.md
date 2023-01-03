@@ -132,6 +132,8 @@ To use the "Race Center", you must have a valid connection to a team session. Th
 
 Once you are connected to an active session on the Team Server, all the data in "Race Center" will be updated every 10 seconds. During this time the user interface is looked to ensure the integrity of the data. This can be somewhat annoying. Therefore you can disable the synchronization temporarily using the corresponding command from the "Session" menu.
 
+You can reload the data stored on the server for the currently selected session by clicking on the small button with the "Reload" icon. This can be helpful, when data seems to be missin, or when you have made changes, you want to discard.
+
 If you have connected to a session that has already been used in a previous race and there is still data stored in the session, it might take a while, before all data have been loaded. The window controls will be blocked during this time and you will see a small mark rotating on the right side of the window to show you that data is being requested from the server.
 
 It is no problem, to reuse a session for many races, because the old data (except the stint plan and the associated strategy, if any) will be automatically cleared, when the new race is started. But you can also use the command "Clear" from the "Session" menu beforehand to erase all current data, if you whish.
@@ -340,6 +342,8 @@ The automatic selection of the next driver is supported for *Assetto Corsa Compe
      ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2018.JPG)
 	 
 	 Please make sure, that the names and the order of the selected drivers are identical to the content of the entry list for your team in the upcoming session. Otherwise, wrong drivers might be selected for the next stint in the pitstop automation. As a beneficial side effect, you can see in the list of drivers also, which of the drivers are currently connected to the Team Server as a *Driver*.
+
+Note: Once you have dialed the next driver for the first time in the simulator, and you want to correct some values for the pitstop, choose "No driver change" in the *Driver* dropdown menu. This will preserve the last selection of the next driver in the pitstop settings, while changing the refuel amount, for example.
 
 Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop" menu and the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
   

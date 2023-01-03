@@ -20,9 +20,27 @@ global vLogLevel := kLogWarn
 #Include ..\Framework\Constants.ahk
 #Include ..\Framework\Variables.ahk
 #Include ..\Framework\Files.ahk
+#Include ..\Framework\Strings.ahk
 #Include ..\Framework\Localization.ahk
 #Include ..\Framework\TrayMenu.ahk
 #Include ..\Framework\Message.ahk
+#Include ..\Libraries\Messages.ahk
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Public Constants Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+/* Must be defined in Constants.ahk due to circular loading problems...
+global kLogDebug := 1
+global kLogInfo := 2
+global kLogWarn := 3
+global kLogCritical := 4
+global kLogOff := 5
+
+global kLogLevels := {Off: kLogOff, Debug: kLogDebug, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
+*/
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -164,12 +182,14 @@ setDebug(debug) {
 		else
 			Menu SupportMenu, Uncheck, %label%
 
+	if (vDebug || debug) {
+		title := translate("Modular Simulator Controller System")
+		state := (debug ? translate("Enabled") : translate("Disabled"))
+
+		TrayTip %title%, Debug: %state%
+	}
+
 	vDebug := debug
-
-	title := translate("Modular Simulator Controller System")
-	state := (debug ? translate("Enabled") : translate("Disabled"))
-
-	TrayTip %title%, Debug: %state%
 }
 
 setLogLevel(level) {
@@ -193,13 +213,16 @@ setLogLevel(level) {
 			level := kLogCritical
 		case "Off":
 			level := kLogOff
+		default:
+			if level is not Integer
+				level := kLogWarn
 	}
 
-	vLogLevel := Min(kLogOff, Max(level, kLogDebug))
+	level := Min(kLogOff, Max(level, kLogDebug))
 
 	state := translate("Unknown")
 
-	switch vLogLevel {
+	switch level {
 		case kLogDebug:
 			state := translate("Debug")
 		case kLogInfo:
@@ -212,12 +235,16 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
+	if (vLogLevel != level) {
+		vLogLevel := level
+
+		title := translate("Modular Simulator Controller System")
+
+		TrayTip %title%, % translate("Log Level: ") . state
+	}
+
 	if hasTrayMenu()
 		Menu LogMenu, Check, %state%
-
-	title := translate("Modular Simulator Controller System")
-
-	TrayTip %title%, % translate("Log Level: ") . state
 }
 
 increaseLogLevel() {

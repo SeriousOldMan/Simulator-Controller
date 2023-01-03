@@ -79,7 +79,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (plugin.TeamServerEnabled && ((trigger = "Off") || (trigger == "Push"))) {
+			if (plugin.TeamServerEnabled && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
 				plugin.disableTeamServer(plugin.actionLabel(this))
 
 				function.setLabel(plugin.actionLabel(this), "Black")
@@ -1199,7 +1199,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if isDebug() {
 					showMessage("Updating lap for team session: " . lapNumber)
 
-					if ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName))
+					if (isDevelopment() && ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName)))
 						throw Exception("Driver inconsistency detected...")
 				}
 

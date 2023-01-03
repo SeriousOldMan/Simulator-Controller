@@ -1222,7 +1222,10 @@ class RaceCenter extends ConfigurationItem {
 		else
 			Gui %window%:Add, DropDownList, x266 yp w120 AltSubmit Choose0 vsessionDropDownMenu gchooseSession
 
-		Gui %window%:Add, Text, x24 yp+30 w356 0x10
+		Gui %window%:Add, Button, x116 yp-1 w23 h23 Center +0x200 HWNDconnectButton gconnectSession
+		setButtonIcon(connectButton, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
+
+		Gui %window%:Add, Text, x24 yp+31 w356 0x10
 
 		Gui %window%:Add, ListView, x16 yp+10 w115 h230 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDreportsListView gchooseReport, % translate("Report")
 
@@ -3008,12 +3011,10 @@ class RaceCenter extends ConfigurationItem {
 		if stint {
 			drivers := this.getPlanDrivers()
 
-			if (drivers.HasKey(stint.Nr + 1)) {
-				index := inList(this.TeamDrivers, drivers[stint.Nr + 1])
-
-				if index
-					GuiControl Choose, pitstopDriverDropDownMenu, %index%
-			}
+			if (drivers.HasKey(stint.Nr + 1))
+				GuiControl Choose, pitstopDriverDropDownMenu, % (inList(this.TeamDrivers, drivers[stint.Nr + 1]) + 1)
+			else
+				GuiControl Choose, pitstopDriverDropDownMenu, 1
 		}
 
 		pressuresDB := this.PressuresDatabase
@@ -3030,6 +3031,11 @@ class RaceCenter extends ConfigurationItem {
 				refuel := 0
 				compound := pressures["Compound"]
 				compoundColor := pressures["Compound.Color"]
+
+				if ((compound = "-") || (compoundColor = "-")) {
+					compound := false
+					compoundColor := false
+				}
 
 				this.initializePitstopSettings(lap, refuel, compound, compoundColor)
 
@@ -3426,7 +3432,9 @@ class RaceCenter extends ConfigurationItem {
 			stint := this.CurrentStint
 			driverSelected := false
 
-			if (stint && pitstopDriverDropDownMenu && (pitstopDriverDropDownMenu != "")) {
+			if (stint && pitstopDriverDropDownMenu
+					  && (pitstopDriverDropDownMenu != "")
+					  && (pitstopDriverDropDownMenu != translate("No driver change"))) {
 				nextDriver := pitstopDriverDropDownMenu
 				nextNr := inList(this.TeamDrivers, nextDriver)
 
@@ -4560,7 +4568,8 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl, , planDriverDropDownMenu, % "|"
 			}
 
-			GuiControl, , pitstopDriverDropDownMenu, % "|"
+			GuiControl, , pitstopDriverDropDownMenu, % "|" . translate("No driver change")
+			GuiControl Choose, pitstopDriverDropDownMenu, 1
 
 			this.iTeamDrivers := []
 			this.iTeamDriversVersion := false
@@ -6025,8 +6034,8 @@ class RaceCenter extends ConfigurationItem {
 
 					this.iTeamDrivers := teamDrivers
 
-					GuiControl, , pitstopDriverDropDownMenu, % ("|" . values2String("|", teamDrivers*))
-					GuiControl Choose, pitstopDriverDropDownMenu, % (teamDrivers.Length() > 0) ? 1 : 0
+					GuiControl, , pitstopDriverDropDownMenu, % ("|" . values2String("|", translate("No driver change"), teamDrivers*))
+					GuiControl Choose, pitstopDriverDropDownMenu, % (teamDrivers.Length() > 0) ? 2 : 1
 				}
 			}
 		}
@@ -6493,8 +6502,8 @@ class RaceCenter extends ConfigurationItem {
 
 			Gui %window%:Default
 
-			GuiControl, , pitstopDriverDropDownMenu, % ("|" . values2String("|", teamDrivers*))
-			GuiControl Choose, pitstopDriverDropDownMenu, % (teamDrivers.Length() > 0) ? 1 : 0
+			GuiControl, , pitstopDriverDropDownMenu, % ("|" . values2String("|", translate("No driver change"), teamDrivers*))
+			GuiControl Choose, pitstopDriverDropDownMenu, % (teamDrivers.Length() > 0) ? 2 : 1
 		}
 	}
 
@@ -8765,6 +8774,7 @@ class RaceCenter extends ConfigurationItem {
 		local hotPressures := "-, -, -, -"
 		local coldPressures := "-, -, -, -"
 		local pressuresLosses := "-, -, -, -"
+		local hasColdPressures := false
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
 		local stintNr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections
@@ -8791,6 +8801,8 @@ class RaceCenter extends ConfigurationItem {
 								tyrePressures[A_Index] := displayValue(kNull)
 							else if (tyrePressures[A_Index] > 0)
 								tyrePressures[A_Index] := ("+" . tyrePressures[A_Index])
+
+							hasColdPressures := true
 						}
 						else
 							tyrePressures[A_Index] := displayValue(kNull)
@@ -8801,7 +8813,11 @@ class RaceCenter extends ConfigurationItem {
 				else
 					pressureCorrections := ""
 
-				coldPressures := (values2String(", ", coldPressures*) . pressureCorrections)
+				coldPressures := values2String(", ", coldPressures*)
+
+				hasColdPressures := (hasColdPressures || (coldPressures != "-, -, -, -"))
+
+				coldPressures := (coldPressures . pressureCorrections)
 
 				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
 												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
@@ -8833,7 +8849,7 @@ class RaceCenter extends ConfigurationItem {
 		if (hotPressures != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
 
-		if (coldPressures != "-, -, -, -")
+		if hasColdPressures
 			html .= ("<tr><td><b>" . translate("Pressures (cold, recommended):") . "</b></td><td>" . coldPressures . "</td></tr>")
 
 		if (pressuresLosses != "-, -, -, -")
@@ -10586,6 +10602,10 @@ chooseSession() {
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "selectSession")
 							   , getValues(rCenter.Sessions)[sessionDropDownMenu])
+}
+
+connectSession() {
+	connectServer()
 }
 
 chooseChartType() {

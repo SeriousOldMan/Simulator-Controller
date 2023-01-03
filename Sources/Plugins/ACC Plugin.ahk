@@ -273,6 +273,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		this.startupUDPClient(restart)
 	}
 
+	driverActive(data, driverForName, driverSurName) {
+		return this.sessionActive(data)
+	}
+
 	updateSession(session) {
 		local lastSession := this.Session
 		local activeModes
@@ -1836,9 +1840,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						currentDriver := pitstopState["driversNames"][pitstopState["currentDriverIndex"] + 1]
 
-						currentTyreSet := carState["currentTyreSet"]
-						tyreStates := []
-
 						pitstopData := {Pitstop: pitstopNumber
 									  , "Service.Time": pitstopState["timeRequired"]
 									  , "Service.Lap": carState["lapCount"]
@@ -1862,32 +1863,37 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
 						}
 
-						for ignore, tyreSet in carState["tyreSets"]
-							if (tyreSet["tyreSet"] = currentTyreSet) {
-								for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
-									wearState := tyreSet["wearStatus"][A_Index]
-									tread := wearState["treadMM"].Clone()
+						if (carState["currentTyreCompound"] != 0) {
+							currentTyreSet := carState["currentTyreSet"]
+							tyreStates := []
 
-									wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100))
+							for ignore, tyreSet in carState["tyreSets"]
+								if (tyreSet["tyreSet"] = currentTyreSet) {
+									for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+										wearState := tyreSet["wearStatus"][A_Index]
+										tread := wearState["treadMM"].Clone()
 
-									for index, section in tread
-										tread[index] := Round(section, 2)
+										wear := Round(100 - ((Max(0, average(tread) - 1.5) / 1.5) * 100))
 
-									grain := Round(wearState["grain"], 2)
-									blister := Round(wearState["blister"], 2)
-									flatSpot := Round(wearState["flatSpot"], 2)
+										for index, section in tread
+											tread[index] := Round(section, 2)
 
-									tyreStates.Push({Tyre: tyre, Tread: tread, Wear: wear, Grain: grain, Blister: blister, FlatSpot: flatSpot})
+										grain := Round(wearState["grain"], 2)
+										blister := Round(wearState["blister"], 2)
+										flatSpot := Round(wearState["flatSpot"], 2)
+
+										tyreStates.Push({Tyre: tyre, Tread: tread, Wear: wear, Grain: grain, Blister: blister, FlatSpot: flatSpot})
+									}
+
+									pitstopData["Tyre.Driver"] := currentDriver
+									pitstopData["Tyre.Laps"] := false
+									pitstopData["Tyre.Compound"] := "Dry"
+									pitstopData["Tyre.Compound.Color"] := "Black"
+									pitstopData["Tyre.Set"] := (currentTyreSet + 1)
+
+									break
 								}
-
-								pitstopData["Tyre.Driver"] := currentDriver
-								pitstopData["Tyre.Laps"] := false
-								pitstopData["Tyre.Compound"] := "Dry"
-								pitstopData["Tyre.Compound.Color"] := "Black"
-								pitstopData["Tyre.Set"] := (currentTyreSet + 1)
-
-								break
-							}
+						}
 
 						data := newConfiguration()
 

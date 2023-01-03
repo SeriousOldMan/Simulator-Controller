@@ -1,7 +1,7 @@
-## Installation Paths ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
+## Installation Paths ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Constants.ahk))
 The following constants may be used to refer to all the relevant locations of the Simulator Controller distribution.
 
-#### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kIncludesDirectory, kLibrariesDirectory, kPluginsDirectory, kBinariesDirectory, kConfigDirectory*, *kRulesDirectory*, *kGrammarsDirectory*, *kTranslationsDirectory* 
+#### *kHomeDirectory, kResourcesDirectory, kSourcesDirectory, kFrameworkDirectory, kLibrariesDirectory, kPluginsDirectory, kBinariesDirectory, kConfigDirectory*, *kRulesDirectory*, *kGrammarsDirectory*, *kTranslationsDirectory* 
 All these constants define paths pointing to a specific folder in the Simulator Controller distribution. In deviation to Windows standards, the paths contain a trailing backslash, since in allmost all cases, a filename will be concatenated to one of these constants in order to access this file.
 
 #### *kSplashMediaDirectory, kScreenImagesDirectory, kButtonBoxImagesDirectory, kStreamDeckImagesDirectory*
@@ -15,7 +15,7 @@ Paths for the most important configuration files used by Simulator Controller.
 
 ***
 
-## Global Configuration Map ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
+## Global Configuration Map ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Constants.ahk))
 One global configuration map exists for Simulator Controller, which define the capabilities, the controller mapping and the configuration of all active plugins.
 
 #### *kSimulatorConfiguration*
@@ -23,15 +23,15 @@ The global configuration map, which is read from *kSimulatorConfigurationFile*. 
 
 ***
 
-## Log Levels ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
-See the dcoumentation about [Debugging & Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-functionsahk) for more information.
+## Log Levels ([Debug.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Debug.ahk))
+See the dcoumentation about [Debugging & Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) for more information.
 
 #### *kLogInfo, kLogWarn, kLogCritical, kLogOff*
 Define the various log levels used by the logging functions. These are numerical values where *kLogInfo* < *kLogWarn* < *kLogCritical* < *kLogOff*.
 
 ***
 
-## Controller Function Types ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
+## Controller Function Types ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Constants.ahk))
 Used to identify the different types of hardware controller functions in a configuration map. See the subclasses of [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) for reference.
 
 #### *k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType*
@@ -55,7 +55,7 @@ These constants define the various delivery methods for messages send by the fun
 
 ***
 
-## Miscellaneous Constants ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Includes/Constants.ahk))
+## Miscellaneous Constants ([Constants.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Constants.ahk))
 Additional constants used by Simulator Controller.
 
 #### *kUndefined*

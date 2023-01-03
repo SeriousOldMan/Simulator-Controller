@@ -169,7 +169,7 @@ The build rules are defined in the file *Simulator Tools.targets* in the *Config
 
 	Simulator Controller=
 		%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk;
-														%kIncludesDirectory%, %kSourcesDirectory%Controller\Plugins\
+														%kFrameworkDirectory%, %kSourcesDirectory%Controller\Plugins\
 
 Note: You cannot normally format the rules like in this example, since due to technical restrictions, the complete rule must be kept on one line without CRs or LFs.
 

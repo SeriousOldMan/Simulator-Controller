@@ -284,9 +284,13 @@ class PitstopRecommendation extends Assert {
 
 				strategist.KnowledgeBase.produce()
 
-				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+				this.AssertEqual(7, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 2...")
+				this.AssertEqual(18, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Position"), "Unexpected position detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Traffic"), "Unexpected cars ahead detected after pitstop recommmendation in lap 2...")
 
-				this.AssertEqual(5, strategist.KnowledgeBase.getValue("Pitstop.Strategy.Lap"), "Unexpected pitstop recommmendation detected in lap 3...")
+				this.AssertEqual("[3, 4, 5, 6, 7]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Laps"), "Unexpected evaluated laps detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[19, 19, 19, 19, 18]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Positions"), "Unexpected evaluated positions detected after pitstop recommmendation in lap 2...")
+				this.AssertEqual("[[11, 7, 5], [11, 7], [11], [], []]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics"), "Unexpected evaluated cars ahead detected after pitstop recommmendation in lap 2...")
 			}
 
 			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
@@ -306,9 +310,9 @@ class PitstopRecommendation extends Assert {
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;~ AHKUnit.AddTestClass(BasicReporting)
-	;~ AHKUnit.AddTestClass(PositionProjection)
-	;~ AHKUnit.AddTestClass(GapReporting)
+	AHKUnit.AddTestClass(BasicReporting)
+	AHKUnit.AddTestClass(PositionProjection)
+	AHKUnit.AddTestClass(GapReporting)
 	AHKUnit.AddTestClass(PitstopRecommendation)
 
 	AHKUnit.Run()

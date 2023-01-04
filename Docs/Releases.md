@@ -5,6 +5,7 @@
   4. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
   5. New car models for "Setup Advisor":
       - Assetto Corsa:
+	    - Porsche 911 GT3 R 2016
 
 ## 4.5.3.1-release 12/30/22
   1. Minor bugfixes, as always

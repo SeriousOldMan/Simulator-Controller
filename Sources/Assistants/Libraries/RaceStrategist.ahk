@@ -2269,7 +2269,7 @@ class RaceStrategist extends RaceAssistant {
 																		   , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
 																		   , false, "Okay"))
 				else
-					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, false))
+					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
 			}
 			finally {
 				speaker.endTalk()
@@ -2277,7 +2277,7 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	explainPitstopRecommendation(plannedLap, instructEngineer := true) {
+	explainPitstopRecommendation(plannedLap) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local position := knowledgeBase.getValue("Pitstop.Strategy.Position", false)
@@ -2319,14 +2319,12 @@ class RaceStrategist extends RaceAssistant {
 				speaker.endTalk()
 			}
 
-			if instructEngineer {
-				Process Exist, Race Engineer.exe
+			Process Exist, Race Engineer.exe
 
-				if ErrorLevel {
-					speaker.speakPhrase("ConfirmInformEngineer", false, true)
+			if ErrorLevel {
+				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
-				}
+				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
 			}
 		}
 	}

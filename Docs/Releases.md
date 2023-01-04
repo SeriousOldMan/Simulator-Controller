@@ -2,8 +2,11 @@
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. A new reload button allows you to reload the list of reports in "Race Reports". Helpful, when you just recorded a race on the selected track.
+  4. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
+  5. New car models for "Setup Advisor":
+      - Assetto Corsa:
 
-## 4.5.3.1-release 12/30/22 (planned)
+## 4.5.3.1-release 12/30/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Fixed handling of custom motion and tactile effects in "Simulator Setup".
@@ -12,7 +15,7 @@
   6. Fixed loading and visualization of tyre pressures in "Race Center".
   7. Introduced a "Reconnect" button in "Race Center".
   8. Introduced a "No driver change" option for pitstop plans in "Race Center".
-  9. The detection of the active driver in team races for *Assetto Corsa Competizione* was made more reliable.
+  9. The detection of the connected drivers in team races for *Assetto Corsa Competizione* was made more reliable.
   10. [Developer] Full refactoring of core framework in preparation for the integration of the unit and time/number format handling.
 
 ## 4.5.3.0-release 12/23/22

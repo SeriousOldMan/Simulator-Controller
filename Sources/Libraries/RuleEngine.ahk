@@ -38,9 +38,9 @@ global kProveAll := "ProveAll:"
 global kSet := "Set:"
 global kClear := "Clear:"
 
-global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
-global kBuiltinFunctions := ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
-global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 3, 1, -1, -1]
+global kBuiltinFunctors := ["option", "sqrt", "+", "-", "*", "/", ">", "<", "=<", ">=", "=", "!=", "builtin0", "builtin1", "unbound?", "append", "get"]
+global kBuiltinFunctions := ["option", "squareRoot", "plus", "minus", "multiply", "divide", "greater", "less", "lessEqual", "greaterEqual", "equal", "unequal", "builtin0", "builtin1", "unbound", "append", "get"]
+global kBuiltinAritys := [2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 3, 1, -1, -1]
 
 global kProduction := "Production"
 global kReduction := "Reduction"
@@ -79,6 +79,10 @@ class Condition {
 	toString(facts := "__NotInitialized__") {
 		throw "Virtual method Condition.toString must be implemented in a subclass..."
 	}
+
+	toObject(facts := "__NotInitialized__") {
+		return this.toString(facts)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -114,6 +118,16 @@ class CompositeCondition extends Condition {
 
 		return values2String(", ", conditions*)
 	}
+
+	toObject(facts := "__NotInitialized__") {
+		local conditions := []
+		local ignore, theCondition
+
+		for ignore, theCondition in this.Conditions
+			conditions.Push(theCondition.toObject(facts))
+
+		return conditions
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -123,6 +137,14 @@ class CompositeCondition extends Condition {
 class Quantor extends CompositeCondition {
 	toString(facts := "__NotInitialized__") {
 		return "{" . this.Type . A_Space . base.toString(facts) . "}"
+	}
+
+	toObject(facts := "__NotInitialized__") {
+		local quantor := Object()
+
+		quantor[this.Type] := base.toObject(facts)
+
+		return quantor
 	}
 }
 
@@ -332,6 +354,17 @@ class Predicate extends Condition {
 		else
 			return ("[" . this.LeftPrimary.toString(facts) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(facts) "]")
 	}
+
+	toObject(facts := "__NotInitialized__") {
+		local predicate := Object()
+
+		if (this.Operator == kNotInitialized)
+			predicate[kPredicate] := [this.LeftPrimary.toObject(facts)]
+		else
+			predicate[kPredicate] := [this.LeftPrimary.toObject(facts), this.Operator, this.RightPrimary.toObject(facts)]
+
+		return predicate
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -398,6 +431,14 @@ class Goal extends Condition {
 
 	toString(facts := "__NotInitialized__") {
 		return ("{" . kProve . A_Space . this.Goal.toString() . "}")
+	}
+
+	toObject(facts := "__NotInitialized__") {
+		local predicate := Object()
+
+		predicate[kProve] := [this.Goal.toObject()]
+
+		return predicate
 	}
 }
 
@@ -749,6 +790,19 @@ class CallAction extends Action {
 
 		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
 	}
+
+	toObject(facts := "__NotInitialized__") {
+		local action := Object()
+		local arguments := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			arguments.Push(argument.toObject(facts))
+
+		action[this.Action] := Array(this.Function.toObject(facts), arguments*)
+
+		return action
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -858,6 +912,17 @@ class SetFactAction extends Action {
 		else
 			return ("(Set: " . this.Fact.toString(facts) . ", " . this.Value.toString(facts) . ")")
 	}
+
+	toObject(facts := "__NotInitialized__") {
+		local action := Object()
+
+		if (this.Value == this.Fact)
+			action[this.Action] := [this.Fact.toObject(facts)]
+		else
+			action[this.Action] := [this.Fact.toObject(facts), this.Value.toObject(facts)]
+
+		return action
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -931,6 +996,23 @@ class SetComposedFactAction extends Action {
 
 		return ("(Set: " . fact . ", " . this.Value.toString(facts) . ")")
 	}
+
+	toObject(facts := "__NotInitialized__") {
+		local action := Object()
+		local fact := ""
+		local index, component
+
+		for index, component in this.Fact {
+			if (index > 1)
+				fact .= "."
+
+			fact .= component.toString(facts)
+		}
+
+		action[this.Action] := [fact, this.Value.toObject(facts)]
+
+		return action
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -961,6 +1043,14 @@ class ClearFactAction extends Action {
 
 	toString(facts := "__NotInitialized__") {
 		return ("(Clear: " . this.Fact.toString(facts) . ")")
+	}
+
+	toObject(facts := "__NotInitialized__") {
+		local action := Object()
+
+		action[kClear] := this.Fact.toObject(facts)
+
+		return action
 	}
 }
 
@@ -1024,6 +1114,23 @@ class ClearComposedFactAction extends Action {
 
 		return ("(Clear: " . fact . ")")
 	}
+
+	toObject(facts := "__NotInitialized__") {
+		local action := Object()
+		local fact := ""
+		local index, component
+
+		for index, component in this.Fact {
+			if (index > 1)
+				fact .= "."
+
+			fact .= component.toString(facts)
+		}
+
+		action[kClear] := fact
+
+		return action
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -1037,6 +1144,10 @@ class Term {
 
 	toString(factsOrResultSet := "__NotInitialized__") {
 		throw "Virtual method Term.toString must be implemented in a subclass..."
+	}
+
+	toObject(factsOrResultSet := "__NotInitialized__") {
+		return this.toString(factsOrResultSet)
 	}
 
 	doVariables(resultSet, function) {
@@ -1121,6 +1232,19 @@ class Compound extends Term {
 			arguments.Push(argument.toString(resultSet))
 
 		return (this.Functor . "(" . values2String(", ", arguments*) . ")")
+	}
+
+	toObject(resultSet := "__NotInitialized__") {
+		local term := Object()
+		local arguments := []
+		local ignore, argument
+
+		for ignore, argument in this.Arguments
+			arguments.Push(argument.toObject(resultSet))
+
+		term[this.Functor] := arguments
+
+		return term
 	}
 
 	getValues(resultSet) {
@@ -1295,6 +1419,27 @@ class Pair extends Term {
 		return (result . "]")
 	}
 
+	toObject(resultSet := "__NotInitialized__") {
+		local list := []
+		local next := this
+
+		loop {
+			list.Push(next.LeftTerm.toObject(resultSet))
+
+			if isInstance(next.RightTerm, Pair)
+				next := next.RightTerm
+			else if isInstance(next.RightTerm, Nil)
+				break
+			else {
+				list.Push(next.RightTerm.toObject(resultSet))
+
+				break
+			}
+		}
+
+		return list
+	}
+
 	doVariables(resultSet, function) {
 		this.LeftTerm.doVariables(resultSet, function)
 		this.RightTerm.doVariables(resultSet, function)
@@ -1355,6 +1500,10 @@ class Nil extends Term {
 		return "[]"
 	}
 
+	toObject(resultSet := "__NotInitialized__") {
+		return []
+	}
+
 	unify(choicePoint, term) {
 		return (term.base == Nil)
 	}
@@ -1370,6 +1519,10 @@ class Rule {
             throw "Virtual property Rule.Type must be implemented in a subclass..."
         }
     }
+
+	toObject(facts := "__NotInitialized__") {
+		throw "Rules cannot be converted to objects in Rule.toObject..."
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -3502,13 +3655,15 @@ class RuleCompiler {
 			else {
 				this.skipWhiteSpace(text, nextCharIndex)
 
-				if (SubStr(text, nextCharIndex, 2) = "!=") {
-					; r != x
+				operation := SubStr(text, nextCharIndex, 2)
+
+				if inList(["!=", "=<", ">="], operation) {
+					; r op x
 					nextCharIndex += 2
 
 					xOperand := this.readCompoundArgument(text, nextCharIndex)
 
-					return Array("!=", functor, xOperand)
+					return Array(operation, functor, xOperand)
 				}
 				else if (SubStr(text, nextCharIndex, 1) = "=") {
 					; r = x op y OR x = y
@@ -3534,8 +3689,8 @@ class RuleCompiler {
 					else
 						return Array("=", functor, xOperand)
 				}
-				else if InStr("<>", SubStr(text, nextCharIndex, 1)) {
-					 ; x op y
+				else if InStr("<>", SubStr(text, nextCharIndex, 1))  {
+					; x op y
 
 					operation := SubStr(text, nextCharIndex, 1)
 
@@ -3856,7 +4011,7 @@ class RuleCompiler {
 			return new CutParser(this, variables)
 		else if ((term = "fail") && !forArguments)
 			return new FailParser(this, variables)
-		else if ((term == "[]") && forArguments)
+		else if ((StrReplace(term, A_Space, "") == "[]") && forArguments)
 			return new NilParser(this, variables)
 		else if (!IsObject(term) && forArguments)
 			return new PrimaryParser(this, variables)
@@ -4227,9 +4382,9 @@ class ListParser extends Parser {
 
 		index := subTerms.Length()
 
-		loop {
+		loop
 			lastTerm := new Pair(subTerms[index], lastTerm)
-		} until (--index == 0)
+		until (--index == 0)
 
 		return lastTerm
 	}
@@ -4264,10 +4419,10 @@ msgShow(ignore, args*) {
 
 option(choicePoint, option, value) {
 	if isInstance(option, Term)
-		option := option.toSTring(resultSet)
+		option := option.toString(resultSet)
 
 	if isInstance(value, Term)
-		value := value.toSTring(resultSet)
+		value := value.toString(resultSet)
 
 	if (option = "Trace") {
 		value := inList(["Full", "Medium", "Light", "Off"], value)
@@ -4685,6 +4840,52 @@ less(choicePoint, operand1, operand2) {
 			return false
 
 		return (value1 < value2)
+	}
+}
+
+lessEqual(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	local value1, value2
+
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+		return false
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+
+		if value1 is not Number
+			return false
+
+		if value2 is not Number
+			return false
+
+		return (value1 <= value2)
+	}
+}
+
+greaterEqual(choicePoint, operand1, operand2) {
+	local resultSet := choicePoint.ResultSet
+	local value1, value2
+
+	operand1 := operand1.getValue(resultSet, operand1)
+	operand2 := operand2.getValue(resultSet, operand2)
+
+	if (isInstance(operand1, Variable) || isInstance(operand2, Variable) || (operand1.isUnbound(resultSet)) || (operand2.isUnbound(resultSet)))
+		return false
+	else {
+		value1 := operand1.toString(resultSet)
+		value2 := operand2.toString(resultSet)
+
+		if value1 is not Number
+			return false
+
+		if value2 is not Number
+			return false
+
+		return (value1 >= value2)
 	}
 }
 

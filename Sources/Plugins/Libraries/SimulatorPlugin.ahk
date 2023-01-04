@@ -848,18 +848,22 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	accept() {
 		if this.RaceEngineer
 			this.RaceEngineer.accept()
-		else if this.RaceStrategist
+		
+		if this.RaceStrategist
 			this.RaceStrategist.accept()
-		else if this.RaceSpotter
+		
+		if this.RaceSpotter
 			this.RaceSpotter.accept()
 	}
 
 	reject() {
 		if this.RaceEngineer
 			this.RaceEngineer.reject()
-		else if this.RaceStrategist
+		
+		if this.RaceStrategist
 			this.RaceStrategist.reject()
-		else if this.RaceSpotter
+		
+		if this.RaceSpotter
 			this.RaceSpotter.reject()
 	}
 

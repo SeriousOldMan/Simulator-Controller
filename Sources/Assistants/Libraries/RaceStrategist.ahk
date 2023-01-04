@@ -2266,8 +2266,8 @@ class RaceStrategist extends RaceAssistant {
 
 				if ErrorLevel
 					this.setContinuation(new this.ExplainPitstopContinuation(this, plannedLap
-																		  , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
-																		  , "Confirm", "Okay"))
+																		   , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
+																		   , false, "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, false))
 			}

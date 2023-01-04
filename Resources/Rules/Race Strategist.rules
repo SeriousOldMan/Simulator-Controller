@@ -300,11 +300,11 @@ pitstopRequired(?lap) <= Get(Strategy.Pitstop.Lap, ?strategyLap)
 pitstopRequired(?lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap =< !Lap.Remaining.Session
 
 plannedPitstopLap(?pitstopLap) <= Get(Strategy.Pitstop.Lap, ?pitstopLap), !
-plannedPitstopLap(?pitstopLap) <= remainingStintLaps(!Lap, Fuel, ?temp, true), floor(?temp, ?fuelLaps), ?pitstopLap = !Lap + ?fuelLaps
+plannedPitstopLap(?pitstopLap) <= remainingStintLaps(!Lap, Fuel, ?temp, false), floor(?temp, ?fuelLaps), ?pitstopLap = !Lap + ?fuelLaps
 
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
 updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
-							   ?temp1 = !Session.Settings.Pitstop.Strategy.Window.Considered * 2, ?offset = ?temp1 - 1
+							   ?temp1 = !Session.Settings.Pitstop.Strategy.Window.Considered * 2, ?offset = ?temp1 - 1,
 							   ?temp2 = ?pitstopLap - ?offset, round(?temp2, ?targetLap),
 							   ?targetLap > !Lap, !, updatePitstopStrategy(?targetLap)
 updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
@@ -394,25 +394,25 @@ trafficDensity(?lap, ?car, ?from, ?to, [?car | ?carsAhead], ?count) <=
 trafficDensity(?lap, ?car, ?from, ?to, ?carsAhead, ?count) <=
 		?nextCar = ?car - 1, trafficDensity(?lap, ?nextCar, ?from, ?to, ?carsAhead, ?count)
 
-choosePitstopScenario([?cLap | ?laps], [?cPosition | ?positions],
-			   [?cCarsInFront | ?carsInFront], [?cDensity | ?densities], ?lap, ?position, ?carsAhead) <=
-		choosePitstopScenario(?laps, ?positions, ?carsInFront, ?densities,
-							  ?cLap, ?cPosition, ?cCarsInFront, ?cDensity, ?lap, ?position, ?carsAhead)
 choosePitstopScenario([], [], [], [], ?cLap, ?cPosition, ?cCarsAhead, ?, ?cLap, ?cPosition, ?cCarsAhead)
 choosePitstopScenario([?cLap | ?laps], [?cPosition | ?positions],
-			   [?cCarsInFront | ?carsInFront], [?cDensity | ?densities],
-			   ?bestLap, ?bestPosition, ?bestCarsAhead, ?bestDensity, ?lap, ?position, ?carsAhead) <=
+					  [?cCarsInFront | ?carsInFront], [?cDensity | ?densities], ?lap, ?position, ?carsAhead) <=
+		choosePitstopScenario(?laps, ?positions, ?carsInFront, ?densities,
+							  ?cLap, ?cPosition, ?cCarsInFront, ?cDensity, ?lap, ?position, ?carsAhead)
+choosePitstopScenario([?cLap | ?laps], [?cPosition | ?positions],
+					  [?cCarsInFront | ?carsInFront], [?cDensity | ?densities],
+					  ?bestLap, ?bestPosition, ?bestCarsAhead, ?bestDensity, ?lap, ?position, ?carsAhead) <=
 		?cPosition < ?bestPosition, !,
 		choosePitstopScenario(?laps, ?positions, ?carsInFront, ?densities,
 							  ?cLap, ?cPosition, ?cCarsInFront, ?cDensity, ?lap, ?position, ?carsAhead)
 choosePitstopScenario([?cLap | ?laps], [?cPosition | ?positions],
-			   [?cCarsInFront | ?carsInFront], [?cDensity | ?densities],
-			   ?bestLap, ?bestPosition, ?bestCarsAhead, ?bestDensity, ?lap, ?position, ?carsAhead) <=
-		?cPosition = ?bestPosition, ?cDensity =< ?bestDensity, !,
+					  [?cCarsInFront | ?carsInFront], [?cDensity | ?densities],
+					  ?bestLap, ?bestPosition, ?bestCarsAhead, ?bestDensity, ?lap, ?position, ?carsAhead) <=
+		?cPosition = ?bestPosition, ?cDensity =< ?bestDensity, ?cLap > ?bestLap, !,
 		choosePitstopScenario(?laps, ?positions, ?carsInFront, ?densities,
 							  ?cLap, ?cPosition, ?cCarsInFront, ?cDensity, ?lap, ?position, ?carsAhead)
 choosePitstopScenario([? | ?laps], [? | ?positions], [? | ?carsInFront], [? | ?densities],
-			   ?bestLap, ?bestPosition, ?bestCarsInFront, ?bestDensity, ?lap, ?position, ?carsAhead) <=
+					  ?bestLap, ?bestPosition, ?bestCarsInFront, ?bestDensity, ?lap, ?position, ?carsAhead) <=
 		choosePitstopScenario(?laps, ?positions, ?carsInFront, ?densities,
 							  ?bestLap, ?bestPosition, ?bestCarsInFront, ?bestDensity, ?lap, ?position, ?carsAhead)
 

@@ -10,7 +10,7 @@ Date=12/30/2022
 Download=https://cutt.ly/I2rkC77;https://www.dropbox.com/s/cgf1isb4m9et32i/Simulator%20Controller%204.5.3.1-release.zip?dl=1
 Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.5.3.1-release
 Development=4.5.4.0-dev

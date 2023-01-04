@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. A new reload button allows you to reload the list of reports in "Race Reports". Helpful, when you just recorded a race on the selected track.
-  4. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) for more information.
+  4. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato) for more information.
   5. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Porsche 911 GT3 R 2016

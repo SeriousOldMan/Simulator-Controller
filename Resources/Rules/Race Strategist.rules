@@ -303,10 +303,14 @@ plannedPitstopLap(?pitstopLap) <= Get(Strategy.Pitstop.Lap, ?pitstopLap), !
 plannedPitstopLap(?pitstopLap) <= remainingStintLaps(!Lap, Fuel, ?temp, true), floor(?temp, ?fuelLaps), ?pitstopLap = !Lap + ?fuelLaps
 
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail
-updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap != !Lap, !, updatePitstopStrategy(?pitstopLap)
+updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
+							   ?temp1 = !Session.Settings.Pitstop.Strategy.Window.Considered * 2, ?offset = ?temp1 - 1
+							   ?temp2 = ?pitstopLap - ?offset, round(?temp2, ?targetLap),
+							   ?targetLap > !Lap, !, updatePitstopStrategy(?targetLap)
 updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap),
 							   ?temp = ?pitstopLap - !Session.Settings.Pitstop.Strategy.Window.Considered, round(?temp, ?targetLap),
-							   ?targetLap != !Lap, !, updatePitstopStrategy(?targetLap)
+							   ?targetLap > !Lap, !, updatePitstopStrategy(?targetLap)
+updatePitstopStrategy(!Lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap > !Lap, !, updatePitstopStrategy(?pitstopLap)
 updatePitstopStrategy(?lap) <= ?deltaLaps = ?lap - !Lap, ?temp = !Lap.Remaining - ?deltaLaps, round(?temp, ?remainingLaps), ?remainingLaps > 0,
 							   updatePitstopStrategy(?lap, ?remainingLaps)
 							   

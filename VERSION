@@ -1,9 +1,9 @@
 [Development]
-Version=4.5.3.1-dev
-Target=4.5.3.1-release
-Date=12/28/2022
+Version=4.5.4.0-dev
+Target=4.5.4.0-release
+Date=01/04/2023
 Download=
-Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center"
+Changes=Reload button in "Race Reports"
 [Release]
 Version=4.5.3.0-release
 Date=12/23/2022
@@ -13,4 +13,4 @@ Changes=Pressure loss detection by the Race Engineer, Compensation of pressure l
 Type=Development
 [Version]
 Release=4.5.3.0-release
-Development=4.5.3.1-dev
+Development=4.5.4.0-dev

@@ -1,3 +1,8 @@
+## 4.5.4.0-release 01/06/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. A new reload button allows you to reload the list of reports in "Race Reports". Helpful, when you just recorded a race on the selected track.
+
 ## 4.5.3.1-release 12/30/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always

@@ -665,8 +665,10 @@ class RaceAssistant extends ConfigurationItem {
 			else
 				this.handleVoiceCommand("Yes", ["Yes"])
 		}
+		/*
 		else if this.VoiceManager
 			this.VoiceManager.recognizeCommand("Yes", ["Yes"])
+		*/
 	}
 
 	reject() {
@@ -680,8 +682,10 @@ class RaceAssistant extends ConfigurationItem {
 			else
 				this.handleVoiceCommand("No", ["No"])
 		}
+		/*
 		else if this.VoiceManager
 			this.VoiceManager.recognizeCommand("No", ["No"])
+		*/
 	}
 
 	mute() {

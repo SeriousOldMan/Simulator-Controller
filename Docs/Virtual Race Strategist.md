@@ -139,7 +139,7 @@ You can ask Cato to evaluate a couple of possible laps for an upcoming pitstop, 
 
 The Race Strategist will simulate the laps around the planned or requested pitstop lap (as long there is enough fuel to do it) and will try to optimize for undercut opportunities as well as the traffic density ahead after you re-enter the track. When you are satisfied with the prposed lap, Cato can handover the data to the Engineer, who will then prepare the pitstop.
 
-Please note, that this simulation does not take possible pitstops or driving errors of your opponents into account. The simulation is based on the current positions and the average lap times of all drivers. If you want a more complex simulation, which is based on the Monte-Carlo method, a team mate of you must run the "Race Center" and use the [strategy tools](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling), which are available on the Team Server. They can be used, even when you are running a solo race.
+Please note, that this simulation does not take possible pitstops or driving errors of your opponents into account. The simulation is based on the current positions and the average lap times of all drivers. If you want a more complex simulation, which is based on the Monte-Carlo method, a team mate of you must run the "Race Center" and use the [strategy tools](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling), which are available on the Team Server. They can be used even when you are running a solo race.
 
 ### How it works
 

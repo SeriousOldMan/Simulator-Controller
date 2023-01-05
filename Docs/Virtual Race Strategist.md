@@ -139,6 +139,8 @@ You can ask Cato to evaluate a couple of possible laps for an upcoming pitstop, 
 
 The Race Strategist will simulate the following laps up until the pitstop lap and will try to optimize for undercut opportunities as well as the traffic density ahead after you re-enter the track. When you are satisfied with the prposed lap, Cato can handover the data to the Engineer, who will then prepare the pitstop.
 
+Please note, that this simulation does not take possible pitstops or driving errors of your opponents into account. The simulation is based on the current positions and the average lap times of all drivers. If you want a more complex simulation, which is based on the Monte-Carlo method, a team mate of you must run the "Race Center" and use the [strategy tools](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling), which are available on the Team Server. They can be used, even when you are running a solo race.
+
 ### How it works
 
 Cato uses the position data gathered from the simulation game to form a complete overview of all drivers, their lap times and the development of their positions on track, even with different pit strategies. Using this knowledge, Cato can give you valuable information, but also can derive adapted race strategies, when your are stuck in traffic or are faced with other challenges.

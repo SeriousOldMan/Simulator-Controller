@@ -27,4 +27,5 @@
   1. Choosing a specific theme depending on the selected simulation game
   2. Further simplification of the overall configuration process. Overhaul of "Race Settings", "Simulator Settings" and "Simulator Configuration"
   3. Integrate WebView2 with Edge to cope with the pending shutdown of IE 11 (https://www.autohotkey.com/boards/viewtopic.php?f=83&t=79868)
-  4. Full system-wide support for culture- or country-specific units, number formats and other localization stuff
+  4. Port all AHK applications to AutoHotkey 2.0.2
+  5. Full system-wide support for culture- or country-specific units, number formats and other localization stuff

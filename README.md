@@ -33,23 +33,19 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.5.3.1-release](https://cutt.ly/I2rkC77) (Changes: Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-453) of this version and all the versions you might have skipped, before installing and using this version.
-
-##### Earlier release builds
-
-[4.5.3.0-release](https://cutt.ly/D0XSWo5) (Changes: Pressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center", Support for audio device selection for voice ouput, Tweaked the range of all integer input fields, Better handling of initial fuel in strategy simulation and display, Fixed race condition for pitstop details synchronization in "Race Center", "Race Center" show tyre pressure target deviations, New car models for "Setup Advisor".)
-
-[4.5.2.1-release](https://cutt.ly/Q0mcGMU) (Changes: Integrated iRacing for the telemetry analyzer of "Setup Advisor", Updated oversteer detection algorithm, New calibration mode for telemetry analyzer, Optimized handling of tyre pressures for multiple drivers in the "Session Database", Support for tyre pressure meta data, Load tyre pressure setups in "Race Center" from the "Session Database", New car models for "Setup Advisor", Remember selection of simulator, car and track in many applications.)
-
-#### Latest development build
-
-[4.5.4.0-dev](https://www.dropbox.com/s/4yh5df8tw4bruwc/Simulator%20Controller%204.5.4.0-dev.zip?dl=1) (Early build for 4.5.5. Changes: Reload button in "Race Reports", Race Strategist can now explain pitstop recommendation, New car models for "Setup Advisor".)
+[4.5.4.0-release](https://cutt.ly/U2vmEMx) (Changes: Reload button in "Race Reports", Race Strategist can now explain pitstop recommendation, New car models for "Setup Advisor".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-454) of this version and all the versions you might have skipped, before installing and using this version.
 
+##### Earlier release builds
 
+[4.5.3.1-release](https://cutt.ly/I2rkC77) (Changes: Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races.)
+
+[4.5.3.0-release](https://cutt.ly/D0XSWo5) (Changes: Pressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center", Support for audio device selection for voice ouput, Tweaked the range of all integer input fields, Better handling of initial fuel in strategy simulation and display, Fixed race condition for pitstop details synchronization in "Race Center", "Race Center" show tyre pressure target deviations, New car models for "Setup Advisor".)
+
+#### Latest development build
+
+None for the moment...
 
 ### Documentation
 

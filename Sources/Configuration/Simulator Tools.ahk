@@ -1651,7 +1651,7 @@ updateInstallationForV392() {
 	}
 }
 
-updateConfigurationForV454() {
+updateConfigurationForV455() {
 	local configuration, subtitle
 
 	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {

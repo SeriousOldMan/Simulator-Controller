@@ -47,6 +47,66 @@ readLanguage(targetLanguageCode) {
 		logError("Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage...")
 }
 
+getPressureUnit(translate := false) {
+	return (translate ? translate("PSI") : "PSI")
+}
+
+getSpeedUnit(translate := false) {
+	return (translate ? translate("km/h") : "km/h")
+}
+
+getDistanceUnit(translate := false) {
+	return (translate ? translate("meter") : "meter")
+}
+
+getWeightUnit(translate := false) {
+	return (translate ? translate("kg") : "kg")
+}
+
+getFloatSeparator() {
+	return "."
+}
+
+displayPressureValue(value) {
+	return value
+}
+
+displayDistanceValue(value) {
+	return value
+}
+
+displaySpeedValue(value) {
+	return value
+}
+
+displayWeightValue(value) {
+	return value
+}
+
+displayFloatValue(value) {
+	return StrReplace(value, ".", getFloatSeparator())
+}
+
+internalPressureValue(value) {
+	return value
+}
+
+internalDistanceValue(value) {
+	return value
+}
+
+internalSpeedValue(value) {
+	return value
+}
+
+internalWeightValue(value) {
+	return value
+}
+
+internalFloatValue(value) {
+	return StrReplace(value, getFloatSeparator(), ".")
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
@@ -229,4 +289,61 @@ getLanguage() {
 
 registerLocalizationCallback(callback) {
 	vLocalizationCallbacks.Push(callback)
+}
+
+getUnit(unit, translate := false) {
+	switch unit {
+		case "Pressure":
+			return getPressureUnit(translate)
+		case "Distance":
+			return getDistanceUnit(translate)
+		case "Speed":
+			return getSpeedUnit(translate)
+		case "Weight":
+			return getWeightUnit(translate)
+	}
+}
+
+displayValue(type, value) {
+	switch type {
+		case "Pressure":
+			return displayPressureValue(value)
+		case "Distance":
+			return displayDistanceValue(value)
+		case "Speed":
+			return displaySpeedValue(value)
+		case "Weight":
+			return displayWeightValue(value)
+		case "Float":
+			return displayFloatValue(value)
+	}
+}
+
+internalValue(type, value) {
+	switch type {
+		case "Pressure":
+			return internalPressureValue(value)
+		case "Distance":
+			return internalDistanceValue(value)
+		case "Speed":
+			return internalSpeedValue(value)
+		case "Weight":
+			return internalWeightValue(value)
+		case "Float":
+			return internalFloatValue(value)
+	}
+}
+
+validNumber(value, display := false) {
+	if value is Integer
+		return true
+	else {
+		if display
+			value := StrReplace(value, getFloatSeparator(), ".")
+
+		if value is Float
+			return true
+		else
+			return false
+	}
 }

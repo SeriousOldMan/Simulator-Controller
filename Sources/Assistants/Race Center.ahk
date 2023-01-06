@@ -3046,8 +3046,8 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl, , pitstopLapEdit, %lap%
 				GuiControl, , pitstopRefuelEdit, %refuel%
 
-				coldPressures := [displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
-								, displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
+				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
+								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
 
 				for index, key in ["Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
 								 , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"]
@@ -5115,7 +5115,7 @@ class RaceCenter extends ConfigurationItem {
 						for ignore, lap in this.loadNewLaps(stint) {
 							Gui ListView, % this.LapsListView
 
-							LV_Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+							LV_Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 
 							lap.Row := LV_GetCount()
 						}
@@ -5569,8 +5569,8 @@ class RaceCenter extends ConfigurationItem {
 
 						row := this.Laps[A_Index].Row
 
-						LV_Modify(row, "Col10", values2String(", ", displayValue(pressureFL), displayValue(pressureFR)
-																  , displayValue(pressureRL), displayValue(pressureRR)))
+						LV_Modify(row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
+																  , displayNullValue(pressureRL), displayNullValue(pressureRR)))
 					}
 					finally {
 						Gui ListView, %currentListView%
@@ -6891,7 +6891,7 @@ class RaceCenter extends ConfigurationItem {
 
 						Gui ListView, % this.LapsListView
 
-						LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+						LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
 					}
 
 			LV_ModifyCol()
@@ -6945,7 +6945,7 @@ class RaceCenter extends ConfigurationItem {
 						 , translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
 						 , values2String(", ", setup["Tyre.Pressure.Front.Left"], setup["Tyre.Pressure.Front.Right"]
 											 , setup["Tyre.Pressure.Rear.Left"], setup["Tyre.Pressure.Rear.Right"])
-						 , displayValue(setup.Notes, ""))
+						 , displayNullValue(setup.Notes, ""))
 			}
 
 			LV_ModifyCol()
@@ -8316,8 +8316,8 @@ class RaceCenter extends ConfigurationItem {
 					LV_GetText(lapPressures, lap.Row, 10)
 
 					if (lapPressures = "-, -, -, -")
-						LV_Modify(lap.Row, "Col10", values2String(", ", displayValue(pressureFL), displayValue(pressureFR)
-																	  , displayValue(pressureRL), displayValue(pressureRR)))
+						LV_Modify(lap.Row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
+																	  , displayNullValue(pressureRL), displayNullValue(pressureRR)))
 
 					newLap += 1
 				}
@@ -8785,8 +8785,8 @@ class RaceCenter extends ConfigurationItem {
 			if (pressuresTable.Length() >= lap.Nr) {
 				pressures := pressuresTable[lap.Nr]
 
-				coldPressures := [displayValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Front.Right"])
-								, displayValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
+				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
+								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
 
 				this.getStintSetup(lap.Stint.Nr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures)
 
@@ -8798,14 +8798,14 @@ class RaceCenter extends ConfigurationItem {
 							tyrePressures[A_Index] := Round(coldPressure - tyrePressures[A_Index], 1)
 
 							if (tyrePressures[A_Index] = 0)
-								tyrePressures[A_Index] := displayValue(kNull)
+								tyrePressures[A_Index] := displayNullValue(kNull)
 							else if (tyrePressures[A_Index] > 0)
 								tyrePressures[A_Index] := ("+" . tyrePressures[A_Index])
 
 							hasColdPressures := true
 						}
 						else
-							tyrePressures[A_Index] := displayValue(kNull)
+							tyrePressures[A_Index] := displayNullValue(kNull)
 					}
 
 					pressureCorrections := (translate(" (") . values2String(", ", tyrePressures*) . translate(")"))
@@ -8819,11 +8819,11 @@ class RaceCenter extends ConfigurationItem {
 
 				coldPressures := (coldPressures . pressureCorrections)
 
-				hotPressures := values2String(", ", displayValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Front.Right"])
-												  , displayValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
+				hotPressures := values2String(", ", displayNullValue(pressures["Tyre.Pressure.Hot.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Front.Right"])
+												  , displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Hot.Rear.Right"]))
 
-				pressuresLosses := values2String(", ", displayValue(pressures["Tyre.Pressure.Loss.Front.Left"]), displayValue(pressures["Tyre.Pressure.Loss.Front.Right"])
-												     , displayValue(pressures["Tyre.Pressure.Loss.Rear.Left"]), displayValue(pressures["Tyre.Pressure.Loss.Rear.Right"]))
+				pressuresLosses := values2String(", ", displayNullValue(pressures["Tyre.Pressure.Loss.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Loss.Front.Right"])
+												     , displayNullValue(pressures["Tyre.Pressure.Loss.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Loss.Rear.Right"]))
 
 				if (hotPressures = "-, -, -, -") {
 					tyresTable := this.TelemetryDatabase.Database.Tables["Tyres"]
@@ -8831,10 +8831,10 @@ class RaceCenter extends ConfigurationItem {
 					if (tyresTable.Length() >= lap.Nr) {
 						tyres := tyresTable[lap.Nr]
 
-						hotPressures := values2String(", ", displayValue(tyres["Tyre.Pressure.Front.Left"])
-														  , displayValue(tyres["Tyre.Pressure.Front.Right"])
-														  , displayValue(tyres["Tyre.Pressure.Rear.Left"])
-														  , displayValue(tyres["Tyre.Pressure.Rear.Right"]))
+						hotPressures := values2String(", ", displayNullValue(tyres["Tyre.Pressure.Front.Left"])
+														  , displayNullValue(tyres["Tyre.Pressure.Front.Right"])
+														  , displayNullValue(tyres["Tyre.Pressure.Rear.Left"])
+														  , displayNullValue(tyres["Tyre.Pressure.Rear.Right"]))
 					}
 				}
 			}
@@ -10472,7 +10472,7 @@ lapTimeDisplayValue(lapTime) {
 	return RaceReportViewer.lapTimeDisplayValue(lapTime)
 }
 
-displayValue(value, null := "-") {
+displayNullValue(value, null := "-") {
 	return (isNull(value) ? null : value)
 }
 

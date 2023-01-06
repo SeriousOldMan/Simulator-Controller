@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Strategist                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -43,7 +43,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	local info := kVersion . " - 2022, Oliver Juwig`nCreative Commons - BY-NC-SA"
+	local info := kVersion . " - 2023, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local image := "1:" . logo
 	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html

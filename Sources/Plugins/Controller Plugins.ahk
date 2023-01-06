@@ -3,7 +3,7 @@
 ;;;                                         Include Sequence                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #Include ..\Plugins\Button Box Plugin.ahk				; Optional, but should be always first, so that Plugins can adopt to the controller layout

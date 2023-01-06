@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Build & Maintenance Tool        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1651,6 +1651,22 @@ updateInstallationForV392() {
 	}
 }
 
+updateConfigurationForV454() {
+	local configuration, subtitle
+
+	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+		configuration := readConfiguration(kUserConfigDirectory . "Simulator Configuration.ini")
+
+		subtitle := getConfigurationValue(configuration, "Splash Window", "Subtitle", false)
+
+		if subtitle {
+			setConfigurationValue(configuration, "Splash Window", "Subtitle", StrReplace(subtitle, "2022", "2023"))
+
+			writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
+		}
+	}
+}
+
 updateConfigurationForV452() {
 	local tempValues := {}
 	local newValues := {}
@@ -2233,7 +2249,7 @@ updateConfigurationForV394() {
 		subtitle := getConfigurationValue(userConfiguration, "Splash Window", "Subtitle", "")
 
 		if InStr(subtitle, "2021") {
-			setConfigurationValue(userConfiguration, "Splash Window", "Subtitle", StrReplace(subtitle, "2021", "2022"))
+			setConfigurationValue(userConfiguration, "Splash Window", "Subtitle", StrReplace(subtitle, "2021", "2023"))
 
 			writeConfiguration(userConfigurationFile, userConfiguration)
 		}

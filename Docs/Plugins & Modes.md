@@ -327,6 +327,9 @@ Please see the following table for available information commands.
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
+| StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
+| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very usefull after an unplanned pitstop or a sudden weather change. |
+| PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

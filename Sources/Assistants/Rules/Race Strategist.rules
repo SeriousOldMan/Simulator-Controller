@@ -299,7 +299,7 @@ priority: -5, [?Pitstop.Strategy.Plan] => (Clear: Pitstop.Strategy.Plan)
 pitstopRequired(?lap) <= Get(Strategy.Pitstop.Lap, ?strategyLap)
 pitstopRequired(?lap) <= plannedPitstopLap(?pitstopLap), ?pitstopLap =< !Lap.Remaining.Session
 
-plannedPitstopLap(?pitstopLap) <= Get(Strategy.Pitstop.Lap, ?pitstopLap), !
+plannedPitstopLap(?pitstopLap) <= Get(Strategy.Pitstop.Lap, ?pitstopLap), ?pitstopLap >= !Lap, !
 plannedPitstopLap(?pitstopLap) <= remainingStintLaps(!Lap, Fuel, ?temp, false), floor(?temp, ?fuelLaps), ?pitstopLap = !Lap + ?fuelLaps
 
 updatePitstopStrategy(?lap) <= ?lap < !Lap, !, fail

@@ -2229,16 +2229,22 @@ class RaceStrategist extends RaceAssistant {
 	recommendPitstop(lap := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local plannedLap, position, traffic
+		local strategyLap, lastLap, plannedLap, position, traffic, hasEngineer
 
 		if !this.hasEnoughData()
 			return
 
 		if !lap {
-			lap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
+			strategyLap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
+			lap := strategyLap
 
 			if (lap && (lap >= (knowledgeBase.getValue("Lap") - knowledgeBase.getValue("Session.Settings.Lap.PitstopWarning"))))
 				lap := false
+
+			lastLap := knowledgeBase.getValue("Lap")
+
+			if (strategyLap && ((Abs(strategyLap - lastLap) / lastLap) > 0.1))
+				strategyLap := false
 		}
 
 		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
@@ -2250,8 +2256,21 @@ class RaceStrategist extends RaceAssistant {
 
 		plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
-		if (plannedLap == kUndefined)
-			speaker.speakPhrase("NoPlannedPitstop")
+		Process Exist, Race Engineer.exe
+
+		hasEngineer := (ErrorLevel != 0)
+
+		if (plannedLap == kUndefined) {
+			if (hasEngineer && strategyLap) {
+				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap, lastLap + 1)})
+
+				speaker.speakPhrase("ConfirmInformEngineer", false, true)
+
+				this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap))
+			}
+			else
+				speaker.speakPhrase("NoPlannedPitstop")
+		}
 		else if !plannedLap
 			speaker.speakPhrase("NoPitstopNeeded")
 		else {
@@ -2262,9 +2281,7 @@ class RaceStrategist extends RaceAssistant {
 
 				speaker.speakPhrase("Explain", false, true)
 
-				Process Exist, Race Engineer.exe
-
-				if ErrorLevel
+				if hasEngineer
 					this.setContinuation(new this.ExplainPitstopContinuation(this, plannedLap
 																		   , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
 																		   , false, "Okay"))

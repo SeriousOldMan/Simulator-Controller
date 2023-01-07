@@ -3,7 +3,7 @@ Version=4.5.5.0-dev
 Target=4.5.5.0-release
 Date=01/04/2023
 Download=
-Changes=Updated copyright information to 2023
+Changes=Updated copyright information to 2023, Optimized pitstop recommendation by Strategist
 [Release]
 Version=4.5.3.1-release
 Date=12/30/2022

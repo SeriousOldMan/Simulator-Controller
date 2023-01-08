@@ -1280,7 +1280,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu
 
-		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
+		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Update from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x565 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu
 
@@ -2509,7 +2509,7 @@ class RaceCenter extends ConfigurationItem {
 		return drivers
 	}
 
-	loadPlanFromStrategy() {
+	updatePlanFromStrategy() {
 		local window, currentListView, pitstops, pitstop, numStints, title, time, currentTime, last, lastTime
 		local driver, forName, surName, nickName, found, ignore, candidate
 		local sForName, sSurName, sNickName
@@ -2529,9 +2529,13 @@ class RaceCenter extends ConfigurationItem {
 
 				this.iSelectedPlanStint := false
 
-				pitstops := this.Strategy.Pitstops
+				pitstops := {}
+				numStints := 1
 
-				numStints := (pitstops.Length() + 1)
+				for ignore, pitstop in this.Strategy.Pitstops {
+					pitstops[pitstop.Nr] := pitstop
+					numStints := Max(numStints, pitstop.Nr + 1)
+				}
 
 				if (numStints < LV_GetCount()) {
 					title := translate("Plan")
@@ -2600,7 +2604,10 @@ class RaceCenter extends ConfigurationItem {
 
 				loop % LV_GetCount()
 				{
-					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index -1].DriverName)
+					if ((A_Index > 1) && !pitstops.HasKey(A_Index - 1))
+						continue
+
+					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index - 1].DriverName)
 
 					forName := false
 					surName := false
@@ -2630,7 +2637,7 @@ class RaceCenter extends ConfigurationItem {
 
 					LV_Modify(A_Index, "Col2", driver)
 
-					if (A_Index > 1) {
+					if ((A_Index > 1) && pitstops.HasKey(A_Index - 1)) {
 						pitstop := pitstops[A_Index - 1]
 
 						time := pitstop.Time
@@ -3793,7 +3800,7 @@ class RaceCenter extends ConfigurationItem {
 
 		switch line {
 			case 3:
-				this.pushTask(ObjBindMethod(this, "loadPlanFromStrategyAsync"))
+				this.pushTask(ObjBindMethod(this, "updatePlanFromStrategyAsync"))
 			case 4:
 				this.pushTask(ObjBindMethod(this, "clearPlanAsync"))
 			case 6:
@@ -3874,8 +3881,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	loadPlanFromStrategyAsync() {
-		this.loadPlanFromStrategy()
+	updatePlanFromStrategyAsync() {
+		this.updatePlanFromStrategy()
 	}
 
 	clearPlanAsync() {

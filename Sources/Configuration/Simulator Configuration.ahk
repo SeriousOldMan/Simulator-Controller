@@ -35,6 +35,7 @@
 #Include Libraries\ConfigurationItemList.ahk
 #Include Libraries\ConfigurationEditor.ahk
 #Include Libraries\ThemesEditor.ahk
+#Include Libraries\FormatsEditor.ahk
 #Include Libraries\TranslationsEditor.ahk
 
 
@@ -62,6 +63,7 @@ class GeneralTab extends ConfigurationItem {
 	iSimulatorsList := false
 	iDevelopment := false
 	iSplashThemesConfiguration := false
+	iFormatsConfiguration := false
 
 	__New(development, configuration) {
 		this.iDevelopment := development
@@ -117,6 +119,8 @@ class GeneralTab extends ConfigurationItem {
 		Gui %window%:Add, Text, x24 y176 w86 h23 +0x200, % translate("Language")
 		Gui %window%:Add, DropDownList, x224 y176 w214 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
 		Gui %window%:Add, Button, x440 y175 w23 h23 gopenTranslationsEditor, % translate("...")
+		Gui %window%:Add, Button, x200 y175 w23 h23 HWNDbuttonHandle gopenFormatsEditor
+		setButtonIcon(buttonHandle, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, % translate("Start with Windows")
 		Gui %window%:Add, CheckBox, x24 y224 w242 h23 Checked%silentModeCheck% VsilentModeCheck, % translate("Silent mode (no splash screen, no sound)")
@@ -216,6 +220,11 @@ class GeneralTab extends ConfigurationItem {
 			setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.Configuration, "Splash Themes", Object()))
 		}
 
+		if this.iFormatsConfiguration
+			setConfigurationValues(configuration, this.iFormatsConfiguration)
+		else
+			setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Configuration, "Localization", Object()))
+
 		if this.iDevelopment {
 			GuiControlGet ahkPathEdit
 			GuiControlGet msBuildPathEdit
@@ -288,11 +297,30 @@ class GeneralTab extends ConfigurationItem {
 
 	openThemesEditor() {
 		local window := ConfigurationEditor.Instance.Window
+		local configuration
 
 		Gui TE:+Owner%window%
 		Gui %window%:+Disabled
 
-		this.iSplashThemesConfiguration := (new ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
+		configuration := (new ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
+
+		if configuration
+			this.iSplashThemesConfiguration := configuration
+
+		Gui %window%:-Disabled
+	}
+
+	openFormatsEditor() {
+		local window := ConfigurationEditor.Instance.Window
+		local configuration
+
+		Gui FE:+Owner%window%
+		Gui %window%:+Disabled
+
+		configuration := new FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats()
+
+		if configuration
+			this.iFormatsConfiguration := configuration
 
 		Gui %window%:-Disabled
 	}
@@ -487,6 +515,10 @@ chooseMSBuildPath() {
 
 openTranslationsEditor() {
 	GeneralTab.Instance.openTranslationsEditor()
+}
+
+openFormatsEditor() {
+	GeneralTab.Instance.openFormatsEditor()
 }
 
 openThemesEditor() {

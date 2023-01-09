@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Libraries\ControllerStepWizard.ahk
+#Include Libraries\FormatsEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,6 +57,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local wizard := this.SetupWizard
 		local application, function, path, directory, voiceControlConfiguration, ignore, section, subConfiguration
 		local modeSelectors, arguments, launchApplications, descriptor, label, language, startWithWindows, silentMode
+		local values, key, value
 
 		base.saveToConfiguration(configuration)
 
@@ -70,6 +72,10 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
 		setConfigurationValue(configuration, "Configuration", "Debug", false)
+
+		for section, values in readConfiguration(kUserHomeDirectory . "Setup\Formats Configuration.ini")
+			for key, value in values
+				setConfigurationValue(configuration, section, key, value)
 
 		if wizard.isSoftwareInstalled("NirCmd") {
 			path := wizard.softwarePath("NirCmd")
@@ -136,6 +142,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local generalInfoTextHandle := false
 		local languageLabelHandle := false
 		local languageDropDownHandle := false
+		local formatsButtonHandle := false
 		local startWithWindowsHandle := false
 		local silentModeHandle := false
 		local labelWidth := width - 30
@@ -153,6 +160,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local launchApplicationsListHandle := false
 		local secondX := x + 105
 		local secondWidth := width - 105
+		local thirdX := secondX + 97
 		local col1Width := (secondX - x) + 120
 		local col2X := secondX + 140
 		local col2Width := width - 140 - secondX + x
@@ -182,7 +190,9 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			choices.Push(language)
 
 		Gui %window%:Add, Text, x%x% yp+10 w86 h23 +0x200 HWNDlanguageLabelHandle Hidden, % translate("Language")
-		Gui %window%:Add, DropDownList, x%secondX% yp w120 HWNDlanguageDropDownHandle VuiLanguageDropDown Hidden, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x%secondX% yp w96 HWNDlanguageDropDownHandle VuiLanguageDropDown Hidden, % values2String("|", choices*)
+		Gui %window%:Add, Button, x%thirdX% yp w23 h23 HWNDformatsButtonHandle gopenFormatsEditor Hidden
+		setButtonIcon(formatsButtonHandle, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Add, CheckBox, x%x% yp+30 w242 h23 Checked%startWithWindowsCheck% HWNDstartWithWindowsHandle VstartWithWindowsCheck Hidden, % translate("Start with Windows")
 		Gui %window%:Add, CheckBox, x%x% yp+24 w242 h23 Checked%silentModeCheck% HWNDsilentModeHandle VsilentModeCheck Hidden, % translate("Silent mode (no splash screen, no sound)")
@@ -232,7 +242,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		this.iControllerWidgets := Array(modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, columnLabel3Handle, columnLine3Handle)
 		this.iVoiceControlWidgets := Array(columnLabel2Handle, columnLine2Handle)
 
-		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, columnLabel3Handle, columnLine3Handle, languageLabelHandle, languageDropDownHandle, startWithWindowsHandle, silentModeHandle)
+		this.registerWidgets(1, generalIconHandle, generalLabelHandle, modeSelectorsLabelHandle, modeSelectorsListHandle, launchApplicationsLabelHandle, launchApplicationsListHandle, generalInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, columnLabel3Handle, columnLine3Handle, languageLabelHandle, languageDropDownHandle, formatsButtonHandle, startWithWindowsHandle, silentModeHandle)
 	}
 
 	registerWidget(page, widget) {
@@ -676,12 +686,32 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	toggleTriggerDetector(callback := false) {
 		this.SetupWizard.toggleTriggerDetector(callback)
 	}
+
+	openFormatsEditor() {
+		local window := this.Window
+		local configuration := readConfiguration(kUserHomeDirectory . "Setup\Formats Configuration.ini")
+		local editor := new FormatsEditor(configuration)
+
+		Gui FE:+Owner%window%
+		Gui %window%:+Disabled
+
+		configuration := editor.editFormats()
+
+		if configuration
+			writeConfiguration(kUserHomeDirectory . "Setup\Formats Configuration.ini", configuration)
+
+		Gui %window%:-Disabled
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+openFormatsEditor() {
+	SetupWizard.Instance.StepWizards["General"].openFormatsEditor()
+}
 
 updateApplicationFunction() {
 	local function, wizard, row, curCoordMode, menuItem, window, handler

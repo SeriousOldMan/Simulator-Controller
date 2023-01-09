@@ -158,9 +158,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local modeSelectorsListHandle := false
 		local launchApplicationsLabelHandle := false
 		local launchApplicationsListHandle := false
-		local secondX := x + 105
-		local secondWidth := width - 105
-		local thirdX := secondX + 97
+		local secondX := x + 106
+		local secondWidth := width - 106
 		local col1Width := (secondX - x) + 120
 		local col2X := secondX + 140
 		local col2Width := width - 140 - secondX + x
@@ -189,10 +188,10 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		for code, language in availableLanguages()
 			choices.Push(language)
 
-		Gui %window%:Add, Text, x%x% yp+10 w86 h23 +0x200 HWNDlanguageLabelHandle Hidden, % translate("Language")
-		Gui %window%:Add, DropDownList, x%secondX% yp w96 HWNDlanguageDropDownHandle VuiLanguageDropDown Hidden, % values2String("|", choices*)
-		Gui %window%:Add, Button, x%thirdX% yp w23 h23 HWNDformatsButtonHandle gopenFormatsEditor Hidden
+		Gui %window%:Add, Text, x%x% yp+10 w86 h23 +0x200 HWNDlanguageLabelHandle Hidden, % translate("Localization")
+		Gui %window%:Add, Button, x%secondX% yp w23 h23 HWNDformatsButtonHandle gopenFormatsEditor Hidden
 		setButtonIcon(formatsButtonHandle, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, DropDownList, xp+24 yp w96 HWNDlanguageDropDownHandle VuiLanguageDropDown Hidden, % values2String("|", choices*)
 
 		Gui %window%:Add, CheckBox, x%x% yp+30 w242 h23 Checked%startWithWindowsCheck% HWNDstartWithWindowsHandle VstartWithWindowsCheck Hidden, % translate("Start with Windows")
 		Gui %window%:Add, CheckBox, x%x% yp+24 w242 h23 Checked%silentModeCheck% HWNDsilentModeHandle VsilentModeCheck Hidden, % translate("Silent mode (no splash screen, no sound)")

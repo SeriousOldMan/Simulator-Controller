@@ -25,7 +25,7 @@ global pressureUnitDropDown
 global volumeUnitDropDown
 global lengthUnitDropDown
 global speedUnitDropDown
-global numbersFormatDropDown
+global numberFormatDropDown
 global timeFormatDropDown
 
 class FormatsEditor extends ConfigurationItem {
@@ -58,40 +58,40 @@ class FormatsEditor extends ConfigurationItem {
 
 		Gui FE:Font, Norm, Arial
 
-		chosen := inList(["Kilogram", "Pound"], massUnitDropDown)
+		chosen := inList(kMassUnits, massUnitDropDown)
 
 		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Mass")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vmassUnitDropDown, % values2String("|", map(["Kilogram", "Pound"], "translate")*)
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vmassUnitDropDown, % values2String("|", map(kMassUnits, "translate")*)
 
-		chosen := inList(["BAR", "PSI", "KPa"], pressureUnitDropDown)
+		chosen := inList(kPressureUnits, pressureUnitDropDown)
 
 		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Pressure")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vpressureUnitDropDown, % values2String("|", map(["BAR", "PSI", "KPa"], "translate")*)
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vpressureUnitDropDown, % values2String("|", map(kPressureUnits, "translate")*)
 
-		chosen := inList(["Liter", "Gallon"], volumeUnitDropDown)
+		chosen := inList(kVolumeUnits, volumeUnitDropDown)
 
 		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Volume")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vvolumeUnitDropDown, % values2String("|", map(["Liter", "Gallon"], "translate")*)
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vvolumeUnitDropDown, % values2String("|", map(kVolumeUnits, "translate")*)
 
-		chosen := inList(["Meter", "Foot"], lengthUnitDropDown)
+		chosen := inList(kLengthUnits, lengthUnitDropDown)
 
 		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Length")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vlengthUnitDropDown, % values2String("|", map(["Meter", "Foot"], "translate")*)
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vlengthUnitDropDown, % values2String("|", map(kLengthUnits, "translate")*)
 
-		chosen := inList(["km/h", "mph"], speedUnitDropDown)
+		chosen := inList(kSpeedUnits, speedUnitDropDown)
 
 		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Speed")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vspeedUnitDropDown, % values2String("|", map(["km/h", "mph"], "translate")*)
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vspeedUnitDropDown, % values2String("|", map(kSpeedUnits, "translate")*)
 
-		chosen := inList(["#.##", "#,##"], numbersFormatDropDown)
+		chosen := inList(kNumberFormats, numberFormatDropDown)
 
-		Gui FE:Add, Text, x16 yp+30 w70 h23 +0x200, % translate("Numbers")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vnumbersFormatDropDown, % values2String("|", map(["#.##", "#,##"], "translate")*)
+		Gui FE:Add, Text, x16 yp+30 w70 h23 +0x200, % translate("Number")
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vnumberFormatDropDown, % values2String("|", map(kNumberFormats, "translate")*)
 
-		chosen := inList(["H:M:S.##", "H:M:S,##", "S.##", "S,##"], timeFormatDropDown)
+		chosen := inList(kTimeFormats, timeFormatDropDown)
 
 		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Time")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vtimeFormatDropDown, % values2String("|", map(["H:M:S.##", "H:M:S,##", "S.##", "S,##"], "translate")*)
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vtimeFormatDropDown, % values2String("|", map(kTimeFormats, "translate")*)
 
 		Gui FE:Add, Text, x24 y+10 w213 0x10
 
@@ -108,8 +108,8 @@ class FormatsEditor extends ConfigurationItem {
 		lengthUnitDropDown := getConfigurationValue(configuration, "Localization", "LengthUnit", "Meter")
 		speedUnitDropDown := getConfigurationValue(configuration, "Localization", "SpeedUnit", "km/h")
 
-		numbersFormatDropDown := getConfigurationValue(configuration, "Localization", "NumbersFormat", "#.##")
-		timeFormatDropDown := getConfigurationValue(configuration, "Localization", "TimeFormat", "H:M:S.##")
+		numberFormatDropDown := getConfigurationValue(configuration, "Localization", "NumberFormat", "#.##")
+		timeFormatDropDown := getConfigurationValue(configuration, "Localization", "TimeFormat", "[H:]M:S.##")
 	}
 
 	saveToConfiguration(configuration) {
@@ -120,17 +120,17 @@ class FormatsEditor extends ConfigurationItem {
 		GuiControlGet volumeUnitDropDown
 		GuiControlGet lengthUnitDropDown
 		GuiControlGet speedUnitDropDown
-		GuiControlGet numbersFormatDropDown
+		GuiControlGet numberFormatDropDown
 		GuiControlGet timeFormatDropDown
 
-		setConfigurationValue(configuration, "Localization", "MassUnit", ["Kilogram", "Pound"][massUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "PressureUnit", ["BAR", "PSI", "KPa"][pressureUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "VolumeUnit", ["Liter", "Gallon"][volumeUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "LengthUnit", ["Meter", "Foot"][lengthUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "SpeedUnit", ["km/h", "mph"][speedUnitDropDown])
+		setConfigurationValue(configuration, "Localization", "MassUnit", kMassUnits[massUnitDropDown])
+		setConfigurationValue(configuration, "Localization", "PressureUnit", kPressureUnits[pressureUnitDropDown])
+		setConfigurationValue(configuration, "Localization", "VolumeUnit", kVolumeUnits[volumeUnitDropDown])
+		setConfigurationValue(configuration, "Localization", "LengthUnit", kLengthUnits[lengthUnitDropDown])
+		setConfigurationValue(configuration, "Localization", "SpeedUnit", kSpeedUnits[speedUnitDropDown])
 
-		setConfigurationValue(configuration, "Localization", "NumbersFormat", ["#.##", "#,##"][numbersFormatDropDown])
-		setConfigurationValue(configuration, "Localization", "TimeFormat", ["H:M:S.##", "H:M:S,##", "S.##", "S,##"][timeFormatDropDown])
+		setConfigurationValue(configuration, "Localization", "NumberFormat", kNumberFormats[numberFormatDropDown])
+		setConfigurationValue(configuration, "Localization", "TimeFormat", kTimeFormats[timeFormatDropDown])
 	}
 
 	editFormats() {

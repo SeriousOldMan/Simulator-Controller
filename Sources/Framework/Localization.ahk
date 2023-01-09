@@ -17,12 +17,34 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Public Constants Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kMassUnits := ["Kilogram", "Pound"]
+global kPressureUnits := ["BAR", "PSI", "KPa"]
+global kVolumeUnits := ["Liter", "Gallon"]
+global kLengthUnits := ["Meter", "Foot"]
+global kSpeedUnits := ["km/h", "mph"]
+
+global kNumberFormats := ["#.##", "#,##"]
+global kTimeFormats := ["[H:]M:S.##", "[H:]M:S,##", "S.##", "S,##"]
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 global vTargetLanguageCode := "en"
 
 global vLocalizationCallbacks := []
+
+global vMassUnit := "Kilogram"
+global vPressureUnit := "PSI"
+global vVolumeUnit := "Liter"
+global vLengthUnit := "Meter"
+global vSpeedUnit := "km/h"
+global vNumberFormat := "#.##"
+global vTimeFormat := "[H:]M:S.##"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -48,50 +70,102 @@ readLanguage(targetLanguageCode) {
 }
 
 getPressureUnit(translate := false) {
-	return (translate ? translate("PSI") : "PSI")
+	return (translate ? translate(vPressureUnit) : vPressureUnit)
 }
 
 getSpeedUnit(translate := false) {
-	return (translate ? translate("km/h") : "km/h")
+	return (translate ? translate(vSpeedUnit) : vSpeedUnit)
 }
 
-getDistanceUnit(translate := false) {
-	return (translate ? translate("meter") : "meter")
+getLengthUnit(translate := false) {
+	return (translate ? translate(vLengthUnit) : vLengthUnit)
 }
 
-getWeightUnit(translate := false) {
-	return (translate ? translate("kg") : "kg")
+getMassUnit(translate := false) {
+	return (translate ? translate(vMassUnit) : vMassUnit)
 }
 
 getFloatSeparator() {
-	return "."
+	return (vNumberFormat == "#.##" ? "." : ",")
 }
 
-displayPressureValue(value) {
-	return value
+displayPressureValue(psi) {
+	switch vPressureUnit {
+		case "PSI":
+			return psi
+		case "BAR":
+			return psi / 14.503773
+		case "KPa":
+			return psi * 6.894757
+		default:
+			throw "Unknown pressure unit detected in displayPressureValue..."
+	}
 }
 
-displayDistanceValue(value) {
-	return value
+displayLengthValue(meter) {
+	switch vLengthUnit {
+		case "Meter":
+			return meter
+		case "Foot":
+			return meter * 3.280840
+		default:
+			throw "Unknown length unit detected in displayLengthValue..."
+	}
 }
 
-displaySpeedValue(value) {
-	return value
+displaySpeedValue(kmh) {
+	switch vSpeedUnit {
+		case "km/h":
+			return kmh
+		case "mph":
+			return kmh / 1.609344
+		default:
+			throw "Unknown speed unit detected in displaySpeedValue..."
+	}
 }
 
-displayWeightValue(value) {
-	return value
+displayMassValue(kilogram) {
+	switch vMassUnit {
+		case "Kilogram":
+			return kilogram
+		case "Pound":
+			return kilogram * 2.204623
+		default:
+			throw "Unknown mass unit detected in displayMassValue..."
+	}
 }
 
-displayFloatValue(value) {
-	return StrReplace(value, ".", getFloatSeparator())
+displayFloatValue(float) {
+	return StrReplace(float, ".", getFloatSeparator())
+}
+
+displayTimeValue(time) {
+	local hours, seconds, fraction, minutes
+
+	if ((vTimeFormat = "S.##") || (vTimeFormat = "S,##"))
+		return StrReplace(time, ".", (vTimeFormat = "S.##") ? "." : ",")
+	else {
+		seconds := Floor(lapTime)
+		fraction := (lapTime - seconds)
+		minutes := Floor(seconds / 60)
+		hours := Floor(seconds / 3600)
+
+		fraction := Round(fraction * 10)
+
+		seconds := ((seconds - (minutes * 60)) . "")
+
+		if (StrLen(seconds) = 1)
+			seconds := ("0" . seconds)
+
+		return (((hours > 0) ? (hours . ":") : "") . minutes . ":" . seconds . ((vTimeFormat = "[H:]M:S.##") ? "." : ",") . fraction)
+	}
 }
 
 internalPressureValue(value) {
 	return value
 }
 
-internalDistanceValue(value) {
+internalLengthValue(value) {
 	return value
 }
 
@@ -99,12 +173,65 @@ internalSpeedValue(value) {
 	return value
 }
 
-internalWeightValue(value) {
+internalMassValue(value) {
 	return value
 }
 
 internalFloatValue(value) {
 	return StrReplace(value, getFloatSeparator(), ".")
+}
+
+internalTimeValue(time) {
+	local seconds, fraction
+
+	if (vTimeFormat = "S,##")
+		return StrReplace(time, ",", ".")
+	else if (vTimeFormat = "S.##")
+		return value
+	else {
+		seconds := StrSplit(time, (vTimeFormat = "S,##") ? "," : ".")
+
+		if (seconds.Length() = 1) {
+			seconds := seconds[1]
+			fraction := 0
+		}
+		else {
+			fraction := seconds[2]
+			seconds := seconds[1]
+		}
+
+		if (fraction > 0)
+			if (StrLen(fraction) = 1)
+				fraction /= 10
+			else
+				fraction /= 100
+
+		seconds := StrSplit(seconds, ":")
+
+		switch seconds.Length() {
+			case 3:
+				return ((seconds[1] * 3600) + (seconds[2] * 60) + seconds[3] + fraction)
+			case 2:
+				return ((seconds[1] * 60) + seconds[2] + fraction)
+			case 1:
+				return (seconds[1] + fraction)
+			default:
+				throw "Invalid format detected in internalTimeValue..."
+		}
+	}
+}
+
+initializeLocalization() {
+	local configuration := readConfiguration(kSimulatorConfigurationFile)
+
+	vMassUnit := getConfigurationValue(configuration, "Localization", "MassUnit", "Kilogram")
+	vPressureUnit := getConfigurationValue(configuration, "Localization", "PressureUnit", "PSI")
+	vVolumeUnit := getConfigurationValue(configuration, "Localization", "VolumeUnit", "Liter")
+	vLengthUnit := getConfigurationValue(configuration, "Localization", "LengthUnit", "Meter")
+	vSpeedUnit := getConfigurationValue(configuration, "Localization", "SpeedUnit", "km/h")
+
+	vNumberFormat := getConfigurationValue(configuration, "Localization", "NumberFormat", "#.##")
+	vTimeFormat := getConfigurationValue(configuration, "Localization", "TimeFormat", "H:M:S.##")
 }
 
 
@@ -295,12 +422,12 @@ getUnit(unit, translate := false) {
 	switch unit {
 		case "Pressure":
 			return getPressureUnit(translate)
-		case "Distance":
-			return getDistanceUnit(translate)
+		case "Length":
+			return getLengthUnit(translate)
 		case "Speed":
 			return getSpeedUnit(translate)
-		case "Weight":
-			return getWeightUnit(translate)
+		case "Mass":
+			return getMassUnit(translate)
 	}
 }
 
@@ -308,12 +435,12 @@ displayValue(type, value) {
 	switch type {
 		case "Pressure":
 			return displayPressureValue(value)
-		case "Distance":
-			return displayDistanceValue(value)
+		case "Length":
+			return displayLengthValue(value)
 		case "Speed":
 			return displaySpeedValue(value)
-		case "Weight":
-			return displayWeightValue(value)
+		case "Mass":
+			return displayMassValue(value)
 		case "Float":
 			return displayFloatValue(value)
 	}
@@ -323,12 +450,12 @@ internalValue(type, value) {
 	switch type {
 		case "Pressure":
 			return internalPressureValue(value)
-		case "Distance":
-			return internalDistanceValue(value)
+		case "Length":
+			return internalLengthValue(value)
 		case "Speed":
 			return internalSpeedValue(value)
-		case "Weight":
-			return internalWeightValue(value)
+		case "Mass":
+			return internalMassValue(value)
 		case "Float":
 			return internalFloatValue(value)
 	}
@@ -347,3 +474,10 @@ validNumber(value, display := false) {
 			return false
 	}
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Initialization Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeLocalization()

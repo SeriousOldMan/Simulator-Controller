@@ -116,10 +116,10 @@ class GeneralTab extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := enIndex
 
-		Gui %window%:Add, Text, x24 y176 w86 h23 +0x200, % translate("Language")
-		Gui %window%:Add, DropDownList, x224 y176 w214 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
+		Gui %window%:Add, Text, x24 y176 w86 h23 +0x200, % translate("Localization")
+		Gui %window%:Add, DropDownList, x250 y176 w188 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
 		Gui %window%:Add, Button, x440 y175 w23 h23 gopenTranslationsEditor, % translate("...")
-		Gui %window%:Add, Button, x200 y175 w23 h23 HWNDbuttonHandle gopenFormatsEditor
+		Gui %window%:Add, Button, x224 y175 w23 h23 HWNDbuttonHandle gopenFormatsEditor
 		setButtonIcon(buttonHandle, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 
 		Gui %window%:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, % translate("Start with Windows")

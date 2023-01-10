@@ -212,7 +212,7 @@ class SessionDatabase extends ConfigurationItem {
 			local result := {}
 			local connector, identifier, serverURL
 
-			for identifier, serverURL in string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard") {
+			for identifier, serverURL in stringToMap("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard") {
 				connector := this.Connector[identifier]
 
 				if connector
@@ -236,7 +236,7 @@ class SessionDatabase extends ConfigurationItem {
 	ServerURLs[identifier := false] {
 		Get {
 			if !SessionDatabase.sServerURLs.HasKey(identifier)
-				SessionDatabase.sServerURLs := string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
+				SessionDatabase.sServerURLs := stringToMap("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
 			return (identifier ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
 		}
@@ -251,7 +251,7 @@ class SessionDatabase extends ConfigurationItem {
 	ServerTokens[identifier := false] {
 		Get {
 			if !SessionDatabase.sServerTokens.HasKey(identifier)
-				SessionDatabase.sServerTokens := string2Map("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.Token", ""), "Standard")
+				SessionDatabase.sServerTokens := stringToMap("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.Token", ""), "Standard")
 
 			return (identifier ? SessionDatabase.sServerTokens[identifier] : SessionDatabase.sServerTokens)
 		}
@@ -272,18 +272,18 @@ class SessionDatabase extends ConfigurationItem {
 	Synchronization[identifier] {
 		Get {
 			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-			local synchronization := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Synchronization", ""), "Standard")
+			local synchronization := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Synchronization", ""), "Standard")
 
 			return (synchronization.HasKey(identifier) ? synchronization[identifier] : 0)
 		}
 
 		Set {
 			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-			local synchronization := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Synchronization", ""), "Standard")
+			local synchronization := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Synchronization", ""), "Standard")
 
 			synchronization[identifier] := value
 
-			synchronization := map2String("|", "->", synchronization)
+			synchronization := mapToString("|", "->", synchronization)
 
 			setConfigurationValue(configuration, "Team Server", "Synchronization", synchronization)
 
@@ -300,7 +300,7 @@ class SessionDatabase extends ConfigurationItem {
 			local groups := getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Groups", "Telemetry, Pressures")
 
 			if InStr(groups, "->") {
-				groups := string2Map("|", "->", groups)
+				groups := stringToMap("|", "->", groups)
 
 				return (groups.HasKey(identifier) ? string2Values(",", groups[identifier]) : [])
 			}
@@ -1688,7 +1688,7 @@ class SessionDatabase extends ConfigurationItem {
 ;;;                  Internal Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-string2Map(elementSeparator, valueSeparator, map, default := "Standard") {
+stringToMap(elementSeparator, valueSeparator, map, default := "Standard") {
 	local result := {}
 	local ignore, keyValue
 
@@ -1704,7 +1704,7 @@ string2Map(elementSeparator, valueSeparator, map, default := "Standard") {
 	return result
 }
 
-map2String(elementSeparator, valueSeparator, map) {
+mapToString(elementSeparator, valueSeparator, map) {
 	local result := []
 	local key, value
 

@@ -21,6 +21,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kMassUnits := ["Kilogram", "Pound"]
+global kTemperatureUnits := ["Celsius", "Fahrenheit"]
 global kPressureUnits := ["Bar", "PSI", "KPa"]
 global kVolumeUnits := ["Liter", "Gallon"]
 global kLengthUnits := ["Meter", "Foot"]
@@ -39,6 +40,7 @@ global vTargetLanguageCode := "en"
 global vLocalizationCallbacks := []
 
 global vMassUnit := "Kilogram"
+global vTemperatureUnit := "Celcius"
 global vPressureUnit := "PSI"
 global vVolumeUnit := "Liter"
 global vLengthUnit := "Meter"
@@ -69,6 +71,10 @@ readLanguage(targetLanguageCode) {
 		logError("Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage...")
 }
 
+getTemperatureUnit(translate := false) {
+	return (translate ? translate(vTemperatureUnit) : vTemperatureUnit)
+}
+
 getPressureUnit(translate := false) {
 	return (translate ? translate(vPressureUnit) : vPressureUnit)
 }
@@ -85,8 +91,23 @@ getMassUnit(translate := false) {
 	return (translate ? translate(vMassUnit) : vMassUnit)
 }
 
+getVolumeUnit(translate := false) {
+	return (translate ? translate(vVolumeUnit) : vMassUnit)
+}
+
 getFloatSeparator() {
 	return (vNumberFormat == "#.##" ? "." : ",")
+}
+
+displayTemperatureValue(celsius) {
+	switch vTemperatureUnit {
+		case "Celsius":
+			return celsius
+		case "Fahrenheit":
+			return ((celsius * 1,8) + 32)
+		default:
+			throw "Unknown temperature unit detected in displayTemperatureValue..."
+	}
 }
 
 displayPressureValue(psi) {
@@ -135,8 +156,22 @@ displayMassValue(kilogram) {
 	}
 }
 
-displayFloatValue(float, precision := 6) {
-	return StrReplace(Round(float, precision), ".", getFloatSeparator())
+displayVolumeValue(liter) {
+	switch vVolumeUnit {
+		case "Liter":
+			return liter
+		case "Gallon":
+			return liter / 4,546092
+		default:
+			throw "Unknown volume unit detected in displayVolumeValue..."
+	}
+}
+
+displayFloatValue(float, precision := "__Undefined__") {
+	if (precision = kUndefined)
+		return StrReplace(float, ".", getFloatSeparator())
+	else
+		return StrReplace(Round(float, precision), ".", getFloatSeparator())
 }
 
 displayTimeValue(time, arguments*) {
@@ -174,6 +209,17 @@ internalPressureValue(value) {
 	}
 }
 
+internalTemperatureValue(value) {
+	switch vTemperatureUnit {
+		case "Celsius":
+			return value
+		case "Fahrenheit":
+			return ((value - 32) / 1,8)
+		default:
+			throw "Unknown temperature unit detected in internalTemperatureValue..."
+	}
+}
+
 internalLengthValue(value) {
 	switch vLengthUnit {
 		case "Meter":
@@ -207,8 +253,22 @@ internalMassValue(value) {
 	}
 }
 
-internalFloatValue(value, precision := 6) {
-	return Round(StrReplace(value, getFloatSeparator(), "."), precision)
+internalVolumeValue(value) {
+	switch vVolumeUnit {
+		case "Liter":
+			return value
+		case "Gallon":
+			return value * 4,546092
+		default:
+			throw "Unknown volume unit detected in internalVolumeValue..."
+	}
+}
+
+internalFloatValue(value, precision := "__Undefined__") {
+	if (precision = kUndefined)
+		return StrReplace(value, getFloatSeparator(), ".")
+	else
+		return Round(StrReplace(value, getFloatSeparator(), "."), precision)
 }
 
 internalTimeValue(time, arguments*) {
@@ -255,6 +315,7 @@ initializeLocalization() {
 	local configuration := readConfiguration(kSimulatorConfigurationFile)
 
 	vMassUnit := getConfigurationValue(configuration, "Localization", "MassUnit", "Kilogram")
+	vTemperatureUnit := getConfigurationValue(configuration, "Localization", "TemperatureUnit", "Celsius")
 	vPressureUnit := getConfigurationValue(configuration, "Localization", "PressureUnit", "PSI")
 	vVolumeUnit := getConfigurationValue(configuration, "Localization", "VolumeUnit", "Liter")
 	vLengthUnit := getConfigurationValue(configuration, "Localization", "LengthUnit", "Meter")
@@ -458,6 +519,8 @@ getUnit(unit, translate := false) {
 			return getSpeedUnit(translate)
 		case "Mass":
 			return getMassUnit(translate)
+		case "Volume":
+			return getVolumeUnit(translate)
 	}
 }
 
@@ -484,23 +547,31 @@ convertUnit(type, value, display := true) {
 		switch type {
 			case "Pressure":
 				return displayPressureValue(value)
+			case "Temperature":
+				return displayTemperatureValue(value)
 			case "Length":
 				return displayLengthValue(value)
 			case "Speed":
 				return displaySpeedValue(value)
 			case "Mass":
 				return displayMassValue(value)
+			case "Volume":
+				return displayVolumeValue(value)
 		}
 	else
 		switch type {
 			case "Pressure":
 				return internalPressureValue(value)
+			case "Temperature":
+				return internalTemperatureValue(value)
 			case "Length":
 				return internalLengthValue(value)
 			case "Speed":
 				return internalSpeedValue(value)
 			case "Mass":
 				return internalMassValue(value)
+			case "Volume":
+				return internalVolumeValue(value)
 		}
 }
 

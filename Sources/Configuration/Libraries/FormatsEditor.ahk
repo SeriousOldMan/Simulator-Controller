@@ -21,6 +21,7 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 global massUnitDropDown
+global temperatureUnitDropDown
 global pressureUnitDropDown
 global volumeUnitDropDown
 global lengthUnitDropDown
@@ -57,6 +58,11 @@ class FormatsEditor extends ConfigurationItem {
 		Gui FE:Add, Text, x83 YP+20 w88 cBlue Center gopenFormatsDocumentation, % translate("Units && Formats")
 
 		Gui FE:Font, Norm, Arial
+
+		chosen := inList(kTemperatureUnits, temperatureUnitDropDown)
+
+		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Temperature")
+		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vtemperatureUnitDropDown, % values2String("|", map(kTemperatureUnits, "translate")*)
 
 		chosen := inList(kMassUnits, massUnitDropDown)
 
@@ -103,6 +109,7 @@ class FormatsEditor extends ConfigurationItem {
 		base.loadFromConfiguration(configuration)
 
 		massUnitDropDown := getConfigurationValue(configuration, "Localization", "MassUnit", "Kilogram")
+		temperatureUnitDropDown := getConfigurationValue(configuration, "Localization", "TempratureUnit", "Celsius")
 		pressureUnitDropDown := getConfigurationValue(configuration, "Localization", "PressureUnit", "PSI")
 		volumeUnitDropDown := getConfigurationValue(configuration, "Localization", "VolumeUnit", "Liter")
 		lengthUnitDropDown := getConfigurationValue(configuration, "Localization", "LengthUnit", "Meter")
@@ -115,6 +122,7 @@ class FormatsEditor extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		base.saveToConfiguration(configuration)
 
+		GuiControlGet temperatureUnitDropDown
 		GuiControlGet massUnitDropDown
 		GuiControlGet pressureUnitDropDown
 		GuiControlGet volumeUnitDropDown
@@ -123,6 +131,7 @@ class FormatsEditor extends ConfigurationItem {
 		GuiControlGet numberFormatDropDown
 		GuiControlGet timeFormatDropDown
 
+		setConfigurationValue(configuration, "Localization", "TemperatureUnit", kTemperatureUnits[temperatureUnitDropDown])
 		setConfigurationValue(configuration, "Localization", "MassUnit", kMassUnits[massUnitDropDown])
 		setConfigurationValue(configuration, "Localization", "PressureUnit", kPressureUnits[pressureUnitDropDown])
 		setConfigurationValue(configuration, "Localization", "VolumeUnit", kVolumeUnits[volumeUnitDropDown])

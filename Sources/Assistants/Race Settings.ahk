@@ -241,11 +241,14 @@ openSettingsDocumentation() {
 isPositiveFloat(numbers*) {
 	local ignore, value
 
-	for ignore, value in numbers
+	for ignore, value in numbers {
+		value := internalValue("Float", value)
+
 		if value is not Float
 			return false
 		else if (value < 0)
 			return false
+	}
 
 	return true
 }
@@ -255,7 +258,14 @@ isPositiveNumber(numbers*) {
 
 	for ignore, value in numbers
 		if value is not Number
-			return false
+		{
+			value := internalValue("Float", value)
+
+			if value is not Number
+				return false
+			else if (value < 0)
+				return false
+		}
 		else if (value < 0)
 			return false
 
@@ -379,14 +389,14 @@ readTyreSetup(settings) {
 	spSetupTyreSetEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 1)
 	spPitstopTyreSetEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", 2)
 
-	spDryFrontLeftEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
-	spDryFrontRightEdit:= getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)
-	spDryRearLeftEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)
-	spDryRearRightEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)
-	spWetFrontLeftEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)
-	spWetFrontRightEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)
-	spWetRearLeftEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)
-	spWetRearRightEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)
+	spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)), 1)
+	spDryFrontRightEdit:= displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)), 1)
+	spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)), 1)
+	spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)), 1)
+	spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)), 1)
+	spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)), 1)
+	spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)), 1)
+	spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)), 1)
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
@@ -741,38 +751,38 @@ restart:
 
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Suspension.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairSuspensionDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Suspension.Repair.Threshold", Round(repairSuspensionThresholdEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Damage.Suspension.Repair.Threshold", internalValue("Float", repairSuspensionThresholdEdit, 1))
 
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairBodyworkDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", Round(repairBodyworkThresholdEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", internalValue("Float", repairBodyworkThresholdEdit, 1))
 
 		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairEngineDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", Round(repairEngineThresholdEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", internalValue("Float", repairEngineThresholdEdit, 1))
 
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change"
 							, ["Never", "Temperature", "Weather"][changeTyreDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", Round(changeTyreThresholdEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", internalValue("Float", changeTyreThresholdEdit, 1))
 
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", tyrePressureDeviationEdit)
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", internalValue("Float", tyrePressureDeviationEdit, 1))
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", temperatureCorrectionCheck)
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", setupPressureCompareCheck)
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Pressure", pressureLossCorrectionCheck)
 
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", Round(tpDryFrontLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", Round(tpDryFrontRightEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", Round(tpDryRearLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", Round(tpDryRearRightEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FL", Round(tpWetFrontLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FR", Round(tpWetFrontRightEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", Round(tpWetRearLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", Round(tpWetRearRightEdit, 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", Round(convertUnit("Pressure", internalValue("Float", tpDryFrontLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", Round(convertUnit("Pressure", internalValue("Float", tpDryFrontRightEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", Round(convertUnit("Pressure", internalValue("Float", tpDryRearLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", Round(convertUnit("Pressure", internalValue("Float", tpDryRearRightEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FL", Round(convertUnit("Pressure", internalValue("Float", tpWetFrontLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FR", Round(convertUnit("Pressure", internalValue("Float", tpWetFrontRightEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", Round(convertUnit("Pressure", internalValue("Float", tpWetRearLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", Round(convertUnit("Pressure", internalValue("Float", tpWetRearRightEdit), false), 1))
 
 		setConfigurationValue(newSettings, "Session Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
-		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(fuelConsumptionEdit, 2))
-		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", safetyFuelEdit)
+		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", Round(convertUnit("Volume", internalValue("Float", fuelConsumptionEdit), false), 2))
+		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", Round(convertUnit("Volume", internalValue("Float", safetyFuelEdit), false)))
 
 		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
@@ -785,19 +795,19 @@ restart:
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
 		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
 
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FR", Round(convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FL", Round(convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FR", Round(convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false), 1))
+		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false), 1))
 
 		setConfigurationValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Tyres", pitstopTyreServiceEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel.Rule", ["Fixed", "Dynamic"][pitstopRefuelServiceRuleDropDown])
-		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel", pitstopRefuelServiceEdit)
+		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel", internalValue("Float", pitstopRefuelServiceEdit, 1))
 		setConfigurationValue(newSettings, "Strategy Settings", "Service.Order", (pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 		setConfigurationValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
 		setConfigurationValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
@@ -850,35 +860,35 @@ restart:
 		pitstopWarningEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3)
 
 		repairSuspensionDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
-		repairSuspensionThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0)
+		repairSuspensionThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)
 
 		repairBodyworkDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact")
-		repairBodyworkThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1)
+		repairBodyworkThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)
 
 		repairEngineDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact")
-		repairEngineThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1)
+		repairEngineThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)
 
 		changeTyreDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never")
-		changeTyreThresholdEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0)
+		changeTyreThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0), 1)
 
-		tyrePressureDeviationEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2)
+		tyrePressureDeviationEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1)
 		temperatureCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
 		setupPressureCompareCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", false)
 		pressureLossCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", false)
 
-		tpDryFrontLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)
-		tpDryFrontRightEdit:= getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)
-		tpDryRearLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)
-		tpDryRearRightEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)
-		tpWetFrontLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)
-		tpWetFrontRightEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)
-		tpWetRearLeftEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)
-		tpWetRearRightEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)
+		tpDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)), 1)
+		tpDryFrontRightEdit:= displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)), 1)
+		tpDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)), 1)
+		tpDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)), 1)
+		tpWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)), 1)
+		tpWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)), 1)
+		tpWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)), 1)
+		tpWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)), 1)
 
 		raceDurationEdit := Round(getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Duration", 3600) / 60)
 		avgLaptimeEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
-		fuelConsumptionEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)
-		safetyFuelEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)
+		fuelConsumptionEdit := displayValue("Float", convertUnit("Volume", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)), 2)
+		safetyFuelEdit := displayValue("Float", convertUnit("Volume", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)))
 
 		formationLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
 		postRaceLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
@@ -886,7 +896,7 @@ restart:
 		pitstopDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
 		pitstopTyreServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
 		pitstopRefuelServiceRuleDropDown := inList(["Fixed", "Dynamic"], getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
-		pitstopRefuelServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5)
+		pitstopRefuelServiceEdit := displayValue("Float", getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)
 		pitstopServiceDropDown := ((getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
 		extrapolationLapsEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
 		overtakeDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
@@ -1086,7 +1096,7 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Fuel Consumption")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit gvalidateFuelConsumption, %fuelConsumptionEdit%
-		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Ltr.")
+		Gui RES:Add, Text, x164 yp+4 w90 h20, % getUnit("Volume", true)
 
 		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
@@ -1232,7 +1242,7 @@ restart:
 		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui RES:Add, Edit, x126 yp w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range0-99, %safetyFuelEdit%
-		Gui RES:Add, Text, x184 yp+2 w90 h20, % translate("Ltr.")
+		Gui RES:Add, Text, x184 yp+2 w90 h20, % getUnit("Volume", true)
 
 		if vTeamMode {
 			Gui RES:Tab, 4
@@ -1371,10 +1381,13 @@ chooseRefuelService() {
 
 validateNumber(field) {
 	local oldValue := %field%
+	local value
 
 	GuiControlGet %field%
 
-	if %field% is not Number
+	value := internalValue("Float", %field%)
+
+	if value is not Number
 	{
 		%field% := oldValue
 
@@ -1577,10 +1590,10 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 		compound := getConfigurationValue(data, "Setup Data", "TyreCompound", spSetupTyreCompoundDropDown)
 
 		if (compound = "Dry") {
-			spDryFrontLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFL", spDryFrontLeftEdit)
-			spDryFrontRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFR", spDryFrontRightEdit)
-			spDryRearLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRL", spDryRearLeftEdit)
-			spDryRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)
+			spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFL", spDryFrontLeftEdit)), 1)
+			spDryFrontRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFR", spDryFrontRightEdit)), 1)
+			spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRL", spDryRearLeftEdit)), 1)
+			spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)), 1)
 
 			if settings {
 				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
@@ -1588,17 +1601,17 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(spDryFrontLeftEdit, 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", Round(spDryFrontRightEdit, 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(spDryRearLeftEdit, 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(spDryRearRightEdit, 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", Round(convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false), 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", Round(convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false), 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", Round(convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false), 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", Round(convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false), 1))
 
 				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
 					message := (translate("Tyre setup imported: ") . translate(compound(compound, compoundColor)))
 
 					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
-							  . Round(spDryFrontLeftEdit, 1) . translate(", ") . Round(spDryFrontRightEdit, 1) . translate(", ")
-							  . Round(spDryRearLeftEdit, 1) . translate(", ") . Round(spDryRearRightEdit, 1), false, "Information.png", 5000)
+							  . spDryFrontLeftEdit . translate(", ") . spDryFrontRightEdit . translate(", ")
+							  . spDryRearLeftEdit . translate(", ") . spDryRearRightEdit, false, "Information.png", 5000)
 				}
 			}
 			else {
@@ -1613,10 +1626,10 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			}
 		}
 		else if ((compound = "Wet") || (compound = "Intermediate")) {
-			spWetFrontLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFL", spWetFrontLeftEdit)
-			spWetFrontRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureFR", spWetFrontRightEdit)
-			spWetRearLeftEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRL", spWetRearLeftEdit)
-			spWetRearRightEdit := getConfigurationValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)
+			spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFL", spWetFrontLeftEdit)), 1)
+			spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFR", spWetFrontRightEdit)), 1)
+			spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRL", spWetRearLeftEdit)), 1)
+			spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)), 1)
 
 			if settings {
 				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
@@ -1624,17 +1637,17 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", Round(spWetFrontLeftEdit, 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", Round(spWetFrontRightEdit, 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(spWetRearLeftEdit, 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(spWetRearRightEdit, 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", Round(convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false), 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", Round(convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false), 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", Round(convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false), 1))
+				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", Round(convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false), 1))
 
 				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
 					message := (translate("Tyre setup imported: ") . compound(compound, compoundColor))
 
 					showMessage(message . translate("; ")
-							  . Round(spWetFrontLeftEdit, 1) . translate(", ") . Round(spWetFrontRightEdit, 1) . translate(", ")
-							  . Round(spWetRearLeftEdit, 1) . translate(", ") . Round(spWetRearRightEdit, 1), false, "Information.png", 5000)
+							  . spWetFrontLeftEdit . translate(", ") . spWetFrontRightEdit . translate(", ")
+							  . spWetRearLeftEdit . translate(", ") . spWetRearRightEdit, false, "Information.png", 5000)
 				}
 			}
 			else {
@@ -1759,10 +1772,10 @@ setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rr
 	Gui RES:Default
 
 	if (compound = "Wet") {
-		spWetFrontLeftEdit := Round(flPressure, 1)
-		spWetFrontRightEdit := Round(frPressure, 1)
-		spWetRearLeftEdit := Round(rlPressure, 1)
-		spWetRearRightEdit := Round(rrPressure, 1)
+		spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", flPressure), 1)
+		spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", frPressure), 1)
+		spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", rlPressure), 1)
+		spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", rrPressure), 1)
 
 		GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
 		GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
@@ -1770,10 +1783,10 @@ setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rr
 		GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
 	}
 	else {
-		spDryFrontLeftEdit := Round(flPressure, 1)
-		spDryFrontRightEdit := Round(frPressure, 1)
-		spDryRearLeftEdit := Round(rlPressure, 1)
-		spDryRearRightEdit := Round(rrPressure, 1)
+		spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", flPressure), 1)
+		spDryFrontRightEdit := displayValue("Float", convertUnit("Pressure", frPressure), 1)
+		spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", rlPressure), 1)
+		spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", rrPressure), 1)
 
 		GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
 		GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%

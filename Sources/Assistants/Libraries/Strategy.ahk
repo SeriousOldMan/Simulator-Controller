@@ -3088,12 +3088,12 @@ class Strategy extends ConfigurationItem {
 				else {
 					pitstop.iStintLaps -= superfluousLaps
 
-					delta := Min((superfluousLaps * pitstop.FuelConsumption), pitstop.iRefuelAmount)
+					delta := Min((superfluousLaps * pitstop.FuelConsumption), pitstop.RefuelAmount)
 
 					pitstop.iRefuelAmount -= delta
 					pitstop.iRemainingFuel -= delta
 
-					pitstop.iDuration := pitstop.Strategy.calcPitstopDuration(this.RefuelAmount, this.TyreChange)
+					pitstop.iDuration := pitstop.Strategy.calcPitstopDuration(pitstop.RefuelAmount, pitstop.TyreChange)
 				}
 			}
 

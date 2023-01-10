@@ -48,20 +48,7 @@ class StrategyViewer {
 		local seconds, fraction, minutes
 
 		if lapTime is Number
-		{
-			seconds := Floor(lapTime)
-			fraction := (lapTime - seconds)
-			minutes := Floor(seconds / 60)
-
-			fraction := Round(fraction * 10)
-
-			seconds := ((seconds - (minutes * 60)) . "")
-
-			if (StrLen(seconds) = 1)
-				seconds := ("0" . seconds)
-
-			return (minutes . ":" . seconds . "." . fraction)
-		}
+			return displayValue("Time", lapTime)
 		else
 			return lapTime
 	}

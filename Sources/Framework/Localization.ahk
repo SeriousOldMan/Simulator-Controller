@@ -145,8 +145,8 @@ displayTimeValue(time) {
 	if ((vTimeFormat = "S.##") || (vTimeFormat = "S,##"))
 		return StrReplace(time, ".", (vTimeFormat = "S.##") ? "." : ",")
 	else {
-		seconds := Floor(lapTime)
-		fraction := (lapTime - seconds)
+		seconds := Floor(time)
+		fraction := (time - seconds)
 		minutes := Floor(seconds / 60)
 		hours := Floor(seconds / 3600)
 
@@ -443,6 +443,8 @@ displayValue(type, value) {
 			return displayMassValue(value)
 		case "Float":
 			return displayFloatValue(value)
+		case "Time":
+			return displayTimeValue(value)
 	}
 }
 
@@ -458,6 +460,8 @@ internalValue(type, value) {
 			return internalMassValue(value)
 		case "Float":
 			return internalFloatValue(value)
+		case "Time":
+			return internalTimeValue(value)
 	}
 }
 

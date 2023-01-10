@@ -513,6 +513,8 @@ getUnit(unit, translate := false) {
 	switch unit {
 		case "Pressure":
 			return getPressureUnit(translate)
+		case "Temperature":
+			return getTemperatureUnit(translate)
 		case "Length":
 			return getLengthUnit(translate)
 		case "Speed":

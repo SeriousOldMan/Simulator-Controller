@@ -608,13 +608,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
-		Gui %window%:Add, Edit, x494 yp w40 -Background Number Limit2 gloadPressures vairTemperatureEdit, % this.iAirTemperature
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % this.iAirTemperature
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Air (Celsius)")
+		Gui %window%:Add, Edit, x494 yp w40 -Background Number Limit2 gloadPressures vairTemperatureEdit, % Round(convertUnit("Temperature", this.iAirTemperature))
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iAirTemperature))
+		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature")})
 
-		Gui %window%:Add, Edit, x494 yp+24 w40 -Background Number Limit2 gloadPressures vtrackTemperatureEdit, % this.iTrackTemperature
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % this.iTrackTemperature
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Track (Celsius)")
+		Gui %window%:Add, Edit, x494 yp+24 w40 -Background Number Limit2 gloadPressures vtrackTemperatureEdit, % Round(convertUnit("Temperature", this.iTrackTemperature))
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iTrackTemperature))
+		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature")})
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Bold Italic, Arial
@@ -2877,7 +2877,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					source := translate("Community")
 
 				LV_Add("", source
-						 , translate(info.Weather), info.AirTemperature, info.TrackTemperature
+						 , translate(info.Weather)
+						 , Round(convertUnit("Temperature", info.AirTemperature))
+						 , Round(convertUnit("Temperature", info.TrackTemperature))
 						 , translate(info.Compound), info.Count)
 			}
 
@@ -3353,7 +3355,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
 																			   , this.SelectedTrack, this.SelectedWeather
-																			   , airTemperatureEdit, trackTemperatureEdit
+																			   , Round(convertUnit("Temperature", airTemperatureEdit, false))
+																			   , Round(convertUnit("Temperature", trackTemperatureEdit, false))
 																			   , compound, compoundColor, driver*)
 				}
 				else
@@ -6143,7 +6146,8 @@ transferPressures() {
 
 	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
 																			, editor.SelectedTrack, editor.SelectedWeather
-																			, airTemperatureEdit, trackTemperatureEdit
+																			, Round(convertUnit("Temperature", airTemperatureEdit, false))
+																			, Round(convertUnit("Temperature", trackTemperatureEdit, false))
 																			, compound, compoundColor, driver*)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 

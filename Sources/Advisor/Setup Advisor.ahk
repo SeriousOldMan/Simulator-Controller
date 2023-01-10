@@ -1739,7 +1739,7 @@ class SettingHandler {
 ;;; NumberHandler                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class NumberHandler {
+class NumberHandler extends SettingHandler {
 	MinValue[] {
 		Get {
 			return -2147483648
@@ -1757,7 +1757,7 @@ class NumberHandler {
 	}
 
 	formatValue(value) {
-		return value
+		return displayValue("Float", value)
 	}
 }
 
@@ -2223,7 +2223,7 @@ class SetupEditor extends ConfigurationItem {
 				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 				if (originalValue = modifiedValue)
-					value := originalValue
+					value := handler.formatValue(originalValue)
 				else if (modifiedValue > originalValue) {
 					value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 
@@ -2433,7 +2433,7 @@ class SetupEditor extends ConfigurationItem {
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 		if (originalValue = modifiedValue) {
-			value := originalValue
+			value := handler.formatValue(originalValue)
 
 			setup.disable(setting)
 		}
@@ -2865,7 +2865,7 @@ class SetupComparator extends ConfigurationItem {
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 		if (originalValue = modifiedValue)
-			value := originalValue
+			value := handler.formatValue(originalValue)
 		else if (modifiedValue > originalValue)
 			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
 		else

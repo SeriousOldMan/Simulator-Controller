@@ -754,14 +754,12 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (simulatorCode = "Unknown")
 			return "Unknown"
-		else if (this.ControllerState.Count() > 0) {
-			for name, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
-				if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
-					return name
-
-			return false
-		}
 		else {
+			if (this.ControllerState.Count() > 0)
+				for name, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
+					if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
+						return name
+
 			for name, code in {"Assetto Corsa": "AC", "Assetto Corsa Competizione": "ACC", "Automobilista 2": "AMS2"
 							 , "iRacing": "IRC", "RaceRoom Racing Experience": "R3E", "rFactor 2": "RF2", "Project CARS 2": "PCARS2"}
 				if ((simulatorCode = name) || (simulatorCode = code))

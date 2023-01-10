@@ -1755,10 +1755,6 @@ class NumberHandler extends SettingHandler {
 	validValue(displayValue) {
 		return ((displayValue >= this.MinValue) && (displayValue <= this.MaxValue))
 	}
-
-	formatValue(value) {
-		return displayValue("Float", value)
-	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2223,14 +2219,14 @@ class SetupEditor extends ConfigurationItem {
 				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 				if (originalValue = modifiedValue)
-					value := handler.formatValue(originalValue)
+					value := displayValue("Float", handler.formatValue(originalValue))
 				else if (modifiedValue > originalValue) {
-					value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 					setup.enable(setting)
 				}
 				else {
-					value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 					setup.enable(setting)
 				}
@@ -2433,17 +2429,17 @@ class SetupEditor extends ConfigurationItem {
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 		if (originalValue = modifiedValue) {
-			value := handler.formatValue(originalValue)
+			value := displayValue("Float", handler.formatValue(originalValue))
 
 			setup.disable(setting)
 		}
 		else if (modifiedValue > originalValue) {
-			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 			setup.enable(setting)
 		}
 		else {
-			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 			setup.enable(setting)
 		}
@@ -2778,18 +2774,22 @@ class SetupComparator extends ConfigurationItem {
 				valueAB := handler.formatValue(valueAB)
 
 				if (valueB > valueA)
-					valueB := (valueB . A_Space . translate("(") . "+" . handler.formatValue(Abs(valueA - valueB)) . translate(")"))
+					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
 				else if (valueB < valueA)
-					valueB := (valueB . A_Space . translate("(") . "-" . handler.formatValue(Abs(valueA - valueB)) . translate(")"))
+					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
+				else
+					valueB := displayValue("Float", valueB)
 
 				if (valueAB > valueA)
-					valueAB := (valueAB . A_Space . translate("(") . "+" . handler.formatValue(Abs(valueA - valueAB)) . translate(")"))
+					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
 				else if (valueAB < valueA)
-					valueAB := (valueAB . A_Space . translate("(") . "-" . handler.formatValue(Abs(valueA - valueAB)) . translate(")"))
+					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
+				else
+					valueAB := displayValue("Float", valueAB)
 
 				label := settingsLabels[setting]
 
-				LV_Add("", categoriesLabels[category], settingsLabels[setting], valueA, valueB, valueAB, settingsUnits[setting])
+				LV_Add("", categoriesLabels[category], settingsLabels[setting], displayValue("Float", valueA), valueB, valueAB, settingsUnits[setting])
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting
@@ -2865,11 +2865,11 @@ class SetupComparator extends ConfigurationItem {
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
 
 		if (originalValue = modifiedValue)
-			value := handler.formatValue(originalValue)
+			value := displayValue("Float", handler.formatValue(originalValue))
 		else if (modifiedValue > originalValue)
-			value := (modifiedValue . A_Space . translate("(") . "+" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 		else
-			value := (modifiedValue . A_Space . translate("(") . "-" . handler.formatValue(Abs(originalValue - modifiedValue)) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 		LV_Modify(row, "Vis Col5", value)
 		LV_ModifyCol(5, "AutoHdr")

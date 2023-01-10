@@ -159,11 +159,11 @@ class SyncSessionTask extends RaceCenterTask {
 	}
 
 	run() {
-		local result := base.run()
+		base.run()
 
 		this.NextExecution := (A_TickCount + 10000)
 
-		return result
+		return this
 	}
 
 	resume() {
@@ -6244,22 +6244,20 @@ class RaceCenter extends ConfigurationItem {
 				if newLaps {
 					this.saveSession()
 
-					if selectedLap {
+					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
 						Gui ListView, % this.LapsListView
 
 						LV_Modify(LV_GetCount(), "Select Vis")
 
-						if (this.SelectedDetailReport = "Lap")
-							this.showLapDetails(this.LastLap)
+						this.showLapDetails(this.LastLap)
 					}
 
-					if selectedStint {
+					if (selectedStint && (this.SelectedDetailReport = "Stint")) {
 						Gui ListView, % this.StintsListView
 
 						LV_Modify(LV_GetCount(), "Select Vis")
 
-						if (this.SelectedDetailReport = "Stint")
-							this.showLapDetails(this.LastLap)
+						this.showLapDetails(this.LastLap)
 					}
 
 					if (this.SelectedDetailReport = "Plan") {

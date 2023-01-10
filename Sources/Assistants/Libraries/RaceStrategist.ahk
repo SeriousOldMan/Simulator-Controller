@@ -2556,7 +2556,7 @@ class RaceStrategist extends RaceAssistant {
 		raceInfo["Cars"] := getConfigurationValue(raceData, "Cars", "Count")
 
 		if getConfigurationValue(raceData, "Cars", "Slots", false)
-			raceInfo["Slots"] := string2Map("|", "->", getConfigurationValue(data, "Cars", "Slots"))
+			raceInfo["Slots"] := string2Map("|", "->", getConfigurationValue(raceData, "Cars", "Slots"))
 		else if this.RaceInfo
 			raceInfo["Slots"] := this.RaceInfo["SLots"]
 		else

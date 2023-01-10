@@ -140,10 +140,10 @@ global strategyStartTCEdit := 1
 global strategyStartABSEdit := 2
 
 global strategyCompoundDropDown
-global strategyPressureFLEdit := 27.7
-global strategyPressureFREdit := 27.7
-global strategyPressureRLEdit := 27.7
-global strategyPressureRREdit := 27.7
+global strategyPressureFLEdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
+global strategyPressureFREdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
+global strategyPressureRLEdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
+global strategyPressureRREdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
 
 class StrategyWorkbench extends ConfigurationItem {
 	iDataListView := false
@@ -915,19 +915,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+26 w85 h20 +0x200, % translate("Pressure")
 		Gui %window%:Add, Text, x%x0% yp w85 h20 +0x200, % translate("FL")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFLEdit Disabled, %strategyPressureFLEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("FR")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFREdit Disabled, %strategyPressureFREdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RL")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRLEdit Disabled, %strategyPressureRLEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RR")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRREdit Disabled, %strategyPressureRREdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("PSI")
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
 
 		x := 371
 		x0 := x - 4
@@ -2418,10 +2418,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		compound := compound(strategy.TyreCompound, strategy.TyreCompoundColor)
 		GuiControl Choose, strategyCompoundDropDown, % inList(this.TyreCompounds, compound)
 
-		GuiControl, , strategyPressureFLEdit, % strategy.TyrePressureFL
-		GuiControl, , strategyPressureFREdit, % strategy.TyrePressureFR
-		GuiControl, , strategyPressureRLEdit, % strategy.TyrePressureRL
-		GuiControl, , strategyPressureRREdit, % strategy.TyrePressureRR
+		GuiControl, , strategyPressureFLEdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFL), 2)
+		GuiControl, , strategyPressureFREdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFR), 2)
+		GuiControl, , strategyPressureRLEdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureRL), 2)
+		GuiControl, , strategyPressureRREdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureRR), 2)
 
 		this.showStrategyInfo(strategy)
 

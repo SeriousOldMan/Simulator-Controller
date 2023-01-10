@@ -21,7 +21,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kMassUnits := ["Kilogram", "Pound"]
-global kPressureUnits := ["BAR", "PSI", "KPa"]
+global kPressureUnits := ["Bar", "PSI", "KPa"]
 global kVolumeUnits := ["Liter", "Gallon"]
 global kLengthUnits := ["Meter", "Foot"]
 global kSpeedUnits := ["km/h", "mph"]
@@ -93,7 +93,7 @@ displayPressureValue(psi) {
 	switch vPressureUnit {
 		case "PSI":
 			return psi
-		case "BAR":
+		case "Bar":
 			return psi / 14.503773
 		case "KPa":
 			return psi * 6.894757
@@ -135,11 +135,11 @@ displayMassValue(kilogram) {
 	}
 }
 
-displayFloatValue(float) {
-	return StrReplace(float, ".", getFloatSeparator())
+displayFloatValue(float, precision := 6) {
+	return StrReplace(Round(float, precision), ".", getFloatSeparator())
 }
 
-displayTimeValue(time) {
+displayTimeValue(time, arguments*) {
 	local hours, seconds, fraction, minutes
 
 	if ((vTimeFormat = "S.##") || (vTimeFormat = "S,##"))
@@ -162,26 +162,56 @@ displayTimeValue(time) {
 }
 
 internalPressureValue(value) {
-	return value
+	switch vPressureUnit {
+		case "PSI":
+			return value
+		case "Bar":
+			return value * 14.503773
+		case "KPa":
+			return value / 6.894757
+		default:
+			throw "Unknown pressure unit detected in internalPressureValue..."
+	}
 }
 
 internalLengthValue(value) {
-	return value
+	switch vLengthUnit {
+		case "Meter":
+			return value
+		case "Foot":
+			return value / 3.280840
+		default:
+			throw "Unknown length unit detected in internalLengthValue..."
+	}
 }
 
 internalSpeedValue(value) {
-	return value
+	switch vSpeedUnit {
+		case "km/h":
+			return value
+		case "mph":
+			return value * 1.609344
+		default:
+			throw "Unknown speed unit detected in internalSpeedValue..."
+	}
 }
 
 internalMassValue(value) {
-	return value
+	switch vMassUnit {
+		case "Kilogram":
+			return value
+		case "Pound":
+			return value / 2.204623
+		default:
+			throw "Unknown mass unit detected in internalMassValue..."
+	}
 }
 
-internalFloatValue(value) {
-	return StrReplace(value, getFloatSeparator(), ".")
+internalFloatValue(value, precision := 6) {
+	return Round(StrReplace(value, getFloatSeparator(), "."), precision)
 }
 
-internalTimeValue(time) {
+internalTimeValue(time, arguments*) {
 	local seconds, fraction
 
 	if (vTimeFormat = "S,##")
@@ -431,38 +461,47 @@ getUnit(unit, translate := false) {
 	}
 }
 
-displayValue(type, value) {
+displayValue(type, value, arguments*) {
 	switch type {
-		case "Pressure":
-			return displayPressureValue(value)
-		case "Length":
-			return displayLengthValue(value)
-		case "Speed":
-			return displaySpeedValue(value)
-		case "Mass":
-			return displayMassValue(value)
 		case "Float":
-			return displayFloatValue(value)
+			return displayFloatValue(value, arguments*)
 		case "Time":
-			return displayTimeValue(value)
+			return displayTimeValue(value, arguments*)
 	}
 }
 
-internalValue(type, value) {
+internalValue(type, value, arguments*) {
 	switch type {
-		case "Pressure":
-			return internalPressureValue(value)
-		case "Length":
-			return internalLengthValue(value)
-		case "Speed":
-			return internalSpeedValue(value)
-		case "Mass":
-			return internalMassValue(value)
 		case "Float":
-			return internalFloatValue(value)
+			return internalFloatValue(value, arguments*)
 		case "Time":
-			return internalTimeValue(value)
+			return internalTimeValue(value, arguments*)
 	}
+}
+
+convertUnit(type, value, display := true) {
+	if display
+		switch type {
+			case "Pressure":
+				return displayPressureValue(value)
+			case "Length":
+				return displayLengthValue(value)
+			case "Speed":
+				return displaySpeedValue(value)
+			case "Mass":
+				return displayMassValue(value)
+		}
+	else
+		switch type {
+			case "Pressure":
+				return internalPressureValue(value)
+			case "Length":
+				return internalLengthValue(value)
+			case "Speed":
+				return internalSpeedValue(value)
+			case "Mass":
+				return internalMassValue(value)
+		}
 }
 
 validNumber(value, display := false) {

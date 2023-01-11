@@ -1206,7 +1206,7 @@ class RaceAssistant extends ConfigurationItem {
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 
 		if (lapNumber <= 2) {
-			if this.AdjustLapTime) {
+			if this.AdjustLapTime {
 				settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 
 				if ((lapTime / settingsLapTime) > 1.2) {

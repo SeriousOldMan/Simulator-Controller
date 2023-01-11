@@ -5017,8 +5017,9 @@ class RaceCenter extends ConfigurationItem {
 
 			LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 								   , translate(stint.Compound), stint.Laps.Length()
-								   , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
-								   , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+								   , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
+								   , displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1)
+								   , stint.Accidents, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
 			this.updatePlan(stint)
 		}
@@ -5031,7 +5032,7 @@ class RaceCenter extends ConfigurationItem {
 		local window := this.Window
 		local session := this.SelectedSession[true]
 		local message, currentStint, first, newData, newStints, updatedStints, currentListView, ignore, stint, lap
-		local selected
+		local selected, remainingFuel, fuelConsumption
 
 		Gui %window%:Default
 
@@ -5089,8 +5090,9 @@ class RaceCenter extends ConfigurationItem {
 
 						LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 								 , translate(stint.Compound), stint.Laps.Length()
-								 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
-								 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+								 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
+								 , displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1)
+								 , stint.Accidents, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
 						stint.Row := LV_GetCount()
 
@@ -5115,7 +5117,17 @@ class RaceCenter extends ConfigurationItem {
 						for ignore, lap in this.loadNewLaps(stint) {
 							Gui ListView, % this.LapsListView
 
-							LV_Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+							remainingFuel := lap.FuelRemaining
+
+							if remainingFuel is Number
+								remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel), 1)
+
+							fuelConsumption := displayNullValue(lap.FuelConsumption)
+
+							if fuelConsumption is Number
+								fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+
+							LV_Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "", lap.Accident ? translate("x") : "")
 
 							lap.Row := LV_GetCount()
 						}
@@ -5361,7 +5373,7 @@ class RaceCenter extends ConfigurationItem {
 	syncTelemetry(load := false) {
 		local lastLap := this.LastLap
 		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID, pitstop, tries
-		local telemetryData, state, pressures, temperatures, wear, currentListView, lapPressures
+		local telemetryData, state, pressures, temperatures, wear, currentListView, lapPressures, pressure
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -5511,8 +5523,16 @@ class RaceCenter extends ConfigurationItem {
 
 					LV_GetText(lapPressures, lap, 10)
 
-					if (lapPressures = "-, -, -, -")
+					if (lapPressures = "-, -, -, -") {
+						loop 4 {
+							pressure := pressures[A_Index]
+
+							if pressure is Number
+								pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+						}
+
 						LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", map(pressures, "displayValue")*))
+					}
 
 					newData := true
 					lap += 1
@@ -5529,7 +5549,7 @@ class RaceCenter extends ConfigurationItem {
 	syncTyrePressures(load := false) {
 		local lastLap, tyresTable, ignore, pressureData, pressureFL, pressureFR, pressureRL, pressureRR, tyres
 		local currentListView, row, session, pressuresDB, message, newData, lap, flush, driverID, tries
-		local lapPressures, coldPressures, hotPressures, pressuresLosses, pressuresTable
+		local lapPressures, coldPressures, hotPressures, pressuresLosses, pressuresTable, pressures, pressure
 
 		if load {
 			lastLap := this.LastLap
@@ -5568,6 +5588,18 @@ class RaceCenter extends ConfigurationItem {
 						Gui ListView, % this.LapsListView
 
 						row := this.Laps[A_Index].Row
+
+						if pressureFL is Number
+							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL), 1)
+
+						if pressureFR is Number
+							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR), 1)
+
+						if pressureRL is Number
+							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL), 1)
+
+						if pressureRR is Number
+							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR), 1)
 
 						LV_Modify(row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
 																  , displayNullValue(pressureRL), displayNullValue(pressureRR)))
@@ -5668,7 +5700,16 @@ class RaceCenter extends ConfigurationItem {
 				try {
 					Gui ListView, % this.LapsListView
 
-					LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", string2Values(",", lapPressures[10])*))
+					pressures := string2Values(", ", lapPressures[10])
+
+					loop 4 {
+						pressure := pressures[A_Index]
+
+						if pressure is Number
+							pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+					}
+
+					LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", pressures*))
 
 					newData := true
 					lap += 1
@@ -6769,7 +6810,7 @@ class RaceCenter extends ConfigurationItem {
 
 	loadStints() {
 		local ignore, stint, newStint, driver, laps, lap, stintNr, stintLap, airTemperatures, trackTemperatures
-		local window, currentListView, currentStint, lastLap
+		local window, currentListView, currentStint, lastLap, remainingFuel, fuelConsumption
 
 		this.iStints := []
 
@@ -6873,8 +6914,9 @@ class RaceCenter extends ConfigurationItem {
 
 						LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 								 , translate(stint.Compound), stint.Laps.Length()
-								 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime), stint.FuelConsumption, stint.Accidents
-								 , stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
+								 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
+								 , displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1)
+								 , stint.Accidents, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					}
 
 			LV_ModifyCol()
@@ -6894,7 +6936,17 @@ class RaceCenter extends ConfigurationItem {
 
 						Gui ListView, % this.LapsListView
 
-						LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(lap.FuelConsumption), lap.FuelRemaining, "", lap.Accident ? translate("x") : "")
+						remainingFuel := lap.FuelRemaining
+
+						if remainingFuel is Number
+							remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel), 1)
+
+						fuelConsumption := displayNullValue(lap.FuelConsumption)
+
+						if fuelConsumption is Number
+							fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+
+						LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "", lap.Accident ? translate("x") : "")
 					}
 
 			LV_ModifyCol()
@@ -8320,9 +8372,22 @@ class RaceCenter extends ConfigurationItem {
 
 					LV_GetText(lapPressures, lap.Row, 10)
 
-					if (lapPressures = "-, -, -, -")
+					if (lapPressures = "-, -, -, -") {
+						if pressureFL is Number
+							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL), 1)
+
+						if pressureFR is Number
+							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR), 1)
+
+						if pressureRL is Number
+							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL), 1)
+
+						if pressureRR is Number
+							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR), 1)
+
 						LV_Modify(lap.Row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
 																	  , displayNullValue(pressureRL), displayNullValue(pressureRR)))
+					}
 
 					newLap += 1
 				}

@@ -3317,10 +3317,10 @@ class RaceCenter extends ConfigurationItem {
 
 			GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
 
-			GuiControl, , pitstopPressureFLEdit, % Round(flPressure, 1)
-			GuiControl, , pitstopPressureFREdit, % Round(frPressure, 1)
-			GuiControl, , pitstopPressureRLEdit, % Round(rlPressure, 1)
-			GuiControl, , pitstopPressureRREdit, % Round(rrPressure, 1)
+			GuiControl, , pitstopPressureFLEdit, % displayValue("Float", convertUnit("Pressure", flPressure), 1)
+			GuiControl, , pitstopPressureFREdit, % displayValue("Float", convertUnit("Pressure", frPressure), 1)
+			GuiControl, , pitstopPressureRLEdit, % displayValue("Float", convertUnit("Pressure", rlPressure), 1)
+			GuiControl, , pitstopPressureRREdit, % displayValue("Float", convertUnit("Pressure", rrPressure), 1)
 		}
 		else {
 			GuiControl Choose, pitstopTyreCompoundDropDown, 1
@@ -3469,8 +3469,10 @@ class RaceCenter extends ConfigurationItem {
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", compoundColor)
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
-									, values2String(",", pitstopPressureFLEdit, pitstopPressureFREdit
-													   , pitstopPressureRLEdit, pitstopPressureRREdit))
+									, values2String(",", Round(convertUnit("Pressure", internalValue("Float", pitstopPressureFLEdit), true), 1)
+													   , Round(convertUnit("Pressure", internalValue("Float", pitstopPressureFREdit), true), 1)
+													   , Round(convertUnit("Pressure", internalValue("Float", pitstopPressureRLEdit), true), 1)
+													   , Round(convertUnit("Pressure", internalValue("Float", pitstopPressureRREdit), true), 1)))
 			}
 			else
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
@@ -4000,7 +4002,7 @@ class RaceCenter extends ConfigurationItem {
 
 	getStintSetup(stintNr, ByRef fuel, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyreSet, ByRef tyrePressures) {
 		local lap := this.Stints[stintNr].Laps[1]
-		local pressureTable, pressures, window, currentListView, compound
+		local pressureTable, pressures, pressure, window, currentListView, compound
 
 		tyrePressures := false
 		fuel := lap.FuelRemaining
@@ -4051,7 +4053,14 @@ class RaceCenter extends ConfigurationItem {
 
 							LV_GetText(pressures, stintNr - 1, 6)
 
-							tyrePressures := string2Values(",", pressures)
+							tyrePressures := string2Values(", ", pressures)
+
+							loop 4 {
+								pressure := tyrePressures[A_Index]
+
+								if pressure is Number
+									tyrePressures[A_Index] := Round(convertUnit("Pressure", internalValue("Float", pressure), false), 1)
+							}
 
 							break
 						}
@@ -5122,12 +5131,12 @@ class RaceCenter extends ConfigurationItem {
 							if remainingFuel is Number
 								remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel), 1)
 
-							fuelConsumption := displayNullValue(lap.FuelConsumption)
+							fuelConsumption := lap.FuelConsumption
 
 							if fuelConsumption is Number
 								fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
 
-							LV_Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "", lap.Accident ? translate("x") : "")
+							LV_Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -", lap.Accident ? translate("x") : "")
 
 							lap.Row := LV_GetCount()
 						}
@@ -5591,13 +5600,10 @@ class RaceCenter extends ConfigurationItem {
 
 						if pressureFL is Number
 							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL), 1)
-
 						if pressureFR is Number
 							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR), 1)
-
 						if pressureRL is Number
 							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL), 1)
-
 						if pressureRR is Number
 							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR), 1)
 
@@ -5700,7 +5706,7 @@ class RaceCenter extends ConfigurationItem {
 				try {
 					Gui ListView, % this.LapsListView
 
-					pressures := string2Values(", ", lapPressures[10])
+					pressures := string2Values(",", lapPressures[10])
 
 					loop 4 {
 						pressure := pressures[A_Index]
@@ -5732,7 +5738,7 @@ class RaceCenter extends ConfigurationItem {
 		local newData := false
 		local compound, currentListView, session, nextStop, lap, fuel, compound, compoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
-		local pressures
+		local pressures, displayPressures
 
 		Gui %window%:Default
 
@@ -5777,20 +5783,28 @@ class RaceCenter extends ConfigurationItem {
 						repairSuspension := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
 						repairEngine := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Engine", false)
 
-						if (compound && (compound != "-"))
-							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
+						if (compound && (compound != "-")) {
+							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
+														   , Round(pressureRL, 1), Round(pressureRR, 1))
+
+							displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL), 1)
+																  , displayValue("Float", convertUnit("Pressure", pressureFR), 1)
+																  , displayValue("Float", convertUnit("Pressure", pressureRL), 1)
+																  , displayValue("Float", convertUnit("Pressure", pressureRR), 1))
+						}
 						else {
 							compound := "-"
 							compoundColor := false
 
 							tyreSet := "-"
 							pressures := "-, -, -, -"
+							displayPressures := pressures
 						}
 
 						Gui ListView, % this.PitstopsListView
 
 						LV_Add("", nextStop, lap + 1, fuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
-								 , pressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+								 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 						if (nextStop = 1) {
 							LV_ModifyCol()
@@ -6941,12 +6955,12 @@ class RaceCenter extends ConfigurationItem {
 						if remainingFuel is Number
 							remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel), 1)
 
-						fuelConsumption := displayNullValue(lap.FuelConsumption)
+						fuelConsumption := lap.FuelConsumption
 
 						if fuelConsumption is Number
 							fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
 
-						LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "", lap.Accident ? translate("x") : "")
+						LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -", lap.Accident ? translate("x") : "")
 					}
 
 			LV_ModifyCol()
@@ -7077,7 +7091,7 @@ class RaceCenter extends ConfigurationItem {
 
 	loadPitstops() {
 		local window := this.Window
-		local currentListView, ignore, pitstop, repairBodywork, repairSuspension, repairEngine, pressures
+		local currentListView, ignore, pitstop, repairBodywork, repairSuspension, repairEngine, pressures, pressure
 		local compound, compoundColor
 
 		Gui %window%:Default
@@ -7091,8 +7105,8 @@ class RaceCenter extends ConfigurationItem {
 				repairBodywork := pitstop["Repair.Bodywork"]
 				repairSuspension := pitstop["Repair.Suspension"]
 				repairEngine := pitstop["Repair.Engine"]
-				pressures := values2String(", ", pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
-											   , pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"])
+				pressures := [pitstop["Tyre.Pressure.Cold.Front.Left"], pitstop["Tyre.Pressure.Cold.Front.Right"]
+							, pitstop["Tyre.Pressure.Cold.Rear.Left"], pitstop["Tyre.Pressure.Cold.Rear.Right"]]
 
 				compound := pitstop["Tyre.Compound"]
 				compoundColor := pitstop["Tyre.Compound.Color"]
@@ -7102,11 +7116,18 @@ class RaceCenter extends ConfigurationItem {
 					compoundColor := false
 				}
 
+				loop 4 {
+					pressure := pressures[A_Index]
+
+					if pressure is Number
+						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+				}
+
 				Gui ListView, % this.PitstopsListView
 
 				LV_Add("", A_Index, pitstop.Lap + 1, pitstop.Fuel
 						 , (compound = "-") ? compound : translate(compound(compound, compoundColor))
-						 , pitstop["Tyre.Set"], pressures
+						 , pitstop["Tyre.Set"], values2String(", ", pressures*)
 						 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 			}
 
@@ -8375,13 +8396,10 @@ class RaceCenter extends ConfigurationItem {
 					if (lapPressures = "-, -, -, -") {
 						if pressureFL is Number
 							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL), 1)
-
 						if pressureFR is Number
 							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR), 1)
-
 						if pressureRL is Number
 							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL), 1)
-
 						if pressureRR is Number
 							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR), 1)
 

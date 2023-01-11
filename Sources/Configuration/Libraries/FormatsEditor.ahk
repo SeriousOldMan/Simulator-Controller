@@ -109,7 +109,7 @@ class FormatsEditor extends ConfigurationItem {
 		base.loadFromConfiguration(configuration)
 
 		massUnitDropDown := getConfigurationValue(configuration, "Localization", "MassUnit", "Kilogram")
-		temperatureUnitDropDown := getConfigurationValue(configuration, "Localization", "TempratureUnit", "Celsius")
+		temperatureUnitDropDown := getConfigurationValue(configuration, "Localization", "TemperatureUnit", "Celsius")
 		pressureUnitDropDown := getConfigurationValue(configuration, "Localization", "PressureUnit", "PSI")
 		volumeUnitDropDown := getConfigurationValue(configuration, "Localization", "VolumeUnit", "Liter")
 		lengthUnitDropDown := getConfigurationValue(configuration, "Localization", "LengthUnit", "Meter")

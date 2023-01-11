@@ -6593,15 +6593,17 @@ class RaceCenter extends ConfigurationItem {
 				splitCompound(this.TyreCompounds[inList(map(this.TyreCompounds, "translate"), compound)]
 							, compound, compoundColor)
 
-				pressures := string2Values(",", pressures)
+				pressures := string2Values(", ", pressures)
 
 				sessionStore.add("Setups.Data", {Driver: driver
 											   , Weather: kWeatherConditions[inList(map(kWeatherConditions, "translate"), conditions[1])]
 											   , "Temperature.Air": Round(convertUnit("Temperature", internalValue("Float", temperatures[1])))
 											   , "Temperature.Track": Round(convertUnit("Temperature", internalValue("Float", temperatures[2])))
 											   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
-											   , "Tyre.Pressure.Front.Left": pressures[1], "Tyre.Pressure.Front.Right": pressures[2]
-											   , "Tyre.Pressure.Rear.Left": pressures[3], "Tyre.Pressure.Rear.Right": pressures[4]
+											   , "Tyre.Pressure.Front.Left": Round(convertUnit("Pressure", internalValue("Float", pressures[1]), false), 1)
+											   , "Tyre.Pressure.Front.Right": Round(convertUnit("Pressure", internalValue("Float", pressures[2]), false), 1)
+											   , "Tyre.Pressure.Rear.Left": Round(convertUnit("Pressure", internalValue("Float", pressures[3]), false), 1)
+											   , "Tyre.Pressure.Rear.Right": Round(convertUnit("Pressure", internalValue("Float", pressures[4]), false), 1)
 											   , Notes: StrReplace(StrReplace(StrReplace(notes, "`n", A_Space), "`t", A_Space), ";", ",")})
 			}
 		}
@@ -6944,8 +6946,10 @@ class RaceCenter extends ConfigurationItem {
 
 				LV_Add("", setup.Driver, conditions
 						 , translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
-						 , values2String(", ", setup["Tyre.Pressure.Front.Left"], setup["Tyre.Pressure.Front.Right"]
-											 , setup["Tyre.Pressure.Rear.Left"], setup["Tyre.Pressure.Rear.Right"])
+						 , values2String(", ", displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Left"]), 1)
+											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Right"]), 1)
+											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Left"]), 1)
+											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Right"]), 1))
 						 , displayNullValue(setup.Notes, ""))
 			}
 

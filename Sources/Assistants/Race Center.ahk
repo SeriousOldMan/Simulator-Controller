@@ -9245,18 +9245,27 @@ class RaceCenter extends ConfigurationItem {
 	createPitstopPlanDetails(pitstopNr) {
 		local html := "<table>"
 		local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
-		local pressures := values2String(", ", pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
-											 , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"])
+		local pressures := [pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
+						  , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"]]
 		local repairBodywork := pitstopData["Repair.Bodywork"]
 		local repairSuspension := pitstopData["Repair.Suspension"]
 		local repairEngine := pitstopData["Repair.Engine"]
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
 		local compound, tyreSet, pressure
 
+		loop 4 {
+			pressure := pressures[A_Index]
+
+			if pressure is Number
+				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+		}
+
+		pressures := values2String(", ", pressures*)
+
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . ((pitstopData.Lap = "-") ? "-" : (pitstopData.Lap + 1)) . "</td></tr>")
 
 		if ((pitstopData.Fuel != "-") && (pitstopData.Fuel > 0))
-			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . pitstopData.Fuel . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", pitstopData.Fuel), 1) . "</td></tr>")
 
 		compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
@@ -9267,13 +9276,6 @@ class RaceCenter extends ConfigurationItem {
 
 			if ((tyreSet != false) && (tyreSet != "-"))
 				html .= ("<tr><td><b>" . translate("Tyre Set:") . "</b></div></td><td>" . pitstopData["Tyre.Set"] . "</td></tr>")
-
-			loop 4 {
-				pressure := pressures[A_Index]
-
-				if pressure is Number
-					pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
-			}
 
 			html .= ("<tr><td><b>" . translate("Tyre Pressures:") . "</b></div></td><td>" . pressures . "</td></tr>")
 		}
@@ -9537,8 +9539,17 @@ class RaceCenter extends ConfigurationItem {
 				previousDriverData.Push("<td class=""td-std"">" . "-" . "</td>")
 				nextDriverData.Push("<td class=""td-std"">" . "-" . "</td>")
 
-				pressures := values2String(", ", pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
-											   , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"])
+				pressures := [pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
+							, pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"]]
+
+				loop 4 {
+					pressure := pressures[A_Index]
+
+					if pressure is Number
+						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+				}
+
+				pressures := values2String(", ", pressures*)
 
 				repairBodywork := pitstopData["Repair.Bodywork"]
 				repairSuspension := pitstopData["Repair.Suspension"]
@@ -9549,7 +9560,7 @@ class RaceCenter extends ConfigurationItem {
 				repairsData.Push("<td class=""td-std"">" . repairs . "</td>")
 
 				lapData.Push("<td class=""td-std"">" . (pitstopData.Lap + 1) . "</td>")
-				refuelData.Push("<td class=""td-std"">" . ((pitstopData.Fuel != 0) ? pitstopData.Fuel : "-") . "</td>")
+				refuelData.Push("<td class=""td-std"">" . ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData.Fuel), 1) : "-") . "</td>")
 
 				compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
@@ -9578,7 +9589,7 @@ class RaceCenter extends ConfigurationItem {
 				timeData.Push("<td class=""td-std"">" . (serviceData.Time ? Round(serviceData.Time, 1) : "-") . "</td>")
 				previousDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Previous"] ? serviceData["Driver.Previous"] : "-") . "</td>")
 				nextDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Next"] ? serviceData["Driver.Next"] : "-") . "</td>")
-				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? ((pitstopData.Fuel != 0) ? pitstopData.Fuel : "-") : "-") . "</td>")
+				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData.Fuel), 1) : "-") : "-") . "</td>")
 
 				compound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
 
@@ -9591,8 +9602,18 @@ class RaceCenter extends ConfigurationItem {
 					tyreSet := "-"
 					tyrePressures := "-, -, -, -"
 				}
-				else
-					tyrePressures := values2String(", ", string2Values(",", tyrePressures)*)
+				else {
+					tyrePressures := string2Values(",", tyrePressures)
+
+					loop 4 {
+						pressure := tyrePressures[A_Index]
+
+						if pressure is Number
+							tyrePressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+					}
+
+					tyrePressures := values2String(", ", tyrePressures*)
+				}
 
 				tyreSetData.Push("<td class=""td-std"">" . tyreSet . "</td>")
 				tyrePressuresData.Push("<td class=""td-std"">" . tyrePressures . "</td>")
@@ -9671,7 +9692,7 @@ class RaceCenter extends ConfigurationItem {
 
 			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
 			avgLapTimesData.Push("<td class=""td-std"">" . lapTimeDisplayValue(Round(average(lapTimes), 1)) . "</td>")
-			avgFuelConsumptionsData.Push("<td class=""td-std"">" . Round(average(fuelConsumptions), 2) . "</td>")
+			avgFuelConsumptionsData.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", average(fuelConsumptions)), 1) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")
 		}
 
@@ -9872,7 +9893,7 @@ class RaceCenter extends ConfigurationItem {
 
 	createSessionSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
 		local drawChartFunction := ("function drawChart" . chartID . "() {")
-		local ignore, time
+		local ignore, time, fuel
 
 		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
@@ -9885,9 +9906,14 @@ class RaceCenter extends ConfigurationItem {
 			if (A_Index > 1)
 				drawChartFunction .= ", "
 
+			fuel := fuelSeries[A_Index]
+
+			if fuel is Number
+				fuel := convertUnit("Volume", fuel)
+
 			drawChartFunction .= ("[" . values2String(", ", lapSeries[A_Index]
 														  , chartValue(null(positionSeries[A_Index]))
-														  , chartValue(null(fuelSeries[A_Index]))
+														  , chartValue(null(fuel))
 														  , chartValue(null(tyreSeries[A_Index])))
 									  . "]")
 		}
@@ -9918,7 +9944,7 @@ class RaceCenter extends ConfigurationItem {
 		local lastLap := this.LastLap
 		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
 		local stint, duration, ignore, lap, width, chart1
-		local simulator, carName, trackName, sessionDate, sessionTime
+		local simulator, carName, trackName, sessionDate, sessionTime, fuelConsumption
 
 		simulator := this.Simulator
 		carName := this.Car
@@ -9968,7 +9994,13 @@ class RaceCenter extends ConfigurationItem {
 				numLaps.Push("<td class=""td-std"">" . stint.Laps.Length() . "</td>")
 				positions.Push("<td class=""td-std"">" . stint.StartPosition . translate(" -> ") . stint.EndPosition . "</td>")
 				avgLapTimes.Push("<td class=""td-std"">" . lapTimeDisplayValue(stint.AvgLaptime) . "</td>")
-				fuelConsumptions.Push("<td class=""td-std"">" . stint.FuelConsumption . "</td>")
+
+				fuelConsumption := stint.FuelConsumption
+
+				if fuelConsumption is Number
+					fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+
+				fuelConsumptions.Push("<td class=""td-std"">" . displayNullValue(fuelConsumption) . "</td>")
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")
 			}
 
@@ -10141,7 +10173,7 @@ class RaceCenter extends ConfigurationItem {
 				LV_GetText(pressures, A_Index, 4)
 				LV_GetText(notes, A_Index, 5)
 
-				pressures := string2Values(",", pressures)
+				pressures := string2Values(", ", pressures)
 
 				html .= ("<td class=""td-std"">" . driver . "</td>"
 					   . "<td class=""td-std"">" . conditions . "</td>"

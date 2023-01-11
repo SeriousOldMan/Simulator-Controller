@@ -1535,7 +1535,7 @@ class RaceEngineer extends RaceAssistant {
 		if (optionsOrLap != true)
 			if optionsOrLap is Number
 			{
-				plannedLap := optionsOrLap
+				plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
 
 				options := true
 			}

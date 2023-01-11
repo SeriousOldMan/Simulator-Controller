@@ -2232,10 +2232,10 @@ class RaceCenter extends ConfigurationItem {
 			row := LV_GetNext(0)
 
 			if row {
-				setupBasePressureFLEdit := Round(flPressure, 1)
-				setupBasePressureFREdit := Round(frPressure, 1)
-				setupBasePressureRLEdit := Round(rlPressure, 1)
-				setupBasePressureRREdit := Round(rrPressure, 1)
+				setupBasePressureFLEdit := displayValue("Float", convertUnit("Pressure", flPressure), 1)
+				setupBasePressureFREdit := displayValue("Float", convertUnit("Pressure", frPressure), 1)
+				setupBasePressureRLEdit := displayValue("Float", convertUnit("Pressure", rlPressure), 1)
+				setupBasePressureRREdit := displayValue("Float", convertUnit("Pressure", rrPressure), 1)
 
 				GuiControl, , setupBasePressureFLEdit, %setupBasePressureFLEdit%
 				GuiControl, , setupBasePressureFREdit, %setupBasePressureFREdit%
@@ -10873,7 +10873,7 @@ chooseSetup() {
 			setupAirTemperatureEdit := temperatures[1]
 			setupTrackTemperatureEdit := temperatures[2]
 
-			pressures := string2Values(",", pressures)
+			pressures := string2Values(", ", pressures)
 
 			setupBasePressureFLEdit := pressures[1]
 			setupBasePressureFREdit := pressures[2]

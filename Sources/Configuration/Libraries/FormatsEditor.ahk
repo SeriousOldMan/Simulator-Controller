@@ -61,43 +61,43 @@ class FormatsEditor extends ConfigurationItem {
 
 		chosen := inList(kTemperatureUnits, temperatureUnitDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Temperature")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vtemperatureUnitDropDown, % values2String("|", map(kTemperatureUnits, "translate")*)
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Temperature")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vtemperatureUnitDropDown, % values2String("|", kTemperatureUnits*)
 
 		chosen := inList(kMassUnits, massUnitDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Mass")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vmassUnitDropDown, % values2String("|", map(kMassUnits, "translate")*)
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Mass")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vmassUnitDropDown, % values2String("|", kMassUnits*)
 
 		chosen := inList(kPressureUnits, pressureUnitDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Pressure")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vpressureUnitDropDown, % values2String("|", map(kPressureUnits, "translate")*)
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Pressure")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vpressureUnitDropDown, % values2String("|", kPressureUnits*)
 
 		chosen := inList(kVolumeUnits, volumeUnitDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Volume")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vvolumeUnitDropDown, % values2String("|", map(kVolumeUnits, "translate")*)
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Volume ")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vvolumeUnitDropDown, % values2String("|", kVolumeUnits*)
 
 		chosen := inList(kLengthUnits, lengthUnitDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Length")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vlengthUnitDropDown, % values2String("|", map(kLengthUnits, "translate")*)
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Length")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vlengthUnitDropDown, % values2String("|", kLengthUnits*)
 
 		chosen := inList(kSpeedUnits, speedUnitDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Speed")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vspeedUnitDropDown, % values2String("|", map(kSpeedUnits, "translate")*)
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Speed")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vspeedUnitDropDown, % values2String("|", kSpeedUnits*)
 
 		chosen := inList(kNumberFormats, numberFormatDropDown)
 
-		Gui FE:Add, Text, x16 yp+30 w70 h23 +0x200, % translate("Number")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vnumberFormatDropDown, % values2String("|", map(kNumberFormats, "translate")*)
+		Gui FE:Add, Text, x16 yp+30 w100 h23 +0x200, % translate("Number")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vnumberFormatDropDown, % values2String("|", kNumberFormats*)
 
 		chosen := inList(kTimeFormats, timeFormatDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Time")
-		Gui FE:Add, DropDownList, x90 yp w155 AltSubmit Choose%chosen% vtimeFormatDropDown, % values2String("|", map(kTimeFormats, "translate")*)
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Time")
+		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vtimeFormatDropDown, % values2String("|", kTimeFormats*)
 
 		Gui FE:Add, Text, x24 y+10 w213 0x10
 

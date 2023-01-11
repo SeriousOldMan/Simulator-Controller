@@ -1205,18 +1205,20 @@ class RaceAssistant extends ConfigurationItem {
 
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)
 
-		if ((lapNumber <= 2) && this.AdjustLapTime) {
-			settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+		if (lapNumber <= 2) {
+			if this.AdjustLapTime) {
+				settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 
-			if ((lapTime / settingsLapTime) > 1.2) {
-				lapTime := settingsLapTime
+				if ((lapTime / settingsLapTime) > 1.2) {
+					lapTime := settingsLapTime
 
-				adjustedLapTime := true
+					adjustedLapTime := true
+				}
 			}
-		}
 
-		if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
-			this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
+			if ((knowledgeBase.getValue("Session.Duration", 0) == 0) || (knowledgeBase.getValue("Session.Laps", 0) == 0))
+				this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
+		}
 
 		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Time.End"))
 

@@ -36,6 +36,9 @@ class NamedPreset extends Preset {
 	getArguments() {
 		return Array(this.Name)
 	}
+
+	edit() {
+	}
 }
 
 class MutedAssistant extends NamedPreset {
@@ -383,6 +386,20 @@ class SetupPatch extends NamedPreset {
 		return concatenate(base.getArguments(), Array(this.File))
 	}
 
+	edit() {
+		local file := this.File
+		local name
+
+		SplitPath file, name
+
+		try {
+			Run notepad %kUserHomeDirectory%Setup\%name%
+		}
+		catch exception {
+			logError(exception)
+		}
+	}
+
 	install(wizard) {
 		local file := this.File
 		local name
@@ -391,12 +408,12 @@ class SetupPatch extends NamedPreset {
 
 		try {
 			FileCopy %file%, %kUserHomeDirectory%Setup\%name%, 1
-
-			Run notepad %kUserHomeDirectory%Setup\%name%
 		}
 		catch exception {
 			logError(exception)
 		}
+
+		this.edit()
 	}
 
 	uninstall(wizard) {
@@ -647,7 +664,7 @@ class ModulesStepWizard extends StepWizard {
 		definition := this.Definition
 		presets := []
 
-		Gui, ListView, % this.AvailablePresetsListView
+		Gui ListView, % this.AvailablePresetsListView
 
 		LV_Delete()
 
@@ -677,7 +694,7 @@ class ModulesStepWizard extends StepWizard {
 
 		Gui %window%:Default
 
-		Gui, ListView, % this.SelectedPresetsListView
+		Gui ListView, % this.SelectedPresetsListView
 
 		LV_Delete()
 
@@ -720,7 +737,7 @@ class ModulesStepWizard extends StepWizard {
 		GuiControl Disable, installPresetButton
 		GuiControl Disable, uninstallPresetButton
 
-		Gui, ListView, % this.AvailablePresetsListView
+		Gui ListView, % this.AvailablePresetsListView
 
 		selected := LV_GetNext()
 
@@ -744,7 +761,7 @@ class ModulesStepWizard extends StepWizard {
 			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 		}
 
-		Gui, ListView, % this.SelectedPresetsListView
+		Gui ListView, % this.SelectedPresetsListView
 
 		selected := LV_GetNext()
 
@@ -778,7 +795,7 @@ class ModulesStepWizard extends StepWizard {
 
 		Gui %window%:Default
 
-		Gui, ListView, % this.AvailablePresetsListView
+		Gui ListView, % this.AvailablePresetsListView
 
 		selected := LV_GetNext()
 
@@ -804,7 +821,7 @@ class ModulesStepWizard extends StepWizard {
 
 		Gui %window%:Default
 
-		Gui, ListView, % this.SelectedPresetsListView
+		Gui ListView, % this.SelectedPresetsListView
 
 		selected := LV_GetNext()
 
@@ -815,6 +832,20 @@ class ModulesStepWizard extends StepWizard {
 
 			this.updatePresetState()
 		}
+	}
+
+	editPreset() {
+		local window := this.Window
+		local selected
+
+		Gui %window%:Default
+
+		Gui ListView, % this.SelectedPresetsListView
+
+		selected := LV_GetNext()
+
+		if selected
+			this.SetupWizard.Presets[selected].edit()
 	}
 }
 
@@ -842,7 +873,7 @@ choosePreset(list1, list2) {
 		selected := LV_GetNext()
 	}
 
-	Gui, ListView, %list2%
+	Gui ListView, %list2%
 
 	if selected
 		LV_Modify(selected, "+Select")
@@ -867,6 +898,13 @@ chooseSelectedPreset() {
 		step := SetupWizard.Instance.StepWizards["Modules"]
 
 		choosePreset(step.AvailablePresetsListView, step.SelectedPresetsListView)
+	}
+	else if (A_GuiEvent = "DoubleClick") {
+		step := SetupWizard.Instance.StepWizards["Modules"]
+
+		choosePreset(step.AvailablePresetsListView, step.SelectedPresetsListView)
+
+		step.editPreset()
 	}
 }
 

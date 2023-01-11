@@ -2091,7 +2091,7 @@ class RaceCenter extends ConfigurationItem {
 
 			selected := LV_GetNext(0)
 
-			if (selected != this.SelectedPlanStint) {
+			if (selected && (selected != this.SelectedPlanStint)) {
 				this.iSelectedPlanStint := false
 
 				selected := false
@@ -2371,7 +2371,7 @@ class RaceCenter extends ConfigurationItem {
 
 			selected := LV_GetNext(0)
 
-			if (selected != this.SelectedSetup) {
+			if (selected && (selected != this.SelectedSetup)) {
 				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
@@ -2783,7 +2783,7 @@ class RaceCenter extends ConfigurationItem {
 
 			selected := LV_GetNext(0)
 
-			if (selected != this.SelectedPlanStint) {
+			if (selected && (selected != this.SelectedPlanStint)) {
 				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
@@ -2816,15 +2816,15 @@ class RaceCenter extends ConfigurationItem {
 			initial := ((stintNr = 1) ? "-" : "")
 
 			if position {
+				this.iSelectedPlanStint := position
+
 				LV_Insert(position, "", stintNr, "", "", "", initial, initial, initial, initial)
 				LV_Modify(position, "Select Vis")
-
-				this.iSelectedPlanStint := position
 			}
 			else {
-				LV_Modify(LV_Add("", stintNr, "", "", "", initial, initial, initial, initial), "Select Vis")
+				this.iSelectedPlanStint := (LV_GetCount() + 1)
 
-				this.iSelectedPlanStint := LV_GetCount()
+				LV_Modify(LV_Add("", stintNr, "", "", "", initial, initial, initial, initial), "Select Vis")
 			}
 
 			GuiControl Choose, planDriverDropDownMenu, 1
@@ -2863,7 +2863,7 @@ class RaceCenter extends ConfigurationItem {
 
 			selected := LV_GetNext(0)
 
-			if (selected != this.SelectedPlanStint) {
+			if (selected && (selected != this.SelectedPlanStint)) {
 				loop % LV_GetCount()
 					LV_Modify(A_Index, "-Select")
 
@@ -10797,14 +10797,14 @@ copySetup() {
 
 		row := LV_GetNext(0)
 
-		if (row != rCenter.SelectedSetup) {
+		if (row && (row != rCenter.SelectedSetup)) {
 			LV_Modify(row, "-Select")
 
 			row := false
 			rCenter.iSelectedSetup := false
 		}
 
-		if LV_GetNext(0)
+		if row
 			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "copySetup"))
 	}
 	finally {
@@ -10826,14 +10826,14 @@ deleteSetup() {
 
 		row := LV_GetNext(0)
 
-		if (row != rCenter.SelectedSetup) {
+		if (row && (row != rCenter.SelectedSetup)) {
 			LV_Modify(row, "-Select")
 
 			row := false
 			rCenter.iSelectedSetup := false
 		}
 
-		if LV_GetNext(0) {
+		if row {
 			title := translate("Delete")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
@@ -10940,14 +10940,14 @@ updateSetupAsync() {
 
 		row := LV_GetNext(0)
 
-		if (row != rCenter.SelectedSetup) {
+		if (row && (row != rCenter.SelectedSetup)) {
 			LV_Modify(row, "-Select")
 
 			row := false
 			rCenter.iSelectedSetup := false
 		}
 
-		if (row > 0) {
+		if row {
 			GuiControlGet setupDriverDropDownMenu
 
 			validateNumber("setupBasePressureFLEdit")
@@ -10997,6 +10997,8 @@ choosePlan() {
 
 		try {
 			Gui ListView, % rCenter.PlanListView
+
+			LV_Modify(A_EventInfo, "Select")
 
 			rCenter.iSelectedPlanStint := A_EventInfo
 
@@ -11065,7 +11067,7 @@ updatePlanAsync() {
 
 		row := LV_GetNext(0)
 
-		if (row != rCenter.SelectedPlanStint) {
+		if (row && (row != rCenter.SelectedPlanStint)) {
 			LV_Modify(row, "-Select")
 
 			row := false
@@ -11122,7 +11124,7 @@ addPlan() {
 
 		row := LV_GetNext(0)
 
-		if (row != rCenter.SelectedPlanStint) {
+		if (row && (row != rCenter.SelectedPlanStint)) {
 			LV_Modify(row, "-Select")
 
 			row := false
@@ -11167,14 +11169,14 @@ deletePlan() {
 
 		row := LV_GetNext(0)
 
-		if (row != rCenter.SelectedPlanStint) {
+		if (row && (row != rCenter.SelectedPlanStint)) {
 			LV_Modify(row, "-Select")
 
 			row := false
 			rCenter.iSelectedPlanStint := false
 		}
 
-		if LV_GetNext(0) {
+		if row {
 			title := translate("Delete")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))

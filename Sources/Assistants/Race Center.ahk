@@ -5731,7 +5731,7 @@ class RaceCenter extends ConfigurationItem {
 		local newData := false
 		local compound, currentListView, session, nextStop, lap, fuel, compound, compoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
-		local pressures, displayPressures
+		local pressures, displayPressures, displayFuel
 
 		Gui %window%:Default
 
@@ -5796,7 +5796,12 @@ class RaceCenter extends ConfigurationItem {
 
 						Gui ListView, % this.PitstopsListView
 
-						LV_Add("", nextStop, lap + 1, fuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
+						if fuel is Number
+							displayFuel := displayValue("Float", convertUnit("Volume", fuel), 1)
+						else
+							displayFuel := fuel
+
+						LV_Add("", nextStop, lap + 1, displayFuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
 								 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 						if (nextStop = 1) {
@@ -7161,7 +7166,7 @@ class RaceCenter extends ConfigurationItem {
 	loadPitstops() {
 		local window := this.Window
 		local currentListView, ignore, pitstop, repairBodywork, repairSuspension, repairEngine, pressures, pressure
-		local compound, compoundColor
+		local compound, compoundColor, fuel
 
 		Gui %window%:Default
 
@@ -7192,9 +7197,14 @@ class RaceCenter extends ConfigurationItem {
 						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
 				}
 
+				fuel := pitstop.Fuel
+
+				if fuel is Number
+					fuel := displayValue("Float", convertUnit("Volume", fuel), 1)
+
 				Gui ListView, % this.PitstopsListView
 
-				LV_Add("", A_Index, (pitstop.Lap = "-") ? "-" : (pitstop.Lap + 1), pitstop.Fuel
+				LV_Add("", A_Index, (pitstop.Lap = "-") ? "-" : (pitstop.Lap + 1), fuel
 						 , (compound = "-") ? compound : translate(compound(compound, compoundColor))
 						 , pitstop["Tyre.Set"], values2String(", ", pressures*)
 						 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))

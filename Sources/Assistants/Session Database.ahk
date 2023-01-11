@@ -3397,7 +3397,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						for index, postfix in ["1", "2", "3", "4", "5"] {
 							pressure := Format("{:.1f}", pressure)
 
-							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", pressure, 1)
+							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", convertUnit("Pressure", pressure), 1)
 
 							if (index = (3 + airDelta)) {
 								GuiControl +Background, %tyre%Pressure%postfix%

@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Reports Tool               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,6 +56,7 @@ global reportSettingsButton
 global chartViewer
 global infoViewer
 
+global reloadRaceReportsButtonHandle
 global deleteRaceReportButtonHandle
 
 class RaceReports extends ConfigurationItem {
@@ -215,7 +216,10 @@ class RaceReports extends ConfigurationItem {
 
 		this.iRacesListView := raceListView
 
-		Gui %window%:Add, Button, x62 yp+229 w23 h23 HwnddeleteRaceReportButtonHandle gdeleteRaceReport
+		Gui %window%:Add, Button, x62 yp+205 w23 h23 HwndreloadRaceReportsButtonHandle greloadRaceReports
+		setButtonIcon(reloadRaceReportsButtonHandle, kIconsDirectory . "Renew.ico", 1)
+
+		Gui %window%:Add, Button, x62 yp+24 w23 h23 HwnddeleteRaceReportButtonHandle gdeleteRaceReport
 		setButtonIcon(deleteRaceReportButtonHandle, kIconsDirectory . "Minus.ico", 1)
 
 		Gui %window%:Add, Text, x16 yp+30 w70 h23 +0x200, % translate("Info")
@@ -549,6 +553,11 @@ class RaceReports extends ConfigurationItem {
 			GuiControl Choose, reportsDropDown, 0
 			GuiControl Disable, %deleteRaceReportButtonHandle%
 
+			if track
+				GuiControl Enable, %reloadRaceReportsButtonHandle%
+			else
+				GuiControl Disable, %reloadRaceReportsButtonHandle%
+
 			this.ReportViewer.showReportChart(false)
 			this.ReportViewer.showReportInfo(false)
 
@@ -824,6 +833,10 @@ reportSettings() {
 	GuiControlGet reportsDropDown
 
 	RaceReports.Instance.reportSettings(kRaceReports[reportsDropDown])
+}
+
+reloadRaceReports() {
+	RaceReports.Instance.loadTrack(RaceReports.Instance.SelectedTrack, true)
 }
 
 deleteRaceReport() {

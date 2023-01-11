@@ -45,7 +45,11 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.5.4.0-dev]() (Early build for 4.5.5. Changes: Reload button in "Race Reports", Race Strategist can now explain pitstop recommendation, New car models for "Setup Advisor".)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-454) of this version and all the versions you might have skipped, before installing and using this version.
+
+
 
 ### Documentation
 
@@ -232,4 +236,4 @@ After firing out one release per week during the last few weeks, the project wil
 
 This software is provided as is. You are free to use it for any purpose and modify it to your needs, as long as you do not use it for any commercial purposes.
 
-(2022) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)
+(2023) Creative Commons - BY-NC-SA - by Oliver Juwig (TheBigO)

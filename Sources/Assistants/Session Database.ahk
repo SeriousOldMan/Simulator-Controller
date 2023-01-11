@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Session Database Tool           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -4341,7 +4341,7 @@ editSettings(editorOrCommand, arguments*) {
 	else if (editorOrCommand = "Rebuild") {
 		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
 
-		setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {}))
+		setConfigurationValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
 
 		writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 	}
@@ -4573,10 +4573,10 @@ editSettings(editorOrCommand, arguments*) {
 			else {
 				serverIdentifierEdit := "Standard"
 
-				serverURLEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
+				serverURLEdit := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
 				serverURLEdit := (serverURLEdit.HasKey("Standard") ? serverURLEdit["Standard"] : "")
 
-				serverTokenEdit := string2Map("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
+				serverTokenEdit := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
 				serverTokenEdit := (serverTokenEdit.HasKey("Standard") ? serverTokenEdit["Standard"] : "")
 
 				serverUpdateEdit := replication
@@ -4813,7 +4813,7 @@ editSettings(editorOrCommand, arguments*) {
 				setConfigurationValue(configuration, "Team Server", "Replication", serverUpdateEdit)
 
 				if changed {
-					setConfigurationValue(configuration, "Team Server", "Synchronization", map2String("|", "->", {}))
+					setConfigurationValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
 
 					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
@@ -4829,9 +4829,9 @@ editSettings(editorOrCommand, arguments*) {
 						groups[connection[1]] := values2String(",", connection[4]*)
 					}
 
-					setConfigurationValue(configuration, "Team Server", "Groups", map2String("|", "->", groups))
-					setConfigurationValue(configuration, "Team Server", "Server.URL", map2String("|", "->", serverURLs))
-					setConfigurationValue(configuration, "Team Server", "Server.Token", map2String("|", "->", serverTokens))
+					setConfigurationValue(configuration, "Team Server", "Groups", mapToString("|", "->", groups))
+					setConfigurationValue(configuration, "Team Server", "Server.URL", mapToString("|", "->", serverURLs))
+					setConfigurationValue(configuration, "Team Server", "Server.Token", mapToString("|", "->", serverTokens))
 
 					writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
 

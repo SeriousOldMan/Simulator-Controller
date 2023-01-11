@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - String Functions                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,4 +53,27 @@ values2String(delimiter, values*) {
 	}
 
 	return result
+}
+
+string2Map(elementSeparator, valueSeparator, map) {
+	local result := {}
+	local ignore, keyValue
+
+	for ignore, keyValue in string2Values(elementSeparator, map) {
+		keyValue := string2Values(valueSeparator, keyValue)
+
+		result[keyValue[1]] := keyValue[2]
+	}
+
+	return result
+}
+
+map2String(elementSeparator, valueSeparator, map) {
+	local result := []
+	local key, value
+
+	for key, value in map
+		result.Push(key . valueSeparator . value)
+
+	return values2String(elementSeparator, result*)
 }

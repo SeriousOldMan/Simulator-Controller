@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Race Center Tool                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,7 +56,7 @@ global kConnect := "Connect"
 global kEvent := "Event"
 
 global kSessionReports := concatenate(["Track"], kRaceReports, ["Pressures", "Brakes", "Temperatures", "Free"])
-global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy"]
+global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy", "Pitstop", "Pitstops", "Setups"]
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
@@ -1280,7 +1280,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, DropDownList, x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown gsessionMenu
 
-		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Load from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
+		Gui %window%:Add, DropDownList, x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown gplanMenu, % values2String("|", map(["Plan", "---------------------------------------------", "Update from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], "translate")*)
 
 		Gui %window%:Add, DropDownList, x565 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown gstrategyMenu
 
@@ -2509,7 +2509,7 @@ class RaceCenter extends ConfigurationItem {
 		return drivers
 	}
 
-	loadPlanFromStrategy() {
+	updatePlanFromStrategy() {
 		local window, currentListView, pitstops, pitstop, numStints, title, time, currentTime, last, lastTime
 		local driver, forName, surName, nickName, found, ignore, candidate
 		local sForName, sSurName, sNickName
@@ -2529,9 +2529,13 @@ class RaceCenter extends ConfigurationItem {
 
 				this.iSelectedPlanStint := false
 
-				pitstops := this.Strategy.Pitstops
+				pitstops := {}
+				numStints := 1
 
-				numStints := (pitstops.Length() + 1)
+				for ignore, pitstop in this.Strategy.Pitstops {
+					pitstops[pitstop.Nr] := pitstop
+					numStints := Max(numStints, pitstop.Nr + 1)
+				}
 
 				if (numStints < LV_GetCount()) {
 					title := translate("Plan")
@@ -2600,7 +2604,12 @@ class RaceCenter extends ConfigurationItem {
 
 				loop % LV_GetCount()
 				{
-					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index -1].DriverName)
+					if ((A_Index > 1) && !pitstops.HasKey(A_Index - 1))
+						continue
+					else if ((A_Index = 1) && (pitstops.Count() > 0) && !pitstops.HasKey(1))
+						continue
+
+					driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index - 1].DriverName)
 
 					forName := false
 					surName := false
@@ -2630,7 +2639,7 @@ class RaceCenter extends ConfigurationItem {
 
 					LV_Modify(A_Index, "Col2", driver)
 
-					if (A_Index > 1) {
+					if ((A_Index > 1) && pitstops.HasKey(A_Index - 1)) {
 						pitstop := pitstops[A_Index - 1]
 
 						time := pitstop.Time
@@ -3587,7 +3596,7 @@ class RaceCenter extends ConfigurationItem {
 			case 14: ; Update Statistics
 				this.updateStatistics()
 			case 16: ; Race Summary
-				this.showRaceSummary()
+				this.showSessionSummary()
 			case 17: ; Driver Statistics
 				this.showDriverStatistics()
 		}
@@ -3795,7 +3804,7 @@ class RaceCenter extends ConfigurationItem {
 
 		switch line {
 			case 3:
-				this.pushTask(ObjBindMethod(this, "loadPlanFromStrategyAsync"))
+				this.pushTask(ObjBindMethod(this, "updatePlanFromStrategyAsync"))
 			case 4:
 				this.pushTask(ObjBindMethod(this, "clearPlanAsync"))
 			case 6:
@@ -3876,8 +3885,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	loadPlanFromStrategyAsync() {
-		this.loadPlanFromStrategy()
+	updatePlanFromStrategyAsync() {
+		this.updatePlanFromStrategy()
 	}
 
 	clearPlanAsync() {
@@ -5115,13 +5124,6 @@ class RaceCenter extends ConfigurationItem {
 							LV_ModifyCol(A_Index, "AutoHdr")
 					}
 
-					Gui ListView, % this.LapsListView
-
-					selected := LV_GetNext()
-
-					if selected
-						selected := (selected == LV_GetCount())
-
 					for ignore, stint in updatedStints {
 						for ignore, lap in this.loadNewLaps(stint) {
 							Gui ListView, % this.LapsListView
@@ -5171,15 +5173,6 @@ class RaceCenter extends ConfigurationItem {
 						else {
 							this.iWeather10Min := lastLap.Weather
 							this.iWeather30Min := lastLap.Weather
-						}
-
-						if selected {
-							Gui ListView, % this.LapsListView
-
-							LV_Modify(LV_GetCount(), "Select Vis")
-
-							if (this.SelectedDetailReport = "Lap")
-								this.showLapDetails(lap)
 						}
 					}
 
@@ -5825,13 +5818,33 @@ class RaceCenter extends ConfigurationItem {
 						newData := true
 
 						nextStop += 1
-
-						if (this.SelectedDetailReport = "Pitstops")
-							this.showPitstopsDetails()
 					}
-					else
+					else if (nextStop >= getConfigurationValue(state, "Session State", "Pitstop.Last", 0))
 						break
+					else {
+						Gui ListView, % this.PitstopsListView
+
+						LV_Add("", nextStop, "-", "-", "-", "-", "-, -, -, -", this.computeRepairs(false, false, false))
+
+						sessionStore.add("Pitstop.Data", {Lap: "-", Fuel: "-", "Tyre.Compound": "-", "Tyre.Compound.Color": false, "Tyre.Set": "-"
+														, "Tyre.Pressure.Cold.Front.Left": "-", "Tyre.Pressure.Cold.Front.Right": "-"
+														, "Tyre.Pressure.Cold.Rear.Left": "-", "Tyre.Pressure.Cold.Rear.Right": "-"
+														, "Repair.Bodywork": false, "Repair.Suspension": false, "Repair.Engine": false
+														, Driver: kNull})
+
+						newData := true
+
+						nextStop += 1
+					}
 				}
+
+				LV_ModifyCol()
+
+				loop % LV_GetCount("Col")
+					LV_ModifyCol(A_Index, "AutoHdr")
+
+				if (newData && (this.SelectedDetailReport = "Pitstops"))
+					this.showPitstopsDetails()
 			}
 		}
 		finally {
@@ -5847,8 +5860,9 @@ class RaceCenter extends ConfigurationItem {
 		local lastPitstop := sessionStore.Tables["Pitstop.Data"].Length()
 		local startLap := 1
 		local newData := false
+		local modifiedPitstops := []
 		local compound, hasServiceData, hasTyreData, nextLap, startLapCandidate, state, pitstop
-		local driver, laps, compound, compoundColor, tyreSet, ignore, tyre, nextPitstop, nextLap
+		local driver, laps, compound, compoundColor, tyreSet, ignore, tyre, nextPitstop, nextLap, pitstopLap
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -5870,37 +5884,41 @@ class RaceCenter extends ConfigurationItem {
 				hasTyreData := (sessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: nextPitstop}}).Length() > 0)
 
 				if (!hasServiceData || !hasTyreData) {
-					nextLap := (full ? startLap : Max(startLap, sessionStore.Tables["Pitstop.Data"][nextPitstop].Lap - 1))
+					pitstopLap := sessionStore.Tables["Pitstop.Data"][nextPitstop].Lap
 
-					loop {
-						startLap := nextLap
-						nextLap += 1
+					if (pitstopLap != "-") {
+						nextLap := (full ? startLap : Max(startLap, pitstopLap - 1))
 
-						if (nextLap > lastLap)
-							break
+						loop {
+							startLap := nextLap
+							nextLap += 1
 
-						if (!full && hasServiceData && hasTyreData)
-							break
+							if (nextLap > lastLap)
+								break
 
-						state := false
+							if (!full && hasServiceData && hasTyreData)
+								break
 
-						try {
-							state := this.Connector.GetLapValue(this.Laps[nextLap].Identifier, "Race Engineer Pitstop State")
-						}
-						catch exception {
-							logError(exception)
-						}
+							state := false
 
-						if (state && (state != "")) {
-							state := parseConfiguration(state)
+							try {
+								state := this.Connector.GetLapValue(this.Laps[nextLap].Identifier, "Race Engineer Pitstop State")
+							}
+							catch exception {
+								logError(exception)
+							}
 
-							pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
+							if (state && (state != "")) {
+								state := parseConfiguration(state)
 
-							if (pitstop <= nextPitstop) {
+								pitstop := getConfigurationValue(state, "Pitstop Data", "Pitstop", kUndefined)
+
 								if ((full || !hasServiceData)
 								 && (getConfigurationValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
 									hasServiceData := true
 									newData := true
+
+									modifiedPitstops.Push(pitstop)
 
 									sessionStore.add("Pitstop.Service.Data"
 												   , {Pitstop: pitstop
@@ -5922,6 +5940,8 @@ class RaceCenter extends ConfigurationItem {
 								 && (getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
 									hasTyreData := true
 									newData := true
+
+									modifiedPitstops.Push(pitstop)
 
 									driver := getConfigurationValue(state, "Pitstop Data", "Tyre.Driver")
 									laps := getConfigurationValue(state, "Pitstop Data", "Tyre.Laps", false)
@@ -5948,9 +5968,15 @@ class RaceCenter extends ConfigurationItem {
 						}
 					}
 
-					if (this.SelectedDetailReport = "Pitstops")
-						if (hasServiceData && hasTyreData)
+					if (hasServiceData && hasTyreData)
+						if (this.SelectedDetailReport = "Pitstops")
 							this.showPitstopsDetails()
+						else if (this.SelectedDetailReport = "Pitstop") {
+							Gui ListView, % rCenter.PitstopsListView
+
+							if inList(modifiedPitstops, LV_GetNext())
+								this.showPitstopDetails(pitstopNr)
+						}
 				}
 			}
 		}
@@ -6161,6 +6187,7 @@ class RaceCenter extends ConfigurationItem {
 	syncSession() {
 		local initial := !this.LastLap
 		local strategy, session, window, lastLap, simulator, car, track, newLaps, newData, finished, message, forcePitstopUpdate
+		local selectedLap, selectedStint, currentStint
 
 		static hadLastLap := false
 		static nextPitstopUpdate := false
@@ -6200,6 +6227,8 @@ class RaceCenter extends ConfigurationItem {
 				else if lastLap
 					hadLastLap := true
 
+				currentStint := this.CurrentStint
+
 				simulator := this.Connector.GetSessionValue(session, "Simulator")
 				car := this.Connector.GetSessionValue(session, "Car")
 				track := this.Connector.GetSessionValue(session, "Track")
@@ -6219,6 +6248,20 @@ class RaceCenter extends ConfigurationItem {
 
 				newLaps := false
 				newData := false
+
+				Gui ListView, % this.LapsListView
+
+				selectedLap := LV_GetNext()
+
+				if selectedLap
+					selectedLap := (selectedLap == LV_GetCount())
+
+				Gui ListView, % this.StintsListView
+
+				selectedStint := LV_GetNext()
+
+				if selectedStint
+					selectedStint := (selectedStint == LV_GetCount())
 
 				if lastLap
 					newLaps := this.syncLaps(lastLap)
@@ -6254,8 +6297,34 @@ class RaceCenter extends ConfigurationItem {
 				if (newData || newLaps)
 					this.updateReports()
 
-				if newLaps
+				if newLaps {
 					this.saveSession()
+
+					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+						Gui ListView, % this.LapsListView
+
+						LV_Modify(LV_GetCount(), "Select Vis")
+
+						this.showLapDetails(this.LastLap)
+					}
+
+					if (selectedStint && (this.SelectedDetailReport = "Stint")) {
+						Gui ListView, % this.StintsListView
+
+						LV_Modify(LV_GetCount(), "Select Vis")
+
+						this.showLapDetails(this.LastLap)
+					}
+
+					if (this.SelectedDetailReport = "Plan") {
+						if (currentStint != this.CurrentStint)
+							this.showPlanDetails()
+					}
+					else if (this.SelectedDetailReport = "Session")
+						this.showSessionSummary()
+					else if (this.SelectedDetailReport = "Drivers")
+						this.showDriverStatistics()
+				}
 				else if (!newLaps && !this.SessionFinished) {
 					finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished
 
@@ -7125,7 +7194,7 @@ class RaceCenter extends ConfigurationItem {
 
 				Gui ListView, % this.PitstopsListView
 
-				LV_Add("", A_Index, pitstop.Lap + 1, pitstop.Fuel
+				LV_Add("", A_Index, (pitstop.Lap = "-") ? "-" : (pitstop.Lap + 1), pitstop.Fuel
 						 , (compound = "-") ? compound : translate(compound(compound, compoundColor))
 						 , pitstop["Tyre.Set"], values2String(", ", pressures*)
 						 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
@@ -9113,9 +9182,9 @@ class RaceCenter extends ConfigurationItem {
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
 		local compound, tyreSet
 
-		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . (pitstopData.Lap + 1) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . ((pitstopData.Lap = "-") ? "-" : (pitstopData.Lap + 1)) . "</td></tr>")
 
-		if (pitstopData.Fuel > 0)
+		if ((pitstopData.Fuel != "-") && (pitstopData.Fuel > 0))
 			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . pitstopData.Fuel . "</td></tr>")
 
 		compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
@@ -9336,22 +9405,32 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	showPitstopDetailsAsync(pitstopNr) {
-		local html := ("<div id=""header""><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
+		local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
+		local html
 
-		html .= ("<br><br><div id=""header""><i>" . translate("Service") . "</i></div>")
+		if (pitstopData.Lap != "-") {
+			html := ("<div id=""header""><b>" . translate("Pitstop: ") . pitstopNr . "</b></div>")
+			html .= ("<br><br><div id=""header""><i>" . translate("Service") . "</i></div>")
 
-		if (this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}}).Length() = 0)
-			html .= ("<br>" . this.createPitstopPlanDetails(pitstopNr))
-		else
-			html .= ("<br>" . this.createPitstopServiceDetails(pitstopNr))
+			if (this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}}).Length() = 0)
+				html .= ("<br>" . this.createPitstopPlanDetails(pitstopNr))
+			else
+				html .= ("<br>" . this.createPitstopServiceDetails(pitstopNr))
 
-		if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length() > 0) {
-			html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear") . "</i></div>")
+			if (this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}}).Length() > 0) {
+				html .= ("<br><br><div id=""header""><i>" . translate("Tyre Wear") . "</i></div>")
 
-			html .= ("<br>" . this.createTyreWearDetails(pitstopNr))
+				html .= ("<br>" . this.createTyreWearDetails(pitstopNr))
+			}
+
+			this.showDetails("Pitstop", html)
 		}
+		else {
+			Gui ListView, % this.PitstopsListView
 
-		this.showDetails("Pitstop", html)
+			loop % LV_GetCount()
+				LV_Modify(A_Index, "-Select")
+		}
 	}
 
 	createPitstopsServiceDetails() {
@@ -9710,10 +9789,10 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br><br><div id=""chart_2" . """ style=""width: " . width . "px; height: 248px""></div>")
 
-		this.showDetails("Driver", html, [1, chart1], [2, chart2])
+		this.showDetails("Drivers", html, [1, chart1], [2, chart2])
 	}
 
-	createRaceSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
+	createSessionSummaryChart(chartID, width, height, lapSeries, positionSeries, fuelSeries, tyreSeries) {
 		local drawChartFunction := ("function drawChart" . chartID . "() {")
 		local ignore, time
 
@@ -9742,7 +9821,8 @@ class RaceCenter extends ConfigurationItem {
 		return drawChartFunction
 	}
 
-	showRaceSummary() {
+	showSessionSummary() {
+		local telemetryDB := this.TelemetryDatabase
 		local html := ("<div id=""header""><b>" . translate("Race Summary") . "</b></div>")
 		local stints := []
 		local drivers := []
@@ -9760,6 +9840,35 @@ class RaceCenter extends ConfigurationItem {
 		local lastLap := this.LastLap
 		local lapDataTable := this.SessionStore.Tables["Lap.Data"]
 		local stint, duration, ignore, lap, width, chart1
+		local simulator, carName, trackName, sessionDate, sessionTime
+
+		simulator := this.Simulator
+		carName := this.Car
+		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
+		trackName := this.Track
+		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+
+		sessionDate := this.Date
+
+		if sessionDate
+			FormatTime sessionDate, %sessionDate%, ShortDate
+		else
+			sessionDate := "-"
+
+		sessionTime := this.Time
+
+		if sessionTime
+			FormatTime sessionTime, %sessionTime%, Time
+		else
+			sessionTime := "-"
+
+		html .= "<br><br><table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (simulator ? simulator : "-") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . carName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . trackName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Date:") . "</b></td><td>" . sessionDate . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Time:") . "</b></td><td>" . sessionTime . "</td></tr>")
+		html .= "</table>"
 
 		html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
 
@@ -9830,7 +9939,7 @@ class RaceCenter extends ConfigurationItem {
 
 		width := (detailsViewer.Width - 20)
 
-		chart1 := this.createRaceSummaryChart(1, width, 248, laps, positions, remainingFuels, tyreLaps)
+		chart1 := this.createSessionSummaryChart(1, width, 248, laps, positions, remainingFuels, tyreLaps)
 
 		html .= ("<br><br><div id=""chart_1" . """ style=""width: " . width . "px; height: 248px""></div>")
 
@@ -9839,8 +9948,38 @@ class RaceCenter extends ConfigurationItem {
 
 	showPlanDetails() {
 		local html := ("<div id=""header""><b>" . translate("Plan Summary") . "</b></div>")
+		local telemetryDB := this.TelemetryDatabase
 		local window := this.Window
 		local currentListView, stint, driver, timePlanned, timeActual, lapPlanned, lapActual, refuelAmount, tyreChange
+		local simulator, carName, trackName, sessionDate, sessionTime
+
+		simulator := this.Simulator
+		carName := this.Car
+		carName := (carName ? telemetryDB.getCarName(simulator, carName) : "-")
+		trackName := this.Track
+		trackName := (trackName ? telemetryDB.getTrackName(simulator, trackName) : "-")
+
+		sessionDate := this.Date
+
+		if sessionDate
+			FormatTime sessionDate, %sessionDate%, ShortDate
+		else
+			sessionDate := "-"
+
+		sessionTime := this.Time
+
+		if sessionTime
+			FormatTime sessionTime, %sessionTime%, Time
+		else
+			sessionTime := "-"
+
+		html .= "<br><br><table>"
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . (simulator ? simulator : "-") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . carName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . trackName . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Date:") . "</b></td><td>" . sessionDate . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Time:") . "</b></td><td>" . sessionTime . "</td></tr>")
+		html .= "</table><br>"
 
 		Gui %window%:Default
 

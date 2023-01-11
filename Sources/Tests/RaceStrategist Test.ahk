@@ -3,7 +3,7 @@
 ;;;                                         (Race Strategist Rules)         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -279,7 +279,7 @@ class PitstopRecommendation extends Assert {
 				strategist.addLap(A_Index, data)
 
 			if (A_Index = 2) {
-				strategist.KnowledgeBase.setFact("Strategy.Pitstop.Lap", 5)
+				strategist.KnowledgeBase.setFact("Strategy.Pitstop.Lap", 8)
 				strategist.KnowledgeBase.setFact("Pitstop.Strategy.Plan", true)
 
 				strategist.KnowledgeBase.produce()

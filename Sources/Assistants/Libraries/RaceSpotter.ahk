@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - AI Race Spotter                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2807,7 +2807,7 @@ class RaceSpotter extends RaceAssistant {
 
 			loop %count%
 			{
-				class := this.getClass(A_Index, data) ; getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", "Unknown")
+				class := this.getClass(A_Index, data)
 
 				if !classes.HasKey(class)
 					classes[class] := [Array(A_Index, this.getPosition(A_Index, "Overall", data))]
@@ -2856,7 +2856,7 @@ class RaceSpotter extends RaceAssistant {
 
 					prefix := ("Car." . carIndex)
 
-					carOverallPosition := this.getPosition(carIndex, "Overall", data) ; getConfigurationValue(data, "Position Data", prefix . ".Position")
+					carOverallPosition := this.getPosition(carIndex, "Overall", data)
 					carClassPosition := carClassPositions[carIndex]
 					carDelta := (((carLaps + carRunning) - (driverLaps + driverRunning)) * lapTime)
 
@@ -2871,7 +2871,7 @@ class RaceSpotter extends RaceAssistant {
 
 					positions[carIndex] := Array(getConfigurationValue(data, "Position Data", prefix . ".Nr")
 											   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
-											   , this.getClass(carIndex, data) ; getConfigurationValue(data, "Position Data", prefix . ".Class", kUnknown)
+											   , this.getClass(carIndex, data)
 											   , computeDriverName(getConfigurationValue(data, "Position Data", prefix . ".Driver.Forname", "John")
 																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
 																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
@@ -2927,7 +2927,7 @@ class RaceSpotter extends RaceAssistant {
 						positions[trackBehind][10] := gapBehind
 				}
 
-				positions["Position.Overall"] := this.getPosition(driver, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+				positions["Position.Overall"] := this.getPosition(driver, "Overall", data)
 				positions["Position.Class"] := driverClassPosition
 				positions["Leader"] := leader
 				positions["StandingsAhead"] := standingsAhead

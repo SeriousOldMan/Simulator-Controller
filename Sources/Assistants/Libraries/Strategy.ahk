@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - Strategy Representation         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -3088,12 +3088,12 @@ class Strategy extends ConfigurationItem {
 				else {
 					pitstop.iStintLaps -= superfluousLaps
 
-					delta := Min((superfluousLaps * pitstop.FuelConsumption), pitstop.iRefuelAmount)
+					delta := Min((superfluousLaps * pitstop.FuelConsumption), pitstop.RefuelAmount)
 
 					pitstop.iRefuelAmount -= delta
 					pitstop.iRemainingFuel -= delta
 
-					pitstop.iDuration := pitstop.Strategy.calcPitstopDuration(this.RefuelAmount, this.TyreChange)
+					pitstop.iDuration := pitstop.Strategy.calcPitstopDuration(pitstop.RefuelAmount, pitstop.TyreChange)
 				}
 			}
 

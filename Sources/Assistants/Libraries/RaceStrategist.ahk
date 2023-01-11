@@ -2,7 +2,7 @@
 ;;;   Modular Simulator Controller System - AI Race Strategist              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -406,9 +406,9 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	RaceInfo[] {
+	RaceInfo[key := false] {
 		Get {
-			return this.iRaceInfo
+			return (key ? this.iRaceInfo[key] : this.iRaceInfo)
 		}
 	}
 
@@ -2229,16 +2229,22 @@ class RaceStrategist extends RaceAssistant {
 	recommendPitstop(lap := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local plannedLap, position, traffic
+		local strategyLap, lastLap, plannedLap, position, traffic, hasEngineer
 
 		if !this.hasEnoughData()
 			return
 
 		if !lap {
-			lap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
+			strategyLap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
+			lap := strategyLap
 
 			if (lap && (lap >= (knowledgeBase.getValue("Lap") - knowledgeBase.getValue("Session.Settings.Lap.PitstopWarning"))))
 				lap := false
+
+			lastLap := knowledgeBase.getValue("Lap")
+
+			if (strategyLap && ((Abs(strategyLap - lastLap) / lastLap) > 0.1))
+				strategyLap := false
 		}
 
 		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
@@ -2250,8 +2256,21 @@ class RaceStrategist extends RaceAssistant {
 
 		plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
-		if (plannedLap == kUndefined)
-			speaker.speakPhrase("NoPlannedPitstop")
+		Process Exist, Race Engineer.exe
+
+		hasEngineer := (ErrorLevel != 0)
+
+		if (plannedLap == kUndefined) {
+			if (hasEngineer && strategyLap) {
+				speaker.speakPhrase("PitstopLap", {lap: Max(strategyLap, lastLap + 1)})
+
+				speaker.speakPhrase("ConfirmInformEngineer", false, true)
+
+				this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap))
+			}
+			else
+				speaker.speakPhrase("NoPlannedPitstop")
+		}
 		else if !plannedLap
 			speaker.speakPhrase("NoPitstopNeeded")
 		else {
@@ -2262,9 +2281,7 @@ class RaceStrategist extends RaceAssistant {
 
 				speaker.speakPhrase("Explain", false, true)
 
-				Process Exist, Race Engineer.exe
-
-				if ErrorLevel
+				if hasEngineer
 					this.setContinuation(new this.ExplainPitstopContinuation(this, plannedLap
 																		   , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
 																		   , false, "Okay"))
@@ -2532,10 +2549,18 @@ class RaceStrategist extends RaceAssistant {
 		local raceInfo := {}
 		local grid := []
 		local classes := []
+		local slots := false
 		local carNr, carID, carClass, carPosition
 
 		raceInfo["Driver"] := getConfigurationValue(raceData, "Cars", "Driver")
 		raceInfo["Cars"] := getConfigurationValue(raceData, "Cars", "Count")
+
+		if getConfigurationValue(raceData, "Cars", "Slots", false)
+			raceInfo["Slots"] := string2Map("|", "->", getConfigurationValue(raceData, "Cars", "Slots"))
+		else if this.RaceInfo
+			raceInfo["Slots"] := this.RaceInfo["SLots"]
+		else
+			slots := {}
 
 		loop % raceInfo["Cars"]
 		{
@@ -2543,6 +2568,11 @@ class RaceStrategist extends RaceAssistant {
 			carID := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID", A_Index)
 			carClass := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", "Unknown")
 			carPosition := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Position")
+
+			if slots {
+				slots["#" . carNr] := A_Index
+				slots["!" . carID] := A_Index
+			}
 
 			grid.Push(carPosition)
 			classes.Push(carClass)
@@ -2554,12 +2584,15 @@ class RaceStrategist extends RaceAssistant {
 		raceInfo["Grid"] := grid
 		raceInfo["Classes"] := classes
 
+		if slots
+			raceInfo["Slots"] := slots
+
 		this.updateSessionValues({RaceInfo: raceInfo})
 	}
 
 	saveStandingsData(lapNumber, simulator, car, track) {
 		local knowledgeBase := this.KnowledgeBase
-		local driver, carCount, data, raceInfo, grid, carNr, carID, key, fileName
+		local driver, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
 		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
 		local driverForname, driverSurname, driverNickname
 
@@ -2587,6 +2620,10 @@ class RaceStrategist extends RaceAssistant {
 
 				raceInfo := this.RaceInfo
 				grid := (raceInfo ? raceInfo["Grid"] : false)
+				slots := (raceInfo ? raceInfo["Slots"] : false)
+
+				if slots
+					setConfigurationValue(data, "Cars", "Slots", map2String("|", "->", slots))
 
 				loop %carCount% {
 					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", 0)
@@ -2595,19 +2632,41 @@ class RaceStrategist extends RaceAssistant {
 					if InStr(carNr, """")
 						carNr := StrReplace(carNr, """", "")
 
-					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Nr", carNr)
-					setConfigurationValue(data, "Cars", "Car." . A_Index . ".ID", carID)
-					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Class"
-										, knowledgeBase.getValue("Car." . A_Index . ".Class", "Unknown"))
-					setConfigurationValue(data, "Cars", "Car." . A_Index . ".Car"
-										, knowledgeBase.getValue("Car." . A_Index . ".Car"))
+					if slots {
+						key := ("#" . carNr)
 
-					key := ("!" . carID)
+						carIndex := (slots.HasKey(key) ? slots[key] : false)
 
-					if ((grid != false) && raceInfo.HasKey(key))
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", grid[raceInfo[key]])
+						if !carIndex {
+							key := ("!" . carID)
+
+							carIndex := (slots.HasKey(key) ? slots[key] : false)
+						}
+					}
 					else
-						setConfigurationValue(data, "Cars", "Car." . A_Index . ".Position", this.getPosition(A_Index))
+						carIndex := A_Index
+
+					if carIndex {
+						setConfigurationValue(data, "Cars", "Car." . carIndex . ".Nr", carNr)
+						setConfigurationValue(data, "Cars", "Car." . carIndex . ".ID", carID)
+						setConfigurationValue(data, "Cars", "Car." . carIndex . ".Class"
+											, knowledgeBase.getValue("Car." . carIndex . ".Class", "Unknown"))
+						setConfigurationValue(data, "Cars", "Car." . carIndex . ".Car"
+											, knowledgeBase.getValue("Car." . carIndex . ".Car"))
+
+						key := ("#" . carNr)
+
+						if ((raceInfo != false) && raceInfo.HasKey(key))
+							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
+						else {
+							key := ("!" . carID)
+
+							if ((raceInfo != false) && raceInfo.HasKey(key))
+								setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
+							else
+								setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", this.getPosition(A_Index))
+						}
+					}
 				}
 
 				fileName := temporaryFileName("Race Strategist Race", "info")
@@ -2649,9 +2708,13 @@ class RaceStrategist extends RaceAssistant {
 			setConfigurationValue(data, "Lap", prefix . ".Pitstop", pitstop)
 
 			raceInfo := this.RaceInfo
+			slots := false
 
-			if raceInfo
-				carCount := raceInfo["Cars"]
+			if raceInfo {
+				slots := raceInfo["Slots"]
+
+				carCount := (slots ? Floor(slots.Count() / 2) : raceInfo["Cars"])
+			}
 			else
 				raceInfo := {}
 
@@ -2674,14 +2737,36 @@ class RaceStrategist extends RaceAssistant {
 				if (carID == kUndefined)
 					break
 
-				key := ("!" . carID)
+				carNr := knowledgeBase.getValue(carPrefix . ".Nr", kUndefined)
 
-				if raceInfo.HasKey(key)
+				key := ("#" . carNr)
+
+				if slots {
+					if slots.HasKey(key)
+						carIndex := slots[key]
+					else {
+						key := ("!" . carID)
+
+						if slots.HasKey(key)
+							carIndex := slots[key]
+						else if (A_Index <= carCount)
+							carIndex := A_Index
+						else
+							carIndex := false
+					}
+				}
+				else if raceInfo.HasKey(key)
 					carIndex := raceInfo[key]
-				else if (A_Index <= carCount)
-					carIndex := A_Index
-				else
-					carIndex := false
+				else {
+					key := ("!" . carID)
+
+					if raceInfo.HasKey(key)
+						carIndex := raceInfo[key]
+					else if (A_Index <= carCount)
+						carIndex := A_Index
+					else
+						carIndex := false
+				}
 
 				if carIndex {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")

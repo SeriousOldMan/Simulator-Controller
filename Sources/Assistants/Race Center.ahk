@@ -2643,7 +2643,7 @@ class RaceCenter extends ConfigurationItem {
 
 						LV_Modify(A_Index, "Col3", time)
 						LV_Modify(A_Index, "Col5", pitstop.Lap)
-						LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : pitstop.RefuelAmount)
+						LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : displayValue("Float", convertUnit("Volume", pitstop.RefuelAmount), 1))
 						LV_Modify(A_Index, "Col8", pitstop.TyreChange ? "x" : "")
 					}
 				}
@@ -2965,7 +2965,7 @@ class RaceCenter extends ConfigurationItem {
 						LV_GetText(tyreChange, A_Index, 8)
 
 						lap := plannedLap
-						refuel := refuelAmount
+						refuel := Round(convertUnit("Volume", internalValue("Float", refuelAmount), false))
 
 						if (tyreChange != "x") {
 							compound := false
@@ -6597,8 +6597,8 @@ class RaceCenter extends ConfigurationItem {
 
 				sessionStore.add("Setups.Data", {Driver: driver
 											   , Weather: kWeatherConditions[inList(map(kWeatherConditions, "translate"), conditions[1])]
-											   , "Temperature.Air": Round(convertUnit("Temperature", internalValue("Float", temperatures[1])))
-											   , "Temperature.Track": Round(convertUnit("Temperature", internalValue("Float", temperatures[2])))
+											   , "Temperature.Air": Round(convertUnit("Temperature", internalValue("Float", temperatures[1]), false))
+											   , "Temperature.Track": Round(convertUnit("Temperature", internalValue("Float", temperatures[2]), false))
 											   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 											   , "Tyre.Pressure.Front.Left": Round(convertUnit("Pressure", internalValue("Float", pressures[1]), false), 1)
 											   , "Tyre.Pressure.Front.Right": Round(convertUnit("Pressure", internalValue("Float", pressures[2]), false), 1)
@@ -6643,7 +6643,7 @@ class RaceCenter extends ConfigurationItem {
 				sessionStore.add("Plan.Data", {Stint: stint, Driver: driver
 											 , "Time.Planned": timePlanned, "Time.Actual": timeActual
 											 , "Lap.Planned": lapPlanned, "Lap.Actual": lapActual
-											 , "Fuel.Amount": refuelAmount, "Tyre.Change": tyreChange})
+											 , "Fuel.Amount": Round(convertUnit("Volume", internalValue("Float", refuelAmount), false)), "Tyre.Change": tyreChange})
 			}
 		}
 		finally {
@@ -7007,7 +7007,7 @@ class RaceCenter extends ConfigurationItem {
 
 				LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], plan["Time.Actual"]
 						 , plan["Lap.Planned"], plan["Lap.Actual"]
-						 , plan["Fuel.Amount"], plan["Tyre.Change"])
+						 , displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0), plan["Tyre.Change"])
 			}
 
 			LV_ModifyCol()
@@ -10462,7 +10462,9 @@ validateNumber(field) {
 
 	GuiControlGet %field%
 
-	if %field% is not Number
+	value := internalValue("Float", %field%)
+
+	if value is not Number
 	{
 		%field% := oldValue
 
@@ -10848,12 +10850,11 @@ deleteSetup() {
 }
 
 chooseSetup() {
-	local rCenter, window, currentListView
+	local rCenter := RaceCenter.Instance
+	local window, currentListView
 	local driver, conditions, compound, pressures, temperatures
 
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
-		rCenter := RaceCenter.Instance
-
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0) && (rCenter.iSelectedSetup != A_EventInfo)) {
 		window := rCenter.Window
 
 		Gui %window%:Default

@@ -104,7 +104,7 @@ displayTemperatureValue(celsius) {
 		case "Celsius":
 			return celsius
 		case "Fahrenheit":
-			return ((celsius * 1,8) + 32)
+			return ((celsius * 1.8) + 32)
 		default:
 			throw "Unknown temperature unit detected in displayTemperatureValue..."
 	}

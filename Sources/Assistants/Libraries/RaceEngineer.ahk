@@ -1539,9 +1539,8 @@ class RaceEngineer extends RaceAssistant {
 
 				options := true
 			}
-			else if IsObject(optionsOrLap)
-				if optionsOrLap.HasKey("Confirm")
-					confirm := optionsOrLap["Confirm"]
+			else if (IsObject(optionsOrLap) && optionsOrLap.HasKey("Confirm"))
+				confirm := optionsOrLap["Confirm"]
 
 		if !this.hasEnoughData()
 			return false

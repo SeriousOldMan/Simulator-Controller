@@ -229,7 +229,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 			GuiControl Text, rsLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, rsLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
 
-			rsDampingFactorEdit := configuration["HistoryLapsDamping"]
+			rsDampingFactorEdit := displayValue("Float", configuration["HistoryLapsDamping"])
 			GuiControl Text, rsDampingFactorEdit, %rsDampingFactorEdit%
 		}
 	}
@@ -252,7 +252,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 			configuration["LearningLaps"] := rsLearningLapsEdit
 			configuration["ConsideredHistoryLaps"] := rsLapsConsideredEdit
-			configuration["HistoryLapsDamping"] := rsDampingFactorEdit
+			configuration["HistoryLapsDamping"] := internalValue("Float", rsDampingFactorEdit)
 			configuration["SaveRaceReport"] := ["Ask", "Always", "Never"][rsSaveRaceReportDropDown]
 			configuration["SaveTelemetry"] := ["Ask", "Always", "Never"][rsSaveTelemetryDropDown]
 			configuration["RaceReview"] := ["No", "Yes"][rsRaceReviewDropDown]
@@ -304,10 +304,13 @@ replicateRSSettings() {
 
 validateRSDampingFactor() {
 	local oldValue := rsDampingFactorEdit
+	local value
 
 	GuiControlGet rsDampingFactorEdit
 
-	if rsDampingFactorEdit is not Number
+	value := internalValue("Float", rsDampingFactorEdit)
+
+	if value is not Number
 	{
 		rsDampingFactorEdit := oldValue
 

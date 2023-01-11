@@ -97,11 +97,11 @@ global tyreSetDeleteButton
 global pitstopDeltaEdit := 60
 global pitstopTyreServiceEdit := 30
 global pitstopFuelServiceRuleDropDown := "Dynamic"
-global pitstopFuelServiceEdit := 1.2
+global pitstopFuelServiceEdit := displayValue("Float", 1.2)
 global pitstopFuelServiceLabel
 global pitstopServiceDropDown
-global fuelCapacityEdit := 125
-global safetyFuelEdit := 5
+global fuelCapacityEdit := displayValue("Float", convertUnit("Volume", 125), 1)
+global safetyFuelEdit := displayValue("Float", convertUnit("Volume", 5), 0)
 
 global simDriverDropDown
 global addDriverButton
@@ -116,7 +116,7 @@ global deleteSimWeatherButton
 
 global simCompoundDropDown
 global simMaxTyreLapsEdit := 40
-global simInitialFuelAmountEdit := 90
+global simInitialFuelAmountEdit := displayValue("Float", convertUnit("Volume", 90), 0)
 global simMapEdit := 1
 global simAvgLapTimeEdit := 120
 global simFuelConsumptionEdit := 3.8
@@ -668,13 +668,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x1% yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui %window%:Add, Text, x%x% yp+27 w85 h20 +0x200, % translate("Fuel Capacity")
-		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 Number Limit3 VfuelCapacityEdit, %fuelCapacityEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % translate("Liter")
+		Gui %window%:Add, Edit, x%x1% yp-1 w50 h20 VfuelCapacityEdit gvalidateFuelCapacity, %fuelCapacityEdit%
+		Gui %window%:Add, Text, x%x3% yp+4 w220 h20, % getUnit("Volume", true)
 
 		Gui %window%:Add, Text, x%x% yp+19 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui %window%:Add, Edit, x%x1% yp+1 w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range0-99, %safetyFuelEdit%
-		Gui %window%:Add, Text, x%x3% yp+2 w130 h20, % translate("Liter")
+		Gui %window%:Add, Text, x%x3% yp+2 w130 h20, % getUnit("Volume", true)
 
 		Gui %window%:Tab, 3
 
@@ -769,7 +769,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Initial Fuel")
 		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit gvalidateSimInitialFuelAmount, %simInitialFuelAmountEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999, %simInitialFuelAmountEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % translate("Liter")
+		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % getUnit("Volume", true)
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
 		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number Limit2 VsimMapEdit, %simMapEdit%
@@ -781,7 +781,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
 		Gui %window%:Add, Edit, x%x1% yp-2 w45 h20 VsimFuelConsumptionEdit gvalidateSimFuelConsumption, %simFuelConsumptionEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % translate("Ltr.")
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Volume", true)
 
 		x := 222
 		x0 := x - 4
@@ -838,7 +838,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x% yp+23 w90 h20 +0x200, % translate("Consumed Fuel")
 		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimConsumedFuelResult, %simConsumedFuelResult%
-		Gui %window%:Add, Text, x%x3% yp+2 w50 h20, % translate("Liter")
+		Gui %window%:Add, Text, x%x3% yp+2 w50 h20, % getUnit("Volume", true)
 
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Pitlane")
 		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimPitlaneSecondsResult, %simPitlaneSecondsResult%
@@ -1258,9 +1258,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			}
 
 			if (this.SelectedChartType = "Bubble")
-				drawChartFunction .= ("['', " . value)
+				drawChartFunction .= ("['', " . convertValue(xAxis, value))
 			else
-				drawChartFunction .= ("[" . value)
+				drawChartFunction .= ("[" . convertValue(xAxis, value))
 
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
@@ -1268,7 +1268,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				if ((value = "n/a") || (isNull(value)))
 					value := kNull
 
-				drawChartFunction .= (", " . value)
+				drawChartFunction .= (", " . convertValue(yAxis, value))
 			}
 
 			drawChartFunction .= "]"
@@ -1790,10 +1790,10 @@ class StrategyWorkbench extends ConfigurationItem {
 								GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
 							}
 
-							GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+							GuiControl, , pitstopFuelServiceEdit, % displayValue("Float", pitstopFuelServiceEdit)
 							GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2
-							GuiControl, , safetyFuelEdit, % strategy.SafetyFuel
-							GuiControl, , fuelCapacityEdit, % strategy.FuelCapacity
+							GuiControl, , safetyFuelEdit, % displayValue("Float", convertUnit("Volume", strategy.SafetyFuel), 0)
+							GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", strategy.FuelCapacity), 1)
 
 							this.iSelectedValidator := strategy.Validator
 
@@ -1912,7 +1912,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							GuiControl, , simMaxTyreLapsEdit, % Round(strategy.MaxTyreLaps)
 
-							GuiControl, , simInitialFuelAmountEdit, % Round(strategy.StartFuel)
+							GuiControl, , simInitialFuelAmountEdit, % displayValue("Float", convertUnit("Volume", strategy.StartFuel), 0)
 							GuiControl, , simMapEdit, % strategy.Map
 
 							GuiControl, , simConsumptionVariation, % strategy.ConsumptionVariation
@@ -2000,9 +2000,9 @@ class StrategyWorkbench extends ConfigurationItem {
 									pitstopFuelServiceEdit := pitstopFuelServiceEdit[2]
 								}
 
-								GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+								GuiControl, , pitstopFuelServiceEdit, % displayValue("Float", pitstopFuelServiceEdit)
 								GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2
-								GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)
+								GuiControl, , safetyFuelEdit, % displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin", 3)), 0)
 
 								compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 								compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
@@ -2061,17 +2061,17 @@ class StrategyWorkbench extends ConfigurationItem {
 									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
 								}
 
-								GuiControl, , pitstopFuelServiceEdit, %pitstopFuelServiceEdit%
+								GuiControl, , pitstopFuelServiceEdit, % displayValue("Float", pitstopFuelServiceEdit)
 							}
 
 							if (getConfigurationValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
 								GuiControl Choose, pitstopServiceDropDown, % (getConfigurationValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2
 
 							if (getConfigurationValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
-								GuiControl, , safetyFuelEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")
+								GuiControl, , safetyFuelEdit, % displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")), 0)
 
 							if (getConfigurationValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
-								GuiControl, , fuelCapacityEdit, % getConfigurationValue(settings, "Session Settings", "Fuel.Amount")
+								GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.Amount"), 1))
 
 							if ((getConfigurationValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
 							 && (getConfigurationValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
@@ -2155,10 +2155,10 @@ class StrategyWorkbench extends ConfigurationItem {
 							initialFuelAmount := getConfigurationValue(data, "Car Data", "FuelRemaining", kUndefined)
 
 							if (fuelCapacity != kUndefined)
-								GuiControl, , fuelCapacityEdit, % Round(fuelCapacity)
+								GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", fuelCapacity), 1)
 
 							if (initialFuelAmount != kUndefined)
-								GuiControl, , simInitialFuelAmountEdit, % Round(initialFuelAmount)
+								GuiControl, , simInitialFuelAmountEdit, % displayValue("Float", convertUnit("Volume", initialFuelAmount), 0)
 
 							compound := getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined)
 							compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", kUndefined)
@@ -2711,10 +2711,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		stintLength := stintLengthEdit
 		formationLap := formationLapCheck
 		postRaceLap := postRaceLapCheck
-		fuelCapacity := fuelCapacityEdit
-		safetyFuel := safetyFuelEdit
+		fuelCapacity := Round(convertUnit("Volume", internalValue("Float", fuelCapacityEdit), false), 1)
+		safetyFuel := Round(convertUnit("Volume", internalValue("Float", safetyFuelEdit), false))
 		pitstopDelta := pitstopDeltaEdit
-		pitstopFuelService := [["Fixed", "Dynamic"][pitstopFuelServiceRuleDropDown], pitstopFuelServiceEdit]
+		pitstopFuelService := [["Fixed", "Dynamic"][pitstopFuelServiceRuleDropDown], internalValue("Float", pitstopFuelServiceEdit)]
 		pitstopTyreService := pitstopTyreServiceEdit
 		pitstopServiceOrder := ((pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
 	}
@@ -2785,9 +2785,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		initialStintTime := 0
 		initialSessionTime := 0
 		initialTyreLaps := 0
-		initialFuelAmount := simInitialFuelAmountEdit
+		initialFuelAmount := Round(convertUnit("Volume", internalValue("Float", simInitialFuelAmountEdit), false), 1)
 		initialMap := simMapEdit
-		initialFuelConsumption := simFuelConsumptionEdit
+		initialFuelConsumption := Round(convertUnit("Volume", internalValue("Float", simFuelConsumptionEdit), false), 2)
 		initialAvgLapTime := simAvgLapTimeEdit
 	}
 
@@ -2947,7 +2947,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			GuiControl Text, simNumPitstopResult, %numPitstops%
 			GuiControl Text, simNumTyreChangeResult, %numTyreChanges%
-			GuiControl Text, simConsumedFuelResult, % Ceil(consumedFuel)
+			GuiControl Text, simConsumedFuelResult, % displayValue("Float", convertUnit("Volume", consumedFuel), 1)
 			GuiControl Text, simPitlaneSecondsResult, % Ceil(strategy.getPitstopTime())
 
 			if (this.SelectedSessionType = "Duration")
@@ -3101,10 +3101,13 @@ validatePitstopRule(full := false) {
 
 validateNumber(field) {
 	local oldValue := %field%
+	local value
 
 	GuiControlGet %field%
 
-	if %field% is not Number
+	value := internalValue("Float", %field%)
+
+	if value is not Number
 	{
 		%field%:= oldValue
 
@@ -3117,9 +3120,9 @@ validatePositiveInteger(field, minValue) {
 
 	GuiControlGet %field%
 
-	if %field% is not Number
+	if %field% is not Integer
 	{
-		%field%:= oldValue
+		%field% := oldValue
 
 		GuiControl, , %field%, %oldValue%
 	}
@@ -3148,6 +3151,10 @@ validateSimFuelConsumption() {
 
 validatePitstopFuelService() {
 	validateNumber("pitstopFuelServiceEdit")
+}
+
+validateFuelCapacity() {
+	validateNumber("fuelCapacityEdit")
 }
 
 chooseSimDriver() {
@@ -3478,6 +3485,19 @@ filterSchema(schema) {
 			newSchema.Push(column)
 
 	return newSchema
+}
+
+convertValue(name, value) {
+	if (value = kNull)
+		return value
+	else if InStr(name, "Fuel")
+		return convertUnit("Volume", value)
+	else if InStr(name, "Temperature")
+		return convertUnit("Temperature", value)
+	else if InStr(name, "Pressure")
+		return convertUnit("Pressure", value)
+	else
+		return value
 }
 
 closeWorkbench() {

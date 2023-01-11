@@ -610,17 +610,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, Edit, x494 yp w40 -Background Number Limit2 gloadPressures vairTemperatureEdit, % Round(convertUnit("Temperature", this.iAirTemperature))
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iAirTemperature))
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature")})
+		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature", true)})
 
 		Gui %window%:Add, Edit, x494 yp+24 w40 -Background Number Limit2 gloadPressures vtrackTemperatureEdit, % Round(convertUnit("Temperature", this.iTrackTemperature))
 		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iTrackTemperature))
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature")})
+		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature", true)})
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Bold Italic, Arial
 
 		Gui %window%:Add, Text, x342 yp+30 w267 0x10
-		Gui %window%:Add, Text, x296 yp+10 w370 h20 Center BackgroundTrans, % translate("Pressures (PSI)")
+		Gui %window%:Add, Text, x296 yp+10 w370 h20 Center BackgroundTrans, % substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure", true)})
 
 		Gui %window%:Font, Norm, Arial
 

@@ -1337,7 +1337,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x378 yp+30 w85 h20, % translate("Refuel")
 		Gui %window%:Add, Edit, x474 yp-2 w50 h20 Limit3 Number vplanRefuelEdit gupdatePlan
 		Gui %window%:Add, UpDown, x506 yp-2 w18 h20 Range1-999
-		Gui %window%:Add, Text, x528 yp+2 w30 h20, % translate("Liter")
+		Gui %window%:Add, Text, x528 yp+2 w30 h20, % getUnit("Volume", true)
 
 		Gui %window%:Add, Text, x378 yp+24 w85 h23 +0x200, % translate("Tyre Change")
 		choices := map(["Yes", "No"], "translate")
@@ -1501,7 +1501,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x24 yp+30 w85 h20, % translate("Refuel")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopRefuelEdit
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20 Range0-999
-		Gui %window%:Add, Text, x164 yp+2 w30 h20, % translate("Liter")
+		Gui %window%:Add, Text, x164 yp+2 w30 h20, % getUnit("Volume", true)
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Tyre Change")
 		choices := map(["No Tyre Change", normalizeCompound("Dry")], "translate")
@@ -2272,13 +2272,13 @@ class RaceCenter extends ConfigurationItem {
 			if (this.SessionDrivers.Count() > 0) {
 				GuiControl Choose, setupDriverDropDownMenu, 1
 
-				setupAirTemperatureEdit := 23
-				setupTrackTemperatureEdit := 27
+				setupAirTemperatureEdit := displayValue("Float", convertUnit("Temperature", 23), 0)
+				setupTrackTemperatureEdit := displayValue("Float", convertUnit("Temperature", 27), 0)
 
-				setupBasePressureFLEdit := 25.5
-				setupBasePressureFREdit := 25.5
-				setupBasePressureRLEdit := 25.5
-				setupBasePressureRREdit := 25.5
+				setupBasePressureFLEdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
+				setupBasePressureFREdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
+				setupBasePressureRLEdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
+				setupBasePressureRREdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
 
 				GuiControl Choose, setupWeatherDropDownMenu, % inList(kWeatherConditions, "Dry")
 				GuiControl, , setupAirTemperatureEdit, %setupAirTemperatureEdit%
@@ -6597,7 +6597,8 @@ class RaceCenter extends ConfigurationItem {
 
 				sessionStore.add("Setups.Data", {Driver: driver
 											   , Weather: kWeatherConditions[inList(map(kWeatherConditions, "translate"), conditions[1])]
-											   , "Temperature.Air": temperatures[1], "Temperature.Track": temperatures[2]
+											   , "Temperature.Air": Round(convertUnit("Temperature", internalValue("Float", temperatures[1])))
+											   , "Temperature.Track": Round(convertUnit("Temperature", internalValue("Float", temperatures[2])))
 											   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
 											   , "Tyre.Pressure.Front.Left": pressures[1], "Tyre.Pressure.Front.Right": pressures[2]
 											   , "Tyre.Pressure.Rear.Left": pressures[3], "Tyre.Pressure.Rear.Right": pressures[4]
@@ -6939,7 +6940,7 @@ class RaceCenter extends ConfigurationItem {
 				Gui ListView, % this.SetupsListView
 
 				conditions := (translate(setup.Weather) . A_Space
-							 . translate("(") . translate(setup["Temperature.Air"]) . ", " . translate(setup["Temperature.Track"]) . translate(")"))
+							 . translate("(") . displayValue("Float", convertUnit("Temperature", setup["Temperature.Air"]), 0) . ", " . displayValue("Float", convertUnit("Temperature", setup["Temperature.Track"]), 0) . translate(")"))
 
 				LV_Add("", setup.Driver, conditions
 						 , translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
@@ -7317,9 +7318,9 @@ class RaceCenter extends ConfigurationItem {
 				value := kNull
 
 			if (this.SelectedChartType = "Bubble")
-				drawChartFunction .= ("['', " . value)
+				drawChartFunction .= ("['', " . convertValue(xAxis, value))
 			else
-				drawChartFunction .= ("[" . value)
+				drawChartFunction .= ("[" . convertValue(xAxis, value))
 
 			for ignore, yAxis in yAxises {
 				value := values[yAxis]
@@ -7331,7 +7332,7 @@ class RaceCenter extends ConfigurationItem {
 					maxValue := ((maxValue == kUndefined) ? value : Max(maxValue, value))
 				}
 
-				drawChartFunction .= (", " . value)
+				drawChartFunction .= (", " . convertValue(yAxis, value))
 			}
 
 			drawChartFunction .= "]"
@@ -8550,7 +8551,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . stint.StartPosition . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . stint.EndPosition . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . stint.AirTemperature . ", " . stint.TrackTemperature . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . stint.FuelConsumption . A_Space . translate("Liter") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1) . A_Space . getUnit("Volume", true) . "</td></tr>")
 		html .= "</table>"
 
 		return html
@@ -10110,6 +10111,19 @@ compareClassPositions(c1, c2) {
 	return (pos1 > pos2)
 }
 
+convertValue(name, value) {
+	if (value = kNull)
+		return value
+	else if InStr(name, "Fuel")
+		return convertUnit("Volume", value)
+	else if InStr(name, "Temperature")
+		return convertUnit("Temperature", value)
+	else if InStr(name, "Pressure")
+		return convertUnit("Pressure", value)
+	else
+		return value
+}
+
 manageTeam(raceCenterOrCommand, teamDrivers := false) {
 	local x, y, row, driver, owner, ignore, name, connection
 
@@ -10726,7 +10740,8 @@ loadSetup() {
 
 					options := concatenate(options, ["-Simulator", """" . simulator . """", "-Car", """" . rCenter.Car . """", "-Track", """" . rCenter.Track . """"
 												   , "-Weather", rCenter.Weather
-												   , "-AirTemperature", Round(setupAirTemperatureEdit), "-TrackTemperature", Round(setupTrackTemperatureEdit)
+												   , "-AirTemperature", Round(convertUnit("Temperature", internalValue("Float", setupAirTemperatureEdit), false))
+												   , "-TrackTemperature", Round(convertUnit("Temperature", internalValue("Float", setupTrackTemperatureEdit), false))
 												   , "-Compound", compound(compound), "-CompoundColor", compoundColor(compound)])
 				}
 

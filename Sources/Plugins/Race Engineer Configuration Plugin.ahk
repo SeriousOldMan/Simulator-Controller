@@ -3,7 +3,7 @@
 ;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2022) Creative Commons - BY-NC-SA                        ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
@@ -242,7 +242,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
 
-			reDampingFactorEdit := configuration["HistoryLapsDamping"]
+			reDampingFactorEdit := displayValue("Float", configuration["HistoryLapsDamping"])
 
 			GuiControl Text, reDampingFactorEdit, %reDampingFactorEdit%
 
@@ -281,7 +281,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 
 			configuration["LearningLaps"] := reLearningLapsEdit
 			configuration["ConsideredHistoryLaps"] := reLapsConsideredEdit
-			configuration["HistoryLapsDamping"] := reDampingFactorEdit
+			configuration["HistoryLapsDamping"] := internalValue("Float", reDampingFactorEdit)
 
 			configuration["AdjustLapTime"] := reAdjustLapTimeCheck
 
@@ -335,10 +335,13 @@ replicateRESettings() {
 
 validateREDampingFactor() {
 	local oldValue := reDampingFactorEdit
+	local value
 
 	GuiControlGet reDampingFactorEdit
 
-	if reDampingFactorEdit is not Number
+	value := internalValue("Float", reDampingFactorEdit)
+
+	if value is not Number
 	{
 		reDampingFactorEdit := oldValue
 

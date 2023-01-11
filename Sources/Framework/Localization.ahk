@@ -214,7 +214,7 @@ internalTemperatureValue(value) {
 		case "Celsius":
 			return value
 		case "Fahrenheit":
-			return ((value - 32) / 1,8)
+			return ((value - 32) / 1.8)
 		default:
 			throw "Unknown temperature unit detected in internalTemperatureValue..."
 	}
@@ -258,7 +258,7 @@ internalVolumeValue(value) {
 		case "Liter":
 			return value
 		case "Gallon":
-			return value * 4,546092
+			return value * 4.546092
 		default:
 			throw "Unknown volume unit detected in internalVolumeValue..."
 	}

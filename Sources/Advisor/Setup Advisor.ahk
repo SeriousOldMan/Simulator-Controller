@@ -1450,7 +1450,8 @@ class SetupAdvisor extends ConfigurationItem {
 
 		Menu CharacteristicsMenu, Add, %label%, %handler%
 
-		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false))
+		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+									  || !inList(getKeys(getConfigurationSectionValues(getControllerState(), "Simulators", Object())), this.SelectedSimulator))
 			Menu CharacteristicsMenu, Disable, %label%
 
 		Menu CharacteristicsMenu, Show

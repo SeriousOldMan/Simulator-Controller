@@ -1523,7 +1523,7 @@ class RaceEngineer extends RaceAssistant {
 			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__"
 			  , tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__", tyrePressures := "__Undefined__"
 			  , repairBodywork := "__Undefined__", repairSuspension := "__Undefined__", repairEngine := "__Undefined__"
-			  , requestDriver:= "__Undefined__") {
+			  , requestDriver := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local confirm := true
 		local options := optionsOrLap
@@ -1543,7 +1543,7 @@ class RaceEngineer extends RaceAssistant {
 				if optionsOrLap.HasKey("Confirm")
 					confirm := optionsOrLap["Confirm"]
 
-		if !this.hasEnoughData()
+		if (!this.hasEnoughData() && !plannedLap)
 			return false
 
 		if !this.supportsPitstop() {

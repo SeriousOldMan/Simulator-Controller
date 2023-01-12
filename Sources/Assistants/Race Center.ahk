@@ -3053,7 +3053,7 @@ class RaceCenter extends ConfigurationItem {
 				Gui %window%:Default
 
 				GuiControl, , pitstopLapEdit, %lap%
-				GuiControl, , pitstopRefuelEdit, %refuel%
+				GuiControl, , pitstopRefuelEdit, % displayValue("Float", convertValue("Volume", refuel), 0)
 
 				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
 								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
@@ -3436,7 +3436,7 @@ class RaceCenter extends ConfigurationItem {
 				pitstopTyreSetEdit := 0
 
 			setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
-			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", pitstopRefuelEdit)
+			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", convertUnit("Volume", internalValue("Float", pitstopRefuelEdit), false))
 
 			stint := this.CurrentStint
 			driverSelected := false
@@ -3478,10 +3478,10 @@ class RaceCenter extends ConfigurationItem {
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", compoundColor)
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
-									, values2String(",", convertUnit("Pressure", internalValue("Float", pitstopPressureFLEdit), true)
-													   , convertUnit("Pressure", internalValue("Float", pitstopPressureFREdit), true)
-													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRLEdit), true)
-													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRREdit), true)))
+									, values2String(",", convertUnit("Pressure", internalValue("Float", pitstopPressureFLEdit), false)
+													   , convertUnit("Pressure", internalValue("Float", pitstopPressureFREdit), false)
+													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRLEdit), false)
+													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRREdit), false)))
 			}
 			else
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)

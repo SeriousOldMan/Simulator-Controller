@@ -1,9 +1,9 @@
 [Development]
 Version=4.5.5.0-dev
 Target=4.5.5.0-release
-Date=01/11/2023
+Date=01/12/2023
 Download=
-Changes=Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats
+Changes=Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats, Pitstops can now be prepared in the "Race Center" even during learning laps
 [Release]
 Version=4.5.3.1-release
 Date=12/30/2022

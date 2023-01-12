@@ -227,7 +227,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControl Text, rspLearningLapsEdit, % configuration["LearningLaps"]
 			GuiControl Text, rspLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
 
-			rspDampingFactorEdit := configuration["HistoryLapsDamping"]
+			rspDampingFactorEdit := displayValue("Float", configuration["HistoryLapsDamping"])
 			GuiControl Text, rspDampingFactorEdit, %rspDampingFactorEdit%
 
 			GuiControl Choose, sideProximityDropDown, % (configuration["SideProximity"] + 1)
@@ -275,7 +275,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 
 			configuration["LearningLaps"] := rspLearningLapsEdit
 			configuration["ConsideredHistoryLaps"] := rspLapsConsideredEdit
-			configuration["HistoryLapsDamping"] := rspDampingFactorEdit
+			configuration["HistoryLapsDamping"] := internalValue("Float", rspDampingFactorEdit)
 
 			configuration["SideProximity"] := (sideProximityDropDown - 1)
 			configuration["RearProximity"] := (rearProximityDropDown - 1)
@@ -344,10 +344,13 @@ replicateRSPSettings() {
 
 validateRSPDampingFactor() {
 	local oldValue := rspDampingFactorEdit
+	local value
 
 	GuiControlGet rspDampingFactorEdit
 
-	if rspDampingFactorEdit is not Number
+	value := internalValue("Float", rspDampingFactorEdit)
+
+	if value is not Number
 	{
 		rspDampingFactorEdit := oldValue
 

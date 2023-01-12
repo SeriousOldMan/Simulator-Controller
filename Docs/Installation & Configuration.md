@@ -212,9 +212,35 @@ As the name of this tab suggests, some very general configuration options are pr
 
 The second group, *Settings* allows you to choose whether the Simulator Controller will start together with Windows and whether it will run silently, i.e. without any splash animation or sound. With the button "Themes Editor..." you can jump to a special editor to customize the splash dialogs of various applications of Simulator Controller. See the chapter on the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor) for a complete explanation of themes. Last but not least you may choose a language for all user interface elements. English as the base language and a German translation are part of the Simulator Controller distribution, but you may define your own translations using the [translations editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor), wich you can open by clicking on the small button next to the language drop down.
 
+Beside chosing the language for the user interface, you can also choose your preferred units and data formats for all displays and entry fields by clicking on the small button to the left of the language drop down menu. Please see the [next section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats) for a detailed discussion on using customized units and formats.
+
 You can add all the simulation games installed on your PC to the list in the third group *Simulators*. For each entry here, you also need to create a similar named application entry in the applications tab. Please note, that the name of all simulation games, where a plugin exists for, may have a predefined name according to the roles of the plugin. The order of the entries in the *Simulators* list is important, at least the first one has a special role. More on that later. You can change the order with the "Up" and "Down" button, if an entry is selected. As with any list in the configuration tool, an entry must be selected with a double click for editing.
 
 The last group, which is only present in developer mode as mentioned above, lets you activate the debug mode, define the log level and enter the path to an AutoHotkey installation on your PC (only necessary, if AutoHotkey has been installed to a location other than C:\Program Files\AutoHotkey). Be careful with the log level *Info*, since the log files found in the *Simulator Controller\Logs* folder found in the users *Documents* folder may grow quite fast. If you want to automatically build all *Visual Studio* applications and DLLs while running *Simulator Tools*, you must enter the path to the *MSBuild Bin* directory here es well. See the [documentation for *Simulator Tools*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#using-the-build-tool) for more information.
+
+#### Units and Formats
+
+All Simulator Controller applications can handle different units and data formats. You can configure your preferred display and data entry units and field formats by using the below dialog.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Localization.JPG)
+
+Please be aware, that choosing a specifc unit or field format here does only change the handling on the user interface level. The internal data format is not changed, which is to keep in mind, when you are looking at some of the data files of Simulator Controller. The internal units and formats are:
+
+| Setting     | Value      |
+| ----------- | ---------- |
+| Temperature | Celsius    |
+| Pressure    | PSI        |
+| Mass        | Kilogram   |
+| Volume      | Liter      |
+| Length      | Meter      |
+| Speed       | km/h       |
+|             |            |
+| Number      | #.##       |
+| Lap Time    | [H:]M:S.## |
+
+This choices are also the default, if you don't change anything here, except lap time, which is stored in milliseconds in the data files.
+
+Please be also aware, that changing any of the units in the user interface of Simulator Controller does not change the corresponding unit in your simulator. If you set the pressure unit to *Bar* here and your simulator is working with *PSI*, the conversion for all entered values in the applications of Simulator Controller will be handled automatically, but if you look at the info in your simulator, you will still see *PSI*, of course.
 
 ### Tab *Voice Control*
 

@@ -1519,32 +1519,33 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	planPitstop(optionsOrLap := true, refuelAmount := "__Undefined__"
+	planPitstop(optionsOrLap := "__Undefined__", refuelAmount := "__Undefined__"
 			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__"
 			  , tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__", tyrePressures := "__Undefined__"
 			  , repairBodywork := "__Undefined__", repairSuspension := "__Undefined__", repairEngine := "__Undefined__"
 			  , requestDriver := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local confirm := true
-		local options := optionsOrLap
+		local options := ((optionsOrLap = kUndefined) ? true : optionsOrLap)
 		local plannedLap := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure
 
-		if (optionsOrLap != true)
+		if (optionsOrLap != kUndefined) {
 			if optionsOrLap is Number
 			{
-				plannedLap := optionsOrLap
+				plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
 
 				options := true
 			}
-			else if IsObject(optionsOrLap)
-				if optionsOrLap.HasKey("Confirm")
-					confirm := optionsOrLap["Confirm"]
+			else if (IsObject(optionsOrLap) && optionsOrLap.HasKey("Confirm"))
+				confirm := optionsOrLap["Confirm"]
+		}
 
-		if (!this.hasEnoughData() && !plannedLap)
-			return false
+		if !plannedLap
+			if !this.hasEnoughData()
+				return false
 
 		if !this.supportsPitstop() {
 			if this.Speaker

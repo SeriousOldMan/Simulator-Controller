@@ -608,49 +608,49 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
-		Gui %window%:Add, Edit, x494 yp w40 -Background Number Limit2 gloadPressures vairTemperatureEdit, % this.iAirTemperature
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % this.iAirTemperature
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Air (Celsius)")
+		Gui %window%:Add, Edit, x494 yp w40 -Background Number Limit2 gloadPressures vairTemperatureEdit, % Round(convertUnit("Temperature", this.iAirTemperature))
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iAirTemperature))
+		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature", true)})
 
-		Gui %window%:Add, Edit, x494 yp+24 w40 -Background Number Limit2 gloadPressures vtrackTemperatureEdit, % this.iTrackTemperature
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % this.iTrackTemperature
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % translate("Temp. Track (Celsius)")
+		Gui %window%:Add, Edit, x494 yp+24 w40 -Background Number Limit2 gloadPressures vtrackTemperatureEdit, % Round(convertUnit("Temperature", this.iTrackTemperature))
+		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iTrackTemperature))
+		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature", true)})
 
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Bold Italic, Arial
 
 		Gui %window%:Add, Text, x342 yp+30 w267 0x10
-		Gui %window%:Add, Text, x296 yp+10 w370 h20 Center BackgroundTrans, % translate("Pressures (PSI)")
+		Gui %window%:Add, Text, x296 yp+10 w370 h20 Center BackgroundTrans, % substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure")})
 
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Front Left")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vflPressure1, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure2, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vflPressure3, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure4, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure5, 0.0
+		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vflPressure1, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure2, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vflPressure3, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure4, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure5, % displayValue("Float", 0.0)
 
 		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Front Right")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vfrPressure1, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure2, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vfrPressure3, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure4, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure5, 0.0
+		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vfrPressure1, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure2, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vfrPressure3, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure4, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure5, % displayValue("Float", 0.0)
 
 		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Rear Left")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vrlPressure1, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure2, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vrlPressure3, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure4, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure5, 0.0
+		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vrlPressure1, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure2, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vrlPressure3, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure4, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure5, % displayValue("Float", 0.0)
 
 		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Rear Right")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vrrPressure1, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure2, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vrrPressure3, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure4, 0.0
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure5, 0.0
+		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vrrPressure1, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure2, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vrrPressure3, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure4, % displayValue("Float", 0.0)
+		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure5, % displayValue("Float", 0.0)
 
 		if this.RequestorPID
 			Gui %window%:Add, Button, x440 yp+50 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
@@ -1366,6 +1366,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					value := translate(setting.Value)
 				else if (type = "Boolean")
 					value := (setting.Value ? "x" : "")
+				else if (type = "Float")
+					value := displayValue("Float", setting.Value)
 				else
 					value := setting.Value
 
@@ -2875,7 +2877,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					source := translate("Community")
 
 				LV_Add("", source
-						 , translate(info.Weather), info.AirTemperature, info.TrackTemperature
+						 , translate(info.Weather)
+						 , Round(convertUnit("Temperature", info.AirTemperature))
+						 , Round(convertUnit("Temperature", info.TrackTemperature))
 						 , translate(info.Compound), info.Count)
 			}
 
@@ -3141,6 +3145,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				display := (value ? "x" : "")
 			else if (type = "Text")
 				display := StrReplace(value, "`n", A_Space)
+			else if (type = "Float")
+				display := displayValue("Float", value)
 			else
 				display := value
 
@@ -3224,6 +3230,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				display := (value ? "x" : "")
 			else if (type = "Text")
 				display := StrReplace(value, "`n", A_Space)
+			else if (type = "Float")
+				display := displayValue("Float", value)
 			else
 				display := value
 
@@ -3347,7 +3355,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
 																			   , this.SelectedTrack, this.SelectedWeather
-																			   , airTemperatureEdit, trackTemperatureEdit
+																			   , convertUnit("Temperature", airTemperatureEdit, false)
+																			   , convertUnit("Temperature", trackTemperatureEdit, false)
 																			   , compound, compoundColor, driver*)
 				}
 				else
@@ -3356,7 +3365,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if (pressureInfos.Count() == 0) {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
 						for ignore, postfix in ["1", "2", "3", "4", "5"] {
-							GuiControl Text, %tyre%Pressure%postfix%, 0.0
+							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", 0.0)
 							GuiControl +Background, %tyre%Pressure%postfix%
 							GuiControl Disable, %tyre%Pressure%postfix%
 						}
@@ -3388,7 +3397,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						for index, postfix in ["1", "2", "3", "4", "5"] {
 							pressure := Format("{:.1f}", pressure)
 
-							GuiControl Text, %tyre%Pressure%postfix%, %pressure%
+							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", convertUnit("Pressure", pressure))
 
 							if (index = (3 + airDelta)) {
 								GuiControl +Background, %tyre%Pressure%postfix%
@@ -5301,8 +5310,8 @@ addSetting() {
 
 			value := default
 
-			settingValueEdit := value
-			GuiControl, , settingValueEdit, %value%
+			settingValueEdit := displayValue("Float", default)
+			GuiControl, , settingValueEdit, %settingValueEdit%
 		}
 
 		editor.addSetting(settings[1][1], settings[1][2], value)
@@ -5432,8 +5441,8 @@ selectSetting() {
 
 			value := default
 
-			settingValueEdit := value
-			GuiControl, , settingValueEdit, %value%
+			settingValueEdit := displayValue("Float", value)
+			GuiControl, , settingValueEdit, %settingValueEdit%
 		}
 
 		editor.updateSetting(section, key, value)
@@ -5515,17 +5524,21 @@ changeSetting() {
 
 						GuiControl, , settingValueEdit, %settingValueEdit%
 					}
+
+					value := settingValueEdit
 				}
 				else if (type = "Float") {
-					if settingValueEdit is not Number
+					value := internalValue("Float", settingValueEdit)
+
+					if value is not Number
 					{
 						settingValueEdit := oldValue
 
 						GuiControl, , settingValueEdit, %settingValueEdit%
+
+						value := internalValue("Float", settingValueEdit)
 					}
 				}
-
-				value := settingValueEdit
 			}
 
 			editor.updateSetting(section, key, value)
@@ -6133,7 +6146,8 @@ transferPressures() {
 
 	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
 																			, editor.SelectedTrack, editor.SelectedWeather
-																			, airTemperatureEdit, trackTemperatureEdit
+																			, convertUnit("Temperature", airTemperatureEdit, false)
+																			, convertUnit("Temperature", trackTemperatureEdit, false)
 																			, compound, compoundColor, driver*)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 

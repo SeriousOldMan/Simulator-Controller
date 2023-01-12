@@ -58,6 +58,16 @@ The "Tactile Feedback" plugin will allow you to enable or disable pedal vibratio
 
 To get the most out of this plugin in the sample configuration presented below, you will need three 2-way toggle switches, two rotary dials and eight push buttons on your controller hardware, although the dials and push buttons may be shared with other modes. But, since all this is fully configurable, you can find a compromise, if your controller provides less control elements. To help you with the configuration of *SimHub*, two shaker profiles are provided in the *Profiles* folder in the Simulator Controller distribution. Please load these profiles, named "...CV..." for chassis vibration and "...PV..." for pedal vibration, and adopt them to the specific configuration of your simulation rig. Using the plugin parameters described below, you can then customize the "Tactile Feedback" plugin to support your concrete hardware configuration as best as possible. These profiles already have been preconfigured with external triggers (for example: "togglePedalVibration" or "increaseRPMSVibration", just to name two), which will be used by the "Tactile Feedback" plugin to interact with *SimHub*.
 
+If you want to create your SimHub profiles from scratch, you can create the external trigger in SimHub using the command shell. Start SimHub and open the controls window for the specific element. The following window will appear:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/SimHub%20Control.JPG)
+
+Click the desired input, then open a command shell, go to the SimHub programm directory and execute the following command:
+
+	SimHubWPF.exe -triggerinput [command][EFFECT]Vibration
+
+[command] must be one of "toggle", "increase" or "decrease" and [EFFECT] the name of the effect you want to control, for example "WHEELSLIP". You can name the effects as you like, but the names here and in the configuration below must match.
+
 ### Mode *Pedal Vibration*
 
 This mode, which is only available, when *SimHub* is runnning, will let you control the pedal vibration effects. In the default configuration, engaged traction control will vibrate the accelerator pedal and the brake pedal will vibrate, when ABS kicks in. This configuration may look like this:
@@ -327,6 +337,9 @@ Please see the following table for available information commands.
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. |
+| StrategyCancel | Cancels the current strategy. Cato will not have any strategy information from now on. |
+| StrategyRecommend | Cato will try to update the currently active strategy according to the current situation. Very usefull after an unplanned pitstop or a sudden weather change. |
+| PitstopRecommend | Cato will try to determine the best possible lap for the next pitstop. Possible undercuts will be taken into account as well as the traffic situation after the pitstop. |
 
 Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 

@@ -12,12 +12,13 @@
   11. Pitstops can now be prepared in the "Race Center" even during learning laps
   12. Full support for system-wide localization of units and number formats. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats) for more information.
   
-## 4.5.4.0-release 01/06/22 (planned)
+## 4.5.4.0-release 01/06/22
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. A new reload button allows you to reload the list of reports in "Race Reports". Helpful, when you just recorded a race on the selected track.
-  4. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato) for more information.
-  5. New car models for "Setup Advisor":
+  4. Optimized the pitstop strategy simulation by the Race Strategist.
+  5. The Race Strategist can now optionally explain its pitstop recommendation. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#racing-with-cato) for more information.
+  6. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Porsche 911 GT3 R 2016
 

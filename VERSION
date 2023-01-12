@@ -5,12 +5,12 @@ Date=01/12/2023
 Download=
 Changes=Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats, Pitstops can now be prepared in the "Race Center" even during learning laps
 [Release]
-Version=4.5.3.1-release
-Date=12/30/2022
-Download=https://cutt.ly/I2rkC77;https://www.dropbox.com/s/cgf1isb4m9et32i/Simulator%20Controller%204.5.3.1-release.zip?dl=1
-Changes=Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races
+Version=4.5.4.0-release
+Date=01/06/2023
+Download=https://cutt.ly/U2vmEMx;https://www.dropbox.com/s/2xznaqase3j9cn3/Simulator%20Controller%204.5.4.0-release.zip?dl=1
+Changes=Reload button in "Race Reports", Race Strategist can now explain pitstop recommendation, New car models for "Setup Advisor"
 [Current]
 Type=Development
 [Version]
-Release=4.5.3.1-release
-Development=4.5.5.0-dev
+Release=4.5.4.0-release
+Development=4.5.5.0-release

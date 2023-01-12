@@ -2232,10 +2232,10 @@ class RaceCenter extends ConfigurationItem {
 			row := LV_GetNext(0)
 
 			if row {
-				setupBasePressureFLEdit := displayValue("Float", convertUnit("Pressure", flPressure), 1)
-				setupBasePressureFREdit := displayValue("Float", convertUnit("Pressure", frPressure), 1)
-				setupBasePressureRLEdit := displayValue("Float", convertUnit("Pressure", rlPressure), 1)
-				setupBasePressureRREdit := displayValue("Float", convertUnit("Pressure", rrPressure), 1)
+				setupBasePressureFLEdit := displayValue("Float", convertUnit("Pressure", flPressure))
+				setupBasePressureFREdit := displayValue("Float", convertUnit("Pressure", frPressure))
+				setupBasePressureRLEdit := displayValue("Float", convertUnit("Pressure", rlPressure))
+				setupBasePressureRREdit := displayValue("Float", convertUnit("Pressure", rrPressure))
 
 				GuiControl, , setupBasePressureFLEdit, %setupBasePressureFLEdit%
 				GuiControl, , setupBasePressureFREdit, %setupBasePressureFREdit%
@@ -2275,10 +2275,10 @@ class RaceCenter extends ConfigurationItem {
 				setupAirTemperatureEdit := displayValue("Float", convertUnit("Temperature", 23), 0)
 				setupTrackTemperatureEdit := displayValue("Float", convertUnit("Temperature", 27), 0)
 
-				setupBasePressureFLEdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
-				setupBasePressureFREdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
-				setupBasePressureRLEdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
-				setupBasePressureRREdit := displayValue("Float", convertUnit("Pressure", 25.5), 1)
+				setupBasePressureFLEdit := displayValue("Float", convertUnit("Pressure", 25.5))
+				setupBasePressureFREdit := displayValue("Float", convertUnit("Pressure", 25.5))
+				setupBasePressureRLEdit := displayValue("Float", convertUnit("Pressure", 25.5))
+				setupBasePressureRREdit := displayValue("Float", convertUnit("Pressure", 25.5))
 
 				GuiControl Choose, setupWeatherDropDownMenu, % inList(kWeatherConditions, "Dry")
 				GuiControl, , setupAirTemperatureEdit, %setupAirTemperatureEdit%
@@ -2652,7 +2652,7 @@ class RaceCenter extends ConfigurationItem {
 
 						LV_Modify(A_Index, "Col3", time)
 						LV_Modify(A_Index, "Col5", pitstop.Lap)
-						LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : displayValue("Float", convertUnit("Volume", pitstop.RefuelAmount), 1))
+						LV_Modify(A_Index, "Col7", (pitstop.RefuelAmount == 0) ? "-" : displayValue("Float", convertUnit("Volume", pitstop.RefuelAmount), 0))
 						LV_Modify(A_Index, "Col8", pitstop.TyreChange ? "x" : "")
 					}
 				}
@@ -2974,7 +2974,7 @@ class RaceCenter extends ConfigurationItem {
 						LV_GetText(tyreChange, A_Index, 8)
 
 						lap := plannedLap
-						refuel := Round(convertUnit("Volume", internalValue("Float", refuelAmount), false))
+						refuel := convertUnit("Volume", internalValue("Float", refuelAmount), false)
 
 						if (tyreChange != "x") {
 							compound := false
@@ -3326,10 +3326,10 @@ class RaceCenter extends ConfigurationItem {
 
 			GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
 
-			GuiControl, , pitstopPressureFLEdit, % displayValue("Float", convertUnit("Pressure", flPressure), 1)
-			GuiControl, , pitstopPressureFREdit, % displayValue("Float", convertUnit("Pressure", frPressure), 1)
-			GuiControl, , pitstopPressureRLEdit, % displayValue("Float", convertUnit("Pressure", rlPressure), 1)
-			GuiControl, , pitstopPressureRREdit, % displayValue("Float", convertUnit("Pressure", rrPressure), 1)
+			GuiControl, , pitstopPressureFLEdit, % displayValue("Float", convertUnit("Pressure", flPressure))
+			GuiControl, , pitstopPressureFREdit, % displayValue("Float", convertUnit("Pressure", frPressure))
+			GuiControl, , pitstopPressureRLEdit, % displayValue("Float", convertUnit("Pressure", rlPressure))
+			GuiControl, , pitstopPressureRREdit, % displayValue("Float", convertUnit("Pressure", rrPressure))
 		}
 		else {
 			GuiControl Choose, pitstopTyreCompoundDropDown, 1
@@ -3478,10 +3478,10 @@ class RaceCenter extends ConfigurationItem {
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", compoundColor)
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
-									, values2String(",", Round(convertUnit("Pressure", internalValue("Float", pitstopPressureFLEdit), true), 1)
-													   , Round(convertUnit("Pressure", internalValue("Float", pitstopPressureFREdit), true), 1)
-													   , Round(convertUnit("Pressure", internalValue("Float", pitstopPressureRLEdit), true), 1)
-													   , Round(convertUnit("Pressure", internalValue("Float", pitstopPressureRREdit), true), 1)))
+									, values2String(",", convertUnit("Pressure", internalValue("Float", pitstopPressureFLEdit), true)
+													   , convertUnit("Pressure", internalValue("Float", pitstopPressureFREdit), true)
+													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRLEdit), true)
+													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRREdit), true)))
 			}
 			else
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
@@ -4068,7 +4068,7 @@ class RaceCenter extends ConfigurationItem {
 								pressure := tyrePressures[A_Index]
 
 								if pressure is Number
-									tyrePressures[A_Index] := Round(convertUnit("Pressure", internalValue("Float", pressure), false), 1)
+									tyrePressures[A_Index] := convertUnit("Pressure", internalValue("Float", pressure), false)
 							}
 
 							break
@@ -4901,7 +4901,7 @@ class RaceCenter extends ConfigurationItem {
 			else {
 				fuelConsumption := (this.getPreviousLap(lap).FuelRemaining - lap.FuelRemaining)
 
-				lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 1) : "-")
+				lap.FuelConsumption := ((fuelConsumption > 0) ? Round(fuelConsumption, 2) : "-")
 			}
 
 			lap.Laptime := Round(getConfigurationValue(data, "Stint Data", "LapLastTime") / 1000, 1)
@@ -5024,7 +5024,7 @@ class RaceCenter extends ConfigurationItem {
 
 		stint.AvgLaptime := Round(average(laptimes), 1)
 		stint.BestLaptime := Round(minimum(laptimes), 1)
-		stint.FuelConsumption := Round(stint.FuelConsumption, 1)
+		stint.FuelConsumption := Round(stint.FuelConsumption, 2)
 		stint.AirTemperature := Round(average(airTemperatures), 1)
 		stint.TrackTemperature := Round(average(trackTemperatures), 1)
 
@@ -5036,7 +5036,7 @@ class RaceCenter extends ConfigurationItem {
 			LV_Modify(stint.Row, "", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 								   , translate(stint.Compound), stint.Laps.Length()
 								   , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
-								   , displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1)
+								   , displayValue("Float", convertUnit("Volume", stint.FuelConsumption))
 								   , stint.Accidents, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
 			this.updatePlan(stint)
@@ -5109,7 +5109,7 @@ class RaceCenter extends ConfigurationItem {
 						LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 								 , translate(stint.Compound), stint.Laps.Length()
 								 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
-								 , displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1)
+								 , displayValue("Float", convertUnit("Volume", stint.FuelConsumption))
 								 , stint.Accidents, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 
 						stint.Row := LV_GetCount()
@@ -5131,12 +5131,12 @@ class RaceCenter extends ConfigurationItem {
 							remainingFuel := lap.FuelRemaining
 
 							if remainingFuel is Number
-								remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel), 1)
+								remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel))
 
 							fuelConsumption := lap.FuelConsumption
 
 							if fuelConsumption is Number
-								fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+								fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 							LV_Add("", lap.Nr, stint.Nr, stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -", lap.Accident ? translate("x") : "")
 
@@ -5530,7 +5530,7 @@ class RaceCenter extends ConfigurationItem {
 							pressure := pressures[A_Index]
 
 							if pressure is Number
-								pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+								pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 						}
 
 						LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", map(pressures, "displayValue")*))
@@ -5592,13 +5592,13 @@ class RaceCenter extends ConfigurationItem {
 						row := this.Laps[A_Index].Row
 
 						if pressureFL is Number
-							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL), 1)
+							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL))
 						if pressureFR is Number
-							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR), 1)
+							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR))
 						if pressureRL is Number
-							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL), 1)
+							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL))
 						if pressureRR is Number
-							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR), 1)
+							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR))
 
 						LV_Modify(row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
 																  , displayNullValue(pressureRL), displayNullValue(pressureRR)))
@@ -5705,7 +5705,7 @@ class RaceCenter extends ConfigurationItem {
 						pressure := pressures[A_Index]
 
 						if pressure is Number
-							pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+							pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 					}
 
 					LV_Modify(this.Laps[lap].Row, "Col10", values2String(", ", pressures*))
@@ -5780,10 +5780,10 @@ class RaceCenter extends ConfigurationItem {
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
 														   , Round(pressureRL, 1), Round(pressureRR, 1))
 
-							displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL), 1)
-																  , displayValue("Float", convertUnit("Pressure", pressureFR), 1)
-																  , displayValue("Float", convertUnit("Pressure", pressureRL), 1)
-																  , displayValue("Float", convertUnit("Pressure", pressureRR), 1))
+							displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
+																  , displayValue("Float", convertUnit("Pressure", pressureFR))
+																  , displayValue("Float", convertUnit("Pressure", pressureRL))
+																  , displayValue("Float", convertUnit("Pressure", pressureRR)))
 						}
 						else {
 							compound := "-"
@@ -5797,7 +5797,7 @@ class RaceCenter extends ConfigurationItem {
 						Gui ListView, % this.PitstopsListView
 
 						if fuel is Number
-							displayFuel := displayValue("Float", convertUnit("Volume", fuel), 1)
+							displayFuel := displayValue("Float", convertUnit("Volume", fuel))
 						else
 							displayFuel := fuel
 
@@ -6726,13 +6726,13 @@ class RaceCenter extends ConfigurationItem {
 
 				sessionStore.add("Setups.Data", {Driver: driver
 											   , Weather: kWeatherConditions[inList(map(kWeatherConditions, "translate"), conditions[1])]
-											   , "Temperature.Air": Round(convertUnit("Temperature", internalValue("Float", temperatures[1]), false))
-											   , "Temperature.Track": Round(convertUnit("Temperature", internalValue("Float", temperatures[2]), false))
+											   , "Temperature.Air": convertUnit("Temperature", internalValue("Float", temperatures[1]), false, false)
+											   , "Temperature.Track": convertUnit("Temperature", internalValue("Float", temperatures[2]), false, false)
 											   , "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor
-											   , "Tyre.Pressure.Front.Left": Round(convertUnit("Pressure", internalValue("Float", pressures[1]), false), 1)
-											   , "Tyre.Pressure.Front.Right": Round(convertUnit("Pressure", internalValue("Float", pressures[2]), false), 1)
-											   , "Tyre.Pressure.Rear.Left": Round(convertUnit("Pressure", internalValue("Float", pressures[3]), false), 1)
-											   , "Tyre.Pressure.Rear.Right": Round(convertUnit("Pressure", internalValue("Float", pressures[4]), false), 1)
+											   , "Tyre.Pressure.Front.Left": convertUnit("Pressure", internalValue("Float", pressures[1]), false, false)
+											   , "Tyre.Pressure.Front.Right": convertUnit("Pressure", internalValue("Float", pressures[2]), false, false)
+											   , "Tyre.Pressure.Rear.Left": convertUnit("Pressure", internalValue("Float", pressures[3]), false, false)
+											   , "Tyre.Pressure.Rear.Right": convertUnit("Pressure", internalValue("Float", pressures[4]), false, false)
 											   , Notes: StrReplace(StrReplace(StrReplace(notes, "`n", A_Space), "`t", A_Space), ";", ",")})
 			}
 		}
@@ -6772,7 +6772,8 @@ class RaceCenter extends ConfigurationItem {
 				sessionStore.add("Plan.Data", {Stint: stint, Driver: driver
 											 , "Time.Planned": timePlanned, "Time.Actual": timeActual
 											 , "Lap.Planned": lapPlanned, "Lap.Actual": lapActual
-											 , "Fuel.Amount": Round(convertUnit("Volume", internalValue("Float", refuelAmount), false)), "Tyre.Change": tyreChange})
+											 , "Fuel.Amount": convertUnit("Volume", internalValue("Float", refuelAmount), false, false)
+											 , "Tyre.Change": tyreChange})
 			}
 		}
 		finally {
@@ -7003,7 +7004,7 @@ class RaceCenter extends ConfigurationItem {
 						LV_Add("", stint.Nr, stint.Driver.FullName, values2String(", ", map(string2Values(",", stint.Weather), "translate")*)
 								 , translate(stint.Compound), stint.Laps.Length()
 								 , stint.StartPosition, stint.EndPosition, lapTimeDisplayValue(stint.AvgLaptime)
-								 , displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1)
+								 , displayValue("Float", convertUnit("Volume", stint.FuelConsumption))
 								 , stint.Accidents, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 					}
 
@@ -7027,12 +7028,12 @@ class RaceCenter extends ConfigurationItem {
 						remainingFuel := lap.FuelRemaining
 
 						if remainingFuel is Number
-							remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel), 1)
+							remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel))
 
 						fuelConsumption := lap.FuelConsumption
 
 						if fuelConsumption is Number
-							fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+							fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 						LV_Add("", lap.Nr, lap.Stint.Nr, lap.Stint.Driver.FullName, lap.Position, translate(lap.Weather), translate(lap.Grip), lapTimeDisplayValue(lap.Laptime), displayNullValue(fuelConsumption), remainingFuel, "-, -, -, -", lap.Accident ? translate("x") : "")
 					}
@@ -7086,10 +7087,10 @@ class RaceCenter extends ConfigurationItem {
 
 				LV_Add("", setup.Driver, conditions
 						 , translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
-						 , values2String(", ", displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Left"]), 1)
-											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Right"]), 1)
-											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Left"]), 1)
-											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Right"]), 1))
+						 , values2String(", ", displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Left"]))
+											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Right"]))
+											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Left"]))
+											 , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Right"])))
 						 , displayNullValue(setup.Notes, ""))
 			}
 
@@ -7194,13 +7195,13 @@ class RaceCenter extends ConfigurationItem {
 					pressure := pressures[A_Index]
 
 					if pressure is Number
-						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 				}
 
 				fuel := pitstop.Fuel
 
 				if fuel is Number
-					fuel := displayValue("Float", convertUnit("Volume", fuel), 1)
+					fuel := displayValue("Float", convertUnit("Volume", fuel))
 
 				Gui ListView, % this.PitstopsListView
 
@@ -8474,13 +8475,13 @@ class RaceCenter extends ConfigurationItem {
 
 					if (lapPressures = "-, -, -, -") {
 						if pressureFL is Number
-							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL), 1)
+							pressureFL := displayValue("Float", convertUnit("Pressure", pressureFL))
 						if pressureFR is Number
-							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR), 1)
+							pressureFR := displayValue("Float", convertUnit("Pressure", pressureFR))
 						if pressureRL is Number
-							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL), 1)
+							pressureRL := displayValue("Float", convertUnit("Pressure", pressureRL))
 						if pressureRR is Number
-							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR), 1)
+							pressureRR := displayValue("Float", convertUnit("Pressure", pressureRR))
 
 						LV_Modify(lap.Row, "Col10", values2String(", ", displayNullValue(pressureFL), displayNullValue(pressureFR)
 																	  , displayNullValue(pressureRL), displayNullValue(pressureRR)))
@@ -8716,8 +8717,8 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Duration:") . "</b></div></td><td>" . Round(duration / 60) . A_Space . translate("Minutes") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . stint.StartPosition . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . stint.EndPosition . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", stint.AirTemperature), 1) . ", " . displayValue("Float", convertUnit("Temperature", stint.TrackTemperature), 1) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", stint.FuelConsumption), 1) . A_Space . getUnit("Volume", true) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", stint.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", stint.TrackTemperature)) . A_Space . getUnit("Temperature", true) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", stint.FuelConsumption)) . A_Space . getUnit("Volume", true) . "</td></tr>")
 		html .= "</table>"
 
 		return html
@@ -8869,7 +8870,7 @@ class RaceCenter extends ConfigurationItem {
 			fuelConsumption := lap.FuelConsumption
 
 			if fuelConsumption is Number
-				fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+				fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 			fuelConsumptionData.Push("<td class=""td-std"">" . displayNullValue(fuelConsumption) . "</td>")
 			accidentData.Push("<td class=""td-std"">" . (lap.Accident ? "x" : "") . "</td>")
@@ -8984,9 +8985,9 @@ class RaceCenter extends ConfigurationItem {
 							if (tyrePressures[A_Index] = 0)
 								tyrePressures[A_Index] := displayNullValue(kNull)
 							else if (tyrePressures[A_Index] > 0)
-								tyrePressures[A_Index] := ("+" . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index]), 1))
+								tyrePressures[A_Index] := ("+" . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index])))
 							else if (tyrePressures[A_Index] < 0)
-								tyrePressures[A_Index] := ("-" . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index]), 1))
+								tyrePressures[A_Index] := ("-" . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index])))
 
 							hasColdPressures := true
 						}
@@ -9003,7 +9004,7 @@ class RaceCenter extends ConfigurationItem {
 					pressure := coldPressures[A_Index]
 
 					if pressure is Number
-						coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+						coldPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 				}
 
 				coldPressures := values2String(", ", coldPressures*)
@@ -9019,7 +9020,7 @@ class RaceCenter extends ConfigurationItem {
 					pressure := hotPressures[A_Index]
 
 					if pressure is Number
-						hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+						hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 				}
 
 				hotPressures := values2String(", ", hotPressures*)
@@ -9031,7 +9032,7 @@ class RaceCenter extends ConfigurationItem {
 					pressure := pressuresLosses[A_Index]
 
 					if pressure is Number
-						pressuresLosses[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+						pressuresLosses[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 				}
 
 				pressuresLosses := values2String(", ", pressuresLosses*)
@@ -9049,7 +9050,7 @@ class RaceCenter extends ConfigurationItem {
 							pressure := hotPressures[A_Index]
 
 							if pressure is Number
-								hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+								hotPressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 						}
 
 						hotPressures := values2String(", ", hotPressures*)
@@ -9061,18 +9062,18 @@ class RaceCenter extends ConfigurationItem {
 		remainingFuel := lap.FuelRemaining
 
 		if remainingFuel is Number
-			remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel), 1)
+			remainingFuel := displayValue("Float", convertUnit("Volume", remainingFuel))
 
 		fuelConsumption := lap.FuelConsumption
 
 		if fuelConsumption is Number
-			fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+			fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 		html .= ("<tr><td><b>" . translate("Position:") . "</b></td><td>" . lap.Position . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature), 1) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature), 1) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . A_Space . getUnit("Temperature", true) . "</td></tr>")
 
 		if (hotPressures != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
@@ -9257,7 +9258,7 @@ class RaceCenter extends ConfigurationItem {
 			pressure := pressures[A_Index]
 
 			if pressure is Number
-				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+				pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 		}
 
 		pressures := values2String(", ", pressures*)
@@ -9265,7 +9266,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . ((pitstopData.Lap = "-") ? "-" : (pitstopData.Lap + 1)) . "</td></tr>")
 
 		if ((pitstopData.Fuel != "-") && (pitstopData.Fuel > 0))
-			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", pitstopData.Fuel), 1) . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", pitstopData.Fuel)) . "</td></tr>")
 
 		compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
@@ -9546,7 +9547,7 @@ class RaceCenter extends ConfigurationItem {
 					pressure := pressures[A_Index]
 
 					if pressure is Number
-						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+						pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 				}
 
 				pressures := values2String(", ", pressures*)
@@ -9560,7 +9561,7 @@ class RaceCenter extends ConfigurationItem {
 				repairsData.Push("<td class=""td-std"">" . repairs . "</td>")
 
 				lapData.Push("<td class=""td-std"">" . (pitstopData.Lap + 1) . "</td>")
-				refuelData.Push("<td class=""td-std"">" . ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData.Fuel), 1) : "-") . "</td>")
+				refuelData.Push("<td class=""td-std"">" . ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData.Fuel)) : "-") . "</td>")
 
 				compound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
@@ -9589,7 +9590,7 @@ class RaceCenter extends ConfigurationItem {
 				timeData.Push("<td class=""td-std"">" . (serviceData.Time ? Round(serviceData.Time, 1) : "-") . "</td>")
 				previousDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Previous"] ? serviceData["Driver.Previous"] : "-") . "</td>")
 				nextDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Next"] ? serviceData["Driver.Next"] : "-") . "</td>")
-				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData.Fuel), 1) : "-") : "-") . "</td>")
+				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData.Fuel)) : "-") : "-") . "</td>")
 
 				compound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
 
@@ -9609,7 +9610,7 @@ class RaceCenter extends ConfigurationItem {
 						pressure := tyrePressures[A_Index]
 
 						if pressure is Number
-							tyrePressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure), 1)
+							tyrePressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
 					}
 
 					tyrePressures := values2String(", ", tyrePressures*)
@@ -9692,7 +9693,7 @@ class RaceCenter extends ConfigurationItem {
 
 			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
 			avgLapTimesData.Push("<td class=""td-std"">" . lapTimeDisplayValue(Round(average(lapTimes), 1)) . "</td>")
-			avgFuelConsumptionsData.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", average(fuelConsumptions)), 1) . "</td>")
+			avgFuelConsumptionsData.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", average(fuelConsumptions))) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")
 		}
 
@@ -9998,7 +9999,7 @@ class RaceCenter extends ConfigurationItem {
 				fuelConsumption := stint.FuelConsumption
 
 				if fuelConsumption is Number
-					fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption), 1)
+					fuelConsumption := displayValue("Float", convertUnit("Volume", fuelConsumption))
 
 				fuelConsumptions.Push("<td class=""td-std"">" . displayNullValue(fuelConsumption) . "</td>")
 				accidents.Push("<td class=""td-std"">" . stint.Accidents . "</td>")

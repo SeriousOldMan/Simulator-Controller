@@ -134,7 +134,7 @@ class TyresDatabase extends SessionDatabase {
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor
 						   , ByRef distributions, driver := "__Undefined__") {
-		local where := {"Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+		local where := {"Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
 					  , Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}
 		local ignore, pressureData, tyre, pressure
 
@@ -243,7 +243,7 @@ class TyresDatabase extends SessionDatabase {
 			theCompound := compoundInfo[1]
 			theCompoundColor := compoundInfo[2]
 
-			for ignore, pressureInfo in this.getPressures(simulator, car, track, weather, airTemperature, trackTemperature
+			for ignore, pressureInfo in this.getPressures(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature)
 														, theCompound, theCompoundColor, driver) {
 				deltaAir := pressureInfo["Delta Air"]
 				deltaTrack := pressureInfo["Delta Track"]
@@ -339,11 +339,11 @@ class TyresDatabase extends SessionDatabase {
 				for ignore, trackDelta in kTemperatureDeltas {
 					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
 
-					this.getPressureDistributions(localTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta
+					this.getPressureDistributions(localTyresDatabase, weather, Round(airTemperature) + airDelta, Round(trackTemperature) + trackDelta
 												, compound, compoundColor, distributions, driver*)
 
 					if this.UseCommunity
-						this.getPressureDistributions(globalTyresDatabase, weather, airTemperature + airDelta, trackTemperature + trackDelta
+						this.getPressureDistributions(globalTyresDatabase, weather, Round(airTemperature) + airDelta, Round(trackTemperature) + trackDelta
 													, compound, compoundColor, distributions, false)
 
 					if (distributions["FL"].Count() != 0) {
@@ -425,7 +425,7 @@ class TyresDatabase extends SessionDatabase {
 		database := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
 
 		database.add("Tyres.Pressures", {Driver: driver, Weather: weather
-									   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+									   , "Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
 									   , Compound: compound, "Compound.Color": compoundColor
 									   , "Tyre.Pressure.Cold.Front.Left": coldPressures[1]
 									   , "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
@@ -441,7 +441,7 @@ class TyresDatabase extends SessionDatabase {
 
 		for typeIndex, tPressures in [coldPressures, hotPressures]
 			for tyreIndex, pressure in tPressures
-				this.updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
+				this.updatePressure(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature), compound, compoundColor
 								  , types[typeIndex], tyres[tyreIndex], pressure, 1, false, false, "User", driver)
 
 		if flush
@@ -468,7 +468,7 @@ class TyresDatabase extends SessionDatabase {
 
 		rows := database.query("Tyres.Pressures.Distribution"
 							 , {Where: {Driver: driver, Weather: weather
-									  , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+									  , "Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
 									  , Compound: compound, "Compound.Color": compoundColor
 									  , Type: type, Tyre: tyre, "Pressure": pressure}})
 
@@ -487,7 +487,7 @@ class TyresDatabase extends SessionDatabase {
 			try {
 				database.add("Tyres.Pressures.Distribution"
 						   , {Driver: driver, Weather: weather
-							, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+							, "Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
 							, Compound: compound, "Compound.Color": compoundColor
 							, Type: type, Tyre: tyre, "Pressure": pressure, Count: count})
 			}

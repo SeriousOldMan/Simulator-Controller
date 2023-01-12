@@ -100,7 +100,7 @@ global pitstopFuelServiceRuleDropDown := "Dynamic"
 global pitstopFuelServiceEdit := displayValue("Float", 1.2)
 global pitstopFuelServiceLabel
 global pitstopServiceDropDown
-global fuelCapacityEdit := displayValue("Float", convertUnit("Volume", 125), 1)
+global fuelCapacityEdit := displayValue("Float", convertUnit("Volume", 125))
 global safetyFuelEdit := displayValue("Float", convertUnit("Volume", 5), 0)
 
 global simDriverDropDown
@@ -140,10 +140,10 @@ global strategyStartTCEdit := 1
 global strategyStartABSEdit := 2
 
 global strategyCompoundDropDown
-global strategyPressureFLEdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
-global strategyPressureFREdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
-global strategyPressureRLEdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
-global strategyPressureRREdit := displayValue("Float", convertUnit("Pressure", 27.7), 2)
+global strategyPressureFLEdit := displayValue("Float", convertUnit("Pressure", 27.7))
+global strategyPressureFREdit := displayValue("Float", convertUnit("Pressure", 27.7))
+global strategyPressureRLEdit := displayValue("Float", convertUnit("Pressure", 27.7))
+global strategyPressureRREdit := displayValue("Float", convertUnit("Pressure", 27.7))
 
 class StrategyWorkbench extends ConfigurationItem {
 	iDataListView := false
@@ -1793,7 +1793,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							GuiControl, , pitstopFuelServiceEdit, % displayValue("Float", pitstopFuelServiceEdit)
 							GuiControl Choose, pitstopServiceDropDown, % (strategy.PitstopServiceOrder = "Simultaneous") ? 1 : 2
 							GuiControl, , safetyFuelEdit, % displayValue("Float", convertUnit("Volume", strategy.SafetyFuel), 0)
-							GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", strategy.FuelCapacity), 1)
+							GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", strategy.FuelCapacity))
 
 							this.iSelectedValidator := strategy.Validator
 
@@ -2071,7 +2071,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								GuiControl, , safetyFuelEdit, % displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.SafetyMargin")), 0)
 
 							if (getConfigurationValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined)
-								GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.Amount"), 1))
+								GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.Amount")))
 
 							if ((getConfigurationValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
 							 && (getConfigurationValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
@@ -2155,7 +2155,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							initialFuelAmount := getConfigurationValue(data, "Car Data", "FuelRemaining", kUndefined)
 
 							if (fuelCapacity != kUndefined)
-								GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", fuelCapacity), 1)
+								GuiControl, , fuelCapacityEdit, % displayValue("Float", convertUnit("Volume", fuelCapacity))
 
 							if (initialFuelAmount != kUndefined)
 								GuiControl, , simInitialFuelAmountEdit, % displayValue("Float", convertUnit("Volume", initialFuelAmount), 0)
@@ -2418,10 +2418,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		compound := compound(strategy.TyreCompound, strategy.TyreCompoundColor)
 		GuiControl Choose, strategyCompoundDropDown, % inList(this.TyreCompounds, compound)
 
-		GuiControl, , strategyPressureFLEdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFL), 2)
-		GuiControl, , strategyPressureFREdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFR), 2)
-		GuiControl, , strategyPressureRLEdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureRL), 2)
-		GuiControl, , strategyPressureRREdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureRR), 2)
+		GuiControl, , strategyPressureFLEdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFL))
+		GuiControl, , strategyPressureFREdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureFR))
+		GuiControl, , strategyPressureRLEdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureRL))
+		GuiControl, , strategyPressureRREdit, % displayValue("Float", convertUnit("Pressure", strategy.TyrePressureRR))
 
 		this.showStrategyInfo(strategy)
 

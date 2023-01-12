@@ -620,7 +620,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Font, Bold Italic, Arial
 
 		Gui %window%:Add, Text, x342 yp+30 w267 0x10
-		Gui %window%:Add, Text, x296 yp+10 w370 h20 Center BackgroundTrans, % substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure", true)})
+		Gui %window%:Add, Text, x296 yp+10 w370 h20 Center BackgroundTrans, % substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure")})
 
 		Gui %window%:Font, Norm, Arial
 
@@ -3355,8 +3355,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
 																			   , this.SelectedTrack, this.SelectedWeather
-																			   , Round(convertUnit("Temperature", airTemperatureEdit, false))
-																			   , Round(convertUnit("Temperature", trackTemperatureEdit, false))
+																			   , convertUnit("Temperature", airTemperatureEdit, false)
+																			   , convertUnit("Temperature", trackTemperatureEdit, false)
 																			   , compound, compoundColor, driver*)
 				}
 				else
@@ -3397,7 +3397,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						for index, postfix in ["1", "2", "3", "4", "5"] {
 							pressure := Format("{:.1f}", pressure)
 
-							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", convertUnit("Pressure", pressure), 1)
+							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", convertUnit("Pressure", pressure))
 
 							if (index = (3 + airDelta)) {
 								GuiControl +Background, %tyre%Pressure%postfix%
@@ -6146,8 +6146,8 @@ transferPressures() {
 
 	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
 																			, editor.SelectedTrack, editor.SelectedWeather
-																			, Round(convertUnit("Temperature", airTemperatureEdit, false))
-																			, Round(convertUnit("Temperature", trackTemperatureEdit, false))
+																			, convertUnit("Temperature", airTemperatureEdit, false)
+																			, convertUnit("Temperature", trackTemperatureEdit, false)
 																			, compound, compoundColor, driver*)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 

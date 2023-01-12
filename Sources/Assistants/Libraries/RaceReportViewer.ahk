@@ -451,7 +451,7 @@ class RaceReportViewer extends RaceReportReader {
 					consumption := translate("n/a")
 
 				if consumption is Number
-					consumption := displayValue("Float", convertUnit("Volume", consumption), 1)
+					consumption := displayValue("Float", convertUnit("Volume", consumption))
 
 				lapTime := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".LapTime", "n/a")
 

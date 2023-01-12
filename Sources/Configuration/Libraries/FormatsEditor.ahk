@@ -76,7 +76,7 @@ class FormatsEditor extends ConfigurationItem {
 
 		chosen := inList(kVolumeUnits, volumeUnitDropDown)
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Volume ")
+		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Volume")
 		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vvolumeUnitDropDown, % values2String("|", kVolumeUnits*)
 
 		chosen := inList(kLengthUnits, lengthUnitDropDown)

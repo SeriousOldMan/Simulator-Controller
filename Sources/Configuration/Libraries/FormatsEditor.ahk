@@ -91,7 +91,7 @@ class FormatsEditor extends ConfigurationItem {
 
 		chosen := inList(kNumberFormats, numberFormatDropDown)
 
-		Gui FE:Add, Text, x16 yp+30 w100 h23 +0x200, % translate("Number")
+		Gui FE:Add, Text, x16 yp+30 w100 h23 +0x200, % translate("Float")
 		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vnumberFormatDropDown, % values2String("|", kNumberFormats*)
 
 		chosen := inList(kTimeFormats, timeFormatDropDown)
@@ -210,5 +210,5 @@ moveFormatsEditor() {
 }
 
 openFormatsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#localization-editor
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats
 }

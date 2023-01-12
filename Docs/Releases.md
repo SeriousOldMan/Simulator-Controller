@@ -1,3 +1,17 @@
+## 4.5.5.0-release 01/13/22 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. The copyright information of all sources has been updated to 2023.
+  4. Further optimization of the pitstop recommendation by Strategist. If no specific lap can be derived, the next pitstop according to the current strategy will be used instead.
+  5. Pitstop plans can now be updated from partial strategies in "Race Center". This is useful, after you have run a strategy simulation during an active session in "Race Center".
+  6. Fixed handling of unplanned pitstops in "Race Center". A dummy entry will be inserted in the list of pitstops in "Race Center".
+  7. Extended the stint plan report in "Race Center" with information about the date and time of the session.
+  8. Extended session summary report in "Race Center" with information about the date and time of the session.
+  9. Fixed the calculation of the pitlane duration for races with only a single pitstop in strategy simulations.
+  10. Preset patch files can now be edited by double clicking on them in "Simulator Setup".
+  11. Pitstops can now be prepared in the "Race Center" even during learning laps
+  12. Full support for system-wide localization of units and number formats. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats) for more information.
+  
 ## 4.5.4.0-release 01/06/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always

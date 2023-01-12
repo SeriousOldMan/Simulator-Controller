@@ -82,7 +82,7 @@ class StrategyViewer {
 	createSetupInfo(strategy) {
 		local html := "<table>"
 		local pressures := strategy.TyrePressures
-		
+
 		loop % pressures.Length()
 			pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressures[A_Index]))
 
@@ -256,7 +256,7 @@ class StrategyViewer {
 
 			xAxis := (durationSession ? lapSeries[A_Index] : time)
 
-			drawChartFunction .= ("[" . xAxis . ", " . convertUnit("Volume", fuelSeries[A_Index], false) . ", " . tyreSeries[A_Index] . "]")
+			drawChartFunction .= ("[" . xAxis . ", " . convertUnit("Volume", fuelSeries[A_Index]) . ", " . tyreSeries[A_Index] . "]")
 		}
 
 		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")

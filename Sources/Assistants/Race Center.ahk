@@ -8717,8 +8717,8 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Duration:") . "</b></div></td><td>" . Round(duration / 60) . A_Space . translate("Minutes") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . stint.StartPosition . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . stint.EndPosition . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", stint.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", stint.TrackTemperature)) . A_Space . getUnit("Temperature", true) . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", stint.FuelConsumption)) . A_Space . getUnit("Volume", true) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", stint.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", stint.TrackTemperature)) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", stint.FuelConsumption)) . "</td></tr>")
 		html .= "</table>"
 
 		return html
@@ -9073,7 +9073,7 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . lapTimeDisplayValue(lap.LapTime) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Consumption:") . "</b></td><td>" . displayNullValue(fuelConsumption) . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Fuel Level:") . "</b></td><td>" . remainingFuel . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . A_Space . getUnit("Temperature", true) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Temperatures (A / T):") . "</b></td><td>" . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", " . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . "</td></tr>")
 
 		if (hotPressures != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (hot):") . "</b></td><td>" . hotPressures . "</td></tr>")
@@ -9292,23 +9292,32 @@ class RaceCenter extends ConfigurationItem {
 	createPitstopServiceDetails(pitstopNr) {
 		local html := "<table>"
 		local pitstopData := this.SessionStore.Tables["Pitstop.Data"][pitstopNr]
-		local pressures := values2String(", ", pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
-											 , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"])
+		local pressures := [pitstopData["Tyre.Pressure.Cold.Front.Left"], pitstopData["Tyre.Pressure.Cold.Front.Right"]
+						  , pitstopData["Tyre.Pressure.Cold.Rear.Left"], pitstopData["Tyre.Pressure.Cold.Rear.Right"]]
 		local repairBodywork := pitstopData["Repair.Bodywork"]
 		local repairSuspension := pitstopData["Repair.Suspension"]
 		local repairEngine := pitstopData["Repair.Engine"]
 		local repairs := this.computeRepairs(repairBodyWork, repairSuspension, repairEngine)
 		local serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: pitstopNr}})
-		local compound, tyreSet, name, key
+		local compound, tyreSet, name, key, pressure
 
 		if (serviceData.Length() > 0) {
+			loop 4 {
+				pressure := pressures[A_Index]
+
+				if pressure is Number
+					pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
+			}
+
+			pressures := values2String(", ", pressures*)
+
 			serviceData := serviceData[1]
 
 			if serviceData.Lap
 				html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . serviceData.Lap . "</td></tr>")
 
 			if serviceData.Time
-				html .= ("<tr><td><b>" . translate("Service Time:") . "</b></div></td><td>" . Round(serviceData.Time, 1) . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Service Time:") . "</b></div></td><td>" . displayValue("Float", serviceData.Time, 1) . "</td></tr>")
 
 			if serviceData["Driver.Previous"]
 				html .= ("<tr><td><b>" . translate("Last Driver:") . "</b></div></td><td>" . serviceData["Driver.Previous"] . "</td></tr>")
@@ -9587,7 +9596,7 @@ class RaceCenter extends ConfigurationItem {
 				repairsData.Push("<td class=""td-std"">" . repairs . "</td>")
 
 				lapData.Push("<td class=""td-std"">" . (serviceData.Lap ? serviceData.Lap : "-") . "</td>")
-				timeData.Push("<td class=""td-std"">" . (serviceData.Time ? Round(serviceData.Time, 1) : "-") . "</td>")
+				timeData.Push("<td class=""td-std"">" . (serviceData.Time ? displayValue("Float", serviceData.Time, 1) : "-") . "</td>")
 				previousDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Previous"] ? serviceData["Driver.Previous"] : "-") . "</td>")
 				nextDriverData.Push("<td class=""td-std"">" . (serviceData["Driver.Next"] ? serviceData["Driver.Next"] : "-") . "</td>")
 				refuelData.Push("<td class=""td-std"">" . (serviceData.Fuel ? ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData.Fuel)) : "-") : "-") . "</td>")

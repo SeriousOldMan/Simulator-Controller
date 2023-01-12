@@ -9,7 +9,7 @@
   8. Extended session summary report in "Race Center" with information about the date and time of the session.
   9. Fixed the calculation of the pitlane duration for races with only a single pitstop in strategy simulations.
   10. Preset patch files can now be edited by double clicking on them in "Simulator Setup".
-  11. Pitstops can now be prepared in the "Race Center" even during learning laps
+  11. Pitstops can now be prepared in the "Race Center" even during learning laps.
   12. Full support for system-wide localization of units and number formats. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats) for more information.
       Disclaimer: The current implementation changes only the bahaviour of the user interface. The Race Assistants still work with the default units as described in the documentation. This will change with a future release.
   

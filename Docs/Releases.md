@@ -11,6 +11,7 @@
   10. Preset patch files can now be edited by double clicking on them in "Simulator Setup".
   11. Pitstops can now be prepared in the "Race Center" even during learning laps
   12. Full support for system-wide localization of units and number formats. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats) for more information.
+      Disclaimer: The current implementation changes only the bahaviour of the user interface. The Race Assistants still work with the default units as described in the documentation. This will change with a future release.
   
 ## 4.5.4.0-release 01/06/22
   1. Minor bugfixes, as always

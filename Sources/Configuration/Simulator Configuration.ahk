@@ -223,7 +223,7 @@ class GeneralTab extends ConfigurationItem {
 		if this.iFormatsConfiguration
 			setConfigurationValues(configuration, this.iFormatsConfiguration)
 		else
-			setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Configuration, "Localization", Object()))
+			setConfigurationSectionValues(configuration, "Localization", getConfigurationSectionValues(this.Configuration, "Localization", Object()))
 
 		if this.iDevelopment {
 			GuiControlGet ahkPathEdit

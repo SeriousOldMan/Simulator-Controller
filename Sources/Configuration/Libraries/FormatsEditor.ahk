@@ -55,7 +55,7 @@ class FormatsEditor extends ConfigurationItem {
 		Gui FE:Font, Norm, Arial
 		Gui FE:Font, Italic Underline, Arial
 
-		Gui FE:Add, Text, x83 YP+20 w88 cBlue Center gopenFormatsDocumentation, % translate("Units && Formats")
+		Gui FE:Add, Text, x63 YP+20 w128 cBlue Center gopenFormatsDocumentation, % translate("Units && Formats")
 
 		Gui FE:Font, Norm, Arial
 

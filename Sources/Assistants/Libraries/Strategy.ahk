@@ -540,18 +540,40 @@ class StrategySimulation {
 				return scenario1
 			else if ((sLaps = cLaps) && (sTime < cTime))
 				return scenario1
-			else if ((sLaps = cLaps) && (sTime = cTime) && (scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true] ))
-				return scenario1
+			else if ((sLaps = cLaps) && (sTime = cTime)) {
+				if (scenario2.Pitstops.Length() > scenario1.Pitstops.Length())
+					return scenario1
+				else if (scenario2.Pitstops.Length() < scenario1.Pitstops.Length())
+					return scenario2
+				if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
+					return scenario1
+				else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())
+					return scenario2
+				else if ((scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true]))
+					return scenario1
+				else
+					return scenario2
+			}
 			else
 				return scenario2
 		}
 		else {
 			if (scenario1.getSessionDuration() < scenario2.getSessionDuration())
 				return scenario1
-			else if ((scenario1.getSessionDuration() = scenario2.getSessionDuration())
-				  && ((scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true])
-				   || (scenario2.RemainingFuel[true] > scenario1.RemainingFuel[true])))
-				return scenario1
+			else if (scenario1.getSessionDuration() = scenario2.getSessionDuration()) {
+				if (scenario2.Pitstops.Length() > scenario1.Pitstops.Length())
+					return scenario1
+				else if (scenario2.Pitstops.Length() < scenario1.Pitstops.Length())
+					return scenario2
+				if (scenario2.getRemainingFuel() > scenario1.getRemainingFuel())
+					return scenario1
+				else if (scenario2.getRemainingFuel() < scenario1.getRemainingFuel())
+					return scenario2
+				else if ((scenario2.FuelConsumption[true] > scenario1.FuelConsumption[true]))
+					return scenario1
+				else
+					return scenario2
+			}
 			else
 				return scenario2
 		}
@@ -3171,6 +3193,14 @@ class Strategy extends ConfigurationItem {
 			return (pitstop.Time + pitstop.Duration + (pitstop.StintLaps * pitstop.AvgLapTime))
 		else
 			return this.RemainingSessionTime
+	}
+
+	getRemainingFuel() {
+		local remainingFuel := this.RemainingFuel[true]
+		local laps := this.StintLaps[true]
+		local fuelConsumption := this.FuelConsumption[true]
+
+		return remainingFuel - (laps * fuelConsumption)
 	}
 }
 

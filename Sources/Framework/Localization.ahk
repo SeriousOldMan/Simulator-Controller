@@ -509,8 +509,8 @@ registerLocalizationCallback(callback) {
 	vLocalizationCallbacks.Push(callback)
 }
 
-getUnit(unit, translate := false) {
-	switch unit {
+getUnit(type, translate := false) {
+	switch type {
 		case "Pressure":
 			return getPressureUnit(translate)
 		case "Temperature":
@@ -523,24 +523,6 @@ getUnit(unit, translate := false) {
 			return getMassUnit(translate)
 		case "Volume":
 			return getVolumeUnit(translate)
-	}
-}
-
-displayValue(type, value, arguments*) {
-	switch type {
-		case "Float":
-			return displayFloatValue(value, arguments*)
-		case "Time":
-			return displayTimeValue(value, arguments*)
-	}
-}
-
-internalValue(type, value, arguments*) {
-	switch type {
-		case "Float":
-			return internalFloatValue(value, arguments*)
-		case "Time":
-			return internalTimeValue(value, arguments*)
 	}
 }
 
@@ -575,6 +557,24 @@ convertUnit(type, value, display := true, round := true) {
 			case "Volume":
 				return internalVolumeValue(value, round)
 		}
+}
+
+displayValue(type, value, arguments*) {
+	switch type {
+		case "Float":
+			return displayFloatValue(value, arguments*)
+		case "Time":
+			return displayTimeValue(value, arguments*)
+	}
+}
+
+internalValue(type, value, arguments*) {
+	switch type {
+		case "Float":
+			return internalFloatValue(value, arguments*)
+		case "Time":
+			return internalTimeValue(value, arguments*)
+	}
 }
 
 validNumber(value, display := false) {

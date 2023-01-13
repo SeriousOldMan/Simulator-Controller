@@ -235,7 +235,22 @@ Returns the [ISO language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_
 Registers a callback, which will be invoked, whenever a part of the localization is changed. A map is passed to this function which contains information about the changes. It contains one or more of the following key / value pairs:
 
 	*Language:* languageCode
- 
+
+#### *getUnit(type :: OneOf("Temperature", "Pressure", "Mass", "Volume", "Length", "Speed"), translate :: Boolean := false)*
+Returns the currently selected unit name for the given *type*, or, if you have passed *true* for the optional parameter *translate*, a translation for the unit name, which can be used as a field label.
+
+#### *convertUnit(type :: OneOf("Temperature", "Pressure", "Mass", "Volume", "Length", "Speed"), value :: Number, display :: Boolean := true, round :: Boolean := true)*
+Converts between internal representation of a given unit and its external value to be used in the user interface. With *display*, you control the direction of the conversion and with *round* you can specify whether the resulting value should be rounded to the *natural* length of the given unit.
+
+#### *displayValue(type :: OneOf("Float", "Time"), value :: Number, ...)*
+Converts an internal value of the given *type* to its display representation, which is always a string. For floating point numbers, this might involve a change of the floating point character. For time values, which must be supplied as seconds with an optional fraction, the conversion might be even more complex. For floating point number you may supply the precision for an optional rounding step.
+
+#### *internalValue(type :: OneOf("Float", "Time"), value :: String)*
+Converts a display representation of the given *type* to its internal value, which is always a number.
+
+#### *validNumber(value :: String, display :: Boolean := true)*
+This function return *true*, if the given *value* in display representation represents a value number. If you pass *false* for the optional *display* parameter, value must be valid number in internal representation, a check which can also be conducted using elements of the programming language itself.
+
 ***
 
 ## GUI Tools ([GUI.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/GUI.ahk))

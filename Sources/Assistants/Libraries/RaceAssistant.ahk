@@ -1234,7 +1234,7 @@ class RaceAssistant extends ConfigurationItem {
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", overallTime)
 
-		overallTime := (this.OverallTime + lapTime)
+		overallTime := (overallTime + lapTime)
 
 		values := {OverallTime: overallTime}
 

@@ -1527,7 +1527,7 @@ class RaceSpotter extends RaceAssistant {
 			else if (remainingSessionLaps > 5) {
 				situation := "HalfTime"
 
-				if (!this.SessionInfos.HasKey(situation) && (Abs((this.SessionDuration / 2) - this.OverallTime) < 120000)) {
+				if ((Abs((this.SessionDuration / 2) - this.OverallTime) < 120000) && !this.SessionInfos.HasKey(situation)) {
 					this.SessionInfos[situation] := true
 
 					if this.reviewHalfTime(lastLap, sector, positions)
@@ -1551,7 +1551,7 @@ class RaceSpotter extends RaceAssistant {
 			if (sector = 1) {
 				stintLaps := Floor(remainingStintLaps)
 
-				if ((this.Session = kSessionRace) && (stintLaps < 4) && (Abs(remainingStintLaps - remainingSessionLaps) > 2)) {
+				if ((this.Session = kSessionRace) && (stintLaps < 5) && (Abs(remainingStintLaps - remainingSessionLaps) > 2)) {
 					if (stintLaps > 0) {
 						situation := ("StintEnding " . Ceil(lastLap + stintLaps))
 

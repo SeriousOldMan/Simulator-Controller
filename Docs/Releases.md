@@ -1,4 +1,4 @@
-## 4.5.5.0-release 01/13/23 (planned)
+## 4.5.5.0-release 01/13/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. The copyright information of all sources has been updated to 2023.

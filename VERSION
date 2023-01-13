@@ -2,12 +2,12 @@
 Version=4.5.5.0-release
 Target=4.5.5.0-release
 Date=01/13/2023
-Download=https://cutt.ly/Q2Kg8M7;https://www.dropbox.com/s/ix6bo0xjj1yd5w1/Simulator%20Controller%204.5.5.0-alpha%20.zip?dl=1
+Download=https://cutt.ly/U2Kx80O;https://www.dropbox.com/s/qc727tluz1wnn4u/Simulator%20Controller%204.4.5.0-release.zip?dl=1
 Changes=Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats, Pitstops can now be prepared in the "Race Center" even during learning laps
 [Release]
 Version=4.5.5.0-release
 Date=01/13/2023
-Download=https://cutt.ly/Q2Kg8M7;https://www.dropbox.com/s/ix6bo0xjj1yd5w1/Simulator%20Controller%204.5.5.0-alpha%20.zip?dl=1
+Download=https://cutt.ly/U2Kx80O;https://www.dropbox.com/s/qc727tluz1wnn4u/Simulator%20Controller%204.4.5.0-release.zip?dl=1
 Changes=Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats, Pitstops can now be prepared in the "Race Center" even during learning laps
 [Current]
 Type=Release

@@ -1,9 +1,9 @@
 [Development]
 Version=4.5.6.0-dev
 Target=4.5.6.0-release
-Date=01/13/2023
+Date=01/14/2023
 Download=
-Changes=Documentation of the unit and data format localization framework for Developers, New heuristical approach in strategy simulation to minimize surplus fuel at the end of a race
+Changes=Documentation of the unit and data format localization framework for Developers, New heuristical approach in strategy simulation to minimize surplus fuel at the end of a race, Fixed endless loop in strategy simulation with high optimizer values, Optimized pressure loss detection
 [Release]
 Version=4.5.4.0-release
 Date=01/06/2023

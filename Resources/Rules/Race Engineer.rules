@@ -69,7 +69,7 @@
 
 updateFuelTarget(?lap) <= lapAvgConsumption(?lap, ?avgConsumption), lapRemainingFuel(?lap, ?remainingFuel),
 						  remainingSessionLaps(?lap, ?remainingLaps),
-						  ?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel),
+						  ?sessionFuel = ?avgConsumption * ?remainingLaps, safetyFuel(?avgConsumption, ?safetyFuel, false),
 						  ?neededFuel = ?sessionFuel + ?safetyFuel, ?neededFuel > ?remainingFuel, ?refillAmount = ?neededFuel - ?remainingFuel,
 						  min(?refillAmount, !Session.Settings.Fuel.Max, ?temp), max(0, ?temp, ?adjustedRefillAmount),
 						  Set(Fuel.Amount.Target, ?adjustedRefillAmount), !
@@ -202,7 +202,7 @@ updatePressureLoss(?, ?, ?, [], [], ?)
 updatePressureLoss(?lap, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [0 | ?losses]) <=
 		!, Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)
 updatePressureLoss(?, ?avg, ?stdDev, [?tyreType | ?tyreTypes], [?loss | ?losses]) <=
-		?temp = ?avg + ?stdDev, ?loss > ?temp,	?loss > !Session.Settings.Tyre.Pressure.Deviation, !,
+		?temp = ?avg + ?stdDev, ?loss > ?temp,	?loss >= !Session.Settings.Tyre.Pressure.Deviation, !,
 		Set(Tyre.Pressure.Loss, ?tyreType, ?loss), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)
 updatePressureLoss(?lap, ?avg, ?stdDev, [? | ?tyreTypes], [? | ?losses]) <=
 		Clear(Tyre.Pressure.Loss, ?tyreType), updatePressureLoss(?lap, ?avg, ?stdDev, ?tyreTypes, ?losses)

@@ -97,8 +97,8 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 													  , "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"]
 							 , "Pitstop.Tyre.Data": ["Pitstop", "Driver", "Laps", "Compound", "Compound.Color", "Set"
 												   , "Tyre", "Tread", "Wear", "Grain", "Blister", "FlatSpot"]
-							 , "Delta.Data": ["Lap", "Car", "Type", "Delta", "Distance"]
-							 , "Standings.Data": ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta"]
+							 , "Delta.Data": ["Lap", "Car", "Type", "Delta", "Distance", "ID"]
+							 , "Standings.Data": ["Lap", "Car", "Driver", "Position", "Time", "Laps", "Delta", "ID"]
 							 , "Plan.Data": ["Stint", "Driver", "Time.Planned", "Time.Actual", "Lap.Planned", "Lap.Actual"
 										   , "Fuel.Amount", "Tyre.Change"]
 							 , "Setups.Data": ["Driver", "Weather", "Temperature.Air", "Temperature.Track"
@@ -6365,13 +6365,14 @@ class RaceCenter extends ConfigurationItem {
 			this.StrategyViewer.showStrategyInfo(this.Strategy)
 	}
 
-	getCar(lap, car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
-		this.ReportViewer.getCar(lap.Nr, car, carNumber, carName, driverForname, driverSurname, driverNickname)
+	getCar(lap, carID, ByRef car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
+		return this.ReportViewer.getCar(lap.Nr, carID, car, carNumber, carName, driverForname, driverSurname, driverNickname)
 	}
 
-	getStandings(lap, ByRef cars, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
+	getStandings(lap, ByRef cars, ByRef ids, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
 					, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
 		local tCars := true
+		local tIDs := true
 		local tOPositions := true
 		local tCPositions := true
 		local tCarNumbers := carNumbers
@@ -6381,11 +6382,14 @@ class RaceCenter extends ConfigurationItem {
 		local tDriverNicknames := driverNicknames
 		local index, multiClass
 
-		multiClass := this.ReportViewer.getStandings(lap.Nr, tCars, tOPositions, tCPositions, tCarNumbers, tCarNames
+		multiClass := this.ReportViewer.getStandings(lap.Nr, tCars, tIDs, tOPositions, tCPositions, tCarNumbers, tCarNames
 												   , tDriverFornames, tDriverSurnames, tDriverNicknames)
 
 		if cars
 			cars := []
+
+		if ids
+			ids := []
 
 		if overallPositions
 			overallPositions := []
@@ -6415,6 +6419,9 @@ class RaceCenter extends ConfigurationItem {
 
 				if cars
 					cars.Push(tCars[index])
+
+				if ids
+					ids.Push(tIDs[index])
 
 				if overallPositions
 					overallPositions.Push(tOPositions[index])
@@ -8310,7 +8317,7 @@ class RaceCenter extends ConfigurationItem {
 		local wearFL, wearFR, wearRL, wearRR
 		local telemetry, brakeTemperatures, ignore, field, brakeWears
 		local currentListView, lapPressures, entry, standingsData, prefix, driver
-		local currentStint, newStint, stint, stintData, tries
+		local currentStint, newStint, stint, stintData, tries, carIDs, positions
 
 		if lastLap
 			lastLap := lastLap.Nr
@@ -8539,55 +8546,74 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					if (standingsData.Count() > 0) {
-						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Behind"
-													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
-																						   , "Position.Standings.Class.Behind.Car", "Position.Standings.Behind.Car")
-													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
-																								   , "Position.Standings.Class.Behind.Delta"
-																								   , "Position.Standings.Behind.Delta") / 1000, 2)
-													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
-																									  , "Position.Standings.Class.Behind.Distance"
-																									  , "Position.Standings.Behind.Distance"), 2)})
-						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Ahead"
-													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
-																						   , "Position.Standings.Class.Ahead.Car", "Position.Standings.Ahead.Car")
-													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
-																								   , "Position.Standings.Class.Ahead.Delta"
-																								   , "Position.Standings.Ahead.Delta") / 1000, 2)
-													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
-																									  , "Position.Standings.Class.Ahead.Distance"
-																									  , "Position.Standings.Ahead.Distance"), 2)})
-						sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
-													  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
-																						   , "Position.Standings.Class.Leader.Car", "Position.Standings.Leader.Car")
-													  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
-																								   , "Position.Standings.Class.Leader.Delta"
-																								   , "Position.Standings.Leader.Delta") / 1000, 2)
-													  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
-																									  , "Position.Standings.Class.Leader.Distance"
-																									  , "Position.Standings.Leader.Distance"), 2)})
-						sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Behind"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
-						sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Ahead"
-													  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Car")
-													  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Delta") / 1000, 2)
-													  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Distance"), 2)})
+						positions := this.Laps[lap].Positions
 
-						prefix := ("Standings.Lap." . lap . ".Car.")
+						if (positions && (positions != "")) {
+							positions := parseConfiguration(positions)
 
-						loop % getConfigurationValue(standingsData, "Standings", prefix . "Count")
-						{
-							driver := computeDriverName(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
-													  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
-													  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Nickname"))
+							carIDs := {}
 
-							sessionStore.add("Standings.Data", {Lap: lap, Car: A_Index, Driver: driver
-															  , Position: getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Position")
-															  , Time: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Time") / 1000, 1)
-															  , Laps: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Laps"), 1)
-															  , Delta: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Delta") / 1000, 2)})
+							loop % getConfigurationValue(positions, "Position Data", "Car.Count")
+								carIDs[A_Index] := getConfigurationValue(positions, "Position Data", "Car." . A_Index . ".ID")
+
+							sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Behind"
+														  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																							   , "Position.Standings.Class.Behind.Car", "Position.Standings.Behind.Car")
+														  , ID: carIDs[getDeprecatedConfigurationValue(standingsData, "Position"
+																							         , "Position.Standings.Class.Behind.Car", "Position.Standings.Behind.Car")]
+														  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									   , "Position.Standings.Class.Behind.Delta"
+																									   , "Position.Standings.Behind.Delta") / 1000, 2)
+														  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																										  , "Position.Standings.Class.Behind.Distance"
+																										  , "Position.Standings.Behind.Distance"), 2)})
+							sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Ahead"
+														  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																							   , "Position.Standings.Class.Ahead.Car", "Position.Standings.Ahead.Car")
+														  , ID: carIDs[getDeprecatedConfigurationValue(standingsData, "Position"
+																							         , "Position.Standings.Class.Ahead.Car", "Position.Standings.Ahead.Car")]
+														  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									   , "Position.Standings.Class.Ahead.Delta"
+																									   , "Position.Standings.Ahead.Delta") / 1000, 2)
+														  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																										  , "Position.Standings.Class.Ahead.Distance"
+																										  , "Position.Standings.Ahead.Distance"), 2)})
+							sessionStore.add("Delta.Data", {Lap: lap, Type: "Standings.Leader"
+														  , Car: getDeprecatedConfigurationValue(standingsData, "Position"
+																							   , "Position.Standings.Class.Leader.Car", "Position.Standings.Leader.Car")
+														  , ID: carIDs[getDeprecatedConfigurationValue(standingsData, "Position"
+																							         , "Position.Standings.Class.Leader.Car", "Position.Standings.Leader.Car")]
+														  , Delta: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																									   , "Position.Standings.Class.Leader.Delta"
+																									   , "Position.Standings.Leader.Delta") / 1000, 2)
+														  , Distance: Round(getDeprecatedConfigurationValue(standingsData, "Position"
+																										  , "Position.Standings.Class.Leader.Distance"
+																										  , "Position.Standings.Leader.Distance"), 2)})
+							sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Behind"
+														  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")
+														  , ID: carIDs[getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Car")]
+														  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Delta") / 1000, 2)
+														  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Behind.Distance"), 2)})
+							sessionStore.add("Delta.Data", {Lap: lap, Type: "Track.Ahead"
+														  , Car: getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Car")
+														  , ID: carIDs[getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Car")]
+														  , Delta: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Delta") / 1000, 2)
+														  , Distance: Round(getConfigurationValue(standingsData, "Position", "Position.Track.Ahead.Distance"), 2)})
+
+							prefix := ("Standings.Lap." . lap . ".Car.")
+
+							loop % getConfigurationValue(standingsData, "Standings", prefix . "Count")
+							{
+								driver := computeDriverName(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Forname")
+														  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Surname")
+														  , getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Driver.Nickname"))
+
+								sessionStore.add("Standings.Data", {Lap: lap, Car: A_Index, ID: carIDs[A_Index], Driver: driver
+																  , Position: getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Position")
+																  , Time: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Time") / 1000, 1)
+																  , Laps: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Laps"), 1)
+																  , Delta: Round(getConfigurationValue(standingsData, "Standings", prefix . A_Index . ".Delta") / 1000, 2)})
+							}
 						}
 					}
 
@@ -9100,6 +9126,7 @@ class RaceCenter extends ConfigurationItem {
 		local rows := [1, 2, 3, 4, 5]
 		local deltas, ignore, entry, carNumber, carName, driverFullName, delta, row
 		local driverForname, driverSurname, driverNickname, entryType, index, label
+		local car, carID
 
 		html .= ("<tr><th class=""th-std"">" . "" . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
@@ -9117,15 +9144,17 @@ class RaceCenter extends ConfigurationItem {
 				driverFullname := "-"
 				delta := "-"
 
-				if (entry.Car) {
+				if (entry.Car || (entry.ID != kNull)) {
 					driverForname := false
 					driverSurname := false
 					driverNickname := false
 
-					this.getCar(lap, entry.Car, carNumber, carName, driverForname, driverSurname, driverNickname)
+					car := entry.Car
 
-					driverFullname := computeDriverName(driverForname, driverSurname, driverNickname)
-					delta := entry.Delta
+					if this.getCar(lap, (entry.ID != kNull) ? entry.ID : false, car, carNumber, carName, driverForname, driverSurname, driverNickname) {
+						driverFullname := computeDriverName(driverForname, driverSurname, driverNickname)
+						delta := entry.Delta
+					}
 				}
 
 				entryType := entry.Type
@@ -9160,6 +9189,7 @@ class RaceCenter extends ConfigurationItem {
 		local telemetryDB := this.TelemetryDatabase
 		local html := "<table class=""table-std"">"
 		local cars := true
+		local carIDs := true
 		local overallPositions := true
 		local classPositions := true
 		local carNumbers := true
@@ -9169,7 +9199,7 @@ class RaceCenter extends ConfigurationItem {
 		local driverNicknames := true
 		local index, position, lapTime, laps, delta, result, multiClass
 
-		multiClass := this.getStandings(lap, cars, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
+		multiClass := this.getStandings(lap, cars, carIDs, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
 
 		html .= ("<tr><th class=""th-std"">" . translate("#") . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
@@ -9189,7 +9219,10 @@ class RaceCenter extends ConfigurationItem {
 			laps := "-"
 			delta := "-"
 
-			result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
+			result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
+
+			if (result.Length() = 0)
+				result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
 
 			if (result.Length() > 0) {
 				lapTime := result[1].Time

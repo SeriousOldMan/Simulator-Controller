@@ -483,6 +483,7 @@ class RaceEngineer extends RaceAssistant {
 	pitstopAdjustFuelRecognized(words) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
+		local convert := false
 		local volumePosition, fuel
 
 		if !this.hasPlannedPitstop() {
@@ -500,15 +501,26 @@ class RaceEngineer extends RaceAssistant {
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
 		else {
-			volumePosition := inList(words, fragments[getUnit("Volume")])
+			for ignore, word in words
+				if InStr(word, fragments["Liter"]) {
+					volumePosition := A_Index
+
+					break
+				}
+				else if InStr(word, fragments["Gallon"]) {
+					volumePosition := A_Index
+					convert := true
+
+					break
+				}
 
 			if volumePosition {
 				fuel := words[volumePosition - 1]
 
 				if this.isNumber(fuel, fuel) {
-					speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[getUnit("Volume")]}, true)
+					speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[convert ? "Gallon" : "Liter"]}, true)
 
-					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", fuel))
+					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", convert ? Ceil(fuel * 4.546092) : fuel))
 
 					return
 				}
@@ -753,7 +765,7 @@ class RaceEngineer extends RaceAssistant {
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
 			else {
-				this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", convertUnit("Volume", internalValue("Float", fuel), false))
+				this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", fuel)
 
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledgeBase(this.KnowledgeBase)

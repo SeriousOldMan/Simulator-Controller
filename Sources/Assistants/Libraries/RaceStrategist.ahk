@@ -1719,7 +1719,8 @@ class RaceStrategist extends RaceAssistant {
 							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
 
 							if ((options == true) || (options.HasKey("Refuel") && options.Refuel))
-								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel", {refuel: refuel})
+								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
+												  , {fuel: displayValue("Float", convertUnit("Volume", refuel)), unit: speaker.Fragments[getUnit("Volume")]})
 
 							if ((options == true) || (options.HasKey("TyreChange") && options.TyreChange))
 								speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")

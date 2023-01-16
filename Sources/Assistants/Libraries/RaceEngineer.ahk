@@ -1530,7 +1530,7 @@ class RaceEngineer extends RaceAssistant {
 		local plannedLap := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
-		local temperatureDelta, debug, tyre, tyreType, lostPressure
+		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold
 
 		if (optionsOrLap != kUndefined) {
 			if optionsOrLap is Number
@@ -1717,10 +1717,12 @@ class RaceEngineer extends RaceAssistant {
 										   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
 					}
 
+					deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
+
 					for tyre, tyreType in {FrontLeft: "FL", FrontRight: "FR", RearLeft: "RL", RearRight: "RR"} {
 						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
 
-						if lostPressure
+						if (lostPressure && (lostPressure >= deviationThreshold))
 							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre], lost: Round(lostPressure, 1), unit: fragments["PSI"]})
 					}
 				}

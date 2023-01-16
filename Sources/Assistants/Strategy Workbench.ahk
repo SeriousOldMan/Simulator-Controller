@@ -118,8 +118,8 @@ global simCompoundDropDown
 global simMaxTyreLapsEdit := 40
 global simInitialFuelAmountEdit := displayValue("Float", convertUnit("Volume", 90), 0)
 global simMapEdit := 1
-global simAvgLapTimeEdit := 120
-global simFuelConsumptionEdit := 3.8
+global simAvgLapTimeEdit := displayValue("Float", 120.0)
+global simFuelConsumptionEdit := displayValue("Float", convertUnit("Volume", 3.8))
 
 global simConsumptionVariation := 0
 global simTyreUsageVariation := 0
@@ -1904,10 +1904,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
 
-							simAvgLapTimeEdit := Round(strategy.AvgLapTime, 1)
+							simAvgLapTimeEdit := displayValue("Float", strategy.AvgLapTime, 1)
 							GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
 
-							simFuelConsumptionEdit := Round(strategy.FuelConsumption, 2)
+							simFuelConsumptionEdit := displayValue("Float", convertUnit("Volume", strategy.FuelConsumption))
 							GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
 
 							GuiControl, , simMaxTyreLapsEdit, % Round(strategy.MaxTyreLaps)
@@ -2009,10 +2009,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 								GuiControl Choose, simCompoundDropDown, % inList(this.TyreCompounds, compound(compound, compoundColor))
 
-								simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
+								simAvgLapTimeEdit := displayValue("Float", getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", 120), 1)
 								GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
 
-								simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0), 2)
+								simFuelConsumptionEdit := displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", 3.0)))
 								GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
 							}
 						}
@@ -2082,13 +2082,13 @@ class StrategyWorkbench extends ConfigurationItem {
 							}
 
 							if (getConfigurationValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined) {
-								simAvgLapTimeEdit := Round(getConfigurationValue(settings, "Session Settings", "Lap.AvgTime"), 1)
+								simAvgLapTimeEdit := displayValue("Float", getConfigurationValue(settings, "Session Settings", "Lap.AvgTime"), 1)
 
 								GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
 							}
 
 							if (getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined) {
-								simFuelConsumptionEdit := Round(getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption"), 2)
+								simFuelConsumptionEdit := displayValue("Float", convertUnit("Volume", getConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption")))
 
 								GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
 							}
@@ -2117,10 +2117,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 								GuiControl, , simMapEdit, % row["Map"]
 
-								simAvgLapTimeEdit := Round(lapTime, 1)
+								simAvgLapTimeEdit := displayValue("Float", lapTime, 1)
 								GuiControl, , simAvgLapTimeEdit, %simAvgLapTimeEdit%
 
-								simFuelConsumptionEdit := Round(row["Fuel.Consumption"], 2)
+								simFuelConsumptionEdit := displayValue("Float", convertUnit("Volume", row["Fuel.Consumption"]))
 								GuiControl, , simFuelConsumptionEdit, %simFuelConsumptionEdit%
 							}
 						}
@@ -2785,10 +2785,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		initialStintTime := 0
 		initialSessionTime := 0
 		initialTyreLaps := 0
-		initialFuelAmount := Round(convertUnit("Volume", internalValue("Float", simInitialFuelAmountEdit), false), 1)
+		initialFuelAmount := convertUnit("Volume", internalValue("Float", simInitialFuelAmountEdit), false)
 		initialMap := simMapEdit
-		initialFuelConsumption := Round(convertUnit("Volume", internalValue("Float", simFuelConsumptionEdit), false), 2)
-		initialAvgLapTime := simAvgLapTimeEdit
+		initialFuelConsumption := convertUnit("Volume", internalValue("Float", simFuelConsumptionEdit), false)
+		initialAvgLapTime := internalValue("Float", simAvgLapTimeEdit)
 	}
 
 	getSimulationSettings(ByRef useInitialConditions, ByRef useTelemetryData
@@ -2903,7 +2903,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		if (min && max)
 			avgLapTime := Max(min, Min(max, avgLapTime))
 
-		return avgLapTime ? avgLapTime : (default ? default : simAvgLapTimeEdit)
+		return avgLapTime ? avgLapTime : (default ? default : internalValue("Float", simAvgLapTimeEdit))
 	}
 
 	runSimulation() {

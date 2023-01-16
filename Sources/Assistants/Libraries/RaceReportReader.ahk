@@ -81,7 +81,7 @@ class RaceReportReader {
 		return this.getDrivers(raceData)
 	}
 
-	getCar(lap, car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
+	getCar(lap, ByRef carID, ByRef car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
 		local raceData := true
 		local drivers := true
 		local positions := false
@@ -89,20 +89,46 @@ class RaceReportReader {
 
 		this.loadData(Array(lap), raceData, drivers, positions, times)
 
-		carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
-		carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
+		if carID {
+			loop % getConfigurationValue(raceData, "Cars", "Count", 0)
+				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID") = carID) {
+					car := A_Index
+					carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
+					carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
 
-		if (drivers.Length() > 0) {
-			parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
+					if (drivers.Length() > 0) {
+						parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
+					}
+					else {
+						driverForname := "John"
+						driverSurname := "Doe"
+						driverNickname := "JDO"
+					}
+
+					return true
+				}
+
+			return false
 		}
 		else {
-			driverForname := "John"
-			driverSurname := "Doe"
-			driverNickname := "JDO"
+			carID := getConfigurationValue(raceData, "Cars", "Car." . car . ".ID", false)
+			carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
+			carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
+
+			if (drivers.Length() > 0) {
+				parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
+			}
+			else {
+				driverForname := "John"
+				driverSurname := "Doe"
+				driverNickname := "JDO"
+			}
+
+			return true
 		}
 	}
 
-	getStandings(lap, ByRef cars, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
+	getStandings(lap, ByRef cars, ByRef ids, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
 					, ByRef driverFornames, ByRef driverSurnames, ByRef driverNicknames) {
 		local raceData := true
 		local drivers := true
@@ -115,6 +141,9 @@ class RaceReportReader {
 
 		if cars
 			cars := []
+
+		if ids
+			ids := []
 
 		if overallPositions
 			overallPositions := []
@@ -139,7 +168,11 @@ class RaceReportReader {
 
 		if cars {
 			loop % getConfigurationValue(raceData, "Cars", "Count", 0) {
-				cars.Push(A_Index)
+				if cars
+					cars.Push(A_Index)
+
+				if ids
+					ids.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID"))
 
 				position := tPositions[1][A_Index]
 

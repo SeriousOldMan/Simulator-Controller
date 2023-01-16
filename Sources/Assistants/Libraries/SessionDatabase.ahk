@@ -1072,7 +1072,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !availableTyreCompounds
 			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
 
-		compounds := map(availableTyreCompounds, "compound")
+		compounds := map(map(availableTyreCompounds, "compound"), "normalizeCompound")
 
 		switch weather {
 			case "Dry":

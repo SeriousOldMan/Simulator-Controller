@@ -92,7 +92,7 @@ getMassUnit(translate := false) {
 }
 
 getVolumeUnit(translate := false) {
-	return (translate ? translate(vVolumeUnit) : vMassUnit)
+	return (translate ? translate(vVolumeUnit) : vVolumeUnit)
 }
 
 displayTemperatureValue(celsius, round) {
@@ -166,6 +166,8 @@ displayVolumeValue(liter, round) {
 displayFloatValue(float, precision := "__Undefined__") {
 	if (precision = kUndefined)
 		return StrReplace(float, ".", getFloatSeparator())
+	else if (precision = 0)
+		return Round(float)
 	else
 		return StrReplace(Round(float, precision), ".", getFloatSeparator())
 }

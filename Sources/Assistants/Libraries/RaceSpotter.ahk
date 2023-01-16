@@ -1500,6 +1500,7 @@ class RaceSpotter extends RaceAssistant {
 	sessionInformation(lastLap, sector, positions, regular) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker(true)
+		local fragments := speaker.Fragments
 		local airTemperature := Round(knowledgebase.getValue("Weather.Temperature.Air"))
 		local trackTemperature := Round(knowledgebase.getValue("Weather.Temperature.Track"))
 		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
@@ -1590,8 +1591,9 @@ class RaceSpotter extends RaceAssistant {
 					this.SessionInfos["AirTemperature"] := airTemperature
 
 					if (this.BaseLap > 1) {
-						speaker.speakPhrase("Temperature", {air: displayValue("Float", convertUnit("Temperature", airTemperature))
-														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
+						speaker.speakPhrase("Temperature", {air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
+														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
+														  , unit: fragments[getUnit("Temperature")]})
 
 						return true
 					}
@@ -1603,15 +1605,17 @@ class RaceSpotter extends RaceAssistant {
 				this.SessionInfos["AirTemperature"] := airTemperature
 
 				if (lastTemperature < airTemperature) {
-					speaker.speakPhrase("TemperatureRising", {air: displayValue("Float", convertUnit("Temperature", airTemperature))
-															, track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
+					speaker.speakPhrase("TemperatureRising", {air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
+															, track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
+															, unit: fragments[getUnit("Temperature")]})
 
 					return true
 				}
 
 				if (lastTemperature > airTemperature) {
-					speaker.speakPhrase("TemperatureFalling", {air: displayValue("Float", convertUnit("Temperature", airTemperature))
-															 , track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
+					speaker.speakPhrase("TemperatureFalling", {air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
+															 , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
+															 , unit: fragments[getUnit("Temperature")]})
 
 					return true
 				}
@@ -2521,8 +2525,9 @@ class RaceSpotter extends RaceAssistant {
 				}
 
 				speaker.speakPhrase("GreetingWeather", {weather: weather
-													  , air: displayValue("Float", convertUnit("Temperature", airTemperature))
-													  , track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
+													  , air: displayValue("Float", convertUnit("Temperature", airTemperature), 0)
+													  , track: displayValue("Float", convertUnit("Temperature", trackTemperature), 0)
+													  , unit: fragments[getUnit("Temperature")]})
 
 				if (this.Session = kSessionRace) {
 					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)

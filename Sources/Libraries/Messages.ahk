@@ -41,6 +41,8 @@ class MessageManager extends PeriodicTask {
 	static sMessageHandlers := {}
 	static sOutgoingMessages := []
 
+	iPaused := false
+
 	class MessageHandler {
 		iHandler := false
 
@@ -152,6 +154,14 @@ class MessageManager extends PeriodicTask {
 		MessageManager.Instance := this
 
 		base.__New(false, 4000, kHighPriority)
+	}
+
+	pause() {
+		MessageManager.Instance.iPaused := true
+	}
+
+	resume() {
+		MessageManager.Instance.iPaused := false
 	}
 
 	receivePipeMessages() {
@@ -309,18 +319,20 @@ class MessageManager extends PeriodicTask {
 	run() {
 		local messages
 
-		protectionOn()
+		if !this.iPaused {
+			protectionOn()
 
-		try {
-			messages := this.receiveMessages()
+			try {
+				messages := this.receiveMessages()
 
-			if (messages.Length() > 0)
-				new this.MessagesDispatcher(messages).start()
-			else
-				this.deliverMessages()
-		}
-		finally {
-			protectionOff()
+				if (messages.Length() > 0)
+					new this.MessagesDispatcher(messages).start()
+				else
+					this.deliverMessages()
+			}
+			finally {
+				protectionOff()
+			}
 		}
 
 		this.Sleep := 200

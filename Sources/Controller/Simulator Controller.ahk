@@ -2189,6 +2189,8 @@ writeControllerState() {
 ;;;                       Initialization Section Part 1                     ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+MessageManager.pause()
+
 initializeSimulatorController()
 
 
@@ -2205,3 +2207,5 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 
 startupSimulatorController()
+
+MessageManager.resume()

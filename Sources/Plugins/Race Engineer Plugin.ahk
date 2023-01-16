@@ -289,8 +289,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		this.Simulator.finishPitstopSetup(pitstopNumber)
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		this.Simulator.setPitstopRefuelAmount(pitstopNumber, litres)
+	setPitstopRefuelAmount(pitstopNumber, liters) {
+		this.Simulator.setPitstopRefuelAmount(pitstopNumber, liters)
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {

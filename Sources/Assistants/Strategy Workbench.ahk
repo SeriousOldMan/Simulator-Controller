@@ -662,7 +662,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, x%x0% yp+20 w110 AltSubmit Choose2 VpitstopFuelServiceRuleDropdown gchooseRefuelService, % values2String("|", map(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
 
 		Gui %window%:Add, Edit, x%x1% yp w50 h20 VpitstopFuelServiceEdit gvalidatePitstopFuelService, %pitstopFuelServiceEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w220 h20 VpitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
+		Gui %window%:Add, Text, x%x3% yp+4 w220 h20 VpitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 liters)")
 
 		Gui %window%:Add, Text, x%x% yp+24 w160 h23, % translate("Service")
 		Gui %window%:Add, DropDownList, x%x1% yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
@@ -1781,13 +1781,13 @@ class StrategyWorkbench extends ConfigurationItem {
 								pitstopFuelServiceRuleDropDown := (1 + (pitstopFuelServiceEdit[1] != "Fixed"))
 								GuiControl Choose, pitstopFuelServiceRuleDropDown, % pitstopFuelServiceRuleDropDown
 
-								GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopFuelServiceRuleDropDown])
+								GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopFuelServiceRuleDropDown])
 
 								pitstopFuelServiceEdit := pitstopFuelServiceEdit[2]
 							}
 							else {
 								GuiControl Choose, pitstopFuelServiceRuleDropDown, % 2
-								GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
+								GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 liters)")
 							}
 
 							GuiControl, , pitstopFuelServiceEdit, % displayValue("Float", pitstopFuelServiceEdit)
@@ -1989,13 +1989,13 @@ class StrategyWorkbench extends ConfigurationItem {
 									pitstopFuelServiceEdit := pitstopFuelServiceEdit[1]
 
 									GuiControl Choose, pitstopFuelServiceRuleDropDown, % 2
-									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
+									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 liters)")
 								}
 								else {
 									pitstopFuelServiceRuleDropDown := (1 + (pitstopFuelServiceEdit[1] != "Fixed"))
 
 									GuiControl Choose, pitstopFuelServiceRuleDropDown, % pitstopFuelServiceRuleDropDown
-									GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopFuelServiceRuleDropDown])
+									GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopFuelServiceRuleDropDown])
 
 									pitstopFuelServiceEdit := pitstopFuelServiceEdit[2]
 								}
@@ -2058,7 +2058,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								}
 								else {
 									GuiControl Choose, pitstopFuelServiceRuleDropDown, % 2
-									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 litres)")
+									GuiControl, , pitstopFuelServiceLabel, % translate("Seconds (Refuel of 10 liters)")
 								}
 
 								GuiControl, , pitstopFuelServiceEdit, % displayValue("Float", pitstopFuelServiceEdit)
@@ -3011,7 +3011,7 @@ readSimulatorData(simulator) {
 chooseRefuelService() {
 	GuiControlGet pitstopFuelServiceRuleDropdown
 
-	GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopFuelServiceRuleDropdown])
+	GuiControl, , pitstopFuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopFuelServiceRuleDropdown])
 }
 
 noSelect() {

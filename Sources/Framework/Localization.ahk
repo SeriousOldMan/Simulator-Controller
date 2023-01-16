@@ -95,10 +95,6 @@ getVolumeUnit(translate := false) {
 	return (translate ? translate(vVolumeUnit) : vMassUnit)
 }
 
-getFloatSeparator() {
-	return (vNumberFormat == "#.##" ? "." : ",")
-}
-
 displayTemperatureValue(celsius, round) {
 	switch vTemperatureUnit {
 		case "Celsius":
@@ -524,6 +520,10 @@ getUnit(type, translate := false) {
 		case "Volume":
 			return getVolumeUnit(translate)
 	}
+}
+
+getFloatSeparator() {
+	return (vNumberFormat == "#.##" ? "." : ",")
 }
 
 convertUnit(type, value, display := true, round := true) {

@@ -1003,12 +1003,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	changeFuelAmount(direction, litres := 5) {
+	changeFuelAmount(direction, liters := 5) {
 		protectionOn(true, true)
 
 		try {
 			if (this.requirePitstopMFD() && this.selectPitstopOption("Refuel"))
-				this.changePitstopOption("Refuel", direction, litres)
+				this.changePitstopOption("Refuel", direction, liters)
 		}
 		finally {
 			protectionOff(true, true)
@@ -1922,15 +1922,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		local litresIncrement
+	setPitstopRefuelAmount(pitstopNumber, liters) {
+		local litersIncrement
 
-		base.setPitstopRefuelAmount(pitstopNumber, litres)
+		base.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		litresIncrement := Round(litres - this.getPitstopOptionValues("Refuel")[1])
+		litersIncrement := Round(liters - this.getPitstopOptionValues("Refuel")[1])
 
-		if (litresIncrement != 0)
-			changePitstopFuelAmount((litresIncrement > 0) ? "Increase" : "Decrease", Abs(litresIncrement))
+		if (litersIncrement != 0)
+			changePitstopFuelAmount((litersIncrement > 0) ? "Increase" : "Decrease", Abs(litersIncrement))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {

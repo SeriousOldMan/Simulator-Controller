@@ -239,6 +239,9 @@ Registers a callback, which will be invoked, whenever a part of the localization
 #### *getUnit(type :: OneOf("Temperature", "Pressure", "Mass", "Volume", "Length", "Speed"), translate :: Boolean := false)*
 Returns the currently selected unit name for the given *type*, or, if you have passed *true* for the optional parameter *translate*, a translation for the unit name, which can be used as a field label.
 
+#### *getFloatSeparator()*
+Returns either "." or "," depending on the selected numer format.
+
 #### *convertUnit(type :: OneOf("Temperature", "Pressure", "Mass", "Volume", "Length", "Speed"), value :: Number, display :: Boolean := true, round :: Boolean := true)*
 Converts between internal representation of a given unit and its external value to be used in the user interface. With *display*, you control the direction of the conversion and with *round* you can specify whether the resulting value should be rounded to the *natural* length of the given unit.
 

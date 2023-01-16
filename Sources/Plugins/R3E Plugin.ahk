@@ -465,14 +465,14 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	changeFuelAmount(direction, litres := 5, require := true, select := true, accept := true) {
+	changeFuelAmount(direction, liters := 5, require := true, select := true, accept := true) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (!require || this.requirePitstopMFD())
 				if (!select || this.selectPitstopOption("Refuel")) {
 					if (accept && this.optionChosen("Refuel"))
 						this.sendCommand(this.AcceptChoiceHotkey)
 
-					this.dialPitstopOption("Refuel", direction, litres)
+					this.dialPitstopOption("Refuel", direction, liters)
 
 					if accept
 						this.sendCommand(this.AcceptChoiceHotkey)
@@ -537,8 +537,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		base.setPitstopRefuelAmount(pitstopNumber, litres)
+	setPitstopRefuelAmount(pitstopNumber, liters) {
+		base.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Refuel") {
@@ -547,7 +547,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 				this.changeFuelAmount("Decrease", 120, false, true, false)
 
-				this.changeFuelAmount("Increase", litres + 3, false, false, false)
+				this.changeFuelAmount("Increase", liters + 3, false, false, false)
 
 				this.sendCommand(this.AcceptChoiceHotkey)
 			}

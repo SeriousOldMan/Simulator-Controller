@@ -1590,7 +1590,8 @@ class RaceSpotter extends RaceAssistant {
 					this.SessionInfos["AirTemperature"] := airTemperature
 
 					if (this.BaseLap > 1) {
-						speaker.speakPhrase("Temperature", {air: airTemperature, track: trackTemperature})
+						speaker.speakPhrase("Temperature", {air: displayValue("Float", convertUnit("Temperature", airTemperature))
+														  , track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
 
 						return true
 					}
@@ -1602,13 +1603,15 @@ class RaceSpotter extends RaceAssistant {
 				this.SessionInfos["AirTemperature"] := airTemperature
 
 				if (lastTemperature < airTemperature) {
-					speaker.speakPhrase("TemperatureRising", {air: airTemperature, track: trackTemperature})
+					speaker.speakPhrase("TemperatureRising", {air: displayValue("Float", convertUnit("Temperature", airTemperature))
+															, track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
 
 					return true
 				}
 
 				if (lastTemperature > airTemperature) {
-					speaker.speakPhrase("TemperatureFalling", {air: airTemperature, track: trackTemperature})
+					speaker.speakPhrase("TemperatureFalling", {air: displayValue("Float", convertUnit("Temperature", airTemperature))
+															 , track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
 
 					return true
 				}
@@ -2517,7 +2520,9 @@ class RaceSpotter extends RaceAssistant {
 						weather := fragments["GreetingWet"]
 				}
 
-				speaker.speakPhrase("GreetingWeather", {air: airTemperature, track: trackTemperature, weather: weather})
+				speaker.speakPhrase("GreetingWeather", {weather: weather
+													  , air: displayValue("Float", convertUnit("Temperature", airTemperature))
+													  , track: displayValue("Float", convertUnit("Temperature", trackTemperature))})
 
 				if (this.Session = kSessionRace) {
 					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)

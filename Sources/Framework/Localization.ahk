@@ -199,9 +199,9 @@ internalPressureValue(value, round) {
 		case "PSI":
 			return (round ? Round(value, 1) : value)
 		case "Bar":
-			return (round ? Round(value * 14.503773, 2) : value)
+			return (round ? Round(value * 14.503773, 2) : (value * 14.503773))
 		case "KPa":
-			return (round ? Round(value / 6.894757) : value)
+			return (round ? Round(value / 6.894757) : (value / 6.894757))
 		default:
 			throw "Unknown pressure unit detected in internalPressureValue..."
 	}
@@ -212,7 +212,7 @@ internalTemperatureValue(value, round) {
 		case "Celsius":
 			return (round ? Round(value, 1) : value)
 		case "Fahrenheit":
-			return (round ? Round(((value - 32) / 1.8), 1) : value)
+			return (round ? Round((value - 32) / 1.8, 1) : ((value - 32) / 1.8))
 		default:
 			throw "Unknown temperature unit detected in internalTemperatureValue..."
 	}
@@ -223,7 +223,7 @@ internalLengthValue(value, round) {
 		case "Meter":
 			return (round ? Round(value, 1) : value)
 		case "Foot":
-			return (round ? Round(value / 3.280840) : value)
+			return (round ? Round(value / 3.280840) : (value / 3.280840))
 		default:
 			throw "Unknown length unit detected in internalLengthValue..."
 	}
@@ -234,7 +234,7 @@ internalSpeedValue(value, round) {
 		case "km/h":
 			return (round ? Round(value, 1) : value)
 		case "mph":
-			return (round ? Round(value * 1.609344, 1) : value)
+			return (round ? Round(value * 1.609344, 1) : (value * 1.609344))
 		default:
 			throw "Unknown speed unit detected in internalSpeedValue..."
 	}
@@ -245,7 +245,7 @@ internalMassValue(value, round) {
 		case "Kilogram":
 			return (round ? Round(value, 1) : value)
 		case "Pound":
-			return (round ? Round(value / 2.204623) : value)
+			return (round ? Round(value / 2.204623) : (value / 2.204623))
 		default:
 			throw "Unknown mass unit detected in internalMassValue..."
 	}
@@ -256,7 +256,7 @@ internalVolumeValue(value, round) {
 		case "Liter":
 			return (round ? Round(value, 1) : value)
 		case "Gallon":
-			return (round ? Round(value * 4.546092, 2) : value)
+			return (round ? Round(value * 4.546092, 2) : (value * 4.546092))
 		default:
 			throw "Unknown volume unit detected in internalVolumeValue..."
 	}

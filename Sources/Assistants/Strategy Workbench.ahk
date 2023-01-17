@@ -2400,7 +2400,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		avgFuelConsumption := []
 
 		for ignore, pitstop in strategy.Pitstops {
-			LV_Add("", pitstop.Lap, pitstop.DriverName, Ceil(pitstop.RefuelAmount), pitstop.TyreChange ? translate("x") : "-", pitstop.Map)
+			LV_Add("", pitstop.Lap, pitstop.DriverName, Ceil(convertUnit("Volume", pitstop.RefuelAmount))
+					 , pitstop.TyreChange ? translate("x") : "-", pitstop.Map)
 
 			avgLapTimes.Push(pitstop.AvgLapTime)
 			avgFuelConsumption.Push(pitstop.FuelConsumption)

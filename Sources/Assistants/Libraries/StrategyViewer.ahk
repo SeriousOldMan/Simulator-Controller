@@ -66,7 +66,7 @@ class StrategyViewer {
 
 		if (strategy.SessionType = "Duration") {
 			html .= ("<tr><td><b>" . translate("Duration:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Minutes") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . Round(strategy.getSessionLaps(), 1) . A_Space . translate("Laps") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . displayValue("Float", strategy.getSessionLaps(), 1) . A_Space . translate("Laps") . "</td></tr>")
 		}
 		else {
 			html .= ("<tr><td><b>" . translate("Laps:") . "</b></td><td>" . strategy.SessionLength . A_Space . translate("Laps") . "</td></tr>")

@@ -177,8 +177,7 @@ class VoiceManager {
 		}
 
 		number2Speech(number, precision := "__Undefined__") {
-			static point := false
-			static comma := false
+			static divider := false
 
 			if (precision != kUndefined)
 				if (precision = 0)
@@ -186,12 +185,10 @@ class VoiceManager {
 				else
 					number := Round(number, precision)
 
-			if !point {
-				point := (A_Space . this.Fragments["Point"] . A_Space)
-				comma := (A_Space . this.Fragments["Comma"] . A_Space)
-			}
+			if !divider
+				divider := (A_Space . this.Fragments[(getFormat("Float") = "#.##") ? "Point" : "Comma"] . A_Space)
 
-			return StrReplace(number, getFloatSeparator(), (getFormat("Float") = "#.##") ? point : comma)
+			return StrReplace(number, ".", divider)
 		}
 	}
 
@@ -325,8 +322,7 @@ class VoiceManager {
 		}
 
 		number2Speech(number, precision := "__Undefined__") {
-			static point := false
-			static comma := false
+			static divider := false
 
 			if (precision != kUndefined)
 				if (precision = 0)
@@ -334,12 +330,10 @@ class VoiceManager {
 				else
 					number := Round(number, precision)
 
-			if !point {
-				point := (A_Space . this.Fragments["Point"] . A_Space)
-				comma := (A_Space . this.Fragments["Comma"] . A_Space)
-			}
+			if !divider
+				divider := (A_Space . this.Fragments[(getFormat("Float") = "#.##") ? "Point" : "Comma"] . A_Space)
 
-			return StrReplace(number, getFloatSeparator(), (getFormat("Float") = "#.##") ? point : comma)
+			return StrReplace(number, ".", divider)
 		}
 	}
 

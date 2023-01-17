@@ -289,19 +289,20 @@ class RaceEngineer extends RaceAssistant {
 
 	fuelInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
 		local lap, fuel
 
 		lap := knowledgeBase.getValue("Lap", 0)
 
 		if (lap == 0)
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
 		else {
 			fuel := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0)
 
 			if (fuel == 0)
-				this.getSpeaker().speakPhrase("Later")
+				speaker.speakPhrase("Later")
 			else
-				this.getSpeaker().speakPhrase("Fuel", {fuel: Floor(fuel)})
+				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel)))})
 		}
 	}
 

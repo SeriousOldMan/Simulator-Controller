@@ -289,19 +289,20 @@ class RaceEngineer extends RaceAssistant {
 
 	fuelInfoRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
 		local lap, fuel
 
 		lap := knowledgeBase.getValue("Lap", 0)
 
 		if (lap == 0)
-			this.getSpeaker().speakPhrase("Later")
+			speaker.speakPhrase("Later")
 		else {
 			fuel := knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0)
 
 			if (fuel == 0)
-				this.getSpeaker().speakPhrase("Later")
+				speaker.speakPhrase("Later")
 			else
-				this.getSpeaker().speakPhrase("Fuel", {fuel: Floor(fuel)})
+				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel)))})
 		}
 	}
 
@@ -309,15 +310,15 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
-		local value, lap
+		local unit, lap, ignore, suffix, value
 
 		if !this.hasEnoughData()
 			return
 
 		if inList(words, fragments["Temperatures"])
-			value := "Temperature"
+			unit := "Temperature"
 		else if inList(words, fragments["Pressures"])
-			value := "Pressure"
+			unit := "Pressure"
 		else {
 			speaker.speakPhrase("Repeat")
 
@@ -329,19 +330,18 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			lap := knowledgeBase.getValue("Lap")
 
-			speaker.speakPhrase((value == "Pressure") ? "Pressures" : "Temperatures")
+			speaker.speakPhrase((unit == "Pressure") ? "Pressures" : "Temperatures")
 
-			speaker.speakPhrase("TyreFL", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FL"), 1)
-										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+			for ignore, suffix in ["FL", "FR", "RL", "RR"] {
+				if (unit = "Pressure")
+					value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Lap." . lap . ".Tyre." . unit . "." . suffix)))
+				else
+					value := speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Tyre." . unit . "." . suffix)), 0)
 
-			speaker.speakPhrase("TyreFR", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".FR"), 1)
-										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
-
-			speaker.speakPhrase("TyreRL", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RL"), 1)
-										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
-
-			speaker.speakPhrase("TyreRR", {value: printNumber(knowledgeBase.getValue("Lap." . lap . ".Tyre." . value . ".RR"), 1)
-										 , unit: (value == "Pressure") ? fragments["PSI"] : fragments["Degrees"]})
+				speaker.speakPhrase("Tyre" . suffix, {value: value
+													, unit: (unit = "Pressure") ? fragments[getUnit("Pressure")]
+																				: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+			}
 		}
 		finally {
 			speaker.endTalk()
@@ -400,17 +400,17 @@ class RaceEngineer extends RaceAssistant {
 
 			speaker.speakPhrase("Temperatures")
 
-			speaker.speakPhrase("BrakeFL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL"))
-										 , unit: fragments["Degrees"]})
+			speaker.speakPhrase("BrakeFL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FL")), 0)
+										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-			speaker.speakPhrase("BrakeFR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR"))
-										 , unit: fragments["Degrees"]})
+			speaker.speakPhrase("BrakeFR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR")), 0)
+										 , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-			speaker.speakPhrase("BrakeRL", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL"))
-										 , unit: fragments["Degrees"]})
+			speaker.speakPhrase("BrakeRL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL")), 0)
+										 , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
-			speaker.speakPhrase("BrakeRR", {value: Round(knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR"))
-										 , unit: fragments["Degrees"]})
+			speaker.speakPhrase("BrakeRR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR")), 0)
+										 , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 		}
 		finally {
 			speaker.endTalk()
@@ -439,13 +439,13 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("Wear")
 
-				speaker.speakPhrase("WearFL", {used: printNumber(flWear, 1), remaining: printNumber(100 - flWear, 1)})
+				speaker.speakPhrase("WearFL", {used: speaker.number2Speech(flWear, 1), remaining: speaker.number2Speech(100 - flWear, 1)})
 
-				speaker.speakPhrase("WearFR", {used: printNumber(frWear, 1), remaining: printNumber(100 - frWear, 1)})
+				speaker.speakPhrase("WearFR", {used: speaker.number2Speech(frWear, 1), remaining: speaker.number2Speech(100 - frWear, 1)})
 
-				speaker.speakPhrase("WearRL", {used: printNumber(rlWear, 1), remaining: printNumber(100 - rlWear, 1)})
+				speaker.speakPhrase("WearRL", {used: speaker.number2Speech(rlWear, 1), remaining: speaker.number2Speech(100 - rlWear, 1)})
 
-				speaker.speakPhrase("WearRR", {used: printNumber(rrWear, 1), remaining: printNumber(100 - rrWear, 1)})
+				speaker.speakPhrase("WearRR", {used: speaker.number2Speech(rrWear, 1), remaining: speaker.number2Speech(100 - rrWear, 1)})
 			}
 			finally {
 				speaker.endTalk()
@@ -483,7 +483,9 @@ class RaceEngineer extends RaceAssistant {
 	pitstopAdjustFuelRecognized(words) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
-		local litresPosition, litres
+		local convert := false
+		local volumePosition := false
+		local fuel
 
 		if !this.hasPlannedPitstop() {
 			speaker.beginTalk()
@@ -500,15 +502,26 @@ class RaceEngineer extends RaceAssistant {
 			this.setContinuation(ObjBindMethod(this, "planPitstop"))
 		}
 		else {
-			litresPosition := inList(words, fragments["Litres"])
+			for ignore, word in words
+				if InStr(word, fragments["Liter"]) {
+					volumePosition := A_Index
 
-			if litresPosition {
-				litres := words[litresPosition - 1]
+					break
+				}
+				else if InStr(word, fragments["Gallon"]) {
+					volumePosition := A_Index
+					convert := true
 
-				if this.isNumber(litres, litres) {
-					speaker.speakPhrase("ConfirmFuelChange", {litres: litres}, true)
+					break
+				}
 
-					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", litres))
+			if volumePosition {
+				fuel := words[volumePosition - 1]
+
+				if this.isNumber(fuel, fuel) {
+					speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[convert ? "Gallon" : "Liter"]}, true)
+
+					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", convert ? Ceil(fuel * 4.546092) : fuel))
 
 					return
 				}
@@ -569,7 +582,7 @@ class RaceEngineer extends RaceAssistant {
 	pitstopAdjustPressureRecognized(words) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
-		local tyreType, action, pointPosition, found, psiValue, tenthPsiValue, ignore, word, startChar, tyre, delta
+		local tyreType, action, pointPosition, found, pressureValue, tenthPressureValue, ignore, word, startChar, tyre, delta
 
 		static tyreTypeFragments := false
 
@@ -613,21 +626,21 @@ class RaceEngineer extends RaceAssistant {
 				else if (inList(words, fragments["Decrease"]) || inList(words, fragments["Less"]))
 					action := kDecrease
 
-				pointPosition := inList(words, fragments["Point"])
+				pointPosition := inList(words, fragments[(getFloatSeparator() = ".") ? "Point" : "Coma"])
 				found := false
 
 				if pointPosition {
-					psiValue := words[pointPosition - 1]
-					tenthPsiValue := words[pointPosition + 1]
+					pressureValue := words[pointPosition - 1]
+					tenthPressureValue := words[pointPosition + 1]
 
-					found := (this.isNumber(psiValue, psiValue) && this.isNumber(tenthPsiValue, tenthPsiValue))
+					found := (this.isNumber(pressureValue, pressureValue) && this.isNumber(tenthPressureValue, tenthPressureValue))
 				}
 				else
 					for ignore, word in words {
 						if word is Float
 						{
-							psiValue := Floor(word)
-							tenthPsiValue := Round((word - psiValue) * 10)
+							pressureValue := Floor(word)
+							tenthPressureValue := Round((word - pressureValue) * 10)
 
 							found := true
 
@@ -638,7 +651,7 @@ class RaceEngineer extends RaceAssistant {
 
 							if startChar is Integer
 								if (StrLen(word) = 2) {
-									found := (this.isNumber(startChar, psiValue) && this.isNumber(SubStr(word, 2, 1), tenthPsiValue))
+									found := (this.isNumber(startChar, pressureValue) && this.isNumber(SubStr(word, 2, 1), tenthPressureValue))
 
 									if found
 										break
@@ -650,9 +663,10 @@ class RaceEngineer extends RaceAssistant {
 					tyre := tyreTypeFragments[tyreType]
 					action := fragments[action]
 
-					delta := Round(psiValue + (tenthPsiValue / 10), 1)
+					delta := Round(pressureValue + (tenthPressureValue / 10), 1)
 
-					speaker.speakPhrase("ConfirmPsiChange", {action: action, tyre: tyre, unit: fragments["PSI"], delta: printNumber(delta, 1)}, true)
+					speaker.speakPhrase("ConfirmPressureChange", {action: action, tyre: tyre, unit: fragments[getUnit("Pressure")]
+																, delta: speaker.number2Speech(delta, 1)}, true)
 
 					this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
 
@@ -740,7 +754,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	updatePitstopFuel(litres) {
+	updatePitstopFuel(fuel) {
 		local speaker := this.getSpeaker()
 
 		speaker.beginTalk()
@@ -753,7 +767,7 @@ class RaceEngineer extends RaceAssistant {
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
 			else {
-				this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", litres)
+				this.KnowledgeBase.setValue("Pitstop.Planned.Fuel", fuel)
 
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledgeBase(this.KnowledgeBase)
@@ -829,6 +843,7 @@ class RaceEngineer extends RaceAssistant {
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
 			else {
+				delta := convertUnit("Pressure", internalValue("Float", delta))
 				targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType)
 				targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
 
@@ -1650,7 +1665,7 @@ class RaceEngineer extends RaceAssistant {
 					if (fuel == 0)
 						speaker.speakPhrase("NoRefuel")
 					else
-						speaker.speakPhrase("Refuel", {litres: fuel})
+						speaker.speakPhrase("Refuel", {fuel: speaker.number2Speech(convertUnit("Volume", fuel), 0), unit: fragments[getUnit("Volume")]})
 
 					if correctedFuel
 						speaker.speakPhrase("RefuelAdjusted")
@@ -1688,20 +1703,20 @@ class RaceEngineer extends RaceAssistant {
 						speaker.speakPhrase("NewPressures")
 
 					if (debug || (incrementFL != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreFL", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL"), 1)
-													 , unit: fragments["PSI"]})
+						speaker.speakPhrase("TyreFL", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL")))
+													 , unit: fragments[getUnit("Pressure")]})
 
 					if (debug || (incrementFR != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreFR", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR"), 1)
-													 , unit: fragments["PSI"]})
+						speaker.speakPhrase("TyreFR", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR")))
+													 , unit: fragments[getUnit("Pressure")]})
 
 					if (debug || (incrementRL != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreRL", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL"), 1)
-													 , unit: fragments["PSI"]})
+						speaker.speakPhrase("TyreRL", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL")))
+													 , unit: fragments[getUnit("Pressure")]})
 
 					if (debug || (incrementRR != 0) || (tyrePressures != kUndefined))
-						speaker.speakPhrase("TyreRR", {value: printNumber(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR"), 1)
-													 , unit: fragments["PSI"]})
+						speaker.speakPhrase("TyreRR", {value: speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RR")))
+													 , unit: fragments[getUnit("Pressure")]})
 
 					pressureCorrection := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Correction", 0), 1)
 
@@ -1712,7 +1727,8 @@ class RaceEngineer extends RaceAssistant {
 							temperatureDelta := ((pressureCorrection > 0) ? -1 : 1)
 
 						speaker.speakPhrase((pressureCorrection > 0) ? "PressureCorrectionUp" : "PressureCorrectionDown"
-										  , {value: printNumber(Abs(pressureCorrection), 1), unit: fragments["PSI"]
+										  , {value: speaker.number2Speech(convertUnit("Pressure", Abs(pressureCorrection)))
+										   , unit: fragments[getUnit("Pressure")]
 										   , pressureDirection: (pressureCorrection > 0) ? fragments["Increase"] : fragments["Decrease"]
 										   , temperatureDirection: (temperatureDelta > 0) ? fragments["Rising"] : fragments["Falling"]})
 					}
@@ -1723,7 +1739,9 @@ class RaceEngineer extends RaceAssistant {
 						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
 
 						if (lostPressure && (lostPressure >= deviationThreshold))
-							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre], lost: Round(lostPressure, 1), unit: fragments["PSI"]})
+							speaker.speakPhrase("PressureAdjustment", {tyre: fragments[tyre]
+																	 , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
+																	 , unit: fragments[getUnit("Pressure")]})
 					}
 				}
 
@@ -2104,7 +2122,7 @@ class RaceEngineer extends RaceAssistant {
 					speaker.beginTalk()
 
 					try {
-						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
+						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
 
 						if this.supportsPitstop() {
 							speaker.speakPhrase("ConfirmPlan", false, true)
@@ -2117,7 +2135,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 				}
 				else if (repair == false)
-					speaker.speakPhrase((Abs(delta) < 0.2) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: printNumber(delta, 1)})
+					speaker.speakPhrase((Abs(delta) < 0.2) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
 			}
 	}
 
@@ -2131,7 +2149,8 @@ class RaceEngineer extends RaceAssistant {
 				fragments := speaker.Fragments
 
 				speaker.speakPhrase("PressureLoss", {tyre: fragments[{FL: "FrontLeft", FR: "FrontRight", RL: "RearLeft", RR: "RearRight"}[tyre]]
-												   , lost: Round(lostPressure, 1), unit: fragments["PSI"]})
+												   , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
+												   , unit: fragments[getUnit("Pressure")]})
 			}
 	}
 
@@ -2195,9 +2214,9 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
+	setPitstopRefuelAmount(pitstopNumber, fuel) {
 		if this.RemoteHandler
-			this.RemoteHandler.setPitstopRefuelAmount(pitstopNumber, litres)
+			this.RemoteHandler.setPitstopRefuelAmount(pitstopNumber, fuel)
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set) {
@@ -2281,8 +2300,8 @@ finishPitstopSetup(context, pitstopNumber) {
 	return true
 }
 
-setPitstopRefuelAmount(context, pitstopNumber, litres) {
-	context.KnowledgeBase.RaceAssistant.setPitstopRefuelAmount(pitstopNumber, litres)
+setPitstopRefuelAmount(context, pitstopNumber, fuel) {
+	context.KnowledgeBase.RaceAssistant.setPitstopRefuelAmount(pitstopNumber, fuel)
 
 	return true
 }

@@ -1581,23 +1581,6 @@ class RaceAssistant extends ConfigurationItem {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-printNumber(number, precision) {
-	local pos
-
-	number := (Format("{:." . precision . "f}", Round(number, precision)) . "")
-
-	pos := InStr(number, ".")
-
-	if pos {
-		if (precision > 0)
-			return SubStr(number, 1, pos + precision)
-		else
-			return SubStr(number, 1, pos - 1)
-	}
-	else
-		return number
-}
-
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
 	local value := getConfigurationValue(data, newSection, key, kUndefined)
 

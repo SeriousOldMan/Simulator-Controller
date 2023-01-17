@@ -1,3 +1,15 @@
+## 4.5.6.0-release 01/20/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. New heuristical approach in strategy simulation to minimize surplus fuel at the end of a race.
+  4. Fixed endless loop in strategy simulation with high optimizer values.
+  5. Fixed weather forecast simulation for strategie development.
+  6. Fixed standings and delta datas in "Race Center" for second stint drivers.
+  7. Optimized pressure loss detection by the Race Engineer.
+  8. All Assistants are now aware of the unit conversion framework. You can the Rece Engineer, for example, to refill 5 Gallons at the next pitstop. Or you will get tyre temperatures in Fahrenheit, if that is your chosen temperature unit.
+  9. Fixed several unit conversion errors in "Race Center".
+  10. Documentation of the unit and data format localization framework for Developers, 
+
 ## 4.5.5.0-release 01/13/22 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always

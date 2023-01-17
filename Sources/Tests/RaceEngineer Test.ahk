@@ -166,12 +166,12 @@ class TestPitstopHandler {
 		vCompletedActions["finishPitstopSetup"] := pitstopNumber
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		this.showAction("setPitstopRefuelAmount", pitstopNumber, litres)
+	setPitstopRefuelAmount(pitstopNumber, liters) {
+		this.showAction("setPitstopRefuelAmount", pitstopNumber, liters)
 
 		vCompletedActions["setPitstopRefuelAmount"] := pitstopNumber
 
-		vPitstopFuel := Round(litres)
+		vPitstopFuel := Round(liters)
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor, set := false) {
@@ -558,7 +558,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
 
 		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
-		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 litres for refueling...")
+		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
 		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
 		this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
@@ -604,7 +604,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
 
 		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
-		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 litres for refueling...")
+		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
 		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
 		this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected suspension repair...")
@@ -653,7 +653,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(1, vCompletedActions["pitstopPlanned"], "Pitstop not planned as number 1...")
 
 		this.AssertEqual(true, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned")), "Pitstop not flagged as Planned...")
-		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 litres for refueling...")
+		this.AssertEqual(57, Round(engineer.KnowledgeBase.getValue("Pitstop.Planned.Fuel")), "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Compound"), "Expected Dry tyre compound...")
 		this.AssertEqual(8, engineer.KnowledgeBase.getValue("Pitstop.Planned.Tyre.Set"), "Expected tyre set 8...")
 		this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected suspension repair...")
@@ -718,7 +718,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
 		this.AssertEqual(true, vCompletedActions.HasKey("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
 
-		this.AssertEqual(57, vPitstopFuel, "Expected 57 litres for refueling...")
+		this.AssertEqual(57, vPitstopFuel, "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", vPitstopTyreCompound, "Expected Dry tyre compound...")
 		this.AssertEqual("Black", vPitstopTyreCompoundColor, "Expected Black tyre compound color...")
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")
@@ -774,7 +774,7 @@ class PitstopHandling extends Assert {
 		this.AssertEqual(true, vCompletedActions.HasKey("setPitstopTyrePressures"), "Pitstop action setPitstopTyrePressures not reported...")
 		this.AssertEqual(true, vCompletedActions.HasKey("requestPitstopRepairs"), "Pitstop action requestPitstopRepairs not reported...")
 
-		this.AssertEqual(57, vPitstopFuel, "Expected 57 litres for refueling...")
+		this.AssertEqual(57, vPitstopFuel, "Expected 57 liters for refueling...")
 		this.AssertEqual("Dry", vPitstopTyreCompound, "Expected Dry tyre compound...")
 		this.AssertEqual("Black", vPitstopTyreCompoundColor, "Expected Black tyre compound color...")
 		this.AssertEqual(8, vPitstopTyreSet, "Expected tyre set 8...")

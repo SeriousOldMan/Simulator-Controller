@@ -175,6 +175,21 @@ class VoiceManager {
 			if phrase
 				this.speak(phrase, focus, cache)
 		}
+
+		number2Speech(number, precision := "__Undefined__") {
+			static divider := false
+
+			if (precision != kUndefined)
+				if (precision = 0)
+					return Round(number)
+				else
+					number := Round(number, precision)
+
+			if !divider
+				divider := (A_Space . this.Fragments[(getFormat("Float") = "#.##") ? "Point" : "Comma"] . A_Space)
+
+			return StrReplace(number, ".", divider)
+		}
 	}
 
 	class LocalSpeaker extends SpeechSynthesizer {
@@ -304,6 +319,21 @@ class VoiceManager {
 
 			if phrase
 				this.speak(phrase, focus, cache)
+		}
+
+		number2Speech(number, precision := "__Undefined__") {
+			static divider := false
+
+			if (precision != kUndefined)
+				if (precision = 0)
+					return Round(number)
+				else
+					number := Round(number, precision)
+
+			if !divider
+				divider := (A_Space . this.Fragments[(getFormat("Float") = "#.##") ? "Point" : "Comma"] . A_Space)
+
+			return StrReplace(number, ".", divider)
 		}
 	}
 

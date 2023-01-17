@@ -103,7 +103,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings
 
 	(CanWe) {prepare the pitstop, let the crew prepare the pitstop, setup everything for the pitstop}
 
-	[(CanWe) refuel (Number) litres, We need to refuel (Number) litres]
+	[(CanWe) refuel (Number) {liters, gallons}, We need to refuel (Number) {liters, gallons}]
 
 	[(CanWe) {use, switch to} wet tires, {Can we, Please} {use, switch to} dry tires, {Can we, Please} {use, switch to} intemediate tires]
 

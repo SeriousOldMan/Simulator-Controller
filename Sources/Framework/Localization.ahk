@@ -92,11 +92,7 @@ getMassUnit(translate := false) {
 }
 
 getVolumeUnit(translate := false) {
-	return (translate ? translate(vVolumeUnit) : vMassUnit)
-}
-
-getFloatSeparator() {
-	return (vNumberFormat == "#.##" ? "." : ",")
+	return (translate ? translate(vVolumeUnit) : vVolumeUnit)
 }
 
 displayTemperatureValue(celsius, round) {
@@ -170,6 +166,8 @@ displayVolumeValue(liter, round) {
 displayFloatValue(float, precision := "__Undefined__") {
 	if (precision = kUndefined)
 		return StrReplace(float, ".", getFloatSeparator())
+	else if (precision = 0)
+		return Round(float)
 	else
 		return StrReplace(Round(float, precision), ".", getFloatSeparator())
 }
@@ -523,7 +521,13 @@ getUnit(type, translate := false) {
 			return getMassUnit(translate)
 		case "Volume":
 			return getVolumeUnit(translate)
+		default:
+			throw "Unknown unit type detected in getUnit..."
 	}
+}
+
+getFloatSeparator() {
+	return (vNumberFormat == "#.##" ? "." : ",")
 }
 
 convertUnit(type, value, display := true, round := true) {
@@ -541,6 +545,8 @@ convertUnit(type, value, display := true, round := true) {
 				return displayMassValue(value, round)
 			case "Volume":
 				return displayVolumeValue(value, round)
+			default:
+				throw "Unknown unit type detected in convertUnit..."
 		}
 	else
 		switch type {
@@ -556,6 +562,8 @@ convertUnit(type, value, display := true, round := true) {
 				return internalMassValue(value, round)
 			case "Volume":
 				return internalVolumeValue(value, round)
+			default:
+				throw "Unknown unit type detected in convertUnit..."
 		}
 }
 
@@ -565,6 +573,8 @@ displayValue(type, value, arguments*) {
 			return displayFloatValue(value, arguments*)
 		case "Time":
 			return displayTimeValue(value, arguments*)
+		default:
+			throw "Unknown format type detected in displayValue..."
 	}
 }
 
@@ -574,6 +584,8 @@ internalValue(type, value, arguments*) {
 			return internalFloatValue(value, arguments*)
 		case "Time":
 			return internalTimeValue(value, arguments*)
+		default:
+			throw "Unknown format type detected in internalValue..."
 	}
 }
 
@@ -588,6 +600,47 @@ validNumber(value, display := false) {
 			return true
 		else
 			return false
+	}
+}
+
+getFormat(type) {
+	switch type {
+		case "Float":
+			return vNumberFormat
+		case "Time":
+			return vTimeFormat
+		default:
+			throw "Unknown format type detected in getFormat..."
+	}
+}
+
+setFormat(type, format) {
+	local oldFormat
+
+	switch type {
+		case "Float":
+			oldFormat := vNumberFormat
+
+			vNumberFormat := format
+		case "Time":
+			oldFormat := vTimeFormat
+
+			vTimeFormat := format
+		default:
+			throw "Unknown format type detected in setFormat..."
+	}
+
+	return oldFormat
+}
+
+withFormat(type, format, function, arguments*) {
+	local oldFormat := setFormat(type, format)
+
+	try {
+		%function%(arguments*)
+	}
+	finally {
+		setFormat(type, oldFormat)
 	}
 }
 

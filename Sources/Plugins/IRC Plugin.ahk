@@ -226,12 +226,12 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		closePitstopMFD()
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		base.setPitstopRefuelAmount(pitstopNumber, litres)
+	setPitstopRefuelAmount(pitstopNumber, liters) {
+		base.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		this.openPitstopMFD("Fuel")
 
-		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
+		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {

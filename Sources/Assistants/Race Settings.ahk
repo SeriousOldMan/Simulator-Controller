@@ -1233,7 +1233,7 @@ restart:
 		Gui RES:Add, DropDownList, x12 yp+21 w110 AltSubmit Choose%pitstopRefuelServiceRuleDropdown% VpitstopRefuelServiceRuleDropdown gchooseRefuelService, % values2String("|", map(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
 
 		Gui RES:Add, Edit, x126 yp w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20 VpitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopRefuelServiceRuleDropdown])
+		Gui RES:Add, Text, x184 yp+4 w290 h20 VpitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopRefuelServiceRuleDropdown])
 
 
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
@@ -1376,7 +1376,7 @@ restart:
 chooseRefuelService() {
 	GuiControlGet pitstopRefuelServiceRuleDropdown
 
-	GuiControl, , pitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 litres)"][pitstopRefuelServiceRuleDropdown])
+	GuiControl, , pitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopRefuelServiceRuleDropdown])
 }
 
 validateNumber(field) {

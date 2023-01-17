@@ -868,8 +868,8 @@ Called at the beginning of the pitstop preparation process, this method might ac
 #### *finishPitstopSetup(pitstopNumber :: Integer)*
 Called at the end of the pitstop preparation process. The implementation might close a special pitstop widget on the simulator user interface, when this has been opened by *startPitstopSetup*. The default method handles internal state change.
 
-#### *setPitstopRefuelAmount(pitstopNumber :: Integer, litres :: Float)*
-The implemenzation of *setPitstopRefuelAmount* must ask the simulation to refuel the given number of litres at the next pitstop. The default method handles internal state change.
+#### *setPitstopRefuelAmount(pitstopNumber :: Integer, liters :: Float)*
+The implemenzation of *setPitstopRefuelAmount* must ask the simulation to refuel the given number of liters at the next pitstop. The default method handles internal state change.
 
 #### *setPitstopTyreSet(pitstopNumber :: Integer, compound :: OneOf("Dry", "Wet", *false*), compoundColor :: OneOf("Red", "White", "Blue", "Black") := false, set :: Integer := false)*
 Requests new tyres at the given pitstop. *compound* will define the tyre category and *compoundColor* the compound mixture, wich will always be "Black" for "Wet" tyres. If a specific tyre set is requested, this will be passed for the last optional parameter. If *false* has been passed for *compound*, this means that no tyre change is requested. Both *compoundColor* and *set* will be ommitted in this case. The default method handles internal state change.

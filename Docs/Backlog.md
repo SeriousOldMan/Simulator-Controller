@@ -31,3 +31,4 @@
   3. Integrate WebView2 with Edge to cope with the pending shutdown of IE 11 (https://www.autohotkey.com/boards/viewtopic.php?f=83&t=79868)
   4. Port all AHK applications to AutoHotkey 2.0.2
   5. Full system-wide support for culture- or country-specific units, number formats and other localization stuff
+  6. Resizeable windows or larger window sizes for the "large" applications

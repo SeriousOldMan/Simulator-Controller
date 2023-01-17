@@ -228,10 +228,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			return false
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
-		base.setPitstopRefuelAmount(pitstopNumber, litres)
+	setPitstopRefuelAmount(pitstopNumber, liters) {
+		base.setPitstopRefuelAmount(pitstopNumber, liters)
 
-		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(litres))
+		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {

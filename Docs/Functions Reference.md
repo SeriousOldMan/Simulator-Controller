@@ -239,8 +239,20 @@ Registers a callback, which will be invoked, whenever a part of the localization
 #### *getUnit(type :: OneOf("Temperature", "Pressure", "Mass", "Volume", "Length", "Speed"), translate :: Boolean := false)*
 Returns the currently selected unit name for the given *type*, or, if you have passed *true* for the optional parameter *translate*, a translation for the unit name, which can be used as a field label.
 
+#### *getFloatSeparator()*
+Returns either "." or "," depending on the selected number format.
+
 #### *convertUnit(type :: OneOf("Temperature", "Pressure", "Mass", "Volume", "Length", "Speed"), value :: Number, display :: Boolean := true, round :: Boolean := true)*
 Converts between internal representation of a given unit and its external value to be used in the user interface. With *display*, you control the direction of the conversion and with *round* you can specify whether the resulting value should be rounded to the *natural* length of the given unit.
+
+#### *getFormat(type :: OneOf("Float", "Time"))*
+Returns the currently active display format for the given format type, which is one of "#.##" or "#,##" for numbers or one of "[H:]M:S.##" or "[H:]M:S,##" for time values.
+
+#### *setFormat(type :: OneOf("Float", "Time"), format :: String)*
+Sets the display format for the given format type. *format* must be one of "#.##" or "#,##" for numbers or one of "[H:]M:S.##" or "[H:]M:S,##" for time values.
+
+#### *withFormat(type :: OneOf("Float", "Time"), format :: String, function :: TypeUnion(String, FuncObj), #rest params)*
+Calls a given function with supplied parameters while the supplied format choice is active. *format* must be one of "#.##" or "#,##" for numbers or one of "[H:]M:S.##" or "[H:]M:S,##" for time values.
 
 #### *displayValue(type :: OneOf("Float", "Time"), value :: Number, ...)*
 Converts an internal value of the given *type* to its display representation, which is always a string. For floating point numbers, this might involve a change of the floating point character. For time values, which must be supplied as seconds with an optional fraction, the conversion might be even more complex. For floating point number you may supply the precision for an optional rounding step.

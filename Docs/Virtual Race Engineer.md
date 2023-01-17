@@ -340,12 +340,12 @@ To enable Jona to handle the pitstop settings in *Assetto Corsa Competizione* co
 
 Before Release 2.6, you had to setup your ACC pitstop strategy in a special way for as many pitstops you expect in the given race (plus some more for a safety margin):
 
-  - Refueling must be set to zero litres for each strategy
+  - Refueling must be set to zero liters for each strategy
   - Each strategy has to use the Dry tyre compound
   - Each strategy has to use the next fresh tyre set after the previous strategy
   - For each strategy, the tyre pressures must be those as used for the first stint and documented in the *Race.settings* file as described above
 
-Beginning with Release 2.6 this is not necessary anymore, since Jona can acquire the curent settings directly from *Assetto Corsa Competizione* via APIs. Jona now uses the values already set in the Pitstop MFD and calculates the delta to the desired target values. Please note, that this requires the settings in the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race) dialog to be valid, especially the value for the first fresh dry tyre set. Beside that, I still recommend to setup a reasonable pitstop strategy, since this will reduce the time needed to dial in all those numbers (going from 0 to 120 litres of refueling will take quite some time).
+Beginning with Release 2.6 this is not necessary anymore, since Jona can acquire the curent settings directly from *Assetto Corsa Competizione* via APIs. Jona now uses the values already set in the Pitstop MFD and calculates the delta to the desired target values. Please note, that this requires the settings in the [*Race Settings*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#tab-race) dialog to be valid, especially the value for the first fresh dry tyre set. Beside that, I still recommend to setup a reasonable pitstop strategy, since this will reduce the time needed to dial in all those numbers (going from 0 to 120 liters of refueling will take quite some time).
 
 Last but not least, the check boxes for repair of Suspension and Bodywork must be both selected at the start of the race in the Pitstop MFD. After you have done all that, you can let Jona handle the pitstop setttings. Only be sure to not interfere with the artificial click and keyboard events, while Jona is managing the pitstop settings.
 

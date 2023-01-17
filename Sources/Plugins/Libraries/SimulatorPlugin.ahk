@@ -1005,7 +1005,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	finishPitstopSetup(pitstopNumber) {
 	}
 
-	setPitstopRefuelAmount(pitstopNumber, litres) {
+	setPitstopRefuelAmount(pitstopNumber, liters) {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
@@ -1265,11 +1265,11 @@ changePitstopStrategy(selection, steps := 1) {
 	changePitstopOption("Strategy", selection, steps)
 }
 
-changePitstopFuelAmount(direction, litres := 5) {
+changePitstopFuelAmount(direction, liters := 5) {
 	if !inList(["Increase", "Decrease"], direction)
 		logMessage(kLogWarn, translate("Unsupported fuel amount """) . direction . translate(""" detected in changePitstopFuelAmount - please check the configuration"))
 
-	changePitstopOption("Refuel", direction, litres)
+	changePitstopOption("Refuel", direction, liters)
 }
 
 changePitstopTyreCompound(selection) {

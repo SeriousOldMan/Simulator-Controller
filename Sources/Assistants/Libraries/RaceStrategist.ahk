@@ -765,7 +765,7 @@ class RaceStrategist extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToAhead", {delta: speaker.number2Speech(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -807,7 +807,7 @@ class RaceStrategist extends RaceAssistant {
 					  && (Abs(delta) > (knowledgeBase.getValue("Lap." . lap . ".Time") / 1000)))
 					speaker.speakPhrase("StandingsAheadLapped")
 				else
-					speaker.speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
+					speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
 
 				if inPit
 					speaker.speakPhrase("GapCarInPit")
@@ -843,7 +843,7 @@ class RaceStrategist extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToBehind", {delta: speaker.number2Speech(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -889,7 +889,7 @@ class RaceStrategist extends RaceAssistant {
 					lapped := true
 				}
 				else
-					speaker.speakPhrase("StandingsGapToBehind", {delta: printNumber(delta, 1)})
+					speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
 
 				if (!lapped && inPit)
 					speaker.speakPhrase("GapCarInPit")
@@ -902,17 +902,18 @@ class RaceStrategist extends RaceAssistant {
 
 	gapToLeaderRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
 		local delta
 
 		if !this.hasEnoughData()
 			return
 
 		if (this.getPosition(false, "Class") = 1)
-			this.getSpeaker().speakPhrase("NoGapToAhead")
+			speaker.speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("GapToLeader", {delta: printNumber(delta, 1)})
+			speaker.speakPhrase("GapToLeader", {delta: speaker.number2Speech(delta, 1)})
 		}
 	}
 
@@ -927,18 +928,25 @@ class RaceStrategist extends RaceAssistant {
 			lapTime /= 1000
 
 			speaker := this.getSpeaker()
+
+			speaker.beginTalk()
 			fragments := speaker.Fragments
 
 			minute := Floor(lapTime / 60)
 			seconds := (lapTime - (minute * 60))
 
-			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
+			try {
+				speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 
-			delta := (driverLapTime - lapTime)
+				delta := (driverLapTime - lapTime)
 
-			if (Abs(delta) > 0.5)
-				this.getSpeaker().speakPhrase("LapTimeDelta", {delta: printNumber(Abs(delta), 1)
-															 , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
+				if (Abs(delta) > 0.5)
+					speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
+													   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
+			}
+			finally {
+				speaker.endTalk()
+			}
 		}
 	}
 
@@ -967,7 +975,7 @@ class RaceStrategist extends RaceAssistant {
 				minute := Floor(driverLapTime / 60)
 				seconds := (driverLapTime - (minute * 60))
 
-				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
+				speaker.speakPhrase("LapTime", {time: speaker.number2Speech(driverLapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 
 				if (position > 2)
 					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
@@ -1073,7 +1081,7 @@ class RaceStrategist extends RaceAssistant {
 					if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
 						only := speaker.Fragments["Only"]
 
-					speaker.speakPhrase("Compare2Leader", {relative: only, seconds: printNumber(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
+					speaker.speakPhrase("Compare2Leader", {relative: only, seconds: speaker.number2Speech(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
 
 					driver := knowledgeBase.getValue("Driver.Car")
 

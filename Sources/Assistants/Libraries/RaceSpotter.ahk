@@ -995,7 +995,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToAhead", {delta: printNumber(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToAhead", {delta: speaker.number2Speech(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -1049,7 +1049,7 @@ class RaceSpotter extends RaceAssistant {
 				else {
 					speaker.beginTalk()
 
-					speaker.speakPhrase("StandingsGapToAhead", {delta: printNumber(delta, 1)})
+					speaker.speakPhrase("StandingsGapToAhead", {delta: speaker.number2Speech(delta, 1)})
 				}
 
 				talking := true
@@ -1090,7 +1090,7 @@ class RaceSpotter extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("TrackGapToBehind", {delta: printNumber(delta / 1000, 1)})
+				speaker.speakPhrase("TrackGapToBehind", {delta: speaker.number2Speech(delta / 1000, 1)})
 
 				lap := knowledgeBase.getValue("Lap")
 				driverLap := Floor(knowledgeBase.getValue("Standings.Lap." . lap . ".Car." . knowledgeBase.getValue("Driver.Car") . ".Laps"))
@@ -1149,7 +1149,7 @@ class RaceSpotter extends RaceAssistant {
 				else {
 					speaker.beginTalk()
 
-					speaker.speakPhrase("StandingsGapToBehind", {delta: printNumber(delta, 1)})
+					speaker.speakPhrase("StandingsGapToBehind", {delta: speaker.number2Speech(delta, 1)})
 				}
 
 				talking := true
@@ -1168,17 +1168,18 @@ class RaceSpotter extends RaceAssistant {
 
 	gapToLeaderRecognized(words) {
 		local knowledgeBase := this.KnowledgeBase
+		local speaker := this.getSpeaker()
 		local delta
 
 		if !this.hasEnoughData()
 			return
 
 		if (this.getPosition(false, "Class") = 1)
-			this.getSpeaker().speakPhrase("NoGapToAhead")
+			speaker.speakPhrase("NoGapToAhead")
 		else {
 			delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Leader.Delta", 0) / 1000)
 
-			this.getSpeaker().speakPhrase("GapToLeader", {delta: printNumber(delta, 1)})
+			speaker.speakPhrase("GapToLeader", {delta: speaker.number2Speech(delta, 1)})
 		}
 	}
 
@@ -1195,13 +1196,20 @@ class RaceSpotter extends RaceAssistant {
 			minute := Floor(lapTime / 60)
 			seconds := (lapTime - (minute * 60))
 
-			speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
+			speaker.beginTalk()
 
-			delta := (driverLapTime - lapTime)
+			try {
+				speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 
-			if (Abs(delta) > 0.5)
-				speaker.speakPhrase("LapTimeDelta", {delta: printNumber(Abs(delta), 1)
-												   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
+				delta := (driverLapTime - lapTime)
+
+				if (Abs(delta) > 0.5)
+					speaker.speakPhrase("LapTimeDelta", {delta: speaker.number2Speech(Abs(delta), 1)
+													   , difference: (delta > 0) ? fragments["Faster"] : fragments["Slower"]})
+			}
+			finally {
+				speaker.endTalk()
+			}
 		}
 	}
 
@@ -1229,7 +1237,7 @@ class RaceSpotter extends RaceAssistant {
 				minute := Floor(driverLapTime / 60)
 				seconds := (driverLapTime - (minute * 60))
 
-				speaker.speakPhrase("LapTime", {time: printNumber(driverLapTime, 1), minute: minute, seconds: printNumber(seconds, 1)})
+				speaker.speakPhrase("LapTime", {time: speaker.number2Speech(driverLapTime, 1), minute: minute, seconds: speaker.number2Speech(seconds, 1)})
 
 				if (position > 2)
 					this.reportLapTime("LapTimeFront", driverLapTime, knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
@@ -1574,8 +1582,8 @@ class RaceSpotter extends RaceAssistant {
 
 						minute := Floor(lapTime / 60)
 
-						speaker.speakPhrase("BestLap", {time: printNumber(lapTime, 1)
-													  , minute: minute, seconds: printNumber((lapTime - (minute * 60)), 1)})
+						speaker.speakPhrase("BestLap", {time: speaker.number2Speech(lapTime, 1)
+													  , minute: minute, seconds: speaker.number2Speech((lapTime - (minute * 60)), 1)})
 
 						this.SessionInfos["BestLap"] := bestLapTime
 
@@ -1706,8 +1714,8 @@ class RaceSpotter extends RaceAssistant {
 				if lapTime {
 					minute := Floor(lapTime / 60)
 
-					speaker.speakPhrase(phrase, {time: printNumber(lapTime, 1), minute: minute
-																			  , seconds: printNumber(lapTime - (minute * 60), 1)})
+					speaker.speakPhrase(phrase, {time: speaker.number2Speech(lapTime, 1), minute: minute
+											   , seconds: speaker.number2Speech(lapTime - (minute * 60), 1)})
 
 					return true
 				}
@@ -1943,9 +1951,9 @@ class RaceSpotter extends RaceAssistant {
 				}
 
 				if ((delta <= frontAttackThreshold) && !standingsAhead.isFaster(sector) && !standingsAhead.Reported) {
-					speaker.speakPhrase("GotHim", {delta: printNumber(delta, 1)
-												 , gained: printNumber(deltaDifference, 1)
-												 , lapTime: printNumber(lapTimeDifference, 1)})
+					speaker.speakPhrase("GotHim", {delta: speaker.number2Speech(delta, 1)
+												 , gained: speaker.number2Speech(deltaDifference, 1)
+												 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
 					car := standingsAhead.Car
 
@@ -1963,9 +1971,9 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
 					lapDifference := standingsAhead.LapDifference[sector]
 
-					speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
-													  , gained: printNumber(deltaDifference, 1)
-													  , lapTime: printNumber(lapTimeDifference, 1)
+					speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+													  , gained: speaker.number2Speech(deltaDifference, 1)
+													  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 													  , deltaLaps: lapDifference
 													  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 
@@ -1986,9 +1994,9 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsAhead.runningAway(sector, frontLostThreshold)) {
 					lapDifference := standingsAhead.LapDifference[sector]
 
-					speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
-													, lost: printNumber(deltaDifference, 1)
-													, lapTime: printNumber(lapTimeDifference, 1)
+					speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+													, lost: speaker.number2Speech(deltaDifference, 1)
+													, lapTime: speaker.number2Speech(lapTimeDifference, 1)
 													, deltaLaps: lapDifference
 													, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 
@@ -2022,9 +2030,9 @@ class RaceSpotter extends RaceAssistant {
 				}
 
 				if ((delta <= behindAttackThreshold) && (standingsBehind.isFaster(sector) || standingsBehind.closingIn(sector, behindLostThreshold)) && !standingsBehind.Reported) {
-					speaker.speakPhrase("ClosingIn", {delta: printNumber(delta, 1)
-													, lost: printNumber(deltaDifference, 1)
-													, lapTime: printNumber(lapTimeDifference, 1)})
+					speaker.speakPhrase("ClosingIn", {delta: speaker.number2Speech(delta, 1)
+													, lost: speaker.number2Speech(deltaDifference, 1)
+													, lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
 					car := standingsAhead.Car
 
@@ -2042,9 +2050,9 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
 					lapDifference := standingsBehind.LapDifference[sector]
 
-					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
-													 , lost: printNumber(deltaDifference, 1)
-													 , lapTime: printNumber(lapTimeDifference, 1)
+					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+													 , lost: speaker.number2Speech(deltaDifference, 1)
+													 , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 													 , deltaLaps: lapDifference
 													 , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 
@@ -2058,9 +2066,9 @@ class RaceSpotter extends RaceAssistant {
 				else if (regular && standingsBehind.runningAway(sector, behindGainThreshold)) {
 					lapDifference := standingsBehind.LapDifference[sector]
 
-					speaker.speakPhrase("GainedBehind", {delta: (delta > 5) ? Round(delta) : printNumber(delta, 1)
-													   , gained: printNumber(deltaDifference, 1)
-													   , lapTime: printNumber(lapTimeDifference, 1)
+					speaker.speakPhrase("GainedBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+													   , gained: speaker.number2Speech(deltaDifference, 1)
+													   , lapTime: speaker.number2Speech(lapTimeDifference, 1)
 													   , deltaLaps: lapDifference
 													   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 

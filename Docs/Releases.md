@@ -6,9 +6,9 @@
   5. Fixed weather forecast simulation for strategie development.
   6. Fixed standings and delta datas in "Race Center" for second stint drivers.
   7. Optimized pressure loss detection by the Race Engineer.
-  8. All Assistants are now aware of the unit conversion framework. You can the Rece Engineer, for example, to refill 5 Gallons at the next pitstop. Or you will get tyre temperatures in Fahrenheit, if that is your chosen temperature unit.
+  8. All Assistants are now aware of the unit conversion framework. You can ask the Rece Engineer, for example, to refill 5 Gallons at the next pitstop. Or you will get tyre temperatures in Fahrenheit, if that is your chosen temperature unit.
   9. Fixed several unit conversion errors in "Race Center".
-  10. Documentation of the unit and data format localization framework for Developers, 
+  10. [Developer] Documentation of the unit and data format localization framework
 
 ## 4.5.5.0-release 01/13/23
   1. Minor bugfixes, as always

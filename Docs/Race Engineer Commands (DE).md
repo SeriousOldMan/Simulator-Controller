@@ -107,9 +107,9 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[(KoennenWir) Regen Reifen {verwenden, aufziehen}, (KannstDu) Trocken Reifen {verwenden, aufziehen}, (KannstDu) Intermediate Reifen {verwenden, aufziehen}]
 
-	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) Punkt (Digit) erhöhen, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) Punkt (Digit) mehr {Druck, Druck bitte}]
+	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) {Punkt, Komma} (Digit) erhöhen, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) {Punkt, Komma} (Digit) mehr {Druck, Druck bitte}]
 
-	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) Punkt (Digit) absenken, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) Punkt (Digit) weniger {Druck, Druck bitte}]
+	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) {Punkt, Komma} (Digit) absenken, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) {Punkt, Komma} (Digit) weniger {Druck, Druck bitte}]
 
 	[(KoennenWir) den {Luftdruck, Druck} unverändert {lassen, lassen bitte}, (KoennenWir) den {Luftdruck, Druck} so lassen wie er {ist, ist bitte}, (KoennenWir) die {Luftdrücke, Drücke} so lassen wie sie {sind, sind bitte}, (KannstDu) die {Luftdrücke, Drücke} nicht {ändern, ändern bitte}]
 

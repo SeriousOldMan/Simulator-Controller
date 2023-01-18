@@ -33,21 +33,19 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.5.4.0-release](https://cutt.ly/U2vmEMx) (Changes: Reload button in "Race Reports", Race Strategist can now explain pitstop recommendation, New car models for "Setup Advisor".)
+[4.5.5.0-release](https://cutt.ly/U2Kx80O) (Changes: Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats, Pitstops can now be prepared in the "Race Center" even during learning laps.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-454) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-455) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[4.5.3.1-release](https://cutt.ly/I2rkC77) (Changes: Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races.)
+[4.5.4.0-release](https://cutt.ly/U2vmEMx) (Changes: Reload button in "Race Reports", Race Strategist can now explain pitstop recommendation, New car models for "Setup Advisor".)
 
-[4.5.3.0-release](https://cutt.ly/D0XSWo5) (Changes: Pressure loss detection by the Race Engineer, Compensation of pressure losses when planning a pitstop with the Race Engineer, Compensation of pressure losses when planning a pitstop with the "Race Center", Support for audio device selection for voice ouput, Tweaked the range of all integer input fields, Better handling of initial fuel in strategy simulation and display, Fixed race condition for pitstop details synchronization in "Race Center", "Race Center" show tyre pressure target deviations, New car models for "Setup Advisor".)
+[4.5.3.1-release](https://cutt.ly/I2rkC77) (Changes: Fixed handling of custom motion and tactile effects in "Simulator Setup", Potential fix for repair settings handling in Assetto Corsa Competizione, Optimized Spotter gap and delta announcements, Full refactoring of core framework, Fixed tyre pressure info in "Race Center", More reliable driver connection in ACC team races.)
 
 #### Latest development build
 
-[4.5.5.0-alpha](https://www.dropbox.com/s/ix6bo0xjj1yd5w1/Simulator%20Controller%204.5.5.0-alpha%20.zip?dl=1) (Test version for 4.5.5. Changes: Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats, Pitstops can now be prepared in the "Race Center" even during learning laps.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-455) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

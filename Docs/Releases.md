@@ -8,8 +8,11 @@
   7. Optimized pressure loss detection by the Race Engineer.
   8. All Assistants are now aware of the unit conversion framework. You can ask the Rece Engineer, for example, to refill 5 Gallons at the next pitstop. Or you will get tyre temperatures in Fahrenheit, if that is your chosen temperature unit.
   9. Fixed several unit conversion errors in "Race Center".
-  10. [Developer] Documentation of the unit and data format localization framework
-
+  10. [Developer] Documentation of the unit and data format localization framework.
+  11. New car models for "Setup Advisor":
+      - Assetto Corsa:
+        - Maserati Granturismo MC GT4
+		
 ## 4.5.5.0-release 01/13/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

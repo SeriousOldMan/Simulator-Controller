@@ -202,7 +202,7 @@ Beside all that, you can request several context specific data, which will be sh
 
   6. Details for a given pitstop
   
-     You will get a summary of a given pitstop, when you select it in the *Pitstops* tab, incl. tyre wear data. The amount of infomration provided here depends of the data available for the current simulator.
+     You will get a summary of a given pitstop, when you select it in the *Pitstops* tab, incl. tyre wear data. This report is only available for pitstops, that already have been performed. You can identify performed pitstops by the small check in the corresponding row. Planned pitstops are shown without this check. The amount of infomration provided here depends of the data available for the current simulator.
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2016.JPG)
 	 

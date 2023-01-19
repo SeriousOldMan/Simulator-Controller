@@ -10,7 +10,7 @@
   9. Fixed several unit conversion errors in "Race Center".
   10. Documentation of the unit and data format localization framework for Developers, 
 
-## 4.5.5.0-release 01/13/22 (planned)
+## 4.5.5.0-release 01/13/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. The copyright information of all sources has been updated to 2023.
@@ -25,7 +25,7 @@
   12. Full support for system-wide localization of units and number formats. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats) for more information.
       Disclaimer: The current implementation changes only the bahaviour of the user interface. The Race Assistants still work with the default units as described in the documentation. This will change with a future release.
   
-## 4.5.4.0-release 01/06/22
+## 4.5.4.0-release 01/06/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. A new reload button allows you to reload the list of reports in "Race Reports". Helpful, when you just recorded a race on the selected track.

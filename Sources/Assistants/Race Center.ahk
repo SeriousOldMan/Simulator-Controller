@@ -1467,12 +1467,12 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x378 yp+30 w90 h23 +0x200, % translate("Pressure Front")
 		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureFLEdit gupdateSetup
 		Gui %window%:Add, Edit, xp+52 yp w50 h23 vsetupBasePressureFREdit gupdateSetup
-		Gui %window%:Add, Text, xp+52 yp+3 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, xp+52 yp+3 w30 h20, % getUnit("Pressure")
 
 		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Pressure Rear")
 		Gui %window%:Add, Edit, x474 yp+1 w50 h23 vsetupBasePressureRLEdit gupdateSetup
 		Gui %window%:Add, Edit, xp+52 yp w50 h23 vsetupBasePressureRREdit gupdateSetup
-		Gui %window%:Add, Text, xp+52 yp+3 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, xp+52 yp+3 w30 h20, % getUnit("Pressure")
 
 		Gui %window%:Add, Text, x378 yp+20 w90 h23 +0x200, % translate("Notes")
 		Gui %window%:Add, Edit, x474 yp+1 w126 h46 vsetupNotesEdit gupdateSetup
@@ -1515,10 +1515,10 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit4 vpitstopPressureFLEdit gvalidatePitstopPressureFL
 		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureFREdit gvalidatePitstopPressureFR
-		Gui %window%:Add, Text, x214 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, x214 yp+2 w30 h20, % getUnit("Pressure")
 		Gui %window%:Add, Edit, x106 yp+20 w50 h20 Limit4 vpitstopPressureRLEdit gvalidatePitstopPressureRL
 		Gui %window%:Add, Edit, x160 yp w50 h20 Limit4 vpitstopPressureRREdit gvalidatePitstopPressureRR
-		Gui %window%:Add, Text, x214 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, x214 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Engine", "Everything"], "translate")

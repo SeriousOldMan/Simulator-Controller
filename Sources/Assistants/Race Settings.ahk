@@ -1019,7 +1019,7 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w105 h20 Section, % translate("Deviation Threshold")
 		Gui RES:Add, Edit, x126 yp-2 w50 h20 VtyrePressureDeviationEdit gvalidateTyrePressureDeviation, %tyrePressureDeviationEdit%
-		Gui RES:Add, Text, x184 yp+2 w70 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x184 yp+2 w70 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
 		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%temperatureCorrectionCheck% VtemperatureCorrectionCheck, %temperatureCorrectionCheck%
@@ -1042,19 +1042,19 @@ restart:
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit gvalidateTPDryFrontLeft, %tpDryFrontLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit gvalidateTPDryFrontRight, %tpDryFrontRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit gvalidateTPDryRearLeft, %tpDryRearLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit gvalidateTPDryRearRight, %tpDryRearRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -1065,19 +1065,19 @@ restart:
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit gvalidateTPWetFrontLeft, %tpWetFrontLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit gvalidateTPWetFrontRight, %tpWetFrontRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit gvalidateTPWetRearLeft, %tpWetRearLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit gvalidateTPWetRearRight, %tpWetRearRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui Tab, 1
 
@@ -1150,19 +1150,19 @@ restart:
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit gvalidateSPDryFrontLeft, %spDryFrontLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit gvalidateSPDryFrontRight, %spDryFrontRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Left")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit gvalidateSPDryRearLeft, %spDryRearLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Right")
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit gvalidateSPDryRearRight, %spDryRearRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Italic, Arial
@@ -1173,19 +1173,19 @@ restart:
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit gvalidateSPWetFrontLeft, %spWetFrontLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit gvalidateSPWetFrontRight, %spWetFrontRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit gvalidateSPWetRearLeft, %spWetRearLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
 		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit gvalidateSPWetRearRight, %spWetRearRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure", true)
+		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
 
 		Gui Tab, 3
 

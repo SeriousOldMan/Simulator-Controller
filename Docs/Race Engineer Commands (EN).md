@@ -107,9 +107,9 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings
 
 	[(CanWe) {use, switch to} wet tires, {Can we, Please} {use, switch to} dry tires, {Can we, Please} {use, switch to} intemediate tires]
 
-	[(CanWe) increase {front left, front right, rear left, rear right} by (Digit) point (Digit), (Digit) point (Digit) more pressure for the {front left, front right, rear left, rear right} tire]
+	[(CanWe) increase {front left, front right, rear left, rear right} by (Digit) {point, comma} (Digit), (Digit) {point, comma} (Digit) more pressure for the {front left, front right, rear left, rear right} tire]
 
-	[(CanWe) decrease {front left, front right, rear left, rear right} by (Digit) point (Digit), (Digit) point (Digit) less pressure for the {front left, front right, rear left, rear right} tire]
+	[(CanWe) decrease {front left, front right, rear left, rear right} by (Digit) {point, comma} (Digit), (Digit) {point, comma} (Digit) less pressure for the {front left, front right, rear left, rear right} tire]
 
 	[(CanWe) leave the {tire pressure, pressure} unchanged, (CanWe) leave the {tire pressure, pressure} as it is, (CanWe) leave the {tire pressures, pressures} unchanged, (CanWe) {leave, keep} the {tire pressures, pressures} as they are]
 

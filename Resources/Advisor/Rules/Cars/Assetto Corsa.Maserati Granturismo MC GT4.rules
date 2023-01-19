@@ -1,0 +1,23 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Maserati Granturismo MC GT4     ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: removeSettings("Assetto Corsa", "Maserati Granturismo MC GT4",
+										[Electronics.TC, Aero.Wing.Front, Aero.Wing.Rear, Differential.Preload,
+										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
+										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
+										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Rear.Front.Right,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Rear.Front.Right]))

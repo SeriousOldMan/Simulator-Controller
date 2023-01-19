@@ -1362,20 +1362,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 																	 , false, false) {
 				type := this.getSettingType(setting.Section, setting.Key, ignore)
 
-				if IsObject(type)
-					value := translate(setting.Value)
-				else if (type = "Boolean")
-					value := (setting.Value ? "x" : "")
-				else if (type = "Float")
-					value := displayValue("Float", setting.Value)
-				else
-					value := setting.Value
+				if type {
+					if IsObject(type)
+						value := translate(setting.Value)
+					else if (type = "Boolean")
+						value := (setting.Value ? "x" : "")
+					else if (type = "Float")
+						value := displayValue("Float", setting.Value)
+					else
+						value := setting.Value
 
-				this.iSettings.Push(Array(setting.Section, setting.Key))
+					this.iSettings.Push(Array(setting.Section, setting.Key))
 
-				Gui ListView, % this.SettingsListView
+					Gui ListView, % this.SettingsListView
 
-				LV_Add("", this.getSettingLabel(setting.Section, setting.Key), value)
+					LV_Add("", this.getSettingLabel(setting.Section, setting.Key), value)
+				}
 			}
 
 			LV_ModifyCol()
@@ -3039,27 +3041,29 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
-		type := getConfigurationValue(this.SettingDescriptors, section . ".Types", key, "Text")
+		type := getConfigurationValue(this.SettingDescriptors, section . ".Types", key, false)
 
-		type := string2Values(";", type)
+		if type {
+			type := string2Values(";", type)
 
-		default := type[2]
-		type := type[1]
+			default := type[2]
+			type := type[1]
 
-		if InStr(type, "Choices:")
-			type := string2Values(",", string2Values(":", type)[2])
+			if InStr(type, "Choices:")
+				type := string2Values(",", string2Values(":", type)[2])
 
-		if (default = kTrue)
-			default := true
-		else if (default = kFalse)
-			default := false
+			if (default = kTrue)
+				default := true
+			else if (default = kFalse)
+				default := false
 
-		if (this.SelectedSimulator && (this.SelectedSimulator != true)
-		 && this.SelectedCar && (this.SelectedCar != true) && (section = "Session Settings")) {
-			if (InStr(key, "Tyre.Dry.Pressure.Target") = 1)
-				default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Dry", default)
-			else if (InStr(key, "Tyre.Wet.Pressure.Target") = 1)
-				default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Wet", default)
+			if (this.SelectedSimulator && (this.SelectedSimulator != true)
+			 && this.SelectedCar && (this.SelectedCar != true) && (section = "Session Settings")) {
+				if (InStr(key, "Tyre.Dry.Pressure.Target") = 1)
+					default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Dry", default)
+				else if (InStr(key, "Tyre.Wet.Pressure.Target") = 1)
+					default := this.SessionDatabase.optimalTyrePressure(this.SelectedSimulator, this.SelectedCar, "Wet", default)
+			}
 		}
 
 		return type

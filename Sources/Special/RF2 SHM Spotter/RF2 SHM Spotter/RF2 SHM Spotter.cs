@@ -420,17 +420,23 @@ namespace RF2SHMSpotter {
 						// Console.Write(i); Console.Write(" "); Console.Write(vehicle.mPos.x); Console.Write(" ");
 						// Console.Write(vehicle.mPos.z); Console.Write(" "); Console.WriteLine(vehicle.mPos.y);
 
-						bool faster = false;
+						double otherSpeed = vectorLength(lastCoordinates[i, 0] - vehicle.mPos.x,
+														 lastCoordinates[i, 2] - (-vehicle.mPos.z));
 
-						if (hasLastCoordinates)
-							faster = vectorLength(lastCoordinates[i, 0] - vehicle.mPos.x,
-												  lastCoordinates[i, 2] - (- vehicle.mPos.z)) > speed * 1.01;
+						if (Math.Abs(speed - otherSpeed) / speed < 0.5)
+						{
 
-						newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle, faster,
-														 vehicle.mPos.x, (- vehicle.mPos.z), vehicle.mPos.y);
+							bool faster = false;
 
-						if ((newSituation == THREE) && carBehind)
-							break;
+							if (hasLastCoordinates)
+								faster = otherSpeed > speed * 1.05;
+
+							newSituation |= checkCarPosition(coordinateX, coordinateZ, coordinateY, angle, faster,
+															 vehicle.mPos.x, (-vehicle.mPos.z), vehicle.mPos.y);
+
+							if ((newSituation == THREE) && carBehind)
+								break;
+						}
 					}
 				}
 

@@ -335,17 +335,21 @@ bool checkPositions() {
 
 		for (int id = 0; id < gf->activeCars; id++) {
 			if (id != carID) {
-				bool faster = false;
+				float otherSpeed = vectorLength(lastCoordinates[id][0] - gf->carCoordinates[id][0],
+												lastCoordinates[id][2] - gf->carCoordinates[id][2]);
 
-				if (hasLastCoordinates)
-					faster = vectorLength(lastCoordinates[id][0] - gf->carCoordinates[id][0],
-										  lastCoordinates[id][2] - gf->carCoordinates[id][2]) > speed * 1.05;
+				if (abs(speed - otherSpeed) / speed < 0.5) {
+					bool faster = false;
 
-				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
-												 gf->carCoordinates[id][0], gf->carCoordinates[id][2], gf->carCoordinates[id][1]);
+					if (hasLastCoordinates)
+						faster = otherSpeed > speed * 1.05;
 
-				if ((newSituation == THREE) && carBehind)
-					break;
+					newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
+						gf->carCoordinates[id][0], gf->carCoordinates[id][2], gf->carCoordinates[id][1]);
+
+					if ((newSituation == THREE) && carBehind)
+						break;
+				}
 			}
 		}
 

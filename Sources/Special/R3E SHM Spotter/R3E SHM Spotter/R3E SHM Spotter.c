@@ -336,19 +336,23 @@ BOOL checkPositions(int playerID) {
 		for (int id = 0; id < map_buffer->num_cars; id++) {
 			if ((map_buffer->all_drivers_data_1[id].driver_info.user_id != playerID) &&
 					(map_buffer->all_drivers_data_1[id].in_pitlane == 0)) {
-				BOOL faster = FALSE;
+				r3e_float64 otherSpeed = vectorLength(lastCoordinates[id][0] - map_buffer->all_drivers_data_1[id].position.x,
+													  lastCoordinates[id][2] - map_buffer->all_drivers_data_1[id].position.z);
 
-				if (hasLastCoordinates)
-					faster = vectorLength(lastCoordinates[id][0] - map_buffer->all_drivers_data_1[id].position.x,
-										  lastCoordinates[id][2] - map_buffer->all_drivers_data_1[id].position.z) > speed * 1.01;
+				if (fabs(speed - otherSpeed) / speed < 0.5) {
+					BOOL faster = FALSE;
 
-				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
-												 map_buffer->all_drivers_data_1[id].position.x,
-												 map_buffer->all_drivers_data_1[id].position.z,
-												 map_buffer->all_drivers_data_1[id].position.y);
+					if (hasLastCoordinates)
+						faster = otherSpeed > speed * 1.05;
 
-				if ((newSituation == THREE) && carBehind)
-					break;
+					newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
+						map_buffer->all_drivers_data_1[id].position.x,
+						map_buffer->all_drivers_data_1[id].position.z,
+						map_buffer->all_drivers_data_1[id].position.y);
+
+					if ((newSituation == THREE) && carBehind)
+						break;
+				}
 			}
 		}
 

@@ -1489,10 +1489,36 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.updateActions(session)
 	}
 
+	callSaveLapState(lap, stateFile) {
+		local lapState
+
+		if (stateFile && FileExist(stateFile)) {
+			lapState := readConfiguration(stateFile)
+
+			deleteFile(stateFile)
+		}
+		else
+			lapState := false
+
+		this.saveLapState(lap, lapState)
+	}
+
+	saveLapState(lap, state) {
+		local teamServer := this.TeamServer
+
+		if (teamServer && this.TeamSessionActive) {
+			if isDebug()
+				showMessage("Saving lap state for " . this.Plugin)
+
+			if state
+				teamServer.setLapValue(lap, this.Plugin . " State", printConfiguration(state))
+		}
+	}
+
 	callSaveSessionState(settingsFile, stateFile) {
 		local sessionSettings, sessionState
 
-		if settingsFile {
+		if (settingsFile && FileExist(settingsFile)) {
 			sessionSettings := readConfiguration(settingsFile)
 
 			deleteFile(settingsFile)
@@ -1500,7 +1526,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			sessionSettings := false
 
-		if stateFile {
+		if (stateFile && FileExist(stateFile)) {
 			sessionState := readConfiguration(stateFile)
 
 			deleteFile(stateFile)

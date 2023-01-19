@@ -119,6 +119,10 @@ class RaceAssistant extends ConfigurationItem {
 		saveSessionState(arguments*) {
 			this.callRemote("callSaveSessionState", arguments*)
 		}
+
+		saveLapState(arguments*) {
+			this.callRemote("callSaveLapState", arguments*)
+		}
 	}
 
 	class RaceVoiceManager extends VoiceManager {

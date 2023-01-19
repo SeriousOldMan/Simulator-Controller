@@ -1276,6 +1276,7 @@ class RaceEngineer extends RaceAssistant {
 		local driverNickname := ""
 		local result, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor, prefix
 		local coldPressures, hotPressures, pressuresLosses, airTemperature, trackTemperature, weatherNow
+		local savedKnowledgeBase, stateFile
 
 		static lastLap := 0
 
@@ -1288,6 +1289,18 @@ class RaceEngineer extends RaceAssistant {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
+		}
+
+		if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Lap", false)) {
+			savedKnowledgeBase := newConfiguration()
+
+			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
+
+			stateFile := temporaryFileName(this.AssistantType, "state")
+
+			writeConfiguration(stateFile, savedKnowledgeBase)
+
+			this.RemoteHandler.saveLapState(lapNumber, stateFile)
 		}
 
 		result := base.addLap(lapNumber, data)

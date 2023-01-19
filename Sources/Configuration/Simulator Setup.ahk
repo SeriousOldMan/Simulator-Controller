@@ -2126,6 +2126,9 @@ class StartStepWizard extends StepWizard {
 
 					Run Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
 				}
+				catch exception {
+					logError(exception)
+				}
 				finally {
 					SetWorkingDir %currentDirectory%
 				}

@@ -212,7 +212,12 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 			}
 		}
 
-		RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%Shared Database\Community' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Shared Database\Database.%id%.zip', , Hide
+		try {
+			RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%Shared Database\Community' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Shared Database\Database.%id%.zip', , Hide
+		}
+		catch exception {
+			logError(exception)
+		}
 
 		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "simulator-controller/database-uploads/Database." . id . ".zip")
 
@@ -285,7 +290,12 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 				if (sessionDB.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
-					RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
+					try {
+						RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
+					}
+					catch exception {
+						logError(exception)
+					}
 
 					deleteFile(kTempDirectory . fileName)
 					deleteDirectory(sessionDBPath . "Community")

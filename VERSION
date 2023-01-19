@@ -3,7 +3,7 @@ Version=4.5.7.0-dev
 Target=4.5.7.0-release
 Date=01/119/2023
 Download=
-Changes=No more superfluous proximity alerts by the Spotter for cars behind the pit wall, "Rsce Center" will now also show information for planned, but not yet performed pitstops
+Changes=No more superfluous proximity alerts by the Spotter for cars behind the pit wall, "Rsce Center" will now also show information for planned, but not yet performed pitstops, The no longer needed race duration has been removed from all settings
 [Release]
 Version=4.5.4.0-release
 Date=01/06/2023

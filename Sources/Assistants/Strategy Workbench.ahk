@@ -915,19 +915,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+26 w85 h20 +0x200, % translate("Pressure")
 		Gui %window%:Add, Text, x%x0% yp w85 h20 +0x200, % translate("FL")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFLEdit Disabled, %strategyPressureFLEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("FR")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureFREdit Disabled, %strategyPressureFREdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RL")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRLEdit Disabled, %strategyPressureRLEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure")
 
 		Gui %window%:Add, Text, x%x0% yp+21 w85 h20 +0x200, % translate("RR")
 		Gui %window%:Add, Edit, x%x1% yp-2 w50 h20 VstrategyPressureRREdit Disabled, %strategyPressureRREdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure", true)
+		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Pressure")
 
 		x := 371
 		x0 := x - 4

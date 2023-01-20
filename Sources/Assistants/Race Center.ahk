@@ -5991,8 +5991,8 @@ class RaceCenter extends ConfigurationItem {
 							nextDriver := string2Values(":", driverRequest[1])[2]
 						}
 						else {
-							currentDriver := this.Laps[lap].Stint.Driver.FullName
-							nextDriver := kNull
+							currentDriver := this.Laps[this.LastLap.Nr].Stint.Driver.FullName
+							nextDriver := currentDriver
 						}
 
 						if fuel is Number

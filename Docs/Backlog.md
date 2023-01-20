@@ -30,4 +30,5 @@
   4. Port all AHK applications to AutoHotkey 2.0.2
   5. Full system-wide support for culture- or country-specific units, number formats and other localization stuff
   6. Resizeable windows or larger window sizes for the "large" applications
-  7. [Important] Migrate from .NET Core 3.1 to .NET 6.0 (https://devblogs.microsoft.com/dotnet/december-2022-updates/)
+  7. More units for conversion, especially "Gallon (US)" and "Gallon (GB)"
+  8. [Important] Migrate from .NET Core 3.1 to .NET 6.0 (https://devblogs.microsoft.com/dotnet/december-2022-updates/)

@@ -995,6 +995,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.performPitstop(lapNumber)
+
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.performPitstop(lapNumber)
 	}
 
 	restoreAssistantsSessionState(data) {

@@ -828,8 +828,7 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 		(Set: Pitstop.Planned.Repair.Bodywork, false)
 {All: [?Pitstop.Plan], {None: [?Damage.Repair.Engine.Target], [?Pitstop.Plan.Repair.Engine]}} =>
 		(Set: Pitstop.Planned.Repair.Engine, false)
-{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Driver.Request]}} =>
-		(Set: Pitstop.Planned.Driver.Request, false)
+{All: [?Pitstop.Plan], {None: [?Pitstop.Plan.Driver.Request]}} => (Set: Pitstop.Planned.Driver.Request, false)
 {All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Loss.FL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.FL, 0)
 {All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Loss.FR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.FR, 0)
 {All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Loss.RL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RL, 0)
@@ -883,8 +882,7 @@ requestRepairs(?pitstopNumber) <= Call(requestPitstopRepairs, ?pitstopNumber,
 															  !Pitstop.Planned.Repair.Bodywork,
 															  !Pitstop.Planned.Repair.Engine)
 
-requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber,
-															!Pitstop.Planned.Driver.Request)
+requestDriver(?pitstopNumber) <= Call(requestPitstopDriver, ?pitstopNumber, !Pitstop.Planned.Driver.Request)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -929,6 +927,7 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.FR, !P
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RL, !Pitstop.Planned.Tyre.Pressure.RL)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.RR, !Pitstop.Planned.Tyre.Pressure.RR)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Tyre.Pressure.Correction, !Pitstop.Planned.Tyre.Pressure.Correction)
+pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Driver.Request, !Pitstop.Planned.Driver.Request)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Suspension, !Pitstop.Planned.Repair.Suspension)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pitstop.Planned.Repair.Bodywork)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Engine, !Pitstop.Planned.Repair.Engine)

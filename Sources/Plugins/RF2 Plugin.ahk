@@ -30,6 +30,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	iOpenPitstopMFDHotkey := false
 	iClosePitstopMFDHotkey := false
 
+	iSelectedDriver := false
+
 	OpenPitstopMFDHotkey[] {
 		Get {
 			return this.iOpenPitstopMFDHotkey
@@ -203,10 +205,10 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 					compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw")
 					compound := new SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track
 																		, compound, kUndefined)
-					
+
 					if (compound = kUndefined)
 						compound := normalizeCompound("Dry")
-						
+
 					compoundColor := false
 
 					splitCompound(compound, compound, compoundColor)
@@ -226,6 +228,12 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 		else
 			return false
+	}
+
+	performPitstop(lap) {
+		base.performPitstop(lap)
+
+		this.iSelectedDriver := false
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
@@ -272,17 +280,25 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
-		local delta
+		local delta, currentDriver, nextDriver
 
 		base.requestPitstopDriver(pitstopNumber, driver)
 
 		if driver {
 			driver := string2Values("|", driver)
 
-			delta := (string2Values(":", driver[2])[2] - string2Values(":", driver[1])[2])
+			nextDriver := string2Values(":", driver[2])
+			currentDriver := string2Values(":", driver[1])
+
+			if !this.iSelectedDriver
+				this.iSelectedDriver := currentDriver[2]
+
+			delta := (nextDriver[2] - this.iSelectedDriver)
 
 			loop % Abs(delta)
 				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
+
+			this.iSelectedDriver := nextDriver[2]
 		}
 	}
 

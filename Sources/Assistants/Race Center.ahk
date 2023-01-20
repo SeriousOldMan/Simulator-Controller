@@ -91,7 +91,8 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
-											  , "Repair.Bodywork", "Repair.Suspension", "Repair.Engine", "Driver", "Status"]
+											  , "Repair.Bodywork", "Repair.Suspension", "Repair.Engine"
+											  , "Driver.Current", "Driver.Next", "Status"]
 							 , "Pitstop.Service.Data": ["Pitstop", "Lap", "Time", "Driver.Previous", "Driver.Next", "Fuel"
 													  , "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Pressures"
 													  , "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"]
@@ -3405,8 +3406,23 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	planPitstop() {
-		local window, pitstopPlan, stint, drivers, currentDriver, nextDriver, currentNr, nextNr
-		local session, lap, title, compound, compoundColor
+		local sessionStore := this.SessionStore
+		local currentDriver := kNull
+		local nextDriver := kNull
+		local fuel := "-"
+		local compound := "-"
+		local compoundColor := false
+		local tyreSet := "-"
+		local pressureFL := "-"
+		local pressureFR := "-"
+		local pressureRL := "-"
+		local pressureRR := "-"
+		local repairBodywork := false
+		local repairSuspension := false
+		local repairEngine := false
+		local window, pitstopPlan, stint, drivers, currentNr, nextNr
+		local session, lap, title, currentListView
+		local displayFuel, displayPressures, pressures
 
 		if this.SessionActive {
 			window := this.Window
@@ -3436,7 +3452,10 @@ class RaceCenter extends ConfigurationItem {
 				pitstopTyreSetEdit := 0
 
 			setConfigurationValue(pitstopPlan, "Pitstop", "Lap", pitstopLapEdit)
-			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", convertUnit("Volume", internalValue("Float", pitstopRefuelEdit), false))
+
+			fuel := convertUnit("Volume", internalValue("Float", pitstopRefuelEdit), false)
+
+			setConfigurationValue(pitstopPlan, "Pitstop", "Refuel", fuel)
 
 			stint := this.CurrentStint
 			driverSelected := false
@@ -3472,28 +3491,33 @@ class RaceCenter extends ConfigurationItem {
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
 
+				tyreSet := pitstopTyreSetEdit
+
 				splitCompound(this.TyreCompounds[pitstopTyreCompoundDropDown - 1], compound, compoundColor)
 
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound", compound)
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", compoundColor)
 
+				pressureFL := convertUnit("Pressure", internalValue("Float", pitstopPressureFLEdit), false)
+				pressureFR := convertUnit("Pressure", internalValue("Float", pitstopPressureFREdit), false)
+				pressureRL := convertUnit("Pressure", internalValue("Float", pitstopPressureRLEdit), false)
+				pressureRR := convertUnit("Pressure", internalValue("Float", pitstopPressureRREdit), false)
+
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Pressures"
-									, values2String(",", convertUnit("Pressure", internalValue("Float", pitstopPressureFLEdit), false)
-													   , convertUnit("Pressure", internalValue("Float", pitstopPressureFREdit), false)
-													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRLEdit), false)
-													   , convertUnit("Pressure", internalValue("Float", pitstopPressureRREdit), false)))
+									, values2String(",", pressureFL, pressureFR, pressureRL, pressureRR))
 			}
 			else
 				setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", false)
 
-			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork"
-								, ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 5)))
+			repairBodywork := ((pitstopRepairsDropDown = 2) || (pitstopRepairsDropDown = 5))
+			repairSuspension := ((pitstopRepairsDropDown = 3) || (pitstopRepairsDropDown = 5))
+			repairEngine := ((pitstopRepairsDropDown = 4) || (pitstopRepairsDropDown = 5))
 
-			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension"
-								, ((pitstopRepairsDropDown = 3) || (pitstopRepairsDropDown = 5)))
+			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Bodywork", repairBodywork)
+			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Suspension", repairSuspension)
+			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Engine", repairEngine)
 
-			setConfigurationValue(pitstopPlan, "Pitstop", "Repair.Engine"
-								, ((pitstopRepairsDropDown = 4) || (pitstopRepairsDropDown = 5)))
+			currentListView := A_DefaultListView
 
 			try {
 				session := this.SelectedSession[true]
@@ -3503,6 +3527,53 @@ class RaceCenter extends ConfigurationItem {
 				this.Connector.SetLapValue(lap, "Pitstop Plan", printConfiguration(pitstopPlan))
 				this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
 
+				sessionStore.remove("Pitstop.Data", {Status: "Planned"}, Func("always").Bind(true))
+
+				Gui ListView, % this.PitstopsListView
+
+				loop % LV_GetCount()
+					if (LV_GetNext(A_Index - 1, "C") != A_Index) {
+						nextStop -= 1
+
+						LV_Delete(A_Index)
+
+						break
+					}
+
+				if (compound && (compound != "-")) {
+					pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
+												   , Round(pressureRL, 1), Round(pressureRR, 1))
+
+					displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
+														  , displayValue("Float", convertUnit("Pressure", pressureFR))
+														  , displayValue("Float", convertUnit("Pressure", pressureRL))
+														  , displayValue("Float", convertUnit("Pressure", pressureRR)))
+				}
+				else {
+					compound := "-"
+					compoundColor := false
+
+					tyreSet := "-"
+					pressures := "-, -, -, -"
+					displayPressures := pressures
+				}
+
+				if fuel is Number
+					displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+				else
+					displayFuel := fuel
+
+				LV_Add("", LV_GetCount() + 1, pitstopLapEdit, displayFuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
+						 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+
+				pressures := string2Values(",", pressures)
+
+				sessionStore.add("Pitstop.Data", {Lap: pitstopLapEdit - 1, Fuel: fuel, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor, "Tyre.Set": tyreSet
+												, "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
+												, "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
+												, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension, "Repair.Engine": repairEngine
+												, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Planned"})
+
 				showMessage(translate("Race Engineer will be instructed as fast as possible."))
 			}
 			catch exception {
@@ -3511,6 +3582,9 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				MsgBox 262192, %title%, % translate("You must be connected to an active session to plan a pitstop.")
 				OnMessage(0x44, "")
+			}
+			finally {
+				Gui ListView, %currentListView%
 			}
 		}
 		else {
@@ -5731,7 +5805,7 @@ class RaceCenter extends ConfigurationItem {
 		local newData := false
 		local compound, currentListView, session, nextStop, lap, fuel, compound, compoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
-		local pressures, displayPressures, displayFuel
+		local pressures, displayPressures, displayFuel, driverRequest, currentDriver, nextDriver
 
 		Gui %window%:Default
 
@@ -5775,6 +5849,7 @@ class RaceCenter extends ConfigurationItem {
 						repairBodywork := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
 						repairSuspension := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
 						repairEngine := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Engine", false)
+						driverRequest := getConfigurationValue(state, "Session State", "Pitstop." . nextStop . ".Driver.Request", false)
 
 						if (compound && (compound != "-")) {
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
@@ -5806,12 +5881,26 @@ class RaceCenter extends ConfigurationItem {
 
 						pressures := string2Values(",", pressures)
 
+						if driverRequest {
+							driverRequest := string2Values("|", driverRequest)
+
+							currentDriver := string2Values(":", driverRequest[1])[1]
+							nextDriver := string2Values(":", driverRequest[1])[2]
+						}
+						else {
+							currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
+
+							if !this.Laps.HasKey(lap + 1)
+								nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
+							else
+								nextDriver := this.CurrentStint.Driver.FullName
+						}
+
 						sessionStore.add("Pitstop.Data", {Lap: lap, Fuel: fuel, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor, "Tyre.Set": tyreSet
 														, "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
 														, "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
-														, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension
-														, "Repair.Engine": repairEngine
-														, Driver: this.Laps[lap].Stint.Driver.FullName, Status: "Performed"})
+														, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension, "Repair.Engine": repairEngine
+														, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Performed"})
 
 						newData := true
 
@@ -5828,7 +5917,7 @@ class RaceCenter extends ConfigurationItem {
 														, "Tyre.Pressure.Cold.Front.Left": "-", "Tyre.Pressure.Cold.Front.Right": "-"
 														, "Tyre.Pressure.Cold.Rear.Left": "-", "Tyre.Pressure.Cold.Rear.Right": "-"
 														, "Repair.Bodywork": false, "Repair.Suspension": false, "Repair.Engine": false
-														, Driver: kNull, Status: "Performed"})
+														, "Driver.Current": kNull, "Driver.Next": kNull, Status: "Performed"})
 
 						newData := true
 
@@ -5875,6 +5964,7 @@ class RaceCenter extends ConfigurationItem {
 						repairBodywork := getConfigurationValue(state, "Session State", "Pitstop.Planned.Repair.Bodywork", false)
 						repairSuspension := getConfigurationValue(state, "Session State", "Pitstop.Planned.Repair.Suspension", false)
 						repairEngine := getConfigurationValue(state, "Session State", "Pitstop.Planned.Repair.Engine", false)
+						driverRequest := getConfigurationValue(state, "Session State", "Pitstop.Planned.Driver.Request", false)
 
 						if (compound && (compound != "-")) {
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
@@ -5894,6 +5984,17 @@ class RaceCenter extends ConfigurationItem {
 							displayPressures := pressures
 						}
 
+						if driverRequest {
+							driverRequest := string2Values("|", driverRequest)
+
+							currentDriver := string2Values(":", driverRequest[1])[1]
+							nextDriver := string2Values(":", driverRequest[1])[2]
+						}
+						else {
+							currentDriver := this.Laps[lap].Stint.Driver.FullName
+							nextDriver := kNull
+						}
+
 						Gui ListView, % this.PitstopsListView
 
 						if fuel is Number
@@ -5909,9 +6010,8 @@ class RaceCenter extends ConfigurationItem {
 						sessionStore.add("Pitstop.Data", {Lap: lap, Fuel: fuel, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor, "Tyre.Set": tyreSet
 														, "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
 														, "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
-														, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension
-														, "Repair.Engine": repairEngine
-														, Driver: this.Laps[lap].Stint.Driver.FullName, Status: "Planned"})
+														, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension, "Repair.Engine": repairEngine
+														, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Planned"})
 					}
 				}
 			}
@@ -9372,6 +9472,12 @@ class RaceCenter extends ConfigurationItem {
 		pressures := values2String(", ", pressures*)
 
 		html .= ("<tr><td><b>" . translate("Lap:") . "</b></div></td><td>" . ((pitstopData.Lap = "-") ? "-" : (pitstopData.Lap + 1)) . "</td></tr>")
+
+		if (pitstopData["Driver.Current"] != kNull)
+			html .= ("<tr><td><b>" . translate("Last Driver:") . "</b></div></td><td>" . pitstopData["Driver.Current"] . "</td></tr>")
+
+		if (pitstopData["Driver.Next"] != kNull)
+			html .= ("<tr><td><b>" . translate("Next Driver:") . "</b></div></td><td>" . pitstopData["Driver.Next"] . "</td></tr>")
 
 		if ((pitstopData.Fuel != "-") && (pitstopData.Fuel > 0))
 			html .= ("<tr><td><b>" . translate("Refuel:") . "</b></div></td><td>" . displayValue("Float", convertUnit("Volume", pitstopData.Fuel)) . "</td></tr>")

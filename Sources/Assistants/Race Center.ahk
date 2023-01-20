@@ -5869,12 +5869,23 @@ class RaceCenter extends ConfigurationItem {
 							displayPressures := pressures
 						}
 
-						Gui ListView, % this.PitstopsListView
-
 						if fuel is Number
 							displayFuel := displayValue("Float", convertUnit("Volume", fuel))
 						else
 							displayFuel := fuel
+
+						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, Func("always").Bind(true))
+
+						Gui ListView, % this.PitstopsListView
+
+						loop % LV_GetCount()
+							if (LV_GetNext(A_Index - 1, "C") != A_Index) {
+								nextStop -= 1
+
+								LV_Delete(A_Index)
+
+								break
+							}
 
 						LV_Add("Check", nextStop, lap + 1, displayFuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
 									  , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
@@ -5925,17 +5936,6 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 			}
-
-			sessionStore.remove("Pitstop.Data", {Status: "Planned"}, Func("always").Bind(true))
-
-			loop % LV_GetCount()
-				if (LV_GetNext(A_Index - 1, "C") != A_Index) {
-					nextStop -= 1
-
-					LV_Delete(A_Index)
-
-					break
-				}
 
 			if (!newData && this.LastLap) {
 				try {
@@ -5995,12 +5995,23 @@ class RaceCenter extends ConfigurationItem {
 							nextDriver := kNull
 						}
 
-						Gui ListView, % this.PitstopsListView
-
 						if fuel is Number
 							displayFuel := displayValue("Float", convertUnit("Volume", fuel))
 						else
 							displayFuel := fuel
+
+						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, Func("always").Bind(true))
+
+						Gui ListView, % this.PitstopsListView
+
+						loop % LV_GetCount()
+							if (LV_GetNext(A_Index - 1, "C") != A_Index) {
+								nextStop -= 1
+
+								LV_Delete(A_Index)
+
+								break
+							}
 
 						LV_Add("", nextStop, lap + 1, displayFuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
 								 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))

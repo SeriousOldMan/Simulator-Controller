@@ -3,7 +3,7 @@ Version=4.5.7.0-dev
 Target=4.5.7.0-release
 Date=01/19/2023
 Download=
-Changes=No more superfluous proximity alerts by the Spotter for cars behind the pit wall, "Race Center" will now also show information for planned, but not yet performed pitstops, The no longer needed race duration has been removed from all settings
+Changes=No more superfluous proximity alerts by the Spotter for cars behind the pit wall, "Race Center" will now also show information for planned, but not yet performed pitstops, The no longer needed race duration has been removed from all settings, Optimized driver swap selection in "Race Center", Separated British from US-American Gallon
 [Release]
 Version=4.5.5.0-release
 Date=01/13/2023

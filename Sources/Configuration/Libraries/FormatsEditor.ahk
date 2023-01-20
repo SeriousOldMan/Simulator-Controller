@@ -117,6 +117,9 @@ class FormatsEditor extends ConfigurationItem {
 
 		numberFormatDropDown := getConfigurationValue(configuration, "Localization", "NumberFormat", "#.##")
 		timeFormatDropDown := getConfigurationValue(configuration, "Localization", "TimeFormat", "[H:]M:S.##")
+
+		if (volumeUnitDropDown = "Gallon")
+			volumeUnitDropDown := "Gallon (GB)"
 	}
 
 	saveToConfiguration(configuration) {

@@ -521,7 +521,13 @@ class RaceEngineer extends RaceAssistant {
 				if this.isNumber(fuel, fuel) {
 					speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[convert ? "Gallon" : "Liter"]}, true)
 
-					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", convert ? Ceil(fuel * 4.546092) : fuel))
+					if convert
+						if (getUnit("Volume") = "Gallon (US)")
+							fuel := Ceil(fuel * 3.785411)
+						else
+							fuel := Ceil(fuel * 4.546092)
+
+					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", fuel))
 
 					return
 				}

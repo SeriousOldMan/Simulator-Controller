@@ -3533,8 +3533,6 @@ class RaceCenter extends ConfigurationItem {
 
 				loop % LV_GetCount()
 					if (LV_GetNext(A_Index - 1, "C") != A_Index) {
-						nextStop -= 1
-
 						LV_Delete(A_Index)
 
 						break
@@ -5818,6 +5816,9 @@ class RaceCenter extends ConfigurationItem {
 
 			nextStop := (LV_GetCount() + 1)
 
+			if LV_GetNext(0, "C")
+				nextStop -= 1
+
 			this.showMessage(translate("Updating pitstops"))
 
 			if !state
@@ -5880,8 +5881,6 @@ class RaceCenter extends ConfigurationItem {
 
 						loop % LV_GetCount()
 							if (LV_GetNext(A_Index - 1, "C") != A_Index) {
-								nextStop -= 1
-
 								LV_Delete(A_Index)
 
 								break
@@ -5896,7 +5895,7 @@ class RaceCenter extends ConfigurationItem {
 							driverRequest := string2Values("|", driverRequest)
 
 							currentDriver := string2Values(":", driverRequest[1])[1]
-							nextDriver := string2Values(":", driverRequest[1])[2]
+							nextDriver := string2Values(":", driverRequest[1])[1]
 						}
 						else {
 							currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
@@ -6006,14 +6005,12 @@ class RaceCenter extends ConfigurationItem {
 
 						loop % LV_GetCount()
 							if (LV_GetNext(A_Index - 1, "C") != A_Index) {
-								nextStop -= 1
-
 								LV_Delete(A_Index)
 
 								break
 							}
 
-						LV_Add("", nextStop, lap + 1, displayFuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
+						LV_Add("", LV_GetCount() + 1, lap + 1, displayFuel, (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
 								 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 						pressures := string2Values(",", pressures)

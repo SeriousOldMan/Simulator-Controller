@@ -6318,7 +6318,7 @@ class RaceCenter extends ConfigurationItem {
 
 						LV_Modify(LV_GetCount(), "Select Vis")
 
-						this.showLapDetails(this.LastLap)
+						this.showStintDetails(this.CurrentStint)
 					}
 
 					if (this.SelectedDetailReport = "Plan") {

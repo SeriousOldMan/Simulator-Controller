@@ -5949,7 +5949,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if (!newData && this.LastLap) {
 				try {
-					state := this.Connector.GetLapValue(this.LastLap.Identifier, "Race Engineer Pitstop State")
+					state := this.Connector.GetLapValue(this.LastLap.Identifier, "Pitstop Pending")
 				}
 				catch exception {
 					logError(exception)
@@ -5958,28 +5958,26 @@ class RaceCenter extends ConfigurationItem {
 				if (state && (state != "")) {
 					state := parseConfiguration(state)
 
-					lap := getConfigurationValue(state, "Session State", "Pitstop.Planned.Lap", kUndefined)
+					pitstopNr := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
 
-					if (lap == kUndefined)
-						lap := false
-					else if !lap
-						lap := "-"
+					Gui ListView, % this.PitstopsListView
 
-					if lap {
+					if (pitstopNr && (pitstopNr > LV_GetCount())) {
 						newData := true
 
-						fuel := Round(getConfigurationValue(state, "Session State", "Pitstop.Planned.Fuel", 0))
-						compound := getConfigurationValue(state, "Session State", "Pitstop.Planned.Tyre.Compound", false)
-						compoundColor := getConfigurationValue(state, "Session State", "Pitstop.Planned.Tyre.Compound.Color", false)
-						tyreSet := getConfigurationValue(state, "Session State", "Pitstop.Planned.Tyre.Set", "-")
-						pressureFL := getConfigurationValue(state, "Session State", "Pitstop.Planned.Tyre.Pressure.FL", "-")
-						pressureFR := getConfigurationValue(state, "Session State", "Pitstop.Planned.Tyre.Pressure.FR", "-")
-						pressureRL := getConfigurationValue(state, "Session State", "Pitstop.Planned.Tyre.Pressure.RL", "-")
-						pressureRR := getConfigurationValue(state, "Session State", "Pitstop.Planned.Tyre.Pressure.RR", "-")
-						repairBodywork := getConfigurationValue(state, "Session State", "Pitstop.Planned.Repair.Bodywork", false)
-						repairSuspension := getConfigurationValue(state, "Session State", "Pitstop.Planned.Repair.Suspension", false)
-						repairEngine := getConfigurationValue(state, "Session State", "Pitstop.Planned.Repair.Engine", false)
-						driverRequest := getConfigurationValue(state, "Session State", "Pitstop.Planned.Driver.Request", false)
+						lap := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Lap", "-")
+						fuel := Round(getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Fuel", 0))
+						compound := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
+						compoundColor := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
+						tyreSet := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
+						pressureFL := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FL", "-")
+						pressureFR := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FR", "-")
+						pressureRL := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RL", "-")
+						pressureRR := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RR", "-")
+						repairBodywork := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
+						repairSuspension := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
+						repairEngine := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
+						driverRequest := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Driver.Request", false)
 
 						if (compound && (compound != "-")) {
 							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)

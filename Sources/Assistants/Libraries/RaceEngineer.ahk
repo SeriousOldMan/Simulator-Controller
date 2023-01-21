@@ -1318,9 +1318,9 @@ class RaceEngineer extends RaceAssistant {
 
 			for key, value in this.KnowledgeBase.Facts.Facts
 				if (InStr(key, "Pitstop") = 1)
-					setConfigurationValue(savedKnowledgeBase, "Pitstop State", key, value)
+					setConfigurationValue(savedKnowledgeBase, "Pitstop Pending", key, value)
 
-			stateFile := temporaryFileName(this.AssistantType . " Pitstop State", "state")
+			stateFile := temporaryFileName(this.AssistantType . " Pitstop Pending", "state")
 
 			writeConfiguration(stateFile, savedKnowledgeBase)
 

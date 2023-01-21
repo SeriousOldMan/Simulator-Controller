@@ -1092,6 +1092,22 @@ class RaceEngineer extends RaceAssistant {
 			:= getConfigurationValue(data, "Car Data", "TyreCompoundColor"
 								   , getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
 
+		if (this.Session = kSessionPractice)
+			this.updateConfigurationValues({Announcements: {FuelWarning: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Practice.LowFuel", true)
+														  , DamageReporting: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
+														  , DamageAnalysis: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Practice.Damage", false)
+														  , PressureReporting: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Practice.Pressure", true)}})
+		else if (this.Session = kSessionQualification)
+			this.updateConfigurationValues({Announcements: {FuelWarning: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Qualification.LowFuel", false)
+														  , DamageReporting: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
+														  , DamageAnalysis: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Qualification.Damage", false)
+														  , PressureReporting: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Qualification.Pressure", true)}})
+		else if (this.Session = kSessionRace)
+			this.updateConfigurationValues({Announcements: {FuelWarning: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Race.LowFuel", true)
+														  , DamageReporting: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
+														  , DamageAnalysis: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
+														  , PressureReporting: getConfigurationValue(settings, "Assistant.Engineer", "Announcement.Race.Pressure", true)}})
+
 		return facts
 	}
 

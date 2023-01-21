@@ -5811,7 +5811,8 @@ class RaceCenter extends ConfigurationItem {
 		local newData := false
 		local compound, currentListView, session, nextStop, lap, fuel, compound, compoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
-		local pressures, displayPressures, displayFuel, driverRequest, currentDriver, nextDriver, wasEmpty
+		local pressures, displayPressures, displayFuel, driverRequest, currentDriver, nextDriver, wasEmpty, tries
+		local pitstopNr
 
 		Gui %window%:Default
 
@@ -5826,8 +5827,12 @@ class RaceCenter extends ConfigurationItem {
 
 			nextStop := (LV_GetCount() + 1)
 
-			if LV_GetNext(0, "C")
-				nextStop -= 1
+			loop % LV_GetCount()
+				if (LV_GetNext(A_Index - 1, "C") != A_Index) {
+					nextStop -= 1
+
+					break
+				}
 
 			this.showMessage(translate("Updating pitstops"))
 
@@ -5894,10 +5899,18 @@ class RaceCenter extends ConfigurationItem {
 						else {
 							currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
 
-							if !this.Laps.HasKey(lap + 1)
+							if this.Laps.HasKey(lap + 1)
 								nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
-							else
+							else if this.CurrentStint
 								nextDriver := this.CurrentStint.Driver.FullName
+							else
+								nextDriver := false
+
+							if !currentDriver
+								currentDriver := kNull
+
+							if !nextDriver
+								nextDriver := currentDriver
 						}
 
 						Gui ListView, % this.PitstopsListView
@@ -5949,7 +5962,30 @@ class RaceCenter extends ConfigurationItem {
 
 			if (!newData && this.LastLap) {
 				try {
-					state := this.Connector.GetLapValue(this.LastLap.Identifier, "Pitstop Pending")
+					tries := 10
+
+					while (tries > 0) {
+						state := this.Connector.GetLapValue(this.LastLap.Identifier, "Race Engineer Pitstop Pending")
+
+						if ((!state || (state == "")) && (this.LastLap.Nr > 1))
+							state := this.Connector.GetLapValue(this.Laps[this.LastLap.Nr - 1].Identifier, "Race Engineer Pitstop Pending")
+
+						if (!state || (state == "")) {
+							tries -= 1
+
+							this.showMessage(translate("Waiting for data"))
+
+							if (tries <= 0) {
+								this.showMessage(translate("Give up - use default values"))
+
+								throw "No data..."
+							}
+							else
+								Sleep 400
+						}
+						else
+							break
+					}
 				}
 				catch exception {
 					logError(exception)
@@ -5966,6 +6002,10 @@ class RaceCenter extends ConfigurationItem {
 						newData := true
 
 						lap := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Lap", "-")
+
+						if !lap
+							lap := "-"
+
 						fuel := Round(getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Fuel", 0))
 						compound := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
 						compoundColor := getConfigurationValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
@@ -6005,6 +6045,10 @@ class RaceCenter extends ConfigurationItem {
 						}
 						else {
 							currentDriver := this.Laps[this.LastLap.Nr].Stint.Driver.FullName
+
+							if !currentDriver
+								currentDriver := kNull
+
 							nextDriver := currentDriver
 						}
 

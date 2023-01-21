@@ -1508,13 +1508,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	saveLapState(lap, state) {
 		local teamServer := this.TeamServer
+		local stateName
 
 		if (teamServer && this.TeamSessionActive) {
 			if isDebug()
 				showMessage("Saving lap state for " . this.Plugin)
 
-			if state
-				teamServer.setLapValue(lap, this.Plugin . " State", printConfiguration(state))
+			if state {
+				stateName := getKeys(state)
+
+				stateName := ((stateName.Length() = 1) ? stateName[1] : "State")
+
+				teamServer.setLapValue(lap, this.Plugin . A_Space . stateName, printConfiguration(state))
+			}
 		}
 	}
 

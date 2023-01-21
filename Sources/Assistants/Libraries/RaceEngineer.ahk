@@ -1300,9 +1300,11 @@ class RaceEngineer extends RaceAssistant {
 		if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Lap", false)) {
 			savedKnowledgeBase := newConfiguration()
 
-			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
+			for key, value in this.KnowledgeBase.Facts.Facts
+				if (InStr(key, "Pitstop") = 1)
+					setConfigurationValue(savedKnowledgeBase, "Pitstop State", key, value)
 
-			stateFile := temporaryFileName(this.AssistantType, "state")
+			stateFile := temporaryFileName(this.AssistantType . " Pitstop State", "state")
 
 			writeConfiguration(stateFile, savedKnowledgeBase)
 

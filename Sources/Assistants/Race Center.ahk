@@ -5949,7 +5949,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if (!newData && this.LastLap) {
 				try {
-					state := this.Connector.GetLapValue(this.LastLap.Identifier, "Race Engineer State")
+					state := this.Connector.GetLapValue(this.LastLap.Identifier, "Race Engineer Pitstop State")
 				}
 				catch exception {
 					logError(exception)

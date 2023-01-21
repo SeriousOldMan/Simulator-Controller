@@ -5958,7 +5958,12 @@ class RaceCenter extends ConfigurationItem {
 				if (state && (state != "")) {
 					state := parseConfiguration(state)
 
-					lap := getConfigurationValue(state, "Session State", "Pitstop.Planned.Lap", false)
+					lap := getConfigurationValue(state, "Session State", "Pitstop.Planned.Lap", kUndefined)
+
+					if (lap == kUndefined)
+						lap := false
+					else if !lap
+						lap := "-"
 
 					if lap {
 						newData := true
@@ -6019,7 +6024,7 @@ class RaceCenter extends ConfigurationItem {
 								break
 							}
 
-						LV_Add("", LV_GetCount() + 1, lap + 1, displayNullValue(nextDriver), displayFuel
+						LV_Add("", LV_GetCount() + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
 								 , (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
 								 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 

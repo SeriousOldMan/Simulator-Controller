@@ -1313,7 +1313,7 @@ class RaceEngineer extends RaceAssistant {
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
 		}
 
-		if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Lap", false)) {
+		if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Nr", false)) {
 			savedKnowledgeBase := newConfiguration()
 
 			for key, value in this.KnowledgeBase.Facts.Facts

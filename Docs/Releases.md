@@ -1,3 +1,15 @@
+## 4.5.7.0-release 01/27/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Reduced superfluous proximity alerts by the Spotter for cars behind the pit wall.
+  4. The no longer needed race duration has been removed from all settings.
+  5. A couple of new settings for Race Engineer in "Session Database". These allow you the amount of information provided by the Engineer in practice, qualifacation and race sessions.
+  6. Separated British from US-American Gallon in unit conversion framework.
+  7. Fixed a couple of unit conversion bugs
+  8. "Race Center" will now also show information for planned, but not yet performed pitstops.
+  9. Optimized driver selection in "Race Center" for *Assettot Corsa Comüetizione* and *rFactor 2*. Driver selection should be correct now, even when you plan and prepare a pitstop several times.
+  10. "Race Center" is now compatible with pitstops planned and performed solely by the Race Engineer. Very helpful, when you are double stinting and no team mate is around.
+
 ## 4.5.6.0-release 01/20/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always

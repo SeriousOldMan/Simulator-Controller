@@ -1298,7 +1298,7 @@ class RaceEngineer extends RaceAssistant {
 		local driverNickname := ""
 		local result, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor, prefix
 		local coldPressures, hotPressures, pressuresLosses, airTemperature, trackTemperature, weatherNow
-		local savedKnowledgeBase, stateFile
+		local savedKnowledgeBase, stateFile, key, value
 
 		static lastLap := 0
 

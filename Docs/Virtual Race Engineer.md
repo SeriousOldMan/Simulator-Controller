@@ -225,7 +225,6 @@ The additional knowledge Jona needs is stored in a special file, *Race.settings*
 The *Race.settings* looks like this:
 
 	[Session Settings]
-	Duration=3600
 	Lap.AvgTime=106
 	Lap.Formation=true
 	Lap.PostRace=true
@@ -559,7 +558,7 @@ Below you find the order, in which the different combinations will be loaded. As
 | All      | Specific | Specific |
 | Specific | Specific | Specific |
 
-Important note: The value for the setting "Race Duration" is stored in seconds, although it will display in minutes in many locations. So you will have to enter 3600 for 60 minute race here. Comparable transformations may apply to other values. So, when entering a new settings value, take a look at the supplied default value, and understand its meaning. And use the "Test..." button to open the "Race Settings" tool to check the resulting values for the current selected car / track / weather combination, after you have entered or changed any settings. Additionally, you may find entries in the list of available settings for which no corresponding field in the "Race Settings" tool exist. These settings are for internal calculations in most cases, for example the correction factor for temperature based tyre pressure calculations. Be careful, when entering values for these settings, you may get funny results. The default values are generally the best choice here.
+Important note: Some values underly a transformation between internal and external representations. For example, lap times are stored in a millisecond format in many places. So, when entering a new settings value, take a look at the supplied default value, and understand its meaning. And use the "Test..." button to open the "Race Settings" tool to check the resulting values for the current selected car / track / weather combination, after you have entered or changed any settings. Additionally, you may find entries in the list of available settings for which no corresponding field in the "Race Settings" tool exist. These settings are for internal calculations in most cases, for example the correction factor for temperature based tyre pressure calculations. Be careful, when entering values for these settings, you may get funny results. The default values are generally the best choice here.
 
 The default values for all these settings may not only be used to initialize the race settings for an upcoming session, but they may also be used in the "Strategy Workbench" to provide values for many [settings for strategy simulation & planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#rules--settings).
 

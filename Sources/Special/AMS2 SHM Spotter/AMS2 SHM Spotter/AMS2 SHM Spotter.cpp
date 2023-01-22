@@ -277,19 +277,23 @@ bool checkPositions(const SharedMemory* sharedData) {
 		
 		for (int id = 0; id < sharedData->mNumParticipants; id++) {
 			if ((id != carID) && (sharedData->mPitModes[id] == PIT_MODE_NONE)) {
-				bool faster = false;
+				float otherSpeed = vectorLength(lastCoordinates[id][VEC_X] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
+												lastCoordinates[id][VEC_Z] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]);
 
-				if (hasLastCoordinates)
-					faster = vectorLength(lastCoordinates[id][VEC_X] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
-										  lastCoordinates[id][VEC_Z] - sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z]) > speed * 1.01;
+				if (abs(speed - otherSpeed) / speed < 0.5) {
+					bool faster = false;
 
-				newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
-					sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
-					sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z],
-					sharedData->mParticipantInfo[id].mWorldPosition[VEC_Y]);
+					if (hasLastCoordinates)
+						faster = otherSpeed > speed * 1.05;
 
-				if ((newSituation == THREE) && carBehind)
-					break;
+					newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
+						sharedData->mParticipantInfo[id].mWorldPosition[VEC_X],
+						sharedData->mParticipantInfo[id].mWorldPosition[VEC_Z],
+						sharedData->mParticipantInfo[id].mWorldPosition[VEC_Y]);
+
+					if ((newSituation == THREE) && carBehind)
+						break;
+				}
 			}
 		}
 

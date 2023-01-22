@@ -521,7 +521,13 @@ class RaceEngineer extends RaceAssistant {
 				if this.isNumber(fuel, fuel) {
 					speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[convert ? "Gallon" : "Liter"]}, true)
 
-					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", convert ? Ceil(fuel * 4.546092) : fuel))
+					if convert
+						if (getUnit("Volume") = "Gallon (US)")
+							fuel := Ceil(fuel * 3.785411)
+						else
+							fuel := Ceil(fuel * 4.546092)
+
+					this.setContinuation(ObjBindMethod(this, "updatePitstopFuel", fuel))
 
 					return
 				}
@@ -1292,6 +1298,7 @@ class RaceEngineer extends RaceAssistant {
 		local driverNickname := ""
 		local result, currentCompound, currentCompoundColor, targetCompound, targetCompoundColor, prefix
 		local coldPressures, hotPressures, pressuresLosses, airTemperature, trackTemperature, weatherNow
+		local savedKnowledgeBase, stateFile, key, value
 
 		static lastLap := 0
 
@@ -1304,6 +1311,20 @@ class RaceEngineer extends RaceAssistant {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
 			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
+		}
+
+		if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Nr", false)) {
+			savedKnowledgeBase := newConfiguration()
+
+			for key, value in this.KnowledgeBase.Facts.Facts
+				if (InStr(key, "Pitstop") = 1)
+					setConfigurationValue(savedKnowledgeBase, "Pitstop Pending", key, value)
+
+			stateFile := temporaryFileName(this.AssistantType . " Pitstop Pending", "state")
+
+			writeConfiguration(stateFile, savedKnowledgeBase)
+
+			this.RemoteHandler.saveLapState(lapNumber, stateFile)
 		}
 
 		result := base.addLap(lapNumber, data)

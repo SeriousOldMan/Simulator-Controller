@@ -513,7 +513,6 @@ editRaceSettings(ByRef settingsOrCommand, arguments*) {
 	static setupPressureCompareCheck
 	static pressureLossCorrectionCheck
 
-	static raceDurationEdit
 	static avgLaptimeEdit
 	static formationLapCheck
 	static postRaceLapCheck
@@ -779,7 +778,6 @@ restart:
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", convertUnit("Pressure", internalValue("Float", tpWetRearLeftEdit), false))
 		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", convertUnit("Pressure", internalValue("Float", tpWetRearRightEdit), false))
 
-		setConfigurationValue(newSettings, "Session Settings", "Duration", raceDurationEdit * 60)
 		setConfigurationValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
 		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", convertUnit("Volume", internalValue("Float", fuelConsumptionEdit), false))
 		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", Round(convertUnit("Volume", internalValue("Float", safetyFuelEdit), false)))
@@ -885,7 +883,6 @@ restart:
 		tpWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)))
 		tpWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)))
 
-		raceDurationEdit := Round(getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Duration", 3600) / 60)
 		avgLaptimeEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
 		fuelConsumptionEdit := displayValue("Float", convertUnit("Volume", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))
 		safetyFuelEdit := displayValue("Float", convertUnit("Volume", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)), 0)
@@ -1084,12 +1081,7 @@ restart:
 
 		Gui Tab, 1
 
-		Gui RES:Add, Text, x16 y82 w90 h20 Section, % translate("Race Duration")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 Number VraceDurationEdit, %raceDurationEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range1-9999 0x80, %raceDurationEdit%
-		Gui RES:Add, Text, x164 yp+4 w70 h20, % translate("Min.")
-
-		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Avg. Lap Time")
+		Gui RES:Add, Text, x16 y82 w85 h23 +0x200 Section, % translate("Avg. Lap Time")
 		Gui RES:Add, Edit, x106 yp w50 h20 Limit3 Number VavgLaptimeEdit, %avgLaptimeEdit%
 		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range1-999 0x80, %avgLaptimeEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
@@ -1098,18 +1090,18 @@ restart:
 		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit gvalidateFuelConsumption, %fuelConsumptionEdit%
 		Gui RES:Add, Text, x164 yp+4 w90 h20, % getUnit("Volume", true)
 
-		Gui RES:Add, Text, x212 ys-2 w85 h23 +0x200, % translate("Formation")
+		Gui RES:Add, Text, x212 ys w85 h23 +0x200, % translate("Formation")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 
-		Gui RES:Add, Text, x212 yp+21 w85 h23 +0x200, % translate("Post Race")
+		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Post Race")
 		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
 		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
 
 		Gui RES:Font, Norm, Arial
 		Gui RES:Font, Bold Italic, Arial
 
-		Gui RES:Add, Text, x66 yp+52 w270 0x10
+		Gui RES:Add, Text, x66 yp+28 w270 0x10
 		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Initial Setup")
 
 		Gui RES:Font, Norm, Arial

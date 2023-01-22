@@ -73,6 +73,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
+	iSelectedDriver := false
+
 	class ChatMode extends ControllerMode {
 		Mode[] {
 			Get {
@@ -1790,6 +1792,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			return false
 	}
 
+	performPitstop(lap) {
+		base.performPitstop(lap)
+
+		this.iSelectedDriver := false
+	}
+
 	startPitstopSetup(pitstopNumber) {
 		base.startPitstopSetup()
 
@@ -1996,17 +2004,25 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {
-		local delta
+		local delta, currentDriver, nextDriver
 
 		base.requestPitstopDriver(pitstopNumber, driver)
 
 		if driver {
 			driver := string2Values("|", driver)
 
-			delta := (string2Values(":", driver[2])[2] - string2Values(":", driver[1])[2])
+			nextDriver := string2Values(":", driver[2])
+			currentDriver := string2Values(":", driver[1])
+
+			if !this.iSelectedDriver
+				this.iSelectedDriver := currentDriver[2]
+
+			delta := (nextDriver[2] - this.iSelectedDriver)
 
 			loop % Abs(delta)
 				this.changeDriver((delta < 0) ? "Previous" : "Next")
+
+			this.iSelectedDriver := nextDriver[2]
 		}
 	}
 

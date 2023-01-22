@@ -848,10 +848,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	accept() {
 		if this.RaceEngineer
 			this.RaceEngineer.accept()
-		
+
 		if this.RaceStrategist
 			this.RaceStrategist.accept()
-		
+
 		if this.RaceSpotter
 			this.RaceSpotter.accept()
 	}
@@ -859,10 +859,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	reject() {
 		if this.RaceEngineer
 			this.RaceEngineer.reject()
-		
+
 		if this.RaceStrategist
 			this.RaceStrategist.reject()
-		
+
 		if this.RaceSpotter
 			this.RaceSpotter.reject()
 	}
@@ -928,6 +928,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	preparePitstop(lap := false) {
 		if this.RaceEngineer
 			this.RaceEngineer.preparePitstop(lap)
+	}
+
+	performPitstop(lap) {
 	}
 
 	pitstopPlanned(pitstopNumber, plannedLap := false) {

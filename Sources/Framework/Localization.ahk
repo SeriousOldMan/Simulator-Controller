@@ -23,7 +23,7 @@
 global kMassUnits := ["Kilogram", "Pound"]
 global kTemperatureUnits := ["Celsius", "Fahrenheit"]
 global kPressureUnits := ["Bar", "PSI", "KPa"]
-global kVolumeUnits := ["Liter", "Gallon"]
+global kVolumeUnits := ["Liter", "Gallon (US)", "Gallon (GB)"]
 global kLengthUnits := ["Meter", "Foot"]
 global kSpeedUnits := ["km/h", "mph"]
 
@@ -156,7 +156,9 @@ displayVolumeValue(liter, round) {
 	switch vVolumeUnit {
 		case "Liter":
 			return (round ? Round(liter, 1) : liter)
-		case "Gallon":
+		case "Gallon (US)":
+			return (round ? Round(liter / 3.785411, 2) : (liter / 3-785411))
+		case "Gallon (GB)", "Gallon":
 			return (round ? Round(liter / 4.546092, 2) : (liter / 4.546092))
 		default:
 			throw "Unknown volume unit detected in displayVolumeValue..."
@@ -255,7 +257,9 @@ internalVolumeValue(value, round) {
 	switch vVolumeUnit {
 		case "Liter":
 			return (round ? Round(value, 1) : value)
-		case "Gallon":
+		case "Gallon (US)":
+			return (round ? Round(value * 3.785411, 2) : (value * 3.785411))
+		case "Gallon (GB)", "Gallon":
 			return (round ? Round(value * 4.546092, 2) : (value * 4.546092))
 		default:
 			throw "Unknown volume unit detected in internalVolumeValue..."
@@ -321,6 +325,9 @@ initializeLocalization() {
 
 	vNumberFormat := getConfigurationValue(configuration, "Localization", "NumberFormat", "#.##")
 	vTimeFormat := getConfigurationValue(configuration, "Localization", "TimeFormat", "H:M:S.##")
+
+	if (vVolumeUnit = "Gallon")
+		vVolumeUnit := "Gallon (GB)"
 }
 
 

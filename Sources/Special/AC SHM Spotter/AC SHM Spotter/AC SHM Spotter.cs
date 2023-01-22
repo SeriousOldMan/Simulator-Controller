@@ -484,17 +484,22 @@ namespace ACSHMSpotter {
 				{
 					if ((id != carID) && (cars.cars[id].isCarInPitline == 0) && (cars.cars[id].isCarInPit == 0))
 					{
-						bool faster = false;
+						double otherSpeed = vectorLength(lastCoordinates[id, 0] - cars.cars[id].worldPosition.x,
+														 lastCoordinates[id, 2] - cars.cars[carID].worldPosition.y);
 
-						if (hasLastCoordinates)
-							faster = vectorLength(lastCoordinates[id, 0] - cars.cars[id].worldPosition.x,
-												  lastCoordinates[id, 2] - cars.cars[carID].worldPosition.y) > speed * 1.05;
+						if (Math.Abs(speed - otherSpeed) / speed < 0.5)
+						{
+							bool faster = false;
 
-						newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
-														 cars.cars[id].worldPosition.x, cars.cars[id].worldPosition.z, cars.cars[id].worldPosition.y);
+							if (hasLastCoordinates)
+								faster = otherSpeed > speed * 1.05;
 
-						if ((newSituation == THREE) && carBehind)
-							break;
+							newSituation |= checkCarPosition(coordinateX, coordinateY, coordinateZ, angle, faster,
+															 cars.cars[id].worldPosition.x, cars.cars[id].worldPosition.z, cars.cars[id].worldPosition.y);
+
+							if ((newSituation == THREE) && carBehind)
+								break;
+						}
 					}
 				}
 

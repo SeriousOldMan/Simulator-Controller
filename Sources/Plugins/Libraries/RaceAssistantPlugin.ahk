@@ -995,6 +995,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
 				assistant.performPitstop(lapNumber)
+
+		if RaceAssistantPlugin.Simulator
+			RaceAssistantPlugin.Simulator.performPitstop(lapNumber)
 	}
 
 	restoreAssistantsSessionState(data) {
@@ -1489,10 +1492,42 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.updateActions(session)
 	}
 
+	callSaveLapState(lap, stateFile) {
+		local lapState
+
+		if (stateFile && FileExist(stateFile)) {
+			lapState := readConfiguration(stateFile)
+
+			deleteFile(stateFile)
+		}
+		else
+			lapState := false
+
+		this.saveLapState(lap, lapState)
+	}
+
+	saveLapState(lap, state) {
+		local teamServer := this.TeamServer
+		local stateName
+
+		if (teamServer && this.TeamSessionActive) {
+			if isDebug()
+				showMessage("Saving lap state for " . this.Plugin)
+
+			if state {
+				stateName := getKeys(state)
+
+				stateName := ((stateName.Length() = 1) ? stateName[1] : "State")
+
+				teamServer.setLapValue(lap, this.Plugin . A_Space . stateName, printConfiguration(state))
+			}
+		}
+	}
+
 	callSaveSessionState(settingsFile, stateFile) {
 		local sessionSettings, sessionState
 
-		if settingsFile {
+		if (settingsFile && FileExist(settingsFile)) {
 			sessionSettings := readConfiguration(settingsFile)
 
 			deleteFile(settingsFile)
@@ -1500,7 +1535,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		else
 			sessionSettings := false
 
-		if stateFile {
+		if (stateFile && FileExist(stateFile)) {
 			sessionState := readConfiguration(stateFile)
 
 			deleteFile(stateFile)

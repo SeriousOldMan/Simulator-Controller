@@ -769,7 +769,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Initial Fuel")
 		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number Limit3 VsimInitialFuelAmountEdit gvalidateSimInitialFuelAmount, %simInitialFuelAmountEdit%
 		Gui %window%:Add, UpDown, x%x2% yp-2 w18 h20 Range1-999, %simInitialFuelAmountEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w45 h20, % getUnit("Volume", true)
+		Gui %window%:Add, Text, x%x3% yp+4 w45 r1, % getUnit("Volume", true)
 
 		Gui %window%:Add, Text, x%x% yp+21 w70 h20 +0x200, % translate("Map")
 		Gui %window%:Add, Edit, x%x1% yp-1 w45 h20 Number Limit2 VsimMapEdit, %simMapEdit%
@@ -781,7 +781,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x% yp+21 w85 h20 +0x200, % translate("Consumption")
 		Gui %window%:Add, Edit, x%x1% yp-2 w45 h20 VsimFuelConsumptionEdit gvalidateSimFuelConsumption, %simFuelConsumptionEdit%
-		Gui %window%:Add, Text, x%x3% yp+4 w30 h20, % getUnit("Volume", true)
+		Gui %window%:Add, Text, x%x3% yp+4 w45 r1, % getUnit("Volume", true)
 
 		x := 222
 		x0 := x - 4
@@ -838,7 +838,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x% yp+23 w90 h20 +0x200, % translate("Consumed Fuel")
 		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimConsumedFuelResult, %simConsumedFuelResult%
-		Gui %window%:Add, Text, x%x3% yp+2 w50 h20, % getUnit("Volume", true)
+		Gui %window%:Add, Text, x%x3% yp+2 w45 r1, % getUnit("Volume", true)
 
 		Gui %window%:Add, Text, x%x% yp+21 w90 h20 +0x200, % translate("@ Pitlane")
 		Gui %window%:Add, Edit, x%x1% yp+1 w40 h20 Disabled VsimPitlaneSecondsResult, %simPitlaneSecondsResult%

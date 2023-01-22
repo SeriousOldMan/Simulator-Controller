@@ -119,6 +119,10 @@ class RaceAssistant extends ConfigurationItem {
 		saveSessionState(arguments*) {
 			this.callRemote("callSaveSessionState", arguments*)
 		}
+
+		saveLapState(arguments*) {
+			this.callRemote("callSaveLapState", arguments*)
+		}
 	}
 
 	class RaceVoiceManager extends VoiceManager {
@@ -965,14 +969,8 @@ class RaceAssistant extends ConfigurationItem {
 			else
 				laps := 0
 		}
-		else if (dataDuration > 0) {
-			settingsDuration := getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Duration", dataDuration)
-
-			if ((Abs(settingsDuration - dataDuration) / dataDuration) >  0.05)
-				duration := dataDuration
-			else
-				duration := settingsDuration
-		}
+		else if (dataDuration > 0)
+			duration := dataDuration
 
 		if isInstance(facts, KnowledgeBase) {
 			if (facts.getValue("Session.Duration", 0) == 0)

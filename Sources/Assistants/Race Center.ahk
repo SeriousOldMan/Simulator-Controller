@@ -226,6 +226,9 @@ global addSetupButton
 global copySetupButton
 global deleteSetupButton
 
+global uploadSetupsButton
+global downloadSetupsButton
+
 global sessionDateCal
 global sessionTimeEdit
 global planDriverDropDownMenu
@@ -1488,7 +1491,11 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Button, x575 yp w23 h23 Center +0x200 HWNDminusButton vdeleteSetupButton gdeleteSetup
 		setButtonIcon(minusButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, Button, x408 ys+279 w160 greleaseSetups, % translate("Save Setups")
+		Gui %window%:Add, Button, x378 ys+279 w160 greleaseSetups, % translate("Save Setups")
+		Gui %window%:Add, Button, x553 yp w23 h23 Center +0x200 HWNDuploadButton vuploadSetupsButton guploadSetups
+		setButtonIcon(uploadButton, kIconsDirectory . "Upload.ico", 1, "L4 T4 R4 B4")
+		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDdownloadButton vdownloadSetupsButton gdownloadSetups
+		setButtonIcon(downloadButton, kIconsDirectory . "Download.ico", 1, "L4 T4 R4 B4")
 
 		Gui Tab, 6
 
@@ -2042,6 +2049,11 @@ class RaceCenter extends ConfigurationItem {
 				LV_Modify(selected, "-Select")
 			}
 
+			if LV_GetCount()
+				GuiControl Enable, downloadSetupsButton
+			else
+				GuiControl Disable, downloadSetupsButton
+
 			if selected {
 				GuiControl Enable, setupDriverDropDownMenu
 				GuiControl Enable, setupWeatherDropDownMenu
@@ -2391,6 +2403,28 @@ class RaceCenter extends ConfigurationItem {
 		}
 		finally {
 			Gui ListView, %currentListView%
+		}
+	}
+
+	importSetups(file, clear) {
+		local directory, ignore, entry
+
+		if clear
+			this.SessionStore.clear("Setups.Data", false)
+
+		directory := temporaryFileName("Setups", "data")
+
+		try {
+			FileCreatedir %directory%
+			FileCopy %file%, %directory%\Setups.Data.CSV
+
+			for ignore, entry in new Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"]
+				this.SessionStore.add("Setups.Data", entry)
+
+			this.loadSetups()
+		}
+		finally {
+			deleteDirectory(directory)
 		}
 	}
 
@@ -11544,6 +11578,62 @@ releaseSetups() {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		MsgBox 262192, %title%, % translate("You are not connected to an active session.")
 		OnMessage(0x44, "")
+	}
+}
+
+uploadSetups() {
+	local rCenter := RaceCenter.Instance
+	local title := translate("Import Setups...")
+
+	Gui +OwnDialogs
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
+	FileSelectFile file, 1, , %title%, Setups (*.setups)
+	OnMessage(0x44, "")
+
+	if (file != "") {
+		title := translate("Import")
+
+		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Add", "Replace", "Cancel"]))
+		MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
+		OnMessage(0x44, "")
+
+		IfMsgBox Cancel
+			return
+
+		IfMsgBox Yes
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "importSetups", file, false))
+
+		IfMsgBox No
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "importSetups", file, true))
+	}
+}
+
+downloadSetups() {
+	local rCenter := RaceCenter.Instance
+	local title := translate("Export Setups...")
+	local file, setups
+
+	Gui +OwnDialogs
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
+	FileSelectFile file, S17, , %title%, Setups (*.setups)
+	OnMessage(0x44, "")
+
+	if (file != "") {
+		if !InStr(file, ".")
+			file := (file . ".setups")
+
+		rCenter.saveSetups(true)
+
+		setups := (rCenter.SessionDirectory . "Setups.Data.CSV")
+
+		try {
+			FileCopy %setups%, %file%, 1
+		}
+		catch exception {
+			logError(exception)
+		}
 	}
 }
 

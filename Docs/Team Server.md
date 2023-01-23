@@ -310,6 +310,8 @@ You can enter as many setups here as you like for different weather conditions, 
 
 Beside using the typical "+" and "-" buttons here to create and delete a tyre pressure setups, you can use the button with the copy icon to clone the currently selected setup. Furthermore, you can use the button with the database icon to open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race--session-database) to look up and load pressure information recorded in previous sessions.
 
+Furthermore, you can download the current list of driver specific reference pressures to an external file and can upload them from this file, for example, to import setups into a different sesison. Finally, when you have made all your changes, push the button labeled "Save Setups", so that everything is stored on the Team Server.
+
 ### Planning a Pitstop
 
 Using the elements on the "Pitstops" tab, any team member can prepare the next pitstop for the current driver. This is a valid alternative instead of using the services of the Virtual Race Assistants in an endurance race, where currently passive team members or even a dedicated Race Engineer are part of the crew supporting the active driver.

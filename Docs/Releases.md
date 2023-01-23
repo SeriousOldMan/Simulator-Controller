@@ -9,6 +9,9 @@
   8. "Race Center" will now also show information for planned, but not yet performed pitstops.
   9. Optimized driver selection in "Race Center" for *Assettot Corsa Comüetizione* and *rFactor 2*. Driver selection should be correct now, even when you plan and prepare a pitstop several times.
   10. "Race Center" is now compatible with pitstops planned and performed solely by the Race Engineer. Very helpful, when you are double stinting and no team mate is around.
+  11. New car models for "Setup Advisor":
+      - Assetto Corsa:
+        - Porsche Cayman GT4 Clubsport
 
 ## 4.5.6.0-release 01/20/23 (planned)
   1. Minor bugfixes, as always

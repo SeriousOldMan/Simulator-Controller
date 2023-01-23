@@ -177,6 +177,7 @@
     - [Data Analysis](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#data-analysis)
     - [Strategy Handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#strategy-handling)
     - [Session & Stint Planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning)
+	- [Driver specific tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-driver-specific-tyre-pressures)
     - [Planning a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop)
   - [Server Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#how-it-works)

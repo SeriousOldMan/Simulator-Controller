@@ -22,9 +22,6 @@
 
 #### Plugins
   1. Definition of motion feedback settings for different tracks and cars, selectable by the touch of a button
-
-#### Configuration
-  1. Integrate a "Locate..." method to identify installed games and additional software in "Setup Advisor".
   
 #### General
   1. Choosing a specific theme depending on the selected simulation game

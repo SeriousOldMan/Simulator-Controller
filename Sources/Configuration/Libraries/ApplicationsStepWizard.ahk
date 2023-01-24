@@ -262,7 +262,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 						executable := wizard.applicationPath(application)
 
-						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate(category), application, executable ? executable : translate("Not installed"))
 
 						stdApplications.Push(application)
 					}
@@ -273,7 +273,7 @@ class ApplicationsStepWizard extends StepWizard {
 				if !inList(stdApplications, application) {
 					executable := wizard.applicationPath(application)
 
-					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", "Other", application, executable ? executable : translate("Not installed"))
+					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate("Other"), application, executable ? executable : translate("Not installed"))
 				}
 
 			if first2 {
@@ -374,7 +374,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 locateSimulator() {
 	local stepWizard := SetupWizard.Instance.StepWizards["Applications"]
-	local title := translate("Select Simulator executable...")
+	local title := substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")})
 	local file, simulator
 
 	Gui +OwnDialogs
@@ -393,7 +393,7 @@ locateSimulator() {
 
 locateApplication() {
 	local stepWizard := SetupWizard.Instance.StepWizards["Applications"]
-	local title := translate("Select Application executable...")
+	local title := substituteVariables(translate("Select %name% executable..."), {name: translate("Application")})
 	local file, application
 
 	Gui +OwnDialogs

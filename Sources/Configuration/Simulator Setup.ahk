@@ -1289,10 +1289,18 @@ class SetupWizard extends ConfigurationItem {
 				knowledgeBase.setFact("Application." . application . ".Installed", true)
 				knowledgeBase.setFact("Application." . application . ".Path", executable)
 
+				knowledgeBase.setFact("Application.Installed"
+									, values2String("###", concatenate(string2Values("###", knowledgeBase.getValue("Application.Installed", ""))
+																	 , [application])*))
+
 				if update
 					this.updateState()
 			}
 		}
+	}
+
+	installedApplications() {
+		return string2Values("###", this.KnowledgeBase.getValue("Application.Installed", ""))
 	}
 
 	applicationPath(application) {
@@ -2630,12 +2638,29 @@ openLabelsAndIconsEditor() {
 	Gui %owner%:-Disabled
 }
 
+standardApplication(definition, categories, executable) {
+	local ignore, category, name, descriptor
+	local software
+
+	SplitPath executable, software
+
+	for ignore, category in categories
+		for name, descriptor in getConfigurationSectionValues(definition, category, Object()) {
+			descriptor := string2Values("|", descriptor)
+
+			if (software = descriptor[3])
+				return name
+		}
+
+	return false
+}
+
 findSoftware(definition, software) {
-	local ignore, section, name, descriptor, ignore, locator, value, folder, installPath, folders
+	local ignore, category, name, descriptor, ignore, locator, value, folder, installPath, folders
 	local fileName, exePath, jsScript, script
 
-	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
-		for name, descriptor in getConfigurationSectionValues(definition, section, Object()) {
+	for ignore, category in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
+		for name, descriptor in getConfigurationSectionValues(definition, category, Object()) {
 			descriptor := string2Values("|", descriptor)
 
 			if (software = descriptor[1]) {
@@ -2693,7 +2718,7 @@ findSoftware(definition, software) {
 								}
 							}
 							catch exception {
-								;
+								logError(exception)
 							}
 						}
 					}
@@ -2717,10 +2742,10 @@ findSoftware(definition, software) {
 
 getApplicationDescriptor(application) {
 	local definition := SetupWizard.Instance.Definition
-	local ignore, section, name, descriptor
+	local ignore, category, name, descriptor
 
-	for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
-		for name, descriptor in getConfigurationSectionValues(definition, section, Object())
+	for ignore, category in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other", "Applications.Special"]
+		for name, descriptor in getConfigurationSectionValues(definition, category, Object())
 			if (name = application)
 				return string2Values("|", descriptor)
 

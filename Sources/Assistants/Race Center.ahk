@@ -11591,22 +11591,25 @@ uploadSetups() {
 	FileSelectFile file, 1, , %title%, Setups (*.setups)
 	OnMessage(0x44, "")
 
-	if (file != "") {
-		title := translate("Import")
+	if (file != "")
+		if (rCenter.SessionStore.Tables["Setups.Data"].Length() > 0) {
+			title := translate("Import")
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Add", "Replace", "Cancel"]))
-		MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
-		OnMessage(0x44, "")
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Add", "Replace", "Cancel"]))
+			MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
+			OnMessage(0x44, "")
 
-		IfMsgBox Cancel
-			return
+			IfMsgBox Cancel
+				return
 
-		IfMsgBox Yes
+			IfMsgBox Yes
+				rCenter.withExceptionhandler(ObjBindMethod(rCenter, "importSetups", file, false))
+
+			IfMsgBox No
+				rCenter.withExceptionhandler(ObjBindMethod(rCenter, "importSetups", file, true))
+		}
+		else
 			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "importSetups", file, false))
-
-		IfMsgBox No
-			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "importSetups", file, true))
-	}
 }
 
 downloadSetups() {

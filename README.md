@@ -45,7 +45,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Latest development build
 
-None for the moment...
+[4.5.7.0-dev](https://www.dropbox.com/s/cz35gywtenjth2j/Simulator%20Controller%204.5.7.0-dev.zip?dl=1) (Early build for 4.5.7. Changes: Reduced superfluous proximity alerts by the Spotter for cars behind the pit wall, "Race Center" will now also show information for planned, but not yet performed pitstops, The no longer needed race duration has been removed from all settings, Optimized driver swap selection in "Race Center", Separated British from US-American Gallon, New settings for Race Engineer in "Session Database", Fixed a couple of unit conversion bugs, "Race Center" is now compatible with pitstops planned and performed by the Race Engineer, Upload and download driver setups in "Race Center", New car models in "Setup Advisor", Software location support in "Simulator Setup" when standard location fails.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-457) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

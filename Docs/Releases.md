@@ -15,7 +15,7 @@
       - Assetto Corsa:
         - Porsche Cayman GT4 Clubsport
 
-## 4.5.6.0-release 01/20/23 (planned)
+## 4.5.6.0-release 01/20/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. New heuristical approach in strategy simulation to minimize surplus fuel at the end of a race.

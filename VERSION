@@ -5,12 +5,12 @@ Date=01/22/2023
 Download=
 Changes=No more superfluous proximity alerts by the Spotter for cars behind the pit wall, "Race Center" will now also show information for planned, but not yet performed pitstops, The no longer needed race duration has been removed from all settings, Optimized driver swap selection in "Race Center", Separated British from US-American Gallon, New settings for Race Engineer in "Session Database", Fixed a couple of unit conversion bugs, "Race Center" is now compatible with pitstops planned and performed by the Race Engineer, Upload and download driver setups in "Race Center", New car models in "Setup Advisor", Software location support in "Simulator Setup" when standard location fails.
 [Release]
-Version=4.5.5.0-release
-Date=01/13/2023
-Download=https://cutt.ly/U2Kx80O;https://www.dropbox.com/s/qc727tluz1wnn4u/Simulator%20Controller%204.4.5.0-release.zip?dl=1
-Changes=Updated copyright information to 2023, Optimized pitstop recommendation by Strategist, Pitstop plans can now be updated from partial strategies in "Race Center", Fixed handling of unplanned pitstops in "Race Center", Extended the stint plan report in "Race Center", Extended session summary report in "Race Center", Fixed pitlane duration for races with only a single pitstop in strategy simulation, Preset patch files can now be edited by double clicking in "Simulator Setup", Full supprt for system-wide localization of units and number formats, Pitstops can now be prepared in the "Race Center" even during learning laps
+Version=4.5.6.0-release
+Date=01/20/2023
+Download=https://cutt.ly/l9rmkzV;https://www.dropbox.com/s/8n15qbko0cv9wn5/Simulator%20Controller%204.5.6.0-release.zip?dl=1
+Changes=Documentation of the unit and data format localization framework for Developers, New heuristical approach in strategy simulation to minimize surplus fuel at the end of a race, Fixed endless loop in strategy simulation with high optimizer values, Optimized pressure loss detection, Fixed weather forecast simulation for strategie development, Fixed standings and delta datas in "Race Center" for second stint drivers, Race Assistants are now aware of the unit conversion framework, New car models for "Setup Advisor"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=4.5.5.0-release
+Release=4.5.6.0-release
 Development=4.5.7.0-dev

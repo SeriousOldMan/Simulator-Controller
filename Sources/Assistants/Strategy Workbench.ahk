@@ -2319,6 +2319,8 @@ class StrategyWorkbench extends ConfigurationItem {
 					title := translate("Save Race Strategy...")
 
 					fileName := (((dirName != "") ? (dirName . "\") : "") . this.SelectedStrategy.Name . ".strategy")
+					fileName := StrReplace(fileName, "n/a", "n.a.")
+					fileName := StrReplace(fileName, "/", "-")
 
 					Gui +OwnDialogs
 

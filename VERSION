@@ -10,7 +10,7 @@ Date=01/20/2023
 Download=https://cutt.ly/l9rmkzV;https://www.dropbox.com/s/8n15qbko0cv9wn5/Simulator%20Controller%204.5.6.0-release.zip?dl=1
 Changes=Documentation of the unit and data format localization framework for Developers, New heuristical approach in strategy simulation to minimize surplus fuel at the end of a race, Fixed endless loop in strategy simulation with high optimizer values, Optimized pressure loss detection, Fixed weather forecast simulation for strategie development, Fixed standings and delta datas in "Race Center" for second stint drivers, Race Assistants are now aware of the unit conversion framework, New car models for "Setup Advisor"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.5.6.0-release
 Development=4.5.7.0-dev

@@ -86,7 +86,7 @@ long getRemainingLaps() {
         return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
     }
     else {
-        long time = (long)map_buffer->lap_time_previous_self;
+        long time = (long)map_buffer->lap_time_previous_self * 1000;
 
         if (time > 0)
             return (long)(getRemainingTime() / time);
@@ -104,12 +104,12 @@ long getRemainingTime() {
 						   (normalize(map_buffer->lap_time_best_self) * normalize(map_buffer->completed_laps)));
 
 		if (time > 0)
-			return time;
+			return time * 1000;
 		else
 			return 0;
     }
     else {
-        return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self);
+        return (long)(getRemainingLaps() * map_buffer->lap_time_previous_self) * 1000;
     }
 }
 
@@ -260,9 +260,7 @@ int main(int argc, char* argv[])
 			}
 			else {
 			*/
-				long timeRemaining = (getRemainingTime() * 1000);
-
-				wprintf_s(L"SessionTimeRemaining=%ld\n", timeRemaining);
+				wprintf_s(L"SessionTimeRemaining=%ld\n", getRemainingTime());
 
 				wprintf_s(L"SessionLapsRemaining=%ld\n", getRemainingLaps());
 			/*
@@ -371,7 +369,7 @@ int main(int argc, char* argv[])
 			}
 			else {
 			*/
-				long timeRemaining = (getRemainingTime() * 1000);
+				long timeRemaining = getRemainingTime();
 
 				wprintf_s(L"StintTimeRemaining=%ld\n", timeRemaining);
 				wprintf_s(L"DriverTimeRemaining=%ld\n", timeRemaining);

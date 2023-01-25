@@ -401,7 +401,7 @@ namespace RF2SHMProvider {
 					return 0;
 				*/
 
-				return (long)Math.Max(0, scoring.mScoringInfo.mEndET - scoring.mScoringInfo.mCurrentET);
+				return (long)Math.Max(0, scoring.mScoringInfo.mEndET - scoring.mScoringInfo.mCurrentET) * 1000;
 			}
 			else
 			{

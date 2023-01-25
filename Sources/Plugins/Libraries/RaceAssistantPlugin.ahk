@@ -1025,6 +1025,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	updateAssistantsTelemetryData(data) {
+		local teamServer := this.TeamServer
 		local simulator, car, track, maxFuel, compound, compoundColor
 		local ignore, assistant
 
@@ -1032,6 +1033,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if !settingsDB
 			settingsDB := new SettingsDatabase()
+
+		setConfigurationValue(data, "Session Data", "Mode", (teamServer && teamServer.Active) ? "Team" : "Solo")
 
 		simulator := getConfigurationValue(data, "Session Data", "Simulator")
 		car := getConfigurationValue(data, "Session Data", "Car")

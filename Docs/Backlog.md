@@ -8,7 +8,6 @@
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
-  2. Make selection of repair settings more reliable in ACC
 
 #### Assistants
   1. Overhaul (shortening) of Assistant phrases

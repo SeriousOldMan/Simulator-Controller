@@ -10,11 +10,12 @@
   9. Optimized driver selection in "Race Center" for *Assettot Corsa Comüetizione* and *rFactor 2*. Driver selection should be correct now, even when you plan and prepare a pitstop several times.
   10. "Race Center" is now compatible with pitstops planned and performed solely by the Race Engineer. Very helpful, when you are double stinting and no team mate is around.
   11. You can now save all driver specific tyre setups from the "Race Center" to an external file and you can upload from this file to another session. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-driver-specific-tyre-pressures) for more information.
-  12. New car models for "Setup Advisor":
+  12. "Simulator Setup" now allows you to locate a simulation or other software which is not installed in the standard location on your PC.
+  13. New car models for "Setup Advisor":
       - Assetto Corsa:
         - Porsche Cayman GT4 Clubsport
 
-## 4.5.6.0-release 01/20/23 (planned)
+## 4.5.6.0-release 01/20/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. New heuristical approach in strategy simulation to minimize surplus fuel at the end of a race.

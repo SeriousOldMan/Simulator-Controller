@@ -35,6 +35,7 @@ class ApplicationsStepWizard extends StepWizard {
 		local definition := this.Definition
 		local groups := {}
 		local simulators := []
+		local stdApplications := []
 		local ignore, applications, theApplication, descriptor, exePath, workingDirectory, hooks, group
 
 		base.saveToConfiguration(configuration)
@@ -67,7 +68,17 @@ class ApplicationsStepWizard extends StepWizard {
 						groups[group] := []
 
 					groups[group].Push(theApplication)
+
+					stdApplications.Push(theApplication)
 				}
+
+		for ignore, theApplication in wizard.installedApplications()
+			if !inList(stdApplications, theApplication) {
+				if !groups.HasKey("Other")
+					groups["Other"] := []
+
+				groups["Other"].Push(theApplication)
+			}
 
 		for group, applications in groups
 			for ignore, theApplication in applications
@@ -84,10 +95,12 @@ class ApplicationsStepWizard extends StepWizard {
 		local applicationsLabelHandle := false
 		local applicationsListViewHandle := false
 		local applicationsInfoTextHandle
+		local locateSimButtonHandle
+		local locateAppButtonHandle
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
-		local application, info, html
+		local application, info, html, buttonX
 
 		static simulatorsInfoText
 
@@ -100,14 +113,18 @@ class ApplicationsStepWizard extends StepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h200 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h170 Section -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
+
+		buttonX := x + width - 90
+
+		Gui %window%:Add, Button, x%buttonX% yp+177 w90 h23 HWNDlocateSimButtonHandle glocateSimulator Hidden, % translate("Locate...")
 
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
 
-		Gui %window%:Add, ActiveX, x%x% yp+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell.explorer
+		Gui %window%:Add, ActiveX, x%x% ys+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -116,7 +133,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		this.iSimulatorsListView := simulatorsListViewHandle
 
-		this.registerWidgets(1, simulatorsIconHandle, simulatorsLabelHandle, simulatorsListViewHandle, simulatorsInfoTextHandle)
+		this.registerWidgets(1, simulatorsIconHandle, simulatorsLabelHandle, simulatorsListViewHandle, simulatorsInfoTextHandle, locateSimButtonHandle)
 
 		applicationsIconHandle := false
 		applicationsLabelHandle := false
@@ -130,14 +147,18 @@ class ApplicationsStepWizard extends StepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h260 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h230 Section -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
+
+		buttonX := x + width - 90
+
+		Gui %window%:Add, Button, x%buttonX% yp+237 w90 h23 HWNDlocateAppButtonHandle glocateApplication Hidden, % translate("Locate...")
 
 		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
 
-		Gui %window%:Add, ActiveX, x%x% yp+265 w%width% h120 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell.explorer
+		Gui %window%:Add, ActiveX, x%x% ys+265 w%width% h120 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell.explorer
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -146,7 +167,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		this.iApplicationsListView := applicationsListViewHandle
 
-		this.registerWidgets(2, applicationsIconHandle, applicationsLabelHandle, applicationsListViewHandle, applicationsInfoTextHandle)
+		this.registerWidgets(2, applicationsIconHandle, applicationsLabelHandle, applicationsListViewHandle, applicationsInfoTextHandle, locateAppButtonHandle)
 	}
 
 	loadStepDefinition(definition) {
@@ -175,6 +196,7 @@ class ApplicationsStepWizard extends StepWizard {
 		local definition := this.Definition
 		local icons := []
 		local rows := []
+		local stdApplications := []
 		local application, simulator, descriptor, executable, iconFile
 		local listViewIcons, ignore, icon, row, ignore, section, category, descriptor
 
@@ -240,10 +262,19 @@ class ApplicationsStepWizard extends StepWizard {
 
 						executable := wizard.applicationPath(application)
 
-						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", category, application, executable ? executable : translate("Not installed"))
+						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate(category), application, executable ? executable : translate("Not installed"))
+
+						stdApplications.Push(application)
 					}
 				}
 			}
+
+			for ignore, application in wizard.installedApplications()
+				if !inList(stdApplications, application) {
+					executable := wizard.applicationPath(application)
+
+					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate("Other"), application, executable ? executable : translate("Not installed"))
+				}
 
 			if first2 {
 				LV_ModifyCol(1, "AutoHdr")
@@ -316,12 +347,73 @@ class ApplicationsStepWizard extends StepWizard {
 		if update
 			wizard.updateState()
 	}
+
+	locateSimulator(name, file) {
+		local wizard := this.SetupWizard
+
+		if !wizard.isApplicationInstalled(name) {
+			wizard.locateApplication(name, file, false)
+			wizard.selectApplication(name, true, false)
+		}
+	}
+
+	locateApplication(name, file) {
+		local wizard := this.SetupWizard
+
+		if !wizard.isApplicationInstalled(name) {
+			wizard.locateApplication(name, file, false)
+			wizard.selectApplication(name, true, false)
+		}
+	}
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+locateSimulator() {
+	local stepWizard := SetupWizard.Instance.StepWizards["Applications"]
+	local title := substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")})
+	local file, simulator
+
+	Gui +OwnDialogs
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
+	FileSelectFile file, 1, , %title%, Executable (*.exe)
+	OnMessage(0x44, "")
+
+	if (file != "") {
+		simulator := standardApplication(SetupWizard.Instance.Definition, ["Applications.Simulators"], file)
+
+		if simulator
+			stepWizard.locateSimulator(simulator, file)
+	}
+}
+
+locateApplication() {
+	local stepWizard := SetupWizard.Instance.StepWizards["Applications"]
+	local title := substituteVariables(translate("Select %name% executable..."), {name: translate("Application")})
+	local file, application
+
+	Gui +OwnDialogs
+
+	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
+	FileSelectFile file, 1, , %title%, Executable (*.exe)
+	OnMessage(0x44, "")
+
+	if (file != "") {
+		application := standardApplication(SetupWizard.Instance.Definition, ["Applications.Core", "Applications.Feedback", "Applications.Other"], file)
+
+		if application
+			stepWizard.locateApplication(application, file)
+		else {
+			SplitPath file, , , , application
+
+			stepWizard.locateApplication(application, file)
+		}
+	}
+}
 
 updateSelectedApplications() {
 	loop % LV_GetCount()

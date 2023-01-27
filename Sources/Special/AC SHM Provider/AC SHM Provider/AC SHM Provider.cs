@@ -365,6 +365,9 @@ namespace ACSHMProvider
             Console.WriteLine("LapLastTime=" + graphics.iLastTime);
             Console.WriteLine("LapBestTime=" + graphics.iBestTime);
 
+            if (graphics.Flag == AC_FLAG_TYPE.AC_PENALTY_FLAG)
+                Console.WriteLine("Penalty=true");
+
             /*
             if (session == "Practice")
             {

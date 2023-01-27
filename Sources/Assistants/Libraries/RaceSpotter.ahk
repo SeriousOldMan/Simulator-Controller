@@ -2698,23 +2698,42 @@ class RaceSpotter extends RaceAssistant {
 		local result := base.addLap(lapNumber, data)
 		local knowledgeBase := this.KnowledgeBase
 		local gapAhead, gapBehind, validLaps, lap, lastPitstop
+		
+		static adjustGaps := true
+		static lastGapAhead := kUndefined
+		static lastGapBehind := kUndefined
+		static sameGapCount := 0
 
 		if !this.MultiClass {
 			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
-
-			if ((gapAhead != kUndefined) && (gapAhead != 0)) {
-				knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
-
-				if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-					knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+			
+			if ((gapAhead = lastGapAhead) && (gapBehind = lastGapBehind)) {
+				if (adjustGaps && (sameGapCount++ > 3))
+					adjustGaps := false
+			}
+			else {
+				adjustGaps := true
+				sameGapCount := 0
+			
+				lastGapAhead := gapAhead
+				lastGapBehind := gapBehind
 			}
 
-			if ((gapBehind != kUndefined) && (gapBehind != 0)) {
-				knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
+			if adjustGaps {
+				if ((gapAhead != kUndefined) && (gapAhead != 0)) {
+					knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
 
-				if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-					knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+					if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+						knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+				}
+
+				if ((gapBehind != kUndefined) && (gapBehind != 0)) {
+					knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
+
+					if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+						knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+				}
 			}
 		}
 

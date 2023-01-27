@@ -1489,6 +1489,11 @@ class RaceStrategist extends RaceAssistant {
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, abs, pressures, temperatures, wear, multiClass
 
 		static lastLap := 0
+		
+		static adjustGaps := true
+		static lastGapAhead := kUndefined
+		static lastGapBehind := kUndefined
+		static sameGapCount := 0
 
 		if (lapNumber <= lastLap)
 			lastLap := 0
@@ -1531,21 +1536,34 @@ class RaceStrategist extends RaceAssistant {
 
 		if !this.MultiClass {
 			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
-
-			if ((gapAhead != kUndefined) && (gapAhead != 0)) {
-				knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
-
-				if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
-					knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+			
+			if ((gapAhead = lastGapAhead) && (gapBehind = lastGapBehind)) {
+				if (adjustGaps && (sameGapCount++ > 3))
+					adjustGaps := false
+			}
+			else {
+				adjustGaps := true
+				sameGapCount := 0
+			
+				lastGapAhead := gapAhead
+				lastGapBehind := gapBehind
 			}
 
-			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+			if adjustGaps {
+				if ((gapAhead != kUndefined) && (gapAhead != 0)) {
+					knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
 
-			if ((gapBehind != kUndefined) && (gapBehind != 0)) {
-				knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
+					if (knowledgeBase.getValue("Position.Track.Ahead.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", 0))
+						knowledgeBase.setFact("Position.Track.Ahead.Delta", gapAhead)
+				}
 
-				if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
-					knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+				if ((gapBehind != kUndefined) && (gapBehind != 0)) {
+					knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", gapBehind)
+
+					if (knowledgeBase.getValue("Position.Track.Behind.Car", -1) = knowledgeBase.getValue("Position.Standings.Class.Behind.Car", 0))
+						knowledgeBase.setFact("Position.Track.Behind.Delta", gapBehind)
+				}
 			}
 		}
 

@@ -1881,7 +1881,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							pitstopData["Service.Tyre.Pressures"] := values2String(",", pressures*)
 						}
 
-						if (carState["currentTyreCompound"] != 0) {
+						if (carState["currentTyreCompound"] = 0) {
 							currentTyreSet := carState["currentTyreSet"]
 							tyreStates := []
 

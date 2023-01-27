@@ -1489,10 +1489,10 @@ class RaceStrategist extends RaceAssistant {
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, abs, pressures, temperatures, wear, multiClass
 
 		static lastLap := 0
-		
+
 		static adjustGaps := true
-		static lastGapAhead := kUndefined
-		static lastGapBehind := kUndefined
+		static lastGapAhead := "__Undefined__"
+		static lastGapBehind := "__Undefined__"
 		static sameGapCount := 0
 
 		if (lapNumber <= lastLap)
@@ -1537,7 +1537,7 @@ class RaceStrategist extends RaceAssistant {
 		if !this.MultiClass {
 			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
-			
+
 			if ((gapAhead = lastGapAhead) && (gapBehind = lastGapBehind)) {
 				if (adjustGaps && (sameGapCount++ > 3))
 					adjustGaps := false
@@ -1545,7 +1545,7 @@ class RaceStrategist extends RaceAssistant {
 			else {
 				adjustGaps := true
 				sameGapCount := 0
-			
+
 				lastGapAhead := gapAhead
 				lastGapBehind := gapBehind
 			}

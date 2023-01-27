@@ -2698,16 +2698,16 @@ class RaceSpotter extends RaceAssistant {
 		local result := base.addLap(lapNumber, data)
 		local knowledgeBase := this.KnowledgeBase
 		local gapAhead, gapBehind, validLaps, lap, lastPitstop
-		
+
 		static adjustGaps := true
-		static lastGapAhead := kUndefined
-		static lastGapBehind := kUndefined
+		static lastGapAhead := "__Undefined__"
+		static lastGapBehind := "__Undefined__"
 		static sameGapCount := 0
 
 		if !this.MultiClass {
 			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
 			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
-			
+
 			if ((gapAhead = lastGapAhead) && (gapBehind = lastGapBehind)) {
 				if (adjustGaps && (sameGapCount++ > 3))
 					adjustGaps := false
@@ -2715,7 +2715,7 @@ class RaceSpotter extends RaceAssistant {
 			else {
 				adjustGaps := true
 				sameGapCount := 0
-			
+
 				lastGapAhead := gapAhead
 				lastGapBehind := gapBehind
 			}

@@ -1,4 +1,4 @@
-## 4.5.7.0-release 01/27/23 (planned)
+## 4.5.7.0-release 01/27/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Reduced superfluous proximity alerts by the Spotter for cars behind the pit wall.

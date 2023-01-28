@@ -114,6 +114,8 @@ class PluginsConfigurator extends ConfigurationItemList {
 		base.updateState()
 
 		if (this.CurrentItem != 0) {
+			GuiControlGet pluginEdit
+
 			if (pluginEdit = "System") {
 				GuiControl Disable, pluginEdit
 				GuiControl Disable, pluginActivatedCheck

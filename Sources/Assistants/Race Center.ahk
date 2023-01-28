@@ -6341,8 +6341,10 @@ class RaceCenter extends ConfigurationItem {
 								if (getLogLevel() <= kLogInfo)
 									logMessage(kLogInfo, translate("Clearing setups, Info: `n`n") . info . "`n")
 
-								LV_Delete()
+								this.clearSetups(false)
 							}
+							else
+								this.iSetupsVersion := version
 						}
 						else {
 							this.showMessage(translate("Updating setups"))
@@ -6616,6 +6618,8 @@ class RaceCenter extends ConfigurationItem {
 						this.iSessionFinished := true
 					}
 				}
+
+				this.updateState()
 			}
 			catch exception {
 				message := (IsObject(exception) ? exception.Message : exception)

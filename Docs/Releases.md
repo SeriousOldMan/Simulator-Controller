@@ -3,13 +3,13 @@
   2. Documentation updates, as always
   3. Reduced superfluous proximity alerts by the Spotter for cars behind the pit wall.
   4. The no longer needed race duration has been removed from all settings.
-  5. A couple of new settings for Race Engineer in "Session Database". These allow you the amount of information provided by the Engineer in practice, qualifacation and race sessions.
+  5. A couple of new settings for Race Engineer in "Session Database". These allow you to choose the amount of information provided by the Engineer in practice, qualifacation and race sessions.
   6. Separated British from US-American Gallon in unit conversion framework.
   7. Fixed a couple of unit conversion bugs.
-  8. Fixed the "RemainingSessionTime" information for *rFactor 2* which prevented a preselected strategy to be accepted by the Race Strategist.
+  8. Fixed the "RemainingSessionTime" information for *rFactor 2*, which prevented a preselected strategy to be accepted by the Race Strategist.
   9. "Race Center" will now also show information for planned, but not yet performed pitstops.
-  10. Optimized driver selection in "Race Center" for *Assettot Corsa Comüetizione* and *rFactor 2*. Driver selection should be correct now, even when you plan and prepare a pitstop several times.
-  11. "Race Center" is now compatible with pitstops planned and performed solely by the Race Engineer. Very helpful, when you are double stinting and no team mate is around.
+  10. Optimized driver selection in "Race Center" for *Assettot Corsa Competizione* and *rFactor 2*. Driver selection should be correct now, even when you plan and prepare a pitstop several times.
+  11. "Race Center" is now compatible with pitstops planned and performed by the Race Engineer alone. Very helpful, when you are double stinting and no team mate is around.
   12. You can now save all driver specific tyre setups from the "Race Center" to an external file and you can upload from this file to another session. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-driver-specific-tyre-pressures) for more information.
   13. "Simulator Setup" now allows you to locate a simulation or other software which is not installed in the standard location on your PC.
   14. New car models for "Setup Advisor":

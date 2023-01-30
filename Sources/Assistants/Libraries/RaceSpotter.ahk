@@ -2818,10 +2818,10 @@ class RaceSpotter extends RaceAssistant {
 
 		if this.Announcements["PenaltyInformation"] {
 			if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
-				if this.Announcements["CutWarnings"]
+				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 		}
-		else if this.Announcements["CutWarnings"]
+		else if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 			this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		return result
@@ -2869,12 +2869,13 @@ class RaceSpotter extends RaceAssistant {
 
 		result := base.updateLap(lapNumber, data)
 
+
 		if this.Announcements["PenaltyInformation"] {
 			if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
-				if this.Announcements["CutWarnings"]
+				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 		}
-		else if this.Announcements["CutWarnings"]
+		else if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 			this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		if (gapAhead != kUndefined) {

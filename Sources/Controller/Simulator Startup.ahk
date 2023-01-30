@@ -549,7 +549,7 @@ launchPad(command := false, arguments*) {
 
 		closeOnStartup := getConfigurationValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false)
 
-		Gui LP:Add, CheckBox, x16 yp+10 w250 h23 Checked%closeOnStartup% vcloseCheckBox gcloseOnStartup, % translate("Close on Startup")
+		Gui LP:Add, CheckBox, x16 yp+10 w120 h23 Checked%closeOnStartup% vcloseCheckBox gcloseOnStartup, % translate("Close on Startup")
 		Gui LP:Add, Button, x267 yp w80 h23 Default GcloseLaunchPad, % translate("Close")
 
 		Gui LP:Add, Button, x482 yp w100 h23 GcloseAll, % translate("Close All...")

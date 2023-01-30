@@ -1223,28 +1223,24 @@ class RaceAssistant extends ConfigurationItem {
 		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
 		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
 
-		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
+		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
 			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
+			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
+		}
 
-		if (!lapValid && knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true))
-			knowledgeBase.setFact("Lap." . lapNumber . ".Valid", false)
+		knowledgeBase.setFact("Lap." . lapNumber . ".Valid", lapValid)
+
+		if (lapPenalty && !knowledgeBase.getValue("Lap." . lapNumber . ".Penalty", false))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Penalty", lapPenalty)
 
 		knowledgeBase.setFact("Lap.Valid", lapValid)
+		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 
 		knowledgeBase.setFact("Lap.Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
-
-		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
-
-		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
-			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
-
-		if lapPenalty
-			knowledgeBase.setFact("Lap." . lapNumber . ".Penalty", lapPenalty)
-
-		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", overallTime)
@@ -1348,23 +1344,28 @@ class RaceAssistant extends ConfigurationItem {
 
 	updateLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
-		local result, lapValid, lapPenalty
+		local result, lapValid, lapPenalty, driver
 
 		data := this.prepareData(lapNumber, data)
 
-		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
-		if (!lapValid && knowledgeBase.getValue("Lap." . (lapNumber + 1) . ".Valid", true))
-			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Valid", false)
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+
+		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
+			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Running.Valid", lapValid)
+			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Running.Penalty", lapPenalty)
+		}
 
 		knowledgeBase.setFact("Lap.Valid", lapValid)
+		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 
-		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+		if !lapValid
+			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Valid", lapPenalty)
 
 		if lapPenalty
 			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Penalty", lapPenalty)
-
-		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 
 		result := knowledgeBase.produce()
 

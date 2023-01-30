@@ -303,9 +303,11 @@ namespace ACCUDPProvider {
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
 									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
 
-									LapData lastLap = car.LastLap;
+                                    LapData lastLap = car.LastLap;
+                                    LapData currentLap = car.CurrentLap;
 
                                     outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
+                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Valid="); outStream.WriteLine(currentLap != null ? (currentLap.IsValid ? "true" : "false") : "true");
 
                                     if (lastLap != null)
                                     {

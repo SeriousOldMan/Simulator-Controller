@@ -1364,7 +1364,8 @@ class RaceStrategist extends RaceAssistant {
 			lastLap := knowledgeBase.getValue("Lap", 0)
 
 			if (shutdown && review && this.RaceReview && (this.Session = kSessionRace)
-						 && (lastLap > this.LearningLaps)) {
+						 && (lastLap > this.LearningLaps)
+						 && (knowledgeBase.getValue("Lap.Penalty", false) != "DSQ")) {
 				this.finishSessionWithReview(shutdown)
 
 				return

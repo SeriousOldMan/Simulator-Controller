@@ -277,7 +277,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			GuiControlGet yellowFlagsDropDown
 			GuiControlGet blueFlagsDropDown
 			GuiControlGet sessionInformationDropDown
-			GuiControlGet cutWarningsInformationDropDown
+			GuiControlGet cutWarningsDropDown
 			GuiControlGet penaltyInformationDropDown
 			GuiControlGet deltaInformationDropDown
 			GuiControlGet deltaInformationMethodDropDown

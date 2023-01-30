@@ -113,6 +113,19 @@ long getRemainingTime() {
     }
 }
 
+char* getPenalty(r3e_cut_track_penalties penalties) {
+	if (penalties.stop_and_go > 0)
+		return 0;
+	else if (penalties.slow_down > 0)
+		return "Slow";
+	else if (penalties.time_deduction > 0)
+		return "Time";
+	else if (penalties.drive_through > 0)
+		return "DT";
+	else
+		return 0;
+}
+
 void substring(char s[], char sub[], int p, int l) {
    int c = 0;
    
@@ -361,6 +374,13 @@ int main(int argc, char* argv[])
 
 			wprintf_s(L"Sector=%ld\n", (long)normalize(map_buffer->track_sector == 0 ? 3 : map_buffer->track_sector));
 			wprintf_s(L"Laps=%ld\n", (long)normalize(map_buffer->completed_laps));
+
+			char* penalty = getPenalty(map_buffer->penalties);
+
+			if (penalty)
+				wprintf_s(L"Penalty=%S\n", penalty);
+
+			wprintf_s(L"Warnings=%ld\n", (long)normalize(map_buffer->cut_track_warnings));
 
 			/*
 			if (practice) {

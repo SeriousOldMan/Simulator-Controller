@@ -55,7 +55,7 @@ CanYou=Can you, Please
 
 CanWe=Can you, Can we, Please
 
-Announcements=fuel warnings, damage warnings, damage analysis, weather warnings
+Announcements=fuel warnings, damage warnings, damage analysis, weather warnings, pressure warnings
 
 #### Commands
 

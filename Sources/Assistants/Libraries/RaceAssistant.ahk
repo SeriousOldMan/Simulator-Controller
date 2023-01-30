@@ -1129,7 +1129,7 @@ class RaceAssistant extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
 		local driver, driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
-		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid
+		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid, lapPenalty
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
@@ -1227,7 +1227,24 @@ class RaceAssistant extends ConfigurationItem {
 		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
 			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
 
-		knowledgeBase.addFact("Lap." . lapNumber . ".Valid", lapValid)
+		if (!lapValid && knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true))
+			knowledgeBase.setFact("Lap." . lapNumber . ".Valid", false)
+
+		knowledgeBase.setFact("Lap.Valid", lapValid)
+
+		knowledgeBase.setFact("Lap.Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
+
+		knowledgeBase.addFact("Lap." . lapNumber . ".Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
+
+		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+
+		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber))
+			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
+
+		if lapPenalty
+			knowledgeBase.setFact("Lap." . lapNumber . ".Penalty", lapPenalty)
+
+		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time", lapTime)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Time.Start", overallTime)
@@ -1331,9 +1348,23 @@ class RaceAssistant extends ConfigurationItem {
 
 	updateLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
-		local result
+		local result, lapValid, lapPenalty
 
 		data := this.prepareData(lapNumber, data)
+
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+
+		if (!lapValid && knowledgeBase.getValue("Lap." . (lapNumber + 1) . ".Valid", true))
+			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Valid", false)
+
+		knowledgeBase.setFact("Lap.Valid", lapValid)
+
+		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+
+		if lapPenalty
+			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Penalty", lapPenalty)
+
+		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 
 		result := knowledgeBase.produce()
 

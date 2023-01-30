@@ -261,7 +261,10 @@ namespace RF2SHMProvider {
 																													 : playerScoring.mBestLapTime) * 1000));
 				Console.Write("LapBestTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mBestLapTime) * 1000));
 
-				Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
+				if (playerScoring.mNumPenalties > 0)
+                    Console.WriteLine("Penalty=true");
+
+                Console.Write("Sector="); Console.WriteLine(playerScoring.mSector == 0 ? 3 : playerScoring.mSector);
 				Console.Write("Laps="); Console.WriteLine(playerScoring.mTotalLaps);
 
 				/*

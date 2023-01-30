@@ -213,6 +213,45 @@ inline const string getSession(AC_SESSION_TYPE session) {
 	}
 }
 
+inline const string getPenalty(PenaltyShortcut penalty) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
+	switch (penalty) {
+	case PenaltyShortcut::None:
+		if (gf->penaltyTime > 0)
+			return "Time";
+		else
+			return "";
+	case PenaltyShortcut::DriveThrough_Cutting:
+	case PenaltyShortcut::DriveThrough_PitSpeeding:
+	case PenaltyShortcut::DriveThrough_IgnoredDriverStint:
+	case PenaltyShortcut::Disqualified_ExceededDriverStintLimit:
+		return "DT";
+	case PenaltyShortcut::StopAndGo_10_Cutting:
+	case PenaltyShortcut::StopAndGo_10_PitSpeeding:
+		return "SG10";
+	case PenaltyShortcut::StopAndGo_20_Cutting:
+	case PenaltyShortcut::StopAndGo_20_PitSpeeding:
+		return "SG20";
+	case PenaltyShortcut::StopAndGo_30_Cutting:
+	case PenaltyShortcut::StopAndGo_30_PitSpeeding:
+		return "SG30";
+	case PenaltyShortcut::Disqualified_Cutting:
+	case PenaltyShortcut::Disqualified_PitSpeeding:
+	case PenaltyShortcut::Disqualified_IgnoredMandatoryPit:
+	case PenaltyShortcut::Disqualified_Trolling:
+	case PenaltyShortcut::Disqualified_PitEntry:
+	case PenaltyShortcut::Disqualified_PitExit:
+	case PenaltyShortcut::Disqualified_WrongWay:
+		return "DSQ";
+	default:
+		if (gf->penaltyTime > 0)
+			return "Time";
+		else
+			return "false";
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	initPhysics();
@@ -269,6 +308,11 @@ int main(int argc, char* argv[])
 		printData("LapValid", gf->isValidLap ? "true" : "false");
 		printData("LapLastTime", gf->iLastTime);
 		printData("LapBestTime", gf->iBestTime);
+
+		string penalty = getPenalty(gf->penalty);
+
+		if (penalty != "")
+			printData("Penalty", penalty);
 
 		printData("GapAhead", gf->gapAhead);
 		printData("GapBehind", gf->gapBehind);

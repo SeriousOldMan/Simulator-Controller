@@ -53,7 +53,7 @@ WhatIs=Tell me, Give me, What is
 
 CanYou=Can you, Please
 
-Announcements=delta information, tactical advice, side alerts, rear alerts, blue flag warnings, yellow flag warnings
+Announcements=delta information, tactical advice, side alerts, rear alerts, blue flag warnings, yellow flag warnings, cut warnings, penalty information
 
 #### Commands
 

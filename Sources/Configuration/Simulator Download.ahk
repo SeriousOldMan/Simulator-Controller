@@ -165,9 +165,10 @@ downloadSimulatorController() {
 			showProgress({message: translate("Extracting installation files...")})
 
 			deleteDirectory(A_Temp . "\Simulator Controller")
-			
+
 			try {
 				RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%A_Temp%\Simulator Controller.zip' -DestinationPath '%A_Temp%\Simulator Controller', , Hide
+			}
 			catch exception {
 				logError(exception)
 			}

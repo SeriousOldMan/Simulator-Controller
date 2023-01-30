@@ -2816,13 +2816,14 @@ class RaceSpotter extends RaceAssistant {
 
 		this.initializeGridPosition(data)
 
-		if this.Announcements["PenaltyInformation"] {
-			if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
-				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
-		}
-		else if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-			this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+		if this.Speaker[false]
+			if this.Announcements["PenaltyInformation"] {
+				if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
+					if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
+						this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+			}
+			else if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
+				this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		return result
 	}
@@ -2869,14 +2870,14 @@ class RaceSpotter extends RaceAssistant {
 
 		result := base.updateLap(lapNumber, data)
 
-
-		if this.Announcements["PenaltyInformation"] {
-			if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
-				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
-		}
-		else if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-			this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+		if this.Speaker[false]
+			if this.Announcements["PenaltyInformation"] {
+				if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
+					if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
+						this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+			}
+			else if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
+				this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		if (gapAhead != kUndefined) {
 			knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)

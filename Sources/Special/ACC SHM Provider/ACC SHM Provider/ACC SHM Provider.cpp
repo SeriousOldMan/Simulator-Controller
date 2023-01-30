@@ -214,9 +214,14 @@ inline const string getSession(AC_SESSION_TYPE session) {
 }
 
 inline const string getPenalty(PenaltyShortcut penalty) {
+	SPageFileGraphic* gf = (SPageFileGraphic*)m_graphics.mapFileBuffer;
+
 	switch (penalty) {
 	case PenaltyShortcut::None:
-		return "";
+		if (gf->penaltyTime > 0)
+			return "Time";
+		else
+			return "";
 	case PenaltyShortcut::DriveThrough_Cutting:
 	case PenaltyShortcut::DriveThrough_PitSpeeding:
 	case PenaltyShortcut::DriveThrough_IgnoredDriverStint:
@@ -240,7 +245,10 @@ inline const string getPenalty(PenaltyShortcut penalty) {
 	case PenaltyShortcut::Disqualified_WrongWay:
 		return "DSQ";
 	default:
-		return "";
+		if (gf->penaltyTime > 0)
+			return "Time";
+		else
+			return "false";
 	}
 }
 

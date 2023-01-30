@@ -24,7 +24,7 @@ As described in the next section, Elisa will give you a lot of warnings and anno
 
 	[Please] No more *announcement* [please]
 
-As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advice", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings". After you have disabled one of the warnings (all are enabled or disabled by default according to your choices in the configuration, see below), you can reenable it with the following command:
+As you might expect, the word "please" is optional. Available options for *announcement* are: "delta information", "tactical advice", "side alerts", "rear alerts", "blue flag warnings", "yellow flag warnings", "cut warnings" and "penalty information". After you have disabled one of the warnings (all are enabled or disabled by default according to your choices in the configuration, see below), you can reenable it with the following command:
 
 	[Please] Give me *announcement* [please]
 
@@ -92,23 +92,27 @@ The Spotter will give you critical and in most cases real time information about
 
    The Virtual Race Spotter has been trained to detect several typical race situations and therefore can advise you how to best handle the corresponding situation. For example will Elisa analyze the laptime difference, when you will be shortly overtaken by another car and will tell you whether it will be possible for you to stay in the slipstream of this faster car. Other adivises will help you to handle faster lapped cars, protect your position by bringing a slower car between you and direct opponent which tries to attack you, and so on. The Race Spotter will learn to detect and handle more situations in the future.
 
-10. Weather Updates
+10. Cut warnings & penalty information
+
+    Depending on the available data from the simulator, you will be informed about track cuts and issued penalties by the Spotter.
+
+11. Weather Updates
 
     The Spotter will inform you when temperatures (both air and track) are rising or falling and will give you the new temperatures in degrees Celcius.
 
-11. Last Laps Announcement
+12. Last Laps Announcement
 
     You will get an announcement a few laps before the end of the race.
    
-12. Stint Timer Alert
+13. Stint Timer Alert
 
     During an endurance race, the Spotter will alert you, that the stint time is ending soon and will tell you the number of laps, which you can still go.
 
-13. Session Timer Information
+14. Session Timer Information
 
     When you are in a practice or qualification session, the Spotter will issue a warning 30, 15 and 5 minutes before the end of the session.
 
-14. Half Time Notification
+15. Half Time Notification
 
     Exactly in the middle of the race, the Spotter will give you a couple of informations about the second half of the race, like your current position, the number of remaining minutes and laps, the number of laps which are possible using the remaining fuel, and so on.
 
@@ -158,6 +162,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Sector Yellow                   | No            | Yes                        | No              | No      | Yes                        | Yes       | No             |
 | Yellow Distance                 | No            | No                         | No              | No      | Yes                        | No        | No             |
 | Blue Flag                       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Track Cuts (Invalid Laps)       | Yes           | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
+| Penalty Information             | No            | Yes                        | No              | No      | Yes                        | Yes (6)   | No             |
 | Pit Window                      | No            | Yes (by time)              | Yes (by lap)    | No      | Yes (by time and lap)      | No        | Yes (by lap)   |
 | Race Start (Green Flag)         | No            | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            |
 | Delta Information               | Yes           | Yes (3)                    | Yes             | Yes     | Yes                        | Yes       | Yes            |
@@ -175,6 +181,8 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 (4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, and so on.
 
 (5) This includes a summary of the start performance, final laps announcement, weather updates, best lap acknowledgement and general information about stint, session and fuel limits.
+
+(6) No detailed information for the concrete penalty available.
 
 ## Track Mapping
 

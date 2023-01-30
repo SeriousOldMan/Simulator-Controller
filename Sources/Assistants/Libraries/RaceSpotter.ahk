@@ -704,6 +704,8 @@ class RaceSpotter extends RaceAssistant {
 
 	iPendingAlerts := []
 
+	iLastPenalty := false
+
 	class SpotterVoiceManager extends RaceAssistant.RaceVoiceManager {
 		iFastSpeechSynthesizer := false
 
@@ -860,7 +862,7 @@ class RaceSpotter extends RaceAssistant {
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 													  , SideProximity: true, RearProximity: true
 		 											  , YellowFlags: true, BlueFlags: true, PitWindow: true
-													  , SessionInformation: true}})
+													  , SessionInformation: true, CutWarnings: true, PenaltyInformation: true}})
 
 		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
 	}
@@ -899,6 +901,7 @@ class RaceSpotter extends RaceAssistant {
 
 		if (values.HasKey("Session") && (values["Session"] == kSessionFinished)) {
 			this.iLastDeltaInformationLap := 0
+			this.iLastPenalty := false
 
 			this.iRunning := false
 			this.iDriverCar := false
@@ -1725,6 +1728,54 @@ class RaceSpotter extends RaceAssistant {
 		return false
 	}
 
+	penaltyInformation(lastLap, sector, lastPenalty) {
+		local knowledgeBase := this.KnowledgeBase
+		local penalty := knowledgeBase.getValue("Lap.Penalty", false)
+
+		if ((penalty != this.iLastPenalty) || (penalty != lastPenalty)) {
+			this.iLastPenalty := penalty
+
+			if (penalty = "DSQ")
+				this.getSpeaker(true).speakPhrase("Disqualified")
+			else {
+				if (InStr(penalty, "SG") = 1) {
+					penalty := ((StrLen(penalty) > 2) ? (A_Space . SubStr(penalty, 3)) : "")
+
+					penalty := (translate("Stop and Go") . penalty)
+				}
+				else if (penalty = "Time")
+					penalty := translate("Time")
+				else if (penalty = "DT")
+					penalty := translate("Drive Through")
+				else if (penalty == true)
+					penalty := ""
+
+				this.getSpeaker(true).speakPhrase("Penalty", {penalty: penalty})
+			}
+
+			return true
+		}
+		else
+			return false
+	}
+
+	cutWarning(lastLap, sector, wasValid, lastWarnings) {
+		local knowledgeBase := this.KnowledgeBase
+
+		if ((wasValid && !knowledgeBase.getValue("Lap.Valid", true)) || (lastWarnings < knowledgeBase.getValue("Lap.Warnings", 0))) {
+			local repeating := (knowledgeBase.getValue("Lap.Warnings", 0) > 1)
+
+			if (!repeating && (this.DriverCar.InvalidLaps > 3))
+				repeating := true
+
+			this.getSpeaker(true).speakPhrase(repeating ? "RepeatedCut" : "Cut")
+
+			return true
+		}
+		else
+			return false
+	}
+
 	tacticalAdvice(lastLap, sector, positions, regular) {
 		local speaker := this.getSpeaker(true)
 		local standingsAhead := false
@@ -2461,7 +2512,7 @@ class RaceSpotter extends RaceAssistant {
 		local ignore, key, default
 
 		for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
-						  , "PitWindow", "SessionInformation"]
+						  , "PitWindow", "SessionInformation", "CutWarnings", "PenaltyInformation"]
 			announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
 		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
@@ -2625,6 +2676,7 @@ class RaceSpotter extends RaceAssistant {
 		this.TacticalAdvices := {}
 		this.SessionInfos := {}
 		this.iLastDeltaInformationLap := 0
+		this.iLastPenalty := false
 
 		this.initializeGridPosition(data)
 
@@ -2695,9 +2747,13 @@ class RaceSpotter extends RaceAssistant {
 	}
 
 	addLap(lapNumber, data) {
-		local result := base.addLap(lapNumber, data)
 		local knowledgeBase := this.KnowledgeBase
+		local lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
+		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
+		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
+		local result := base.addLap(lapNumber, data)
 		local gapAhead, gapBehind, validLaps, lap, lastPitstop
+
 
 		if !this.MultiClass {
 			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
@@ -2738,15 +2794,27 @@ class RaceSpotter extends RaceAssistant {
 			this.TacticalAdvices := {}
 			this.SessionInfos := {}
 			this.iLastDeltaInformationLap := 0
+			this.iLastPenalty := false
 		}
 
 		this.initializeGridPosition(data)
+
+		if this.Announcements["PenaltyInformation"] {
+			if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
+				if this.Announcements["CutWarnings"]
+					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+		}
+		else if this.Announcements["CutWarnings"]
+			this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		return result
 	}
 
 	updateLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
+		local lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
+		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
+		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local update, sector, gapAhead, gapBehind, result
 
 		static lastSector := 1
@@ -2783,6 +2851,14 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		result := base.updateLap(lapNumber, data)
+
+		if this.Announcements["PenaltyInformation"] {
+			if !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty)
+				if this.Announcements["CutWarnings"]
+					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+		}
+		else if this.Announcements["CutWarnings"]
+			this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		if (gapAhead != kUndefined) {
 			knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
@@ -2963,6 +3039,7 @@ class RaceSpotter extends RaceAssistant {
 		this.TacticalAdvices := {}
 		this.SessionInfos := {}
 		this.iLastDeltaInformationLap := 0
+		this.iLastPenalty := false
 
 		return base.executePitstop(lapNumber)
 	}

@@ -14,7 +14,6 @@
   1. Overhaul (shortening) of Assistant phrases
   2. Support for Full Course Yellow rules in the Assistants
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
-  4. Information by the Spotter about track cuts and penalties issued by race control
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer

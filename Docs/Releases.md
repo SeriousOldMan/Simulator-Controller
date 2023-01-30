@@ -1,3 +1,14 @@
+## 4.5.8.0-release 02/03/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Migrated Team Server to .NET Core 6.0. Attention: This requires an update of the Team Server. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-458), if you are hosting your own Team Server.
+  4. Made gap ahead calculation more reliable for Strategist and Spotter.
+  5. Track cut and penalty information are now given by the Spotter.
+  6. "Race Center" shows penalties in the Stints and Laps lists and all associated reports.
+  7. Added settings to configure the verbosity for cut warnings and penalty information to the Spotter configuration.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-458), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
+
 ## 4.5.7.0-release 01/27/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

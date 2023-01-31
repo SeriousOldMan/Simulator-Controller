@@ -1307,24 +1307,26 @@ class RaceEngineer extends RaceAssistant {
 		else if ((lastLap == 0) && (lapNumber > 1))
 			lastLap := (lapNumber - 1)
 
-		if (this.Speaker && (lapNumber > 1)) {
-			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
-			driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
-			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
-		}
+		if knowledgeBase {
+			if (this.Speaker && (lapNumber > 1)) {
+				driverForname := knowledgeBase.getValue("Driver.Forname", "John")
+				driverSurname := knowledgeBase.getValue("Driver.Surname", "Doe")
+				driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
+			}
 
-		if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Nr", false)) {
-			savedKnowledgeBase := newConfiguration()
+			if (this.RemoteHandler && knowledgeBase.getValue("Pitstop.Planned.Nr", false)) {
+				savedKnowledgeBase := newConfiguration()
 
-			for key, value in this.KnowledgeBase.Facts.Facts
-				if (InStr(key, "Pitstop") = 1)
-					setConfigurationValue(savedKnowledgeBase, "Pitstop Pending", key, value)
+				for key, value in this.KnowledgeBase.Facts.Facts
+					if (InStr(key, "Pitstop") = 1)
+						setConfigurationValue(savedKnowledgeBase, "Pitstop Pending", key, value)
 
-			stateFile := temporaryFileName(this.AssistantType . " Pitstop Pending", "state")
+				stateFile := temporaryFileName(this.AssistantType . " Pitstop Pending", "state")
 
-			writeConfiguration(stateFile, savedKnowledgeBase)
+				writeConfiguration(stateFile, savedKnowledgeBase)
 
-			this.RemoteHandler.saveLapState(lapNumber, stateFile)
+				this.RemoteHandler.saveLapState(lapNumber, stateFile)
+			}
 		}
 
 		result := base.addLap(lapNumber, data)

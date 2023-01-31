@@ -148,7 +148,7 @@ namespace RF2SHMProvider {
 
                 Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(vehicle.mTotalLaps);
 				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(vehicle.mLapDist / scoring.mScoringInfo.mLapDist);
-				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
+				Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running.Valid="); Console.WriteLine(vehicle.mCountLapFlag == 2 ? "true" : "false");
 
 				int lapTime = (int)Math.Round(Normalize(vehicle.mLastLapTime) * 1000);
 
@@ -255,7 +255,7 @@ namespace RF2SHMProvider {
 				Console.Write("DriverSurname="); Console.WriteLine(GetSurname(scoring.mScoringInfo.mPlayerName));
 				Console.Write("DriverNickname="); Console.WriteLine(GetNickname(scoring.mScoringInfo.mPlayerName));
 
-				Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag > 0) ? "true" : "false");
+				Console.Write("LapValid="); Console.WriteLine((playerScoring.mCountLapFlag == 2) ? "true" : "false");
 				
 				Console.Write("LapLastTime="); Console.WriteLine(Math.Round(Normalize(playerScoring.mLastLapTime > 0 ? playerScoring.mLastLapTime
 																													 : playerScoring.mBestLapTime) * 1000));

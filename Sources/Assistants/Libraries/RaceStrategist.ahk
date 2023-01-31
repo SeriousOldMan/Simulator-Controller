@@ -29,7 +29,7 @@
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class RaceStrategist extends RaceAssistant {
+class RaceStrategist extends GridRaceAssistant {
 	iRaceInfo := false
 
 	iOriginalStrategy := false
@@ -1467,25 +1467,12 @@ class RaceStrategist extends RaceAssistant {
 		}
 	}
 
-	prepareData(lapNumber, data) {
-		local knowledgeBase, key, value
-
-		data := base.prepareData(lapNumber, data)
-
-		knowledgeBase := this.KnowledgeBase
-
-		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			knowledgeBase.setFact(key, value)
-
-		return data
-	}
-
 	addLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname := ""
 		local driverSurname := ""
 		local driverNickname := ""
-		local compound, result, exists, gapAhead, gapBehind, validLaps, lap, simulator, car, track
+		local compound, result, exists, gapAhead, gapBehind, lap, simulator, car, track
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
 		local fuelConsumption, fuelRemaining, lapTime, map, tc, abs, pressures, temperatures, wear, multiClass
 
@@ -1570,14 +1557,16 @@ class RaceStrategist extends RaceAssistant {
 
 		loop % knowledgeBase.getValue("Car.Count")
 		{
-			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
 			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
 
 			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
 				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
 
+				if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
+					knowledgeBase.addFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
+
 				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
-					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", validLaps +  1)
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) +  1)
 			}
 		}
 
@@ -1640,7 +1629,7 @@ class RaceStrategist extends RaceAssistant {
 
 	updateLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
-		local sector, result, gapAhead, gapBehind
+		local sector, result, gapAhead, gapBehind, valid
 
 		static lastSector := 1
 
@@ -1656,6 +1645,14 @@ class RaceStrategist extends RaceAssistant {
 		}
 
 		result := base.updateLap(lapNumber, data)
+
+		loop % knowledgeBase.getValue("Car.Count")
+		{
+			valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
+
+			if (valid != kUndefined)
+				knowledgeBase.addFact("Car." . A_Index . ".Valid.Running", valid)
+		}
 
 		if !this.MultiClass {
 			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)

@@ -257,7 +257,7 @@ namespace ACSHMProvider
 
                     Console.Write("Car."); Console.Write(i); Console.Write(".Lap="); Console.WriteLine(car.lapCount);
                     Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running="); Console.WriteLine(car.splinePosition);
-                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
+                    Console.Write("Car."); Console.Write(i); Console.Write(".Lap.Running.Valid="); Console.WriteLine((car.currentLapInvalid == 1) ? "false" : "true");
 
                     int lapTime = car.lastLapTimeMS;
                     int sector1Time = 0;

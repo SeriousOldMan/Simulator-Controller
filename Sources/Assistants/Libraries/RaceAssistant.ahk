@@ -326,21 +326,6 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	MultiClass[data := false] {
-		Get {
-			static knowledgeBase := false
-			static multiClass := false
-
-			if (!knowledgeBase || (knowledgeBase != this.KnowledgeBase)) {
-				knowledgaBase := this.KnowledgeBase
-
-				multiClass := (this.getClasses(data).Length() > 1)
-			}
-
-			return multiClass
-		}
-	}
-
 	SessionDuration[] {
 		Get {
 			return this.iSessionDuration
@@ -1125,12 +1110,12 @@ class RaceAssistant extends ConfigurationItem {
 		return data
 	}
 
-	addLap(lapNumber, ByRef data) {
+	addLap(lapNumber, ByRef data, dump := true, validLap := "__Undefined__", pendingPenalty := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
-		local driver, driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
+		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid, lapPenalty
-		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear
+		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
 			return false
@@ -1220,25 +1205,22 @@ class RaceAssistant extends ConfigurationItem {
 
 		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Time.End"))
 
-		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
-
-		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
-		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
-
-		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
-			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
-			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
-		}
-
-		knowledgeBase.setFact("Lap." . lapNumber . ".Valid", lapValid)
-
-		if (lapPenalty && !knowledgeBase.getValue("Lap." . lapNumber . ".Penalty", false))
-			knowledgeBase.setFact("Lap." . lapNumber . ".Penalty", lapPenalty)
+		lapValid := ((validLap = kUndefined) ? getConfigurationValue(data, "Stint Data", "LapValid", true) : validLap)
+		lapPenalty := ((pendingPenalty = kUndefined) ? getConfigurationValue(data, "Stint Data", "Penalty", false) : pendingPenalty)
 
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
-
 		knowledgeBase.setFact("Lap.Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
+
+		key := ("Lap." . lapNumber . ".Valid")
+
+		if ((knowledgeBase.getValue(key, kUndefined) == kUndefined) || (knowledgeBase.getValue(key, true) && !lapValid))
+			knowledgeBase.setFact(key, lapValid)
+
+		key := ("Lap." . lapNumber . ".Penalty")
+
+		if ((knowledgeBase.getValue(key, kUndefined) == kUndefined) || (!knowledgeBase.getValue(key, false) && lapPenalty))
+			knowledgeBase.setFact(key, lapPenalty)
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
 
@@ -1336,36 +1318,51 @@ class RaceAssistant extends ConfigurationItem {
 
 		result := knowledgeBase.produce()
 
-		if this.Debug[kDebugKnowledgeBase]
+		if (dump && this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledgeBase(this.KnowledgeBase)
 
 		return result
 	}
 
-	updateLap(lapNumber, ByRef data) {
+	updateLap(lapNumber, ByRef data, dump := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local result, lapValid, lapPenalty, driver
 
 		data := this.prepareData(lapNumber, data)
 
-		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+		knowledgeBase.setFact("Lap.Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
+		knowledgeBase.setFact("Lap.Penalty", getConfigurationValue(data, "Stint Data", "Penalty", false))
+		knowledgeBase.setFact("Lap.Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
 
-		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
-		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+		result := knowledgeBase.produce()
 
-		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
-			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Running.Valid", lapValid)
-			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Running.Penalty", lapPenalty)
-		}
+		if (dump && this.Debug[kDebugKnowledgeBase])
+			this.dumpKnowledgeBase(knowledgeBase)
 
-		knowledgeBase.setFact("Lap.Valid", lapValid)
-		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
+		return result
+	}
 
-		if !lapValid
-			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Valid", lapPenalty)
+	performPitstop(lapNumber := false) {
+		if !lapNumber
+			lapNumber := this.KnowledgeBase.getValue("Lap")
 
-		if lapPenalty
-			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Penalty", lapPenalty)
+		this.startPitstop(lapNumber)
+
+		this.executePitstop(lapNumber)
+
+		this.finishPitstop(lapNumber)
+
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+	}
+
+	startPitstop(lapNumber) {
+		return true
+	}
+
+	executePitstop(lapNumber) {
+		local knowledgeBase := this.KnowledgeBase
+
+		knowledgeBase.addFact("Pitstop.Lap", lapNumber)
 
 		result := knowledgeBase.produce()
 
@@ -1373,6 +1370,98 @@ class RaceAssistant extends ConfigurationItem {
 			this.dumpKnowledgeBase(knowledgeBase)
 
 		return result
+	}
+
+	finishPitstop(lapNumber) {
+		local savedKnowledgeBase, settingsFile, stateFile
+
+		if this.RemoteHandler {
+			savedKnowledgeBase := newConfiguration()
+
+			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
+
+			settingsFile := temporaryFileName(this.AssistantType, "settings")
+			stateFile := temporaryFileName(this.AssistantType, "state")
+
+			writeConfiguration(settingsFile, this.Settings)
+			writeConfiguration(stateFile, savedKnowledgeBase)
+
+			this.RemoteHandler.saveSessionState(settingsFile, stateFile)
+		}
+
+		return true
+	}
+
+	saveSessionSettings() {
+		local knowledgeBase, compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
+		local loadSettings, lapTime, fileName, settings
+
+		if this.hasEnoughData(false) {
+			knowledgeBase := this.KnowledgeBase
+			settingsDB := this.SettingsDatabase
+
+			simulator := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
+			car := knowledgeBase.getValue("Session.Car")
+			track := knowledgeBase.getValue("Session.Track")
+			duration := knowledgeBase.getValue("Session.Duration")
+			weather := knowledgeBase.getValue("Weather.Weather.Now")
+			compound := knowledgeBase.getValue("Tyre.Compound")
+			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
+
+			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default")
+			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulator . ".LoadSettings", oldValue)
+
+			lapTime := Round(this.BestLapTime / 1000)
+
+			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase")) {
+				if (this.AvgFuelConsumption > 0)
+					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+
+				if (settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
+					settingsDB.setSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
+
+				if (lapTime > 10)
+					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
+			}
+			else {
+				fileName := getFileName("Race.settings", kUserConfigDirectory)
+
+				settings := readConfiguration(fileName)
+
+				if (this.AvgFuelConsumption > 0)
+					setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
+
+				if (lapTime > 10)
+					setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
+
+				writeConfiguration(fileName, settings)
+			}
+		}
+	}
+
+	dumpKnowledgeBase(knowledgeBase) {
+		knowledgeBase.dumpFacts()
+	}
+
+	dumpRules(knowledgeBase) {
+		knowledgeBase.dumpRules()
+	}
+}
+
+class GridRaceAssistant extends RaceAssistant {
+	MultiClass[data := false] {
+		Get {
+			static knowledgeBase := false
+			static multiClass := false
+
+			if (!knowledgeBase || (knowledgeBase != this.KnowledgeBase)) {
+				knowledgaBase := this.KnowledgeBase
+
+				multiClass := (this.getClasses(data).Length() > 1)
+			}
+
+			return multiClass
+		}
 	}
 
 	getClasses(data := false) {
@@ -1500,109 +1589,70 @@ class RaceAssistant extends ConfigurationItem {
 			return knowledgeBase.getValue("Car." . car . ".Position", car)
 	}
 
-	performPitstop(lapNumber := false) {
-		if !lapNumber
-			lapNumber := this.KnowledgeBase.getValue("Lap")
+	prepareData(lapNumber, data) {
+		local knowledgeBase, key, value
 
-		this.startPitstop(lapNumber)
+		data := base.prepareData(lapNumber, data)
 
-		this.executePitstop(lapNumber)
+		knowledgeBase := this.KnowledgeBase
 
-		this.finishPitstop(lapNumber)
+		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
+			knowledgeBase.setFact(key, value)
 
-		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+		return data
 	}
 
-	startPitstop(lapNumber) {
-		return true
-	}
-
-	executePitstop(lapNumber) {
+	addLap(lapNumber, ByRef data) {
 		local knowledgeBase := this.KnowledgeBase
+		local driver, lapValid, lapPenalty
 
-		knowledgeBase.addFact("Pitstop.Lap", lapNumber)
+		if !IsObject(data)
+			data := readConfiguration(data)
 
-		result := knowledgeBase.produce()
+		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
 
-		if (this.Debug[kDebugKnowledgeBase])
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+
+		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
+			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Valid", lapValid)
+			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
+		}
+
+		return base.addLap(lapNumber, data, true, lapValid, lapPenalty)
+	}
+
+	updateLap(lapNumber, ByRef data) {
+		local knowledgeBase := this.KnowledgeBase
+		local driver, lapValid, lapPenalty, result
+
+		if !IsObject(data)
+			data := readConfiguration(data)
+
+		driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+		lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+		lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+
+		if (driver && (getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap", false) = lapNumber)) {
+			lapValid := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Running.Valid", lapValid)
+			lapPenalty := getConfigurationValue(data, "Position Data", "Car." . driver . ".Lap.Running.Penalty", lapPenalty)
+		}
+
+		if !lapValid
+			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Valid", false)
+
+		if lapPenalty
+			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Penalty", lapPenalty)
+
+		result := base.updateLap(lapNumber, data, false)
+
+		knowledgeBase.setFact("Lap.Valid", lapValid)
+		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
+
+		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(knowledgeBase)
 
 		return result
-	}
-
-	finishPitstop(lapNumber) {
-		local savedKnowledgeBase, settingsFile, stateFile
-
-		if this.RemoteHandler {
-			savedKnowledgeBase := newConfiguration()
-
-			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
-
-			settingsFile := temporaryFileName(this.AssistantType, "settings")
-			stateFile := temporaryFileName(this.AssistantType, "state")
-
-			writeConfiguration(settingsFile, this.Settings)
-			writeConfiguration(stateFile, savedKnowledgeBase)
-
-			this.RemoteHandler.saveSessionState(settingsFile, stateFile)
-		}
-
-		return true
-	}
-
-	saveSessionSettings() {
-		local knowledgeBase, compound, settingsDB, simulator, car, track, duration, weather, compound, compoundColor, oldValue
-		local loadSettings, lapTime, fileName, settings
-
-		if this.hasEnoughData(false) {
-			knowledgeBase := this.KnowledgeBase
-			settingsDB := this.SettingsDatabase
-
-			simulator := settingsDB.getSimulatorName(knowledgeBase.getValue("Session.Simulator"))
-			car := knowledgeBase.getValue("Session.Car")
-			track := knowledgeBase.getValue("Session.Track")
-			duration := knowledgeBase.getValue("Session.Duration")
-			weather := knowledgeBase.getValue("Weather.Weather.Now")
-			compound := knowledgeBase.getValue("Tyre.Compound")
-			compoundColor := knowledgeBase.getValue("Tyre.Compound.Color")
-
-			oldValue := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulator . ".LoadSettings", "Default")
-			loadSettings := getConfigurationValue(this.Configuration, "Race Assistant Startup", simulator . ".LoadSettings", oldValue)
-
-			lapTime := Round(this.BestLapTime / 1000)
-
-			if ((loadSettings = "SettingsDatabase") || (loadSettings = "SetupDatabase")) {
-				if (this.AvgFuelConsumption > 0)
-					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
-
-				if (settingsDB.getSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", kUndefined) == kUndefined)
-					settingsDB.setSettingValue(simulator, car, track, "*", "Session Settings", "Fuel.Amount", Round(knowledgeBase.getValue("Session.Settings.Fuel.Max")))
-
-				if (lapTime > 10)
-					settingsDB.setSettingValue(simulator, car, track, weather, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
-			}
-			else {
-				fileName := getFileName("Race.settings", kUserConfigDirectory)
-
-				settings := readConfiguration(fileName)
-
-				if (this.AvgFuelConsumption > 0)
-					setConfigurationValue(settings, "Session Settings", "Fuel.AvgConsumption", Round(this.AvgFuelConsumption, 2))
-
-				if (lapTime > 10)
-					setConfigurationValue(settings, "Session Settings", "Lap.AvgTime", Round(lapTime, 1))
-
-				writeConfiguration(fileName, settings)
-			}
-		}
-	}
-
-	dumpKnowledgeBase(knowledgeBase) {
-		knowledgeBase.dumpFacts()
-	}
-
-	dumpRules(knowledgeBase) {
-		knowledgeBase.dumpRules()
 	}
 }
 

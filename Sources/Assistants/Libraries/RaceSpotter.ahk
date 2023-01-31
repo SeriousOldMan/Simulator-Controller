@@ -682,7 +682,7 @@ class PositionInfo {
 	}
 }
 
-class RaceSpotter extends RaceAssistant {
+class RaceSpotter extends GridRaceAssistant {
 	iSpotterPID := false
 	iRunning := false
 
@@ -2733,26 +2733,13 @@ class RaceSpotter extends RaceAssistant {
 		}
 	}
 
-	prepareData(lapNumber, data) {
-		local knowledgeBase, key, value
-
-		data := base.prepareData(lapNumber, data)
-
-		knowledgeBase := this.KnowledgeBase
-
-		for key, value in getConfigurationSectionValues(data, "Position Data", Object())
-			knowledgeBase.setFact(key, value)
-
-		return data
-	}
-
 	addLap(lapNumber, data) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
 		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local result := base.addLap(lapNumber, data)
-		local gapAhead, gapBehind, validLaps, lap, lastPitstop
+		local gapAhead, gapBehind, lap, lastPitstop
 		static adjustGaps := true
 		static lastGapAhead := "__Undefined__"
 		static lastGapBehind := "__Undefined__"
@@ -2793,14 +2780,16 @@ class RaceSpotter extends RaceAssistant {
 
 		loop % knowledgeBase.getValue("Car.Count")
 		{
-			validLaps := knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0)
 			lap := knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)
 
 			if (lap != knowledgeBase.getValue("Car." . A_Index . ".Valid.LastLap", 0)) {
 				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
 
+				if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
+					knowledgeBase.addFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
+
 				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
-					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", validLaps +  1)
+					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) + 1)
 			}
 		}
 
@@ -2833,7 +2822,7 @@ class RaceSpotter extends RaceAssistant {
 		local lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
 		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
-		local update, sector, gapAhead, gapBehind, result
+		local update, sector, gapAhead, gapBehind, result, valid
 
 		static lastSector := 1
 
@@ -2869,6 +2858,14 @@ class RaceSpotter extends RaceAssistant {
 		}
 
 		result := base.updateLap(lapNumber, data)
+
+		loop % knowledgeBase.getValue("Car.Count")
+		{
+			valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
+
+			if (valid != kUndefined)
+				knowledgeBase.addFact("Car." . A_Index . ".Valid.Running", valid)
+		}
 
 		if this.Speaker[false]
 			if this.Announcements["PenaltyInformation"] {
@@ -2992,7 +2989,8 @@ class RaceSpotter extends RaceAssistant {
 											   , carLaps, carRunning
 											   , getConfigurationValue(data, "Position Data", prefix . ".Time")
 											   , carDelta, carAheadDelta, carBehindDelta
-											   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid", true)
+											   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid"
+																	 , getConfigurationValue(data, "Position Data", prefix . ".Lap.Current.Valid", true))
 											   , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
 											   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
 											   , getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false))

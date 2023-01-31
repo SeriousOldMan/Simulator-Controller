@@ -47,7 +47,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 Updates are handled automatically. Beside that:
 
-1. If you are hosting your own Team Server, you **should** update your instance. Although both the old and the new client are compatible, I strongly recommend to deploy the new Team Server, since the .NET Core 3.1 framework used in the old version of the Team Server is out of supprt now. You can continue to use your current database file, schema updates will be handled automatically.
+1. If you are hosting your own Team Server, you **should** update your instance. Although both the old and the new client are compatible, I strongly recommend to deploy the new Team Server, since the .NET Core 3.1 framework used in the old version of the Team Server is out of supprt now. You can continue to use your current database file, schema updates will be handled automatically. You can download the latest version of the .NET Core 6.0 runtime environment from a [dedicated Microsoft website](https://dotnet.microsoft.com/en-us/download/dotnet/6.0).
 2. If you are using a managed instance of the Team Server because of your Patreon membership, you have nothing to do.
 
 ***

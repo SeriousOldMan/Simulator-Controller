@@ -5,7 +5,7 @@
   4. Made gap ahead calculation more reliable for Strategist and Spotter.
   5. Track cut and penalty information are now given by the Spotter.
   6. "Race Center" shows penalties in the Stints and Laps lists and all associated reports.
-  7. Added settings to configure the verbosity for cut warnings and penalty information to the Spotter configuration.
+  7. Added [new settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-spotter) to configure the verbosity for cut warnings and penalty information to the Spotter configuration.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-458), especially, if you are using or even hosting a Team Server. The server code has changed and needs a redeploy.
 

@@ -11687,8 +11687,8 @@ uploadSetups() {
 		if (rCenter.SessionStore.Tables["Setups.Data"].Length() > 0) {
 			title := translate("Import")
 
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Add", "Replace", "Cancel"]))
-			MsgBox 262179, %title%, % translate("Do you want to add the new entry before or after the currently selected entry?")
+			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Insert", "Replace", "Cancel"]))
+			MsgBox 262179, %title%, % translate("Do you want to replace all current entries or do you want to add the imported entries to the list?")
 			OnMessage(0x44, "")
 
 			IfMsgBox Cancel

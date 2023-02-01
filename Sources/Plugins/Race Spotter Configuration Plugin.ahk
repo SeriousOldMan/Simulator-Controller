@@ -116,7 +116,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 		Gui %window%:Font, Italic, Arial
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h207 HWNDwidget15 Hidden, % translate("Announcements")
+		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h206 HWNDwidget15 Hidden, % translate("Announcements")
 
 		Gui %window%:Font, Norm, Arial
 

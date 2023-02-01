@@ -947,6 +947,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					break
 				}
 
+		if (shutdownAssistant && GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P"))
+			shutdownAssistant := false
+
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant)
 				assistant.finishSession(shutdownAssistant)

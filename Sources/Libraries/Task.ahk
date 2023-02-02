@@ -403,7 +403,7 @@ class Task {
 			next := theTask.execute()
 		}
 		catch exception {
-			logError(exception)
+			logError(exception, true)
 
 			next := false
 		}

@@ -107,6 +107,7 @@ parseConfiguration(text) {
 
 writeConfiguration(configFile, configuration, symbolic := true) {
 	local tempFile := temporaryFileName("Config", "ini")
+	local empty := true
 	local directory, section, keyValues, key, value, pairs, tries
 
 	deleteFile(tempFile)
@@ -125,6 +126,8 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 		section := "[" . section . "]" . pairs . "`n"
 
 		FileAppend %section%, %tempFile%, UTF-16
+
+		empty := false
 	}
 
 	configFile := getFileName(configFile, kUserConfigDirectory)
@@ -136,9 +139,22 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 
 	loop
 		try {
-			FileMove %tempFile%, %configFile%, 1
+			if empty {
+				if !FileExist(configFile)
+					break
+				else if deleteFile(configFile)
+					break
+				else {
+					Sleep 200
 
-			break
+					tries -= 1
+				}
+			}
+			else {
+				FileMove %tempFile%, %configFile%, 1
+
+				break
+			}
 		}
 		catch exception {
 			logError(exception)

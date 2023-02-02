@@ -1269,33 +1269,32 @@ class SetupWizard extends ConfigurationItem {
 
 	locateApplication(application, executable := false, update := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local ignore, section, descriptor
+		local ignore, section, descriptor, applications
 
-		if !this.isApplicationInstalled(application) {
-			if !executable
-				for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other"] {
-					descriptor := getConfigurationValue(this.Definition, section, application, false)
+		if (!this.isApplicationInstalled(application) && !executable)
+			for ignore, section in ["Applications.Simulators", "Applications.Core", "Applications.Feedback", "Applications.Other"] {
+				descriptor := getConfigurationValue(this.Definition, section, application, false)
 
-					if descriptor {
-						descriptor := string2Values("|", descriptor)
+				if descriptor {
+					descriptor := string2Values("|", descriptor)
 
-						executable := findSoftware(this.Definition, descriptor[1])
+					executable := findSoftware(this.Definition, descriptor[1])
 
-						break
-					}
+					break
 				}
-
-			if executable {
-				knowledgeBase.setFact("Application." . application . ".Installed", true)
-				knowledgeBase.setFact("Application." . application . ".Path", executable)
-
-				knowledgeBase.setFact("Application.Installed"
-									, values2String("###", concatenate(string2Values("###", knowledgeBase.getValue("Application.Installed", ""))
-																	 , [application])*))
-
-				if update
-					this.updateState()
 			}
+
+		if executable {
+			knowledgeBase.setFact("Application." . application . ".Installed", true)
+			knowledgeBase.setFact("Application." . application . ".Path", executable)
+
+			applications := string2Values("###", knowledgeBase.getValue("Application.Installed", ""))
+
+			if !inList(applications, application)
+				knowledgeBase.setFact("Application.Installed", values2String("###", concatenate(applications, [application])*))
+
+			if update
+				this.updateState()
 		}
 	}
 

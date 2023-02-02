@@ -192,98 +192,11 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
-		local wizard := this.SetupWizard
-		local definition := this.Definition
-		local icons := []
-		local rows := []
-		local stdApplications := []
-		local application, simulator, descriptor, executable, iconFile
-		local listViewIcons, ignore, icon, row, ignore, section, category, descriptor
-
 		this.updateAvailableApplications()
 
 		base.showPage(page)
 
-		static first1 := true
-		static first2 := true
-
-		if (page == 1) {
-			Gui ListView, % this.iSimulatorsListView
-
-			LV_Delete()
-
-			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
-				if wizard.isApplicationInstalled(simulator) {
-					descriptor := string2Values("|", descriptor)
-
-					executable := wizard.applicationPath(simulator)
-
-					iconFile := findInstallProperty(simulator, "DisplayIcon")
-
-					if iconFile
-						icons.Push(iconFile)
-					else if executable
-						icons.Push(executable)
-					else
-						icons.Push("")
-
-					rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
-				}
-			}
-
-			listViewIcons := IL_Create(icons.Length())
-
-			for ignore, icon in icons
-				IL_Add(listViewIcons, icon)
-
-			LV_SetImageList(listViewIcons)
-
-			for ignore, row in rows
-				LV_Add(row*)
-
-			if first1 {
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
-
-				first1 := false
-			}
-		}
-		else if (page == 2) {
-			Gui ListView, % this.iApplicationsListView
-
-			LV_Delete()
-
-			for ignore, section in string2Values(",", definition[2]) {
-				category := ConfigurationItem.splitDescriptor(section)[2]
-
-				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
-					if (wizard.isApplicationSelected(application) || wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
-						descriptor := string2Values("|", descriptor)
-
-						executable := wizard.applicationPath(application)
-
-						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate(category), application, executable ? executable : translate("Not installed"))
-
-						stdApplications.Push(application)
-					}
-				}
-			}
-
-			for ignore, application in wizard.installedApplications()
-				if !inList(stdApplications, application) {
-					executable := wizard.applicationPath(application)
-
-					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate("Other"), application, executable ? executable : translate("Not installed"))
-				}
-
-			if first2 {
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
-				LV_ModifyCol(3, "AutoHdr")
-
-				first2 := false
-			}
-		}
+		this.loadApplications(page == 1)
 	}
 
 	hidePage(page) {
@@ -348,22 +261,119 @@ class ApplicationsStepWizard extends StepWizard {
 			wizard.updateState()
 	}
 
+	loadApplications(simulators := true) {
+		local wizard := this.SetupWizard
+		local definition := this.Definition
+		local icons := []
+		local rows := []
+		local stdApplications := []
+		local application, simulator, descriptor, executable, iconFile
+		local listViewIcons, ignore, icon, row, ignore, section, category, descriptor
+
+		static first1 := true
+		static first2 := true
+
+		if simulators {
+			Gui ListView, % this.iSimulatorsListView
+
+			LV_Delete()
+
+			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
+				if wizard.isApplicationInstalled(simulator) {
+					descriptor := string2Values("|", descriptor)
+
+					executable := wizard.applicationPath(simulator)
+
+					iconFile := findInstallProperty(simulator, "DisplayIcon")
+
+					if iconFile
+						icons.Push(iconFile)
+					else if executable
+						icons.Push(executable)
+					else
+						icons.Push("")
+
+					rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
+				}
+			}
+
+			listViewIcons := IL_Create(icons.Length())
+
+			for ignore, icon in icons
+				IL_Add(listViewIcons, icon)
+
+			LV_SetImageList(listViewIcons)
+
+			for ignore, row in rows
+				LV_Add(row*)
+
+			if first1 {
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+
+				first1 := false
+			}
+		}
+		else {
+			Gui ListView, % this.iApplicationsListView
+
+			LV_Delete()
+
+			for ignore, section in string2Values(",", definition[2]) {
+				category := ConfigurationItem.splitDescriptor(section)[2]
+
+				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+					if (wizard.isApplicationSelected(application) || wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
+						descriptor := string2Values("|", descriptor)
+
+						executable := wizard.applicationPath(application)
+
+						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate(category), application, executable ? executable : translate("Not installed"))
+
+						stdApplications.Push(application)
+					}
+				}
+			}
+
+			for ignore, application in wizard.installedApplications()
+				if !inList(stdApplications, application) {
+					executable := wizard.applicationPath(application)
+
+					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate("Other"), application, executable ? executable : translate("Not installed"))
+				}
+
+			if first2 {
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+				LV_ModifyCol(3, "AutoHdr")
+
+				first2 := false
+			}
+		}
+	}
+
 	locateSimulator(name, file) {
 		local wizard := this.SetupWizard
+		local wasInstalled := wizard.isApplicationInstalled(name)
 
-		if !wizard.isApplicationInstalled(name) {
-			wizard.locateApplication(name, file, false)
+		wizard.locateApplication(name, file, false)
+
+		if !wasInstalled
 			wizard.selectApplication(name, true, false)
-		}
+
+		this.loadApplications(true)
 	}
 
 	locateApplication(name, file) {
 		local wizard := this.SetupWizard
+		local wasInstalled := wizard.isApplicationInstalled(name)
 
-		if !wizard.isApplicationInstalled(name) {
-			wizard.locateApplication(name, file, false)
+		wizard.locateApplication(name, file, false)
+
+		if !wasInstalled
 			wizard.selectApplication(name, true, false)
-		}
+
+		this.loadApplications(false)
 	}
 }
 

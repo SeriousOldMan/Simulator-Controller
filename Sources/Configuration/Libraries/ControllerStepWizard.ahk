@@ -271,6 +271,9 @@ class ControllerStepWizard extends StepWizard {
 
 			this.iControllerEditor := false
 
+			buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+			streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+
 			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
 			this.iFunctionTriggers := false

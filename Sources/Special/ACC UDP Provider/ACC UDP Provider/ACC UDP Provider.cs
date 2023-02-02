@@ -284,90 +284,95 @@ namespace ACCUDPProvider {
 
 							string command = cmdStream.ReadLine();
 
-							if (command == "Exit")
-								done = true;
-							else if (command == "Read") {
-								StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
+                            if (command == "Exit")
+                                done = true;
+                            else if (command == "Read")
+                            {
+                                StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
 
-								outStream.WriteLine("[Position Data]");
+                                outStream.WriteLine("[Position Data]");
 
-								outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
+                                // outStream.Write("Car.Count="); outStream.WriteLine(Cars.Count);
 
                                 int index = 1;
 
-								foreach (CarData car in Cars) {
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".ID="); outStream.WriteLine(car.CarIndex);
-
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
-									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
-									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
-
-                                    LapData lastLap = car.LastLap;
-                                    LapData currentLap = car.CurrentLap;
-
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Valid="); outStream.WriteLine(currentLap != null ? (currentLap.IsValid ? "true" : "false") : "true");
-
-                                    if (lastLap != null)
-                                    {
-                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Type=");
-
-                                        if (lastLap.LapHint == "OUT")
-                                            outStream.WriteLine("Out");
-                                        else if (lastLap.LapHint == "IN")
-                                            outStream.WriteLine("In");
-                                        else
-                                            outStream.WriteLine("Regular");
-                                    }
-
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
-									outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
-
-									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Delta="); outStream.WriteLine(car.Delta);
-
-									outStream.Write("Car."); outStream.Write(index);
-									if (lastLap != null) {
-										string split1MS = lastLap.Split1MS + "";
-										string split2MS = lastLap.Split2MS + "";
-										string split3MS = lastLap.Split3MS + "";
-
-										if (split1MS.Length == 0)
-											split1MS = "0";
-
-										if (split2MS.Length == 0)
-											split2MS = "0";
-
-										if (split3MS.Length == 0)
-											split3MS = "0";
-
-										outStream.Write(".Time.Sectors="); outStream.WriteLine(split1MS + "," + split2MS + "," + split3MS);
-									}
-									else
-										outStream.WriteLine(".Time.Sectors=0,0,0");
-									
-									outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
-
-									DriverData currentDriver = car.CurrentDriver;
-
-									if (currentDriver != null) {
-										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
-										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
-										outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
-									}
-
+                                foreach (CarData car in Cars)
+                                {
                                     CarLocationEnum location = car.CarLocation;
-                                    bool inPitLane = false;
+                                    
+                                    if (location != CarLocationEnum.NONE) {
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".ID="); outStream.WriteLine(car.CarIndex);
 
-                                    if (location == CarLocationEnum.Pitlane)
-                                        inPitLane = true;
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Nr="); outStream.WriteLine(car.RaceNumber);
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Position="); outStream.WriteLine(car.Position);
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap="); outStream.WriteLine(car.Laps);
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running="); outStream.WriteLine(car.SplinePosition);
 
-                                    outStream.Write("Car."); outStream.Write(index); outStream.Write(".InPitlane="); outStream.WriteLine(inPitLane ? "true" : "false");
+                                        LapData lastLap = car.LastLap;
+                                        LapData currentLap = car.CurrentLap;
 
-                                    index += 1;
-								}
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Valid="); outStream.WriteLine(lastLap != null ? (lastLap.IsValid ? "true" : "false") : "true");
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Running.Valid="); outStream.WriteLine(currentLap != null ? (currentLap.IsValid ? "true" : "false") : "true");
 
-								outStream.Close();
+                                        if (lastLap != null)
+                                        {
+                                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Lap.Type=");
+
+                                            if (lastLap.LapHint == "OUT")
+                                                outStream.WriteLine("Out");
+                                            else if (lastLap.LapHint == "IN")
+                                                outStream.WriteLine("In");
+                                            else
+                                                outStream.WriteLine("Regular");
+                                        }
+
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Time=");
+                                        outStream.WriteLine(lastLap != null ? (lastLap.LaptimeMS != null ? lastLap.LaptimeMS : 0) : 0);
+
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Delta="); outStream.WriteLine(car.Delta);
+
+                                        outStream.Write("Car."); outStream.Write(index);
+                                        if (lastLap != null)
+                                        {
+                                            string split1MS = lastLap.Split1MS + "";
+                                            string split2MS = lastLap.Split2MS + "";
+                                            string split3MS = lastLap.Split3MS + "";
+
+                                            if (split1MS.Length == 0)
+                                                split1MS = "0";
+
+                                            if (split2MS.Length == 0)
+                                                split2MS = "0";
+
+                                            if (split3MS.Length == 0)
+                                                split3MS = "0";
+
+                                            outStream.Write(".Time.Sectors="); outStream.WriteLine(split1MS + "," + split2MS + "," + split3MS);
+                                        }
+                                        else
+                                            outStream.WriteLine(".Time.Sectors=0,0,0");
+
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".Car="); outStream.WriteLine(car.CarModelEnum);
+
+                                        DriverData currentDriver = car.CurrentDriver;
+
+                                        if (currentDriver != null)
+                                        {
+                                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Forname="); outStream.WriteLine(currentDriver.FirstName);
+                                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Surname="); outStream.WriteLine(currentDriver.LastName);
+                                            outStream.Write("Car."); outStream.Write(index); outStream.Write(".Driver.Nickname="); outStream.WriteLine(currentDriver.ShortName);
+                                        }
+
+                                        outStream.Write("Car."); outStream.Write(index); outStream.Write(".InPitlane=");
+                                        outStream.WriteLine((location == CarLocationEnum.Pitlane) ? "true" : "false");
+
+                                        index += 1;
+                                    }
+                                }
+
+                                outStream.Write("Car.Count="); outStream.WriteLine(index - 1);
+
+                                outStream.Close();
 							}
 
 							cmdStream.Close();

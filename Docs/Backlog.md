@@ -14,6 +14,8 @@
   2. Support for Full Course Yellow rules in the Assistants
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
+  5. Information Command to get the cold pressures of the currently mounted tyres.
+  6. Voice command to increase / decrease the pressures of all tyres at once.
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer

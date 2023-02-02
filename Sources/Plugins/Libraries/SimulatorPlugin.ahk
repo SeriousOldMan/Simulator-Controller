@@ -1119,17 +1119,37 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	acquirePositionsData(telemetryData) {
-		local positionsData
+		local cars := []
+		local positionsData, count
 
 		if telemetryData.HasKey("Position Data") {
 			positionsData := newConfiguration()
 
 			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(telemetryData, "Position Data"))
-
-			return positionsData
 		}
 		else
-			return readSimulatorData(this.Code, "-Standings")
+			positionsData := readSimulatorData(this.Code, "-Standings")
+
+		count := getConfigurationValue(positionsData, "Position Data", "Car.Count", 0)
+
+		loop %count%
+			cars.Push(Array(A_Index, getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
+								   + getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
+
+		bubbleSort(cars, "compareCarPositions")
+
+		if isDebug()
+			loop %count% {
+				if (getConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position") != A_Index)
+					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index])
+
+				setConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
+			}
+		else
+			loop %count%
+				setConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
+
+		return positionsData
 	}
 
 	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
@@ -1193,6 +1213,10 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+compareCarPositions(c1, c2) {
+	return (c1[2] > c2[2])
+}
 
 getCurrentSimulatorPlugin(option := false) {
 	local actions, ignore, candidate

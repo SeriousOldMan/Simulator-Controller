@@ -1148,7 +1148,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		if isDebug()
 			loop %count% {
 				if (getConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position") != A_Index)
-					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index])
+					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index] . ": "
+										. getConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position")
+										. " -> " . A_Index)
 
 				setConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
 			}

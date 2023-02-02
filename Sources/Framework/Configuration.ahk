@@ -107,7 +107,7 @@ parseConfiguration(text) {
 
 writeConfiguration(configFile, configuration, symbolic := true) {
 	local tempFile := temporaryFileName("Config", "ini")
-	local empty := true
+	local empty := (configuration.Count() = 0)
 	local directory, section, keyValues, key, value, pairs, tries
 
 	deleteFile(tempFile)
@@ -126,8 +126,6 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 		section := "[" . section . "]" . pairs . "`n"
 
 		FileAppend %section%, %tempFile%, UTF-16
-
-		empty := false
 	}
 
 	configFile := getFileName(configFile, kUserConfigDirectory)

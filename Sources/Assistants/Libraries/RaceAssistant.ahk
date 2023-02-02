@@ -1110,11 +1110,11 @@ class RaceAssistant extends ConfigurationItem {
 		return data
 	}
 
-	addLap(lapNumber, ByRef data, dump := true, validLap := "__Undefined__", pendingPenalty := "__Undefined__") {
+	addLap(lapNumber, ByRef data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
-		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, lapValid, lapPenalty
+		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
@@ -1205,8 +1205,11 @@ class RaceAssistant extends ConfigurationItem {
 
 		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Time.End"))
 
-		lapValid := ((validLap = kUndefined) ? getConfigurationValue(data, "Stint Data", "LapValid", true) : validLap)
-		lapPenalty := ((pendingPenalty = kUndefined) ? getConfigurationValue(data, "Stint Data", "Penalty", false) : pendingPenalty)
+		if (lapValid = kUndefined)
+			lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+
+		if (lapPenalty = kUndefined)
+			lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
 
 		knowledgeBase.setFact("Lap.Valid", lapValid)
 		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
@@ -1324,14 +1327,20 @@ class RaceAssistant extends ConfigurationItem {
 		return result
 	}
 
-	updateLap(lapNumber, ByRef data, dump := true) {
+	updateLap(lapNumber, ByRef data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
-		local result, lapValid, lapPenalty, driver
+		local result
 
 		data := this.prepareData(lapNumber, data)
 
-		knowledgeBase.setFact("Lap.Valid", getConfigurationValue(data, "Stint Data", "LapValid", true))
-		knowledgeBase.setFact("Lap.Penalty", getConfigurationValue(data, "Stint Data", "Penalty", false))
+		if (lapValid = kUndefined)
+			lapValid := getConfigurationValue(data, "Stint Data", "LapValid", true)
+
+		if (lapPenalty = kUndefined)
+			lapPenalty := getConfigurationValue(data, "Stint Data", "Penalty", false)
+
+		knowledgeBase.setFact("Lap.Valid", lapValid)
+		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
 		knowledgeBase.setFact("Lap.Warnings", getConfigurationValue(data, "Stint Data", "Warnings", 0))
 
 		result := knowledgeBase.produce()
@@ -1603,7 +1612,6 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	addLap(lapNumber, ByRef data) {
-		local knowledgeBase := this.KnowledgeBase
 		local driver, lapValid, lapPenalty
 
 		if !IsObject(data)
@@ -1644,10 +1652,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if lapPenalty
 			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Penalty", lapPenalty)
 
-		result := base.updateLap(lapNumber, data, false)
-
-		knowledgeBase.setFact("Lap.Valid", lapValid)
-		knowledgeBase.setFact("Lap.Penalty", lapPenalty)
+		result := base.updateLap(lapNumber, data, false, lapValid, lapPenalty)
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(knowledgeBase)

@@ -2986,7 +2986,7 @@ class RaceSpotter extends GridRaceAssistant {
 											   , getConfigurationValue(data, "Position Data", prefix . ".Time")
 											   , carDelta, carAheadDelta, carBehindDelta
 											   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid"
-																	 , getConfigurationValue(data, "Position Data", prefix . ".Lap.Current.Valid", true))
+																	 , getConfigurationValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
 											   , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
 											   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
 											   , getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false))

@@ -441,7 +441,7 @@ launchPad(command := false, arguments*) {
 		toolTips["Startup"] := "Startup: Launches all components to be ready for the track."
 
 		toolTips["RaceReports"] := "Race Reports: Analyze your recent races."
-		toolTips["StrategyWorkbench"] := "Strategy Workbench: Find the best stratetgy for an upcoming race."
+		toolTips["StrategyWorkbench"] := "Strategy Workbench: Find the best strategy for an upcoming race."
 		toolTips["RaceCenter"] := "Race Center: Manage your team and control the race during an event using the Team Server."
 		toolTips["ServerAdministration"] := "Server Administration: Manage accounts and access rights on your Team Server. Only needed, when you run your own Team Server."
 

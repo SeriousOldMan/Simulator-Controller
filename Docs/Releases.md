@@ -1,4 +1,4 @@
-## 4.5.8.0-release 02/03/23 (planned)
+## 4.5.8.0-release 02/03/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Migrated Team Server to .NET Core 6.0. Attention: This requires an update of the Team Server. Please read the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-458), if you are hosting your own Team Server.

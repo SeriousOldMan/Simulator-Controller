@@ -1582,11 +1582,17 @@ class RaceEngineer extends RaceAssistant {
 		local confirm := true
 		local options := ((optionsOrLap = kUndefined) ? true : optionsOrLap)
 		local plannedLap := false
+		local force := false
 		local result, pitstopNumber, speaker, fragments, fuel, lap, correctedFuel, targetFuel
 		local correctedTyres, compound, color, incrementFL, incrementFR, incrementRL, incrementRR, pressureCorrection
 		local temperatureDelta, debug, tyre, tyreType, lostPressure, deviationThreshold
 
-		if (optionsOrLap != kUndefined) {
+		if (optionsOrLap = "Now") {
+			optionsOrLap := kUndefined
+
+			force := true
+		}
+		else if (optionsOrLap != kUndefined) {
 			if optionsOrLap is Number
 			{
 				plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
@@ -1597,7 +1603,7 @@ class RaceEngineer extends RaceAssistant {
 				confirm := optionsOrLap["Confirm"]
 		}
 
-		if !plannedLap
+		if (!force && !plannedLap)
 			if !this.hasEnoughData()
 				return false
 
@@ -2095,7 +2101,7 @@ class RaceEngineer extends RaceAssistant {
 					else if !this.hasPlannedPitstop() {
 						speaker.speakPhrase("ConfirmPlan", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+						this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 					}
 					else {
 						speaker.speakPhrase("ConfirmPrepare", false, true)
@@ -2166,7 +2172,7 @@ class RaceEngineer extends RaceAssistant {
 						if this.supportsPitstop() {
 							speaker.speakPhrase("ConfirmPlan", false, true)
 
-							this.setContinuation(ObjBindMethod(this, "planPitstop"))
+							this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 						}
 					}
 					finally {
@@ -2228,7 +2234,7 @@ class RaceEngineer extends RaceAssistant {
 					if this.supportsPitstop() {
 						speaker.speakPhrase("ConfirmPlan", false, true)
 
-						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+						this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 					}
 				}
 				finally {

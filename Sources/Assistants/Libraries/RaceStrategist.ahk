@@ -2385,7 +2385,7 @@ class RaceStrategist extends GridRaceAssistant {
 				if (refuel != kUndefined)
 					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange, kUndefined, tyreCompound, tyreCompoundColor), ErrorLevel)
 				else
-					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . plannedLap, ErrorLevel)
+					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . (plannedLap ? plannedLap : "Now"), ErrorLevel)
 			}
 			else
 				sendMessage(kFileMessage, "Race Engineer", "planPitstop", ErrorLevel)

@@ -81,7 +81,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 	[(TellMe) the time, What time is it, What is the {current time, time}]
 
-	[(WhatAre) {the tire pressures, the current tire pressures, the pressures in the tires}, (TellMe) the current pressures]
+	[(WhatAre) {the, the cold, the current} {tire pressures, pressures}, (TellMe) {the, the cold, the current} {tire pressures, pressures}]
 
 	[(WhatAre) {the tire temperatures, the current tire temperatures, the temperatures at the moment}, (TellMe) {the tire temperatures, the current tire temperatures, the temperatures at the moment}]
 
@@ -107,10 +107,10 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 	[(CanWe) {use, switch to} wet tires, {Can we, Please} {use, switch to} dry tires, {Can we, Please} {use, switch to} intemediate tires]
 
-	[(CanWe) increase {front left, front right, rear left, rear right} by (Digit) {point, comma} (Digit), (Digit) {point, comma} (Digit) more pressure for the {front left, front right, rear left, rear right} tire]
-
-	[(CanWe) decrease {front left, front right, rear left, rear right} by (Digit) {point, comma} (Digit), (Digit) {point, comma} (Digit) less pressure for the {front left, front right, rear left, rear right} tire]
-
+	[(CanWe) increase {front left, front right, rear left, rear right, all} by (Digit) {point, comma} (Digit), (Digit) {point, comma} (Digit) more pressure for {the front left, the front right, the rear left, the rear right, all} {tire, tires}]
+	
+	[(CanWe) decrease {front left, front right, rear left, rear right, all} by (Digit) {point, comma} (Digit), (Digit) {point, comma} (Digit) less pressure for {the front left, the front right, the rear left, the rear right, all} {tire, tires}]
+	
 	[(CanWe) leave the {tire pressure, pressure} unchanged, (CanWe) leave the {tire pressure, pressure} as it is, (CanWe) leave the {tire pressures, pressures} unchanged, (CanWe) {leave, keep} the {tire pressures, pressures} as they are]
 
 	[(CanWe) {leave, keep} the tires on the car, {Please} do not change the tires, (CanWe) {leave, keep} the tires unchanged]

@@ -164,7 +164,7 @@ class RaceEngineer extends RaceAssistant {
 			case "TyreTemperatures":
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			case "TyrePressures":
-				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"]))
+				this.tyreInfoRecognized(concatenate(Array(this.getSpeaker().Fragments["Pressures"]), words))
 			case "Weather":
 				this.weatherRecognized(words)
 			case "PitstopPlan":
@@ -310,6 +310,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
+		local forCold := false
 		local unit, lap, ignore, suffix, value
 
 		if !this.hasEnoughData()
@@ -317,8 +318,11 @@ class RaceEngineer extends RaceAssistant {
 
 		if inList(words, fragments["Temperatures"])
 			unit := "Temperature"
-		else if inList(words, fragments["Pressures"])
+		else if inList(words, fragments["Pressures"]) {
 			unit := "Pressure"
+
+			forCold := inList(words, fragments["Cold"])
+		}
 		else {
 			speaker.speakPhrase("Repeat")
 
@@ -330,13 +334,20 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			lap := knowledgeBase.getValue("Lap")
 
-			speaker.speakPhrase((unit == "Pressure") ? "Pressures" : "Temperatures")
+			if (unit == "Pressure")
+				speaker.speakPhrase("Pressures", {cold: forCold ? fragments["Cold"] : ""})
+			else
+				speaker.speakPhrase("Temperatures")
 
 			for ignore, suffix in ["FL", "FR", "RL", "RR"] {
-				if (unit = "Pressure")
-					value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Lap." . lap . ".Tyre." . unit . "." . suffix)))
+				if (unit = "Pressure") {
+					if forCold
+						value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Tyre.Pressure.Target." . suffix)))
+					else
+						value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure." . suffix)))
+				}
 				else
-					value := speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Tyre." . unit . "." . suffix)), 0)
+					value := speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Tyre.Temperature." . suffix)), 0)
 
 				speaker.speakPhrase("Tyre" . suffix, {value: value
 													, unit: (unit = "Pressure") ? fragments[getUnit("Pressure")]
@@ -588,7 +599,7 @@ class RaceEngineer extends RaceAssistant {
 	pitstopAdjustPressureRecognized(words) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
-		local tyreType, action, pointPosition, found, pressureValue, tenthPressureValue, ignore, word, startChar, tyre, delta
+		local tyreType, action, pointPosition, found, pressureValue, tenthPressureValue, ignore, word, startChar, delta
 
 		static tyreTypeFragments := false
 
@@ -611,7 +622,9 @@ class RaceEngineer extends RaceAssistant {
 
 			tyreType := false
 
-			if inList(words, fragments["Front"]) {
+			if inList(words, fragments["All"])
+				tyreType := "All"
+			else if inList(words, fragments["Front"]) {
 				if inList(words, fragments["Left"])
 					tyreType := "FL"
 				else if inList(words, fragments["Right"])
@@ -666,13 +679,17 @@ class RaceEngineer extends RaceAssistant {
 					}
 
 				if found {
-					tyre := tyreTypeFragments[tyreType]
 					action := fragments[action]
 
 					delta := Round(pressureValue + (tenthPressureValue / 10), 1)
 
-					speaker.speakPhrase("ConfirmPressureChange", {action: action, tyre: tyre, unit: fragments[getUnit("Pressure")]
-																, delta: speaker.number2Speech(delta, 1)}, true)
+					if (tyreType = "All")
+						speaker.speakPhrase("ConfirmAllPressureChange", {action: action, unit: fragments[getUnit("Pressure")]
+																	   , delta: speaker.number2Speech(delta, 1)}, true)
+					else
+						speaker.speakPhrase("ConfirmPressureChange", {action: action, tyre: tyreTypeFragments[tyreType]
+																	, unit: fragments[getUnit("Pressure")]
+																	, delta: speaker.number2Speech(delta, 1)}, true)
 
 					this.setContinuation(ObjBindMethod(this, "updatePitstopTyrePressure", tyreType, (action == kIncrease) ? delta : (delta * -1)))
 
@@ -837,7 +854,7 @@ class RaceEngineer extends RaceAssistant {
 	updatePitstopTyrePressure(tyreType, delta) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local targetValue, targetIncrement
+		local targetValue, targetIncrement, ignore, tyre
 
 		speaker.beginTalk()
 
@@ -850,11 +867,19 @@ class RaceEngineer extends RaceAssistant {
 			}
 			else {
 				delta := convertUnit("Pressure", internalValue("Float", delta))
-				targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType)
-				targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
 
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
+				if (tyreType = "All")
+					tyreType := ["FL", "FR", "RL", "RR"]
+				else
+					tyreType := Array(tyreType)
+
+				for ignore, tyre in tyreType {
+					targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre)
+					targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment")
+
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre, targetValue + delta)
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment", targetIncrement + delta)
+				}
 
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledgeBase(this.KnowledgeBase)
@@ -1562,6 +1587,8 @@ class RaceEngineer extends RaceAssistant {
 				this.weatherRecognized([])
 			case "TyrePressures":
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"]))
+			case "TyrePressuresCold":
+				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Pressures"], this.getSpeaker().Fragments["Cold"]))
 			case "TyreTemperatures":
 				this.tyreInfoRecognized(Array(this.getSpeaker().Fragments["Temperatures"]))
 			case "TyreWear":

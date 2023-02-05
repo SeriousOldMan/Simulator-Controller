@@ -1,16 +1,16 @@
 [Development]
-Version=4.5.8.0-release
+Version=4.5.9.0-dev
 Target=4.5.8.0-release
-Date=02/03/2023
-Download=https://cutt.ly/T9N5qq3;https://www.dropbox.com/s/mldnq097btg9895/Simulator%20Controller%204.5.8.0-release.zip?dl=1
-Changes=Migrated Team Server to .NET Core 6.0, Made gap ahead calculation more reliable, Track cut and penalty information by the Spotter, "Race Center" shows penalties in stints and laps list and all associated reports, Added settings for cut warnings and penalty information to the Spotter configuration, New car models for "Setup Advisor"
+Date=02/06/2023
+Download=
+Changes=New voice command for Race Engineer to ask about cold trye pressures, New voice command for Race Engineer to increase/decrease the cold pressures for all tyres at once for the next pitstop, New information request controller action "TyrePressuresCold", New icons in the Stream Deck icon set for request cold tyre pressure information
 [Release]
 Version=4.5.8.0-release
 Date=02/03/2023
 Download=https://cutt.ly/T9N5qq3;https://www.dropbox.com/s/mldnq097btg9895/Simulator%20Controller%204.5.8.0-release.zip?dl=1
 Changes=Migrated Team Server to .NET Core 6.0, Made gap ahead calculation more reliable, Track cut and penalty information by the Spotter, "Race Center" shows penalties in stints and laps list and all associated reports, Added settings for cut warnings and penalty information to the Spotter configuration, New car models for "Setup Advisor"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.5.8.0-release
-Development=4.5.8.0-release
+Development=4.5.9.0-dev

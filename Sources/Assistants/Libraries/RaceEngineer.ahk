@@ -334,7 +334,10 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			lap := knowledgeBase.getValue("Lap")
 
-			speaker.speakPhrase((unit == "Pressure") ? "Pressures" : "Temperatures")
+			if (unit == "Pressure")
+				speaker.speakPhrase("Pressures", {cold: forCold ? fragments["Cold"] : ""})
+			else
+				speaker.speakPhrase("Temperatures")
 
 			for ignore, suffix in ["FL", "FR", "RL", "RR"] {
 				if (unit = "Pressure") {
@@ -851,7 +854,7 @@ class RaceEngineer extends RaceAssistant {
 	updatePitstopTyrePressure(tyreType, delta) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local targetValue, targetIncrement
+		local targetValue, targetIncrement, ignore, tyre
 
 		speaker.beginTalk()
 
@@ -864,11 +867,19 @@ class RaceEngineer extends RaceAssistant {
 			}
 			else {
 				delta := convertUnit("Pressure", internalValue("Float", delta))
-				targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType)
-				targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment")
 
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType, targetValue + delta)
-				knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyreType . ".Increment", targetIncrement + delta)
+				if (tyreType = "All")
+					tyreType := ["FL", "FR", "RL", "RR"]
+				else
+					tyreType := Array(tyreType)
+
+				for ignore, tyre in tyreType {
+					targetValue := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre)
+					targetIncrement := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment")
+
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre, targetValue + delta)
+					knowledgeBase.setValue("Pitstop.Planned.Tyre.Pressure." . tyre . ".Increment", targetIncrement + delta)
+				}
 
 				if this.Debug[kDebugKnowledgeBase]
 					this.dumpKnowledgeBase(this.KnowledgeBase)

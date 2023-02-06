@@ -4004,7 +4004,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()
-			case 13:
+			case 14:
 				this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
 				this.updateState()

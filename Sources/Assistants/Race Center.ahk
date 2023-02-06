@@ -345,6 +345,7 @@ class RaceCenter extends ConfigurationItem {
 	iSelectedPlanStint := false
 
 	iTyrePressureMode := "Relative"
+	iCorrectPressureLost := false
 
 	iSessionStore := false
 	iTelemetryDatabase := false
@@ -1024,6 +1025,12 @@ class RaceCenter extends ConfigurationItem {
 	TyrePressureMode[] {
 		Get {
 			return this.iTyrePressureMode
+		}
+	}
+
+	CorrectPressureLoss[] {
+		Get {
+			return this.iCorrectPressureLoss
 		}
 	}
 
@@ -2221,14 +2228,15 @@ class RaceCenter extends ConfigurationItem {
 
 	updatePitstopMenu() {
 		local window := this.Window
-		local correct1, correct2
+		local correct1, correct2, correct3
 
 		Gui %window%:Default
 
 		correct1 := ((this.TyrePressureMode = "Reference") ? "(x) Adjust Pressures (Reference)" : "      Adjust Pressures (Reference)")
 		correct2 := ((this.TyrePressureMode = "Relative") ? "(x) Adjust Pressures (Relative)" : "      Adjust Pressures (Relative)")
+		correct3 := (this.CorrectPressureLoss ? "(x) Correct pressure loss" : "      Correct pressure loss")
 
-		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, "---------------------------------------------", "Instruct Engineer"], "translate")*)
+		GuiControl, , pitstopMenuDropDown, % "|" . values2String("|", map(["Pitstop", "---------------------------------------------", "Select Team...", "---------------------------------------------", "Initialize from Session", "Load from Database...", "Clear Setups...", "---------------------------------------------", "Setups Summary", "Pitstops Summary", "---------------------------------------------", correct1, correct2, correct3, "---------------------------------------------", "Instruct Engineer"], "translate")*)
 
 		GuiControl Choose, pitstopMenuDropDown, 1
 	}
@@ -3095,11 +3103,11 @@ class RaceCenter extends ConfigurationItem {
 				coldPressures := [displayNullValue(pressures["Tyre.Pressure.Cold.Front.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Front.Right"])
 								, displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Left"]), displayNullValue(pressures["Tyre.Pressure.Cold.Rear.Right"])]
 
-				for index, key in ["Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
-								 , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"]
-					if ((coldPressures[index] != "-") && !isNull(pressures[key]))
-						coldPressures[index] -= pressures[key]
-
+				if this.CorrectPressureLoss
+					for index, key in ["Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
+									 , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"]
+						if ((coldPressures[index] != "-") && !isNull(pressures[key]))
+							coldPressures[index] -= pressures[key]
 
 				this.initializePitstopTyreSetup(compound, compoundColor, coldPressures*)
 			}
@@ -3996,7 +4004,11 @@ class RaceCenter extends ConfigurationItem {
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()
-			case 15:
+			case 13:
+				this.iCorrectPressureLoss := !this.CorrectPressureLoss
+
+				this.updateState()
+			case 16:
 				this.planPitstop()
 		}
 	}

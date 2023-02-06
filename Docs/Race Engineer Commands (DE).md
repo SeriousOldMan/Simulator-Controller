@@ -81,7 +81,7 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[(KannstDu) (Mir) die Uhrzeit sagen, Wie viel Uhr ist es, Sag {mir bitte, mir} die Uhrzeit]
 
-	[(GibMir) {die Reifendrücke, die Reifen Drücke, die aktuellen Reifendrücke, die aktuellen Reifen Drücke, die Drücke in den Reifen}, (KannstDu) (Mir) die {Reifendrücke, Reifen Drücke} {durchgeben, durchgeben bitte, bitte durchgeben}]
+	[(GibMir) {die, die kalten} {Reifendrücke, Reifen Drücke, aktuellen Reifendrücke, aktuellen Reifen Drücke, Drücke in den Reifen, Drücke in den kalten Reifen}, (KannstDu) (Mir) {die, die kalten} {Reifendrücke, Reifen Drücke} {durchgeben, durchgeben bitte, bitte durchgeben}]
 
 	[(GibMir) die {Reifentemperaturen, Reifen Temperaturen, Temperaturen der Reifen im Moment}, (KannstDu) (Mir) die {Reifentemperaturen, Reifen Temperaturen, Temperaturen der Reifen im Moment} {durchgeben, durchgeben bitte, bitte durchgeben}]
 
@@ -107,9 +107,9 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[(KoennenWir) Regen Reifen {verwenden, aufziehen}, (KannstDu) Trocken Reifen {verwenden, aufziehen}, (KannstDu) Intermediate Reifen {verwenden, aufziehen}]
 
-	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) {Punkt, Komma} (Digit) erhöhen, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) {Punkt, Komma} (Digit) mehr {Druck, Druck bitte}]
-
-	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts} um (Digit) {Punkt, Komma} (Digit) absenken, {Vorne links, Vorne rechts, Hinten links, Hinten rechts} (Digit) {Punkt, Komma} (Digit) weniger {Druck, Druck bitte}]
+	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts, überall} um (Digit) {Punkt, Komma} (Digit) erhöhen, {Vorne links, Vorne rechts, Hinten links, Hinten rechts, Überall} (Digit) {Punkt, Komma} (Digit) mehr {Druck, Druck bitte}]
+	
+	[(KoennenWir) den Druck {vorne links, vorne rechts, hinten links, hinten rechts, überall} um (Digit) {Punkt, Komma} (Digit) absenken, {Vorne links, Vorne rechts, Hinten links, Hinten rechts, Überall} (Digit) {Punkt, Komma} (Digit) weniger {Druck, Druck bitte}]
 
 	[(KoennenWir) den {Luftdruck, Druck} unverändert {lassen, lassen bitte}, (KoennenWir) den {Luftdruck, Druck} so lassen wie er {ist, ist bitte}, (KoennenWir) die {Luftdrücke, Drücke} so lassen wie sie {sind, sind bitte}, (KannstDu) die {Luftdrücke, Drücke} nicht {ändern, ändern bitte}]
 

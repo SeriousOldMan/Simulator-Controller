@@ -476,7 +476,8 @@ class ControllerStepWizard extends StepWizard {
 		LV_ModifyCol(1, "AutoHdr")
 		LV_ModifyCol(2, "AutoHdr")
 		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr Integer Center")
+		LV_ModifyCol(4, "AutoHdr Integer")
+		LV_ModifyCol(4, "Center")
 		LV_ModifyCol(5, "AutoHdr")
 		LV_ModifyCol(6, "AutoHdr")
 	}

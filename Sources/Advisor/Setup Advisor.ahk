@@ -1223,10 +1223,14 @@ class SetupAdvisor extends ConfigurationItem {
 
 				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
 
-				if (track == true)
-					GuiControl Choose, trackDropDown, 1
-				else
-					GuiControl Choose, trackDropDown, % inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track)
+				if (track != true) {
+					track := inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track)
+
+					if !track
+						track := 1
+				}
+
+				GuiControl Choose, trackDropDown, %track%
 			}
 			finally {
 				Gui %window%:-Disabled

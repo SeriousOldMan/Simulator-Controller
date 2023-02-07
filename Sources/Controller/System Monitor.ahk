@@ -679,7 +679,7 @@ moveSystemMonitor() {
 }
 
 openSystemMonitorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities
 }
 
 noSelect() {

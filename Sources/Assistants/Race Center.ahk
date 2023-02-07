@@ -60,7 +60,7 @@ global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strateg
 
 global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
-											, "Position.Start", "Position.End", "Time.Start", "Driver.ID", "Penalties"]
+											, "Position.Start", "Position.End", "Time.Start", "Driver.ID", "Penalties", "Time.End"]
 							 , "Driver.Data": ["Forname", "Surname", "Nickname", "Nr", "ID"]
 							 , "Lap.Data": ["Stint", "Nr", "Lap", "Lap.Time", "Position", "Grip", "Map", "TC", "ABS"
 										  , "Weather", "Temperature.Air", "Temperature.Track"
@@ -88,7 +88,7 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 										  , "Brake.Temperature.Front.Average", "Brake.Temperature.Rear.Average"
 										  , "Tyre.Pressure.Loss.Front.Left", "Tyre.Pressure.Loss.Front.Right"
 										  , "Tyre.Pressure.Loss.Rear.Left", "Tyre.Pressure.Loss.Rear.Right"
-										  , "Penalty"]
+										  , "Penalty", "Time.Stint.Remaining", "Time.Driver.Remaining"]
 							 , "Pitstop.Data": ["Lap", "Fuel", "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set"
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
@@ -4004,7 +4004,7 @@ class RaceCenter extends ConfigurationItem {
 				this.iTyrePressureMode := ((this.TyrePressureMode = "Relative") ? false : "Relative")
 
 				this.updateState()
-			case 13:
+			case 14:
 				this.iCorrectPressureLoss := !this.CorrectPressureLoss
 
 				this.updateState()
@@ -4878,9 +4878,9 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					if (!time || (time == ""))
-						newStint.Time := ((newStint.Nr == 1) ? (A_Now . "") : false)
+						newStint.StartTime := ((newStint.Nr == 1) ? (A_Now . "") : false)
 					else
-						newStint.Time := time
+						newStint.StartTime := time
 
 					try {
 						newStint.ID := this.Connector.GetStintValue(identifier, "ID")
@@ -5036,6 +5036,16 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			lap.Laptime := Round(getConfigurationValue(data, "Stint Data", "LapLastTime") / 1000, 1)
+
+			lap.RemainingDriverTime := getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", "-")
+
+			if (lap.RemainingDriverTime != "-")
+				lap.RemainingDriverTime := Round(lap.RemainingDriverTime / 1000)
+
+			lap.RemainingStintTime := getConfigurationValue(data, "Stint Data", "StintTimeRemaining", "-")
+
+			if (lap.RemainingStintTime != "-")
+				lap.RemainingStintTime := Round(lap.RemainingStintTime / 1000)
 
 			lap.Map := getConfigurationValue(data, "Car Data", "Map")
 			lap.TC := getConfigurationValue(data, "Car Data", "TC")
@@ -6769,6 +6779,22 @@ class RaceCenter extends ConfigurationItem {
 		return multiClass
 	}
 
+	computeDriverTime(driver) {
+		local duration := 0
+		local stint
+
+		if this.CurrentStint
+			loop % this.CurrentStint.Nr
+			{
+				stint := this.Stints[A_Index]
+
+				if (stint.Driver == driver)
+					duration += this.computeDuration(stint)
+			}
+
+		return duration
+	}
+
 	computeDuration(stint) {
 		local duration, duration, ignore, lap
 
@@ -6787,31 +6813,40 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	computeStartTime(stint) {
-		local time, lastStint, duration, ignore, lap
+	computeEndTime(stint, update := false) {
+		local time, duration
 
-		if stint.Time
-			return stint.Time
+		if stint.EndTime
+			return stint.EndTime
+		else {
+			time := this.computeStartTime(stint)
+			duration := this.computeDuration(stint)
+
+			EnvAdd time, %duration%, Seconds
+
+			if update
+				stint.EndTime := time
+
+			return time
+		}
+	}
+
+	computeStartTime(stint) {
+		local time
+
+		if stint.StartTime
+			return stint.StartTime
 		else {
 			if (stint.Nr = 1) {
-				stint.Time := (A_Now . "")
+				stint.StartTime := (A_Now . "")
 
-				time := stint.Time
+				time := stint.StartTime
 			}
-			else {
-				lastStint := this.Stints[stint.Nr - 1]
-				duration := 0
-
-				for ignore, lap in lastStint.Laps
-					duration += lap.LapTime
-
-				time := this.computeStartTime(lastStint)
-
-				EnvAdd time, %duration%, Seconds
-			}
+			else
+				time := this.computeEndTime(this.Stints[stint.Nr - 1], true)
 
 			if (stint != this.CurrentStint)
-				stint.Time := time
+				stint.StartTime := time
 
 			return time
 		}
@@ -7195,7 +7230,8 @@ class RaceCenter extends ConfigurationItem {
 					 , FuelRemaining: lap["Fuel.Remaining"], FuelConsumption: lap["Fuel.Consumption"]
 					 , Damage: lap.Damage, EngineDamage: lap.EngineDamage
 					 , Accident: lap.Accident, Penalty: ((lap.Penalty != kNull) ? lap.Penalty : false)
-					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])}
+					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compoiund.Color"])
+					 , RemainingDriverTime: lap["Time.Driver.Remaining"], RemainingStintTime: lap["Time.Stint.Remaining"]}
 
 			if (isNull(newLap.Map))
 				newLap.Map := "n/a"
@@ -7227,6 +7263,12 @@ class RaceCenter extends ConfigurationItem {
 			if (isNull(newLap.TrackTemperature))
 				newLap.TrackTemperature := "-"
 
+			if (isNull(newLap.RemainingDriverTime))
+				newLap.RemainingDriverTime := "-"
+
+			if (isNull(newLap.RemainingStintTime))
+				newLap.RemainingStintTime := "-"
+
 			this.Laps[newLap.Nr] := newLap
 			this.iLastLap := newLap
 		}
@@ -7247,10 +7289,13 @@ class RaceCenter extends ConfigurationItem {
 					   , FuelConsumption: stint["Fuel.Consumption"]
 					   , Accidents: stint.Accidents, Penalties: stint.Penalties
 					   , StartPosition: stint["Position.Start"], EndPosition: stint["Position.End"]
-					   , Time: stint["Time.Start"]}
+					   , StartTime: stint["Time.Start"], EndTime: stint["Time.End"]}
 
-			if (isNull(newStint.Time))
-				newStint.Time := false
+			if (isNull(newStint.StartTime))
+				newStint.StartTime := false
+
+			if (isNull(newStint.EndTime))
+				newStint.EndTime := false
 
 			driver.Stints.Push(newStint)
 			laps := []
@@ -8694,7 +8739,8 @@ class RaceCenter extends ConfigurationItem {
 						  , "Fuel.Consumption": null(lap.FuelConsumption), "Fuel.Remaining": null(lap.FuelRemaining)
 						  , Weather: lap.Weather, "Temperature.Air": null(lap.AirTemperature), "Temperature.Track": null(lap.TrackTemperature)
 						  , Grip: lap.Grip, Map: null(lap.Map), TC: null(lap.TC), ABS: null(lap.ABS)
-						  , "Tyre.Compound": compound(lap.Compound), "Tyre.Compound.Color": compoundColor(lap.Compound)}
+						  , "Tyre.Compound": compound(lap.Compound), "Tyre.Compound.Color": compoundColor(lap.Compound)
+						  , "Time.Stint.Remaining": lap.RemainingStintTime, "Time.Driver.Remaining": lap.RemainingDriverTime}
 
 				pressures := pressuresTable[newLap]
 				tyres := tyresTable[newLap]
@@ -8990,7 +9036,7 @@ class RaceCenter extends ConfigurationItem {
 									, "Weather": stint.Weather, "Compound": stint.Compound, "Lap.Time.Average": null(stint.AvgLaptime), "Lap.Time.Best": null(stint.BestLapTime)
 									, "Fuel.Consumption": null(stint.FuelConsumption), Accidents: stint.Accidents, Penalties: stint.Penalties
 									, "Position.Start": null(stint.StartPosition), "Position.End": null(stint.EndPosition)
-									, "Time.Start": stint.Time, "Driver.ID": stint.ID}
+									, "Time.Start": stint.StartTime, "Time.End": stint.EndTime, "Driver.ID": stint.ID}
 
 						sessionStore.add("Stint.Data", stintData)
 					}
@@ -9081,14 +9127,28 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createStintHeader(stint) {
+		local startTime := this.computeStartTime(stint)
+		local endTime := this.computeEndTime(stint)
 		local duration := 0
 		local ignore, lap, html
 
 		for ignore, lap in stint.Laps
 			duration += lap.Laptime
 
+		if startTime
+			FormatTime startTime, %startTime%, Time
+		else
+			startTime := "-"
+
+		if endTime
+			FormatTime endTime, %endTime%, Time
+		else
+			endTime := "-"
+
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Driver:") . "</b></div></td><td>" . StrReplace(stint.Driver.FullName, "'", "\'") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Start:") . "</b></div></td><td>" . startTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("End:") . "</b></div></td><td>" . endTime . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Duration:") . "</b></div></td><td>" . Round(duration / 60) . A_Space . translate("Minutes") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Start Position:") . "</b></div></td><td>" . stint.StartPosition . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("End Position:") . "</b></div></td><td>" . stint.EndPosition . "</td></tr>")
@@ -9359,7 +9419,7 @@ class RaceCenter extends ConfigurationItem {
 		local pressuresDB := this.PressuresDatabase
 		local pressuresTable, pressures, coldPressures, hotPressures, pressuresLosses, tyresTable, tyres
 		local stintNr, fuel, tyreCompound, tyreCompoundColor, tyreSet, tyrePressures, pressureCorrections, pressure
-		local fuelConsumption, remainingFuel
+		local fuelConsumption, remainingFuel, remainingDriverTime, remainingStintTime
 
 		if pressuresDB {
 			pressuresTable := pressuresDB.Database.Tables["Tyres.Pressures"]
@@ -9480,6 +9540,20 @@ class RaceCenter extends ConfigurationItem {
 
 		if (pressuresLosses != "-, -, -, -")
 			html .= ("<tr><td><b>" . translate("Pressures (loss):") . "</b></td><td>" . pressuresLosses . "</td></tr>")
+
+		html .= ("<tr><td></td><td></td></tr>")
+
+		remainingStintTime := lap.RemainingStintTime
+		remainingDriverTime := lap.RemainingDriverTime
+
+		if (remainingStintTime != "-")
+			remainingStintTime := (Round(remainingStintTime / 60) . A_Space . translate("Minutes"))
+
+		if (remainingDriverTime != "-")
+			remainingDriverTime := (Round(remainingDriverTime / 60) . A_Space . translate("Minutes"))
+
+		html .= ("<tr><td><b>" . translate("Remaining Stint Time:") . "</b></td><td>" . remainingStintTime . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Remaining Driver Time:") . "</b></td><td>" . remainingDriverTime . "</td></tr>")
 
 		html .= "</table>"
 
@@ -10090,21 +10164,19 @@ class RaceCenter extends ConfigurationItem {
 		local avgFuelConsumptionsData := []
 		local accidentsData := []
 		local penaltiesData := []
-		local ignore, driver, drivingTime, lapAccidents, lapPenalties, lapTimes, fuelConsumptions, ignore, lap, html
+		local ignore, driver, lapAccidents, lapPenalties, lapTimes, fuelConsumptions, ignore, lap, html
 
 		for ignore, driver in drivers {
 			driverData.Push("<th class=""th-std"">" . StrReplace(driver.FullName, "'", "\'") . "</th>")
 			stintsData.Push("<td class=""td-std"">" . driver.Stints.Length() . "</td>")
 			lapsData.Push("<td class=""td-std"">" . driver.Laps.Length() . "</td>")
 
-			drivingTime := 0
 			lapAccidents := 0
 			lapPenalties := 0
 			lapTimes := []
 			fuelConsumptions := []
 
 			for ignore, lap in driver.Laps {
-				drivingTime += lap.Laptime
 				lapTimes.Push(lap.Laptime)
 				fuelConsumptions.Push(lap.FuelConsumption)
 
@@ -10115,7 +10187,7 @@ class RaceCenter extends ConfigurationItem {
 					lapPenalties += 1
 			}
 
-			drivingTimesData.Push("<td class=""td-std"">" . Round(drivingTime / 60) . "</td>")
+			drivingTimesData.Push("<td class=""td-std"">" . Round(this.computeDriverTime(driver) / 60) . "</td>")
 			avgLapTimesData.Push("<td class=""td-std"">" . lapTimeDisplayValue(Round(average(lapTimes), 1)) . "</td>")
 			avgFuelConsumptionsData.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", average(fuelConsumptions))) . "</td>")
 			accidentsData.Push("<td class=""td-std"">" . lapAccidents . "</td>")

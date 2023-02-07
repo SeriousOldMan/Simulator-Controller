@@ -935,6 +935,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		local session := this.Session
+		local finalizeAssistant := shutdownAssistant
 		local ignore, assistant
 
 		RaceAssistantPlugin.initializeAssistantsState()
@@ -947,12 +948,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					break
 				}
 
-		if (shutdownAssistant && GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P"))
-			shutdownAssistant := false
+		if (finalizeAssistant && GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P"))
+			finalizeAssistant := false
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.RaceAssistantEnabled && assistant.RaceAssistant)
-				assistant.finishSession(shutdownAssistant)
+				assistant.finishSession(finalizeAssistant, shutdownAssistant)
 
 		if (shutdownTeamSession && RaceAssistantPlugin.TeamSessionActive) {
 			RaceAssistantPlugin.TeamServer.leaveSession()
@@ -1204,7 +1205,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.iRaceAssistantEnabled := false
 
 			if this.RaceAssistant
-				this.finishSession()
+				this.finishSession(!(GetKeyState("Shift", "P") && GetKeyState("Ctrl", "P")))
 
 			this.updateTrayLabel(label, false)
 
@@ -1371,7 +1372,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				deleteFile(A_LoopFilePath)
 
 			if this.RaceAssistant
-				this.finishSession(false)
+				this.finishSession(false, false)
 			else
 				this.requireRaceAssistant()
 
@@ -1392,13 +1393,13 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	joinSession(settings, data) {
 	}
 
-	finishSession(shutdownAssistant := true) {
+	finishSession(finalize := true, shutdown := true) {
 		if this.RaceAssistant {
-			this.RaceAssistant.finishSession(shutdownAssistant)
+			this.RaceAssistant.finishSession(finalize)
 
 			 this.RaceAssistantActive := false
 
-			if shutdownAssistant
+			if shutdown
 				this.shutdownRaceAssistant()
 		}
 	}

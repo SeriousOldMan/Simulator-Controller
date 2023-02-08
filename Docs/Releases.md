@@ -10,6 +10,9 @@
   10. Setting for pressure loss correction in pitstop initialization in "Race Center".
   11. Remaining stint and remaining driver time will be shown in the lap report in "Race Center".
   12. Holding down the Shift and Control key while ending a session now prevents the Assistants to run their post-session actions.
+  13. New car models for "Setup Advisor":
+      - Assetto Corsa:
+        - Mercedes-Benz C9
 
 ## 4.5.8.0-release 02/03/23
   1. Minor bugfixes, as always

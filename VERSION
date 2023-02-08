@@ -3,7 +3,7 @@ Version=4.5.9.0-dev
 Target=4.5.8.0-release
 Date=02/08/2023
 Download=
-Changes=New voice command for Race Engineer to ask about cold or setup trye pressures, New voice command for Race Engineer to increase/decrease the cold pressures for all tyres at once for the next pitstop, New information request controller actions "TyrePressuresCold" and "TyrePressuresSetup", New icons in the Stream Deck icon set for request cold or setup tyre pressure information, Setting for pressure loss correction in "Race Center", Remaining stint and remaining driver time is available in the lap report in "Race Center", Special keys to prevent the Assistants to shutdown normally at the end of a session
+Changes=New voice command for Race Engineer to ask about cold or setup trye pressures, New voice command for Race Engineer to increase/decrease the cold pressures for all tyres at once for the next pitstop, New information request controller actions "TyrePressuresCold" and "TyrePressuresSetup", New icons in the Stream Deck icon set for request cold or setup tyre pressure information, Setting for pressure loss correction in "Race Center", Remaining stint and remaining driver time is available in the lap report in "Race Center", Special keys to prevent the Assistants to shutdown normally at the end of a session, New car models for "Setup Advisor"
 [Release]
 Version=4.5.8.0-release
 Date=02/03/2023

@@ -2881,14 +2881,6 @@ class RaceStrategist extends GridRaceAssistant {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-parseList(list) {
-	local compiler := new RuleCompiler()
-	local nextCharIndex := 1
-	local term := compiler.readList(list, nextCharIndex)
-
-	return compiler.createTermParser(term).parse(term).toObject()
-}
-
 getTime() {
 	return A_Now
 }

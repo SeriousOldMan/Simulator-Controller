@@ -17,6 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\Task.ahk
+#Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
 #Include ..\Assistants\Libraries\SessionDatabase.ahk
 
@@ -311,7 +312,8 @@ class RaceEngineer extends RaceAssistant {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local forCold := false
-		local unit, lap, ignore, suffix, value
+		local forSetup := false
+		local unit, lap, index, suffix, value, setupPressures, ignore, tyreType, goal, resultSet, compound
 
 		if !this.hasEnoughData()
 			return
@@ -321,6 +323,7 @@ class RaceEngineer extends RaceAssistant {
 		else if inList(words, fragments["Pressures"]) {
 			unit := "Pressure"
 
+			forSetup := inList(words, fragments["Setup"])
 			forCold := inList(words, fragments["Cold"])
 		}
 		else {
@@ -335,13 +338,27 @@ class RaceEngineer extends RaceAssistant {
 			lap := knowledgeBase.getValue("Lap")
 
 			if (unit == "Pressure")
-				speaker.speakPhrase("Pressures", {cold: forCold ? fragments["Cold"] : ""})
+				speaker.speakPhrase("Pressures", {type: forSetup ? fragments["Setup"] : (forCold ? fragments["Cold"] : "")})
 			else
 				speaker.speakPhrase("Temperatures")
 
-			for ignore, suffix in ["FL", "FR", "RL", "RR"] {
+			if forSetup {
+				compound := knowledgeBase.getValue("Tyre.Compound", "Dry")
+				setupPressures := []
+
+				for ignore, tyreType in ["FL", "FR", "RL", "RR"] {
+					goal := new RuleCompiler().compileGoal("lastPressure(" . compound . ", " . tyreType . ", ?pressure)")
+					resultSet := knowledgeBase.prove(goal)
+
+					setupPressures.Push(resultSet ? resultSet.getValue(goal.Arguments[3]).toString() : 0)
+				}
+			}
+
+			for index, suffix in ["FL", "FR", "RL", "RR"] {
 				if (unit = "Pressure") {
-					if forCold
+					if forSetup
+						value := speaker.number2Speech(convertUnit("Pressure", setupPressures[index]))
+					else if forCold
 						value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Tyre.Pressure.Target." . suffix)))
 					else
 						value := speaker.number2Speech(convertUnit("Pressure", knowledgeBase.getValue("Lap." . lap . ".Tyre.Pressure." . suffix)))
@@ -496,7 +513,7 @@ class RaceEngineer extends RaceAssistant {
 		local fragments := speaker.Fragments
 		local convert := false
 		local volumePosition := false
-		local fuel
+		local fuel, ignore, word
 
 		if !this.hasPlannedPitstop() {
 			speaker.beginTalk()

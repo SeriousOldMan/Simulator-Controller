@@ -1666,6 +1666,14 @@ class GridRaceAssistant extends RaceAssistant {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+parseList(list) {
+	local compiler := new RuleCompiler()
+	local nextCharIndex := 1
+	local term := compiler.readList(list, nextCharIndex)
+
+	return compiler.createTermParser(term).parse(term).toObject()
+}
+
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
 	local value := getConfigurationValue(data, newSection, key, kUndefined)
 

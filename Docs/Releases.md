@@ -1,3 +1,16 @@
+## 4.5.9.0-release 02/10/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. You can now ask the Race Engineer about the cold trye pressures, which will result in ideal tyre pressures for the current conditions.
+  4. You can also ask the Race Engineer for the cold tyre pressures that had been used to setup the current tyres.
+  5. New information request controller action "TyrePressuresCold", which is equivalent to using the first above voice command.
+  6. New information request controller action "TyrePressuresSetup", which is equivalent to using the second above voice command.
+  7. New icons in the Stream Deck icon set for request the cold or setup tyre pressure information.
+  9. New voice command for Race Engineer to increase/decrease the cold pressures for all tyres at once for the next pitstop.
+  10. Setting for pressure loss correction in pitstop initialization in "Race Center".
+  11. Remaining stint and remaining driver time will be shown in the lap report in "Race Center".
+  12. Holding down the Shift and Control key while ending a session now prevents the Assistants to run their post-session actions.
+
 ## 4.5.8.0-release 02/03/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

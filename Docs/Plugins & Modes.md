@@ -269,8 +269,10 @@ Please see the following table for available information commands.
 | LapsRemaining | Jona will give you the number of laps still to drive. The number of remaining laps is determined by the remaining stint, session or driver time, but of course is also limited by the remaining fuel. |
 | FuelRemaining | Jona will give you the amount of remaining fuel in the tank. |
 | Weather | You will get information about the current and upcoming weather. |
-| TyrePressures | Cato will tell you the current pressures in your tyres in PSI. |
-| TyreTemperatures | This command will give you the current temperatures in the core of your tyres in Degrees Celsius. |
+| TyrePressures | Jona will tell you the current pressures in your tyres. |
+| TyrePressuresCold | Jona will tell you the current cold target pressures for the next pitstop of your tyres. |
+| TyrePressuresSetup | Jona will tell you the last cold setup pressures of your tyres. |
+| TyreTemperatures | This command will give you the current temperatures in the core of your tyres. |
 | TyreWear | This command will give you the current tyre wear in percentage of total wear for the inidividual tyres. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
 | BrakeTemperatures | This command will give you the current temperatures for the individual brakes in Degrees Celsius. |
 | BrakeWear | This command will give you the current tyre wear in percentage of total wear for the brakes. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |

@@ -81,7 +81,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 	[(TellMe) the time, What time is it, What is the {current time, time}]
 
-	[(WhatAre) {the, the cold, the current} {tire pressures, pressures}, (TellMe) {the, the cold, the current} {tire pressures, pressures}]
+	[(WhatAre) {the, the cold, the current, the setup} {tire pressures, pressures}, (TellMe) {the, the cold, the current, the setup} {tire pressures, pressures}]
 
 	[(WhatAre) {the tire temperatures, the current tire temperatures, the temperatures at the moment}, (TellMe) {the tire temperatures, the current tire temperatures, the temperatures at the moment}]
 

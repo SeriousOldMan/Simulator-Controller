@@ -7,7 +7,7 @@
   6. New information request controller action "TyrePressuresSetup" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), which is equivalent to using the second above voice command.
   7. New icons in the Stream Deck icon set for request the cold or setup tyre pressure information.
   9. New [voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) for Race Engineer to increase/decrease the cold pressures for all tyres at once for the next pitstop.
-  10. Setting for pressure loss correction in pitstop initialization in "Race Center".
+  10. New setting to decide whether pressure loss corrections should be included in pitstop initialization in "Race Center".
   11. Remaining stint and remaining driver time will be shown in the lap report in "Race Center".
   12. Holding down the Shift and Control key while ending a session now prevents the Assistants to run their post-session actions.
   13. New car models for "Setup Advisor":

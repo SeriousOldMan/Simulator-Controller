@@ -395,8 +395,14 @@ class SimulatorPlugin extends ControllerPlugin {
 					label := this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), kUndefined)
 
 					if (label == kUndefined) {
-						label := this.getLabel(ConfigurationItem.descriptor(action, "Dial"), action)
-						icon := this.getIcon(ConfigurationItem.descriptor(action, "Dial"))
+						label := this.getLabel(ConfigurationItem.descriptor(action, "Dial"), kUndefined)
+
+						if (label == kUndefined) {
+							label := this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action)
+							icon := this.getIcon(ConfigurationItem.descriptor(action, "Activate"))
+						}
+						else
+							icon := this.getIcon(ConfigurationItem.descriptor(action, "Dial"))
 					}
 					else
 						icon := this.getIcon(ConfigurationItem.descriptor(action, "Toggle"))

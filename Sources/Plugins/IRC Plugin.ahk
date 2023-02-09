@@ -54,7 +54,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreChange: "Change Tyres", TyreAllAround: "All Around"
+		allActions := {NoRefuel: "No Refuel", Refuel: "Refuel", TyreChange: "Change Tyres", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , RepairRequest: "Repair"}
 		selectActions := []
@@ -171,12 +171,19 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	changePitstopOption(option, action, steps := 1) {
 		switch option {
 			case "Refuel":
-				if (steps == 1)
+				if ((steps == 1) && (getUnit("Volume") = "Liter"))
 					steps := 4
 
 				this.openPitstopMFD("Fuel")
 
 				this.sendPitstopCommand("Pitstop", "Change", "Refuel", (action = kIncrease) ? Round(steps) : Round(steps * -1))
+			case "No Refuel":
+				if ((steps == 1) && (getUnit("Volume") = "Liter"))
+					steps := 4
+
+				this.openPitstopMFD("Fuel")
+
+				this.sendPitstopCommand("Pitstop", "Change", "Refuel", -250)
 			case "Change Tyres":
 				this.openPitstopMFD("Tyre")
 
@@ -210,7 +217,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 										  , getConfigurationValue(data, "Session Data", "Track", "Unknown")
 										  , getConfigurationValue(data, "Session Data", "TrackShortName", "Unknown")
 										  , getConfigurationValue(data, "Session Data", "TrackLongName", "Unknown"))
-	
+
 		base.prepareSession(settings, data)
 	}
 

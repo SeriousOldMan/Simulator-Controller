@@ -82,7 +82,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreCompound: "Tyre Compound", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+		allActions := {NoRefuel: "NoRefuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
 		selectActions := []
 	}
 
@@ -123,7 +123,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (option = "Tyre Compound")
 				this.sendCommand(this.PreviousOptionHotkey)
-			else if (option = "Refuel") {
+			else if ((option = "Refuel") || (option = "No Refuel")) {
 				this.sendCommand(this.PreviousOptionHotkey)
 				this.sendCommand(this.PreviousOptionHotkey)
 			}
@@ -158,7 +158,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 				return true
 			}
-			else if (option = "Refuel") {
+			else if ((option = "Refuel") || (option = "No Refuel")) {
 				this.sendCommand(this.NextOptionHotkey)
 				this.sendCommand(this.NextOptionHotkey)
 
@@ -203,6 +203,11 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (option = "Refuel") {
 				this.dialPitstopOption("Refuel", action, steps)
+
+				this.closePitstopMFD("Refuel")
+			}
+			else if (option = "No Refuel") {
+				this.dialPitstopOption("Refuel", "Decrease", 250)
 
 				this.closePitstopMFD("Refuel")
 			}
@@ -261,7 +266,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.requirePitstopMFD()
 
 			if this.selectPitstopOption("Refuel") {
-				this.dialPitstopOption("Refuel", "Decrease", 200)
+				this.dialPitstopOption("Refuel", "Decrease", 250)
 				this.dialPitstopOption("Refuel", "Increase", Round(liters))
 
 				this.closePitstopMFD("Refuel")

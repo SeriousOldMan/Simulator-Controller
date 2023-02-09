@@ -108,7 +108,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", Refuel: "Refuel", TyreChange: "Change Tyres", TyreCompound: "Tyre Compound"
+		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel", TyreChange: "Change Tyres", TyreCompound: "Tyre Compound"
 					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
 		selectActions := []
 	}
@@ -417,6 +417,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				this.dialPitstopOption(option, action, steps)
 			else if (option = "Refuel")
 				this.changeFuelAmount(action, steps, false, false)
+			else if (option = "No Refuel")
+				this.changeFuelAmount("Decrease", 250, false, false)
 			else if (option = "Change Tyres") {
 				this.toggleActivity("Change Front Tyres", false, true)
 				this.toggleActivity("Change Rear Tyres", false, true)
@@ -545,7 +547,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				if this.optionChosen("Refuel")
 					this.sendCommand(this.AcceptChoiceHotkey)
 
-				this.changeFuelAmount("Decrease", 120, false, true, false)
+				this.changeFuelAmount("Decrease", 200, false, true, false)
 
 				this.changeFuelAmount("Increase", liters + 3, false, false, false)
 

@@ -196,7 +196,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", Refuel: "Refuel"
+		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel"
 					 , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
@@ -933,7 +933,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		try {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				if inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
+				if inList(["No Refuel", "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
 					this.toggleActivity(option)
 				else
 					switch option {
@@ -967,6 +967,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		try {
 			if this.requirePitstopMFD()
 				switch activity {
+					case "No Refuel":
+						this.changeFuelAmount("Decrease", 250)
 					case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
 						if this.selectPitstopOption(activity)
 							this.changePitstopOption(activity, "Increase")
@@ -990,7 +992,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if newValues
 						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", newValues*)
 				default:
-					base.notifyPitstopChanged(option)
+					base.notifyPitstopChanged((option = "No Refuel") ? "Refuel" : option)
 			}
 	}
 

@@ -82,7 +82,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", Refuel: "Refuel", TyreCompound: "Tyre Compound"
+		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel", TyreCompound: "Tyre Compound"
 					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"
 					 , DriverSwap: "Swap Driver"}
 		selectActions := []
@@ -142,7 +142,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				steps := 6
 			else if (option = "Tyre Compound")
 				steps := 5
-			else if (option = "Refuel")
+			else if ((option = "Refuel") || (option = "No Refuel"))
 				steps := 4
 			else if ((option = "Repair All") || (option = "Repair Bodywork") || (option = "Repair Suspension"))
 				steps := 3
@@ -174,7 +174,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				steps := 6
 			else if (option = "Tyre Compound")
 				steps := 5
-			else if (option = "Refuel")
+			else if ((option = "Refuel") || (option = "No Refuel"))
 				steps := 4
 			else if ((option = "Repair All") || (option = "Repair Bodywork") || (option = "Repair Suspension"))
 				steps := 3
@@ -210,6 +210,11 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.dialPitstopOption(option, action, steps)
 
 				this.deselectPitstopOption(option)
+			}
+			else if (option = "No Refuel") {
+				this.dialPitstopOption("Refuel", "Decrease", 250)
+
+				this.deselectPitstopOption("Refuel")
 			}
 			else if (option = "Tyre Compound") {
 				this.iTyreCompoundChosen += 1
@@ -266,7 +271,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 			this.requirePitstopMFD()
 
 			if this.selectPitstopOption("Refuel") {
-				this.dialPitstopOption("Refuel", "Decrease", 200)
+				this.dialPitstopOption("Refuel", "Decrease", 250)
 				this.dialPitstopOption("Refuel", "Increase", Round(liters))
 
 				this.deselectPitstopOption("Refuel")

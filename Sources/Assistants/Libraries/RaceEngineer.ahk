@@ -563,7 +563,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else {
 			for ignore, word in words
-				if InStr(word, fragments["Liter"]) {
+				if (InStr(word, fragments["Liter"]) || InStr(word, "litre")) {
 					volumePosition := A_Index
 
 					break
@@ -580,7 +580,7 @@ class RaceEngineer extends RaceAssistant {
 
 				if InStr(values2String(A_Space, words*), A_Space . fragments["UpTo"] . A_Space) {
 					lap := knowledgeBase.getValue("Lap")
-					remainingFuel := (knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0) - knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))
+					remainingFuel := (knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0) - knowledgeBase.getValue("Lap." . lap . ".Fuel.AvgConsumption", 0))
 
 					if convert
 						if (getUnit("Volume") = "Gallon (US)")
@@ -588,7 +588,7 @@ class RaceEngineer extends RaceAssistant {
 						else
 							remainingFuel := Floor(remainingFuel / 4.546092)
 
-					fuel := Max(0, fuel - remainingFuel)
+					fuel := Round(Max(0, fuel - remainingFuel))
 				}
 
 				if this.isNumber(fuel, fuel) {
@@ -1926,6 +1926,10 @@ class RaceEngineer extends RaceAssistant {
 					this.RemoteHandler.planDriverSwap(false)
 				else
 					this.RemoteHandler.planDriverSwap(lap)
+		}
+		else if (lap == false) {
+			if this.Speaker
+				this.getSpeaker().speakPhrase("NoDriverSwap")
 		}
 		else
 			this.planPitstop(lap, arguments*)

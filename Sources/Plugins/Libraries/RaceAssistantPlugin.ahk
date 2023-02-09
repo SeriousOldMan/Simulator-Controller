@@ -1038,7 +1038,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if !settingsDB
 			settingsDB := new SettingsDatabase()
 
-		setConfigurationValue(data, "Session Data", "Mode", (teamServer && teamServer.Active) ? "Team" : "Solo")
+		setConfigurationValue(data, "Session Data", "Mode", (teamServer && teamServer.SessionActive) ? "Team" : "Solo")
 
 		simulator := getConfigurationValue(data, "Session Data", "Simulator")
 		car := getConfigurationValue(data, "Session Data", "Car")

@@ -231,12 +231,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	planDriverSwap(lap := "__Undefined__") {
-		if this.RaceEngineer
+		if this.RaceEngineer {
 			if (lap = kUndefined)
 				this.RaceEngineer.planDriverSwap()
 			else {
 				this.RaceEngineer.planDriverSwap(false)
 			}
+		}
 	}
 
 	preparePitstop(lap := false) {

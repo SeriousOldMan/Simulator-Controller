@@ -100,6 +100,8 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 3.  Boxenstopp
 
 	[(KoennenWir) {den Boxenstopp planen, den Plan für den Boxenstopp erstellen}, (KannstDu) (Mir) den Boxenstopp Plan {durchsagen, durchsagen bitte}]
+	
+	[(KoennenWir) {den Fahrerwechsel planen, den Plan für den Fahrerwechsel erstellen}, (KannstDu) (Mir) den Fahrerwechsel Plan {durchsagen, durchsagen bitte}]
 
 	(KoennenWir) {den Boxenstopp vorbereiten, die Crew den Boxenstopp vorbereiten lassen, alles für den Boxenstopp vorbereiten}
 

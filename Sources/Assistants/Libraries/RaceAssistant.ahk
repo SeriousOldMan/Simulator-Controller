@@ -67,8 +67,9 @@ class RaceAssistant extends ConfigurationItem {
 
 	iSimulator := ""
 	iSession := kSessionFinished
-	iDriverForName := "John"
+	iTeamSession := false
 
+	iDriverForName := "John"
 	iDriverFullName := "John Doe (JD)"
 
 	iLearningLaps := 1
@@ -302,6 +303,12 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
+	TeamSession[] {
+		Get {
+			return this.iTeamSession
+		}
+	}
+
 	KnowledgeBase[] {
 		Get {
 			return this.iKnowledgeBase
@@ -504,6 +511,8 @@ class RaceAssistant extends ConfigurationItem {
 			this.iSession := values["Session"]
 
 			if (this.Session == kSessionFinished) {
+				this.iTeamSession := false
+
 				this.iSessionDuration := 0
 				this.iSessionLaps := 0
 
@@ -511,6 +520,9 @@ class RaceAssistant extends ConfigurationItem {
 				this.iInitialFuelAmount := 0
 			}
 		}
+
+		if values.HasKey("TeamSession")
+			this.iTeamSession := values["TeamSession"]
 	}
 
 	updateDynamicValues(values) {
@@ -935,7 +947,8 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 
-		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
+		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getConfigurationValue(data, "Session Data", "Mode", "Solo") = "Team")
+								, SessionTime: A_Now
 								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 	}
 
@@ -976,7 +989,7 @@ class RaceAssistant extends ConfigurationItem {
 			facts["Session.Format"] := sessionFormat
 		}
 
-		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps})
+		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getConfigurationValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
 
 	readSettings(ByRef settings) {
@@ -1040,7 +1053,8 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 
-		this.updateSessionValues({Simulator: simulatorName, Session: session, SessionTime: A_Now
+		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getConfigurationValue(data, "Session Data", "Mode", "Solo") = "Team")
+								, SessionTime: A_Now
 								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 
 		lapTime := getConfigurationValue(data, "Stint Data", "LapLastTime", 0)

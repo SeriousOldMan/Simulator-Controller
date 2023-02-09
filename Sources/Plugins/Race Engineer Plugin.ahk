@@ -42,6 +42,10 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			this.callRemote("callPlanPitstop", arguments*)
 		}
 
+		planDriverSwap(arguments*) {
+			this.callRemote("callPlanDriverSwap", arguments*)
+		}
+
 		preparePitstop(arguments*) {
 			this.callRemote("callPreparePitstop", arguments*)
 		}
@@ -55,6 +59,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		fireAction(function, trigger) {
 			if (this.Plugin.RaceEngineer && (this.Action = "PitstopPlan"))
 				this.Plugin.planPitstop()
+			if (this.Plugin.RaceEngineer && (this.Action = "DriverSwapPlan"))
+				this.Plugin.planDriverSwap()
 			else if (this.Plugin.RaceEngineer && (this.Action = "PitstopPrepare"))
 				this.Plugin.preparePitstop()
 			else
@@ -86,7 +92,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
 		local function, descriptor
 
-		if inList(["PitstopPlan", "PitstopPrepare"], action) {
+		if inList(["PitstopPlan", "DriverSwapPlan", "PitstopPrepare"], action) {
 			function := controller.findFunction(actionFunction)
 
 			if (function != false) {
@@ -222,6 +228,15 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	planPitstop() {
 		if this.RaceEngineer
 			this.RaceEngineer.planPitstop()
+	}
+
+	planDriverSwap(lap := "__Undefined__") {
+		if this.RaceEngineer
+			if (lap = kUndefined)
+				this.RaceEngineer.planDriverSwap()
+			else {
+				this.RaceEngineer.planDriverSwap(false)
+			}
 	}
 
 	preparePitstop(lap := false) {
@@ -438,6 +453,20 @@ planPitstop() {
 	try {
 		if SimulatorController.Instance.isActive(plugin)
 			plugin.planPitstop()
+	}
+	finally {
+		protectionOff()
+	}
+}
+
+planDriverSwap() {
+	local plugin := SimulatorController.Instance.findPlugin(kRaceEngineerPlugin)
+
+	protectionOn()
+
+	try {
+		if SimulatorController.Instance.isActive(plugin)
+			plugin.planDriverSwap()
 	}
 	finally {
 		protectionOff()

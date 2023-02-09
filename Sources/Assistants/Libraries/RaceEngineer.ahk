@@ -90,6 +90,10 @@ class RaceEngineer extends RaceAssistant {
 		updateTyresDatabase(arguments*) {
 			this.callRemote("updateTyresDatabase", arguments*)
 		}
+
+		planDriverSwap(arguments*) {
+			this.callRemote("planDriverSwap", arguments*)
+		}
 	}
 
 	AdjustLapTime[] {
@@ -187,6 +191,28 @@ class RaceEngineer extends RaceAssistant {
 						Sleep 500
 
 					this.planPitstopRecognized(words)
+				}
+			case "DriverSwapPlan":
+				this.clearContinuation()
+
+				if !this.supportsPitstop()
+					this.getSpeaker().speakPhrase("NoPitstop")
+				else if !this.TeamSession
+					this.getSpeaker().speakPhrase("NoDriverSwap")
+				else if this.hasPlannedPitstop() {
+					this.getSpeaker().speakPhrase("ConfirmRePlan")
+
+					this.setContinuation(ObjBindMethod(this, "driverSwapRecognized", words))
+				}
+				else {
+					this.getSpeaker().speakPhrase("Confirm")
+
+					Task.yield()
+
+					loop 10
+						Sleep 500
+
+					this.driverSwapRecognized(words)
 				}
 			case "PitstopPrepare":
 				this.clearContinuation()
@@ -303,7 +329,7 @@ class RaceEngineer extends RaceAssistant {
 			if (fuel == 0)
 				speaker.speakPhrase("Later")
 			else
-				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel)))})
+				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel))), unit: fragments[getUnit("Volume")]})
 		}
 	}
 
@@ -497,6 +523,10 @@ class RaceEngineer extends RaceAssistant {
 		this.planPitstop()
 	}
 
+	driverSwapRecognized(words) {
+		this.planDriverSwap()
+	}
+
 	preparePitstopRecognized(words) {
 		this.getSpeaker().speakPhrase("Confirm")
 
@@ -509,11 +539,13 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	pitstopAdjustFuelRecognized(words) {
+		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local convert := false
 		local volumePosition := false
-		local fuel, ignore, word
+		local fillUp := false
+		local fuel, ignore, word, lap, remainingFuel
 
 		if !this.hasPlannedPitstop() {
 			speaker.beginTalk()
@@ -545,6 +577,19 @@ class RaceEngineer extends RaceAssistant {
 
 			if volumePosition {
 				fuel := words[volumePosition - 1]
+
+				if InStr(values2String(A_Space, words*), A_Space . fragments["UpTo"] . A_Space) {
+					lap := knowledgeBase.getValue("Lap")
+					remainingFuel := (knowledgeBase.getValue("Lap." . lap . ".Fuel.Remaining", 0) - knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))
+
+					if convert
+						if (getUnit("Volume") = "Gallon (US)")
+							remainingFuel := Floor(remainingFuel / 3.785411)
+						else
+							remainingFuel := Floor(remainingFuel / 4.546092)
+
+					fuel := Max(0, fuel - remainingFuel)
+				}
 
 				if this.isNumber(fuel, fuel) {
 					speaker.speakPhrase("ConfirmFuelChange", {fuel: fuel, unit: fragments[convert ? "Gallon" : "Liter"]}, true)
@@ -1874,6 +1919,18 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 
+	planDriverSwap(lap := "__Undefined__", arguments*) {
+		if (arguments.Length() == 0) {
+			if this.RemoteHandler
+				if (lap = kUndefined)
+					this.RemoteHandler.planDriverSwap(false)
+				else
+					this.RemoteHandler.planDriverSwap(lap)
+		}
+		else
+			this.planPitstop(lap, arguments*)
+	}
+
 	preparePitstop(lap := false) {
 		local speaker, result
 
@@ -2041,6 +2098,41 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else
 			this.planPitstop(lap, arguments*)
+	}
+
+	callPlanDriverSwap(lap := "__Undefined__", arguments*) {
+		this.clearContinuation()
+
+		if !this.supportsPitstop()
+			this.getSpeaker().speakPhrase("NoPitstop")
+		else if (!this.TeamSession || (lap == false))
+			this.getSpeaker().speakPhrase("NoDriverSwap")
+		else if ((lap = kUndefined) && this.hasPlannedPitstop()) {
+			this.getSpeaker().speakPhrase("ConfirmRePlan")
+
+			this.setContinuation(ObjBindMethod(this, "invokePlanDriverSwap", false, lap, arguments*))
+		}
+		else
+			this.invokePlanDriverSwap(true, lap, arguments*)
+	}
+
+	invokePlanDriverSwap(confirm, lap := "__Undefined__", arguments*) {
+		this.clearContinuation()
+
+		if (lap == kUndefined) {
+			if confirm {
+				this.getSpeaker().speakPhrase("Confirm")
+
+				Task.yield()
+
+				loop 10
+					Sleep 500
+			}
+
+			this.planDriverSwap()
+		}
+		else
+			this.planDriverSwap(lap, arguments*)
 	}
 
 	callPreparePitstop(lap := false) {

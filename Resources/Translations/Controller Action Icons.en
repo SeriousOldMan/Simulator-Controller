@@ -121,6 +121,7 @@ Reject.Activate=
 PitstopRecommend.Activate=
 StrategyCancel.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 [ACC]
 Strategy.Dial=
@@ -199,6 +200,7 @@ Reject.Activate=
 PitstopRecommend.Activate=
 StrategyCancel.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 [IRC]
 NoRefuel.Activate=
@@ -253,6 +255,7 @@ Reject.Activate=
 PitstopRecommend.Activate=
 StrategyCancel.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 [RF2]
 NoRefuel.Activate=
@@ -310,6 +313,7 @@ Reject.Activate=
 PitstopRecommend.Activate=
 StrategyCancel.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 [R3E]
 Strategy.Dial=
@@ -358,6 +362,7 @@ Reject.Activate=
 PitstopRecommend.Activate=
 StrategyCancel.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 [AMS2]
 Strategy.Dial=
@@ -406,6 +411,7 @@ Reject.Activate=
 PitstopRecommend.Activate=
 StrategyCancel.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 [PCARS2]
 NoRefuel.Activate=
@@ -448,6 +454,7 @@ Reject.Activate=
 PitstopRecommend.Activate=
 StrategyCancel.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 [Race Engineer]
 Call.Activate=
@@ -456,6 +463,7 @@ Reject.Activate=
 Mute.Activate=
 Unmute.Activate=
 PitstopPlan.Activate=
+DriverSwapPlan.Activate=
 PitstopPrepare.Activate=
 RaceAssistant.Toggle=
 TeamServer.Toggle=

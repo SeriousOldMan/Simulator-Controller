@@ -196,13 +196,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", Refuel: "Refuel"
+		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel"
 					 , TyreChange: "Change Tyres", TyreSet: "Tyre Set", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
 					 , DriverSelect: "Driver"
 					 , SuspensionRepair: "Repair Suspension", BodyworkRepair: "Repair Bodywork"}
-		selectActions := ["TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
+		selectActions := ["NoRefuel", "TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
 
 	startupUDPClient(force := false) {
@@ -834,64 +834,68 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	selectPitstopOption(option, retry := true) {
 		local delta, targetSelectedOption
 
-		protectionOn(true, true)
+		if (option = "No Refuel")
+			return this.selectPitstopOption("Refuel", retry)
+		else {
+			protectionOn(true, true)
 
-		try {
-			if (this.OpenPitstopMFDHotkey != "Off") {
-				targetSelectedOption := inList(this.iPSOptions, option)
+			try {
+				if (this.OpenPitstopMFDHotkey != "Off") {
+					targetSelectedOption := inList(this.iPSOptions, option)
 
-				if targetSelectedOption {
-					delta := 0
+					if targetSelectedOption {
+						delta := 0
 
-					if (targetSelectedOption > this.iPSTyreOptionPosition) {
-						if (targetSelectedOption <= (this.iPSTyreOptionPosition + this.iPSTyreOptions)) {
-							if !this.iPSChangeTyres {
-								this.toggleActivity("Change Tyres")
+						if (targetSelectedOption > this.iPSTyreOptionPosition) {
+							if (targetSelectedOption <= (this.iPSTyreOptionPosition + this.iPSTyreOptions)) {
+								if !this.iPSChangeTyres {
+									this.toggleActivity("Change Tyres")
 
-								return (retry && this.selectPitstopOption(option, false))
+									return (retry && this.selectPitstopOption(option, false))
+								}
 							}
+							else
+								if !this.iPSChangeTyres
+									delta -= this.iPSTyreOptions
 						}
-						else
-							if !this.iPSChangeTyres
-								delta -= this.iPSTyreOptions
-					}
 
-					if (targetSelectedOption > this.iPSBrakeOptionPosition) {
-						if (targetSelectedOption <= (this.iPSBrakeOptionPosition + this.iPSBrakeOptions)) {
-							if !this.iPSChangeBrakes {
-								this.toggleActivity("Change Brakes")
+						if (targetSelectedOption > this.iPSBrakeOptionPosition) {
+							if (targetSelectedOption <= (this.iPSBrakeOptionPosition + this.iPSBrakeOptions)) {
+								if !this.iPSChangeBrakes {
+									this.toggleActivity("Change Brakes")
 
-								return (retry && this.selectPitstopOption(option, false))
+									return (retry && this.selectPitstopOption(option, false))
+								}
 							}
+							else
+								if !this.iPSChangeBrakes
+									delta -= this.iPSBrakeOptions
 						}
+
+						targetSelectedOption += delta
+
+						this.activateWindow()
+
+						if (targetSelectedOption > this.iPSSelectedOption)
+							loop % targetSelectedOption - this.iPSSelectedOption
+								this.sendCommand("{Down}")
 						else
-							if !this.iPSChangeBrakes
-								delta -= this.iPSBrakeOptions
+							loop % this.iPSSelectedOption - targetSelectedOption
+								this.sendCommand("{Up}")
+
+						this.iPSSelectedOption := targetSelectedOption
+
+						return true
 					}
-
-					targetSelectedOption += delta
-
-					this.activateWindow()
-
-					if (targetSelectedOption > this.iPSSelectedOption)
-						loop % targetSelectedOption - this.iPSSelectedOption
-							this.sendCommand("{Down}")
 					else
-						loop % this.iPSSelectedOption - targetSelectedOption
-							this.sendCommand("{Up}")
-
-					this.iPSSelectedOption := targetSelectedOption
-
-					return true
+						return false
 				}
 				else
 					return false
 			}
-			else
-				return false
-		}
-		finally {
-			protectionOff(true, true)
+			finally {
+				protectionOff(true, true)
+			}
 		}
 	}
 
@@ -900,25 +904,29 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		try {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				switch direction {
-					case "Increase":
-						this.activateWindow()
+				if (option = "No Refuel")
+					this.changePitstopOption("Refuel", "Decrease", this.getPitstopOptionValues("Refuel")[1])
+				else {
+					switch direction {
+						case "Increase":
+							this.activateWindow()
 
-						loop %steps%
-							this.sendCommand("{Right}")
-					case "Decrease":
-						this.activateWindow()
+							loop %steps%
+								this.sendCommand("{Right}")
+						case "Decrease":
+							this.activateWindow()
 
-						loop %steps%
-							this.sendCommand("{Left}")
-					default:
-						throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
+							loop %steps%
+								this.sendCommand("{Left}")
+						default:
+							throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
+					}
+
+					if (option = "Repair Suspension")
+						this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+					else if (option = "Repair Bodywork")
+						this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
 				}
-
-				if (option = "Repair Suspension")
-					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
-				else if (option = "Repair Bodywork")
-					this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
 
 				this.resetPitstopState(inList(kPSMutatingOptions, option))
 			}
@@ -933,7 +941,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		try {
 			if (this.OpenPitstopMFDHotkey != "Off") {
-				if inList(["Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
+				if inList(["No Refuel", "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension"], option)
 					this.toggleActivity(option)
 				else
 					switch option {
@@ -967,6 +975,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		try {
 			if this.requirePitstopMFD()
 				switch activity {
+					case "No Refuel":
+						this.changeFuelAmount("Decrease", this.getPitstopOptionValues("Refuel")[1])
 					case "Change Tyres", "Change Brakes", "Repair Bodywork", "Repair Suspension":
 						if this.selectPitstopOption(activity)
 							this.changePitstopOption(activity, "Increase")
@@ -990,7 +1000,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if newValues
 						this.RaceEngineer.pitstopOptionChanged("Tyre Compound", newValues*)
 				default:
-					base.notifyPitstopChanged(option)
+					base.notifyPitstopChanged((option = "No Refuel") ? "Refuel" : option)
 			}
 	}
 

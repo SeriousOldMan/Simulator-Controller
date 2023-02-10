@@ -81,7 +81,7 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 
 	[(TellMe) the time, What time is it, What is the {current time, time}]
 
-	[(WhatAre) {the, the cold, the current} {tire pressures, pressures}, (TellMe) {the, the cold, the current} {tire pressures, pressures}]
+	[(WhatAre) {the, the cold, the current, the setup} {tire pressures, pressures}, (TellMe) {the, the cold, the current, the setup} {tire pressures, pressures}]
 
 	[(WhatAre) {the tire temperatures, the current tire temperatures, the temperatures at the moment}, (TellMe) {the tire temperatures, the current tire temperatures, the temperatures at the moment}]
 
@@ -100,6 +100,8 @@ Announcements=fuel warnings, damage warnings, damage analysis, weather warnings,
 3.  Pitstop
 
 	(CanWe) {plan the pitstop, create a plan for the pitstop, create a pitstop plan, come up with a pitstop plan}
+	
+	(CanWe) {plan the driver swap, create a plan for the driver swap, create a driver swap plan, come up with a driver swap plan}
 
 	(CanWe) {prepare the pitstop, let the crew prepare the pitstop, setup everything for the pitstop}
 

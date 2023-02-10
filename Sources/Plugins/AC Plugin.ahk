@@ -108,7 +108,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
+		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension", EngineRepair: "Repair Engine"}
 		selectActions := []
@@ -240,7 +240,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 			if ((option = "Strategy") || (option = "All Around"))
 				return true
-			else if (option = "Refuel") {
+			else if ((option = "Refuel") || (option = "No Refuel")) {
 				this.sendCommand(this.NextOptionHotkey)
 
 				return true
@@ -329,6 +329,8 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			}
 			else if inList(["Strategy", "Refuel", "Tyre Compound", "Front Left", "Front Right", "Rear Left", "Rear Right"], option)
 				this.dialPitstopOption(option, action, steps)
+			else if (option = "No Refuel")
+				this.dialPitstopOption("Refuel", "Decrease", 250)
 			else if (option = "Repair Bodywork") {
 				this.dialPitstopOption("Repair Bodywork", action, steps)
 
@@ -358,7 +360,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			this.requirePitstopMFD()
 
 			if this.selectPitstopOption("Refuel") {
-				this.dialPitstopOption("Refuel", "Decrease", 200)
+				this.dialPitstopOption("Refuel", "Decrease", 250)
 				this.dialPitstopOption("Refuel", "Increase", Round(liters))
 			}
 		}

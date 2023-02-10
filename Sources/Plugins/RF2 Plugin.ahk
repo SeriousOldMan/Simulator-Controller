@@ -54,7 +54,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
+		allActions := {NoRefuel: "No Refuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
 					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
 					 , DriverSelect: "Driver", RepairRequest: "Repair"}
 		selectActions := []
@@ -155,6 +155,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 			switch option {
 				case "Refuel":
 					this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
+				case "No Refuel":
+					this.sendPitstopCommand("Pitstop", "Decrease", "Refuel", 250)
 				case "Tyre Compound":
 					this.sendPitstopCommand("Pitstop", action, "Tyre Compound", Round(steps))
 				case "All Around":

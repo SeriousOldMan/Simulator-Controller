@@ -81,7 +81,7 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 
 	[(KannstDu) (Mir) die Uhrzeit sagen, Wie viel Uhr ist es, Sag {mir bitte, mir} die Uhrzeit]
 
-	[(GibMir) {die, die kalten} {Reifendrücke, Reifen Drücke, aktuellen Reifendrücke, aktuellen Reifen Drücke, Drücke in den Reifen, Drücke in den kalten Reifen}, (KannstDu) (Mir) {die, die kalten} {Reifendrücke, Reifen Drücke} {durchgeben, durchgeben bitte, bitte durchgeben}]
+	[(GibMir) {die, die kalten, die Setup} {Reifendrücke, Reifen Drücke, aktuellen Reifendrücke, aktuellen Reifen Drücke, Drücke in den Reifen, Drücke in den kalten Reifen}, (KannstDu) (Mir) {die, die kalten, die Setup} {Reifendrücke, Reifen Drücke} {durchgeben, durchgeben bitte, bitte durchgeben}]
 
 	[(GibMir) die {Reifentemperaturen, Reifen Temperaturen, Temperaturen der Reifen im Moment}, (KannstDu) (Mir) die {Reifentemperaturen, Reifen Temperaturen, Temperaturen der Reifen im Moment} {durchgeben, durchgeben bitte, bitte durchgeben}]
 
@@ -100,6 +100,8 @@ Announcements=Benzinmangel Warnungen, Schadenswarnungen, Schadensanalysen, Wette
 3.  Boxenstopp
 
 	[(KoennenWir) {den Boxenstopp planen, den Plan für den Boxenstopp erstellen}, (KannstDu) (Mir) den Boxenstopp Plan {durchsagen, durchsagen bitte}]
+	
+	[(KoennenWir) {den Fahrerwechsel planen, den Plan für den Fahrerwechsel erstellen}, (KannstDu) (Mir) den Fahrerwechsel Plan {durchsagen, durchsagen bitte}]
 
 	(KoennenWir) {den Boxenstopp vorbereiten, die Crew den Boxenstopp vorbereiten lassen, alles für den Boxenstopp vorbereiten}
 

@@ -242,9 +242,9 @@ With *raceAssistantRecognizer* you specify the engine used for voice recognition
 
 With *raceAssistantSpeaker* and *raceAssistantListener* you can customize the natural language interface (or the personality) of Jona. If you simply supply "On" (or *true*) as arguments, a voice and the corresponding recognition engine will be choosen based on the currently configured language. If you prefer a specific voice and / or a specific language, you can supply the name for this voice and language instead (Example: "Microsoft David Desktop" is a male US-English voice and "Microsoft Server Speech Recognition - TELE (de-DE)" provide german spoken language recognition. The phrase grammars of Jona can be localized for any language, with English and German already supplied by the standard distribution of Simulator Controller, but you will also need the corresponding Windows libraries for TTS (text-to-speech) and STT (speech-to-text). Using the parameter *raceAssistantSpeakerVocalics*, you can supply individual values for the voice volume, voice pitch and speech rate. *volume* must be a number between 0 and 100. For *pitch* and *rate*, you can supply values from -10 to 10. Additionally, you can supply a "*" for each of the three values. In this case, the corresponding setting in the voice control configuration is used. If an argument for the paramter *raceAssistantSpeakerVocalics* is not supplied at all, the values from the general voice control configuration will be taken as default as well. For more information about Jona, see the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer). With *raceAssistantLanguage* you can overwrite the default language, which has been configured in the [voice tab of the configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control).
 
-It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this cconfiguration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
+It is possible, although not much fun, to use Jona without its natural language interface. Only the pitstop planning and setup capabilities are available in this configuration, but it is still useful. You can use the following parameters to connect these actions to your controller hardware:
 
-	assistantCommands: PitstopPlan *function*, PitstopPrepare *function*,
+	assistantCommands: PitstopPlan *function*, DriverSwapPlan *function*, PitstopPrepare *function*,
 					   Call *callFunction*, Accept *acceptFunction*, Reject *rejectFunction*,
 					   Mute *muteFunction*, Unmute *unmuteFunction*,
 					   InformationRequest *requestFunction* *command* [*arguments*], ...
@@ -511,11 +511,12 @@ See the following table for the supported Assistant commands.
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
@@ -630,11 +631,12 @@ See the following table for the supported Assistant commands.
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
@@ -733,11 +735,12 @@ See the following table for the supported Assistant commands.
 | PitstopRecommend | Asks the virtual Eace Strategist for a recommendation for the next pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
@@ -823,11 +826,12 @@ See the following table for the supported Assistant commands.
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
@@ -917,11 +921,12 @@ See the following table for the supported Assistant commands.
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
@@ -1021,11 +1026,12 @@ See the following table for the supported Assistant commands.
 | PitstopRecommend | Asks the Virtual Race Strategist for a recommendation for the next pitstop. |
 | StrategyCancel | Asks the Virtual Race Strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the Virtual Race Engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the Virtual Race Assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
@@ -1116,11 +1122,12 @@ See the following table for the supported assistant commands.
 | StrategyRecommend | Asks the virtual race strategist to [recalculate and adjust the strategy](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#strategy-handling) based on the currently active strategy and the current race situation. Very useful after an unplanned pitstop. |
 | StrategyCancel | Asks the virtual race strategist to drop the currently active strategy. |
 | PitstopPlan | Requests a pitstop plan from the virtual race engineer. |
+| DriverSwapPlan | Requests a pitstop plan for the next driver in a team session from the Virtual Race Engineer. |
 | PitstopPrepare | Requests Jona to transfer the values from the current pitstop plan to the Pitstop MFD. |
 | Accept | Accepts the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 | Reject | Cancels or rejects the last recommendation by one of the virtual race assistants. Useful, if you don't want to use voice commands to interact with Jona or Cato. |
 
-See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
+See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
 
 Note: For convinience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 

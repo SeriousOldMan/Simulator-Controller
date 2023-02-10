@@ -36,7 +36,7 @@ global kSessions := [kSessionOther, kSessionPractice, kSessionQualification, kSe
 global kSessionNames := ["Other", "Practice", "Qualification", "Race"]
 
 global kAssistantAnswerActions := ["Accept", "Reject"]
-global kAssistantRaceActions := ["PitstopPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "StrategyCancel"]
+global kAssistantRaceActions := ["PitstopPlan", "DriverSwapPlan", "PitstopPrepare", "PitstopRecommend", "StrategyRecommend", "StrategyCancel"]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -395,8 +395,14 @@ class SimulatorPlugin extends ControllerPlugin {
 					label := this.getLabel(ConfigurationItem.descriptor(action, "Toggle"), kUndefined)
 
 					if (label == kUndefined) {
-						label := this.getLabel(ConfigurationItem.descriptor(action, "Dial"), action)
-						icon := this.getIcon(ConfigurationItem.descriptor(action, "Dial"))
+						label := this.getLabel(ConfigurationItem.descriptor(action, "Dial"), kUndefined)
+
+						if (label == kUndefined) {
+							label := this.getLabel(ConfigurationItem.descriptor(action, "Activate"), action)
+							icon := this.getIcon(ConfigurationItem.descriptor(action, "Activate"))
+						}
+						else
+							icon := this.getIcon(ConfigurationItem.descriptor(action, "Dial"))
 					}
 					else
 						icon := this.getIcon(ConfigurationItem.descriptor(action, "Toggle"))
@@ -667,6 +673,8 @@ class RaceAssistantAction extends ControllerAction {
 				plugin.cancelStrategy()
 			case "PitstopPlan":
 				plugin.planPitstop()
+			case "DriverSwapPlan":
+				plugin.planDriverSwap()
 			case "PitstopPrepare":
 				plugin.preparePitstop()
 			case "Accept":
@@ -930,6 +938,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	planPitstop() {
 		if this.RaceEngineer
 			this.RaceEngineer.planPitstop()
+	}
+
+	planDriverSwap() {
+		if this.RaceEngineer
+			this.RaceEngineer.planDriverSwap()
 	}
 
 	preparePitstop(lap := false) {

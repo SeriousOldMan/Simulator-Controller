@@ -407,6 +407,7 @@ Although you may call any globally defined function, you should use only the fol
 | changePitstopBrakePadType | brake, selection | ACC | Selects the brake pad compound to change to during the next pitstop. *brake* must be "Front Brake" or "Rear Brake" and *selection* must be "Next" or "Previous".  |
 | changePitstopDriver | selection | ACC, RF2 | Selects the driver to take the car during the next pitstop. *selection* must be either "Next" or "Previous". |
 | planPitstop | - | Race Engineer | *planPitstop* triggers Jona, the Virtual Race Engineer, to plan a pitstop. |
+| planDriverSwap | - | Race Engineer | This is a special form of *planPitstop*, which is only available in team races. Jona is asked to plan the next pitstop for the next driver according to the stint plan of the session. |
 | preparePitstop | - | Race Engineer | *preparePitstop* triggers Jona, the Virtual Race Engineer, to prepare a previously planned pitstop. |
 | openRaceSettings | import | Race Engineer, Race Strategist, Team Server | Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. If you supply *true* for the optional *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened. |
 | openSetupAdvisor | - | Race Engineer | Opens a tool, which generates recommendations for changing the setup options of a car based on problem descriptions provided by the driver. |

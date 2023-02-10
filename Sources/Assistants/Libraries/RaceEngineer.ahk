@@ -1920,12 +1920,20 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	planDriverSwap(lap := "__Undefined__", arguments*) {
+		local knowledgeBase := this.KnowledgeBase
+		local repairBodywork, repairSuspension, repairEngine
+
 		if (arguments.Length() == 0) {
-			if this.RemoteHandler
+			if this.RemoteHandler {
+				repairBodywork := knowledgeBase.getValue("Damage.Repair.Bodywork.Target", false)
+				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
+				repairEngine := knowledgeBase.getValue("Damage.Repair.Engine.Target", false)
+
 				if (lap = kUndefined)
-					this.RemoteHandler.planDriverSwap(false)
+					this.RemoteHandler.planDriverSwap(false, repairBodywork, repairSuspension, repairEngine)
 				else
-					this.RemoteHandler.planDriverSwap(lap)
+					this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
+			}
 		}
 		else if (lap == false) {
 			if this.Speaker

@@ -296,18 +296,18 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			this.RaceEngineer.planPitstop()
 	}
 
-	planDriverSwap(lap := "__Undefined__") {
+	planDriverSwap(arguments*) {
 		local teamServer
 
 		if this.RaceEngineer {
-			if (lap = kUndefined)
+			if (arguments.Length() = 0)
 				this.RaceEngineer.planDriverSwap()
 			else {
 				teamServer := this.TeamServer
 
 				if (teamServer && teamServer.SessionActive) {
 					teamServer.setSessionValue(this.Plugin . " Driver Swap Plan", "")
-					teamServer.setSessionValue(this.Plugin . " Driver Swap Request", lap)
+					teamServer.setSessionValue(this.Plugin . " Driver Swap Request", values2String(";", arguments*))
 
 					new this.DriverSwapTask(this).start()
 				}

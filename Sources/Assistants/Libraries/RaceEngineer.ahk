@@ -1686,9 +1686,11 @@ class RaceEngineer extends RaceAssistant {
 		else if (optionsOrLap != kUndefined) {
 			if optionsOrLap is Number
 			{
-				plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
+				if (optionsOrLap != false) {
+					plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
 
-				options := true
+					options := true
+				}
 			}
 			else if (IsObject(optionsOrLap) && optionsOrLap.HasKey("Confirm"))
 				confirm := optionsOrLap["Confirm"]
@@ -1940,7 +1942,7 @@ class RaceEngineer extends RaceAssistant {
 				this.getSpeaker().speakPhrase("NoDriverSwap")
 		}
 		else
-			this.planPitstop(lap, arguments*)
+			this.planPitstop(false, arguments*)
 	}
 
 	preparePitstop(lap := false) {

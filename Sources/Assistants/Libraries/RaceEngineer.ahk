@@ -1680,17 +1680,17 @@ class RaceEngineer extends RaceAssistant {
 
 		if (optionsOrLap = "Now") {
 			optionsOrLap := kUndefined
+			options := true
 
 			force := true
 		}
 		else if (optionsOrLap != kUndefined) {
 			if optionsOrLap is Number
 			{
-				if (optionsOrLap != false) {
-					plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
+				options := true
 
-					options := true
-				}
+				if (optionsOrLap != false)
+					plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
 			}
 			else if (IsObject(optionsOrLap) && optionsOrLap.HasKey("Confirm"))
 				confirm := optionsOrLap["Confirm"]

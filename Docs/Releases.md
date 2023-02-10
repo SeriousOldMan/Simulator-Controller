@@ -1,4 +1,4 @@
-## 4.5.9.0-release 02/10/23 (planned)
+## 4.5.9.0-release 02/10/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. You can now [ask the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) about the cold trye pressures, which will result in ideal tyre pressures for the current conditions.

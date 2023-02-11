@@ -147,8 +147,11 @@ class SimulatorStartup extends ConfigurationItem {
 		if (editConfig || noConfiguration) {
 			result := editSettings(settings, true)
 
-			if (result == kCancel)
+			if (result == kCancel) {
 				exitStartup(true)
+
+				return false
+			}
 			else if (noConfiguration && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				error := translate("Error")
@@ -156,6 +159,8 @@ class SimulatorStartup extends ConfigurationItem {
 				OnMessage(0x44, "")
 
 				exitStartup(true)
+
+				return false
 			}
 			else if (result == kSave) {
 				writeConfiguration(kSimulatorSettingsFile, settings)
@@ -165,6 +170,8 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 
 		this.loadFromConfiguration(this.Configuration)
+
+		return true
 	}
 
 	startSimulatorController() {
@@ -254,71 +261,71 @@ class SimulatorStartup extends ConfigurationItem {
 	startup() {
 		local startSimulator, runningIndex, hidden, hasSplashTheme
 
-		this.prepareConfiguration()
+		if this.prepareConfiguration() {
+			startSimulator := ((this.iStartupOption != false) || GetKeyState("Ctrl") || GetKeyState("MButton"))
 
-		startSimulator := ((this.iStartupOption != false) || GetKeyState("Ctrl") || GetKeyState("MButton"))
+			this.iControllerPID := this.startSimulatorController()
 
-		this.iControllerPID := this.startSimulatorController()
+			if (this.ControllerPID == 0)
+				exitStartup(true)
 
-		if (this.ControllerPID == 0)
-			exitStartup(true)
+			if (!kSilentMode && this.iSplashTheme)
+				showSplashTheme(this.iSplashTheme, "playSong")
 
-		if (!kSilentMode && this.iSplashTheme)
-			showSplashTheme(this.iSplashTheme, "playSong")
-
-		if !kSilentMode
-			showProgress({color: "Blue"
-						, message: translate("Start: Simulator Controller")
-						, title: translate("Initialize Core System")})
-
-		loop 50 {
 			if !kSilentMode
-				showProgress({progress: A_Index * 2})
+				showProgress({color: "Blue"
+							, message: translate("Start: Simulator Controller")
+							, title: translate("Initialize Core System")})
 
-			Sleep 20
-		}
+			loop 50 {
+				if !kSilentMode
+					showProgress({progress: A_Index * 2})
 
-		if !kSilentMode
-			showProgress({progress: 0, color: "Green"
-					   , message: translate("..."), title: translate("Starting System Components")})
-
-		runningIndex := 1
-
-		this.startComponents("Core", this.iCoreComponents, startSimulator, runningIndex)
-		this.startComponents("Feedback", this.iFeedbackComponents, startSimulator, runningIndex)
-
-		if !kSilentMode
-			showProgress({progress: 100, message: translate("Done")})
-
-		Sleep 500
-
-		this.iFinished := true
-
-		hidden := false
-		hasSplashTheme := this.iSplashTheme
-
-		if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton"))) {
-			if (!kSilentMode && hasSplashTheme) {
-				this.hideSplashTheme()
-
-				hidden := true
+				Sleep 20
 			}
 
-			this.startSimulator()
-		}
+			if !kSilentMode
+				showProgress({progress: 0, color: "Green"
+						   , message: translate("..."), title: translate("Starting System Components")})
 
-		if !kSilentMode
-			hideProgress()
+			runningIndex := 1
 
-		if (kSilentMode || this.Canceled) {
-			if (!hidden && !kSilentMode && hasSplashTheme)
-				this.hideSplashTheme()
+			this.startComponents("Core", this.iCoreComponents, startSimulator, runningIndex)
+			this.startComponents("Feedback", this.iFeedbackComponents, startSimulator, runningIndex)
 
-			exitStartup(true)
-		}
-		else {
-			if !hasSplashTheme
+			if !kSilentMode
+				showProgress({progress: 100, message: translate("Done")})
+
+			Sleep 500
+
+			this.iFinished := true
+
+			hidden := false
+			hasSplashTheme := this.iSplashTheme
+
+			if (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton"))) {
+				if (!kSilentMode && hasSplashTheme) {
+					this.hideSplashTheme()
+
+					hidden := true
+				}
+
+				this.startSimulator()
+			}
+
+			if !kSilentMode
+				hideProgress()
+
+			if (kSilentMode || this.Canceled) {
+				if (!hidden && !kSilentMode && hasSplashTheme)
+					this.hideSplashTheme()
+
 				exitStartup(true)
+			}
+			else {
+				if !hasSplashTheme
+					exitStartup(true)
+			}
 		}
 	}
 

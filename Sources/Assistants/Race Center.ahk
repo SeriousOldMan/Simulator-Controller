@@ -3525,6 +3525,8 @@ class RaceCenter extends ConfigurationItem {
 			GuiControlGet pitstopPressureRREdit
 			GuiControlGet pitstopRepairsDropDown
 		}
+		else
+			pitstopTyreSetEdit := ""
 
 		if ((pitstopLapEdit = "") || (pitstopLapEdit <= 0))
 			pitstopLapEdit := (this.LastLap ? this.LastLap.Nr : 1)

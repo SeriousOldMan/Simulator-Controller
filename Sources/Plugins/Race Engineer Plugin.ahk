@@ -61,6 +61,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					driverSwapPlan := teamServer.getSessionValue(this.Plugin.Plugin . " Driver Swap Plan")
 
 					if (driverSwapPlan && (driverSwapPlan != "")) {
+						teamServer.setSessionValue(this.Plugin.Plugin . " Driver Swap Plan", "")
+
 						driverSwapPlan := parseConfiguration(driverSwapPlan)
 
 						requestDriver := getConfigurationValue(driverSwapPlan, "Pitstop", "Driver", false)
@@ -77,6 +79,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Suspension", false)
 															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Engine", false)
 															  , requestDriver*)
+
+						return false
 					}
 				}
 				catch exception {

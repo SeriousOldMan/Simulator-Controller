@@ -2382,10 +2382,9 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ErrorLevel
 			if plannedLap {
-				if this.TeamSession
-					sendMessage(kFileMessage, "Race Engineer", "planDriverSwap:" . plannedLap, ErrorLevel)
-				else if ((refuel != kUndefined) && !this.TeamSession)
-					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange, kUndefined, tyreCompound, tyreCompoundColor), ErrorLevel)
+				if (refuel != kUndefined)
+					sendMessage(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:")
+															 . values2String(";", "!" . plannedLap, refuel, tyreChange, kUndefined, tyreCompound, tyreCompoundColor), ErrorLevel)
 				else
 					sendMessage(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:") . plannedLap, ErrorLevel)
 			}

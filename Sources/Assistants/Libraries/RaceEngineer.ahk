@@ -1923,7 +1923,9 @@ class RaceEngineer extends RaceAssistant {
 
 	planDriverSwap(lap := "__Undefined__", arguments*) {
 		local knowledgeBase := this.KnowledgeBase
-		local repairBodywork, repairSuspension, repairEngine
+		local repairBodywork, repairSuspension, repairEngine, speaker
+
+		static lastRequest := []
 
 		if (arguments.Length() == 0) {
 			if this.RemoteHandler {
@@ -1931,18 +1933,51 @@ class RaceEngineer extends RaceAssistant {
 				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
 				repairEngine := knowledgeBase.getValue("Damage.Repair.Engine.Target", false)
 
-				if (lap = kUndefined)
+				if (lap = kUndefined) {
+					lastRequest := []
+
 					this.RemoteHandler.planDriverSwap(false, repairBodywork, repairSuspension, repairEngine)
-				else
+				}
+				else {
+					lastRequest := Array(lap)
+
 					this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
+				}
 			}
 		}
 		else if (lap == false) {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("NoDriverSwap")
+			if this.Speaker {
+				speaker := this.getSpeaker()
+
+				speaker.speakPhrase("NoDriverSwap")
+
+				if this.supportsPitstop() {
+					speaker.speakPhrase("ConfirmPlan", {forYou: speaker.Fragments["ForYou"]}, true)
+
+					this.setContinuation(ObjBindMethod(this, "planPitstop", lastRequest*))
+				}
+			}
+
+			lastRequest := []
 		}
-		else
+		else if (InStr(lap, "!") = 1) {
+			lap := SubStr(lap, 2)
+
+			lastRequest := concatenate(Array(lap), arguments)
+
+			if this.RemoteHandler {
+				repairBodywork := knowledgeBase.getValue("Damage.Repair.Bodywork.Target", false)
+				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
+				repairEngine := knowledgeBase.getValue("Damage.Repair.Engine.Target", false)
+
+				this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
+			}
+		}
+		else {
+			lastRequest := []
+
 			this.planPitstop(lap, arguments*)
+		}
 	}
 
 	preparePitstop(lap := false) {

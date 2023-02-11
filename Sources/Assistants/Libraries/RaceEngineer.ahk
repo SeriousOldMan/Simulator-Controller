@@ -1942,7 +1942,7 @@ class RaceEngineer extends RaceAssistant {
 				this.getSpeaker().speakPhrase("NoDriverSwap")
 		}
 		else
-			this.planPitstop(false, arguments*)
+			this.planPitstop(lap, arguments*)
 	}
 
 	preparePitstop(lap := false) {

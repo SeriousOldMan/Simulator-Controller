@@ -2382,13 +2382,15 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if ErrorLevel
 			if plannedLap {
-				if (refuel != kUndefined)
+				if this.TeamSession
+					sendMessage(kFileMessage, "Race Engineer", "planDriverSwap:" . plannedLap, ErrorLevel)
+				else if ((refuel != kUndefined) && !this.TeamSession)
 					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . values2String(";", plannedLap, refuel, tyreChange, kUndefined, tyreCompound, tyreCompoundColor), ErrorLevel)
 				else
-					sendMessage(kFileMessage, "Race Engineer", "planPitstop:" . (plannedLap ? plannedLap : "Now"), ErrorLevel)
+					sendMessage(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:") . plannedLap, ErrorLevel)
 			}
 			else
-				sendMessage(kFileMessage, "Race Engineer", "planPitstop", ErrorLevel)
+				sendMessage(kFileMessage, "Race Engineer", this.TeamSession ? "planDriverSwap" : "planPitstop:Now", ErrorLevel)
 	}
 
 	executePitstop(lapNumber) {
@@ -2528,7 +2530,7 @@ class RaceStrategist extends GridRaceAssistant {
 					tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap
-													 , refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))
+													                      , refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))
 				}
 			}
 			finally {

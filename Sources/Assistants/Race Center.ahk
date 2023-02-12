@@ -1449,7 +1449,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui Tab, 5
 
-		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistHandle gchooseSetup, % values2String("|", map(["Driver", "Conditions", "Compound", "Pressures", "Notes"], "translate")*)
+		Gui %window%:Add, ListView, x24 ys+33 w344 h270 -Multi -LV0x10 AltSubmit HWNDlistHandle gchooseSetup, % values2String("|", map(["Driver", "Conditions", "Compound", "Pressures", "Notes"], "translate")*)
 
 		this.iSetupsListView := listHandle
 

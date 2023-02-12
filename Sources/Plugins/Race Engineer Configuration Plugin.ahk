@@ -107,7 +107,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
-		choices := map(["Load from Settings", "Load from Database", "Import from Simulator", "Use start pressures"], "translate")
+		choices := map(["Load from Settings", "Load from Database", "Import from Simulator", "Use initial pressures"], "translate")
 		chosen := 1
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown HWNDwidget10 Hidden, % values2String("|", choices*)
 

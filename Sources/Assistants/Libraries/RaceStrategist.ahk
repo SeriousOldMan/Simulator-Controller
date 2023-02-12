@@ -1794,12 +1794,14 @@ class RaceStrategist extends GridRaceAssistant {
 
 			if this.Speaker
 				this.getSpeaker().speakPhrase("StrategyCanceled")
+
+			this.updateSessionValues({OriginalStrategy: false, Strategy: false})
 		}
 	}
 
 	clearStrategy() {
 		local knowledgeBase := this.KnowledgeBase
-		local ignore, index, theFact
+		local ignore, pitstop, theFact
 
 		for ignore, theFact in ["Name", "Weather", "Weather.Temperature.Air", "Weather.Temperature.Track"
 							  , "Tyre.Compound", "Tyre.Compound.Color", "Map", "TC", "ABS"
@@ -1807,10 +1809,16 @@ class RaceStrategist extends GridRaceAssistant {
 			knowledgeBase.clearFact("Strategy." . theFact)
 
 		loop % knowledgeBase.getValue("Strategy.Pitstop.Count", 0)
-			for index, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
-				knowledgeBase.clearFact("Strategy.Pitstop." . index . theFact)
+		{
+			pitstop := A_Index
+
+			for ignore, theFact in [".Lap", ".Fuel.Amount", ".Tyre.Change", ".Tyre.Compound", ".Tyre.Compound.Color", ".Map"]
+				knowledgeBase.clearFact("Strategy.Pitstop." . pitstop . theFact)
+		}
 
 		knowledgeBase.clearFact("Strategy.Pitstop.Count")
+
+		this.iStrategy := false
 	}
 
 	recommendStrategy(options := true) {
@@ -1865,11 +1873,8 @@ class RaceStrategist extends GridRaceAssistant {
 				}
 			}
 		}
-		else {
+		else
 			this.cancelStrategy(false)
-
-			this.updateSessionValues({OriginalStrategy: false, Strategy: false})
-		}
 	}
 
 	runSimulation(pitstopHistory) {

@@ -107,7 +107,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
-		choices := map(["Load from Settings", "Load from Database", "Import from Simulator"], "translate")
+		choices := map(["Load from Settings", "Load from Database", "Import from Simulator", "Use start pressures"], "translate")
 		chosen := 1
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown HWNDwidget10 Hidden, % values2String("|", choices*)
 
@@ -234,7 +234,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			if (value = "SetupDatabase")
 				value := "TyresDatabase"
 
-			GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "TyresDatabase", "Import"], configuration["LoadTyrePressures"])
+			GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "TyresDatabase", "Import", "Setup"], configuration["LoadTyrePressures"])
 
 			GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
 			GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
@@ -274,7 +274,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
 			configuration["LoadSettings"] := ["Default", "SettingsDatabase"][reLoadSettingsDropDown]
-			configuration["LoadTyrePressures"] := ["Default", "TyresDatabase", "Import"][reLoadTyrePressuresDropDown]
+			configuration["LoadTyrePressures"] := ["Default", "TyresDatabase", "Import", "Setup"][reLoadTyrePressuresDropDown]
 
 			configuration["SaveSettings"] := ["Ask", "Always", "Never"][reSaveSettingsDropDown]
 			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][reSaveTyrePressuresDropDown]

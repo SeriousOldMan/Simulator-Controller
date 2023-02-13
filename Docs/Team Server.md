@@ -353,7 +353,7 @@ Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop
 
 #### Planning and preparing pitstops in a team race using the Race Assistants
 
-You probably might have used the Race Engineer to plan and prepare a pitstop during solo races or even have used the Race Strategist to run a full race with a pre-selected strategy. Although in most cases these duties will be taken by your team mates in a team race, it is still possible to use the Assistants as additional support as well. The following rules apply:
+You probably might have used the Race Engineer to plan and prepare a pitstop during solo races or even have used the Race Strategist to run a full race with a pre-selected strategy. Although in most cases these duties will be taken by your team mates in a team race, it is still possible to use the Assistants as additional support as well. The following applies:
 
 1. Planning and preparing a pitstop using the Race Engineer
 

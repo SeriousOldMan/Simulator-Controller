@@ -7,7 +7,7 @@
   6. New [controller action "NoRefuel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) for all simulators to set refueling amount to zero, New icons in the Stream Deck icon set for all new controller actions.
   7. New icons in the Stream Deck icon set for all above new controller actions.
   8. A fourth method to identify initial tyre pressures has been added to the configuration. This one takes the initial pressures which the tyres have in the moment, when data is acquired for the first time from the simulator. They can be a little bit off, though, when the car had sit for some time and the tyres lost temperature. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more details.
-  9. Setup list in "Race Center" can now be sorted by clicking in the column headers.
+  9. List of drivr-specific tyre setups can now be sorted in the "Race Center" by clicking in the column headers.
 
 ## 4.5.9.0-release 02/10/23 (planned)
   1. Minor bugfixes, as always

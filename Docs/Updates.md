@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.6.0
 
-New controller actions ["DriverSwapPlan", "NoRefuel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) have been introduced for the Race Engineer. If you want to use this new commands and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icons for the new actions are available.
+New controller actions ["DriverSwapPlan" and "NoRefuel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) have been introduced for the Race Engineer. If you want to use this new commands and are using a Stream Deck as well, you may want to reload the Stream Deck icon preset using "Simulator Setup", so that the icons for the new actions are available.
 
 You may also take the opportunity to take a look at the controller actions ["TyrePressuresCold" and "TyrePressuresSetup"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) introduced in the last release.
 

@@ -1,3 +1,14 @@
+## 4.6.0.0-release 02/17/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races. See the [all new documentation](*) about the interaction between the Race Assistants and the "Race Center".
+  4. New [controller action "DriverSwapPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the Race Engineer and all simulators to create a pitstop including driver swap in team races. Aquivalent to the above voice command.
+  5. New voice command for Race Engineer to adjust the pitstop plan so that a given amount of fuel is available after the pitstop. Just ask "Can we refuel **up to** xx liters?". Refuel target will be calculated for the next lap in this case.
+  6. New [controller action "NoRefuel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) for all simulators to set refueling amount to zero, New icons in the Stream Deck icon set for all new controller actions.
+  7. New icons in the Stream Deck icon set for all above new controller actions.
+  8. A fourth method to identify initial tyre pressures has been added to the configuration. This one takes the initial pressures which the tyres have in the moment, when data is acquired for the first time from the simulator. They can be a little bit off, though, when the car had sit for some time and the tyres lost temperature. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more details.
+  9. Setup list in "Race Center" can now be sorted by clicking in the column headers.
+
 ## 4.5.9.0-release 02/10/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always

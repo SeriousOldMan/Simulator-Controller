@@ -61,6 +61,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					driverSwapPlan := teamServer.getSessionValue(this.Plugin.Plugin . " Driver Swap Plan")
 
 					if (driverSwapPlan && (driverSwapPlan != "")) {
+						teamServer.setSessionValue(this.Plugin.Plugin . " Driver Swap Plan", "")
+
 						driverSwapPlan := parseConfiguration(driverSwapPlan)
 
 						requestDriver := getConfigurationValue(driverSwapPlan, "Pitstop", "Driver", false)
@@ -77,6 +79,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Suspension", false)
 															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Engine", false)
 															  , requestDriver*)
+
+						return false
 					}
 				}
 				catch exception {
@@ -218,6 +222,14 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			openRaceSettings(true, true, false, kTempDirectory . "Race Engineer.settings")
 
 			settings := readConfiguration(kTempDirectory . "Race Engineer.settings")
+		}
+		else if (tpSetting = "Setup") {
+			pressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
+			
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 		}
 
 		return settings

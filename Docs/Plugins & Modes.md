@@ -478,6 +478,7 @@ See the following table for the supported settings:
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreChange | Enables or disables the tyre management. |
 | TyreCompound | Selects either the Wet or Dry tyre compound. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
@@ -602,6 +603,7 @@ See the following table for the supported settings:
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreCompound | Cycles through the available tyre compounds. The leftmost position disables tyre change completely. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
@@ -708,6 +710,7 @@ See the following table for the supported settings:
 | Setting | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreChange | Toggles, whether tyres will be changed at the pitstop. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
@@ -798,6 +801,7 @@ See the following table for the supported settings:
 | Setting | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreCompound | Cycles through the available tyre compounds. |
 | TyreAllAround | Change the pressure for all tyres at once. Supports the additional increments argument. |
 | TyreFrontLeft | Change the pressure for the front left tyre. Supports the additional increments argument. |
@@ -897,6 +901,7 @@ See the following table for the supported settings:
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreChange | Toggles, whether you want to change the tyres at the next pitstop or not. |
 | TyreCompound | Cycles through the available tyre compounds. |
 | SuspensionRepair | Toggles the repair of the suspension components. |
@@ -1002,6 +1007,7 @@ See the following table for the supported settings:
 | ------ | ------ |
 | Strategy | Choose one of the predefined pitstop strategies. |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreCompound | Cycles through the available tyre compounds. The leftmost position disables tyre change completely. Only the first 3 positions are supported, typically 1. Slicks, 2. Intermediate or Wets and 3. Automatic |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |
@@ -1098,6 +1104,7 @@ See the following table for the supported settings:
 | Setting | Description |
 | ------ | ------ |
 | Refuel | Increment or decrement the refuel amount. Supports the additional increments argument. |
+| NoRefuel | Sets the refuel amount to zero, thereby skipping refueling. |
 | TyreCompound | Cycles through the available tyre compounds. The leftmost position disables tyre change completely. Only the first 3 positions are supported, typically 1. Slicks, 2. Intermediate or Wets and 3. Automatic |
 | SuspensionRepair | Toggles the repair of the suspension components. |
 | BodyworkRepair | Toggles the repair of all the bodywork and aerodynamic elements. |

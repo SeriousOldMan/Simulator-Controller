@@ -197,8 +197,15 @@ class RaceEngineer extends RaceAssistant {
 
 				if !this.supportsPitstop()
 					this.getSpeaker().speakPhrase("NoPitstop")
-				else if !this.TeamSession
+				else if !this.TeamSession {
 					this.getSpeaker().speakPhrase("NoDriverSwap")
+
+					if this.supportsPitstop() {
+						this.getSpeaker().speakPhrase("ConfirmPlan", {forYou: this.getSpeaker().Fragments["ForYou"]}, true)
+
+						this.setContinuation(ObjBindMethod(this, "planPitstop"))
+					}
+				}
 				else if this.hasPlannedPitstop() {
 					this.getSpeaker().speakPhrase("ConfirmRePlan")
 
@@ -553,7 +560,7 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("NotPossible")
 
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 			}
 			finally {
 				speaker.endTalk()
@@ -621,7 +628,7 @@ class RaceEngineer extends RaceAssistant {
 
 			try {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 			}
 			finally {
 				speaker.endTalk()
@@ -670,7 +677,7 @@ class RaceEngineer extends RaceAssistant {
 
 			try {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 			}
 			finally {
 				speaker.endTalk()
@@ -771,7 +778,7 @@ class RaceEngineer extends RaceAssistant {
 
 			try {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 			}
 			finally {
 				speaker.endTalk()
@@ -794,7 +801,7 @@ class RaceEngineer extends RaceAssistant {
 
 			try {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 			}
 			finally {
 				speaker.endTalk()
@@ -819,7 +826,7 @@ class RaceEngineer extends RaceAssistant {
 
 			try {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 			}
 			finally {
 				speaker.endTalk()
@@ -847,7 +854,7 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			if !this.hasPlannedPitstop() {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
@@ -875,7 +882,7 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			if !this.hasPlannedPitstop() {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
@@ -923,7 +930,7 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			if !this.hasPlannedPitstop() {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
@@ -964,7 +971,7 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			if !this.hasPlannedPitstop() {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
@@ -1010,7 +1017,7 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			if !this.hasPlannedPitstop() {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
@@ -1040,7 +1047,7 @@ class RaceEngineer extends RaceAssistant {
 		try {
 			if !this.hasPlannedPitstop() {
 				speaker.speakPhrase("NotPossible")
-				speaker.speakPhrase("ConfirmPlan", false, true)
+				speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 				this.setContinuation(ObjBindMethod(this, "planPitstop"))
 			}
@@ -1680,15 +1687,17 @@ class RaceEngineer extends RaceAssistant {
 
 		if (optionsOrLap = "Now") {
 			optionsOrLap := kUndefined
+			options := true
 
 			force := true
 		}
 		else if (optionsOrLap != kUndefined) {
 			if optionsOrLap is Number
 			{
-				plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
-
 				options := true
+
+				if (optionsOrLap != false)
+					plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
 			}
 			else if (IsObject(optionsOrLap) && optionsOrLap.HasKey("Confirm"))
 				confirm := optionsOrLap["Confirm"]
@@ -1921,7 +1930,9 @@ class RaceEngineer extends RaceAssistant {
 
 	planDriverSwap(lap := "__Undefined__", arguments*) {
 		local knowledgeBase := this.KnowledgeBase
-		local repairBodywork, repairSuspension, repairEngine
+		local repairBodywork, repairSuspension, repairEngine, speaker
+
+		static lastRequest := []
 
 		if (arguments.Length() == 0) {
 			if this.RemoteHandler {
@@ -1929,18 +1940,51 @@ class RaceEngineer extends RaceAssistant {
 				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
 				repairEngine := knowledgeBase.getValue("Damage.Repair.Engine.Target", false)
 
-				if (lap = kUndefined)
+				if (lap = kUndefined) {
+					lastRequest := []
+
 					this.RemoteHandler.planDriverSwap(false, repairBodywork, repairSuspension, repairEngine)
-				else
+				}
+				else {
+					lastRequest := Array(lap)
+
 					this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
+				}
 			}
 		}
 		else if (lap == false) {
-			if this.Speaker
-				this.getSpeaker().speakPhrase("NoDriverSwap")
+			if this.Speaker {
+				speaker := this.getSpeaker()
+
+				speaker.speakPhrase("NoDriverSwap")
+
+				if this.supportsPitstop() {
+					speaker.speakPhrase("ConfirmPlan", {forYou: speaker.Fragments["ForYou"]}, true)
+
+					this.setContinuation(ObjBindMethod(this, "planPitstop", lastRequest*))
+				}
+			}
+
+			lastRequest := []
 		}
-		else
+		else if (InStr(lap, "!") = 1) {
+			lap := SubStr(lap, 2)
+
+			lastRequest := concatenate(Array(lap), arguments)
+
+			if this.RemoteHandler {
+				repairBodywork := knowledgeBase.getValue("Damage.Repair.Bodywork.Target", false)
+				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
+				repairEngine := knowledgeBase.getValue("Damage.Repair.Engine.Target", false)
+
+				this.RemoteHandler.planDriverSwap(lap, repairBodywork, repairSuspension, repairEngine)
+			}
+		}
+		else {
+			lastRequest := []
+
 			this.planPitstop(lap, arguments*)
+		}
 	}
 
 	preparePitstop(lap := false) {
@@ -1960,7 +2004,7 @@ class RaceEngineer extends RaceAssistant {
 				speaker.speakPhrase("MissingPlan")
 
 				if this.supportsPitstop() {
-					speaker.speakPhrase("ConfirmPlan", false, true)
+					speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop"))
 				}
@@ -2113,14 +2157,23 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	callPlanDriverSwap(lap := "__Undefined__", arguments*) {
+		local speaker := this.getSpeaker()
+
 		this.clearContinuation()
 
 		if !this.supportsPitstop()
-			this.getSpeaker().speakPhrase("NoPitstop")
-		else if (!this.TeamSession || (lap == false))
-			this.getSpeaker().speakPhrase("NoDriverSwap")
+			speaker.speakPhrase("NoPitstop")
+		else if (!this.TeamSession || (lap == false)) {
+			speaker.speakPhrase("NoDriverSwap")
+
+			if this.supportsPitstop() {
+				speaker.speakPhrase("ConfirmPlan", {forYou: speaker.Fragments["ForYou"]}, true)
+
+				this.setContinuation(ObjBindMethod(this, "planPitstop", lap, arguments*))
+			}
+		}
 		else if ((lap = kUndefined) && this.hasPlannedPitstop()) {
-			this.getSpeaker().speakPhrase("ConfirmRePlan")
+			speaker.speakPhrase("ConfirmRePlan")
 
 			this.setContinuation(ObjBindMethod(this, "invokePlanDriverSwap", false, lap, arguments*))
 		}
@@ -2249,7 +2302,7 @@ class RaceEngineer extends RaceAssistant {
 					if this.hasPreparedPitstop()
 						speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
 					else if !this.hasPlannedPitstop() {
-						speaker.speakPhrase("ConfirmPlan", false, true)
+						speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 						this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 					}
@@ -2320,7 +2373,7 @@ class RaceEngineer extends RaceAssistant {
 						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
 
 						if this.supportsPitstop() {
-							speaker.speakPhrase("ConfirmPlan", false, true)
+							speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 							this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 						}
@@ -2382,7 +2435,7 @@ class RaceEngineer extends RaceAssistant {
 									  , {minutes: minutes, compound: fragments[recommendedCompound . "Tyre"]})
 
 					if this.supportsPitstop() {
-						speaker.speakPhrase("ConfirmPlan", false, true)
+						speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
 						this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
 					}

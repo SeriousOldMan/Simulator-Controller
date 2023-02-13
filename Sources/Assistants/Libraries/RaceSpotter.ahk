@@ -1449,35 +1449,39 @@ class RaceSpotter extends GridRaceAssistant {
 			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 
-			speaker.beginTalk()
+			if (remainingSessionLaps > 0) {
+				speaker.beginTalk()
 
-			try {
-				speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
-													, laps: remainingSessionLaps
-													, position: Round(positions["Position.Class"])})
+				try {
+					speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
+														, laps: remainingSessionLaps
+														, position: Round(positions["Position.Class"])})
 
-				remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+					remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
-				if (remainingStintTime < remainingSessionTime) {
-					speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
+					if (remainingStintTime < remainingSessionTime) {
+						speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
 
-					enoughFuel := (remainingStintLaps < remainingFuelLaps)
+						enoughFuel := (remainingStintLaps < remainingFuelLaps)
+					}
+					else {
+						speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
+															  , laps: Ceil(remainingSessionLaps)})
+
+						enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+					}
+
+					speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
+									  , {laps: Floor(remainingFuelLaps)})
 				}
-				else {
-					speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
-														  , laps: Ceil(remainingSessionLaps)})
-
-					enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+				finally {
+					speaker.endTalk()
 				}
 
-				speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
-								  , {laps: Floor(remainingFuelLaps)})
+				return true
 			}
-			finally {
-				speaker.endTalk()
-			}
-
-			return true
+			else
+				return false
 		}
 		else
 			return false

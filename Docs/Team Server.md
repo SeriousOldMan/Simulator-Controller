@@ -350,6 +350,22 @@ The automatic selection of the next driver is supported for *Assetto Corsa Compe
 Note: Once you have dialed the next driver for the first time in the simulator, and you want to correct some values for the pitstop, choose "No driver change" in the *Driver* dropdown menu. This will preserve the last selection of the next driver in the pitstop settings, while changing the refuel amount, for example.
 
 Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop" menu and the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
+
+#### Planning and preparing pitstops in a team race using the Race Assistants
+
+You probably might have used the Race Engineer to plan and prepare a pitstop during solo races or even have used the Race Strategist to run a full race with a pre-selected strategy. Although in most cases these duties will be taken by your team mates in a team race, it is still possible to use the Assistants as additional support as well. The following applies:
+
+1. Planning and preparing a pitstop using the Race Engineer
+
+   You can use the Race Engineer to plan and prepare a pitstop even during a team race. Doing it the same way as in a solo race might be the perfect method, when you are running a double stint, since you will be selected as the next driver. You initiate this process by issuing the voice command "Can you plan a pitstop?" or using the controller action ["PitstopPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). A pitstop planned and performed this way will also recorded in the list of pitstops in the "Race Center" as well.
+   
+   But this might not be the best way when another driver will take the seat, since the tyre pressures calculated for you might not be perfect for your team mate. Therefore a second command exist to initiate a pitstop including a driver swap. Ask the Engineer "Can you plan a driver swap?" or use the controller action ["DriverSwapPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer). When you initiate the process in this way, the Race Engineer will consult the Team Server to lookup the planned lap for the service, the next driver and the refuel amount from the Stint Plan and to calculate the best possible tyre pressures for the next stint. Therefore, at least one instance of the "Race Center" must be running (not necessarily on the same PC as the current driver) for this method to be used. Please note, that the above mentioned adjustments for the tyre pressures will be apllied as well in this case, so be careful that the desired settings have been chosen in the "Pitstop" menu.
+
+2. Strategy handling using the Race Strategist
+
+   The Race Strategist will also be aware of a team session and will adjust its behaviour accordingly. You can send the strategy, which has been loaded into the "Race Center", to the Race Strategist, so that he will inform the driver about upcoming pitstops and will collaborate with the Engineer to plan and prepare these pitstops. Doing it this way will also use the integrated method, which will consult the "Race Center" for the stint plan, tyre pressures and so on. This will also be the case, if you ask the Strategist to recommend a pitstop lap to optimize for undercuts, and so on.
+   
+   One notable exception might be an unplanned stop due to incoming weather changes or a heavy crash. In some cases, especially when not enough data are already available in the "Race Center" for the upcoming weather conditions, the stop will planned by the Race Engineer locally, which means that the current driver will stay in the car. But it is of course possible to plan the pitstop using the "Race Center" manually by your team mate in this case as well.
   
 ## Server Administration
 

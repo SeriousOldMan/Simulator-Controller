@@ -1,4 +1,17 @@
-## 4.5.9.0-release 02/10/23 (planned)
+## 4.6.0.0-release 02/17/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races. See the [all new documentation](*) about the interaction between the Race Assistants and the "Race Center".
+  4. New [controller action "DriverSwapPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the Race Engineer and all simulators to create a pitstop including driver swap in team races. Aquivalent to the above voice command.
+  5. New voice command for Race Engineer to adjust the pitstop plan so that a given amount of fuel is available after the pitstop. Just ask "Can we refuel **up to** xx liters?". Refuel target will be calculated for the next lap in this case.
+  6. New [controller action "NoRefuel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) for all simulators to set refueling amount to zero, New icons in the Stream Deck icon set for all new controller actions.
+  7. New icons in the Stream Deck icon set for all above new controller actions.
+  8. A fourth method to identify initial tyre pressures has been added to the configuration. This one takes the initial pressures which the tyres have in the moment, when data is acquired for the first time from the simulator. They can be a little bit off, though, when the car had sit for some time and the tyres lost temperature. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more details.
+  9. List of drivr-specific tyre setups can now be sorted in the "Race Center" by clicking in the column headers.
+  10. Unprepared pitstops that had been performed without the control of the Race Engineer will be recorded for documentation in the "Race Center", although all information about refueling, tyre changes, and so on, will be empty.
+  11. The term "Qualification" has been renamed throughout the suite to "Qualifying".
+
+## 4.5.9.0-release 02/10/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. You can now [ask the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) about the cold trye pressures, which will result in ideal tyre pressures for the current conditions.
@@ -7,7 +20,7 @@
   6. New information request controller action "TyrePressuresSetup" for the ["Race Engineer"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), which is equivalent to using the second above voice command.
   7. New icons in the Stream Deck icon set for request the cold or setup tyre pressure information.
   9. New [voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Engineer-Commands-(EN)) for Race Engineer to increase/decrease the cold pressures for all tyres at once for the next pitstop.
-  10. Setting for pressure loss correction in pitstop initialization in "Race Center".
+  10. New setting to decide whether [pressure loss corrections should be included in pitstop initialization](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) in "Race Center".
   11. Remaining stint and remaining driver time will be shown in the lap report in "Race Center".
   12. Holding down the Shift and Control key while ending a session now prevents the Assistants to run their post-session actions.
   13. New car models for "Setup Advisor":
@@ -346,7 +359,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - Announcement of the Green flag at race start.
 	 - Information when direct opponents or the race leader enter the pit.
 	 - Applause, when a new personal best lap time has been set.
-	 - Information when the current session (Practice or Qualification) is ending in 30, 15 or 5 minutes.
+	 - Information when the current session (Practice or Qualifying) is ending in 30, 15 or 5 minutes.
 	 - Detailed information package, when the first half of a race session has been finished.
 	 - Warning a few laps before the current stint is ending.
 	 - Information when temperatures are rising or falling.
@@ -1304,7 +1317,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Integration of Jona, the Virtual Race Engineer, for *RaceRoom Racing Experience*. No support for actual pitstop handling yet, and actually, this might never come due to limitations in the UI and API design of *RaceRoom Racing Experience*.
   5. Initial version of Jona for rFactor 2 too. Support for pitstop handling will be added in a future release.
   6. Jona is now also active in practice sessions but does not support pitstop planning and preparation there.
-  7. When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions.
+  7. When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualifying or even Endurance Race sessions.
   8. Introduced color coding (Red = Soft, White = Medium, Blue = Hard) to the tyre compound handling of the Virtual Race Engineer.
   9. (Developer only): Documentation for the configuration tool plugin interface has been added. Please take a look here: [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) and also the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#configuration-editor-classes) in the *Classes Reference* for more information.
   10. (Developer only): The build pipeline of *Simulator Tools* now incorporates *VS MSBuild*, so that all external applications and DLLs will be automatically compiled too. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#using-the-build-tool) on *Simulator Tools* for more information.

@@ -912,7 +912,7 @@ priority: -10, [?Pitstop.Lap] => (Clear: Pitstop.Planned.Lap),
 priority: -20, {All: [?Pitstop.Lap], [?Pitstop.Prepared], [?Pitstop.Planned.Nr]} => (Set: Pitstop.Last, ?Pitstop.Planned.Nr)
 priority: -20, [?Pitstop.Lap] => (Clear: Pitstop.Lap), (Clear: Pitstop.Prepared), (Clear: Pitstop.Planned.Nr)
 
-pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, fail
+pitstopPerformed(?lap) <= unbound?(!Pitstop.Prepared), !, unpreparedPitstopPerformed(?lap), fail
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Lap, ?lap)
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Time.End, ?time), Set(Pitstop, !Pitstop.Planned.Nr, Time, ?time)
 pitstopPerformed(?lap) <= Get(Lap, ?lap, Temperature.Air, ?temp), Set(Pitstop, !Pitstop.Planned.Nr, Temperature.Air, ?temp)
@@ -931,6 +931,14 @@ pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Driver.Request, !Pit
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Suspension, !Pitstop.Planned.Repair.Suspension)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Bodywork, !Pitstop.Planned.Repair.Bodywork)
 pitstopPerformed(?lap) <= Set(Pitstop, !Pitstop.Planned.Nr, Repair.Engine, !Pitstop.Planned.Repair.Engine)
+
+unpreparedPitstopPerformed(?lap) <= lastPitstop(?last), ?nr = ?last + 1, !, unpreparedPitstopPerformed(?nr, ?lap), Set(Pitstop.Last, ?nr)
+unpreparedPitstopPerformed(?lap) <= unpreparedPitstopPerformed(1, ?lap), Set(Pitstop.Last, 1)
+
+unpreparedPitstopPerformed(?nr, ?lap) <= Set(Pitstop, ?nr, Lap, ?lap)
+unpreparedPitstopPerformed(?nr, ?lap) <= Get(Lap, ?lap, Time.End, ?time), Set(Pitstop, ?nr, Time, ?time)
+unpreparedPitstopPerformed(?nr, ?lap) <= Get(Lap, ?lap, Temperature.Air, ?temp), Set(Pitstop, ?nr, Temperature.Air, ?temp)
+unpreparedPitstopPerformed(?nr, ?lap) <= Get(Lap, ?lap, Temperature.Track, ?temp), Set(Pitstop, ?nr, Temperature.Track, ?temp)
 
 
 ;;;-------------------------------------------------------------------------;;;

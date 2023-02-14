@@ -1154,7 +1154,8 @@ class RaceAssistant extends ConfigurationItem {
 		driverSurname := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
 		driverNickname := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
 
-		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForname, driverSurname, driverNickname)})
+		this.updateSessionValues({Driver: driverForname, DriverFullName: computeDriverName(driverForname, driverSurname, driverNickname)
+								, TeamSession: (getConfigurationValue(data, "Session Data", "Mode", "Solo") = "Team")})
 
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Forname", driverForname)
 		knowledgeBase.addFact("Lap." . lapNumber . ".Driver.Surname", driverSurname)

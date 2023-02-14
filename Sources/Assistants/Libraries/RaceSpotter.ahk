@@ -1449,35 +1449,39 @@ class RaceSpotter extends GridRaceAssistant {
 			remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 			remainingStintTime := Round(knowledgeBase.getValue("Driver.Time.Stint.Remaining") / 60000)
 
-			speaker.beginTalk()
+			if (remainingSessionLaps > 0) {
+				speaker.beginTalk()
 
-			try {
-				speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
-													, laps: remainingSessionLaps
-													, position: Round(positions["Position.Class"])})
+				try {
+					speaker.speakPhrase("HalfTimeIntro", {minutes: remainingSessionTime
+														, laps: remainingSessionLaps
+														, position: Round(positions["Position.Class"])})
 
-				remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
+					remainingFuelLaps := Floor(knowledgeBase.getValue("Lap.Remaining.Fuel"))
 
-				if (remainingStintTime < remainingSessionTime) {
-					speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
+					if (remainingStintTime < remainingSessionTime) {
+						speaker.speakPhrase("HalfTimeStint", {minutes: remainingStintTime, laps: Floor(remainingStintLaps)})
 
-					enoughFuel := (remainingStintLaps < remainingFuelLaps)
+						enoughFuel := (remainingStintLaps < remainingFuelLaps)
+					}
+					else {
+						speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
+															  , laps: Ceil(remainingSessionLaps)})
+
+						enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+					}
+
+					speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
+									  , {laps: Floor(remainingFuelLaps)})
 				}
-				else {
-					speaker.speakPhrase("HalfTimeSession", {minutes: remainingSessionTime
-														  , laps: Ceil(remainingSessionLaps)})
-
-					enoughFuel := (remainingSessionLaps < remainingFuelLaps)
+				finally {
+					speaker.endTalk()
 				}
 
-				speaker.speakPhrase(enoughFuel ? "HalfTimeEnoughFuel" : "HalfTimeNotEnoughFuel"
-								  , {laps: Floor(remainingFuelLaps)})
+				return true
 			}
-			finally {
-				speaker.endTalk()
-			}
-
-			return true
+			else
+				return false
 		}
 		else
 			return false
@@ -2015,41 +2019,43 @@ class RaceSpotter extends GridRaceAssistant {
 
 					spoken := true
 				}
-				else if (regular && standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
+				else if regular {
 					lapDifference := standingsAhead.LapDifference[sector]
 
-					speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-													  , gained: speaker.number2Speech(deltaDifference, 1)
-													  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-													  , deltaLaps: lapDifference
-													  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+					if (lapDifference > 0) {
+						if (standingsAhead.closingIn(sector, frontGainThreshold) && !standingsAhead.Reported) {
+							speaker.speakPhrase("GainedFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+															  , gained: speaker.number2Speech(deltaDifference, 1)
+															  , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+															  , deltaLaps: lapDifference
+															  , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 
-					remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
+							remaining := Min(knowledgeBase.getValue("Session.Time.Remaining"), knowledgeBase.getValue("Driver.Time.Stint.Remaining"))
 
-					if ((remaining > 0) && (lapTimeDifference > 0))
-						if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
-							speaker.speakPhrase("CanDoIt")
-						else
-							speaker.speakPhrase("CantDoIt")
+							if ((remaining > 0) && (lapTimeDifference > 0))
+								if (((remaining / 1000) / this.DriverCar.LapTime[true]) > (delta / lapTimeDifference))
+									speaker.speakPhrase("CanDoIt")
+								else
+									speaker.speakPhrase("CantDoIt")
 
-					informed := true
+							informed := true
 
-					standingsAhead.reset(sector, false, true)
+							standingsAhead.reset(sector, false, true)
 
-					spoken := true
-				}
-				else if (regular && standingsAhead.runningAway(sector, frontLostThreshold)) {
-					lapDifference := standingsAhead.LapDifference[sector]
+							spoken := true
+						}
+						else if (standingsAhead.runningAway(sector, frontLostThreshold)) {
+							speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+															, lost: speaker.number2Speech(deltaDifference, 1)
+															, lapTime: speaker.number2Speech(lapTimeDifference, 1)
+															, deltaLaps: lapDifference
+															, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 
-					speaker.speakPhrase("LostFront", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-													, lost: speaker.number2Speech(deltaDifference, 1)
-													, lapTime: speaker.number2Speech(lapTimeDifference, 1)
-													, deltaLaps: lapDifference
-													, laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+							standingsAhead.reset(sector, true, true)
 
-					standingsAhead.reset(sector, true, true)
-
-					spoken := true
+							spoken := true
+						}
+					}
 				}
 			}
 
@@ -2094,34 +2100,36 @@ class RaceSpotter extends GridRaceAssistant {
 
 					spoken := true
 				}
-				else if (regular && standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
+				else if regular {
 					lapDifference := standingsBehind.LapDifference[sector]
 
-					speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-													 , lost: speaker.number2Speech(deltaDifference, 1)
-													 , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-													 , deltaLaps: lapDifference
-													 , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+					if (lapDifference > 0) {
+						if (standingsBehind.closingIn(sector, behindLostThreshold) && !standingsBehind.Reported) {
+							speaker.speakPhrase("LostBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+															 , lost: speaker.number2Speech(deltaDifference, 1)
+															 , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+															 , deltaLaps: lapDifference
+															 , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 
-					if !informed
-						speaker.speakPhrase("Focus")
+							if !informed
+								speaker.speakPhrase("Focus")
 
-					standingsBehind.reset(sector, false, true)
+							standingsBehind.reset(sector, false, true)
 
-					spoken := true
-				}
-				else if (regular && standingsBehind.runningAway(sector, behindGainThreshold)) {
-					lapDifference := standingsBehind.LapDifference[sector]
+							spoken := true
+						}
+						else if (standingsBehind.runningAway(sector, behindGainThreshold)) {
+							speaker.speakPhrase("GainedBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
+															   , gained: speaker.number2Speech(deltaDifference, 1)
+															   , lapTime: speaker.number2Speech(lapTimeDifference, 1)
+															   , deltaLaps: lapDifference
+															   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
 
-					speaker.speakPhrase("GainedBehind", {delta: (delta > 5) ? Round(delta) : speaker.number2Speech(delta, 1)
-													   , gained: speaker.number2Speech(deltaDifference, 1)
-													   , lapTime: speaker.number2Speech(lapTimeDifference, 1)
-													   , deltaLaps: lapDifference
-													   , laps: speaker.Fragments[(lapDifference > 1) ? "Laps" : "Lap"]})
+							standingsBehind.reset(sector, true, true)
 
-					standingsBehind.reset(sector, true, true)
-
-					spoken := true
+							spoken := true
+						}
+					}
 				}
 			}
 		}

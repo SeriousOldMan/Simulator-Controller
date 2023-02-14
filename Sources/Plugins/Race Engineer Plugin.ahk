@@ -33,6 +33,76 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 	iLapDatabase := false
 
+	class DriverSwapTask extends Task {
+		iPlugin := false
+
+		iStartTime := false
+
+		Plugin[] {
+			Get {
+				return this.iPlugin
+			}
+		}
+
+		__New(plugin) {
+			this.iPlugin := plugin
+
+			this.iStartTime := A_TickCount
+
+			base.__New(false, 1000, kLowPriority)
+		}
+
+		run() {
+			local teamServer := this.Plugin.TeamServer
+			local driverSwapPlan, requestDriver
+
+			if (teamServer && teamServer.SessionActive) {
+				try {
+					driverSwapPlan := teamServer.getSessionValue(this.Plugin.Plugin . " Driver Swap Plan")
+
+					if (driverSwapPlan && (driverSwapPlan != "")) {
+						teamServer.setSessionValue(this.Plugin.Plugin . " Driver Swap Plan", "")
+
+						driverSwapPlan := parseConfiguration(driverSwapPlan)
+
+						requestDriver := getConfigurationValue(driverSwapPlan, "Pitstop", "Driver", false)
+						requestDriver := (requestDriver ? [requestDriver] : [])
+
+						this.Plugin.RaceEngineer.planDriverSwap(getConfigurationValue(driverSwapPlan, "Pitstop", "Lap", 0)
+															  , "!" . getConfigurationValue(driverSwapPlan, "Pitstop", "Refuel", 0)
+															  , "!" . getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Change", false)
+															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Set", 0)
+															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Compound", "Dry")
+															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Compound.Color", "Black")
+															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
+															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Bodywork", false)
+															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Suspension", false)
+															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Engine", false)
+															  , requestDriver*)
+
+						return false
+					}
+				}
+				catch exception {
+					logError(exception)
+				}
+
+				if (A_TickCount > (this.iStartTime + 20000)) {
+					this.Plugin.RaceEngineer.planDriverSwap(false)
+
+					return false
+				}
+				else
+					return this
+			}
+			else {
+				this.Plugin.RaceEngineer.planDriverSwap(false)
+
+				return false
+			}
+		}
+	}
+
 	class RemoteRaceEngineer extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
 			base.__New(plugin, "Race Engineer", remotePID)
@@ -153,6 +223,14 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 			settings := readConfiguration(kTempDirectory . "Race Engineer.settings")
 		}
+		else if (tpSetting = "Setup") {
+			pressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
+			
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+		}
 
 		return settings
 	}
@@ -230,12 +308,23 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			this.RaceEngineer.planPitstop()
 	}
 
-	planDriverSwap(lap := "__Undefined__") {
+	planDriverSwap(arguments*) {
+		local teamServer
+
 		if this.RaceEngineer {
-			if (lap = kUndefined)
+			if (arguments.Length() = 0)
 				this.RaceEngineer.planDriverSwap()
 			else {
-				this.RaceEngineer.planDriverSwap(false)
+				teamServer := this.TeamServer
+
+				if (teamServer && teamServer.SessionActive) {
+					teamServer.setSessionValue(this.Plugin . " Driver Swap Plan", "")
+					teamServer.setSessionValue(this.Plugin . " Driver Swap Request", values2String(";", arguments*))
+
+					new this.DriverSwapTask(this).start()
+				}
+				else
+					this.RaceEngineer.planDriverSwap(false)
 			}
 		}
 	}

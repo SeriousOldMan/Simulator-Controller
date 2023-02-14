@@ -110,7 +110,7 @@ The Spotter will give you critical and in most cases real time information about
 
 14. Session Timer Information
 
-    When you are in a practice or qualification session, the Spotter will issue a warning 30, 15 and 5 minutes before the end of the session.
+    When you are in a practice or qualifying session, the Spotter will issue a warning 30, 15 and 5 minutes before the end of the session.
 
 15. Half Time Notification
 

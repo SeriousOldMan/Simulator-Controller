@@ -2083,7 +2083,7 @@ class RaceEngineer extends RaceAssistant {
 	executePitstop(lapNumber) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastLap, flWear, frWear, rlWear, rrWear, driver, tyreCompound, tyreCompoundColor, tyreSet, result
-		local lastPitstop, pitstop, options
+		local lastPitstop, pitstop, options, compound, pressures, tyre
 
 		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")
@@ -2118,10 +2118,24 @@ class RaceEngineer extends RaceAssistant {
 			if (knowledgeBase.getValue("Pitstop." . pitstop . ".Refuel", kUndefined) = kUndefined) {
 				options := readConfiguration(this.iPitstopOptionsFile)
 
-				knowledgeBase.setFact("Pitstop." . pitstop . ".Refuel", getConfigurationValue(options, "Pitstop", "Refuel", 0))
-				knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound", getConfigurationValue(options, "Pitstop", "Tyre.Compound", false))
-				knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color", getConfigurationValue(options, "Pitstop", "Tyre.Compound.Color", false))
-				knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Set", getConfigurationValue(options, "Pitstop", "Tyre.Set", false))
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Fuel", getConfigurationValue(options, "Pitstop", "Refuel", 0))
+
+				compound := getConfigurationValue(options, "Pitstop", "Tyre.Compound", false)
+
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound", compound)
+
+				if compound {
+					knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color", getConfigurationValue(options, "Pitstop", "Tyre.Compound.Color", false))
+					knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Set", getConfigurationValue(options, "Pitstop", "Tyre.Set", false))
+
+					pressures := string2Values(";", getConfigurationValue(options, "Pitstop", "Tyre.Pressures", ""))
+
+					for index, tyre in ["FL", "FR", "RL", "RR"]
+						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Pressure." . tyre, pressures[index])
+				}
+				else
+					knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color", false)
+
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Suspension", getConfigurationValue(options, "Pitstop", "Repair.Suspension", false))
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Bodywork", getConfigurationValue(options, "Pitstop", "Repair.Bodywork", false))
 				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Engine", getConfigurationValue(options, "Pitstop", "Repair.Engine", false))

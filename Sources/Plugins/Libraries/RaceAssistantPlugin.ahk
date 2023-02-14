@@ -998,7 +998,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local ignore, assistant
 
 		if RaceAssistantPlugin.Simulator
-			options := RaceAssistantPlugin.Simulator.getAllPitstopOptionValues()
+			options := RaceAssistantPlugin.Simulator.getPitstopAllOptionValues()
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)

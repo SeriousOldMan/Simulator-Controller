@@ -600,7 +600,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			}
 	}
 
-	getAllPitstopOptionValues() {
+	getPitstopAllOptionValues() {
 		local options := {}
 
 		options["Refuel"] := this.getPitstopOptionValues("Refuel")

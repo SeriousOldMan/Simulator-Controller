@@ -14,6 +14,7 @@
   2. Support for Full Course Yellow rules in the Assistants
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
+  5. Graphical editor for telemtry data browsing and cleanup
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer
@@ -25,6 +26,8 @@
 #### General
   1. Choosing a specific theme depending on the selected simulation game
   2. Further simplification of the overall configuration process. Overhaul of "Race Settings", "Simulator Settings" and "Simulator Configuration"
-  3. Integrate WebView2 with Edge to cope with the pending shutdown of IE 11 (https://www.autohotkey.com/boards/viewtopic.php?f=83&t=79868)
-  4. Port all AHK applications to AutoHotkey 2.0.2
+  3. Port all AHK applications to AutoHotkey 2.0.2
+  4. Integrate WebView2 with Edge to cope with the pending shutdown of IE 11
+     - https://www.autohotkey.com/boards/viewtopic.php?f=83&t=79868
+	 - https://www.autohotkey.com/boards/viewtopic.php?t=95666
   5. Resizeable windows or larger window sizes for the "large" applications

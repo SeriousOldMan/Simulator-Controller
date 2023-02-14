@@ -179,6 +179,8 @@
     - [Session & Stint Planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning)
 	- [Driver specific tyre pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#managing-driver-specific-tyre-pressures)
     - [Planning a Pitstop](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop)
+	  - [Selecting the next Driver](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#automatically-select-the-next-driver)
+	  - [Using the Race Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants)
   - [Server Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#troubleshooting)

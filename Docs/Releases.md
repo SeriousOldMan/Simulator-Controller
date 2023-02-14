@@ -8,6 +8,8 @@
   7. New icons in the Stream Deck icon set for all above new controller actions.
   8. A fourth method to identify initial tyre pressures has been added to the configuration. This one takes the initial pressures which the tyres have in the moment, when data is acquired for the first time from the simulator. They can be a little bit off, though, when the car had sit for some time and the tyres lost temperature. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more details.
   9. List of drivr-specific tyre setups can now be sorted in the "Race Center" by clicking in the column headers.
+  10. Unprepared pitstops that had been performed without the control of the Race Engineer will be recorded for documentation in the "Race Center", although all information about refueling, tyre changes, and so on, will be empty.
+  11. The term "Qualification" has been renamed throughout the suite to "Qualifying".
 
 ## 4.5.9.0-release 02/10/23
   1. Minor bugfixes, as always
@@ -357,7 +359,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
      - Announcement of the Green flag at race start.
 	 - Information when direct opponents or the race leader enter the pit.
 	 - Applause, when a new personal best lap time has been set.
-	 - Information when the current session (Practice or Qualification) is ending in 30, 15 or 5 minutes.
+	 - Information when the current session (Practice or Qualifying) is ending in 30, 15 or 5 minutes.
 	 - Detailed information package, when the first half of a race session has been finished.
 	 - Warning a few laps before the current stint is ending.
 	 - Information when temperatures are rising or falling.
@@ -1315,7 +1317,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   4. Integration of Jona, the Virtual Race Engineer, for *RaceRoom Racing Experience*. No support for actual pitstop handling yet, and actually, this might never come due to limitations in the UI and API design of *RaceRoom Racing Experience*.
   5. Initial version of Jona for rFactor 2 too. Support for pitstop handling will be added in a future release.
   6. Jona is now also active in practice sessions but does not support pitstop planning and preparation there.
-  7. When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualification or even Endurance Race sessions.
+  7. When the *Race Engineer.settings* file is changed while Jona is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualifying or even Endurance Race sessions.
   8. Introduced color coding (Red = Soft, White = Medium, Blue = Hard) to the tyre compound handling of the Virtual Race Engineer.
   9. (Developer only): Documentation for the configuration tool plugin interface has been added. Please take a look here: [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) and also the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#configuration-editor-classes) in the *Classes Reference* for more information.
   10. (Developer only): The build pipeline of *Simulator Tools* now incorporates *VS MSBuild*, so that all external applications and DLLs will be automatically compiled too. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#using-the-build-tool) on *Simulator Tools* for more information.

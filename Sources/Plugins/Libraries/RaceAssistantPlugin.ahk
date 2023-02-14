@@ -786,7 +786,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					setConfigurationValue(configuration, "Race Assistants", "Session", session)
 
 					information := values2String("; ", translate("Started: ") . translate(this.RaceAssistant ? "Yes" : "No")
-													 , translate("Session: ") . translate(session)
+													 , translate("Session: ") . translate((session = "Qualification") ? "Qualifying" : session)
 													 , translate("Laps: ") . this.LastLap
 													 , translate("Mode: ") . translate(this.TeamSessionActive ? "Team" : "Solo"))
 

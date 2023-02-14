@@ -85,6 +85,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 14. [Analyzing Driving Style and Handling Issues](https://youtu.be/UmXMKMpGOkk) - This video shows you how to use the all new telemetry analyzer, which will automatically detect handling issues of your setup (or your driving style) while you are driving. The handling issues can then be transferred to the Setup Advisor to create a modification of the car setup.
 
+15. [Expert guide to race settings](https://youtu.be/UeD397KFEhg) - This video will give you a complete overview over all the settings used by the Race Assistants, for example all the stuff needed by the Race Engineer to handle a successful pitstop in even the worst conditions.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

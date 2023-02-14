@@ -600,6 +600,20 @@ class SimulatorPlugin extends ControllerPlugin {
 			}
 	}
 
+	getAllPitstopOptionValues() {
+		local options := {}
+
+		options["Refuel"] := this.getPitstopOptionValues("Refuel")
+		options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")
+		options["Tyre Set"] := this.getPitstopOptionValues("Tyre Set")
+		options["Tyre Pressures"] := this.getPitstopOptionValues("Tyre Pressures")
+		options["Repair Suspension"] := this.getPitstopOptionValues("Repair Suspension")
+		options["Repair Bodywork"] := this.getPitstopOptionValues("Repair Bodywork")
+		options["Repair Engine"] := this.getPitstopOptionValues("Repair Engine")
+
+		return options
+	}
+
 	getPitstopOptionValues(option) {
 		return false
 	}
@@ -950,7 +964,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.RaceEngineer.preparePitstop(lap)
 	}
 
-	performPitstop(lap) {
+	performPitstop(lap, options) {
 	}
 
 	pitstopPlanned(pitstopNumber, plannedLap := false) {

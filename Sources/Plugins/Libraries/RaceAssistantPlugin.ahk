@@ -994,14 +994,18 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	performAssistantsPitstop(lapNumber) {
+		local options := false
 		local ignore, assistant
+
+		if RaceAssistantPlugin.Simulator
+			options := RaceAssistantPlugin.Simulator.getAllPitstopOptionValues()
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
 			if (assistant.requireRaceAssistant() && assistant.RaceAssistantActive)
-				assistant.performPitstop(lapNumber)
+				assistant.performPitstop(lapNumber, options)
 
 		if RaceAssistantPlugin.Simulator
-			RaceAssistantPlugin.Simulator.performPitstop(lapNumber)
+			RaceAssistantPlugin.Simulator.performPitstop(lapNumber, options)
 	}
 
 	restoreAssistantsSessionState(data) {
@@ -1428,9 +1432,37 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	performPitstop(lapNumber) {
-		if this.RaceAssistant
-			this.RaceAssistant.performPitstop(lapNumber)
+	performPitstop(lapNumber, options) {
+		local data, dataFile, ignore, key, value
+
+		if this.RaceAssistant {
+			dataFile := temporaryFileName(this.Plugin, "pitstop")
+
+			data := newConfiguration()
+
+			for ignore, key in ["Refuel", "Tyre Compound", "Tyre Set", "Tyre Pressures"
+							  , "Repair Suspension", "Repair Bodywork", "Repair Engine"]
+				if options.HasKey(key) {
+					value := options[key]
+
+					if value
+						switch key {
+							case "Tyre Compound":
+								setConfigurationValue(data, "Pitstop", "Tyre.Compound", value[1])
+								setConfigurationValue(data, "Pitstop", "Tyre.Compound.Color", value[2])
+							case "Tyre Pressures":
+								setConfigurationValue(data, "Pitstop", "Tyre.Pressures", values2String(";", value*))
+							default:
+								setConfigurationValue(data, "Pitstop", StrReplace(key, A_Space, "."), value[1])
+						}
+				}
+
+			data := printConfiguration(data)
+
+			FileAppend %data%, %dataFile%, UTF-16
+
+			this.RaceAssistant.performPitstop(lapNumber, dataFile)
+		}
 	}
 
 	supportsSetupImport() {

@@ -3,7 +3,7 @@ Version=4.6.0.0-dev
 Target=4.6.0.0-release
 Date=02/13/2023
 Download=
-Changes=New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races, New controller action for Race Engineer and all simulators to create a pitstop including driver swap in team races, New voice command for Race Engineer to plan refueling so that a given amount of fuel is available after the pitstop, New controller action for all simulators to set refueling amount to zero, New icons in the Stream Deck icon set for all new controller actions, Setup list in "Race Center" can now be sorted by clicking in the column headers
+Changes=New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races, New controller action for Race Engineer and all simulators to create a pitstop including driver swap in team races, New voice command for Race Engineer to plan refueling so that a given amount of fuel is available after the pitstop, New controller action for all simulators to set refueling amount to zero, New icons in the Stream Deck icon set for all new controller actions, Setup list in "Race Center" can now be sorted by clicking in the column headers, Record unprepared pitstops for documentation in "Race Center"
 [Release]
 Version=4.5.9.0-release
 Date=02/10/2023

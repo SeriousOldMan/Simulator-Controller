@@ -8,6 +8,8 @@
   7. New icons in the Stream Deck icon set for all above new controller actions.
   8. A fourth method to identify initial tyre pressures has been added to the configuration. This one takes the initial pressures which the tyres have in the moment, when data is acquired for the first time from the simulator. They can be a little bit off, though, when the car had sit for some time and the tyres lost temperature. Please see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more details.
   9. List of drivr-specific tyre setups can now be sorted in the "Race Center" by clicking in the column headers.
+  10. Unprepared pitstops that had been performed without the control of the Race Engineer will be recorded for documentation in the "Race Center", although all information about refueling, tyre changes, and so on, will be empty.
+  11. The term "Qualification" has been renamed throughout the suite to "Qualifying".
 
 ## 4.5.9.0-release 02/10/23
   1. Minor bugfixes, as always

@@ -48,7 +48,7 @@ global kOk := "Ok"
 global kCancel := "Cancel"
 global kClose := "Close"
 
-global kSetupNames := {DQ: "Qualification (Dry)", DR: "Race (Dry)", WQ: "Qualification (Wet)", WR: "Race (Wet)"}
+global kSetupNames := {DQ: "Qualifying (Dry)", DR: "Race (Dry)", WQ: "Qualifying (Wet)", WR: "Race (Wet)"}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -580,7 +580,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui Tab, 3
 
 		Gui %window%:Add, Text, x296 ys w80 h23 +0x200, % translate("Purpose")
-		Gui %window%:Add, DropDownList, xp+90 yp w270 AltSubmit Choose2 vsetupTypeDropDown gchooseSetupType, % values2String("|", map(["Qualification (Dry)", "Race (Dry)", "Qualification (Wet)", "Race (Wet)"], "translate")*)
+		Gui %window%:Add, DropDownList, xp+90 yp w270 AltSubmit Choose2 vsetupTypeDropDown gchooseSetupType, % values2String("|", map(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], "translate")*)
 
 		Gui %window%:Add, ListView, x296 yp+24 w360 h302 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", map(["Source", "Name"], "translate")*)
 

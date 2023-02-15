@@ -334,8 +334,8 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			this.RaceEngineer.preparePitstop(lap)
 	}
 
-	performPitstop(lapNumber) {
-		base.performPitstop(lapNumber)
+	performPitstop(lapNumber, options) {
+		base.performPitstop(lapNumber, options)
 
 		this.iPitstopPending := false
 

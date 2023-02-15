@@ -34,6 +34,8 @@ class RaceEngineer extends RaceAssistant {
 	iHasPressureData := false
 	iSessionDataActive := false
 
+	iPitstopOptionsFile := false
+
 	class RaceEngineerRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
 			base.__New("Race Engineer", remotePID)
@@ -2072,10 +2074,16 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
+	performPitstop(lapNumber := false, optionsFile := false) {
+		this.iPitstopOptionsFile := optionsFile
+
+		base.performPitstop(lapNumber, optionsFile)
+	}
+
 	executePitstop(lapNumber) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastLap, flWear, frWear, rlWear, rrWear, driver, tyreCompound, tyreCompoundColor, tyreSet, result
-		local lastPitstop, pitstop
+		local lastPitstop, pitstop, options, compound, pressures, tyre
 
 		if this.Speaker[false]
 			this.getSpeaker().speakPhrase("Perform")
@@ -2105,6 +2113,41 @@ class RaceEngineer extends RaceAssistant {
 		result := base.executePitstop(lapNumber)
 
 		pitstop := knowledgeBase.getValue("Pitstop.Last", 0)
+
+		if this.iPitstopOptionsFile {
+			if (knowledgeBase.getValue("Pitstop." . pitstop . ".Refuel", kUndefined) = kUndefined) {
+				options := readConfiguration(this.iPitstopOptionsFile)
+
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Fuel", getConfigurationValue(options, "Pitstop", "Refuel", 0))
+
+				compound := getConfigurationValue(options, "Pitstop", "Tyre.Compound", false)
+
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound", compound)
+
+				if compound {
+					knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color", getConfigurationValue(options, "Pitstop", "Tyre.Compound.Color", false))
+					knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Set", getConfigurationValue(options, "Pitstop", "Tyre.Set", false))
+
+					pressures := string2Values(";", getConfigurationValue(options, "Pitstop", "Tyre.Pressures", ""))
+
+					for index, tyre in ["FL", "FR", "RL", "RR"]
+						knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Pressure." . tyre, pressures[index])
+				}
+				else
+					knowledgeBase.setFact("Pitstop." . pitstop . ".Tyre.Compound.Color", false)
+
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Suspension", getConfigurationValue(options, "Pitstop", "Repair.Suspension", false))
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Bodywork", getConfigurationValue(options, "Pitstop", "Repair.Bodywork", false))
+				knowledgeBase.setFact("Pitstop." . pitstop . ".Repair.Engine", getConfigurationValue(options, "Pitstop", "Repair.Engine", false))
+
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledgeBase(knowledgeBase)
+			}
+
+			deleteFile(this.iPitstopOptionsFile)
+
+			this.iPitstopOptionsFile := false
+		}
 
 		if (this.RemoteHandler && (flWear != kUndefined) && (pitstop != lastPitstop))
 			this.RemoteHandler.updateTyreSet(pitstop, driver, false

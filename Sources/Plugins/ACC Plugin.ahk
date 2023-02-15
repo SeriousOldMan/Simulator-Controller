@@ -1802,8 +1802,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			return false
 	}
 
-	performPitstop(lap) {
-		base.performPitstop(lap)
+	performPitstop(lap, options) {
+		base.performPitstop(lap, options)
 
 		this.iSelectedDriver := false
 	}

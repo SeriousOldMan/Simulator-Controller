@@ -1366,7 +1366,7 @@ class RaceAssistant extends ConfigurationItem {
 		return result
 	}
 
-	performPitstop(lapNumber := false) {
+	performPitstop(lapNumber := false, optionsFile := false) {
 		if !lapNumber
 			lapNumber := this.KnowledgeBase.getValue("Lap")
 

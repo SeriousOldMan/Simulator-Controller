@@ -695,7 +695,7 @@ chooseLogLevel() {
 
 updateSimulationState(controllerState) {
 	local state := getConfigurationValue(controllerState, "Simulation", "State", "Disabled")
-	local html, icon
+	local html, icon, displayState
 
 	if kStateIcons.HasKey(state)
 		icon := kStateIcons[state]
@@ -704,12 +704,17 @@ updateSimulationState(controllerState) {
 
 	GuiControl, , simulationState, %icon%
 
+	displayState := getConfigurationValue(controllerState, "Simulation", "Session")
+	
+	if (displayState = "Qualification")
+		displayState := "Qualifying"
+		
 	if (state = "Active") {
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Car") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Track") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(getConfigurationValue(controllerState, "Simulation", "Session")) . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(displayState) . "</td></tr>")
 		html .= "</table>"
 	}
 	else if (state = "Passive") {

@@ -690,6 +690,12 @@ class SetupWizard extends ConfigurationItem {
 		local buttonBoxConfiguration, streamDeckConfiguration
 
 		if (this.Step && this.Step.hidePage(this.Page)) {
+			while this.SettingsOpen {
+				Task.yield()
+
+				Sleep 100
+			}
+
 			window := this.WizardWindow
 
 			Gui %window%:Default
@@ -2250,8 +2256,6 @@ class FinishStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
-		this.SetupWizard.SettingsOpen := true
-
 		base.showPage(page)
 
 		Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200, kLowPriority)
@@ -2280,11 +2284,16 @@ class FinishStepWizard extends StepWizard {
 
 			configuration := this.SetupWizard.getSimulatorConfiguration()
 
-			editSettings(settings, false, configuration
-					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
-					   , "Center")
+			this.SetupWizard.SettingsOpen := true
 
-			this.SetupWizard.SettingsOpen := false
+			try {
+				editSettings(settings, false, configuration
+						   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
+						   , "Center")
+			}
+			finally {
+				this.SetupWizard.SettingsOpen := false
+			}
 		}
 	}
 
@@ -2304,7 +2313,7 @@ finishSetup(finish := false, save := false) {
 	local window, title, message
 
 	if (finish = "Finish") {
-		if (SetupWizard.Instance.SettingsOpen || SetupWizard.Instance.Working) {
+		if (!SetupWizard.Instance.SettingsOpen || SetupWizard.Instance.Working) {
 			; Let other threads finish...
 
 			Task.startTask(Func("finishSetup").Bind("Finish", save), 200)

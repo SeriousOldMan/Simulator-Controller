@@ -690,7 +690,7 @@ class SetupWizard extends ConfigurationItem {
 		local buttonBoxConfiguration, streamDeckConfiguration
 
 		if (this.Step && this.Step.hidePage(this.Page)) {
-			while this.SettingsOpen {
+			while this.SetupWizard.SettingsOpen {
 				Task.yield()
 
 				Sleep 100
@@ -2256,9 +2256,9 @@ class FinishStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
-		base.showPage(page)
+		Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200, kHighPriority)
 
-		Task.startTask(ObjBindMethod(this, "openSettingsEditor"), 200, kLowPriority)
+		base.showPage(page)
 	}
 
 	hidePage(page) {
@@ -2286,21 +2286,23 @@ class FinishStepWizard extends StepWizard {
 
 			this.SetupWizard.SettingsOpen := true
 
-			try {
-				editSettings(settings, false, configuration
-						   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
-						   , "Center")
-			}
-			finally {
-				this.SetupWizard.SettingsOpen := false
-			}
+			editSettings(settings, false, configuration
+					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
+					   , "Center")
 		}
+
+		return false
 	}
 
 	closeSettingsEditor() {
-		local settings := editSettings(kSave, false, true)
+		if !this.SetupWizard.SettingsOpen
+			Task.startTask(ObjBindMethod(this, "closeSettingsEditor"), 1000, kHighPriority)
 
-		writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", settings)
+		writeConfiguration(kUserHomeDirectory . "Setup\Simulator Settings.ini", editSettings(kSave, false, true))
+
+		this.SetupWizard.SettingsOpen := false
+
+		return false
 	}
 }
 
@@ -2313,13 +2315,18 @@ finishSetup(finish := false, save := false) {
 	local window, title, message
 
 	if (finish = "Finish") {
-		if (!SetupWizard.Instance.SettingsOpen || SetupWizard.Instance.Working) {
-			; Let other threads finish...
-
+		if !SetupWizard.Instance.SettingsOpen
 			Task.startTask(Func("finishSetup").Bind("Finish", save), 200)
+		else {
+			; Wait for settings editor to be fully open...
+
+			Task.yield()
+
+			Sleep 1000
+
+			if SetupWizard.Instance.finishSetup(save)
+				ExitApp 0
 		}
-		else if SetupWizard.Instance.finishSetup(save)
-			ExitApp 0
 	}
 	else {
 		window := SetupWizard.Instance.WizardWindow

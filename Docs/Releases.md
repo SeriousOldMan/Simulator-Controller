@@ -1,7 +1,7 @@
 ## 4.6.0.0-release 02/17/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races. See the [all new documentation](*) about the interaction between the Race Assistants and the "Race Center".
+  3. New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races. See the [all new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants) about the interaction between the Race Assistants and the "Race Center".
   4. New [controller action "DriverSwapPlan"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the Race Engineer and all simulators to create a pitstop including driver swap in team races. Aquivalent to the above voice command.
   5. New voice command for Race Engineer to adjust the pitstop plan so that a given amount of fuel is available after the pitstop. Just ask "Can we refuel **up to** xx liters?". Refuel target will be calculated for the next lap in this case.
   6. New [controller action "NoRefuel"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#mode-pitstop) for all simulators to set refueling amount to zero, New icons in the Stream Deck icon set for all new controller actions.
@@ -13,6 +13,10 @@
   12. New plugin parameter *raceAssistantMuted* for all Race Assistants to start the correspnding assistant in muted state. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   13. The "Simulator Setup" presets *Muted Engineer*, *Muted Strategist* and *Muted Spotter*, which completely disables voice input and output of a given Race Assistant, had been renamed to *Silent Engineer* and so on.
   14. New presets for "Simulator Setup", which are now named *Muted Engineer*, *Muted Strategist* and *Muted Spotter*, will use the new plugin parameter *raceAssistantMuted* to start up the correspnding Race Assistant in muted state.
+  15. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Lotus Evora GTC
+	    - Lotus Evora GX
 
 ## 4.5.9.0-release 02/10/23
   1. Minor bugfixes, as always

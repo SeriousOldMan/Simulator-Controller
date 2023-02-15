@@ -10,6 +10,10 @@
   9. List of drivr-specific tyre setups can now be sorted in the "Race Center" by clicking in the column headers.
   10. Unprepared pitstops that had been performed without the control of the Race Engineer will be recorded for documentation in the "Race Center", although all information about refueling, tyre changes, and so on, will be empty.
   11. The term "Qualification" has been renamed throughout the suite to "Qualifying".
+  12. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Lotus Evora GTC
+	    - Lotus Evora GX
 
 ## 4.5.9.0-release 02/10/23
   1. Minor bugfixes, as always

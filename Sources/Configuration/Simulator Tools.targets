@@ -34,7 +34,7 @@ Release 4.5.1=Release 4.5.0 -> updateConfigurationForV451
 Release 4.5.2.1=Release 4.5.1 -> updateConfigurationForV452
 Release 4.5.5=Release 4.5.2.1 -> updateConfigurationForV455
 Release 4.5.9=Release 4.5.5 -> updateStreamDeckIconPreset
-Release 4.6.0=Release 4.5.9 -> updateStreamDeckIconPreset
+Release 4.6.0=Release 4.5.9 -> updateStreamDeckIconPreset, updateConfigurationForV460
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

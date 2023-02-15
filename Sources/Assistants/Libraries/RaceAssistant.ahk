@@ -406,7 +406,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
-	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		local options
 
 		if !kUnknown
@@ -441,6 +441,7 @@ class RaceAssistant extends ConfigurationItem {
 			}
 		}
 
+		this.iMuted := muted
 		this.iVoiceManager := this.createVoiceManager(name, options)
 
 		configuration := newConfiguration()

@@ -2027,6 +2027,20 @@ clearWearFields(database, table, id) {
 	}
 }
 
+updateConfigurationForV460() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileRead text, %kUserHomeDirectory%Setup\Setup.data
+
+		text := StrReplace(text, "MutedEngineer", "SilentEngineer")
+		text := StrReplace(text, "MutedStrategist", "SilentStrategist")
+		text := StrReplace(text, "MutedSpotter", "SilentSpotter")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
+	}
+}
+
 updateConfigurationForV422() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
 	local userConfiguration := readConfiguration(userConfigurationFile)

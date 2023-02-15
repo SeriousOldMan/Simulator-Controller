@@ -99,6 +99,7 @@ startRaceStrategist() {
 	local strategistSpeakerVocalics := false
 	local strategistRecognizer := true
 	local strategistListener := false
+	local strategistMuted := false
 	local debug := false
 	local voiceServer, index, strategist, label, callback
 
@@ -140,6 +141,9 @@ startRaceStrategist() {
 			case "-Listener":
 				strategistListener := A_Args[index + 1]
 				index += 2
+			case "-Muted":
+				strategistMuted := true
+				index += 1
 			case "-Voice":
 				voiceServer := A_Args[index + 1]
 				index += 2
@@ -168,7 +172,7 @@ startRaceStrategist() {
 								   , remotePID ? new RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
 								   , strategistName, strategistLanguage
 								   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics
-								   , strategistRecognizer, strategistListener, voiceServer)
+								   , strategistRecognizer, strategistListener, strategistMuted, voiceServer)
 
 	RaceStrategist.Instance := strategist
 

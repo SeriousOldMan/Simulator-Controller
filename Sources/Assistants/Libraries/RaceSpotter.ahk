@@ -851,8 +851,8 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
-		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
-		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, voiceServer)
+		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
+		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
 		if isDebug() {
 			this.setDebug(kDebugKnowledgeBase, true)

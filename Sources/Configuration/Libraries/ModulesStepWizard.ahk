@@ -41,8 +41,9 @@ class NamedPreset extends Preset {
 	}
 }
 
-class MutedAssistant extends NamedPreset {
+class SilentAssistant extends NamedPreset {
 	iAssistant := false
+	iDisabled := true
 
 	Assistant[] {
 		Get {
@@ -50,14 +51,15 @@ class MutedAssistant extends NamedPreset {
 		}
 	}
 
-	__New(name, assistant) {
-		base.__New(name)
-
+	__New(name, assistant, muted := false) {
 		this.iAssistant := assistant
+		this.iDisabled := ((muted = kTrue) ? false : ((muted = kFalse) ? true : !muted))
+
+		base.__New(name)
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.Assistant))
+		return concatenate(base.getArguments(), Array(this.Assistant, this.iDisabled))
 	}
 
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
@@ -67,8 +69,12 @@ class MutedAssistant extends NamedPreset {
 			if (getConfigurationValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
 				assistant := new Plugin(this.Assistant, simulatorConfiguration)
 
-				assistant.setArgumentValue("raceAssistantSpeaker", "Off")
-				assistant.setArgumentValue("raceAssistantListener", "Off")
+				if this.iDisabled {
+					assistant.setArgumentValue("raceAssistantSpeaker", "Off")
+					assistant.setArgumentValue("raceAssistantListener", "Off")
+				}
+				else
+					assistant.setArgumentValue("raceAssistantMuted", "true")
 
 				assistant.saveToConfiguration(simulatorConfiguration)
 			}

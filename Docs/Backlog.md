@@ -14,7 +14,7 @@
   2. Support for Full Course Yellow rules in the Assistants
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
-  5. Graphical editor for telemtry data browsing and cleanup
+  5. Graphical editor for telemetry data browsing and cleanup
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer

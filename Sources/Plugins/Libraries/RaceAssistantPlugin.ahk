@@ -48,6 +48,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	iRaceAssistantSpeakerVocalics := false
 	iRaceAssistantRecognizer := false
 	iRaceAssistantListener := false
+	iRaceAssistantMuted := false
 
 	iRaceAssistant := false
 	iRaceAssistantZombie := false
@@ -571,6 +572,12 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
+	RaceAssistantMuted[] {
+		Get {
+			return this.iRaceAssistantMuted
+		}
+	}
+
 	__New(controller, name, configuration := false, register := true) {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction
 		local openRaceSettings, openSessionDatabase, openSetupAdvisor, openRaceCenter, openStrategyWorkbench, importSetup
@@ -686,6 +693,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				if ((assistantListener != false) && (assistantListener != kFalse) && (assistantListener != "Off"))
 					this.iRaceAssistantListener := (((assistantListener = kTrue) || (assistantListener = "On")) ? true : assistantListener)
 			}
+
+			this.iRaceAssistantMuted := this.getArgumentValue("raceAssistantMuted", false)
 
 			controller.registerPlugin(this)
 
@@ -1276,6 +1285,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 					if this.RaceAssistantListener
 						options .= " -Listener """ . this.RaceAssistantListener . """"
+
+					if this.RaceAssistantMuted
+						options .= " -Muted"
 
 					if this.Controller.VoiceServer
 						options .= " -Voice """ . this.Controller.VoiceServer . """"

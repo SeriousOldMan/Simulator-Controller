@@ -57,8 +57,6 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceManager := false
 
-	iMuted := false
-
 	iAnnouncements := false
 
 	iRemoteHandler := false
@@ -406,7 +404,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
-	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, voiceServer := false) {
+	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		local options
 
 		if !kUnknown
@@ -450,6 +448,9 @@ class RaceAssistant extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice", "Muted", this.Muted)
 
 		writeConfiguration(kTempDirectory . assistantType . ".state", configuration)
+
+		if muted
+			this.Muted := true
 	}
 
 	loadFromConfiguration(configuration) {

@@ -51,9 +51,9 @@ class SilentAssistant extends NamedPreset {
 		}
 	}
 
-	__New(name, assistant, muted := false) {
+	__New(name, assistant, full := true) {
 		this.iAssistant := assistant
-		this.iDisabled := ((muted = kTrue) ? false : ((muted = kFalse) ? true : !muted))
+		this.iDisabled := ((full = kTrue) ? true : ((full = kFalse) ? false : full))
 
 		base.__New(name)
 	}

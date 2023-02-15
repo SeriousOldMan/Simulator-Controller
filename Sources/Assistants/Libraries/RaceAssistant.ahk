@@ -57,8 +57,6 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceManager := false
 
-	iMuted := false
-
 	iAnnouncements := false
 
 	iRemoteHandler := false
@@ -441,7 +439,6 @@ class RaceAssistant extends ConfigurationItem {
 			}
 		}
 
-		this.iMuted := muted
 		this.iVoiceManager := this.createVoiceManager(name, options)
 
 		configuration := newConfiguration()
@@ -451,6 +448,9 @@ class RaceAssistant extends ConfigurationItem {
 		setConfigurationValue(configuration, "Voice", "Muted", this.Muted)
 
 		writeConfiguration(kTempDirectory . assistantType . ".state", configuration)
+
+		if muted
+			this.Muted := true
 	}
 
 	loadFromConfiguration(configuration) {

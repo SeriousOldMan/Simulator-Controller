@@ -3665,7 +3665,12 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if fuel is Number
-				displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+			{
+				if (fuel = 0)
+					displayFuel := "-"
+				else
+					displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+			}
 			else
 				displayFuel := fuel
 
@@ -6072,7 +6077,12 @@ class RaceCenter extends ConfigurationItem {
 						}
 
 						if fuel is Number
-							displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+						{
+							if (fuel = 0)
+								displayFuel := "-"
+							else
+								displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+						}
 						else
 							displayFuel := fuel
 
@@ -6239,7 +6249,12 @@ class RaceCenter extends ConfigurationItem {
 						}
 
 						if fuel is Number
-							displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+						{
+							if (fuel = 0)
+								displayFuel := "-"
+							else
+								displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+						}
 						else
 							displayFuel := fuel
 
@@ -7716,7 +7731,10 @@ class RaceCenter extends ConfigurationItem {
 				fuel := pitstop.Fuel
 
 				if fuel is Number
-					fuel := displayValue("Float", convertUnit("Volume", fuel))
+					if (fuel = 0)
+						fuel := "-"
+					else
+						fuel := displayValue("Float", convertUnit("Volume", fuel))
 
 				Gui ListView, % this.PitstopsListView
 

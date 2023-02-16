@@ -1500,13 +1500,13 @@ class GridRaceAssistant extends RaceAssistant {
 			classes := {}
 
 			loop % (data ? getConfigurationValue(data, "Position Data", "Car.Count") : knowledgeBase.getValue("Car.Count"))
-			{
-				class := (data ? getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)
-							   : knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
+				if (data || knowledgeBase.getValue("Car." . A_Index . ".Car", false)) {
+					class := (data ? getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)
+								   : knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
 
-				if !classes.HasKey(class)
-					classes[class] := true
-			}
+					if !classes.HasKey(class)
+						classes[class] := true
+				}
 
 			lastKnowledgeBase := (data ? false : knowledgeBase)
 
@@ -1553,7 +1553,8 @@ class GridRaceAssistant extends RaceAssistant {
 				else
 					loop % knowledgeBase.getValue("Car.Count")
 						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
-							positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
+							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
+								positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
 
 				bubbleSort(positions, "compareClassPositions")
 
@@ -1569,7 +1570,8 @@ class GridRaceAssistant extends RaceAssistant {
 				else
 					loop % knowledgeBase.getValue("Car.Count")
 						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
-							classGrid.Push(A_Index)
+							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
+								classGrid.Push(A_Index)
 			}
 
 			if (data || !class) {

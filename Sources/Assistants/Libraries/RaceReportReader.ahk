@@ -17,6 +17,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kNotInitialized := "__NotInitialized__"
 global kUnknown := false
 
 
@@ -55,15 +56,17 @@ class RaceReportReader {
 
 	getClasses(raceData) {
 		local classes := []
+		local unknown := translate("Unknown")
 		local class
 
-		loop % getConfigurationValue(raceData, "Cars", "Count")
-		{
-			class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", translate("Unknown"))
 
-			if !inList(classes, class)
-				classes.Push(class)
-		}
+		loop % getConfigurationValue(raceData, "Cars", "Count")
+			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
+				class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", unknown)
+
+				if !inList(classes, class)
+					classes.Push(class)
+			}
 
 		return classes
 	}
@@ -72,7 +75,8 @@ class RaceReportReader {
 		local cars := []
 
 		loop % getConfigurationValue(raceData, "Cars", "Count")
-			cars.Push(A_Index)
+			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
+				cars.Push(A_Index)
 
 		return cars
 	}
@@ -91,7 +95,8 @@ class RaceReportReader {
 
 		if carID {
 			loop % getConfigurationValue(raceData, "Cars", "Count", 0)
-				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID") = carID) {
+				if ((getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
+				 && (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID") = carID)) {
 					car := A_Index
 					carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
 					carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
@@ -107,25 +112,27 @@ class RaceReportReader {
 
 					return true
 				}
-
-			return false
 		}
 		else {
-			carID := getConfigurationValue(raceData, "Cars", "Car." . car . ".ID", false)
-			carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
-			carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
+			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
+				carID := getConfigurationValue(raceData, "Cars", "Car." . car . ".ID", false)
+				carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
+				carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
 
-			if (drivers.Length() > 0) {
-				parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
-			}
-			else {
-				driverForname := "John"
-				driverSurname := "Doe"
-				driverNickname := "JDO"
-			}
+				if (drivers.Length() > 0) {
+					parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
+				}
+				else {
+					driverForname := "John"
+					driverSurname := "Doe"
+					driverNickname := "JDO"
+				}
 
-			return true
+				return true
+			}
 		}
+
+		return false
 	}
 
 	getStandings(lap, ByRef cars, ByRef ids, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames

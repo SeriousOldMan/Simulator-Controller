@@ -2625,7 +2625,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local driver, carCount, data, raceInfo, slots, grid, carNr, carID, key, fileName, slotsString
 		local data, pitstop, pitstops, prefix, times, positions, drivers, laps, carPrefix, carIndex
-		local driverForname, driverSurname, driverNickname
+		local driverForname, driverSurname, driverNickname, carCar
 
 		if this.RemoteHandler {
 			driver := knowledgeBase.getValue("Driver.Car", 0)
@@ -2678,24 +2678,27 @@ class RaceStrategist extends GridRaceAssistant {
 						carIndex := A_Index
 
 					if carIndex {
-						setConfigurationValue(data, "Cars", "Car." . carIndex . ".Nr", carNr)
-						setConfigurationValue(data, "Cars", "Car." . carIndex . ".ID", carID)
-						setConfigurationValue(data, "Cars", "Car." . carIndex . ".Class"
-											, knowledgeBase.getValue("Car." . carIndex . ".Class", "Unknown"))
-						setConfigurationValue(data, "Cars", "Car." . carIndex . ".Car"
-											, knowledgeBase.getValue("Car." . carIndex . ".Car"))
+						carCar := knowledgeBase.getValue("Car." . carIndex . ".Car", false)
 
-						key := ("#" . carNr)
+						if carCar {
+							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Nr", carNr)
+							setConfigurationValue(data, "Cars", "Car." . carIndex . ".ID", carID)
+							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Class"
+												, knowledgeBase.getValue("Car." . carIndex . ".Class", kUnknown))
+							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Car", carCar)
 
-						if ((raceInfo != false) && raceInfo.HasKey(key))
-							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
-						else {
-							key := ("!" . carID)
+							key := ("#" . carNr)
 
 							if ((raceInfo != false) && raceInfo.HasKey(key))
 								setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
-							else
-								setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", this.getPosition(A_Index))
+							else {
+								key := ("!" . carID)
+
+								if ((raceInfo != false) && raceInfo.HasKey(key))
+									setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", grid[raceInfo[key]])
+								else
+									setConfigurationValue(data, "Cars", "Car." . carIndex . ".Position", this.getPosition(A_Index))
+							}
 						}
 					}
 				}

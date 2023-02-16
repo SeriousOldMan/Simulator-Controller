@@ -17,6 +17,7 @@
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+global kNotInitialized := "__NotInitialized__"
 global kUnknown := false
 
 
@@ -60,7 +61,7 @@ class RaceReportReader {
 
 
 		loop % getConfigurationValue(raceData, "Cars", "Count")
-			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", "__NotInitialized__") != "__NotInitialized__") {
+			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 				class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", unknown)
 
 				if !inList(classes, class)
@@ -74,7 +75,7 @@ class RaceReportReader {
 		local cars := []
 
 		loop % getConfigurationValue(raceData, "Cars", "Count")
-			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", "__NotInitialized__") != "__NotInitialized__")
+			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
 				cars.Push(A_Index)
 
 		return cars
@@ -94,7 +95,7 @@ class RaceReportReader {
 
 		if carID {
 			loop % getConfigurationValue(raceData, "Cars", "Count", 0)
-				if ((getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", "__NotInitialized__") != "__NotInitialized__")
+				if ((getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
 				 && (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID") = carID)) {
 					car := A_Index
 					carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
@@ -113,7 +114,7 @@ class RaceReportReader {
 				}
 		}
 		else {
-			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", "__NotInitialized__") != "__NotInitialized__") {
+			if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 				carID := getConfigurationValue(raceData, "Cars", "Car." . car . ".ID", false)
 				carNumber := getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr", "-")
 				carName := getConfigurationValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))

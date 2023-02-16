@@ -225,7 +225,7 @@ class RaceReportViewer extends RaceReportReader {
 			result := []
 
 			loop % getConfigurationValue(raceData, "Cars", "Count")
-				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", "__NotInitialized__") != "__NotInitialized__")
+				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
 					result.Push(drivers[1][A_Index])
 
 			return result
@@ -347,7 +347,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				nr := StrReplace(cars[A_Index][1], """", "")
 
-				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", "__NotInitialized__") != "__NotInitialized__") {
+				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 					class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
 
 					if !classes.HasKey(class)
@@ -1312,16 +1312,17 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			LV_Delete()
 
 			for ignore, driver in allDrivers
-				if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown))) {
-					if inList(options, "Cars")
-						column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
-					else
-						column1 := driver
+				if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
+					if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
+						if inList(options, "Cars")
+							column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+						else
+							column1 := driver
 
-					column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+						column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
-					LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
-				}
+						LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
+					}
 
 			if (!selectedDrivers || (selectedDrivers.Length() == LV_GetCount()))
 				GuiControl, , driverSelectCheck, 1

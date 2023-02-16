@@ -12,7 +12,7 @@
   11. The term "Qualification" has been renamed throughout the suite to "Qualifying".
   12. New plugin parameter *raceAssistantMuted* for all Race Assistants to start the correspnding assistant in muted state. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for more information.
   13. The "Simulator Setup" presets *Muted Engineer*, *Muted Strategist* and *Muted Spotter*, which completely disables voice input and output of a given Race Assistant, had been renamed to *Silent Engineer* and so on.
-  14. New presets for "Simulator Setup", which are now named *Muted Engineer*, *Muted Strategist* and *Muted Spotter*, will use the new plugin parameter *raceAssistantMuted* to start up the corresponding Race Assistant in muted state.
+  14. New presets for "Simulator Setup", which are now named *Muted Engineer*, *Muted Strategist* and *Muted Spotter*, will use the new plugin parameter *raceAssistantMuted* to start up the corresponding Race Assistant in muted state. When you later on want to unmute the Assistant again, you can use voice command "You can talk again." or the "Unmute" controller action.
   15. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Lotus Evora GTC

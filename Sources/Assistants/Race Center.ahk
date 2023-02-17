@@ -344,7 +344,7 @@ class RaceCenter extends ConfigurationItem {
 	iSelectedSetup := false
 	iSelectedPlanStint := false
 
-	iTyrePressureMode := "Relative"
+	iTyrePressureMode := "Reference"
 	iCorrectPressureLost := false
 
 	iSessionStore := false

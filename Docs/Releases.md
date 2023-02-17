@@ -1,4 +1,4 @@
-## 4.6.0.0-release 02/17/23 (planned)
+## 4.6.0.0-release 02/17/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races. See the [all new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-and-preparing-pitstops-in-a-team-race-using-the-race-assistants) about the interaction between the Race Assistants and the "Race Center".

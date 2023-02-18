@@ -1514,6 +1514,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	sessionInformation(lastLap, sector, positions, regular) {
 		local knowledgeBase := this.KnowledgeBase
+		local enoughData := this.hasEnoughData(false)
 		local speaker := this.getSpeaker(true)
 		local fragments := speaker.Fragments
 		local airTemperature := Round(knowledgebase.getValue("Weather.Temperature.Air"))
@@ -1540,7 +1541,7 @@ class RaceSpotter extends GridRaceAssistant {
 						return true
 				}
 			}
-			else if (remainingSessionLaps > 5) {
+			else if (enoughData && (remainingSessionLaps > 5)) {
 				situation := "HalfTime"
 
 				if ((Abs((this.SessionDuration / 2) - this.OverallTime) < 120000) && !this.SessionInfos.HasKey(situation)) {
@@ -1551,7 +1552,7 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 			}
 
-		if this.hasEnoughData(false) {
+		if enoughData {
 			if ((remainingSessionLaps <= 3) && (Floor(remainingSessionLaps) > 1) && (this.Session = kSessionRace)) {
 				situation := "FinalLaps"
 

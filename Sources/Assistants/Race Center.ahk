@@ -1538,7 +1538,7 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Repairs")
 		choices := map(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Engine", "Everything"], "translate")
-		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopRepairsDropDown, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose5 vpitstopRepairsDropDown, % values2String("|", choices*)
 
 		Gui %window%:Add, Button, x66 ys+279 w160 gplanPitstop, % translate("Instruct Engineer")
 
@@ -2927,14 +2927,12 @@ class RaceCenter extends ConfigurationItem {
 			}
 
 			if selected {
+				LV_GetText(stintNr, selected)
 				LV_Delete(selected)
 
-				if (selected <= LV_GetCount()) {
-					LV_GetText(stintNr, 1)
-
+				if (selected <= LV_GetCount())
 					loop % LV_GetCount()
 						LV_Modify(A_Index, "", stintNr++)
-				}
 			}
 
 			if (this.SelectedDetailReport = "Plan")
@@ -3501,7 +3499,6 @@ class RaceCenter extends ConfigurationItem {
 		local nextDriver := kNull
 		local compound := "-"
 		local compoundColor := false
-		local tyreSet := "-"
 		local pressureFL := "-"
 		local pressureFR := "-"
 		local pressureRL := "-"
@@ -3509,7 +3506,7 @@ class RaceCenter extends ConfigurationItem {
 		local repairBodywork := false
 		local repairSuspension := false
 		local repairEngine := false
-		local stint, drivers, currentNr, nextNr
+		local stint, drivers, currentNr, nextNr, tyreSet
 
 		if !internal {
 			Gui %window%:Default
@@ -3573,9 +3570,12 @@ class RaceCenter extends ConfigurationItem {
 		if (pitstopTyreCompoundDropDown > 1) {
 			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
 
-			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", pitstopTyreSetEdit)
-
 			tyreSet := pitstopTyreSetEdit
+
+			if ((tyreSet = "") || (tyreSet = "-"))
+				tyreSet := false
+
+			setConfigurationValue(pitstopPlan, "Pitstop", "Tyre.Set", tyreSet)
 
 			splitCompound(this.TyreCompounds[pitstopTyreCompoundDropDown - 1], compound, compoundColor)
 
@@ -4292,8 +4292,12 @@ class RaceCenter extends ConfigurationItem {
 						LV_GetText(compound, stintNr - 1, 5)
 
 						if (compound != "-") {
-							if !tyreSet
+							if !tyreSet {
 								LV_GetText(tyreSet, stintNr - 1, 6)
+
+								if (tyreSet = "-")
+									tyreSet := 0
+							}
 
 							LV_GetText(pressures, stintNr - 1, 7)
 
@@ -6090,7 +6094,7 @@ class RaceCenter extends ConfigurationItem {
 							driverRequest := string2Values("|", driverRequest)
 
 							currentDriver := string2Values(":", driverRequest[1])[1]
-							nextDriver := string2Values(":", driverRequest[1])[1]
+							nextDriver := string2Values(":", driverRequest[2])[1]
 						}
 						else {
 							currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
@@ -6119,7 +6123,8 @@ class RaceCenter extends ConfigurationItem {
 							}
 
 						LV_Add("Check", nextStop, lap + 1, displayNullValue(nextDriver), displayFuel
-									  , (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
+									  , (compound = "-") ? compound : translate(compound(compound, compoundColor))
+									  , ((tyreSet = 0) ? "-" : tyreSet)
 									  , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 						pressures := string2Values(",", pressures)
@@ -6237,7 +6242,7 @@ class RaceCenter extends ConfigurationItem {
 							driverRequest := string2Values("|", driverRequest)
 
 							currentDriver := string2Values(":", driverRequest[1])[1]
-							nextDriver := string2Values(":", driverRequest[1])[2]
+							nextDriver := string2Values(":", driverRequest[2])[1]
 						}
 						else {
 							currentDriver := this.Laps[this.LastLap.Nr].Stint.Driver.FullName
@@ -6268,7 +6273,8 @@ class RaceCenter extends ConfigurationItem {
 							}
 
 						LV_Add("", LV_GetCount() + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
-								 , (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
+								 , (compound = "-") ? compound : translate(compound(compound, compoundColor))
+								 , ((tyreSet = 0) ? "-" : tyreSet)
 								 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 						pressures := string2Values(",", pressures)
@@ -6396,7 +6402,7 @@ class RaceCenter extends ConfigurationItem {
 									laps := getConfigurationValue(state, "Pitstop Data", "Tyre.Laps", false)
 									compound := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound", "Dry")
 									compoundColor := getConfigurationValue(state, "Pitstop Data", "Tyre.Compound.Color", "Black")
-									tyreSet := getConfigurationValue(state, "Pitstop Data", "Tyre.Set", false)
+									tyreSet := getConfigurationValue(state, "Pitstop Data", "Tyre.Set", "-")
 
 									for ignore, tyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"]
 										sessionStore.add("Pitstop.Tyre.Data"
@@ -9575,9 +9581,9 @@ class RaceCenter extends ConfigurationItem {
 							if (tyrePressures[A_Index] = 0)
 								tyrePressures[A_Index] := displayNullValue(kNull)
 							else if (tyrePressures[A_Index] > 0)
-								tyrePressures[A_Index] := ("+" . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index])))
+								tyrePressures[A_Index] := ("+ " . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index])))
 							else if (tyrePressures[A_Index] < 0)
-								tyrePressures[A_Index] := ("-" . displayValue("Float", convertUnit("Pressure", tyrePressures[A_Index])))
+								tyrePressures[A_Index] := ("- " . displayValue("Float", convertUnit("Pressure", Abs(tyrePressures[A_Index]))))
 
 							hasColdPressures := true
 						}

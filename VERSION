@@ -3,7 +3,7 @@ Version=4.6.1.0-dev
 Target=4.6.1.0-release
 Date=02/18/2023
 Download=
-Changes=Changed default for pressure calculation in "Race Center"
+Changes=Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center"
 [Release]
 Version=4.6.0.0-release
 Date=02/17/2023

@@ -278,7 +278,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 																		, this.Simulator.Car, this.Simulator.Track)
 
 			for ignore, candidate in trackAutomations
-				if ((name && (candidate.Name = name)) || candidate.Active) {
+				if ((name && (candidate.Name = name)) || (!name && candidate.Active)) {
 					enabled := this.TrackAutomationEnabled
 
 					if enabled

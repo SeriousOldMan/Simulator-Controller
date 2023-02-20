@@ -2799,7 +2799,7 @@ class RaceSpotter extends GridRaceAssistant {
 				knowledgeBase.setFact("Car." . A_Index . ".Valid.LastLap", lap)
 
 				if (knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", kUndefined) == kUndefined)
-					knowledgeBase.addFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
+					knowledgeBase.setFact("Car." . A_Index . ".Lap.Valid", knowledgeBase.getValue("Car." . A_Index . ".Valid.Running", true))
 
 				if knowledgeBase.getValue("Car." . A_Index . ".Lap.Valid", true)
 					knowledgeBase.setFact("Car." . A_Index . ".Valid.Laps", knowledgeBase.getValue("Car." . A_Index . ".Valid.Laps", 0) + 1)

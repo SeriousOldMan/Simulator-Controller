@@ -649,6 +649,7 @@ checkInstallation() {
 					writeUninstallerInfo(installLocation)
 				}
 
+				fixIE(11, "Session Database.exe")
 				fixIE(11, "Setup Advisor.exe")
 				fixIE(11, "Race Reports.exe")
 				fixIE(11, "Strategy Workbench.exe")

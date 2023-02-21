@@ -1,16 +1,16 @@
 [Development]
 Version=4.6.1.0-dev
 Target=4.6.1.0-release
-Date=02/18/2023
+Date=02/21/2023
 Download=
 Changes=Changed default for pressure calculation in "Race Center"
 [Release]
-Version=4.5.9.0-release
-Date=02/10/2023
-Download=https://cutt.ly/q3kGG7a;https://www.dropbox.com/s/1lvwvcfszfb05yr/Simulator%20Controller%204.5.9.0-release.zip?dl=1
-Changes=New voice command for Race Engineer to ask about cold or setup trye pressures, New voice command for Race Engineer to increase/decrease the cold pressures for all tyres at once for the next pitstop, New information request controller actions "TyrePressuresCold" and "TyrePressuresSetup", New icons in the Stream Deck icon set for request cold or setup tyre pressure information, Setting for pressure loss correction in "Race Center", Remaining stint and remaining driver time is available in the lap report in "Race Center", Special keys to prevent the Assistants to shutdown normally at the end of a session, New car models for "Setup Advisor"
+Version=4.6.0.0-release
+Date=02/17/2023
+Download=https://cutt.ly/h3JNCJ9;https://www.dropbox.com/s/zriilnkacc950ue/Simulator%20Controller%204.6.0.0-release.zip?dl=1
+Changes=New voice command for Race Engineer to ask for a pitstop plan including driver swap in team races, New controller action for Race Engineer and all simulators to create a pitstop including driver swap in team races, New voice command for Race Engineer to plan refueling so that a given amount of fuel is available after the pitstop, New controller action for all simulators to set refueling amount to zero, New icons in the Stream Deck icon set for all new controller actions, Setup list in "Race Center" can now be sorted by clicking in the column headers, Record unprepared pitstops for documentation in "Race Center", New assistants plugin parameter "raceAssistantMuted", New presets in "Simulator Setup"
 [Current]
 Type=Development
 [Version]
-Release=4.5.9.0-release
+Release=4.6.0.0-release
 Development=4.6.1.0-dev

@@ -3458,8 +3458,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		GuiControlGet tyreCompoundDropDown
 
 		if new PressuresEditor(this, this.iTyreCompound, this.iTyreCompoundColor
-								   , convertUnit("Temperature", airTemperatureEdit, false)
-								   , convertUnit("Temperature", trackTemperatureEdit, false)).editPressures()
+								   , Round(convertUnit("Temperature", airTemperatureEdit, false))
+								   , Round(convertUnit("Temperature", trackTemperatureEdit, false))).editPressures()
 			this.selectPressures()
 
 		Gui %window%:-Disabled

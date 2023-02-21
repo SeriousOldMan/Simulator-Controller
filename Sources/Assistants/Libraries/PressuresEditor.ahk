@@ -106,14 +106,13 @@ class PressuresEditor {
 
 		PressuresEditor.Instance := this
 
-		this.createGui(compound, compoundColor, airTemperature, trackTemperature)
+		this.createGui(compound, compoundColor, Round(airTemperature), Round(trackTemperature))
 	}
 
 	createGui(tyreCompound, tyreCompoundColor, airTemperature, trackTemperature) {
 		local sessionDatabase := this.SessionDatabase
 		local compounds := []
-		local temperatures := []
-		local weather, ignore, row, compound, temperature, chosen
+		local weather, ignore, row, compound
 
 		Gui PE:Default
 
@@ -152,65 +151,23 @@ class PressuresEditor {
 		Gui PE:Add, Text, x100 yp+4 w160 h23, % translate(weather)
 
 		for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
-													  , {Select: ["Compound", "Compound.Color", "Temperature.Air", "Temperature.Track"]
-													   , By: ["Compound", "Compound.Color", "Temperature.Air", "Temperature.Track"]
+													  , {Select: ["Compound", "Compound.Color"], By: ["Compound", "Compound.Color"]
 													   , Where: {Weather: weather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID}}) {
 			compound := compound(row.Compound, row["Compound.Color"])
 
 			if !inList(compounds, compound)
 				compounds.Push(compound)
-
-			temperature := (row["Temperature.Air"] . translate(" / ") . row["Temperature.Track"])
-
-			if !inList(temperatures, temperature)
-				temperatures.Push(temperature)
 		}
 
 		bubbleSort(compounds)
-		bubbleSort(temperatures)
 
 		this.iCompounds := compounds
 
-		loop % temperatures.Length()
-		{
-			temperature := string2Values(translate(" / "), temperatures[A_Index])
-
-			this.Temperatures.Push(Array(temperature[1], temperature[2]))
-
-			temperatures[A_Index] := (Round(convertUnit("Temperature", temperature[1])) . translate(" / ") . Round(convertUnit("Temperature", temperature[2])))
-		}
-
 		Gui PE:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Compound")
 
-		if (compounds.Length() > 0) {
-			chosen := inList(compounds, tyreCompound)
+		Gui PE:Add, DropDownList, x96 yp w100 vcompoundDropDown gchooseCompound, % values2String("|", compounds*)
 
-			if !chosen {
-				chosen := 1
-
-				splitCompound(compounds[1], tyreCompound, tyreCompoundColor)
-			}
-		}
-		else
-			chosen := 0
-
-		Gui PE:Add, DropDownList, x96 yp w100 Choose%chosen% vcompoundDropDown gchooseCompound, % values2String("|", compounds*)
-
-		if (temperatures.Length() > 0) {
-			temperature := (Round(convertUnit("Temperature", airTemperature)) . translate(" / ") . Round(convertUnit("Temperature", trackTemperature)))
-			chosen := inList(temperatures, temperature)
-
-			if !chosen {
-				chosen := 1
-
-				airTemperature := this.Temperatures[1][1]
-				trackTemperature := this.Temperatures[1][2]
-			}
-		}
-		else
-			chosen := 0
-
-		Gui PE:Add, DropDownList, x205 yp w60 AltSubmit Choose%chosen% vtemperaturesDropDown gchooseTemperatures, % values2String("|", temperatures*)
+		Gui PE:Add, DropDownList, x205 yp w60 AltSubmit vtemperaturesDropDown gchooseTemperatures
 
 		Gui PE:Add, Text, x270 yp w140 h23 +0x200, % substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)})
 
@@ -238,7 +195,7 @@ class PressuresEditor {
 		Gui PE:Add, Button, x126 yp+10 w80 h23 Default GsavePressuresEditor, % translate("Save")
 		Gui PE:Add, Button, x214 yp w80 h23 GcancelPressuresEditor, % translate("&Cancel")
 
-		if ((compounds.Length() > 0) && (temperatures.Length() > 0)) {
+		if (compounds.Length() > 0) {
 			this.loadCompound(compound(tyreCompound, tyreCompoundColor), true)
 			this.loadTemperatures(airTemperature, trackTemperature, true)
 		}
@@ -302,7 +259,7 @@ class PressuresEditor {
 
 	loadCompound(compound, force := false) {
 		local temperatures := []
-		local temperature, ignore, row, compoundColor, chosen
+		local temperature, ignore, row, compoundColor
 
 		if (force || (compound != this.SelectedCompound)) {
 			Gui PE:Default
@@ -333,12 +290,10 @@ class PressuresEditor {
 			{
 				temperature := string2Values(translate(" / "), temperatures[A_Index])
 
-				this.Temperatures.Push(Array(temperature[1], temperature[2]))
+				this.Temperatures.Push(Array(temperature[1] + 0, temperature[2] + 0))
 
 				temperatures[A_Index] := (Round(convertUnit("Temperature", temperature[1])) . translate(" / ") . Round(convertUnit("Temperature", temperature[2])))
 			}
-
-			chosen := ((temperatures.Length() > 0) ? 1 : 0)
 
 			GuiControl, , temperaturesDropDown, % ("|" . values2String("|", temperatures*))
 
@@ -350,7 +305,8 @@ class PressuresEditor {
 	}
 
 	loadTemperatures(airTemperature, trackTemperature, force := false) {
-		local compound, compoundColor, index, candidate, chosen
+		local chosen := 0
+		local compound, compoundColor, index, candidate
 
 		if (force || (airTemperature != this.SelectedTemperatures[1]) || (airTemperature != this.SelectedTemperatures[2])) {
 			this.iSelectedTemperatures := [airTemperature, trackTemperature]
@@ -362,15 +318,22 @@ class PressuresEditor {
 					break
 				}
 
-			GuiControl Choose, temperaturesDropDown, %chosen%
-
 			if (airTemperature && trackTemperature) {
+				if ((chosen = 0) && (this.Temperatures.Length() > 0)) {
+					airTemperature := this.Temperatures[1][1]
+					trackTemperature := this.Temperatures[1][2]
+
+					chosen := 1
+				}
+
 				splitCompound(this.SelectedCompound, compound, compoundColor)
 
 				this.loadPressures(compound, compoundColor, airTemperature, trackTemperature)
 			}
 			else
 				this.loadPressures(false, false)
+
+			GuiControl Choose, temperaturesDropDown, %chosen%
 		}
 	}
 

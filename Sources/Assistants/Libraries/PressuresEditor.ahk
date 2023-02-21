@@ -43,7 +43,12 @@ class PressuresEditor {
 
 	iPressuresListView := false
 
+	iCompounds := []
 	iTemperatures := []
+
+	iSelectedWeather := false
+	iSelectedCompound := false
+	iSelectedTemperatures := [false, false]
 
 	SessionDatabase[] {
 		Get {
@@ -57,9 +62,33 @@ class PressuresEditor {
 		}
 	}
 
+	Compounds[key := false] {
+		Get {
+			return (key ? this.iCompounds[key] : this.iCompounds)
+		}
+	}
+
 	Temperatures[key := false] {
 		Get {
 			return (key ? this.iTemperatures[key] : this.iTemperatures)
+		}
+	}
+
+	SelectedWeather[] {
+		Get {
+			return this.iSelectedWeather
+		}
+	}
+
+	SelectedCompound[] {
+		Get {
+			return this.iSelectedCompound
+		}
+	}
+
+	SelectedTemperatures[key := false] {
+		Get {
+			return (key ? this.iSelectedTemperatures[key] : this.iSelectedTemperatures)
 		}
 	}
 
@@ -117,8 +146,7 @@ class PressuresEditor {
 
 		weather := sessionDatabase.SelectedWeather
 
-		if (weather == true)
-			weather := "All"
+		this.iSelectedWeather := weather
 
 		Gui PE:Add, Text, x16 yp+20 w80 h23 +0x200, % translate("Weather")
 		Gui PE:Add, Text, x100 yp+4 w160 h23, % translate(weather)
@@ -140,6 +168,8 @@ class PressuresEditor {
 
 		bubbleSort(compounds)
 		bubbleSort(temperatures)
+
+		this.iCompounds := compounds
 
 		loop % temperatures.Length()
 		{
@@ -164,7 +194,7 @@ class PressuresEditor {
 		else
 			chosen := 0
 
-		Gui PE:Add, DropDownList, x96 yp w100 Choose%chosen% vcompoundDropDown, % values2String("|", compounds*)
+		Gui PE:Add, DropDownList, x96 yp w100 Choose%chosen% vcompoundDropDown gchooseCompound, % values2String("|", compounds*)
 
 		if (temperatures.Length() > 0) {
 			temperature := (Round(convertUnit("Temperature", airTemperature)) . translate(" / ") . Round(convertUnit("Temperature", trackTemperature)))
@@ -180,7 +210,7 @@ class PressuresEditor {
 		else
 			chosen := 0
 
-		Gui PE:Add, DropDownList, x205 yp w60 Choose%chosen% vtemperaturesDropDown, % values2String("|", temperatures*)
+		Gui PE:Add, DropDownList, x205 yp w60 AltSubmit Choose%chosen% vtemperaturesDropDown gchooseTemperatures, % values2String("|", temperatures*)
 
 		Gui PE:Add, Text, x270 yp w140 h23 +0x200, % substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)})
 
@@ -208,8 +238,10 @@ class PressuresEditor {
 		Gui PE:Add, Button, x126 yp+10 w80 h23 Default GsavePressuresEditor, % translate("Save")
 		Gui PE:Add, Button, x214 yp w80 h23 GcancelPressuresEditor, % translate("&Cancel")
 
-		if ((compounds.Length() > 0) && (temperatures.Length() > 0))
-			this.loadPressures(weather, tyreCompound, tyreCompoundColor, airTemperature, trackTemperature)
+		if ((compounds.Length() > 0) && (temperatures.Length() > 0)) {
+			this.loadCompound(compound(tyreCompound, tyreCompoundColor), true)
+			this.loadTemperatures(airTemperature, trackTemperature, true)
+		}
 	}
 
 	editPressures() {
@@ -268,7 +300,81 @@ class PressuresEditor {
 		}
 	}
 
-	loadPressures(weather, compound, compoundColor, airTemperature, trackTemperature) {
+	loadCompound(compound, force := false) {
+		local temperatures := []
+		local temperature, ignore, row, compoundColor, chosen
+
+		if (force || (compound != this.SelectedCompound)) {
+			Gui PE:Default
+
+			this.iSelectedCompound := compound
+
+			GuiControl Choose, compoundDropDown, % inList(this.Compounds, compound)
+
+			splitCompound(compound, compound, compoundColor)
+
+			for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
+														  , {Select: ["Temperature.Air", "Temperature.Track"]
+														   , By: ["Temperature.Air", "Temperature.Track"]
+														   , Where: {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
+																   , Compound: compound, CompoundColor: compoundColor}})
+				if (row["Temperature.Air"] && row["Temperature.Track"]) {
+					temperature := (row["Temperature.Air"] . translate(" / ") . row["Temperature.Track"])
+
+					if !inList(temperatures, temperature)
+						temperatures.Push(temperature)
+				}
+
+			this.iTemperatures := []
+
+			bubbleSort(temperatures)
+
+			loop % temperatures.Length()
+			{
+				temperature := string2Values(translate(" / "), temperatures[A_Index])
+
+				this.Temperatures.Push(Array(temperature[1], temperature[2]))
+
+				temperatures[A_Index] := (Round(convertUnit("Temperature", temperature[1])) . translate(" / ") . Round(convertUnit("Temperature", temperature[2])))
+			}
+
+			chosen := ((temperatures.Length() > 0) ? 1 : 0)
+
+			GuiControl, , temperaturesDropDown, % ("|" . values2String("|", temperatures*))
+
+			if (temperatures.Length() > 0)
+				this.loadTemperatures(this.Temperatures[1][1], this.Temperatures[1][2], true)
+			else
+				this.loadPressures(false, false)
+		}
+	}
+
+	loadTemperatures(airTemperature, trackTemperature, force := false) {
+		local compound, compoundColor, index, candidate, chosen
+
+		if (force || (airTemperature != this.SelectedTemperatures[1]) || (airTemperature != this.SelectedTemperatures[2])) {
+			this.iSelectedTemperatures := [airTemperature, trackTemperature]
+
+			for index, candidate in this.Temperatures
+				if ((candidate[1] = airTemperature) && (candidate[2] = trackTemperature)) {
+					chosen := index
+
+					break
+				}
+
+			GuiControl Choose, temperaturesDropDown, %chosen%
+
+			if (airTemperature && trackTemperature) {
+				splitCompound(this.SelectedCompound, compound, compoundColor)
+
+				this.loadPressures(compound, compoundColor, airTemperature, trackTemperature)
+			}
+			else
+				this.loadPressures(false, false)
+		}
+	}
+
+	loadPressures(compound, compoundColor, airTemperature := false, trackTemperature := false) {
 		local tyres := {FL: translate("Front Left"), FR: translate("Front Right")
 					  , RL: translate("Rear Left"), RR: translate("Rear Right")}
 		local pressures := []
@@ -280,33 +386,186 @@ class PressuresEditor {
 
 		LV_Delete()
 
-		for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
-													  , {Select: ["Count", "Tyre", "Pressure"]
-													   , Where: {Weather: weather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
-															   , Compound: compound, "Compound.Color": compoundColor
-															   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature}})
-			pressures.Push(Array(tyres[row.Tyre], displayValue("Float", convertUnit("Pressure", row.Pressure)), row.Count))
+		if (compound && compoundColor) {
+			for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
+														  , {Select: ["Count", "Tyre", "Pressure"]
+														   , Where: {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
+																   , Compound: compound, "Compound.Color": compoundColor
+																   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature}})
+				pressures.Push(Array(tyres[row.Tyre], displayValue("Float", convertUnit("Pressure", row.Pressure)), row.Count))
 
-		bubbleSort(pressures, "comparePressures")
+			bubbleSort(pressures, "comparePressures")
 
-		lastTyre := false
+			lastTyre := false
 
-		for ignore, row in pressures
-			if (pressures[A_Index][1] = lastTyre)
-				pressures[A_Index][1] := ""
-			else
-				lastTyre := pressures[A_Index][1]
+			for ignore, row in pressures
+				if (pressures[A_Index][1] = lastTyre)
+					pressures[A_Index][1] := ""
+				else
+					lastTyre := pressures[A_Index][1]
 
-		loop % pressures.Length()
-			LV_Add("", pressures[A_Index, 1], pressures[A_Index, 2], pressures[A_Index, 3])
+			loop % pressures.Length()
+				LV_Add("", pressures[A_Index, 1], pressures[A_Index, 2], pressures[A_Index, 3])
 
-		LV_ModifyCol()
+			LV_ModifyCol()
 
-		loop 3
-			LV_ModifyCol(A_Index, "AutoHdr")
+			loop 3
+				LV_ModifyCol(A_Index, "AutoHdr")
+		}
 
 		this.updateState()
 		this.updateStatistics()
+	}
+
+	showStatisticsChart(drawChartFunction) {
+		local before, after, width, height, html
+
+		Gui PE:Default
+
+		pressuresViewer.Document.open()
+
+		if (drawChartFunction && (drawChartFunction != "")) {
+			before =
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+						.cellStyle { text-align: right; }
+						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
+						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+					</style>
+					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+					<script type="text/javascript">
+						google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
+			)
+
+			width := pressuresViewer.Width
+			height := (pressuresViewer.Height - 1)
+
+			after =
+			(
+					</script>
+				</head>
+				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+				</body>
+			</html>
+			)
+
+			html := (before . drawChartFunction . after)
+
+			pressuresViewer.Document.write(html)
+		}
+		else {
+			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+
+			pressuresViewer.Document.write(html)
+		}
+
+		pressuresViewer.Document.close()
+	}
+
+	updateStatistics() {
+		local drawChartFunction := "function drawChart() {`nvar array = [`n"
+		local tyreData := {}
+		local tyreDatas := []
+		local lastTyre := false
+		local ignore, index, tyre, pressure, count, maxCount, text
+
+		Gui PE:Default
+
+		Gui ListView, % this.PressuresListView
+
+		for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
+			tyreData[translate(tyre)] := Array()
+
+		loop % LV_GetCount()
+		{
+			LV_GetText(tyre, A_Index, 1)
+			LV_GetText(pressure, A_Index, 2)
+			LV_GetText(count, A_Index, 3)
+
+			if (tyre != "")
+				lastTyre := tyre
+
+			loop %count%
+				tyreData[lastTyre].Push(internalValue("Float", pressure))
+		}
+
+		maxCount := 0
+
+		for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"] {
+			tyre := translate(tyre)
+
+			maxCount := Max(maxCount, tyreData[tyre].Length())
+		}
+
+		for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"] {
+			tyre := translate(tyre)
+
+			loop %maxCount%
+				if (tyreData[tyre].Length() < maxCount)
+					tyreData[tyre].Push(average(tyreData[tyre]))
+				else
+					break
+
+			if (average(tyreData[tyre]) > 0)
+				tyreDatas.Push("['" . tyre . "', " . values2String(", ", tyreData[tyre]*) . "]")
+		}
+
+		drawChartFunction .= (values2String("`n, ", tyreDatas*) . "];")
+
+		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
+		drawChartFunction .= "`ndata.addColumn('string', '" . translate("Tyre") . "');"
+
+		loop %maxCount%
+			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Pressure") . A_Space . A_Index . "');"
+
+		text =
+		(
+		data.addColumn({id:'max', type:'number', role:'interval'});
+		data.addColumn({id:'min', type:'number', role:'interval'});
+		data.addColumn({id:'firstQuartile', type:'number', role:'interval'});
+		data.addColumn({id:'median', type:'number', role:'interval'});
+		data.addColumn({id:'mean', type:'number', role:'interval'});
+		data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
+		)
+
+		drawChartFunction .= ("`n" . text)
+
+		drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (maxCount + 1) . "));")
+
+		drawChartFunction .= ("`n" . getBoxAndWhiskerJSFunctions())
+
+		text =
+		(
+		var options = {
+			backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
+			legend: { position: 'none' },
+		)
+
+		drawChartFunction .= text
+
+		text =
+		(
+			hAxis: { title: '`%tyres`%', gridlines: {count: 0} },
+			vAxis: { title: '`%pressures`%', gridlines: {count: 0} },
+			lineWidth: 0,
+			series: [ { 'color': 'D8D8D8' } ],
+			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
+			interval: { max: { style: 'bars', fillOpacity: 1, color: '#777' },
+						min: { style: 'bars', fillOpacity: 1, color: '#777' },
+						mean: { style: 'points', color: 'grey', pointsize: 5 } }
+		};
+		)
+
+		drawChartFunction .= ("`n" . substituteVariables(text, {tyres: translate("Tyres"), pressures: translate("Pressure")}))
+
+		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
+
+		this.showStatisticsChart(drawChartFunction)
 	}
 }
 
@@ -315,8 +574,116 @@ class PressuresEditor {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+getBoxAndWhiskerJSFunctions() {
+	local script
+
+	script =
+	(
+	/**
+	* Takes an array of input data and returns an
+	* array of the input data with the box plot
+	* interval data appended to each row.
+	*/
+	function getBoxPlotValues(array, base) {
+		for (var i = 0; i < array.length; i++) {
+			var arr = array[i].slice(1).sort(function (a, b) {
+												return a - b;
+											 });
+
+			var max = arr[arr.length - 1];
+			var min = arr[0];
+			var median = getMedian(arr);
+			var average = getAverage(arr);
+
+			if (arr.length `% 2 === 0) {
+				var midUpper = arr.length / 2;
+				var midLower = midUpper - 1;
+
+				array[i][base + 2] = getMedian(arr.slice(0, midUpper));
+				array[i][base + 5] = getMedian(arr.slice(midLower));
+			}
+			else {
+				var index = Math.floor(arr.length / 2);
+
+				array[i][base + 2] = getMedian(arr.slice(0, index + 1));
+				array[i][base + 5] = getMedian(arr.slice(index));
+			}
+
+			array[i][base] = max;
+			array[i][base + 1] = min
+			array[i][base + 3] = median;
+			array[i][base + 4] = average;
+		}
+
+		return array;
+	}
+
+	/*
+	* Takes an array and returns
+	* the median value.
+	*/
+	function getMedian(array) {
+		var length = array.length;
+
+		/* If the array is an even length the
+		* median is the average of the two
+		* middle-most values. Otherwise the
+		* median is the middle-most value.
+		*/
+		if (length `% 2 === 0) {
+			var midUpper = length / 2;
+			var midLower = midUpper - 1;
+
+			return (array[midUpper] + array[midLower]) / 2;
+		}
+		else {
+			return array[Math.floor(length / 2)];
+		}
+	}
+
+	/*
+	* Takes an array and returns
+	* the average value.
+	*/
+	function getAverage(array) {
+		var value = 0;
+
+		if (array.length == 0)
+			return 0;
+		else {
+			for (var i = 0; i < array.length; i++)
+				value = value + array[i];
+
+			return value / array.length;
+		}
+	}
+	)
+
+	return script
+}
+
 comparePressures(a, b) {
 	return (a[1] > b[1])
+}
+
+chooseCompound() {
+	local editor := PressuresEditor.Instance
+
+	Gui PE:Default
+
+	GuiControlGet compoundDropDown
+
+	editor.loadCompound(compoundDropDown)
+}
+
+chooseTemperatures() {
+	local editor := PressuresEditor.Instance
+
+	Gui PE:Default
+
+	GuiControlGet temperaturesDropDown
+
+	editor.loadTemperatures(editor.Temperatures[temperaturesDropDown][1], editor.Temperatures[temperaturesDropDown][2])
 }
 
 choosePressure() {

@@ -93,7 +93,7 @@ global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Dr
 											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
 											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
 											  , "Repair.Bodywork", "Repair.Suspension", "Repair.Engine"
-											  , "Driver.Current", "Driver.Next", "Status"]
+											  , "Driver.Current", "Driver.Next", "Status", "Stint"]
 							 , "Pitstop.Service.Data": ["Pitstop", "Lap", "Time", "Driver.Previous", "Driver.Next", "Fuel"
 													  , "Tyre.Compound", "Tyre.Compound.Color", "Tyre.Set", "Tyre.Pressures"
 													  , "Bodywork.Repair", "Suspension.Repair", "Engine.Repair"]
@@ -3691,7 +3691,8 @@ class RaceCenter extends ConfigurationItem {
 											, "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
 											, "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
 											, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension, "Repair.Engine": repairEngine
-											, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Planned"})
+											, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Planned"
+											, Stint: this.CurrentStint.Nr + 1})
 		}
 		finally {
 			Gui ListView, %currentListView%
@@ -4245,8 +4246,9 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getStintSetup(stintNr, ByRef fuel, ByRef tyreCompound, ByRef tyreCompoundColor, ByRef tyreSet, ByRef tyrePressures) {
+		local sessionStore := this.SessionStore
 		local lap := this.Stints[stintNr].Laps[1]
-		local pressureTable, pressures, pressure, window, currentListView, compound
+		local pressureTable, pressures, pressure, window, currentListView, compound, pitstop
 
 		tyrePressures := false
 		fuel := lap.FuelRemaining
@@ -4279,47 +4281,69 @@ class RaceCenter extends ConfigurationItem {
 				break
 			}
 			else {
-				window := this.Window
+				pitstop := sessionStore.query("Pitstop.Data", {Where: {Stint: stintNr}})
 
-				Gui %window%:Default
+				if (pitstop.Length() > 0) {
+					pitstop := pitstop[1]
 
-				currentListView := A_DefaultListView
+					compound := pitstop["Tyre.Compound"]
 
-				try {
-					Gui ListView, % this.PitstopsListView
+					if (compound != "-") {
+						tyreSet := pitstop["Tyre.Set"]
 
-					if (LV_GetCount() >= (stintNr - 1)) {
-						LV_GetText(compound, stintNr - 1, 5)
+						tyrePressures := []
 
-						if (compound != "-") {
-							if !tyreSet {
-								LV_GetText(tyreSet, stintNr - 1, 6)
+						tyrePressures.Push(pitstop["Tyre.Pressure.Cold.Front.Left"])
+						tyrePressures.Push(pitstop["Tyre.Pressure.Cold.Front.Right"])
+						tyrePressures.Push(pitstop["Tyre.Pressure.Cold.Rear.Left"])
+						tyrePressures.Push(pitstop["Tyre.Pressure.Cold.Rear.Right"])
 
-								if (tyreSet = "-")
-									tyreSet := 0
+						break
+					}
+				}
+				else {
+					window := this.Window
+
+					Gui %window%:Default
+
+					currentListView := A_DefaultListView
+
+					try {
+						Gui ListView, % this.PitstopsListView
+
+						if (LV_GetCount() >= (stintNr - 1)) {
+							LV_GetText(compound, stintNr - 1, 5)
+
+							if (compound != "-") {
+								if !tyreSet {
+									LV_GetText(tyreSet, stintNr - 1, 6)
+
+									if (tyreSet = "-")
+										tyreSet := 0
+								}
+
+								LV_GetText(pressures, stintNr - 1, 7)
+
+								tyrePressures := string2Values(", ", pressures)
+
+								loop 4 {
+									pressure := tyrePressures[A_Index]
+
+									if pressure is Number
+										tyrePressures[A_Index] := convertUnit("Pressure", internalValue("Float", pressure), false)
+								}
+
+								break
 							}
-
-							LV_GetText(pressures, stintNr - 1, 7)
-
-							tyrePressures := string2Values(", ", pressures)
-
-							loop 4 {
-								pressure := tyrePressures[A_Index]
-
-								if pressure is Number
-									tyrePressures[A_Index] := convertUnit("Pressure", internalValue("Float", pressure), false)
-							}
-
-							break
 						}
 					}
-
-					stintNr -= 1
-				}
-				finally {
-					Gui ListView, %currentListView%
+					finally {
+						Gui ListView, %currentListView%
+					}
 				}
 			}
+
+			stintNr -= 1
 		}
 	}
 
@@ -6007,7 +6031,7 @@ class RaceCenter extends ConfigurationItem {
 		local compound, currentListView, session, nextStop, lap, fuel, compound, compoundColor, tyreSet
 		local pressureFL, pressureFR, pressureRL, pressureRR, repairBodywork, repairSuspension, repairEngine
 		local pressures, displayPressures, displayFuel, driverRequest, currentDriver, nextDriver, wasEmpty, tries
-		local pitstopNr
+		local pitstopNr, stint
 
 		Gui %window%:Default
 
@@ -6097,14 +6121,26 @@ class RaceCenter extends ConfigurationItem {
 							nextDriver := string2Values(":", driverRequest[2])[1]
 						}
 						else {
-							currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
+							if (lap > 1) {
+								currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
 
-							if this.Laps.HasKey(lap + 1)
-								nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
-							else if this.CurrentStint
-								nextDriver := this.CurrentStint.Driver.FullName
-							else
-								nextDriver := false
+								if this.Laps.HasKey(lap + 1)
+									nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
+								else if this.CurrentStint
+									nextDriver := this.CurrentStint.Driver.FullName
+								else
+									nextDriver := false
+							}
+							else {
+								currentDriver := this.Laps[1].Stint.Driver.FullName
+
+								if this.Laps.HasKey(2)
+									nextDriver := this.Laps[2].Stint.Driver.FullName
+								else if this.CurrentStint
+									nextDriver := this.CurrentStint.Driver.FullName
+								else
+									nextDriver := false
+							}
 
 							if !currentDriver
 								currentDriver := kNull
@@ -6131,11 +6167,14 @@ class RaceCenter extends ConfigurationItem {
 
 						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, Func("always").Bind(true))
 
+						stint := this.Laps[lap].Stint
+
 						sessionStore.add("Pitstop.Data", {Lap: lap, Fuel: fuel, "Tyre.Compound": compound, "Tyre.Compound.Color": compoundColor, "Tyre.Set": tyreSet
 														, "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
 														, "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
 														, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension, "Repair.Engine": repairEngine
-														, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Performed"})
+														, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Performed"
+														, Stint: stint.Nr + 1})
 
 						newData := true
 
@@ -6152,7 +6191,8 @@ class RaceCenter extends ConfigurationItem {
 														, "Tyre.Pressure.Cold.Front.Left": "-", "Tyre.Pressure.Cold.Front.Right": "-"
 														, "Tyre.Pressure.Cold.Rear.Left": "-", "Tyre.Pressure.Cold.Rear.Right": "-"
 														, "Repair.Bodywork": false, "Repair.Suspension": false, "Repair.Engine": false
-														, "Driver.Current": kNull, "Driver.Next": kNull, Status: "Performed"})
+														, "Driver.Current": kNull, "Driver.Next": kNull, Status: "Performed"
+														, Stint: "-"})
 
 						newData := true
 
@@ -6285,7 +6325,8 @@ class RaceCenter extends ConfigurationItem {
 														, "Tyre.Pressure.Cold.Front.Left": pressures[1], "Tyre.Pressure.Cold.Front.Right": pressures[2]
 														, "Tyre.Pressure.Cold.Rear.Left": pressures[3], "Tyre.Pressure.Cold.Rear.Right": pressures[4]
 														, "Repair.Bodywork": repairBodywork, "Repair.Suspension": repairSuspension, "Repair.Engine": repairEngine
-														, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Planned"})
+														, "Driver.Current": currentDriver, "Driver.Next": nextDriver, Status: "Planned"
+														, Stint: this.CurrentStint.Nr + 1})
 					}
 				}
 			}

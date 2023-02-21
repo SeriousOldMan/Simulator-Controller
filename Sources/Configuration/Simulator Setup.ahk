@@ -690,11 +690,12 @@ class SetupWizard extends ConfigurationItem {
 		local buttonBoxConfiguration, streamDeckConfiguration
 
 		if (this.Step && this.Step.hidePage(this.Page)) {
-			while this.SetupWizard.SettingsOpen {
+			while this.SettingsOpen {
 				Task.yield()
 
 				Sleep 100
 			}
+			msgbox here
 
 			window := this.WizardWindow
 

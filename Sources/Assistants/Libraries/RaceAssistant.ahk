@@ -79,6 +79,7 @@ class RaceAssistant extends ConfigurationItem {
 	iBestLapTime := 0
 
 	iBaseLap := false
+	iLastLap := false
 	iLastFuelAmount := 0
 	iInitialFuelAmount := 0
 	iAvgFuelConsumption := 0
@@ -352,6 +353,12 @@ class RaceAssistant extends ConfigurationItem {
 	BestLapTime[] {
 		Get {
 			return this.iBestLapTime
+		}
+	}
+
+	LastLap[] {
+		Get {
+			return this.iLastLap
 		}
 	}
 
@@ -1129,7 +1136,7 @@ class RaceAssistant extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
-		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap
+		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, enoughData
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
@@ -1146,7 +1153,14 @@ class RaceAssistant extends ConfigurationItem {
 		else
 			baseLap := this.BaseLap
 
-		this.updateDynamicValues({EnoughData: (lapNumber > (baseLap + (this.LearningLaps - 1)))})
+		if (lapNumber > (this.LastLap + 1))
+			enoughData := false
+		else
+			enoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
+
+		this.LastLap := lapNumber
+
+		this.updateDynamicValues({EnoughData: enoughData})
 
 		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
 		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
@@ -1346,6 +1360,9 @@ class RaceAssistant extends ConfigurationItem {
 	updateLap(lapNumber, ByRef data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local result
+
+		if (lapNumber > this.LastLap)
+			this.updateDynamicValues({EnoughData: false})
 
 		data := this.prepareData(lapNumber, data)
 

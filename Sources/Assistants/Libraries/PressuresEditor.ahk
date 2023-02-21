@@ -309,8 +309,6 @@ class PressuresEditor {
 		local compound, compoundColor, index, candidate
 
 		if (force || (airTemperature != this.SelectedTemperatures[1]) || (airTemperature != this.SelectedTemperatures[2])) {
-			this.iSelectedTemperatures := [airTemperature, trackTemperature]
-
 			for index, candidate in this.Temperatures
 				if ((candidate[1] = airTemperature) && (candidate[2] = trackTemperature)) {
 					chosen := index
@@ -326,12 +324,17 @@ class PressuresEditor {
 					chosen := 1
 				}
 
+				this.iSelectedTemperatures := [airTemperature, trackTemperature]
+
 				splitCompound(this.SelectedCompound, compound, compoundColor)
 
 				this.loadPressures(compound, compoundColor, airTemperature, trackTemperature)
 			}
-			else
+			else {
+				this.iSelectedTemperatures := [false, false]
+
 				this.loadPressures(false, false)
+			}
 
 			GuiControl Choose, temperaturesDropDown, %chosen%
 		}
@@ -378,6 +381,69 @@ class PressuresEditor {
 
 		this.updateState()
 		this.updateStatistics()
+	}
+
+	savePressures() {
+		local pressuresDB := this.PressuresDatabase
+		local pressures := {}
+		local tyres := {}
+		local airTemperature := this.SelectedTemperatures[1]
+		local trackTemperature := this.SelectedTemperatures[2]
+		local tyre, pressure, count, lastTyre, oldPressure
+		local compound, compoundColor, ignore, entry
+
+		splitCompound(this.SelectedCompound, compound, compoundColor)
+
+		tyres[translate("Front Left")] := "FL"
+		tyres[translate("Front Right")] := "FR"
+		tyres[translate("Rear Left")] := "RL"
+		tyres[translate("Rear Right")] := "RR"
+
+		Gui PE:Default
+
+		Gui ListView, % this.PressuresListView
+
+		loop % LV_GetCount()
+		{
+			LV_GetText(tyre, A_Index, 1)
+			LV_GetText(pressure, A_Index, 2)
+			LV_GetText(count, A_Index, 3)
+
+			if (tyre != "")
+				lastTyre := tyres[tyre]
+
+			pressure := Round(convertUnit("Pressure", internalValue("Float", pressure), false), 1)
+
+			pressures[lastTyre . "." . pressure] := true
+
+			oldPressure := pressuresDB.query("Tyres.Pressures.Distribution"
+										   , {Where: {Weather: this.SelectedWeather, Driver: this.SessionDatabase.SessionDatabase.ID
+													, Compound: compound, "Compound.Color": compoundColor, Tyre: lastTyre, Type: "Cold"
+													, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+													, Pressure: pressure}})
+
+			if (oldPressure.Length() > 0)
+				oldPressure[1].Count := count
+			else
+				pressuresDB.add("Tyres.Pressures.Distribution"
+							  , {Driver: this.SessionDatabase.SessionDatabase.ID, Weather: this.SelectedWeather
+							   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+							   , Compound: compound, "Compound.Color": compoundColor
+							   , Type: "Cold", Tyre: tyre, "Pressure": pressure, Count: count})
+		}
+
+		for ignore, entry in pressuresDB.query("Tyres.Pressures.Distribution"
+											 , {Select: ["Tyre", "Pressure"]
+											  , Where: {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
+													  , Compound: compound, "Compound.Color": compoundColor
+													  , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature}})
+			if !pressures.HasKey(entry.Tyre . "." . entry.Pressure)
+				pressuresDB.remove("Tyres.Pressures.Distribution"
+								 , {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
+							      , Compound: compound, "Compound.Color": compoundColor
+							      , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+								  , Tyre: Entry.Tyre, Pressure: entry.Pressure}
+								 , Func("always").Bind(true))
 	}
 
 	showStatisticsChart(drawChartFunction) {
@@ -670,6 +736,7 @@ upPressure() {
 		LV_Modify(index, "Col3", count + 1)
 	}
 
+	editor.savePressures()
 	editor.updateState()
 	editor.updateStatistics()
 }
@@ -690,6 +757,7 @@ downPressure() {
 		LV_Modify(index, "Col3", count - 1)
 	}
 
+	editor.savePressures()
 	editor.updateState()
 	editor.updateStatistics()
 }
@@ -717,6 +785,7 @@ clearPressure() {
 		LV_Delete(index)
 	}
 
+	editor.savePressures()
 	editor.updateState()
 	editor.updateStatistics()
 }

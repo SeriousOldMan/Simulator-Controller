@@ -10470,7 +10470,7 @@ class RaceCenter extends ConfigurationItem {
 
 		drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (length + 1) . "));")
 
-		drawChartFunction .= ("`n" . getPaceJSFunctions())
+		drawChartFunction .= ("`n" . getBoxAndWhiskerJSFunctions())
 
 		text =
 		(

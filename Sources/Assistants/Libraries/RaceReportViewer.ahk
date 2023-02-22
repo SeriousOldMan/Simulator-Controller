@@ -1009,7 +1009,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (Min(length, laps.Length()) + 1) . "));")
 
-			drawChartFunction .= ("`n" . getPaceJSFunctions())
+			drawChartFunction .= ("`n" . getBoxAndWhiskerJSFunctions())
 
 			text =
 			(
@@ -1165,7 +1165,7 @@ class RaceReportViewer extends RaceReportReader {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getPaceJSFunctions() {
+getBoxAndWhiskerJSFunctions() {
 	local script
 
 	script =

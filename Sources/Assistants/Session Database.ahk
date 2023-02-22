@@ -38,6 +38,7 @@
 #Include ..\Assistants\Libraries\SettingsDatabase.ahk
 #Include ..\Assistants\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Assistants\Libraries\PressuresEditor.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -138,6 +139,7 @@ global downloadWetRaceButton
 global deleteWetRaceButton
 
 global driverDropDown
+global editPressuresButton
 global tyreCompoundDropDown
 global airTemperatureEdit
 global trackTemperatureEdit
@@ -605,6 +607,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Driver")
 		Gui %window%:Add, DropDownList, x386 yp w100 vdriverDropDown gloadPressures
 
+		Gui %window%:Add, Button, x494 yp w22 h22 HWNDeditPressuresButtonHandle veditPressuresButton geditPressures
+		setButtonIcon(editPressuresButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L2 T2 R2 B2")
+
 		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
 		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
 
@@ -794,8 +799,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
+		local sessionDB := this.SessionDatabase
 		local simulator, car, track, defaultListView, selected, selectedEntries, row, type
-		local name, info
+		local name, info, index, driver
 
 		Gui %window%:Default
 
@@ -902,6 +908,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			case "Pressures":
 				GuiControl Font, settingsTab4
 				GuiControl Choose, settingsTab, 4
+				GuiControl Disable, editPressuresButton
+
+				if ((this.SelectedWeather != true) && !this.UseCommunity)
+					for index, driver in sessionDB.getAllDrivers(this.SelectedSimulator)
+						if (driver = sessionDB.ID) {
+							GuiControlGet driverDropDown
+
+							if (driverDropDown = sessionDB.getDriverName(this.SelectedSimulator, driver))
+								GuiControl Enable, editPressuresButton
+
+							break
+						}
 			case "Automation":
 				GuiControl Font, settingsTab5
 				GuiControl Choose, settingsTab, 5
@@ -3399,8 +3417,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						}
 
 						for index, postfix in ["1", "2", "3", "4", "5"] {
-							pressure := Format("{:.1f}", pressure)
-
 							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", convertUnit("Pressure", pressure))
 
 							if (index = (3 + airDelta)) {
@@ -3423,7 +3439,30 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			catch exception {
 				logError(exception)
 			}
+
+			this.updateState()
 		}
+	}
+
+	openPressuresEditor() {
+		local window := this.Window
+		local configuration
+
+		Gui PE:+Owner%window%
+		Gui %window%:+Disabled
+
+		Gui %window%:Default
+
+		GuiControlGet airTemperatureEdit
+		GuiControlGet trackTemperatureEdit
+		GuiControlGet tyreCompoundDropDown
+
+		if new PressuresEditor(this, this.iTyreCompound, this.iTyreCompoundColor
+								   , Round(convertUnit("Temperature", airTemperatureEdit, false))
+								   , Round(convertUnit("Temperature", trackTemperatureEdit, false))).editPressures()
+			this.selectPressures()
+
+		Gui %window%:-Disabled
 	}
 
 	selectStrategy(row) {
@@ -5790,6 +5829,13 @@ loadPressures() {
 		new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures"), 100).start()
 }
 
+editPressures() {
+	local editor := SessionDatabaseEditor.Instance
+
+	if (editor.SelectedModule = "Pressures")
+		new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "openPressuresEditor"), 100).start()
+}
+
 noSelect() {
 	local editor, window, defaultListView
 
@@ -6252,6 +6298,8 @@ showSessionDatabaseEditor() {
 
 	if (trackTemperature <= 0)
 		trackTemperature := 27
+
+	fixIE(11)
 
 	protectionOn()
 

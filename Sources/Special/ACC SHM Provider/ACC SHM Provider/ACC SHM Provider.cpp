@@ -218,10 +218,7 @@ inline const string getPenalty(PenaltyShortcut penalty) {
 
 	switch (penalty) {
 	case PenaltyShortcut::None:
-		if (gf->penaltyTime > 0)
-			return "Time";
-		else
-			return "";
+		return "";
 	case PenaltyShortcut::DriveThrough_Cutting:
 	case PenaltyShortcut::DriveThrough_PitSpeeding:
 	case PenaltyShortcut::DriveThrough_IgnoredDriverStint:

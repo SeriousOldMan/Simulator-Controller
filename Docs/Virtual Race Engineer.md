@@ -605,6 +605,16 @@ Notes:
 
   3. You can configure using the [settings in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings-1) the session types, from which tyre pressure data will be collected and stored into the database by Jona. Default is to collect tyre pressure data during practice and race sessions.
 
+##### Browsing and Editing Tyre Pressures
+
+A tool is available to investigate the tyre pressure data collected by the Race Engineer. Using this tool you can also correct invalid data points, if wrong pressures might have been mistakingly recorded. To open this tool, you must select a specific weather condition (i.e. not "All") and you must choose yourself as the current driver. Then you can click on the small button with the "Pencil" beside the driver name and the following window opens:
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2016.jpg)
+
+Here you can select one of the tyre compounds, you have used in that specific weather condition, and the temperatures (air / track) for which pressure data is available. In the list in the lower part of the window you will see all recorded data points. Select one of the entries, and you can increase or decrease the count and thereby the weight of this data point, or you can delete it alltogether. The graph in the upper area shows you the data distribution. The narrower the box, the more accurate the cold tyre pressure recommendation.
+
+Please note, that **all** changes will only be saved, if you close the tool using the "Save" button.
+
 #### Automations
 
 At this page, you can define automatic actions for specific locations at the track. Since this is a very extensive functionality and observing your car and its position on the track is the duty of the Race Spotter, there is a [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Spotter#track-automations) in the documentation of the Virtual Race Spotter, which shows how to setup and use track automations.

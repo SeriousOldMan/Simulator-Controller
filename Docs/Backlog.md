@@ -15,9 +15,6 @@
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
 
-#### Session Database
-  1. Graphical editor for telemetry data browsing and cleanup
-
 #### Race Center
   1. Show # of pitstops and the corresponding laps of all cars
 

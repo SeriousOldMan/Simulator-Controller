@@ -17,6 +17,7 @@
 
 #### Race Center
   1. Show # of pitstops and the corresponding laps of all cars
+  2. Command to transfer the currently chosen setup to the "Pitstop" tab fields.
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer

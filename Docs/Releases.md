@@ -3,7 +3,10 @@
   2. Documentation updates, as always
   3. Changed default for pressure calculation in "Race Center" to "Adjust (Reference)".
   4. Changed default for repairs to *Everything* in "Race Center".
-  5. A new tool has been added to the "Session Database", which let's you investigate and correct (if necessary) recorded cold tyre pressures recommendations. See the [all new documentation](*) for more information.
+  5. A new tool has been added to the "Session Database", which let's you investigate and correct (if necessary) recorded cold tyre pressures recommendations. See the [all new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures) for more information.
+  6. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Ford Mustang 2015
 
 ## 4.6.0.0-release 02/17/23
   1. Minor bugfixes, as always

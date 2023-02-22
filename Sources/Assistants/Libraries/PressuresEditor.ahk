@@ -50,6 +50,8 @@ class PressuresEditor {
 	iSelectedCompound := false
 	iSelectedTemperatures := [false, false]
 
+	iModifications := []
+
 	SessionDatabase[] {
 		Get {
 			return this.iSessionDatabase
@@ -201,6 +203,51 @@ class PressuresEditor {
 		}
 	}
 
+	flushPressures() {
+		local sessionDatabase := this.SessionDatabase
+		local connectors := sessionDatabase.SessionDatabase.Connectors
+		local database := this.PressuresDatabase
+		local ignore, update, entry, row, connector, properties
+
+		database.reload("Tyres.Pressures.Distribution", false)
+
+		database.lock("Tyres.Pressures.Distribution")
+
+		try {
+			for ignore, update in this.iModifications
+				switch update[1] {
+					case "Update":
+						entry := database.query("Tyres.Pressures.Distribution", {Where: update[2]})
+
+						if (entry.Length() > 0) {
+							entry := entry[1]
+
+							entry.Count := update[3]
+							entry.Synchronized := kNull
+
+							database.changed("Tyres.Pressures.Distribution")
+						}
+					case "Add":
+						database.add(update[2])
+					case "Remove":
+						for ignore, connector in connectors
+							try {
+								for ignore, row in database.query("Tyres.Pressures.Distribution", {Where: update[2]})
+									if (row.Identifier != kNull)
+										connector.DeleteData("TyresPressuresDistribution", row.Identifier)
+							}
+							catch exception {
+								logError(exception, true)
+							}
+
+						database.remove("Tyres.Pressures.Distribution", update[2], Func("always").Bind(true))
+				}
+		}
+		finally {
+			database.unlock("Tyres.Pressures.Distribution")
+		}
+	}
+
 	editPressures() {
 		local x, y
 
@@ -215,6 +262,8 @@ class PressuresEditor {
 
 		try {
 			if (this.iClosed == kOk) {
+				this.flushPressures()
+
 				return true
 			}
 			else
@@ -390,7 +439,7 @@ class PressuresEditor {
 		local airTemperature := this.SelectedTemperatures[1]
 		local trackTemperature := this.SelectedTemperatures[2]
 		local tyre, pressure, count, lastTyre, oldPressure
-		local compound, compoundColor, ignore, entry
+		local compound, compoundColor, ignore, entry, prototype
 
 		splitCompound(this.SelectedCompound, compound, compoundColor)
 
@@ -416,20 +465,28 @@ class PressuresEditor {
 
 			pressures[lastTyre . "." . pressure] := true
 
-			oldPressure := pressuresDB.query("Tyres.Pressures.Distribution"
-										   , {Where: {Weather: this.SelectedWeather, Driver: this.SessionDatabase.SessionDatabase.ID
-													, Compound: compound, "Compound.Color": compoundColor, Tyre: lastTyre, Type: "Cold"
-													, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-													, Pressure: pressure}})
+			prototype := {Weather: this.SelectedWeather, Driver: this.SessionDatabase.SessionDatabase.ID
+						, Compound: compound, "Compound.Color": compoundColor, Tyre: lastTyre, Type: "Cold"
+						, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+						, Pressure: pressure}
 
-			if (oldPressure.Length() > 0)
-				oldPressure[1].Count := count
-			else
-				pressuresDB.add("Tyres.Pressures.Distribution"
-							  , {Driver: this.SessionDatabase.SessionDatabase.ID, Weather: this.SelectedWeather
-							   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-							   , Compound: compound, "Compound.Color": compoundColor
-							   , Type: "Cold", Tyre: tyre, "Pressure": pressure, Count: count})
+			oldPressure := pressuresDB.query("Tyres.Pressures.Distribution", {Where: prototype})
+
+			if (oldPressure.Length() > 0) {
+				if (oldPressure[1].Count != count) {
+					oldPressure[1].Count := count
+
+					this.iModifications.Push(Array("Update", prototype, count))
+				}
+			}
+			else {
+				prototype := prototype.Clone()
+				prototype.Count := count
+
+				pressuresDB.add("Tyres.Pressures.Distribution", prototype)
+
+				this.iModifications.Push(Array("Add", prototype))
+			}
 		}
 
 		for ignore, entry in pressuresDB.query("Tyres.Pressures.Distribution"
@@ -437,13 +494,16 @@ class PressuresEditor {
 											  , Where: {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
 													  , Compound: compound, "Compound.Color": compoundColor
 													  , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature}})
-			if !pressures.HasKey(entry.Tyre . "." . entry.Pressure)
-				pressuresDB.remove("Tyres.Pressures.Distribution"
-								 , {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
-							      , Compound: compound, "Compound.Color": compoundColor
-							      , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-								  , Tyre: Entry.Tyre, Pressure: entry.Pressure}
-								 , Func("always").Bind(true))
+			if !pressures.HasKey(entry.Tyre . "." . entry.Pressure) {
+				where := {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
+						, Compound: compound, "Compound.Color": compoundColor
+						, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
+						, Tyre: Entry.Tyre, Pressure: entry.Pressure}
+
+				pressuresDB.remove("Tyres.Pressures.Distribution", where, Func("always").Bind(true))
+
+				this.iModifications.Push(Array("Remove", where))
+			}
 	}
 
 	showStatisticsChart(drawChartFunction) {

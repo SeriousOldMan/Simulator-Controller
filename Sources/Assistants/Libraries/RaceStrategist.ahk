@@ -42,8 +42,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iHasTelemetryData := false
 
-	iFirstStandingsLap := true
-
 	iTelemetryDatabaseDirectory := false
 
 	iTelemetryDatabase := false
@@ -1328,8 +1326,6 @@ class RaceStrategist extends GridRaceAssistant {
 			saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
 		}
 
-		this.iFirstStandingsLap := (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1)
-
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
 									  , SaveTelemetry: getConfigurationValue(configuration, "Race Strategist Shutdown", simulatorName . ".SaveTelemetry", kAlways)
@@ -1487,8 +1483,6 @@ class RaceStrategist extends GridRaceAssistant {
 			lastLap := 0
 		else if ((lastLap == 0) && (lapNumber > 1))
 			lastLap := (lapNumber - 1)
-
-		this.iFirstStandingsLap := (this.iFirstStandingsLap && (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1))
 
 		if (this.Speaker && (lapNumber > 1)) {
 			driverForname := knowledgeBase.getValue("Driver.Forname", "John")
@@ -2636,9 +2630,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if ((driver == 0) || (carCount == 0))
 				return
 
-			if this.iFirstStandingsLap {
-				this.iFirstStandingsLap := false
-
+			if (lapNumber == 1) {
 				data := newConfiguration()
 
 				setConfigurationValue(data, "Session", "Time", this.SessionTime)

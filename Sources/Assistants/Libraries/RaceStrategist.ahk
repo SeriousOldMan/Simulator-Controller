@@ -2705,11 +2705,13 @@ class RaceStrategist extends GridRaceAssistant {
 					}
 				}
 
+				this.updateRaceInfo(data)
+
+				setConfigurationValue(data, "Cars", "Slots", map2String("|", "->", this.RaceInfo["Slots"]))
+
 				fileName := temporaryFileName("Race Strategist Race", "info")
 
 				writeConfiguration(fileName, data)
-
-				this.updateRaceInfo(data)
 
 				this.RemoteHandler.saveRaceInfo(lapNumber, fileName)
 			}

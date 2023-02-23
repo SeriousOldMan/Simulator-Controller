@@ -111,6 +111,8 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 
 	if includeDirectory {
 		try {
+			recurse := (recurse != false)
+
 			FileRemoveDir %directoryName%, %recurse%
 
 			return !ErrorLevel

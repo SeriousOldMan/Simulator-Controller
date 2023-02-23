@@ -3,7 +3,7 @@ Version=4.6.1.0-dev
 Target=4.6.1.0-release
 Date=02/22/2023
 Download=https://www.dropbox.com/s/358413oc9odtp4p/Simulator%20Controller%204.6.1.0-dev.zip?dl=1
-Changes=Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center", New pressures cleaning tool in "Session Database", New car models for "Setup Advisor"
+Changes=Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center", New pressures cleaning tool in "Session Database", New car models for "Setup Advisor", Fixed critical bug in "Race Reports" for team races
 [Release]
 Version=4.6.0.0-release
 Date=02/17/2023

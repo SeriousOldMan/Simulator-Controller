@@ -2589,7 +2589,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if getConfigurationValue(raceData, "Cars", "Slots", false)
 			raceInfo["Slots"] := string2Map("|", "->", getConfigurationValue(raceData, "Cars", "Slots"))
 		else if this.RaceInfo
-			raceInfo["Slots"] := this.RaceInfo["SLots"]
+			raceInfo["Slots"] := this.RaceInfo["Slots"]
 		else
 			slots := {}
 
@@ -2678,13 +2678,13 @@ class RaceStrategist extends GridRaceAssistant {
 						carIndex := A_Index
 
 					if carIndex {
-						carCar := knowledgeBase.getValue("Car." . carIndex . ".Car", false)
+						carCar := knowledgeBase.getValue("Car." . A_Index . ".Car", false)
 
 						if carCar {
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Nr", carNr)
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".ID", carID)
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Class"
-												, knowledgeBase.getValue("Car." . carIndex . ".Class", kUnknown))
+												, knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Car", carCar)
 
 							key := ("#" . carNr)
@@ -2703,11 +2703,13 @@ class RaceStrategist extends GridRaceAssistant {
 					}
 				}
 
+				this.updateRaceInfo(data)
+
+				setConfigurationValue(data, "Cars", "Slots", map2String("|", "->", this.RaceInfo["Slots"]))
+
 				fileName := temporaryFileName("Race Strategist Race", "info")
 
 				writeConfiguration(fileName, data)
-
-				this.updateRaceInfo(data)
 
 				this.RemoteHandler.saveRaceInfo(lapNumber, fileName)
 			}

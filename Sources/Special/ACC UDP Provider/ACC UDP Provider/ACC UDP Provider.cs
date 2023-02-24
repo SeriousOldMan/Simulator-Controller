@@ -218,6 +218,8 @@ namespace ACCUDPProvider {
         public ObservableCollection<DriverData> Drivers { get; set; } = new ObservableCollection<DriverData>();
         public ObservableCollection<LapData> Laps { get; set; } = new ObservableCollection<LapData>();
 
+        public SessionPhase sessionPhase = SessionPhase.NONE;
+
         private float trackMeters = 0;
         private string cmdFileName;
         private string outFileName;
@@ -289,6 +291,12 @@ namespace ACCUDPProvider {
                             else if (command == "Read")
                             {
                                 StreamWriter outStream = new StreamWriter(outFileName, false, Encoding.Unicode);
+
+                                if (sessionPhase == SessionPhase.SessionOver)
+                                {
+                                    outStream.WriteLine("[Session Data]");
+                                    outStream.WriteLine("Session=Finished");
+                                }
 
                                 outStream.WriteLine("[Position Data]");
 
@@ -435,6 +443,8 @@ namespace ACCUDPProvider {
 
         private void OnRealtimeUpdate(string sender, RealtimeUpdate realtimeUpdate) {
             try {
+                sessionPhase = realtimeUpdate.Phase;
+
                 if (trackMeters > 0) {
                     var sortedCars = Cars.OrderBy(x => x.SplinePosition).ToArray();
 

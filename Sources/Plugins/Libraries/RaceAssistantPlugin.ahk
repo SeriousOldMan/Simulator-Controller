@@ -1699,8 +1699,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					setConfigurationValue(data, "Session Data", "Session", "Race")
 
 					if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
-						if !RaceAssistantPlugin.Finished
-							RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
+						if !RaceAssistantPlugin.Finished {
+							; RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
+
+							if (RaceAssistantPlugin.LastLap = dataLastLap)
+								RaceAssistantPlugin.sFinished := (dataLastLap + 1)
+							else
+								RaceAssistantPlugin.sFinished := dataLastLap
+						}
 
 						finished := false
 					}

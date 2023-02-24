@@ -312,7 +312,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	acquirePositionsData(telemetryData) {
-		local positionsData
+		local positionsData, session
 		local lap, restart, fileName, tries
 		local driverForname, driverSurname, driverNickname, lapTime, driverCar, driverCarCandidate, carID, car
 
@@ -378,6 +378,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		if positionsData {
+			session := getConfigurationValue(positionsData, "Session Data", "Session", kUndefined)
+
+			if (session != kUndefined) {
+				removeConfigurationSection(positionsData, "Session Data")
+
+				setConfigurationValue(telemetryData, "Session Data", "Session", session)
+			}
+
 			if (lap <= 1)
 				lastDriverCar := false
 

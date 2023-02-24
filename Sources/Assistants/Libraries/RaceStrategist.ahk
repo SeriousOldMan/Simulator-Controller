@@ -42,8 +42,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iHasTelemetryData := false
 
-	iFirstStandingsLap := true
-
 	iTelemetryDatabaseDirectory := false
 
 	iTelemetryDatabase := false
@@ -1327,8 +1325,6 @@ class RaceStrategist extends GridRaceAssistant {
 			deprecated := getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
 			saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
 		}
-
-		this.iFirstStandingsLap := (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1)
 
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
@@ -2634,9 +2630,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if ((driver == 0) || (carCount == 0))
 				return
 
-			if this.iFirstStandingsLap {
-				this.iFirstStandingsLap := false
-
+			if (lapNumber == 1) {
 				data := newConfiguration()
 
 				setConfigurationValue(data, "Session", "Time", this.SessionTime)
@@ -2678,13 +2672,13 @@ class RaceStrategist extends GridRaceAssistant {
 						carIndex := A_Index
 
 					if carIndex {
-						carCar := knowledgeBase.getValue("Car." . carIndex . ".Car", false)
+						carCar := knowledgeBase.getValue("Car." . A_Index . ".Car", false)
 
 						if carCar {
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Nr", carNr)
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".ID", carID)
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Class"
-												, knowledgeBase.getValue("Car." . carIndex . ".Class", kUnknown))
+												, knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
 							setConfigurationValue(data, "Cars", "Car." . carIndex . ".Car", carCar)
 
 							key := ("#" . carNr)
@@ -2703,11 +2697,13 @@ class RaceStrategist extends GridRaceAssistant {
 					}
 				}
 
+				this.updateRaceInfo(data)
+
+				setConfigurationValue(data, "Cars", "Slots", map2String("|", "->", this.RaceInfo["Slots"]))
+
 				fileName := temporaryFileName("Race Strategist Race", "info")
 
 				writeConfiguration(fileName, data)
-
-				this.updateRaceInfo(data)
 
 				this.RemoteHandler.saveRaceInfo(lapNumber, fileName)
 			}

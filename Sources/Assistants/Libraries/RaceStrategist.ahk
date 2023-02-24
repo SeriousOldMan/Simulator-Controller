@@ -2589,7 +2589,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if getConfigurationValue(raceData, "Cars", "Slots", false)
 			raceInfo["Slots"] := string2Map("|", "->", getConfigurationValue(raceData, "Cars", "Slots"))
 		else if this.RaceInfo
-			raceInfo["Slots"] := this.RaceInfo["SLots"]
+			raceInfo["Slots"] := this.RaceInfo["Slots"]
 		else
 			slots := {}
 
@@ -2671,7 +2671,7 @@ class RaceStrategist extends GridRaceAssistant {
 						if !carIndex {
 							key := ("!" . carID)
 
-							carIndex := (slots.HasKey(key) ? slots[key] : false)
+							carIndex := (slots.HasKey(key) ? slots[key] : A_Index)
 						}
 					}
 					else

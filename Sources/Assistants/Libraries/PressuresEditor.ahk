@@ -877,5 +877,5 @@ movePressuresEditor() {
 }
 
 openPressuresDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures
 }

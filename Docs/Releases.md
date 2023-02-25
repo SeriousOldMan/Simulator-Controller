@@ -1,4 +1,4 @@
-## 4.6.1.0-release 02/22/23 (planned)
+## 4.6.1.0-release 02/24/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Changed default for pressure calculation in "Race Center" to "Adjust (Reference)".

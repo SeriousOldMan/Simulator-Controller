@@ -42,8 +42,6 @@ class RaceStrategist extends GridRaceAssistant {
 
 	iHasTelemetryData := false
 
-	iFirstStandingsLap := true
-
 	iTelemetryDatabaseDirectory := false
 
 	iTelemetryDatabase := false
@@ -1327,8 +1325,6 @@ class RaceStrategist extends GridRaceAssistant {
 			deprecated := getConfigurationValue(configuration, "Race Engineer Shutdown", simulatorName . ".SaveSettings", kNever)
 			saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings", deprecated)
 		}
-
-		this.iFirstStandingsLap := (getConfigurationValue(data, "Stint Data", "Laps", 0) == 1)
 
 		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Strategist Analysis", simulatorName . ".LearningLaps", 1)
 									  , SessionReportsDatabase: getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
@@ -2634,9 +2630,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if ((driver == 0) || (carCount == 0))
 				return
 
-			if this.iFirstStandingsLap {
-				this.iFirstStandingsLap := false
-
+			if (lapNumber == 1) {
 				data := newConfiguration()
 
 				setConfigurationValue(data, "Session", "Time", this.SessionTime)
@@ -2671,7 +2665,7 @@ class RaceStrategist extends GridRaceAssistant {
 						if !carIndex {
 							key := ("!" . carID)
 
-							carIndex := (slots.HasKey(key) ? slots[key] : false)
+							carIndex := (slots.HasKey(key) ? slots[key] : A_Index)
 						}
 					}
 					else

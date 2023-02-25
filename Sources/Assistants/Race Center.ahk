@@ -332,6 +332,9 @@ class RaceCenter extends ConfigurationItem {
 	iStints := {}
 	iLaps := {}
 
+	iPitstops := {}
+	iLastPitstopUpdate := false
+
 	iCurrentStint := false
 	iLastLap := false
 
@@ -669,6 +672,48 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
+	class Pitstop {
+		iID := false
+
+		iTime := false
+		iLap := 0
+		iDuration := 0
+
+		ID[] {
+			Get {
+				return this.iID
+			}
+		}
+
+		Time[] {
+			Get {
+				return this.iTime
+			}
+		}
+
+		Lap[] {
+			Get {
+				return this.iLap
+			}
+		}
+
+		Duration[] {
+			Get {
+				return this.iDuration
+			}
+
+			Set {
+				return (this.iDuration := value)
+			}
+		}
+
+		__New(id, time, lap) {
+			this.iID := id
+			this.iTime := time
+			this.iLap := lap
+		}
+	}
+
 	Window[] {
 		Get {
 			return "RaceCenter"
@@ -977,6 +1022,19 @@ class RaceCenter extends ConfigurationItem {
 				return (asIdentifier ? this.iLastLap.Identifier : this.iLastLap)
 			else
 				return false
+		}
+	}
+
+	Pitstops[id := false] {
+		Get {
+			if id {
+				if !this.iPitstops.HasKey(id)
+					this.iPitstops[id] := []
+
+				return this.iPitstops[id]
+			}
+			else
+				return this.iPitstops
 		}
 	}
 
@@ -4859,6 +4917,9 @@ class RaceCenter extends ConfigurationItem {
 			this.iStints := {}
 			this.iLaps := {}
 
+			this.iPitstops := {}
+			this.iLastPitstopUpdate := false
+
 			this.iLastLap := false
 			this.iCurrentStint := false
 
@@ -5172,6 +5233,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.Laptime := Round(getConfigurationValue(data, "Stint Data", "LapLastTime") / 1000, 1)
 
+			lap.RemainingSessionTime := getConfigurationValue(data, "Session Data", "SessionTimeRemaining")
 			lap.RemainingDriverTime := getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", "-")
 
 			if (lap.RemainingDriverTime != "-")
@@ -5225,6 +5287,8 @@ class RaceCenter extends ConfigurationItem {
 
 				lap.Positions := rawData
 
+				this.updatePitstops(lap, data)
+
 				car := getConfigurationValue(data, "Position Data", "Driver.Car")
 
 				if car
@@ -5247,7 +5311,76 @@ class RaceCenter extends ConfigurationItem {
 			this.Laps[lap.Nr] := lap
 		}
 
+		if ((count = 0) && this.LastLap) {
+			lap := this.LastLap
+			identifier := lap.Identifier
+
+			try {
+				tries := ((A_Index == count) ? 30 : 1)
+
+				while (tries > 0) {
+					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
+
+					if (!rawData || (rawData = "")) {
+						tries -= 1
+
+						this.showMessage(translate("Waiting for data"))
+
+						if (tries <= 0) {
+							this.showMessage(translate("Give up - use default values"))
+
+							throw "No data..."
+						}
+						else
+							Sleep 400
+					}
+					else
+						break
+				}
+
+				this.updatePitstops(lap, parseConfiguration(rawData))
+			}
+			catch exception {
+			}
+		}
+
 		return newLaps
+	}
+
+	updatePitstops(lap, data) {
+		local carID, delta, pitstops, pitstop
+
+		if !this.iLastPitstopUpdate {
+			this.iLastPitstopUpdate := Round(lap.RemainingSessionTime / 1000)
+
+			delta := 0
+		}
+		else {
+			delta := (this.iLastPitstopUpdate - Round(lap.RemainingSessionTime / 1000))
+
+			this.iLastPitstopUpdate -= delta
+		}
+
+		loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
+		{
+			if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 || getConfigurationValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
+				carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index)
+
+				pitstops := this.Pitstops[carID]
+
+				if (pitstops.Length() = 0)
+					pitstops.Push(new this.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
+				else {
+					pitstop := pitstops[pitstops.Length()]
+
+					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
+						pitstop.Duration := (pitstop.Duration + delta)
+					else
+						pitstops.Push(new this.Pitstop(carID, this.iLastPitstopUpdate, lap.Nr))
+				}
+			}
+		}
 	}
 
 	updateStint(stint) {

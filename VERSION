@@ -1,16 +1,16 @@
 [Development]
-Version=4.6.1.0-release
-Target=4.6.1.0-release
-Date=02/24/2023
-Download=https://cutt.ly/n8tardr;https://www.dropbox.com/s/20tgf0a0vrcm9i0/Simulator%20Controller%204.6.1.0-release.zip?dl=1
-Changes=Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center", New pressures cleaning tool in "Session Database", New car models for "Setup Advisor", Fixed critical bug in "Race Reports" for team races
+Version=4.6.2.0-dev
+Target=4.6.2.0-release
+Date=02/25/2023
+Download=
+Changes=Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC
 [Release]
 Version=4.6.1.0-release
 Date=02/24/2023
 Download=https://cutt.ly/n8tardr;https://www.dropbox.com/s/20tgf0a0vrcm9i0/Simulator%20Controller%204.6.1.0-release.zip?dl=1
 Changes=Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center", New pressures cleaning tool in "Session Database", New car models for "Setup Advisor", Fixed critical bug in "Race Reports" for team races
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=4.6.1.0-release
-Development=4.6.1.0-release
+Development=4.6.2.0-dev

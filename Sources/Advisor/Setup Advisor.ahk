@@ -948,7 +948,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.iSettings := []
 
 		if !simulator
-			knowledgeBase.addFact("Settings.Count", 0)
+			knowledgeBase.setFact("Settings.Count", 0)
 
 		compiler := new RuleCompiler()
 

@@ -695,7 +695,6 @@ class SetupWizard extends ConfigurationItem {
 
 				Sleep 100
 			}
-			msgbox here
 
 			window := this.WizardWindow
 

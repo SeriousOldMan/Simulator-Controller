@@ -86,7 +86,7 @@ long getRemainingLaps() {
         return (long)(map_buffer->race_session_laps[map_buffer->session_iteration - 1] - normalize(map_buffer->completed_laps));
     }
     else {
-        long time = (long)map_buffer->lap_time_previous_self * 1000;
+        long time = (map_buffer->session_type != R3E_SESSION_PRACTICE) ? (long)map_buffer->lap_time_previous_self * 1000 : (long)map_buffer->lap_time_best_self * 1000;
 
         if (time > 0)
             return (long)(getRemainingTime() / time);

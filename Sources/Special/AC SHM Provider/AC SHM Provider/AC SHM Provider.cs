@@ -47,11 +47,22 @@ namespace ACSHMProvider
 
         private long GetRemainingLaps(long timeLeft)
         {
-            if (GetSession(graphics.Session) != "Practice" && staticInfo.IsTimedRace == 0)
-                return (graphics.NumberOfLaps - graphics.CompletedLaps);
-            else {
-                if (graphics.iLastTime > 0)
-                    return ((GetRemainingTime(timeLeft) / graphics.iLastTime) + 1);
+            if (GetSession(graphics.Session) != "Practice")
+            {
+                if (staticInfo.IsTimedRace == 0)
+                    return (graphics.NumberOfLaps - graphics.CompletedLaps);
+                else
+                {
+                    if (graphics.iLastTime > 0)
+                        return ((GetRemainingTime(timeLeft) / graphics.iLastTime) + 1);
+                    else
+                        return 0;
+                }
+            }
+            else
+            {
+                if (graphics.iBestTime > 0)
+                    return ((GetRemainingTime(timeLeft) / graphics.iBestTime) + 1);
                 else
                     return 0;
             }

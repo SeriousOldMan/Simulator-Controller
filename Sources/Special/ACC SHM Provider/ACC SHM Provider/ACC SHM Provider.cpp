@@ -399,7 +399,11 @@ int main(int argc, char* argv[])
 				timeLeft = 0.0;
 
 		printData("SessionTimeRemaining", timeLeft);
-		printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
+
+		if (gf->session == AC_PRACTICE)
+			printData("SessionLapsRemaining", (gf->iBestTime > 0) ? timeLeft / gf->iBestTime : 99);
+		else
+			printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 
 	if ((argc == 2) && (strcmp(argv[1], "-Setup") == 0))

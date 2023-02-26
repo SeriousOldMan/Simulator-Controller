@@ -9946,6 +9946,7 @@ class RaceCenter extends ConfigurationItem {
 		local sessionStore := this.SessionStore
 		local telemetryDB := this.TelemetryDatabase
 		local html := "<table class=""table-std"">"
+		local lapNr := lap.Nr
 		local cars := true
 		local carIDs := true
 		local overallPositions := true
@@ -9955,7 +9956,7 @@ class RaceCenter extends ConfigurationItem {
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
-		local index, position, lapTime, laps, delta, result, multiClass
+		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop
 
 		multiClass := this.getStandings(lap, cars, carIDs, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
 
@@ -9970,38 +9971,48 @@ class RaceCenter extends ConfigurationItem {
 		html .= ("<th class=""th-std"">" . translate("Lap Time") . "</th>"
 			   . "<th class=""th-std"">" . translate("Laps") . "</th>"
 			   . "<th class=""th-std"">" . translate("Delta") . "</th>"
+			   . "<th class=""th-std"">" . translate("Pitstops") . "</th>"
 			   . "</tr>")
 
-		for index, position in overallPositions {
-			lapTime := "-"
-			laps := "-"
-			delta := "-"
+		for index, position in overallPositions
+			if (position && carIDs.HasKey(index)) {
+				lapTime := "-"
+				laps := "-"
+				delta := "-"
 
-			result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
+				result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, ID: carIDs[index]}})
 
-			if (result.Length() = 0)
-				result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
+				if (result.Length() = 0)
+					result := sessionStore.query("Standings.Data", {Select: ["Time", "Laps", "Delta"], Where: {Lap: lap.Nr, Car: cars[index]}})
 
-			if (result.Length() > 0) {
-				lapTime := result[1].Time
-				laps := result[1].Laps
-				delta := Round(result[1].Delta, 1)
+				if (result.Length() > 0) {
+					lapTime := result[1].Time
+					laps := result[1].Laps
+					delta := Round(result[1].Delta, 1)
+				}
+
+				html .= ("<tr><th class=""th-std"">" . position . "</th>")
+				html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index]
+																							 , computeDriverName(driverFornames[index]
+																											   , driverSurnames[index]
+																											   , driverNickNames[index])
+																							 , telemetryDB.getCarName(this.Simulator, carNames[index]))
+					   . "</td>")
+
+				if multiClass
+					html .= ("<td class=""td-std"">" . classPositions[index] . "</td>")
+
+				html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", lapTimeDisplayValue(lapTime), laps, delta)
+					   . "</td>")
+
+				numPitstops := 0
+
+				for ignore, pitstop in this.Pitstops[carIDs[index]]
+					if (pitstop.Lap <= lapNr)
+						numPitstops += 1
+
+				html .= ("<td class=""td-std"">" . numPitstops . "</td></tr>")
 			}
-
-			html .= ("<tr><th class=""th-std"">" . position . "</th>")
-			html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", carNumbers[index]
-																						 , computeDriverName(driverFornames[index]
-																										   , driverSurnames[index]
-																										   , driverNickNames[index])
-																						 , telemetryDB.getCarName(this.Simulator, carNames[index]))
-				   . "</td>")
-
-			if multiClass
-				html .= ("<td class=""td-std"">" . classPositions[index] . "</td>")
-
-			html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", lapTimeDisplayValue(lapTime), laps, delta)
-				   . "</td></tr>")
-		}
 
 		html .= "</table>"
 

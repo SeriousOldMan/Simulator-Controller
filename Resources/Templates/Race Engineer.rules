@@ -834,7 +834,7 @@ priority: 10, [?Pitstop.Plan] => (Prove: planPitstop())
 {All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Loss.RL]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RL, 0)
 {All: [?Pitstop.Plan], {None: [?Tyre.Pressure.Loss.RR]}} => (Set: Pitstop.Planned.Tyre.Pressure.Lost.RR, 0)
 
-priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [Pitstop.Plan.Tyre.Change = true]}} =>
+priority: -5, {All: [?Pitstop.Plan], [?Lap.Remaining.Session <= 5], {None: [?Pitstop.Plan.Tyre.Change = true]}} =>
 		(Set: Pitstop.Planned.Tyre.Compound, false), (Set: Pitstop.Planned.Tyre.Compound.Color, false)
 
 priority: -20, [?Pitstop.Plan] => (Set: Pitstop.Planned), (Clear: Pitstop.Plan),

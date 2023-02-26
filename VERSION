@@ -1,9 +1,9 @@
 [Development]
 Version=4.6.2.0-dev
 Target=4.6.2.0-release
-Date=02/25/2023
+Date=02/26/2023
 Download=
-Changes=Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC
+Changes=Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC, "Race Center" provides detailed information about the pitstops of all cars
 [Release]
 Version=4.6.1.0-release
 Date=02/24/2023

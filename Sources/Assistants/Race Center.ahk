@@ -9956,7 +9956,7 @@ class RaceCenter extends ConfigurationItem {
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
-		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop
+		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopInfo
 
 		multiClass := this.getStandings(lap, cars, carIDs, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
 
@@ -10005,13 +10005,27 @@ class RaceCenter extends ConfigurationItem {
 				html .= ("<td class=""td-std"">" . values2String("</td><td class=""td-std"">", lapTimeDisplayValue(lapTime), laps, delta)
 					   . "</td>")
 
+				pitstops := this.Pitstops[carIDs[index]]
 				numPitstops := 0
 
-				for ignore, pitstop in this.Pitstops[carIDs[index]]
-					if (pitstop.Lap <= lapNr)
-						numPitstops += 1
+				if (pitstops.Length() > 0) {
+					for ignore, pitstop in pitstops
+						if (pitstop.Lap <= lapNr) {
+							numPitstops += 1
 
-				html .= ("<td class=""td-std"">" . numPitstops . "</td></tr>")
+							pitstopInfo := pitstop
+						}
+
+					if (numPitstops > 0)
+						pitstops := substituteVariables(translate("Total: %pitstops%, Last: Lap %lap%")
+													  , {pitstops: numPitstops, lap: pitstopInfo.Lap, seconds: pitstopInfo.Duration})
+					else
+						pitstops := "-"
+				}
+				else
+					pitstops := "-"
+
+				html .= ("<td class=""td-std"">" . pitstops . "</td></tr>")
 			}
 
 		html .= "</table>"

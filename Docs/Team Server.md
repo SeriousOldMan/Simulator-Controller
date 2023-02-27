@@ -196,7 +196,9 @@ Beside all that, you can request several context specific data, which will be sh
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%209.JPG)
 	 
-	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, beside their overall position in the race. In a multi-class race, the gaps shown in the first table will always be specific for the own class.
+	 If the current race is a multi-class race, the report will also show the class specific positions of all cars, additionally to their overall position in the race. In a multi-class race, the gaps shown in the first table will always be specific for the own class.
+	 
+	 Last, but not least, you will find informations about the past pitstops of each car. The overall number of pitstops, as well as the lap (in reference to your own laps) of the last stop are shown. Please keep in mind, that due to restrictions in the data provided by the various simulators, it cannot be differentiated in many cases, whether a car has been in the pits for a penalty, an regualr pitstop or even an unplanned stop due to repairs.
 	 
 	 Some basic data is shown in the header of the lap details as well. Important are here the ambient temperatures and the tyre pressure information. You can see the current hot pressures, recommend cold pressures (incl. a potential correction factor compared to the pressure setup at the beginning of the stint) and information about tyre pressure losses, if there are any.
 
@@ -335,6 +337,8 @@ Important: The correction factor to be applied for temperature corrections will 
 Furthermore, it is possible to enable a compensation for pressure losses as reported by the Race Engineer, like slow punctures or sudden pressure losses cause of collisions with curbs. But be sure, that it is really a loss of pressure due to a puncture or running over curbs. If not, you will end up with even worse pressures in those tyres.
 
 Also important: "Race Center" will try to guess the best possible tyre pressures using input from the AI and also from the calculation methods discussed above. But you need to take a look as well, since the software can't cope with everything, especially sudden weather changes, moisture in the night, and so on. In these cases you might have to correct some of the recommended pressures manually to compensate for bad decisisions made by the software.
+
+Of course, you can calculate and enter all values here on your own. For your convinience, you can use the small button with the "Copy" icon to the right of the tyre change drop down menu to select one of the tyre pressure setups in the "Setups" tab, which will then be entered into the tyre pressure fields, where you can edit them afterwards, if desired.
 
 #### Automatically select the next driver
 

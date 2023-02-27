@@ -457,3 +457,9 @@ Opens the "Strategy Workbench" tool, with which you can explore the telemetrie d
 
 #### *openRaceCenter()*
 Opens the "Race Center" tool, with which you can analyze the telemetry data of a running team session, plan and control pitstops and change race strategy on the fly.
+
+#### execute(command :: String)*
+Execute any command, which can be an executable or a script with an extension accepted by the system. The *command* string can name additional arguments for parameters accepted by the command, and you can use global variables enclosed in percent signs, like %ComSpec%.
+
+#### *hotkey(hotkeys :: String, method :: String := "Event")*
+This function can be used to send keyboard commands to a simulator, for example. Each keyboard command is a [keyboard command hotkey](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys). The vertical bar separates between the individual commands, if there are more than one command. The optional argument for method specifies the communication method to send the keyboard commands. These are named "Event", Input", "Play", "Raw" and "Default".

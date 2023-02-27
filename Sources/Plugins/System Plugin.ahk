@@ -672,6 +672,29 @@ execute(command) {
 	}
 }
 
+hotkey(hotkeys, method := "Event") {
+	local ignore, theHotkey
+
+	for ignore, theHotkey in string2Values("|", hotkeys)
+		try {
+			switch method {
+				case "Event":
+					SendEvent %theHotkey%
+				case "Input":
+					SendInput %theHotkey%
+				case "Play":
+					SendPlay %theHotkey%
+				case "Raw":
+					SendRaw %theHotkey%
+				default:
+					Send %theHotkey%
+			}
+		}
+		catch exception {
+			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%hotkey%) - please check the configuration"), {command: theHotkey}))
+		}
+}
+
 startSimulation(name := false) {
 	local controller := SimulatorController.Instance
 	local simulators

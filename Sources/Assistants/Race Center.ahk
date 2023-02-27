@@ -263,6 +263,7 @@ global pitstopDriverDropDownMenu
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
 global pitstopTyreSetEdit
+global copyPressuresButton
 global pitstopPressureFLEdit := ""
 global pitstopPressureFREdit := ""
 global pitstopPressureRLEdit := ""
@@ -1579,7 +1580,10 @@ class RaceCenter extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x24 yp+24 w85 h23 +0x200, % translate("Tyre Change")
 		choices := map(["No Tyre Change", normalizeCompound("Dry")], "translate")
-		Gui %window%:Add, DropDownList, x106 yp w157 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
+		Gui %window%:Add, DropDownList, x106 yp w133 AltSubmit Choose1 vpitstopTyreCompoundDropDown gupdateState, % values2String("|", choices*)
+
+		Gui %window%:Add, Button, x240 yp w23 h23 Center +0x200 HWNDcopyButton vcopyPressuresButton gcopyPressures
+		setButtonIcon(copyButton, kIconsDirectory . "Copy.ico", 1, "")
 
 		Gui %window%:Add, Text, x24 yp+26 w85 h20, % translate("Tyre Set")
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit2 Number vpitstopTyreSetEdit
@@ -12434,6 +12438,64 @@ updateState() {
 	local rCenter := RaceCenter.Instance
 
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "updateState"))
+}
+
+copyPressure(compound, pressures) {
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local chosen := inList(map(concatenate(["No Tyre Change"], RaceCenter.Instance.TyreCompounds), "translate"), compound)
+
+	Gui %window%:Default
+
+	pressures := string2Values(",", pressures)
+
+	GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
+	GuiControl, , pitstopPressureFLEdit, % pressures[1]
+	GuiControl, , pitstopPressureFREdit, % pressures[2]
+	GuiControl, , pitstopPressureRLEdit, % pressures[3]
+	GuiControl, , pitstopPressureRREdit, % pressures[4]
+
+	rCenter.updateState()
+}
+
+copyPressures() {
+	local rCenter := RaceCenter.Instance
+	local window := rCenter.Window
+	local currentListView := A_DefaultListView
+	local driver, conditions, compound, pressures
+	local label, handler
+
+	Gui %window%:Default
+
+	try {
+		Menu PressuresMenu, DeleteAll
+	}
+	catch exception {
+		logError(exception)
+	}
+
+	try {
+		Gui ListView, % rCenter.SetupsListView
+
+		loop % LV_GetCount()
+		{
+			LV_GetText(driver, A_Index, 1)
+			LV_GetText(conditions, A_Index, 2)
+			LV_GetText(compound, A_Index, 3)
+			LV_GetText(pressures, A_Index, 4)
+
+			label := (driver . translate(" - ") . conditions . translate(": ") . pressures)
+			handler := Func("copyPressure").Bind(compound, pressures)
+
+			Menu, PressuresMenu, Add, %label%, %handler%
+		}
+
+		if (LV_GetCount() > 0)
+			Menu PressuresMenu, Show
+	}
+	finally {
+		Gui ListView, %currentListView%
+	}
 }
 
 planPitstop() {

@@ -16,7 +16,7 @@
   4. Controller action and voice command to enable/disable data collection
 
 #### Race Center
-  1. Command to transfer the currently chosen setup to the "Pitstop" tab fields.
+  1. Show the current chosen values in the Pitstop MFD, if available.
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer

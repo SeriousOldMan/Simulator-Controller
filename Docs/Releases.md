@@ -1,3 +1,12 @@
+## 4.6.2.0-release 03/03/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Better session end detection for practice sessions when you has been standing in the pitlane for a long time.
+  4. General better last lap and session end detection for *Assetto Corsa Competizione*.
+  5. "Race Center" now provides detailed information about the pitstops of all cars. This information is available in the details report for each lap.
+  6. New *hotkey* controller action function allows you to program special keyboard sequences which then can be triggered by a push of a button or by issuing a voice command.
+  7. A new "Copy" button in "Race Center" lets you select one of the predefined tyre pressure setups which will then be used to initialize the fields in the "Pitstop" tab.
+
 ## 4.6.1.0-release 02/24/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

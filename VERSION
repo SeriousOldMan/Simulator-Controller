@@ -3,7 +3,7 @@ Version=4.6.2.0-dev
 Target=4.6.2.0-release
 Date=02/28/2023
 Download=
-Changes=Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC, "Race Center" provides detailed information about the pitstops of all cars, New *hotkey* controller action function, "Copy" button in "Race Center" to transfer one of the predefined tyre pressure setups to the "Pitstop" tab, New information window for Pitstop MFD information in "Race Center"
+Changes=Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC, "Race Center" provides detailed information about the pitstops of all cars, New *hotkey* controller action function, "Copy" button in "Race Center" to transfer one of the predefined tyre pressure setups to the "Pitstop" tab, New information window for Pitstop MFD information in "Race Center", Increased reliability of repair setting choices in *Assetto Corsa Competizione*
 [Release]
 Version=4.6.1.0-release
 Date=02/24/2023

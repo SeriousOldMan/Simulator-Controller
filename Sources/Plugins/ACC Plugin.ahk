@@ -2021,11 +2021,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		if (repairSuspension != this.iRepairSuspensionChosen)
+		this.toggleActivity("Repair Suspension")
+		this.toggleActivity("Repair Suspension")
+		this.toggleActivity("Repair Bodywork")
+
+		if repairBodywork
+			this.toggleActivity("Repair Bodywork")
+
+		if repairSuspension
 			this.toggleActivity("Repair Suspension")
 
-		if (repairBodywork != this.iRepairBodyworkChosen)
-			this.toggleActivity("Repair Bodywork")
+		this.iRepairSuspensionChosen := repairSuspension
+		this.iRepairBodyworkChosen := repairBodywork
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {

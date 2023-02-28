@@ -861,9 +861,12 @@ namespace RF2SHMProvider {
 
 				string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
-				Console.WriteLine("TyreCompoundRaw=" + compound);
-				
-				void writePressure(string category, string key) {
+				if (compound != "No Change")
+					Console.WriteLine("TyreCompoundRaw=" + compound);
+				else
+					Console.WriteLine("TyreCompoundRaw=false");
+
+                void writePressure(string category, string key) {
 					if (!SelectPitstopCategory(category))
 						return;
 

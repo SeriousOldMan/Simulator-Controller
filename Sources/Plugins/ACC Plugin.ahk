@@ -930,10 +930,17 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 							throw "Unsupported change operation """ . direction . """ detected in ACCPlugin.changePitstopOption..."
 					}
 
-					if (option = "Repair Suspension")
+					if (option = "Repair Suspension") {
 						this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
+
+						if this.iRepairSuspensionChosen
+							this.iRepairBodyworkChosen := true
+					}
 					else if (option = "Repair Bodywork")
 						this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
+
+						if !this.iRepairBodyworkChosen
+							this.iRepairSuspensionChosen := false
 				}
 
 				this.resetPitstopState(inList(kPSMutatingOptions, option))
@@ -2014,11 +2021,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
 		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
-		if (repairSuspension != this.iRepairSuspensionChosen)
+		this.toggleActivity("Repair Suspension")
+		this.toggleActivity("Repair Suspension")
+		this.toggleActivity("Repair Bodywork")
+
+		if repairBodywork
+			this.toggleActivity("Repair Bodywork")
+
+		if repairSuspension
 			this.toggleActivity("Repair Suspension")
 
-		if (repairBodywork != this.iRepairBodyworkChosen)
-			this.toggleActivity("Repair Bodywork")
+		this.iRepairSuspensionChosen := repairSuspension
+		this.iRepairBodyworkChosen := repairBodywork
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {

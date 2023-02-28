@@ -8,6 +8,7 @@
   7. A new "Copy" button in "Race Center" lets you select one of the predefined tyre pressure setups which will then be used to initialize the fields in the "Pitstop" tab.
   8. "Race Center" can now display the actual settings in the Pitstop MFD for those simulators, which support read the data. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop) for more information.
   9. Fixed several tyre compound meta data after the recent *rFactor 2* update.
+  10. Increased reliability of repair setting choices in *Assetto Corsa Competizione*.
 
 ## 4.6.1.0-release 02/24/23
   1. Minor bugfixes, as always

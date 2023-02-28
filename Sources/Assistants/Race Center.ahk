@@ -2124,10 +2124,14 @@ class RaceCenter extends ConfigurationItem {
 				LV_Modify(selected, "-Select")
 			}
 
-			if LV_GetCount()
+			if LV_GetCount() {
 				GuiControl Enable, downloadSetupsButton
-			else
+				GuiControl Enable, copyPressuresButton
+			}
+			else {
 				GuiControl Disable, downloadSetupsButton
+				GuiControl Disable, copyPressuresButton
+			}
 
 			if selected {
 				GuiControl Enable, setupDriverDropDownMenu
@@ -4879,6 +4883,8 @@ class RaceCenter extends ConfigurationItem {
 
 			this.ReportViewer.setReport(reportDirectory)
 		}
+
+		pitstopSettings(kClose)
 
 		currentListView := A_DefaultListView
 
@@ -11591,43 +11597,50 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 
 	try {
 		if (raceCenterOrCommand = kClose) {
-			Gui PS:Hide
+			if isOpen {
+				Gui PS:Hide
 
-			isOpen := false
+				isOpen := false
+			}
 		}
 		else if (raceCenterOrCommand = "Update") {
-			if settingsListView {
-				Gui PS:Default
+			if !settingsListView
+				pitstopSettings(false, false)
 
-				Gui ListView, %settingsListView%
+			Gui PS:Default
 
-				LV_Delete()
+			Gui ListView, %settingsListView%
 
-				if arguments[1].HasKey("Refuel")
-					LV_Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["Refuel"])))
+			LV_Delete()
 
-				if arguments[1].HasKey("TyreCompound")
-					LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["tyreCompoundColor"]))
+			if arguments[1].HasKey("FuelAmount")
+				LV_Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])))
 
-				if arguments[1].HasKey("TyreSet")
+			if arguments[1].HasKey("TyreCompound")
+				if arguments[1]["TyreCompound"]
+					LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
+														 . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (estimated)") : ""))
+
+			if arguments[1].HasKey("TyreSet")
+				if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
 					LV_Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
 
-				if arguments[1].HasKey("TyrePressureFL")
+			if arguments[1].HasKey("TyrePressureFL")
+				if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
 					LV_Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
 																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
 																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
 																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
 
-				if (arguments[1].HasKey("RepairBodywork") || arguments[1].HasKey("RepairSuspension") || arguments[1].HasKey("RepairEngine"))
-					LV_Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].HasKey("RepairBodywork") ? arguments[1]["RepairBodywork"]
-																		  , arguments[1].HasKey("RepairSuspension") ? arguments[1]["RepairSuspension"]
-																		  , arguments[1].HasKey("RepairEngine") ? arguments[1]["RepairEngine"]))
+			if (arguments[1].HasKey("RepairBodywork") || arguments[1].HasKey("RepairSuspension") || arguments[1].HasKey("RepairEngine"))
+				LV_Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].HasKey("RepairBodywork") ? arguments[1]["RepairBodywork"]
+																	  , arguments[1].HasKey("RepairSuspension") ? arguments[1]["RepairSuspension"]
+																	  , arguments[1].HasKey("RepairEngine") ? arguments[1]["RepairEngine"]))
 
-				LV_ModifyCol()
+			LV_ModifyCol()
 
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
-			}
+			LV_ModifyCol(1, "AutoHdr")
+			LV_ModifyCol(2, "AutoHdr")
 		}
 		else if (settingsListView && !isOpen) {
 			Gui PS:Show
@@ -11651,16 +11664,25 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 
 			Gui PS:Font, s8 Norm, Arial
 
-			Gui PS:Add, ListView, x16 yp+30 w284 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriversListView gnoSelect Section, % values2String("|", map(["Setting", "Value"], "translate")*)
+			Gui PS:Add, ListView, x16 yp+30 w284 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDsettingsListView gnoSelect Section, % values2String("|", map(["Setting", "Value"], "translate")*)
 
 			Gui PS:Add, Button, x120 yp+200 w80 h23 Default GclosePitstopSettings, % translate("Close")
 
-			if getWindowPosition("Race Center.Pitstop Settings", x, y)
-				Gui PS:Show, x%x% y%y%
-			else
-				Gui PS:Show
+			if ((arguments.Length() = 0) || arguments[1]) {
+				if getWindowPosition("Race Center.Pitstop Settings", x, y)
+					Gui PS:Show, x%x% y%y%
+				else
+					Gui PS:Show
 
-			isOpen := true
+				isOpen := true
+			}
+			else {
+				if getWindowPosition("Race Center.Pitstop Settings", x, y)
+					Gui PS:Show, x%x% y%y% Hide
+				else
+					Gui PS:Show, Hide
+			}
+
 		}
 	}
 	finally {

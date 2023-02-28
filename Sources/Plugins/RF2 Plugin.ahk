@@ -212,7 +212,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 					compoundColor := false
 
-					splitCompound(compound, compound, compoundColor)
+					if compound
+						splitCompound(compound, compound, compoundColor)
 
 					return [compound, compoundColor]
 				case "Repair Suspension":

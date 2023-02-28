@@ -2124,10 +2124,14 @@ class RaceCenter extends ConfigurationItem {
 				LV_Modify(selected, "-Select")
 			}
 
-			if LV_GetCount()
+			if LV_GetCount() {
 				GuiControl Enable, downloadSetupsButton
-			else
+				GuiControl Enable, copyPressuresButton
+			}
+			else {
 				GuiControl Disable, downloadSetupsButton
+				GuiControl Disable, copyPressuresButton
+			}
 
 			if selected {
 				GuiControl Enable, setupDriverDropDownMenu

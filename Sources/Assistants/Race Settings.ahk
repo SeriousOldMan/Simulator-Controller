@@ -1499,7 +1499,7 @@ readSimulatorData(simulator) {
 	if (getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
 		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
-		if (compound != kUndefined) {
+		if (compound && (compound != kUndefined)) {
 			compound := new SessionDatabase().getTyreCompoundName(simulator, vCar, vTrack, compound, false)
 
 			if compound {

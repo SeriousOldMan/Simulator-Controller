@@ -11613,17 +11613,20 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 				LV_Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])))
 
 			if arguments[1].HasKey("TyreCompound")
-				LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
-													 . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (estimated)") : ""))
+				if arguments[1]["TyreCompound"]
+					LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
+														 . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (estimated)") : ""))
 
 			if arguments[1].HasKey("TyreSet")
-				LV_Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
+				if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
+					LV_Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
 
 			if arguments[1].HasKey("TyrePressureFL")
-				LV_Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
-																		  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
-																		  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
-																		  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
+				if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
+					LV_Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
+																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
+																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
+																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
 
 			if (arguments[1].HasKey("RepairBodywork") || arguments[1].HasKey("RepairSuspension") || arguments[1].HasKey("RepairEngine"))
 				LV_Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].HasKey("RepairBodywork") ? arguments[1]["RepairBodywork"]

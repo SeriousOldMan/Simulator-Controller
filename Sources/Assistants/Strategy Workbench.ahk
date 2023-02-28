@@ -2166,7 +2166,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							if (compound = kUndefined) {
 								compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
-								if (compound != kUndefined) {
+								if (compound && (compound != kUndefined)) {
 									compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, false)
 
 									if compound

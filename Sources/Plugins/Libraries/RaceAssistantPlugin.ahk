@@ -1074,7 +1074,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 				compoundColor := false
 
-				splitCompound(compound, compound, compoundColor)
+				if compound
+					splitCompound(compound, compound, compoundColor)
 
 				setConfigurationValue(data, section, "TyreCompound", compound)
 				setConfigurationValue(data, section, "TyreCompoundColor", compoundColor)

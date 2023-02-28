@@ -1044,7 +1044,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	updateAssistantsTelemetryData(data) {
 		local teamServer := this.TeamServer
 		local simulator, car, track, maxFuel, compound, compoundColor
-		local ignore, assistant
+		local ignore, assistant, section
 
 		static settingsDB := false
 
@@ -1063,20 +1063,22 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		if (maxFuel && (maxFuel != kUndefined) && (maxFuel != ""))
 			setConfigurationValue(data, "Session Data", "FuelAmount", maxFuel)
 
-		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+		for ignore, section in ["Car Data", "Setup Data"] {
+			compound := getConfigurationValue(data, section, "TyreCompoundRaw", kUndefined)
 
-		if (compound != kUndefined) {
-			compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, kUndefined)
+			if (compound != kUndefined) {
+				compound := new SessionDatabase().getTyreCompoundName(simulator, car, track, compound, kUndefined)
 
-			if (compound = kUndefined)
-				compound := normalizeCompound("Dry")
+				if (compound = kUndefined)
+					compound := normalizeCompound("Dry")
 
-			compoundColor := false
+				compoundColor := false
 
-			splitCompound(compound, compound, compoundColor)
+				splitCompound(compound, compound, compoundColor)
 
-			setConfigurationValue(data, "Car Data", "TyreCompound", compound)
-			setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+				setConfigurationValue(data, section, "TyreCompound", compound)
+				setConfigurationValue(data, section, "TyreCompoundColor", compoundColor)
+			}
 		}
 
 		RaceAssistantPlugin.Simulator.updateTelemetryData(data)
@@ -1699,14 +1701,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					setConfigurationValue(data, "Session Data", "Session", "Race")
 
 					if (getConfigurationValue(data, "Session Data", "SessionFormat") = "Time") {
-						if !RaceAssistantPlugin.Finished {
-							; RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
-
-							if (RaceAssistantPlugin.LastLap = dataLastLap)
-								RaceAssistantPlugin.sFinished := (dataLastLap + 1)
-							else
-								RaceAssistantPlugin.sFinished := dataLastLap
-						}
+						if !RaceAssistantPlugin.Finished
+							RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
 
 						finished := false
 					}

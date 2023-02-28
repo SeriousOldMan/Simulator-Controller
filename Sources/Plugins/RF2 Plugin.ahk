@@ -204,9 +204,8 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				case "Tyre Compound":
 					data := readSimulatorData(this.Code, "-Setup")
 
-					compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw")
-					compound := new SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track
-																		, compound, kUndefined)
+					compound := getConfigurationValue(data, "Setup Data", "TyreCompoundRaw")
+					compound := new SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
 
 					if (compound = kUndefined)
 						compound := normalizeCompound("Dry")

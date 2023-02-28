@@ -1065,7 +1065,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local compound, compoundColor
 
 		if (!getConfigurationValue(data, "Car Data", "TyreCompound", false)
-		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false)) {
+		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false))
 			if this.CurrentTyreCompound {
 				compound := "Dry"
 				compoundColor := "Black"
@@ -1075,7 +1075,6 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				setConfigurationValue(data, "Car Data", "TyreCompound", compound)
 				setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
 			}
-		}
 	}
 
 	updateTelemetryData(data) {

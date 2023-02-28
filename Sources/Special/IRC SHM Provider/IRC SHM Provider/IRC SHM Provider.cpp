@@ -706,26 +706,25 @@ void writeData(const irsdk_header *header, const char* data, bool setupOnly)
 		if (bestTime == 0)
 			bestTime = lastTime;
 
-		if (setupOnly) {
-			printf("[Setup Data]\n");
+		printf("[Setup Data]\n");
 
-			// printf("TyreCompound=Dry\n");
-			// printf("TyreCompoundColor=Black\n");
-			// printf("TyreSet=1\n");
+		// printf("TyreCompound=Dry\n");
+		// printf("TyreCompoundColor=Black\n");
+		// printf("TyreSet=1\n");
 
-			float pressureFL = GetPsi(getDataFloat(header, data, "LFcoldPressure"));
-			float pressureFR = GetPsi(getDataFloat(header, data, "RFcoldPressure"));
-			float pressureRL = GetPsi(getDataFloat(header, data, "LRcoldPressure"));
-			float pressureRR = GetPsi(getDataFloat(header, data, "RRcoldPressure"));
+		float pressureFL = GetPsi(getDataFloat(header, data, "LFcoldPressure"));
+		float pressureFR = GetPsi(getDataFloat(header, data, "RFcoldPressure"));
+		float pressureRL = GetPsi(getDataFloat(header, data, "LRcoldPressure"));
+		float pressureRR = GetPsi(getDataFloat(header, data, "RRcoldPressure"));
 
-			printf("TyrePressureFL=%f\n", pressureFL);
-			printf("TyrePressureFR=%f\n", pressureFR);
-			printf("TyrePressureRL=%f\n", pressureRL);
-			printf("TyrePressureRR=%f\n", pressureRR);
+		printf("TyrePressureFL=%f\n", pressureFL);
+		printf("TyrePressureFR=%f\n", pressureFR);
+		printf("TyrePressureRL=%f\n", pressureRL);
+		printf("TyrePressureRR=%f\n", pressureRR);
 
-			printf("TyrePressure = %f, %f, %f, %f\n", pressureFL, pressureFR, pressureRL, pressureRR);
-		}
-		else {
+		printf("TyrePressure = %f, %f, %f, %f\n", pressureFL, pressureFR, pressureRL, pressureRR);
+		
+		if (!setupOnly) {
 			printf("[Session Data]\n");
 
 			bool running = false;

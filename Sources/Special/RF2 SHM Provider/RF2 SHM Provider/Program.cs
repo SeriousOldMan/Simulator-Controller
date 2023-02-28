@@ -39,6 +39,7 @@ namespace RF2SHMProvider {
             {
                 provider.ReadData();
                 provider.ReadStandings();
+				provider.ReadSetup();
             }
         }
     }

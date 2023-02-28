@@ -259,6 +259,7 @@ global overtakeDeltaEdit := 2
 global trafficConsideredEdit := 7
 
 global pitstopLapEdit
+global pitstopSettingsButton
 global pitstopDriverDropDownMenu
 global pitstopRefuelEdit
 global pitstopTyreCompoundDropDown
@@ -1570,6 +1571,9 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Edit, x106 yp-2 w50 h20 Limit3 Number vpitstopLapEdit
 		Gui %window%:Add, UpDown, x138 yp-2 w18 h20 Range1-999
 
+		Gui %window%:Add, Button, x240 yp w23 h23 Center +0x200 HWNDsettingsButton vpitstopSettingsButton gpitstopSettings
+		setButtonIcon(settingsButton, kIconsDirectory . "Tools BW.ico", 1, "")
+
 		Gui %window%:Add, Text, x24 yp+30 w80 h23 +0x200, % translate("Driver")
 		Gui %window%:Add, DropDownList, x106 yp w157 vpitstopDriverDropDownMenu
 
@@ -2252,6 +2256,11 @@ class RaceCenter extends ConfigurationItem {
 		finally {
 			Gui ListView, %currentListView%
 		}
+
+		if (this.SessionActive && this.LastLap && InStr(this.LastLap.Telemetry, "[Setup Data]"))
+			GuiControl Enable, pitstopSettingsButton
+		else
+			GuiControl Disable, pitstopSettingsButton
 	}
 
 	updateSessionMenu() {
@@ -5142,6 +5151,7 @@ class RaceCenter extends ConfigurationItem {
 	loadNewLaps(stint) {
 		local stintLaps := string2Values(";" , this.Connector.GetStintLaps(stint.Identifier))
 		local newLaps := []
+		local newTelemetry := false
 		local ignore, identifier, newLap, count, lap, tries, rawData, data, damage, ignore, value
 		local fuelConsumption, compound, compoundColor, car, pLap
 
@@ -5203,6 +5213,8 @@ class RaceCenter extends ConfigurationItem {
 			data := parseConfiguration(rawData)
 
 			lap.Telemetry := rawData
+
+			newTelemetry := data
 
 			damage := 0
 
@@ -5348,7 +5360,14 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
+		if (newTelemetry && newTelemetry.HasKey("Setup Data"))
+			this.updatePitstop(getConfigurationSectionValues(newTelemetry, "Setup Data"))
+
 		return newLaps
+	}
+
+	updatePitstop(pitstopSettings) {
+		pitstopSettings("Update", pitstopSettings)
 	}
 
 	updatePitstops(lap, data) {
@@ -11557,6 +11576,114 @@ moveTeamManager() {
 
 openTeamManagerDocumentation() {
 	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#session--stint-planning
+}
+
+pitstopSettings(raceCenterOrCommand := false, arguments*) {
+	local defaultWindow := A_DefaultGui
+	local defaultListView := A_DefaultListView
+
+	static rCenter := false
+	static isOpen := false
+	static settingsListView := false
+
+	if !raceCenterOrCommand
+		raceCenterOrCommand := RaceCenter.Instance
+
+	try {
+		if (raceCenterOrCommand = kClose) {
+			Gui PS:Hide
+
+			isOpen := false
+		}
+		else if (raceCenterOrCommand = "Update") {
+			if settingsListView {
+				Gui PS:Default
+
+				Gui ListView, %settingsListView%
+
+				LV_Delete()
+
+				if arguments[1].HasKey("Refuel")
+					LV_Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["Refuel"])))
+
+				if arguments[1].HasKey("TyreCompound")
+					LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["tyreCompoundColor"]))
+
+				if arguments[1].HasKey("TyreSet")
+					LV_Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
+
+				if arguments[1].HasKey("TyrePressureFL")
+					LV_Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
+																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
+																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
+																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
+
+				if (arguments[1].HasKey("RepairBodywork") || arguments[1].HasKey("RepairSuspension") || arguments[1].HasKey("RepairEngine"))
+					LV_Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].HasKey("RepairBodywork") ? arguments[1]["RepairBodywork"]
+																		  , arguments[1].HasKey("RepairSuspension") ? arguments[1]["RepairSuspension"]
+																		  , arguments[1].HasKey("RepairEngine") ? arguments[1]["RepairEngine"]))
+
+				LV_ModifyCol()
+
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+			}
+		}
+		else if (settingsListView && !isOpen) {
+			Gui PS:Show
+
+			isOpen := true
+		}
+		else {
+			rCenter := raceCenterOrCommand
+
+			Gui PS:-Border ; -Caption
+			Gui PS:Color, D0D0D0, D8D8D8
+
+			Gui PS:Font, s10 Bold, Arial
+
+			Gui PS:Add, Text, w292 Center gmovePitstopSettings, % translate("Modular Simulator Controller System")
+
+			Gui PS:Font, s9 Norm, Arial
+			Gui PS:Font, Italic Underline, Arial
+
+			Gui PS:Add, Text, x98 YP+20 w112 cBlue Center gopenPitstopSettingsDocumentation, % translate("Pitstop Settings")
+
+			Gui PS:Font, s8 Norm, Arial
+
+			Gui PS:Add, ListView, x16 yp+30 w284 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailableDriversListView gnoSelect Section, % values2String("|", map(["Setting", "Value"], "translate")*)
+
+			Gui PS:Add, Button, x120 yp+200 w80 h23 Default GclosePitstopSettings, % translate("Close")
+
+			if getWindowPosition("Race Center.Pitstop Settings", x, y)
+				Gui PS:Show, x%x% y%y%
+			else
+				Gui PS:Show
+
+			isOpen := true
+		}
+	}
+	finally {
+		Gui ListView, %defaultListView%
+		Gui %defaultWindow%:Default
+	}
+}
+
+closePitstopSettings() {
+	pitstopSettings(kClose)
+}
+
+movePitstopSettings() {
+	moveByMouse("PS", "Race Center.Pitstop Settings")
+}
+
+openPitstopSettingsDocumentation() {
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop
+}
+
+noSelect() {
+	loop % LV_GetCount()
+		LV_Modify(A_Index, "-Select")
 }
 
 loginDialog(connectorOrCommand := false, teamServerURL := false) {

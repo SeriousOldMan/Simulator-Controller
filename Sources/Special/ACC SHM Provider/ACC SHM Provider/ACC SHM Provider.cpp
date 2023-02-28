@@ -406,7 +406,7 @@ int main(int argc, char* argv[])
 			printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}
 
-	if ((argc == 2) && (strcmp(argv[1], "-Setup") == 0))
+	if ((argc == 1) || ((argc == 2) && (strcmp(argv[1], "-Setup") == 0)))
 	{
 		wcout << "[Setup Data]" << endl;
 
@@ -425,9 +425,10 @@ int main(int argc, char* argv[])
 		printData("TyrePressureRL", gf->mfdTyrePressureRL);
 		printData("TyrePressureRR", gf->mfdTyrePressureRR);
 		
-		wcout << "[Car Data]" << endl;
-		wcout << "PitLimiter=" << ((pf->pitLimiterOn == 0) ? "false" : "true") << endl;
-		
+		if (argc == 2) {
+			wcout << "[Car Data]" << endl;
+			wcout << "PitLimiter=" << ((pf->pitLimiterOn == 0) ? "false" : "true") << endl;
+		}
 	}
 
 	dismiss(m_graphics);

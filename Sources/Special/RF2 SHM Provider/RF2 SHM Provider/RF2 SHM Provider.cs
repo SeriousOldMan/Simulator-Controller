@@ -859,8 +859,6 @@ namespace RF2SHMProvider {
 				if (!SelectPitstopCategory("F TIRES:"))
 					return;
 
-				Console.Write("TyreCompound=");
-
 				string compound = GetStringFromBytes(pitInfo.mPitMenu.mChoiceString);
 
 				Console.WriteLine("TyreCompoundRaw=" + compound);

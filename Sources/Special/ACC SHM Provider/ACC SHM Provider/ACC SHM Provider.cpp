@@ -416,9 +416,16 @@ int main(int argc, char* argv[])
 		_bstr_t tc(gf->tyreCompound);
 		std::string tyreCompound(tc);
 
-		wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
+		if ((gf->trackGripStatus >= ACC_DAMP) || (gf->rainIntensityIn10min >= ACC_LIGHT_RAIN))
+			wcout << "TyreCompound=Wet" << endl;
+		else
+			wcout << "TyreCompound=" << ((tyreCompound.compare("dry_compound") == 0) ? "Dry" : "Wet") << endl;
+
 		wcout << "TyreCompoundColor=Black" << endl;
+		
 		printData("TyreSet", gf->mfdTyreSet + 1);
+		printData("TyreSetCurrent", gf->currentTyreSet + 1);
+		printData("TyreSetStrategy", gf->strategyTyreSet + 1);
 		printData("FuelAmount", gf->mfdFuelToAdd);
 		printData("TyrePressureFL", gf->mfdTyrePressureFL);
 		printData("TyrePressureFR", gf->mfdTyrePressureFR);

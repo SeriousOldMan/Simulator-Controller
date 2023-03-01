@@ -11715,7 +11715,7 @@ movePitstopSettings() {
 }
 
 openPitstopSettingsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#planning-a-pitstop
+	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#initiating-a-pitstop-for-the-current-driver
 }
 
 noSelect() {

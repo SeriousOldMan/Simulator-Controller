@@ -2032,7 +2032,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.toggleActivity("Repair Suspension")
 
 		this.iRepairSuspensionChosen := repairSuspension
-		this.iRepairBodyworkChosen := repairBodywork
+		this.iRepairBodyworkChosen := (repairBodywork || repairSuspension)
 	}
 
 	requestPitstopDriver(pitstopNumber, driver) {

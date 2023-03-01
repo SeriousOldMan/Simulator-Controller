@@ -2016,7 +2016,7 @@ class RaceCenter extends ConfigurationItem {
 
 	updateState() {
 		local window := this.Window
-		local currentListView, selected, stint
+		local currentListView, selected, stint, hasPitstops
 
 		Gui %window%:Default
 
@@ -2112,7 +2112,26 @@ class RaceCenter extends ConfigurationItem {
 		currentListView := A_DefaultListView
 
 		try {
+			hasPitstops := false
+
+			Gui ListView, % this.PitstopsListView
+
+			loop % LV_GetCount()
+			{
+				LV_GetText(hasPitstops, A_Index, 5)
+
+				if (hasPitstops && (hasPitstops != "-"))
+					break
+				else
+					hasPitstops := false
+			}
+
 			Gui ListView, % this.SetupsListView
+
+			if (hasPitstops || LV_GetCount())
+				GuiControl Enable, copyPressuresButton
+			else
+				GuiControl Disable, copyPressuresButton
 
 			selected := LV_GetNext(0)
 
@@ -2124,14 +2143,10 @@ class RaceCenter extends ConfigurationItem {
 				LV_Modify(selected, "-Select")
 			}
 
-			if LV_GetCount() {
+			if LV_GetCount()
 				GuiControl Enable, downloadSetupsButton
-				GuiControl Enable, copyPressuresButton
-			}
-			else {
+			else
 				GuiControl Disable, downloadSetupsButton
-				GuiControl Disable, copyPressuresButton
-			}
 
 			if selected {
 				GuiControl Enable, setupDriverDropDownMenu
@@ -2256,15 +2271,15 @@ class RaceCenter extends ConfigurationItem {
 				GuiControl Disable, overtakeDeltaEdit
 				GuiControl Disable, trafficConsideredEdit
 			}
+
+			if (this.SessionActive && this.LastLap && InStr(this.LastLap.Telemetry, "[Setup Data]"))
+				GuiControl Enable, pitstopSettingsButton
+			else
+				GuiControl Disable, pitstopSettingsButton
 		}
 		finally {
 			Gui ListView, %currentListView%
 		}
-
-		if (this.SessionActive && this.LastLap && InStr(this.LastLap.Telemetry, "[Setup Data]"))
-			GuiControl Enable, pitstopSettingsButton
-		else
-			GuiControl Disable, pitstopSettingsButton
 	}
 
 	updateSessionMenu() {
@@ -12589,20 +12604,27 @@ updateState() {
 	rCenter.withExceptionhandler(ObjBindMethod(rCenter, "updateState"))
 }
 
-copyPressure(compound, pressures) {
+copyPressure(driver, compound, pressures) {
 	local rCenter := RaceCenter.Instance
 	local window := rCenter.Window
 	local chosen := inList(map(concatenate(["No Tyre Change"], RaceCenter.Instance.TyreCompounds), "translate"), compound)
 
 	Gui %window%:Default
 
-	pressures := string2Values(",", pressures)
+	pressures := string2Values(", ", pressures)
 
 	GuiControl Choose, pitstopTyreCompoundDropDown, % ((chosen == 0) ? 1 : chosen)
 	GuiControl, , pitstopPressureFLEdit, % pressures[1]
 	GuiControl, , pitstopPressureFREdit, % pressures[2]
 	GuiControl, , pitstopPressureRLEdit, % pressures[3]
 	GuiControl, , pitstopPressureRREdit, % pressures[4]
+
+	if driver {
+		driver := inList(rCenter.TeamDrivers, driver)
+
+		if driver
+			GuiControl Choose, pitstopDriverDropDownMenu, % (driver + 1)
+	}
 
 	rCenter.updateState()
 }
@@ -12611,7 +12633,8 @@ copyPressures() {
 	local rCenter := RaceCenter.Instance
 	local window := rCenter.Window
 	local currentListView := A_DefaultListView
-	local driver, conditions, compound, pressures
+	local hasPitstops := false
+	local lap, driver, conditions, compound, pressures
 	local label, handler
 
 	Gui %window%:Default
@@ -12624,22 +12647,50 @@ copyPressures() {
 	}
 
 	try {
+		Gui ListView, % rCenter.PitstopsListView
+
+		loop % LV_GetCount()
+		{
+			LV_GetText(lap, A_Index, 2)
+
+			if rCenter.Laps.HasKey(lap) {
+				LV_GetText(compound, A_Index, 5)
+				LV_GetText(pressures, A_Index, 7)
+
+				lap := rCenter.Laps[lap]
+
+				conditions := (translate(lap.Weather) . A_Space . translate("(")
+						     . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", "
+						     . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . translate(")"))
+
+				label := (translate("Pitstop") . A_Space . A_Index . translate(" - ") . conditions . translate(" - ") . compound . translate(": ") . pressures)
+				handler := Func("copyPressure").Bind(false, compound, pressures)
+
+				Menu, PressuresMenu, Add, %label%, %handler%
+
+				hasPitstops := true
+			}
+		}
+
 		Gui ListView, % rCenter.SetupsListView
 
 		loop % LV_GetCount()
 		{
+			if ((A_Index = 1) && hasPitstops)
+				Menu, PressuresMenu, Add
+
 			LV_GetText(driver, A_Index, 1)
 			LV_GetText(conditions, A_Index, 2)
 			LV_GetText(compound, A_Index, 3)
 			LV_GetText(pressures, A_Index, 4)
 
-			label := (driver . translate(" - ") . conditions . translate(": ") . pressures)
-			handler := Func("copyPressure").Bind(compound, pressures)
+			label := (driver . translate(" - ") . conditions . translate(" - ") . compound . translate(": ") . pressures)
+			handler := Func("copyPressure").Bind(driver, compound, pressures)
 
 			Menu, PressuresMenu, Add, %label%, %handler%
 		}
 
-		if (LV_GetCount() > 0)
+		if (hasPitstops || (LV_GetCount() > 0))
 			Menu PressuresMenu, Show
 	}
 	finally {

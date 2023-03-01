@@ -11634,7 +11634,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			if arguments[1].HasKey("TyreCompound")
 				if arguments[1]["TyreCompound"]
 					LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
-														 . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (estimated)") : ""))
+														 . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (probably)") : ""))
 
 			if arguments[1].HasKey("TyreSet")
 				if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
@@ -11675,7 +11675,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			Gui PS:Font, s9 Norm, Arial
 			Gui PS:Font, Italic Underline, Arial
 
-			Gui PS:Add, Text, x98 YP+20 w112 cBlue Center gopenPitstopSettingsDocumentation, % translate("Pitstop Settings")
+			Gui PS:Add, Text, x68 YP+20 w172 cBlue Center gopenPitstopSettingsDocumentation, % translate("Pitstop Settings")
 
 			Gui PS:Font, s8 Norm, Arial
 
@@ -12654,6 +12654,7 @@ copyPressures() {
 			LV_GetText(lap, A_Index, 2)
 
 			if rCenter.Laps.HasKey(lap) {
+				LV_GetText(driver, A_Index, 3)
 				LV_GetText(compound, A_Index, 5)
 				LV_GetText(pressures, A_Index, 7)
 
@@ -12663,8 +12664,13 @@ copyPressures() {
 						     . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", "
 						     . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . translate(")"))
 
-				label := (translate("Pitstop") . A_Space . A_Index . translate(" - ") . conditions . translate(" - ") . compound . translate(": ") . pressures)
-				handler := Func("copyPressure").Bind(false, compound, pressures)
+				label := (translate("Pitstop") . A_Space . A_Index . translate(" - "))
+
+				if (driver && (driver != "-"))
+					label .= (driver . translate(" - "))
+
+				label .= (conditions . translate(" - ") . compound . translate(": ") . pressures)
+				handler := Func("copyPressure").Bind((driver && (driver != "-")) ? driver : false, compound, pressures)
 
 				Menu, PressuresMenu, Add, %label%, %handler%
 

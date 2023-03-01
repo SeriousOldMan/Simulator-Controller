@@ -12,7 +12,7 @@ Disclaimer: Although the current version of the *Team Server* is no longer to be
 
 ## Installation & Configuration
 
-The *Team Server* requires you to run a Web API server process, which has been developed using .NET 6.0. Applications developed using this multi-plattform server framework from Micorsoft can be hosted on Windows, Linux and even macOS operating systems. You can find the *Team Server* in the *Binaries* folder - please copy this directory to your favorite hosting environment. If you want to set up your own host or if you want to test the *Team Server* on your local PC, you propably will have to install the .NET 6.0 Core framework runtime (Hosting Bundle) - depending on your installed Windows version. All required resources can be found on this [dedicated website](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) from Microsoft.
+The *Team Server* requires you to run a Web API server process, which has been developed using .NET 6.0. Applications developed using this multi-plattform server framework from Micorsoft can be hosted on Windows, Linux and even macOS operating systems. You can find the *Team Server* in the *Binaries* folder - please copy this directory to your favorite hosting environment. If you want to set up your own host or if you want to test the *Team Server* on your local PC, you probably will have to install the .NET 6.0 Core framework runtime (Hosting Bundle) - depending on your installed Windows version. All required resources can be found on this [dedicated website](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) from Microsoft.
 
 After you have installed .NET Core 6.0 and the Team Server, you have to configure the URL, where the server listens. Default is "https://localhost:5001" or "http://localhost:5000". But, when you want to setup a server which is available on the network, you have to setup a different URL. Information about this can be found in this [short article](https://andrewlock.net/5-ways-to-set-the-urls-for-an-aspnetcore-app/). The easiest way will be to supply the URL using a command line argument, for example:
 
@@ -338,7 +338,11 @@ Furthermore, it is possible to enable a compensation for pressure losses as repo
 
 Also important: "Race Center" will try to guess the best possible tyre pressures using input from the AI and also from the calculation methods discussed above. But you need to take a look as well, since the software can't cope with everything, especially sudden weather changes, moisture in the night, and so on. In these cases you might have to correct some of the recommended pressures manually to compensate for bad decisisions made by the software.
 
-Of course, you can calculate and enter all values here on your own. For your convinience, you can use the small button with the "Copy" icon to the right of the tyre change drop down menu to select one of the tyre pressure setups in the "Setups" tab, which will then be entered into the tyre pressure fields, where you can edit them afterwards, if desired.
+Of course, you can calculate and enter all values here on your own. For your convinience, you can use the small button with the "Copy" icon to the right of the tyre change drop down menu.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2022.JPG)
+
+A menu appears, which let you choose one of the tyre pressure setups from the "Setups" tab or one of the settings for a past pitstop, which will then be entered together with the corresponding driver into the tyre pressure fields, where you can edit them afterwards, if desired.
 
 #### Automatically select the next driver
 
@@ -353,7 +357,27 @@ The automatic selection of the next driver is supported for *Assetto Corsa Compe
 
 Note: Once you have dialed the next driver for the first time in the simulator, and you want to correct some values for the pitstop, choose "No driver change" in the *Driver* dropdown menu. This will preserve the last selection of the next driver in the pitstop settings, while changing the refuel amount, for example.
 
+#### Initiating a pitstop for the current driver
+
 Once, you have dialed all settings, choose "Instruct Engineer" from the "Pitstop" menu and the entered values will be transferred to the Race Engineer of the active driver. The driver will be informed by Jona about the planned pitstop, but no interaction is necessary. The settings will be automatically entered into the Pitstop MFD, once the car crosses the start/finish line of the lap for which the pitstop has been planned, and the driver is called to the pit.
+
+For some simulators, it is possible to bring up a floating information window, which displays (some of) the currently chosen settings in the Pitstop MFD. To bring up this window, click on the small button with crossed tools on the right of the "Lap" input field.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2023.JPG)
+
+This floating window, which can be left open all the time, will be updated once per lap with the actual data currently entered into the Pitstop MFD, of the simulator. Please note, that only the data, that is actually available from the simulator data API is shown here. The following simulators are supported here:
+
+1. *Assetto Corsa Competizione*
+
+   Information about a tyre change is really selected and the chosen tyre compound is not available. The most probable tyre compound will be derived from current and future weather conditions. Also, information about the chosen repair settings and the chosen next driver is not available. Refuel amount, tyre pressures and tyre set are exact.
+
+2. *rFactor 2*
+
+   Refuel amount, chosen tyre compound and pressures, as well as the repair settings are exact.
+
+3. *iRacing*
+
+   Only chosen cold tyre pressures are available here.
 
 #### Planning and preparing pitstops in a team race using the Race Assistants
 

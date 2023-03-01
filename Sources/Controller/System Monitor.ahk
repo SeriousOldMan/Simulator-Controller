@@ -516,7 +516,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x34 ys+73 w32 h32 vsimulationState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x114 ys+46 w280 h90 vsimulationDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x94 ys+46 w300 h90 vsimulationDashboard, shell.explorer
 		simulationDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -524,7 +524,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x415 ys+73 w32 h32 vassistantsState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x495 ys+46 w280 h90 vassistantsDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x475 ys+46 w300 h90 vassistantsDashboard, shell.explorer
 		assistantsDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -532,7 +532,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x34 ys+183 w32 h32 vsessionState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x114 ys+156 w280 h90 vsessionDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x94 ys+156 w300 h90 vsessionDashboard, shell.explorer
 		sessionDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -540,7 +540,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x415 ys+183 w32 h32 vdataState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x495 ys+156 w280 h90 vdataDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x475 ys+156 w300 h90 vdataDashboard, shell.explorer
 		dataDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -548,7 +548,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x34 ys+293 w32 h32 vautomationState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x114 ys+266 w280 h90 vautomationDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x94 ys+266 w300 h90 vautomationDashboard, shell.explorer
 		automationDashboard.Navigate("about:blank")
 
 		Gui SM:Font, Italic, Arial
@@ -556,7 +556,7 @@ systemMonitor(command := false, arguments*) {
 		Gui SM:Font, s8 Norm, Arial
 
 		Gui SM:Add, Picture, x415 ys+293 w32 h32 vmapperState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x495 ys+266 w280 h90 vmapperDashboard, shell.explorer
+		Gui SM:Add, ActiveX, x475 ys+266 w300 h90 vmapperDashboard, shell.explorer
 		mapperDashboard.Navigate("about:blank")
 
 		Gui Tab, 2
@@ -705,10 +705,10 @@ updateSimulationState(controllerState) {
 	GuiControl, , simulationState, %icon%
 
 	displayState := getConfigurationValue(controllerState, "Simulation", "Session")
-	
+
 	if (displayState = "Qualification")
 		displayState := "Qualifying"
-		
+
 	if (state = "Active") {
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Simulator") . "</td></tr>")

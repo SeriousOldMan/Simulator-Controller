@@ -20,11 +20,11 @@ You probably already have understood, that Simulator Controller is a quite sophi
    
    - Runtimes from Microsoft - Most likely already installed on your computer, but it does not harm to run those installer again.
    
-   - Plugins - Can be skipped for the moment, unless *Assetto Corsa* is your only game. Then you have to install the "SimulatorController" plugin. Instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers).
+   - Plugins - Can be skipped for the moment, unless *Assetto Corsa* and / or *rFactor 2* are your only games. Then you have to install the "SimulatorController" plugin for *Assetto Corsa* and "rFactor2SharedMemoryMapPlugin64.dll" plugin for *rFactor 2*. Instructions can be found [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation-of-telemetry-providers).
    
    - SoX - Although optional, I strongly recommend installing SoX for an immersive soud experience.
    
-   - NirCmd - Also optional, but strongly recommend. It is used to control sound volumes, when more than one assistant tries to talk to you at the same time.
+   - NirCmd - Also optional, but strongly recommended as well. It is used to control sound volumes, when more than one assistant try to talk to you at the same time.
    
    - Speech Runtime and libraries - Runtime and at least the English library should be installed.
    
@@ -45,4 +45,4 @@ Done, you have created a first runnable configuration. Next step is to run "Simu
 
 ## Disclaimer
 
-This initial configuration covers only a fraction of the functionality of Simulator Controller. Only one of the Assistants, the Spotter will be active and all the other fancy stuff of Simulator Controller like support for Stream Decks and Button Boxes, Motion Rigs, and so on, is disabled as well. But this configuration will assure, that the low level parts of Simulator Controller are correctly configured for your environment and you can come back to "Simulator Setup" anytime to enable more functionality step by step later on. But before you do this, read the remainder of the [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) documentation or watch the [video](https://youtu.be/1XFvWhg2cPw), which covers the full configuration process. Special case is the full configuration of voice control, which also covered in a separate [video](https://youtu.be/u_2cIrZ1zFk) as well as getting the most out of your hardware controllers, which is also covered in a separate [video](https://youtu.be/wPUnjViU15U).
+This initial configuration covers only a fraction of the functionality of Simulator Controller. Only one of the Assistants, the Spotter will be active and all the other fancy stuff of Simulator Controller like support for Stream Decks and Button Boxes, Motion Rigs, and so on, is disabled as well. But this configuration will assure, that the low level parts of Simulator Controller are correctly configured for your environment and you can come back to "Simulator Setup" anytime to enable more functionality step by step later on. But before you do this, read the remainder of the [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) documentation or watch the [video](https://youtu.be/1XFvWhg2cPw), which covers the full configuration process. Special case is the full configuration of voice control, which is also covered in a separate [video](https://youtu.be/u_2cIrZ1zFk) as well as getting the most out of your hardware controllers, for an additional [video guide](https://youtu.be/wPUnjViU15U) is available.

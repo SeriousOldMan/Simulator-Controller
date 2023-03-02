@@ -248,6 +248,8 @@ void sendAutomationMessage(char* message) {
 
 #define PI 3.14159265
 
+long cycle = 0;
+
 const float nearByDistance = 8.0;
 const float longitudinalDistance = 5;
 const float lateralDistance = 6;
@@ -268,12 +270,14 @@ int situationCount = 0;
 bool carBehind = false;
 bool carBehindReported = false;
 int carBehindCount = 0;
+long nextCarBehind = 0;
 
 const int YELLOW = 1;
 const int BLUE = 16;
 
 int blueCount = 0;
 int yellowCount = 0;
+long nextBlueFlag = 0;
 
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
@@ -452,7 +456,8 @@ bool checkPositions(const irsdk_header* header, const char* data, const int play
 	else if (carBehind)
 	{
 		if (!carBehindReported) {
-			if (carBehindCount < 20) {
+			if (carBehindCount < 20 && cycle > nextCarBehind) {
+				nextCarBehind = cycle + 200;
 				carBehindReported = true;
 
 				sendSpotterMessage("proximityAlert:Behind");
@@ -508,7 +513,9 @@ bool checkFlagState(const irsdk_header* header, const char* data) {
 		yellowCount = 0;
 
 	if (laps > 0 && (flags & irsdk_blue) != 0) {
-		if ((lastFlagState & BLUE) == 0) {
+		if (((lastFlagState & BLUE) == 0) && (cycle > nextBlueFlag)) {
+			nextBlueFlag = cycle + 400;
+
 			sendSpotterMessage("blueFlag");
 
 			lastFlagState |= BLUE;
@@ -1387,6 +1394,8 @@ int main(int argc, char* argv[])
 							*/
 
 							if (onTrack && !inPit) {
+								cycle += 1;
+
 								if (!greenFlag(pHeader, g_data) && !checkFlagState(pHeader, g_data) && !checkPositions(pHeader, g_data, playerCarIndex, trackLength))
 									wait = !checkPitWindow(pHeader, g_data);
 								else

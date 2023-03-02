@@ -174,6 +174,8 @@ namespace RF2SHMSpotter {
 
 		const double PI = 3.14159265;
 
+		long cycle = 0;
+
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
 		double longitudinalFrontDistance = 4;
@@ -198,6 +200,7 @@ namespace RF2SHMSpotter {
 		bool carBehindRight = false;
 		bool carBehindReported = false;
 		int carBehindCount = 0;
+		long nextCarBehind = 0;
 
 		const int YELLOW_SECTOR_1 = 1;
 		const int YELLOW_SECTOR_2 = 2;
@@ -209,6 +212,7 @@ namespace RF2SHMSpotter {
 
 		int blueCount = 0;
 		int yellowCount = 0;
+		long nextBlueFlag = 0;
 
 		int lastFlagState = 0;
 		int waitYellowFlagState = 0;
@@ -479,9 +483,10 @@ namespace RF2SHMSpotter {
 					{
 						if (!carBehindReported)
 						{
-							if (carBehindLeft || carBehindRight || (carBehindCount < 20))
-							{
-								carBehindReported = true;
+							if (carBehindLeft || carBehindRight || ((carBehindCount < 20) && (cycle > nextCarBehind)))
+                            {
+                                nextCarBehind = cycle + 200;
+                                carBehindReported = true;
 
 								SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
 															(carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
@@ -558,9 +563,11 @@ namespace RF2SHMSpotter {
 
 			if (playerScoring.mFlag == (byte)rF2PrimaryFlag.Blue)
 			{
-				if ((lastFlagState & BLUE) == 0)
-				{
-					SendSpotterMessage("blueFlag");
+				if ((lastFlagState & BLUE) == 0 && cycle > nextBlueFlag)
+                {
+                    nextBlueFlag = cycle + 400;
+
+                    SendSpotterMessage("blueFlag");
 
 					lastFlagState |= BLUE;
 
@@ -1338,6 +1345,8 @@ namespace RF2SHMSpotter {
 								if (extended.mSessionStarted != 0 && scoring.mScoringInfo.mGamePhase < (byte)SessionStopped &&
 									playerScoring.mPitState < (byte)Entering)
 								{
+									cycle += 1;
+
 									if (!startGo || !greenFlag())
 										if (!checkFlagState(ref playerScoring) && !checkPositions(ref playerScoring))
 											wait = !checkPitWindow(ref playerScoring);

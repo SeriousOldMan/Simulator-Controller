@@ -9,7 +9,9 @@
   8. "Race Center" can now display the actual settings in the Pitstop MFD for those simulators, which support read the data. See the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#initiating-a-pitstop-for-the-current-driver) for more information.
   9. Fixed several tyre compound meta data after the recent *rFactor 2* update.
   10. Increased reliability of repair setting choices in *Assetto Corsa Competizione*.
-  11. New car models for "Setup Advisor":
+  11. Reduced frequency of blue flag alerts by the Spotter.
+  12. Reduced frequency of behind alerts by the Spotter.
+  13. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Mercedes-Benz SLS AMG
 

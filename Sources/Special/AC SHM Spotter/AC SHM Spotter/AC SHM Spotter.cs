@@ -261,6 +261,8 @@ namespace ACSHMSpotter {
 
 		const double PI = 3.14159265;
 
+		long cycle = 0;
+
 		const double nearByXYDistance = 10.0;
 		const double nearByZDistance = 6.0;
 		double longitudinalFrontDistance = 4;
@@ -285,6 +287,7 @@ namespace ACSHMSpotter {
 		bool carBehindRight = false;
 		bool carBehindReported = false;
 		int carBehindCount = 0;
+		long nextCarBehind = 0;
 
 		const int YELLOW = 1;
 
@@ -292,6 +295,7 @@ namespace ACSHMSpotter {
 
 		int blueCount = 0;
 		int yellowCount = 0;
+		long nextBlueFlag = 0;
 
 		int lastFlagState = 0;
 		int waitYellowFlagState = 0;
@@ -540,9 +544,10 @@ namespace ACSHMSpotter {
 					{
 						if (!carBehindReported)
 						{
-							if (carBehindLeft || carBehindRight || (carBehindCount < 20))
-							{
-								carBehindReported = true;
+							if (carBehindLeft || carBehindRight || ((carBehindCount < 20) && (cycle > nextCarBehind)))
+                            {
+                                nextCarBehind = cycle + 200;
+                                carBehindReported = true;
 
 								SendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
 																   (carBehindRight ? "proximityAlert:BehindRight" : "proximityAlert:Behind"));
@@ -595,9 +600,11 @@ namespace ACSHMSpotter {
 
 			if (graphics.Flag == AC_FLAG_TYPE.AC_BLUE_FLAG)
 			{
-				if ((lastFlagState & BLUE) == 0)
-				{
-					SendSpotterMessage("blueFlag");
+				if ((lastFlagState & BLUE) == 0 && cycle > nextBlueFlag)
+                {
+                    nextBlueFlag = cycle + 400;
+
+                    SendSpotterMessage("blueFlag");
 
 					lastFlagState |= BLUE;
 
@@ -1252,6 +1259,8 @@ namespace ACSHMSpotter {
 					{
 						if ((graphics.Status == AC_STATUS.AC_LIVE) && (graphics.IsInPit == 0) && (graphics.IsInPitLane == 0))
 						{
+							cycle += 1;
+
 							if (!checkFlagState() && !checkPositions())
 								wait = !checkPitWindow();
 							else

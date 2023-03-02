@@ -126,6 +126,8 @@ void sendAutomationMessage(char* message) {
 
 #define PI 3.14159265
 
+long cycle = 0;
+
 #define nearByXYDistance 10.0
 #define nearByZDistance 6.0
 float longitudinalFrontDistance = 4;
@@ -150,6 +152,7 @@ BOOL carBehindLeft = FALSE;
 BOOL carBehindRight = FALSE;
 BOOL carBehindReported = FALSE;
 int carBehindCount = 0;
+long nextCarBehind = 0;
 
 #define YELLOW_SECTOR_1 1
 #define YELLOW_SECTOR_2 2
@@ -161,6 +164,7 @@ int carBehindCount = 0;
 
 int blueCount = 0;
 int yellowCount = 0;
+long nextBlueFlag = 0;
 
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
@@ -393,7 +397,8 @@ BOOL checkPositions(int playerID) {
 		
 			if (carBehind) {
 				if (!carBehindReported) {
-					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
+					if (carBehindLeft || carBehindRight || ((carBehindCount < 20) && (cycle > nextCarBehind))) {
+						nextCarBehind = cycle + 200;
 						carBehindReported = TRUE;
 
 						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
@@ -462,7 +467,9 @@ BOOL checkFlagState() {
 
 	if (!sector)
 		if (map_buffer->flags.blue == 1) {
-			if ((lastFlagState & BLUE) == 0) {
+			if ((lastFlagState & BLUE) == 0 && cycle > nextBlueFlag) {
+				nextBlueFlag = cycle + 400;
+
 				sendSpotterMessage("blueFlag");
 
 				lastFlagState |= BLUE;
@@ -1218,6 +1225,8 @@ int main(int argc, char* argv[])
 
 				if (running) {
 					if (mapped_r3e && (map_buffer->completed_laps >= 0) && !map_buffer->game_paused) {
+						cycle += 1;
+
 						if (!startGo || !greenFlag())
 							if (!checkFlagState() && !checkPositions(playerID))
 								wait = !checkPitWindow();

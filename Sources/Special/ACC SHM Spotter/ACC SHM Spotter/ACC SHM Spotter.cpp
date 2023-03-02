@@ -117,6 +117,8 @@ void sendAutomationMessage(string message) {
 
 #define PI 3.14159265
 
+long cycle = 0;
+
 int sessionDuration = 0;
 
 const float nearByXYDistance = 10.0;
@@ -143,6 +145,7 @@ bool carBehindLeft = false;
 bool carBehindRight = false;
 bool carBehindReported = false;
 int carBehindCount = 0;
+long nextCarBehind = 0;
 
 const int YELLOW_SECTOR_1 = 1;
 const int YELLOW_SECTOR_2 = 2;
@@ -154,6 +157,7 @@ const int BLUE = 16;
 
 int blueCount = 0;
 int yellowCount = 0;
+long nextBlueFlag = 0;
 
 int lastFlagState = 0;
 int waitYellowFlagState = 0;
@@ -385,7 +389,8 @@ bool checkPositions() {
 			
 			if (carBehind) {
 				if (!carBehindReported) {
-					if (carBehindLeft || carBehindRight || (carBehindCount < 20)) {
+					if (carBehindLeft || carBehindRight || ((carBehindCount < 20) && (cycle > nextCarBehind))) {
+						nextCarBehind = cycle + 200;
 						carBehindReported = true;
 
 						sendSpotterMessage(carBehindLeft ? "proximityAlert:BehindLeft" :
@@ -459,7 +464,9 @@ bool checkFlagState() {
 		yellowCount = 0;
 
 	if (gf->flag == AC_BLUE_FLAG) {
-		if ((lastFlagState & BLUE) == 0) {
+		if (((lastFlagState & BLUE) == 0) && (cycle > nextBlueFlag)) {
+			nextBlueFlag = cycle + 400;
+
 			sendSpotterMessage("blueFlag");
 
 			lastFlagState |= BLUE;
@@ -1134,7 +1141,7 @@ int main(int argc, char* argv[])
 
 	int countdown = 4000;
 	int safety = 200;
-	int counter = 0;
+	long counter = 0;
 
 	while (++counter) {
 		bool wait = true;
@@ -1182,6 +1189,8 @@ int main(int argc, char* argv[])
 					sessionDuration = gf->sessionTimeLeft;
 
 				if ((gf->status == AC_LIVE) && !gf->isInPit && !gf->isInPitLane) {
+					cycle += 1;
+
 					if (!startGo || !greenFlag())
 						if (!checkFlagState() && !checkPositions())
 							wait = !checkPitWindow();

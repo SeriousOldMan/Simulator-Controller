@@ -179,6 +179,8 @@ class SyncSessionTask extends RaceCenterTask {
 ;;; Class                          RaceCenter                               ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
+global raceCenterTabView
+
 global messageField
 
 global serverURLEdit
@@ -1381,7 +1383,7 @@ class RaceCenter extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 y827 w554 vmessageField
 		Gui %window%:Add, Button, x649 y824 w80 h23 GcloseRaceCenter, % translate("Close")
 
-		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 -Wrap Section, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], "translate")*)
+		Gui %window%:Add, Tab3, x16 ys+39 w593 h316 AltSubmit -Wrap Section vraceCenterTabView, % values2String("|", map(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], "translate")*)
 
 		Gui Tab, 1
 
@@ -5324,7 +5326,7 @@ class RaceCenter extends ConfigurationItem {
 
 				lap.Positions := rawData
 
-				this.updatePitstops(lap, data)
+				this.updatePitstopState(lap, data)
 
 				car := getConfigurationValue(data, "Position Data", "Driver.Car")
 
@@ -5348,50 +5350,50 @@ class RaceCenter extends ConfigurationItem {
 			this.Laps[lap.Nr] := lap
 		}
 
-		if ((count = 0) && this.LastLap) {
-			lap := this.LastLap
-			identifier := lap.Identifier
-
-			try {
-				tries := ((A_Index == count) ? 30 : 1)
-
-				while (tries > 0) {
-					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
-
-					if (!rawData || (rawData = "")) {
-						tries -= 1
-
-						this.showMessage(translate("Waiting for data"))
-
-						if (tries <= 0) {
-							this.showMessage(translate("Give up - use default values"))
-
-							throw "No data..."
-						}
-						else
-							Sleep 400
-					}
-					else
-						break
-				}
-
-				this.updatePitstops(lap, parseConfiguration(rawData))
-			}
-			catch exception {
-			}
-		}
-
 		if (newTelemetry && newTelemetry.HasKey("Setup Data"))
-			this.updatePitstop(getConfigurationSectionValues(newTelemetry, "Setup Data"))
+			this.updatePitstopSettings(getConfigurationSectionValues(newTelemetry, "Setup Data"))
 
 		return newLaps
 	}
 
-	updatePitstop(pitstopSettings) {
+	updatePitstops() {
+		local lap, identifier, rawData, window
+
+		if this.LastLap {
+			lap := this.LastLap
+			identifier := lap.Identifier
+
+			try {
+				window := this.Window
+
+				Gui %window%:Default
+
+				GuiControlGet raceCenterTabView
+
+				if (raceCenterTabView = 6) {
+					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
+
+					if (rawData && (rawData != ""))
+						this.updatePitstopState(lap, parseConfiguration(rawData))
+				}
+
+				if pitstopSettings("Visible") {
+					rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
+
+					if (rawData && (rawData != "") && InStr(rawData, "[Setup Data]"))
+						this.updatePitstopSettings(getConfigurationSectionValues(parseConfiguration(rawData), "Setup Data"))
+				}
+			}
+			catch exception {
+			}
+		}
+	}
+
+	updatePitstopSettings(pitstopSettings) {
 		pitstopSettings("Update", pitstopSettings)
 	}
 
-	updatePitstops(lap, data) {
+	updatePitstopState(lap, data) {
 		local carID, delta, pitstops, pitstop
 
 		if !this.iLastPitstopUpdate {
@@ -6950,12 +6952,15 @@ class RaceCenter extends ConfigurationItem {
 				if this.syncTyrePressures()
 					newData := true
 
-				if newLaps
+				if newLaps {
 					if this.syncPitstops() {
 						newData := true
 
 						nextPitstopUpdate := (this.LastLap.Nr + 2)
 					}
+				}
+				else
+					this.updatePitstops()
 
 				forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
 
@@ -11607,11 +11612,13 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 	static isOpen := false
 	static settingsListView := false
 
-	if !raceCenterOrCommand
-		raceCenterOrCommand := RaceCenter.Instance
+	if !rCenter
+		rCenter := RaceCenter.Instance
 
 	try {
-		if (raceCenterOrCommand = kClose) {
+		if (raceCenterOrCommand = "Visible")
+			return isOpen
+		else if (raceCenterOrCommand = kClose) {
 			if isOpen {
 				Gui PS:Hide
 
@@ -11619,43 +11626,45 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			}
 		}
 		else if (raceCenterOrCommand = "Update") {
-			if !settingsListView
-				pitstopSettings(false, false)
+			if isOpen {
+				if !settingsListView
+					pitstopSettings()
 
-			Gui PS:Default
+				Gui PS:Default
 
-			Gui ListView, %settingsListView%
+				Gui ListView, %settingsListView%
 
-			LV_Delete()
+				LV_Delete()
 
-			if arguments[1].HasKey("FuelAmount")
-				LV_Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])))
+				if arguments[1].HasKey("FuelAmount")
+					LV_Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])))
 
-			if arguments[1].HasKey("TyreCompound")
-				if arguments[1]["TyreCompound"]
-					LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
-														 . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (probably)") : ""))
+				if arguments[1].HasKey("TyreCompound")
+					if arguments[1]["TyreCompound"]
+						LV_Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
+															 . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (probably)") : ""))
 
-			if arguments[1].HasKey("TyreSet")
-				if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
-					LV_Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
+				if arguments[1].HasKey("TyreSet")
+					if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
+						LV_Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
 
-			if arguments[1].HasKey("TyrePressureFL")
-				if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
-					LV_Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
-																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
-																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
-																			  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
+				if arguments[1].HasKey("TyrePressureFL")
+					if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
+						LV_Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
+																				  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
+																				  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
+																				  , displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
 
-			if (arguments[1].HasKey("RepairBodywork") || arguments[1].HasKey("RepairSuspension") || arguments[1].HasKey("RepairEngine"))
-				LV_Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].HasKey("RepairBodywork") ? arguments[1]["RepairBodywork"]
-																	  , arguments[1].HasKey("RepairSuspension") ? arguments[1]["RepairSuspension"]
-																	  , arguments[1].HasKey("RepairEngine") ? arguments[1]["RepairEngine"]))
+				if (arguments[1].HasKey("RepairBodywork") || arguments[1].HasKey("RepairSuspension") || arguments[1].HasKey("RepairEngine"))
+					LV_Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].HasKey("RepairBodywork") ? arguments[1]["RepairBodywork"]
+																		  , arguments[1].HasKey("RepairSuspension") ? arguments[1]["RepairSuspension"]
+																		  , arguments[1].HasKey("RepairEngine") ? arguments[1]["RepairEngine"]))
 
-			LV_ModifyCol()
+				LV_ModifyCol()
 
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
+				LV_ModifyCol(1, "AutoHdr")
+				LV_ModifyCol(2, "AutoHdr")
+			}
 		}
 		else if (settingsListView && !isOpen) {
 			Gui PS:Show
@@ -11663,8 +11672,6 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			isOpen := true
 		}
 		else {
-			rCenter := raceCenterOrCommand
-
 			Gui PS:-Border ; -Caption
 			Gui PS:Color, D0D0D0, D8D8D8
 

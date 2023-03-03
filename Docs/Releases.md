@@ -1,4 +1,4 @@
-## 4.6.2.0-release 03/03/23 (planned)
+## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Better session end detection for practice sessions when you has been standing in the pitlane for a long time.

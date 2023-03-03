@@ -5,12 +5,12 @@ Date=03/03/2023
 Download=
 Changes=Allow multiple actions for a custome voice command
 [Release]
-Version=4.6.1.0-release
-Date=02/24/2023
-Download=https://cutt.ly/n8tardr;https://www.dropbox.com/s/20tgf0a0vrcm9i0/Simulator%20Controller%204.6.1.0-release.zip?dl=1
-Changes=Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center", New pressures cleaning tool in "Session Database", New car models for "Setup Advisor", Fixed critical bug in "Race Reports" for team races
+Version=4.6.2.0-release
+Date=03/03/2023
+Download=https://cutt.ly/g8Qpqzw;https://www.dropbox.com/s/9nll176icgzhg2f/Simulator%20Controller%204.6.2.0-release.zip?dl=1
+Changes=Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC, "Race Center" provides detailed information about the pitstops of all cars, New *hotkey* controller action function, "Copy" button in "Race Center" to transfer one of the predefined tyre pressure setups or one of the recent pitstop setups to the "Pitstop" tab, New information window for Pitstop MFD information in "Race Center", Updated tyre compound meta data for *rFactor 2*, Increased reliability of repair setting choices in *Assetto Corsa Competizione*, New car models for "Setup Advisor", Reduced frequency of blue flag alerts by Spotter, Reduced frequency of behind alerts by Spotter
 [Current]
 Type=Development
 [Version]
-Release=4.6.1.0-release
+Release=4.6.2.0-release
 Development=4.6.3.0-dev

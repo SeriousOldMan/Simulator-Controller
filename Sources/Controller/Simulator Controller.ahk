@@ -852,11 +852,12 @@ class SimulatorController extends ConfigurationItem {
 		local descriptor, pid, activationCommand
 
 		static registered := false
+		static registeredCommands := {}
 
 		if this.iVoiceCommands.HasKey(command)
 			return this.iVoiceCommands[command]
 		else {
-			descriptor := Array(command, false)
+			descriptor := Array(command, [])
 
 			this.iVoiceCommands[command] := descriptor
 
@@ -876,7 +877,11 @@ class SimulatorController extends ConfigurationItem {
 					registered := true
 				}
 
-				sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
+				if !registeredCommands.HasKey(command) {
+					sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
+
+					registeredCommands[command] := true
+				}
 			}
 
 			return descriptor
@@ -893,18 +898,25 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	voiceCommand(grammar, command, words*) {
-		local handler := this.iVoiceCommands[command][2]
+		local ignore, handler
 
-		if handler
+		for ignore, handler in this.iVoiceCommands[command][2]
 			%handler%()
 	}
 
 	enableVoiceCommand(command, handler) {
-		this.getVoiceCommandDescriptor(command)[2] := handler
+		local handlers := this.getVoiceCommandDescriptor(command)[2]
+
+		if !inList(handlers, handler)
+			handlers.Push(handler)
 	}
 
-	disableVoiceCommand(command) {
-		this.getVoiceCommandDescriptor(command)[2] := false
+	disableVoiceCommand(command, handler) {
+		local handlers := this.getVoiceCommandDescriptor(command)[2]
+		local index := inList(handlers, handler)
+
+		if index
+			handlers.RemoveAt(index)
 	}
 
 	connectAction(plugin, function, action) {
@@ -1366,14 +1378,16 @@ class ControllerFunction {
 
 	disconnectAction(plugin, action) {
 		local controller := this.Controller
-		local ignore, trigger, theHotkey
+		local ignore, trigger, theHotkey, handler
 
 		this.iEnabledActions.Delete(action)
 
-		for ignore, trigger in this.Function.Trigger {
+		for ignore, trigger in this.Trigger {
+			handler := this.Actions[trigger]
+
 			for ignore, theHotkey in this.Hotkeys[trigger] {
 				if (SubStr(theHotkey, 1, 1) = "?")
-					controller.disableVoiceCommand(SubStr(theHotkey, 2))
+					controller.disableVoiceCommand(SubStr(theHotkey, 2), handler)
 				else
 					Hotkey %theHotkey%, Off
 			}
@@ -1821,9 +1835,9 @@ setHotkeyEnabled(function, trigger, enabled) {
 	for ignore, theHotkey in function.Hotkeys[trigger]
 		if (SubStr(theHotkey, 1, 1) = "?") {
 			if enabled
-				controller.enableVoiceCommand(SubStr(theHotkey, 2))
+				controller.enableVoiceCommand(SubStr(theHotkey, 2), function.Actions[trigger])
 			else
-				controller.disableVoiceCommand(SubStr(theHotkey, 2))
+				controller.disableVoiceCommand(SubStr(theHotkey, 2), function.Actions[trigger])
 		}
 		else
 			Hotkey %theHotkey%, %state%

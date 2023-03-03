@@ -140,6 +140,7 @@ updateModes() {
 editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 	local modes, row, thePlugin, pluginConfiguration, ignore, mode, simulator, options
 	Local defaultModes, pluginSimulators, x, y
+	local index, session
 
 	static newSettings
 	static result := false
@@ -191,8 +192,16 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 
 				simulatorSessions := string2Values(",", string2Values("|", getConfigurationValue(configuration, "Simulators", selectedSimulator, ""))[2])
 
+				for index, session in simulatorSessions
+					if (session = "Qualification")
+						simulatorSessions[index] := "Qualifying"
+
 				GuiControl Text, modeSessionDropDown, % "|" . translate("Inactive") . "|" . values2String("|", map(simulatorSessions, "translate")*)
 				GuiControl Choose, modeSessionDropDown, 1
+
+				for index, session in simulatorSessions
+					if (session = "Qualifying")
+						simulatorSessions[index] := "Qualification"
 
 				modes := string2Values(",", getConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), ""))
 			}

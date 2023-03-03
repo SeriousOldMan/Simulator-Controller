@@ -15,6 +15,7 @@
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
   5. Ability to ask how many cars are left in the race
+  6. Spotter informs about pitstops of opponents
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer

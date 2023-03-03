@@ -162,7 +162,7 @@ Simulator Controller allows you to direct voice output to different audio device
 	Race Engineer.AudioDevice=Headphone
 	Race Strategist.AudioDevice=Headphone
 
-*Headphone* is only an example for any audio device configured and name in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
+*Headphone* is only an example for any audio device configured and named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
    
 ## Monitoring health and activities
 

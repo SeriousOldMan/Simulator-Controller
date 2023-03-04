@@ -387,10 +387,11 @@ class Function extends ConfigurationItem {
 			local ignore, action, arguments, index, argument, theAction, result, actions, callables
 
 			if trigger {
+				actions := this.iActions[trigger]
 				callables := []
 
 				if asText {
-					for ignore, action in this.iActions[trigger] {
+					for ignore, action in actions {
 						arguments := []
 
 						if (action && (action.Length() == 2)) {
@@ -403,20 +404,25 @@ class Function extends ConfigurationItem {
 									arguments[index] := kFalse
 						}
 
-						callables.Push((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
+						if action
+							callables.Push((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
 					}
 
-					return values2String(" | ", callables*)
+					return ((callables.Length() > 0) ? values2String(" | ", callables*) : "")
 				}
 				else {
 					if (actions.Length() > 0) {
 						for ignore, action in actions
 							callables.Push(this.actionCallable(trigger, action))
-
-						return ObjBindMethod(this, "callActions", callables*)
 					}
-					else
-						return false
+					else {
+						action := this.actionCallable(trigger, false)
+
+						if action
+							callables.Push(action)
+					}
+
+					return ((callables.Length() > 0) ? Func("callActions").Bind(callables*) : false)
 				}
 			}
 			else {
@@ -439,12 +445,20 @@ class Function extends ConfigurationItem {
 										arguments[index] := kFalse
 							}
 
-							callables.Push((theAction && (theAction.Length() == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
+							if theAction
+								callables.Push((theAction && (theAction.Length() == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
 						}
 						else
 							callables.Push(this.actionCallable(trigger, action))
 
-					result[trigger] := (asText ? values2String(" | ", callables*) : ObjBindMethod(this, "callActions", callables*))
+					if (!asText && (callables.Length() = 0)) {
+						action := this.actionCallable(trigger, false)
+
+						if action
+							callables.Push(action)
+					}
+
+					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length() > 0) ? Func("callActions").Bind(callables*) : false))
 				}
 
 				return result
@@ -533,7 +547,7 @@ class Function extends ConfigurationItem {
 		action := Trim(action)
 
 		if (action == "")
-			return false
+			return []
 		else {
 			actions := []
 
@@ -555,13 +569,6 @@ class Function extends ConfigurationItem {
 
 			return actions
 		}
-	}
-
-	callActions(actions*) {
-		local ignore, action
-
-		for ignore, action in actions
-			%action%()
 	}
 
 	actionCallable(trigger, action) {
@@ -821,4 +828,16 @@ class Plugin extends ConfigurationItem {
 
 		return result
 	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Private Function Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+callActions(actions*) {
+	local ignore, action
+
+	for ignore, action in actions
+		%action%()
 }

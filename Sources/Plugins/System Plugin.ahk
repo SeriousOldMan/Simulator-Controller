@@ -664,7 +664,7 @@ startupExited() {
 ;;;-------------------------------------------------------------------------;;;
 
 execute(command) {
-	local thePlugin
+	local thePlugin := false
 
 	SimulatorController.Instance.runninSimulator(thePlugin)
 
@@ -680,7 +680,8 @@ execute(command) {
 }
 
 hotkey(hotkeys, method := "Event") {
-	local ignore, theHotkey, thePlugin
+	local thePlugin := false
+	local ignore, theHotkey
 
 	SimulatorController.Instance.runninSimulator(thePlugin)
 

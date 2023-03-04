@@ -161,16 +161,14 @@ class GuiFunctionController extends FunctionController {
 	VisibleDuration[] {
 		Get {
 			local controller := this.Controller
-			local inSimulation, type
+			local type
 
 			if (controller != false) {
-				inSimulation := (controller.ActiveSimulator != false)
-
 				type := this.Type
 
 				return getConfigurationValue(this.Controller.Settings, type
-										   , type . (inSimulation ? " Simulation Duration" : " Duration")
-										   , inSimulation ? false : false)
+										   , type . (controller.ActiveSimulator ? " Simulation Duration" : " Duration")
+										   , false)
 			}
 			else
 				return false
@@ -749,14 +747,16 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	runningSimulator() {
+	runningSimulator(ByRef plugin := false) {
 		local ignore, thePlugin, simulator
 
 		static lastSimulator := false
+		static lastPlugin := false
 		static lastCheck := 0
 
 		if (A_TickCount > (lastCheck + 10000)) {
 			lastSimulator := false
+			lastPlugin := false
 
 			for ignore, thePlugin in this.Plugins
 				if this.isActive(thePlugin) {
@@ -764,6 +764,7 @@ class SimulatorController extends ConfigurationItem {
 
 					if (simulator != false) {
 						lastSimulator := simulator
+						lastPlugin := thePlugin
 
 						break
 					}
@@ -771,6 +772,8 @@ class SimulatorController extends ConfigurationItem {
 
 			lastCheck := A_TickCount
 		}
+
+		plugin := lastPlugin
 
 		return lastSimulator
 	}

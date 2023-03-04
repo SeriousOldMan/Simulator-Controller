@@ -4306,7 +4306,7 @@ class RaceCenter extends ConfigurationItem {
 	runSimulationAsync(sessionType) {
 		local telemetryDB
 
-		this.saveSession()
+		this.syncSessionStore(true)
 
 		telemetryDB := new this.RaceCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
 
@@ -4583,8 +4583,6 @@ class RaceCenter extends ConfigurationItem {
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local lastLap, tyresTable, lap, ignore, stint, telemetryDB
 		local strategy, simulator, car, track, weather, tyreCompound, tyreCompoundColor
-
-		this.syncSessionStore()
 
 		lastLap := this.LastLap
 
@@ -6978,7 +6976,7 @@ class RaceCenter extends ConfigurationItem {
 					this.updateReports()
 
 				if newLaps {
-					this.saveSession()
+					this.syncSessionStore()
 
 					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
 						Gui ListView, % this.LapsListView

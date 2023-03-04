@@ -2,6 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Multiple controller actions can be bound to a single custom voice command.
+  4. Multiple functions can be executed by a custom controller function.
 
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always

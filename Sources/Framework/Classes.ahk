@@ -384,40 +384,17 @@ class Function extends ConfigurationItem {
 
 	Actions[trigger := false, asText := false] {
 		Get {
-			local action, arguments, index, argument, theAction, result
+			local ignore, action, arguments, index, argument, theAction, result, actions, callables
 
 			if trigger {
-				action := this.iActions[trigger]
+				callables := []
 
 				if asText {
-					arguments := []
-
-					if (action && (action.Length() == 2)) {
-						arguments := action[2].Clone()
-
-						for index, argument in arguments
-							if (argument == true)
-								arguments[index] := kTrue
-							else if (argument == false)
-								arguments[index] := kFalse
-					}
-
-					action := ((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
-				}
-				else
-					action := this.actionCallable(trigger, action)
-
-				return action
-			}
-			else {
-				result := {}
-
-				for trigger, theAction in this.iActions
-					if asText {
+					for ignore, action in this.iActions[trigger] {
 						arguments := []
 
-						if (theAction && (theAction.Length() == 2)) {
-							arguments := theAction[2].Clone()
+						if (action && (action.Length() == 2)) {
+							arguments := action[2].Clone()
 
 							for index, argument in arguments
 								if (argument == true)
@@ -426,10 +403,49 @@ class Function extends ConfigurationItem {
 									arguments[index] := kFalse
 						}
 
-						result[trigger] := ((theAction && (theAction.Length() == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
+						callables.Push((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
+					}
+
+					return values2String(" | ", callables*)
+				}
+				else {
+					if (actions.Length() > 0) {
+						for ignore, action in actions
+							callables.Push(this.actionCallable(trigger, action))
+
+						return ObjBindMethod(this, "callActions", callables*)
 					}
 					else
-						result[trigger] := this.actionCallable(trigger, action)
+						return false
+				}
+			}
+			else {
+				result := {}
+
+				for trigger, actions in this.iActions {
+					callables := []
+
+					for ignore, action in actions
+						if asText {
+							arguments := []
+
+							if (theAction && (theAction.Length() == 2)) {
+								arguments := theAction[2].Clone()
+
+								for index, argument in arguments
+									if (argument == true)
+										arguments[index] := kTrue
+									else if (argument == false)
+										arguments[index] := kFalse
+							}
+
+							callables.Push((theAction && (theAction.Length() == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
+						}
+						else
+							callables.Push(this.actionCallable(trigger, action))
+
+					result[trigger] := (asText ? values2String(" | ", callables*) : ObjBindMethod(this, "callActions", callables*))
+				}
 
 				return result
 			}
@@ -470,7 +486,7 @@ class Function extends ConfigurationItem {
 		if InStr(trigger, " Action") {
 			trigger := SubStr(trigger, 1, StrLen(trigger) - StrLen(" Action"))
 
-			this.iActions[trigger] := this.computeAction(trigger, value)
+			this.iActions[trigger] := this.computeActions(trigger, value)
 		}
 		else
 			this.iHotkeys[trigger] := this.computeHotkeys(value)
@@ -511,28 +527,41 @@ class Function extends ConfigurationItem {
 		return StrSplit(value, "|", " `t")
 	}
 
-	computeAction(trigger, action) {
-		local arguments, argument, index
+	computeActions(trigger, action) {
+		local arguments, argument, index, ignore, actions
 
 		action := Trim(action)
 
 		if (action == "")
 			return false
 		else {
-			action := StrSplit(action, "(", " `t", 2)
+			actions := []
 
-			arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))
-			action := action[1]
+			for ignore, action in StrSplit(action, "|") {
+				action := StrSplit(action, "(", " `t", 2)
 
-			for index, argument in arguments {
-				if (argument = kTrue)
-					arguments[index] := true
-				else if (argument = kFalse)
-					arguments[index] := false
+				arguments := string2Values(",", SubStr(action[2], 1, StrLen(action[2]) - 1))
+				action := action[1]
+
+				for index, argument in arguments {
+					if (argument = kTrue)
+						arguments[index] := true
+					else if (argument = kFalse)
+						arguments[index] := false
+				}
+
+				actions.Push(Array(action, arguments))
 			}
 
-			return Array(action, arguments)
+			return actions
 		}
+	}
+
+	callActions(actions*) {
+		local ignore, action
+
+		for ignore, action in actions
+			%action%()
 	}
 
 	actionCallable(trigger, action) {

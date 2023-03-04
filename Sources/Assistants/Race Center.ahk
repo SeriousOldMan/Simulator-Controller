@@ -7868,7 +7868,7 @@ class RaceCenter extends ConfigurationItem {
 
 	loadPlan(info := false, plan := false) {
 		local window := this.Window
-		local currentListView, fileName, ignore
+		local currentListView, fileName, ignore, refuel
 
 		Gui %window%:Default
 
@@ -7905,9 +7905,11 @@ class RaceCenter extends ConfigurationItem {
 			for ignore, plan in this.SessionStore.Tables["Plan.Data"] {
 				Gui ListView, % this.PlanListView
 
+				refuel := displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0)
+
 				LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], plan["Time.Actual"]
 						 , plan["Lap.Planned"], plan["Lap.Actual"]
-						 , displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0), plan["Tyre.Change"])
+						 , (refuel = 0) ? "-" : refuel, plan["Tyre.Change"])
 			}
 
 			LV_ModifyCol()
@@ -11017,7 +11019,7 @@ class RaceCenter extends ConfigurationItem {
 					   . "<td class=""td-std"">" . timeActual . "</td>"
 					   . "<td class=""td-std"">" . lapPlanned . "</td>"
 					   . "<td class=""td-std"">" . lapActual . "</td>"
-					   . "<td class=""td-std"">" . refuelAmount . "</td>"
+					   . "<td class=""td-std"">" . (refuelAmount ? refuelAmount : "-") . "</td>"
 					   . "<td class=""td-std"">" . tyreChange . "</td>"
 					   . "</tr>")
 			}

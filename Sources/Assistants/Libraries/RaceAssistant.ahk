@@ -1098,7 +1098,6 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	restoreSessionState(settingsFile, stateFile) {
-		local knowledgeBase := this.KnowledgeBase
 		local sessionState, sessionSettings
 
 		if stateFile {
@@ -1106,11 +1105,7 @@ class RaceAssistant extends ConfigurationItem {
 
 			deleteFile(stateFile)
 
-			knowledgeBase.Facts.Facts := getConfigurationSectionValues(sessionState, "Session State", Object())
-
-			this.updateSessionValues({SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
-									, SessionLaps: knowledgeBase.getValue("Session.Laps")})
-			this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+			this.loadSessionState(sessionState)
 		}
 
 		if settingsFile {
@@ -1118,8 +1113,36 @@ class RaceAssistant extends ConfigurationItem {
 
 			deleteFile(settingsFile)
 
-			this.updateSettings(sessionSettings)
+			this.loadSessionSettings(sessionSettings)
 		}
+	}
+
+	createSessionState() {
+		local savedKnowledgeBase := newConfiguration()
+
+		setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
+
+		return savedKnowledgeBase
+	}
+
+	createSessionSettings() {
+		return this.Settings
+	}
+
+	loadSessionState(state) {
+		local knowledgeBase := this.KnowledgeBase
+
+		knowledgeBase.Facts.Facts := getConfigurationSectionValues(state, "Session State", Object())
+
+		this.updateSessionValues({SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
+								, SessionLaps: knowledgeBase.getValue("Session.Laps")})
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, EnoughData: false})
+	}
+
+	loadSessionSettings(settings) {
+		this.updateSettings(settings)
+
+		this.updateConfigurationValues({Settings: settings})
 	}
 
 	prepareData(lapNumber, data) {
@@ -1415,18 +1438,14 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	finishPitstop(lapNumber) {
-		local savedKnowledgeBase, settingsFile, stateFile
+		local settingsFile, stateFile
 
 		if this.RemoteHandler {
-			savedKnowledgeBase := newConfiguration()
-
-			setConfigurationSectionValues(savedKnowledgeBase, "Session State", this.KnowledgeBase.Facts.Facts)
-
 			settingsFile := temporaryFileName(this.AssistantType, "settings")
 			stateFile := temporaryFileName(this.AssistantType, "state")
 
-			writeConfiguration(settingsFile, this.Settings)
-			writeConfiguration(stateFile, savedKnowledgeBase)
+			writeConfiguration(settingsFile, this.createSessionSettings())
+			writeConfiguration(stateFile, this.createSessionState())
 
 			this.RemoteHandler.saveSessionState(settingsFile, stateFile)
 		}

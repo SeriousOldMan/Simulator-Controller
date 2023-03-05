@@ -258,7 +258,8 @@ class CarInfo {
 		}
 	}
 
-	__New(nr, car, class) {
+	__New(spotter, nr, car, class) {
+		this.iSpotter := spotter
 		this.iNr := nr
 		this.iCar := car
 		this.iClass := class
@@ -2847,12 +2848,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 			for index, pitstop in pitstops
 				setConfigurationValue(state, "Pitstop State", "Pitstop." . nr . "." . index
-										   , values2String(";", pitstop.Nr, pitstop.Time, pitstop.Lap, pitstop.Duration))
+										   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
 
 			setConfigurationValue(state, "Pitstop State", "Pitstop." . nr . ".Count", pitstops.Length())
 		}
 
 		setConfigurationValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count())
+
+		if isDevelopment()
+			writeConfiguration(temporaryFileName("Race Spotter", "pitstops"), state)
 
 		return state
 	}
@@ -2870,7 +2874,7 @@ class RaceSpotter extends GridRaceAssistant {
 			pitstops := this.Pitstops[carNr]
 
 			loop % getConfigurationValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
-				pitstops.Push(new this.Pitstop(string2Values(";", getConfigurationValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
+				pitstops.Push(new this.Pitstop(carNr, string2Values(";", getConfigurationValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
 		}
 	}
 
@@ -3042,12 +3046,12 @@ class RaceSpotter extends GridRaceAssistant {
 		local carNr, delta, pitstops, pitstop
 
 		if !this.iLastPitstopUpdate {
-			this.iLastPitstopUpdate := Round(lap.RemainingSessionTime / 1000)
+			this.iLastPitstopUpdate := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
 
 			delta := 0
 		}
 		else {
-			delta := (this.iLastPitstopUpdate - Round(lap.RemainingSessionTime / 1000))
+			delta := (this.iLastPitstopUpdate - Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 
 			this.iLastPitstopUpdate -= delta
 		}
@@ -3061,14 +3065,14 @@ class RaceSpotter extends GridRaceAssistant {
 				pitstops := this.Pitstops[carNr]
 
 				if (pitstops.Length() = 0)
-					pitstops.Push(new this.Pitstop(carNr, this.iLastPitstopUpdate, lap.Nr))
+					pitstops.Push(new this.Pitstop(carNr, this.iLastPitstopUpdate, lap))
 				else {
 					pitstop := pitstops[pitstops.Length()]
 
 					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
 						pitstop.Duration := (pitstop.Duration + delta)
 					else
-						pitstops.Push(new this.Pitstop(carNr, this.iLastPitstopUpdate, lap.Nr))
+						pitstops.Push(new this.Pitstop(carNr, this.iLastPitstopUpdate, lap))
 				}
 			}
 		}

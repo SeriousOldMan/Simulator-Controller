@@ -1991,6 +1991,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local spoken := false
 		local standingsAhead, standingsBehind, trackAhead, trackBehind, leader, info, informed
 		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, speaker, rnd
+		local unsafe, driverPitstops, carPitstops
 
 		static lapUpRangeThreshold := "__Undefined__"
 		static lapDownRangeThreshold := false
@@ -2084,11 +2085,22 @@ class RaceSpotter extends GridRaceAssistant {
 												 , lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
 					car := standingsAhead.Car
+					unsafe := true
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriverFront")
 					else if (car.InvalidLaps > 3)
 						speaker.speakPhrase("InconsistentDriverFront")
+					else
+						unsafe := false
+
+					driverPitstops := this.DriverCar.Pitstops.Length()
+					carPitstops := standingsBehind.Car.Pitstops.Length()
+
+					if (driverPitstops < carPitstops)
+						speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: carPitstops - driverPitstops})
+					else (driverPitstops > carPitstops)
+						speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: driverPitstops - carPitstops})
 
 					standingsAhead.Reported := true
 
@@ -2165,11 +2177,22 @@ class RaceSpotter extends GridRaceAssistant {
 													, lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
 					car := standingsAhead.Car
+					unsafe := true
 
 					if (car.Incidents > 0)
 						speaker.speakPhrase("UnsafeDriveBehind")
 					else if (car.InvalidLaps > 3)
 						speaker.speakPhrase("InconsistentDriverBehind")
+					else
+						unsafe := false
+
+					driverPitstops := this.DriverCar.Pitstops.Length()
+					carPitstops := standingsBehind.Car.Pitstops.Length()
+
+					if (driverPitstops < carPitstops)
+						speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: carPitstops - driverPitstops})
+					else (driverPitstops > carPitstops)
+						speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: driverPitstops - carPitstops})
 
 					standingsBehind.Reported := true
 

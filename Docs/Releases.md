@@ -5,9 +5,10 @@
   4. Multiple functions can be executed by a custom controller function.
   5. Increased performance of lap update in "Race Center" in low latency situations.
   6. The Spotter informas you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
-  7. New voice command for requesting the number of active cars in a session from the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) or the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)).
-  8. New information request controller action "ActiveCars" for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter).
-  9. New Stream Deck icon for the "ActiveCars" information request action.
+  7. Improved detection of retired cars in "Race Reports" and "Race Center".
+  8. New voice command for requesting the number of active cars in a session from the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) or the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)).
+  9. New information request controller action "ActiveCars" for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter).
+  10. New Stream Deck icon for the "ActiveCars" information request action.
   
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always

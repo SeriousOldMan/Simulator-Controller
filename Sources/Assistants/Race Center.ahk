@@ -5883,15 +5883,15 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 
 			while (lap <= lastLap) {
-				driverID := this.Laps[lap].Stint.ID
-
-				pitstop := false
-
 				if !this.Laps.HasKey(lap) {
 					lap += 1
 
 					continue
 				}
+
+				driverID := this.Laps[lap].Stint.ID
+
+				pitstop := false
 
 				try {
 					tries := ((lap == lastLap) ? 10 : 1)
@@ -6113,13 +6113,13 @@ class RaceCenter extends ConfigurationItem {
 			flush := (Abs(lastLap - lap) <= 2)
 
 			while (lap <= lastLap) {
-				driverID := this.Laps[lap].Stint.ID
-
 				if !this.Laps.HasKey(lap) {
 					lap += 1
 
 					continue
 				}
+
+				driverID := this.Laps[lap].Stint.ID
 
 				try {
 					tries := ((lap == lastLap) ? 10 : 1)
@@ -6568,6 +6568,9 @@ class RaceCenter extends ConfigurationItem {
 
 							if (nextLap > lastLap)
 								break
+
+							if !this.Laps.HasKey(nextLap)
+								continue
 
 							if (!full && hasServiceData && hasTyreData)
 								break

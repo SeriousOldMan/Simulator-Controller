@@ -5496,6 +5496,10 @@ selectSetting() {
 }
 
 changeSetting() {
+	Task.startTask("changeSettingAsync")
+}
+
+changeSettingAsync() {
 	local editor := SessionDatabaseEditor.Instance
 	local window, defaultListView, selected, settings, section, key, ignore, setting
 	local type, value, oldValue

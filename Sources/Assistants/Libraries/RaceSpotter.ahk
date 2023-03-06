@@ -1337,13 +1337,14 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	activeCarsRecognized(words) {
-		if !this.hasEnoughData()
-			return
-
-		if this.MultiClass
-			this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length(), classCars: this.getCars("Class").Length()})
-		else
-			this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length()})
+		if !this.Knowledgebase
+			this.getSpeaker().speakPhrase("Later")
+		else {
+			if this.MultiClass
+				this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length(), classCars: this.getCars("Class").Length()})
+			else
+				this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length()})
+		}
 	}
 
 	updateAnnouncement(announcement, value) {

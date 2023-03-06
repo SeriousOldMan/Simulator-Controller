@@ -3,7 +3,7 @@ Version=4.6.3.0-dev
 Target=4.6.3.0-release
 Date=03/06/2023
 Download=
-Changes=Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center"
+Changes=Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center", Fixed potential race condition in session database
 [Release]
 Version=4.6.2.0-release
 Date=03/03/2023

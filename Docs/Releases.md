@@ -6,6 +6,7 @@
   5. Increased performance of lap update in "Race Center".
   6. The Spotter informas you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
   7. Improved detection of retired cars in "Race Reports" and "Race Center".
+  8. Fixed potential race condition in session database which leads to "Session Database" freezing while editing settings.
 
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always

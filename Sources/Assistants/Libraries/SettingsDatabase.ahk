@@ -221,50 +221,87 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	getSettingValue(simulator, car, track, weather, section, key, default := false) {
+		local database := this.getSettingsDatabase(simulator, "User")
+		local tries := 5
 		local rows
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
 
-		rows := this.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Owner: this.ID
-																					 , Car: car, Track: track, Weather: weather
-																					 , Section: section, Key: key}})
+		while (tries-- > 0) {
+			if database.lock("Settings", false)
+				try {
+					rows := database.query("Settings", {Where: {Owner: this.ID
+															  , Car: car, Track: track, Weather: weather
+															  , Section: section, Key: key}})
 
-		return ((rows.Length() > 0) ? rows[1].Value : default)
+					return ((rows.Length() > 0) ? rows[1].Value : default)
+				}
+				catch exception {
+					return default
+				}
+				finally {
+					database.unlock("Settings")
+				}
+
+			Sleep 200
+		}
+
+		return default
 	}
 
 	setSettingValue(simulator, car, track, weather, section, key, value) {
 		local database := this.getSettingsDatabase(simulator, "User")
+		local tries := 5
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
 
-		if database.lock("Settings")
-			try {
-				database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
-										  , Func("always").Bind(true))
+		while (tries-- > 0) {
+			if database.lock("Settings", false)
+				try {
+					database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
+											  , Func("always").Bind(true))
 
-				database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
-			}
-			finally {
-				database.unlock("Settings")
-			}
+					database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
+
+					return
+				}
+				catch exception {
+					return
+				}
+				finally {
+					database.unlock("Settings")
+				}
+
+			Sleep 200
+		}
 	}
 
 	removeSettingValue(simulator, car, track, weather, section, key) {
 		local database := this.getSettingsDatabase(simulator, "User")
+		local tries := 5
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
 
-		if database.lock("Settings")
-			try {
-				database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
-										  , Func("always").Bind(true), true)
-			}
-			finally {
-				database.unlock("Settings")
-			}
+		while (tries-- > 0) {
+			if database.lock("Settings")
+				try {
+					database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
+											  , Func("always").Bind(true), true)
+
+					return
+				}
+				catch exception {
+					return
+				}
+				finally {
+					database.unlock("Settings")
+				}
+
+			Sleep 200
+		}
 	}
 }
 
@@ -285,16 +322,27 @@ constraintSettings(constraints, row) {
 
 readSetting(database, simulator, owner, user, community, car, track, weather
 		  , section, key, default := false) {
-	local rows, ignore, row
+	local rows, ignore, row, settingsDB
 
 	if user {
-		rows := database.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Car: car, Track: track
-																						 , Weather: weather
-																						 , Section: section, Key: key
-																						 , Owner: owner}})
+		settingsDB := database.getSettingsDatabase(simulator, "User")
 
-		if (rows.Length() > 0)
-			return rows[1].Value
+		settingsDB.lock("Settings")
+
+		try {
+			rows := settingsDB.query("Settings", {Where: {Car: car, Track: track
+														, Weather: weather
+														, Section: section, Key: key
+														, Owner: owner}})
+
+			if (rows.Length() > 0)
+				return rows[1].Value
+		}
+		catch exception {
+		}
+		finally {
+			settingsDB.unlock("Settings")
+		}
 	}
 
 	if community
@@ -311,6 +359,7 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
 	local result := []
 	local ignore, row, filtered, visited
+	local settingsDB
 
 	if community
 		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
@@ -318,10 +367,20 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 			if (row.Owner != owner)
 				result.Push(row)
 
-	if user
-		for ignore, row in database.getSettingsDatabase(simulator, "User").query("Settings", {Where: {Car: car, Track: track
-																									, Weather: weather, Owner: owner}})
-			result.Push(row)
+	if user {
+		settingsDB := database.getSettingsDatabase(simulator, "User")
+
+		settingsDB.lock("Settings")
+
+		try {
+			for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
+																										, Weather: weather, Owner: owner}})
+				result.Push(row)
+		}
+		finally {
+			settingsDB.lock("Settings")
+		}
+	}
 
 	filtered := []
 	visited := {}

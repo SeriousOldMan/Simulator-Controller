@@ -4306,7 +4306,7 @@ class RaceCenter extends ConfigurationItem {
 	runSimulationAsync(sessionType) {
 		local telemetryDB
 
-		this.saveSession()
+		this.syncSessionStore(true)
 
 		telemetryDB := new this.RaceCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
 
@@ -4583,8 +4583,6 @@ class RaceCenter extends ConfigurationItem {
 					 , ByRef initialMap, ByRef initialFuelConsumption, ByRef initialAvgLapTime) {
 		local lastLap, tyresTable, lap, ignore, stint, telemetryDB
 		local strategy, simulator, car, track, weather, tyreCompound, tyreCompoundColor
-
-		this.syncSessionStore()
 
 		lastLap := this.LastLap
 
@@ -6978,7 +6976,7 @@ class RaceCenter extends ConfigurationItem {
 					this.updateReports()
 
 				if newLaps {
-					this.saveSession()
+					this.syncSessionStore()
 
 					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
 						Gui ListView, % this.LapsListView
@@ -7868,7 +7866,7 @@ class RaceCenter extends ConfigurationItem {
 
 	loadPlan(info := false, plan := false) {
 		local window := this.Window
-		local currentListView, fileName, ignore
+		local currentListView, fileName, ignore, refuel
 
 		Gui %window%:Default
 
@@ -7905,9 +7903,11 @@ class RaceCenter extends ConfigurationItem {
 			for ignore, plan in this.SessionStore.Tables["Plan.Data"] {
 				Gui ListView, % this.PlanListView
 
+				refuel := displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0)
+
 				LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], plan["Time.Actual"]
 						 , plan["Lap.Planned"], plan["Lap.Actual"]
-						 , displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0), plan["Tyre.Change"])
+						 , (refuel = 0) ? "-" : refuel, plan["Tyre.Change"])
 			}
 
 			LV_ModifyCol()
@@ -11017,7 +11017,7 @@ class RaceCenter extends ConfigurationItem {
 					   . "<td class=""td-std"">" . timeActual . "</td>"
 					   . "<td class=""td-std"">" . lapPlanned . "</td>"
 					   . "<td class=""td-std"">" . lapActual . "</td>"
-					   . "<td class=""td-std"">" . refuelAmount . "</td>"
+					   . "<td class=""td-std"">" . (refuelAmount ? refuelAmount : "-") . "</td>"
 					   . "<td class=""td-std"">" . tyreChange . "</td>"
 					   . "</tr>")
 			}

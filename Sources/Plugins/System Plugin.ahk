@@ -664,6 +664,13 @@ startupExited() {
 ;;;-------------------------------------------------------------------------;;;
 
 execute(command) {
+	local thePlugin := false
+
+	SimulatorController.Instance.runninSimulator(thePlugin)
+
+	if thePlugin
+		thePlugin.activateWindow()
+
 	try {
 		Run % substituteVariables(command)
 	}
@@ -673,7 +680,13 @@ execute(command) {
 }
 
 hotkey(hotkeys, method := "Event") {
+	local thePlugin := false
 	local ignore, theHotkey
+
+	SimulatorController.Instance.runninSimulator(thePlugin)
+
+	if thePlugin
+		thePlugin.activateWindow()
 
 	for ignore, theHotkey in string2Values("|", hotkeys)
 		try {

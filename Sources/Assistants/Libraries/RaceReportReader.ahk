@@ -173,7 +173,7 @@ class RaceReportReader {
 		if driverNicknames
 			driverNicknames := []
 
-		if cars {
+		if (cars && (tPositions.Length() > 0) && (drivers.Length() > 0)) {
 			loop % getConfigurationValue(raceData, "Cars", "Count", 0) {
 				if cars
 					cars.Push(A_Index)

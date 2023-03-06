@@ -1,9 +1,9 @@
 [Development]
 Version=4.6.3.0-dev
 Target=4.6.3.0-release
-Date=03/04/2023
+Date=03/06/2023
 Download=
-Changes=Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops
+Changes=Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, New voice command for requesting the number of active cars in a session, New information request action "ActiveCars" for Race Strategist and Race Spotter, New Stream Deck icon for the "ActiveCars" information request action
 [Release]
 Version=4.6.2.0-release
 Date=03/03/2023

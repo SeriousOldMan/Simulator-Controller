@@ -87,6 +87,8 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 15. [Expert guide to race settings](https://youtu.be/UeD397KFEhg) - This video will give you a complete overview over all the settings used by the Race Assistants, for example all the stuff needed by the Race Engineer to handle a successful pitstop in even the worst conditions.
 
+16. [Create your own voice commands](https://youtu.be/QJtKu3I75Vs) - In this video you will learn how to define your own voice commands to control not only any part of Simulator Controller, but also all functionalities of  your simulation games.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

@@ -316,7 +316,7 @@ class RaceReportViewer extends RaceReportReader {
 			{
 				car := A_Index
 
-				result := (isNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
+				result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
 				lapTimes := []
 				hasNull := false
 
@@ -324,7 +324,7 @@ class RaceReportViewer extends RaceReportReader {
 				{
 					lapTime := times[A_Index][car]
 
-					if (!isNull(lapTime) && (lapTime > 0))
+					if (!extendedIsNull(lapTime) && (lapTime > 0))
 						lapTimes.Push(lapTime)
 					else if (A_Index == lapsCount)
 						result := "DNF"
@@ -608,7 +608,7 @@ class RaceReportViewer extends RaceReportReader {
 
 					for ignore, lap in this.getReportLaps(raceData)
 						if positions.HasKey(lap)
-							if (positions[lap].HasKey(car) && (positions[lap][car] != kNull) && (positions[lap][car] > 0)) {
+							if (positions[lap].HasKey(car) && !extendedIsNull(positions[lap][car]) && (positions[lap][car] > 0)) {
 								valid := true
 
 								minPosition := Min(minPosition, positions[lap][car])
@@ -650,7 +650,7 @@ class RaceReportViewer extends RaceReportReader {
 						if (StrLen(Trim(position)) == 0)
 							position := A_Index
 						else if (position != "null")
-							if position is not number
+							if position is not Number
 								position := "null"
 
 						drawChartFunction := (drawChartFunction . ", " . position)
@@ -727,7 +727,7 @@ class RaceReportViewer extends RaceReportReader {
 					if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
 						if times.hasKey(lap) {
 							time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-							time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+							time := (extendedIsNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
 
 							if (time > 0)
 								lapTimes.Push("'" . this.lapTimeDisplayValue(time) . "'")
@@ -799,7 +799,7 @@ class RaceReportViewer extends RaceReportReader {
 					if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
 						if times.hasKey(lap) {
 							time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-							time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+							time := (extendedIsNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
 
 							if (time > 0) {
 								allTimes.Push(time)
@@ -820,9 +820,9 @@ class RaceReportViewer extends RaceReportReader {
 				carTimes := []
 
 				for ignore, lap in laps {
-					time := drivertimes[lap][car]
+					time := driverTimes[lap][car]
 
-					if (time != kNull)
+					if !extendedIsNull(time)
 						carTimes.Push(time)
 				}
 
@@ -832,8 +832,8 @@ class RaceReportViewer extends RaceReportReader {
 					avg := average(carTimes)
 
 					for ignore, lap in laps
-						if (drivertimes[lap][car] = kNull)
-							drivertimes[lap][car] := avg
+						if (driverTimes[lap][car] = kNull)
+							driverTimes[lap][car] := avg
 				}
 			}
 
@@ -866,7 +866,7 @@ class RaceReportViewer extends RaceReportReader {
 				for ignore, lap in laps {
 					time := driverTimes[lap][1]
 
-					if time is number
+					if time is Number
 						carTimes.Push(time)
 				}
 

@@ -114,7 +114,8 @@ class Database {
 
 	lock(name := false, wait := true) {
 		local done := false
-		local directory, file, ignore
+		local locked := []
+		local directory, file, ignore, result
 
 		if (!name && !wait)
 			throw "Inconsistent parameters detected in Database.lock..."
@@ -152,10 +153,24 @@ class Database {
 			else
 				return true
 		}
-		else
-			for name, ignore in getKeys(this.Schemas)
-				this.lock(name, wait)
+		else {
+			result := true
 
+			for name, ignore in getKeys(this.Schemas)
+				if this.lock(name, wait)
+					locked.Push(name)
+				else {
+					result := false
+
+					break
+				}
+
+			if !result
+				for ignore, name in locked
+					this.unlock(name)
+
+			return result
+		}
 	}
 
 	unlock(name := false) {
@@ -337,13 +352,30 @@ class Database {
 	}
 
 	flush(name := false) {
+		local bakFile := false
 		local directory, fileName, schema, ignore, row, values, column, file
 
 		if name {
 			if (this.Tables.HasKey(name) && this.iTableChanged.HasKey(name)) {
+				directory := this.Directory
+				fileName := (directory . name . ".CSV")
 				file := this.Files[name]
 
 				if file {
+					try {
+						file.Position := 0
+
+						bakFile := FileOpen(fileName . ".bak", "w")
+
+						bakFile.Write(file.Read())
+					}
+					catch exception {
+					}
+					finally {
+						if bakFile
+							bakFile.Close()
+					}
+
 					file.Length := 0
 
 					schema := this.Schemas[name]
@@ -363,7 +395,7 @@ class Database {
 
 					FileCreateDir %directory%
 
-					deleteFile(fileName)
+					deleteFile(fileName, true)
 
 					schema := this.Schemas[name]
 

@@ -93,7 +93,14 @@ temporaryFileName(name, extension) {
 	return (kTempDirectory . name . "_" . Round(rnd) . "." . extension)
 }
 
-deleteFile(fileName) {
+deleteFile(fileName, backup := false) {
+	if backup
+		try {
+			FileMove %fileName%, %fileName%.bak, 1
+		}
+		catch exception {
+		}
+
 	try {
 		FileDelete %fileName%
 

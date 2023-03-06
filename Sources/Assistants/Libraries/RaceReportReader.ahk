@@ -140,11 +140,11 @@ class RaceReportReader {
 		local raceData := true
 		local drivers := true
 		local tPositions := true
-		local times := false
+		local tTimes := true
 		local classes := {}
 		local forName, surName, nickName, position
 
-		this.loadData(Array(lap), raceData, drivers, tPositions, times)
+		this.loadData(Array(lap), raceData, drivers, tPositions, tTimes)
 
 		if cars
 			cars := []
@@ -174,46 +174,47 @@ class RaceReportReader {
 			driverNicknames := []
 
 		if (cars && (tPositions.Length() > 0) && (drivers.Length() > 0)) {
-			loop % getConfigurationValue(raceData, "Cars", "Count", 0) {
-				if cars
-					cars.Push(A_Index)
+			loop % getConfigurationValue(raceData, "Cars", "Count", 0)
+				if (!extendedIsNull(tPositions[tPositions.Length()][A_Index]) && !extendedIsNull(tTimes[tTimes.Length()][A_Index])) {
+					if cars
+						cars.Push(A_Index)
 
-				if ids
-					ids.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID"))
+					if ids
+						ids.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".ID"))
 
-				position := tPositions[1][A_Index]
+					position := tPositions[1][A_Index]
 
-				if overallPositions
-					overallPositions.Push(position)
+					if overallPositions
+						overallPositions.Push(position)
 
-				class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
+					class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
 
-				if !classes.HasKey(class)
-					classes[class] := [Array(A_Index, position)]
-				else
-					classes[class].Push(Array(A_Index, position))
+					if !classes.HasKey(class)
+						classes[class] := [Array(A_Index, position)]
+					else
+						classes[class].Push(Array(A_Index, position))
 
-				if carNumbers
-					carNumbers.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
+					if carNumbers
+						carNumbers.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
 
-				if carNames
-					carNames.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+					if carNames
+						carNames.Push(getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
-				forName := false
-				surName := false
-				nickName := false
+					forName := false
+					surName := false
+					nickName := false
 
-				parseDriverName(drivers[1][A_Index], forName, surName, nickName)
+					parseDriverName(drivers[1][A_Index], forName, surName, nickName)
 
-				if driverFornames
-					driverFornames.Push(forName)
+					if driverFornames
+						driverFornames.Push(forName)
 
-				if driverSurnames
-					driverSurnames.Push(surName)
+					if driverSurnames
+						driverSurnames.Push(surName)
 
-				if driverNicknames
-					driverNicknames.Push(nickName)
-			}
+					if driverNicknames
+						driverNicknames.Push(nickName)
+				}
 
 			if (classes.Count() > 1) {
 				classPositions := overallPositions.Clone()
@@ -517,6 +518,10 @@ class RaceReportReader {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+extendedIsNull(value) {
+	return (isNull(value) || (value = "-") || (value = ""))
+}
 
 correctEmptyValues(table, default := "__Undefined__") {
 	local line

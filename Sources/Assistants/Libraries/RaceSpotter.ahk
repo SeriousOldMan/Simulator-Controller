@@ -1861,7 +1861,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local trackAhead := false
 		local trackBehind := false
 		local leader := false
-		local situation, opponentType
+		local situation, opponentType, driverPitstops, carPitstops
 
 		this.getPositionInfos(standingsAhead, standingsBehind, trackAhead, trackBehind, leader, true)
 
@@ -1960,7 +1960,15 @@ class RaceSpotter extends GridRaceAssistant {
 						try {
 							speaker.speakPhrase(opponentType . "Faster")
 
-							speaker.speakPhrase("Slipstream")
+							driverPitstops := this.DriverCar.Pitstops.Length()
+							carPitstops := trackBehind.Car.Pitstops.Length()
+
+							if ((driverPitstops < carPitstops) && (opponentType = "LapDown"))
+								speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments["But"], pitstops: carPitstops - driverPitstops})
+							else if ((driverPitstops > carPitstops) && (opponentType = "LapUp"))
+								speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments["But"], pitstops: driverPitstops - carPitstops})
+							else
+								speaker.speakPhrase("Slipstream")
 						}
 						finally {
 							speaker.endTalk()
@@ -2035,6 +2043,7 @@ class RaceSpotter extends GridRaceAssistant {
 		speaker.beginTalk()
 
 		try {
+			driverPitstops := this.DriverCar.Pitstops.Length()
 			opponentType := (trackAhead ? trackAhead.OpponentType[sector] : false)
 
 			if ((sector > 1) && trackAhead && (trackAhead != standingsAhead) && trackAhead.hasGap(sector)
@@ -2042,8 +2051,13 @@ class RaceSpotter extends GridRaceAssistant {
 			 && trackAhead.inRange(sector, true, (opponentType = "LapDown") ? lapDownRangeThreshold : lapUpRangeThreshold)
 			 && !trackAhead.isFaster(sector) && !trackAhead.runningAway(sector, frontGainThreshold)
 			 && !trackAhead.Reported) {
+				carPitstops := trackAhead.Car.Pitstops.Length()
+
 				if (opponentType = "LapDown") {
 					speaker.speakPhrase("LapDownDriver")
+
+					if (driverPitstops < carPitstops)
+						speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
 
 					trackAhead.Reported := true
 
@@ -2051,6 +2065,11 @@ class RaceSpotter extends GridRaceAssistant {
 				}
 				else if (opponentType = "LapUp") {
 					speaker.speakPhrase("LapUpDriver")
+
+					if (driverPitstops < carPitstops)
+						speaker.speakPhrase("MorePitstops", {conjunction: "", pitstops: carPitstops - driverPitstops})
+					else if (driverPitstops > carPitstops)
+						speaker.speakPhrase("LessPitstops", {conjunction: "", pitstops: driverPitstops - carPitstops})
 
 					trackAhead.Reported := true
 
@@ -2095,12 +2114,11 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						unsafe := false
 
-					driverPitstops := this.DriverCar.Pitstops.Length()
-					carPitstops := standingsBehind.Car.Pitstops.Length()
+					carPitstops := standingsAhead.Car.Pitstops.Length()
 
 					if (driverPitstops < carPitstops)
 						speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: carPitstops - driverPitstops})
-					else (driverPitstops > carPitstops)
+					else if (driverPitstops > carPitstops)
 						speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: driverPitstops - carPitstops})
 
 					standingsAhead.Reported := true
@@ -2187,12 +2205,11 @@ class RaceSpotter extends GridRaceAssistant {
 					else
 						unsafe := false
 
-					driverPitstops := this.DriverCar.Pitstops.Length()
 					carPitstops := standingsBehind.Car.Pitstops.Length()
 
 					if (driverPitstops < carPitstops)
 						speaker.speakPhrase("MorePitstops", {conjunction: speaker.Fragments[unsafe ? "But" : "And"], pitstops: carPitstops - driverPitstops})
-					else (driverPitstops > carPitstops)
+					else if (driverPitstops > carPitstops)
 						speaker.speakPhrase("LessPitstops", {conjunction: speaker.Fragments[unsafe ? "And" : "But"], pitstops: driverPitstops - carPitstops})
 
 					standingsBehind.Reported := true

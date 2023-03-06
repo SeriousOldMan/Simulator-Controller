@@ -439,7 +439,7 @@ A word about memory consumption here as well: Although a lot of effort has been 
 
 A lot can happen when talking to services on the internet. The system tries to be as robust as possible. For example, when the connection to the *Team Server* is lost, the Race Assistants will continue to run in local mode. There will be no error messages on the screen in this situation in order to not interfere with your current stint. You can consult the log files in the *Simulator Controller\Logs* folder which is located in your user *Documents* folder afterwards. In most cases it will be a problem with the connection to the *Team Server*, but a full database (depending on your hosting environment quotas) might also be a root cause. Here are some tipps:
 
-  1. Always check the connection to the *Team Server* using the "Race Settings" application just before the race.
+  1. Always check the connection to the *Team Server* using the "Race Settings" application just before the race or use the "System Monitor", which will constantly check the health state of the Team Server connection.
   
   2. Do not use "cheap" or free hosting. Especially the free account on Azure or AWS do not have any SLAs regarding service availibility and service quality.
   

@@ -4306,7 +4306,11 @@ class RaceCenter extends ConfigurationItem {
 	runSimulationAsync(sessionType) {
 		local telemetryDB
 
+		this.showMessage(translate("Saving session"))
+
 		this.syncSessionStore(true)
+
+		this.showMessage(translate("Running simulation"))
 
 		telemetryDB := new this.RaceCenterTelemetryDatabase.SimulationTelemetryDatabase(this, this.Simulator, this.Car, this.Track)
 
@@ -4321,6 +4325,8 @@ class RaceCenter extends ConfigurationItem {
 		finally {
 			this.iSimulationTelemetryDatabase := false
 		}
+
+		this.showMessage(false)
 	}
 
 	getPreviousLap(lap) {
@@ -5883,15 +5889,15 @@ class RaceCenter extends ConfigurationItem {
 			lap += 1
 
 			while (lap <= lastLap) {
-				driverID := this.Laps[lap].Stint.ID
-
-				pitstop := false
-
 				if !this.Laps.HasKey(lap) {
 					lap += 1
 
 					continue
 				}
+
+				driverID := this.Laps[lap].Stint.ID
+
+				pitstop := false
 
 				try {
 					tries := ((lap == lastLap) ? 10 : 1)
@@ -6113,13 +6119,13 @@ class RaceCenter extends ConfigurationItem {
 			flush := (Abs(lastLap - lap) <= 2)
 
 			while (lap <= lastLap) {
-				driverID := this.Laps[lap].Stint.ID
-
 				if !this.Laps.HasKey(lap) {
 					lap += 1
 
 					continue
 				}
+
+				driverID := this.Laps[lap].Stint.ID
 
 				try {
 					tries := ((lap == lastLap) ? 10 : 1)
@@ -6568,6 +6574,9 @@ class RaceCenter extends ConfigurationItem {
 
 							if (nextLap > lastLap)
 								break
+
+							if !this.Laps.HasKey(nextLap)
+								continue
 
 							if (!full && hasServiceData && hasTyreData)
 								break
@@ -7517,6 +7526,8 @@ class RaceCenter extends ConfigurationItem {
 	saveSessionAsync(copy := false) {
 		local info, directory, title, folder, session
 
+		this.showMessage(translate("Saving session"))
+
 		if this.SessionActive {
 			this.syncSessionStore(true)
 
@@ -7562,6 +7573,8 @@ class RaceCenter extends ConfigurationItem {
 				FileCopyDir %directory%, %folder%\%session%, 1
 			}
 		}
+
+		this.showMessage(false)
 	}
 
 	loadDrivers() {

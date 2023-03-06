@@ -340,6 +340,7 @@ Please see the following table for available information commands.
 | Weather | You will get information about the current and upcoming weather. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| ActiveCars | Cato will give you information about the number of cars in the session. In a multi-class session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Cato will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. Please note, that for compatibility reasons, *GapToFront* is supported as well. |
 | GapToBehind [Standings, Track] | Cato will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Cato will tell you the gap in seconds to the leading car. |
@@ -405,6 +406,7 @@ Please see the following table for available information commands.
 | Time | You will be told the current time of your local computer. |
 | Position | Cato will tell you your current position. |
 | LapTimes | You will be given information about your average lap time and those of your direct opponents. |
+| ActiveCars | Cato will give you information about the number of cars in the session. In a multi-class session additional information will be given on the number of cars in your own class as well. |
 | GapToAhead [Standings, Track] | Elisa will tell you the gap in seconds to the car one position ahead of you or to the car directly in front of you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToBehind [Standings, Track] | Elisa will tell you the gap in seconds to the car one position behind you or to the car directly behind you. If you don't supply *Standings* or *Track*, it will default to *Standings*. |
 | GapToLeader | Elisa will tell you the gap in seconds to the leading car. |

@@ -5,6 +5,7 @@
 	 - Drivers
 	 - Number of pitstops
 	 - Relative performance
+  2. Support for new simulators
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*

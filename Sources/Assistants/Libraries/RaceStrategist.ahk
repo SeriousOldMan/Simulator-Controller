@@ -548,6 +548,8 @@ class RaceStrategist extends GridRaceAssistant {
 				this.positionRecognized(words)
 			case "LapTimes":
 				this.lapTimesRecognized(words)
+			case "ActiveCars":
+				this.activeCarsRecognized(words)
 			case "FuturePosition":
 				this.futurePositionRecognized(words)
 			case "GapToAhead", "GapToFront":
@@ -648,7 +650,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, overallPosition, classPosition
 
-		if ((this.Session != kSessionRace) && !this.hasEnoughData())
+		if !this.hasEnoughData()
 			return
 
 		speaker := this.getSpeaker()
@@ -988,6 +990,16 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.endTalk()
 			}
 		}
+	}
+
+	activeCarsRecognized(words) {
+		if !this.hasEnoughData()
+			return
+
+		if this.MultiClass
+			this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length(), classCars: this.getCars("Class").Length()})
+		else
+			this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length()})
 	}
 
 	strategyOverviewRecognized(words) {
@@ -1685,6 +1697,8 @@ class RaceStrategist extends GridRaceAssistant {
 				this.positionRecognized([])
 			case "LapTimes":
 				this.lapTimesRecognized([])
+			case "ActiveCars":
+				this.activeCarsRecognized([])
 			case "GapToAheadStandings", "GapToFrontStandings":
 				this.gapToAheadRecognized([])
 			case "GapToAheadTrack", "GapToFrontTrack":

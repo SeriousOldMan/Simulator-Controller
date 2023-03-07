@@ -1657,12 +1657,12 @@ updateInstallationForV392() {
 
 updateConfigurationForV463() {
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		FileRead text, %kUserHomeDirectory%Setup\Setup.data
+		FileRead text, *t %kUserHomeDirectory%Setup\Setup.data
 
 		text := StrReplace(text, "Class=MutedAssistant", "Class=SilentAssistant")
-		text := StrReplace(text, "Arguments=SilentSpotter###Race Spotter", "Arguments=SilentSpotter###Race Spotter###1")
-		text := StrReplace(text, "Arguments=SilentStrategist###Race Strategist", "Arguments=SilentStrategist###Race Strategist###1")
-		text := StrReplace(text, "Arguments=SilentEngineer###Race Engineer", "Arguments=SilentEngineer###Race Engineer###1")
+		text := StrReplace(text, "Arguments=SilentSpotter###Race Spotter`n", "Arguments=SilentSpotter###Race Spotter###1`n")
+		text := StrReplace(text, "Arguments=SilentStrategist###Race Strategist`n", "Arguments=SilentStrategist###Race Strategist###1`n")
+		text := StrReplace(text, "Arguments=SilentEngineer###Race Engineer`n", "Arguments=SilentEngineer###Race Engineer###1`n")
 
 		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
 

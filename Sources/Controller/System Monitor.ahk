@@ -52,6 +52,13 @@ global kStateIcons := {Disabled: kIconsDirectory . "Black.ico"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Variable Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global vStartupFinished := false
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -660,6 +667,8 @@ systemMonitor(command := false, arguments*) {
 		new PeriodicTask(Func("systemMonitor").Bind("UpdateModules"), 2000, kLowPriority).start()
 		new PeriodicTask(Func("systemMonitor").Bind("UpdateServer"), 5000, kLowPriority).start()
 
+		vStartupFinished := true
+
 		loop
 			Sleep 100
 		until result
@@ -1035,13 +1044,14 @@ startSystemMonitor() {
 ;;;-------------------------------------------------------------------------;;;
 
 monitoringMessageHandler(category, data) {
-	if (InStr(data, "logMessage") = 1) {
-		data := StrSplit(StrSplit(data, ":", , 2)[2], ";", " `t", 5)
+	if vStartupFinished
+		if (InStr(data, "logMessage") = 1) {
+			data := StrSplit(StrSplit(data, ":", , 2)[2], ";", " `t", 5)
 
-		return withProtection("systemMonitor", "LogMessage", data[1], data[2], data[3], data[4])
-	}
-	else
-		return functionMessageHandler(category, data)
+			return withProtection("systemMonitor", "LogMessage", data[1], data[2], data[3], data[4])
+		}
+		else
+			return functionMessageHandler(category, data)
 }
 
 

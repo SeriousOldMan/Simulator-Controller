@@ -1655,6 +1655,35 @@ updateInstallationForV392() {
 	}
 }
 
+updateConfigurationForV463() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileRead text, *t %kUserHomeDirectory%Setup\Setup.data
+
+		text := StrReplace(text, "Class=MutedAssistant", "Class=SilentAssistant")
+		text := StrReplace(text, "Arguments=SilentSpotter###Race Spotter`n", "Arguments=SilentSpotter###Race Spotter###1`n")
+		text := StrReplace(text, "Arguments=SilentStrategist###Race Strategist`n", "Arguments=SilentStrategist###Race Strategist###1`n")
+		text := StrReplace(text, "Arguments=SilentEngineer###Race Engineer`n", "Arguments=SilentEngineer###Race Engineer###1`n")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
+	}
+}
+
+updateConfigurationForV460() {
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		FileRead text, %kUserHomeDirectory%Setup\Setup.data
+
+		text := StrReplace(text, "MutedEngineer", "SilentEngineer")
+		text := StrReplace(text, "MutedStrategist", "SilentStrategist")
+		text := StrReplace(text, "MutedSpotter", "SilentSpotter")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
+	}
+}
+
 updateConfigurationForV455() {
 	local configuration, subtitle
 
@@ -2025,20 +2054,6 @@ clearWearFields(database, table, id) {
 
 		if changed
 			database.changed(table)
-	}
-}
-
-updateConfigurationForV460() {
-	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		FileRead text, %kUserHomeDirectory%Setup\Setup.data
-
-		text := StrReplace(text, "MutedEngineer", "SilentEngineer")
-		text := StrReplace(text, "MutedStrategist", "SilentStrategist")
-		text := StrReplace(text, "MutedSpotter", "SilentSpotter")
-
-		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
-
-		FileAppend %text%, %kUserHomeDirectory%Setup\Setup.data, UTF-16
 	}
 }
 

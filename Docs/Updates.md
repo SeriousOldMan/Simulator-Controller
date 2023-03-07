@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 4.6.3
 
-Everything handled automatically.
+A new controller action ["ActiveCars"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) has been introduced for the Race Strategist and the Race Spotter. If you want to use this new command and are using a Stream Deck as well, you might have to reload the Stream Deck icon preset using "Simulator Setup" in case the automatic update fails, so that the icon ("CALL_Cars.png") for the new action is available.
 
 ***
 

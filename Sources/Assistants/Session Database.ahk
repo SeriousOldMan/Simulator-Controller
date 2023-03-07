@@ -3266,12 +3266,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			settingsDB := new SettingsDatabase()
 
-			settingsDB.removeSettingValue(this.SelectedSimulator
-										, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-										, this.iSettings[selected][1], this.iSettings[selected][2])
+			if ((this.iSettings[selected][1] != section) || (this.iSettings[selected][2] != key)) {
+				settingsDB.removeSettingValue(this.SelectedSimulator
+											, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+											, this.iSettings[selected][1], this.iSettings[selected][2])
 
-			this.iSettings[selected][1] := section
-			this.iSettings[selected][2] := key
+				this.iSettings[selected][1] := section
+				this.iSettings[selected][2] := key
+			}
 
 			settingsDB.setSettingValue(this.SelectedSimulator
 									 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
@@ -5169,115 +5171,117 @@ updateNotes() {
 }
 
 chooseSetting() {
-	local editor, window, defaultListView, selected, setting, value, settings, section, key, ignore, candidate
+	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
+		Task.startTask("chooseSettingAsync")
+}
+
+chooseSettingAsync() {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+	local defaultListView, selected, setting, value, settings, section, key, ignore, candidate
 	local labels, descriptor, type
 
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
-		editor := SessionDatabaseEditor.Instance
-		window := editor.Window
+	Gui %window%:Default
 
-		Gui %window%:Default
+	defaultListView := A_DefaultListView
 
-		defaultListView := A_DefaultListView
+	try {
+		Gui ListView, % editor.SettingsListView
 
-		try {
-			Gui ListView, % editor.SettingsListView
+		selected := LV_GetNext(0)
 
-			selected := LV_GetNext(0)
+		if !selected
+			return
 
-			if !selected
-				return
+		LV_GetText(setting, selected, 1)
+		LV_GetText(value, selected, 2)
 
-			LV_GetText(setting, selected, 1)
-			LV_GetText(value, selected, 2)
+		settings := editor.getAvailableSettings(selected)
 
-			settings := editor.getAvailableSettings(selected)
+		section := false
+		key := false
 
-			section := false
-			key := false
+		for ignore, candidate in settings
+			if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
+				section := candidate[1]
+				key := candidate[2]
 
-			for ignore, candidate in settings
-				if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
-					section := candidate[1]
-					key := candidate[2]
-
-					break
-				}
-
-			labels := []
-
-			for ignore, descriptor in settings
-				labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
-
-			bubbleSort(labels)
-
-			GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
-			GuiControl Choose, settingDropDown, % inList(labels, setting)
-
-			ignore := false
-
-			type := editor.getSettingType(section, key, ignore)
-
-			if IsObject(type) {
-				GuiControl Hide, settingValueEdit
-				GuiControl Hide, settingValueText
-				GuiControl Hide, settingValueCheck
-				GuiControl Show, settingValueDropDown
-				GuiControl Enable, settingValueDropDown
-
-				labels := map(type, "translate")
-
-				GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-				GuiControl Choose, settingValueDropDown, % inList(labels, value)
-			}
-			else if (type = "Boolean") {
-				GuiControl Hide, settingValueDropDown
-				GuiControl Hide, settingValueEdit
-				GuiControl Hide, settingValueText
-				GuiControl Show, settingValueCheck
-				GuiControl Enable, settingValueCheck
-
-				GuiControlGet settingValueCheck
-
-				if (settingValueCheck != value)
-					GuiControl, , settingValueCheck, % (value = "x") ? true : false
-			}
-			else if (type = "Text") {
-				GuiControl Hide, settingValueDropDown
-				GuiControl Hide, settingValueCheck
-				GuiControl Hide, settingValueEdit
-				GuiControl Show, settingValueText
-				GuiControl Enable, settingValueText
-
-				GuiControlGet settingValueText
-
-				if (settingValueText != value) {
-					settingValueText := value
-
-					GuiControl, , settingValueText, %value%
-				}
-			}
-			else {
-				GuiControl Hide, settingValueDropDown
-				GuiControl Hide, settingValueCheck
-				GuiControl Hide, settingValueText
-				GuiControl Show, settingValueEdit
-				GuiControl Enable, settingValueEdit
-
-				GuiControlGet settingValueEdit
-
-				if (settingValueEdit != value) {
-					settingValueEdit := value
-
-					GuiControl, , settingValueEdit, %value%
-				}
+				break
 			}
 
-			editor.updateState()
+		labels := []
+
+		for ignore, descriptor in settings
+			labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
+
+		bubbleSort(labels)
+
+		GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
+		GuiControl Choose, settingDropDown, % inList(labels, setting)
+
+		ignore := false
+
+		type := editor.getSettingType(section, key, ignore)
+
+		if IsObject(type) {
+			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueText
+			GuiControl Hide, settingValueCheck
+			GuiControl Show, settingValueDropDown
+			GuiControl Enable, settingValueDropDown
+
+			labels := map(type, "translate")
+
+			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
+			GuiControl Choose, settingValueDropDown, % inList(labels, value)
 		}
-		finally {
-			Gui ListView, %defaultListView%
+		else if (type = "Boolean") {
+			GuiControl Hide, settingValueDropDown
+			GuiControl Hide, settingValueEdit
+			GuiControl Hide, settingValueText
+			GuiControl Show, settingValueCheck
+			GuiControl Enable, settingValueCheck
+
+			GuiControlGet settingValueCheck
+
+			if (settingValueCheck != value)
+				GuiControl, , settingValueCheck, % (value = "x") ? true : false
 		}
+		else if (type = "Text") {
+			GuiControl Hide, settingValueDropDown
+			GuiControl Hide, settingValueCheck
+			GuiControl Hide, settingValueEdit
+			GuiControl Show, settingValueText
+			GuiControl Enable, settingValueText
+
+			GuiControlGet settingValueText
+
+			if (settingValueText != value) {
+				settingValueText := value
+
+				GuiControl, , settingValueText, %value%
+			}
+		}
+		else {
+			GuiControl Hide, settingValueDropDown
+			GuiControl Hide, settingValueCheck
+			GuiControl Hide, settingValueText
+			GuiControl Show, settingValueEdit
+			GuiControl Enable, settingValueEdit
+
+			GuiControlGet settingValueEdit
+
+			if (settingValueEdit != value) {
+				settingValueEdit := value
+
+				GuiControl, , settingValueEdit, %value%
+			}
+		}
+
+		editor.updateState()
+	}
+	finally {
+		Gui ListView, %defaultListView%
 	}
 }
 
@@ -5404,6 +5408,10 @@ deleteSetting() {
 }
 
 selectSetting() {
+	Task.startTask("selectSettingAsync")
+}
+
+selectSettingAsync() {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
 	local defaultListView, selected, settings, section, key, ignore, setting, type, value, default, labels
@@ -5496,6 +5504,10 @@ selectSetting() {
 }
 
 changeSetting() {
+	Task.startTask("changeSettingAsync")
+}
+
+changeSettingAsync() {
 	local editor := SessionDatabaseEditor.Instance
 	local window, defaultListView, selected, settings, section, key, ignore, setting
 	local type, value, oldValue

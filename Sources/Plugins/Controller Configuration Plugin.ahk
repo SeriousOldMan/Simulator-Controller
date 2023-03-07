@@ -334,7 +334,7 @@ class FunctionsList extends ConfigurationItemList {
 
 		Gui %window%:Font, Underline, Arial
 
-		Gui %window%:Add, Text, x24 y450 w83 h23 cBlue gopenActionsDocumentation, % translate("Action(s) (optional)")
+		Gui %window%:Add, Text, x24 y450 w95 h23 cBlue gopenActionsDocumentation, % translate("Action(s) (optional)")
 
 		Gui %window%:Font, Norm, Arial
 

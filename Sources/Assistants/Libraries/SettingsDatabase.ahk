@@ -253,6 +253,7 @@ class SettingsDatabase extends SessionDatabase {
 	setSettingValue(simulator, car, track, weather, section, key, value) {
 		local database := this.getSettingsDatabase(simulator, "User")
 		local tries := 5
+		local entry
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
@@ -260,10 +261,17 @@ class SettingsDatabase extends SessionDatabase {
 		while (tries-- > 0) {
 			if database.lock("Settings", false)
 				try {
-					database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
-											  , Func("always").Bind(true))
+					entry := database.query("Settings", {Where: {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}})
 
-					database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
+					if (entry.Length() > 0) {
+						if (entry.Value != value) {
+							entry.Value := value
+
+							database.changed("Settings")
+						}
+					}
+					else
+						database.add("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key, Value: value})
 
 					return
 				}

@@ -253,6 +253,7 @@ class SettingsDatabase extends SessionDatabase {
 	setSettingValue(simulator, car, track, weather, section, key, value) {
 		local database := this.getSettingsDatabase(simulator, "User")
 		local tries := 5
+		local cValue := value
 		local entry
 
 		car := this.getCarCode(simulator, car)
@@ -264,8 +265,8 @@ class SettingsDatabase extends SessionDatabase {
 					entry := database.query("Settings", {Where: {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}})
 
 					if (entry.Length() > 0) {
-						if (entry.Value != value) {
-							entry.Value := value
+						if (entry[1].Value != cValue) {
+							entry[1].Value := value
 
 							database.changed("Settings")
 						}

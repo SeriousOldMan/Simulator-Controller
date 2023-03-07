@@ -3266,12 +3266,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			settingsDB := new SettingsDatabase()
 
-			settingsDB.removeSettingValue(this.SelectedSimulator
-										, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-										, this.iSettings[selected][1], this.iSettings[selected][2])
+			if ((this.iSettings[selected][1] != section) || (this.iSettings[selected][2] != key)) {
+				settingsDB.removeSettingValue(this.SelectedSimulator
+											, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+											, this.iSettings[selected][1], this.iSettings[selected][2])
 
-			this.iSettings[selected][1] := section
-			this.iSettings[selected][2] := key
+				this.iSettings[selected][1] := section
+				this.iSettings[selected][2] := key
+			}
 
 			settingsDB.setSettingValue(this.SelectedSimulator
 									 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]

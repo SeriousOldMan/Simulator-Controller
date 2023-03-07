@@ -94,6 +94,8 @@ Announcements=weather warnings
 	[(TellMe) the gap to the {leading car, leader}, (WhatIs) the gap to the {leading car, leader}, How big is the gap to the {leading car, leader}]
 
 	[(TellMe) the {current lap, lap} times, (WhatAre) the {current lap, lap} times]
+	
+	[(TellMe) the number of {cars, cars on the track, cars in the session, active cars, cars still active}, (WhatAre) the number of {cars, cars on the track, cars in the session}, How many cars {are, are still} {active, on the track, in the session}]
 
 3. Pitstop
 

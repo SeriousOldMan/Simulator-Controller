@@ -3,11 +3,15 @@
   2. Documentation updates, as always
   3. Multiple controller actions can be bound to a single custom voice command.
   4. Multiple functions can be executed by a custom controller function.
-  5. Increased performance of lap update in "Race Center".
+  5. Increased performance of lap update in "Race Center" in low latency situations.
   6. The Spotter informas you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
   7. Improved detection of retired cars in "Race Reports" and "Race Center".
   8. Fixed potential race condition in session database which leads to "Session Database" freezing while editing settings.
-
+  9. The update procedure for Release 4.6.0 had a bug, which could result in the MutedAssistant preset to be non-functional after the update. This has been fixed with this release.
+  10. New voice command for requesting the number of active cars in a session from the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) or the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)).
+  11. New information request controller action "ActiveCars" for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter).
+  12. New Stream Deck icon for the "ActiveCars" information request action.
+  
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

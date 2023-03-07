@@ -5,6 +5,7 @@
 	 - Drivers
 	 - Number of pitstops
 	 - Relative performance
+  2. Support for new simulators
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*
@@ -14,8 +15,6 @@
   2. Support for Full Course Yellow rules in the Assistants
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
-  5. Ability to ask how many cars are left in the race
-  6. Spotter informs about pitstops of opponents
 
 #### Setup Advisor
   1. General detection of counter steering in the telemetry analyzer

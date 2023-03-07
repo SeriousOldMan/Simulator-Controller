@@ -94,15 +94,11 @@ temporaryFileName(name, extension) {
 }
 
 deleteFile(fileName, backup := false) {
-	if backup
-		try {
-			FileMove %fileName%, %fileName%.bak, 1
-		}
-		catch exception {
-		}
-
 	try {
-		FileDelete %fileName%
+		if backup
+			FileMove %fileName%, %fileName%.bak, 1
+		else
+			FileDelete %fileName%
 
 		return !ErrorLevel
 	}

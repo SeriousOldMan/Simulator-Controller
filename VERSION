@@ -1,8 +1,8 @@
 [Development]
-Version=4.6.3.0-dev
+Version=4.6.3.0-beta
 Target=4.6.3.0-release
 Date=03/07/2023
-Download=https://www.dropbox.com/s/z42jy4ko7nrbvlo/Simulator%20Controller%204.6.3.0-dev.zip?dl=1
+Download=https://www.dropbox.com/s/f3s15hdcu1omm9a/Simulator%20Controller%204.6.3.0-beta.zip?dl=1
 Changes=Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center", Fixed potential race condition in session database, Fixed update procedure for SilentAssistant, New voice command for requesting the number of active cars in a session, New information request action "ActiveCars" for Race Strategist and Race Spotter, New Stream Deck icon for the "ActiveCars" information request action, New car models for "Setup Advisor"
 [Release]
 Version=4.6.2.0-release
@@ -13,4 +13,4 @@ Changes=Better session end detection for practice sessions when your standing in
 Type=Development
 [Version]
 Release=4.6.2.0-release
-Development=4.6.3.0-dev
+Development=4.6.3.0-beta

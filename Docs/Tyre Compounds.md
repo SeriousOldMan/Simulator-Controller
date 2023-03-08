@@ -10,9 +10,9 @@ Let's start easy, with a compound mapping. A compound rule maps an internal iden
 
 This maps the compound identifier "Hard" from *RaceRoom Racing Experience* to the identifier "Dry (H)" which is used in Simulator Controller. The set of supported compound identifiers (on the right side of the "->" in the above example) in Simulator Controller is quite long:
 
-	Wet
-	Intermediate
-	Dry
+	Wet (Black)
+	Intermediate (Black)
+	Dry (Black)
 	Wet (S)
 	Wet (M)
 	Wet (H)
@@ -30,9 +30,9 @@ This maps the compound identifier "Hard" from *RaceRoom Racing Experience* to th
 	Dry (Green)
 	Dry (Blue)
 
-The list of internal identifiers for a given race simulator (on the left side of the "->" in the above example) is potentially endless.
+Note: *Black* is used whenever a simulator does not provide different compound mixtures. Currently, this is the case especially for *Assetto Corsa Competizione*, which provides only one dry and one wet tyre compound. These compounds can also be abbreviated by ommitting the "(Black)" suffix, naming them simply "Dry" or "Wet" or "Immediate".
 
-Most of the time, there are more than one tyre compound available for a given car. Potentially the set of available tyre compounds might even vary depending on a given track, but this is a very special case. Let's take a look at two examples with a couple of available tyre compounds:
+As you probably expect, the list of internal identifiers for a given race simulator (on the left side of the "->" in the above example) is potentially endless. Most of the time, there are more than one tyre compound available for a given car. Potentially the set of available tyre compounds might even vary depending on a given track, but this is a very special case. Let's take a look at two examples with a couple of available tyre compounds:
 
 	Soft->Dry (S);Medium->Dry (M);Hard->Dry (H)
 	

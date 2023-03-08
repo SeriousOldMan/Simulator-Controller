@@ -12,6 +12,10 @@
   11. New voice command for requesting the number of active cars in a session from the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Strategist-Commands-(EN)) or the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Spotter-Commands-(EN)).
   12. New information request controller action "ActiveCars" for the [Race Strategist](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the [Race Spotter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter).
   13. New Stream Deck icon for the "ActiveCars" information request action.
+  14. Fixed toe values in meta data for "Audi TT RS VLN" in *Assetto Corsa*
+  15. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Audi TT Cup
   
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always

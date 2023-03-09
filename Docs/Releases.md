@@ -14,7 +14,8 @@
   13. New Stream Deck icon for the "ActiveCars" information request action.
   14. An *Input* section has been added to the [audio routing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#audio-routing) capabilities, which allows you to configure the audio input device(s) to use for your different voice commands.
   15. Fixed toe values in meta data for "Audi TT RS VLN" in *Assetto Corsa*.
-  16. New car models for "Setup Advisor":
+  16. A new script in the *Utilities* folder allows a fast startup of the voice command test mode.
+  17. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT Cup
   

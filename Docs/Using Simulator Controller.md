@@ -100,7 +100,7 @@ Please don't forget to press the Push-To-Talk button at the end of your speech, 
 
 #### Testing voice configuration and voice commands
 
-*After* you have finished all the required [installation and configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) steps (especially for the [voice support](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation) of the Assistants), you can test the dialog with two different Assistants. To do this, please open a Windows command shell (type Windows-R => cmd => Return), go to the *Binaries* folder of the Simulator Controller distribution and enter the following commands:
+*After* you have finished all the required [installation and configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) steps (especially for the [voice support](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#installation) of the Assistants), you can test the dialog with two different Assistants. To do this, please open a Windows command shell (type Windows-R => cmd => Return), go to the *Binaries* folder of the Simulator Controller distribution and enter the following commands (or go the the *Utilities* folder in the installation folder and double-click the file "Voice Test.bat"):
 
 	D:\Controller\Binaries>"Voice Server.exe" -Debug true
 
@@ -178,7 +178,7 @@ First you have to identify the default audio input device, which should be activ
 
 After defining the default input device, you can configure the voice input devices for all Simulator Controller dialog partners, first and foremost the Race Assistants. A special listener is the *Activation* object, which listens to the activation phrases, as you might expect. Typically you will use here the same input device here, you use to talk to the Assistants. Additionally, if you are using voice commands to trigger actions in Simulator Controller, for example switching between track automations, you can also set the input audio device for the *Controller* object as well.
  
-Similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device.
+Similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device. Please note, that changing the input audio device is only supported when the additional software [NirCmd](https://www.nirsoft.net/utils/nircmd.html) is installed and configured.
    
 ## Monitoring health and activities
 

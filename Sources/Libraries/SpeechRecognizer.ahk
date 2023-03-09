@@ -75,7 +75,7 @@ global kAzureLanguages := {"af-ZA": "Afrikaans (South Africa)"
 
 initializeAzureLanguages() {
 	local culture, name
-	
+
 	for culture, name in {"et-EE": "Estonian (Estonia)"
 						, "fil-PH": "Filipino (Philippines)"
 						, "fi-FI": "Finnish (Finland)"
@@ -169,8 +169,17 @@ class SpeechRecognizer {
 	iEngine := false
 	iChoices := {}
 
+	iRecognizerAudioDevice := false
+	iDefaultAudioDevice := false
+
 	_grammarCallbacks := {}
 	_grammars := {}
+
+	Routing[] {
+		Get {
+			return "Standard"
+		}
+	}
 
 	Recognizers[language := false] {
 		Get {
@@ -192,7 +201,7 @@ class SpeechRecognizer {
 	__New(engine, recognizer := false, language := false, silent := false) {
 		local dllName := "Speech.Recognizer.dll"
 		local dllFile := kBinariesDirectory . dllName
-		local instance, choices, found, ignore, recognizerDescriptor
+		local instance, choices, found, ignore, recognizerDescriptor, configuration
 
 		this.iEngine := engine
 		this.Instance := false
@@ -205,9 +214,17 @@ class SpeechRecognizer {
 				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
+			configuration := readConfiguration(kUserConfigDirectory . "Audio Settings.ini")
+
+			this.iRecognizerAudioDevice := getConfigurationValue(configuration, "Input", this.Routing . ".AudioDevice", false)
+			this.iDefaultAudioDevice := getConfigurationValue(configuration, "Input", "Default.AudioDevice", this.iRecognizerAudioDevice)
+
 			instance := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
 
 			this.Instance := instance
+
+			; if this.iRecognizerAudioDevice
+			; 	instance.SetDevice(this.iRecognizerAudioDevice)
 
 			if (InStr(engine, "Azure|") == 1) {
 				this.iEngine := "Azure"
@@ -339,11 +356,40 @@ class SpeechRecognizer {
 	}
 
 	startRecognizer() {
+		local audioDevice
+
+		if (this.iRecognizerAudioDevice && kNirCmd) {
+			audioDevice := this.iRecognizerAudioDevice
+
+			try {
+				Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
+			}
+			catch exception {
+				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+
 		return (this.Instance ? this.Instance.StartRecognizer() : false)
 	}
 
 	stopRecognizer() {
-		return (this.Instance ? this.Instance.StopRecognizer() : false)
+		try {
+			return (this.Instance ? this.Instance.StopRecognizer() : false)
+		}
+		finally {
+			if (this.iDefaultAudioDevice && kNirCmd) {
+				audioDevice := this.iDefaultAudioDevice
+
+				try {
+					Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
+				}
+				catch exception {
+					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+				}
+			}
+		}
 	}
 
 	getRecognizerList() {

@@ -1138,7 +1138,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		static isRunning := "__Undefined__"
 
 		if (isRunning == kUndefined)
-			isRunning := this.Application.isRunning()
+			isRunning := !this.Application.isRunning()
 
 		protectionOn()
 

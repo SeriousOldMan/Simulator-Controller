@@ -337,6 +337,28 @@ class VoiceManager {
 		}
 	}
 
+	class LocalRecognizer extends SpeechRecognizer {
+		iVoiceManager := false
+
+		Routing[] {
+			Get {
+				return this.VoiceManager.Routing
+			}
+		}
+
+		VoiceManager[] {
+			Get {
+				return this.iVoiceManager
+			}
+		}
+
+		__New(voiceManager, arguments*) {
+			this.iVoiceManager := voiceManager
+
+			base.__New(arguments*)
+		}
+	}
+
 	class VoiceContinuation {
 		iManager := false
 		iContinuation := false
@@ -688,7 +710,7 @@ class VoiceManager {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				recognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+				recognizer := new this.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language)
 
 				this.buildGrammars(recognizer, this.Language)
 

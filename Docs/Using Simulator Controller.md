@@ -163,6 +163,22 @@ Simulator Controller allows you to direct voice output to different audio device
 	Race Strategist.AudioDevice=Headphone
 
 *Headphone* is only an example for any audio device configured and named "Headphone" in the standard Windows settings. You only have to enter those lines, where you want to configure a non-default audio device, if not present the currently selected default audio device will be used.
+
+As you might expect, you can configure voice input as well. There are some additional things to consider, though, as you can see in the example below.
+
+	[Input]
+	Default.AudioDevice=Streaming
+	Activation.AudioDevice=Headphone
+	Race Spotter.AudioDevice=Headphone
+	Race Engineer.AudioDevice=Headphone
+	Race Strategist.AudioDevice=Headphone
+	Controller.AudioDevice=Headphone
+
+First you have to identify the default audio input device, which should be active whenever no voice input is captured by Simulator Controller (i.e. the Push-To-Talk button is not activated). This may be important, when you are using different microphones, for example, because you are streaming your race on a video platform. In the example above, this microphone device is named "Streaming". This setting must be identical to that you have chosen in the Windows settings, otherwise you won't get the desired results.
+
+After defining the default input device, you can configure the voice input devices for all Simulator Controller dialog partners, most and foremost the Race Assistants. A special listener is the *Activation* object, which listens to the activation phrases, as you might expect. Typically you will use here the same input device here, you use to talk to the Assistants. Additionally, if you are using voice commands to trigger actions in Simulator Controller, for example switching between track automations, you can also set the input audio device for the *Controller* object as well.
+ 
+Similar to the output settings shown above, you only have to enter those audio devices, which differ from the default audio device.
    
 ## Monitoring health and activities
 

@@ -124,10 +124,32 @@ class VoiceServer extends ConfigurationItem {
 				}
 			}
 
-			__New(voiceClient, synthesizer, speaker, language) {
+			__New(voiceClient, arguments*) {
 				this.iVoiceClient := voiceClient
 
-				base.__New(synthesizer, speaker, language)
+				base.__New(arguments*)
+			}
+		}
+
+		class ClientSpeechRecognizer extends SpeechRecognizer {
+			iVoiceClient := false
+
+			Routing[] {
+				Get {
+					return this.VoiceClient.Routing
+				}
+			}
+
+			VoiceClient[] {
+				Get {
+					return this.iVoiceClient
+				}
+			}
+
+			__New(voiceClient, arguments*) {
+				this.iVoiceClient := voiceClient
+
+				base.__New(arguments*)
 			}
 		}
 
@@ -278,7 +300,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
-					this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := new this.ClientSpeechRecognizer(this, this.Recognizer, this.Listener, this.Language)
 
 				return this.iSpeechRecognizer
 			}
@@ -476,6 +498,14 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
+	class ActivationSpeechRecognizer extends SpeechRecognizer {
+		Routing[] {
+			Get {
+				return "Activation"
+			}
+		}
+	}
+
 	Debug[option] {
 		Get {
 			return (this.iDebug & option)
@@ -565,20 +595,20 @@ class VoiceServer extends ConfigurationItem {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
-						this.iSpeechRecognizer := new SpeechRecognizer("Server", true, this.Language, true)
+						this.iSpeechRecognizer := new this.ActivationSpeechRecognizer("Server", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
 							throw "Server speech recognizer engine not installed..."
 					}
 					catch exception {
-						this.iSpeechRecognizer := new SpeechRecognizer("Desktop", true, this.Language, true)
+						this.iSpeechRecognizer := new this.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
 							throw "Desktop speech recognizer engine not installed..."
 					}
 				}
 				catch exception {
-					this.iSpeechRecognizer := new SpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := new this.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				}
 
 				if !this.PushToTalk

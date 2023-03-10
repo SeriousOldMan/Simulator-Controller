@@ -4,7 +4,7 @@
   3. Multiple controller actions can be bound to a single custom voice command.
   4. Multiple action functions can be executed by a custom controller function.
   5. Increased performance of lap update in "Race Center" in low latency situations.
-  6. The Spotter informas you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
+  6. The Spotter informs you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
   7. Improved detection of retired cars in "Race Reports" and "Race Center".
   8. Fixed potential race condition in session database which leads to "Session Database" freezing while editing settings.
   9. Added a mechanism that creates a *.bak file whenever a database file is updated.

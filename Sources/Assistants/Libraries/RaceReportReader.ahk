@@ -505,6 +505,7 @@ class RaceReportReader {
 							times.Push(string2Values(";", A_LoopReadLine))
 
 					times := correctEmptyValues(times, kNull)
+					times := correctLapTimes(times)
 				}
 			}
 			finally {
@@ -519,8 +520,8 @@ class RaceReportReader {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-extendedIsNull(value) {
-	return (isNull(value) || (value = "-") || (value = ""))
+extendedIsNull(value, allowZero := true) {
+	return (isNull(value) || (!allowZero && !value) || (value = "-") || (value = ""))
 }
 
 correctEmptyValues(table, default := "__Undefined__") {
@@ -536,6 +537,32 @@ correctEmptyValues(table, default := "__Undefined__") {
 	}
 
 	return table
+}
+
+correctLapTimes(times) {
+	local lastLapTimes := {}
+	local line, lapTime
+
+	loop % times.Length()
+	{
+		line := A_Index
+
+		loop % times[line].Length()
+		{
+			lapTime := times[line][A_Index]
+
+			if (lastLapTimes.HasKey(A_Index) && (times[line][A_Index] = lastLapTimes[A_Index][1])) {
+				if lastLapTimes[A_Index][2]
+					times[line][A_Index] := 0
+				else
+					lastLapTimes[A_Index][2] := true
+			}
+			else
+				lastLapTimes[A_Index] := [lapTime, false]
+		}
+	}
+
+	return times
 }
 
 comparePositions(c1, c2) {

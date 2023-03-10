@@ -655,7 +655,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		static isRunning := "__Undefined__"
 
 		if (isRunning == kUndefined)
-			isRunning := this.Application.isRunning()
+			isRunning := !this.Application.isRunning()
 
 		if ((isRunning != this.Application.isRunning()) && controller.isActive(this)) {
 			protectionOn()

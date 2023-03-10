@@ -2,7 +2,7 @@
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Multiple controller actions can be bound to a single custom voice command.
-  4. Multiple functions can be executed by a custom controller function.
+  4. Multiple action functions can be executed by a custom controller function.
   5. Increased performance of lap update in "Race Center" in low latency situations.
   6. The Spotter informas you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
   7. Improved detection of retired cars in "Race Reports" and "Race Center".

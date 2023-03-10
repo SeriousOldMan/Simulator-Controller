@@ -1,4 +1,4 @@
-## 4.6.3.0-release 03/10/23 (planned)
+## 4.6.3.0-release 03/10/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Multiple controller actions can be bound to a single custom voice command.

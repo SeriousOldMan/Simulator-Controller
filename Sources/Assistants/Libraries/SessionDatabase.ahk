@@ -970,7 +970,7 @@ class SessionDatabase extends ConfigurationItem {
 												   , kUndefined)
 			data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
 
-			if (compounds == kUndefined) {
+			if ((compounds == kUndefined) || (compounds = "")) {
 				compounds := getConfigurationValue(data, "Cars", car . ";" . track, kUndefined)
 
 				if (compounds == kUndefined)

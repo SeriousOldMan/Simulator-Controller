@@ -1071,7 +1071,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if knowledgeBase.getValue("Car." . car . ".InPitLane")
+		if (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 			speaker.speakPhrase("AheadCarInPit")
 		else if (delta != 0) {
 			speaker.beginTalk()
@@ -1107,7 +1107,7 @@ class RaceSpotter extends GridRaceAssistant {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car")
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
-				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 
 				if (delta = 0) {
 					if standard {
@@ -1166,7 +1166,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if knowledgeBase.getValue("Car." . car . ".InPitLane")
+		if (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 			speaker.speakPhrase("BehindCarInPit")
 		else if (delta != 0) {
 			speaker.beginTalk()
@@ -1204,7 +1204,7 @@ class RaceSpotter extends GridRaceAssistant {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
-				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 				lapped := false
 
 				if (delta = 0) {
@@ -3208,7 +3208,8 @@ class RaceSpotter extends GridRaceAssistant {
 																	 , getConfigurationValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
 											   , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
 											   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
-											   , getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false))
+											   , (getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false)
+											   || getConfigurationValue(data, "Position Data", prefix . ".InPit", false)))
 
 					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)

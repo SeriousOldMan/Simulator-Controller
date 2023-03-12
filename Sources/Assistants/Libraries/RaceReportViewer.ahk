@@ -1278,7 +1278,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 	local x, y, oldEncoding, owner
 	local lapsDef, laps, baseLap, lastLap, ignore, lap, yOption, headers, allDrivers, selectedDrivers
 	local sessionDB, simulator, ignore, driver, column1, column2, startLap, endLap, lap, index
-	local newLaps, newDrivers, rowNumber, classes, selectedClass
+	local newLaps, newDrivers, rowNumber, classes, selectedClass, valid
 
 	static allLapsRadio
 	static rangeLapsRadio
@@ -1504,6 +1504,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 					result["Laps"] := true
 				else {
 					laps := {}
+					valid := true
 
 					for ignore, lap in string2Values(";", rangeLapsEdit)
 						if InStr(lap, "-") {
@@ -1512,23 +1513,45 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 							endLap := lap[2]
 
 							if startLap is Integer
+							{
 								if endLap is Integer
-									if (endLap + 0) > (startLap + 0)
+								{
+									if (endLap = startLap)
+										laps[startLap] := startLap
+									else if (endLap < startLap)
+										loop {
+											index := endLap + A_Index - 1
+
+											laps[index] := index
+										} until (index = startLap)
+									else
 										loop {
 											index := startLap + A_Index - 1
 
 											laps[index] := index
 										} until (index = endLap)
+								}
+								else
+									valid := false
+							}
+							else
+								valid := false
 						}
 						else if lap is Integer
 							laps[lap] := lap
+						else
+							valid := false
 
-					newlaps := []
+					if valid {
+						newlaps := []
 
-					for lap, ignore in laps
-						newLaps.Push(lap)
+						for lap, ignore in laps
+							newLaps.Push(lap)
 
-					result["Laps"] := newLaps
+						result["Laps"] := newLaps
+					}
+					else
+						result["Laps"] := true
 				}
 			}
 

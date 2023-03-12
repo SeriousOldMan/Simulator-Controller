@@ -3767,7 +3767,8 @@ class RaceCenter extends ConfigurationItem {
 				displayFuel := fuel
 
 			LV_Add("", LV_GetCount() + 1, pitstopLap, displayNullValue(nextDriver), displayFuel
-					 , (compound = "-") ? compound : translate(compound(compound, compoundColor)), tyreSet
+					 , (compound = "-") ? compound : translate(compound(compound, compoundColor))
+					 , (tyreSet != 0) ? tyreSet : "-"
 					 , displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 
 			if (LV_GetCount() = 1) {
@@ -6983,12 +6984,13 @@ class RaceCenter extends ConfigurationItem {
 					if this.syncTrackMap()
 						newData := true
 
+				if newLaps
+					this.syncSessionStore()
+
 				if (newData || newLaps)
 					this.updateReports()
 
 				if newLaps {
-					this.syncSessionStore()
-
 					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
 						Gui ListView, % this.LapsListView
 
@@ -7941,7 +7943,7 @@ class RaceCenter extends ConfigurationItem {
 	loadPitstops() {
 		local window := this.Window
 		local currentListView, ignore, pitstop, repairBodywork, repairSuspension, repairEngine, pressures, pressure
-		local compound, compoundColor, fuel
+		local compound, compoundColor, tyreSet, fuel
 
 		Gui %window%:Default
 
@@ -7982,10 +7984,12 @@ class RaceCenter extends ConfigurationItem {
 
 				Gui ListView, % this.PitstopsListView
 
+				tyreSet := pitstop["Tyre.Set"]
+
 				LV_Add((pitstop.Status = "Planned") ? "" : "Check", A_Index
 					 , (pitstop.Lap = "-") ? "-" : (pitstop.Lap + 1), displayNullValue(pitstop["Driver.Next"]), fuel
 					 , (compound = "-") ? compound : translate(compound(compound, compoundColor))
-					 , pitstop["Tyre.Set"], values2String(", ", pressures*)
+					 , (tyreSet = 0) ? "-" : tyreSet, values2String(", ", pressures*)
 					 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
 			}
 
@@ -10020,7 +10024,7 @@ class RaceCenter extends ConfigurationItem {
 		local driverFornames := true
 		local driverSurnames := true
 		local driverNicknames := true
-		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopInfo
+		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
 
 		multiClass := this.getStandings(lap, cars, carIDs, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
 
@@ -10073,16 +10077,24 @@ class RaceCenter extends ConfigurationItem {
 				numPitstops := 0
 
 				if (pitstops.Length() > 0) {
+					pitstopLaps := []
+
 					for ignore, pitstop in pitstops
 						if (pitstop.Lap <= lapNr) {
 							numPitstops += 1
 
-							pitstopInfo := pitstop
+							if (numPitstops <= 2)
+								pitstopLaps.Push(pitstop.Lap)
 						}
 
-					if (numPitstops > 0)
-						pitstops := substituteVariables(translate("Total: %pitstops%, Last: Lap %lap%")
-													  , {pitstops: numPitstops, lap: pitstopInfo.Lap, seconds: pitstopInfo.Duration})
+					if (numPitstops > 0) {
+						pitstops := (numPitstops . A_Space . translate("["))
+
+						if (numPitstops > 2)
+							pitstops .= (translate("...") . translate(", "))
+
+						pitstops .= (values2String(", ", pitstopLaps*) . translate("]"))
+					}
 					else
 						pitstops := "-"
 				}

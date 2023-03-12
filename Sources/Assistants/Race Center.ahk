@@ -6540,7 +6540,7 @@ class RaceCenter extends ConfigurationItem {
 		local startLap := 1
 		local newData := false
 		local modifiedPitstops := []
-		local compound, hasServiceData, hasTyreData, nextLap, startLapCandidate, state, pitstop
+		local compound, hasServiceData, hasTyreData, nextLap, startLapCandidate, state, pitstop, pitstopNr
 		local driver, laps, compound, compoundColor, tyreSet, ignore, tyre, nextPitstop, nextLap, pitstopLap
 
 		if lastLap
@@ -6654,9 +6654,11 @@ class RaceCenter extends ConfigurationItem {
 						if (this.SelectedDetailReport = "Pitstops")
 							this.showPitstopsDetails()
 						else if (this.SelectedDetailReport = "Pitstop") {
-							Gui ListView, % rCenter.PitstopsListView
+							Gui ListView, % this.PitstopsListView
 
-							if inList(modifiedPitstops, LV_GetNext())
+							pitstopNr := LV_GetNext()
+
+							if inList(modifiedPitstops, pitstopNr)
 								this.showPitstopDetails(pitstopNr)
 						}
 				}

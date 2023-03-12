@@ -2512,7 +2512,7 @@ class RaceCenter extends ConfigurationItem {
 		local directory, ignore, entry
 
 		if clear
-			this.SessionStore.clear("Setups.Data", false)
+			this.SessionStore.clear("Setups.Data")
 
 		directory := temporaryFileName("Setups", "data")
 
@@ -10088,7 +10088,7 @@ class RaceCenter extends ConfigurationItem {
 						}
 
 					if (numPitstops > 0) {
-						pitstops := (numPitstops . A_Space . translate("["))
+						pitstops := (numPitstops . translate(" - ["))
 
 						if (numPitstops > 2)
 							pitstops .= (translate("...") . translate(", "))

@@ -376,6 +376,10 @@ getTableCSS() {
 			text-align: left;
 		}
 
+		.td-left {
+			text-align: left;
+		}
+
 		tfoot {
 			border-bottom: thin solid #BBB;
 		}

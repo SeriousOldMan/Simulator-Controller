@@ -2562,6 +2562,8 @@ class RaceCenter extends ConfigurationItem {
 
 					LV_Delete()
 
+					this.SessionStore.clear("Setups.Data")
+
 					this.iSelectedSetup := false
 
 					if (this.SelectedDetailReport = "Setups")
@@ -10083,14 +10085,14 @@ class RaceCenter extends ConfigurationItem {
 						if (pitstop.Lap <= lapNr) {
 							numPitstops += 1
 
-							if (numPitstops <= 2)
+							if (numPitstops <= 3)
 								pitstopLaps.Push(pitstop.Lap)
 						}
 
 					if (numPitstops > 0) {
-						pitstops := (numPitstops . A_Space . translate("["))
+						pitstops := (numPitstops . translate(":   ["))
 
-						if (numPitstops > 2)
+						if (numPitstops > 3)
 							pitstops .= (translate("...") . translate(", "))
 
 						pitstops .= (values2String(", ", pitstopLaps*) . translate("]"))
@@ -10101,7 +10103,7 @@ class RaceCenter extends ConfigurationItem {
 				else
 					pitstops := "-"
 
-				html .= ("<td class=""td-std"">" . pitstops . "</td></tr>")
+				html .= ("<td class=""td-std td-left"">" . pitstops . "</td></tr>")
 			}
 
 		html .= "</table>"

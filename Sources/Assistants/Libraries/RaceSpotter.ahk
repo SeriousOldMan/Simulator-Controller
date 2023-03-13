@@ -1071,7 +1071,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
+		if (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 			speaker.speakPhrase("AheadCarInPit")
 		else if (delta != 0) {
 			speaker.beginTalk()
@@ -1107,7 +1107,7 @@ class RaceSpotter extends GridRaceAssistant {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car")
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
-				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
 				if (delta = 0) {
 					if standard {
@@ -1166,7 +1166,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
+		if (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 			speaker.speakPhrase("BehindCarInPit")
 		else if (delta != 0) {
 			speaker.beginTalk()
@@ -1204,7 +1204,7 @@ class RaceSpotter extends GridRaceAssistant {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
-				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 				lapped := false
 
 				if (delta = 0) {

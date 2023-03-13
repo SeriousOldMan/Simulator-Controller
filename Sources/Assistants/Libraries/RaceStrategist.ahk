@@ -759,7 +759,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Ahead.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if knowledgeBase.getValue("Car." . car . ".InPitLane")
+		if (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 			speaker.speakPhrase("AheadCarInPit")
 		else if (delta != 0) {
 			speaker.beginTalk()
@@ -796,7 +796,7 @@ class RaceStrategist extends GridRaceAssistant {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Ahead.Car")
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
-				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 
 				if (delta = 0) {
 					speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
@@ -837,7 +837,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local delta := Abs(knowledgeBase.getValue("Position.Track.Behind.Delta", 0))
 		local lap, driverLap, otherLap
 
-		if knowledgeBase.getValue("Car." . car . ".InPitLane")
+		if (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 			speaker.speakPhrase("BehindCarInPit")
 		else if (delta != 0) {
 			speaker.beginTalk()
@@ -874,7 +874,7 @@ class RaceStrategist extends GridRaceAssistant {
 				lap := knowledgeBase.getValue("Lap")
 				car := knowledgeBase.getValue("Position.Standings.Class.Behind.Car")
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Behind.Delta", 0) / 1000)
-				inPit := knowledgeBase.getValue("Car." . car . ".InPitLane")
+				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane") || knowledgeBase.getValue("Car." . car . ".InPit"))
 				lapped := false
 
 				if (delta = 0) {

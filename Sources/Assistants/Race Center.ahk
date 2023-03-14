@@ -2512,7 +2512,7 @@ class RaceCenter extends ConfigurationItem {
 		local directory, ignore, entry
 
 		if clear
-			this.SessionStore.clear("Setups.Data", false)
+			this.SessionStore.clear("Setups.Data")
 
 		directory := temporaryFileName("Setups", "data")
 

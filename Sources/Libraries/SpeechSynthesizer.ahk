@@ -60,14 +60,14 @@ class SpeechSynthesizer {
 	iCache := {}
 	iCacheDirectory := false
 
-	static sSoundPlayerInitialized := false
+	static sAudioRoutingInitialized := false
+
+	static sAudioDriver := false
+	static sAudioDevice := false
 
 	iSoundPlayer := false
 	iSoundPlayerLevel := 1.0
 	iPlaysCacheFile := false
-
-	iAudioDriver := false
-	iAudioDevice := false
 
 	iSpeechStatusCallback := false
 
@@ -265,13 +265,13 @@ class SpeechSynthesizer {
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
 
 		if kSox {
-			if !SpeechSynthesizer.sSoundPlayerInitialized {
-				SpeechSynthesizer.sSoundPlayerInitialized := true
+			if !SpeechSynthesizer.sAudioRoutingInitialized {
+				SpeechSynthesizer.sAudioRoutingInitialized := true
 
 				configuration := readConfiguration(kUserConfigDirectory . "Audio Settings.ini")
 
-				this.iAudioDriver := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDriver", false)
-				this.iAudioDevice := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDevice", false)
+				SpeechSynthesizer.sAudioDriver := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDriver", false)
+				SpeechSynthesizer.sAudioDevice := getConfigurationValue(configuration, "Output", this.Routing . ".AudioDevice", false)
 			}
 
 			for ignore, player in ["SoundPlayerSync.exe", "SoundPlayerAsync.exe"]
@@ -351,7 +351,7 @@ class SpeechSynthesizer {
 
 			SplitPath kSox, , workingDirectory
 
-			option := (this.iAudioDevice ? ("""" . this.iAudioDevice . """") : "")
+			option := (SpeechSynthesizer.sAudioDevice ? ("""" . SpeechSynthesizer.sAudioDevice . """") : "")
 
 			Run "%kTempDirectory%%player%" "%soundFile%" -t waveaudio %option%, %workingDirectory%, HIDE, pid
 

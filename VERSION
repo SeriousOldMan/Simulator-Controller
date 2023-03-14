@@ -1,9 +1,9 @@
 [Development]
 Version=4.6.4.0-dev
 Target=4.6.4.0-release
-Date=03/13/2023
+Date=03/14/2023
 Download=
-Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Fixed german grammars for Spotter and Strategist
+Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed german grammars for Spotter and Strategist
 [Release]
 Version=4.6.3.0-release
 Date=03/10/2023

@@ -1,9 +1,9 @@
 [Development]
-Version=4.6.4.0-dev
-Target=4.6.4.0-release
-Date=03/14/2023
+Version=4.6.3.1-dev
+Target=4.6.3.1-release
+Date=03/15/2023
 Download=
-Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted
+Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor"
 [Release]
 Version=4.6.3.0-release
 Date=03/10/2023
@@ -13,4 +13,4 @@ Changes=Allow multiple actions for a custom voice command, Allow multiple action
 Type=Development
 [Version]
 Release=4.6.3.0-release
-Development=4.6.4.0-dev
+Development=4.6.3.1-dev

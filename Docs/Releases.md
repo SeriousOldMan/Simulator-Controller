@@ -1,3 +1,10 @@
+## 4.6.3.1-release 03/17/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Lamborghini Aventador SV
+
 ## 4.6.3.0-release 03/10/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

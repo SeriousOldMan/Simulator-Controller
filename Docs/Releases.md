@@ -1,7 +1,12 @@
 ## 4.6.3.1-release 03/17/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
-  3. New car models for "Setup Advisor":
+  3. Improved detection of retired cars in "Race Reports" and "Race Center".
+  4. Improved display of pitstops in "Race Center".
+  5. Fixed a bug in audio routing where a route was forgotten when an Assistant restarted.
+  6. Fixed german grammars for Spotter and Strategist.
+  7. Fixed the Spotter announcing a 0 time penalty in *Assetto Corsa Competizione*.
+  8. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Lamborghini Aventador SV
 

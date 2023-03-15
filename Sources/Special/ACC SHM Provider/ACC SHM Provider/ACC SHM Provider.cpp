@@ -245,7 +245,7 @@ inline const string getPenalty(PenaltyShortcut penalty) {
 		if (gf->penaltyTime > 0)
 			return "Time";
 		else
-			return "false";
+			return "";
 	}
 }
 

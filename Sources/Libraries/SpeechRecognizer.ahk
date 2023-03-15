@@ -169,8 +169,9 @@ class SpeechRecognizer {
 	iEngine := false
 	iChoices := {}
 
-	iRecognizerAudioDevice := false
-	iDefaultAudioDevice := false
+	static sAudioRoutingInitialized := false
+	static sRecognizerAudioDevice := false
+	static sDefaultAudioDevice := false
 
 	_grammarCallbacks := {}
 	_grammars := {}
@@ -214,13 +215,17 @@ class SpeechRecognizer {
 				throw "Unable to find Speech.Recognizer.dll in " . kBinariesDirectory . "..."
 			}
 
-			configuration := readConfiguration(kUserConfigDirectory . "Audio Settings.ini")
+			if !SpeechRecognizer.sAudioRoutingInitialized {
+				SpeechRecognizer.sAudioRoutingInitialized := true
 
-			this.iRecognizerAudioDevice := getConfigurationValue(configuration, "Input", this.Routing . ".AudioDevice", false)
-			this.iDefaultAudioDevice := getConfigurationValue(configuration, "Input", "Default.AudioDevice", this.iRecognizerAudioDevice)
+				configuration := readConfiguration(kUserConfigDirectory . "Audio Settings.ini")
 
-			if (this.iRecognizerAudioDevice && kNirCmd) {
-				audioDevice := this.iRecognizerAudioDevice
+				SpeechRecognizer.sRecognizerAudioDevice := getConfigurationValue(configuration, "Input", this.Routing . ".AudioDevice", false)
+				SpeechRecognizer.sDefaultAudioDevice := getConfigurationValue(configuration, "Input", "Default.AudioDevice", SpeechRecognizer.sRecognizerAudioDevice)
+			}
+
+			if (SpeechRecognizer.sRecognizerAudioDevice && kNirCmd) {
+				audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
 				try {
 					Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
@@ -321,8 +326,8 @@ class SpeechRecognizer {
 			this.Instance := false
 		}
 		finally {
-			if (this.iDefaultAudioDevice && kNirCmd) {
-				audioDevice := this.iDefaultAudioDevice
+			if (SpeechRecognizer.sDefaultAudioDevice && kNirCmd) {
+				audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 				try {
 					Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
@@ -380,8 +385,8 @@ class SpeechRecognizer {
 	startRecognizer() {
 		local audioDevice
 
-		if (this.iRecognizerAudioDevice && kNirCmd) {
-			audioDevice := this.iRecognizerAudioDevice
+		if (SpeechRecognizer.sRecognizerAudioDevice && kNirCmd) {
+			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
 			try {
 				Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
@@ -402,8 +407,8 @@ class SpeechRecognizer {
 			return (this.Instance ? this.Instance.StopRecognizer() : false)
 		}
 		finally {
-			if (this.iDefaultAudioDevice && kNirCmd) {
-				audioDevice := this.iDefaultAudioDevice
+			if (SpeechRecognizer.sDefaultAudioDevice && kNirCmd) {
+				audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 				try {
 					Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"

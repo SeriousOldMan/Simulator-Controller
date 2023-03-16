@@ -252,20 +252,19 @@ class MessageManager extends PeriodicTask {
 
 		static ERROR_PIPE_CONNECTED := 535
 		static ERROR_PIPE_LISTENING := 536
-		static ptr
 
 		pipeName := "\\.\pipe\SC." . category
 
-		pipe := DllCall("CreateNamedPipe", "str", pipeName, "uint", 2, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, ptr, 0)
+		pipe := DllCall("CreateNamedPipe", "str", pipeName, "uint", 2, "uint", 0, "uint", 255, "uint", 1024, "uint", 1024, "uint", 0, "ptr", 0)
 
-		DllCall("ConnectNamedPipe", ptr, pipe, ptr, 0)
+		DllCall("ConnectNamedPipe", "ptr", pipe, "ptr", 0)
 
 		if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
 			category := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (category . ":" . data)
 
-			DllCall("WriteFile", ptr, pipe, "str", category, "uint", (StrLen(category) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, ptr, 0)
+			DllCall("WriteFile", "ptr", pipe, "str", category, "uint", (StrLen(category) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, "ptr", 0)
 
-			DllCall("CloseHandle", ptr, pipe)
+			DllCall("CloseHandle", "ptr", pipe)
 
 			return true
 		}

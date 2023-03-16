@@ -152,7 +152,7 @@ moveByMouse(window, descriptor := false) {
 		}
 	}
 	finally {
-		CoordMode Mouse, curCoordMode
+		CoordMode Mouse, %curCoordMode%
 	}
 }
 

@@ -23,7 +23,7 @@ substituteVariables(string, values := false) {
 			if endPos {
 				variable := Trim(SubStr(result, startPos, endPos - startPos))
 
-				value := (values && values.HasKey(variable)) ? values[variable] : %variable%
+				value := (values && values.Has(variable)) ? values[variable] : %variable%
 
 				result := StrReplace(result, "%" . variable . "%", value)
 			}

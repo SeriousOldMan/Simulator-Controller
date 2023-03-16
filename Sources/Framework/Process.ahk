@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Global Process Framework        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,9 +9,9 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
-#Include ..\Framework\GUI.ahk
-#Include ..\Framework\Message.ahk
-#Include ..\Framework\Progress.ahk
-#Include ..\Framework\Classes.ahk
-#Include ..\Framework\Startup.ahk
+#Include "..\Framework\Framework.ahk"
+#Include "..\Framework\GUI.ahk"
+#Include "..\Framework\Message.ahk"
+#Include "..\Framework\Progress.ahk"
+#Include "..\Framework\Classes.ahk"
+#Include "..\Framework\Startup.ahk"

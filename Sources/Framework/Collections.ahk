@@ -22,7 +22,7 @@ inList(list, value) {
 listEqual(list1, list2) {
 	local index, value
 
-	if (list1.Length() != list2.Length())
+	if (list1.Length != list2.Length)
 		return false
 	else
 		for index, value in list1
@@ -45,9 +45,9 @@ concatenate(lists*) {
 
 reverse(list) {
 	local result := []
-	local length := list.Length()
+	local length := list.Length
 
-	loop %length%
+	loop length
 		result.Push(list[length - (A_Index - 1)])
 
 	return result
@@ -93,7 +93,7 @@ do(list, function) {
 }
 
 combine(maps*) {
-	local result := {}
+	local result := Map()
 	local ignore, map, key, value
 
 	for ignore, map in maps
@@ -127,8 +127,8 @@ greaterComparator(a, b) {
 	return (a > b)
 }
 
-bubbleSort(ByRef array, comparator := "greaterComparator") {
-	local n := array.Length()
+bubbleSort(&array, comparator := "greaterComparator") {
+	local n := array.Length
 	local newN, i, j, lineI, lineJ
 
 	while (n > 1) {

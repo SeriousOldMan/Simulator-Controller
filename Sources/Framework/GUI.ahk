@@ -9,12 +9,12 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Debug.ahk
-#Include ..\Framework\Strings.ahk
-#Include ..\Framework\Localization.ahk
-#Include ..\Framework\Configuration.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\Strings.ahk"
+#Include "..\Framework\Localization.ahk"
+#Include "..\Framework\Configuration.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -92,54 +92,57 @@ fixIE(version := 0, exeName := "") {
 	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
 	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
 
-	if versions.HasKey(version)
+	if versions.Has(version)
 		version := versions[version]
 
 	if !exeName {
 		if A_IsCompiled
 			exeName := A_ScriptName
 		else
-			SplitPath A_AhkPath, exeName
+			SplitPath(A_AhkPath, &exeName)
 	}
 
-	RegRead previousValue, HKCU, %key%, %exeName%
+	previousValue := RegRead("HKCU\" . key, exeName, "")
 
 	if (version = "") {
-		RegDelete, HKCU, %key%, %exeName%
-		RegDelete, HKLM, %key%, %exeName%
+		RegDelete("HKCU\" . key, exeName)
+		RegDelete("HKLM\" . key, exeName)
 	}
 	else {
-		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
-		RegWrite, REG_DWORD, HKLM, %key%, %exeName%, %version%
+		RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
+		RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
 	}
 
 	return previousValue
 }
 
-moveByMouse(window, descriptor := false) {
+moveByMouse(dialog, descriptor := false) {
 	local curCoordMode := A_CoordModeMouse
 	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
 	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
 
-	if window is not Alpha
-		window := A_Gui
+	while isAlpha(dialog)
+		dialog := %dialog%
 
-	CoordMode Mouse, Screen
+	if !isInstance(dialog, Gui)
+		dialog := A_Gui
+
+	CoordMode("Mouse", "Screen")
 
 	try {
-		MouseGetPos anchorX, anchorY
-		WinGetPos winX, winY, w, h, A
+		MouseGetPos(&anchorX, &anchorY)
+		WinGetPos(&winX, &winY, &w, &h, "A")
 
 		newX := winX
 		newY := winY
 
 		while GetKeyState("LButton", "P") {
-			MouseGetPos x, y
+			MouseGetPos(&x, &y)
 
 			newX := winX + (x - anchorX)
 			newY := winY + (y - anchorY)
 
-			Gui %window%:Show, X%newX% Y%newY%
+			dialog.Move(newX, newY)
 		}
 
 		if descriptor {
@@ -152,24 +155,21 @@ moveByMouse(window, descriptor := false) {
 		}
 	}
 	finally {
-		CoordMode Mouse, curCoordMode
+		CoordMode("Mouse", curCoordMode)
 	}
 }
 
-getWindowPosition(descriptor, ByRef x, ByRef y) {
+getWindowPosition(descriptor, &x, &y) {
 	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
 	local posX := getConfigurationValue(settings, "Window Positions", descriptor . ".X", kUndefined)
 	local posY := getConfigurationValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
-	local count, screen, screenLeft, screenRight, screenTop, screenBottom
-
+	local screen, screenLeft, screenRight, screenTop, screenBottom
 
 	if ((posX == kUndefined) || (posY == kUndefined))
 		return false
 	else {
-		SysGet count, MonitorCount
-
-		loop %count% {
-			SysGet, screen, MonitorWorkArea, %A_Index%
+		loop MonitorGetCount() {
+			MonitorGetWorkArea(A_Index, &screenLeft, &screenTop, &screenRight, &screenBottom)
 
 			if ((posX >= screenLeft) && (posX <= screenRight) && (posY >= screenTop) && (posY <= screenBottom)) {
 				x := posX
@@ -187,15 +187,13 @@ translateMsgBoxButtons(buttonLabels) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local index, label
 
-    DetectHiddenWindows, On
+    DetectHiddenWindows(true)
 
 	try {
-		Process, Exist
-
-		If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
+		if WinExist("ahk_class #32770 ahk_pid " . ProcessExist()) {
 			for index, label in buttonLabels
 				try {
-					ControlSetText Button%index%, % translate(label)
+					ControlSetText(translate(label), "Button" index)
 				}
 				catch exception {
 					logError(exception)
@@ -203,7 +201,7 @@ translateMsgBoxButtons(buttonLabels) {
 		}
 	}
 	finally {
-		DetectHiddenWindows %curDetectHiddenWindows%
+		DetectHiddenWindows(curDetectHiddenWindows)
 	}
 }
 

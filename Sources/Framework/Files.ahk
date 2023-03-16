@@ -9,11 +9,11 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Debug.ahk
-#Include ..\Framework\Strings.ahk
-#Include ..\Framework\Collections.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\Strings.ahk"
+#Include "..\Framework\Collections.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -25,7 +25,7 @@ getFileName(fileName, directories*) {
 
 	fileName := substituteVariables(fileName)
 
-	SplitPath fileName, , , , , driveName
+	SplitPath(fileName, , , , , &driveName)
 
 	if (driveName && (driveName != ""))
 		return fileName
@@ -34,7 +34,7 @@ getFileName(fileName, directories*) {
 			if FileExist(directory . fileName)
 				return (directory . fileName)
 
-		if (directories.Length() > 0)
+		if (directories.Length > 0)
 			return (directories[1] . fileName)
 		else
 			return fileName
@@ -48,8 +48,8 @@ getFileNames(filePattern, directories*) {
 	for ignore, directory in directories {
 		pattern := directory . filePattern
 
-		loop Files, %pattern%, FD
-			result.Push(A_LoopFileLongPath)
+		loop Files, pattern, "FD"
+			result.Push(A_LoopFileFullPath)
 	}
 
 	return result
@@ -86,19 +86,15 @@ normalizeDirectoryPath(path) {
 }
 
 temporaryFileName(name, extension) {
-	local rnd
-
-	Random rnd, 1, 100000
-
-	return (kTempDirectory . name . "_" . Round(rnd) . "." . extension)
+	return (kTempDirectory . name . "_" . Round(Random(1, 100000)) . "." . extension)
 }
 
 deleteFile(fileName, backup := false) {
 	try {
 		if backup
-			FileMove %fileName%, %fileName%.bak, 1
+			FileMove(fileName, fileName . ".bak", 1)
 		else
-			FileDelete %fileName%
+			FileDelete(fileName)
 
 		return !ErrorLevel
 	}
@@ -116,7 +112,7 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 		try {
 			recurse := (recurse != false)
 
-			FileRemoveDir %directoryName%, %recurse%
+			DirDelete(directoryName, %recurse%)
 
 			return !ErrorLevel
 		}
@@ -130,7 +126,7 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 		files := []
 		result := true
 
-		loop Files, %directoryName%\*.*, DF
+		loop Files, directoryName . "\*.*", "DF"
 			files.Push(A_LoopFilePath)
 
 		for ignore, fileName in files {

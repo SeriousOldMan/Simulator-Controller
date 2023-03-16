@@ -9,10 +9,10 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Debug.ahk
-#Include ..\Framework\Files.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\Files.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -24,7 +24,7 @@ newConfiguration() {
 }
 
 readConfiguration(configFile) {
-	local configuration := {}
+	local configuration := Map()
 	local section := false
 	local file := false
 	local tries := 20
@@ -39,7 +39,7 @@ readConfiguration(configFile) {
 				file := FileOpen(configFile, "r-wd")
 
 				if file {
-					FileRead data, %configFile%
+					data := FileRead(configFile)
 
 					file.Close()
 
@@ -52,12 +52,11 @@ readConfiguration(configFile) {
 				if (tries-- <= 0)
 					return configuration
 				else
-					Sleep 10
+					Sleep(10)
 			}
 
 		if (data && (data != "")) {
-			loop Parse, data, `n, `r
-			{
+			loop Parse, data, "`n", "`r" {
 				currentLine := LTrim(A_LoopField)
 
 				if (StrLen(currentLine) == 0)
@@ -76,8 +75,7 @@ readConfiguration(configFile) {
 					keyValue := LTrim(currentLine)
 
 					if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
-						keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_")
-										   , "=", "", 2)
+						keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
 
 						key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
 						value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
@@ -96,7 +94,7 @@ parseConfiguration(text) {
 	local fileName := temporaryFileName("Config", "ini")
 	local configuration
 
-	FileAppend %text%, %fileName%, UTF-16
+	FileAppend(text, fileName, "UTF-16")
 
 	configuration := readConfiguration(fileName)
 
@@ -107,7 +105,7 @@ parseConfiguration(text) {
 
 writeConfiguration(configFile, configuration, symbolic := true) {
 	local tempFile := temporaryFileName("Config", "ini")
-	local empty := (configuration.Count() = 0)
+	local empty := (configuration.Count = 0)
 	local directory, section, keyValues, key, value, pairs, tries
 
 	deleteFile(tempFile)
@@ -125,13 +123,13 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 
 		section := "[" . section . "]" . pairs . "`n"
 
-		FileAppend %section%, %tempFile%, UTF-16
+		FileAppend(section, tempFile, "UTF-16")
 	}
 
 	configFile := getFileName(configFile, kUserConfigDirectory)
 
-	SplitPath configFile, , directory
-	FileCreateDir %directory%
+	SplitPath(configFile, , &directory)
+	DirCreate(directory)
 
 	tries := 10
 
@@ -143,13 +141,13 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 				else if deleteFile(configFile)
 					break
 				else {
-					Sleep 200
+					Sleep(200)
 
 					tries -= 1
 				}
 			}
 			else {
-				FileMove %tempFile%, %configFile%, 1
+				FileMove(tempFile, configFile, 1)
 
 				break
 			}
@@ -169,7 +167,7 @@ printConfiguration(configuration, symbolic := true) {
 	writeConfiguration(fileName, configuration, symbolic)
 
 	try {
-		FileRead text, %fileName%
+		text := FileRead(fileName)
 	}
 	catch exception {
 		text := ""
@@ -183,10 +181,10 @@ printConfiguration(configuration, symbolic := true) {
 getConfigurationValue(configuration, section, key, default := false) {
 	local value
 
-	if configuration.HasKey(section) {
+	if configuration.Has(section) {
 		value := configuration[section]
 
-		if value.HasKey(key)
+		if value.Has(key)
 			return value[key]
 	}
 
@@ -194,7 +192,7 @@ getConfigurationValue(configuration, section, key, default := false) {
 }
 
 getConfigurationSectionValues(configuration, section, default := false) {
-	return configuration.HasKey(section) ? configuration[section].Clone() : default
+	return configuration.Has(section) ? configuration[section].Clone() : default
 }
 
 setConfigurationValue(configuration, section, key, value) {
@@ -218,11 +216,11 @@ setConfigurationValues(configuration, otherConfiguration) {
 }
 
 removeConfigurationValue(configuration, section, key) {
-	if configuration.HasKey(section)
+	if configuration.Has(section)
 		configuration[section].Delete(key)
 }
 
 removeConfigurationSection(configuration, section) {
-	if configuration.HasKey(section)
+	if configuration.Has(section)
 		configuration.Delete(section)
 }

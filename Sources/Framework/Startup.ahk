@@ -9,14 +9,14 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Messages.ahk
+#Include "..\Libraries\Messages.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -25,12 +25,7 @@
 
 global kUninstallKey := "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SimulatorController"
 
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vDetachedInstallation := false
+global kDetachedInstallation := false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,6 +33,8 @@ global vDetachedInstallation := false
 ;;;-------------------------------------------------------------------------;;;
 
 loadSimulatorConfiguration() {
+	global kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode
+
 	local version, section, pid, path
 
 	kSimulatorConfiguration := readConfiguration(kSimulatorConfigurationFile)
@@ -59,23 +56,21 @@ loadSimulatorConfiguration() {
 	else
 		kVersion := getConfigurationValue(version, "Current", "Version", getConfigurationValue(version, "Version", "Current", "0.0.0.0-dev"))
 
-	Process Exist
-
-	pid := ErrorLevel
+	pid := ProcessExist()
 
 	logMessage(kLogOff, "-----------------------------------------------------------------")
 	logMessage(kLogOff, translate("      Running ") . StrSplit(A_ScriptName, ".")[1] . " (" . kVersion . ") [" . pid . "]")
 	logMessage(kLogOff, "-----------------------------------------------------------------")
 
-	if (kSimulatorConfiguration.Count() == 0)
+	if (kSimulatorConfiguration.Count == 0)
 		logMessage(kLogCritical, translate("No configuration found - please run the configuration tool"))
 
 	path := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini"), "Database", "Path")
 	if path {
 		kDatabaseDirectory := (normalizeDirectoryPath(path) . "\")
 
-		FileCreateDir %kDatabaseDirectory%Community
-		FileCreateDir %kDatabaseDirectory%User
+		DirCreate(kDatabaseDirectory . "Community")
+		DirCreate(kDatabaseDirectory . "User")
 
 		logMessage(kLogInfo, translate("Session database path set to ") . path)
 	}
@@ -131,7 +126,8 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
-	local installOptions, installLocation, install, title, newID, idFileName, ID, ticks, wait, major, minor
+	global kDetachedInstallation
+	local installOptions, installLocation, install, title, newID, idFileName, ID, ticks, wait, major, minor, msgResult
 
 	if A_IsCompiled {
 		if FileExist(kConfigDirectory . "Simulator Controller.install") {
@@ -139,11 +135,11 @@ initializeEnvironment() {
 			installLocation := getConfigurationValue(installOptions, "Install", "Location", "..\")
 
 			if ((installLocation = "*") || (installLocation = "..\"))
-				vDetachedInstallation := true
+				kDetachedInstallation := true
 		}
 
 		if !isDetachedInstallation() {
-			RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
+			installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation")
 
 			installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
 			installLocation := getConfigurationValue(installOptions, "Install", "Location", installLocation)
@@ -159,48 +155,48 @@ initializeEnvironment() {
 				else
 					setLanguage(getConfigurationValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
+				OnMessage(0x44, translateMsgBoxButtons.Bind(["Yes", "No"]))
 				title := translate("Installation")
-				MsgBox 262436, %title%, % translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?")
-				OnMessage(0x44, "")
+				msgResult := MsgBox(translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?"), title, 262436)
+				OnMessage(0x44)
 
-				IfMsgBox Yes
-					Run *RunAs %kBinariesDirectory%Simulator Tools.exe
+				if (msgResult = "Yes")
+					Run("*RunAs " . kBinariesDirectory . "Simulator Tools.exe")
 
-				ExitApp 0
+				ExitApp(0)
 			}
 		}
 	}
 
-	FileCreateDir %A_MyDocuments%\Simulator Controller
-	FileCreateDir %kUserHomeDirectory%Config
-	FileCreateDir %kUserHomeDirectory%Rules
-	FileCreateDir %kUserHomeDirectory%Advisor
-	FileCreateDir %kUserHomeDirectory%Advisor\Definitions
-	FileCreateDir %kUserHomeDirectory%Advisor\Rules
-	FileCreateDir %kUserHomeDirectory%Advisor\Definitions\Cars
-	FileCreateDir %kUserHomeDirectory%Advisor\Rules\Cars
-	FileCreateDir %kUserHomeDirectory%Validators
-	FileCreateDir %kUserHomeDirectory%Logs
-	FileCreateDir %kUserHomeDirectory%Splash Media
-	FileCreateDir %kUserHomeDirectory%Screen Images
-	FileCreateDir %kUserHomeDirectory%Plugins
-	FileCreateDir %kUserHomeDirectory%Translations
-	FileCreateDir %kUserHomeDirectory%Grammars
-	FileCreateDir %kUserHomeDirectory%Simulator Data
-	FileCreateDir %kUserHomeDirectory%Temp
-	FileCreateDir %kDatabaseDirectory%Community
-	FileCreateDir %kDatabaseDirectory%User
+	DirCreate(A_MyDocuments . "\Simulator Controller")
+	DirCreate(kUserHomeDirectory . "Config")
+	DirCreate(kUserHomeDirectory . "Rules")
+	DirCreate(kUserHomeDirectory . "Advisor")
+	DirCreate(kUserHomeDirectory . "Advisor\Definitions")
+	DirCreate(kUserHomeDirectory . "Advisor\Rules")
+	DirCreate(kUserHomeDirectory . "Advisor\Definitions\Cars")
+	DirCreate(kUserHomeDirectory . "Advisor\Rules\Cars")
+	DirCreate(kUserHomeDirectory . "Validators")
+	DirCreate(kUserHomeDirectory . "Logs")
+	DirCreate(kUserHomeDirectory . "Splash Media")
+	DirCreate(kUserHomeDirectory . "Screen Images")
+	DirCreate(kUserHomeDirectory . "Plugins")
+	DirCreate(kUserHomeDirectory . "Translations")
+	DirCreate(kUserHomeDirectory . "Grammars")
+	DirCreate(kUserHomeDirectory . "Simulator Data")
+	DirCreate(kUserHomeDirectory . "Temp")
+	DirCreate(kDatabaseDirectory . "Community")
+	DirCreate(kDatabaseDirectory . "User")
 
 	if FileExist(kResourcesDirectory . "Templates") {
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk")
-			FileCopy %kResourcesDirectory%Templates\Controller Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+			FileCopy(kResourcesDirectory . "Templates\Controller Plugins.ahk", A_MyDocuments . "\Simulator Controller\Plugins")
 
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
-			FileCopy %kResourcesDirectory%Templates\Configuration Plugins.ahk, %A_MyDocuments%\Simulator Controller\Plugins
+			FileCopy(kResourcesDirectory . "Templates\Configuration Plugins.ahk", A_MyDocuments . "\Simulator Controller\Plugins")
 
 		if !FileExist(kUserConfigDirectory . "Race.settings")
-			FileCopy %kResourcesDirectory%Templates\Race.settings, %kUserConfigDirectory%
+			FileCopy(kResourcesDirectory . "Templates\Race.settings", kUserConfigDirectory)
 	}
 
 	newID := !FileExist(kUserConfigDirectory . "ID")
@@ -208,7 +204,7 @@ initializeEnvironment() {
 	if !newID {
 		idFileName := kUserConfigDirectory . "ID"
 
-		FileReadLine ID, %idFileName%, 1
+		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
 
 		newID := ((ID = false) || (Trim(ID) = ""))
 	}
@@ -218,16 +214,16 @@ initializeEnvironment() {
 
 		deleteFile(kUserConfigDirectory . "ID")
 
-		FileAppend %ID%, % kUserConfigDirectory . "ID"
+		FileAppend(ID, kUserConfigDirectory . "ID")
 	}
 
 	if !FileExist(kDatabaseDirectory . "ID")
-		FileCopy %kUserConfigDirectory%ID, %kDatabaseDirectory%ID
+		FileCopy(kUserConfigDirectory . "ID", kDatabaseDirectory . "ID")
 
 	if (!FileExist(kUserConfigDirectory . "UPDATES") && FileExist(kResourcesDirectory . "Templates"))
-		FileCopy %kResourcesDirectory%Templates\UPDATES, %kUserConfigDirectory%
+		FileCopy(kResourcesDirectory . "Templates\UPDATES", kUserConfigDirectory)
 
-	registerMessageHandler("Core", "functionMessageHandler")
+	registerMessageHandler("Core", functionMessageHandler)
 }
 
 
@@ -236,7 +232,7 @@ initializeEnvironment() {
 ;;;-------------------------------------------------------------------------;;;
 
 isDetachedInstallation() {
-	return vDetachedInstallation
+	return kDetachedInstallation
 }
 
 getControllerState(configuration := "__Undefined__") {
@@ -248,9 +244,7 @@ getControllerState(configuration := "__Undefined__") {
 	else if (configuration = kUndefined)
 		configuration := false
 
-	Process Exist, Simulator Controller.exe
-
-	pid := ErrorLevel
+	pid := ProcessExist("Simulator Controller.exe")
 
 	if (load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
 		try {
@@ -264,20 +258,18 @@ getControllerState(configuration := "__Undefined__") {
 			else
 				options := ""
 
-			exePath := ("""" . kBinariesDirectory . "Simulator Controller.exe"" -NoStartup -NoUpdate" .  options)
+			exePath := ("`"" . kBinariesDirectory . "Simulator Controller.exe`" -NoStartup -NoUpdate" .  options)
 
-			Run %exePath%, %kBinariesDirectory%, , pid
+			Run(exePath, kBinariesDirectory, , &pid)
 
-			Sleep 1000
+			Sleep(1000)
 
 			tries := 30
 
 			while (tries > 0) {
-				Sleep 200
+				Sleep(200)
 
-				Process Exist, %pid%
-
-				if !ErrorLevel
+				if !ProcessExist(pid)
 					break
 			}
 
@@ -295,7 +287,7 @@ getControllerState(configuration := "__Undefined__") {
 }
 
 exit() {
-	ExitApp 0
+	ExitApp(0)
 }
 
 

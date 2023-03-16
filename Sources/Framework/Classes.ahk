@@ -9,13 +9,13 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Debug.ahk
-#Include ..\Framework\Strings.ahk
-#Include ..\Framework\Collections.ahk
-#Include ..\Framework\Configuration.ahk
-#Include ..\Framework\Message.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\Strings.ahk"
+#Include "..\Framework\Collections.ahk"
+#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\Message.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -159,7 +159,7 @@ class Application extends ConfigurationItem {
 		if ((this.iExePath != "") && (this.iWorkingDirectory == "")) {
 			exePath := this.iExePath
 
-			SplitPath exePath, , workingDirectory
+			SplitPath(exePath, , &workingDirectory)
 
 			this.iWorkingDirectory := workingDirectory
 		}
@@ -200,7 +200,7 @@ class Application extends ConfigurationItem {
 
 		if (special && (specialStartup && specialStartup != "")) {
 			if IsLabel(specialStartup) {
-				Gosub %specialStartup%
+				%specialStartup%()
 
 				return this.CurrentPID
 			}
@@ -218,7 +218,7 @@ class Application extends ConfigurationItem {
 
 		if (special && specialShutdown && (specialShutdown != "")) {
 			if IsLabel(specialShutdown)
-				Gosub %specialShutdown%
+				%specialShutdown%()
 			else
 				%specialShutdown%()
 
@@ -227,16 +227,16 @@ class Application extends ConfigurationItem {
 		else {
 			if (this.iRunningPID > 0)
 				try {
-					WinClose % "ahk_pid " . this.iRunningPID
-					Process Close, % this.iRunningPID
+					WinClose("ahk_pid " . this.iRunningPID)
+					ProcessClose(this.iRunningPID)
 				}
 				catch exception {
 					logError(exception)
 				}
 			else if (this.ExePath != "")
-				WinClose % "ahk_exe " . this.ExePath
+				WinClose("ahk_exe " . this.ExePath)
 			else if (this.WindowTitle != "")
-				WinClose % this.WindowTitle
+				WinClose(this.WindowTitle)
 
 			this.iRunningPID := 0
 		}
@@ -246,7 +246,7 @@ class Application extends ConfigurationItem {
 		local specialIsRunning := this.iSpecialIsRunning
 
 		if (special && specialIsRunning && (specialIsRunning != ""))
-			if (Func(specialIsRunning) && %specialIsRunning%())
+			if %specialIsRunning%()
 				return true
 			else if (this.getProcessID() != 0)
 				return true
@@ -260,25 +260,25 @@ class Application extends ConfigurationItem {
 		local processID := false
 		local curDetectHiddenWindows := A_DetectHiddenWindows
 
-		DetectHiddenWindows On
+		DetectHiddenWindows(true)
 
 		try {
 			if (this.iRunningPID > 0) {
-				Process Exist, % this.iRunningPID
+				ErrorLevel := ProcessExist(this.iRunningPID)
 
 				processID := ((ErrorLevel != 0) || WinExist("ahk_pid " . this.iRunningPID)) ? this.iRunningPID : 0
 			}
 
 			if (!processID && (this.WindowTitle != ""))
 				if WinExist(this.WindowTitle)
-					WinGet processID, PID, % this.WindowTitle
+					processID := WinGetPID(this.WindowTitle)
 
 			if (!processID && (this.ExePath != ""))
 				if WinExist("ahk_exe " . this.ExePath)
-					WinGet processID, PID, % "ahk_exe " . this.ExePath
+					processID := WinGetPID("ahk_exe " . this.ExePath)
 		}
 		finally {
-			DetectHiddenWindows % curDetectHiddenWindows
+			DetectHiddenWindows(curDetectHiddenWindows)
 		}
 
 		return (this.iRunningPID := processID)
@@ -295,7 +295,7 @@ class Application extends ConfigurationItem {
 				workingDirectory := ("""" . workingDirectory . """")
 
 			if wait {
-				RunWait %exePath%, %workingDirectory%, %options%
+				RunWait(exePath, workingDirectory, options)
 
 				result := ErrorLevel
 
@@ -304,7 +304,7 @@ class Application extends ConfigurationItem {
 				return result
 			}
 			else {
-				Run %exePath%, %workingDirectory%, %options%, pid
+				Run(exePath, workingDirectory, options, &pid)
 
 				logMessage(kLogInfo, translate("Application ") . application . translate(" started"))
 
@@ -394,7 +394,7 @@ class Function extends ConfigurationItem {
 					for ignore, action in actions {
 						arguments := []
 
-						if (action && (action.Length() == 2)) {
+						if (action && (action.Length == 2)) {
 							arguments := action[2].Clone()
 
 							for index, argument in arguments
@@ -405,13 +405,13 @@ class Function extends ConfigurationItem {
 						}
 
 						if action
-							callables.Push((action && (action.Length() == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
+							callables.Push((action && (action.Length == 2) && action[1]) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
 					}
 
-					return ((callables.Length() > 0) ? values2String(" | ", callables*) : "")
+					return ((callables.Length > 0) ? values2String(" | ", callables*) : "")
 				}
 				else {
-					if (actions.Length() > 0) {
+					if (actions.Length > 0) {
 						for ignore, action in actions
 							callables.Push(this.actionCallable(trigger, action))
 					}
@@ -422,7 +422,7 @@ class Function extends ConfigurationItem {
 							callables.Push(action)
 					}
 
-					return ((callables.Length() > 0) ? Func("callActions").Bind(callables*) : false)
+					return ((callables.Length > 0) ? Func("callActions").Bind(callables*) : false)
 				}
 			}
 			else {
@@ -435,7 +435,7 @@ class Function extends ConfigurationItem {
 						if asText {
 							arguments := []
 
-							if (theAction && (theAction.Length() == 2)) {
+							if (theAction && (theAction.Length == 2)) {
 								arguments := theAction[2].Clone()
 
 								for index, argument in arguments
@@ -446,19 +446,19 @@ class Function extends ConfigurationItem {
 							}
 
 							if theAction
-								callables.Push((theAction && (theAction.Length() == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
+								callables.Push((theAction && (theAction.Length == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
 						}
 						else
 							callables.Push(this.actionCallable(trigger, action))
 
-					if (!asText && (callables.Length() = 0)) {
+					if (!asText && (callables.Length = 0)) {
 						action := this.actionCallable(trigger, false)
 
 						if action
 							callables.Push(action)
 					}
 
-					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length() > 0) ? Func("callActions").Bind(callables*) : false))
+					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length > 0) ? Func("callActions").Bind(callables*) : false))
 				}
 
 				return result
@@ -473,7 +473,7 @@ class Function extends ConfigurationItem {
 		this.iNumber := functionNumber
 
 		for ignore, trigger in this.Trigger {
-			if (index > hotkeyActions.Length())
+			if (index > hotkeyActions.Length)
 				break
 
 			this.loadFromDescriptor(trigger, hotkeyActions[index++])
@@ -572,7 +572,7 @@ class Function extends ConfigurationItem {
 	}
 
 	actionCallable(trigger, action) {
-		local function := (action != false) ? Func(action[1]) : false
+		local function := (action != false) ? %action[1]% : false
 
 		return (function != false) ? function.Bind(action[2]*) : false
 	}
@@ -753,7 +753,7 @@ class Plugin extends ConfigurationItem {
 		if (StrLen(descriptor) > 0) {
 			descriptor := StrSplit(descriptor, "|", " `t", 3)
 
-			if (descriptor.Length() > 0) {
+			if (descriptor.Length > 0) {
 				this.iIsActive := ((descriptor[1] == true) || (descriptor[1] = kTrue)) ? true : false
 				this.iSimulators := StrSplit(descriptor[2], [",", ";"], " `t")
 				this.iArguments := this.computeArgments(descriptor[3])
@@ -774,14 +774,14 @@ class Plugin extends ConfigurationItem {
 		for ignore, argument in string2Values(";", arguments) {
 			argument := string2Values(":", argument, 2)
 
-			result[argument[1]] := ((argument.Length() == 1) ? "" : argument[2])
+			result[argument[1]] := ((argument.Length == 1) ? "" : argument[2])
 		}
 
 		return result
 	}
 
 	hasArgument(parameter) {
-		return this.Arguments.HasKey(parameter)
+		return this.Arguments.Has(parameter)
 	}
 
 	getArgumentValue(argument, default := false) {
@@ -797,7 +797,7 @@ class Plugin extends ConfigurationItem {
 
 	parseValues(delimiter, string) {
 		local startPos, endPos, argument, key, result, ignore, value
-		local arguments := {}
+		local arguments := Map()
 
 		loop {
 			startPos := InStr(string, """")
@@ -824,7 +824,7 @@ class Plugin extends ConfigurationItem {
 		result := []
 
 		for ignore, value in string2Values(delimiter, string)
-			result.Push(arguments.HasKey(value) ? arguments[value] : value)
+			result.Push(arguments.Has(value) ? arguments[value] : value)
 
 		return result
 	}

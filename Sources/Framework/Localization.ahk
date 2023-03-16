@@ -9,11 +9,11 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Debug.ahk
-#Include ..\Framework\Files.ahk
-#Include ..\Framework\Collections.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\Files.ahk"
+#Include "..\Framework\Collections.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -54,11 +54,10 @@ global vTimeFormat := "[H:]M:S.##"
 ;;;-------------------------------------------------------------------------;;;
 
 readLanguage(targetLanguageCode) {
-	local translations := {}
+	local translations := Map()
 	local translation
 
-	loop Read, % getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory)
-	{
+	loop Read, getFileName("Translations." . targetLanguageCode, kUserTranslationsDirectory, kTranslationsDirectory) {
 		translation := StrSplit(A_LoopReadLine, "=>")
 
 		if (translation[1] = targetLanguageCode)
@@ -72,30 +71,44 @@ readLanguage(targetLanguageCode) {
 }
 
 getTemperatureUnit(translate := false) {
+	global vTemperatureUnit
+
 	return (translate ? translate(vTemperatureUnit) : vTemperatureUnit)
 }
 
 getPressureUnit(translate := false) {
+	global vPressureUnit
+
 	return (translate ? translate(vPressureUnit) : vPressureUnit)
 }
 
 getSpeedUnit(translate := false) {
+	global vSpeedUnit
+
 	return (translate ? translate(vSpeedUnit) : vSpeedUnit)
 }
 
 getLengthUnit(translate := false) {
+	global vLengthUnit
+
 	return (translate ? translate(vLengthUnit) : vLengthUnit)
 }
 
 getMassUnit(translate := false) {
+	global vMassUnit
+
 	return (translate ? translate(vMassUnit) : vMassUnit)
 }
 
 getVolumeUnit(translate := false) {
+	global vVolumeUnit
+
 	return (translate ? translate(vVolumeUnit) : vVolumeUnit)
 }
 
 displayTemperatureValue(celsius, round) {
+	global vTemperatureUnit
+
 	switch vTemperatureUnit {
 		case "Celsius":
 			return (round ? Round(celsius, 1) : celsius)
@@ -107,6 +120,8 @@ displayTemperatureValue(celsius, round) {
 }
 
 displayPressureValue(psi, round) {
+	global vPressureUnit
+
 	switch vPressureUnit {
 		case "PSI":
 			return (round ? Round(psi, 1) : psi)
@@ -120,6 +135,8 @@ displayPressureValue(psi, round) {
 }
 
 displayLengthValue(meter, round) {
+	global vLengthUnit
+
 	switch vLengthUnit {
 		case "Meter":
 			return (round ? Round(meter, 1) : meter)
@@ -131,6 +148,8 @@ displayLengthValue(meter, round) {
 }
 
 displaySpeedValue(kmh, round) {
+	global vSpeedUnit
+
 	switch vSpeedUnit {
 		case "km/h":
 			return (round ? Round(kmh, 1) : kmh)
@@ -142,6 +161,8 @@ displaySpeedValue(kmh, round) {
 }
 
 displayMassValue(kilogram, round) {
+	global vMassUnit
+
 	switch vMassUnit {
 		case "Kilogram":
 			return (round ? Round(kilogram, 1) : kilogram)
@@ -153,6 +174,8 @@ displayMassValue(kilogram, round) {
 }
 
 displayVolumeValue(liter, round) {
+	global vVolumeUnit
+
 	switch vVolumeUnit {
 		case "Liter":
 			return (round ? Round(liter, 1) : liter)
@@ -175,6 +198,8 @@ displayFloatValue(float, precision := "__Undefined__") {
 }
 
 displayTimeValue(time, arguments*) {
+	global vTimeFormat
+
 	local hours, seconds, fraction, minutes
 
 	if ((vTimeFormat = "S.##") || (vTimeFormat = "S,##"))
@@ -197,6 +222,8 @@ displayTimeValue(time, arguments*) {
 }
 
 internalPressureValue(value, round) {
+	global vPressureUnit
+
 	switch vPressureUnit {
 		case "PSI":
 			return (round ? Round(value, 1) : value)
@@ -210,6 +237,8 @@ internalPressureValue(value, round) {
 }
 
 internalTemperatureValue(value, round) {
+	global vTemperatureUnit
+
 	switch vTemperatureUnit {
 		case "Celsius":
 			return (round ? Round(value, 1) : value)
@@ -221,6 +250,8 @@ internalTemperatureValue(value, round) {
 }
 
 internalLengthValue(value, round) {
+	global vLengthUnit
+
 	switch vLengthUnit {
 		case "Meter":
 			return (round ? Round(value, 1) : value)
@@ -232,6 +263,8 @@ internalLengthValue(value, round) {
 }
 
 internalSpeedValue(value, round) {
+	global vSpeedUnit
+
 	switch vSpeedUnit {
 		case "km/h":
 			return (round ? Round(value, 1) : value)
@@ -243,6 +276,8 @@ internalSpeedValue(value, round) {
 }
 
 internalMassValue(value, round) {
+	global vMassUnit
+
 	switch vMassUnit {
 		case "Kilogram":
 			return (round ? Round(value, 1) : value)
@@ -254,6 +289,8 @@ internalMassValue(value, round) {
 }
 
 internalVolumeValue(value, round) {
+	global vVolumeUnit
+
 	switch vVolumeUnit {
 		case "Liter":
 			return (round ? Round(value, 1) : value)
@@ -274,6 +311,8 @@ internalFloatValue(value, precision := "__Undefined__") {
 }
 
 internalTimeValue(time, arguments*) {
+	global vTimeFormat
+
 	local seconds, fraction
 
 	if (vTimeFormat = "S,##")
@@ -283,7 +322,7 @@ internalTimeValue(time, arguments*) {
 	else {
 		seconds := StrSplit(time, (vTimeFormat = "S,##") ? "," : ".")
 
-		if (seconds.Length() = 1) {
+		if (seconds.Length = 1) {
 			seconds := seconds[1]
 			fraction := 0
 		}
@@ -300,7 +339,7 @@ internalTimeValue(time, arguments*) {
 
 		seconds := StrSplit(seconds, ":")
 
-		switch seconds.Length() {
+		switch seconds.Length {
 			case 3:
 				return ((seconds[1] * 3600) + (seconds[2] * 60) + seconds[3] + fraction)
 			case 2:
@@ -314,6 +353,8 @@ internalTimeValue(time, arguments*) {
 }
 
 initializeLocalization() {
+	global vMassUnit, vTemperatureUnit, vPressureUnit, vVolumeUnit, vLengthUnit, vSpeedUnit, vNumberFormat, vTimeFormat
+
 	local configuration := readConfiguration(kSimulatorConfigurationFile)
 
 	vMassUnit := getConfigurationValue(configuration, "Localization", "MassUnit", "Kilogram")
@@ -336,11 +377,11 @@ initializeLocalization() {
 ;;;-------------------------------------------------------------------------;;;
 
 availableLanguages() {
-	local translations := {en: "English"}
+	local translations := map("en", "English")
 	local ignore, fileName, languageCode
 
 	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
-		SplitPath fileName, , , languageCode
+		SplitPath(fileName, , , &languageCode)
 
 		translations[languageCode] := readLanguage(languageCode)
 	}
@@ -363,11 +404,10 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 			fileNames.Push(fileName)
 	}
 
-	translations := {}
+	translations := Map()
 
 	for ignore, fileName in fileNames
-		loop Read, %fileName%
-		{
+		loop Read, fileName {
 			translation := A_LoopReadLine
 
 			translation := StrReplace(translation, "\=", "=")
@@ -378,7 +418,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 			enString := translation[1]
 
 			if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
-				if ((A_Index == 1) && (translations.HasKey(enString) && (translations[enString] != translation[2])))
+				if ((A_Index == 1) && (translations.Has(enString) && (translations[enString] != translation[2])))
 					if isDebug()
 						throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
 					else
@@ -406,7 +446,7 @@ writeTranslations(languageCode, languageName, translations) {
 		temp := {}
 
 		for key, value in translations
-			if (!stdTranslations.HasKey(key) || (stdTranslations[key] != value))
+			if (!stdTranslations.Has(key) || (stdTranslations[key] != value))
 				temp[key] := value
 
 		translations := temp
@@ -416,12 +456,12 @@ writeTranslations(languageCode, languageName, translations) {
 
 	curEncoding := A_FileEncoding
 
-	FileEncoding UTF-16
+	FileEncoding("UTF-16")
 
 	try {
-		FileAppend [Locale]`n, %fileName%
-		FileAppend %languageCode%=>%languageName%`n, %fileName%
-		FileAppend [Translations], %fileName%
+		FileAppend("[Locale]`n", fileName)
+		FileAppend(languageCode . "=>" . languageName . "`n", fileName)
+		FileAppend("[Translations]", fileName)
 
 		for original, translation in translations {
 			original := StrReplace(original, "\", "\\")
@@ -432,15 +472,17 @@ writeTranslations(languageCode, languageName, translations) {
 			translation := StrReplace(translation, "=", "\=")
 			translation := StrReplace(translation, "`n", "\n")
 
-			FileAppend `n%original%=>%translation%, %fileName%
+			FileAppend("`n" . original . "=>" . translation, fileName)
 		}
 	}
 	finally {
-		FileEncoding %curEncoding%
+		FileEncoding(curEncoding)
 	}
 }
 
 translate(string, targetLanguageCode := false) {
+	global vTargetLanguageCode
+
 	local theTranslations, translation
 
 	static currentLanguageCode := "en"
@@ -449,7 +491,7 @@ translate(string, targetLanguageCode := false) {
 	if (targetLanguageCode && (targetLanguageCode != vTargetLanguageCode)) {
 		theTranslations := readTranslations(targetLanguageCode)
 
-		if theTranslations.HasKey(string) {
+		if theTranslations.Has(string) {
 			translation := theTranslations[string]
 
 			return ((translation != "") ? translation : string)
@@ -464,7 +506,7 @@ translate(string, targetLanguageCode := false) {
 			translations := readTranslations(currentLanguageCode)
 		}
 
-		if translations.HasKey(string) {
+		if translations.Has(string) {
 			translation := translations[string]
 
 			return ((translation != "") ? translation : string)
@@ -477,6 +519,8 @@ translate(string, targetLanguageCode := false) {
 }
 
 setLanguage(languageCode) {
+	global vLocalizationCallbacks, vTargetLanguageCode
+
 	local igore, callback
 
 	if (vTargetLanguageCode != languageCode) {
@@ -507,10 +551,14 @@ getSystemLanguage() {
 }
 
 getLanguage() {
+	global vTargetLanguageCode
+
 	return vTargetLanguageCode
 }
 
 registerLocalizationCallback(callback) {
+	global vLocalizationCallbacks
+
 	vLocalizationCallbacks.Push(callback)
 }
 
@@ -534,6 +582,8 @@ getUnit(type, translate := false) {
 }
 
 getFloatSeparator() {
+	global vNumberFormat
+
 	return (vNumberFormat == "#.##" ? "." : ",")
 }
 
@@ -597,13 +647,13 @@ internalValue(type, value, arguments*) {
 }
 
 validNumber(value, display := false) {
-	if value is Integer
+	if isInteger(value)
 		return true
 	else {
 		if display
 			value := StrReplace(value, getFloatSeparator(), ".")
 
-		if value is Float
+		if isFloat(value)
 			return true
 		else
 			return false
@@ -611,6 +661,8 @@ validNumber(value, display := false) {
 }
 
 getFormat(type) {
+	global vNumberFormat, vTimeFormat
+
 	switch type {
 		case "Float":
 			return vNumberFormat
@@ -622,6 +674,8 @@ getFormat(type) {
 }
 
 setFormat(type, format) {
+	global vNumberFormat, vTimeFormat
+
 	local oldFormat
 
 	switch type {

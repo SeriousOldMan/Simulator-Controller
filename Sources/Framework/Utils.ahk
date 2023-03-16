@@ -9,8 +9,8 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,12 +20,12 @@
 createGUID() {
 	local guid, pGuid, sGuid, size
 
-    VarSetCapacity(pGuid, 16, 0)
+    pGuid := Buffer(16, 0)
 
-	if !DllCall("ole32.dll\CoCreateGuid", "ptr", &pGuid) {
-        size := VarSetCapacity(sguid, (38 << !!A_IsUnicode) + 1, 0)
+	if !DllCall("ole32.dll\CoCreateGuid", "ptr", pGuid) {
+		size := VarSetStrCapacity(&sGuid, 38 + 1)
 
-        if (DllCall("ole32.dll\StringFromGUID2", "ptr", &pGuid, "ptr", &sGuid, "int", size)) {
+        if (DllCall("ole32.dll\StringFromGUID2", "ptr", pGuid, "ptr", sGuid, "int", size)) {
 			guid := StrGet(&sGuid)
 
             return SubStr(SubStr(guid, 1, StrLen(guid) - 1), 2)

@@ -68,7 +68,7 @@ showProgress(options) {
 		else
 			w := 280
 
-		color := options.HasKey("color") ? options.color : "Green"
+		color := options.HasKey("Color") ? options.color : "Green"
 
 		Gui Progress:Default
 		Gui Progress:-Border ; -Caption

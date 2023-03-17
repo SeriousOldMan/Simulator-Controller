@@ -1,4 +1,4 @@
-## 4.6.3.1-release 03/17/23 (planned)
+## 4.6.3.1-release 03/17/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Improved detection of retired cars in "Race Reports" and "Race Center".
@@ -30,6 +30,8 @@
   17. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT Cup
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-463), when you are using a Stream Deck, or when you want to use the new audio routing capabilities for your streaming setup.
   
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always

@@ -2,12 +2,12 @@
 Version=4.6.3.1-release
 Target=4.6.3.1-release
 Date=03/17/2023
-Download=
+Download=https://cutt.ly/i4ppetI;https://www.dropbox.com/s/2ycm4i9cdoprjwl/Simulator%20Controller%204.6.3.1-release.zip?dl=1
 Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC
 [Release]
 Version=4.6.3.1-release
 Date=03/17/2023
-Download=
+Download=https://cutt.ly/i4ppetI;https://www.dropbox.com/s/2ycm4i9cdoprjwl/Simulator%20Controller%204.6.3.1-release.zip?dl=1
 Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC
 [Current]
 Type=Release

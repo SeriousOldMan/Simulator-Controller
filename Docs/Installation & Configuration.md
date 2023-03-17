@@ -417,11 +417,11 @@ Although you may call any globally defined function, you should use only the fol
 | openRaceCenter | - | Race Engineer, Race Strategist, Team Server | Opens the "Race Center" tool, with which you can analyze the telemetry data of a running team session, plan and control pitstops and change race strategy on the fly. |
 | enableRaceAssistant | name | Race Engineer, Race Strategist, Race Spotter | Enables the Race Assistant with the given *name*, which must be one of : Race Engineer, Race Strategist or Race Spotter. |
 | disableRaceAssistant | name | Race Engineer, Race Strategist, Race Spotter | Disables the Race Assistant with the given *name*, which must be one of : Race Engineer, Race Strategist or Race Spotter. |
-| enableTeamServer | - | Team Server | Enables the team mode and opens a connection to the currently configured Team Server. Must be called before session start. |
-| disableTeamServer | - | Team Server | Disables the team mode and closes the connection to the Team Server. |
 | enableTrackAutomation | - | Race Spotter | Enables the track automation. Can be called anytime, the automation will be activated at the beginning of the next lap. |
 | disableTrackAutomation | - | Race Spotter | Disables the track automation. No further actions will be executed. |
 | selectTrackAutomation | [Optional] name | Race Spotter | Selects one of the configured track automations by its *name* and loads it. If *name* is omitted, the automation marked as the active one, will be loaded. If track automation is currently enabled, the execution of actions will start with the next lap. |
+| enableTeamServer | - | Team Server | Enables the team mode and opens a connection to the currently configured Team Server. Must be called before session start. |
+| disableTeamServer | - | Team Server | Disables the team mode and closes the connection to the Team Server. |
 
 #### Trigger Detector Tool
 

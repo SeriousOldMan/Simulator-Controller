@@ -1,10 +1,22 @@
+## 4.6.3.1-release 03/17/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Improved detection of retired cars in "Race Reports" and "Race Center".
+  4. Improved display of pitstops in "Race Center".
+  5. Fixed a bug in audio routing where a route was forgotten when an Assistant restarted.
+  6. Fixed german grammars for Spotter and Strategist.
+  7. Fixed the Spotter announcing a 0 time penalty in *Assetto Corsa Competizione*.
+  8. New car models for "Setup Advisor":
+      - Assetto Corsa:
+	    - Lamborghini Aventador SV
+
 ## 4.6.3.0-release 03/10/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Multiple controller actions can be bound to a single custom voice command.
   4. Multiple action functions can be executed by a custom controller function.
   5. Increased performance of lap update in "Race Center" in low latency situations.
-  6. The Spotter informas you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
+  6. The Spotter informs you know whether you are ahead or behind your opponent regarding the number of performed pitstops.
   7. Improved detection of retired cars in "Race Reports" and "Race Center".
   8. Fixed potential race condition in session database which leads to "Session Database" freezing while editing settings.
   9. Added a mechanism that creates a *.bak file whenever a database file is updated.

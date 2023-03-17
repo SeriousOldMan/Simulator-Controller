@@ -338,13 +338,11 @@ class Database {
 	}
 
 	clear(name, flush := false) {
-		if this.Tables.HasKey(name) {
-			this.iTables[name] := []
-			this.iTableChanged[name] := true
+		this.iTables[name] := []
+		this.iTableChanged[name] := true
 
-			if flush
-				this.flush(name)
-		}
+		if flush
+			this.flush(name)
 	}
 
 	changed(name) {

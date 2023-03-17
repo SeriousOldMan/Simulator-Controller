@@ -324,10 +324,12 @@ class RaceReportViewer extends RaceReportReader {
 				{
 					lapTime := times[A_Index][car]
 
-					if (!extendedIsNull(lapTime) && (lapTime > 0))
+					if (!extendedIsNull(lapTime, lap < 2) && (lapTime > 0))
 						lapTimes.Push(lapTime)
-					else if (A_Index == lapsCount)
-						result := "DNF"
+					else {
+						if (A_Index == lapsCount)
+							result := "DNF"
+					}
 				}
 
 				min := minimum(lapTimes)
@@ -576,14 +578,14 @@ class RaceReportViewer extends RaceReportReader {
 	showPositionsReport() {
 		local report := this.Report
 		local raceData, drivers, positions, times, cars, carsCount, simulator, sessionDB
-		local carIndices, minPosition, maxPosition
+		local carIndices, minPosition, maxPosition, newMinPosition, newMaxPosition
 		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions, selectedClasses
 
 		if report {
 			raceData := true
 			drivers := false
 			positions := true
-			times := false
+			times := true
 
 			this.loadReportData(false, raceData, drivers, positions, times)
 
@@ -606,26 +608,36 @@ class RaceReportViewer extends RaceReportReader {
 				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)) {
 					valid := false
 
+					newMinPosition := minPosition
+					newMaxPosition := maxPosition
+
 					for ignore, lap in this.getReportLaps(raceData)
-						if positions.HasKey(lap)
-							if (positions[lap].HasKey(car) && !extendedIsNull(positions[lap][car]) && (positions[lap][car] > 0)) {
+						if (positions.HasKey(lap) && times.HasKey(lap))
+							if (positions[lap].HasKey(car) && !extendedIsNull(positions[lap][car]) && (positions[lap][car] > 0)
+							 && times[lap].HasKey(car) && !extendedIsNull(times[lap][car], lap < 2)) {
 								valid := true
 
-								minPosition := Min(minPosition, positions[lap][car])
-								maxPosition := Max(maxPosition, positions[lap][car])
+								newMinPosition := Min(newMinPosition, positions[lap][car])
+								newMaxPosition := Max(newMaxPosition, positions[lap][car])
 
-								break
+								; break
 							}
 							else
 								positions[lap][car] := kNull ; carsCount
 
 					if valid {
+						minPosition := newMinPosition
+						maxPosition := newMaxPosition
+
 						carIndices.Push(car)
 
 						cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
 									   . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
 				}
+
+				if getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") = 414
+					x := 1 + 1
 			}
 
 			for ignore, lap in this.getReportLaps(raceData)
@@ -668,7 +680,7 @@ class RaceReportViewer extends RaceReportReader {
 					lapPositions := positions[lap]
 
 					loop % cars.Length() {
-						if lapPositions.HasKey(A_Index)
+						if (lapPositions.HasKey(A_Index) && !extendedIsNull(lapPositions[A_Index], lap < 2))
 							drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
 						else
 							drawChartFunction := (drawChartFunction . ", null")
@@ -1266,7 +1278,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 	local x, y, oldEncoding, owner
 	local lapsDef, laps, baseLap, lastLap, ignore, lap, yOption, headers, allDrivers, selectedDrivers
 	local sessionDB, simulator, ignore, driver, column1, column2, startLap, endLap, lap, index
-	local newLaps, newDrivers, rowNumber, classes, selectedClass
+	local newLaps, newDrivers, rowNumber, classes, selectedClass, valid
 
 	static allLapsRadio
 	static rangeLapsRadio
@@ -1492,6 +1504,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 					result["Laps"] := true
 				else {
 					laps := {}
+					valid := true
 
 					for ignore, lap in string2Values(";", rangeLapsEdit)
 						if InStr(lap, "-") {
@@ -1500,23 +1513,45 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 							endLap := lap[2]
 
 							if startLap is Integer
+							{
 								if endLap is Integer
-									if (endLap + 0) > (startLap + 0)
+								{
+									if (endLap = startLap)
+										laps[startLap] := startLap
+									else if (endLap < startLap)
+										loop {
+											index := endLap + A_Index - 1
+
+											laps[index] := index
+										} until (index = startLap)
+									else
 										loop {
 											index := startLap + A_Index - 1
 
 											laps[index] := index
 										} until (index = endLap)
+								}
+								else
+									valid := false
+							}
+							else
+								valid := false
 						}
 						else if lap is Integer
 							laps[lap] := lap
+						else
+							valid := false
 
-					newlaps := []
+					if valid {
+						newlaps := []
 
-					for lap, ignore in laps
-						newLaps.Push(lap)
+						for lap, ignore in laps
+							newLaps.Push(lap)
 
-					result["Laps"] := newLaps
+						result["Laps"] := newLaps
+					}
+					else
+						result["Laps"] := true
 				}
 			}
 

@@ -1,16 +1,16 @@
 [Development]
-Version=4.6.3.0-release
-Target=4.6.3.0-release
-Date=03/10/2023
-Download=https://cutt.ly/v8VeUy6;https://www.dropbox.com/s/hrideyvzxpudtlv/Simulator%20Controller%204.6.3.0-release.zip?dl=1
-Changes=Allow multiple actions for a custom voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center", Fixed potential race condition in session database, Fixed update procedure for SilentAssistant, New voice command for requesting the number of active cars in a session, New information request action "ActiveCars" for Race Strategist and Race Spotter, New Stream Deck icon for the "ActiveCars" information request action, New car models for "Setup Advisor", Support for input audio routing, New voice test script in *Utilities* folder
+Version=4.6.3.1-release
+Target=4.6.3.1-release
+Date=03/17/2023
+Download=
+Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC
 [Release]
-Version=4.6.3.0-release
-Date=03/10/2023
-Download=https://cutt.ly/v8VeUy6;https://www.dropbox.com/s/hrideyvzxpudtlv/Simulator%20Controller%204.6.3.0-release.zip?dl=1
-Changes=Allow multiple actions for a custom voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center", Fixed potential race condition in session database, Fixed update procedure for SilentAssistant, New voice command for requesting the number of active cars in a session, New information request action "ActiveCars" for Race Strategist and Race Spotter, New Stream Deck icon for the "ActiveCars" information request action, New car models for "Setup Advisor", Support for input audio routing, New voice test script in *Utilities* folder
+Version=4.6.3.1-release
+Date=03/17/2023
+Download=
+Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC
 [Current]
 Type=Release
 [Version]
-Release=4.6.3.0-release
-Development=4.6.3.0-release
+Release=4.6.3.1-release
+Development=4.6.3.1-release

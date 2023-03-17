@@ -176,7 +176,7 @@ When you want the merged setup to be taken over to the *Setup Editor*, when you 
 
 As you might have noticed, the "Setup Advisor" implements a quite generic, but also to a large extent general approach to car handling problems. But it is also possible to introduce simulator specific or even car specific rules for the AI processing and you can also describe the car specific settings, their ranges and rules for reading and modifying setup files. All builtin definitions and rules can be found in the *Resources\Advisor\Definitions* and in the *Resources\Advisor\Rules* folder in the program directory. But you can introduce their own versions of these files or even new ones in the *Simulator Controller\Advisor* folder in your user *Documents* folder. You can use the definition and rule files which are located in the programm directory as a template when creating your own files.
 
-Although it is possible to introduce support for a completely new simulator, much more common is the addition of a new car. Every simulator will support a so called generic car, with all setup settings supported by this simulator. Also, the Setup Editor will handle this generic car, but almost all settings will be handled a simple "clicks" without restricting the changes to a known range. This information is provided by the so called car definition files and the car specific rules.
+Although it is possible to introduce support for a completely new simulator, much more common is the addition of a new car. Every simulator will support a so called generic car, with all setup settings supported by this simulator. Also, the Setup Editor will handle this generic car, but almost all settings will be handled as simple "clicks" without restricting the changes to a known range. This information is provided by the so called car definition files and the car specific rules.
 
 ### Introducing new car specifications
 
@@ -194,7 +194,7 @@ with [Simulator] and [Car] substituted by the specific names.
 
 These rules are loaded and activated, when you select a specific car in "Setup Advisor". In most cases, the car specific rules will alter the set of available car settings, but it is also possible to modify, add or remove rules for the problem analysis as described above.
 
-Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very minimalistic approach, when it comes to car setup possibilities:
+Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very minimalistic approach, when it comes to car setup capabilities:
 
 	[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 992 GT3 Cup",
 				[Electronics.TC, Aero.Splitter.Front,

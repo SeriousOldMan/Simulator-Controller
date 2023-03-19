@@ -166,47 +166,47 @@ Sends the given message. The first parameter defines the delivery method, where 
 
 ***
 
-## Configurations ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
-Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
+## Multi Maps ([MultiMap.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/MultiMap.ahk))
+Multi Maps are used to store a definition or the state of an object to the file system. Multi Maps are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Multi Maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a Multi Map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
 
-#### *newConfiguration()* 
-Returns a new empty configuration map. The configuration map is not derived from a public class and may be accessed only through the functions given below. 
+#### *newMultiMap()* 
+Returns a new empty Multi Map. The Multi Map is not derived from a public class and may be accessed only through the functions given below. 
 
-#### *getConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, default := false)*
+#### *getMultiMapValue(multiMap :: MultiMap, section :: String, key :: String, default := false)*
 Returns the value defined for the given key or the *default*, if no such key has been defined.
 
-#### *setConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, value)*
-Stores the given value for the given key in the configuration map. The value must be convertible to a String representation.
+#### *setMultiMapValue(multiMap :: MultiMap, section :: String, key :: String, value)*
+Stores the given value for the given key in the Multi Map. The value must be convertible to a String representation.
 
-#### *getConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, default := false)*
+#### *getMultiMapValues(multiMap :: MultiMap, section :: String, default := false)*
 Retrieves all key / value pairs for a given section as a map. Returns *default*, if the section does not exist.
 
-#### *setConfigurationValues(configuration, otherConfiguration)*
-This function takes all key / value pairs from all sections in *otherConfiguration* and copies them to *configuration*.
+#### *setMultiMapValues(multiMap, otherMultiMap)*
+This function takes all key / value pairs from all sections in *otherMultiMap* and copies them to *multiMap*.
 
-#### *setConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, values :: Object)*
-Stores all the key / value pairs in the configuration map under the given section.
+#### *setMultiMapValues(multiMap :: MultiMap, section :: String, values :: Object)*
+Stores all the key / value pairs in the Multi Map under the given section.
 
-#### *removeConfigurationValue(configuration :: ConfigurationMao, section :: String, key :: String)*
-Removes the given key and its value from the configuration map.
+#### *removeMultiMapValue(multiMap :: MultiMap, section :: String, key :: String)*
+Removes the given key and its value from the Multi Map.
 
-#### *removeConfigurationSection(configuration :: ConfigurationMao, section :: String)*
-Removes the given section including all keys and values from the configuration map.
+#### *removeMultiMapValues(multiMap :: MultiMap, section :: String)*
+Removes the given section including all keys and values from the Multi Map.
 
-#### *readConfiguration(configFile :: String)*
-Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file. If *configFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
+#### *readMultiMap(multiMapFile :: String)*
+Reads a Multi Map from a file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the Multi Map file. If *multiMapFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
 
-#### *parseConfiguration(text :: String)*
-Simular to *readConfiguration*, but reads the configuration from a string instead of a file.
+#### *parseMultiMap(text :: String)*
+Simular to *readMultiMap*, but reads the Multi Map from a string instead of a file.
 
-#### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
-Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file. If *configFile* denotes an absolute path, the configuration will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
+#### *writeMultiMap(multiMapFile :: String, multiMap :: MultiMap)*
+Stores a Multi Map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the Multi Map file. If *multiMapFile* denotes an absolute path, the Multi Map will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
 
-#### *printConfiguration(configuration :: ConfigurationMap)*
-Simular to *writeConfiguration*, but returns the textual configuration as a string.
+#### *printMultiMap(multiMap :: MultiMap)*
+Simular to *writeMultiMap*, but returns the textual Multi Map as a string.
 
 #### *getControllerState()*
-This function returns a representation of the file *Simulator Controller.status* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The configuration object consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller as well as a lot of information about the internal status of all components. This file is created by the *Simulator Controller.exe* application and is updated periodically. Note: This function is actually not part of the *Configuration* library, but is referenced here for completeness.
+This function returns a representation of the file *Simulator Controller.status* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The Multi Map consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller as well as a lot of information about the internal status of all components. This file is created by the *Simulator Controller.exe* application and is updated periodically. Note: This function is actually not part of the *Multi Map* library, but is referenced here for completeness.
 
 ***
 

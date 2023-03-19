@@ -15,7 +15,7 @@
 #Include "..\Framework\Strings.ahk"
 #Include "..\Framework\Collections.ahk"
 #Include "..\Framework\Localization.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\MultiMap.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -61,8 +61,8 @@ showSplash(image, alwaysOnTop := true, video := false) {
 			}
 		}
 
-		title := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
-		subTitle := substituteVariables(translate(getConfigurationValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
+		title := substituteVariables(translate(getMultiMapValue(kSimulatorConfiguration, "Splash Window", "Title", "")))
+		subTitle := substituteVariables(translate(getMultiMapValue(kSimulatorConfiguration, "Splash Window", "Subtitle", "")))
 
 		SplitPath(image, , , &extension)
 
@@ -136,9 +136,6 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 	static numImages := 0
 	static onTop := false
 
-	while isAlpha(songHandler)
-		songHandler := %songHandler%
-
 	if !songHandler
 		songHandler := playThemeSong
 
@@ -154,11 +151,11 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 
 	song := false
 	duration := 3000
-	type := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Type", false)
+	type := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Type", false)
 
 	if (type == "Video") {
-		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
-		video := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Video")
+		song := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
+		video := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Video")
 
 		showSplash(video, true)
 
@@ -168,9 +165,9 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 		return
 	}
 	else if (type == "Picture Carousel") {
-		duration := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Duration", 5000)
-		song := getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
-		images := string2Values(",", getConfigurationValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
+		duration := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Duration", 5000)
+		song := getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Song", false)
+		images := string2Values(",", getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
 	}
 	else {
 		logMessage(kLogCritical, translate("Theme """) . theme . translate(""" not found - please check the configuration"))
@@ -198,7 +195,7 @@ hideSplashTheme() {
 	try {
 		SoundPlay("NonExistent.avi")
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 	}
 
@@ -212,7 +209,7 @@ getAllThemes(configuration := false) {
 	if !configuration
 		configuration := kSimulatorConfiguration
 
-	for descriptor, value in getConfigurationSectionValues(configuration, "Splash Themes", Map()) {
+	for descriptor, value in getMultiMapValues(configuration, "Splash Themes") {
 		theme := StrSplit(descriptor, ".")[1]
 
 		if !inList(result, theme)

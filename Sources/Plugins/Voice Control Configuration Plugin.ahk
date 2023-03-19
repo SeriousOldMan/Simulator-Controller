@@ -79,7 +79,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 
 	iCorrection := 0
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
@@ -88,7 +88,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	__New(editor, configuration := false) {
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		VoiceControlConfigurator.Instance := this
 	}
@@ -201,9 +201,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Add, DropDownList, AltSubmit x%x1% yp w160 Choose%chosen% HWNDwidget29 gchooseVoiceRecognizer VvoiceRecognizerDropDown Hidden, % values2String("|", choices*)
 
 		if (voiceRecognizerDropDown = 3)
-			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			recognizers := SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		else
-			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			recognizers := SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 
 		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
@@ -275,9 +275,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		local languageCode, languages, synthesizer, recognizer
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		languageCode := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
+		languageCode := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
 		languages := availableLanguages()
 
 		if languages.HasKey(languageCode)
@@ -285,32 +285,32 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		else
 			voiceLanguageDropDown := languageCode
 
-		synthesizer := getConfigurationValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+		synthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
 		if (InStr(synthesizer, "Azure") == 1)
 			synthesizer := "Azure"
 
-		recognizer := getConfigurationValue(configuration, "Voice Control", "Recognizer", "Desktop")
+		recognizer := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
 		if (InStr(recognizer, "Azure") == 1)
 			recognizer := "Azure"
 
 		voiceSynthesizerDropDown := inList(["Windows", "dotNET", "Azure"], synthesizer)
 		voiceRecognizerDropDown := inList(["Server", "Desktop", "Azure"], recognizer)
 
-		azureSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", true)
-		windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows",  getConfigurationValue(configuration, "Voice Control", "Speaker", true))
+		azureSpeakerDropDown := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
+		windowsSpeakerDropDown := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows",  getMultiMapValue(configuration, "Voice Control", "Speaker", true))
 
-		azureSubscriptionKeyEdit := getConfigurationValue(configuration, "Voice Control", "SubscriptionKey", "")
-		azureTokenIssuerEdit := getConfigurationValue(configuration, "Voice Control", "TokenIssuer", "")
+		azureSubscriptionKeyEdit := getMultiMapValue(configuration, "Voice Control", "SubscriptionKey", "")
+		azureTokenIssuerEdit := getMultiMapValue(configuration, "Voice Control", "TokenIssuer", "")
 
-		speakerVolumeSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
-		speakerPitchSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
-		speakerSpeedSlider := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		speakerVolumeSlider := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
+		speakerPitchSlider := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
+		speakerSpeedSlider := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
 
-		soXPathEdit := getConfigurationValue(configuration, "Voice Control", "SoX Path", "")
+		soXPathEdit := getMultiMapValue(configuration, "Voice Control", "SoX Path", "")
 
-		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", true)
-		pushToTalkEdit := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
-		activationCommandEdit := getConfigurationValue(configuration, "Voice Control", "ActivationCommand", false)
+		listenerDropDown := getMultiMapValue(configuration, "Voice Control", "Listener", true)
+		pushToTalkEdit := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
+		activationCommandEdit := getMultiMapValue(configuration, "Voice Control", "ActivationCommand", false)
 
 		if (pushToTalkEdit = false)
 			pushToTalkEdit := ""
@@ -335,22 +335,22 @@ class VoiceControlConfigurator extends ConfigurationItem {
 				listenerDropDown := translate("Deactivated")
 		}
 
-		this.iSoundProcessingSettings := [getConfigurationValue(configuration, "Voice Control", "Speaker.ClickVolume", 80)
-										, getConfigurationValue(configuration, "Voice Control", "Speaker.NoiseVolume", 66)
-										, getConfigurationValue(configuration, "Voice Control", "Speaker.Overdrive", 20)
-										, getConfigurationValue(configuration, "Voice Control", "Speaker.Color", 20)
-										, getConfigurationValue(configuration, "Voice Control", "Speaker.HighPass", 800)
-										, getConfigurationValue(configuration, "Voice Control", "Speaker.LowPass", 1800)]
+		this.iSoundProcessingSettings := [getMultiMapValue(configuration, "Voice Control", "Speaker.ClickVolume", 80)
+										, getMultiMapValue(configuration, "Voice Control", "Speaker.NoiseVolume", 66)
+										, getMultiMapValue(configuration, "Voice Control", "Speaker.Overdrive", 20)
+										, getMultiMapValue(configuration, "Voice Control", "Speaker.Color", 20)
+										, getMultiMapValue(configuration, "Voice Control", "Speaker.HighPass", 800)
+										, getMultiMapValue(configuration, "Voice Control", "Speaker.LowPass", 1800)]
 	}
 
 	saveToConfiguration(configuration) {
 		local window := this.Editor.Window
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		Gui %window%:Default
 
-		setConfigurationValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
+		setMultiMapValue(configuration, "Voice Control", "Language", this.getCurrentLanguage())
 
 		GuiControlGet voiceSynthesizerDropDown
 		GuiControlGet voiceRecognizerDropDown
@@ -370,27 +370,27 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			azureSpeakerDropDown := false
 
 		if (voiceSynthesizerDropDown = 1) {
-			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "Windows")
-			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Windows")
+			setMultiMapValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", windowsSpeakerDropDown)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
 		else if (voiceSynthesizerDropDown = 2) {
-			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "dotNET")
-			setConfigurationValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeakerDropDown)
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+			setMultiMapValue(configuration, "Voice Control", "Speaker", windowsSpeakerDropDown)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", windowsSpeakerDropDown)
 		}
 		else {
-			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
-			setConfigurationValue(configuration, "Voice Control", "Speaker", azureSpeakerDropDown)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.Windows", true)
-			setConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
+			setMultiMapValue(configuration, "Voice Control", "Speaker", azureSpeakerDropDown)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		}
 
-		setConfigurationValue(configuration, "Voice Control", "Speaker.Azure", azureSpeakerDropDown)
-		setConfigurationValue(configuration, "Voice Control", "SubscriptionKey", azureSubscriptionKeyEdit)
-		setConfigurationValue(configuration, "Voice Control", "TokenIssuer", azureTokenIssuerEdit)
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeakerDropDown)
+		setMultiMapValue(configuration, "Voice Control", "SubscriptionKey", azureSubscriptionKeyEdit)
+		setMultiMapValue(configuration, "Voice Control", "TokenIssuer", azureTokenIssuerEdit)
 
 		GuiControlGet speakerVolumeSlider
 		GuiControlGet speakerPitchSlider
@@ -400,10 +400,10 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControlGet pushToTalkEdit
 		GuiControlGet activationCommandEdit
 
-		setConfigurationValue(configuration, "Voice Control", "SpeakerVolume", speakerVolumeSlider)
-		setConfigurationValue(configuration, "Voice Control", "SpeakerPitch", speakerPitchSlider)
-		setConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", speakerSpeedSlider)
-		setConfigurationValue(configuration, "Voice Control", "SoX Path", soXPathEdit)
+		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", speakerVolumeSlider)
+		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", speakerPitchSlider)
+		setMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", speakerSpeedSlider)
+		setMultiMapValue(configuration, "Voice Control", "SoX Path", soXPathEdit)
 
 		if (listenerDropDown = translate("Automatic"))
 			listenerDropDown := true
@@ -411,20 +411,20 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			listenerDropDown := false
 
 		if (voiceRecognizerDropDown <= 2)
-			setConfigurationValue(configuration, "Voice Control", "Recognizer", ["Server", "Desktop"][voiceRecognizerDropDown])
+			setMultiMapValue(configuration, "Voice Control", "Recognizer", ["Server", "Desktop"][voiceRecognizerDropDown])
 		else
-			setConfigurationValue(configuration, "Voice Control", "Recognizer", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
+			setMultiMapValue(configuration, "Voice Control", "Recognizer", "Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit)
 
-		setConfigurationValue(configuration, "Voice Control", "Listener", listenerDropDown)
-		setConfigurationValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
-		setConfigurationValue(configuration, "Voice Control", "ActivationCommand", (Trim(activationCommandEdit) = "") ? false : activationCommandEdit)
+		setMultiMapValue(configuration, "Voice Control", "Listener", listenerDropDown)
+		setMultiMapValue(configuration, "Voice Control", "PushToTalk", (Trim(pushToTalkEdit) = "") ? false : pushToTalkEdit)
+		setMultiMapValue(configuration, "Voice Control", "ActivationCommand", (Trim(activationCommandEdit) = "") ? false : activationCommandEdit)
 
-		setConfigurationValue(configuration, "Voice Control", "Speaker.ClickVolume", this.iSoundProcessingSettings[1])
-		setConfigurationValue(configuration, "Voice Control", "Speaker.NoiseVolume", this.iSoundProcessingSettings[2])
-		setConfigurationValue(configuration, "Voice Control", "Speaker.Overdrive", this.iSoundProcessingSettings[3])
-		setConfigurationValue(configuration, "Voice Control", "Speaker.Color", this.iSoundProcessingSettings[4])
-		setConfigurationValue(configuration, "Voice Control", "Speaker.HighPass", this.iSoundProcessingSettings[5])
-		setConfigurationValue(configuration, "Voice Control", "Speaker.LowPass", this.iSoundProcessingSettings[6])
+		setMultiMapValue(configuration, "Voice Control", "Speaker.ClickVolume", this.iSoundProcessingSettings[1])
+		setMultiMapValue(configuration, "Voice Control", "Speaker.NoiseVolume", this.iSoundProcessingSettings[2])
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Overdrive", this.iSoundProcessingSettings[3])
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Color", this.iSoundProcessingSettings[4])
+		setMultiMapValue(configuration, "Voice Control", "Speaker.HighPass", this.iSoundProcessingSettings[5])
+		setMultiMapValue(configuration, "Voice Control", "Speaker.LowPass", this.iSoundProcessingSettings[6])
 	}
 
 	loadConfigurator(configuration) {
@@ -494,7 +494,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		else
 			GuiControl Disable, soXConfigurationButton
 
-		listenerDropDown := getConfigurationValue(configuration, "Voice Control", "Listener", true)
+		listenerDropDown := getMultiMapValue(configuration, "Voice Control", "Listener", true)
 
 		if (listenerDropDown == true)
 			listenerDropDown := translate("Automatic")
@@ -502,9 +502,9 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			listenerDropDown := translate("Deactivated")
 
 		if (voiceRecognizerDropDown = 3)
-			recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			recognizers := SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 		else
-			recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
+			recognizers := SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()].Clone()
 
 		recognizers.InsertAt(1, translate("Deactivated"))
 		recognizers.InsertAt(1, translate("Automatic"))
@@ -774,12 +774,12 @@ class VoiceControlConfigurator extends ConfigurationItem {
 			GuiControlGet voiceRecognizerDropDown
 
 			if (voiceRecognizerDropDown <= 2)
-				recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+				recognizers := SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
 			else {
 				GuiControlGet azureSubscriptionKeyEdit
 				GuiControlGet azureTokenIssuerEdit
 
-				recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
+				recognizers := SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, this.getCurrentLanguage(), true).Recognizers[this.getCurrentLanguage()]
 			}
 
 			recognizers.InsertAt(1, translate("Deactivated"))
@@ -794,7 +794,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 
 	loadVoices(synthesizer, configuration) {
 		local language := this.getCurrentLanguage()
-		local voices := new SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
+		local voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
 
 		voices.InsertAt(1, translate("Deactivated"))
 		voices.InsertAt(1, translate("Automatic"))
@@ -808,7 +808,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Default
 
 		if configuration
-			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Windows", getConfigurationValue(this.Configuration, "Voice Control", "Speaker", true))
+			windowsSpeakerDropDown := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(this.Configuration, "Voice Control", "Speaker", true))
 		else {
 			GuiControlGet windowsSpeakerDropDown
 
@@ -824,7 +824,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		Gui %window%:Default
 
 		if configuration
-			windowsSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.dotNET", true)
+			windowsSpeakerDropDown := getMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
 		else {
 			GuiControlGet windowsSpeakerDropDown
 
@@ -873,7 +873,7 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		GuiControlGet azureTokenIssuerEdit
 
 		if configuration
-			azureSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", true)
+			azureSpeakerDropDown := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 		else {
 			configuration := this.Configuration
 
@@ -881,12 +881,12 @@ class VoiceControlConfigurator extends ConfigurationItem {
 		}
 
 		if (configuration && !azureSpeakerDropDown)
-			azureSpeakerDropDown := getConfigurationValue(configuration, "Voice Control", "Speaker.Azure", true)
+			azureSpeakerDropDown := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 
 		if ((azureSubscriptionKeyEdit != "") && (azureTokenIssuerEdit)) {
 			language := this.getCurrentLanguage()
 
-			voices := new SpeechSynthesizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, true, language).Voices[language].Clone()
+			voices := SpeechSynthesizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, true, language).Voices[language].Clone()
 		}
 
 		voices.InsertAt(1, translate("Deactivated"))
@@ -1079,13 +1079,13 @@ chooseVoiceRecognizer() {
 		GuiControlGet azureSubscriptionKeyEdit
 		GuiControlGet azureTokenIssuerEdit
 
-		recognizers := new SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
+		recognizers := SpeechRecognizer("Azure|" . azureTokenIssuerEdit . "|" . azureSubscriptionKeyEdit, false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
 
 		configurator.showAzureRecognizerEditor()
 	}
 
 	if (voiceRecognizerDropDown <= 2)
-		recognizers := new SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
+		recognizers := SpeechRecognizer((voiceRecognizerDropDown = 1) ? "Server" : "Desktop", false, configurator.getCurrentLanguage(), true).Recognizers[configurator.getCurrentLanguage()].Clone()
 
 	recognizers.InsertAt(1, translate("Deactivated"))
 	recognizers.InsertAt(1, translate("Automatic"))
@@ -1170,7 +1170,7 @@ initializeVoiceControlConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Voice Control"), new VoiceControlConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Voice Control"), VoiceControlConfigurator(editor, editor.Configuration))
 	}
 }
 

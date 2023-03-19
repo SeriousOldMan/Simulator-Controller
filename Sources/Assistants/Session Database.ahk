@@ -172,9 +172,9 @@ global transferPressuresButton
 
 class SessionDatabaseEditor extends ConfigurationItem {
 	iRequestorPID := false
-	iSettingDescriptors := newConfiguration()
+	iSettingDescriptors := newMultiMap()
 
-	iSessionDatabase := new SessionDatabase()
+	iSessionDatabase := SessionDatabase()
 
 	iSelectedSimulator := false
 	iSelectedCar := true
@@ -213,25 +213,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	class EditorTyresDatabase extends TyresDatabase {
 		__New(controllerState := false) {
-			base.__New()
+			super.__New()
 
 			this.UseCommunity[false] := SessionDatabaseEditor.Instance.UseCommunity
 		}
 	}
 
-	Window[] {
+	Window {
 		Get {
 			return "SDE"
 		}
 	}
 
-	RequestorPID[] {
+	RequestorPID {
 		Get {
 			return this.iRequestorPID
 		}
 	}
 
-	SettingDescriptors[] {
+	SettingDescriptors {
 		Get {
 			return this.iSettingDescriptors
 		}
@@ -247,7 +247,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	SessionDatabase[] {
+	SessionDatabase {
 		Get {
 			return this.iSessionDatabase
 		}
@@ -297,43 +297,43 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	SelectedModule[] {
+	SelectedModule {
 		Get {
 			return this.iSelectedModule
 		}
 	}
 
-	SelectedSetupType[] {
+	SelectedSetupType {
 		Get {
 			return this.iSelectedSetupType
 		}
 	}
 
-	DataListView[] {
+	DataListView {
 		Get {
 			return this.iDataListView
 		}
 	}
 
-	SettingsListView[] {
+	SettingsListView {
 		Get {
 			return this.iSettingsListView
 		}
 	}
 
-	StrategyListView[] {
+	StrategyListView {
 		Get {
 			return this.iStrategyListView
 		}
 	}
 
-	SetupListView[] {
+	SetupListView {
 		Get {
 			return this.iSetupListView
 		}
 	}
 
-	AdministrationListView[] {
+	AdministrationListView {
 		Get {
 			return this.iAdministrationListView
 		}
@@ -349,25 +349,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	SelectedTrackAutomation[] {
+	SelectedTrackAutomation {
 		Get {
 			return this.iSelectedTrackAutomation
 		}
 	}
 
-	TrackMap[] {
+	TrackMap {
 		Get {
 			return this.iTrackMap
 		}
 	}
 
-	TrackImage[] {
+	TrackImage {
 		Get {
 			return this.iTrackImage
 		}
 	}
 
-	TrackAutomationsListView[] {
+	TrackAutomationsListView {
 		Get {
 			return this.iTrackAutomationsListView
 		}
@@ -389,7 +389,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iRequestorPID := requestorPID
 
-		base.__New(kSimulatorConfiguration)
+		super.__New(kSimulatorConfiguration)
 
 		SessionDatabaseEditor.Instance := this
 
@@ -456,7 +456,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Weather")
 
-		choices := map(kWeatherConditions, "translate")
+		choices := collect(kWeatherConditions, "translate")
 		choices.InsertAt(1, translate("All"))
 		chosen := inList(kWeatherConditions, weather)
 
@@ -534,13 +534,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, GroupBox, x280 ys-8 w390 h476
 
-		tabs := map(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], "translate")
+		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], "translate")
 
 		Gui %window%:Add, Tab2, x296 ys+16 w0 h0 -Wrap vsettingsTab Section, % values2String("|", tabs*)
 
 		Gui Tab, 1
 
-		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", map(["Setting", "Value"], "translate")*)
+		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", collect(["Setting", "Value"], "translate")*)
 
 		this.iSettingsListView := settingsListViewHandle
 
@@ -562,7 +562,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui Tab, 2
 
-		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseStrategy, % values2String("|", map(["Source", "Name"], "translate")*)
+		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseStrategy, % values2String("|", collect(["Source", "Name"], "translate")*)
 
 		this.iStrategyListView := listViewHandle
 
@@ -582,9 +582,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		Gui Tab, 3
 
 		Gui %window%:Add, Text, x296 ys w80 h23 +0x200, % translate("Purpose")
-		Gui %window%:Add, DropDownList, xp+90 yp w270 AltSubmit Choose2 vsetupTypeDropDown gchooseSetupType, % values2String("|", map(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], "translate")*)
+		Gui %window%:Add, DropDownList, xp+90 yp w270 AltSubmit Choose2 vsetupTypeDropDown gchooseSetupType, % values2String("|", collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], "translate")*)
 
-		Gui %window%:Add, ListView, x296 yp+24 w360 h302 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", map(["Source", "Name"], "translate")*)
+		Gui %window%:Add, ListView, x296 yp+24 w360 h302 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", collect(["Source", "Name"], "translate")*)
 
 		this.iSetupListView := listViewHandle
 		this.iSelectedSetupType := kDryRaceSetup
@@ -669,7 +669,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iTrackDisplay := trackDisplay
 
-		Gui %window%:Add, ListView, x296 y597 w110 h85 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", map(["Name", "#"], "translate")*)
+		Gui %window%:Add, ListView, x296 y597 w110 h85 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", collect(["Name", "#"], "translate")*)
 
 		this.iTrackAutomationsListView := trackAutomationsListViewHandle
 
@@ -690,7 +690,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		Gui %window%:Add, CheckBox, +Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck gselectAllData
 
-		Gui %window%:Add, ListView, x314 ys w342 h404 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
+		Gui %window%:Add, ListView, x314 ys w342 h404 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", collect(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
 		this.iAdministrationListView := administrationListViewHandle
 
@@ -706,9 +706,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
-		Gui %window%:Add, DropDownList, x120 yp w140 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
+		Gui %window%:Add, DropDownList, x120 yp w140 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", collect(choices, "translate")*)
 
-		Gui %window%:Add, ListView, x16 ys+301 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", map(["Source", "Type", "#"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+301 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", collect(["Source", "Type", "#"], "translate")*)
 
 		this.iDataListView := listViewHandle
 
@@ -719,7 +719,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		chosen := (this.UseCommunity ? 2 : 1)
 
 		Gui %window%:Add, Text, x16 y661 w55 h23 +0x200, % translate("Scope")
-		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", map(choices, "translate")*)
+		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", collect(choices, "translate")*)
 		*/
 
 
@@ -946,7 +946,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					GuiControl Enable, deleteStrategyButton
 
-					if (!info || (getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+					if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
 						GuiControl Enable, renameStrategyButton
 						GuiControl Enable, shareStrategyWithCommunityCheck
 						GuiControl Enable, shareStrategyWithTeamServerCheck
@@ -998,7 +998,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					GuiControl Enable, deleteSetupButton
 
-					if (!info || (getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+					if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
 						GuiControl Enable, renameSetupButton
 						GuiControl Enable, shareSetupWithCommunityCheck
 						GuiControl Enable, shareSetupWithTeamServerCheck
@@ -1127,11 +1127,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.iSelectedSimulator := simulator
 
-			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setConfigurationValue(settings, "Session Database", "Simulator", simulator)
+			setMultiMapValue(settings, "Session Database", "Simulator", simulator)
 
-			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			this.iAllTracks := []
 
@@ -1156,11 +1156,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (force || (car != this.SelectedCar)) {
 			this.iSelectedCar := car
 
-			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setConfigurationValue(settings, "Session Database", "Car", car)
+			setMultiMapValue(settings, "Session Database", "Car", car)
 
-			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			window := this.Window
 
@@ -1172,7 +1172,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car) + 1
 
 			tracks := this.getTracks(this.SelectedSimulator, car).Clone()
-			trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
+			trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 
 			tracks.InsertAt(1, true)
 			trackNames.InsertAt(1, translate("All"))
@@ -1189,11 +1189,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (force || (track != this.SelectedTrack)) {
 			this.iSelectedTrack := track
 
-			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setConfigurationValue(settings, "Session Database", "Track", track)
+			setMultiMapValue(settings, "Session Database", "Track", track)
 
-			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 			window := this.Window
 
@@ -1257,7 +1257,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if !info
 					origin := translate("User")
 				else {
-					origin := getConfigurationValue(info, "Origin", "Driver", this.SessionDatabase.ID)
+					origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
 
 					origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
 				}
@@ -1325,7 +1325,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					if !info
 						origin := translate("User")
 					else {
-						origin := getConfigurationValue(info, "Origin", "Driver", this.SessionDatabase.ID)
+						origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
 
 						origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
 					}
@@ -1426,7 +1426,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while LV_DeleteCol(1)
 				ignore := 1
 
-			for ignore, column in map(["Reference", "#"], "translate") {
+			for ignore, column in collect(["Reference", "#"], "translate") {
 				Gui ListView, % this.DataListView
 
 				LV_InsertCol(A_Index, "", column)
@@ -1495,19 +1495,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local candidateX, candidateY, deltaX, deltaY, coordX, coordY, dX, dY
 
 		if (this.SelectedTrackAutomation && trackMap && trackImage) {
-			scale := getConfigurationValue(trackMap, "Map", "Scale")
+			scale := getMultiMapValue(trackMap, "Map", "Scale")
 
-			offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-			offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+			offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
+			offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
 
-			marginX := getConfigurationValue(trackMap, "Map", "Margin.X")
-			marginY := getConfigurationValue(trackMap, "Map", "Margin.Y")
+			marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
+			marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
 
 			width := this.iTrackDisplayArea[3]
 			height := this.iTrackDisplayArea[4]
 
-			imgWidth := ((getConfigurationValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
-			imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+			imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+			imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 
 			imgScale := Min(width / imgWidth, height / imgHeight)
 
@@ -1524,10 +1524,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			threshold := (threshold / scale)
 
-			loop % getConfigurationValue(trackMap, "Map", "Points")
+			loop % getMultiMapValue(trackMap, "Map", "Points")
 			{
-				coordX := getConfigurationValue(trackMap, "Points", A_Index . ".X")
-				coordY := getConfigurationValue(trackMap, "Points", A_Index . ".Y")
+				coordX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
+				coordY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
 
 				dX := Abs(coordX - x)
 				dY := Abs(coordY - y)
@@ -1564,7 +1564,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			deltaX := false
 			deltaY := false
 
-			threshold := (threshold / getConfigurationValue(trackMap, "Map", "Scale"))
+			threshold := (threshold / getMultiMapValue(trackMap, "Map", "Scale"))
 
 			for index, action in this.SelectedTrackAutomation.Actions {
 				dX := Abs(coordinateX - action.X)
@@ -1805,15 +1805,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	createTrackMap(actions := false) {
 		local trackMap := this.TrackMap
 		local trackImage := this.TrackImage
-		local scale := getConfigurationValue(trackMap, "Map", "Scale")
+		local scale := getMultiMapValue(trackMap, "Map", "Scale")
 		local width := this.iTrackDisplayArea[3]
 		local height := this.iTrackDisplayArea[4]
-		local offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-		local offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
-		local marginX := getConfigurationValue(trackMap, "Map", "Margin.X")
-		local marginY := getConfigurationValue(trackMap, "Map", "Margin.Y")
-		local imgWidth := ((getConfigurationValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
-		local imgHeight := ((getConfigurationValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
+		local offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
+		local offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
+		local marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
+		local marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
+		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
+		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
 		local imgScale := Min(width / imgWidth, height / imgHeight)
 		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, x, y, trackImage, trackDisplay
 		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY, window
@@ -1944,7 +1944,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while LV_DeleteCol(1)
 				ignore := 1
 
-			for ignore, column in map(["Type", "#"], "translate")
+			for ignore, column in collect(["Type", "#"], "translate")
 				LV_InsertCol(A_Index, "", column)
 
 			LV_Delete()
@@ -1975,7 +1975,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							if (row.Identifier != kNull)
 								connector.DeleteData(serverTable, row.Identifier)
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception, true)
 					}
 
@@ -2050,12 +2050,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				switch type {
 					case translate("Telemetry"):
-						telemetryDB := new TelemetryDatabase(simulator, car, track).Database
+						telemetryDB := TelemetryDatabase(simulator, car, track).Database
 
 						this.deleteEntries(connectors, telemetryDB, "Electronics", "Electronics", driver)
 						this.deleteEntries(connectors, telemetryDB, "Tyres", "Tyres", driver)
 					case translate("Pressures"):
-						tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+						tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
 
 						this.deleteEntries(connectors, tyresDB, "Tyres.Pressures", "TyresPressures", driver)
 						this.deleteEntries(connectors, tyresDB, "Tyres.Pressures.Distribution", "TyresPressuresDistribution", driver)
@@ -2180,8 +2180,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				switch type {
 					case translate("Telemetry"):
-						sourceDB := new TelemetryDatabase(simulator, car, track).Database
-						targetDB := new Database(targetDirectory, kTelemetrySchemas)
+						sourceDB := TelemetryDatabase(simulator, car, track).Database
+						targetDB := Database(targetDirectory, kTelemetrySchemas)
 
 						schemas["Electronics"] := kTelemetrySchemas["ELectronics"]
 						schemas["Tyres"] := kTelemetrySchemas["Tyres"]
@@ -2192,8 +2192,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						for ignore, entry in sourceDB.query("Tyres", {Where: {Driver: driver}})
 							targetDB.add("Tyres", entry, true)
 					case translate("Pressures"):
-						sourceDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
-						targetDB := new Database(targetDirectory, kTyresSchemas)
+						sourceDB := TyresDatabase().getTyresDatabase(simulator, car, track)
+						targetDB := Database(targetDirectory, kTyresSchemas)
 
 						schemas["Tyres.Pressures"] := kTyresSchemas["Tyres.Pressures"]
 						schemas["Tyres.Pressures.Distribution"] := kTyresSchemas["Tyres.Pressures.Distribution"]
@@ -2212,7 +2212,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							try {
 								FileCopy %A_LoopFileLongPath%, %targetDirectory%Race Strategies\%A_LoopFileName%
 							}
-							catch exception {
+							catch Any as exception {
 								logError(exception)
 							}
 					case translate("Setups"):
@@ -2226,7 +2226,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								try {
 									FileCopy %A_LoopFileLongPath%, %targetDirectory%Car Setups\%type%\%A_LoopFileName%
 								}
-								catch exception {
+								catch Any as exception {
 									logError(exception)
 								}
 							}
@@ -2243,7 +2243,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								try {
 									FileCopy %A_LoopFileLongPath%, %directory%\.Tracks\%A_LoopFileName%
 								}
-								catch exception {
+								catch Any as exception {
 									logError(exception)
 								}
 						}
@@ -2259,21 +2259,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				row := LV_GetNext(row, "C")
 			}
 
-			info := newConfiguration()
+			info := newMultiMap()
 
-			setConfigurationValue(info, "General", "Simulator", simulator)
-			setConfigurationValue(info, "General", "Creator", this.SessionDatabase.ID)
-			setConfigurationValue(info, "General", "Origin", this.SessionDatabase.DatabaseID)
+			setMultiMapValue(info, "General", "Simulator", simulator)
+			setMultiMapValue(info, "General", "Creator", this.SessionDatabase.ID)
+			setMultiMapValue(info, "General", "Origin", this.SessionDatabase.DatabaseID)
 
 			for id, name in drivers
-				setConfigurationValue(info, "Driver", id, name)
+				setMultiMapValue(info, "Driver", id, name)
 
 			for schema, fields in schemas
-				setConfigurationValue(info, "Schema", schema, values2String(",", fields*))
+				setMultiMapValue(info, "Schema", schema, values2String(",", fields*))
 
-			writeConfiguration(directory . "\Export.info", info)
+			writeMultiMap(directory . "\Export.info", info)
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 		finally {
@@ -2287,14 +2287,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	importData(directory, selection) {
 		local window := this.Window
 		local simulator := this.SelectedSimulator
-		local info := readConfiguration(directory . "\Export.info")
+		local info := readMultiMap(directory . "\Export.info")
 		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
 		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName, extension
 
 		directory := normalizeDirectoryPath(directory)
 
-		if (this.SessionDatabase.getSimulatorName(getConfigurationValue(info, "General", "Simulator", "")) = simulator) {
+		if (this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "")) = simulator) {
 			progressWindow := showProgress({color: "Green", title: translate("Importing Data")})
 
 			Gui %progressWindow%:+Owner%window%
@@ -2308,11 +2308,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			schemas["Tyres.Pressures"] := kTyresSchemas["Tyres.Pressures"]
 			schemas["Tyres.Pressures.Distribution"] := kTyresSchemas["Tyres.Pressures.Distribution"]
 
-			for schema, fields in getConfigurationSectionValues(info, "Schema", Object())
+			for schema, fields in getMultiMapValues(info, "Schema")
 				schemas[schema] := string2Values(",", fields)
 
 			try {
-				for id, name in getConfigurationSectionValues(info, "Driver", Object())
+				for id, name in getMultiMapValues(info, "Driver")
 					this.SessionDatabase.registerDriver(simulator, id, name)
 
 				progress := 0
@@ -2363,8 +2363,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							if selection.HasKey(key . "Telemetry") {
 								driver := selection[key . "Telemetry"]
 
-								sourceDB := new Database(sourceDirectory . "\", schemas)
-								targetDB := new TelemetryDatabase(simulator, car, track).Database
+								sourceDB := Database(sourceDirectory . "\", schemas)
+								targetDB := TelemetryDatabase(simulator, car, track).Database
 
 								targetDB.lock("Electronics")
 
@@ -2402,8 +2402,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							if selection.HasKey(key . "Pressures") {
 								driver := selection[key . "Pressures"]
 
-								tyresDB := new TyresDatabase()
-								sourceDB := new Database(sourceDirectory . "\", schemas)
+								tyresDB := TyresDatabase()
+								sourceDB := Database(sourceDirectory . "\", schemas)
 								targetDB := tyresDB.lock(simulator, car, track)
 
 								try {
@@ -2494,7 +2494,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						}
 					}
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 			finally {
@@ -2575,7 +2575,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 									targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
 
-									telemetryDB := new TelemetryDatabase(simulator, car, track)
+									telemetryDB := TelemetryDatabase(simulator, car, track)
 
 									for ignore, driver in drivers {
 										count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
@@ -2586,7 +2586,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 													 , count)
 									}
 
-									tyresDB := new TyresDatabase().getTyresDatabase(simulator, car, track)
+									tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
 
 									for ignore, driver in drivers {
 										result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
@@ -2671,7 +2671,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while LV_DeleteCol(1)
 				ignore := 1
 
-			for ignore, column in map(["Type", "#"], "translate")
+			for ignore, column in collect(["Type", "#"], "translate")
 				LV_InsertCol(A_Index, "", column)
 
 			selectedSimulator := this.SelectedSimulator
@@ -2796,7 +2796,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while LV_DeleteCol(1)
 				ignore := 1
 
-			for ignore, column in map(["Source", "#"], "translate")
+			for ignore, column in collect(["Source", "#"], "translate")
 				LV_InsertCol(A_Index, "", column)
 
 			userStrategies := true
@@ -2837,7 +2837,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while LV_DeleteCol(1)
 				ignore := 1
 
-			for ignore, column in map(["Source", "Type", "#"], "translate")
+			for ignore, column in collect(["Source", "Type", "#"], "translate")
 				LV_InsertCol(A_Index, "", column)
 
 			userSetups := true
@@ -2879,7 +2879,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			while LV_DeleteCol(1)
 				ignore := 1
 
-			for ignore, column in map(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
+			for ignore, column in collect(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
 				LV_InsertCol(A_Index, "", column)
 
 			sessionDB := this.SessionDatabase
@@ -3029,7 +3029,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
-		return getConfigurationValue(this.SettingDescriptors, section . ".Labels", key, "")
+		return getMultiMapValue(this.SettingDescriptors, section . ".Labels", key, "")
 	}
 
 	getSettingType(section := false, key := false, ByRef default := false) {
@@ -3059,7 +3059,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			}
 		}
 
-		type := getConfigurationValue(this.SettingDescriptors, section . ".Types", key, false)
+		type := getMultiMapValue(this.SettingDescriptors, section . ".Types", key, false)
 
 		if type {
 			type := string2Values(";", type)
@@ -3093,21 +3093,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local available, index, candidate, rootDirectory
 
 		if (this.SettingDescriptors.Count() = 0) {
-			settingDescriptors := readConfiguration(kResourcesDirectory . "Database\Settings.ini")
+			settingDescriptors := readMultiMap(kResourcesDirectory . "Database\Settings.ini")
 
 			for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
 				if FileExist(rootDirectory . "Settings." . getLanguage()) {
 					found := true
 
-					for section, values in readConfiguration(rootDirectory . "Settings." . getLanguage())
+					for section, values in readMultiMap(rootDirectory . "Settings." . getLanguage())
 						for key, value in values
-							setConfigurationValue(settingDescriptors, section, key, value)
+							setMultiMapValue(settingDescriptors, section, key, value)
 				}
 
 			if !found
-				for section, values in readConfiguration(kTranslationsDirectory . "Settings.en")
+				for section, values in readMultiMap(kTranslationsDirectory . "Settings.en")
 					for key, value in values
-						setConfigurationValue(settingDescriptors, section, key, value)
+						setMultiMapValue(settingDescriptors, section, key, value)
 
 			this.iSettingDescriptors := settingDescriptors
 		}
@@ -3264,7 +3264,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			LV_ModifyCol(1, "AutoHdr")
 			LV_ModifyCol(2, "AutoHdr")
 
-			settingsDB := new SettingsDatabase()
+			settingsDB := SettingsDatabase()
 
 			if ((this.iSettings[selected][1] != section) || (this.iSettings[selected][2] != key)) {
 				settingsDB.removeSettingValue(this.SelectedSimulator
@@ -3315,7 +3315,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				compounds := sessionDB.getTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
-				GuiControl, , tyreCompoundDropDown, % ("|" . values2String("|", map(compounds, "translate")*))
+				GuiControl, , tyreCompoundDropDown, % ("|" . values2String("|", collect(compounds, "translate")*))
 
 				chosenCompound := 0
 
@@ -3377,7 +3377,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					this.iTyreCompound := compound
 					this.iTyreCompoundColor := compoundColor
 
-					pressureInfos := new this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
+					pressureInfos := this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
 																			   , this.SelectedTrack, this.SelectedWeather
 																			   , convertUnit("Temperature", airTemperatureEdit, false)
 																			   , convertUnit("Temperature", trackTemperatureEdit, false)
@@ -3438,7 +3438,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					}
 				}
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -3479,9 +3479,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
 
-		if (info && getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
-			GuiControl, , shareStrategyWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
-			GuiControl, , shareStrategyWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
+		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
+			GuiControl, , shareStrategyWithCommunityCheck, % getMultiMapValue(info, "Access", "Share", false)
+			GuiControl, , shareStrategyWithTeamServerCheck, % getMultiMapValue(info, "Access", "Synchronize", false)
 		}
 		else {
 			GuiControl, , shareStrategyWithCommunityCheck, 0
@@ -3507,9 +3507,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, name)
 
-		if (info && getConfigurationValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
-			GuiControl, , shareSetupWithCommunityCheck, % getConfigurationValue(info, "Access", "Share", false)
-			GuiControl, , shareSetupWithTeamServerCheck, % getConfigurationValue(info, "Access", "Synchronize", false)
+		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
+			GuiControl, , shareSetupWithCommunityCheck, % getMultiMapValue(info, "Access", "Share", false)
+			GuiControl, , shareSetupWithTeamServerCheck, % getMultiMapValue(info, "Access", "Synchronize", false)
 		}
 		else {
 			GuiControl, , shareSetupWithCommunityCheck, 0
@@ -3532,7 +3532,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		OnMessage(0x44, "")
 
 		if (fileName != "") {
-			strategy := readConfiguration(fileName)
+			strategy := readMultiMap(fileName)
 
 			SplitPath fileName, fileName
 
@@ -3557,7 +3557,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (fileName != "") {
 			deleteFile(fileName)
 
-			writeConfiguration(fileName, this.SessionDatabase.readStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName))
+			writeMultiMap(fileName, this.SessionDatabase.readStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName))
 		}
 	}
 
@@ -3859,7 +3859,7 @@ actionDialog(xOrCommand := false, y := false, action := false) {
 			actionEdit := ""
 		}
 
-		Gui %window%:Add, DropDownList, x90 yp+1 w180 AltSubmit Choose%chosen% VactionTypeDropDown gchooseActionType, % values2String("|", map(["Hotkey(s)", "Command"], "translate")*)
+		Gui %window%:Add, DropDownList, x90 yp+1 w180 AltSubmit Choose%chosen% VactionTypeDropDown gchooseActionType, % values2String("|", collect(["Hotkey(s)", "Command"], "translate")*)
 
 		Gui %window%:Add, Text, x16 yp+23 w70 h23 +0x200 vactionLabel, % translate("Hotkey(s)")
 		Gui %window%:Add, Edit, x90 yp+1 w155 h21 VactionEdit, %actionEdit%
@@ -3953,7 +3953,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 		Gui IDS:Add, CheckBox, Check3 x16 yp+12 w15 h23 vimportSelectCheck gselectAllImportEntries ; +Theme
 
-		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", map(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
+		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", collect(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
 
 		directory := normalizeDirectoryPath(directory)
 		editor := sessionDatabaseEditorOrCommand
@@ -3962,11 +3962,11 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		simulator := editor.SelectedSimulator
 		code := editor.SessionDatabase.getSimulatorCode(simulator)
 
-		info := readConfiguration(directory . "\Export.info")
+		info := readMultiMap(directory . "\Export.info")
 
 		drivers := {}
 
-		for id, name in getConfigurationSectionValues(info, "Driver", Object()) {
+		for id, name in getMultiMapValues(info, "Driver") {
 			drivers[id] := name
 			drivers[name] := id
 		}
@@ -4020,9 +4020,9 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 					found := false
 
-					telemetryDB := new TelemetryDatabase()
+					telemetryDB := TelemetryDatabase()
 
-					telemetryDB.setDatabase(new Database(sourceDirectory . "\", kTelemetrySchemas))
+					telemetryDB.setDatabase(Database(sourceDirectory . "\", kTelemetrySchemas))
 
 					for driver, driverName in drivers {
 						count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
@@ -4031,7 +4031,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 							LV_Add("Check", translate("Telemetry"), (carName . " / " . trackName), driverName, count)
 					}
 
-					tyresDB := new Database(sourceDirectory . "\", kTyresSchemas)
+					tyresDB := Database(sourceDirectory . "\", kTyresSchemas)
 
 					for driver, driverName in drivers {
 						rows := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
@@ -4330,9 +4330,9 @@ editSettings(editorOrCommand, arguments*) {
 
 		GuiControl, , serverIdentifierEdit, %serverIdentifierEdit%
 
-		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		availableServerURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+		availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
 		if (!inList(availableServerURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
 			availableServerURLs.Push(serverURLEdit)
@@ -4384,11 +4384,11 @@ editSettings(editorOrCommand, arguments*) {
 		}
 	}
 	else if (editorOrCommand = "Rebuild") {
-		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+		configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-		setConfigurationValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
+		setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
 
-		writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+		writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 	}
 	else if (editorOrCommand = "DatabaseLocation") {
 		Gui +OwnDialogs
@@ -4419,7 +4419,7 @@ editSettings(editorOrCommand, arguments*) {
 
 			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
 
 			showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
@@ -4458,16 +4458,16 @@ editSettings(editorOrCommand, arguments*) {
 			if (connection && (connection != "")) {
 				connector.ValidateDataToken()
 
-				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				availableServerURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+				availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
 				if !inList(availableServerURLs, serverURLEdit) {
 					availableServerURLs.Push(serverURLEdit)
 
-					setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", availableServerURLs*))
+					setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", availableServerURLs*))
 
-					writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 					GuiControl, , serverURLEdit, % ("|" . values2String("|", availableServerURLs*))
 					GuiControl Choose, serverURLEdit, % inList(availableServerURLs, serverURLEdit)
@@ -4476,7 +4476,7 @@ editSettings(editorOrCommand, arguments*) {
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			title := translate("Error")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -4585,11 +4585,11 @@ editSettings(editorOrCommand, arguments*) {
 
 		currentConnection := ((connections.Length() = 0) ? 0 : 1)
 
-		configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+		configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-		databaseLocationEdit := normalizeDirectoryPath(getConfigurationValue(configuration, "Database", "Path", kDatabaseDirectory))
+		databaseLocationEdit := normalizeDirectoryPath(getMultiMapValue(configuration, "Database", "Path", kDatabaseDirectory))
 
-		replication := getConfigurationValue(configuration, "Team Server", "Replication", false)
+		replication := getMultiMapValue(configuration, "Team Server", "Replication", false)
 
 		if currentConnection
 			groups := connections[currentConnection][4]
@@ -4618,10 +4618,10 @@ editSettings(editorOrCommand, arguments*) {
 			else {
 				serverIdentifierEdit := "Standard"
 
-				serverURLEdit := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Server.URL", ""), "Standard")
+				serverURLEdit := stringToMap("|", "->", getMultiMapValue(configuration, "Team Server", "Server.URL", ""), "Standard")
 				serverURLEdit := (serverURLEdit.HasKey("Standard") ? serverURLEdit["Standard"] : "")
 
-				serverTokenEdit := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Server.Token", ""), "Standard")
+				serverTokenEdit := stringToMap("|", "->", getMultiMapValue(configuration, "Team Server", "Server.Token", ""), "Standard")
 				serverTokenEdit := (serverTokenEdit.HasKey("Standard") ? serverTokenEdit["Standard"] : "")
 
 				serverUpdateEdit := replication
@@ -4676,9 +4676,9 @@ editSettings(editorOrCommand, arguments*) {
 		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Name")
 		Gui %window%:Add, Edit, x146 yp+1 w246 vserverIdentifierEdit, %serverIdentifierEdit%
 
-		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		availableServerURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+		availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
 		if (!inList(availableServerURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
 			availableServerURLs.Push(serverURLEdit)
@@ -4759,7 +4759,7 @@ editSettings(editorOrCommand, arguments*) {
 						try {
 							FileCreateDir %databaseLocationEdit%
 						}
-						catch exception {
+						catch Any as exception {
 							title := translate("Error")
 
 							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -4853,16 +4853,16 @@ editSettings(editorOrCommand, arguments*) {
 						}
 				}
 
-				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-				setConfigurationValue(configuration, "Team Server", "Replication", serverUpdateEdit)
+				setMultiMapValue(configuration, "Team Server", "Replication", serverUpdateEdit)
 
 				if changed {
-					setConfigurationValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
+					setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
 
 					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
 
-					setConfigurationValue(configuration, "Database", "Path", databaseLocationEdit)
+					setMultiMapValue(configuration, "Database", "Path", databaseLocationEdit)
 
 					serverURLs := {}
 					serverTokens := {}
@@ -4874,11 +4874,11 @@ editSettings(editorOrCommand, arguments*) {
 						groups[connection[1]] := values2String(",", connection[4]*)
 					}
 
-					setConfigurationValue(configuration, "Team Server", "Groups", mapToString("|", "->", groups))
-					setConfigurationValue(configuration, "Team Server", "Server.URL", mapToString("|", "->", serverURLs))
-					setConfigurationValue(configuration, "Team Server", "Server.Token", mapToString("|", "->", serverTokens))
+					setMultiMapValue(configuration, "Team Server", "Groups", mapToString("|", "->", groups))
+					setMultiMapValue(configuration, "Team Server", "Server.URL", mapToString("|", "->", serverURLs))
+					setMultiMapValue(configuration, "Team Server", "Server.Token", mapToString("|", "->", serverTokens))
 
-					writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+					writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 
 					if restart {
 						title := translate("Information")
@@ -4891,7 +4891,7 @@ editSettings(editorOrCommand, arguments*) {
 					}
 				}
 				else
-					writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+					writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 
 				SessionDatabase.reloadConfiguration()
 
@@ -5010,7 +5010,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 
 				return connectorOrCommand.GetDataToken()
 			}
-			catch exception {
+			catch Any as exception {
 				title := translate("Error")
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -5142,7 +5142,7 @@ chooseTrack() {
 	else {
 		simulator := editor.SelectedSimulator
 		tracks := editor.getTracks(simulator, editor.SelectedCar)
-		trackNames := map(tracks, ObjBindMethod(editor, "getTrackName", simulator))
+		trackNames := collect(tracks, ObjBindMethod(editor, "getTrackName", simulator))
 
 		editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
 	}
@@ -5230,7 +5230,7 @@ chooseSettingAsync() {
 			GuiControl Show, settingValueDropDown
 			GuiControl Enable, settingValueDropDown
 
-			labels := map(type, "translate")
+			labels := collect(type, "translate")
 
 			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
 			GuiControl Choose, settingValueDropDown, % inList(labels, value)
@@ -5319,7 +5319,7 @@ addSetting() {
 			GuiControl Show, settingValueDropDown
 			GuiControl Enable, settingValueDropDown
 
-			labels := map(type, "translate")
+			labels := collect(type, "translate")
 
 			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
 			GuiControl Choose, settingValueDropDown, % inList(type, default)
@@ -5454,7 +5454,7 @@ selectSettingAsync() {
 			GuiControl Show, settingValueDropDown
 			GuiControl Enable, settingValueDropDown
 
-			labels := map(type, "translate")
+			labels := collect(type, "translate")
 
 			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
 			GuiControl Choose, settingValueDropDown, % inList(type, default)
@@ -5549,7 +5549,7 @@ changeSettingAsync() {
 			if IsObject(type) {
 				GuiControlGet settingValueDropDown
 
-				value := type[inList(map(type, "translate"), settingValueDropDown)]
+				value := type[inList(collect(type, "translate"), settingValueDropDown)]
 			}
 			else if (type = "Boolean") {
 				GuiControlGet settingValueCheck
@@ -5628,9 +5628,9 @@ updateStrategyAccess() {
 
 		info := sessionDB.readStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
 
-		setConfigurationValue(info, "Strategy", "Synchronized", false)
-		setConfigurationValue(info, "Access", "Share", shareStrategyWithCommunityCheck)
-		setConfigurationValue(info, "Access", "Synchronize", shareStrategyWithTeamServerCheck)
+		setMultiMapValue(info, "Strategy", "Synchronized", false)
+		setMultiMapValue(info, "Access", "Share", shareStrategyWithCommunityCheck)
+		setMultiMapValue(info, "Access", "Synchronize", shareStrategyWithTeamServerCheck)
 
 		sessionDB.writeStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
 	}
@@ -5746,9 +5746,9 @@ updateSetupAccess() {
 
 		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
 
-		setConfigurationValue(info, "Setup", "Synchronized", false)
-		setConfigurationValue(info, "Access", "Share", shareSetupWithCommunityCheck)
-		setConfigurationValue(info, "Access", "Synchronize", shareSetupWithTeamServerCheck)
+		setMultiMapValue(info, "Setup", "Synchronized", false)
+		setMultiMapValue(info, "Access", "Share", shareSetupWithCommunityCheck)
+		setMultiMapValue(info, "Access", "Synchronize", shareSetupWithTeamServerCheck)
 
 		sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
 	}
@@ -6073,9 +6073,9 @@ importData() {
 
 	if (folder != "")
 		if FileExist(folder . "\Export.info") {
-			info := readConfiguration(folder . "\Export.info")
+			info := readMultiMap(folder . "\Export.info")
 
-			if (getConfigurationValue(info, "General", "Simulator") = SessionDatabaseEditor.Instance.SelectedSimulator) {
+			if (getMultiMapValue(info, "General", "Simulator") = SessionDatabaseEditor.Instance.SelectedSimulator) {
 				selection := selectImportData(SessionDatabaseEditor.Instance, folder)
 
 				if selection
@@ -6223,14 +6223,14 @@ testSettings() {
 	local settings, section, values, key, value, options
 
 	try {
-		settings := readConfiguration(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
+		settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
 
 		for section, values in new SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
 																 , editor.SelectedTrack["*"], editor.SelectedWeather["*"], false)
 			for key, value in values
-				setConfigurationValue(settings, section, key, value)
+				setMultiMapValue(settings, section, key, value)
 
-		writeConfiguration(fileName, settings)
+		writeMultiMap(fileName, settings)
 
 		options := "-NoTeam -Test -File """ . fileName . """"
 
@@ -6245,7 +6245,7 @@ testSettings() {
 
 		Run "%exePath%" %options%, %kBinariesDirectory%
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -6255,10 +6255,10 @@ testSettings() {
 
 showSessionDatabaseEditor() {
 	local icon := kIconsDirectory . "Session Database.ico"
-	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getConfigurationValue(settings, "Session Database", "Simulator", false)
-	local car := getConfigurationValue(settings, "Session Database", "Car", false)
-	local track := getConfigurationValue(settings, "Session Database", "Track", false)
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getMultiMapValue(settings, "Session Database", "Simulator", false)
+	local car := getMultiMapValue(settings, "Session Database", "Car", false)
+	local track := getMultiMapValue(settings, "Session Database", "Track", false)
 	local weather := false
 	local airTemperature := 23
 	local trackTemperature:= 27
@@ -6316,7 +6316,7 @@ showSessionDatabaseEditor() {
 	protectionOn()
 
 	try {
-		editor := new SessionDatabaseEditor(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, requestorPID)
+		editor := SessionDatabaseEditor(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, requestorPID)
 
 		editor.createGui(editor.Configuration)
 

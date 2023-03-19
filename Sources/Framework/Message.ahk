@@ -12,7 +12,7 @@
 #Include "..\Framework\Constants.ahk"
 #Include "..\Framework\Variables.ahk"
 #Include "..\Framework\Localization.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\MultiMap.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,7 +28,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 
 	if (y = kUndefined) {
 		if !popupPosition
-			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+			popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 												 , "General", "Popup Position", "Bottom")
 
 		y := popupPosition

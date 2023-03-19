@@ -51,32 +51,32 @@ class R3EPitstopTester extends Plugin {
 	iPitstopOptions := []
 	iPitstopOptionStates := []
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	ClosePitstopMFDHotkey[] {
+	ClosePitstopMFDHotkey {
 		Get {
 			return this.iClosePitstopMFDHotkey
 		}
 	}
 
-	NextOptionHotkey[] {
+	NextOptionHotkey {
 		Get {
 			return this.iNextOptionHotkey
 		}
 	}
 
-	Messages[] {
+	Messages {
 		Get {
 			return this.iMessages
 		}
 	}
 
 	__New() {
-		base.__New("R3E", kSimulatorConfiguration)
+		super.__New("R3E", kSimulatorConfiguration)
 
 		this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
 
@@ -464,7 +464,7 @@ runR3EPitstopTester() {
 	Menu Tray, Tip, R3E Pitstop Tester
 
 	while true {
-		pitstopTester := new R3EPitstopTester()
+		pitstopTester := R3EPitstopTester()
 
 		pitstopTester.logMessage("Pass #1: Learning MFD position and labels...`n`n")
 

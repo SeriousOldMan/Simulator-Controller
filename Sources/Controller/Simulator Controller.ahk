@@ -60,43 +60,43 @@ class FunctionController extends ConfigurationItem {
 	iNumButtons := 0
 	iNumDials := 0
 
-	Controller[] {
+	Controller {
 		Get {
 			return this.iController
 		}
 	}
 
-	Descriptor[] {
+	Descriptor {
 		Get {
 			return this.base.__Class
 		}
 	}
 
-	Type[] {
+	Type {
 		Get {
 			return this.Descriptor
 		}
 	}
 
-	Num1WayToggles[] {
+	Num1WayToggles {
 		Get {
 			return this.iNum1WayToggles
 		}
 	}
 
-	Num2WayToggles[] {
+	Num2WayToggles {
 		Get {
 			return this.iNum2WayToggles
 		}
 	}
 
-	NumButtons[] {
+	NumButtons {
 		Get {
 			return this.iNumButtons
 		}
 	}
 
-	NumDials[] {
+	NumDials {
 		Get {
 			return this.iNumDials
 		}
@@ -105,7 +105,7 @@ class FunctionController extends ConfigurationItem {
 	__New(controller, configuration := false) {
 		this.iController := controller
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		controller.registerFunctionController(this)
 	}
@@ -152,13 +152,13 @@ class GuiFunctionController extends FunctionController {
 	iIsVisible := false
 	iIsPositioned := false
 
-	Visible[] {
+	Visible {
 		Get {
 			return this.iIsVisible
 		}
 	}
 
-	VisibleDuration[] {
+	VisibleDuration {
 		Get {
 			local controller := this.Controller
 			local type
@@ -166,7 +166,7 @@ class GuiFunctionController extends FunctionController {
 			if (controller != false) {
 				type := this.Type
 
-				return getConfigurationValue(this.Controller.Settings, type
+				return getMultiMapValue(this.Controller.Settings, type
 										   , type . (controller.ActiveSimulator ? " Simulation Duration" : " Duration")
 										   , false)
 			}
@@ -176,7 +176,7 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	__New(controller, configuration := false) {
-		base.__New(controller, configuration)
+		super.__New(controller, configuration)
 
 		this.createGui()
 	}
@@ -306,7 +306,7 @@ class GuiFunctionController extends FunctionController {
 				return
 			else {
 				if !hideTask {
-					hideTask := new PeriodicTask("hideFunctionController", duration, kLowPriority)
+					hideTask := PeriodicTask("hideFunctionController", duration, kLowPriority)
 
 					hideTask.start()
 				}
@@ -329,7 +329,7 @@ class GuiFunctionController extends FunctionController {
 					else {
 						type := this.Type
 
-						position := getConfigurationValue(this.Controller.Settings, type, type . " Position", "Bottom Right")
+						position := getMultiMapValue(this.Controller.Settings, type, type . " Position", "Bottom Right")
 
 						SysGet mainScreen, MonitorWorkArea
 
@@ -359,8 +359,8 @@ class GuiFunctionController extends FunctionController {
 									Goto defaultCase
 							case "Last Position":
 	defaultCase:
-								x := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.X", mainScreenRight - width)
-								y := getConfigurationValue(this.Controller.Settings, type, this.Descriptor . ".Position.Y", mainScreenBottom - height)
+								x := getMultiMapValue(this.Controller.Settings, type, this.Descriptor . ".Position.X", mainScreenRight - width)
+								y := getMultiMapValue(this.Controller.Settings, type, this.Descriptor . ".Position.Y", mainScreenBottom - height)
 							default:
 								throw "Unhandled position for " . type " (" . position . ") encountered in GuiFunctionController.show..."
 						}
@@ -424,10 +424,10 @@ class GuiFunctionController extends FunctionController {
 
 			settings := this.Controller.Settings
 
-			setConfigurationValue(settings, this.Type, this.Descriptor . ".Position.X", newX)
-			setConfigurationValue(settings, this.Type, this.Descriptor . ".Position.Y", newY)
+			setMultiMapValue(settings, this.Type, this.Descriptor . ".Position.X", newX)
+			setMultiMapValue(settings, this.Type, this.Descriptor . ".Position.Y", newY)
 
-			writeConfiguration(kSimulatorSettingsFile, settings)
+			writeMultiMap(kSimulatorSettingsFile, settings)
 
 			this.Controller.reloadSettings(settings)
 		}
@@ -461,25 +461,25 @@ class SimulatorController extends ConfigurationItem {
 	iShowLogo := false
 	iLogoIsVisible := false
 
-	ID[] {
+	ID {
 		Get {
 			return this.iID
 		}
 	}
 
-	Settings[] {
+	Settings {
 		Get {
 			return this.iSettings
 		}
 	}
 
-	Started[] {
+	Started {
 		Get {
 			return this.iStarted
 		}
 	}
 
-	VoiceServer[] {
+	VoiceServer {
 		Get {
 			return this.iVoiceServer
 		}
@@ -503,19 +503,19 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	Functions[] {
+	Functions {
 		Get {
 			return this.iFunctions
 		}
 	}
 
-	Plugins[] {
+	Plugins {
 		Get {
 			return this.iPlugins
 		}
 	}
 
-	Modes[] {
+	Modes {
 		Get {
 			return this.iModes
 		}
@@ -538,19 +538,19 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	ActiveModes[] {
+	ActiveModes {
 		Get {
 			return this.iActiveModes
 		}
 	}
 
-	ActiveSimulator[] {
+	ActiveSimulator {
 		Get {
 			return this.runningSimulator()
 		}
 	}
 
-	LastEvent[] {
+	LastEvent {
 		Get {
 			return this.iLastEvent
 		}
@@ -568,7 +568,7 @@ class SimulatorController extends ConfigurationItem {
 
 		SimulatorController.Instance := this
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		if !inList(A_Args, "-NoStartup")
 			this.initializeBackgroundTasks()
@@ -577,9 +577,9 @@ class SimulatorController extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		local descriptor, arguments, functions
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, arguments in getConfigurationSectionValues(configuration, "Controller Functions", Object()) {
+		for descriptor, arguments in getMultiMapValues(configuration, "Controller Functions") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			descriptor := ConfigurationItem.descriptor(descriptor[1], descriptor[2])
 
@@ -599,15 +599,15 @@ class SimulatorController extends ConfigurationItem {
 
 		switch descriptor[1] {
 			case k2WayToggleType:
-				return new Controller2WayToggleFunction(this, descriptor[2], configuration)
+				return Controller2WayToggleFunction(this, descriptor[2], configuration)
 			case k1WayToggleType:
-				return new Controller1WayToggleFunction(this, descriptor[2], configuration)
+				return Controller1WayToggleFunction(this, descriptor[2], configuration)
 			case kButtonType:
-				return new ControllerButtonFunction(this, descriptor[2], configuration)
+				return ControllerButtonFunction(this, descriptor[2], configuration)
 			case kDialType:
-				return new ControllerDialFunction(this, descriptor[2], configuration)
+				return ControllerDialFunction(this, descriptor[2], configuration)
 			case kCustomType:
-				return new ControllerCustomFunction(this, descriptor[2], configuration)
+				return ControllerCustomFunction(this, descriptor[2], configuration)
 			default:
 				throw "Unknown controller function type (" . descriptor[1] . ") detected in SimulatorController.createControllerFunction..."
 		}
@@ -815,8 +815,8 @@ class SimulatorController extends ConfigurationItem {
 					try {
 						showSplash(splashImage)
 
-						theme := getConfigurationValue(this.Settings, "Startup", "Splash Theme", false)
-						songFile := (theme ? getConfigurationValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
+						theme := getMultiMapValue(this.Settings, "Startup", "Splash Theme", false)
+						songFile := (theme ? getMultiMapValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
 
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
 							sendMessage(kLocalMessage, "Startup", "playStartupSong:" . songFile)
@@ -870,7 +870,7 @@ class SimulatorController extends ConfigurationItem {
 				pid := ErrorLevel
 
 				if !registered {
-					activationCommand := getConfigurationValue(this.Configuration, "Voice Control", "ActivationCommand", false)
+					activationCommand := getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false)
 
 					sendMessage(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
 																								 , activationCommand, "activationCommand", false
@@ -1089,12 +1089,12 @@ class SimulatorController extends ConfigurationItem {
 		local ignore, theMode
 
 		if !simulator
-			modes := getConfigurationValue(this.Settings, "Modes", "Default", "")
+			modes := getMultiMapValue(this.Settings, "Modes", "Default", "")
 		else {
-			modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, session), "")
+			modes := getMultiMapValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, session), "")
 
 			if (StrLen(Trim(modes)) = 0)
-				modes := getConfigurationValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, "Default"), "")
+				modes := getMultiMapValue(this.Settings, "Modes", ConfigurationItem.descriptor(simulator, "Default"), "")
 		}
 
 		if (StrLen(Trim(modes)) != 0)
@@ -1173,7 +1173,7 @@ class SimulatorController extends ConfigurationItem {
 		local plugins := {}
 		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
-		configuration := newConfiguration()
+		configuration := newMultiMap()
 
 		try {
 			for ignore, thePlugin in this.Plugins {
@@ -1188,7 +1188,7 @@ class SimulatorController extends ConfigurationItem {
 						for ignore, name in thePlugin.Sessions[true]
 							states.Push(name)
 
-						setConfigurationValue(configuration, "Simulators", thePlugin.Simulator.Application
+						setMultiMapValue(configuration, "Simulators", thePlugin.Simulator.Application
 											, thePlugin.Plugin . "|" . values2String(",", states*))
 					}
 
@@ -1200,7 +1200,7 @@ class SimulatorController extends ConfigurationItem {
 					for ignore, simulator in thePlugin.Simulators
 						simulators.Push(simulator)
 
-					setConfigurationValue(configuration, "Plugins", thePlugin.Plugin
+					setMultiMapValue(configuration, "Plugins", thePlugin.Plugin
 										, values2String("|", (this.isActive(thePlugin) ? kTrue : kFalse)
 														   , values2String(",", simulators*), values2String(",", modes*)))
 				}
@@ -1208,18 +1208,18 @@ class SimulatorController extends ConfigurationItem {
 				thePlugin.writePluginState(configuration)
 			}
 
-			setConfigurationValue(configuration, "Modules", "Plugins", values2String("|", getKeys(plugins)*))
+			setMultiMapValue(configuration, "Modules", "Plugins", values2String("|", getKeys(plugins)*))
 
 			for ignore, fnController in this.FunctionController
-				setConfigurationValue(configuration, fnController.Type, fnController.Descriptor
+				setMultiMapValue(configuration, fnController.Type, fnController.Descriptor
 									, values2String(",", fnController.Num1WayToggles, fnController.Num2WayToggles
 													   , fnController.NumButtons, fnController.NumDials))
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
-		writeConfiguration(kTempDirectory . "Simulator Controller.state", configuration)
+		writeMultiMap(kTempDirectory . "Simulator Controller.state", configuration)
 
 		if periodic {
 			Process Exist, System Monitor.exe
@@ -1235,31 +1235,31 @@ class ControllerFunction {
 
 	iEnabledActions := {}
 
-	Controller[] {
+	Controller {
 		Get {
 			return this.iController
 		}
 	}
 
-	Function[] {
+	Function {
 		Get {
 			return this.iFunction
 		}
 	}
 
-	Type[] {
+	Type {
 		Get {
 			return this.Function.Type
 		}
 	}
 
-	Number[] {
+	Number {
 		Get {
 			return this.Function.Number
 		}
 	}
 
-	Descriptor[] {
+	Descriptor {
 		Get {
 			return this.Function.Descriptor
 		}
@@ -1280,7 +1280,7 @@ class ControllerFunction {
 		}
 	}
 
-	Trigger[] {
+	Trigger {
 		Get {
 			return this.Function.Trigger
 		}
@@ -1368,7 +1368,7 @@ class ControllerFunction {
 
 						logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
 					}
-					catch exception {
+					catch Any as exception {
 						logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
 						showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
@@ -1405,16 +1405,16 @@ class Controller1WayToggleFunction extends ControllerFunction {
 		__New(outerFunction, functionNumber, configuration := false) {
 			this.iOuterFunction := outerFunction
 
-			base.__New(functionNumber, configuration)
+			super.__New(functionNumber, configuration)
 		}
 
 		actionCallable(trigger, action) {
-			return functionActionCallable(this.iOuterFunction, trigger, base.actionCallable(trigger, action))
+			return functionActionCallable(this.iOuterFunction, trigger, super.actionCallable(trigger, action))
 		}
 	}
 
 	__New(controller, number, configuration := false) {
-		base.__New(controller, new this.Inner1WayToggleFunction(this, number, configuration))
+		super.__New(controller, this.Inner1WayToggleFunction(this, number, configuration))
 	}
 }
 
@@ -1425,16 +1425,16 @@ class Controller2WayToggleFunction extends ControllerFunction {
 		__New(outerFunction, functionNumber, configuration := false) {
 			this.iOuterFunction := outerFunction
 
-			base.__New(functionNumber, configuration)
+			super.__New(functionNumber, configuration)
 		}
 
 		actionCallable(trigger, action) {
-			return functionActionCallable(this.iOuterFunction, trigger, base.actionCallable(trigger, action))
+			return functionActionCallable(this.iOuterFunction, trigger, super.actionCallable(trigger, action))
 		}
 	}
 
 	__New(controller, number, configuration := false) {
-		base.__New(controller, new this.Inner2WayToggleFunction(this, number, configuration))
+		super.__New(controller, this.Inner2WayToggleFunction(this, number, configuration))
 	}
 }
 
@@ -1445,16 +1445,16 @@ class ControllerButtonFunction extends ControllerFunction {
 		__New(outerFunction, functionNumber, configuration := false) {
 			this.iOuterFunction := outerFunction
 
-			base.__New(functionNumber, configuration)
+			super.__New(functionNumber, configuration)
 		}
 
 		actionCallable(trigger, action) {
-			return functionActionCallable(this.iOuterFunction, trigger, base.actionCallable(trigger, action))
+			return functionActionCallable(this.iOuterFunction, trigger, super.actionCallable(trigger, action))
 		}
 	}
 
 	__New(controller, number, configuration := false) {
-		base.__New(controller, new this.InnerButtonFunction(this, number, configuration))
+		super.__New(controller, this.InnerButtonFunction(this, number, configuration))
 	}
 }
 
@@ -1465,16 +1465,16 @@ class ControllerDialFunction extends ControllerFunction {
 		__New(outerFunction, functionNumber, configuration := false) {
 			this.iOuterFunction := outerFunction
 
-			base.__New(functionNumber, configuration)
+			super.__New(functionNumber, configuration)
 		}
 
 		actionCallable(trigger, action) {
-			return functionActionCallable(this.iOuterFunction, trigger, base.actionCallable(trigger, action))
+			return functionActionCallable(this.iOuterFunction, trigger, super.actionCallable(trigger, action))
 		}
 	}
 
 	__New(controller, number, configuration := false) {
-		base.__New(controller, new this.InnerDialFunction(this, number, configuration))
+		super.__New(controller, this.InnerDialFunction(this, number, configuration))
 	}
 }
 
@@ -1485,16 +1485,16 @@ class ControllerCustomFunction extends ControllerFunction {
 		__New(outerFunction, functionNumber, configuration := false) {
 			this.iOuterFunction := outerFunction
 
-			base.__New(functionNumber, configuration)
+			super.__New(functionNumber, configuration)
 		}
 
 		actionCallable(trigger, action) {
-			return functionActionCallable(this.iOuterFunction, trigger, base.actionCallable(trigger, action))
+			return functionActionCallable(this.iOuterFunction, trigger, super.actionCallable(trigger, action))
 		}
 	}
 
 	__New(controller, number, configuration := false) {
-		base.__New(controller, new this.InnerCustomFunction(this, number, configuration))
+		super.__New(controller, this.InnerCustomFunction(this, number, configuration))
 
 		this.connectAction(false, false)
 	}
@@ -1508,19 +1508,19 @@ class ControllerPlugin extends Plugin {
 	iModes := []
 	iActions := []
 
-	Controller[] {
+	Controller {
 		Get {
 			return this.iController
 		}
 	}
 
-	Modes[] {
+	Modes {
 		Get {
 			return this.iModes
 		}
 	}
 
-	Actions[] {
+	Actions {
 		Get {
 			return this.iActions
 		}
@@ -1529,7 +1529,7 @@ class ControllerPlugin extends Plugin {
 	__New(controller, name, configuration := false, register := true) {
 		this.iController := controller
 
-		base.__New(name, configuration)
+		super.__New(name, configuration)
 
 		if (this.Active || isDebug())
 			if register
@@ -1620,7 +1620,7 @@ class ControllerPlugin extends Plugin {
 		if !this.sLabelsDatabase
 			ControllerPlugin.sLabelsDatabase := getControllerActionLabels()
 
-		label := getConfigurationValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
+		label := getMultiMapValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
 
 		if (!label || (label == ""))
 			label := default
@@ -1634,7 +1634,7 @@ class ControllerPlugin extends Plugin {
 		if !this.sIconsDatabase
 			ControllerPlugin.sIconsDatabase := getControllerActionIcons()
 
-		icon := getConfigurationValue(this.sIconsDatabase, this.Plugin, descriptor, false)
+		icon := getMultiMapValue(this.sIconsDatabase, this.Plugin, descriptor, false)
 
 		if (!icon || (icon == ""))
 			icon := default
@@ -1647,7 +1647,7 @@ class ControllerPlugin extends Plugin {
 	}
 
 	writePluginState(configuration) {
-		setConfigurationValue(configuration, this.Plugin, "State", this.Active ? "Passive" : "Disabled")
+		setMultiMapValue(configuration, this.Plugin, "State", this.Active ? "Passive" : "Disabled")
 	}
 }
 
@@ -1657,31 +1657,31 @@ class ControllerMode {
 
 	iFunctionController := []
 
-	Mode[] {
+	Mode {
 		Get {
 			throw "Virtual property ControllerMode.Mode must be implemented in a subclass..."
 		}
 	}
 
-	Plugin[] {
+	Plugin {
 		Get {
 			return this.iPlugin
 		}
 	}
 
-	Controller[] {
+	Controller {
 		Get {
 			return this.Plugin.Controller
 		}
 	}
 
-	Actions[] {
+	Actions {
 		Get {
 			return this.iActions
 		}
 	}
 
-	FunctionController[] {
+	FunctionController {
 		Get {
 			return this.iFunctionController
 		}
@@ -1777,25 +1777,25 @@ class ControllerAction {
 	iLabel := ""
 	iIcon := false
 
-	Function[] {
+	Function {
 		Get {
 			return this.iFunction
 		}
 	}
 
-	Controller[] {
+	Controller {
 		Get {
 			return this.Function.Controller
 		}
 	}
 
-	Label[] {
+	Label {
 		Get {
 			return this.iLabel
 		}
 	}
 
-	Icon[] {
+	Icon {
 		Get {
 			return this.iIcon
 		}
@@ -1983,7 +1983,7 @@ updateTrayMessageState(settings := false) {
 		inSimulation := SimulatorController.Instance.ActiveSimulator
 	}
 
-	duration := getConfigurationValue(settings, "Tray Tip"
+	duration := getMultiMapValue(settings, "Tray Tip"
 									, inSimulation ? "Tray Tip Simulation Duration" : "Tray Tip Duration"
 									, inSimulation ? 1500 : 1500)
 
@@ -2007,7 +2007,7 @@ externalCommandManager() {
 			if !file
 				return
 		}
-		catch exception {
+		catch Any as exception {
 			return
 		}
 
@@ -2052,7 +2052,7 @@ initializeSimulatorController() {
 
 	SetKeyDelay 10, 30
 
-	settings := readConfiguration(kSimulatorSettingsFile)
+	settings := readMultiMap(kSimulatorSettingsFile)
 
 	if inList(A_Args, "-NoStartup")
 		disableTrayMessages()
@@ -2075,7 +2075,7 @@ initializeSimulatorController() {
 	argIndex := inList(A_Args, "-Configuration")
 
 	if argIndex
-		configuration := readConfiguration(A_Args[argIndex + 1])
+		configuration := readMultiMap(A_Args[argIndex + 1])
 
 	protectionOn()
 

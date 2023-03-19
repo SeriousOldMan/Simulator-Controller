@@ -168,8 +168,8 @@ startRaceSpotter() {
 	if debug
 		setDebug(true)
 
-	spotter := new RaceSpotter(kSimulatorConfiguration
-										  , remotePID ? new RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
+	spotter := RaceSpotter(kSimulatorConfiguration
+										  , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
 										  , spotterName, spotterLanguage
 										  , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
 										  , spotterRecognizer, spotterListener, spotterMuted, voiceServer)
@@ -214,7 +214,7 @@ startRaceSpotter() {
 		showLogo(spotterName)
 
 	if remotePID
-		Task.startTask(new PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
 
 	return
 }

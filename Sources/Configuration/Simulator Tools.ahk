@@ -121,7 +121,7 @@ installOptions(options) {
 				try {
 					FileCreateDir %directory%
 				}
-				catch exception {
+				catch Any as exception {
 					title := translate("Error")
 
 					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -183,7 +183,7 @@ installOptions(options) {
 		disabled := (options["Update"] ? "Disabled" : "")
 
 		Gui Install:Add, Text, x16 yp+60 w100 h23 +0x200, % translate("Installation Type")
-		Gui Install:Add, DropDownList, x116 yp w80 AltSubmit %disabled% Choose%chosen% VinstallationTypeDropDown, % values2String("|", map(["Registry", "Portable"], "translate")*)
+		Gui Install:Add, DropDownList, x116 yp w80 AltSubmit %disabled% Choose%chosen% VinstallationTypeDropDown, % values2String("|", collect(["Registry", "Portable"], "translate")*)
 
 		Gui Install:Add, Text, x16 yp+24 w110 h23 +0x200, % translate("Installation Folder")
 		Gui Install:Add, Edit, x116 yp w187 h21 %disabled% VinstallLocationPathEdit, % options["InstallLocation"]
@@ -346,7 +346,7 @@ chooseInstallLocationPath() {
 			try {
 				FileCreateDir %directory%
 			}
-			catch exception {
+			catch Any as exception {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("You must enter a valid directory.")
@@ -439,8 +439,8 @@ checkInstallation() {
 
 	RegRead installLocation, HKLM, %kUninstallKey%, InstallLocation
 
-	installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
-	installLocation := getConfigurationValue(installOptions, "Install", "Location", installLocation)
+	installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	installLocation := getMultiMapValue(installOptions, "Install", "Location", installLocation)
 
 	if inList(A_Args, "-Uninstall") {
 		quiet := inList(A_Args, "-Quiet")
@@ -454,7 +454,7 @@ checkInstallation() {
 				else
 					Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" %options%
 			}
-			catch exception {
+			catch Any as exception {
 				;ignore
 			}
 
@@ -464,11 +464,11 @@ checkInstallation() {
 		if !exitProcesses()
 			ExitApp 1
 
-		options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
+		options := {InstallType: getMultiMapValue(installOptions, "Install", "Type", "Registry")
 				  , InstallLocation: normalizeDirectoryPath(installLocation)
-				  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
-				  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
-				  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
+				  , AutomaticUpdates: getMultiMapValue(installOptions, "Updates", "Automatic", true)
+				  , DesktopShortcuts: getMultiMapValue(installOptions, "Shortcuts", "Desktop", false)
+				  , StartMenuShortcuts: getMultiMapValue(installOptions, "Shortcuts", "StartMenu", true)
 				  , DeleteUserFiles: false}
 
 		if (quiet || uninstallOptions(options)) {
@@ -548,7 +548,7 @@ checkInstallation() {
 					else
 						Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" -NoUpdate %options%
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -564,12 +564,12 @@ checkInstallation() {
 				if !exitProcesses()
 					ExitApp 1
 
-			options := {InstallType: getConfigurationValue(installOptions, "Install", "Type", "Registry")
-					  , InstallLocation: normalizeDirectoryPath(getConfigurationValue(installOptions, "Install", "Location", installLocation))
-					  , AutomaticUpdates: getConfigurationValue(installOptions, "Updates", "Automatic", true)
-					  , Verbose: getConfigurationValue(installOptions, "Updates", "Verbose", false)
-					  , DesktopShortcuts: getConfigurationValue(installOptions, "Shortcuts", "Desktop", false)
-					  , StartMenuShortcuts: getConfigurationValue(installOptions, "Shortcuts", "StartMenu", true)
+			options := {InstallType: getMultiMapValue(installOptions, "Install", "Type", "Registry")
+					  , InstallLocation: normalizeDirectoryPath(getMultiMapValue(installOptions, "Install", "Location", installLocation))
+					  , AutomaticUpdates: getMultiMapValue(installOptions, "Updates", "Automatic", true)
+					  , Verbose: getMultiMapValue(installOptions, "Updates", "Verbose", false)
+					  , DesktopShortcuts: getMultiMapValue(installOptions, "Shortcuts", "Desktop", false)
+					  , StartMenuShortcuts: getMultiMapValue(installOptions, "Shortcuts", "StartMenu", true)
 					  , StartSetup: isNew, Update: !isNew}
 
 			packageLocation := normalizeDirectoryPath(kHomeDirectory)
@@ -577,12 +577,12 @@ checkInstallation() {
 			if ((!isNew && !options["Verbose"]) || installOptions(options)) {
 				installLocation := options["InstallLocation"]
 
-				setConfigurationValue(installOptions, "Install", "Type", options["InstallType"])
-				setConfigurationValue(installOptions, "Install", "Location", installLocation)
-				setConfigurationValue(installOptions, "Updates", "Automatic", options["AutomaticUpdates"])
-				setConfigurationValue(installOptions, "Updates", "Verbose", options["Verbose"])
-				setConfigurationValue(installOptions, "Shortcuts", "Desktop", options["DesktopShortcuts"])
-				setConfigurationValue(installOptions, "Shortcuts", "StartMenu", options["StartMenuShortcuts"])
+				setMultiMapValue(installOptions, "Install", "Type", options["InstallType"])
+				setMultiMapValue(installOptions, "Install", "Location", installLocation)
+				setMultiMapValue(installOptions, "Updates", "Automatic", options["AutomaticUpdates"])
+				setMultiMapValue(installOptions, "Updates", "Verbose", options["Verbose"])
+				setMultiMapValue(installOptions, "Shortcuts", "Desktop", options["DesktopShortcuts"])
+				setMultiMapValue(installOptions, "Shortcuts", "StartMenu", options["StartMenuShortcuts"])
 
 				; showSplashTheme("McLaren 720s GT3 Pictures")
 
@@ -602,7 +602,7 @@ checkInstallation() {
 
 						RunWait Powershell -Command Get-ChildItem -Path '.' -Recurse | Unblock-File, , Hide
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 					}
 					finally {
@@ -656,7 +656,7 @@ checkInstallation() {
 				fixIE(11, "Race Center.exe")
 				fixIE(10, "Simulator Setup.exe")
 
-				writeConfiguration(kUserConfigDirectory . "Simulator Controller.install", installOptions)
+				writeMultiMap(kUserConfigDirectory . "Simulator Controller.install", installOptions)
 
 				; hideSplashTheme()
 
@@ -860,7 +860,7 @@ cleanupDirectory(source, destination, maxStep, ByRef count) {
 			try {
 				FileRemoveDir %A_LoopFilePath%
 			}
-			catch exception {
+			catch Any as exception {
 			}
 		}
 		else if !FileExist(source . "\" . fileName) {
@@ -984,9 +984,9 @@ deleteUninstallerInfo() {
 
 readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySettings, ByRef buildSettings
 					 , ByRef splashTheme, ByRef targetConfiguration) {
-	local targets := readConfiguration(kToolsTargetsFile)
-	local configuration := readConfiguration(kToolsConfigurationFile)
-	local updateConfiguration := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
+	local targets := readMultiMap(kToolsTargetsFile)
+	local configuration := readMultiMap(kToolsConfigurationFile)
+	local updateConfiguration := readMultiMap(getFileName("UPDATES", kUserConfigDirectory))
 	local target, rule
 
 	updateSettings := Object()
@@ -994,53 +994,53 @@ readToolsConfiguration(ByRef updateSettings, ByRef cleanupSettings, ByRef copySe
 	copySettings := Object()
 	buildSettings := Object()
 
-	for target, rule in getConfigurationSectionValues(targets, "Update", Object())
-		if !getConfigurationValue(updateConfiguration, "Processed", target, false)
+	for target, rule in getMultiMapValues(targets, "Update")
+		if !getMultiMapValue(updateConfiguration, "Processed", target, false)
 			updateSettings[target] := true
 
-	for target, rule in getConfigurationSectionValues(targets, "Cleanup", Object()) {
+	for target, rule in getMultiMapValues(targets, "Cleanup") {
 		if !InStr(target, "*.bak")
 			target := ConfigurationItem.splitDescriptor(target)[1]
 
-		cleanupSettings[target] := getConfigurationValue(configuration, "Cleanup", target, InStr(target, "*.ahk") ? true : false)
+		cleanupSettings[target] := getMultiMapValue(configuration, "Cleanup", target, InStr(target, "*.ahk") ? true : false)
 	}
 
-	for target, rule in getConfigurationSectionValues(targets, "Copy", Object()) {
+	for target, rule in getMultiMapValues(targets, "Copy") {
 		target := ConfigurationItem.splitDescriptor(target)[1]
 
-		copySettings[target] := getConfigurationValue(configuration, "Copy", target, true)
+		copySettings[target] := getMultiMapValue(configuration, "Copy", target, true)
 	}
 
-	for target, rule in getConfigurationSectionValues(targets, "Build", Object()) {
+	for target, rule in getMultiMapValues(targets, "Build") {
 		target := ConfigurationItem.splitDescriptor(target)[1]
 
-		buildSettings[target] := getConfigurationValue(configuration, "Build", target, true)
+		buildSettings[target] := getMultiMapValue(configuration, "Build", target, true)
 	}
 
-	splashTheme := getConfigurationValue(configuration, "General", "Splash Theme", false)
-	targetConfiguration := getConfigurationValue(configuration, "Compile", "TargetConfiguration", "Development")
+	splashTheme := getMultiMapValue(configuration, "General", "Splash Theme", false)
+	targetConfiguration := getMultiMapValue(configuration, "Compile", "TargetConfiguration", "Development")
 
 	if A_IsCompiled
 		buildSettings["Simulator Tools"] := false
 }
 
 writeToolsConfiguration(updateSettings, cleanupSettings, copySettings, buildSettings, splashTheme, targetConfiguration) {
-	local configuration := newConfiguration()
+	local configuration := newMultiMap()
 	local target, setting
 
 	for target, setting in cleanupSettings
-		setConfigurationValue(configuration, "Cleanup", target, setting)
+		setMultiMapValue(configuration, "Cleanup", target, setting)
 
 	for target, setting in copySettings
-		setConfigurationValue(configuration, "Copy", target, setting)
+		setMultiMapValue(configuration, "Copy", target, setting)
 
 	for target, setting in buildSettings
-		setConfigurationValue(configuration, "Build", target, setting)
+		setMultiMapValue(configuration, "Build", target, setting)
 
-	setConfigurationValue(configuration, "General", "Splash Theme", splashTheme)
-	setConfigurationValue(configuration, "Compile", "TargetConfiguration", targetConfiguration)
+	setMultiMapValue(configuration, "General", "Splash Theme", splashTheme)
+	setMultiMapValue(configuration, "Compile", "TargetConfiguration", targetConfiguration)
 
-	writeConfiguration(kToolsConfigurationFile, configuration)
+	writeMultiMap(kToolsConfigurationFile, configuration)
 }
 
 viewBuildLog(fileName, title := "", x := "Center", y := "Center", width := 800, height := 400) {
@@ -1391,7 +1391,7 @@ editTargets(command := "") {
 		chosen := inList(["Development", "Production"], vTargetConfiguration)
 
 		Gui TE:Add, Text, X10 Y%yPos%, % translate("Target")
-		Gui TE:Add, DropDownList, X110 YP-5 w310 AltSubmit Choose%chosen% vtargetConfiguration, % values2String("|", map(["Development", "Production"], "translate")*)
+		Gui TE:Add, DropDownList, X110 YP-5 w310 AltSubmit Choose%chosen% vtargetConfiguration, % values2String("|", collect(["Development", "Production"], "translate")*)
 
 		themes := getAllThemes()
 		chosen := (vSplashTheme ? inList(themes, vSplashTheme) + 1 : 1)
@@ -1426,15 +1426,15 @@ updatePhraseGrammars() {
 		for ignore, grammarFileName in getFileNames(filePrefix . "*", kUserGrammarsDirectory, kUserConfigDirectory) {
 			SplitPath grammarFileName, , , languageCode
 
-			userGrammars := readConfiguration(grammarFileName)
-			bundledGrammars := readConfiguration(getFileName(filePrefix . languageCode, kGrammarsDirectory, kConfigDirectory))
+			userGrammars := readMultiMap(grammarFileName)
+			bundledGrammars := readMultiMap(getFileName(filePrefix . languageCode, kGrammarsDirectory, kConfigDirectory))
 
 			for section, keyValues in bundledGrammars
 				for key, value in keyValues
-					if (getConfigurationValue(userGrammars, section, key, kUndefined) == kUndefined)
-						setConfigurationValue(userGrammars, section, key, value)
+					if (getMultiMapValue(userGrammars, section, key, kUndefined) == kUndefined)
+						setMultiMapValue(userGrammars, section, key, value)
 
-			writeConfiguration(grammarFileName, userGrammars)
+			writeMultiMap(grammarFileName, userGrammars)
 		}
 	*/
 }
@@ -1473,7 +1473,7 @@ deletePluginLabels(fileName := "Controller Plugin Labels") {
 		try {
 			FileMove %fName%, %fName%.bak, 1
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 }
@@ -1484,7 +1484,7 @@ updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false)
 
 	if preset {
 		languages := availableLanguages()
-		enDefinitions := readConfiguration(kResourcesDirectory . "Setup\Presets\" . fileName . ".en")
+		enDefinitions := readMultiMap(kResourcesDirectory . "Setup\Presets\" . fileName . ".en")
 
 		for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory) {
 			SplitPath userDefinitionsFile, , , languageCode
@@ -1492,31 +1492,31 @@ updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false)
 			if (!languages.HasKey(languageCode) || (languageCode = "en"))
 				bundledDefinitions := enDefinitions
 			else {
-				bundledDefinitions := readConfiguration(kResourcesDirectory . "Setup\Presets\" . fileName . "." . languageCode)
+				bundledDefinitions := readMultiMap(kResourcesDirectory . "Setup\Presets\" . fileName . "." . languageCode)
 
 				if (bundledDefinitions.Count() == 0)
 					bundledDefinitions := enDefinitions
 			}
 
-			userDefinitions := readConfiguration(userDefinitionsFile)
+			userDefinitions := readMultiMap(userDefinitionsFile)
 			changed := false
 
 			for section, keyValues in bundledDefinitions
 				for key, value in keyValues
-					if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
-						setConfigurationValue(userDefinitions, section, key, value)
+					if (getMultiMapValue(userDefinitions, section, key, kUndefined) == kUndefined) {
+						setMultiMapValue(userDefinitions, section, key, value)
 
 						changed := true
 					}
 
 			if changed
-				writeConfiguration(userDefinitionsFile, userDefinitions)
+				writeMultiMap(userDefinitionsFile, userDefinitions)
 		}
 	}
 	else {
 		/* Obsolete since 4.0.4...
 		languages := availableLanguages()
-		enDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . ".en")
+		enDefinitions := readMultiMap(kResourcesDirectory . "Templates\" . fileName . ".en")
 
 		for ignore, userDefinitionsFile in getFileNames(fileName . ".*", kUserTranslationsDirectory, kUserConfigDirectory) {
 			SplitPath userDefinitionsFile, , , languageCode
@@ -1524,19 +1524,19 @@ updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false)
 			if (!languages.HasKey(languageCode) || (languageCode = "en"))
 				bundledDefinitions := enDefinitions
 			else {
-				bundledDefinitions := readConfiguration(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
+				bundledDefinitions := readMultiMap(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
 
 				if (bundledDefinitions.Count() == 0)
 					bundledDefinitions := enDefinitions
 			}
 
-			userDefinitions := readConfiguration(userDefinitionsFile)
+			userDefinitions := readMultiMap(userDefinitionsFile)
 			changed := false
 
 			for section, keyValues in bundledDefinitions
 				for key, value in keyValues
-					if (getConfigurationValue(userDefinitions, section, key, kUndefined) == kUndefined) {
-						setConfigurationValue(userDefinitions, section, key, value)
+					if (getMultiMapValue(userDefinitions, section, key, kUndefined) == kUndefined) {
+						setMultiMapValue(userDefinitions, section, key, value)
 
 						changed := true
 					}
@@ -1545,18 +1545,18 @@ updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false)
 				keys := []
 
 				for key, value in keyValues
-					if (getConfigurationValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
+					if (getMultiMapValue(bundledDefinitions, section, key, kUndefined) == kUndefined) {
 						keys.Push(key)
 
 						changed := true
 					}
 
 				for ignore, key in keys
-					removeConfigurationValue(userDefinitions, section, key)
+					removeMultiMapValue(userDefinitions, section, key)
 			}
 
 			if changed
-				writeConfiguration(userDefinitionsFile, userDefinitions)
+				writeMultiMap(userDefinitionsFile, userDefinitions)
 		}
 		*/
 	}
@@ -1576,60 +1576,60 @@ updateStreamDeckIconPreset() {
 
 updateCustomCalls(startNumber, endNumber) {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local bundledConfiguration, customCallIndex, key
 
 	if (userConfiguration.Count() > 0) {
-		bundledConfiguration := readConfiguration(getFileName(kSimulatorConfigurationFile, kConfigDirectory))
+		bundledConfiguration := readMultiMap(getFileName(kSimulatorConfigurationFile, kConfigDirectory))
 
 		customCallIndex := startNumber
 
 		loop {
 			key := "Custom." . customCallIndex . ".Call"
 
-			if (getConfigurationValue(userConfiguration, "Controller Functions", key, kUndefined) == kUndefined) {
-				setConfigurationValue(userConfiguration, "Controller Functions", key, getConfigurationValue(bundledConfiguration, "Controller Functions", key))
+			if (getMultiMapValue(userConfiguration, "Controller Functions", key, kUndefined) == kUndefined) {
+				setMultiMapValue(userConfiguration, "Controller Functions", key, getMultiMapValue(bundledConfiguration, "Controller Functions", key))
 
 				key .= " Action"
 
-				setConfigurationValue(userConfiguration, "Controller Functions", key, getConfigurationValue(bundledConfiguration, "Controller Functions", key))
+				setMultiMapValue(userConfiguration, "Controller Functions", key, getMultiMapValue(bundledConfiguration, "Controller Functions", key))
 			}
 
 			customCallIndex += 1
 		} until (customCallIndex > endNumber)
 
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 }
 
 renewConsent() {
-	local consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+	local consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
 	if (consent.Count() > 0) {
-		setConfigurationValue(consent, "General", "ReNew", true)
+		setMultiMapValue(consent, "General", "ReNew", true)
 
-		writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+		writeMultiMap(kUserConfigDirectory . "CONSENT", consent)
 	}
 }
 
 updateInstallationForV398() {
-	local installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	local installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	local installLocation
 
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getMultiMapValue(installOptions, "Install", "Location")
 
 		deleteFile(installLocation . "\Binaries\Setup Database.exe")
 
 		try {
 			FileCreateShortCut %installLocation%\Binaries\Session Database.exe, %A_StartMenu%\Simulator Controller\Session Database.lnk, %installLocation%\Binaries
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
 
-	if (getConfigurationValue(installOptions, "Install", "Type", false) = "Registry") {
+	if (getMultiMapValue(installOptions, "Install", "Type", false) = "Registry") {
 		try {
 			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe, , %installLocation%\Binaries\Session Database.exe
 			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
@@ -1638,18 +1638,18 @@ updateInstallationForV398() {
 
 			RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
 }
 
 updateInstallationForV392() {
-	local installOptions := readConfiguration(kUserConfigDirectory . "Simulator Controller.install")
+	local installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	local installLocation
 
-	if (getConfigurationValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getConfigurationValue(installOptions, "Install", "Location")
+	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
+		installLocation := getMultiMapValue(installOptions, "Install", "Location")
 
 		FileCreateShortCut %installLocation%\Binaries\Setup Advisor.exe, %A_StartMenu%\Simulator Controller\Setup Advisor.lnk, %installLocation%\Binaries
 	}
@@ -1688,14 +1688,14 @@ updateConfigurationForV455() {
 	local configuration, subtitle
 
 	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
-		configuration := readConfiguration(kUserConfigDirectory . "Simulator Configuration.ini")
+		configuration := readMultiMap(kUserConfigDirectory . "Simulator Configuration.ini")
 
-		subtitle := getConfigurationValue(configuration, "Splash Window", "Subtitle", false)
+		subtitle := getMultiMapValue(configuration, "Splash Window", "Subtitle", false)
 
 		if subtitle {
-			setConfigurationValue(configuration, "Splash Window", "Subtitle", StrReplace(subtitle, "2022", "2023"))
+			setMultiMapValue(configuration, "Splash Window", "Subtitle", StrReplace(subtitle, "2022", "2023"))
 
-			writeConfiguration(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
+			writeMultiMap(kUserConfigDirectory . "Simulator Configuration.ini", configuration)
 		}
 	}
 }
@@ -1707,9 +1707,9 @@ updateConfigurationForV452() {
 
 	updateConfigurationForV451()
 
-	settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-	for key, value in getConfigurationSectionValues(settings, "Setup Advisor", Object())
+	for key, value in getMultiMapValues(settings, "Setup Advisor")
 		tempValues[StrReplace(key, ".Unknown", ".*")] := value
 
 	for key, value in tempValues {
@@ -1729,14 +1729,14 @@ updateConfigurationForV452() {
 			newValues[key] := value
 	}
 
-	setConfigurationSectionValues(settings, "Setup Advisor", newValues)
+	setMultiMapValues(settings, "Setup Advisor", newValues)
 
-	writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+	writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 }
 
 updateConfigurationForV451() {
-	local directory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
-	local sessionDB := new SessionDatabase()
+	local directory := getMultiMapValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
+	local sessionDB := SessionDatabase()
 	local raceData, simulator, car, track
 
 	if directory
@@ -1746,10 +1746,10 @@ updateConfigurationForV451() {
 
 			loop Files, %directory%\%simulator%\*.*, D
 				if FileExist(A_LoopFilePath . "\Race.data") {
-					raceData := readConfiguration(A_LoopFilePath . "\Race.data")
+					raceData := readMultiMap(A_LoopFilePath . "\Race.data")
 
-					car := sessionDB.getCarCode(simulator, getConfigurationValue(raceData, "Session", "Car"))
-					track := sessionDB.getTrackCode(simulator, getConfigurationValue(raceData, "Session", "Track"))
+					car := sessionDB.getCarCode(simulator, getMultiMapValue(raceData, "Session", "Car"))
+					track := sessionDB.getTrackCode(simulator, getMultiMapValue(raceData, "Session", "Track"))
 
 					FileCreateDir %directory%\%simulator%\%car%\%track%
 
@@ -1762,22 +1762,22 @@ updateConfigurationForV448() {
 	local data, count
 
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
-		data := readConfiguration(kUserHomeDirectory . "Setup\Setup.data")
-		count := getConfigurationValue(data, "Setup", "Module.Voice Control.Components", 0)
+		data := readMultiMap(kUserHomeDirectory . "Setup\Setup.data")
+		count := getMultiMapValue(data, "Setup", "Module.Voice Control.Components", 0)
 
 		loop %count%
-			if (getConfigurationValue(data, "Setup", "Module.Voice Control.Component." . A_Index, false) = "MSSpeechLibrary_es-ES")
+			if (getMultiMapValue(data, "Setup", "Module.Voice Control.Component." . A_Index, false) = "MSSpeechLibrary_es-ES")
 				return
 
-		setConfigurationValue(data, "Setup", "Module.Voice Control.Component." . ++count, "MSSpeechLibrary_es-ES")
-		setConfigurationValue(data, "Setup", "Module.Voice Control.Component." . ++count, "NirCmd")
-		setConfigurationValue(data, "Setup", "Module.Voice Control.Components", count)
-		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.MSSpeechLibrary_es-ES.Optional", true)
-		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.MSSpeechLibrary_es-ES.Required", false)
-		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.NirCmd.Optional", true)
-		setConfigurationValue(data, "Setup", "Module.Voice Control.Component.NirCmd.Required", false)
+		setMultiMapValue(data, "Setup", "Module.Voice Control.Component." . ++count, "MSSpeechLibrary_es-ES")
+		setMultiMapValue(data, "Setup", "Module.Voice Control.Component." . ++count, "NirCmd")
+		setMultiMapValue(data, "Setup", "Module.Voice Control.Components", count)
+		setMultiMapValue(data, "Setup", "Module.Voice Control.Component.MSSpeechLibrary_es-ES.Optional", true)
+		setMultiMapValue(data, "Setup", "Module.Voice Control.Component.MSSpeechLibrary_es-ES.Required", false)
+		setMultiMapValue(data, "Setup", "Module.Voice Control.Component.NirCmd.Optional", true)
+		setMultiMapValue(data, "Setup", "Module.Voice Control.Component.NirCmd.Required", false)
 
-		writeConfiguration(kUserHomeDirectory . "Setup\Setup.data", data)
+		writeMultiMap(kUserHomeDirectory . "Setup\Setup.data", data)
 	}
 }
 
@@ -1788,36 +1788,36 @@ updateConfigurationForV441() {
 
 updateConfigurationForV430() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local changed := false
 
-	if (getConfigurationValue(userConfiguration, "Automobilista 2", "Window Title", false) = "Automobilista 2") {
-		setConfigurationValue(userConfiguration, "Automobilista 2", "Window Title", "ahk_exe AMS2AVX.exe")
+	if (getMultiMapValue(userConfiguration, "Automobilista 2", "Window Title", false) = "Automobilista 2") {
+		setMultiMapValue(userConfiguration, "Automobilista 2", "Window Title", "ahk_exe AMS2AVX.exe")
 
 		changed := true
 	}
 
-	if (getConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", false) = "Project CARS 2") {
-		setConfigurationValue(userConfiguration, "Project CARS 2", "Window Title", "ahk_exe PCARS2AVX.exe")
+	if (getMultiMapValue(userConfiguration, "Project CARS 2", "Window Title", false) = "Project CARS 2") {
+		setMultiMapValue(userConfiguration, "Project CARS 2", "Window Title", "ahk_exe PCARS2AVX.exe")
 
 		changed := true
 	}
 
 	if changed
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data")
 		FileAppend `nModule.Team Server.Selected=true, %kUserHomeDirectory%Setup\Setup.data
 
 	if FileExist(kUserConfigDirectory . "Simulator Startup.ini") {
 		userConfigurationFile := getFileName("Application Settings.ini", kUserConfigDirectory)
-		userConfiguration := readConfiguration(userConfigurationFile)
+		userConfiguration := readMultiMap(userConfigurationFile)
 
-		setConfigurationValue(userConfiguration, "Simulator Startup", "CloseLaunchPad"
-							, getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Startup.ini")
+		setMultiMapValue(userConfiguration, "Simulator Startup", "CloseLaunchPad"
+							, getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Startup.ini")
 												  , "Startup", "CloseLaunchPad"))
 
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 
 		deleteFile(kUserConfigDirectory . "Simulator Startup.ini")
 	}
@@ -1873,7 +1873,7 @@ updateConfigurationForV425() {
 }
 
 updateConfigurationForV424() {
-	local tyresDB := new TyresDatabase()
+	local tyresDB := TyresDatabase()
 	local simulator := "rFactor 2"
 	local car, oldCar, track, sourceDirectory, sourceDB, targetDB, ignore, row, data, field, tyresDB
 	local targetDirectory, fileName, targetName, name
@@ -1893,8 +1893,8 @@ updateConfigurationForV424() {
 
 					sourceDirectory := (kDatabaseDirectory . "User\RF2\" . oldCar . "\" . track . "\")
 
-					sourceDB := new Database(sourceDirectory, kTelemetrySchemas)
-					targetDB := new TelemetryDatabase(simulator, car, track).Database
+					sourceDB := Database(sourceDirectory, kTelemetrySchemas)
+					targetDB := TelemetryDatabase(simulator, car, track).Database
 
 					for ignore, row in sourceDB.Tables["Electronics"] {
 						data := Object()
@@ -1914,8 +1914,8 @@ updateConfigurationForV424() {
 						targetDB.add("Tyres", data, true)
 					}
 
-					tyresDB := new TyresDatabase()
-					sourceDB := new Database(sourceDirectory, kTyresSchemas)
+					tyresDB := TyresDatabase()
+					sourceDB := Database(sourceDirectory, kTyresSchemas)
 					targetDB := tyresDB.getTyresDatabase(simulator, car, track)
 
 					for ignore, row in sourceDB.Tables["Tyres.Pressures"] {
@@ -1966,10 +1966,10 @@ updateConfigurationForV423() {
 	local directoryName
 
 	if FileExist(kUserConfigDirectory . "Session Database.ini") {
-		sessionDB := new SessionDatabase()
-		sessionDBConfig := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+		sessionDB := SessionDatabase()
+		sessionDBConfig := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-		for key, drivers in getConfigurationSectionValues(sessionDBConfig, "Drivers", Object()) {
+		for key, drivers in getMultiMapValues(sessionDBConfig, "Drivers") {
 			key := StrSplit(key, ".", " `t", 2)
 			simulator := key[1]
 			id := key[2]
@@ -1978,9 +1978,9 @@ updateConfigurationForV423() {
 				sessionDB.registerDriver(simulator, id, driver)
 		}
 
-		removeConfigurationSection(sessionDBConfig, "Drivers")
+		removeMultiMapValues(sessionDBConfig, "Drivers")
 
-		writeConfiguration(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
+		writeMultiMap(kUserConfigDirectory . "Session Database.ini", sessionDBConfig)
 	}
 
 	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
@@ -2059,18 +2059,18 @@ clearWearFields(database, table, id) {
 
 updateConfigurationForV422() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local id, simulator, car, track, db, tyresDB
 
-	if (getConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
-		setConfigurationValue(userConfiguration, "Assetto Corsa", "Window Title", "ahk_exe acs.exe")
+	if (getMultiMapValue(userConfiguration, "Assetto Corsa", "Window Title", false) = "Assetto Corsa Launcher") {
+		setMultiMapValue(userConfiguration, "Assetto Corsa", "Window Title", "ahk_exe acs.exe")
 
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 
 	FileRead id, % kUserConfigDirectory . "ID"
 
-	tyresDB := new TyresDatabase()
+	tyresDB := TyresDatabase()
 
 	loop Files, %kDatabaseDirectory%User\*.*, D									; Simulator
 	{
@@ -2084,7 +2084,7 @@ updateConfigurationForV422() {
 			{
 				track := A_LoopFileName
 
-				db := new TelemetryDatabase(simulator, car, track).Database
+				db := TelemetryDatabase(simulator, car, track).Database
 
 				addOwnerField(db, "Electronics", id)
 				clearWearFields(db, "Tyres", id)
@@ -2144,28 +2144,28 @@ updateConfigurationForV400() {
 
 updateConfigurationForV398() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local simulator, car, track, fileName, text, ignore
 
 	if (userConfiguration.Count() > 0) {
 		for ignore, simulator in ["Assetto Corsa Competizione", "rFactor 2", "iRacing", "Automobilista 2", "RaceRoom Racing Experience"] {
-			if (getConfigurationValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", false) = "SetupDatabase")
-				setConfigurationValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", "SettingsDatabase")
+			if (getMultiMapValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", false) = "SetupDatabase")
+				setMultiMapValue(userConfiguration, "Race Assistant Startup", simulator . ".LoadSettings", "SettingsDatabase")
 
-			if (getConfigurationValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", false) = "SetupDatabase")
-				setConfigurationValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "TyresDatabase")
+			if (getMultiMapValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", false) = "SetupDatabase")
+				setMultiMapValue(userConfiguration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "TyresDatabase")
 
-			setConfigurationValue(userConfiguration, "Race Assistant Shutdown", simulator . ".SaveSettings", "Never")
+			setMultiMapValue(userConfiguration, "Race Assistant Shutdown", simulator . ".SaveSettings", "Never")
 		}
 
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 
 	if FileExist(kDatabaseDirectory . "Local") {
 		try {
 			FileCopyDir %kDatabaseDirectory%Local, %kDatabaseDirectory%User, 1
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
@@ -2176,7 +2176,7 @@ updateConfigurationForV398() {
 		try {
 			FileCopyDir %kDatabaseDirectory%Global, %kDatabaseDirectory%Community, 1
 		}
-		catch exception {
+		catch Any as exception {
 			; ignore
 		}
 
@@ -2221,14 +2221,14 @@ updateConfigurationForV398() {
 
 updatePluginsForV426() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local changed, pcars2
 
 	if (userConfiguration.Count() > 0) {
 		changed := false
 
-		if getConfigurationValue(userConfiguration, "Plugins", "PCARS2", false) {
-			pcars2 := new Plugin("PCARS2", userConfiguration)
+		if getMultiMapValue(userConfiguration, "Plugins", "PCARS2", false) {
+			pcars2 := Plugin("PCARS2", userConfiguration)
 
 			if (pcars2.Simulators.Length() = 0) {
 				pcars2.iSimulators := ["Project CARS 2"]
@@ -2239,52 +2239,52 @@ updatePluginsForV426() {
 			}
 		}
 		else {
-			pcars2 := new Plugin("PCARS2", false, false, "Project CARS 2")
+			pcars2 := Plugin("PCARS2", false, false, "Project CARS 2")
 
 			pcars2.saveToConfiguration(userConfiguration)
 
 			changed := true
 		}
 
-		if getConfigurationValue(userConfiguration, "Plugins", "Project CARS 2", false) {
-			removeConfigurationValue(userConfiguration, "Plugins", "Project CARS 2")
+		if getMultiMapValue(userConfiguration, "Plugins", "Project CARS 2", false) {
+			removeMultiMapValue(userConfiguration, "Plugins", "Project CARS 2")
 
 			changed := true
 		}
 
 		if changed
-			writeConfiguration(userConfigurationFile, userConfiguration)
+			writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 }
 
 updatePluginsForV424() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local pcars2
 
 	if (userConfiguration.Count() > 0) {
-		if !getConfigurationValue(userConfiguration, "Plugins", "PCARS2", false) {
-			pcars2 := new Plugin("Project CARS 2", false, false, "", "")
+		if !getMultiMapValue(userConfiguration, "Plugins", "PCARS2", false) {
+			pcars2 := Plugin("Project CARS 2", false, false, "", "")
 
 			pcars2.saveToConfiguration(userConfiguration)
 
-			writeConfiguration(userConfigurationFile, userConfiguration)
+			writeMultiMap(userConfigurationFile, userConfiguration)
 		}
 	}
 }
 
 updateConfigurationForV394() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local subtitle
 
 	if (userConfiguration.Count() > 0) {
-		subtitle := getConfigurationValue(userConfiguration, "Splash Window", "Subtitle", "")
+		subtitle := getMultiMapValue(userConfiguration, "Splash Window", "Subtitle", "")
 
 		if InStr(subtitle, "2021") {
-			setConfigurationValue(userConfiguration, "Splash Window", "Subtitle", StrReplace(subtitle, "2021", "2023"))
+			setMultiMapValue(userConfiguration, "Splash Window", "Subtitle", StrReplace(subtitle, "2021", "2023"))
 
-			writeConfiguration(userConfigurationFile, userConfiguration)
+			writeMultiMap(userConfigurationFile, userConfiguration)
 		}
 	}
 }
@@ -2328,88 +2328,88 @@ updateConfigurationForV384() {
 
 updatePluginsForV402() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local descriptor
 
 	if (userConfiguration.Count() > 0) {
-		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
+		descriptor := getMultiMapValue(userConfiguration, "Plugins", "Race Spotter", false)
 
 		if descriptor {
 			descriptor := StrReplace(descriptor, "raceAssistantListener: off", "raceAssistantListener: On")
 
-			setConfigurationValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
+			setMultiMapValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
 		}
 
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 }
 
 updatePluginsForV400() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local ignore, name, descriptor
 
 	if (userConfiguration.Count() > 0) {
 		for ignore, name in ["Race Engineer", "Race Strategist", "Race Spotter"] {
-			descriptor := getConfigurationValue(userConfiguration, "Plugins", name, false)
+			descriptor := getMultiMapValue(userConfiguration, "Plugins", name, false)
 
 			if descriptor {
 				descriptor := StrReplace(descriptor, "raceAssistantService", "raceAssistantSynthesizer")
 
-				setConfigurationValue(userConfiguration, "Plugins", name, descriptor)
+				setMultiMapValue(userConfiguration, "Plugins", name, descriptor)
 			}
 		}
 
-		descriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false)
+		descriptor := getMultiMapValue(userConfiguration, "Plugins", "Race Spotter", false)
 
 		if descriptor {
 			descriptor := StrReplace(descriptor, "raceAssistantListener: false", "raceAssistantListener: true")
 
-			setConfigurationValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
+			setMultiMapValue(userConfiguration, "Plugins", "Race Spotter", descriptor)
 		}
 
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 }
 
 updatePluginsForV398() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local engineerDescriptor, strategistDescriptor
 
 	if (userConfiguration.Count() > 0) {
-		engineerDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Engineer", false)
+		engineerDescriptor := getMultiMapValue(userConfiguration, "Plugins", "Race Engineer", false)
 
 		if engineerDescriptor {
 			engineerDescriptor := StrReplace(engineerDescriptor, "openSetupDatabase", "openSessionDatabase")
 
-			setConfigurationValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
+			setMultiMapValue(userConfiguration, "Plugins", "Race Engineer", engineerDescriptor)
 		}
 
-		strategistDescriptor := getConfigurationValue(userConfiguration, "Plugins", "Race Strategist", false)
+		strategistDescriptor := getMultiMapValue(userConfiguration, "Plugins", "Race Strategist", false)
 
 		if strategistDescriptor {
 			strategistDescriptor := StrReplace(strategistDescriptor, "openSetupDatabase", "openSessionDatabase")
 
-			setConfigurationValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
+			setMultiMapValue(userConfiguration, "Plugins", "Race Strategist", strategistDescriptor)
 		}
 
-		writeConfiguration(userConfigurationFile, userConfiguration)
+		writeMultiMap(userConfigurationFile, userConfiguration)
 	}
 }
 
 updatePluginsForV386() {
 	local userConfigurationFile := getFileName(kSimulatorConfigurationFile, kUserConfigDirectory)
-	local userConfiguration := readConfiguration(userConfigurationFile)
+	local userConfiguration := readMultiMap(userConfigurationFile)
 	local raceSpotter
 
 	if (userConfiguration.Count() > 0) {
-		if !getConfigurationValue(userConfiguration, "Plugins", "Race Spotter", false) {
-			raceSpotter := new Plugin("Race Spotter", false, false, "", "raceAssistant: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
+		if !getMultiMapValue(userConfiguration, "Plugins", "Race Spotter", false) {
+			raceSpotter := Plugin("Race Spotter", false, false, "", "raceAssistant: On; raceAssistantName: Elisa; raceAssistantSpeaker: true; raceAssistantListener: false")
 
 			raceSpotter.saveToConfiguration(userConfiguration)
 
-			writeConfiguration(userConfigurationFile, userConfiguration)
+			writeMultiMap(userConfigurationFile, userConfiguration)
 		}
 	}
 }
@@ -2508,7 +2508,7 @@ runSpecialTargets(ByRef buildProgress) {
 							throw "Error while compiling..."
 					}
 				}
-				catch exception {
+				catch Any as exception {
 					logMessage(kLogCritical, translate("Cannot compile ") . solution . translate(" - Solution or MSBuild (") . msBuild . translate(") not found"))
 
 					showMessage(substituteVariables(translate("Cannot compile %solution%: Solution or MSBuild (%msBuild%) not found..."), {solution: solution, msBuild: msBuild})
@@ -2570,12 +2570,12 @@ runUpdateTargets(ByRef buildProgress) {
 
 	updatesFileName := getFileName("UPDATES", kUserConfigDirectory)
 
-	updates := readConfiguration(updatesFileName)
+	updates := readMultiMap(updatesFileName)
 
 	for target, ignore in vUpdateSettings
-		setConfigurationValue(updates, "Processed", target, true)
+		setMultiMapValue(updates, "Processed", target, true)
 
-	writeConfiguration(updatesFileName, updates)
+	writeMultiMap(updatesFileName, updates)
 }
 
 runCleanTargets(ByRef buildProgress) {
@@ -2606,7 +2606,7 @@ runCleanTargets(ByRef buildProgress) {
 							else
 								deleteFile(A_LoopFilePath)
 						}
-						catch exception {
+						catch Any as exception {
 							; ignore
 						}
 
@@ -2815,7 +2815,7 @@ runBuildTargets(ByRef buildProgress) {
 				else
 					RunWait % kCompiler . " /in """ . targetSource . """"
 			}
-			catch exception {
+			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
 
 				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
@@ -2849,8 +2849,8 @@ compareUpdateTargets(t1, t2) {
 
 prepareTargets(ByRef buildProgress, updateOnly) {
 	local counter := 0
-	local targets := readConfiguration(kToolsTargetsFile)
-	local updateTargets := getConfigurationSectionValues(targets, "Update", Object())
+	local targets := readMultiMap(kToolsTargetsFile)
+	local updateTargets := getMultiMapValues(targets, "Update")
 	local target, arguments, update, cleanupTargets, targetName, cleanup, copyTargets, copy, buildTargets, build, rule
 
 	for target, arguments in updateTargets {
@@ -2876,7 +2876,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 	bubbleSort(vUpdateTargets, "compareUpdateTargets")
 
 	if !updateOnly {
-		cleanupTargets := getConfigurationSectionValues(targets, "Cleanup", Object())
+		cleanupTargets := getMultiMapValues(targets, "Cleanup")
 
 		for target, arguments in cleanupTargets {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
@@ -2896,7 +2896,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Sleep 50
 		}
 
-		copyTargets := getConfigurationSectionValues(targets, "Copy", Object())
+		copyTargets := getMultiMapValues(targets, "Copy")
 
 		for target, arguments in copyTargets {
 			targetName := ConfigurationItem.splitDescriptor(target)[1]
@@ -2916,7 +2916,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 			Sleep 50
 		}
 
-		buildTargets := getConfigurationSectionValues(targets, "Build", Object())
+		buildTargets := getMultiMapValues(targets, "Build")
 
 		for target, arguments in buildTargets {
 			buildProgress += (A_Index / buildTargets.Count())

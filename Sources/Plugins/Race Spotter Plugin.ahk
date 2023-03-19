@@ -35,14 +35,14 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 	class RemoteRaceSpotter extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
-			base.__New(plugin, "Race Spotter", remotePID)
+			super.__New(plugin, "Race Spotter", remotePID)
 		}
 	}
 
 	class TrackAutomationToggleAction extends ControllerAction {
 		iPlugin := false
 
-		Plugin[] {
+		Plugin {
 			Get {
 				return this.iPlugin
 			}
@@ -51,7 +51,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		__New(plugin, function, label, icon) {
 			this.iPlugin := plugin
 
-			base.__New(function, label, icon)
+			super.__New(function, label, icon)
 		}
 
 		fireAction(function, trigger) {
@@ -70,13 +70,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	RaceSpotter[] {
+	RaceSpotter {
 		Get {
 			return this.RaceAssistant
 		}
 	}
 
-	TrackAutomationEnabled[] {
+	TrackAutomationEnabled {
 		Get {
 			return this.iTrackAutomationEnabled
 		}
@@ -85,7 +85,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	__New(controller, name, configuration := false) {
 		local trackAutomation, arguments
 
-		base.__New(controller, name, configuration)
+		super.__New(controller, name, configuration)
 
 		if (this.Active || isDebug()) {
 			trackAutomation := this.getArgumentValue("trackAutomation", false)
@@ -125,67 +125,67 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if ((function != false) && (action = "TrackAutomation")) {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-			this.registerAction(new this.TrackAutomationToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			this.registerAction(this.TrackAutomationToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else
-			base.createRaceAssistantAction(controller, action, actionFunction, arguments*)
+			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 	}
 
 	createRaceAssistant(pid) {
-		return new this.RemoteRaceSpotter(this, pid)
+		return this.RemoteRaceSpotter(this, pid)
 	}
 
 	writePluginState(configuration) {
 		local sessionDB, simulator, simulatorName, trackAutomation
 
-		base.writePluginState(configuration)
+		super.writePluginState(configuration)
 
 		if this.Active {
 			if this.RaceAssistant
-				setConfigurationValue(configuration, "Race Assistants", this.Plugin, "Active")
+				setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Active")
 
 			if this.TrackAutomationEnabled {
 				simulator := this.Simulator
 
 				if (simulator && simulator.Track) {
-					sessionDB := new SessionDatabase()
+					sessionDB := SessionDatabase()
 
 					simulatorName := simulator.runningSimulator()
 
-					setConfigurationValue(configuration, "Track Automation", "Simulator", simulatorName)
-					setConfigurationValue(configuration, "Track Automation", "Car", sessionDB.getCarName(simulatorName, simulator.Car))
-					setConfigurationValue(configuration, "Track Automation", "Track", sessionDB.getTrackName(simulatorName, simulator.Track))
+					setMultiMapValue(configuration, "Track Automation", "Simulator", simulatorName)
+					setMultiMapValue(configuration, "Track Automation", "Car", sessionDB.getCarName(simulatorName, simulator.Car))
+					setMultiMapValue(configuration, "Track Automation", "Track", sessionDB.getTrackName(simulatorName, simulator.Track))
 
 					trackAutomation := simulator.TrackAutomation
 
 					if trackAutomation {
-						setConfigurationValue(configuration, "Track Automation", "State", "Active")
+						setMultiMapValue(configuration, "Track Automation", "State", "Active")
 
-						setConfigurationValue(configuration, "Track Automation", "Automation", trackAutomation.Name)
+						setMultiMapValue(configuration, "Track Automation", "Automation", trackAutomation.Name)
 					}
 					else {
-						setConfigurationValue(configuration, "Track Automation", "State", "Warning")
+						setMultiMapValue(configuration, "Track Automation", "State", "Warning")
 
-						setConfigurationValue(configuration, "Track Automation", "Information"
+						setMultiMapValue(configuration, "Track Automation", "Information"
 														   , translate("Message: ") . translate("No track automation available..."))
 					}
 				}
 				else {
-					setConfigurationValue(configuration, "Track Automation", "State", "Passive")
+					setMultiMapValue(configuration, "Track Automation", "State", "Passive")
 
-					setConfigurationValue(configuration, "Track Automation", "Information"
+					setMultiMapValue(configuration, "Track Automation", "Information"
 													   , translate("Message: ") . translate("Waiting for simulation..."))
 				}
 			}
 			else
-				setConfigurationValue(configuration, "Track Automation", "State", "Disabled")
+				setMultiMapValue(configuration, "Track Automation", "State", "Disabled")
 		}
 	}
 
 	updateActions(session) {
 		local ignore, theAction
 
-		base.updateActions(session)
+		super.updateActions(session)
 
 		for ignore, theAction in this.Actions
 			if isInstance(theAction, RaceSpotterPlugin.TrackAutomationToggleAction) {
@@ -274,7 +274,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		local trackAutomation, ignore, candidate, enabled, trackAutomations
 
 		if this.Simulator {
-			trackAutomations := new SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
+			trackAutomations := SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
 																		, this.Simulator.Car, this.Simulator.Track)
 
 			for ignore, candidate in trackAutomations
@@ -314,7 +314,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				simulator := this.Simulator.Simulator[true]
 				track := this.Simulator.Track
 
-				sessionDB := new SessionDatabase()
+				sessionDB := SessionDatabase()
 
 				code := sessionDB.getSimulatorCode(simulator)
 				data := sessionDB.getTrackData(simulator, track)
@@ -330,7 +330,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						else
 							Run "%exePath%" -Trigger %positions%, %kBinariesDirectory%, Hide, pid
 					}
-					catch exception {
+					catch Any as exception {
 						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
 																   , {simulator: code, protocol: "SHM"})
 											   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -360,7 +360,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			Process Exist, %pid%
 
 			if (force && ErrorLevel) {
-				processName := (new SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
+				processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
 
 				tries := 5
 
@@ -384,7 +384,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	joinSession(settings, data) {
-		if getConfigurationValue(settings, "Assistant.Spotter", "Join.Late", true)
+		if getMultiMapValue(settings, "Assistant.Spotter", "Join.Late", true)
 			this.startSession(settings, data)
 	}
 
@@ -394,7 +394,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		this.shutdownTrackMapper(true)
 		this.shutdownTrackAutomation(true)
 
-		base.finishSession(arguments*)
+		super.finishSession(arguments*)
 	}
 
 	addLap(lap, running, data) {
@@ -403,9 +403,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		static sessionDB := false
 
 		if !sessionDB
-			sessionDB := new SessionDatabase()
+			sessionDB := SessionDatabase()
 
-		base.addLap(lap, running, data)
+		super.addLap(lap, running, data)
 
 		if (this.RaceAssistant && this.Simulator) {
 			simulator := this.Simulator.Simulator[true]
@@ -415,7 +415,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else if this.iMapperPID
 				hasTrackMap := false
 			else {
-				track := getConfigurationValue(data, "Session Data", "Track", false)
+				track := getMultiMapValue(data, "Session Data", "Track", false)
 
 				hasTrackMap := sessionDB.hasTrackMap(simulator, track)
 			}
@@ -429,8 +429,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			else if !this.iMapperPID {
 				simulatorName := sessionDB.getSimulatorName(simulator)
 
-				if (lap > getConfigurationValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
-					track := getConfigurationValue(data, "Session Data", "Track", false)
+				if (lap > getMultiMapValue(this.Configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)) {
+					track := getMultiMapValue(data, "Session Data", "Track", false)
 
 					code := sessionDB.getSimulatorCode(simulator)
 					dataFile := (kTempDirectory . code . " Data\" . track . ".data")
@@ -445,7 +445,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 							this.iMapperPID := pid
 						}
-						catch exception {
+						catch Any as exception {
 							logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
 																	   , {simulator: code, protocol: "SHM"})
 												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -459,40 +459,40 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						}
 
 						if ((ErrorLevel != "Error") && this.iMapperPID) {
-							trackMapperState := newConfiguration()
+							trackMapperState := newMultiMap()
 
-							setConfigurationValue(trackMapperState, "Track Mapper", "State", "Active")
-							setConfigurationValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
-							setConfigurationValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-							setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Scanning")
-							setConfigurationValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Scanning track..."))
+							setMultiMapValue(trackMapperState, "Track Mapper", "State", "Active")
+							setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
+							setMultiMapValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+							setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Scanning")
+							setMultiMapValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Scanning track..."))
 
-							writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+							writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 							Task.startTask(ObjBindMethod(this, "createTrackMap", simulatorName, track, dataFile), 120000, kLowPriority)
 						}
 					}
 				}
 				else {
-					trackMapperState := newConfiguration()
+					trackMapperState := newMultiMap()
 
-					setConfigurationValue(trackMapperState, "Track Mapper", "State", "Passive")
-					setConfigurationValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
-					setConfigurationValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-					setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Waiting")
-					setConfigurationValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
+					setMultiMapValue(trackMapperState, "Track Mapper", "State", "Passive")
+					setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", simulatorName)
+					setMultiMapValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+					setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Waiting")
+					setMultiMapValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Waiting for track scanner..."))
 
-					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+					writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 				}
 			}
 		}
 	}
 
 	updateLap(lap, running, data) {
-		base.updateLap(lap, running, data)
+		super.updateLap(lap, running, data)
 
 		if this.TeamSessionActive
-			this.TeamServer.setLapValue(lap, "Telemetry Update", printConfiguration(data))
+			this.TeamServer.setLapValue(lap, "Telemetry Update", printMultiMap(data))
 	}
 
 	createTrackMap(simulator, track, dataFile) {
@@ -509,7 +509,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, UserErrorLevel Hide, pid
 				}
-				catch exception {
+				catch Any as exception {
 					logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
 
 					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
@@ -558,7 +558,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				Process Exist, %pid%
 
 				if (force && ErrorLevel) {
-					processName := (new SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
+					processName := (SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 
 					tries := 5
 

@@ -52,13 +52,13 @@ class PressuresEditor {
 
 	iModifications := []
 
-	SessionDatabase[] {
+	SessionDatabase {
 		Get {
 			return this.iSessionDatabase
 		}
 	}
 
-	PressuresDatabase[] {
+	PressuresDatabase {
 		Get {
 			return this.iPressuresDatabase
 		}
@@ -76,13 +76,13 @@ class PressuresEditor {
 		}
 	}
 
-	SelectedWeather[] {
+	SelectedWeather {
 		Get {
 			return this.iSelectedWeather
 		}
 	}
 
-	SelectedCompound[] {
+	SelectedCompound {
 		Get {
 			return this.iSelectedCompound
 		}
@@ -94,7 +94,7 @@ class PressuresEditor {
 		}
 	}
 
-	PressuresListView[] {
+	PressuresListView {
 		Get {
 			return this.iPressuresListView
 		}
@@ -102,7 +102,7 @@ class PressuresEditor {
 
 	__New(sessionDatabase, compound, compoundColor, airTemperature, trackTemperature) {
 		this.iSessionDatabase := sessionDatabase
-		this.iPressuresDatabase := new TyresDatabase().getTyresDatabase(sessionDatabase.SelectedSimulator
+		this.iPressuresDatabase := TyresDatabase().getTyresDatabase(sessionDatabase.SelectedSimulator
 																	  , sessionDatabase.SelectedCar
 																	  , sessionDatabase.SelectedTrack)
 
@@ -178,7 +178,7 @@ class PressuresEditor {
 		pressuresViewer.Navigate("about:blank")
 		pressuresViewer.Document.Write("<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 
-		Gui PE:Add, ListView, x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit HwndpressuresListViewHandle gchoosePressure, % values2String("|", map(["Tyre", "Pressure", "#"], "translate")*) ; NoSort NoSortHdr
+		Gui PE:Add, ListView, x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit HwndpressuresListViewHandle gchoosePressure, % values2String("|", collect(["Tyre", "Pressure", "#"], "translate")*) ; NoSort NoSortHdr
 
 		this.iPressuresListView := pressuresListViewHandle
 
@@ -236,7 +236,7 @@ class PressuresEditor {
 									if (row.Identifier != kNull)
 										connector.DeleteData("TyresPressuresDistribution", row.Identifier)
 							}
-							catch exception {
+							catch Any as exception {
 								logError(exception, true)
 							}
 

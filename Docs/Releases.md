@@ -1071,7 +1071,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New "Server Administration" application for [Team Server administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration).
   4. New application ["Team Dashboard"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center) supports pitstop settings preparation by a team member in multiplayer endurance races.
-  5. [Developer]Added *parseConfiguration* and *printConfiguration* functions.
+  5. [Developer]Added *parseMultiMap* and *printMultiMap* functions.
 
 ## 3.7.2-release 12/03/21
 

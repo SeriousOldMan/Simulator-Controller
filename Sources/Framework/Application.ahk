@@ -61,14 +61,14 @@ consentDialog(id, consent := false) {
 	for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
 		if FileExist(rootDirectory . "Consent." . language)
 			if !texts
-				texts := readConfiguration(rootDirectory . "Consent." . language)
+				texts := readMultiMap(rootDirectory . "Consent." . language)
 			else
-				for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
+				for section, keyValues in readMultiMap(rootDirectory . "Consent." . language)
 					for key, value in keyValues
-						setConfigurationValue(texts, section, key, value)
+						setMultiMapValue(texts, section, key, value)
 
 	if !texts
-		texts := readConfiguration(kTranslationsDirectory . "Consent.en")
+		texts := readMultiMap(kTranslationsDirectory . "Consent.en")
 
 	consentGui := Gui()
 	consentGui.Opt("-Border") ; -Caption
@@ -82,29 +82,29 @@ consentDialog(id, consent := false) {
 
 	consentGui.Add("Text", "x0 y32 w800 h23 +0x200 +0x1 BackgroundTrans", translate("Declaration of consent"))
 
-	consentGui.Add("Text", "x8 y70 w784 h180 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Introduction"), "``n", "`n"), "\<>", "="))
+	consentGui.Add("Text", "x8 y70 w784 h180 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Introduction"), "``n", "`n"), "\<>", "="))
 
 	consentGui.Add("Text", "x8 y260 w450 h23 +0x200", translate("Your database identification key is:"))
 	consentGui.Add("Edit", "x460 y260 w332 h23 -VScroll ReadOnly Center", id)
 
 	consentGui.Add("Text", "x8 y300 w450 h23 +0x200", translate("Do you want to share your tyre pressure data?"))
 
-	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Undecided"))
-	tyrePressuresConsentDropDown := consentGui.Add("DropDownList", "x460 y300 w332 Choose" . chosen, map(["Yes", "No", "Ask again later..."], translate))
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "Undecided"))
+	tyrePressuresConsentDropDown := consentGui.Add("DropDownList", "x460 y300 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
 	consentGui.Add("Text", "x8 y324 w450 h23 +0x200", translate("Do you want to share your car setup data?"))
 
-	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided"))
-	carSetupsConsentDropDown := consentGui.Add("DropDownList", "x460 y324 w332 Choose" . chosen, map(["Yes", "No", "Ask again later..."], translate))
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Car Setups", "Undecided"))
+	carSetupsConsentDropDown := consentGui.Add("DropDownList", "x460 y324 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
 	consentGui.Add("Text", "x8 y348 w450 h23 +0x200", translate("Do you want to share your race strategies?"))
 
-	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Race Strategies", "Undecided"))
-	raceStrategiesConsentDropDown := consentGui.Add("DropDownList", "x460 y348 w332 Choose" . chosen, map(["Yes", "No", "Ask again later..."], translate))
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Race Strategies", "Undecided"))
+	raceStrategiesConsentDropDown := consentGui.Add("DropDownList", "x460 y348 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	consentGui.Add("Text", "x8 y388 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
+	consentGui.Add("Text", "x8 y388 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
 
-	consentGui.Add("Link", "x8 y458 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
+	consentGui.Add("Link", "x8 y458 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
 
 	consentGui.Add("Button", "x368 y514 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
 
@@ -114,8 +114,6 @@ consentDialog(id, consent := false) {
 		consentGui.Show("x" . x . " y" . y)
 	else
 		consentGui.Show()
-
-	consentGui.Default()
 
 	Loop
 		Sleep(100)
@@ -136,29 +134,29 @@ requestShareSessionDatabaseConsent() {
 
 			ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
 
-			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
-			request := ((consent.Count == 0) || (ID != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
+			request := ((consent.Count == 0) || (ID != getMultiMapValue(consent, "General", "ID")) || getMultiMapValue(consent, "General", "ReNew", false))
 
 			if !request {
-				countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
+				countdown := getMultiMapValue(consent, "General", "Countdown", kUndefined)
 
 				if (countdown != kUndefined) {
 					if (--countdown <= 0)
 						request := true
 					else {
-						setConfigurationValue(consent, "General", "Countdown", countdown)
+						setMultiMapValue(consent, "General", "Countdown", countdown)
 
-						writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+						writeMultiMap(kUserConfigDirectory . "CONSENT", consent)
 					}
 				}
 			}
 
 			if request {
-				newConsent := newConfiguration()
+				newConsent := newMultiMap()
 
-				setConfigurationValue(newConsent, "General", "ID", id)
-				setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
+				setMultiMapValue(newConsent, "General", "ID", id)
+				setMultiMapValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 
 				if (getFileNames("Consent.*", kTranslationsDirectory).Length() > 0)
 					result := consentDialog(id, consent)
@@ -174,15 +172,15 @@ requestShareSessionDatabaseConsent() {
 								, CarSetups: "Share Car Setups"}
 					switch result[type] {
 						case "Yes":
-							setConfigurationValue(newConsent, "Consent", key, "Yes")
+							setMultiMapValue(newConsent, "Consent", key, "Yes")
 						case "No":
-							setConfigurationValue(newConsent, "Consent", key, "No")
+							setMultiMapValue(newConsent, "Consent", key, "No")
 						case "Retry":
-							setConfigurationValue(newConsent, "Consent", key, "Undecided")
-							setConfigurationValue(newConsent, "General", "Countdown", 10)
+							setMultiMapValue(newConsent, "Consent", key, "Undecided")
+							setMultiMapValue(newConsent, "General", "Countdown", 10)
 					}
 
-				writeConfiguration(kUserConfigDirectory . "CONSENT", newConsent)
+				writeMultiMap(kUserConfigDirectory . "CONSENT", newConsent)
 			}
 		}
 	}
@@ -206,26 +204,26 @@ checkForNews() {
 			try {
 				Download("https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1", kTempDirectory . "NEWS")
 			}
-			catch exception {
+			catch Any as exception {
 				check := false
 			}
 		}
 
 		if check {
-			news := readConfiguration(kUserConfigDirectory . "NEWS")
+			news := readMultiMap(kUserConfigDirectory . "NEWS")
 
-			for nr, html in getConfigurationSectionValues(readConfiguration(kTempDirectory . "NEWS"), "News")
-				if !getConfigurationValue(news, "News", nr, false)
+			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS"), "News")
+				if !getMultiMapValue(news, "News", nr, false)
 					try {
 						Download(html, kTempDirectory . "NEWS.htm")
 
-						setConfigurationValue(news, "News", nr, true)
+						setMultiMapValue(news, "News", nr, true)
 
-						writeConfiguration(kUserConfigDirectory . "NEWS", news)
+						writeMultiMap(kUserConfigDirectory . "NEWS", news)
 
 						viewHTML(kTempDirectory . "NEWS.htm")
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 					}
 		}
@@ -245,11 +243,11 @@ startDatabaseSynchronizer() {
 		dbID := StrSplit(FileRead(dbIDFileName),"`n","`r")[1]
 
 		if (ID = dbID) {
-			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
-			shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-			shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
-			shareRaceStrategies := (getConfigurationValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
+			shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+			shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+			shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
 
 			options := ("-ID """ . ID . """ -Synchronize " . true)
 
@@ -265,7 +263,7 @@ startDatabaseSynchronizer() {
 			try {
 				Run(kBinariesDirectory . "Database Synchronizer.exe " . options)
 			}
-			catch exception {
+			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 
 				showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
@@ -300,14 +298,14 @@ checkForUpdates() {
 				if ErrorLevel
 					throw "Error while checking VERSION..."
 			}
-			catch exception {
+			catch Any as exception {
 				check := false
 			}
 		}
 
 		if check {
-			release := readConfiguration(kUserConfigDirectory . "VERSION")
-			version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
+			release := readMultiMap(kUserConfigDirectory . "VERSION")
+			version := getMultiMapValue(release, "Release", "Version", getMultiMapValue(release, "Version", "Release", false))
 
 			if version {
 				version := StrSplit(version, "-", , 2)
@@ -335,7 +333,7 @@ checkForUpdates() {
 					OnMessage(0x44)
 
 					if (msgResult = "Yes") {
-						automaticUpdates := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
+						automaticUpdates := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
 
 						if automaticUpdates
 							Run("*RunAs `"" . kBinariesDirectory . "Simulator Download.exe`" -NoUpdate -Download -Update -Start `"" . A_ScriptFullPath . "`"")
@@ -351,22 +349,22 @@ checkForUpdates() {
 		}
 	}
 
-	toolTargets := readConfiguration(getFileName("Simulator Tools.targets", kConfigDirectory))
+	toolTargets := readMultiMap(getFileName("Simulator Tools.targets", kConfigDirectory))
 
 	userToolTargetsFile := getFileName("Simulator Tools.targets", kUserConfigDirectory)
-	userToolTargets := readConfiguration(userToolTargetsFile)
+	userToolTargets := readMultiMap(userToolTargetsFile)
 
 	if (userToolTargets.Count > 0) {
-		setConfigurationSectionValues(userToolTargets, "Update", getConfigurationSectionValues(toolTargets, "Update", Object()))
+		setMultiMapValues(userToolTargets, "Update", getMultiMapValues(toolTargets, "Update"))
 
-		writeConfiguration(userToolTargetsFile, userToolTargets)
+		writeMultiMap(userToolTargetsFile, userToolTargets)
 	}
 
 	if (!inList(A_Args, "-NoUpdate") && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1])) {
-		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
+		updates := readMultiMap(getFileName("UPDATES", kUserConfigDirectory))
 restartUpdate:
-		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
-			if !getConfigurationValue(updates, "Processed", target, false) {
+		for target, arguments in getMultiMapValues(toolTargets, "Update")
+			if !getMultiMapValue(updates, "Processed", target, false) {
 				/*
 				SoundPlay *32
 
@@ -384,10 +382,10 @@ restartUpdate:
 
 					IfMsgBox Yes
 					{
-						for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
-							setConfigurationValue(updates, "Processed", target, true)
+						for target, arguments in getMultiMapValues(toolTargets, "Update")
+							setMultiMapValue(updates, "Processed", target, true)
 
-						writeConfiguration(getFileName("UPDATES", kUserConfigDirectory), updates)
+						writeMultiMap(getFileName("UPDATES", kUserConfigDirectory), updates)
 
 						break
 					}

@@ -24,7 +24,7 @@ class ApplicationsStepWizard extends StepWizard {
 	iSimulatorsListView := false
 	iApplicationsListView := false
 
-	Pages[] {
+	Pages {
 		Get {
 			return 2
 		}
@@ -38,10 +38,10 @@ class ApplicationsStepWizard extends StepWizard {
 		local stdApplications := []
 		local ignore, applications, theApplication, descriptor, exePath, workingDirectory, hooks, group
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, applications in concatenate([definition[1]], string2Values(",", definition[2]))
-			for theApplication, ignore in getConfigurationSectionValues(wizard.Definition, applications)
+			for theApplication, ignore in getMultiMapValues(wizard.Definition, applications)
 				if (((applications != "Applications.Simulators") || wizard.isApplicationInstalled(theApplication)) && wizard.isApplicationSelected(theApplication)) {
 					descriptor := getApplicationDescriptor(theApplication)
 
@@ -82,7 +82,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		for group, applications in groups
 			for ignore, theApplication in applications
-				setConfigurationValue(configuration, "Applications", group . "." . A_Index, theApplication)
+				setMultiMapValue(configuration, "Applications", group . "." . A_Index, theApplication)
 	}
 
 	createGui(wizard, x, y, width, height) {
@@ -113,13 +113,13 @@ class ApplicationsStepWizard extends StepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h170 Section -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h170 Section -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", collect(["Simulation", "Path"], "translate")*)
 
 		buttonX := x + width - 90
 
 		Gui %window%:Add, Button, x%buttonX% yp+177 w90 h23 HWNDlocateSimButtonHandle glocateSimulator Hidden, % translate("Locate...")
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -147,13 +147,13 @@ class ApplicationsStepWizard extends StepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h230 Section -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h230 Section -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", collect(["Category", "Application", "Path"], "translate")*)
 
 		buttonX := x + width - 90
 
 		Gui %window%:Add, Button, x%buttonX% yp+237 w90 h23 HWNDlocateAppButtonHandle glocateApplication Hidden, % translate("Locate...")
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -171,21 +171,21 @@ class ApplicationsStepWizard extends StepWizard {
 	}
 
 	loadStepDefinition(definition) {
-		base.loadStepDefinition(definition)
+		super.loadStepDefinition(definition)
 
 		if !FileExist(kUserHomeDirectory . "Setup\Simulator Setup.data")
 			this.updateAvailableApplications(true)
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iSimulatorsListView := false
 		this.iApplicationsListView := false
 	}
 
 	updateState() {
-		base.updateState()
+		super.updateState()
 
 		if (this.Definition && (SetupWizard.Instance.Step == this))
 			this.updateAvailableApplications()
@@ -194,7 +194,7 @@ class ApplicationsStepWizard extends StepWizard {
 	showPage(page) {
 		this.updateAvailableApplications()
 
-		base.showPage(page)
+		super.showPage(page)
 
 		this.loadApplications(page == 1)
 	}
@@ -202,7 +202,7 @@ class ApplicationsStepWizard extends StepWizard {
 	hidePage(page) {
 		this.updateSelectedApplications(page, false)
 
-		return base.hidePage(page)
+		return super.hidePage(page)
 	}
 
 	updateAvailableApplications(initialize := false) {
@@ -213,7 +213,7 @@ class ApplicationsStepWizard extends StepWizard {
 		for ignore, section in concatenate([definition[1]], string2Values(",", definition[2])) {
 			category := ConfigurationItem.splitDescriptor(section)[2]
 
-			for application, ignore in getConfigurationSectionValues(wizard.Definition, section) {
+			for application, ignore in getMultiMapValues(wizard.Definition, section) {
 				if !wizard.isApplicationInstalled(application) {
 					wizard.locateApplication(application, false, false)
 
@@ -278,7 +278,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 			LV_Delete()
 
-			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
+			for simulator, descriptor in getMultiMapValues(wizard.Definition, definition[1]) {
 				if wizard.isApplicationInstalled(simulator) {
 					descriptor := string2Values("|", descriptor)
 
@@ -322,7 +322,7 @@ class ApplicationsStepWizard extends StepWizard {
 			for ignore, section in string2Values(",", definition[2]) {
 				category := ConfigurationItem.splitDescriptor(section)[2]
 
-				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				for application, descriptor in getMultiMapValues(wizard.Definition, section) {
 					if (wizard.isApplicationSelected(application) || wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
 						descriptor := string2Values("|", descriptor)
 
@@ -434,7 +434,7 @@ updateSelectedApplications() {
 }
 
 initializeApplicationsStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new ApplicationsStepWizard(SetupWizard.Instance, "Applications", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(ApplicationsStepWizard(SetupWizard.Instance, "Applications", kSimulatorConfiguration))
 }
 
 

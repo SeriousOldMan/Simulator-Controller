@@ -33,7 +33,7 @@ class FormatsEditor extends ConfigurationItem {
 	iClosed := false
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		FormatsEditor.Instance := this
 
@@ -106,24 +106,24 @@ class FormatsEditor extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		massUnitDropDown := getConfigurationValue(configuration, "Localization", "MassUnit", "Kilogram")
-		temperatureUnitDropDown := getConfigurationValue(configuration, "Localization", "TemperatureUnit", "Celsius")
-		pressureUnitDropDown := getConfigurationValue(configuration, "Localization", "PressureUnit", "PSI")
-		volumeUnitDropDown := getConfigurationValue(configuration, "Localization", "VolumeUnit", "Liter")
-		lengthUnitDropDown := getConfigurationValue(configuration, "Localization", "LengthUnit", "Meter")
-		speedUnitDropDown := getConfigurationValue(configuration, "Localization", "SpeedUnit", "km/h")
+		massUnitDropDown := getMultiMapValue(configuration, "Localization", "MassUnit", "Kilogram")
+		temperatureUnitDropDown := getMultiMapValue(configuration, "Localization", "TemperatureUnit", "Celsius")
+		pressureUnitDropDown := getMultiMapValue(configuration, "Localization", "PressureUnit", "PSI")
+		volumeUnitDropDown := getMultiMapValue(configuration, "Localization", "VolumeUnit", "Liter")
+		lengthUnitDropDown := getMultiMapValue(configuration, "Localization", "LengthUnit", "Meter")
+		speedUnitDropDown := getMultiMapValue(configuration, "Localization", "SpeedUnit", "km/h")
 
-		numberFormatDropDown := getConfigurationValue(configuration, "Localization", "NumberFormat", "#.##")
-		timeFormatDropDown := getConfigurationValue(configuration, "Localization", "TimeFormat", "[H:]M:S.##")
+		numberFormatDropDown := getMultiMapValue(configuration, "Localization", "NumberFormat", "#.##")
+		timeFormatDropDown := getMultiMapValue(configuration, "Localization", "TimeFormat", "[H:]M:S.##")
 
 		if (volumeUnitDropDown = "Gallon")
 			volumeUnitDropDown := "Gallon (GB)"
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		GuiControlGet temperatureUnitDropDown
 		GuiControlGet massUnitDropDown
@@ -134,15 +134,15 @@ class FormatsEditor extends ConfigurationItem {
 		GuiControlGet numberFormatDropDown
 		GuiControlGet timeFormatDropDown
 
-		setConfigurationValue(configuration, "Localization", "TemperatureUnit", kTemperatureUnits[temperatureUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "MassUnit", kMassUnits[massUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "PressureUnit", kPressureUnits[pressureUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "VolumeUnit", kVolumeUnits[volumeUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "LengthUnit", kLengthUnits[lengthUnitDropDown])
-		setConfigurationValue(configuration, "Localization", "SpeedUnit", kSpeedUnits[speedUnitDropDown])
+		setMultiMapValue(configuration, "Localization", "TemperatureUnit", kTemperatureUnits[temperatureUnitDropDown])
+		setMultiMapValue(configuration, "Localization", "MassUnit", kMassUnits[massUnitDropDown])
+		setMultiMapValue(configuration, "Localization", "PressureUnit", kPressureUnits[pressureUnitDropDown])
+		setMultiMapValue(configuration, "Localization", "VolumeUnit", kVolumeUnits[volumeUnitDropDown])
+		setMultiMapValue(configuration, "Localization", "LengthUnit", kLengthUnits[lengthUnitDropDown])
+		setMultiMapValue(configuration, "Localization", "SpeedUnit", kSpeedUnits[speedUnitDropDown])
 
-		setConfigurationValue(configuration, "Localization", "NumberFormat", kNumberFormats[numberFormatDropDown])
-		setConfigurationValue(configuration, "Localization", "TimeFormat", kTimeFormats[timeFormatDropDown])
+		setMultiMapValue(configuration, "Localization", "NumberFormat", kNumberFormats[numberFormatDropDown])
+		setMultiMapValue(configuration, "Localization", "TimeFormat", kTimeFormats[timeFormatDropDown])
 	}
 
 	editFormats() {
@@ -159,7 +159,7 @@ class FormatsEditor extends ConfigurationItem {
 
 		try {
 			if (this.iClosed == kOk) {
-				configuration := newConfiguration()
+				configuration := newMultiMap()
 
 				this.saveToConfiguration(configuration)
 

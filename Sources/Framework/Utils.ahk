@@ -40,6 +40,7 @@ isNull(value) {
 }
 
 isInstance(object, root) {
+	/*
 	local candidate, classVar, outerClassVar
 
 	if IsObject(object) {
@@ -67,4 +68,7 @@ isInstance(object, root) {
 	}
 
 	return false
+	*/
+
+	return (object is root)
 }

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - JSON Parser                     ;;;
 ;;;                                                                         ;;;
 ;;;   This code is based on work of teadrinker. See                         ;;;
@@ -14,7 +14,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -61,7 +61,7 @@ class JSON {
 		try {
 			return this.JS.eval("JSON.stringify((" . script . ")" . ((SubStr(key, 1, 1) = "[") ? "" : ".") . key . ",'','" . indent . "')")
 		}
-		catch exception {
+		catch Any as exception {
 			return false
 		}
 	}
@@ -81,7 +81,7 @@ class JSON {
 
 			return result
 		}
-		catch exception {
+		catch Any as exception {
 			return false
 		}
 	}
@@ -95,18 +95,18 @@ class JSON {
 		sign := ((SubStr(key, 1, 1) = "[") ? "" : ".")
 
 		try {
-			if !RegExMatch(key, "(.*)\[(\d+)]$", match)
+			if !RegExMatch(key, "(.*)\[(\d+)]$", &match)
 				result := this.JS.eval("var obj = (" . script . "); delete obj" . sign . key . "; JSON.stringify(obj,'','" . indent . "')")
 			else
 				result := this.JS.eval("var obj = (" . script . ");"
-									 . "obj" . (match1 != "" ? sign . match1 : "") . ".splice(" . match2 . ", 1);"
+									 . "obj" . (match[1] != "" ? sign . match[1] : "") . ".splice(" . match[2] . ", 1);"
 									 . "JSON.stringify(obj,'','" . indent . "')")
 
 			this.JS.eval("obj = ''")
 
 			return result
 		}
-		catch exception {
+		catch Any as exception {
 			return false
 		}
 	}
@@ -126,22 +126,22 @@ class JSON {
 			if (result = "")
 				return false
 
-			object := {}
+			object := Map()
 
 			if (result = -1) {
-				loop % jsObject.length
+				loop jsObject.length
 					object[A_Index - 1] := this.JS.eval("JSON.stringify((" . script . ")" . concatenated . "[" . (A_Index - 1) . "],'','" . indent . "')")
 			}
 			else if (result = 0) {
 				keys := jsObject.GetKeys()
 
-				loop % keys.length
+				loop keys.length
 					k := keys[A_Index - 1], object[k] := this.JS.eval("JSON.stringify((" . script . ")" . concatenated . "['" . k . "'],'','" . indent . "')")
 			}
 
 			return object
 		}
-		catch exception {
+		catch Any as exception {
 			return false
 		}
 	}
@@ -197,7 +197,7 @@ class JSON {
 
 		static document
 
-		document := ComObjCreate("htmlfile")
+		document := ComObject("htmlfile")
 
 		document.write("<meta http-equiv=""X-UA-Compatible"" content=""IE=9"">")
 
@@ -208,10 +208,10 @@ class JSON {
 		return JS
 	}
 
-	_AddMethods(ByRef JS) {
+	_AddMethods(JS) {
 		local script
 
-		script =
+		script := "
 		(
 			Object.prototype.GetKeys = function () {
 				var keys = []
@@ -227,7 +227,7 @@ class JSON {
 
 				return toStandardString.call(this) == '[object Array]'
 			}
-		)
+		)"
 
 		JS.eval(script)
 	}
@@ -245,14 +245,14 @@ class JSON {
 		else if (result = -1) {
 			object := []
 
-			loop % jsObject.length
+			Loop jsObject.length
 				object[A_Index] := this._CreateObject(jsObject[A_Index - 1])
 		}
 		else if (result = 0) {
-			object := {}
+			object := map()
 			keys := jsObject.GetKeys()
 
-			loop % keys.length
+			Loop keys.length
 				k := keys[A_Index - 1], object[k] := this._CreateObject(jsObject[k])
 		}
 

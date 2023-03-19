@@ -48,19 +48,19 @@ class TelemetryDatabase extends SessionDatabase {
 	iDrivers := false
 	iShared := true
 
-	Database[] {
+	Database {
 		Get {
 			return this.iDatabase
 		}
 	}
 
-	Drivers[] {
+	Drivers {
 		Get {
 			return this.iDrivers
 		}
 	}
 
-	Shared[] {
+	Shared {
 		Get {
 			return this.iShared
 		}
@@ -75,7 +75,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 		this.iDrivers := drivers
 
-		base.__New()
+		super.__New()
 
 		if (simulator && car && track) {
 			simulatorCode := this.getSimulatorCode(simulator)
@@ -83,7 +83,7 @@ class TelemetryDatabase extends SessionDatabase {
 			car := this.getCarCode(simulator, car)
 			track := this.getCarCode(simulator, track)
 
-			this.iDatabase := new Database(this.DatabasePath . "User\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
+			this.iDatabase := Database(this.DatabasePath . "User\" . simulatorCode . "\" . car . "\" . track . "\", kTelemetrySchemas)
 		}
 	}
 
@@ -272,7 +272,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 								connector.DeleteData("Electronics", identifiers)
 							}
-							catch exception {
+							catch Any as exception {
 								logError(exception, true)
 							}
 				}
@@ -315,7 +315,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 								connector.DeleteData("Tyres", identifiers)
 							}
-							catch exception {
+							catch Any as exception {
 								logError(exception, true)
 							}
 				}
@@ -572,7 +572,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 					track := telemetry.Track
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
-						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
 
 						lastSimulator := simulator
 						lastCar := car
@@ -592,7 +592,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 												 , "Fuel.Remaining": telemetry.FuelRemaining, "Fuel.Consumption": telemetry.FuelConsumption
 												 , "Lap.Time": telemetry.LapTime, "Map": telemetry.Map, "TC": telemetry.TC, "ABS": telemetry.ABS}, true)
 						}
-						catch exception {
+						catch Any as exception {
 							logError(exception)
 						}
 					}
@@ -609,7 +609,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 					track := telemetry.Track
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
-						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
 
 						lastSimulator := simulator
 						lastCar := car
@@ -641,7 +641,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 										   , "Tyre.Wear.Rear.Left": telemetry.WearRearLeft
 										   , "Tyre.Wear.Rear.Right": telemetry.WearRearRight}, true)
 						}
-						catch exception {
+						catch Any as exception {
 							logError(exception)
 						}
 					}
@@ -653,7 +653,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 
 				for ignore, car in sessionDB.getCars(simulator)
 					for ignore, track in sessionDB.getTracks(simulator, car) {
-						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTelemetrySchemas)
 
 						if db.lock("Electronics", false)
 							try {

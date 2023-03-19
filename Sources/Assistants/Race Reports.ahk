@@ -62,7 +62,7 @@ global deleteRaceReportButtonHandle
 class RaceReports extends ConfigurationItem {
 	iDatabase := false
 
-	iSessionDatabase := new SessionDatabase()
+	iSessionDatabase := SessionDatabase()
 
 	iSelectedSimulator := false
 	iSelectedCar := false
@@ -76,43 +76,43 @@ class RaceReports extends ConfigurationItem {
 
 	iReportViewer := false
 
-	Window[] {
+	Window {
 		Get {
 			return "Reports"
 		}
 	}
 
-	RacesListView[] {
+	RacesListView {
 		Get {
 			return this.iRacesListView
 		}
 	}
 
-	Database[] {
+	Database {
 		Get {
 			return this.iDatabase
 		}
 	}
 
-	SessionDatabase[] {
+	SessionDatabase {
 		Get {
 			return this.iSessionDatabase
 		}
 	}
 
-	SelectedSimulator[] {
+	SelectedSimulator {
 		Get {
 			return this.iSelectedSimulator
 		}
 	}
 
-	SelectedCar[] {
+	SelectedCar {
 		Get {
 			return this.iSelectedCar
 		}
 	}
 
-	SelectedTrack[] {
+	SelectedTrack {
 		Get {
 			return this.iSelectedTrack
 		}
@@ -127,19 +127,19 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 
-	SelectedRace[] {
+	SelectedRace {
 		Get {
 			return this.iSelectedRace
 		}
 	}
 
-	SelectedReport[] {
+	SelectedReport {
 		Get {
 			return this.iSelectedReport
 		}
 	}
 
-	ReportViewer[] {
+	ReportViewer {
 		Get {
 			return this.iReportViewer
 		}
@@ -164,7 +164,7 @@ class RaceReports extends ConfigurationItem {
 	__New(database, configuration) {
 		this.iDatabase := database
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		RaceReports.Instance := this
 	}
@@ -212,7 +212,7 @@ class RaceReports extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x16 yp+26 w70 h23 +0x200, % translate("Races")
 
-		Gui %window%:Add, ListView, x90 yp-2 w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDraceListView gchooseRace, % values2String("|", map(["Date", "Time", "Duration", "Starting Grid"], "translate")*)
+		Gui %window%:Add, ListView, x90 yp-2 w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDraceListView gchooseRace, % values2String("|", collect(["Date", "Time", "Duration", "Starting Grid"], "translate")*)
 
 		this.iRacesListView := raceListView
 
@@ -228,7 +228,7 @@ class RaceReports extends ConfigurationItem {
 		infoViewer.Navigate("about:blank")
 
 		Gui %window%:Add, Text, x290 ys w40 h23 +0x200, % translate("Report")
-		Gui %window%:Add, DropDownList, x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", map(kRaceReports, "translate")*)
+		Gui %window%:Add, DropDownList, x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", collect(kRaceReports, "translate")*)
 
 		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
 		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "Report Settings.ico", 1)
@@ -237,7 +237,7 @@ class RaceReports extends ConfigurationItem {
 
 		chartViewer.Navigate("about:blank")
 
-		this.iReportViewer := new RaceReportViewer(window, chartViewer, infoViewer)
+		this.iReportViewer := RaceReportViewer(window, chartViewer, infoViewer)
 
 		this.loadSimulator(simulator, true)
 
@@ -526,7 +526,7 @@ class RaceReports extends ConfigurationItem {
 			tracks := this.getTracks(this.SelectedSimulator, car)
 
 			GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car)
-			GuiControl, , trackDropDown, % "|" . values2String("|", map(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator))*)
+			GuiControl, , trackDropDown, % "|" . values2String("|", collect(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator))*)
 
 			this.loadTrack((tracks.Length() > 0) ? tracks[1] : false, true)
 		}
@@ -572,12 +572,12 @@ class RaceReports extends ConfigurationItem {
 					FormatTime date, %fileName%, ShortDate
 					FormatTime time, %fileName%, HH:mm
 
-					raceData := readConfiguration(report . "\Race.data")
+					raceData := readMultiMap(report . "\Race.data")
 
-					if ((getConfigurationValue(raceData, "Session", "Car") = this.SelectedCar) && (getConfigurationValue(raceData, "Session", "Track") = track)) {
+					if ((getMultiMapValue(raceData, "Session", "Car") = this.SelectedCar) && (getMultiMapValue(raceData, "Session", "Track") = track)) {
 						this.AvailableRaces.Push(fileName)
 
-						LV_Add("", date, time, Round(getConfigurationValue(raceData, "Session", "Duration") / 60), getConfigurationValue(raceData, "Cars", "Count"))
+						LV_Add("", date, time, Round(getMultiMapValue(raceData, "Session", "Duration") / 60), getMultiMapValue(raceData, "Cars", "Count"))
 					}
 				}
 
@@ -695,7 +695,7 @@ class RaceReports extends ConfigurationItem {
 
 							drivers := []
 
-							loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+							loop % Min(5, getMultiMapValue(raceData, "Cars", "Count"))
 								drivers.Push(A_Index)
 
 							this.ReportViewer.Settings["Drivers"] := drivers
@@ -714,7 +714,7 @@ class RaceReports extends ConfigurationItem {
 
 							drivers := []
 
-							loop % Min(5, getConfigurationValue(raceData, "Cars", "Count"))
+							loop % Min(5, getMultiMapValue(raceData, "Cars", "Count"))
 								drivers.Push(A_Index)
 
 							this.ReportViewer.Settings["Drivers"] := drivers
@@ -809,7 +809,7 @@ chooseTrack() {
 	local reports := RaceReports.Instance
 	local simulator := reports.SelectedSimulator
 	local tracks := reports.getTracks(simulator, reports.SelectedCar)
-	local trackNames := map(tracks, ObjBindMethod(reports.SessionDatabase, "getTrackName", simulator))
+	local trackNames := collect(tracks, ObjBindMethod(reports.SessionDatabase, "getTrackName", simulator))
 
 	GuiControlGet trackDropDown
 
@@ -845,7 +845,7 @@ deleteRaceReport() {
 
 runRaceReports() {
 	local icon := kIconsDirectory . "Chart.ico"
-	local reportsDirectory := getConfigurationValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
+	local reportsDirectory := getMultiMapValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
 	local title := translate("Configuration")
 	local reports, simulators
 
@@ -865,7 +865,7 @@ runRaceReports() {
 
 	fixIE(11)
 
-	reports := new RaceReports(reportsDirectory, kSimulatorConfiguration)
+	reports := RaceReports(reportsDirectory, kSimulatorConfiguration)
 
 	reports.createGui(reports.Configuration)
 	reports.show()

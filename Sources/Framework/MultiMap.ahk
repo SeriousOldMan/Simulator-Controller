@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Configuration Functions         ;;;
+;;;   Modular Simulator Controller System - Multi Map Functions             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -19,27 +19,27 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-newConfiguration() {
-	return {}
+newMultiMap() {
+	return Map()
 }
 
-readConfiguration(configFile) {
-	local configuration := Map()
+readMultiMap(multiMapFile) {
+	local multiMap := newMultiMap()
 	local section := false
 	local file := false
 	local tries := 20
 	local data := false
 	local currentLine, firstChar, keyValue, key, value
 
-	configFile := getFileName(configFile, kUserConfigDirectory, kConfigDirectory)
+	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory, kConfigDirectory)
 
-	if FileExist(configFile) {
+	if FileExist(multiMapFile) {
 		loop
 			try {
-				file := FileOpen(configFile, "r-wd")
+				file := FileOpen(multiMapFile, "r-wd")
 
 				if file {
-					data := FileRead(configFile)
+					data := FileRead(multiMapFile)
 
 					file.Close()
 
@@ -48,9 +48,9 @@ readConfiguration(configFile) {
 				else
 					throw "File not found..."
 			}
-			catch exception {
+			catch Any as exception {
 				if (tries-- <= 0)
-					return configuration
+					return multiMap
 				else
 					Sleep(10)
 			}
@@ -67,9 +67,9 @@ readConfiguration(configFile) {
 				if (firstChar = ";")
 					continue
 				else if (firstChar = "[") {
-					section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
+					section := StrUpper(StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", ""))
 
-					configuration[section] := {}
+					multiMap[section] := Map()
 				}
 				else if section {
 					keyValue := LTrim(currentLine)
@@ -77,40 +77,40 @@ readConfiguration(configFile) {
 					if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
 						keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
 
-						key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
+						key := StrUpper(StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n"))
 						value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
 
-						configuration[section][keyValue[1]] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
+						multiMap[section][key] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
 					}
 				}
 			}
 		}
 	}
 
-	return configuration
+	return multiMap
 }
 
-parseConfiguration(text) {
+parseMultiMap(text) {
 	local fileName := temporaryFileName("Config", "ini")
-	local configuration
+	local multiMap
 
 	FileAppend(text, fileName, "UTF-16")
 
-	configuration := readConfiguration(fileName)
+	multiMap := readMultiMap(fileName)
 
 	deleteFile(fileName)
 
-	return configuration
+	return multiMap
 }
 
-writeConfiguration(configFile, configuration, symbolic := true) {
+writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 	local tempFile := temporaryFileName("Config", "ini")
-	local empty := (configuration.Count = 0)
+	local empty := (multiMap.Count = 0)
 	local directory, section, keyValues, key, value, pairs, tries
 
 	deleteFile(tempFile)
 
-	for section, keyValues in configuration {
+	for section, keyValues in multiMap {
 		pairs := ""
 
 		for key, value in keyValues {
@@ -126,9 +126,9 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 		FileAppend(section, tempFile, "UTF-16")
 	}
 
-	configFile := getFileName(configFile, kUserConfigDirectory)
+	multiMapFile := getFileName(multiMapFile, kUserConfigDirectory)
 
-	SplitPath(configFile, , &directory)
+	SplitPath(multiMapFile, , &directory)
 	DirCreate(directory)
 
 	tries := 10
@@ -136,9 +136,9 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 	loop
 		try {
 			if empty {
-				if !FileExist(configFile)
+				if !FileExist(multiMapFile)
 					break
-				else if deleteFile(configFile)
+				else if deleteFile(multiMapFile)
 					break
 				else {
 					Sleep(200)
@@ -147,12 +147,12 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 				}
 			}
 			else {
-				FileMove(tempFile, configFile, 1)
+				FileMove(tempFile, multiMapFile, 1)
 
 				break
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 
 			if (tries-- <= 0)
@@ -160,16 +160,16 @@ writeConfiguration(configFile, configuration, symbolic := true) {
 		}
 }
 
-printConfiguration(configuration, symbolic := true) {
+printMultiMap(multiMap, symbolic := true) {
 	local fileName := temporaryFileName("Config", "ini")
 	local text
 
-	writeConfiguration(fileName, configuration, symbolic)
+	writeMultiMap(fileName, multiMap, symbolic)
 
 	try {
 		text := FileRead(fileName)
 	}
-	catch exception {
+	catch Any as exception {
 		text := ""
 	}
 
@@ -178,11 +178,14 @@ printConfiguration(configuration, symbolic := true) {
 	return text
 }
 
-getConfigurationValue(configuration, section, key, default := false) {
+getMultiMapValue(multiMap, section, key, default := false) {
 	local value
 
-	if configuration.Has(section) {
-		value := configuration[section]
+	section := StrUpper(section)
+	key := StrUpper(key)
+
+	if multiMap.Has(section) {
+		value := multiMap[section]
 
 		if value.Has(key)
 			return value[key]
@@ -191,36 +194,50 @@ getConfigurationValue(configuration, section, key, default := false) {
 	return default
 }
 
-getConfigurationSectionValues(configuration, section, default := false) {
-	return configuration.Has(section) ? configuration[section].Clone() : default
+getMultiMapValues(multiMap, section, default := unset) {
+	section := StrUpper(section)
+
+	return multiMap.Has(section) ? multiMap[section].Clone() : (isSet(default) ? default : Map())
 }
 
-setConfigurationValue(configuration, section, key, value) {
-	configuration[section, key] := value
+setMultiMapValue(multiMap, section, key, value) {
+	section := StrUpper(section)
+	key := StrUpper(key)
+
+	if !multiMap.Has(section)
+		multiMap[section] := Map()
+
+	multiMap[section, key] := value
 }
 
-setConfigurationSectionValues(configuration, section, values) {
+setMultiMapValues(multiMap, section, values) {
 	local key, value
 
-	removeConfigurationSection(configuration, section)
+	section := StrUpper(section)
+
+	removeMultiMapValues(multiMap, section)
 
 	for key, value in values
-		setConfigurationValue(configuration, section, key, value)
+		setMultiMapValue(multiMap, section, key, value)
 }
 
-setConfigurationValues(configuration, otherConfiguration) {
+addMultiMapValues(multiMap, otherMultiMap) {
 	local section, values
 
-	for section, values in otherConfiguration
-		setConfigurationSectionValues(configuration, section, values)
+	for section, values in otherMultiMap
+		setMultiMapValues(multiMap, section, values)
 }
 
-removeConfigurationValue(configuration, section, key) {
-	if configuration.Has(section)
-		configuration[section].Delete(key)
+removeMultiMapValue(multiMap, section, key) {
+	section := StrUpper(section)
+
+	if multiMap.Has(section)
+		multiMap[section].Delete(StrUpper(key))
 }
 
-removeConfigurationSection(configuration, section) {
-	if configuration.Has(section)
-		configuration.Delete(section)
+removeMultiMapValues(multiMap, section) {
+	section := StrUpper(section)
+
+	if multiMap.Has(section)
+		multiMap.Delete(section)
 }

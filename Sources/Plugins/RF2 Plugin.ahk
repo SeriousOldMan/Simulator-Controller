@@ -32,20 +32,20 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 	iSelectedDriver := false
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	ClosePitstopMFDHotkey[] {
+	ClosePitstopMFDHotkey {
 		Get {
 			return this.iClosePitstopMFDHotkey
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
@@ -74,7 +74,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				else
 					RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
 			}
-			catch exception {
+			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
 														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 														   . kBinariesDirectory . translate(")"))
@@ -195,17 +195,17 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				case "Refuel":
 					data := readSimulatorData(this.Code, "-Setup")
 
-					return [getConfigurationValue(data, "Setup Data", "FuelAmount", 0)]
+					return [getMultiMapValue(data, "Setup Data", "FuelAmount", 0)]
 				case "Tyre Pressures":
 					data := readSimulatorData(this.Code, "-Setup")
 
-					return [getConfigurationValue(data, "Setup Data", "TyrePressureFL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureFR", 26.1)
-						  , getConfigurationValue(data, "Setup Data", "TyrePressureRL", 26.1), getConfigurationValue(data, "Setup Data", "TyrePressureRR", 26.1)]
+					return [getMultiMapValue(data, "Setup Data", "TyrePressureFL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureFR", 26.1)
+						  , getMultiMapValue(data, "Setup Data", "TyrePressureRL", 26.1), getMultiMapValue(data, "Setup Data", "TyrePressureRR", 26.1)]
 				case "Tyre Compound":
 					data := readSimulatorData(this.Code, "-Setup")
 
-					compound := getConfigurationValue(data, "Setup Data", "TyreCompoundRaw")
-					compound := new SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
+					compound := getMultiMapValue(data, "Setup Data", "TyreCompoundRaw")
+					compound := SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
 
 					if (compound = kUndefined)
 						compound := normalizeCompound("Dry")
@@ -219,13 +219,13 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 				case "Repair Suspension":
 					data := readSimulatorData(this.Code, "-Setup")
 
-					return [getConfigurationValue(data, "Setup Data", "RepairSuspension", false)]
+					return [getMultiMapValue(data, "Setup Data", "RepairSuspension", false)]
 				case "Repair Bodywork":
 					data := readSimulatorData(this.Code, "-Setup")
 
-					return [getConfigurationValue(data, "Setup Data", "RepairBodywork", false)]
+					return [getMultiMapValue(data, "Setup Data", "RepairBodywork", false)]
 				default:
-					return base.getPitstopOptionValues(option)
+					return super.getPitstopOptionValues(option)
 			}
 		}
 		else
@@ -233,19 +233,19 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	performPitstop(lap, options) {
-		base.performPitstop(lap, options)
+		super.performPitstop(lap, options)
 
 		this.iSelectedDriver := false
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		this.sendPitstopCommand("Pitstop", "Set", "Refuel", Round(liters))
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if compound {
 			compound := this.tyreCompoundCode(compound, compoundColor)
@@ -262,14 +262,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		this.sendPitstopCommand("Pitstop", "Set", "Tyre Pressure"
 							  , Round(pressureFL, 1), Round(pressureFR, 1), Round(pressureRL, 1), Round(pressureRR, 1))
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (repairBodywork && repairSuspension)
 			this.sendPitstopCommand("Pitstop", "Set", "Repair", "Both")
@@ -284,7 +284,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	requestPitstopDriver(pitstopNumber, driver) {
 		local delta, currentDriver, nextDriver
 
-		base.requestPitstopDriver(pitstopNumber, driver)
+		super.requestPitstopDriver(pitstopNumber, driver)
 
 		if driver {
 			driver := string2Values("|", driver)
@@ -305,11 +305,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateTelemetryData(data) {
-		base.updateTelemetryData(data)
+		super.updateTelemetryData(data)
 
-		if !getConfigurationValue(data, "Stint Data", "InPit", false)
-			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
-				setConfigurationValue(data, "Session Data", "Paused", true)
+		if !getMultiMapValue(data, "Stint Data", "InPit", false)
+			if (getMultiMapValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setMultiMapValue(data, "Session Data", "Paused", true)
 	}
 }
 

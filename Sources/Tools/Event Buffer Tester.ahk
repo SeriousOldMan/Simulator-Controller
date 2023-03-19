@@ -83,7 +83,7 @@ selectCommand(title := "Event Buffer Tester", x := "Center", y := "Center", widt
 
 		Gui EBT:Add, Text, x16 yp+40 w70 h23 +0x200, % translate("Simulator")
 
-		simulators := new SessionDatabase().getSimulators()
+		simulators := SessionDatabase().getSimulators()
 		simulator := 0
 
 		if (simulators.Length() > 0)
@@ -139,7 +139,7 @@ selectCommand(title := "Event Buffer Tester", x := "Center", y := "Center", widt
 }
 
 activateSimulatorWindow(selectedSimulator) {
-	window := new Application(selectedSimulator, kSimulatorConfiguration).WindowTitle
+	window := Application(selectedSimulator, kSimulatorConfiguration).WindowTitle
 
 	if !WinExist(window) {
 		showMessage(selectedSimulator . " not found...")

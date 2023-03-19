@@ -25,7 +25,7 @@ global chatMessageUpdateButton
 class ChatMessagesConfigurator extends ConfigurationItemList {
 	iEditor := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
@@ -34,7 +34,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	__New(editor, configuration) {
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ChatMessagesConfigurator.Instance := this
 	}
@@ -44,7 +44,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 		local configuration := editor.Configuration
 
 		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
-						, % values2String("|", map(["#", "Label", "Text"], "translate")*)
+						, % values2String("|", collect(["#", "Label", "Text"], "translate")*)
 
 		Gui %window%:Add, Text, x16 y295 w86 h23 +0x200, % translate("Button")
 		Gui %window%:Add, Text, x95 y295 w23 h23 +0x200, % translate("#")
@@ -68,9 +68,9 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		local descriptor, chatMessage
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, chatMessage in getConfigurationSectionValues(configuration, "Chat Messages", Object()) {
+		for descriptor, chatMessage in getMultiMapValues(configuration, "Chat Messages") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			chatMessage := string2Values("|", chatMessage)
 
@@ -81,10 +81,10 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		local ignore, chatMessage
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, chatMessage in this.ItemList
-			setConfigurationValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", chatMessage[1]), values2String("|", chatMessage[2], chatMessage[3]))
+			setMultiMapValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", chatMessage[1]), values2String("|", chatMessage[2], chatMessage[3]))
 	}
 
 	loadList(items) {
@@ -163,7 +163,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 			OnMessage(0x44, "")
 		}
 		else
-			base.updateItem()
+			super.updateItem()
 	}
 }
 
@@ -182,7 +182,7 @@ initializeChatMessagesConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Chat"), new ChatMessagesConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Chat"), ChatMessagesConfigurator(editor, editor.Configuration))
 	}
 }
 

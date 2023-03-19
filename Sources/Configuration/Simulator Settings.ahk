@@ -46,10 +46,10 @@ showSettingsEditor() {
 	Menu Tray, Icon, %icon%, , 1
 	Menu Tray, Tip, Simulator Settings
 
-	settings := readConfiguration(kSimulatorSettingsFile)
+	settings := readMultiMap(kSimulatorSettingsFile)
 
 	if (editSettings(settings) == kSave)
-		writeConfiguration(kSimulatorSettingsFile, settings)
+		writeMultiMap(kSimulatorSettingsFile, settings)
 
 	ExitApp 0
 }

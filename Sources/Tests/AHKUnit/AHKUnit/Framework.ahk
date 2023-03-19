@@ -3,7 +3,7 @@
 
 class AhkUnit_Framework extends AhkUnit.FrameworkCore {
 	__New() {
-		base.__New()
+		super.__New()
 		this.callstackDepth := 0
 	}
 	
@@ -26,7 +26,7 @@ class AhkUnit_Framework extends AhkUnit.FrameworkCore {
 				return ""
 			}
 		} else {
-			assertion := new AhkUnit.Assert.Message("Bad assertion object.")
+			assertion := AhkUnit.Assert.Message("Bad assertion object.")
 		}
 		caller := IsObject(caller) ? caller : Exception("", -caller - 1)
 		file := caller.file
@@ -59,42 +59,42 @@ class AhkUnit_Framework extends AhkUnit.FrameworkCore {
 	}
 	
 	AssertEqual(expected, actual, message = "") {
-		this.Assert(new AhkUnit.Assert.Equal(expected, actual), message)
+		this.Assert(AhkUnit.Assert.Equal(expected, actual), message)
 	}
 	
 	AssertNotEqual(expected, actual, message = "") {
-		this.Assert(new AhkUnit.Assert.NotEqual(expected, actual), message)
+		this.Assert(AhkUnit.Assert.NotEqual(expected, actual), message)
 	}
 	
 	AssertEqualIgnoreCase(expected, actual, message = "") {
-		this.Assert(new AhkUnit.Assert.Equal(expected, actual).IgnoreCase(), message)
+		this.Assert(AhkUnit.Assert.Equal(expected, actual).IgnoreCase(), message)
 	}
 	
 	AssertNotEqualIgnoreCase(expected, actual, message = "") {
-		this.Assert(new AhkUnit.Assert.NotEqual(expected, actual).IgnoreCase(), message)
+		this.Assert(AhkUnit.Assert.NotEqual(expected, actual).IgnoreCase(), message)
 	}
 	
 	AssertObjectEqual(expected, actual, message = "") {
-		this.Assert(new AhkUnit.Assert.ObjectEqual(expected, actual), message)
+		this.Assert(AhkUnit.Assert.ObjectEqual(expected, actual), message)
 	}
 	
 	AssertTrue(actual, message = "") {
-		this.Assert(new AhkUnit.Assert.True(actual), message)
+		this.Assert(AhkUnit.Assert.True(actual), message)
 	}
 	
 	AssertFalse(actual, message = "") {
-		this.Assert(new AhkUnit.Assert.False(actual), message)
+		this.Assert(AhkUnit.Assert.False(actual), message)
 	}
 	
 	AssertEmpty(actual, message = "") {
-		this.Assert(new AhkUnit.Assert.Empty(actual), message)
+		this.Assert(AhkUnit.Assert.Empty(actual), message)
 	}
 	
 	AssertNotEmpty(actual, message = "") {
-		this.Assert(new AhkUnit.Assert.NotEmpty(actual), message)
+		this.Assert(AhkUnit.Assert.NotEmpty(actual), message)
 	}
 	
 	AssertObject(actual, message = "") {
-		this.Assert(new AhkUnit.Assert.Object(actual), message)
+		this.Assert(AhkUnit.Assert.Object(actual), message)
 	}
 }

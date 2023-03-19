@@ -36,7 +36,15 @@ global vHasTrayMenu := false
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-exitApplication() {
+emptyLogsDirectory(*) {
+	deleteDirectory(kLogsDirectory, false)
+}
+
+emptyTempDirectory(*) {
+	deleteDirectory(kTempDirectory, false)
+}
+
+exitApplication(*) {
 	ExitApp(0)
 }
 
@@ -50,7 +58,7 @@ hasTrayMenu() {
 }
 
 installTrayMenu(update := false) {
-	global vHasTrayMenu
+	global LogMenu, SupportMenu, vHasTrayMenu
 	local icon := kIconsDirectory . "Pause.ico"
 	local label := translate("Exit")
 	local levels, level, ignore, oldLabel
@@ -75,14 +83,14 @@ installTrayMenu(update := false) {
 	try {
 		LogMenu.Delete()
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 	}
 
 	try {
 		SupportMenu.Delete()
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 	}
 
@@ -110,8 +118,8 @@ installTrayMenu(update := false) {
 
 	SupportMenu.Add()
 
-	SupportMenu.Add(translate("Clear log files"), deleteDirectory.Bind(kLogsDirectory, false))
-	SupportMenu.Add(translate("Clear temporary files"), deleteDirectory.Bind(kTempDirectory, false))
+	SupportMenu.Add(translate("Clear log files"), emptyLogsDirectory)
+	SupportMenu.Add(translate("Clear temporary files"), emptyTempDirectory)
 
 	label := translate("Support")
 
@@ -152,9 +160,9 @@ trayMessage(title, message, duration := false, async := true) {
 				TrayTip()
 
 				if SubStr(A_OSVersion, 1, 3) = "10." {
-					Tray.NoIcon()
+					A_TrayMenu.NoIcon()
 					Sleep(200)  ; It may be necessary to adjust this sleep...
-					Tray.Icon()
+					A_TrayMenu.Icon()
 				}
 			}
 			finally {

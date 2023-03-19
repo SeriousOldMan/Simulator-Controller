@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 startAITrack() {
-	local aiTrack := new Application("Face Recognition", SimulatorController.Instance.Configuration)
+	local aiTrack := Application("Face Recognition", SimulatorController.Instance.Configuration)
 	local pid, windowTitle, active
 
 	if !aiTrack.isRunning() {
@@ -54,7 +54,7 @@ startAITrack() {
 }
 
 startVoiceMacro() {
-	local voiceMacro := new Application("Voice Recognition", SimulatorController.Instance.Configuration)
+	local voiceMacro := Application("Voice Recognition", SimulatorController.Instance.Configuration)
 	local pid, curDetectHiddenWindows, windowTitle, active
 
 	if !voiceMacro.isRunning() {

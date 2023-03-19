@@ -51,7 +51,7 @@ class AhkUnit_Runner {
 				thrownClass := (IsObject(e) && (e.__Class == "")) ? "Exception" : e.__Class
 				expectedClass := testInstance[key . "_throws"]
 				if (expectedClass != "") {
-					assertion := new AhkUnit.Assert.Equal("throw " . expectedClass, "throw " . thrownClass)
+					assertion := AhkUnit.Assert.Equal("throw " . expectedClass, "throw " . thrownClass)
 					caller := IsObject(e) ? e : Object()
 					testInstance.Assert_(assertion, "", caller)
 				} else {

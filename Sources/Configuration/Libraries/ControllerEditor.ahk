@@ -58,43 +58,43 @@ class ControllerEditor extends ConfigurationItem {
 	iPreviewCenterX := 0
 	iPreviewCenterY := 0
 
-	ControllerPreview[] {
+	ControllerPreview {
 		Get {
 			return this.iControllerPreview
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	ButtonBoxConfiguration[] {
+	ButtonBoxConfiguration {
 		Get {
 			return this.iButtonBoxConfiguration
 		}
 	}
 
-	ButtonBoxConfigurationFile[] {
+	ButtonBoxConfigurationFile {
 		Get {
 			return this.iButtonBoxConfigurationFile
 		}
 	}
 
-	StreamDeckConfiguration[] {
+	StreamDeckConfiguration {
 		Get {
 			return this.iStreamDeckConfiguration
 		}
 	}
 
-	StreamDeckConfigurationFile[] {
+	StreamDeckConfigurationFile {
 		Get {
 			return this.iStreamDeckConfigurationFile
 		}
 	}
 
-	AutoSave[] {
+	AutoSave {
 		Get {
 			try {
 				/*
@@ -106,7 +106,7 @@ class ControllerEditor extends ConfigurationItem {
 
 				return false
 			}
-			catch exception {
+			catch Any as exception {
 				return false
 			}
 		}
@@ -124,14 +124,14 @@ class ControllerEditor extends ConfigurationItem {
 		this.iButtonBoxConfigurationFile := buttonBoxConfigurationFile
 		this.iStreamDeckConfigurationFile := streamDeckConfigurationFile
 
-		this.iButtonBoxConfiguration := readConfiguration(buttonBoxConfigurationFile)
-		this.iStreamDeckConfiguration := readConfiguration(streamDeckConfigurationFile)
+		this.iButtonBoxConfiguration := readMultiMap(buttonBoxConfigurationFile)
+		this.iStreamDeckConfiguration := readMultiMap(streamDeckConfigurationFile)
 
-		this.iControlsList := new ControlsList(this.iButtonBoxConfiguration)
-		this.iLabelsList := new LabelsList(this.iButtonBoxConfiguration)
-		this.iLayoutsList := new LayoutsList(this.iButtonBoxConfiguration, this.iStreamDeckConfiguration)
+		this.iControlsList := ControlsList(this.iButtonBoxConfiguration)
+		this.iLabelsList := LabelsList(this.iButtonBoxConfiguration)
+		this.iLayoutsList := LayoutsList(this.iButtonBoxConfiguration, this.iStreamDeckConfiguration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ControllerEditor.Instance := this
 
@@ -169,7 +169,7 @@ class ControllerEditor extends ConfigurationItem {
 
 	saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save := true) {
 		if save
-			base.saveToConfiguration(buttonBoxConfiguration)
+			super.saveToConfiguration(buttonBoxConfiguration)
 
 		this.iControlsList.saveToConfiguration(buttonBoxConfiguration, save)
 		this.iLabelsList.saveToConfiguration(buttonBoxConfiguration, save)
@@ -240,13 +240,13 @@ class ControllerEditor extends ConfigurationItem {
 		local buttonBoxConfiguration, streamDeckConfiguration
 
 		if save {
-			buttonBoxConfiguration := newConfiguration()
-			streamDeckConfiguration := newConfiguration()
+			buttonBoxConfiguration := newMultiMap()
+			streamDeckConfiguration := newMultiMap()
 
 			this.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration)
 
-			writeConfiguration(this.ButtonBoxConfigurationFile, buttonBoxConfiguration)
-			writeConfiguration(this.StreamDeckConfigurationFile, streamDeckConfiguration)
+			writeMultiMap(this.ButtonBoxConfigurationFile, buttonBoxConfiguration)
+			writeMultiMap(this.StreamDeckConfigurationFile, streamDeckConfiguration)
 		}
 
 		this.saveController()
@@ -275,8 +275,8 @@ class ControllerEditor extends ConfigurationItem {
 	}
 
 	updateControllerPreview(type, name) {
-		local buttonBoxConfiguration := newConfiguration()
-		local streamDeckConfiguration := newConfiguration()
+		local buttonBoxConfiguration := newMultiMap()
+		local streamDeckConfiguration := newMultiMap()
 		local oldPreview
 
 		this.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, false)
@@ -288,9 +288,9 @@ class ControllerEditor extends ConfigurationItem {
 
 		if name {
 			if (type = "Button Box")
-				this.iControllerPreview := new ButtonBoxPreview(this, name, buttonBoxConfiguration)
+				this.iControllerPreview := ButtonBoxPreview(this, name, buttonBoxConfiguration)
 			else
-				this.iControllerPreview := new StreamDeckPreview(this, name, streamDeckConfiguration)
+				this.iControllerPreview := StreamDeckPreview(this, name, streamDeckConfiguration)
 
 			this.ControllerPreview.open()
 		}
@@ -319,14 +319,14 @@ global controlDeleteButton
 global controlUpdateButton
 
 class ControlsList extends ConfigurationItemList {
-	AutoSave[] {
+	AutoSave {
 		Get {
 			return ControllerEditor.Instance.AutoSave
 		}
 	}
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ControlsList.Instance := this
 	}
@@ -339,11 +339,11 @@ class ControlsList extends ConfigurationItemList {
 
 		Gui CTRLE:Font, Norm, Arial
 		Gui CTRLE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
-							 , % values2String("|", map(["Name", "Function", "Size"], "translate")*)
+							 , % values2String("|", collect(["Name", "Function", "Size"], "translate")*)
 
 		Gui CTRLE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Name")
 		Gui CTRLE:Add, Edit, x214 y80 w101 h21 VcontrolNameEdit, %controlNameEdit%
-		Gui CTRLE:Add, DropDownList, x321 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
+		Gui CTRLE:Add, DropDownList, x321 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", collect(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
 		;426 400
 		Gui CTRLE:Add, Text, x164 y103 w80 h23 +0x200, % translate("Image")
 		Gui CTRLE:Add, Edit, x214 y103 w186 h21 VimageFilePathEdit, %imageFilePathEdit%
@@ -367,9 +367,9 @@ class ControlsList extends ConfigurationItemList {
 		local controls := []
 		local name, definition
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for name, definition in getConfigurationSectionValues(configuration, "Controls", Object())
+		for name, definition in getMultiMapValues(configuration, "Controls")
 			controls.Push(Array(name, string2Values(";", definition)*))
 
 		this.ItemList := controls
@@ -380,12 +380,12 @@ class ControlsList extends ConfigurationItemList {
 		local ignore, control
 
 		if save
-			base.saveToConfiguration(configuration)
+			super.saveToConfiguration(configuration)
 
 		for ignore, control in this.ItemList
 			controls[control[1]] := values2String(";", control[2], control[3], control[4])
 
-		setConfigurationSectionValues(configuration, "Controls", controls)
+		setMultiMapValues(configuration, "Controls", controls)
 	}
 
 	loadList(items) {
@@ -488,14 +488,14 @@ global labelDeleteButton
 global labelUpdateButton
 
 class LabelsList extends ConfigurationItemList {
-	AutoSave[] {
+	AutoSave {
 		Get {
 			return ControllerEditor.Instance.AutoSave
 		}
 	}
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		LabelsList.Instance := this
 	}
@@ -508,7 +508,7 @@ class LabelsList extends ConfigurationItemList {
 
 		Gui CTRLE:Font, Norm, Arial
 		Gui CTRLE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
-							 , % values2String("|", map(["Name", "Size"], "translate")*)
+							 , % values2String("|", collect(["Name", "Size"], "translate")*)
 
 		Gui CTRLE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Name")
 		Gui CTRLE:Add, Edit, x214 y225 w101 h21 VlabelNameEdit, %labelNameEdit%
@@ -531,9 +531,9 @@ class LabelsList extends ConfigurationItemList {
 		local labels := []
 		local name, definition
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for name, definition in getConfigurationSectionValues(configuration, "Labels", Object())
+		for name, definition in getMultiMapValues(configuration, "Labels")
 			labels.Push(Array(name, definition))
 
 		this.ItemList := labels
@@ -544,12 +544,12 @@ class LabelsList extends ConfigurationItemList {
 		local ignore, label
 
 		if save
-			base.saveToConfiguration(configuration)
+			super.saveToConfiguration(configuration)
 
 		for ignore, label in this.ItemList
 			labels[label[1]] := label[2]
 
-		setConfigurationSectionValues(configuration, "Labels", labels)
+		setMultiMapValues(configuration, "Labels", labels)
 	}
 
 	loadList(items) {
@@ -666,31 +666,31 @@ class LayoutsList extends ConfigurationItemList {
 	iButtonBoxWidgets := []
 	iStreamDeckWidgets := []
 
-	AutoSave[] {
+	AutoSave {
 		Get {
 			return ControllerEditor.Instance.AutoSave
 		}
 	}
 
-	ButtonBoxConfiguration[] {
+	ButtonBoxConfiguration {
 		Get {
 			return this.Configuration
 		}
 	}
 
-	StreamDeckConfiguration[] {
+	StreamDeckConfiguration {
 		Get {
 			return this.iStreamDeckConfiguration
 		}
 	}
 
-	CurrentControllerType[] {
+	CurrentControllerType {
 		Get {
 			return ((this.CurrentItem != 0) ? this.ItemList[this.CurrentItem][2]["Type"] : "Button Box")
 		}
 	}
 
-	CurrentController[] {
+	CurrentController {
 		Get {
 			return ((this.CurrentItem != 0) ? this.ItemList[this.CurrentItem][1] : false)
 		}
@@ -699,18 +699,18 @@ class LayoutsList extends ConfigurationItemList {
 	__New(buttonBoxConfiguration, streamDeckConfiguration) {
 		this.iStreamDeckConfiguration := streamDeckConfiguration
 
-		base.__New(buttonBoxConfiguration)
+		super.__New(buttonBoxConfiguration)
 
 		LayoutsList.Instance := this
 	}
 
 	createGui(buttonBoxConfiguration, streamDeckConfiguration) {
 		Gui CTRLE:Add, ListView, x8 y330 w424 h105 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
-							 , % values2String("|", map(["Name", "Grid", "Margins", "Definition"], "translate")*)
+							 , % values2String("|", collect(["Name", "Grid", "Margins", "Definition"], "translate")*)
 
 		Gui CTRLE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name && Type")
 		Gui CTRLE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
-		Gui CTRLE:Add, DropDownList, x215 y445 w117 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", map(["Button Box", "Stream Deck"], "translate")*)
+		Gui CTRLE:Add, DropDownList, x215 y445 w117 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", collect(["Button Box", "Stream Deck"], "translate")*)
 
 		Gui CTRLE:Add, Text, x8 y469 w86 h23 +0x200 Section hwndbbWidget1, % translate("Visible")
 		if layoutVisibleCheck
@@ -751,7 +751,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 
 		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
-		Gui CTRLE:Add, DropDownList, x102 yp w110 AltSubmit Choose1 VlayoutDropDown gchooseLayout hwndsdWidget2, % values2String("|", map(["Mini", "Standard", "XL"], "translate")*)
+		Gui CTRLE:Add, DropDownList, x102 yp w110 AltSubmit Choose1 VlayoutDropDown gchooseLayout hwndsdWidget2, % values2String("|", collect(["Mini", "Standard", "XL"], "translate")*)
 
 		Gui CTRLE:Add, Button, x102 yp+30 w230 h23 Center gopenDisplayRulesEditor hwndsdWidget3, % translate("Edit Display Rules...")
 
@@ -771,9 +771,9 @@ class LayoutsList extends ConfigurationItemList {
 		local layouts := {}
 		local descriptor, definition, name, rowMargin, columnMargin, sidesMargin, bottomMargin, items
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, definition in getConfigurationSectionValues(this.ButtonBoxConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(this.ButtonBoxConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			name := descriptor[1]
 
@@ -800,7 +800,7 @@ class LayoutsList extends ConfigurationItemList {
 				layouts[name][descriptor[2]] := definition
 		}
 
-		for descriptor, definition in getConfigurationSectionValues(this.StreamDeckConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(this.StreamDeckConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			name := descriptor[1]
 
@@ -816,8 +816,8 @@ class LayoutsList extends ConfigurationItemList {
 				layouts[name][descriptor[2]] := definition
 		}
 
-		this.iButtonDefinitions := getConfigurationSectionValues(this.StreamDeckConfiguration, "Buttons", Object())
-		this.iIconDefinitions := getConfigurationSectionValues(this.StreamDeckConfiguration, "Icons", Object())
+		this.iButtonDefinitions := getMultiMapValues(this.StreamDeckConfiguration, "Buttons")
+		this.iIconDefinitions := getMultiMapValues(this.StreamDeckConfiguration, "Icons")
 
 		items := []
 
@@ -831,33 +831,33 @@ class LayoutsList extends ConfigurationItemList {
 		local ignore, layout, grid
 
 		if save
-			base.saveToConfiguration(buttonBoxConfiguration)
+			super.saveToConfiguration(buttonBoxConfiguration)
 
 		for ignore, layout in this.ItemList {
 			if (layout[2]["Type"] = "Button Box") {
 				grid := layout[2]["Grid"]
 
-				setConfigurationValue(buttonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
+				setMultiMapValue(buttonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
 									, grid . ", " . values2String(", ", layout[2]["Margins"]*))
 
 				loop % string2Values("x", grid)[1]
-					setConfigurationValue(buttonBoxConfiguration, "Layouts"
+					setMultiMapValue(buttonBoxConfiguration, "Layouts"
 										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
-				setConfigurationValue(buttonBoxConfiguration, "Layouts"
+				setMultiMapValue(buttonBoxConfiguration, "Layouts"
 									, ConfigurationItem.descriptor(layout[1], "Visible"), layout[2]["Visible"])
 			}
 			else {
 				grid := layout[2]["Grid"]
 
-				setConfigurationValue(streamDeckConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout"), grid)
+				setMultiMapValue(streamDeckConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout"), grid)
 
 				loop % string2Values("x", grid)[1]
-					setConfigurationValue(streamDeckConfiguration, "Layouts"
+					setMultiMapValue(streamDeckConfiguration, "Layouts"
 										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
-				setConfigurationSectionValues(streamDeckConfiguration, "Buttons", this.iButtonDefinitions)
-				setConfigurationSectionValues(streamDeckConfiguration, "Icons", this.iIconDefinitions)
+				setMultiMapValues(streamDeckConfiguration, "Buttons", this.iButtonDefinitions)
+				setMultiMapValues(streamDeckConfiguration, "Icons", this.iIconDefinitions)
 			}
 		}
 	}
@@ -1023,7 +1023,7 @@ class LayoutsList extends ConfigurationItemList {
 	addItem() {
 		local type, preview
 
-		base.addItem()
+		super.addItem()
 
 		if this.CurrentItem {
 			type := this.ItemList[this.CurrentItem][2]["Type"]
@@ -1141,24 +1141,24 @@ class LayoutsList extends ConfigurationItemList {
 			name := layoutNameEdit
 		}
 
-		configuration := newConfiguration()
+		configuration := newMultiMap()
 
-		setConfigurationSectionValues(configuration, "Icons", this.iIconDefinitions)
-		setConfigurationSectionValues(configuration, "Buttons", this.iButtonDefinitions)
+		setMultiMapValues(configuration, "Icons", this.iIconDefinitions)
+		setMultiMapValues(configuration, "Buttons", this.iButtonDefinitions)
 
 		Gui IRE:+OwnerCTRLE
 		Gui CTRLE:+Disabled
 
 		try {
-			result := (new DisplayRulesEditor(name, configuration)).editDisplayRules()
+			result := (DisplayRulesEditor(name, configuration)).editDisplayRules()
 		}
 		finally {
 			Gui CTRLE:-Disabled
 		}
 
 		if result {
-			this.iIconDefinitions := getConfigurationSectionValues(configuration, "Icons", Object())
-			this.iButtonDefinitions := getConfigurationSectionValues(configuration, "Buttons", Object())
+			this.iIconDefinitions := getMultiMapValues(configuration, "Icons")
+			this.iButtonDefinitions := getMultiMapValues(configuration, "Buttons")
 		}
 	}
 
@@ -1427,31 +1427,31 @@ class ControllerPreview extends ConfigurationItem {
 
 	iControlClickHandler := ObjBindMethod(this, "openControlMenu")
 
-	PreviewManager[] {
+	PreviewManager {
 		Get {
 			return this.iPreviewManager
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	Descriptor[] {
+	Descriptor {
 		Get {
 			return this.Name
 		}
 	}
 
-	Type[] {
+	Type {
 		Get {
 			throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
 		}
 	}
 
-	Rows[] {
+	Rows {
 		Get {
 			return this.iRows
 		}
@@ -1461,7 +1461,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Columns[] {
+	Columns {
 		Get {
 			return this.iColumns
 		}
@@ -1471,7 +1471,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Width[] {
+	Width {
 		Get {
 			return this.iWidth
 		}
@@ -1481,7 +1481,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Height[] {
+	Height {
 		Get {
 			return this.iHeight
 		}
@@ -1491,13 +1491,13 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Window[] {
+	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	CurrentWindow[] {
+	CurrentWindow {
 		Get {
 			return ("CTRLP" . ControllerPreview.sCurrentWindow)
 		}
@@ -1521,7 +1521,7 @@ class ControllerPreview extends ConfigurationItem {
 
 		this.iWindow := this.CurrentWindow
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		this.createGui(configuration)
 
@@ -1653,13 +1653,13 @@ class DisplayRulesEditor extends ConfigurationItem {
 
 	iDisplayRulesList := false
 
-	Layout[] {
+	Layout {
 		Get {
 			return this.iLayout
 		}
 	}
 
-	SelectedLayout[] {
+	SelectedLayout {
 		Get {
 			return this.iSelectedLayout
 		}
@@ -1674,7 +1674,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		}
 	}
 
-	SelectedButton[] {
+	SelectedButton {
 		Get {
 			return this.iSelectedButton
 		}
@@ -1684,11 +1684,11 @@ class DisplayRulesEditor extends ConfigurationItem {
 		this.iLayout := layout
 		this.iSelectedLayout := layout
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		DisplayRulesEditor.Instance := this
 
-		this.iDisplayRulesList := new DisplayRulesList(configuration)
+		this.iDisplayRulesList := DisplayRulesList(configuration)
 
 		this.createGui(configuration)
 	}
@@ -1758,7 +1758,7 @@ class DisplayRulesEditor extends ConfigurationItem {
 		Gui IRE:Default
 
 		if this.SelectedLayout
-			for descriptor, definition in getConfigurationSectionValues(LayoutsList.Instance.StreamDeckConfiguration, "Layouts", Object()) {
+			for descriptor, definition in getMultiMapValues(LayoutsList.Instance.StreamDeckConfiguration, "Layouts") {
 				descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 				if ((descriptor[1] = this.Layout) && (descriptor[2] != "Layout"))
@@ -1863,24 +1863,24 @@ global displayRuleDeleteButton
 global displayRuleUpdateButton
 
 class DisplayRulesList extends ConfigurationItemList {
-	AutoSave[] {
+	AutoSave {
 		Get {
 			return ControllerEditor.Instance.AutoSave
 		}
 	}
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		DisplayRulesList.Instance := this
 	}
 
 	createGui(configuration) {
 		Gui IRE:Add, ListView, x8 yp+30 w316 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwnddisplayRulesListViewHandle VdisplayRulesListView glistEvent
-							 , % values2String("|", map(["Rule", "Icon"], "translate")*)
+							 , % values2String("|", collect(["Rule", "Icon"], "translate")*)
 
 		Gui IRE:Add, Text, x8 yp+126 w80 h23 +0x200, % translate("Rule")
-		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit Choose1 VdisplayRuleDropDown, % values2String("|", map(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
+		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit Choose1 VdisplayRuleDropDown, % values2String("|", collect(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
 
 		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200, % translate("Icon")
 		Gui IRE:Add, Edit, x90 yp w211 h21 ViconFilePathEdit, %iconFilePathEdit%
@@ -1896,7 +1896,7 @@ class DisplayRulesList extends ConfigurationItemList {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
 		this.ItemList := this.loadDisplayRules(configuration, DisplayRulesEditor.Instance.SelectedLayout, DisplayRulesEditor.Instance.SelectedButton)
 	}
@@ -1906,8 +1906,8 @@ class DisplayRulesList extends ConfigurationItemList {
 
 		this.saveDisplayRules(fullConfiguration, DisplayRulesEditor.Instance.SelectedLayout, DisplayRulesEditor.Instance.SelectedButton, this.ItemList)
 
-		setConfigurationSectionValues(configuration, "Icons", getConfigurationSectionValues(fullConfiguration, "Icons"))
-		setConfigurationSectionValues(configuration, "Buttons", getConfigurationSectionValues(fullConfiguration, "Buttons"))
+		setMultiMapValues(configuration, "Icons", getMultiMapValues(fullConfiguration, "Icons"))
+		setMultiMapValues(configuration, "Buttons", getMultiMapValues(fullConfiguration, "Buttons"))
 	}
 
 	loadDisplayRules(configuration, layout, button) {
@@ -1918,7 +1918,7 @@ class DisplayRulesList extends ConfigurationItemList {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
 			loop {
-				icon := getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined)
+				icon := getMultiMapValue(configuration, "Buttons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
 					break
@@ -1930,7 +1930,7 @@ class DisplayRulesList extends ConfigurationItemList {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
 			loop {
-				icon := getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined)
+				icon := getMultiMapValue(configuration, "Icons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
 					break
@@ -1949,27 +1949,27 @@ class DisplayRulesList extends ConfigurationItemList {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
 			loop {
-				if (getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined) == kUndefined)
+				if (getMultiMapValue(configuration, "Buttons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else
-					removeConfigurationValue(configuration, "Buttons", prefix . A_Index)
+					removeMultiMapValue(configuration, "Buttons", prefix . A_Index)
 			}
 
 			for index, displayRule in displayRules
-				setConfigurationValue(configuration, "Buttons", prefix . index, values2String(";", displayRule*))
+				setMultiMapValue(configuration, "Buttons", prefix . index, values2String(";", displayRule*))
 		}
 		else {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
 			loop {
-				if (getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
+				if (getMultiMapValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else
-					removeConfigurationValue(configuration, "Icons", prefix . A_Index)
+					removeMultiMapValue(configuration, "Icons", prefix . A_Index)
 			}
 
 			for index, displayRule in displayRules
-				setConfigurationValue(configuration, "Icons", prefix . index, values2String(";", displayRule*))
+				setMultiMapValue(configuration, "Icons", prefix . index, values2String(";", displayRule*))
 		}
 	}
 
@@ -2150,7 +2150,7 @@ updateLayoutRowEditor() {
 		if list
 			list.updateLayoutRowEditor()
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 	}
 }

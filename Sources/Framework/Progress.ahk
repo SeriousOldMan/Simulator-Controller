@@ -12,7 +12,7 @@
 #Include "..\Framework\Constants.ahk"
 #Include "..\Framework\Variables.ahk"
 #Include "..\Framework\Localization.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\MultiMap.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,7 +38,7 @@ showProgress(options := unset) {
 	else {
 		if !progressGui {
 			if !popupPosition
-				popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 													 , "General", "Popup Position", "Bottom")
 
 			if options.Has("X")
@@ -72,7 +72,7 @@ showProgress(options := unset) {
 			color := (options.Has("Color") ? options.color : "Green")
 
 			progressGui := Gui()
-			progressGui.Default()
+			
 			progressGui.Opt("-Border") ; -Caption
 			progressGui.BackColor := "D0D0D0"
 
@@ -89,8 +89,6 @@ showProgress(options := unset) {
 			progressGui.Opt("+AlwaysOnTop")
 			progressGui.Show("x" . x . " y" . y . " AutoSize NoActivate")
 		}
-
-		progressGui.Default()
 
 		if isSet(options) {
 			if options.Has("title")

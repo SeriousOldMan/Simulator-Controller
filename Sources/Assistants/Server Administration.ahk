@@ -133,7 +133,7 @@ loadConnections(connector, listView) {
 
 				LV_Add("", translate(connection.Type), connection.Name, connection.Created, session)
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 		}
@@ -233,21 +233,21 @@ administrationEditor(configurationOrCommand, arguments*) {
 				token := false
 
 			if token {
-				sessionDB := new SessionDatabase()
+				sessionDB := SessionDatabase()
 
 				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Admin")
 
-				administrationConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				setConfigurationValue(administrationConfig, "Server Administration", "ServerURL", teamServerURLEdit)
-				setConfigurationValue(administrationConfig, "Server Administration", "Login", teamServerNameEdit)
+				setMultiMapValue(administrationConfig, "Server Administration", "ServerURL", teamServerURLEdit)
+				setMultiMapValue(administrationConfig, "Server Administration", "Login", teamServerNameEdit)
 
-				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", administrationConfig)
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", administrationConfig)
 
 				if keepAliveTask
 					keepAliveTask.stop()
 
-				keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+				keepAliveTask := PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
 
 				keepAliveTask.start()
 
@@ -261,7 +261,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			token := false
 
 			accounts := loadAccounts(connector, accountsListView)
@@ -561,7 +561,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 			else if (arguments[1] = "LoadConnections")
 				loadConnections(connector, connectionsListView)
 		}
-		catch exception {
+		catch Any as exception {
 			title := translate("Error")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -582,17 +582,17 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		administrationConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		teamServerURLEdit := getConfigurationValue(administrationConfig, "Server Administration", "ServerURL", "https://localhost:5001")
-		teamServerNameEdit := getConfigurationValue(administrationConfig, "Server Administration", "Login", "")
+		teamServerURLEdit := getMultiMapValue(administrationConfig, "Server Administration", "ServerURL", "https://localhost:5001")
+		teamServerNameEdit := getMultiMapValue(administrationConfig, "Server Administration", "Login", "")
 
 		Gui ADM:Default
 
@@ -649,14 +649,14 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButtonHandle vchangePasswordButton gchangePassword
 		setButtonIcon(changePasswordButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
 
-		Gui ADM:Add, Tab3, x8 y122 w388 h343 -Wrap, % values2String("|", map(["Accounts", "Jobs", "Connections"], "translate")*)
+		Gui ADM:Add, Tab3, x8 y122 w388 h343 -Wrap, % values2String("|", collect(["Accounts", "Jobs", "Connections"], "translate")*)
 
 		x0 := 16
 		y := 152
 
 		Gui Tab, 1
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h146 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h146 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", collect(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], "translate")*)
 
 		Gui ADM:Add, Text, x%x0% yp+150 w90 h23 +0x200, % translate("Name")
 		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
@@ -676,7 +676,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui ADM:Add, CheckBox, xp+24 yp w23 vaccountDataAccessCheck
 
 		Gui ADM:Add, Text, x%x0% yp+22 w90 h23 +0x200, % translate("Contingent")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", collect(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], "translate")*)
 		Gui ADM:Add, Edit, x%x3% yp w60 h21 Number vaccountMinutesEdit
 		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
 		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDavailableMinutesButtonHandle vavailableMinutesButton gupdateAvailableMinutes
@@ -696,24 +696,24 @@ administrationEditor(configurationOrCommand, arguments*) {
 		Gui Tab, 2
 
 		Gui ADM:Add, Text, x%x0% y%y% w120 h23 +0x200, % translate("Expired Tokens")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskTokenOperationDropDown gupdateTokenTask, % values2String("|", map(["Delete"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskTokenFrequencyDropDown gupdateTokenTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskTokenOperationDropDown gupdateTokenTask, % values2String("|", collect(["Delete"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskTokenFrequencyDropDown gupdateTokenTask, % values2String("|", collect(["Never", "Daily", "Weekly"], "translate")*)
 
 		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Expired Accounts")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskAccountOperationDropDown gupdateAccountTask, % values2String("|", map(["Delete"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskAccountFrequencyDropDown gupdateAccountTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskAccountOperationDropDown gupdateAccountTask, % values2String("|", collect(["Delete"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskAccountFrequencyDropDown gupdateAccountTask, % values2String("|", collect(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 
 		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Finished Sessions")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose3 vtaskSessionOperationDropDown gupdateSessionTask, % values2String("|", map(["Delete", "Clear", "Reset"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskSessionFrequencyDropDown gupdateSessionTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose3 vtaskSessionOperationDropDown gupdateSessionTask, % values2String("|", collect(["Delete", "Clear", "Reset"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskSessionFrequencyDropDown gupdateSessionTask, % values2String("|", collect(["Never", "Daily", "Weekly"], "translate")*)
 
 		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Quotas")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaOperationDropDown gupdateQuotaTask, % values2String("|", map(["Renew"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaFrequencyDropDown gupdateQuotaTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaOperationDropDown gupdateQuotaTask, % values2String("|", collect(["Renew"], "translate")*)
+		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaFrequencyDropDown gupdateQuotaTask, % values2String("|", collect(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
 
 		Gui Tab, 3
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconnectionsListView gconnectionsListEvent, % values2String("|", map(["Role", "Name", "Since", "Session"], "translate")*)
+		Gui ADM:Add, ListView, x%x0% y%y% w372 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconnectionsListView gconnectionsListEvent, % values2String("|", collect(["Role", "Name", "Since", "Session"], "translate")*)
 
 		Gui ADM:Add, Button, x%x0% y430 w80 h23 vrefreshConnectionsListButton grefreshConnectionsList, % translate("Refresh")
 

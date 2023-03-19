@@ -15,6 +15,6 @@
 
 class IRCTelemetryAnalyzer extends GenericTelemetryAnalyzer {
 	settingAvailable(setting) {
-		return ((setting = "SteerLock") ? false : base.settingAvailable(setting))
+		return ((setting = "SteerLock") ? false : super.settingAvailable(setting))
 	}
 }

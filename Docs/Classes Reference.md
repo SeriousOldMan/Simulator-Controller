@@ -22,7 +22,7 @@ May be overriden by a subclass to read and initialize the item instance variable
 	loadFromConfiguration(configuration) {
 		base.loadFromConfiguration(configuration)
 
-		for functionDescriptor, descriptorValues in getConfigurationSectionValues(configuration, "Controller Functions", Object()) {
+		for functionDescriptor, descriptorValues in getMultiMapValues(configuration, "Controller Functions", Object()) {
 			functionDescriptor := ConfigurationItem.splitDescriptor(functionDescriptor)
 			
 			if ((functionDescriptor[1] == this.Type) && (functionDescriptor[2] == this.Number))
@@ -39,8 +39,8 @@ Typically invoked by the configuration tool, this method needs to write the item
 		descriptor := this.Descriptor
 		
 		for ignore, trigger in this.Trigger {
-			setConfigurationValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
-			setConfigurationValue(configuration, "Controller Functions", descriptor . "." . trigger . " Action", this.Actions[trigger, true])
+			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
+			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . " Action", this.Actions[trigger, true])
 		}
 	}
 

@@ -69,7 +69,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 	iControllerPID := false
 
-	StayOpen[] {
+	StayOpen {
 		Get {
 			return SimulatorStartup.sStayOpen
 		}
@@ -79,7 +79,7 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 
-	Settings[] {
+	Settings {
 		Get {
 			return this.iSettings
 		}
@@ -89,19 +89,19 @@ class SimulatorStartup extends ConfigurationItem {
 		}
 	}
 
-	Finished[] {
+	Finished {
 		Get {
 			return this.iFinished
 		}
 	}
 
-	Canceled[] {
+	Canceled {
 		Get {
 			return this.iCanceled
 		}
 	}
 
-	ControllerPID[] {
+	ControllerPID {
 		Get {
 			return this.iControllerPID
 		}
@@ -110,22 +110,22 @@ class SimulatorStartup extends ConfigurationItem {
 	__New(configuration, settings) {
 		this.Settings := settings
 
-		base.__New(configuration)
+		super.__New(configuration)
 	}
 
 	loadFromConfiguration(configuration) {
 		local descriptor, applicationName
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.iSimulators := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
-		this.iSplashTheme := getConfigurationValue(this.Settings, "Startup", "Splash Theme", false)
-		this.iStartupOption := getConfigurationValue(this.Settings, "Startup", "Simulator", false)
+		this.iSimulators := string2Values("|", getMultiMapValue(configuration, "Configuration", "Simulators", ""))
+		this.iSplashTheme := getMultiMapValue(this.Settings, "Startup", "Splash Theme", false)
+		this.iStartupOption := getMultiMapValue(this.Settings, "Startup", "Simulator", false)
 
 		this.iCoreComponents := []
 		this.iFeedbackComponents := []
 
-		for descriptor, applicationName in getConfigurationSectionValues(configuration, "Applications", Object()) {
+		for descriptor, applicationName in getMultiMapValues(configuration, "Applications") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 			if (descriptor[1] == "Core")
@@ -152,7 +152,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 				return false
 			}
-			else if (noConfiguration && (readConfiguration(kSimulatorConfigurationFile).Count() == 0)) {
+			else if (noConfiguration && (readMultiMap(kSimulatorConfigurationFile).Count() == 0)) {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				error := translate("Error")
 				MsgBox 262160, %error%, % translate("Cannot initiate startup sequence, please check the configuration...")
@@ -163,7 +163,7 @@ class SimulatorStartup extends ConfigurationItem {
 				return false
 			}
 			else if (result == kSave) {
-				writeConfiguration(kSimulatorSettingsFile, settings)
+				writeMultiMap(kSimulatorSettingsFile, settings)
 
 				this.Settings := settings
 			}
@@ -180,7 +180,7 @@ class SimulatorStartup extends ConfigurationItem {
 		try {
 			logMessage(kLogInfo, translate("Starting ") . translate("Simulator Controller"))
 
-			if getConfigurationValue(this.Settings, "Core", "System Monitor", false) {
+			if getMultiMapValue(this.Settings, "Core", "System Monitor", false) {
 				Process Exist, System Monitor.exe
 
 				if !ErrorLevel {
@@ -204,7 +204,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 			return pid
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 			showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
@@ -229,7 +229,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 			startSimulator := (startSimulator || (GetKeyState("Ctrl") || GetKeyState("MButton")))
 
-			if getConfigurationValue(this.Settings, section, component, false) {
+			if getMultiMapValue(this.Settings, section, component, false) {
 				if !kSilentMode
 					showProgress({message: translate("Start: ") . component . translate("...")})
 
@@ -408,13 +408,13 @@ launchPad(command := false, arguments*) {
 			return false
 	}
 	else if (command = "CloseOnStartup") {
-		startupConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		GuiControlGet closeCheckBox
 
-		setConfigurationValue(startupConfig, "Simulator Startup", "CloseLaunchPad", closeCheckBox)
+		setMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", closeCheckBox)
 
-		writeConfiguration(kUserConfigDirectory . "Application Settings.ini", startupConfig)
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
 	}
 	else if (command = "Launch") {
 		application := arguments[1]
@@ -552,9 +552,9 @@ launchPad(command := false, arguments*) {
 
 		Gui LP:Add, Text, x8 yp+40 w590 0x10
 
-		startupConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		closeOnStartup := getConfigurationValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false)
+		closeOnStartup := getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false)
 
 		Gui LP:Add, CheckBox, x16 yp+10 w120 h23 Checked%closeOnStartup% vcloseCheckBox gcloseOnStartup, % translate("Close on Startup")
 		Gui LP:Add, Button, x267 yp w80 h23 Default GcloseLaunchPad, % translate("Close")
@@ -627,14 +627,14 @@ launchApplication() {
 }
 
 modifySettings() {
-	local settings := readConfiguration(kSimulatorSettingsFile)
+	local settings := readMultiMap(kSimulatorSettingsFile)
 
 	Gui SE:+OwnerLP
 	Gui LP:+Disabled
 
 	try {
 		if (editSettings(settings) == kSave)
-			writeConfiguration(kSimulatorSettingsFile, settings)
+			writeMultiMap(kSimulatorSettingsFile, settings)
 	}
 	finally {
 		Gui LP:-Disabled
@@ -705,7 +705,7 @@ watchStartupSemaphore() {
 			try {
 				hideSplashTheme()
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 }
@@ -721,7 +721,7 @@ startupSimulator() {
 
 	Hotkey Escape, On
 
-	SimulatorStartup.Instance := new SimulatorStartup(kSimulatorConfiguration, readConfiguration(kSimulatorSettingsFile))
+	SimulatorStartup.Instance := SimulatorStartup(kSimulatorConfiguration, readMultiMap(kSimulatorSettingsFile))
 
 	SimulatorStartup.Instance.startup()
 

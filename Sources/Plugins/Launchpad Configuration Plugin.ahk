@@ -24,7 +24,7 @@ global launchpadUpdateButton
 class LaunchpadConfigurator extends ConfigurationItemList {
 	iEditor := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
@@ -33,7 +33,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 	__New(editor, configuration) {
 		this.iEditor := editor
 
-		base.__New(configuration, this.createControls(configuration), "launchpadListView"
+		super.__New(configuration, this.createControls(configuration), "launchpadListView"
 				 , "launchpadAddButton", "launchpadDeleteButton", "launchpadUpdateButton")
 
 		LaunchpadConfigurator.Instance := this
@@ -43,7 +43,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		local window := editor.Window
 
 		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlaunchpadListViewHandle VlaunchpadListView glistEvent
-						, % values2String("|", map(["#", "Label", "Application"], "translate")*)
+						, % values2String("|", collect(["#", "Label", "Application"], "translate")*)
 
 		Gui %window%:Add, Text, x16 y295 w86 h23 +0x200, % translate("Button")
 		Gui %window%:Add, Text, x95 y295 w23 h23 +0x200, % translate("#")
@@ -68,9 +68,9 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		local descriptor, launchpad
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, launchpad in getConfigurationSectionValues(configuration, "Launchpad", Object()) {
+		for descriptor, launchpad in getMultiMapValues(configuration, "Launchpad") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			launchpad := string2Values("|", launchpad)
 
@@ -81,10 +81,10 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		local ignore, launchpadApplication
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, launchpadApplication in this.ItemList
-			setConfigurationValue(configuration, "Launchpad", ConfigurationItem.descriptor("Button", launchpadApplication[1]), values2String("|", launchpadApplication[2], launchpadApplication[3]))
+			setMultiMapValue(configuration, "Launchpad", ConfigurationItem.descriptor("Button", launchpadApplication[1]), values2String("|", launchpadApplication[2], launchpadApplication[3]))
 	}
 
 	loadList(items) {
@@ -184,7 +184,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 			OnMessage(0x44, "")
 		}
 		else
-			base.updateItem()
+			super.updateItem()
 	}
 }
 
@@ -203,7 +203,7 @@ initializeLaunchpadConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Launchpad"), new LaunchpadConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Launchpad"), LaunchpadConfigurator(editor, editor.Configuration))
 	}
 }
 

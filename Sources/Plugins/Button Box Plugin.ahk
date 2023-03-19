@@ -66,7 +66,7 @@ global bbControl50
 ;;;-------------------------------------------------------------------------;;;
 
 class ButtonBox extends GuiFunctionController {
-	Type[] {
+	Type {
 		Get {
 			return "Button Box"
 		}
@@ -103,55 +103,55 @@ class GridButtonBox extends ButtonBox {
 	iRowDefinitions := []
 	iControls := {}
 
-	Descriptor[] {
+	Descriptor {
 		Get {
 			return this.Name
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	Layout[] {
+	Layout {
 		Get {
 			return this.iLayout
 		}
 	}
 
-	Rows[] {
+	Rows {
 		Get {
 			return this.iRows
 		}
 	}
 
-	Columns[] {
+	Columns {
 		Get {
 			return this.iColumns
 		}
 	}
 
-	RowMargin[] {
+	RowMargin {
 		Get {
 			return this.iRowMargin
 		}
 	}
 
-	ColumnMargin[] {
+	ColumnMargin {
 		Get {
 			return this.iColumnMargin
 		}
 	}
 
-	SidesMargin[] {
+	SidesMargin {
 		Get {
 			return this.iSidesMargin
 		}
 	}
 
-	BottomMargin[] {
+	BottomMargin {
 		Get {
 			return this.iBottomMargin
 		}
@@ -170,15 +170,15 @@ class GridButtonBox extends ButtonBox {
 		this.iName := name
 		this.iLayout := layout
 
-		base.__New(controller, configuration)
+		super.__New(controller, configuration)
 	}
 
 	loadFromConfiguration(configuration) {
 		local layout, rows
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
+		layout := string2Values(",", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 
 		if (layout.Length() > 1)
 			this.iRowMargin := layout[2]
@@ -200,7 +200,7 @@ class GridButtonBox extends ButtonBox {
 		rows := []
 
 		loop % this.Rows
-			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), "")))
+			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), "")))
 
 		this.iRowDefinitions := rows
 	}
@@ -261,7 +261,7 @@ class GridButtonBox extends ButtonBox {
 					descriptor := string2Values(",", descriptor)
 
 					if (descriptor.Length() > 1) {
-						label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+						label := string2Values("x", getMultiMapValue(this.Configuration, "Labels", descriptor[2], ""))
 						labelWidth := label[1]
 						labelHeight := label[2]
 					}
@@ -273,7 +273,7 @@ class GridButtonBox extends ButtonBox {
 					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
 					number := descriptor[2]
 
-					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", descriptor[1], ""))
+					descriptor := string2Values(";", getMultiMapValue(this.Configuration, "Controls", descriptor[1], ""))
 
 					if (descriptor.Length() > 0) {
 						function := descriptor[1]
@@ -356,7 +356,7 @@ class GridButtonBox extends ButtonBox {
 					descriptor := string2Values(",", descriptor)
 
 					if (descriptor.Length() > 1) {
-						label := getConfigurationValue(this.Configuration, "Labels", descriptor[2], "")
+						label := getMultiMapValue(this.Configuration, "Labels", descriptor[2], "")
 						label := string2Values("x", label)
 						labelWidth := label[1]
 						labelHeight := label[2]
@@ -366,7 +366,7 @@ class GridButtonBox extends ButtonBox {
 						labelHeight := 0
 					}
 
-					descriptor := string2Values(";", getConfigurationValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
+					descriptor := string2Values(";", getMultiMapValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
 
 					if (descriptor.Length() > 0) {
 						descriptor := string2Values("x", descriptor[3])
@@ -437,13 +437,13 @@ moveButtonBox() {
 
 initializeButtonBoxPlugin() {
 	local controller := SimulatorController.Instance
-	local configuration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+	local configuration := readMultiMap(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 	local ignore, btnBox
 
-	for ignore, btnBox in string2Values("|", getConfigurationValue(controller.Configuration, "Controller Layouts", "Button Boxes", "")) {
+	for ignore, btnBox in string2Values("|", getMultiMapValue(controller.Configuration, "Controller Layouts", "Button Boxes", "")) {
 		btnBox := string2Values(":", btnBox)
 
-		if getConfigurationValue(configuration, "Layouts", btnBox[2] . ".Visible", true)
+		if getMultiMapValue(configuration, "Layouts", btnBox[2] . ".Visible", true)
 			new GridButtonBox(btnBox[1], btnBox[2], controller, configuration)
 	}
 }

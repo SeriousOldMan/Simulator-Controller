@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Database                        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,14 +9,14 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Math.ahk
+#Include "..\Libraries\Math.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,7 +30,7 @@ class Database {
 	iFiles := {}
 	iTableChanged := {}
 
-	Directory[] {
+	Directory {
 		Get {
 			return this.iDirectory
 		}
@@ -54,7 +54,7 @@ class Database {
 			local file, line
 
 			if name {
-				if !this.iTables.HasKey(name) {
+				if !this.iTables.Has(name) {
 					schema := this.Schemas[name]
 					data := []
 
@@ -67,9 +67,9 @@ class Database {
 							while !file.AtEOF {
 								line := Trim(file.ReadLine(), " `t`n`r")
 
-								row := {}
+								row := Map()
 								values := string2Values(";", line)
-								length := values.Length()
+								length := values.Length
 
 								for ignore, column in schema
 									if (length >= A_Index)
@@ -81,11 +81,11 @@ class Database {
 							}
 						}
 						else
-							loop Read, % (this.Directory . name . ".CSV")
+							loop Read, (this.Directory . name . ".CSV")
 							{
-								row := {}
+								row := Map()
 								values := string2Values(";", A_LoopReadLine)
-								length := values.Length()
+								length := values.Length
 
 								for ignore, column in schema
 									if (length >= A_Index)
@@ -121,23 +121,23 @@ class Database {
 			throw "Inconsistent parameters detected in Database.lock..."
 
 		if name {
-			if !this.Files.HasKey(name) {
+			if !this.Files.Has(name) {
 				while !done {
 					directory := this.Directory
 
-					FileCreateDir %directory%
+					DirCreate(directory)
 
 					try {
 						file := FileOpen(directory . name . ".CSV", "rw-rwd")
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 
 						file := false
 					}
 
 					if (!file && wait)
-						Sleep 100
+						Sleep(100)
 					else
 						done := true
 				}
@@ -203,12 +203,12 @@ class Database {
 		rows := this.Tables[name]
 		needsClone := true
 
-		if query.HasKey("Where") {
+		if query.Has("Where") {
 			predicate := query["Where"]
 			selection := []
 
 			if !predicate.MinParams
-				predicate := Func("constraintColumns").Bind(predicate)
+				predicate := constraintColumns.Bind(predicate)
 
 			for ignore, row in rows
 				if %predicate%(row)
@@ -218,18 +218,18 @@ class Database {
 			needsClone := false
 		}
 
-		if query.HasKey("Transform") {
+		if query.Has("Transform") {
 			transform := query["Transform"]
 
 			rows := %transform%(rows)
 		}
 
-		if (query.HasKey("Group") || query.HasKey("By")) {
-			rows := groupRows(query.HasKey("By") ? query["By"] : [], query.HasKey("Group") ? query["Group"] : [], rows)
+		if (query.Has("Group") || query.Has("By")) {
+			rows := groupRows(query.Has("By") ? query["By"] : [], query.Has("Group") ? query["Group"] : [], rows)
 			needsClone := false
 		}
 
-		if query.HasKey("Select") {
+		if query.Has("Select") {
 			projection := query["Select"]
 			projectedRows := []
 
@@ -266,7 +266,7 @@ class Database {
 			row := []
 
 			for ignore, column in this.Schemas[name]
-				row.Push(values.HasKey(column) ? values[column] : kNull)
+				row.Push(values.Has(column) ? values[column] : kNull)
 
 			file := this.Files[name]
 
@@ -279,19 +279,19 @@ class Database {
 				directory := this.Directory
 				fileName := (directory . name . ".CSV")
 
-				FileCreateDir %directory%
+				DirCreate(directory)
 
 				row := (values2String(";", row*) . "`n")
 
 				loop
 					try {
-						FileAppend %row%, %fileName%
+						FileAppend(row, fileName)
 
 						break
 					}
-					catch exception {
+					catch Any as exception {
 						if (tries-- > 0)
-							Sleep 10
+							Sleep(10)
 						else
 							throw Exception
 					}
@@ -320,7 +320,7 @@ class Database {
 		local ignore, row
 
 		if (where && !where.MinParams)
-			where := Func("constraintColumns").Bind(where)
+			where := constraintColumns.Bind(where)
 
 		for ignore, row in this.Tables[name]
 			if (!where || %where%(row)) {
@@ -354,7 +354,7 @@ class Database {
 		local directory, fileName, schema, ignore, row, values, column, file
 
 		if name {
-			if (this.Tables.HasKey(name) && this.iTableChanged.HasKey(name)) {
+			if (this.Tables.Has(name) && this.iTableChanged.Has(name)) {
 				directory := this.Directory
 				fileName := (directory . name . ".CSV")
 				file := this.Files[name]
@@ -367,7 +367,7 @@ class Database {
 
 						bakFile.Write(file.Read())
 					}
-					catch exception {
+					catch Any as exception {
 					}
 					finally {
 						if bakFile
@@ -382,7 +382,7 @@ class Database {
 						values := []
 
 						for ignore, column in schema
-							values.Push(row.HasKey(column) ? row[column] : kNull)
+							values.Push(row.Has(column) ? row[column] : kNull)
 
 						file.WriteLine(values2String(";", values*))
 					}
@@ -391,7 +391,7 @@ class Database {
 					directory := this.Directory
 					fileName := (directory . name . ".CSV")
 
-					FileCreateDir %directory%
+					DirCreate(directory)
 
 					deleteFile(fileName, true)
 
@@ -401,11 +401,11 @@ class Database {
 						values := []
 
 						for ignore, column in schema
-							values.Push(row.HasKey(column) ? row[column] : kNull)
+							values.Push(row.Has(column) ? row[column] : kNull)
 
 						row := (values2String(";", values*) . "`n")
 
-						FileAppend %row%, %fileName%
+						FileAppend(row, fileName)
 					}
 				}
 
@@ -440,14 +440,14 @@ constraintColumns(constraints, row) {
 	local column, value
 
 	for column, value in constraints
-		if (row.HasKey(column) && (row[column] != value))
+		if (row.Has(column) && (row[column] != value))
 			return false
 
 	return true
 }
 
 groupRows(groupedByColumns, groupedColumns, rows) {
-	local values := {}
+	local values := Map()
 	local function, ignore, row, column, key, result, group, groupedRows, columnValues
 	local resultRow, valueColumn, resultColumn, columnDescriptor
 
@@ -462,7 +462,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 
 		key := values2String("|", key*)
 
-		if values.HasKey(key)
+		if values.Has(key)
 			values[key].Push(row)
 		else
 			values[key] := Array(row)

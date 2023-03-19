@@ -68,13 +68,13 @@ class SessionDatabase extends ConfigurationItem {
 
 	iUseCommunity := false
 
-	ID[] {
+	ID {
 		Get {
 			return SessionDatabase.sID
 		}
 	}
 
-	DatabaseID[] {
+	DatabaseID {
 		Get {
 			local id
 
@@ -83,44 +83,44 @@ class SessionDatabase extends ConfigurationItem {
 
 				return id
 			}
-			catch exception {
+			catch Any as exception {
 				return SessionDatabase.ID
 			}
 		}
 	}
 
-	DatabasePath[] {
+	DatabasePath {
 		Get {
 			return kDatabaseDirectory
 		}
 
 		Set {
-			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			local configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
 			value := (normalizeDirectoryPath(value) . "\")
 
-			setConfigurationValue(configuration, "Database", "Path", value)
-			setConfigurationValue(SessionDatabase.sConfiguration, "Database", "Path", value)
+			setMultiMapValue(configuration, "Database", "Path", value)
+			setMultiMapValue(SessionDatabase.sConfiguration, "Database", "Path", value)
 
-			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 
 			return (kDatabaseDirectory := (normalizeDirectoryPath(value) . "\"))
 		}
 	}
 
-	DatabaseVersion[] {
+	DatabaseVersion {
 		Get {
-			return getConfigurationValue(readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			return getMultiMapValue(readMultiMap(kUserConfigDirectory . "Session Database.ini")
 									   , "Database", "Version", false)
 		}
 
 		Set {
-			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			local configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-			setConfigurationValue(configuration, "Database", "Version", value)
-			setConfigurationValue(SessionDatabase.sConfiguration, "Database", "Version", value)
+			setMultiMapValue(configuration, "Database", "Version", value)
+			setMultiMapValue(SessionDatabase.sConfiguration, "Database", "Version", value)
 
-			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 
 			return value
 		}
@@ -153,7 +153,7 @@ class SessionDatabase extends ConfigurationItem {
 
 						connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
 					}
-					catch exception {
+					catch Any as exception {
 						logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
 
 						showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
@@ -172,7 +172,7 @@ class SessionDatabase extends ConfigurationItem {
 								try {
 									connector.ValidateDataToken()
 								}
-								catch exception {
+								catch Any as exception {
 									logError(exception)
 
 									connector := false
@@ -186,7 +186,7 @@ class SessionDatabase extends ConfigurationItem {
 							else
 								connector := false
 						}
-						catch exception {
+						catch Any as exception {
 							logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . this.ServerURL[identifier]
 												   . translate(", Token: ") . this.ServerToken[identifier]
 												   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
@@ -207,12 +207,12 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	Connectors[] {
+	Connectors {
 		Get {
 			local result := {}
 			local connector, identifier, serverURL
 
-			for identifier, serverURL in stringToMap("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard") {
+			for identifier, serverURL in stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard") {
 				connector := this.Connector[identifier]
 
 				if connector
@@ -236,7 +236,7 @@ class SessionDatabase extends ConfigurationItem {
 	ServerURLs[identifier := false] {
 		Get {
 			if !SessionDatabase.sServerURLs.HasKey(identifier)
-				SessionDatabase.sServerURLs := stringToMap("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
+				SessionDatabase.sServerURLs := stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
 			return (identifier ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
 		}
@@ -251,7 +251,7 @@ class SessionDatabase extends ConfigurationItem {
 	ServerTokens[identifier := false] {
 		Get {
 			if !SessionDatabase.sServerTokens.HasKey(identifier)
-				SessionDatabase.sServerTokens := stringToMap("|", "->", getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Server.Token", ""), "Standard")
+				SessionDatabase.sServerTokens := stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.Token", ""), "Standard")
 
 			return (identifier ? SessionDatabase.sServerTokens[identifier] : SessionDatabase.sServerTokens)
 		}
@@ -263,7 +263,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	Synchronizers[] {
+	Synchronizers {
 		Get {
 			return SessionDatabase.sSynchronizers
 		}
@@ -271,25 +271,25 @@ class SessionDatabase extends ConfigurationItem {
 
 	Synchronization[identifier] {
 		Get {
-			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-			local synchronization := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Synchronization", ""), "Standard")
+			local configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+			local synchronization := stringToMap("|", "->", getMultiMapValue(configuration, "Team Server", "Synchronization", ""), "Standard")
 
 			return (synchronization.HasKey(identifier) ? synchronization[identifier] : 0)
 		}
 
 		Set {
-			local configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
-			local synchronization := stringToMap("|", "->", getConfigurationValue(configuration, "Team Server", "Synchronization", ""), "Standard")
+			local configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+			local synchronization := stringToMap("|", "->", getMultiMapValue(configuration, "Team Server", "Synchronization", ""), "Standard")
 
 			synchronization[identifier] := value
 
 			synchronization := mapToString("|", "->", synchronization)
 
-			setConfigurationValue(configuration, "Team Server", "Synchronization", synchronization)
+			setMultiMapValue(configuration, "Team Server", "Synchronization", synchronization)
 
-			writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+			writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 
-			setConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Synchronization", synchronization)
+			setMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Synchronization", synchronization)
 
 			return value
 		}
@@ -297,7 +297,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	Groups[identifier] {
 		Get {
-			local groups := getConfigurationValue(SessionDatabase.sConfiguration, "Team Server", "Groups", "Telemetry, Pressures")
+			local groups := getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Groups", "Telemetry, Pressures")
 
 			if InStr(groups, "->") {
 				groups := stringToMap("|", "->", groups)
@@ -309,7 +309,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	ControllerState[] {
+	ControllerState {
 		Get {
 			return SessionDatabase.sControllerState
 		}
@@ -324,12 +324,12 @@ class SessionDatabase extends ConfigurationItem {
 			local configuration
 
 			if persistent {
-				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-				setConfigurationValue(configuration, "Scope", "Community", value)
-				setConfigurationValue(SessionDatabase.sConfiguration, "Scope", "Community", value)
+				setMultiMapValue(configuration, "Scope", "Community", value)
+				setMultiMapValue(SessionDatabase.sConfiguration, "Scope", "Community", value)
 
-				writeConfiguration(kUserConfigDirectory . "Session Database.ini", configuration)
+				writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 			}
 
 			return (this.iUseCommunity := value)
@@ -340,7 +340,7 @@ class SessionDatabase extends ConfigurationItem {
 		local identifier, controllerState
 
 		if !SessionDatabase.sConfiguration
-			SessionDatabase.sConfiguration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+			SessionDatabase.sConfiguration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
 		if !SessionDatabase.sControllerState {
 			controllerState := getControllerState()
@@ -357,11 +357,11 @@ class SessionDatabase extends ConfigurationItem {
 			SessionDatabase.sID := identifier
 		}
 
-		base.__New(SessionDatabase.sConfiguration)
+		super.__New(SessionDatabase.sConfiguration)
 	}
 
 	loadFromConfiguration(configuration) {
-		this.iUseCommunity := getConfigurationValue(configuration, "Scope", "Community", false)
+		this.iUseCommunity := getMultiMapValue(configuration, "Scope", "Community", false)
 	}
 
 	reloadConfiguration() {
@@ -369,7 +369,7 @@ class SessionDatabase extends ConfigurationItem {
 		SessionDatabase.sServerURLs := {}
 		SessionDatabase.sServerTokens := {}
 
-		SessionDatabase.sConfiguration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+		SessionDatabase.sConfiguration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 	}
 
 	prepareDatabase(simulator, car, track, data := false) {
@@ -383,7 +383,7 @@ class SessionDatabase extends ConfigurationItem {
 				prefix := (kDatabaseDirectory . "User\" . simulatorCode . "\")
 
 				if ((simulatorCode = "RF2") && data) {
-					carName := getConfigurationValue(data, "Session Data", "CarName")
+					carName := getMultiMapValue(data, "Session Data", "CarName")
 
 					if (car != carName) {
 						if FileExist(prefix . carName . "\" . track) {
@@ -393,7 +393,7 @@ class SessionDatabase extends ConfigurationItem {
 								else
 									FileMoveDir %prefix%%carName%, %prefix%%car%, R
 							}
-							catch exception {
+							catch Any as exception {
 								logError(exception)
 							}
 
@@ -410,7 +410,7 @@ class SessionDatabase extends ConfigurationItem {
 									else
 										FileMoveDir %prefix%%carName%, %prefix%%car%, R
 								}
-								catch exception {
+								catch Any as exception {
 									logError(exception)
 								}
 
@@ -433,7 +433,7 @@ class SessionDatabase extends ConfigurationItem {
 		local sessionDB, ids, index, row, ignore, id, result, candidate
 
 		if simulator {
-			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+			sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			ids := sessionDB.query("Drivers", {Select: ["ID"], By: "ID"})
 
@@ -471,7 +471,7 @@ class SessionDatabase extends ConfigurationItem {
 		local sessionDB, forName, surName, nickName
 
 		if (simulator && id && name && (name != "John Doe (JD)")) {
-			sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+			sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			forName := false
 			surName := false
@@ -483,7 +483,7 @@ class SessionDatabase extends ConfigurationItem {
 				try {
 					sessionDB.add("Drivers", {ID: id, Forname: forName, Surname: surName, Nickname: nickName}, true)
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 		}
@@ -510,7 +510,7 @@ class SessionDatabase extends ConfigurationItem {
 			parseDriverName(name, forName, surName, nickName)
 
 			if !sessionDB
-				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			ids := []
 
@@ -528,7 +528,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		if (simulator && id) {
 			if !sessionDB
-				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 			drivers := []
 
@@ -539,7 +539,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 		else if id {
 			for ignore, simulator in this.getSimulators() {
-				sessionDB := new Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
+				sessionDB := Database(kDatabaseDirectory . "User\" . this.getSimulatorCode(simulator) . "\", kSessionSchemas)
 
 				for ignore, driver in sessionDB.query("Drivers", {Where: {ID: id}})
 					return Array(computeDriverName(driver.Forname, driver.Surname, driver.Nickname))
@@ -558,7 +558,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	availableTrackMaps(simulator) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local code := sessionDB.getSimulatorCode(simulator)
 		local tracks := []
 		local track
@@ -574,7 +574,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	availableTrackImages(simulator) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local code := sessionDB.getSimulatorCode(simulator)
 		local directory := (kDatabaseDirectory . "User\Tracks\" . code . "\")
 		local tracks := []
@@ -596,7 +596,7 @@ class SessionDatabase extends ConfigurationItem {
 		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 		local extension
 
-		writeConfiguration(prefix . ".map", map)
+		writeMultiMap(prefix . ".map", map)
 
 		SplitPath imageFileName, , , extension
 
@@ -610,7 +610,7 @@ class SessionDatabase extends ConfigurationItem {
 		local fileName := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track) . ".map")
 
 		if FileExist(fileName)
-			return readConfiguration(fileName)
+			return readMultiMap(fileName)
 		else
 			return false
 	}
@@ -687,22 +687,22 @@ class SessionDatabase extends ConfigurationItem {
 		local id, actions
 
 		if !IsObject(data)
-			data := readConfiguration(data)
+			data := readMultiMap(data)
 
-		loop % getConfigurationValue(data, "Automations", "Count", 0)
+		loop % getMultiMapValue(data, "Automations", "Count", 0)
 		{
 			id := A_Index
 
 			actions := []
 
-			loop % getConfigurationValue(data, "Automations", id . ".Actions", 0)
-				actions.Push({X: getConfigurationValue(data, "Actions", id . "." . A_Index . ".X", 0)
-							, Y: getConfigurationValue(data, "Actions", id . "." . A_Index . ".Y", 0)
-							, Type: getConfigurationValue(data, "Actions", id . "." . A_Index . ".Type", 0)
-							, Action: getConfigurationValue(data, "Actions", id . "." . A_Index . ".Action", 0)})
+			loop % getMultiMapValue(data, "Automations", id . ".Actions", 0)
+				actions.Push({X: getMultiMapValue(data, "Actions", id . "." . A_Index . ".X", 0)
+							, Y: getMultiMapValue(data, "Actions", id . "." . A_Index . ".Y", 0)
+							, Type: getMultiMapValue(data, "Actions", id . "." . A_Index . ".Type", 0)
+							, Action: getMultiMapValue(data, "Actions", id . "." . A_Index . ".Action", 0)})
 
-			result.Push({Name: getConfigurationValue(data, "Automations", id . ".Name", "")
-					   , Active: getConfigurationValue(data, "Automations", id . ".Active", false)
+			result.Push({Name: getMultiMapValue(data, "Automations", id . ".Name", "")
+					   , Active: getMultiMapValue(data, "Automations", id . ".Active", false)
 					   , Actions: actions})
 		}
 
@@ -710,26 +710,26 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	saveTrackAutomations(trackAutomations, fileName := false) {
-		local data := newConfiguration()
+		local data := newMultiMap()
 		local id, trackAutomation, ignore, trackAction
 
 		for id, trackAutomation in trackAutomations {
-			setConfigurationValue(data, "Automations", id . ".Name", trackAutomation.Name)
-			setConfigurationValue(data, "Automations", id . ".Active", trackAutomation.Active)
-			setConfigurationValue(data, "Automations", id . ".Actions", trackAutomation.Actions.Length())
+			setMultiMapValue(data, "Automations", id . ".Name", trackAutomation.Name)
+			setMultiMapValue(data, "Automations", id . ".Active", trackAutomation.Active)
+			setMultiMapValue(data, "Automations", id . ".Actions", trackAutomation.Actions.Length())
 
 			for ignore, trackAction in trackAutomation.Actions {
-				setConfigurationValue(data, "Actions", id . "." . A_Index . ".X", trackAction.X)
-				setConfigurationValue(data, "Actions", id . "." . A_Index . ".Y", trackAction.Y)
-				setConfigurationValue(data, "Actions", id . "." . A_Index . ".Type", trackAction.Type)
-				setConfigurationValue(data, "Actions", id . "." . A_Index . ".Action", trackAction.Action)
+				setMultiMapValue(data, "Actions", id . "." . A_Index . ".X", trackAction.X)
+				setMultiMapValue(data, "Actions", id . "." . A_Index . ".Y", trackAction.Y)
+				setMultiMapValue(data, "Actions", id . "." . A_Index . ".Type", trackAction.Type)
+				setMultiMapValue(data, "Actions", id . "." . A_Index . ".Action", trackAction.Action)
 			}
 		}
 
-		setConfigurationValue(data, "Automations", "Count", trackAutomations.Length())
+		setMultiMapValue(data, "Automations", "Count", trackAutomations.Length())
 
 		if fileName
-			writeConfiguration(fileName, data)
+			writeMultiMap(fileName, data)
 
 		return data
 	}
@@ -756,7 +756,7 @@ class SessionDatabase extends ConfigurationItem {
 			return "Unknown"
 		else {
 			if (this.ControllerState.Count() > 0)
-				for name, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
+				for name, description in getMultiMapValues(this.ControllerState, "Simulators")
 					if ((simulatorCode = name) || (simulatorCode = string2Values("|", description)[1]))
 						return name
 
@@ -775,12 +775,12 @@ class SessionDatabase extends ConfigurationItem {
 		if (simulatorName = "Unknown")
 			return "Unknown"
 		else {
-			code := getConfigurationValue(this.ControllerState, "Simulators", simulatorName, false)
+			code := getMultiMapValue(this.ControllerState, "Simulators", simulatorName, false)
 
 			if code
 				return string2Values("|", code)[1]
 			else {
-				for ignore, description in getConfigurationSectionValues(this.ControllerState, "Simulators", Object())
+				for ignore, description in getMultiMapValues(this.ControllerState, "Simulators")
 					if (simulatorName = string2Values("|", description)[1])
 						return simulatorName
 
@@ -795,9 +795,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getSimulators() {
-		local configuredSimulators := string2Values("|", getConfigurationValue(kSimulatorConfiguration, "Configuration"
+		local configuredSimulators := string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration"
 																									  , "Simulators", ""))
-		local controllerSimulators := getKeys(getConfigurationSectionValues(this.ControllerState, "Simulators", Object()))
+		local controllerSimulators := getKeys(getMultiMapValues(this.ControllerState, "Simulators"))
 		local simulators := []
 		local simulator, ignore, name, code
 
@@ -849,16 +849,16 @@ class SessionDatabase extends ConfigurationItem {
 			name := (kResourcesDirectory . "Simulator Data\" . simulator . "\" . fileName)
 
 			if FileExist(name)
-				data := readConfiguration(name)
+				data := readMultiMap(name)
 			else
-				data := newConfiguration()
+				data := newMultiMap()
 
 			name := (kUserHomeDirectory . "Simulator Data\" . simulator . "\" . fileName)
 
 			if FileExist(name)
-				for section, values in readConfiguration(name)
+				for section, values in readMultiMap(name)
 					for key, value in values
-						setConfigurationValue(data, section, key, value)
+						setMultiMapValue(data, section, key, value)
 
 			cache[simulator] := data
 
@@ -873,22 +873,22 @@ class SessionDatabase extends ConfigurationItem {
 	registerCar(simulator, car, name) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
-		local carData := readConfiguration(fileName)
+		local carData := readMultiMap(fileName)
 
 		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%
 
-		if (getConfigurationValue(carData, "Car Names", car, kUndefined) == kUndefined) {
-			setConfigurationValue(carData, "Car Names", car, name)
-			setConfigurationValue(carData, "Car Codes", name, car)
+		if (getMultiMapValue(carData, "Car Names", car, kUndefined) == kUndefined) {
+			setMultiMapValue(carData, "Car Names", car, name)
+			setMultiMapValue(carData, "Car Codes", name, car)
 
-			writeConfiguration(fileName, carData)
+			writeMultiMap(fileName, carData)
 
 			this.clearCache(this.sCarData, this.getSimulatorCode(simulator))
 		}
 	}
 
 	getCarName(simulator, car) {
-		local name := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local name := getMultiMapValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
 										  , "Car Names", car, car)
 
 		if (!name || (name = ""))
@@ -898,7 +898,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getCarCode(simulator, car) {
-		local code := getConfigurationValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local code := getMultiMapValue(this.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
 										  , "Car Codes", car, car)
 
 		if (!code || (code = ""))
@@ -910,24 +910,24 @@ class SessionDatabase extends ConfigurationItem {
 	registerTrack(simulator, car, track, shortName, longName) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
-		local trackData := readConfiguration(fileName)
+		local trackData := readMultiMap(fileName)
 
 		FileCreateDir %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%
 
-		if (getConfigurationValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
-			setConfigurationValue(trackData, "Track Names Long", track, longName)
-			setConfigurationValue(trackData, "Track Names Short", track, shortName)
-			setConfigurationValue(trackData, "Track Codes", longName, track)
-			setConfigurationValue(trackData, "Track Codes", shortName, track)
+		if (getMultiMapValue(trackData, "Track Names Long", track, kUndefined) == kUndefined) {
+			setMultiMapValue(trackData, "Track Names Long", track, longName)
+			setMultiMapValue(trackData, "Track Names Short", track, shortName)
+			setMultiMapValue(trackData, "Track Codes", longName, track)
+			setMultiMapValue(trackData, "Track Codes", shortName, track)
 
-			writeConfiguration(fileName, trackData)
+			writeMultiMap(fileName, trackData)
 
 			this.clearCache(this.sTrackData, this.getSimulatorCode(simulator))
 		}
 	}
 
 	getTrackName(simulator, track, long := true) {
-		local name := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local name := getMultiMapValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
 										  , long ? "Track Names Long" : "Track Names Short", track, track)
 
 		if (!name || (name = ""))
@@ -937,7 +937,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	getTrackCode(simulator, track) {
-		local code := getConfigurationValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local code := getMultiMapValue(this.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
 										  , "Track Codes", track, track)
 
 		if (!code || (code = ""))
@@ -963,7 +963,7 @@ class SessionDatabase extends ConfigurationItem {
 			return cache[key]
 		else {
 			if !settingsDB
-				settingsDB := new SettingsDatabase()
+				settingsDB := SettingsDatabase()
 
 			compounds := settingsDB.readSettingValue(simulator, car, track, "*"
 												   , "Session Settings", "Tyre.Compound.Choices"
@@ -971,16 +971,16 @@ class SessionDatabase extends ConfigurationItem {
 			data := this.loadData(this.sTyreData, code, "Tyre Data.ini")
 
 			if ((compounds == kUndefined) || (compounds = "")) {
-				compounds := getConfigurationValue(data, "Cars", car . ";" . track, kUndefined)
+				compounds := getMultiMapValue(data, "Cars", car . ";" . track, kUndefined)
 
 				if (compounds == kUndefined)
-					compounds := getConfigurationValue(data, "Cars", car . ";*", kUndefined)
+					compounds := getMultiMapValue(data, "Cars", car . ";*", kUndefined)
 
 				if (compounds == kUndefined)
-					compounds := getConfigurationValue(data, "Cars", "*;" . track, kUndefined)
+					compounds := getMultiMapValue(data, "Cars", "*;" . track, kUndefined)
 
 				if (compounds == kUndefined)
-					compounds := getConfigurationValue(data, "Cars", "*;*", kUndefined)
+					compounds := getMultiMapValue(data, "Cars", "*;*", kUndefined)
 			}
 
 			if (compounds == kUndefined) {
@@ -990,7 +990,7 @@ class SessionDatabase extends ConfigurationItem {
 					compounds := "*->Dry"
 			}
 			else {
-				candidate := getConfigurationValue(data, "Compounds", compounds, false)
+				candidate := getMultiMapValue(data, "Compounds", compounds, false)
 
 				if candidate
 					compounds := candidate
@@ -1072,7 +1072,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !availableTyreCompounds
 			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
 
-		compounds := map(map(availableTyreCompounds, "compound"), "normalizeCompound")
+		compounds := collect(collect(availableTyreCompounds, "compound"), "normalizeCompound")
 
 		switch weather {
 			case "Dry":
@@ -1113,7 +1113,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 		compound := compound(compound)
 
-		return getConfigurationValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
+		return getMultiMapValue(this.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
 								   , "Pressures", car . ";" . compound, default)
 	}
 
@@ -1133,7 +1133,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			return notes
 		}
-		catch exception {
+		catch Any as exception {
 			return ""
 		}
 	}
@@ -1266,22 +1266,22 @@ class SessionDatabase extends ConfigurationItem {
 			fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 
 			if FileExist(fileName) {
-				info := newConfiguration()
+				info := newMultiMap()
 
-				setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-				setConfigurationValue(info, "Origin", "Car", car)
-				setConfigurationValue(info, "Origin", "Track", track)
-				setConfigurationValue(info, "Origin", "Driver", this.ID)
+				setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+				setMultiMapValue(info, "Origin", "Car", car)
+				setMultiMapValue(info, "Origin", "Track", track)
+				setMultiMapValue(info, "Origin", "Driver", this.ID)
 
-				setConfigurationValue(info, "Setup", "Name", name)
-				setConfigurationValue(info, "Setup", "Type", type)
-				setConfigurationValue(info, "Setup", "Identifier", createGuid())
-				setConfigurationValue(info, "Setup", "Synchronized", false)
+				setMultiMapValue(info, "Setup", "Name", name)
+				setMultiMapValue(info, "Setup", "Type", type)
+				setMultiMapValue(info, "Setup", "Identifier", createGuid())
+				setMultiMapValue(info, "Setup", "Synchronized", false)
 
-				setConfigurationValue(info, "Access", "Share", false)
-				setConfigurationValue(info, "Access", "Synchronize", false)
+				setMultiMapValue(info, "Access", "Share", false)
+				setMultiMapValue(info, "Access", "Synchronize", false)
 
-				writeConfiguration(fileName . ".info", info)
+				writeMultiMap(fileName . ".info", info)
 
 				return info
 			}
@@ -1289,7 +1289,7 @@ class SessionDatabase extends ConfigurationItem {
 				return false
 		}
 		else
-			return readConfiguration(fileName)
+			return readMultiMap(fileName)
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
@@ -1320,17 +1320,17 @@ class SessionDatabase extends ConfigurationItem {
 			info := this.readSetupInfo(simulator, car, track, type, name)
 
 			if (driver != kUndefined)
-				setConfigurationValue(info, "Origin", "Driver", driver)
+				setMultiMapValue(info, "Origin", "Driver", driver)
 
 			if (identifier != kUndefined)
-				setConfigurationValue(info, "Setup", "Identifier", identifier)
+				setMultiMapValue(info, "Setup", "Identifier", identifier)
 
-			setConfigurationValue(info, "Setup", "Synchronized", synchronized)
+			setMultiMapValue(info, "Setup", "Synchronized", synchronized)
 
-			setConfigurationValue(info, "Setup", "Size", size)
+			setMultiMapValue(info, "Setup", "Size", size)
 
-			setConfigurationValue(info, "Access", "Share", share)
-			setConfigurationValue(info, "Access", "Synchronize", synchronize)
+			setMultiMapValue(info, "Access", "Share", share)
+			setMultiMapValue(info, "Access", "Synchronize", synchronize)
 
 			this.writeSetupInfo(simulator, car, track, type, name, info)
 		}
@@ -1344,7 +1344,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%.info
 
-		writeConfiguration(fileName, info)
+		writeMultiMap(fileName, info)
 	}
 
 	renameSetup(simulator, car, track, type, oldName, newName) {
@@ -1360,17 +1360,17 @@ class SessionDatabase extends ConfigurationItem {
 			FileMove %oldFileName%, %newFileName%, 1
 
 			if FileExist(oldFileName . ".info") {
-				info := readConfiguration(oldFileName . ".info")
+				info := readMultiMap(oldFileName . ".info")
 
 				deleteFile(oldFileName . ".info")
 
-				setConfigurationValue(info, "Setup", "Name", newName)
-				setConfigurationValue(info, "Setup", "Synchronized", false)
+				setMultiMapValue(info, "Setup", "Name", newName)
+				setMultiMapValue(info, "Setup", "Synchronized", false)
 
-				writeConfiguration(newFileName . ".info", info)
+				writeMultiMap(newFileName . ".info", info)
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -1383,19 +1383,19 @@ class SessionDatabase extends ConfigurationItem {
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Car Setups\%type%\%name%
 
-		info := readConfiguration(fileName . ".info")
+		info := readMultiMap(fileName . ".info")
 
 		deleteFile(fileName)
 		deleteFile(fileName . ".info")
 
-		identifier := getConfigurationValue(info, "Setup", "Identifier", false)
+		identifier := getMultiMapValue(info, "Setup", "Identifier", false)
 
-		if (identifier && (getConfigurationValue(info, "Origin", "Driver", false) = this.ID))
+		if (identifier && (getMultiMapValue(info, "Origin", "Driver", false) = this.ID))
 			for ignore, connector in this.Connectors
 				try {
 					connector.DeleteData("Document", identifier)
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception, true)
 				}
 	}
@@ -1442,7 +1442,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !FileExist(fileName)
 			fileName = %kDatabaseDirectory%Community\%simulatorCode%\%car%\%track%\Race Strategies\%name%
 
-		return readConfiguration(fileName)
+		return readMultiMap(fileName)
 	}
 
 	readStrategyInfo(simulator, car, track, name) {
@@ -1457,21 +1457,21 @@ class SessionDatabase extends ConfigurationItem {
 			fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%
 
 			if FileExist(fileName) {
-				info := newConfiguration()
+				info := newMultiMap()
 
-				setConfigurationValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-				setConfigurationValue(info, "Origin", "Car", car)
-				setConfigurationValue(info, "Origin", "Track", track)
-				setConfigurationValue(info, "Origin", "Driver", this.ID)
+				setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+				setMultiMapValue(info, "Origin", "Car", car)
+				setMultiMapValue(info, "Origin", "Track", track)
+				setMultiMapValue(info, "Origin", "Driver", this.ID)
 
-				setConfigurationValue(info, "Strategy", "Name", name)
-				setConfigurationValue(info, "Strategy", "Identifier", createGuid())
-				setConfigurationValue(info, "Strategy", "Synchronized", false)
+				setMultiMapValue(info, "Strategy", "Name", name)
+				setMultiMapValue(info, "Strategy", "Identifier", createGuid())
+				setMultiMapValue(info, "Strategy", "Synchronized", false)
 
-				setConfigurationValue(info, "Access", "Share", true)
-				setConfigurationValue(info, "Access", "Synchronize", true)
+				setMultiMapValue(info, "Access", "Share", true)
+				setMultiMapValue(info, "Access", "Synchronize", true)
 
-				writeConfiguration(fileName . ".info", info)
+				writeMultiMap(fileName . ".info", info)
 
 				return info
 			}
@@ -1479,7 +1479,7 @@ class SessionDatabase extends ConfigurationItem {
 				return false
 		}
 		else
-			return readConfiguration(fileName)
+			return readMultiMap(fileName)
 	}
 
 	writeStrategy(simulator, car, track, name, strategy, share, synchronize
@@ -1497,7 +1497,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		deleteFile(fileName)
 
-		writeConfiguration(fileName, strategy)
+		writeMultiMap(fileName, strategy)
 
 		if !driver
 			driver := this.ID
@@ -1505,15 +1505,15 @@ class SessionDatabase extends ConfigurationItem {
 		info := this.readStrategyInfo(simulator, car, track, name)
 
 		if (driver != kUndefined)
-			setConfigurationValue(info, "Origin", "Driver", driver)
+			setMultiMapValue(info, "Origin", "Driver", driver)
 
 		if (identifier != kUndefined)
-			setConfigurationValue(info, "Strategy", "Identifier", identifier)
+			setMultiMapValue(info, "Strategy", "Identifier", identifier)
 
-		setConfigurationValue(info, "Strategy", "Synchronized", synchronized)
+		setMultiMapValue(info, "Strategy", "Synchronized", synchronized)
 
-		setConfigurationValue(info, "Access", "Share", share)
-		setConfigurationValue(info, "Access", "Synchronize", synchronize)
+		setMultiMapValue(info, "Access", "Share", share)
+		setMultiMapValue(info, "Access", "Synchronize", synchronize)
 
 		this.writeSetupInfo(simulator, car, track, name, info)
 	}
@@ -1526,7 +1526,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%.info
 
-		writeConfiguration(fileName, info)
+		writeMultiMap(fileName, info)
 	}
 
 	renameStrategy(simulator, car, track, oldName, newName) {
@@ -1542,17 +1542,17 @@ class SessionDatabase extends ConfigurationItem {
 			FileMove %oldFileName%, %newFileName%, 1
 
 			if FileExist(oldFileName . ".info") {
-				info := readConfiguration(oldFileName . ".info")
+				info := readMultiMap(oldFileName . ".info")
 
 				deleteFile(oldFileName . ".info")
 
-				setConfigurationValue(info, "Strategy", "Name", newName)
-				setConfigurationValue(info, "Strategy", "Synchronized", false)
+				setMultiMapValue(info, "Strategy", "Name", newName)
+				setMultiMapValue(info, "Strategy", "Synchronized", false)
 
-				writeConfiguration(newFileName . ".info", info)
+				writeMultiMap(newFileName . ".info", info)
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -1565,70 +1565,70 @@ class SessionDatabase extends ConfigurationItem {
 
 		fileName = %kDatabaseDirectory%User\%simulatorCode%\%car%\%track%\Race Strategies\%name%
 
-		info := readConfiguration(fileName . ".info")
+		info := readMultiMap(fileName . ".info")
 
 		deleteFile(fileName)
 		deleteFile(fileName . ".info")
 
-		identifier := getConfigurationValue(info, "Setup", "Identifier", false)
+		identifier := getMultiMapValue(info, "Setup", "Identifier", false)
 
-		if (identifier && (getConfigurationValue(info, "Origin", "Driver", false) = this.ID))
+		if (identifier && (getMultiMapValue(info, "Origin", "Driver", false) = this.ID))
 			for ignore, connector in this.Connectors
 				try {
 					connector.DeleteData("Document", identifier)
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception, true)
 				}
 	}
 
 	writeDatabaseState(identifier, info, arguments*) {
-		local configuration := newConfiguration()
+		local configuration := newMultiMap()
 		local exception, rebuild
 
 		if identifier {
-			setConfigurationValue(configuration, "Database Synchronizer", "ServerURL", this.ServerURL[identifier])
-			setConfigurationValue(configuration, "Database Synchronizer", "ServerToken", this.ServerToken[identifier])
+			setMultiMapValue(configuration, "Database Synchronizer", "ServerURL", this.ServerURL[identifier])
+			setMultiMapValue(configuration, "Database Synchronizer", "ServerToken", this.ServerToken[identifier])
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Connected", this.Connected[identifier])
+			setMultiMapValue(configuration, "Database Synchronizer", "Connected", this.Connected[identifier])
 		}
 
-		setConfigurationValue(configuration, "Database Synchronizer", "UserID", this.ID)
-		setConfigurationValue(configuration, "Database Synchronizer", "DatabaseID", this.DatabaseID)
+		setMultiMapValue(configuration, "Database Synchronizer", "UserID", this.ID)
+		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", this.DatabaseID)
 
 		if ((info = "State") || !identifier) {
 			if (identifier && !this.ServerURL[identifier])
-				setConfigurationValue(configuration, "Database Synchronizer", "State", "Disabled")
+				setMultiMapValue(configuration, "Database Synchronizer", "State", "Disabled")
 			else if (this.ID != this.DatabaseID) {
-				setConfigurationValue(configuration, "Database Synchronizer", "State", "Warning")
+				setMultiMapValue(configuration, "Database Synchronizer", "State", "Warning")
 
-				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+				setMultiMapValue(configuration, "Database Synchronizer", "Information"
 									, translate("Message: ") . translate("Cannot synchronize a database from another user..."))
 			}
 			else if (identifier && !this.Connector[identifier]) {
-				setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+				setMultiMapValue(configuration, "Database Synchronizer", "State", "Critical")
 
-				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+				setMultiMapValue(configuration, "Database Synchronizer", "Information"
 									, translate("Message: ") . translate("Cannot connect to the Team Server (URL: ") . this.ServerURL[identifier]
 															 . translate(", Token: ") . this.ServerToken[identifier] . translate(")"))
 			}
 			else if (identifier && !this.Connected[identifier]) {
-				setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+				setMultiMapValue(configuration, "Database Synchronizer", "State", "Critical")
 
-				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+				setMultiMapValue(configuration, "Database Synchronizer", "Information"
 									, translate("Message: ") . translate("Lost connection to the Team Server (URL: ") . this.ServerURL[identifier]
 															 . translate(", Token: ") . this.ServerToken[identifier] . translate(")"))
 			}
 			else if (this.Connectors.Count() != this.ServerURLs.Count()) {
 				for identifier, serverURL in this.ServerURLs
 					if !this.Connectors.HasKey(identifier) {
-						setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+						setMultiMapValue(configuration, "Database Synchronizer", "State", "Critical")
 
-						setConfigurationValue(configuration, "Database Synchronizer", "ServerURL", serverURL)
-						setConfigurationValue(configuration, "Database Synchronizer", "ServerToken", this.ServerToken[identifier])
-						setConfigurationValue(configuration, "Database Synchronizer", "Connected", this.Connected[identifier])
+						setMultiMapValue(configuration, "Database Synchronizer", "ServerURL", serverURL)
+						setMultiMapValue(configuration, "Database Synchronizer", "ServerToken", this.ServerToken[identifier])
+						setMultiMapValue(configuration, "Database Synchronizer", "Connected", this.Connected[identifier])
 
-						setConfigurationValue(configuration, "Database Synchronizer", "Information"
+						setMultiMapValue(configuration, "Database Synchronizer", "Information"
 											, translate("Message: ") . translate("Lost connection to the Team Server (URL: ") . serverURL
 																	 . translate(", Token: ") . this.ServerToken[identifier] . translate(")"))
 
@@ -1636,48 +1636,48 @@ class SessionDatabase extends ConfigurationItem {
 					}
 			}
 			else {
-				setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+				setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
-				setConfigurationValue(configuration, "Database Synchronizer", "Information"
+				setMultiMapValue(configuration, "Database Synchronizer", "Information"
 									, translate("Message: ") . translate("Waiting for next synchronization..."))
 
-				setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Waiting")
+				setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Waiting")
 			}
 		}
 		else if (info = "Synchronize") {
-			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+			setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
 			rebuild := arguments[1]
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+			setMultiMapValue(configuration, "Database Synchronizer", "Information"
 								, translate("Message: ") . (rebuild ? translate("Rebuilding database...")
 																	: translate("Synchronizing database...")))
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Identifier", identifier)
-			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Running")
-			setConfigurationValue(configuration, "Database Synchronizer", "Counter", (arguments.Length() > 1) ? arguments[2] : false)
+			setMultiMapValue(configuration, "Database Synchronizer", "Identifier", identifier)
+			setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Running")
+			setMultiMapValue(configuration, "Database Synchronizer", "Counter", (arguments.Length() > 1) ? arguments[2] : false)
 		}
 		else if (info = "Success") {
-			setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+			setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+			setMultiMapValue(configuration, "Database Synchronizer", "Information"
 								, translate("Message: ") . translate("Synchronization finished..."))
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
+			setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
 		}
 		else if (info = "Error") {
-			setConfigurationValue(configuration, "Database Synchronizer", "State", "Critical")
+			setMultiMapValue(configuration, "Database Synchronizer", "State", "Critical")
 
 			exception := arguments[1]
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Information"
+			setMultiMapValue(configuration, "Database Synchronizer", "Information"
 								, translate("Error: ") . translate("Synchronization failed (Exception: ")
 													   . (IsObject(exception) ? exception.Message : exception) . translate(")"))
 
-			setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Failed")
+			setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Failed")
 		}
 
-		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 	}
 }
 
@@ -1782,7 +1782,7 @@ updateSynchronizationState(sessionDB, rebuild) {
 }
 
 synchronizeDatabase(command := false) {
-	local sessionDB := new SessionDatabase()
+	local sessionDB := SessionDatabase()
 	local rebuild := (command = "Rebuild")
 	local timestamp, simulators, ignore, connector, synchronizer, synchronizeTask
 
@@ -1796,7 +1796,7 @@ synchronizeDatabase(command := false) {
 		return identifier
 
 	if !stateTask {
-		stateTask := new PeriodicTask(ObjBindMethod(sessionDB, "writeDatabaseState", false, "State"), 10000)
+		stateTask := PeriodicTask(ObjBindMethod(sessionDB, "writeDatabaseState", false, "State"), 10000)
 
 		stateTask.start()
 	}
@@ -1822,7 +1822,7 @@ synchronizeDatabase(command := false) {
 
 			counter := 0
 
-			synchronizeTask := new PeriodicTask(Func("updateSynchronizationState").Bind(sessionDB, rebuild), 1000, kInterruptPriority)
+			synchronizeTask := PeriodicTask(Func("updateSynchronizationState").Bind(sessionDB, rebuild), 1000, kInterruptPriority)
 
 			try {
 				for identifier, connector in sessionDB.Connectors {
@@ -1845,7 +1845,7 @@ synchronizeDatabase(command := false) {
 				Task.startTask(ObjBindMethod(stateTask, "resume"), 10000)
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 
 			sessionDB.writeDatabaseState(identifier, "Error", exception)
@@ -1889,7 +1889,7 @@ synchronizeDrivers(groups, sessionDB, connector, simulators, timestamp, lastSync
 		for ignore, simulator in simulators {
 			simulator := sessionDB.getSimulatorCode(simulator)
 
-			db := new Database(kDatabaseDirectory . "User\" . simulator . "\", kSessionSchemas)
+			db := Database(kDatabaseDirectory . "User\" . simulator . "\", kSessionSchemas)
 
 			if db.lock("Drivers", false)
 				try {
@@ -1951,7 +1951,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 	local start, lastRun, ignore, identifier, document, name, type, info, simulator, car, track, setup, size
 
 	if inList(groups, "Setups") {
-		lastRun := getConfigurationValue(readConfiguration(kDatabaseDirectory . "SYNCHRONIZE"), "Setups", "Synchronization", "")
+		lastRun := getMultiMapValue(readMultiMap(kDatabaseDirectory . "SYNCHRONIZE"), "Setups", "Synchronization", "")
 		start := A_Now
 
 		for ignore, identifier in string2Values(";", connector.QueryData("Document", "Type = 'Setup' And Modified > " . lastSynchronization)) {
@@ -1960,27 +1960,27 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 			simulator := document.Simulator
 
 			if inList(simulators, sessionDB.getSimulatorName(simulator)) {
-				info := parseConfiguration(connector.GetDataValue("Document", identifier, "Info"))
+				info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
 				car := document.Car
 				track := document.Track
 
 				if !sessionDB.readSetupInfo(simulator, car, track
-										  , getConfigurationValue(info, "Setup", "Type")
-										  , getConfigurationValue(info, "Setup", "Name")) {
+										  , getMultiMapValue(info, "Setup", "Type")
+										  , getMultiMapValue(info, "Setup", "Name")) {
 					setup := connector.GetDataValue("Document", identifier, "Setup")
 
 					counter += 1
 
 					sessionDB.writeSetup(simulator, car, track
-									   , getConfigurationValue(info, "Setup", "Type")
-									   , getConfigurationValue(info, "Setup", "Name")
+									   , getMultiMapValue(info, "Setup", "Type")
+									   , getMultiMapValue(info, "Setup", "Name")
 									   , setup
-									   , getConfigurationValue(info, "Setup", "Size")
-									   , getConfigurationValue(info, "Access", "Share")
-									   , getConfigurationValue(info, "Access", "Synchronize")
-									   , getConfigurationValue(info, "Origin", "Driver")
-									   , getConfigurationValue(info, "Origin", "Identifier")
+									   , getMultiMapValue(info, "Setup", "Size")
+									   , getMultiMapValue(info, "Access", "Share")
+									   , getMultiMapValue(info, "Access", "Synchronize")
+									   , getMultiMapValue(info, "Origin", "Driver")
+									   , getMultiMapValue(info, "Origin", "Identifier")
 									   , true)
 				}
 			}
@@ -2003,21 +2003,21 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 							FileGetTime lastModified, %A_LoopFilePath%, M
 
 							if (lastModified > lastRun) {
-								info := readConfiguration(A_LoopFilePath)
+								info := readMultiMap(A_LoopFilePath)
 
-								if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
-								 && getConfigurationValue(info, "Access", "Synchronize", false)
-								 && !getConfigurationValue(info, "Setup", "Synchronized", false)) {
+								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
+								 && getMultiMapValue(info, "Access", "Synchronize", false)
+								 && !getMultiMapValue(info, "Setup", "Synchronized", false)) {
 									setup := sessionDB.readSetup(simulator, car, track
-															   , getConfigurationValue(info, "Setup", "Type")
-															   , getConfigurationValue(info, "Setup", "Name")
+															   , getMultiMapValue(info, "Setup", "Type")
+															   , getMultiMapValue(info, "Setup", "Name")
 															   , size)
 									info := sessionDB.readSetupInfo(simulator, car, track
-																  , getConfigurationValue(info, "Setup", "Type")
-																  , getConfigurationValue(info, "Setup", "Name"))
+																  , getMultiMapValue(info, "Setup", "Type")
+																  , getMultiMapValue(info, "Setup", "Name"))
 
 									if (setup && (size > 0)) {
-										identifier := getConfigurationValue(info, "Setup", "Identifier")
+										identifier := getMultiMapValue(info, "Setup", "Identifier")
 
 										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
 											connector.CreateData("Document"
@@ -2025,18 +2025,18 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
 																				   , {Identifier: identifier
-																					, Driver: getConfigurationValue(info, "Origin", "Driver")
+																					, Driver: getMultiMapValue(info, "Origin", "Driver")
 																					, Simulator: simulator, Car: car, Track: track}))
 
 										counter += 1
 
 										connector.SetDataValue("Document", identifier, "Setup", setup)
 
-										setConfigurationValue(info, "Setup", "Synchronized", true)
+										setMultiMapValue(info, "Setup", "Synchronized", true)
 
-										connector.SetDataValue("Document", identifier, "Info", printConfiguration(info))
+										connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-										writeConfiguration(A_LoopFilePath, info)
+										writeMultiMap(A_LoopFilePath, info)
 									}
 								}
 							}
@@ -2045,11 +2045,11 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 			}
 		}
 
-		info := readConfiguration(kDatabaseDirectory . "SYNCHRONIZE")
+		info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
 
-		setConfigurationValue(info, "Setups", "Synchronization", start)
+		setMultiMapValue(info, "Setups", "Synchronization", start)
 
-		writeConfiguration(kDatabaseDirectory . "SYNCHRONIZE", info)
+		writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
 	}
 }
 
@@ -2058,7 +2058,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 	local directory, extension
 
 	if inList(groups, "Strategies") {
-		lastRun := getConfigurationValue(readConfiguration(kDatabaseDirectory . "SYNCHRONIZE"), "Strategies", "Synchronization", "")
+		lastRun := getMultiMapValue(readMultiMap(kDatabaseDirectory . "SYNCHRONIZE"), "Strategies", "Synchronization", "")
 		start := A_Now
 
 		try {
@@ -2068,27 +2068,27 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 				simulator := document.Simulator
 
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
-					info := parseConfiguration(connector.GetDataValue("Document", identifier, "Info"))
+					info := parseMultiMap(connector.GetDataValue("Document", identifier, "Info"))
 
 					car := document.Car
 					track := document.Track
 
-					if !sessionDB.readStrategyInfo(simulator, car, track, getConfigurationValue(info, "Strategy", "Name")) {
+					if !sessionDB.readStrategyInfo(simulator, car, track, getMultiMapValue(info, "Strategy", "Name")) {
 						counter += 1
 
-						strategy := parseConfiguration(connector.GetDataValue("Document", identifier, "Strategy"))
+						strategy := parseMultiMap(connector.GetDataValue("Document", identifier, "Strategy"))
 
 						directory = %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\
 
 						FileCreateDir %directory%
 
-						name := getConfigurationValue(info, "Strategy", "Name")
+						name := getMultiMapValue(info, "Strategy", "Name")
 
-						writeConfiguration(directory . name, strategy)
+						writeMultiMap(directory . name, strategy)
 
-						setConfigurationValue(info, "Strategy", "Synchronized", true)
+						setMultiMapValue(info, "Strategy", "Synchronized", true)
 
-						writeConfiguration(directory . name . ".info", info)
+						writeMultiMap(directory . name . ".info", info)
 					}
 				}
 			}
@@ -2119,13 +2119,13 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 
 								info := sessionDB.readStrategyInfo(simulator, car, track, name)
 
-								if ((getConfigurationValue(info, "Origin", "Driver", false) = sessionDB.ID)
-								 && getConfigurationValue(info, "Access", "Synchronize", false)
-								 && !getConfigurationValue(info, "Strategy", "Synchronized", false)) {
-									strategy := readConfiguration(directory . getConfigurationValue(info, "Strategy", "Name"))
+								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
+								 && getMultiMapValue(info, "Access", "Synchronize", false)
+								 && !getMultiMapValue(info, "Strategy", "Synchronized", false)) {
+									strategy := readMultiMap(directory . getMultiMapValue(info, "Strategy", "Name"))
 
 									if (strategy.Count() > 0) {
-										identifier := getConfigurationValue(info, "Strategy", "Identifier", false)
+										identifier := getMultiMapValue(info, "Strategy", "Identifier", false)
 
 										if (connector.CountData("Document", "Identifier = '" . identifier . "'") = 0)
 											connector.CreateData("Document"
@@ -2133,18 +2133,18 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 																				   . "Identifier=%Identifier%`nDriver=%Driver%`n"
 																				   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%"
 																				   , {Identifier: identifier
-																					, Driver: getConfigurationValue(info, "Access", "Driver")
+																					, Driver: getMultiMapValue(info, "Access", "Driver")
 																					, Simulator: simulator, Car: car, Track: track}))
 
 										counter += 1
 
-										connector.SetDataValue("Document", identifier, "Strategy", printConfiguration(strategy))
+										connector.SetDataValue("Document", identifier, "Strategy", printMultiMap(strategy))
 
-										setConfigurationValue(info, "Strategy", "Synchronized", true)
+										setMultiMapValue(info, "Strategy", "Synchronized", true)
 
-										connector.SetDataValue("Document", identifier, "Info", printConfiguration(info))
+										connector.SetDataValue("Document", identifier, "Info", printMultiMap(info))
 
-										writeConfiguration(A_LoopFilePath, info)
+										writeMultiMap(A_LoopFilePath, info)
 									}
 								}
 							}
@@ -2154,11 +2154,11 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 			}
 		}
 
-		info := readConfiguration(kDatabaseDirectory . "SYNCHRONIZE")
+		info := readMultiMap(kDatabaseDirectory . "SYNCHRONIZE")
 
-		setConfigurationValue(info, "Strategies", "Synchronization", start)
+		setMultiMapValue(info, "Strategies", "Synchronization", start)
 
-		writeConfiguration(kDatabaseDirectory . "SYNCHRONIZE", info)
+		writeMultiMap(kDatabaseDirectory . "SYNCHRONIZE", info)
 	}
 }
 

@@ -32,7 +32,7 @@ class ACCSetup extends FileSetup {
 	}
 
 	__New(editor, originalFileName := false) {
-		base.__New(editor, originalFileName)
+		super.__New(editor, originalFileName)
 
 		this.iOriginalData := JSON.parse(this.Setup[true])
 		this.iModifiedData := JSON.parse(this.Setup[false])
@@ -42,7 +42,7 @@ class ACCSetup extends FileSetup {
 		local data := this.Data[original]
 		local ignore, path
 
-		for ignore, path in string2Values(".", getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting)) {
+		for ignore, path in string2Values(".", getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting)) {
 			if InStr(path, "[") {
 				path := string2Values("[", SubStr(path, 1, StrLen(path) - 1))
 
@@ -68,7 +68,7 @@ class ACCSetup extends FileSetup {
 
 	setValue(setting, value, display := false) {
 		local data := (display ? display : this.Data)
-		local elements := string2Values(".", getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting))
+		local elements := string2Values(".", getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting))
 		local length := elements.Length()
 		local index, path, last
 
@@ -123,21 +123,21 @@ class ACCSetup extends FileSetup {
 	}
 
 	enable(setting) {
-		base.enable(setting)
+		super.enable(setting)
 
 		if setting
 			this.setValue(setting, this.getValue(setting))
 	}
 
 	disable(setting) {
-		base.disable(setting)
+		super.disable(setting)
 
 		if setting
 			this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iModifiedData := JSON.parse(this.Setup[false])
 	}
@@ -148,14 +148,14 @@ class ACCSetup extends FileSetup {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ACCSetupEditor extends FileSetupEditor {
-	SetupClass[] {
+	SetupClass {
 		Get {
 			return "ACCSetup"
 		}
 	}
 
 	chooseSetup(load := true) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
@@ -176,7 +176,7 @@ class ACCSetupEditor extends FileSetupEditor {
 		OnMessage(0x44, "")
 
 		if fileName {
-			theSetup := new ACCSetup(this, fileName)
+			theSetup := ACCSetup(this, fileName)
 
 			if load
 				this.loadSetup(theSetup)
@@ -225,7 +225,7 @@ class ACCSetupEditor extends FileSetupEditor {
 
 class ACCSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
@@ -246,7 +246,7 @@ class ACCSetupComparator extends FileSetupComparator {
 		OnMessage(0x44, "")
 
 		if fileName {
-			theSetup := new ACCSetup(this, fileName)
+			theSetup := ACCSetup(this, fileName)
 
 			if load {
 				if (type = "A")

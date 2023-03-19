@@ -47,7 +47,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: protocol})
 												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 												   . kBinariesDirectory . translate(")"))
@@ -57,11 +57,11 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 
-	data := readConfiguration(dataFile)
+	data := readMultiMap(dataFile)
 
 	deleteFile(dataFile)
 
-	setConfigurationValue(data, "Session Data", "Simulator", simulator)
+	setMultiMapValue(data, "Session Data", "Simulator", simulator)
 
 	return data
 }
@@ -78,16 +78,16 @@ runTeamSessionLogger() {
 		data := readSimulatorData("ACC")
 
 		info := values2String("; ", A_Now,
-								  , getConfigurationValue(data, "Session Data", "Active", "?")
-								  , getConfigurationValue(data, "Session Data", "Paused", "?")
-								  , getConfigurationValue(data, "Session Data", "Session", "?")
-								  , getConfigurationValue(data, "Stint Data", "Laps", "?")
-								  , getConfigurationValue(data, "Stint Data", "InPit", "?")
-								  , getConfigurationValue(data, "Stint Data", "DriverForname", "?")
-								  , getConfigurationValue(data, "Stint Data", "DriverSurname", "?")
-								  , getConfigurationValue(data, "Stint Data", "DriverNickName", "?")
-								  , getConfigurationValue(data, "Stint Data", "DriverTimeRemaining", "?")
-								  , getConfigurationValue(data, "Stint Data", "StintTimeRemaining", "?")) . "`n"
+								  , getMultiMapValue(data, "Session Data", "Active", "?")
+								  , getMultiMapValue(data, "Session Data", "Paused", "?")
+								  , getMultiMapValue(data, "Session Data", "Session", "?")
+								  , getMultiMapValue(data, "Stint Data", "Laps", "?")
+								  , getMultiMapValue(data, "Stint Data", "InPit", "?")
+								  , getMultiMapValue(data, "Stint Data", "DriverForname", "?")
+								  , getMultiMapValue(data, "Stint Data", "DriverSurname", "?")
+								  , getMultiMapValue(data, "Stint Data", "DriverNickName", "?")
+								  , getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", "?")
+								  , getMultiMapValue(data, "Stint Data", "StintTimeRemaining", "?")) . "`n"
 
 		FileAppend %info%, %kTempDirectory%Team Session.log
 

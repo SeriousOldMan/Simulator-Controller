@@ -41,13 +41,13 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	iControllerWidgets := []
 	iVoiceControlWidgets := []
 
-	Pages[] {
+	Pages {
 		Get {
 			return 1
 		}
 	}
 
-	CurrentGeneralStep[] {
+	CurrentGeneralStep {
 		Get {
 			return GeneralStepWizard.sCurrentGeneralStep
 		}
@@ -59,46 +59,46 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local modeSelectors, arguments, launchApplications, descriptor, label, language, startWithWindows, silentMode
 		local values, key, value
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Window"))
-		setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.SetupWizard.Definition, "Splash Themes"))
+		setMultiMapValues(configuration, "Splash Window", getMultiMapValues(this.SetupWizard.Definition, "Splash Window"))
+		setMultiMapValues(configuration, "Splash Themes", getMultiMapValues(this.SetupWizard.Definition, "Splash Themes"))
 
 		wizard.getGeneralConfiguration(language, startWithWindows, silentMode)
 
-		setConfigurationValue(configuration, "Configuration", "Language", language)
-		setConfigurationValue(configuration, "Configuration", "Start With Windows", startWithWindows)
-		setConfigurationValue(configuration, "Configuration", "Silent Mode", silentMode)
+		setMultiMapValue(configuration, "Configuration", "Language", language)
+		setMultiMapValue(configuration, "Configuration", "Start With Windows", startWithWindows)
+		setMultiMapValue(configuration, "Configuration", "Silent Mode", silentMode)
 
-		setConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
-		setConfigurationValue(configuration, "Configuration", "Debug", false)
+		setMultiMapValue(configuration, "Configuration", "Log Level", "Warn")
+		setMultiMapValue(configuration, "Configuration", "Debug", false)
 
-		for section, values in readConfiguration(kUserHomeDirectory . "Setup\Formats Configuration.ini")
+		for section, values in readMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini")
 			for key, value in values
-				setConfigurationValue(configuration, section, key, value)
+				setMultiMapValue(configuration, section, key, value)
 
 		if wizard.isSoftwareInstalled("NirCmd") {
 			path := wizard.softwarePath("NirCmd")
 
 			SplitPath path, , directory
 
-			setConfigurationValue(configuration, "Configuration", "NirCmd Path", directory)
+			setMultiMapValue(configuration, "Configuration", "NirCmd Path", directory)
 		}
 
 		if wizard.isModuleSelected("Voice Control") {
-			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
+			voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
 			for ignore, section in ["Voice Control"] {
-				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
+				subConfiguration := getMultiMapValues(voiceControlConfiguration, section, false)
 
 				if subConfiguration
-					setConfigurationSectionValues(configuration, section, subConfiguration)
+					setMultiMapValues(configuration, section, subConfiguration)
 			}
 		}
 		else {
-			setConfigurationValue(configuration, "Voice Control", "Synthesizer", "dotNET")
-			setConfigurationValue(configuration, "Voice Control", "Speaker", false)
-			setConfigurationValue(configuration, "Voice Control", "Listener", false)
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
+			setMultiMapValue(configuration, "Voice Control", "Speaker", false)
+			setMultiMapValue(configuration, "Voice Control", "Listener", false)
 		}
 
 		modeSelectors := wizard.getModeSelectors()
@@ -110,7 +110,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		launchApplications := []
 
 		for ignore, section in string2Values(",", this.Definition[3])
-			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+			for application, descriptor in getMultiMapValues(wizard.Definition, section) {
 				if wizard.isApplicationSelected(application) {
 					function := wizard.getLaunchApplicationFunction(application)
 
@@ -207,9 +207,9 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		Gui %window%:Add, ListBox, x%secondX% yp w120 h60 Disabled ReadOnly HWNDmodeSelectorsListHandle Hidden
 
 		Gui %window%:Add, Text, x%x% yp+60 w140 h23 +0x200 HWNDlaunchApplicationsLabelHandle Hidden, % translate("Launchpad Mode")
-		Gui %window%:Add, ListView, x%x% yp+24 w%col1Width% h112 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDlaunchApplicationsListHandle gupdateApplicationFunction Hidden, % values2String("|", map(["Application", "Label", "Function"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+24 w%col1Width% h112 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDlaunchApplicationsListHandle gupdateApplicationFunction Hidden, % values2String("|", collect(["Application", "Label", "Function"], "translate")*)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -228,7 +228,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		Gui %window%:Font, Norm, Arial
 
-		configurator := new VoiceControlConfigurator(this)
+		configurator := VoiceControlConfigurator(this)
 
 		this.iVoiceControlConfigurator := configurator
 
@@ -246,13 +246,13 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 	registerWidget(page, widget) {
 		if (page = this.iVoiceControlConfigurator)
-			base.registerWidget(1, widget)
+			super.registerWidget(1, widget)
 		else
-			base.registerWidget(page, widget)
+			super.registerWidget(page, widget)
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iVoiceControlConfigurator := false
 		this.iModeSelectorsListHandle := false
@@ -275,7 +275,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		GeneralStepWizard.sCurrentGeneralStep := this
 
-		base.showPage(page)
+		super.showPage(page)
 
 		Gui %window%:Default
 
@@ -301,22 +301,22 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		if this.SetupWizard.isModuleSelected("Voice Control") {
 			configuration := this.SetupWizard.getSimulatorConfiguration()
-			voiceControlConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
+			voiceControlConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini")
 
 			for ignore, section in ["Voice Control"] {
-				subConfiguration := getConfigurationSectionValues(voiceControlConfiguration, section, false)
+				subConfiguration := getMultiMapValues(voiceControlConfiguration, section, false)
 
 				if subConfiguration
-					setConfigurationSectionValues(configuration, section, subConfiguration)
+					setMultiMapValues(configuration, section, subConfiguration)
 			}
 
-			if (getConfigurationValue(configuration, "Voice Control", "SoX Path", "") = "") {
+			if (getMultiMapValue(configuration, "Voice Control", "SoX Path", "") = "") {
 				path := wizard.softwarePath("SoX")
 
 				if path {
 					SplitPath path, , directory
 
-					setConfigurationValue(configuration, "Voice Control", "SoX Path", directory)
+					setMultiMapValue(configuration, "Voice Control", "SoX Path", directory)
 				}
 			}
 
@@ -345,7 +345,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		this.iVoiceControlConfigurator.hideWidgets()
 
-		if base.hidePage(page) {
+		if super.hidePage(page) {
 			GeneralStepWizard.sCurrentGeneralStep := false
 
 			wizard := this.SetupWizard
@@ -375,20 +375,20 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			}
 
 			if wizard.isModuleSelected("Voice Control") {
-				configuration := newConfiguration()
+				configuration := newMultiMap()
 
 				this.iVoiceControlConfigurator.saveToConfiguration(configuration)
 
-				voiceControlConfiguration := newConfiguration()
+				voiceControlConfiguration := newMultiMap()
 
 				for ignore, section in ["Voice Control"] {
-					subConfiguration := getConfigurationSectionValues(configuration, section, false)
+					subConfiguration := getMultiMapValues(configuration, section, false)
 
 					if subConfiguration
-						setConfigurationSectionValues(voiceControlConfiguration, section, subConfiguration)
+						setMultiMapValues(voiceControlConfiguration, section, subConfiguration)
 				}
 
-				writeConfiguration(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceControlConfiguration)
+				writeMultiMap(kUserHomeDirectory . "Setup\Voice Control Configuration.ini", voiceControlConfiguration)
 			}
 
 			this.iPendingApplicationRegistration := false
@@ -421,7 +421,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		column := false
 
 		for ignore, section in string2Values(",", this.Definition[3])
-			for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+			for application, descriptor in getMultiMapValues(wizard.Definition, section) {
 				if wizard.isApplicationSelected(application) {
 					if load {
 						function := wizard.getLaunchApplicationFunction(application)
@@ -454,11 +454,11 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local column := false
 		local function, action, ignore, preview, section, application, descriptor, label
 
-		base.loadControllerLabels()
+		super.loadControllerLabels()
 
 		for ignore, preview in this.ControllerPreviews {
 			for ignore, section in string2Values(",", this.Definition[3])
-				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section)
+				for application, descriptor in getMultiMapValues(wizard.Definition, section)
 					if wizard.isApplicationSelected(application) {
 						if this.iLaunchApplications.HasKey(application) {
 							function := this.iLaunchApplications[application][2]
@@ -592,7 +592,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				try {
 					Menu ContextMenu, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -688,8 +688,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 	openFormatsEditor() {
 		local window := this.Window
-		local configuration := readConfiguration(kUserHomeDirectory . "Setup\Formats Configuration.ini")
-		local editor := new FormatsEditor(configuration)
+		local configuration := readMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini")
+		local editor := FormatsEditor(configuration)
 
 		Gui FE:+Owner%window%
 		Gui %window%:+Disabled
@@ -697,7 +697,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		configuration := editor.editFormats()
 
 		if configuration
-			writeConfiguration(kUserHomeDirectory . "Setup\Formats Configuration.ini", configuration)
+			writeMultiMap(kUserHomeDirectory . "Setup\Formats Configuration.ini", configuration)
 
 		Gui %window%:-Disabled
 	}
@@ -737,7 +737,7 @@ updateApplicationFunction() {
 					try {
 						Menu ContextMenu, DeleteAll
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 					}
 
@@ -841,7 +841,7 @@ showLaunchHint() {
 }
 
 initializeGeneralStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new GeneralStepWizard(SetupWizard.Instance, "General", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(GeneralStepWizard(SetupWizard.Instance, "General", kSimulatorConfiguration))
 }
 
 

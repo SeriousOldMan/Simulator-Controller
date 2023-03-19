@@ -63,37 +63,37 @@ class DatabaseCreator {
 
 	iTyresDatabase := false
 
-	SourceDirectory[] {
+	SourceDirectory {
 		Get {
 			return this.iSourceDirectory
 		}
 	}
 
-	TargetDirectory[] {
+	TargetDirectory {
 		Get {
 			return this.iTargetDirectory
 		}
 	}
 
-	IncludePressures[] {
+	IncludePressures {
 		Get {
 			return this.iIncludePressures
 		}
 	}
 
-	IncludeStrategies[] {
+	IncludeStrategies {
 		Get {
 			return this.iIncludeStrategies
 		}
 	}
 
-	IncludeSetups[] {
+	IncludeSetups {
 		Get {
 			return this.iIncludeSetups
 		}
 	}
 
-	TyresDatabase[] {
+	TyresDatabase {
 		Get {
 			return this.iTyresDatabase
 		}
@@ -112,7 +112,7 @@ class DatabaseCreator {
 
 		sourceDirectory := this.SourceDirectory
 
-		database := new TyresDatabase()
+		database := TyresDatabase()
 
 		database.DatabaseDirectory := this.TargetDirectory
 
@@ -150,7 +150,7 @@ class DatabaseCreator {
 									FileMove %directory%Setup.Pressures.Distribution.CSV, %directory%Tyres.Pressures.Distribution.CSV
 
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
-									this.loadPressures(simulator, car, track, new Database(directory, kTyresSchemas))
+									this.loadPressures(simulator, car, track, Database(directory, kTyresSchemas))
 
 								loop Files, %databaseDirectory%%simulator%\%car%\%track%\Race Strategies\*.*
 									this.loadRaceStrategy(simulator, car, track, A_LoopFilePath)

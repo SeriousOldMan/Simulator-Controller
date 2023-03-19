@@ -46,10 +46,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
-	local sessionDB := new SessionDatabase()
+	local sessionDB := SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local uploadTimeStamp := sessionDBPath . "UPLOAD"
-	local targetDB := new TyresDatabase()
+	local targetDB := TyresDatabase()
 	local upload, now, simulator, car, track, distFile, configuration
 	local directory, sourceDB, targetDB, ignore, type, row, compound, compoundColor
 
@@ -67,19 +67,19 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 	targetDB.DatabaseDirectory := (kTempDirectory . "Shared Database\")
 
 	try {
-		configuration := newConfiguration()
+		configuration := newMultiMap()
 
-		setConfigurationValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
-		setConfigurationValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
+		setMultiMapValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
+		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
 
-		setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+		setMultiMapValue(configuration, "Database Synchronizer", "Information"
 							, translate("Message: ") . translate("Uploading community database..."))
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
+		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
 
-		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 
@@ -123,7 +123,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 									directory := (sessionDBPath . "User\" . simulator . "\" . car . "\" . track . "\")
 
 									if FileExist(directory . "Tyres.Pressures.Distribution.CSV") {
-										sourceDB := new Database(directory, kTyresSchemas)
+										sourceDB := Database(directory, kTyresSchemas)
 
 										for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: sessionDB.ID} }) {
 											compound := row.Compound
@@ -163,16 +163,16 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 
 													info := sessionDB.readSetupInfo(simulator, car, track, type, name)
 
-													if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
-													 || !getConfigurationValue(info, "Access", "Share", false))
-														deleteFile(directory . getConfigurationValue(info, "Setup", "Name"))
+													if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+													 || !getMultiMapValue(info, "Access", "Share", false))
+														deleteFile(directory . getMultiMapValue(info, "Setup", "Name"))
 
 													deleteFile(A_LoopFilePath)
 
 													Sleep 1
 												}
 									}
-									catch exception {
+									catch Any as exception {
 										logError(exception)
 									}
 								}
@@ -192,16 +192,16 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 
 												info := sessionDB.readStrategyInfo(simulator, car, track, name)
 
-												if ((getConfigurationValue(info, "Origin", "Driver", false) != sessionDB.ID)
-												 || !getConfigurationValue(info, "Access", "Share", false))
-													deleteFile(directory . getConfigurationValue(info, "Strategy", "Name"))
+												if ((getMultiMapValue(info, "Origin", "Driver", false) != sessionDB.ID)
+												 || !getMultiMapValue(info, "Access", "Share", false))
+													deleteFile(directory . getMultiMapValue(info, "Strategy", "Name"))
 
 												deleteFile(A_LoopFilePath)
 
 												Sleep 1
 											}
 									}
-									catch exception {
+									catch Any as exception {
 										logError(exception)
 									}
 								}
@@ -215,7 +215,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 		try {
 			RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%kTempDirectory%Shared Database\Community' -CompressionLevel Optimal -DestinationPath '%kTempDirectory%Shared Database\Database.%id%.zip', , Hide
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
@@ -226,22 +226,22 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 
 		FileAppend %A_Now%, %sessionDBPath%UPLOAD
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+		setMultiMapValue(configuration, "Database Synchronizer", "Information"
 							, translate("Message: ") . translate("Synchronization finished..."))
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
+		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
 
-		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 
 		logMessage(kLogInfo, translate("Database successfully uploaded"))
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, translate("Error while uploading database - please check your internet connection..."))
 	}
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies) {
-	local sessionDB := new SessionDatabase()
+	local sessionDB := SessionDatabase()
 	local sessionDBPath := sessionDB.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
 	local download, now, ignore, fileName, type, databaseDirectory, configuration
@@ -261,25 +261,25 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 		try {
 			FileRemoveDir %kTempDirectory%Shared Database, 1
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
-		configuration := newConfiguration()
+		configuration := newMultiMap()
 
-		setConfigurationValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
-		setConfigurationValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
+		setMultiMapValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
+		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
 
-		setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+		setMultiMapValue(configuration, "Database Synchronizer", "Information"
 							, translate("Message: ") . translate("Downloading community database..."))
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
+		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Downloading")
 
-		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 
-		sessionDB := new SessionDatabase()
+		sessionDB := SessionDatabase()
 
 		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
 			SplitPath fileName, , , , databaseDirectory
@@ -293,7 +293,7 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 					try {
 						RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%kTempDirectory%%fileName%' -DestinationPath '%kTempDirectory%Shared Database', , Hide
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 					}
 
@@ -315,18 +315,18 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		FileAppend %A_Now%, %sessionDBPath%DOWNLOAD
 
-		setConfigurationValue(configuration, "Database Synchronizer", "State", "Active")
+		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Information"
+		setMultiMapValue(configuration, "Database Synchronizer", "Information"
 							, translate("Message: ") . translate("Synchronization finished..."))
 
-		setConfigurationValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
+		setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Finished")
 
-		writeConfiguration(kTempDirectory . "Database Synchronizer.state", configuration)
+		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 
 		logMessage(kLogInfo, translate("Database successfully downloaded"))
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, translate("Error while downloading database - please check your internet connection..."))
 	}
 }
@@ -351,7 +351,7 @@ synchronizeSessionDatabase(minutes) {
 	try {
 		synchronizeDatabase()
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 	}
 
@@ -386,9 +386,9 @@ updateSessionDatabase() {
 
 		if (minutes && (minutes != kFalse)) {
 			if ((minutes == true) || (minutes = kTrue)) {
-				configuration := readConfiguration(kUserConfigDirectory . "Session Database.ini")
+				configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-				minutes := getConfigurationValue(configuration, "Team Server", "Replication", 30)
+				minutes := getMultiMapValue(configuration, "Team Server", "Replication", 30)
 			}
 
 			Task.startTask(Func("synchronizeSessionDatabase").Bind(minutes), 1000, kLowPriority)

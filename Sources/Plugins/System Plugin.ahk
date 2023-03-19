@@ -38,13 +38,13 @@ class SystemPlugin extends ControllerPlugin {
 		iLaunchpadFunction := false
 		iLaunchpadAction := false
 
-		LaunchpadFunction[] {
+		LaunchpadFunction {
 			Get {
 				return this.iLaunchpadFunction
 			}
 		}
 
-		LaunchpadAction[] {
+		LaunchpadAction {
 			Get {
 				return this.iLaunchpadAction
 			}
@@ -96,7 +96,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	class LaunchMode extends ControllerMode {
-		Mode[] {
+		Mode {
 			Get {
 				return kLaunchMode
 			}
@@ -104,7 +104,7 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	class ModeSelectorAction extends ControllerAction {
-		Label[] {
+		Label {
 			Get {
 				local controller := this.Controller
 				local mode := controller.ActiveMode[controller.findFunctionController(this.Function)]
@@ -129,22 +129,22 @@ class SystemPlugin extends ControllerPlugin {
 		iApplication := false
 		iTransition := false
 
-		Application[] {
+		Application {
 			Get {
 				return this.iApplication
 			}
 		}
 
-		Transition[] {
+		Transition {
 			Get {
 				return this.iTransition
 			}
 		}
 
 		__New(function, label, icon, name) {
-			this.iApplication := new Application(name, function.Controller.Configuration)
+			this.iApplication := Application(name, function.Controller.Configuration)
 
-			base.__New(function, label, icon)
+			super.__New(function, label, icon)
 		}
 
 		fireAction(function, trigger) {
@@ -185,25 +185,25 @@ class SystemPlugin extends ControllerPlugin {
 		}
 	}
 
-	ChildProcess[] {
+	ChildProcess {
 		Get {
 			return this.iChildProcess
 		}
 	}
 
-	ModeSelectors[] {
+	ModeSelectors {
 		Get {
 			return this.iModeSelectors
 		}
 	}
 
-	RunnableApplications[] {
+	RunnableApplications {
 		Get {
 			return this.iRunnableApplications
 		}
 	}
 
-	MouseClicked[] {
+	MouseClicked {
 		Get {
 			return this.iMouseClicked
 		}
@@ -215,7 +215,7 @@ class SystemPlugin extends ControllerPlugin {
 		if inList(A_Args, "-Startup")
 			this.iChildProcess := true
 
-		base.__New(controller, name, configuration, false)
+		super.__New(controller, name, configuration, false)
 
 		if (this.Active || isDebug()) {
 			for ignore, descriptor in string2Values(A_Space, this.getArgumentValue("modeSelector", ""))
@@ -223,7 +223,7 @@ class SystemPlugin extends ControllerPlugin {
 					function := controller.findFunction(descriptor)
 
 					if (function != false) {
-						action := new this.ModeSelectorAction(function, "", this.getIcon("ModeSelector.Activate"))
+						action := this.ModeSelectorAction(function, "", this.getIcon("ModeSelector.Activate"))
 
 						this.iModeSelectors.Push(action)
 
@@ -243,9 +243,9 @@ class SystemPlugin extends ControllerPlugin {
 
 				if (function != false) {
 					if !this.iLaunchMode
-						this.iLaunchMode := new this.LaunchMode(this)
+						this.iLaunchMode := this.LaunchMode(this)
 
-					this.iLaunchMode.registerAction(new this.LogoToggleAction(function, ""))
+					this.iLaunchMode.registerAction(this.LogoToggleAction(function, ""))
 				}
 				else
 					this.logFunctionNotFound(descriptor)
@@ -258,9 +258,9 @@ class SystemPlugin extends ControllerPlugin {
 
 				if (function != false) {
 					if !this.iLaunchMode
-						this.iLaunchMode := new this.LaunchMode(this)
+						this.iLaunchMode := this.LaunchMode(this)
 
-					this.iLaunchMode.registerAction(new this.SystemShutdownAction(function, "Shutdown"))
+					this.iLaunchMode.registerAction(this.SystemShutdownAction(function, "Shutdown"))
 				}
 				else
 					this.logFunctionNotFound(descriptor)
@@ -279,12 +279,12 @@ class SystemPlugin extends ControllerPlugin {
 	loadFromConfiguration(configuration) {
 		local action, function, descriptor, name, appDescriptor, runnable
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
-			this.RunnableApplications.Push(new this.RunnableApplication(name, configuration))
+		for descriptor, name in getMultiMapValues(configuration, "Applications")
+			this.RunnableApplications.Push(this.RunnableApplication(name, configuration))
 
-		for descriptor, appDescriptor in getConfigurationSectionValues(configuration, "Launchpad", Object()) {
+		for descriptor, appDescriptor in getMultiMapValues(configuration, "Launchpad") {
 			function := this.Controller.findFunction(descriptor)
 
 			if (function != false) {
@@ -293,10 +293,10 @@ class SystemPlugin extends ControllerPlugin {
 				runnable := this.findRunnableApplication(appDescriptor[2])
 
 				if (runnable != false) {
-					action := new this.LaunchAction(function, appDescriptor[1], this.getIcon("Launch.Activate"), appDescriptor[2])
+					action := this.LaunchAction(function, appDescriptor[1], this.getIcon("Launch.Activate"), appDescriptor[2])
 
 					if !this.iLaunchMode
-						this.iLaunchMode := new this.LaunchMode(this)
+						this.iLaunchMode := this.LaunchMode(this)
 
 					this.iLaunchMode.registerAction(action)
 
@@ -319,10 +319,10 @@ class SystemPlugin extends ControllerPlugin {
 			runnable := this.findRunnableApplication(application)
 
 			if (runnable != false) {
-				action := new this.LaunchAction(function, label, this.getIcon("Launch.Activate"), application)
+				action := this.LaunchAction(function, label, this.getIcon("Launch.Activate"), application)
 
 				if !this.iLaunchMode
-					this.iLaunchMode := new this.LaunchMode(this)
+					this.iLaunchMode := this.LaunchMode(this)
 
 				this.iLaunchMode.registerAction(action)
 
@@ -335,9 +335,9 @@ class SystemPlugin extends ControllerPlugin {
 
 	writePluginState(configuration) {
 		if this.Active
-			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 		else
-			base.writePluginState(configuration)
+			super.writePluginState(configuration)
 	}
 
 	simulatorStartup(simulator) {
@@ -355,7 +355,7 @@ class SystemPlugin extends ControllerPlugin {
 			deleteFile(fileName)
 		}
 
-		base.simulatorStartup(simulator)
+		super.simulatorStartup(simulator)
 	}
 
 	findRunnableApplication(name) {
@@ -383,7 +383,7 @@ class SystemPlugin extends ControllerPlugin {
 					this.iStartupSongIsPlaying := true
 				}
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 		}
@@ -398,7 +398,7 @@ class SystemPlugin extends ControllerPlugin {
 		try {
 			SoundPlay NonExistent.avi
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
@@ -475,12 +475,12 @@ restoreSimulatorVolume() {
 			simulator := SimulatorController.Instance.ActiveSimulator
 
 			if (simulator != false) {
-				pid := (new Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
+				pid := (Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
 
 				Run "%kNirCmd%" setappvolume /%pid% 1.0
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
@@ -497,11 +497,11 @@ muteSimulator() {
 
 		if kNirCmd
 			try {
-				pid := (new Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
+				pid := (Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
 
 				Run "%kNirCmd%" setappvolume /%pid% 0.0
 			}
-			catch exception {
+			catch Any as exception {
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
@@ -674,7 +674,7 @@ execute(command) {
 	try {
 		Run % substituteVariables(command)
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
 	}
 }
@@ -703,7 +703,7 @@ hotkey(hotkeys, method := "Event") {
 					Send %theHotkey%
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%hotkey%) - please check the configuration"), {command: theHotkey}))
 		}
 }
@@ -714,7 +714,7 @@ startSimulation(name := false) {
 
 	if !(controller.ActiveSimulator != false) {
 		if !name {
-			simulators := string2Values("|", getConfigurationValue(controller.Configuration, "Configuration", "Simulators", ""))
+			simulators := string2Values("|", getMultiMapValue(controller.Configuration, "Configuration", "Simulators", ""))
 
 			if (simulators.Length() > 0)
 				name := simulators[1]

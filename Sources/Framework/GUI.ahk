@@ -14,7 +14,7 @@
 #Include "..\Framework\Debug.ahk"
 #Include "..\Framework\Strings.ahk"
 #Include "..\Framework\Localization.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\MultiMap.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,11 +28,11 @@ getControllerActionDefinitions(type) {
 	if (!FileExist(kTranslationsDirectory . fileName) && !FileExist(kUserTranslationsDirectory . fileName))
 		fileName := ("Controller Action " . type . ".en")
 
-	definitions := readConfiguration(kTranslationsDirectory . fileName)
+	definitions := readMultiMap(kTranslationsDirectory . fileName)
 
-	for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+	for section, values in readMultiMap(kUserTranslationsDirectory . fileName)
 		for key, value in values
-			setConfigurationValue(definitions, section, key, value)
+			setMultiMapValue(definitions, section, key, value)
 
 	return definitions
 }
@@ -121,9 +121,6 @@ moveByMouse(dialog, descriptor := false) {
 	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
 	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
 
-	while isAlpha(dialog)
-		dialog := %dialog%
-
 	if !isInstance(dialog, Gui)
 		dialog := A_Gui
 
@@ -146,12 +143,12 @@ moveByMouse(dialog, descriptor := false) {
 		}
 
 		if descriptor {
-			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setConfigurationValue(settings, "Window Positions", descriptor . ".X", newX)
-			setConfigurationValue(settings, "Window Positions", descriptor . ".Y", newY)
+			setMultiMapValue(settings, "Window Positions", descriptor . ".X", newX)
+			setMultiMapValue(settings, "Window Positions", descriptor . ".Y", newY)
 
-			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
 	}
 	finally {
@@ -160,9 +157,9 @@ moveByMouse(dialog, descriptor := false) {
 }
 
 getWindowPosition(descriptor, &x, &y) {
-	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-	local posX := getConfigurationValue(settings, "Window Positions", descriptor . ".X", kUndefined)
-	local posY := getConfigurationValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	local posX := getMultiMapValue(settings, "Window Positions", descriptor . ".X", kUndefined)
+	local posY := getMultiMapValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
 	local screen, screenLeft, screenRight, screenTop, screenBottom
 
 	if ((posX == kUndefined) || (posY == kUndefined))
@@ -195,7 +192,7 @@ translateMsgBoxButtons(buttonLabels) {
 				try {
 					ControlSetText(translate(label), "Button" index)
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 		}

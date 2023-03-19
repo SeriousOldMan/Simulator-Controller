@@ -177,7 +177,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 
 				return connectorOrCommand.GetSessionToken()
 			}
-			catch exception {
+			catch Any as exception {
 				title := translate("Error")
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -400,12 +400,12 @@ readTyreSetup(settings) {
 }
 
 getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
-	local value := getConfigurationValue(data, newSection, key, kUndefined)
+	local value := getMultiMapValue(data, newSection, key, kUndefined)
 
 	if (value != kUndefined)
 		return value
 	else
-		return getConfigurationValue(data, oldSection, key, default)
+		return getMultiMapValue(data, oldSection, key, default)
 }
 
 parseObject(properties) {
@@ -431,7 +431,7 @@ loadTeams(connector) {
 	try {
 		identifiers := string2Values(";", connector.GetAllTeams())
 	}
-	catch exception {
+	catch Any as exception {
 		identifiers := []
 	}
 
@@ -452,7 +452,7 @@ loadDrivers(connector, team) {
 		try {
 			identifiers := string2Values(";", connector.GetTeamDrivers(team))
 		}
-		catch exception {
+		catch Any as exception {
 			identifiers := []
 		}
 
@@ -476,7 +476,7 @@ loadSessions(connector, team) {
 		try {
 			identifiers := string2Values(";", connector.GetTeamSessions(team))
 		}
-		catch exception {
+		catch Any as exception {
 			identifiers := []
 		}
 
@@ -486,7 +486,7 @@ loadSessions(connector, team) {
 
 				sessions[session.Name] := session.Identifier
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 		}
@@ -656,23 +656,23 @@ restart:
 			try {
 				connector.Initialize(serverURLEdit, serverTokenEdit)
 
-				sessionDB := new SessionDatabase()
+				sessionDB := SessionDatabase()
 
 				connection := connector.Connect(serverTokenEdit, sessionDB.ID
 											  , vSimulator ? sessionDB.getDriverName(vSimulator, sessionDB.ID) : sessionDB.getUserName()
 											  , "Driver")
 
 				if (connection && (connection != "")) {
-					settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-					serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+					serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
 					if !inList(serverURLs, serverURLEdit) {
 						serverURLs.Push(serverURLEdit)
 
-						setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
+						setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
 
-						writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+						writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 						GuiControl, , serverURLEdit, % ("|" . values2String("|", serverURLs*))
 						GuiControl Choose, serverURLEdit, % inList(serverURLs, serverURLEdit)
@@ -683,7 +683,7 @@ restart:
 					if keepAliveTask
 						keepAliveTask.stop()
 
-					keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+					keepAliveTask := PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
 
 					keepAliveTask.start()
 
@@ -714,9 +714,9 @@ restart:
 					showMessage(translate("Successfully connected to the Team Server."))
 				}
 				else
-					throw Exception("Invalid or missing token...")
+					throw "Invalid or missing token..."
 			}
-			catch exception {
+			catch Any as exception {
 				title := translate("Error")
 
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -728,7 +728,7 @@ restart:
 	else if ((settingsOrCommand == kSave) || (settingsOrCommand == kOk)) {
 		Gui RES:Submit, NoHide
 
-		newSettings := newConfiguration()
+		newSettings := newMultiMap()
 
 		if (!isPositiveFloat(tyrePressureDeviationEdit
 						   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
@@ -746,81 +746,81 @@ restart:
 			return false
 		}
 
-		setConfigurationValue(newSettings, "Session Settings", "Lap.PitstopWarning", pitstopWarningEdit)
+		setMultiMapValue(newSettings, "Session Settings", "Lap.PitstopWarning", pitstopWarningEdit)
 
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Suspension.Repair"
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Suspension.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairSuspensionDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Suspension.Repair.Threshold", internalValue("Float", repairSuspensionThresholdEdit, 1))
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Suspension.Repair.Threshold", internalValue("Float", repairSuspensionThresholdEdit, 1))
 
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair"
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Bodywork.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairBodyworkDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", internalValue("Float", repairBodyworkThresholdEdit, 1))
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", internalValue("Float", repairBodyworkThresholdEdit, 1))
 
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair"
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Engine.Repair"
 							, ["Never", "Always", "Threshold", "Impact"][repairEngineDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", internalValue("Float", repairEngineThresholdEdit, 1))
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", internalValue("Float", repairEngineThresholdEdit, 1))
 
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change"
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change"
 							, ["Never", "Temperature", "Weather"][changeTyreDropDown])
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", internalValue("Float", changeTyreThresholdEdit, 1))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", internalValue("Float", changeTyreThresholdEdit, 1))
 
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", internalValue("Float", tyrePressureDeviationEdit, 1))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", temperatureCorrectionCheck)
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", setupPressureCompareCheck)
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Pressure", pressureLossCorrectionCheck)
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", internalValue("Float", tyrePressureDeviationEdit, 1))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", temperatureCorrectionCheck)
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", setupPressureCompareCheck)
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Pressure", pressureLossCorrectionCheck)
 
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", convertUnit("Pressure", internalValue("Float", tpDryFrontLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", convertUnit("Pressure", internalValue("Float", tpDryFrontRightEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", convertUnit("Pressure", internalValue("Float", tpDryRearLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", convertUnit("Pressure", internalValue("Float", tpDryRearRightEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FL", convertUnit("Pressure", internalValue("Float", tpWetFrontLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FR", convertUnit("Pressure", internalValue("Float", tpWetFrontRightEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", convertUnit("Pressure", internalValue("Float", tpWetRearLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", convertUnit("Pressure", internalValue("Float", tpWetRearRightEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", convertUnit("Pressure", internalValue("Float", tpDryFrontLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", convertUnit("Pressure", internalValue("Float", tpDryFrontRightEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", convertUnit("Pressure", internalValue("Float", tpDryRearLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", convertUnit("Pressure", internalValue("Float", tpDryRearRightEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FL", convertUnit("Pressure", internalValue("Float", tpWetFrontLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FR", convertUnit("Pressure", internalValue("Float", tpWetFrontRightEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", convertUnit("Pressure", internalValue("Float", tpWetRearLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", convertUnit("Pressure", internalValue("Float", tpWetRearRightEdit), false))
 
-		setConfigurationValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
-		setConfigurationValue(newSettings, "Session Settings", "Fuel.AvgConsumption", convertUnit("Volume", internalValue("Float", fuelConsumptionEdit), false))
-		setConfigurationValue(newSettings, "Session Settings", "Fuel.SafetyMargin", Round(convertUnit("Volume", internalValue("Float", safetyFuelEdit), false)))
+		setMultiMapValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
+		setMultiMapValue(newSettings, "Session Settings", "Fuel.AvgConsumption", convertUnit("Volume", internalValue("Float", fuelConsumptionEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Fuel.SafetyMargin", Round(convertUnit("Volume", internalValue("Float", safetyFuelEdit), false)))
 
-		setConfigurationValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
-		setConfigurationValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
+		setMultiMapValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
+		setMultiMapValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
 
 		splitCompound(vTyreCompounds[spSetupTyreCompoundDropDown], compound, compoundColor)
 
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound", compound)
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound", compound)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
 
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false))
-		setConfigurationValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false))
 
-		setConfigurationValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
-		setConfigurationValue(newSettings, "Strategy Settings", "Service.Tyres", pitstopTyreServiceEdit)
-		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel.Rule", ["Fixed", "Dynamic"][pitstopRefuelServiceRuleDropDown])
-		setConfigurationValue(newSettings, "Strategy Settings", "Service.Refuel", internalValue("Float", pitstopRefuelServiceEdit, 1))
-		setConfigurationValue(newSettings, "Strategy Settings", "Service.Order", (pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
-		setConfigurationValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
-		setConfigurationValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
-		setConfigurationValue(newSettings, "Strategy Settings", "Traffic.Considered", trafficConsideredEdit)
-		setConfigurationValue(newSettings, "Strategy Settings", "Strategy.Window.Considered", pitstopStrategyWindowEdit)
+		setMultiMapValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Tyres", pitstopTyreServiceEdit)
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Refuel.Rule", ["Fixed", "Dynamic"][pitstopRefuelServiceRuleDropDown])
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Refuel", internalValue("Float", pitstopRefuelServiceEdit, 1))
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Order", (pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
+		setMultiMapValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
+		setMultiMapValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
+		setMultiMapValue(newSettings, "Strategy Settings", "Traffic.Considered", trafficConsideredEdit)
+		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Window.Considered", pitstopStrategyWindowEdit)
 
 		if vTeamMode {
-			setConfigurationValue(newSettings, "Team Settings", "Server.URL", serverURLEdit)
-			setConfigurationValue(newSettings, "Team Settings", "Server.Token", serverTokenEdit)
-			setConfigurationValue(newSettings, "Team Settings", "Team.Name", teamName)
-			setConfigurationValue(newSettings, "Team Settings", "Driver.Name", driverName)
-			setConfigurationValue(newSettings, "Team Settings", "Session.Name", sessionName)
-			setConfigurationValue(newSettings, "Team Settings", "Team.Identifier", teamIdentifier)
-			setConfigurationValue(newSettings, "Team Settings", "Driver.Identifier", driverIdentifier)
-			setConfigurationValue(newSettings, "Team Settings", "Session.Identifier", sessionIdentifier)
+			setMultiMapValue(newSettings, "Team Settings", "Server.URL", serverURLEdit)
+			setMultiMapValue(newSettings, "Team Settings", "Server.Token", serverTokenEdit)
+			setMultiMapValue(newSettings, "Team Settings", "Team.Name", teamName)
+			setMultiMapValue(newSettings, "Team Settings", "Driver.Name", driverName)
+			setMultiMapValue(newSettings, "Team Settings", "Session.Name", sessionName)
+			setMultiMapValue(newSettings, "Team Settings", "Team.Identifier", teamIdentifier)
+			setMultiMapValue(newSettings, "Team Settings", "Driver.Identifier", driverIdentifier)
+			setMultiMapValue(newSettings, "Team Settings", "Session.Identifier", sessionIdentifier)
 		}
 
 		if (settingsOrCommand == kOk)
@@ -845,7 +845,7 @@ restart:
 
 				connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 			}
-			catch exception {
+			catch Any as exception {
 				logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 				showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
@@ -890,31 +890,31 @@ restart:
 		formationLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
 		postRaceLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
 
-		pitstopDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
-		pitstopTyreServiceEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
-		pitstopRefuelServiceRuleDropDown := inList(["Fixed", "Dynamic"], getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
-		pitstopRefuelServiceEdit := displayValue("Float", getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)
-		pitstopServiceDropDown := ((getConfigurationValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
-		extrapolationLapsEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
-		overtakeDeltaEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
-		trafficConsideredEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
-		pitstopStrategyWindowEdit := getConfigurationValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 2)
+		pitstopDeltaEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
+		pitstopTyreServiceEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
+		pitstopRefuelServiceRuleDropDown := inList(["Fixed", "Dynamic"], getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
+		pitstopRefuelServiceEdit := displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)
+		pitstopServiceDropDown := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
+		extrapolationLapsEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
+		overtakeDeltaEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
+		trafficConsideredEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
+		pitstopStrategyWindowEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 2)
 
 		readTyreSetup(settingsOrCommand)
 
 		if vTeamMode {
-			serverURLEdit := getConfigurationValue(settingsOrCommand, "Team Settings", "Server.URL", "")
-			serverTokenEdit := getConfigurationValue(settingsOrCommand, "Team Settings", "Server.Token", "")
-			teamName := getConfigurationValue(settingsOrCommand, "Team Settings", "Team.Name", "")
-			teamIdentifier := getConfigurationValue(settingsOrCommand, "Team Settings", "Team.Identifier", false)
-			driverName := getConfigurationValue(settingsOrCommand, "Team Settings", "Driver.Name", "")
-			driverIdentifier := getConfigurationValue(settingsOrCommand, "Team Settings", "Driver.Identifier", false)
-			sessionName := getConfigurationValue(settingsOrCommand, "Team Settings", "Session.Name", "")
-			sessionIdentifier := getConfigurationValue(settingsOrCommand, "Team Settings", "Session.Identifier", false)
+			serverURLEdit := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.URL", "")
+			serverTokenEdit := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.Token", "")
+			teamName := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Name", "")
+			teamIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Identifier", false)
+			driverName := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Name", "")
+			driverIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Identifier", false)
+			sessionName := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Name", "")
+			sessionIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Identifier", false)
 
-			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+			serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 		}
 
 		Gui RES:Default
@@ -944,9 +944,9 @@ restart:
 		Gui RES:Add, Button, x90 y499 w77 h23 gsaveRaceSettings, % translate("&Save...")
 
 		if vTeamMode
-			tabs := map(["Race", "Pitstop", "Strategy", "Team"], "translate")
+			tabs := collect(["Race", "Pitstop", "Strategy", "Team"], "translate")
 		else
-			tabs := map(["Race", "Pitstop", "Strategy"], "translate")
+			tabs := collect(["Race", "Pitstop", "Strategy"], "translate")
 
 		Gui RES:Add, Tab3, x8 y48 w388 h444 -Wrap, % values2String("|", tabs*)
 
@@ -959,7 +959,7 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w105 h23 +0x200, % translate("Repair Suspension")
 
-		choices := map(["Never", "Always", "Threshold", "Impact"], "translate")
+		choices := collect(["Never", "Always", "Threshold", "Impact"], "translate")
 
 		repairSuspensionDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairSuspensionDropDown)
 
@@ -972,7 +972,7 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Repair Bodywork")
 
-		choices := map(["Never", "Always", "Threshold", "Impact"], "translate")
+		choices := collect(["Never", "Always", "Threshold", "Impact"], "translate")
 
 		repairBodyworkDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairBodyworkDropDown)
 
@@ -985,7 +985,7 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Repair Engine")
 
-		choices := map(["Never", "Always", "Threshold", "Impact"], "translate")
+		choices := collect(["Never", "Always", "Threshold", "Impact"], "translate")
 
 		repairEngineDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairEngineDropDown)
 
@@ -998,7 +998,7 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
 
-		choices := map(["Never", "Tyre Temperature", "Weather"], "translate")
+		choices := collect(["Never", "Tyre Temperature", "Weather"], "translate")
 
 		changeTyreDropDown := inList(["Never", "Temperature", "Weather"], changeTyreDropDown)
 
@@ -1108,7 +1108,7 @@ restart:
 
 		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Compound")
 
-		choices := map(vTyreCompounds, "translate")
+		choices := collect(vTyreCompounds, "translate")
 
 		spSetupTyreCompoundDropDown := inList(vTyreCompounds, spSetupTyreCompoundDropDown)
 
@@ -1127,7 +1127,7 @@ restart:
 
 		import := false
 
-		for simulator, ignore in getConfigurationSectionValues(getControllerState(), "Simulators", Object())
+		for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
 			if new Application(simulator, kSimulatorConfiguration).isRunning() {
 				import := true
 
@@ -1222,14 +1222,14 @@ restart:
 		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80 Range0-99, %pitstopTyreServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Change four tyres)")
 
-		Gui RES:Add, DropDownList, x12 yp+21 w110 AltSubmit Choose%pitstopRefuelServiceRuleDropdown% VpitstopRefuelServiceRuleDropdown gchooseRefuelService, % values2String("|", map(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
+		Gui RES:Add, DropDownList, x12 yp+21 w110 AltSubmit Choose%pitstopRefuelServiceRuleDropdown% VpitstopRefuelServiceRuleDropdown gchooseRefuelService, % values2String("|", collect(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
 
 		Gui RES:Add, Edit, x126 yp w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
 		Gui RES:Add, Text, x184 yp+4 w290 h20 VpitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopRefuelServiceRuleDropdown])
 
 
 		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
-		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose%pitstopServiceDropDown% vpitstopServiceDropDown, % values2String("|", map(["Simultaneous", "Sequential"], "translate")*)
+		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose%pitstopServiceDropDown% vpitstopServiceDropDown, % values2String("|", collect(["Simultaneous", "Sequential"], "translate")*)
 
 		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
 		Gui RES:Add, Edit, x126 yp w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
@@ -1293,7 +1293,7 @@ restart:
 				title := translate("Load Race Settings...")
 
 				if (vSimulator && vCar && vTrack) {
-					sessionDB := new SessionDatabase()
+					sessionDB := SessionDatabase()
 
 					directory := sessionDB.DatabasePath
 					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
@@ -1312,7 +1312,7 @@ restart:
 				OnMessage(0x44, "")
 
 				if (file != "") {
-					settingsOrCommand := readConfiguration(file)
+					settingsOrCommand := readMultiMap(file)
 
 					Gui RES:Destroy
 
@@ -1323,7 +1323,7 @@ restart:
 				result := false
 
 				if (vSimulator && vCar && vTrack) {
-					sessionDB := new SessionDatabase()
+					sessionDB := SessionDatabase()
 
 					directory := sessionDB.DatabasePath
 					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
@@ -1349,7 +1349,7 @@ restart:
 					if !InStr(file, ".")
 						file := (file . ".settings")
 
-					writeConfiguration(file, newSettings)
+					writeMultiMap(file, newSettings)
 				}
 			}
 			else if (result == kOk) {
@@ -1485,30 +1485,30 @@ readSimulatorData(simulator) {
 	try {
 		RunWait %ComSpec% /c ""%exePath%" -Setup > "%dataFile%"", , Hide
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration..."), {simulator: simulator, protocol: "SHM", exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 
-	data := readConfiguration(dataFile)
+	data := readMultiMap(dataFile)
 
 	deleteFile(dataFile)
 
-	if (getConfigurationValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
-		compound := getConfigurationValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+	if (getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
+		compound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
 		if (compound && (compound != kUndefined)) {
-			compound := new SessionDatabase().getTyreCompoundName(simulator, vCar, vTrack, compound, false)
+			compound := SessionDatabase().getTyreCompoundName(simulator, vCar, vTrack, compound, false)
 
 			if compound {
 				compoundColor := false
 
 				splitCompound(compound, compound, compoundColor)
 
-				setConfigurationValue(data, "Car Data", "TyreCompound", compound)
-				setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+				setMultiMapValue(data, "Car Data", "TyreCompound", compound)
+				setMultiMapValue(data, "Car Data", "TyreCompoundColor", compoundColor)
 			}
 		}
 	}
@@ -1536,7 +1536,7 @@ openSessionDatabase() {
 
 		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
 		showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
@@ -1552,51 +1552,51 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 
 		simulator := false
 
-		for candidate, ignore in getConfigurationSectionValues(getControllerState(), "Simulators", Object())
+		for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
 			if new Application(candidate, kSimulatorConfiguration).isRunning() {
 				simulator := candidate
 
 				break
 			}
 
-		prefix := new SessionDatabase().getSimulatorCode(simulator)
+		prefix := SessionDatabase().getSimulatorCode(simulator)
 	}
 
 	data := readSimulatorData(prefix)
 
-	if (getConfigurationSectionValues(data, "Setup Data", Object()).Count() > 0) {
-		readTyreSetup(readConfiguration(kRaceSettingsFile))
+	if (getMultiMapValues(data, "Setup Data").Count() > 0) {
+		readTyreSetup(readMultiMap(kRaceSettingsFile))
 
-		spPitstopTyreSetEdit := getConfigurationValue(data, "Setup Data", "TyreSet", spPitstopTyreSetEdit)
+		spPitstopTyreSetEdit := getMultiMapValue(data, "Setup Data", "TyreSet", spPitstopTyreSetEdit)
 		spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
 
 		if settings {
-			setConfigurationValue(settings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
-			setConfigurationValue(settings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
+			setMultiMapValue(settings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
+			setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
 		}
 		else {
 			GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
 			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
 		}
 
-		compound := getConfigurationValue(data, "Setup Data", "TyreCompound", spSetupTyreCompoundDropDown)
+		compound := getMultiMapValue(data, "Setup Data", "TyreCompound", spSetupTyreCompoundDropDown)
 
 		if (compound = "Dry") {
-			spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFL", spDryFrontLeftEdit)))
-			spDryFrontRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFR", spDryFrontRightEdit)))
-			spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRL", spDryRearLeftEdit)))
-			spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)))
+			spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", spDryFrontLeftEdit)))
+			spDryFrontRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", spDryFrontRightEdit)))
+			spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", spDryRearLeftEdit)))
+			spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)))
 
 			if settings {
-				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false))
 
 				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
 					message := (translate("Tyre setup imported: ") . translate(compound(compound, compoundColor)))
@@ -1607,7 +1607,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				}
 			}
 			else {
-				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
 				GuiControl Choose, spSetupTyreCompoundDropDown, % inList(vTyreCompounds, compound(compound, compoundColor))
 
@@ -1618,21 +1618,21 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 			}
 		}
 		else if ((compound = "Wet") || (compound = "Intermediate")) {
-			spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFL", spWetFrontLeftEdit)))
-			spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureFR", spWetFrontRightEdit)))
-			spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRL", spWetRearLeftEdit)))
-			spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getConfigurationValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)))
+			spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", spWetFrontLeftEdit)))
+			spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", spWetFrontRightEdit)))
+			spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", spWetRearLeftEdit)))
+			spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)))
 
 			if settings {
-				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false))
-				setConfigurationValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false))
+				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false))
 
 				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
 					message := (translate("Tyre setup imported: ") . compound(compound, compoundColor))
@@ -1643,7 +1643,7 @@ importFromSimulation(message := false, simulator := false, prefix := false, sett
 				}
 			}
 			else {
-				compoundColor := getConfigurationValue(data, "Setup Data", "TyreCompoundColor", "Black")
+				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
 
 				GuiControl Choose, spSetupTyreCompoundDropDown, % inList(vTyreCompounds, compound(compound, compoundColor))
 
@@ -1709,7 +1709,7 @@ showRaceSettingsEditor() {
 	}
 
 	if (vSimulator && vCar)
-		vTyreCompounds := new SessionDatabase().getTyreCompounds(vSimulator, vCar, vTrack ? vTrack : "*")
+		vTyreCompounds := SessionDatabase().getTyreCompounds(vSimulator, vCar, vTrack ? vTrack : "*")
 
 	if (vAirTemperature <= 0)
 		vAirTemperature := 23
@@ -1724,7 +1724,7 @@ showRaceSettingsEditor() {
 	if index
 		fileName := A_Args[index + 1]
 
-	settings := readConfiguration(fileName)
+	settings := readMultiMap(fileName)
 
 	if inList(A_Args, "-Silent")
 		vSilentMode := true
@@ -1740,13 +1740,13 @@ showRaceSettingsEditor() {
 	if index {
 		importFromSimulation("Import", A_Args[index + 1], A_Args[index + 2], settings)
 
-		writeConfiguration(fileName, settings)
+		writeMultiMap(fileName, settings)
 	}
 	else {
 		registerMessageHandler("Setup", "functionMessageHandler")
 
 		if (editRaceSettings(settings) = kOk) {
-			writeConfiguration(fileName, settings)
+			writeMultiMap(fileName, settings)
 
 			ExitApp 0
 		}

@@ -31,7 +31,7 @@ global applicationUpdateButton
 class ApplicationsConfigurator extends ConfigurationItemList {
 	iEditor := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
@@ -55,7 +55,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	__New(editor, configuration) {
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ApplicationsConfigurator.Instance := this
 	}
@@ -64,7 +64,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		local window := editor.Window
 
 		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent
-						, % values2String("|", map(["Type", "Name", "Executable", "Window Title", "Working Directory"], "translate")*)
+						, % values2String("|", collect(["Type", "Name", "Executable", "Window Title", "Working Directory"], "translate")*)
 
 		Gui %window%:Add, Text, x16 y295 w141 h23 +0x200, % translate("Name")
 		Gui %window%:Add, Edit, x180 y295 w268 h21 VapplicationNameEdit, %applicationNameEdit%
@@ -109,17 +109,17 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		local descriptor, name
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
-			this.ItemList.Push(Array(translate(ConfigurationItem.splitDescriptor(descriptor)[1]), new Application(name, configuration)))
+		for descriptor, name in getMultiMapValues(configuration, "Applications")
+			this.ItemList.Push(Array(translate(ConfigurationItem.splitDescriptor(descriptor)[1]), Application(name, configuration)))
 	}
 
 	saveToConfiguration(configuration) {
 		local count := 0
 		local lastType, index, theApplication, type, types
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		lastType := ""
 
@@ -136,8 +136,8 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 
 			types := ["Core", "Feedback", "Other"]
 
-			setConfigurationValue(configuration, "Applications"
-								, ConfigurationItem.descriptor(types[inList(map(types, "translate"), type)], count), theApplication.Application)
+			setMultiMapValue(configuration, "Applications"
+								, ConfigurationItem.descriptor(types[inList(collect(types, "translate"), type)], count), theApplication.Application)
 
 			theApplication.saveToConfiguration(configuration)
 		}
@@ -146,7 +146,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	updateState() {
 		local theApplication, type
 
-		base.updateState()
+		super.updateState()
 
 		if (this.CurrentItem != 0) {
 			theApplication := this.ItemList[this.CurrentItem]
@@ -248,7 +248,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		GuiControlGet applicationIsRunningEdit
 
 		return Array(isNew ? translate("Other") : this.ItemList[this.CurrentItem][1]
-				   , new Application(applicationNameEdit, false, applicationExePathEdit, applicationWorkingDirectoryPathEdit, applicationWindowTitleEdit
+				   , Application(applicationNameEdit, false, applicationExePathEdit, applicationWorkingDirectoryPathEdit, applicationWindowTitleEdit
 				   , applicationStartupEdit, applicationShutdownEdit, applicationIsRunningEdit))
 	}
 }
@@ -315,7 +315,7 @@ initializeApplicationsConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Applications"), new ApplicationsConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Applications"), ApplicationsConfigurator(editor, editor.Configuration))
 	}
 }
 

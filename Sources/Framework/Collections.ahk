@@ -53,7 +53,7 @@ reverse(list) {
 	return result
 }
 
-map(list, function) {
+collect(list, function) {
 	local result := []
 	local ignore, value
 
@@ -61,6 +61,13 @@ map(list, function) {
 		result.Push(%function%(value))
 
 	return result
+}
+
+do(list, function) {
+	local ignore, value
+
+	for ignore, value in list
+		%function%(value)
 }
 
 remove(list, object) {
@@ -83,13 +90,6 @@ removeDuplicates(list) {
 			result.Push(value)
 
 	return result
-}
-
-do(list, function) {
-	local ignore, value
-
-	for ignore, value in list
-		%function%(value)
 }
 
 combine(maps*) {
@@ -127,7 +127,7 @@ greaterComparator(a, b) {
 	return (a > b)
 }
 
-bubbleSort(&array, comparator := "greaterComparator") {
+bubbleSort(&array, comparator := greaterComparator) {
 	local n := array.Length
 	local newN, i, j, lineI, lineJ
 
@@ -138,7 +138,7 @@ bubbleSort(&array, comparator := "greaterComparator") {
 		while (++i < n) {
 			j := i + 1
 
-			if %comparator%(lineI := array[i], lineJ := array[j]) {
+			if comparator.Call(lineI := array[i], lineJ := array[j]) {
 				array[i] := lineJ
 				array[j] := lineI
 

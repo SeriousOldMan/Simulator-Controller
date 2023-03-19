@@ -30,7 +30,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 	iCachedActions := false
 
-	Pages[] {
+	Pages {
 		Get {
 			local wizard := this.SetupWizard
 			local count := 0
@@ -64,22 +64,22 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local function, action, ignore, assistant, assistantConfiguration, section, subConfiguration, arguments
 		local actions
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, assistant in this.Definition
 			if wizard.isModuleSelected(assistant) {
 				assistantActive := true
 
-				assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . assistant . " Configuration.ini")
+				assistantConfiguration := readMultiMap(kUserHomeDirectory . "Setup\" . assistant . " Configuration.ini")
 
 				for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 									  , "Race Strategist Startup", "Race Strategist Shutdown"
 									  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
 									  , "Race Spotter Analysis", "Race Spotter Announcements"] {
-					subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
+					subConfiguration := getMultiMapValues(assistantConfiguration, section, false)
 
 					if subConfiguration
-						setConfigurationSectionValues(configuration, section, subConfiguration)
+						setMultiMapValues(configuration, section, subConfiguration)
 				}
 
 				if (assistant = "Race Engineer")
@@ -93,7 +93,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 				actions := ""
 
-				for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
+				for ignore, action in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
 					if wizard.assistantActionAvailable(assistant, action) {
 						function := wizard.getAssistantActionFunction(assistant, action)
 
@@ -116,7 +116,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				else
 					arguments .= "; raceAssistantSpeaker: Off"
 
-				for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special"))
+				for ignore, action in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special"))
 					if wizard.assistantActionAvailable(assistant, action) {
 						function := wizard.getAssistantActionFunction(assistant, action)
 
@@ -204,9 +204,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			Gui %window%:Font, Norm, Arial
 
-			Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden, % values2String("|", map(["Action", "Label", "Function"], "translate")*)
+			Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden, % values2String("|", collect(["Action", "Label", "Function"], "translate")*)
 
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 			Sleep 200
@@ -221,11 +221,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			this.iActionsListViews.Push(actionsListViewHandle)
 
 			if (assistant = "Race Engineer")
-				configurator := new RaceEngineerConfigurator(this)
+				configurator := RaceEngineerConfigurator(this)
 			else if (assistant = "Race Strategist")
-				configurator := new RaceStrategistConfigurator(this)
+				configurator := RaceStrategistConfigurator(this)
 			else if (assistant = "Race Spotter")
-				configurator := new RaceSpotterConfigurator(this)
+				configurator := RaceSpotterConfigurator(this)
 			else
 				configurator := false
 
@@ -255,13 +255,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local index := inList(this.iAssistantConfigurators, page)
 
 		if index
-			base.registerWidget(index, widget)
+			super.registerWidget(index, widget)
 		else
-			base.registerWidget(page, widget)
+			super.registerWidget(page, widget)
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iControllerWidgets := []
 
@@ -279,23 +279,23 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		this.setActionsListView(this.iActionsListViews[page])
 
-		base.showPage(page)
+		super.showPage(page)
 
 		if !this.SetupWizard.isModuleSelected("Controller")
 			for ignore, widget in this.iControllerWidgets
 				GuiControl Hide, %widget%
 
 		configuration := this.SetupWizard.getSimulatorConfiguration()
-		assistantConfiguration := readConfiguration(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini")
+		assistantConfiguration := readMultiMap(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini")
 
 		for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 							  , "Race Strategist Startup", "Race Strategist Shutdown"
 							  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
 							  , "Race Spotter Analysis", "Race Spotter Announcements"] {
-			subConfiguration := getConfigurationSectionValues(assistantConfiguration, section, false)
+			subConfiguration := getMultiMapValues(assistantConfiguration, section, false)
 
 			if subConfiguration
-				setConfigurationSectionValues(configuration, section, subConfiguration)
+				setMultiMapValues(configuration, section, subConfiguration)
 		}
 
 		this.iAssistantConfigurators[page].loadConfigurator(configuration, this.getSimulators())
@@ -306,26 +306,26 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		page := this.TransposePage[page]
 
-		if base.hidePage(page) {
+		if super.hidePage(page) {
 			configurator := this.iAssistantConfigurators[page]
 
-			configuration := newConfiguration()
+			configuration := newMultiMap()
 
 			configurator.saveToConfiguration(configuration)
 
-			assistantConfiguration := newConfiguration()
+			assistantConfiguration := newMultiMap()
 
 			for ignore, section in ["Race Assistant Startup", "Race Assistant Shutdown", "Race Engineer Startup", "Race Engineer Shutdown"
 								  , "Race Strategist Startup", "Race Strategist Shutdown"
 								  , "Race Engineer Analysis", "Race Strategist Analysis", "Race Strategist Reports"
 								  , "Race Spotter Analysis", "Race Spotter Announcements"] {
-				subConfiguration := getConfigurationSectionValues(configuration, section, false)
+				subConfiguration := getMultiMapValues(configuration, section, false)
 
 				if subConfiguration
-					setConfigurationSectionValues(assistantConfiguration, section, subConfiguration)
+					setMultiMapValues(assistantConfiguration, section, subConfiguration)
 			}
 
-			writeConfiguration(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini", assistantConfiguration)
+			writeMultiMap(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini", assistantConfiguration)
 
 			return true
 		}
@@ -356,8 +356,8 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		else {
 			wizard := this.SetupWizard
 
-			actions := concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
-								 , string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special")))
+			actions := concatenate(string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
+								 , string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special")))
 
 			wizard.setModuleAvailableActions(this.iCurrentAssistant, false, actions)
 
@@ -371,7 +371,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local function, functions, ignore
 
-		base.setAction(row, mode, action, actionDescriptor, label, argument)
+		super.setAction(row, mode, action, actionDescriptor, label, argument)
 
 		functions := this.getActionFunction(false, action)
 
@@ -382,7 +382,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 	}
 
 	clearActionFunction(mode, action, function) {
-		base.clearActionFunction(mode, action, function)
+		super.clearActionFunction(mode, action, function)
 
 		this.SetupWizard.removeModuleStaticFunction(this.iCurrentAssistant, function)
 	}
@@ -442,17 +442,17 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					isInformationRequest := false
 				}
 
-				label := getConfigurationValue(pluginLabels, assistant, subAction . ".Toggle", kUndefined)
+				label := getMultiMapValue(pluginLabels, assistant, subAction . ".Toggle", kUndefined)
 
 				if (label == kUndefined) {
-					label := getConfigurationValue(pluginLabels, assistant, subAction . ".Activate", "")
+					label := getMultiMapValue(pluginLabels, assistant, subAction . ".Activate", "")
 
 					this.setAction(count, false, action, [isInformationRequest, "Activate"], label)
 
 					isBinary := false
 				}
 				else {
-					if (getConfigurationValue(pluginLabels, assistant, subAction . ".Increase", kUndefined) != kUndefined)
+					if (getMultiMapValue(pluginLabels, assistant, subAction . ".Increase", kUndefined) != kUndefined)
 						this.setAction(count, false, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 					else
 						this.setAction(count, false, action, [isInformationRequest, "Toggle", false, false], label)
@@ -512,7 +512,7 @@ updateAssistantActionFunction() {
 }
 
 initializeAssistantsStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new AssistantsStepWizard(SetupWizard.Instance, "Assistants", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(AssistantsStepWizard(SetupWizard.Instance, "Assistants", kSimulatorConfiguration))
 }
 
 

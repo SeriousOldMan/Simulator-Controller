@@ -65,9 +65,9 @@ readLanguage(targetLanguageCode) {
 	}
 
 	if isDebug()
-		throw "Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage..."
+		throw "Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage..."
 	else
-		logError("Inconsistent translation encountered for """ . targetLanguageCode . """ in readLanguage...")
+		logError("Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage...")
 }
 
 getTemperatureUnit(translate := false) {
@@ -318,7 +318,7 @@ internalTimeValue(time, arguments*) {
 	if (vTimeFormat = "S,##")
 		return StrReplace(time, ",", ".")
 	else if (vTimeFormat = "S.##")
-		return value
+		return time
 	else {
 		seconds := StrSplit(time, (vTimeFormat = "S,##") ? "," : ".")
 
@@ -355,17 +355,17 @@ internalTimeValue(time, arguments*) {
 initializeLocalization() {
 	global vMassUnit, vTemperatureUnit, vPressureUnit, vVolumeUnit, vLengthUnit, vSpeedUnit, vNumberFormat, vTimeFormat
 
-	local configuration := readConfiguration(kSimulatorConfigurationFile)
+	local configuration := readMultiMap(kSimulatorConfigurationFile)
 
-	vMassUnit := getConfigurationValue(configuration, "Localization", "MassUnit", "Kilogram")
-	vTemperatureUnit := getConfigurationValue(configuration, "Localization", "TemperatureUnit", "Celsius")
-	vPressureUnit := getConfigurationValue(configuration, "Localization", "PressureUnit", "PSI")
-	vVolumeUnit := getConfigurationValue(configuration, "Localization", "VolumeUnit", "Liter")
-	vLengthUnit := getConfigurationValue(configuration, "Localization", "LengthUnit", "Meter")
-	vSpeedUnit := getConfigurationValue(configuration, "Localization", "SpeedUnit", "km/h")
+	vMassUnit := getMultiMapValue(configuration, "Localization", "MassUnit", "Kilogram")
+	vTemperatureUnit := getMultiMapValue(configuration, "Localization", "TemperatureUnit", "Celsius")
+	vPressureUnit := getMultiMapValue(configuration, "Localization", "PressureUnit", "PSI")
+	vVolumeUnit := getMultiMapValue(configuration, "Localization", "VolumeUnit", "Liter")
+	vLengthUnit := getMultiMapValue(configuration, "Localization", "LengthUnit", "Meter")
+	vSpeedUnit := getMultiMapValue(configuration, "Localization", "SpeedUnit", "km/h")
 
-	vNumberFormat := getConfigurationValue(configuration, "Localization", "NumberFormat", "#.##")
-	vTimeFormat := getConfigurationValue(configuration, "Localization", "TimeFormat", "H:M:S.##")
+	vNumberFormat := getMultiMapValue(configuration, "Localization", "NumberFormat", "#.##")
+	vTimeFormat := getMultiMapValue(configuration, "Localization", "TimeFormat", "H:M:S.##")
 
 	if (vVolumeUnit = "Gallon")
 		vVolumeUnit := "Gallon (GB)"
@@ -377,7 +377,7 @@ initializeLocalization() {
 ;;;-------------------------------------------------------------------------;;;
 
 availableLanguages() {
-	local translations := map("en", "English")
+	local translations := collect("en", "English")
 	local ignore, fileName, languageCode
 
 	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
@@ -420,9 +420,9 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 			if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
 				if ((A_Index == 1) && (translations.Has(enString) && (translations[enString] != translation[2])))
 					if isDebug()
-						throw "Inconsistent translation encountered for """ . enString . """ in readTranslations..."
+						throw "Inconsistent translation encountered for `"" . enString . "`" in readTranslations..."
 					else
-						logError("Inconsistent translation encountered for """ . enString . """ in readTranslations...")
+						logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...")
 
 				translations[enString] := translation[2]
 		}

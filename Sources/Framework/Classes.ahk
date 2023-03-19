@@ -14,7 +14,7 @@
 #Include "..\Framework\Debug.ahk"
 #Include "..\Framework\Strings.ahk"
 #Include "..\Framework\Collections.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\MultiMap.ahk"
 #Include "..\Framework\Message.ahk"
 
 
@@ -29,7 +29,7 @@
 class ConfigurationItem {
 	iConfiguration := false
 
-	Configuration[] {
+	Configuration {
         Get {
             return this.iConfiguration
         }
@@ -84,49 +84,49 @@ class Application extends ConfigurationItem {
 
 	iRunningPID := 0
 
-	Application[] {
+	Application {
         Get {
             return this.iApplication
         }
     }
 
-	ExePath[] {
+	ExePath {
         Get {
             return this.iExePath
         }
     }
 
-	WorkingDirectory[] {
+	WorkingDirectory {
         Get {
             return this.iWorkingDirectory
         }
     }
 
-	WindowTitle[] {
+	WindowTitle {
         Get {
             return this.iWindowTitle
         }
     }
 
-	SpecialStartup[] {
+	SpecialStartup {
         Get {
             return this.iSpecialStartup
         }
     }
 
-	SpecialShutdown[] {
+	SpecialShutdown {
         Get {
             return this.iSpecialShutdown
         }
     }
 
-	SpecialIsRunning[] {
+	SpecialIsRunning {
         Get {
             return this.iSpecialIsRunning
         }
     }
 
-	CurrentPID[] {
+	CurrentPID {
 		Get {
 			if ((this.iRunningPID == 0) || (this.iRunningPID == -1))
 				this.iRunningPID := this.getProcessID()
@@ -144,17 +144,17 @@ class Application extends ConfigurationItem {
 		this.iSpecialShutdown := specialShutdown
 		this.iSpecialIsRunning := specialIsRunning
 
-		base.__New(configuration)
+		super.__New(configuration)
 	}
 
 	loadFromConfiguration(configuration) {
 		local exePath, workingDirectory
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.iExePath := getConfigurationValue(configuration, this.Application, "Exe Path", "")
-		this.iWorkingDirectory := getConfigurationValue(configuration, this.Application, "Working Directory", "")
-		this.iWindowTitle := getConfigurationValue(configuration, this.Application, "Window Title", "")
+		this.iExePath := getMultiMapValue(configuration, this.Application, "Exe Path", "")
+		this.iWorkingDirectory := getMultiMapValue(configuration, this.Application, "Working Directory", "")
+		this.iWindowTitle := getMultiMapValue(configuration, this.Application, "Window Title", "")
 
 		if ((this.iExePath != "") && (this.iWorkingDirectory == "")) {
 			exePath := this.iExePath
@@ -164,33 +164,33 @@ class Application extends ConfigurationItem {
 			this.iWorkingDirectory := workingDirectory
 		}
 
-		this.iSpecialStartup := getConfigurationValue(configuration, "Application Hooks"
+		this.iSpecialStartup := getMultiMapValue(configuration, "Application Hooks"
 													, ConfigurationItem.descriptor(this.Application, "Startup"), false)
-		this.iSpecialShutdown := getConfigurationValue(configuration, "Application Hooks"
+		this.iSpecialShutdown := getMultiMapValue(configuration, "Application Hooks"
 													 , ConfigurationItem.descriptor(this.Application, "Shutdown"), false)
-		this.iSpecialIsRunning := getConfigurationValue(configuration, "Application Hooks"
+		this.iSpecialIsRunning := getMultiMapValue(configuration, "Application Hooks"
 													  , ConfigurationItem.descriptor(this.Application, "Running"), false)
 	}
 
 	saveToConfiguration(configuration) {
 		local startHandler, shutdownHandler, runningHandler
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		setConfigurationValue(configuration, this.Application, "Exe Path", this.ExePath)
-		setConfigurationValue(configuration, this.Application, "Working Directory", this.WorkingDirectory)
-		setConfigurationValue(configuration, this.Application, "Window Title", this.WindowTitle)
+		setMultiMapValue(configuration, this.Application, "Exe Path", this.ExePath)
+		setMultiMapValue(configuration, this.Application, "Working Directory", this.WorkingDirectory)
+		setMultiMapValue(configuration, this.Application, "Window Title", this.WindowTitle)
 
 		startHandler := this.SpecialStartup
 		shutdownHandler := this.SpecialShutdown
 		runningHandler := this.SpecialIsRunning
 
 		if (startHandler && (startHandler != ""))
-			setConfigurationValue(configuration, "Application Hooks", ConfigurationItem.descriptor(this.Application, "Startup"), startHandler)
+			setMultiMapValue(configuration, "Application Hooks", ConfigurationItem.descriptor(this.Application, "Startup"), startHandler)
 		if (shutdownHandler && (shutdownHandler != ""))
-			setConfigurationValue(configuration, "Application Hooks", ConfigurationItem.descriptor(this.Application, "Shutdown"), shutdownHandler)
+			setMultiMapValue(configuration, "Application Hooks", ConfigurationItem.descriptor(this.Application, "Shutdown"), shutdownHandler)
 		if (runningHandler && (runningHandler != ""))
-			setConfigurationValue(configuration, "Application Hooks", ConfigurationItem.descriptor(this.Application, "Running"), runningHandler)
+			setMultiMapValue(configuration, "Application Hooks", ConfigurationItem.descriptor(this.Application, "Running"), runningHandler)
 	}
 
 	startup(special := true, wait := false, options := "") {
@@ -230,7 +230,7 @@ class Application extends ConfigurationItem {
 					WinClose("ahk_pid " . this.iRunningPID)
 					ProcessClose(this.iRunningPID)
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 			else if (this.ExePath != "")
@@ -311,7 +311,7 @@ class Application extends ConfigurationItem {
 				return pid
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			message := (IsObject(exception) ? exception.Message : exception)
 
 			logMessage(kLogCritical, translate("Error while starting application ") . application . translate(" (") . exePath . translate("): ") . message . " - please check the configuration")
@@ -333,25 +333,25 @@ class Function extends ConfigurationItem {
 	iHotkeys := {}
 	iActions := {}
 
-	Type[] {
+	Type {
 		Get {
 			throw "Virtual property Function.Type must be implemented in a subclass..."
 		}
 	}
 
-	Number[] {
+	Number {
 		Get {
 			return this.iNumber
 		}
 	}
 
-	Descriptor[] {
+	Descriptor {
 		Get {
 			return this.Type . "." . this.Number
 		}
 	}
 
-	Trigger[] {
+	Trigger {
 		Get {
 			throw "Virtual property Function.Trigger must be implemented in a subclass..."
 		}
@@ -480,15 +480,15 @@ class Function extends ConfigurationItem {
 			this.loadFromDescriptor(trigger . " Action", hotkeyActions[index++])
 		}
 
-		base.__New(configuration)
+		super.__New(configuration)
 	}
 
 	loadFromConfiguration(configuration) {
 		local functionDescriptor, descriptorValues
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for functionDescriptor, descriptorValues in getConfigurationSectionValues(configuration, "Controller Functions", Object()) {
+		for functionDescriptor, descriptorValues in getMultiMapValues(configuration, "Controller Functions") {
 			functionDescriptor := ConfigurationItem.splitDescriptor(functionDescriptor)
 
 			if ((functionDescriptor[1] == this.Type) && (functionDescriptor[2] == this.Number))
@@ -510,11 +510,11 @@ class Function extends ConfigurationItem {
 		local descriptor := this.Descriptor
 		local ignore, trigger
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, trigger in this.Trigger {
-			setConfigurationValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
-			setConfigurationValue(configuration, "Controller Functions", descriptor . "." . trigger . " Action", this.Actions[trigger, true])
+			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger, this.Hotkeys[trigger, true])
+			setMultiMapValue(configuration, "Controller Functions", descriptor . "." . trigger . " Action", this.Actions[trigger, true])
 		}
 	}
 
@@ -523,15 +523,15 @@ class Function extends ConfigurationItem {
 
 		switch descriptor[1] {
 			case k1WayToggleType:
-				return new 1WayToggleFunction(descriptor[2], configuration, onHotkeys, onAction)
+				return 1WayToggleFunction(descriptor[2], configuration, onHotkeys, onAction)
 			case k2WayToggleType:
-				return new 2WayToggleFunction(descriptor[2], configuration, onHotkeys, onAction, offHotkeys, offAction)
+				return 2WayToggleFunction(descriptor[2], configuration, onHotkeys, onAction, offHotkeys, offAction)
 			case kButtonType:
-				return new ButtonFunction(descriptor[2], configuration, onHotkeys, onAction)
+				return ButtonFunction(descriptor[2], configuration, onHotkeys, onAction)
 			case kDialType:
-				return new DialFunction(descriptor[2], configuration, onHotkeys, onAction, offHotkeys, offAction)
+				return DialFunction(descriptor[2], configuration, onHotkeys, onAction, offHotkeys, offAction)
 			case kCustomType:
-				return new CustomFunction(descriptor[2], configuration, onHotkeys, onAction)
+				return CustomFunction(descriptor[2], configuration, onHotkeys, onAction)
 			default:
 				throw "Unknown controller function (" . descriptor[1] . ") detected in Function.createFunction..."
 		}
@@ -590,13 +590,13 @@ class Function extends ConfigurationItem {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class 1WayToggleFunction extends Function {
-	Type[] {
+	Type {
 		Get {
 			return k1WayToggleType
 		}
 	}
 
-	Trigger[] {
+	Trigger {
 		Get {
 			return ["On"]
 		}
@@ -608,13 +608,13 @@ class 1WayToggleFunction extends Function {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class 2WayToggleFunction extends Function {
-	Type[] {
+	Type {
 		Get {
 			return k2WayToggleType
 		}
 	}
 
-	Trigger[] {
+	Trigger {
 		Get {
 			return ["On", "Off"]
 		}
@@ -626,13 +626,13 @@ class 2WayToggleFunction extends Function {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ButtonFunction extends Function {
-	Type[] {
+	Type {
 		Get {
 			return kButtonType
 		}
 	}
 
-	Trigger[] {
+	Trigger {
 		Get {
 			return ["Push"]
 		}
@@ -644,13 +644,13 @@ class ButtonFunction extends Function {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class DialFunction extends Function {
-	Type[] {
+	Type {
 		Get {
 			return kDialType
 		}
 	}
 
-	Trigger[] {
+	Trigger {
 		Get {
 			return ["Increase", "Decrease"]
 		}
@@ -662,13 +662,13 @@ class DialFunction extends Function {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CustomFunction extends Function {
-	Type[] {
+	Type {
 		Get {
 			return kCustomType
 		}
 	}
 
-	Trigger[] {
+	Trigger {
 		Get {
 			return ["Call"]
 		}
@@ -685,25 +685,25 @@ class Plugin extends ConfigurationItem {
 	iSimulators := []
 	iArguments := {}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iPlugin
 		}
 	}
 
-	Plugin[] {
+	Plugin {
 		Get {
 			return this.iPlugin
 		}
 	}
 
-	Active[] {
+	Active {
 		Get {
 			return this.iIsActive
 		}
 	}
 
-	Simulators[] {
+	Simulators {
 		Get {
 			return this.iSimulators
 		}
@@ -740,15 +740,15 @@ class Plugin extends ConfigurationItem {
 
 		this.iArguments := this.computeArgments(arguments)
 
-		base.__New(configuration)
+		super.__New(configuration)
 	}
 
 	loadFromConfiguration(configuration) {
 		local descriptor
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		descriptor := getConfigurationValue(configuration, "Plugins", this.Plugin, "")
+		descriptor := getMultiMapValue(configuration, "Plugins", this.Plugin, "")
 
 		if (StrLen(descriptor) > 0) {
 			descriptor := StrSplit(descriptor, "|", " `t", 3)
@@ -762,9 +762,9 @@ class Plugin extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		setConfigurationValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . this.Arguments[true])
+		setMultiMapValue(configuration, "Plugins", this.Plugin, (this.Active ? kTrue : kFalse) . "|" . values2String(", ", this.Simulators*) . "|" . this.Arguments[true])
 	}
 
 	computeArgments(arguments) {

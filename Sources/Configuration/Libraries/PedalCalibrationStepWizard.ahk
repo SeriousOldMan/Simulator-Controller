@@ -24,7 +24,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 	iCachedActions := false
 	iPedalsCheck := {}
 
-	Pages[] {
+	Pages {
 		Get {
 			local wizard := this.SetupWizard
 
@@ -41,7 +41,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		local calibrations := []
 		local function, ignore, action
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, action in this.getActions() {
 			function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
@@ -102,7 +102,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		allPedals := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals"))
+		allPedals := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals"))
 		pedals := wizard.getModuleValue("Pedal Calibration", "Pedals", kUndefined)
 
 		if (pedals == kUndefined)
@@ -131,9 +131,9 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h260 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDpedalCalibrationListViewHandle gupdatePedalCalibrationActionFunction Hidden, % values2String("|", map(["Mode", "Pedal", "Action", "Label", "Function"], "translate")*)
+		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h260 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDpedalCalibrationListViewHandle gupdatePedalCalibrationActionFunction Hidden, % values2String("|", collect(["Mode", "Pedal", "Action", "Label", "Function"], "translate")*)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -151,7 +151,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iCachedActions := false
 		this.iPedalsCheck := {}
@@ -171,7 +171,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				return false
 		}
 
-		return base.hidePage(page)
+		return super.hidePage(page)
 	}
 
 	getModule() {
@@ -198,10 +198,10 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				pedals := wizard.getModuleValue("Pedal Calibration", "Pedals", kUndefined)
 
 				if (pedals == kUndefined)
-					pedals := values2String("|", string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals"))*)
+					pedals := values2String("|", string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals"))*)
 
 				for ignore, pedal in string2Values("|", pedals)
-					for ignore, curve in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves"))
+					for ignore, curve in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Curves"))
 						actions.Push(pedal . "." . curve)
 
 				wizard.setModuleAvailableActions("Pedal Calibration", "Pedal Calibration", actions)
@@ -309,7 +309,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		wizard.setModuleAvailableActions("Pedal Calibration", "Pedal Calibration", [])
 
-		for ignore, pedal in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals")) {
+		for ignore, pedal in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals")) {
 			GuiControlGet checked, , % this.iPedalsCheck[pedal]
 
 			if checked
@@ -336,7 +336,7 @@ updatePedalCalibrationActionFunction() {
 }
 
 initializePedalCalibrationStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new PedalCalibrationStepWizard(SetupWizard.Instance, "Pedal Calibration", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(PedalCalibrationStepWizard(SetupWizard.Instance, "Pedal Calibration", kSimulatorConfiguration))
 }
 
 

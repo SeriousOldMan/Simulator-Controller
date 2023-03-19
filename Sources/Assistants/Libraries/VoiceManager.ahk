@@ -79,13 +79,13 @@ class VoiceManager {
 		iText := ""
 		iFocus := false
 
-		VoiceManager[] {
+		VoiceManager {
 			Get {
 				return this.iVoiceManager
 			}
 		}
 
-		Speaking[] {
+		Speaking {
 			Get {
 				return this.VoiceManager.Speaking
 			}
@@ -95,7 +95,7 @@ class VoiceManager {
 			}
 		}
 
-		Talking[] {
+		Talking {
 			Get {
 				return this.iIsTalking
 			}
@@ -201,21 +201,21 @@ class VoiceManager {
 		iText := ""
 		iFocus := false
 
-		Routing[] {
+		Routing {
 			Get {
 				return this.VoiceManager.Routing
 			}
 		}
 
-		VoiceManager[] {
+		VoiceManager {
 			Get {
 				return this.iVoiceManager
 			}
 		}
 
-		Speaking[] {
+		Speaking {
 			Get {
-				return (this.VoiceManager.Speaking || base.Speaking)
+				return (this.VoiceManager.Speaking || super.Speaking)
 			}
 
 			Set {
@@ -223,7 +223,7 @@ class VoiceManager {
 			}
 		}
 
-		Talking[] {
+		Talking {
 			Get {
 				return this.iIsTalking
 			}
@@ -252,7 +252,7 @@ class VoiceManager {
 			this.iFragments := fragments
 			this.iPhrases := phrases
 
-			base.__New(synthesizer, speaker, language)
+			super.__New(synthesizer, speaker, language)
 		}
 
 		beginTalk() {
@@ -289,7 +289,7 @@ class VoiceManager {
 					this.Speaking := true
 
 					try {
-						base.speak(text, !this.Awaitable, cache)
+						super.speak(text, !this.Awaitable, cache)
 					}
 					finally {
 						this.Speaking := false
@@ -340,13 +340,13 @@ class VoiceManager {
 	class LocalRecognizer extends SpeechRecognizer {
 		iVoiceManager := false
 
-		Routing[] {
+		Routing {
 			Get {
 				return this.VoiceManager.Routing
 			}
 		}
 
-		VoiceManager[] {
+		VoiceManager {
 			Get {
 				return this.iVoiceManager
 			}
@@ -355,7 +355,7 @@ class VoiceManager {
 		__New(voiceManager, arguments*) {
 			this.iVoiceManager := voiceManager
 
-			base.__New(arguments*)
+			super.__New(arguments*)
 		}
 	}
 
@@ -363,13 +363,13 @@ class VoiceManager {
 		iManager := false
 		iContinuation := false
 
-		Manager[] {
+		Manager {
 			Get {
 				return this.iManager
 			}
 		}
 
-		Continuation[] {
+		Continuation {
 			Get {
 				return this.iContinuation
 			}
@@ -397,13 +397,13 @@ class VoiceManager {
 		iAccept := false
 		iReject := false
 
-		Accept[] {
+		Accept {
 			Get {
 				return this.iAccept
 			}
 		}
 
-		Reject[] {
+		Reject {
 			Get {
 				return this.iReject
 			}
@@ -413,21 +413,21 @@ class VoiceManager {
 			this.iAccept := accept
 			this.iReject := reject
 
-			base.__New(manager, continuation)
+			super.__New(manager, continuation)
 		}
 
 		continue() {
 			if (this.Manager.Speaker && this.Accept)
 				this.Manager.getSpeaker().speakPhrase(this.Accept)
 
-			base.continue()
+			super.continue()
 		}
 
 		cancel() {
 			if (this.Manager.Speaker && this.Reject)
 				this.Manager.getSpeaker().speakPhrase(this.Reject)
 
-			base.cancel()
+			super.cancel()
 		}
 	}
 
@@ -437,31 +437,31 @@ class VoiceManager {
 		}
 	}
 
-	VoiceServer[] {
+	VoiceServer {
 		Get {
 			return this.iVoiceServer
 		}
 	}
 
-	Language[] {
+	Language {
 		Get {
 			return this.iLanguage
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	Routing[] {
+	Routing {
 		Get {
 			throw "Virtual property VoiceManager.Routing must be implemented in a subclass..."
 		}
 	}
 
-	Synthesizer[] {
+	Synthesizer {
 		Get {
 			return this.iSynthesizer
 		}
@@ -483,7 +483,7 @@ class VoiceManager {
 		}
 	}
 
-	Speaking[] {
+	Speaking {
 		Get {
 			return this.iIsSpeaking
 		}
@@ -493,61 +493,61 @@ class VoiceManager {
 		}
 	}
 
-	Recognizer[] {
+	Recognizer {
 		Get {
 			return this.iRecognizer
 		}
 	}
 
-	Listener[] {
+	Listener {
 		Get {
 			return this.iListener
 		}
 	}
 
-	Listening[] {
+	Listening {
 		Get {
 			return this.iIsListening
 		}
 	}
 
-	SpeakerVolume[] {
+	SpeakerVolume {
 		Get {
 			return this.iSpeakerVolume
 		}
 	}
 
-	SpeakerPitch[] {
+	SpeakerPitch {
 		Get {
 			return this.iSpeakerPitch
 		}
 	}
 
-	SpeakerSpeed[] {
+	SpeakerSpeed {
 		Get {
 			return this.iSpeakerSpeed
 		}
 	}
 
-	Grammars[] {
+	Grammars {
 		Get {
 			return this.iGrammars
 		}
 	}
 
-	PushToTalk[] {
+	PushToTalk {
 		Get {
 			return this.iPushToTalk
 		}
 	}
 
-	User[] {
+	User {
 		Get {
 			throw "Virtual property VoiceManager.User must be implemented in a subclass..."
 		}
 	}
 
-	Continuation[] {
+	Continuation {
 		Get {
 			return this.iContinuation
 		}
@@ -667,7 +667,7 @@ class VoiceManager {
 
 				pid := ErrorLevel
 
-				activationCommand := getConfigurationValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
+				activationCommand := getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
 				sendMessage(kFileMessage, "Voice"
@@ -679,12 +679,12 @@ class VoiceManager {
 																	  , this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
 						  , this.VoiceServer)
 
-				this.iSpeechSynthesizer := new this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+				this.iSpeechSynthesizer := this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
 																, this.buildFragments(this.Language)
 																, this.buildPhrases(this.Language))
 			}
 			else {
-				this.iSpeechSynthesizer := new this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+				this.iSpeechSynthesizer := this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
 															   , this.buildFragments(this.Language)
 															   , this.buildPhrases(this.Language))
 
@@ -710,7 +710,7 @@ class VoiceManager {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				recognizer := new this.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language)
+				recognizer := this.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language)
 
 				this.buildGrammars(recognizer, this.Language)
 
@@ -765,7 +765,7 @@ class VoiceManager {
 			try {
 				FileAppend TRUE, %kTempDirectory%Voice.mute
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 	}
@@ -786,7 +786,7 @@ class VoiceManager {
 		local grammars := this.getGrammars(language)
 		local fragment, word
 
-		for fragment, word in getConfigurationSectionValues(grammars, "Fragments", {})
+		for fragment, word in getMultiMapValues(grammars, "Fragments")
 			fragments[fragment] := word
 
 		return fragments
@@ -797,7 +797,7 @@ class VoiceManager {
 		local grammars := this.getGrammars(language)
 		local key, value
 
-		for key, value in getConfigurationSectionValues(grammars, section, {}) {
+		for key, value in getMultiMapValues(grammars, section) {
 			key := ConfigurationItem.splitDescriptor(key)[1]
 
 			if this.Debug[kDebugPhrases]
@@ -816,13 +816,13 @@ class VoiceManager {
 		local grammars := this.getGrammars(language)
 		local grammar, definition, name, choices, nextCharIndex
 
-		for name, choices in getConfigurationSectionValues(grammars, "Choices", {})
+		for name, choices in getMultiMapValues(grammars, "Choices")
 			if speechRecognizer
 				speechRecognizer.setChoices(name, choices)
 			else
 				sendMessage(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
 
-		for grammar, definition in getConfigurationSectionValues(grammars, "Listener Grammars", {}) {
+		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})
 
 			this.Grammars[grammar] := definition
@@ -838,7 +838,7 @@ class VoiceManager {
 					if !speechRecognizer.loadGrammar(grammar, speechRecognizer.compileGrammar(definition), ObjBindMethod(this, "raisePhraseRecognized"))
 						throw "Recognizer not running..."
 				}
-				catch exception {
+				catch Any as exception {
 					logMessage(kLogCritical, translate("Error while registering voice command """) . definition . translate(""" - please check the configuration"))
 
 					showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: definition})
@@ -854,7 +854,7 @@ class VoiceManager {
 			try {
 				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)^
 			}
 		else

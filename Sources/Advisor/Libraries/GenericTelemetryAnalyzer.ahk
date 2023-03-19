@@ -48,13 +48,13 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	iAnalyzerPID := false
 
-	Car[] {
+	Car {
 		Get {
 			return this.iCar
 		}
 	}
 
-	Track[] {
+	Track {
 		Get {
 			return this.iTrack
 		}
@@ -102,7 +102,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	LowspeedThreshold[] {
+	LowspeedThreshold {
 		Get {
 			return this.iLowspeedThreshold
 		}
@@ -114,7 +114,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	SteerLock[] {
+	SteerLock {
 		Get {
 			return this.iSteerLock
 		}
@@ -126,7 +126,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	SteerRatio[] {
+	SteerRatio {
 		Get {
 			return this.iSteerRatio
 		}
@@ -138,7 +138,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	Wheelbase[] {
+	Wheelbase {
 		Get {
 			return this.iWheelbase
 		}
@@ -150,7 +150,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	TrackWidth[] {
+	TrackWidth {
 		Get {
 			return this.iTrackWidth
 		}
@@ -165,12 +165,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	__New(advisor, simulator) {
 		local selectedCar := advisor.SelectedCar[false]
 		local selectedTrack := advisor.SelectedTrack[false]
-		local defaultUndersteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
-		local defaultOversteerThresholds := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
-		local defaultLowspeedThreshold := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
+		local defaultUndersteerThresholds := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
+		local defaultOversteerThresholds := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
+		local defaultLowspeedThreshold := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
 
-		simulator := new SessionDatabase().getSimulatorName(simulator)
+		simulator := SessionDatabase().getSimulatorName(simulator)
 
 		if (selectedCar == true)
 			selectedCar := false
@@ -181,55 +181,55 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iCar := selectedCar
 		this.iTrack := selectedTrack
 
-		this.iSteerLock := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerLock", 900)
-		this.iSteerRatio := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "SteerRatio", 12)
-		this.iWheelbase := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "Wheelbase", 270)
-		this.iTrackWidth := getConfigurationValue(advisor.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
+		this.iSteerLock := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "SteerLock", 900)
+		this.iSteerRatio := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "SteerRatio", 12)
+		this.iWheelbase := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "Wheelbase", 270)
+		this.iTrackWidth := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
 
 		if selectedCar {
 			fileName := getFileName("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
 
 			if FileExist(fileName) {
-				configuration := readConfiguration(fileName)
+				configuration := readMultiMap(fileName)
 
-				this.iSteerLock := getConfigurationValue(configuration, "Setup.General", "SteerLock", this.SteerLock)
-				this.iSteerRatio := getConfigurationValue(configuration, "Setup.General", "SteerRatio", this.SteerRatio)
-				this.iWheelbase := getConfigurationValue(configuration, "Setup.General", "Wheelbase", this.Wheelbase)
-				this.iTrackWidth := getConfigurationValue(configuration, "Setup.General", "TrackWidth", this.TrackWidth)
+				this.iSteerLock := getMultiMapValue(configuration, "Setup.General", "SteerLock", this.SteerLock)
+				this.iSteerRatio := getMultiMapValue(configuration, "Setup.General", "SteerRatio", this.SteerRatio)
+				this.iWheelbase := getMultiMapValue(configuration, "Setup.General", "Wheelbase", this.Wheelbase)
+				this.iTrackWidth := getMultiMapValue(configuration, "Setup.General", "TrackWidth", this.TrackWidth)
 
-				defaultUndersteerThresholds := getConfigurationValue(configuration, "Analyzer", "UndersteerThresholds", defaultUndersteerThresholds)
-				defaultOversteerThresholds := getConfigurationValue(configuration, "Analyzer", "OversteerThresholds", defaultOversteerThresholds)
-				defaultLowspeedThreshold := getConfigurationValue(configuration, "Analyzer", "LowspeedThreshold", defaultLowspeedThreshold)
+				defaultUndersteerThresholds := getMultiMapValue(configuration, "Analyzer", "UndersteerThresholds", defaultUndersteerThresholds)
+				defaultOversteerThresholds := getMultiMapValue(configuration, "Analyzer", "OversteerThresholds", defaultOversteerThresholds)
+				defaultLowspeedThreshold := getMultiMapValue(configuration, "Analyzer", "LowspeedThreshold", defaultLowspeedThreshold)
 			}
 		}
 
-		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".*.")
 
-		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
-		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
-		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
-		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+		this.iSteerLock := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getMultiMapValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getMultiMapValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
 
-		defaultUndersteerThresholds := getConfigurationValue(settings, "Setup Advisor", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
-		defaultOversteerThresholds := getConfigurationValue(settings, "Setup Advisor", prefix . "OversteerThresholds", defaultOversteerThresholds)
-		defaultLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+		defaultUndersteerThresholds := getMultiMapValue(settings, "Setup Advisor", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
+		defaultOversteerThresholds := getMultiMapValue(settings, "Setup Advisor", prefix . "OversteerThresholds", defaultOversteerThresholds)
+		defaultLowspeedThreshold := getMultiMapValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
-		this.iSteerLock := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
-		this.iSteerRatio := getConfigurationValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
-		this.iWheelbase := getConfigurationValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
-		this.iTrackWidth := getConfigurationValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+		this.iSteerLock := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getMultiMapValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getMultiMapValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
 
-		this.iUndersteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
+		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Advisor"
 																					   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
-		this.iOversteerThresholds := string2Values(",", getConfigurationValue(settings, "Setup Advisor"
+		this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Advisor"
 																					  , prefix . "OversteerThresholds", defaultOversteerThresholds))
-		this.iLowspeedThreshold := getConfigurationValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+		this.iLowspeedThreshold := getMultiMapValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
-		base.__New(advisor, simulator)
+		super.__New(advisor, simulator)
 
 		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
 	}
@@ -244,7 +244,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		if telemetry {
 			advisor := this.Advisor
-			characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
+			characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
 			severities := {Light: 33, Medium: 50, Heavy: 66}
 			characteristics := {}
 			count := 0
@@ -260,13 +260,13 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, severity in ["Light", "Medium", "Heavy"]
 						for ignore, key in ["Entry", "Apex", "Exit"]
-							maxValue := Max(maxValue, getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, 0))
+							maxValue := Max(maxValue, getMultiMapValue(telemetry, type . "." . speed . "." . severity, key, 0))
 
 			for ignore, type in ["Oversteer", "Understeer"]
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, severity in ["Light", "Medium", "Heavy"]
 						for ignore, key in ["Entry", "Apex", "Exit"] {
-							value := getConfigurationValue(telemetry, type . "." . speed . "." . severity, key, false)
+							value := getMultiMapValue(telemetry, type . "." . speed . "." . severity, key, false)
 
 							if value {
 								characteristic := (type . ".Corner." . key . "." . speed)
@@ -343,11 +343,11 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable("TrackWidth")
 					options .= (A_Space . this.TrackWidth)
 
-				code := new SessionDatabase().getSimulatorCode(this.Simulator)
+				code := SessionDatabase().getSimulatorCode(this.Simulator)
 
 				Run %kBinariesDirectory%%code% SHM Spotter.exe %options%, %kBinariesDirectory%, UserErrorLevel Hide, pid
 			}
-			catch exception {
+			catch Any as exception {
 				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
 													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
 
@@ -397,11 +397,11 @@ setAnalyzerSetting(analyzer, key, value) {
 	local car := analyzer.Car
 	local track := analyzer.Track
 	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . "." . (track ? track : "*") . ".")
-	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-	setConfigurationValue(settings, "Setup Advisor", prefix . key, value)
+	setMultiMapValue(settings, "Setup Advisor", prefix . key, value)
 
-	writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+	writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 }
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
@@ -561,7 +561,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzer.startTelemetryAnalyzer(dataFile)
 
-		updateTask := new PeriodicTask(Func("runAnalyzer").Bind("UpdateIssues"), 5000)
+		updateTask := PeriodicTask(Func("runAnalyzer").Bind("UpdateIssues"), 5000)
 
 		updateTask.start()
 	}
@@ -592,7 +592,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		tries := 10
 
 		while (tries-- > 0) {
-			data := readConfiguration(dataFile)
+			data := readMultiMap(dataFile)
 
 			if (data.Count() > 0) {
 				runAnalyzer("UpdateTelemetry", data)
@@ -605,7 +605,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 	else if (commandOrAnalyzer == "FilterTelemetry") {
 		advisor := analyzer.Advisor
-		characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
+		characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
 		final := ((arguments.Length() > 0) && arguments[1])
 
 		Gui TAN:Default
@@ -614,13 +614,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		GuiControlGet applyThresholdSlider
 
-		data := readConfiguration(dataFile)
+		data := readMultiMap(dataFile)
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
 				for ignore, severity in ["Light", "Medium", "Heavy"]
 					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getConfigurationValue(data, type . "." . speed . "." . severity, key, kUndefined)
+						value := getMultiMapValue(data, type . "." . speed . "." . severity, key, kUndefined)
 
 						include := ((value != kUndefined) && (value >= applyThresholdSlider))
 
@@ -645,14 +645,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						}
 
 						if !include
-							setConfigurationValue(data, type . "." . speed . "." . severity, key, 0)
+							setMultiMapValue(data, type . "." . speed . "." . severity, key, 0)
 					}
 
 		return data
 	}
 	else if (commandOrAnalyzer == "UpdateTelemetry") {
 		advisor := analyzer.Advisor
-		characteristicLabels := getConfigurationSectionValues(advisor.Definition, "Setup.Characteristics.Labels")
+		characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
 		data := arguments[1]
 
 		Gui TAN:Default
@@ -665,7 +665,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			for ignore, speed in ["Slow", "Fast"]
 				for ignore, severity in ["Light", "Medium", "Heavy"]
 					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getConfigurationValue(data, type . "." . speed . "." . severity, key, false)
+						value := getMultiMapValue(data, type . "." . speed . "." . severity, key, false)
 
 						if value {
 							characteristic := (type . ".Corner." . key . "." . speed)
@@ -818,7 +818,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 33
 			prepareWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", collect(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
 
 		issuesListView := widget1
 
@@ -831,7 +831,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		loop 2
 			runWidgets.Push(widget%A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h230 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", map(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys w320 h230 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", collect(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
 
 		resultListView := widget1
 
@@ -915,7 +915,7 @@ runCalibrator(commandOrAnalyzer) {
 	else if ((commandOrAnalyzer == "Activate") && (state = "Clean")) {
 		analyzer.stopTelemetryAnalyzer()
 
-		cleanValues := readConfiguration(dataFile)
+		cleanValues := readMultiMap(dataFile)
 
 		GuiControl, , infoText, % translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press ""Finish"".")
 		GuiControl, , activateButton, % translate("Finish")
@@ -929,7 +929,7 @@ runCalibrator(commandOrAnalyzer) {
 	else if ((commandOrAnalyzer == "Activate") && (state = "Push")) {
 		analyzer.stopTelemetryAnalyzer()
 
-		overValues := readConfiguration(dataFile)
+		overValues := readMultiMap(dataFile)
 
 		result := [cleanValues, overValues]
 	}
@@ -993,7 +993,7 @@ runCalibrator(commandOrAnalyzer) {
 
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getConfigurationValue(result[1], type . "." . speed, key, kUndefined)
+						value := getMultiMapValue(result[1], type . "." . speed, key, kUndefined)
 
 						if (value && (value != kUndefined))
 							if (type = "Understeer")
@@ -1008,7 +1008,7 @@ runCalibrator(commandOrAnalyzer) {
 
 				for ignore, speed in ["Slow", "Fast"]
 					for ignore, key in ["Entry", "Apex", "Exit"] {
-						value := getConfigurationValue(result[2], type . "." . speed, key, kUndefined)
+						value := getMultiMapValue(result[2], type . "." . speed, key, kUndefined)
 
 						if (value && (value != kUndefined))
 							if (type = "Understeer")

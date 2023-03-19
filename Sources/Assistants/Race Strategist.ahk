@@ -168,8 +168,8 @@ startRaceStrategist() {
 	if debug
 		setDebug(true)
 
-	strategist := new RaceStrategist(kSimulatorConfiguration
-								   , remotePID ? new RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
+	strategist := RaceStrategist(kSimulatorConfiguration
+								   , remotePID ? RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
 								   , strategistName, strategistLanguage
 								   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics
 								   , strategistRecognizer, strategistListener, strategistMuted, voiceServer)
@@ -206,7 +206,7 @@ startRaceStrategist() {
 		showLogo(strategistName)
 
 	if remotePID
-		Task.startTask(new PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
 
 	return
 }

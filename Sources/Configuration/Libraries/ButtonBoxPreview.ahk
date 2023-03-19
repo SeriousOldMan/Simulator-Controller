@@ -42,31 +42,31 @@ class ButtonBoxPreview extends ControllerPreview {
 	iFunctions := {}
 	iLabels := {}
 
-	Type[] {
+	Type {
 		Get {
 			return "Button Box"
 		}
 	}
 
-	RowMargin[] {
+	RowMargin {
 		Get {
 			return this.iRowMargin
 		}
 	}
 
-	ColumnMargin[] {
+	ColumnMargin {
 		Get {
 			return this.iColumnMargin
 		}
 	}
 
-	SidesMargin[] {
+	SidesMargin {
 		Get {
 			return this.iSidesMargin
 		}
 	}
 
-	BottomMargin[] {
+	BottomMargin {
 		Get {
 			return this.iBottomMargin
 		}
@@ -143,7 +143,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				descriptor := string2Values(",", descriptor)
 
 				if (descriptor.Length() > 1) {
-					label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+					label := string2Values("x", getMultiMapValue(this.Configuration, "Labels", descriptor[2], ""))
 					labelWidth := label[1]
 					labelHeight := label[2]
 				}
@@ -159,7 +159,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				else {
 					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
 					number := descriptor[2]
-					descriptor := getConfigurationValue(this.Configuration, "Controls", descriptor[1], "")
+					descriptor := getMultiMapValue(this.Configuration, "Controls", descriptor[1], "")
 				}
 
 				descriptor := string2Values(";", descriptor)
@@ -221,7 +221,7 @@ class ButtonBoxPreview extends ControllerPreview {
 	}
 
 	loadFromConfiguration(configuration) {
-		local layout := string2Values(",", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
+		local layout := string2Values(",", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
 		local rows := []
 
 		if (layout.Length() > 1)
@@ -242,7 +242,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		this.Columns := layout[2]
 
 		loop % this.Rows
-			rows.Push(string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
+			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
 
 		this.iRowDefinitions := rows
 	}
@@ -272,7 +272,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				descriptor := string2Values(",", descriptor)
 
 				if (descriptor.Length() > 1) {
-					label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+					label := string2Values("x", getMultiMapValue(this.Configuration, "Labels", descriptor[2], ""))
 					labelWidth := label[1]
 					labelHeight := label[2]
 				}
@@ -284,7 +284,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				if (descriptor[1] = "Empty.0")
 					descriptor := kEmptySpaceDescriptor
 				else
-					descriptor := getConfigurationValue(this.Configuration, "Controls"
+					descriptor := getMultiMapValue(this.Configuration, "Controls"
 													  , ConfigurationItem.splitDescriptor(descriptor[1])[1], "")
 
 				descriptor := string2Values(";", descriptor)
@@ -360,7 +360,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				descriptor := string2Values(",", descriptor)
 
 				if (descriptor.Length() > 1) {
-					label := string2Values("x", getConfigurationValue(this.Configuration, "Labels", descriptor[2], ""))
+					label := string2Values("x", getMultiMapValue(this.Configuration, "Labels", descriptor[2], ""))
 					labelWidth := label[1]
 					labelHeight := label[2]
 				}
@@ -378,7 +378,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					descriptor := ConfigurationItem.splitDescriptor(descriptor[1])
 					name := descriptor[1]
 					number := descriptor[2]
-					descriptor := getConfigurationValue(this.Configuration, "Controls", descriptor[1], "")
+					descriptor := getMultiMapValue(this.Configuration, "Controls", descriptor[1], "")
 				}
 
 				descriptor := string2Values(";", descriptor)
@@ -447,7 +447,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		local function := ConfigurationItem.splitDescriptor(element[2])
 		local control, descriptor
 
-		for control, descriptor in getConfigurationSectionValues(this.Configuration, "Controls")
+		for control, descriptor in getMultiMapValues(this.Configuration, "Controls")
 			if (control = function[1]) {
 				function := ConfigurationItem.descriptor(string2Values(";", descriptor)[1], function[2])
 
@@ -468,7 +468,7 @@ class ButtonBoxPreview extends ControllerPreview {
 			try {
 				Menu MainMenu, DeleteAll
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -483,7 +483,7 @@ class ButtonBoxPreview extends ControllerPreview {
 			try {
 				Menu ControlMenu, DeleteAll
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -508,7 +508,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				try {
 					Menu NumberMenu, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -528,7 +528,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					try {
 						Menu %menu%, DeleteAll
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 					}
 
@@ -559,7 +559,7 @@ class ButtonBoxPreview extends ControllerPreview {
 				try {
 					Menu LabelMenu, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 

@@ -14,6 +14,14 @@ global vLogLevel := kLogWarn
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Public Constants Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global SupportMenu := Menu()
+global LogMenu := Menu()
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -30,9 +38,6 @@ global vLogLevel := kLogWarn
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Public Constants Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-global SupportMenu := Menu()
-global LogMenu := Menu()
 
 /* Must be defined in Constants.ahk due to circular loading problems...
 global kLogDebug := 1
@@ -63,9 +68,15 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
-	"".base.__Get := "".base.__Set := "".base.__Call := reportNonObjectUsage
+	; "".base.__Get := "".base.__Set := "".base.__Call := reportNonObjectUsage
 
-	OnError(logError.Bind(true))
+	; OnError(logUnhandledError)
+}
+
+logUnhandledError(error, *) {
+	logError(error, true)
+
+	return -1
 }
 
 
@@ -96,7 +107,7 @@ logMessage(logLevel, message) {
 
 	local script := StrSplit(A_ScriptName, ".")[1]
 	local time := A_Now
-	local level, fileName, directory, tries, logTime, logLine
+	local level, fileName, directory, tries, logTime, logLine, pid
 
 	static sending := false
 
@@ -134,18 +145,20 @@ logMessage(logLevel, message) {
 
 				break
 			}
-			catch exception {
+			catch Any as exception {
 				Sleep(1)
 
 				tries -= 1
 			}
 
 		if (!sending && (script != "System Monitor")) {
-			if ProcessExist("System Monitor.exe") {
+			pid := ProcessExist("System Monitor.exe")
+
+			if pid {
 				sending := true
 
 				try {
-					messageSend(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), ErrorLevel)
+					messageSend(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), pid)
 				}
 				finally {
 					sending := false
@@ -178,11 +191,11 @@ logError(exception, unhandled := false) {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-toggleDebug() {
+toggleDebug(*) {
 	setDebug(!isDebug())
 }
 
-setDebug(debug) {
+setDebug(debug, *) {
 	global SupportMenu, vDebug
 	local title, state
 
@@ -202,7 +215,7 @@ setDebug(debug) {
 	vDebug := debug
 }
 
-setLogLevel(level) {
+setLogLevel(level, *) {
 	global LogMenu, vLogLevel
 
 	local ignore, title, state
@@ -256,11 +269,11 @@ setLogLevel(level) {
 		LogMenu.Check(state)
 }
 
-increaseLogLevel() {
+increaseLogLevel(*) {
 	setLogLevel(getLogLevel() - 1)
 }
 
-decreaseLogLevel() {
+decreaseLogLevel(*) {
 	setLogLevel(getLogLevel() + 1)
 }
 

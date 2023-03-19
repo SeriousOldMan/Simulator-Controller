@@ -40,15 +40,15 @@ global vBuildConfiguration := "Development"
 
 class TestRaceStrategist extends RaceStrategist {
 	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
-		base.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
+		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
 	}
 
 	createKnowledgeBase(facts) {
-		local knowledgeBase := base.createKnowledgeBase(facts)
+		local knowledgeBase := super.createKnowledgeBase(facts)
 
-		knowledgeBase.addRule(new RuleCompiler().compileRule("carNumber(?car, ?car)"))
+		knowledgeBase.addRule(RuleCompiler().compileRule("carNumber(?car, ?car)"))
 
 		return knowledgeBase
 	}
@@ -56,10 +56,10 @@ class TestRaceStrategist extends RaceStrategist {
 
 class BasicReporting extends Assert {
 	BasisTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
 				break
@@ -98,10 +98,10 @@ class BasicReporting extends Assert {
 	}
 
 	StandingsMemoryTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
 				break
@@ -157,10 +157,10 @@ class GapReporting extends Assert {
 	}
 
 	StandingsGapTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
 				break
@@ -190,10 +190,10 @@ class GapReporting extends Assert {
 	}
 
 	TrackGapTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
 				break
@@ -225,10 +225,10 @@ class GapReporting extends Assert {
 
 class PositionProjection extends Assert {
 	PositionProjectionTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
 				break
@@ -268,10 +268,10 @@ class PositionProjection extends Assert {
 
 class PitstopRecommendation extends Assert {
 	PitstopRecommendationTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
 			if (data.Count() == 0)
 				break
@@ -321,8 +321,8 @@ if !GetKeyState("Ctrl") {
 }
 else {
 	raceNr := 17
-	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
+	strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
+									   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
 
 	strategist.VoiceManager.setDebug(kDebugGrammars, false)
 
@@ -333,7 +333,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -374,7 +374,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -409,7 +409,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (lap == 1 && A_Index == 1)
 					strategist.prepareSession(false, data)

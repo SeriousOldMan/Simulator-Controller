@@ -40,8 +40,8 @@ class SettingsDatabase extends SessionDatabase {
 		if (this.iLastSimulator != simulator) {
 			this.iLastSimulator := simulator
 
-			this.iUserDatabase := new Database(this.DatabasePath . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
-			this.iCommunityDatabase := new Database(this.DatabasePath . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
+			this.iUserDatabase := Database(this.DatabasePath . "User\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
+			this.iCommunityDatabase := Database(this.DatabasePath . "Community\" . this.getSimulatorCode(simulator) . "\", kSettingsDataSchemas)
 		}
 
 		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)
@@ -110,7 +110,7 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	loadSettings(simulator, car, track, weather, community := "__Undefined__") {
-		local settings := newConfiguration()
+		local settings := newMultiMap()
 		local id := this.ID
 		local dryPressure, wetPressure, ignore, tyre
 
@@ -125,11 +125,11 @@ class SettingsDatabase extends SessionDatabase {
 
 		if dryPressure
 			for ignore, tyre in ["FL", "FR", "RL", "RR"]
-				setConfigurationValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target." . tyre, dryPressure)
+				setMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target." . tyre, dryPressure)
 
 		if wetPressure
 			for ignore, tyre in ["FL", "FR", "RL", "RR"]
-				setConfigurationValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target." . tyre, wetPressure)
+				setMultiMapValue(settings, "Session Settings", "Tyre.Wet.Pressure.Target." . tyre, wetPressure)
 
 		loadSettings(this, simulator, settings, id, true, community, "*", "*", "*")
 		loadSettings(this, simulator, settings, id, true, community, car, "*", "*")
@@ -237,7 +237,7 @@ class SettingsDatabase extends SessionDatabase {
 
 					return ((rows.Length() > 0) ? rows[1].Value : default)
 				}
-				catch exception {
+				catch Any as exception {
 					return default
 				}
 				finally {
@@ -276,7 +276,7 @@ class SettingsDatabase extends SessionDatabase {
 
 					return
 				}
-				catch exception {
+				catch Any as exception {
 					return
 				}
 				finally {
@@ -302,7 +302,7 @@ class SettingsDatabase extends SessionDatabase {
 
 					return
 				}
-				catch exception {
+				catch Any as exception {
 					return
 				}
 				finally {
@@ -347,7 +347,7 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 			if (rows.Length() > 0)
 				return rows[1].Value
 		}
-		catch exception {
+		catch Any as exception {
 		}
 		finally {
 			settingsDB.unlock("Settings")
@@ -412,5 +412,5 @@ loadSettings(database, simulator, settings, owner, user, community, car, track, 
 	readSettings(database, simulator, values, owner, user, community, car, track, weather)
 
 	for ignore, setting in values
-		setConfigurationValue(settings, setting.Section, setting.Key, setting.Value)
+		setMultiMapValue(settings, setting.Section, setting.Key, setting.Value)
 }

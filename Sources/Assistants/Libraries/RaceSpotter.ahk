@@ -67,43 +67,43 @@ class CarInfo {
 
 	iProblem := true
 
-	Spotter[] {
+	Spotter {
 		Get {
 			return this.iSpotter
 		}
 	}
 
-	Nr[] {
+	Nr {
 		Get {
 			return this.iNr
 		}
 	}
 
-	Car[] {
+	Car {
 		Get {
 			return this.iCar
 		}
 	}
 
-	Driver[] {
+	Driver {
 		Get {
 			return this.iDriver
 		}
 	}
 
-	Class[] {
+	Class {
 		Get {
 			return this.iClass
 		}
 	}
 
-	BestLapTime[] {
+	BestLapTime {
 		Get {
 			return this.iBestLapTime
 		}
 	}
 
-	LastLap[] {
+	LastLap {
 		Get {
 			return this.iLastLap
 		}
@@ -123,7 +123,7 @@ class CarInfo {
 		}
 	}
 
-	LastPitstop[] {
+	LastPitstop {
 		Get {
 			local pitstops := this.Spotter.Pitstops[this.Nr]
 			local numStops := pitstops.Length()
@@ -132,7 +132,7 @@ class CarInfo {
 		}
 	}
 
-	InPit[] {
+	InPit {
 		Get {
 			return this.iInPit
 		}
@@ -148,7 +148,7 @@ class CarInfo {
 		}
 	}
 
-	LastLapTime[] {
+	LastLapTime {
 		Get {
 			local numLapTimes := this.LapTimes.Length()
 
@@ -196,13 +196,13 @@ class CarInfo {
 		}
 	}
 
-	TrackAheadDelta[] {
+	TrackAheadDelta {
 		Get {
 			return this.iTrackAheadDelta
 		}
 	}
 
-	TrackBehindDelta[] {
+	TrackBehindDelta {
 		Get {
 			return this.iTrackBehindDelta
 		}
@@ -240,19 +240,19 @@ class CarInfo {
 		}
 	}
 
-	InvalidLaps[] {
+	InvalidLaps {
 		Get {
 			return this.iInvalidLaps
 		}
 	}
 
-	Incidents[] {
+	Incidents {
 		Get {
 			return this.iIncidents
 		}
 	}
 
-	Problem[] {
+	Problem {
 		Get {
 			return this.iProblem
 		}
@@ -393,19 +393,19 @@ class PositionInfo {
 
 	iBestLapTime := false
 
-	Type[] {
+	Type {
 		Get {
 			throw "Virtual property PositionInfo.Type must be implemented in a subclass..."
 		}
 	}
 
-	Spotter[] {
+	Spotter {
 		Get {
 			return this.iSpotter
 		}
 	}
 
-	Car[] {
+	Car {
 		Get {
 			return this.iCar
 		}
@@ -428,7 +428,7 @@ class PositionInfo {
 		}
 	}
 
-	Observed[] {
+	Observed {
 		Get {
 			return this.iObserved
 		}
@@ -483,7 +483,7 @@ class PositionInfo {
 		}
 	}
 
-	LastLapTime[] {
+	LastLapTime {
 		Get {
 			return this.Car.LastLapTime
 		}
@@ -498,7 +498,7 @@ class PositionInfo {
 		}
 	}
 
-	Reported[] {
+	Reported {
 		Get {
 			return this.iReported
 		}
@@ -730,7 +730,7 @@ class RaceSpotter extends GridRaceAssistant {
 		class FastSpeaker extends VoiceManager.LocalSpeaker {
 			speak(arguments*) {
 				if (this.VoiceManager.RaceAssistant.Session >= kSessionPractice)
-					base.speak(arguments*)
+					super.speak(arguments*)
 			}
 
 			speakPhrase(phrase, arguments*) {
@@ -740,7 +740,7 @@ class RaceSpotter extends GridRaceAssistant {
 				if this.Awaitable
 					this.wait()
 
-				base.speakPhrase(phrase, arguments*)
+				super.speakPhrase(phrase, arguments*)
 			}
 		}
 
@@ -749,7 +749,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 			if fast {
 				if !this.iFastSpeechSynthesizer {
-					synthesizer := new this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+					synthesizer := this.FastSpeaker(this, this.Synthesizer, this.Speaker, this.Language
 													  , this.buildFragments(this.Language), this.buildPhrases(this.Language, true))
 
 					this.iFastSpeechSynthesizer := synthesizer
@@ -764,7 +764,7 @@ class RaceSpotter extends GridRaceAssistant {
 				return this.iFastSpeechSynthesizer
 			}
 			else
-				return base.getSpeaker()
+				return super.getSpeaker()
 		}
 
 		updateSpeechStatus(status) {
@@ -776,15 +776,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 		buildPhrases(language, fast := false) {
 			if fast
-				return base.buildPhrases(language, "Spotter Phrases")
+				return super.buildPhrases(language, "Spotter Phrases")
 			else
-				return base.buildPhrases(language)
+				return super.buildPhrases(language)
 		}
 	}
 
 	class RaceSpotterRemoteHandler extends RaceAssistant.RaceAssistantRemoteHandler {
 		__New(remotePID) {
-			base.__New("Race Spotter", remotePID)
+			super.__New("Race Spotter", remotePID)
 		}
 	}
 
@@ -795,25 +795,25 @@ class RaceSpotter extends GridRaceAssistant {
 		iLap := 0
 		iDuration := 0
 
-		Nr[] {
+		Nr {
 			Get {
 				return this.iNr
 			}
 		}
 
-		Time[] {
+		Time {
 			Get {
 				return this.iTime
 			}
 		}
 
-		Lap[] {
+		Lap {
 			Get {
 				return this.iLap
 			}
 		}
 
-		Duration[] {
+		Duration {
 			Get {
 				return this.iDuration
 			}
@@ -831,19 +831,19 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	Running[] {
+	Running {
 		Get {
 			return this.iRunning
 		}
 	}
 
-	SessionDataActive[] {
+	SessionDataActive {
 		Get {
 			return this.iSessionDataActive
 		}
 	}
 
-	SpotterSpeaking[] {
+	SpotterSpeaking {
 		Get {
 			return this.getSpeaker(true).Speaking
 		}
@@ -859,7 +859,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	DriverCar[] {
+	DriverCar {
 		Get {
 			return this.iDriverCar
 		}
@@ -926,7 +926,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
-		base.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
+		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
 		if isDebug() {
 			this.setDebug(kDebugKnowledgeBase, true)
@@ -944,7 +944,7 @@ class RaceSpotter extends GridRaceAssistant {
 	setDebug(option, enabled) {
 		local label := false
 
-		base.setDebug(option, enabled)
+		super.setDebug(option, enabled)
 
 		switch option {
 			case kDebugPositions:
@@ -958,17 +958,17 @@ class RaceSpotter extends GridRaceAssistant {
 				else
 					Menu SupportMenu, Uncheck, %label%
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
 
 	createVoiceManager(name, options) {
-		return new this.SpotterVoiceManager(this, name, options)
+		return this.SpotterVoiceManager(this, name, options)
 	}
 
 	updateSessionValues(values) {
-		base.updateSessionValues(values)
+		super.updateSessionValues(values)
 
 		if values.HasKey("Running")
 			this.iRunning := values["Running"]
@@ -993,7 +993,7 @@ class RaceSpotter extends GridRaceAssistant {
 		if (values.HasKey("BaseLap") && (values["BaseLap"] != this.BaseLap))
 			this.SessionInfos.Delete("AirTemperature")
 
-		base.updateDynamicValues(values)
+		super.updateDynamicValues(values)
 	}
 
 	handleVoiceCommand(grammar, words) {
@@ -1011,7 +1011,7 @@ class RaceSpotter extends GridRaceAssistant {
 			case "GapToLeader":
 				this.gapToLeaderRecognized(words)
 			default:
-				base.handleVoiceCommand(grammar, words)
+				super.handleVoiceCommand(grammar, words)
 		}
 	}
 
@@ -1349,15 +1349,15 @@ class RaceSpotter extends GridRaceAssistant {
 
 	updateAnnouncement(announcement, value) {
 		if (value && (announcement = "DeltaInformation")) {
-			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
-			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", value)
-			value := getConfigurationValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DeltaInformation", value)
+			value := getMultiMapValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".PerformanceUpdates", 2)
+			value := getMultiMapValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DistanceInformation", value)
+			value := getMultiMapValue(this.Configuration, "Race Spotter Announcements", this.Simulator . ".DeltaInformation", value)
 
 			if !value
 				value := 2
 		}
 
-		base.updateAnnouncement(announcement, value)
+		super.updateAnnouncement(announcement, value)
 	}
 
 	getSpeaker(fast := false) {
@@ -1382,7 +1382,7 @@ class RaceSpotter extends GridRaceAssistant {
 					if otherCars.HasKey(carNr)
 						cInfo := otherCars[carNr]
 					else {
-						cInfo := new CarInfo(this, carNr, car[2], car[3])
+						cInfo := CarInfo(this, carNr, car[2], car[3])
 
 						otherCars[carNr] := cInfo
 					}
@@ -1391,7 +1391,7 @@ class RaceSpotter extends GridRaceAssistant {
 					cInfo := this.DriverCar
 
 					if !cInfo {
-						cInfo := new CarInfo(this, carNr, car[2], car[3])
+						cInfo := CarInfo(this, carNr, car[2], car[3])
 
 						this.iDriverCar := cInfo
 					}
@@ -1425,7 +1425,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if positionInfos.HasKey(nr)
 				position := positionInfos[nr]
 			else {
-				position := new PositionInfo(this, car)
+				position := PositionInfo(this, car)
 
 				positionInfos[nr] := position
 			}
@@ -2570,7 +2570,7 @@ class RaceSpotter extends GridRaceAssistant {
 				try {
 					Run %exePath%, %kBinariesDirectory%, Hide UseErrorLevel, pid
 				}
-				catch exception {
+				catch Any as exception {
 					logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
 															   , {simulator: code, protocol: "SHM"})
 										   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -2625,22 +2625,22 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	createSession(settings, data) {
-		local facts := base.createSession(settings, data)
+		local facts := super.createSession(settings, data)
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local configuration := this.Configuration
 
 		facts["Session.Settings.Lap.Learning.Laps"]
-			:= getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+			:= getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
 		facts["Session.Settings.Lap.History.Considered"]
-			:= getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
+			:= getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".ConsideredHistoryLaps", 5)
 		facts["Session.Settings.Lap.History.Damping"]
-			:= getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
+			:= getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".HistoryLapsDamping", 0.2)
 
 		return facts
 	}
 
 	initializeAnnouncements(data) {
-		local simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 		local configuration := this.Configuration
 		local announcements := {}
@@ -2648,24 +2648,24 @@ class RaceSpotter extends GridRaceAssistant {
 
 		for ignore, key in ["TacticalAdvices", "SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 						  , "PitWindow", "SessionInformation", "CutWarnings", "PenaltyInformation"]
-			announcements[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
+			announcements[key] := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . "." . key, true)
 
-		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
-		default := getConfigurationValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
+		default := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . ".PerformanceUpdates", 2)
+		default := getMultiMapValue(configuration, "Race Spotter Announcements", simulatorName . ".DistanceInformation", default)
 
-		announcements["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements"
+		announcements["DeltaInformation"] := getMultiMapValue(configuration, "Race Spotter Announcements"
 																 , simulatorName . ".DeltaInformation", default)
 		announcements["DeltaInformationMethod"] := inList(["Static", "Dynamic", "Both"]
-														, getConfigurationValue(configuration, "Race Spotter Announcements"
+														, getMultiMapValue(configuration, "Race Spotter Announcements"
 																			  , simulatorName . ".DeltaInformationMethod", "Both"))
 
 		this.updateConfigurationValues({Announcements: announcements})
 	}
 
 	initializeGridPosition(data, force := false) {
-		local driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
+		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
-		if ((force || !this.GridPosition) && driver && (getConfigurationValue(data, "Stint Data", "Laps", 0) <= 1)) {
+		if ((force || !this.GridPosition) && driver && (getMultiMapValue(data, "Stint Data", "Laps", 0) <= 1)) {
 			this.iOverallGridPosition := this.getPosition(driver, "Overall", data)
 			this.iClassGridPosition := this.getPosition(driver, "Class", data)
 		}
@@ -2677,7 +2677,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
 		local position, length
 
-		base.prepareSession(settings, data)
+		super.prepareSession(settings, data)
 
 		this.iWasStartDriver := true
 
@@ -2692,18 +2692,18 @@ class RaceSpotter extends GridRaceAssistant {
 			try {
 				speaker.speakPhrase("GreetingIntro")
 
-				airTemperature := Round(getConfigurationValue(data, "Weather Data", "Temperature", 0))
-				trackTemperature := Round(getConfigurationValue(data, "Track Data", "Temperature", 0))
+				airTemperature := Round(getMultiMapValue(data, "Weather Data", "Temperature", 0))
+				trackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature", 0))
 
 				if (airTemperature = 0)
-					airTemperature := Round(getConfigurationValue(data, "Car Data", "AirTemperature", 0))
+					airTemperature := Round(getMultiMapValue(data, "Car Data", "AirTemperature", 0))
 
 				if (trackTemperature = 0)
-					trackTemperature := Round(getConfigurationValue(data, "Car Data", "RoadTemperature", 0))
+					trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
 
-				weatherNow := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-				weather10Min := getConfigurationValue(data, "Weather Data", "Weather10Min", "Dry")
-				weather30Min := getConfigurationValue(data, "Weather Data", "Weather30Min", "Dry")
+				weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+				weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
+				weather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")
 
 				if (weatherNow = "Dry") {
 					if ((weather10Min = "Dry") || (weather30Min = "Dry"))
@@ -2724,15 +2724,15 @@ class RaceSpotter extends GridRaceAssistant {
 													  , unit: fragments[getUnit("Temperature")]})
 
 				if (this.Session = kSessionRace) {
-					driver := getConfigurationValue(data, "Position Data", "Driver.Car", false)
-					position := this.getPosition(driver, "Overall", data) ; getConfigurationValue(data, "Position Data", "Car." . driver . ".Position")
+					driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+					position := this.getPosition(driver, "Overall", data) ; getMultiMapValue(data, "Position Data", "Car." . driver . ".Position")
 
 					if (driver && position)
 						speaker.speakPhrase("GreetingPosition"
 										  , {position: position, overall: this.MultiClass[data] ? speaker.Fragments["Overall"] : ""})
 
-					if (getConfigurationValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
-						length := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
+					if (getMultiMapValue(data, "Session Data", "SessionFormat", "Time") = "Time") {
+						length := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 60000)
 
 						if (length > 0)
 							speaker.speakPhrase("GreetingDuration", {minutes: length})
@@ -2741,7 +2741,7 @@ class RaceSpotter extends GridRaceAssistant {
 						length := this.SessionLaps
 
 						if (length = 0)
-							length := getConfigurationValue(data, "Session Data", "SessionLapsRemaining", 0)
+							length := getMultiMapValue(data, "Session Data", "SessionLapsRemaining", 0)
 
 						if (length > 0)
 							speaker.speakPhrase("GreetingLaps", {laps: length})
@@ -2768,10 +2768,10 @@ class RaceSpotter extends GridRaceAssistant {
 		joined := !this.iWasStartDriver
 
 		if !IsObject(settings)
-			settings := readConfiguration(settings)
+			settings := readMultiMap(settings)
 
 		if !IsObject(data)
-			data := readConfiguration(data)
+			data := readMultiMap(data)
 
 		if joined {
 			this.initializeAnnouncements(data)
@@ -2795,10 +2795,10 @@ class RaceSpotter extends GridRaceAssistant {
 			if (ErrorLevel > 0)
 				saveSettings := kNever
 			else
-				saveSettings := getConfigurationValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
+				saveSettings := getMultiMapValue(configuration, "Race Assistant Shutdown", simulatorName . ".SaveSettings")
 		}
 
-		this.updateConfigurationValues({LearningLaps: getConfigurationValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
+		this.updateConfigurationValues({LearningLaps: getMultiMapValue(configuration, "Race Spotter Analysis", simulatorName . ".LearningLaps", 1)
 									  , SaveSettings: saveSettings})
 
 		this.updateDynamicValues({KnowledgeBase: this.createKnowledgeBase(facts)
@@ -2869,24 +2869,24 @@ class RaceSpotter extends GridRaceAssistant {
 	}
 
 	createSessionState() {
-		local state := base.createSessionState()
+		local state := super.createSessionState()
 		local data := {}
 		local nr, pitstops, index, pitstop
 
 		for nr, pitstops in this.Pitstops {
-			setConfigurationValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr", nr)
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr", nr)
 
 			for index, pitstop in pitstops
-				setConfigurationValue(state, "Pitstop State", "Pitstop." . nr . "." . index
+				setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . "." . index
 										   , values2String(";", pitstop.Time, pitstop.Lap, pitstop.Duration))
 
-			setConfigurationValue(state, "Pitstop State", "Pitstop." . nr . ".Count", pitstops.Length())
+			setMultiMapValue(state, "Pitstop State", "Pitstop." . nr . ".Count", pitstops.Length())
 		}
 
-		setConfigurationValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count())
+		setMultiMapValue(state, "Pitstop State", "Pitstop.Count", this.Pitstops.Count())
 
 		if isDevelopment()
-			writeConfiguration(temporaryFileName("Race Spotter", "pitstops"), state)
+			writeMultiMap(temporaryFileName("Race Spotter", "pitstops"), state)
 
 		return state
 	}
@@ -2894,17 +2894,17 @@ class RaceSpotter extends GridRaceAssistant {
 	loadSessionState(state) {
 		local carNr
 
-		base.loadSessionState(state)
+		super.loadSessionState(state)
 
 		this.iPitstops := {}
 
-		loop % getConfigurationValue(state, "Pitstop State", "Pitstop.Count", 0)
+		loop % getMultiMapValue(state, "Pitstop State", "Pitstop.Count", 0)
 		{
-			carNr := getConfigurationValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr")
+			carNr := getMultiMapValue(state, "Pitstop State", "Pitstop." . A_Index . ".Nr")
 			pitstops := this.Pitstops[carNr]
 
-			loop % getConfigurationValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
-				pitstops.Push(new this.Pitstop(carNr, string2Values(";", getConfigurationValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
+			loop % getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . ".Count", 0)
+				pitstops.Push(this.Pitstop(carNr, string2Values(";", getMultiMapValue(state, "Pitstop State", "Pitstop." . carNr . "." . A_Index))*))
 		}
 	}
 
@@ -2926,11 +2926,11 @@ class RaceSpotter extends GridRaceAssistant {
 			lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		}
 
-		result := base.addLap(lapNumber, data)
+		result := super.addLap(lapNumber, data)
 
 		if !this.MultiClass {
-			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
-			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+			gapAhead := getMultiMapValue(data, "Stint Data", "GapAhead", kUndefined)
+			gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
 
 			if ((gapAhead = lastGapAhead) && (gapBehind = lastGapBehind)) {
 				if (adjustGaps && (sameGapCount++ > 3))
@@ -2989,9 +2989,9 @@ class RaceSpotter extends GridRaceAssistant {
 		this.initializeGridPosition(data)
 
 		if this.Speaker[false]
-			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty))
+			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		this.updatePitstops(lapNumber, data)
 
@@ -3010,9 +3010,9 @@ class RaceSpotter extends GridRaceAssistant {
 		update := false
 
 		if !IsObject(data)
-			data := readConfiguration(data)
+			data := readMultiMap(data)
 
-		sector := getConfigurationValue(data, "Stint Data", "Sector", 0)
+		sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
 
 		if (sector != lastSector) {
 			lastSector := sector
@@ -3027,8 +3027,8 @@ class RaceSpotter extends GridRaceAssistant {
 			gapBehind := kUndefined
 		}
 		else {
-			gapAhead := getConfigurationValue(data, "Stint Data", "GapAhead", kUndefined)
-			gapBehind := getConfigurationValue(data, "Stint Data", "GapBehind", kUndefined)
+			gapAhead := getMultiMapValue(data, "Stint Data", "GapAhead", kUndefined)
+			gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
 		}
 
 		if update {
@@ -3038,7 +3038,7 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateDriver(lapNumber, sector, this.Positions)
 		}
 
-		result := base.updateLap(lapNumber, data)
+		result := super.updateLap(lapNumber, data)
 
 		loop % knowledgeBase.getValue("Car.Count")
 		{
@@ -3049,9 +3049,9 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		if this.Speaker[false]
-			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), lastPenalty))
+			if (!this.Announcements["PenaltyInformation"] || !this.penaltyInformation(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), lastPenalty))
 				if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
-					this.cutWarning(lapNumber, getConfigurationValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
+					this.cutWarning(lapNumber, getMultiMapValue(data, "Stint Data", "Sector", 0), wasValid, lastWarnings)
 
 		if (gapAhead != kUndefined) {
 			knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", gapAhead)
@@ -3076,33 +3076,33 @@ class RaceSpotter extends GridRaceAssistant {
 		local carNr, delta, pitstops, pitstop
 
 		if !this.iLastPitstopUpdate {
-			this.iLastPitstopUpdate := Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
+			this.iLastPitstopUpdate := Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000)
 
 			delta := 0
 		}
 		else {
-			delta := (this.iLastPitstopUpdate - Round(getConfigurationValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
+			delta := (this.iLastPitstopUpdate - Round(getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000))
 
 			this.iLastPitstopUpdate -= delta
 		}
 
-		loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
+		loop % getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		{
-			if (getConfigurationValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
-			 || getConfigurationValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
-				carNr := StrReplace(getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index), """", "")
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
+				carNr := StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index), """", "")
 
 				pitstops := this.Pitstops[carNr]
 
 				if (pitstops.Length() = 0)
-					pitstops.Push(new this.Pitstop(carNr, this.iLastPitstopUpdate, lap))
+					pitstops.Push(this.Pitstop(carNr, this.iLastPitstopUpdate, lap))
 				else {
 					pitstop := pitstops[pitstops.Length()]
 
 					if ((pitstop.Time - pitstop.Duration - (delta + 20)) < this.iLastPitstopUpdate)
 						pitstop.Duration := (pitstop.Duration + delta)
 					else
-						pitstops.Push(new this.Pitstop(carNr, this.iLastPitstopUpdate, lap))
+						pitstops.Push(this.Pitstop(carNr, this.iLastPitstopUpdate, lap))
 				}
 			}
 		}
@@ -3111,8 +3111,8 @@ class RaceSpotter extends GridRaceAssistant {
 	computePositions(data, gapAhead, gapBehind) {
 		local knowledgeBase := this.KnowledgeBase
 		local carPositions := []
-		local driver := getConfigurationValue(data, "Position Data", "Driver.Car", 0)
-		local count := getConfigurationValue(data, "Position Data", "Car.Count", 0)
+		local driver := getMultiMapValue(data, "Position Data", "Driver.Car", 0)
+		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local notAlone := (count > 1)
 		local carPositions := []
 		local positions := {}
@@ -3151,8 +3151,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 			loop %count%
 			{
-				carLaps := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap")
-				carRunning := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
+				carLaps := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap")
+				carRunning := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap.Running")
 
 				if (A_Index = driver) {
 					hasDriver := true
@@ -3172,7 +3172,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 				driverClassPosition := carClassPositions[driver]
 				class := this.getClass(driver, data)
-				lapTime := getConfigurationValue(data, "Position Data", "Car." . driver . ".Time")
+				lapTime := getMultiMapValue(data, "Position Data", "Car." . driver . ".Time")
 
 				for index, car in carPositions {
 					carIndex := car[1]
@@ -3194,22 +3194,22 @@ class RaceSpotter extends GridRaceAssistant {
 						carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
 					}
 
-					positions[carIndex] := Array(StrReplace(getConfigurationValue(data, "Position Data", prefix . ".Nr"), """", "")
-											   , getConfigurationValue(data, "Position Data", prefix . ".Car", "Unknown")
+					positions[carIndex] := Array(StrReplace(getMultiMapValue(data, "Position Data", prefix . ".Nr"), """", "")
+											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)
-											   , computeDriverName(getConfigurationValue(data, "Position Data", prefix . ".Driver.Forname", "John")
-																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
-																 , getConfigurationValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
+											   , computeDriverName(getMultiMapValue(data, "Position Data", prefix . ".Driver.Forname", "John")
+																 , getMultiMapValue(data, "Position Data", prefix . ".Driver.Surname", "Doe")
+																 , getMultiMapValue(data, "Position Data", prefix . ".Driver.Nickname", "JD"))
 											   , carOverallPosition, carClassPosition
 											   , carLaps, carRunning
-											   , getConfigurationValue(data, "Position Data", prefix . ".Time")
+											   , getMultiMapValue(data, "Position Data", prefix . ".Time")
 											   , carDelta, carAheadDelta, carBehindDelta
-											   , getConfigurationValue(data, "Position Data", prefix . ".Lap.Valid"
-																	 , getConfigurationValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
+											   , getMultiMapValue(data, "Position Data", prefix . ".Lap.Valid"
+																	 , getMultiMapValue(data, "Position Data", prefix . ".Lap.Running.Valid", true))
 											   , knowledgeBase.getValue(prefix . ".Valid.Laps", carLaps)
-											   , getConfigurationValue(data, "Position Data", prefix . ".Incidents", 0)
-											   , (getConfigurationValue(data, "Position Data", prefix . ".InPitlane", false)
-											   || getConfigurationValue(data, "Position Data", prefix . ".InPit", false)))
+											   , getMultiMapValue(data, "Position Data", prefix . ".Incidents", 0)
+											   , (getMultiMapValue(data, "Position Data", prefix . ".InPitlane", false)
+											   || getMultiMapValue(data, "Position Data", prefix . ".InPit", false)))
 
 					if (class = this.getClass(carIndex, data)) {
 						if (carClassPosition = 1)
@@ -3274,7 +3274,7 @@ class RaceSpotter extends GridRaceAssistant {
 		this.iLastDeltaInformationLap := 0
 		this.iLastPenalty := false
 
-		return base.executePitstop(lapNumber)
+		return super.executePitstop(lapNumber)
 	}
 
 	requestInformation(category, arguments*) {

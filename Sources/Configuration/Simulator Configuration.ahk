@@ -67,9 +67,9 @@ class GeneralTab extends ConfigurationItem {
 
 	__New(development, configuration) {
 		this.iDevelopment := development
-		this.iSimulatorsList := new SimulatorsList(configuration)
+		this.iSimulatorsList := SimulatorsList(configuration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		GeneralTab.Instance := this
 	}
@@ -164,25 +164,25 @@ class GeneralTab extends ConfigurationItem {
 			if !chosen
 				chosen := 2
 
-			Gui %window%:Add, DropDownList, x224 y477 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", map(choices, "translate")*)
+			Gui %window%:Add, DropDownList, x224 y477 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", collect(choices, "translate")*)
 		}
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		nirCmdPathEdit := getConfigurationValue(configuration, "Configuration", "NirCmd Path", "")
-		homePathEdit := getConfigurationValue(configuration, "Configuration", "Home Path", "")
+		nirCmdPathEdit := getMultiMapValue(configuration, "Configuration", "NirCmd Path", "")
+		homePathEdit := getMultiMapValue(configuration, "Configuration", "Home Path", "")
 
-		languageDropDown := availableLanguages()[getConfigurationValue(configuration, "Configuration", "Language", getLanguage())]
-		startWithWindowsCheck := getConfigurationValue(configuration, "Configuration", "Start With Windows", true)
-		silentModeCheck := getConfigurationValue(configuration, "Configuration", "Silent Mode", false)
+		languageDropDown := availableLanguages()[getMultiMapValue(configuration, "Configuration", "Language", getLanguage())]
+		startWithWindowsCheck := getMultiMapValue(configuration, "Configuration", "Start With Windows", true)
+		silentModeCheck := getMultiMapValue(configuration, "Configuration", "Silent Mode", false)
 
 		if this.iDevelopment {
-			ahkPathEdit := getConfigurationValue(configuration, "Configuration", "AHK Path", "")
-			msBuildPathEdit := getConfigurationValue(configuration, "Configuration", "MSBuild Path", "")
-			debugEnabledCheck := getConfigurationValue(configuration, "Configuration", "Debug", false)
-			logLevelDropDown := getConfigurationValue(configuration, "Configuration", "Log Level", "Warn")
+			ahkPathEdit := getMultiMapValue(configuration, "Configuration", "AHK Path", "")
+			msBuildPathEdit := getMultiMapValue(configuration, "Configuration", "MSBuild Path", "")
+			debugEnabledCheck := getMultiMapValue(configuration, "Configuration", "Debug", false)
+			logLevelDropDown := getMultiMapValue(configuration, "Configuration", "Log Level", "Warn")
 		}
 	}
 
@@ -190,7 +190,7 @@ class GeneralTab extends ConfigurationItem {
 		local languageCode := "en"
 		local code, language, choices
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		GuiControlGet nirCmdPathEdit
 		GuiControlGet homePathEdit
@@ -199,8 +199,8 @@ class GeneralTab extends ConfigurationItem {
 		GuiControlGet startWithWindowsCheck
 		GuiControlGet silentModeCheck
 
-		setConfigurationValue(configuration, "Configuration", "NirCmd Path", nirCmdPathEdit)
-		setConfigurationValue(configuration, "Configuration", "Home Path", homePathEdit)
+		setMultiMapValue(configuration, "Configuration", "NirCmd Path", nirCmdPathEdit)
+		setMultiMapValue(configuration, "Configuration", "Home Path", homePathEdit)
 
 		for code, language in availableLanguages()
 			if (language = languageDropDown) {
@@ -209,21 +209,21 @@ class GeneralTab extends ConfigurationItem {
 				break
 			}
 
-		setConfigurationValue(configuration, "Configuration", "Language", languageCode)
-		setConfigurationValue(configuration, "Configuration", "Start With Windows", startWithWindowsCheck)
-		setConfigurationValue(configuration, "Configuration", "Silent Mode", silentModeCheck)
+		setMultiMapValue(configuration, "Configuration", "Language", languageCode)
+		setMultiMapValue(configuration, "Configuration", "Start With Windows", startWithWindowsCheck)
+		setMultiMapValue(configuration, "Configuration", "Silent Mode", silentModeCheck)
 
 		if this.iSplashThemesConfiguration
-			setConfigurationValues(configuration, this.iSplashThemesConfiguration)
+			addMultiMapValues(configuration, this.iSplashThemesConfiguration)
 		else {
-			setConfigurationSectionValues(configuration, "Splash Window", getConfigurationSectionValues(this.Configuration, "Splash Window", Object()))
-			setConfigurationSectionValues(configuration, "Splash Themes", getConfigurationSectionValues(this.Configuration, "Splash Themes", Object()))
+			setMultiMapValues(configuration, "Splash Window", getMultiMapValues(this.Configuration, "Splash Window"))
+			setMultiMapValues(configuration, "Splash Themes", getMultiMapValues(this.Configuration, "Splash Themes"))
 		}
 
 		if this.iFormatsConfiguration
-			setConfigurationValues(configuration, this.iFormatsConfiguration)
+			addMultiMapValues(configuration, this.iFormatsConfiguration)
 		else
-			setConfigurationSectionValues(configuration, "Localization", getConfigurationSectionValues(this.Configuration, "Localization", Object()))
+			setMultiMapValues(configuration, "Localization", getMultiMapValues(this.Configuration, "Localization"))
 
 		if this.iDevelopment {
 			GuiControlGet ahkPathEdit
@@ -231,13 +231,13 @@ class GeneralTab extends ConfigurationItem {
 			GuiControlGet debugEnabledCheck
 			GuiControlGet logLevelDropDown
 
-			setConfigurationValue(configuration, "Configuration", "AHK Path", ahkPathEdit)
-			setConfigurationValue(configuration, "Configuration", "MSBuild Path", msBuildPathEdit)
-			setConfigurationValue(configuration, "Configuration", "Debug", debugEnabledCheck)
+			setMultiMapValue(configuration, "Configuration", "AHK Path", ahkPathEdit)
+			setMultiMapValue(configuration, "Configuration", "MSBuild Path", msBuildPathEdit)
+			setMultiMapValue(configuration, "Configuration", "Debug", debugEnabledCheck)
 
 			choices := ["Info", "Warn", "Critical", "Off"]
 
-			setConfigurationValue(configuration, "Configuration", "Log Level", choices[inList(map(choices, "translate"), logLevelDropDown)])
+			setMultiMapValue(configuration, "Configuration", "Log Level", choices[inList(collect(choices, "translate"), logLevelDropDown)])
 		}
 
 		this.iSimulatorsList.saveToConfiguration(configuration)
@@ -247,7 +247,7 @@ class GeneralTab extends ConfigurationItem {
 		local simulators := []
 		local simulator, ignore
 
-		for simulator, ignore in getConfigurationSectionValues(getControllerState(), "Simulators", Object())
+		for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
 			simulators.Push(simulator)
 
 		return simulators
@@ -262,7 +262,7 @@ class GeneralTab extends ConfigurationItem {
 		Gui TE:+Owner%window%
 		Gui %window%:+Disabled
 
-		if (new TranslationsEditor(this.Configuration)).editTranslations() {
+		if (TranslationsEditor(this.Configuration)).editTranslations() {
 			Gui %window%:-Disabled
 
 			window := ConfigurationEditor.Instance.Window
@@ -302,7 +302,7 @@ class GeneralTab extends ConfigurationItem {
 		Gui TE:+Owner%window%
 		Gui %window%:+Disabled
 
-		configuration := (new ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
+		configuration := (ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
 
 		if configuration
 			this.iSplashThemesConfiguration := configuration
@@ -317,7 +317,7 @@ class GeneralTab extends ConfigurationItem {
 		Gui FE:+Owner%window%
 		Gui %window%:+Disabled
 
-		configuration := new FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats()
+		configuration := FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats()
 
 		if configuration
 			this.iFormatsConfiguration := configuration
@@ -343,7 +343,7 @@ global simulatorUpdateButton
 
 class SimulatorsList extends ConfigurationItemList {
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		SimulatorsList.Instance := this
 	}
@@ -367,15 +367,15 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.ItemList := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
+		this.ItemList := string2Values("|", getMultiMapValue(configuration, "Configuration", "Simulators", ""))
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", this.ItemList*))
+		setMultiMapValue(configuration, "Configuration", "Simulators", values2String("|", this.ItemList*))
 	}
 
 	clickEvent(line, count) {
@@ -526,18 +526,18 @@ openThemesEditor() {
 }
 
 saveConfiguration(configurationFile, editor) {
-	local configuration := newConfiguration()
+	local configuration := newMultiMap()
 	local startupLink, startupExe
 
 	editor.saveToConfiguration(configuration)
 
-	writeConfiguration(configurationFile, configuration)
+	writeMultiMap(configurationFile, configuration)
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 
 	startupLink := A_Startup . "\Simulator Startup.lnk"
 
-	if getConfigurationValue(configuration, "Configuration", "Start With Windows", false) {
+	if getMultiMapValue(configuration, "Configuration", "Start With Windows", false) {
 		startupExe := kBinariesDirectory . "Simulator Startup.exe"
 
 		FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
@@ -575,8 +575,8 @@ initializeSimulatorConfiguration() {
 
 	try {
 		new ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Ctrl")
-							 || (getConfigurationValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
-							 , initialize ? newConfiguration() : kSimulatorConfiguration)
+							 || (getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
+							 , initialize ? newMultiMap() : kSimulatorConfiguration)
 	}
 	finally {
 		protectionOff()

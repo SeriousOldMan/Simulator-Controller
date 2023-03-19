@@ -27,13 +27,13 @@ class StrategyViewer {
 	iWindow := false
 	iStrategyViewer := false
 
-	Window[] {
+	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	StrategyViewer[] {
+	StrategyViewer {
 		Get {
 			return this.iStrategyViewer
 		}
@@ -54,7 +54,7 @@ class StrategyViewer {
 	}
 
 	createStrategyInfo(strategy) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
 		local car := (strategy.Car ? strategy.Car : translate("Unknown"))
 		local track := (strategy.Track ? strategy.Track : translate("Unknown"))

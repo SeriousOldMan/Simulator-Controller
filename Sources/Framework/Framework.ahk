@@ -12,5 +12,5 @@
 #Include "..\Framework\Files.ahk"
 #Include "..\Framework\Strings.ahk"
 #Include "..\Framework\Collections.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\MultiMap.ahk"
 #Include "..\Framework\Localization.ahk"

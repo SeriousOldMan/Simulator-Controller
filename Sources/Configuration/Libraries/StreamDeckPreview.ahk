@@ -46,20 +46,20 @@ class StreamDeckPreview extends ControllerPreview {
 	iLabels := {}
 	iIcons := {}
 
-	Type[] {
+	Type {
 		Get {
 			return "Stream Deck"
 		}
 	}
 
-	Size[] {
+	Size {
 		Get {
 			return this.iSize
 		}
 	}
 
 	loadFromConfiguration(configuration) {
-		local layout := getConfigurationValue(configuration, "Layouts", this.Name . ".Layout", "Standard")
+		local layout := getMultiMapValue(configuration, "Layouts", this.Name . ".Layout", "Standard")
 		local row, column, button, icon, label, mode
 
 		switch layout {
@@ -105,12 +105,12 @@ class StreamDeckPreview extends ControllerPreview {
 			{
 				column := A_Index
 
-				button := string2Values(";", getConfigurationValue(this.Configuration, "Layouts", this.Name . "." . row))[column]
+				button := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row))[column]
 
 				if (button && (button != "")) {
-					icon := getConfigurationValue(this.Configuration, "Buttons", this.Name . "." . button . ".Icon", true)
-					label := getConfigurationValue(this.Configuration, "Buttons", this.Name . "." . button . ".Label", true)
-					mode := getConfigurationValue(this.Configuration, "Buttons", this.Name . "." . button . ".Mode", kIconOrLabel)
+					icon := getMultiMapValue(this.Configuration, "Buttons", this.Name . "." . button . ".Icon", true)
+					label := getMultiMapValue(this.Configuration, "Buttons", this.Name . "." . button . ".Label", true)
+					mode := getMultiMapValue(this.Configuration, "Buttons", this.Name . "." . button . ".Mode", kIconOrLabel)
 
 					this.iButtons[row][column] := {Button: ConfigurationItem.splitDescriptor(button)[2], Icon: icon, Label: label, Mode: mode}
 				}
@@ -324,7 +324,7 @@ class StreamDeckPreview extends ControllerPreview {
 			try {
 				Menu MainMenu, DeleteAll
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -339,7 +339,7 @@ class StreamDeckPreview extends ControllerPreview {
 			try {
 				Menu ControlMenu, DeleteAll
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -353,7 +353,7 @@ class StreamDeckPreview extends ControllerPreview {
 			try {
 				Menu NumberMenu, DeleteAll
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -373,7 +373,7 @@ class StreamDeckPreview extends ControllerPreview {
 				try {
 					Menu %menu%, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -403,14 +403,14 @@ class StreamDeckPreview extends ControllerPreview {
 				try {
 					Menu DisplayMenu, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
 				try {
 					Menu LabelMenu, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -441,7 +441,7 @@ class StreamDeckPreview extends ControllerPreview {
 				try {
 					Menu IconMenu, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -472,7 +472,7 @@ class StreamDeckPreview extends ControllerPreview {
 				try {
 					Menu ModeMenu, DeleteAll
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 

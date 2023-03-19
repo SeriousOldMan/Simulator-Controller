@@ -58,49 +58,49 @@ class StreamDeck extends FunctionController {
 	iRefreshActive := false
 	iPendingUpdates := []
 
-	Descriptor[] {
+	Descriptor {
 		Get {
 			return this.Name
 		}
 	}
 
-	Type[] {
+	Type {
 		Get {
 			return "Stream Deck"
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	Layout[] {
+	Layout {
 		Get {
 			return this.iLayout
 		}
 	}
 
-	RowDefinitions[] {
+	RowDefinitions {
 		Get {
 			return this.iRowDefinitions
 		}
 	}
 
-	Rows[] {
+	Rows {
 		Get {
 			return this.iRows
 		}
 	}
 
-	Columns[] {
+	Columns {
 		Get {
 			return this.iColumns
 		}
 	}
 
-	Functions[] {
+	Functions {
 		Get {
 			return this.iFunctions
 		}
@@ -161,13 +161,13 @@ class StreamDeck extends FunctionController {
 		}
 	}
 
-	RefreshActive[] {
+	RefreshActive {
 		Get {
 			return this.iRefreshActive
 		}
 	}
 
-	Connector[] {
+	Connector {
 		Get {
 			return this.iConnector
 		}
@@ -184,7 +184,7 @@ class StreamDeck extends FunctionController {
 
 		this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
 
-		base.__New(controller, configuration)
+		super.__New(controller, configuration)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -194,13 +194,13 @@ class StreamDeck extends FunctionController {
 		local num2WayToggles := 0
 		local function, special, rows, row, ignore, label, icon, mode, isRunning, layout
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
 		if !this.sModes {
 			StreamDeck.sModes := {}
 
 			loop {
-				special := getConfigurationValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
+				special := getMultiMapValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
 
 				if (special == kUndefined)
 					break
@@ -212,13 +212,13 @@ class StreamDeck extends FunctionController {
 			}
 		}
 
-		layout := string2Values("x", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
+		layout := string2Values("x", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 
 		this.iRows := layout[1]
 		this.iColumns := layout[2]
 
 		loop {
-			special := getConfigurationValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
+			special := getMultiMapValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
 
 			if (special == kUndefined)
 				break
@@ -233,15 +233,15 @@ class StreamDeck extends FunctionController {
 
 		loop % this.Rows
 		{
-			row := string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
+			row := string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
 
 			for ignore, function in row
 				if (function != "") {
 					this.Functions.Push(function)
 
-					icon := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
-					label := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
-					mode := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
+					icon := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
+					label := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
+					mode := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
 
 					isRunning := this.isRunning()
 
@@ -269,7 +269,7 @@ class StreamDeck extends FunctionController {
 					}
 
 					loop {
-						special := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
+						special := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
 
 						if (special == kUndefined)
 							break
@@ -613,10 +613,10 @@ handleStreamDeckMessage(category, data) {
 
 initializeStreamDeckPlugin() {
 	local controller := SimulatorController.Instance
-	local configuration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+	local configuration := readMultiMap(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 	local ignore, strmDeck
 
-	for ignore, strmDeck in string2Values("|", getConfigurationValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
+	for ignore, strmDeck in string2Values("|", getMultiMapValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
 		strmDeck := string2Values(":", strmDeck)
 
 		new StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)

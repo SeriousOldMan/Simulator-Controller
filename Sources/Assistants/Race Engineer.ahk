@@ -168,8 +168,8 @@ startRaceEngineer() {
 	if debug
 		setDebug(true)
 
-	engineer := new RaceEngineer(kSimulatorConfiguration
-							   , remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
+	engineer := RaceEngineer(kSimulatorConfiguration
+							   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
 							   , engineerName, engineerLanguage
 							   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
 							   , engineerRecognizer, engineerListener, engineerMuted, voiceServer)
@@ -206,7 +206,7 @@ startRaceEngineer() {
 		showLogo(engineerName)
 
 	if remotePID
-		Task.startTask(new PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
 
 	return
 }

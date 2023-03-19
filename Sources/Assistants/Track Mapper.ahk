@@ -41,10 +41,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 createTrackImage(trackMap) {
-	local mapWidth := getConfigurationValue(trackMap, "Map", "Width")
-	local mapHeight := getConfigurationValue(trackMap, "Map", "Height")
-	local offsetX := getConfigurationValue(trackMap, "Map", "Offset.X")
-	local offsetY := getConfigurationValue(trackMap, "Map", "Offset.Y")
+	local mapWidth := getMultiMapValue(trackMap, "Map", "Width")
+	local mapHeight := getMultiMapValue(trackMap, "Map", "Height")
+	local offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
+	local offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
 	local margin := Min(mapWidth / 20, mapHeight / 20)
 	local marginX := margin
 	local marginY := margin
@@ -54,13 +54,13 @@ createTrackImage(trackMap) {
 	local token, bitmap, graphics, pen
 	local firstX, firstY, lastX, lastY, x, y
 
-	setConfigurationValue(trackMap, "Map", "Margin.X", marginX)
-	setConfigurationValue(trackMap, "Map", "Margin.Y", marginY)
-	setConfigurationValue(trackMap, "Map", "Scale", scale)
+	setMultiMapValue(trackMap, "Map", "Margin.X", marginX)
+	setMultiMapValue(trackMap, "Map", "Margin.Y", marginY)
+	setMultiMapValue(trackMap, "Map", "Scale", scale)
 
 	token := Gdip_Startup()
 
-	bitmap := Gdip_CreateBitmap(Round(width * scale), Round(height * scale))
+	bitmap := Gdip_CreateBitcollect(Round(width * scale), Round(height * scale))
 
 	graphics := Gdip_GraphicsFromImage(bitmap)
 
@@ -73,10 +73,10 @@ createTrackImage(trackMap) {
 	lastX := 0
 	lastY := 0
 
-	loop % getConfigurationValue(trackMap, "Map", "Points")
+	loop % getMultiMapValue(trackMap, "Map", "Points")
 	{
-		x := Round((marginX + offsetX + getConfigurationValue(trackMap, "Points", A_Index . ".X")) * scale)
-		y := Round((marginY + offsetY + getConfigurationValue(trackMap, "Points", A_Index . ".Y")) * scale)
+		x := Round((marginX + offsetX + getMultiMapValue(trackMap, "Points", A_Index . ".X")) * scale)
+		y := Round((marginY + offsetY + getMultiMapValue(trackMap, "Points", A_Index . ".Y")) * scale)
 
 		if (A_Index = 1) {
 			firstX := x
@@ -107,24 +107,24 @@ createTrackImage(trackMap) {
 }
 
 createTrackMap(simulator, track, fileName) {
-	local sessionDB := new SessionDatabase()
-	local trackMapperState := newConfiguration()
-	local trackMap := newConfiguration()
+	local sessionDB := SessionDatabase()
+	local trackMapperState := newMultiMap()
+	local trackMap := newMultiMap()
 	local coordinates := []
 	local exact, xIndex, yIndex, xMin, xMax, yMin, yMax, points, ignore, coordinate, width, height
 	local trackData, normalized
 
-	setConfigurationValue(trackMap, "General", "Simulator", simulator)
-	setConfigurationValue(trackMap, "General", "Track", track)
+	setMultiMapValue(trackMap, "General", "Simulator", simulator)
+	setMultiMapValue(trackMap, "General", "Track", track)
 
-	setConfigurationValue(trackMapperState, "Track Mapper", "State", "Active")
-	setConfigurationValue(trackMapperState, "Track Mapper", "Simulator", sessionDB.getSimulatorName(simulator))
-	setConfigurationValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
-	setConfigurationValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Creating track map..."))
-	setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Reading")
-	setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
+	setMultiMapValue(trackMapperState, "Track Mapper", "State", "Active")
+	setMultiMapValue(trackMapperState, "Track Mapper", "Simulator", sessionDB.getSimulatorName(simulator))
+	setMultiMapValue(trackMapperState, "Track Mapper", "Track", sessionDB.getTrackName(simulator, track))
+	setMultiMapValue(trackMapperState, "Track Mapper", "Information", translate("Message: ") . translate("Creating track map..."))
+	setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Reading")
+	setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
-	writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+	writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 	loop Read, %fileName%
 	{
@@ -133,14 +133,14 @@ createTrackMap(simulator, track, fileName) {
 		Sleep 1
 
 		if (Mod(A_Index, 100) = 0) {
-			setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+			setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
-			writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+			writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 		}
 	}
 
-	setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Analyzing")
-	setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
+	setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Analyzing")
+	setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
 	if (coordinates.Length() > 0) {
 		if (coordinates[1].Length() = 2) {
@@ -174,25 +174,25 @@ createTrackMap(simulator, track, fileName) {
 			Sleep 1
 
 			if (Mod(A_Index, 100) = 0) {
-				setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+				setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
-				writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+				writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 			}
 		}
 
 		width := (Ceil(xMax) - Floor(xMin))
 		height := (Ceil(yMax) - Floor(yMin))
 
-		setConfigurationValue(trackMap, "Map", "Width", Round(width))
+		setMultiMapValue(trackMap, "Map", "Width", Round(width))
 
-		setConfigurationValue(trackMap, "Map", "Height", Round(height))
-		setConfigurationValue(trackMap, "Map", "X.Min", Round(xMin, 3))
-		setConfigurationValue(trackMap, "Map", "X.Max", Round(xMax, 3))
-		setConfigurationValue(trackMap, "Map", "Y.Min", Round(yMin, 3))
-		setConfigurationValue(trackMap, "Map", "Y.Max", Round(yMax, 3))
+		setMultiMapValue(trackMap, "Map", "Height", Round(height))
+		setMultiMapValue(trackMap, "Map", "X.Min", Round(xMin, 3))
+		setMultiMapValue(trackMap, "Map", "X.Max", Round(xMax, 3))
+		setMultiMapValue(trackMap, "Map", "Y.Min", Round(yMin, 3))
+		setMultiMapValue(trackMap, "Map", "Y.Max", Round(yMax, 3))
 
-		setConfigurationValue(trackMap, "Map", "Offset.X", - xMin)
-		setConfigurationValue(trackMap, "Map", "Offset.Y", - yMin)
+		setMultiMapValue(trackMap, "Map", "Offset.X", - xMin)
+		setMultiMapValue(trackMap, "Map", "Offset.Y", - yMin)
 
 		if exact
 			trackData := false
@@ -204,8 +204,8 @@ createTrackMap(simulator, track, fileName) {
 
 			normalized[1] := [0.0, 0.0]
 
-			setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Normalizing")
-			setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
+			setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Normalizing")
+			setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
 			for ignore, coordinate in coordinates {
 				normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
@@ -213,16 +213,16 @@ createTrackMap(simulator, track, fileName) {
 				Sleep 1
 
 				if (Mod(A_Index, 100) = 0) {
-					setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+					setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
-					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+					writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 				}
 			}
 
 			trackData := ""
 
-			setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Transforming")
-			setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
+			setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Transforming")
+			setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
 			loop 1000 {
 				coordinate := normalized[A_Index]
@@ -241,9 +241,9 @@ createTrackMap(simulator, track, fileName) {
 				Sleep 1
 
 				if (Mod(A_Index, 100) = 0) {
-					setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+					setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
-					writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+					writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 				}
 			}
 
@@ -251,24 +251,24 @@ createTrackMap(simulator, track, fileName) {
 			points := 1000
 		}
 
-		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Processing")
-		setConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)
+		setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Processing")
+		setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
 		simulator := sessionDB.getSimulatorName(simulator)
 
-		setConfigurationValue(trackMap, "Map", "Precision", exact ? "Exact" : "Estimated")
-		setConfigurationValue(trackMap, "Map", "Points", points)
+		setMultiMapValue(trackMap, "Map", "Precision", exact ? "Exact" : "Estimated")
+		setMultiMapValue(trackMap, "Map", "Points", points)
 
 		loop %points% {
-			setConfigurationValue(trackMap, "Points", A_Index . ".X", coordinates[A_Index][1])
-			setConfigurationValue(trackMap, "Points", A_Index . ".Y", coordinates[A_Index][2])
+			setMultiMapValue(trackMap, "Points", A_Index . ".X", coordinates[A_Index][1])
+			setMultiMapValue(trackMap, "Points", A_Index . ".Y", coordinates[A_Index][2])
 
 			Sleep 1
 
 			if (Mod(A_Index, 100) = 0) {
-				setConfigurationValue(trackMapperState, "Track Mapper", "Points", A_Index)
+				setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
 
-				writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+				writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 			}
 		}
 
@@ -280,14 +280,14 @@ createTrackMap(simulator, track, fileName) {
 			trackData := (kTempDirectory . track . ".data")
 		}
 
-		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Image")
-		removeConfigurationValue(trackMapperState, "Track Mapper", "Points")
-		writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+		setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Image")
+		removeMultiMapValue(trackMapperState, "Track Mapper", "Points")
+		writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 		fileName := createTrackImage(trackMap)
 
-		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Metadata")
-		writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+		setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Metadata")
+		writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 		sessionDB.updateTrackMap(simulator, track, trackMap, fileName, trackData)
 
@@ -298,8 +298,8 @@ createTrackMap(simulator, track, fileName) {
 
 		Sleep 10000
 
-		setConfigurationValue(trackMapperState, "Track Mapper", "Action", "Finished")
-		writeConfiguration(kTempDirectory . "Track Mapper.state", trackMapperState)
+		setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Finished")
+		writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
 		Sleep 10000
 
@@ -308,7 +308,7 @@ createTrackMap(simulator, track, fileName) {
 }
 
 recreateTrackMap(simulator, track) {
-	local sessionDB := new SessionDatabase()
+	local sessionDB := SessionDatabase()
 	local trackMap := sessionDB.getTrackMap(simulator, track)
 	local fileName := createTrackImage(trackMap)
 
@@ -316,7 +316,7 @@ recreateTrackMap(simulator, track) {
 }
 
 recreateTrackMaps() {
-	local sessionDB := new SessionDatabase()
+	local sessionDB := SessionDatabase()
 	local directory := sessionDB.DatabasePath
 	local code, simulator, track
 

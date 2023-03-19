@@ -35,13 +35,13 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	iSimulatorConfigurations := {}
 	iCurrentSimulator := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	Simulators[] {
+	Simulators {
 		Get {
 			return this.iSimulators
 		}
@@ -50,7 +50,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	__New(editor, configuration := false) {
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		RaceEngineerConfigurator.Instance := this
 	}
@@ -92,10 +92,10 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget4 Hidden, % translate("@ Session Begin")
-		choices := map(["Load from previous Session", "Load from Database"], "translate")
+		choices := collect(["Load from previous Session", "Load from Database"], "translate")
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit vreLoadSettingsDropDown HWNDwidget5 Hidden, % values2String("|", choices*)
 
-		choices := map(["Ask", "Always save", "No action"], "translate")
+		choices := collect(["Ask", "Always save", "No action"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget6 Hidden, % translate("@ Session End")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
 
@@ -107,11 +107,11 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		Gui %window%:Font, Norm, Arial
 
 		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
-		choices := map(["Load from Settings", "Load from Database", "Import from Simulator", "Use initial pressures"], "translate")
+		choices := collect(["Load from Settings", "Load from Database", "Import from Simulator", "Use initial pressures"], "translate")
 		chosen := 1
 		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown HWNDwidget10 Hidden, % values2String("|", choices*)
 
-		choices := map(["Ask", "Always save", "No action"], "translate")
+		choices := collect(["Ask", "Always save", "No action"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget11 Hidden, % translate("@ Session End")
 		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveTyrePressuresDropDown HWNDwidget12 Hidden, % values2String("|", choices*)
 
@@ -153,7 +153,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		local ignore, simulator, simulatorConfiguration
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
 		if (this.Simulators.Length() = 0)
 			this.iSimulators := this.getSimulators()
@@ -161,18 +161,18 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		for ignore, simulator in this.Simulators {
 			simulatorConfiguration := {}
 
-			simulatorConfiguration["LoadSettings"] := getConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "SettingsDatabase"))
+			simulatorConfiguration["LoadSettings"] := getMultiMapValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "SettingsDatabase"))
 
-			simulatorConfiguration["LoadTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "Setup")
+			simulatorConfiguration["LoadTyrePressures"] := getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", "Setup")
 
-			simulatorConfiguration["SaveSettings"] := getConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Always"))
-			simulatorConfiguration["SaveTyrePressures"] := getConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask")
+			simulatorConfiguration["SaveSettings"] := getMultiMapValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", getMultiMapValue(configuration, "Race Engineer Shutdown", simulator . ".SaveSettings", "Always"))
+			simulatorConfiguration["SaveTyrePressures"] := getMultiMapValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", "Ask")
 
-			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 1)
-			simulatorConfiguration["ConsideredHistoryLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".ConsideredHistoryLaps", 5)
-			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".HistoryLapsDamping", 0.2)
-			simulatorConfiguration["AdjustLapTime"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".AdjustLapTime", true)
-			simulatorConfiguration["DamageAnalysisLaps"] := getConfigurationValue(configuration, "Race Engineer Analysis", simulator . ".DamageAnalysisLaps", 1)
+			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".LearningLaps", 1)
+			simulatorConfiguration["ConsideredHistoryLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".ConsideredHistoryLaps", 5)
+			simulatorConfiguration["HistoryLapsDamping"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".HistoryLapsDamping", 0.2)
+			simulatorConfiguration["AdjustLapTime"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".AdjustLapTime", true)
+			simulatorConfiguration["DamageAnalysisLaps"] := getMultiMapValue(configuration, "Race Engineer Analysis", simulator . ".DamageAnalysisLaps", 1)
 
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -181,19 +181,19 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		local simulator, simulatorConfiguration, ignore, key
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		this.saveSimulatorConfiguration()
 
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
-			setConfigurationValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", simulatorConfiguration["LoadSettings"])
-			setConfigurationValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", simulatorConfiguration["SaveSettings"])
+			setMultiMapValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", simulatorConfiguration["LoadSettings"])
+			setMultiMapValue(configuration, "Race Assistant Shutdown", simulator . ".SaveSettings", simulatorConfiguration["SaveSettings"])
 
-			setConfigurationValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", simulatorConfiguration["LoadTyrePressures"])
-			setConfigurationValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", simulatorConfiguration["SaveTyrePressures"])
+			setMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadTyrePressures", simulatorConfiguration["LoadTyrePressures"])
+			setMultiMapValue(configuration, "Race Engineer Shutdown", simulator . ".SaveTyrePressures", simulatorConfiguration["SaveTyrePressures"])
 
 			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping", "AdjustLapTime", "DamageAnalysisLaps"]
-				setConfigurationValue(configuration, "Race Engineer Analysis", simulator . "." . key, simulatorConfiguration[key])
+				setMultiMapValue(configuration, "Race Engineer Analysis", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
 
@@ -362,7 +362,7 @@ initializeRaceEngineerConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Race Engineer"), new RaceEngineerConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Race Engineer"), RaceEngineerConfigurator(editor, editor.Configuration))
 	}
 }
 

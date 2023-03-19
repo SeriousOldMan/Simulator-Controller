@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - .NET Common Language Runtime    ;;;
 ;;;                                                                         ;;;
 ;;;                         .NET Framework Interop                          ;;;
@@ -19,7 +19,7 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-CLR_LoadLibrary(AssemblyName, AppDomain = 0) {
+CLR_LoadLibrary(AssemblyName, AppDomain := 0) {
 	local e, assembly, args, typeofAssembly
 
 	if !AppDomain
@@ -31,7 +31,7 @@ CLR_LoadLibrary(AssemblyName, AppDomain = 0) {
 		if assembly := AppDomain.Load_2(AssemblyName)
 			break
 
-		static _null := ComObject(13, 0)
+		static _null := ComValue(13, 0)
 
 		args := ComObjArray(0xC, 1),  args[0] := AssemblyName
 		typeofAssembly := AppDomain.GetType().Assembly.GetType()
@@ -56,11 +56,11 @@ CLR_CreateObject(Assembly, TypeName, Args*) {
 
 	vargs := ComObjArray(0xC, argCount)
 
-	loop % argCount
+	loop argCount
 		vargs[A_Index - 1] := Args[A_Index]
 
 	static Array_Empty := ComObjArray(0xC, 0)
-	static _null := ComObject(13, 0)
+	static _null := ComValue(13, 0)
 
 	return Assembly.CreateInstance_3(TypeName, true, 0, _null, vargs, _null, Array_Empty)
 }
@@ -69,33 +69,33 @@ CLR_CompileC#(Code, References = "", AppDomain = 0, FileName = "", CompilerOptio
 	return CLR_CompileAssembly(Code, References, "System", "Microsoft.CSharp.CSharpCodeProvider", AppDomain, FileName, CompilerOptions)
 }
 
-CLR_CompileVB(Code, References = "", AppDomain = 0, FileName = "", CompilerOptions = "") {
+CLR_CompileVB(Code, References := "", AppDomain := 0, FileName := "", CompilerOptions := "") {
 	return CLR_CompileAssembly(Code, References, "System", "Microsoft.VisualBasic.VBCodeProvider", AppDomain, FileName, CompilerOptions)
 }
 
-CLR_StartDomain(ByRef AppDomain, BaseDirectory = "") {
+CLR_StartDomain(&AppDomain, BaseDirectory := "") {
 	local args
 
-	static _null := ComObject(13, 0)
+	static _null := ComValue(13, 0)
 
-	args := ComObjArray(0xC, 5), args[0] := "", args[2] := BaseDirectory, args[4] := ComObject(0xB,false)
+	args := ComObjArray(0xC, 5), args[0] := "", args[2] := BaseDirectory, args[4] := ComValue(0xB, false)
 
 	AppDomain := CLR_GetDefaultDomain().GetType().InvokeMember_3("CreateDomain", 0x158, _null, _null, args)
 
 	return A_LastError >= 0
 }
 
-CLR_StopDomain(ByRef AppDomain) {
+CLR_StopDomain(&AppDomain) {
 	local hr, RtHst
 
-	DllCall("SetLastError", "uint", hr := DllCall(NumGet(NumGet(0 + RtHst := CLR_Start()) + 20 * A_PtrSize), "ptr", RtHst, "ptr", ComObjValue(AppDomain)))
+	DllCall("SetLastError", "uint", hr := DllCall(NumGet(NumGet(RtHst := CLR_Start(), 0, "UPtr"), 20 * A_PtrSize, "UPtr"), "ptr", RtHst, "ptr", ComObjValue(AppDomain)))
 
 	AppDomain := ""
 
 	return hr >= 0
 }
 
-CLR_Start(Version = "") {
+CLR_Start(Version := "") {
 	local SystemRoot, CLSID_CorRuntimeHost, IID_ICorRuntimeHost
 
 	static RtHst := 0
@@ -106,37 +106,37 @@ CLR_Start(Version = "") {
 	if RtHst
 		return RtHst
 
-	EnvGet SystemRoot, SystemRoot
+	SystemRoot := EnvGet("SystemRoot")
 
-	if Version =
-		loop % SystemRoot "\Microsoft.NET\Framework" (A_PtrSize = 8 ? "64" : "") "\*", 2
+	if (Version = "")
+		loop Files, SystemRoot . "\Microsoft.NET\Framework" . (A_PtrSize = 8 ? "64" : "") "\*", "D"
 			if (FileExist(A_LoopFilePath "\mscorlib.dll") && A_LoopFileName > Version)
 				Version := A_LoopFileName
 
-	if DllCall("mscoree\CorBindToRuntimeEx", "wstr", Version, "ptr", 0, "uint", 0
-			 , "ptr", CLR_GUID(CLSID_CorRuntimeHost, "{CB2F6723-AB3A-11D2-9C40-00C04FA30A3E}")
-			 , "ptr", CLR_GUID(IID_ICorRuntimeHost,  "{CB2F6722-AB3A-11D2-9C40-00C04FA30A3E}")
-			 , "ptr*", RtHst) >= 0
-		DllCall(NumGet(NumGet(RtHst + 0) + 10 * A_PtrSize), "ptr", RtHst) ; Start
+	if (DllCall("mscoree\CorBindToRuntimeEx", "wstr", Version, "ptr", 0, "uint", 0
+			  , "ptr", CLR_GUID(&CLSID_CorRuntimeHost, "{CB2F6723-AB3A-11D2-9C40-00C04FA30A3E}")
+			  , "ptr", CLR_GUID(&IID_ICorRuntimeHost,  "{CB2F6722-AB3A-11D2-9C40-00C04FA30A3E}"), "ptr*", &RtHst) >= 0)
+		DllCall(NumGet(NumGet(RtHst, 0, "UPtr"), 10 * A_PtrSize, "UPtr"), "ptr", RtHst) ; Start
 
 	return RtHst
 }
 
 CLR_GetDefaultDomain() {
+	local p := 0
 	local RtHst, p
 
 	static defaultDomain := 0
 
 	if !defaultDomain {
-		if DllCall(NumGet(NumGet(0 + RtHst := CLR_Start()) + 13 * A_PtrSize), "ptr", RtHst, "ptr*", p := 0) >= 0
-			defaultDomain := ComObject(p), ObjRelease(p)
+		if (DllCall(NumGet(NumGet(RtHst := CLR_Start(), 0, "UPtr"), 13 * A_PtrSize, "UPtr"), "ptr", RtHst, "ptr*", &p) >= 0)
+			defaultDomain := ComValue(p), ObjRelease(p)
 	}
 
 	return defaultDomain
 }
 
-CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain = 0, FileName = "", CompilerOptions = "") {
-	local asmProvider, codeProvider, codeCompiler, Refs, Refs0, Refs1, Refs2, Refs3, Refs4, Refs5, Refs6, Refs7, Refs8
+CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain := 0, FileName := "", CompilerOptions := "") {
+	local asmProvider, codeProvider, codeCompiler, Refs
 	local prms, aRefs, compilerRes, errors, error_count, error_text, e, asmSystem
 
 	if !AppDomain
@@ -150,19 +150,19 @@ CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain 
 	if !(asmSystem := (ProviderAssembly = "System") ? asmProvider : CLR_LoadLibrary("System", AppDomain))
 		return 0
 
-	StringSplit, Refs, References, |, %A_Space%%A_Tab%
+	Refs := StrSplit(References, "|" , A_Space . A_Tab)
 
-	aRefs := ComObjArray(8, Refs0)
+	aRefs := ComObjArray(8, Refs.Length)
 
-	loop % Refs0
-		aRefs[A_Index - 1] := Refs%A_Index%
+	loop Refs.Length
+		aRefs[A_Index - 1] := Refs[A_Index]
 
 	; Set parameters for compiler.
 	prms := CLR_CreateObject(asmSystem, "System.CodeDom.Compiler.CompilerParameters", aRefs)
 
 	prms.OutputAssembly          := FileName
-	prms.GenerateInMemory        := FileName=""
-	prms.GenerateExecutable      := SubStr(FileName,-3)=".exe"
+	prms.GenerateInMemory        := (FileName = "")
+	prms.GenerateExecutable      := (SubStr(FileName, -4) = ".exe")
 	prms.CompilerOptions         := CompilerOptions
 	prms.IncludeDebugInformation := true
 
@@ -171,10 +171,10 @@ CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain 
 	if error_count := (errors := compilerRes.Errors).Count {
 		error_text := ""
 
-		loop % error_count
+		loop error_count
 			error_text .= ((e := errors.Item[A_Index - 1]).IsWarning ? "Warning " : "Error ") . e.ErrorNumber " on line " e.Line ": " e.ErrorText "`n`n"
 
-		MsgBox, 16, Compilation Failed, %error_text%
+		MsgBox(error_text, "Compilation Failed", 16)
 
 		return 0
 	}
@@ -182,8 +182,8 @@ CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain 
 	return compilerRes[FileName = "" ? "CompiledAssembly" : "PathToAssembly"]
 }
 
-CLR_GUID(ByRef GUID, sGUID) {
-	VarSetCapacity(GUID, 16, 0)
+CLR_GUID(&GUID, sGUID) {
+	VarSetStrCapacity(&GUID, 16)
 
-	return DllCall("ole32\CLSIDFromString", "wstr", sGUID, "ptr", &GUID) >= 0 ? &GUID : ""
+	return ((DllCall("ole32\CLSIDFromString", "wstr", sGUID, "ptr", GUID) >= 0) ? GUID : "")
 }

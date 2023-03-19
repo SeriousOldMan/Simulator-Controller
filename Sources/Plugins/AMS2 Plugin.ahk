@@ -38,38 +38,38 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	PreviousOptionHotkey[] {
+	PreviousOptionHotkey {
 		Get {
 			return this.iPreviousOptionHotkey
 		}
 	}
 
-	NextOptionHotkey[] {
+	NextOptionHotkey {
 		Get {
 			return this.iNextOptionHotkey
 		}
 	}
 
-	PreviousChoiceHotkey[] {
+	PreviousChoiceHotkey {
 		Get {
 			return this.iPreviousChoiceHotkey
 		}
 	}
 
-	NextChoiceHotkey[] {
+	NextChoiceHotkey {
 		Get {
 			return this.iNextChoiceHotkey
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
@@ -265,7 +265,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -282,7 +282,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		local delta
 
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			delta := this.tyreCompoundIndex(compound, compoundColor)
@@ -304,7 +304,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (this.iRepairSuspensionChosen != repairSuspension) {
@@ -324,7 +324,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		base.finishPitstopSetup()
+		super.finishPitstopSetup()
 
 		this.requirePitstopMFD()
 
@@ -336,7 +336,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSession(session) {
-		base.updateSession(session)
+		super.updateSession(session)
 
 		if (session == kSessionFinished) {
 			this.iTyreCompoundChosen := 0

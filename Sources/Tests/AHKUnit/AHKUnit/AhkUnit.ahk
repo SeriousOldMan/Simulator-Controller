@@ -8,7 +8,7 @@ class AhkUnit {
 	
 	RunTestClass(testClass, runner = false) {
 		if (!runner) {
-			runner := new AhkUnit.defaultRunner()
+			runner := AhkUnit.defaultRunner()
 			runner.Default()
 		}
 		runner.Run(testClass)
@@ -28,7 +28,7 @@ class AhkUnit {
 			return
 		}
 		if (!runner) {
-			runner := new AhkUnit.defaultRunner()
+			runner := AhkUnit.defaultRunner()
 			runner.Default()
 		}
 		for key in AhkUnit.testClasses {

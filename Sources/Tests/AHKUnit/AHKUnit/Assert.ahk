@@ -26,7 +26,7 @@ class AhkUnit_Assert {
 		; actual
 		
 		__New(actual) {
-			base.__New()
+			super.__New()
 			this.actual := actual
 		}
 	}
@@ -35,7 +35,7 @@ class AhkUnit_Assert {
 		; expected, actual
 		
 		__New(expected, actual) {
-			base.__New()
+			super.__New()
 			this.expected := expected
 			this.actual := actual
 		}
@@ -45,7 +45,7 @@ class AhkUnit_Assert {
 		; message
 		
 		__New(message) {
-			base.__New()
+			super.__New()
 			this.message := message
 		}
 		
@@ -60,7 +60,7 @@ class AhkUnit_Assert {
 	
 	class Equal extends AhkUnit_Assert.Arg2_ {
 		__New(params*) {
-			base.__New(params*)
+			super.__New(params*)
 			AhkUnit.Assert.mixin(this, AhkUnit.Assert.Case_)
 		}
 		
@@ -135,7 +135,7 @@ class AhkUnit_Assert {
 		; assertion, message
 		
 		__New(assertion, message = "") {
-			base.__New()
+			super.__New()
 			this.assertion := assertion
 			this.message := message
 		}

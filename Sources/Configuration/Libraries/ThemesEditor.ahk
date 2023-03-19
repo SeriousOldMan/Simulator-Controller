@@ -36,9 +36,9 @@ class ThemesEditor extends ConfigurationItem {
 	iThemesList := false
 
 	__New(configuration) {
-		this.iThemesList := new ThemesList(configuration)
+		this.iThemesList := ThemesList(configuration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ThemesEditor.Instance := this
 
@@ -79,17 +79,17 @@ class ThemesEditor extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		windowTitleEdit := getConfigurationValue(configuration, "Splash Window", "Title", "")
-		windowSubtitleEdit := getConfigurationValue(configuration, "Splash Window", "Subtitle", "")
+		windowTitleEdit := getMultiMapValue(configuration, "Splash Window", "Title", "")
+		windowSubtitleEdit := getMultiMapValue(configuration, "Splash Window", "Subtitle", "")
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		setConfigurationValue(configuration, "Splash Window", "Title", windowTitleEdit)
-		setConfigurationValue(configuration, "Splash Window", "Subtitle", windowSubtitleEdit)
+		setMultiMapValue(configuration, "Splash Window", "Title", windowTitleEdit)
+		setMultiMapValue(configuration, "Splash Window", "Subtitle", windowSubtitleEdit)
 
 		this.iThemesList.saveToConfiguration(configuration)
 	}
@@ -110,7 +110,7 @@ class ThemesEditor extends ConfigurationItem {
 
 		try {
 			if (this.iClosed == kOk) {
-				configuration := newConfiguration()
+				configuration := newMultiMap()
 
 				this.saveToConfiguration(configuration)
 
@@ -166,14 +166,14 @@ class ThemesList extends ConfigurationItemList {
 	iSoundIsPlaying := false
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ThemesList.Instance := this
 	}
 
 	createGui(configuration) {
 		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent
-							, % values2String("|", map(["Theme", "Media", "Sound File"], "translate")*)
+							, % values2String("|", collect(["Theme", "Media", "Sound File"], "translate")*)
 
 		Gui TE:Add, Text, x16 y270 w86 h23 +0x200, % translate("Theme")
 		Gui TE:Add, Edit, x110 y270 w140 h21 VthemeNameEdit, %themeNameEdit%
@@ -211,11 +211,11 @@ class ThemesList extends ConfigurationItemList {
 	}
 
 	loadFromConfiguration(configuration) {
-		local splashThemes := getConfigurationSectionValues(configuration, "Splash Themes", Object())
+		local splashThemes := getMultiMapValues(configuration, "Splash Themes")
 		local themes := {}
 		local descriptor, value, theme, type, media, duration, songFile
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
 		for descriptor, value in splashThemes {
 			theme := StrSplit(descriptor, ".")[1]
@@ -239,24 +239,24 @@ class ThemesList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		local index, theme, name, type, songFile
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for index, theme in this.ItemList {
 			name := theme[2]
 			type := theme[1]
 			songFile := theme[4]
 
-			setConfigurationValue(configuration, "Splash Themes", name . ".Type", type)
+			setMultiMapValue(configuration, "Splash Themes", name . ".Type", type)
 
 			if (songFile && (songFile != ""))
-				setConfigurationValue(configuration, "Splash Themes", name . ".Song", songFile)
+				setMultiMapValue(configuration, "Splash Themes", name . ".Song", songFile)
 
 			if (type == "Picture Carousel") {
-				setConfigurationValue(configuration, "Splash Themes", name . ".Images", theme[3])
-				setConfigurationValue(configuration, "Splash Themes", name . ".Duration", theme[5])
+				setMultiMapValue(configuration, "Splash Themes", name . ".Images", theme[3])
+				setMultiMapValue(configuration, "Splash Themes", name . ".Duration", theme[5])
 			}
 			else
-				setConfigurationValue(configuration, "Splash Themes", name . ".Video", theme[3])
+				setMultiMapValue(configuration, "Splash Themes", name . ".Video", theme[3])
 		}
 	}
 
@@ -299,7 +299,7 @@ class ThemesList extends ConfigurationItemList {
 	}
 
 	updateState() {
-		base.updateState()
+		super.updateState()
 
 		GuiControlGet themeTypeDropDown
 
@@ -461,7 +461,7 @@ error:
 			try {
 				SoundPlay NonExistent.avi
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -481,7 +481,7 @@ error:
 					this.iSoundIsPlaying := true
 				}
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 		}

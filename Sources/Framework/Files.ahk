@@ -96,9 +96,9 @@ deleteFile(fileName, backup := false) {
 		else
 			FileDelete(fileName)
 
-		return !ErrorLevel
+		return true
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 
 		return false
@@ -114,9 +114,9 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 
 			DirDelete(directoryName, %recurse%)
 
-			return !ErrorLevel
+			return true
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 
 			return false

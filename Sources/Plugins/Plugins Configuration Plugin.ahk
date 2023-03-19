@@ -35,13 +35,13 @@ global pluginUpdateButton
 class PluginsConfigurator extends ConfigurationItemList {
 	iEditor := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	Plugins[] {
+	Plugins {
 		Get {
 			local result := []
 			local index, thePlugin
@@ -56,7 +56,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 	__New(editor, configuration) {
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		PluginsConfigurator.Instance := this
 	}
@@ -65,7 +65,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		local window := editor.Window
 
 		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent
-						, % values2String("|", map(["Active?", "Plugin", "Simulator(s)", "Arguments"], "translate")*)
+						, % values2String("|", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], "translate")*)
 
 		Gui %window%:Add, Text, x16 y295 w86 h23 +0x200, % translate("Plugin")
 		Gui %window%:Add, Edit, x110 y295 w154 h21 VpluginEdit, %pluginEdit%
@@ -95,23 +95,23 @@ class PluginsConfigurator extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		local name, arguments
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for name, arguments in getConfigurationSectionValues(configuration, "Plugins", Object())
-			this.ItemList.Push(new Plugin(name, configuration))
+		for name, arguments in getMultiMapValues(configuration, "Plugins")
+			this.ItemList.Push(Plugin(name, configuration))
 	}
 
 	saveToConfiguration(configuration) {
 		local ignore, thePlugin
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, thePlugin in this.ItemList
 			thePlugin.saveToConfiguration(configuration)
 	}
 
 	updateState() {
-		base.updateState()
+		super.updateState()
 
 		if (this.CurrentItem != 0) {
 			GuiControlGet pluginEdit
@@ -215,7 +215,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		GuiControlGet pluginArgumentsEdit
 		GuiControlGet pluginActivatedCheck
 
-		return new Plugin(pluginEdit, false, pluginActivatedCheck != 0, pluginSimulatorsEdit, pluginArgumentsEdit)
+		return Plugin(pluginEdit, false, pluginActivatedCheck != 0, pluginSimulatorsEdit, pluginArgumentsEdit)
 	}
 }
 
@@ -294,7 +294,7 @@ initializePluginsConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Plugins"), new PluginsConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Plugins"), PluginsConfigurator(editor, editor.Configuration))
 	}
 }
 

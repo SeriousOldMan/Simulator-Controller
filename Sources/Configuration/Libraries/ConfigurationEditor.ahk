@@ -36,13 +36,13 @@ class TriggerDetectorTask extends Task {
 	iCallback := false
 	iJoysticks := []
 
-	CallBack[] {
+	CallBack {
 		Get {
 			return this.iCallback
 		}
 	}
 
-	Stopped[] {
+	Stopped {
 		Set {
 			if value
 				ToolTip, , , 1
@@ -51,7 +51,7 @@ class TriggerDetectorTask extends Task {
 		}
 	}
 
-	Joysticks[] {
+	Joysticks {
 		Get {
 			return this.iJoysticks
 		}
@@ -60,7 +60,7 @@ class TriggerDetectorTask extends Task {
 	__New(callback, arguments*) {
 		this.iCallback := callback
 
-		base.__New(false, arguments*)
+		super.__New(false, arguments*)
 	}
 
 	run() {
@@ -76,7 +76,7 @@ class TriggerDetectorTask extends Task {
 
 		this.iJoysticks := joysticks
 
-		return new TriggerDetectorContinuation(Task.CurrentTask)
+		return TriggerDetectorContinuation(Task.CurrentTask)
 	}
 }
 
@@ -86,7 +86,7 @@ class TriggerDetectorTask extends Task {
 
 class TriggerDetectorContinuation extends Continuation {
 	__New(task, arguments*) {
-		base.__New(task, false, arguments*)
+		super.__New(task, false, arguments*)
 	}
 
 	run() {
@@ -188,10 +188,10 @@ class TriggerDetectorContinuation extends Continuation {
 					return false
 				}
 				else
-					return new TriggerDetectorContinuation(this.Task, 2000)
+					return TriggerDetectorContinuation(this.Task, 2000)
 			}
 
-			return new TriggerDetectorContinuation(this.Task, 750)
+			return TriggerDetectorContinuation(this.Task, 750)
 		}
 		else {
 			this.stop()
@@ -223,25 +223,25 @@ class ConfigurationEditor extends ConfigurationItem {
 		}
 	}
 
-	AutoSave[] {
+	AutoSave {
 		Get {
 			return (this.iSaveMode = "Auto")
 		}
 	}
 
-	Window[] {
+	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	GeneralTab[] {
+	GeneralTab {
 		Get {
 			return this.Configurators[1][2]
 		}
 	}
 
-	Result[] {
+	Result {
 		Get {
 			return this.iResult
 		}
@@ -254,9 +254,9 @@ class ConfigurationEditor extends ConfigurationItem {
 	__New(development, configuration) {
 		this.iDevelopment := development
 
-		base.__New(configuration)
+		super.__New(configuration)
 
-		this.registerConfigurator(translate("General"), new GeneralTab(development, configuration))
+		this.registerConfigurator(translate("General"), GeneralTab(development, configuration))
 
 		ConfigurationEditor.Instance := this
 	}
@@ -304,7 +304,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		chosen := inList(choices, saveModeDropDown)
 
 		Gui %window%:Add, Text, x8 y528 w55 h23 +0x200, % translate("Save")
-		Gui %window%:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% gupdateSaveMode VsaveModeDropDown, % values2String("|", map(choices, "translate")*)
+		Gui %window%:Add, DropDownList, x63 y528 w75 AltSubmit Choose%chosen% gupdateSaveMode VsaveModeDropDown, % values2String("|", collect(choices, "translate")*)
 
 		labels := []
 
@@ -327,9 +327,9 @@ class ConfigurationEditor extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.iSaveMode := getConfigurationValue(configuration, "General", "Save", "Manual")
+		this.iSaveMode := getMultiMapValue(configuration, "General", "Save", "Manual")
 
 		saveModeDropDown := this.iSaveMode
 	}
@@ -337,13 +337,13 @@ class ConfigurationEditor extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		local ignore, configurator
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		GuiControlGet saveModeDropDown
 
 		this.iSaveMode := ["Auto", "Manual"][saveModeDropDown]
 
-		setConfigurationValue(configuration, "General", "Save", this.iSaveMode)
+		setMultiMapValue(configuration, "General", "Save", this.iSaveMode)
 
 		for ignore, configurator in this.Configurators
 			configurator[2].saveToConfiguration(configuration)
@@ -442,7 +442,7 @@ triggerDetector(callback := false) {
 			detectorTask := false
 		}
 		else {
-			detectorTask := new TriggerDetectorTask(callback, 100)
+			detectorTask := TriggerDetectorTask(callback, 100)
 
 			detectorTask.start()
 		}

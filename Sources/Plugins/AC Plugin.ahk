@@ -44,42 +44,42 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	iSettingsDatabase := false
 	iCarMetaData := {}
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	PreviousOptionHotkey[] {
+	PreviousOptionHotkey {
 		Get {
 			return this.iPreviousOptionHotkey
 		}
 	}
 
-	NextOptionHotkey[] {
+	NextOptionHotkey {
 		Get {
 			return this.iNextOptionHotkey
 		}
 	}
 
-	PreviousChoiceHotkey[] {
+	PreviousChoiceHotkey {
 		Get {
 			return this.iPreviousChoiceHotkey
 		}
 	}
 
-	NextChoiceHotkey[] {
+	NextChoiceHotkey {
 		Get {
 			return this.iNextChoiceHotkey
 		}
 	}
 
-	SettingsDatabase[] {
+	SettingsDatabase {
 		Get {
 			local settingsDB := this.iSettingsDatabase
 
 			if !settingsDB {
-				settingsDB := new SettingsDatabase()
+				settingsDB := SettingsDatabase()
 
 				this.iSettingsDatabase := settingsDB
 			}
@@ -95,7 +95,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "{Down}")
@@ -123,7 +123,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSession(session) {
-		base.updateSession(session)
+		super.updateSession(session)
 
 		if (session == kSessionFinished) {
 			this.iRepairSuspensionChosen := false
@@ -135,32 +135,32 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	updateTelemetryData(data) {
 		local forName, surName, nickName, name
 
-		base.updateTelemetryData(data)
+		super.updateTelemetryData(data)
 
-		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
-		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
+		setMultiMapValue(data, "Car Data", "TC", Round((getMultiMapValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
+		setMultiMapValue(data, "Car Data", "ABS", Round((getMultiMapValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
 
-		forName := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
-		surName := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-		nickName := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+		forName := getMultiMapValue(data, "Stint Data", "DriverForname", "John")
+		surName := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+		nickName := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		if ((forName = surName) && (surName = nickName)) {
 			name := string2Values(A_Space, forName, 2)
 
-			setConfigurationValue(data, "Stint Data", "DriverForname", name[1])
-			setConfigurationValue(data, "Stint Data", "DriverSurname", (name.Length() > 1) ? name[2] : "")
-			setConfigurationValue(data, "Stint Data", "DriverNickname", "")
+			setMultiMapValue(data, "Stint Data", "DriverForname", name[1])
+			setMultiMapValue(data, "Stint Data", "DriverSurname", (name.Length() > 1) ? name[2] : "")
+			setMultiMapValue(data, "Stint Data", "DriverNickname", "")
 		}
 
 		if !isDebug() {
-			removeConfigurationValue(data, "Car Data", "TCRaw")
-			removeConfigurationValue(data, "Car Data", "ABSRaw")
-			removeConfigurationValue(data, "Track Data", "GripRaw")
+			removeMultiMapValue(data, "Car Data", "TCRaw")
+			removeMultiMapValue(data, "Car Data", "ABSRaw")
+			removeMultiMapValue(data, "Track Data", "GripRaw")
 		}
 
-		if !getConfigurationValue(data, "Stint Data", "InPit", false)
-			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
-				setConfigurationValue(data, "Session Data", "Paused", true)
+		if !getMultiMapValue(data, "Stint Data", "InPit", false)
+			if (getMultiMapValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setMultiMapValue(data, "Session Data", "Paused", true)
 	}
 
 	getCarMetaData(meta, default := 0) {
@@ -172,12 +172,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		if this.CarMetaData.HasKey(key)
 			return this.CarMetaData[key]
 		else {
-			value := getConfigurationValue(readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
+			value := getMultiMapValue(readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
 
 			if (value == kUndefined) {
 				settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*")
 
-				value := getConfigurationValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, default)
+				value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, default)
 			}
 
 			this.CarMetaData[key] := value
@@ -354,7 +354,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -369,7 +369,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		local delta
 
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			delta := this.tyreCompoundIndex(compound, compoundColor)
@@ -387,7 +387,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -423,7 +423,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (this.iRepairSuspensionChosen != repairSuspension) {

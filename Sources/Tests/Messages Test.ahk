@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Messages Test                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,27 +9,24 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Requires AutoHotkey >=2.0
 #SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
-
-; SetBatchLines -1				; Maximize CPU utilization
-; ListLines Off					; Disable execution history
+SendMode("Input")				; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
 
-global vBuildConfiguration := "Development"
+global kBuildConfiguration := "Development"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Messages.ahk
-#Include AHKUnit\AHKUnit.ahk
+#Include "..\Libraries\Messages.ahk"
+#Include "AHKUnit\AHKUnit.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,12 +41,12 @@ global vIncomingValues := []
 ;;;-------------------------------------------------------------------------;;;
 
 exit() {
-	ExitApp 0
+	ExitApp(0)
 }
 
 class MessagesTest extends Assert {
 	listEqual(list1, list2) {
-		if (list1.Length() == list2.Length()) {
+		if (list1.Length == list2.Length) {
 			for index, value in list1
 				if (list2[index] != value)
 					return false
@@ -61,21 +58,21 @@ class MessagesTest extends Assert {
 	}
 
 	Messages_Order_Test() {
-		Sleep 5000
+		global vIncomingValues
 
-		Process Exist
+		Sleep(5000)
 
-		pid := ErrorLevel
+		pid := ProcessExist()
 
 		loop 5
-			sendMessage(kFileMessage, "Test", "registerValue:" . A_Index, pid)
+			messageSend(kFileMessage, "Test", "registerValue:" . A_Index, pid)
 
-		while (vIncomingValues.Length() < 5) {
-			Random priority, 1, 4
+		while (vIncomingValues.Length < 5) {
+			priority := Random(1, 4)
 
-			Task.startTask("disturb", 50, Round(priority))
+			; Task.startTask("disturb", 50, Round(priority))
 
-			Sleep 1
+			Sleep(1)
 		}
 
 		this.AssertEqual(true, this.listEqual(vIncomingValues, [1,2,3,4,5]), "Message order is not retained...")
@@ -88,6 +85,8 @@ class MessagesTest extends Assert {
 ;;;-------------------------------------------------------------------------;;;
 
 registerValue(value) {
+	global vIncomingValues
+
 	vIncomingValues.Push(value)
 }
 
@@ -95,12 +94,10 @@ ignore(arguments*) {
 }
 
 disturb() {
-	Process Exist
-
-	pid := ErrorLevel
+	pid := ProcessExist()
 
 	loop 2
-		sendMessage(kFileMessage, "Test", "ignore:" . A_Index, pid)
+		messageSend(kFileMessage, "Test", "ignore:" . A_Index, pid)
 }
 
 
@@ -108,7 +105,7 @@ disturb() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-registerMessageHandler("Test", "functionMessageHandler")
+registerMessageHandler("Test", functionMessageHandler)
 
 AHKUnit.AddTestClass(MessagesTest)
 

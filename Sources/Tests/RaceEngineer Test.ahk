@@ -65,13 +65,13 @@ global vPitstopRepairEngine := kNotInitialized
 
 class TestRaceEngineer extends RaceEngineer {
 	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
-		base.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
+		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
 	}
 
 	createKnowledgeBase(facts) {
-		local knowledgeBase := base.createKnowledgeBase(facts)
+		local knowledgeBase := super.createKnowledgeBase(facts)
 
 		knowledgeBase.setFact("Session.Settings.Tyre.Pressure.Correction.Pressure", true)
 
@@ -83,7 +83,7 @@ class TestRaceEngineer extends RaceEngineer {
 	}
 
 	lowFuelWarning(remainingLaps) {
-		base.lowFuelWarning(remainingLaps)
+		super.lowFuelWarning(remainingLaps)
 
 		if isDebug()
 			showMessage("Low fuel warning - " . remainingLaps . " lap left")
@@ -92,7 +92,7 @@ class TestRaceEngineer extends RaceEngineer {
 	}
 
 	damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage) {
-		base.damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage)
+		super.damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage)
 
 		if isDebug()
 			showMessage("Damage warning for " . (newSuspensionDamage ? "Suspension " : "") . (newBodyworkDamage ? " Bodywork" : "") . (newEngineDamage ? " Engine" : ""))
@@ -103,14 +103,14 @@ class TestRaceEngineer extends RaceEngineer {
 	}
 
 	pressureLossWarning(tyre, lostPressure) {
-		base.pressureLossWarning(tyre, lostPressure)
+		super.pressureLossWarning(tyre, lostPressure)
 
 		if isDebug()
 			showMessage("Pressure loss warning for " . tyre . ": " . lostPressure)
 	}
 
 	reportDamageAnalysis(repair, stintLaps, delta) {
-		base.reportDamageAnalysis(repair, stintLaps, delta)
+		super.reportDamageAnalysis(repair, stintLaps, delta)
 
 		if isDebug()
 			showMessage("Damage analysis - Repair: " . (repair ? "Yes" : "No") . "; Lap Delta : " . delta . "; Remaining Laps: " . stintLaps)
@@ -210,12 +210,12 @@ class TestPitstopHandler {
 
 class FuelReporting extends Assert {
 	FuelWarningTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
 
 		vFuelWarnings := {}
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -235,12 +235,12 @@ class FuelReporting extends Assert {
 	}
 
 	RemainingFuelTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), false, false, false)
 
 		vFuelWarnings := {}
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -260,10 +260,10 @@ class FuelReporting extends Assert {
 
 class DamageReporting extends Assert {
 	DamageReportingTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
@@ -296,7 +296,7 @@ class DamageReporting extends Assert {
 
 class DamageAnalysis extends Assert {
 	DamageRace2ReportingTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 2\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		done := false
 
@@ -311,7 +311,7 @@ class DamageAnalysis extends Assert {
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
 
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -364,7 +364,7 @@ class DamageAnalysis extends Assert {
 	}
 
 	DamageRace3ReportingTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 3\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		done := false
 
@@ -379,7 +379,7 @@ class DamageAnalysis extends Assert {
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
 
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -443,7 +443,7 @@ class DamageAnalysis extends Assert {
 	}
 
 	DamageRace4ReportingTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 4\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		done := false
 
@@ -458,7 +458,7 @@ class DamageAnalysis extends Assert {
 				vDamageLapDelta := kNotInitialized
 				vDamageStintLaps := kNotInitialized
 
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -535,12 +535,12 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopPlanLap3Test() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		vCompletedActions := {}
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -581,12 +581,12 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopPlanLap4Test() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		vCompletedActions := {}
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -627,12 +627,12 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopPlanLap5Test() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		vCompletedActions := {}
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -676,7 +676,7 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopPrepare3Test() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		vCompletedActions := {}
 
@@ -690,7 +690,7 @@ class PitstopHandling extends Assert {
 		vPitstopRepairEngine := kNotInitialized
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -732,7 +732,7 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopPrepare5Test() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		vCompletedActions := {}
 
@@ -746,7 +746,7 @@ class PitstopHandling extends Assert {
 		vPitstopRepairEngine := kNotInitialized
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -788,12 +788,12 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopPerformedTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		vCompletedActions := {}
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -857,14 +857,14 @@ class PitstopHandling extends Assert {
 	}
 
 	PitstopMultipleTest() {
-		engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), new TestPitStopHandler(), false, false)
+		engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Race Engineer.settings"), TestPitStopHandler(), false, false)
 
 		loop {
 			vSuspensionDamage := kNotInitialized
 			vBodyworkDamage := kNotInitialized
 			vEngineDamage := kNotInitialized
 
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -922,9 +922,9 @@ class PitstopHandling extends Assert {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".ConsideredHistoryLaps", 2)
-setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".HistoryLapsDamping", 0.5)
-setConfigurationValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTime", false)
+setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".ConsideredHistoryLaps", 2)
+setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".HistoryLapsDamping", 0.5)
+setMultiMapValue(kSimulatorConfiguration, "Race Engineer Analysis", "Unknown" . ".AdjustLapTime", false)
 
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
@@ -940,14 +940,14 @@ if !GetKeyState("Ctrl") {
 }
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
-	engineer := new TestRaceEngineer(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-								   , new TestPitStopHandler(), "Jona", "de", "Windows", true, true, true)
+	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
+								   , TestPitStopHandler(), "Jona", "de", "Windows", true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 
 	if (raceNr == 1) {
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 1\Lap " . A_Index . ".data")
 
 			if (data.Count() == 0)
 				break
@@ -987,7 +987,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 2\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -1021,7 +1021,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 3\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -1055,7 +1055,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 4\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -1090,7 +1090,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 5\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 5\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -1125,7 +1125,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 6\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 6\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -1160,7 +1160,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)
@@ -1236,7 +1236,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (lap == 82)
@@ -1263,7 +1263,7 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Lap " . lap . "." . A_Index . ".data")
 
 				if (data.Count() == 0) {
 					if (A_Index == 1)

@@ -38,7 +38,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 		iStartTime := false
 
-		Plugin[] {
+		Plugin {
 			Get {
 				return this.iPlugin
 			}
@@ -49,7 +49,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 			this.iStartTime := A_TickCount
 
-			base.__New(false, 1000, kLowPriority)
+			super.__New(false, 1000, kLowPriority)
 		}
 
 		run() {
@@ -63,27 +63,27 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					if (driverSwapPlan && (driverSwapPlan != "")) {
 						teamServer.setSessionValue(this.Plugin.Plugin . " Driver Swap Plan", "")
 
-						driverSwapPlan := parseConfiguration(driverSwapPlan)
+						driverSwapPlan := parseMultiMap(driverSwapPlan)
 
-						requestDriver := getConfigurationValue(driverSwapPlan, "Pitstop", "Driver", false)
+						requestDriver := getMultiMapValue(driverSwapPlan, "Pitstop", "Driver", false)
 						requestDriver := (requestDriver ? [requestDriver] : [])
 
-						this.Plugin.RaceEngineer.planDriverSwap(getConfigurationValue(driverSwapPlan, "Pitstop", "Lap", 0)
-															  , "!" . getConfigurationValue(driverSwapPlan, "Pitstop", "Refuel", 0)
-															  , "!" . getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Change", false)
-															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Set", 0)
-															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Compound", "Dry")
-															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Compound.Color", "Black")
-															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
-															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Bodywork", false)
-															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Suspension", false)
-															  , getConfigurationValue(driverSwapPlan, "Pitstop", "Repair.Engine", false)
+						this.Plugin.RaceEngineer.planDriverSwap(getMultiMapValue(driverSwapPlan, "Pitstop", "Lap", 0)
+															  , "!" . getMultiMapValue(driverSwapPlan, "Pitstop", "Refuel", 0)
+															  , "!" . getMultiMapValue(driverSwapPlan, "Pitstop", "Tyre.Change", false)
+															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Tyre.Set", 0)
+															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Tyre.Compound", "Dry")
+															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Tyre.Compound.Color", "Black")
+															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
+															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Repair.Bodywork", false)
+															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Repair.Suspension", false)
+															  , getMultiMapValue(driverSwapPlan, "Pitstop", "Repair.Engine", false)
 															  , requestDriver*)
 
 						return false
 					}
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -105,7 +105,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 	class RemoteRaceEngineer extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
-			base.__New(plugin, "Race Engineer", remotePID)
+			super.__New(plugin, "Race Engineer", remotePID)
 		}
 
 		planPitstop(arguments*) {
@@ -134,26 +134,26 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			else if (this.Plugin.RaceEngineer && (this.Action = "PitstopPrepare"))
 				this.Plugin.preparePitstop()
 			else
-				base.fireAction(function, trigger)
+				super.fireAction(function, trigger)
 		}
 	}
 
-	RaceEngineer[] {
+	RaceEngineer {
 		Get {
 			return this.RaceAssistant
 		}
 	}
 
-	LapDatabase[] {
+	LapDatabase {
 		Get {
 			if !this.iLapDatabase
-				this.iLapDatabase := new Database(false, this.kLapDataSchemas)
+				this.iLapDatabase := Database(false, this.kLapDataSchemas)
 
 			return this.iLapDatabase
 		}
 	}
 
-	PitstopPending[] {
+	PitstopPending {
 		Get {
 			return this.iPitstopPending
 		}
@@ -168,7 +168,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				action := new this.RaceEngineerAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action)
+				action := this.RaceEngineerAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action)
 
 				this.registerAction(action)
 			}
@@ -176,30 +176,30 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				this.logFunctionNotFound(actionFunction)
 		}
 		else
-			return base.createRaceAssistantAction(controller, action, actionFunction, arguments*)
+			return super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 	}
 
 	createRaceAssistant(pid) {
-		return new this.RemoteRaceEngineer(this, pid)
+		return this.RemoteRaceEngineer(this, pid)
 	}
 
 	prepareSettings(data) {
-		local settings := base.prepareSettings(data)
-		local tyresDB := new TyresDatabase()
-		local simulator := getConfigurationValue(data, "Session Data", "Simulator")
-		local car := getConfigurationValue(data, "Session Data", "Car")
-		local track := getConfigurationValue(data, "Session Data", "Track")
+		local settings := super.prepareSettings(data)
+		local tyresDB := TyresDatabase()
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator")
+		local car := getMultiMapValue(data, "Session Data", "Car")
+		local track := getMultiMapValue(data, "Session Data", "Track")
 		local simulatorName := tyresDB.getSimulatorName(simulator)
-		local duration := Round((getConfigurationValue(data, "Stint Data", "LapLastTime") - getConfigurationValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
-		local weather := getConfigurationValue(data, "Weather Data", "Weather", "Dry")
-		local compound := getConfigurationValue(data, "Car Data", "TyreCompound", "Dry")
-		local compoundColor := getConfigurationValue(data, "Car Data", "TyreCompoundColor", "Black")
-		local tpSetting := getConfigurationValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
+		local duration := Round((getMultiMapValue(data, "Stint Data", "LapLastTime") - getMultiMapValue(data, "Session Data", "SessionTimeRemaining")) / 1000)
+		local weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
+		local compound := getMultiMapValue(data, "Car Data", "TyreCompound", "Dry")
+		local compoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor", "Black")
+		local tpSetting := getMultiMapValue(this.Configuration, "Race Engineer Startup", simulatorName . ".LoadTyrePressures", "Default")
 		local airTemperature, trackTemperature, pressures, certainty
 
 		if ((tpSetting = "TyresDatabase") || (tpSetting = "SetupDatabase")) {
-			trackTemperature := getConfigurationValue(data, "Track Data", "Temperature", 23)
-			airTemperature := getConfigurationValue(data, "Weather Data", "Temperature", 27)
+			trackTemperature := getMultiMapValue(data, "Track Data", "Temperature", 23)
+			airTemperature := getMultiMapValue(data, "Weather Data", "Temperature", 27)
 
 			compound := false
 			compoundColor := false
@@ -207,42 +207,42 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			certainty := 1.0
 
 			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty, true) {
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 
-				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
-				setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+				setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 			}
 		}
 		else if (tpSetting = "Import") {
-			writeConfiguration(kTempDirectory . "Race Engineer.settings", settings)
+			writeMultiMap(kTempDirectory . "Race Engineer.settings", settings)
 
 			openRaceSettings(true, true, false, kTempDirectory . "Race Engineer.settings")
 
-			settings := readConfiguration(kTempDirectory . "Race Engineer.settings")
+			settings := readMultiMap(kTempDirectory . "Race Engineer.settings")
 		}
 		else if (tpSetting = "Setup") {
-			pressures := string2Values(",", getConfigurationValue(data, "Car Data", "TyrePressure", ""))
+			pressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
 			
-			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
-			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
-			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
-			setConfigurationValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
+			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
+			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
+			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
+			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RR", Round(pressures[4], 1))
 		}
 
 		return settings
 	}
 
 	startSession(settings, data) {
-		base.startSession(settings, data)
+		super.startSession(settings, data)
 
 		this.iLapDatabase := false
 	}
 
 	joinSession(settings, data) {
-		if getConfigurationValue(settings, "Assistant.Engineer", "Join.Late", false)
+		if getMultiMapValue(settings, "Assistant.Engineer", "Join.Late", false)
 			this.startSession(settings, data)
 	}
 
@@ -258,21 +258,21 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				pitstopSettings := this.TeamServer.getLapValue(pitstopSettings, "Pitstop Plan")
 
 				if (pitstopSettings && (pitstopSettings != "")) {
-					pitstopSettings := parseConfiguration(pitstopSettings)
+					pitstopSettings := parseMultiMap(pitstopSettings)
 
-					requestDriver := getConfigurationValue(pitstopSettings, "Pitstop", "Driver", false)
+					requestDriver := getMultiMapValue(pitstopSettings, "Pitstop", "Driver", false)
 					requestDriver := (requestDriver ? [requestDriver] : [])
 
-					this.RaceEngineer.planPitstop(getConfigurationValue(pitstopSettings, "Pitstop", "Lap", 0)
-												, "!" . getConfigurationValue(pitstopSettings, "Pitstop", "Refuel", 0)
-												, "!" . getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Set", 0)
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound", "Dry")
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Compound.Color", "Black")
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Suspension", false)
-												, getConfigurationValue(pitstopSettings, "Pitstop", "Repair.Engine", false)
+					this.RaceEngineer.planPitstop(getMultiMapValue(pitstopSettings, "Pitstop", "Lap", 0)
+												, "!" . getMultiMapValue(pitstopSettings, "Pitstop", "Refuel", 0)
+												, "!" . getMultiMapValue(pitstopSettings, "Pitstop", "Tyre.Change", false)
+												, getMultiMapValue(pitstopSettings, "Pitstop", "Tyre.Set", 0)
+												, getMultiMapValue(pitstopSettings, "Pitstop", "Tyre.Compound", "Dry")
+												, getMultiMapValue(pitstopSettings, "Pitstop", "Tyre.Compound.Color", "Black")
+												, getMultiMapValue(pitstopSettings, "Pitstop", "Tyre.Pressures", "26.1,26.1,26.1,26.1")
+												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Bodywork", false)
+												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Suspension", false)
+												, getMultiMapValue(pitstopSettings, "Pitstop", "Repair.Engine", false)
 												, requestDriver*)
 				}
 			}
@@ -280,13 +280,13 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	addLap(lap, running, data) {
-		base.addLap(lap, running, data)
+		super.addLap(lap, running, data)
 
 		this.checkPitstopPlan()
 	}
 
 	updateLap(lap, running, data) {
-		base.updateLap(lap, running, data)
+		super.updateLap(lap, running, data)
 
 		this.checkPitstopPlan()
 	}
@@ -335,7 +335,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	performPitstop(lapNumber, options) {
-		base.performPitstop(lapNumber, options)
+		super.performPitstop(lapNumber, options)
 
 		this.iPitstopPending := false
 
@@ -368,20 +368,20 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateTyreSet(pitstopNumber, driver, laps, compound, compoundColor, set, flWear, frWear, rlWear, rrWear) {
-		local data := newConfiguration()
+		local data := newMultiMap()
 
-		setConfigurationValue(data, "Pitstop Data", "Pitstop", pitstopNumber)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Driver", driver)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Laps", laps)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Compound", compound)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Compound.Color", compoundColor)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Set", set)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Front.Left", flWear)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Front.Right", frWear)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Rear.Left", rlWear)
-		setConfigurationValue(data, "Pitstop Data", "Tyre.Wear.Rear.Right", rrWear)
+		setMultiMapValue(data, "Pitstop Data", "Pitstop", pitstopNumber)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Driver", driver)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Laps", laps)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Compound", compound)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Compound.Color", compoundColor)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Set", set)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Wear.Front.Left", flWear)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Wear.Front.Right", frWear)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Wear.Rear.Left", rlWear)
+		setMultiMapValue(data, "Pitstop Data", "Tyre.Wear.Rear.Right", rrWear)
 
-		writeConfiguration(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
+		writeMultiMap(kTempDirectory . "Pitstop " . pitstopNumber . ".ini", data)
 
 		this.updatePitstopState(data)
 	}
@@ -418,7 +418,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local teamServer := this.TeamServer
 
 		if (teamServer && teamServer.SessionActive) {
-			teamServer.setLapValue(this.LastLap, this.Plugin . " Pitstop State", printConfiguration(data))
+			teamServer.setLapValue(this.LastLap, this.Plugin . " Pitstop State", printMultiMap(data))
 
 			teamServer.setSessionValue(this.Plugin . " Pitstop State", this.LastLap)
 		}
@@ -440,7 +440,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateTyresDatabase() {
-		local tyresDB := new TyresDatabase()
+		local tyresDB := TyresDatabase()
 		local teamServer := this.TeamServer
 		local session := this.TeamSession
 		local first := true
@@ -488,7 +488,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						tyresDB.updatePressures(lapPressures[1], lapPressures[2], lapPressures[3], lapPressures[4], lapPressures[5], lapPressures[6]
 											  , lapPressures[7], lapPressures[8], coldPressures, string2Values(",", lapPressures[10]), false, driverID)
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 
 						break
@@ -515,7 +515,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 											  , coldPressures, string2Values(",", lapData["Pressures.Hot"]), false)
 					}
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 		}
@@ -523,7 +523,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			try {
 				tyresDB.unlock()
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 		}

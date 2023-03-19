@@ -53,7 +53,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	iPedalProfileMode := false
 
 	class PedalProfileMode extends ControllerMode {
-		Mode[] {
+		Mode {
 			Get {
 				return kPedalCalibrationMode
 			}
@@ -66,13 +66,13 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		iSelectionIndex := false
 		iSelectionXPosition := false
 
-		Pedal[] {
+		Pedal {
 			Get {
 				return this.iPedal
 			}
 		}
 
-		Shape[] {
+		Shape {
 			Get {
 				return this.iShape
 			}
@@ -97,7 +97,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					throw "Unknown pedal type """ . pedal . """ detected in CurveShapeAction.__New..."
 			}
 
-			base.__New(function, label, icon)
+			super.__New(function, label, icon)
 		}
 
 		fireAction(function, trigger) {
@@ -175,7 +175,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		}
 	}
 
-	Application[] {
+	Application {
 		Get {
 			return this.iSmartCtrlApplication
 		}
@@ -184,10 +184,10 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false, register := true) {
 		local smartCtrl, ignore, theAction
 
-		base.__New(controller, name, configuration, false)
+		super.__New(controller, name, configuration, false)
 
 		if (this.Active || isDebug()) {
-			this.iSmartCtrlApplication := new Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
+			this.iSmartCtrlApplication := Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
 
 			smartCtrl := this.iSmartCtrlApplication.ExePath
 
@@ -198,7 +198,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					return false
 			}
 
-			this.iPedalProfileMode := new this.PedalProfileMode(this)
+			this.iPedalProfileMode := this.PedalProfileMode(this)
 
 			this.registerMode(this.iPedalProfileMode)
 
@@ -223,7 +223,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		if (function != false) {
 			icon := this.getIcon("CurveShape." . shape . ".Activate", this.getIcon("CurveShape.Activate"))
 
-			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, icon, pedal, shape))
+			this.iPedalProfileMode.registerAction(this.CurveShapeAction(function, label, icon, pedal, shape))
 		}
 		else
 			this.logFunctionNotFound(descriptor)
@@ -231,9 +231,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 	writePluginState(configuration) {
 		if this.Active
-			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 		else
-			base.writePluginState(configuration)
+			super.writePluginState(configuration)
 	}
 }
 

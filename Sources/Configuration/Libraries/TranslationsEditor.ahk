@@ -40,16 +40,16 @@ class TranslationsEditor extends ConfigurationItem {
 	iTranslationsList := false
 	iClosed := false
 
-	TranslationsList[] {
+	TranslationsList {
 		Get {
 			return this.iTranslationsList
 		}
 	}
 
 	__New(configuration) {
-		this.iTranslationsList := new TranslationsList(configuration)
+		this.iTranslationsList := TranslationsList(configuration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		TranslationsEditor.Instance := this
 
@@ -287,7 +287,7 @@ class TranslationsList extends ConfigurationItemList {
 	iLanguageCode := ""
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		TranslationsList.Instance := this
 	}
@@ -296,7 +296,7 @@ class TranslationsList extends ConfigurationItemList {
 		local option
 
 		Gui TE:Add, ListView, x16 y+10 w377 h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndtranslationsListViewHandle VtranslationsListView glistEvent
-							, % values2String("|", map(["Original", "Translation"], "translate")*)
+							, % values2String("|", collect(["Original", "Translation"], "translate")*)
 
 		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Original")
 		Gui TE:Add, Edit, x110 yp w283 h80 Disabled VoriginalTextEdit, %originalTextEdit%
@@ -341,7 +341,7 @@ class TranslationsList extends ConfigurationItemList {
 	}
 
 	updateState() {
-		base.updateState()
+		super.updateState()
 	}
 
 	loadEditor(item) {
@@ -385,7 +385,7 @@ class TranslationsList extends ConfigurationItemList {
 				this.updateItem()
 		}
 
-		base.openEditor(itemIndex)
+		super.openEditor(itemIndex)
 	}
 
 	findNextUntranslated() {

@@ -112,13 +112,13 @@ class VoiceServer extends ConfigurationItem {
 		class ClientSpeechSynthesizer extends SpeechSynthesizer {
 			iVoiceClient := false
 
-			Routing[] {
+			Routing {
 				Get {
 					return this.VoiceClient.Routing
 				}
 			}
 
-			VoiceClient[] {
+			VoiceClient {
 				Get {
 					return this.iVoiceClient
 				}
@@ -127,20 +127,20 @@ class VoiceServer extends ConfigurationItem {
 			__New(voiceClient, arguments*) {
 				this.iVoiceClient := voiceClient
 
-				base.__New(arguments*)
+				super.__New(arguments*)
 			}
 		}
 
 		class ClientSpeechRecognizer extends SpeechRecognizer {
 			iVoiceClient := false
 
-			Routing[] {
+			Routing {
 				Get {
 					return this.VoiceClient.Routing
 				}
 			}
 
-			VoiceClient[] {
+			VoiceClient {
 				Get {
 					return this.iVoiceClient
 				}
@@ -149,101 +149,101 @@ class VoiceServer extends ConfigurationItem {
 			__New(voiceClient, arguments*) {
 				this.iVoiceClient := voiceClient
 
-				base.__New(arguments*)
+				super.__New(arguments*)
 			}
 		}
 
-		Routing[] {
+		Routing {
 			Get {
 				return this.iRouting
 			}
 		}
 
-		VoiceServer[] {
+		VoiceServer {
 			Get {
 				return this.iVoiceServer
 			}
 		}
 
-		Descriptor[] {
+		Descriptor {
 			Get {
 				return this.iDescriptor
 			}
 		}
 
-		PID[] {
+		PID {
 			Get {
 				return this.iPID
 			}
 		}
 
-		Language[] {
+		Language {
 			Get {
 				return this.iLanguage
 			}
 		}
 
-		Synthesizer[] {
+		Synthesizer {
 			Get {
 				return this.iSynthesizer
 			}
 		}
 
-		Speaker[] {
+		Speaker {
 			Get {
 				return this.iSpeaker
 			}
 		}
 
-		Speaking[] {
+		Speaking {
 			Get {
 				return this.iSpeaking
 			}
 		}
 
-		Recognizer[] {
+		Recognizer {
 			Get {
 				return this.iRecognizer
 			}
 		}
 
-		Listener[] {
+		Listener {
 			Get {
 				return this.iListener
 			}
 		}
 
-		Listening[] {
+		Listening {
 			Get {
 				return this.iListening
 			}
 		}
 
-		SpeakerVolume[] {
+		SpeakerVolume {
 			Get {
 				return this.iSpeakerVolume
 			}
 		}
 
-		SpeakerPitch[] {
+		SpeakerPitch {
 			Get {
 				return this.iSpeakerPitch
 			}
 		}
 
-		SpeakerSpeed[] {
+		SpeakerSpeed {
 			Get {
 				return this.iSpeakerSpeed
 			}
 		}
 
-		ActivationCallback[] {
+		ActivationCallback {
 			Get {
 				return this.iActivationCallback
 			}
 		}
 
-		DeactivationCallback[] {
+		DeactivationCallback {
 			Get {
 				return this.iDeactivationCallback
 			}
@@ -268,7 +268,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechSynthesizer[create := false] {
 			Get {
 				if (!this.iSpeechSynthesizer && create && this.Speaker) {
-					this.iSpeechSynthesizer := new this.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language)
+					this.iSpeechSynthesizer := this.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language)
 
 					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -279,19 +279,19 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		Muted[] {
+		Muted {
 			Get {
 				return this.iMuted
 			}
 		}
 
-		Interrupted[] {
+		Interrupted {
 			Get {
 				return this.iInterrupted
 			}
 		}
 
-		Interruptable[] {
+		Interruptable {
 			Get {
 				return this.iInterruptable
 			}
@@ -300,7 +300,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
-					this.iSpeechRecognizer := new this.ClientSpeechRecognizer(this, this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := this.ClientSpeechRecognizer(this, this.Recognizer, this.Listener, this.Language)
 
 				return this.iSpeechRecognizer
 			}
@@ -468,7 +468,7 @@ class VoiceServer extends ConfigurationItem {
 				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
 					throw "Recognizer not running..."
 			}
-			catch exception {
+			catch Any as exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
@@ -499,7 +499,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	class ActivationSpeechRecognizer extends SpeechRecognizer {
-		Routing[] {
+		Routing {
 			Get {
 				return "Activation"
 			}
@@ -512,79 +512,79 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	VoiceClients[] {
+	VoiceClients {
 		Get {
 			return this.iVoiceClients
 		}
 	}
 
-	ActiveVoiceClient[] {
+	ActiveVoiceClient {
 		Get {
 			return this.iActiveVoiceClient
 		}
 	}
 
-	Language[] {
+	Language {
 		Get {
 			return this.iLanguage
 		}
 	}
 
-	Synthesizer[] {
+	Synthesizer {
 		Get {
 			return this.iSynthesizer
 		}
 	}
 
-	Speaker[] {
+	Speaker {
 		Get {
 			return this.iSpeaker
 		}
 	}
 
-	Speaking[] {
+	Speaking {
 		Get {
 			return this.iSpeaking
 		}
 	}
 
-	Recognizer[] {
+	Recognizer {
 		Get {
 			return this.iRecognizer
 		}
 	}
 
-	Listener[] {
+	Listener {
 		Get {
 			return this.iListener
 		}
 	}
 
-	Listening[] {
+	Listening {
 		Get {
 			return this.iListening
 		}
 	}
 
-	SpeakerVolume[] {
+	SpeakerVolume {
 		Get {
 			return this.iSpeakerVolume
 		}
 	}
 
-	SpeakerPitch[] {
+	SpeakerPitch {
 		Get {
 			return this.iSpeakerPitch
 		}
 	}
 
-	SpeakerSpeed[] {
+	SpeakerSpeed {
 		Get {
 			return this.iSpeakerSpeed
 		}
 	}
 
-	PushToTalk[] {
+	PushToTalk {
 		Get {
 			return this.iPushToTalk
 		}
@@ -595,20 +595,20 @@ class VoiceServer extends ConfigurationItem {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
-						this.iSpeechRecognizer := new this.ActivationSpeechRecognizer("Server", true, this.Language, true)
+						this.iSpeechRecognizer := this.ActivationSpeechRecognizer("Server", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
 							throw "Server speech recognizer engine not installed..."
 					}
-					catch exception {
-						this.iSpeechRecognizer := new this.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
+					catch Any as exception {
+						this.iSpeechRecognizer := this.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
 
 						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
 							throw "Desktop speech recognizer engine not installed..."
 					}
 				}
-				catch exception {
-					this.iSpeechRecognizer := new this.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+				catch Any as exception {
+					this.iSpeechRecognizer := this.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				}
 
 				if !this.PushToTalk
@@ -622,7 +622,7 @@ class VoiceServer extends ConfigurationItem {
 	__New(configuration := false) {
 		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		VoiceServer.Instance := this
 
@@ -635,18 +635,18 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
-		this.iSynthesizer := getConfigurationValue(configuration, "Voice Control", "Synthesizer"
-												 , getConfigurationValue(configuration, "Voice Control", "Service", "dotNET"))
-		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
-		this.iSpeakerVolume := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
-		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
-		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
-		this.iRecognizer := getConfigurationValue(configuration, "Voice Control", "Recognizer", "Desktop")
-		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
-		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+		this.iLanguage := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iSynthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer"
+												 , getMultiMapValue(configuration, "Voice Control", "Service", "dotNET"))
+		this.iSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker", true)
+		this.iSpeakerVolume := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
+		this.iSpeakerPitch := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
+		this.iSpeakerSpeed := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		this.iRecognizer := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
+		this.iListener := getMultiMapValue(configuration, "Voice Control", "Listener", false)
+		this.iPushToTalk := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 
 		this.initializePushToTalk()
 	}
@@ -659,7 +659,7 @@ class VoiceServer extends ConfigurationItem {
 			toggle := false
 
 			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
-				toggle := (getConfigurationValue(readConfiguration(kUserConfigDirectory . "P2T Configuration.ini")
+				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "P2T Configuration.ini")
 											   , "PushToTalk", "Mode", "Press") = "Toggle")
 
 			if toggle {
@@ -744,7 +744,7 @@ class VoiceServer extends ConfigurationItem {
 						listening := true
 					}
 					else {
-						listenTask := new Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
+						listenTask := Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
 
 						Task.startTask(listenTask)
 					}
@@ -960,7 +960,7 @@ class VoiceServer extends ConfigurationItem {
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := new this.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		client := this.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 
 		this.VoiceClients[descriptor] := client
 
@@ -981,7 +981,7 @@ class VoiceServer extends ConfigurationItem {
 				if !recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
 					throw "Recognizer not running..."
 			}
-			catch exception {
+			catch Any as exception {
 				logMessage(kLogCritical, translate("Error while registering voice command """) . activationCommand . translate(""" - please check the configuration"))
 
 				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: activationCommand})
@@ -1173,7 +1173,7 @@ startupVoiceServer() {
 	if debug
 		setDebug(true)
 
-	server := new VoiceServer(kSimulatorConfiguration)
+	server := VoiceServer(kSimulatorConfiguration)
 
 	Menu SupportMenu, Insert, 1&
 

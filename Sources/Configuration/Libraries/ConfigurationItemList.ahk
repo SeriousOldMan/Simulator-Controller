@@ -28,19 +28,19 @@ class ConfigurationItemList extends ConfigurationItem {
 
 	iWindow := false
 
-	Window[] {
+	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	ListHandle[] {
+	ListHandle {
 		Get {
 			return this.iListHandle
 		}
 	}
 
-	AutoSave[] {
+	AutoSave {
 		Get {
 ; #Warn UseUnsetLocal, Off
 			try {
@@ -49,7 +49,7 @@ class ConfigurationItemList extends ConfigurationItem {
 				else
 					return false
 			}
-			catch exception {
+			catch Any as exception {
 				return false
 			}
 		}
@@ -71,7 +71,7 @@ class ConfigurationItemList extends ConfigurationItem {
 		}
 	}
 
-	CurrentItem[] {
+	CurrentItem {
 		Get {
 			return this.iCurrentItem
 		}

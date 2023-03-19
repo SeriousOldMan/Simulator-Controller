@@ -39,7 +39,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 	class RemoteRaceStrategist extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
-			base.__New(plugin, "Race Strategist", remotePID)
+			super.__New(plugin, "Race Strategist", remotePID)
 		}
 
 		recommendPitstop(arguments*) {
@@ -76,7 +76,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			else if (this.Plugin.RaceStrategist && (this.Action = "StrategyRecommend"))
 				this.Plugin.recommendStrategy()
 			else
-				base.fireAction(function, trigger)
+				super.fireAction(function, trigger)
 		}
 	}
 
@@ -85,7 +85,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if (zombie = "Ghost")
 				return this.iRaceStrategist
 			else
-				return base.RaceAssistant[zombie]
+				return super.RaceAssistant[zombie]
 		}
 
 		Set {
@@ -96,16 +96,16 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	RaceStrategist[] {
+	RaceStrategist {
 		Get {
 			return this.RaceAssistant
 		}
 	}
 
-	LapDatabase[] {
+	LapDatabase {
 		Get {
 			if !this.iLapDatabase
-				this.iLapDatabase := new Database(false, this.kLapDataSchemas)
+				this.iLapDatabase := Database(false, this.kLapDataSchemas)
 
 			return this.iLapDatabase
 		}
@@ -120,21 +120,21 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(new this.RaceStrategistAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+				this.registerAction(this.RaceStrategistAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
 			}
 			else
 				this.logFunctionNotFound(actionFunction)
 		}
 		else
-			return base.createRaceAssistantAction(controller, action, actionFunction, arguments*)
+			return super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 	}
 
 	createRaceAssistant(pid) {
-		return new this.RemoteRaceStrategist(this, pid)
+		return this.RemoteRaceStrategist(this, pid)
 	}
 
 	startSession(settings, data) {
-		base.startSession(settings, data)
+		super.startSession(settings, data)
 
 		this.iLapDatabase := false
 	}
@@ -160,7 +160,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 							FileAppend %strategyUpdate%, %kTempDirectory%Race Strategy.update
 						}
-						catch exception {
+						catch Any as exception {
 							logError(exception)
 						}
 
@@ -193,18 +193,18 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	joinSession(settings, data) {
-		if getConfigurationValue(settings, "Assistant.Strategist", "Join.Late", false)
+		if getMultiMapValue(settings, "Assistant.Strategist", "Join.Late", false)
 			this.startSession(settings, data)
 	}
 
 	addLap(lap, running, data) {
-		base.addLap(lap, running, data)
+		super.addLap(lap, running, data)
 
 		this.checkStrategy()
 	}
 
 	updateLap(lap, running, data) {
-		base.updateLap(lap, running, data)
+		super.updateLap(lap, running, data)
 
 		this.checkStrategy()
 	}
@@ -290,7 +290,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					telemetryData := string2Values(";", telemetryData)
 
 					if !telemetryDB
-						telemetryDB := new TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
+						telemetryDB := TelemetryDatabase(telemetryData[1], telemetryData[2], telemetryData[3])
 
 					if (newStint && driverID)
 						telemetryDB.registerDriver(telemetryData[1], driverID, teamServer.getStintDriverName(stint))
@@ -319,12 +319,12 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 												   , telemetryData[7], telemetryData[8], telemetryData[9], driverID
 												   , telemetryData.HasKey(20) ? telemetryData[20] : false)
 						}
-						catch exception {
+						catch Any as exception {
 							logError(exception)
 						}
 					}
 				}
-				catch exception {
+				catch Any as exception {
 					break
 				}
 			}
@@ -332,7 +332,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		else
 			for ignore, telemetryData in this.LapDatabase.Tables["Telemetry"] {
 				if !telemetryDB
-					telemetryDB := new TelemetryDatabase(telemetryData.Simulator, telemetryData.Car, telemetryData.Track)
+					telemetryDB := TelemetryDatabase(telemetryData.Simulator, telemetryData.Car, telemetryData.Track)
 
 				if telemetryData.Pitstop
 					runningLap := 0
@@ -356,7 +356,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 										   , wear[1], wear[2], wear[3], wear[4]
 										   , telemetryData["Fuel.Consumption"], telemetryData["Fuel.Remaining"], telemetryData.LapTime)
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 			}
@@ -448,7 +448,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				this.RaceStrategist.restoreRaceInfo(fileName)
 			}
-			catch exception {
+			catch Any as exception {
 				return
 			}
 		}
@@ -460,11 +460,11 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 		if (this.RaceStrategist && teamServer && teamServer.Active)
 			this.restoreRaceInfo(data)
 
-		base.restoreSessionState(data)
+		super.restoreSessionState(data)
 	}
 
 	createRaceReport(targetDirectory := false) {
-		local reportsDirectory := getConfigurationValue(this.Configuration, "Race Strategist Reports", "Database", false)
+		local reportsDirectory := getMultiMapValue(this.Configuration, "Race Strategist Reports", "Database", false)
 		local teamServer, session, runningLap, raceInfo, count, pitstops, lapData, data, key, value
 		local times, positions, laps, drivers, newLine, line, fileName, directory
 		local sessionDB, simulatorCode, carCode, trackCode
@@ -488,9 +488,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					FileAppend %raceInfo%, %kTempDirectory%Race Report\Race.data
 
-					data := readConfiguration(kTempDirectory . "Race Report\Race.data")
+					data := readMultiMap(kTempDirectory . "Race Report\Race.data")
 				}
-				catch exception {
+				catch Any as exception {
 					data := {}
 				}
 
@@ -503,19 +503,19 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 						lapData := teamServer.getLapValue(A_Index, this.Plugin . " Race Lap", session)
 
 						if (lapData && (lapData != "")) {
-							lapData := parseConfiguration(lapData)
+							lapData := parseMultiMap(lapData)
 
 							count += 1
 
-							for key, value in getConfigurationSectionValues(lapData, "Lap")
-								setConfigurationValue(data, "Laps", key, value)
+							for key, value in getMultiMapValues(lapData, "Lap")
+								setMultiMapValue(data, "Laps", key, value)
 
-							pitstops := getConfigurationValue(lapData, "Pitstop", "Laps", "")
+							pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
 
-							times := getConfigurationValue(lapData, "Times", A_Index)
-							positions := getConfigurationValue(lapData, "Positions", A_Index)
-							laps := getConfigurationValue(lapData, "Laps", A_Index)
-							drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+							times := getMultiMapValue(lapData, "Times", A_Index)
+							positions := getMultiMapValue(lapData, "Positions", A_Index)
+							laps := getMultiMapValue(lapData, "Laps", A_Index)
+							drivers := getMultiMapValue(lapData, "Drivers", A_Index)
 
 							newLine := ((count > 1) ? "`n" : "")
 
@@ -537,32 +537,32 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 							FileAppend %line%, %directory%, UTF-16
 						}
 					}
-					catch exception {
+					catch Any as exception {
 						break
 					}
 				}
 
-				removeConfigurationValue(data, "Laps", "Lap")
-				setConfigurationValue(data, "Laps", "Count", count)
+				removeMultiMapValue(data, "Laps", "Lap")
+				setMultiMapValue(data, "Laps", "Count", count)
 
-				setConfigurationValue(data, "Laps", "Pitstops", pitstops)
+				setMultiMapValue(data, "Laps", "Pitstops", pitstops)
 
-				writeConfiguration(kTempDirectory . "Race Report\Race.data", data)
+				writeMultiMap(kTempDirectory . "Race Report\Race.data", data)
 
 				if !targetDirectory {
-					sessionDB := new SessionDatabase()
+					sessionDB := SessionDatabase()
 
-					simulatorCode := sessionDB.getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Track"))
+					simulatorCode := sessionDB.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
+					carCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
+					trackCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
 
-					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getConfigurationValue(data, "Session", "Time"))
+					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
 				}
 
 				FileCopyDir %kTempDirectory%Race Report, %targetDirectory%, 1
 			}
 			else {
-				data := readConfiguration(kTempDirectory . "Race Report\Race.data")
+				data := readMultiMap(kTempDirectory . "Race Report\Race.data")
 
 				count := 0
 				pitstops := false
@@ -573,7 +573,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 					FileCreateDir %kTempDirectory%Race Report\Output
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -583,19 +583,19 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					if !FileExist(fileName)
 						break
 					else {
-						lapData := readConfiguration(fileName)
+						lapData := readMultiMap(fileName)
 
 						count += 1
 
-						for key, value in getConfigurationSectionValues(lapData, "Lap")
-							setConfigurationValue(data, "Laps", key, value)
+						for key, value in getMultiMapValues(lapData, "Lap")
+							setMultiMapValue(data, "Laps", key, value)
 
-						pitstops := getConfigurationValue(lapData, "Pitstop", "Laps", "")
+						pitstops := getMultiMapValue(lapData, "Pitstop", "Laps", "")
 
-						times := getConfigurationValue(lapData, "Times", A_Index)
-						positions := getConfigurationValue(lapData, "Positions", A_Index)
-						laps := getConfigurationValue(lapData, "Laps", A_Index)
-						drivers := getConfigurationValue(lapData, "Drivers", A_Index)
+						times := getMultiMapValue(lapData, "Times", A_Index)
+						positions := getMultiMapValue(lapData, "Positions", A_Index)
+						laps := getMultiMapValue(lapData, "Laps", A_Index)
+						drivers := getMultiMapValue(lapData, "Drivers", A_Index)
 
 						newLine := ((count > 1) ? "`n" : "")
 
@@ -618,21 +618,21 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 					}
 				}
 
-				removeConfigurationValue(data, "Laps", "Lap")
-				setConfigurationValue(data, "Laps", "Count", count)
+				removeMultiMapValue(data, "Laps", "Lap")
+				setMultiMapValue(data, "Laps", "Count", count)
 
-				setConfigurationValue(data, "Laps", "Pitstops", pitstops)
+				setMultiMapValue(data, "Laps", "Pitstops", pitstops)
 
-				writeConfiguration(kTempDirectory . "Race Report\Output\Race.data", data)
+				writeMultiMap(kTempDirectory . "Race Report\Output\Race.data", data)
 
 				if !targetDirectory {
-					sessionDB := new SessionDatabase()
+					sessionDB := SessionDatabase()
 
-					simulatorCode := sessionDB.getSimulatorCode(getConfigurationValue(data, "Session", "Simulator"))
-					carCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Car"))
-					trackCode := sessionDB.getCarCode(simulatorCode, getConfigurationValue(data, "Session", "Track"))
+					simulatorCode := sessionDB.getSimulatorCode(getMultiMapValue(data, "Session", "Simulator"))
+					carCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Car"))
+					trackCode := sessionDB.getCarCode(simulatorCode, getMultiMapValue(data, "Session", "Track"))
 
-					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getConfigurationValue(data, "Session", "Time"))
+					targetDirectory := (reportsDirectory . "\" . simulatorCode . "\" . carCode . "\" . trackCode . "\" . getMultiMapValue(data, "Session", "Time"))
 				}
 
 				FileCopyDir %kTempDirectory%Race Report\Output, %targetDirectory%, 1
@@ -653,7 +653,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 		try {
 			try {
-				reader := new RaceReportReader(report)
+				reader := RaceReportReader(report)
 
 				raceData := true
 				drivers := true
@@ -662,19 +662,19 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				reader.loadData(false, raceData, drivers, positions, times)
 
-				cars := getConfigurationValue(raceData, "Cars", "Count", 0)
-				driver := getConfigurationValue(raceData, "Cars", "Driver", 0)
-				laps := getConfigurationValue(raceData, "Laps", "Count", 0)
+				cars := getMultiMapValue(raceData, "Cars", "Count", 0)
+				driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
+				laps := getMultiMapValue(raceData, "Laps", "Count", 0)
 
 				if (reader.getClasses(raceData).Length() > 1) {
-					class := getConfigurationValue(raceData, "Cars", "Car." . driver . ".Class", false)
+					class := getMultiMapValue(raceData, "Cars", "Car." . driver . ".Class", false)
 
 					if class {
 						classCars := 0
 						classPositions := []
 
 						loop %cars%
-							if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class") = class) {
+							if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class") = class) {
 								classCars += 1
 
 								if laps
@@ -739,7 +739,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				this.RaceAssistant["Ghost"].reviewRace(multiclass, cars, laps, position, leaderAvgLapTime
 													 , driverAvgLapTime, driverMinLapTime, driverMaxLapTime, driverLapTimeStdDev)
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 
 				this.RaceAssistant["Ghost"].reviewRace(false, 0, 0, 0, 0, 0, 0, 0, 0)

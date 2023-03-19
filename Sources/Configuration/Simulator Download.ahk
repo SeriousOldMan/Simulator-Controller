@@ -78,7 +78,7 @@ downloadSimulatorController() {
 			else
 				Run *RunAs "%A_AhkPath%" /restart "%A_ScriptFullPath%" %options%
 		}
-		catch exception {
+		catch Any as exception {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			title := translate("Error")
 			MsgBox 262160, %title%, % translate("An error occured while starting the automatic installation due to Windows security restrictions. You can try a manual installation.")
@@ -99,7 +99,7 @@ downloadSimulatorController() {
 		if ErrorLevel
 			throw "No valid installation file (Error: " . ErrorLevel . ")..."
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception, true)
 
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -110,19 +110,19 @@ downloadSimulatorController() {
 		ExitApp 0
 	}
 
-	release := readConfiguration(kTempDirectory . "VERSION")
-	version := getConfigurationValue(release, (devVersion ? "Development" : "Release"), "Version", getConfigurationValue(release, "Version", "Release", false))
+	release := readMultiMap(kTempDirectory . "VERSION")
+	version := getMultiMapValue(release, (devVersion ? "Development" : "Release"), "Version", getMultiMapValue(release, "Version", "Release", false))
 
 	if version {
 		if devVersion
-			download := getConfigurationValue(release, "Development", "Download", false)
+			download := getMultiMapValue(release, "Development", "Download", false)
 		else
-			download := getConfigurationValue(release, "Release", "Download", false)
+			download := getMultiMapValue(release, "Release", "Download", false)
 
 		if download {
 			showProgress({color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller"), message: translate("Downloading Version ") . version})
 
-			updateTask := new PeriodicTask(Func("updateProgress").Bind(45), 1500)
+			updateTask := PeriodicTask(Func("updateProgress").Bind(45), 1500)
 
 			updateTask.start()
 
@@ -143,7 +143,7 @@ downloadSimulatorController() {
 						break
 					}
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception, true)
 				}
 
@@ -158,7 +158,7 @@ downloadSimulatorController() {
 
 			updateTask.stop()
 
-			updateTask := new PeriodicTask(Func("updateProgress").Bind(90), 1000)
+			updateTask := PeriodicTask(Func("updateProgress").Bind(90), 1000)
 
 			updateTask.start()
 
@@ -169,7 +169,7 @@ downloadSimulatorController() {
 			try {
 				RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%A_Temp%\Simulator Controller.zip' -DestinationPath '%A_Temp%\Simulator Controller', , Hide
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -189,7 +189,7 @@ downloadSimulatorController() {
 
 				RunWait Powershell -Command Get-ChildItem -Path '.' | Unblock-File, , Hide
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception, true)
 			}
 			finally {
@@ -215,7 +215,7 @@ downloadSimulatorController() {
 				else
 					Run "%directory%\Binaries\Simulator Tools.exe" -NoUpdate -Install
 			}
-			catch exception {
+			catch Any as exception {
 				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("An error occured while starting the automatic instalation due to Windows security restrictions. You can try a manual installation.")

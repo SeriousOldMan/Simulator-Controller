@@ -32,13 +32,13 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	iSimulatorConfigurations := {}
 	iCurrentSimulator := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	Simulators[] {
+	Simulators {
 		Get {
 			return this.iSimulators
 		}
@@ -47,7 +47,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	__New(editor, configuration := false) {
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		RaceStrategistConfigurator.Instance := this
 	}
@@ -122,7 +122,7 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 		Gui %window%:Font, Norm, Arial
 
-		choices := map(["Ask", "Always save", "No action"], "translate")
+		choices := collect(["Ask", "Always save", "No action"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+17 w105 h23 +0x200 HWNDwidget18 Hidden, % translate("Save Race Report")
 		Gui %window%:Add, DropDownList, x%x1% yp w110 AltSubmit vrsSaveRaceReportDropDown HWNDwidget19 Hidden, % values2String("|", choices*)
 
@@ -130,13 +130,13 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%x5% yp+3 w110 h20 HWNDwidget20 Hidden, % translate("@ Session End")
 
-		choices := map(["Ask", "Always save", "No action"], "translate")
+		choices := collect(["Ask", "Always save", "No action"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+21 w105 h23 +0x200 HWNDwidget21 Hidden, % translate("Save Telemetry")
 		Gui %window%:Add, DropDownList, x%x1% yp w110 AltSubmit vrsSaveTelemetryDropDown HWNDwidget22 Hidden, % values2String("|", choices*)
 
 		Gui %window%:Add, Text, x%x5% yp+3 w110 h20 HWNDwidget23 Hidden, % translate("@ Session End")
 
-		choices := map(["No", "Yes"], "translate")
+		choices := collect(["No", "Yes"], "translate")
 		Gui %window%:Add, Text, x%x0% yp+21 w105 h23 +0x200 HWNDwidget25 Hidden, % translate("Race Review")
 		Gui %window%:Add, DropDownList, x%x1% yp w110 AltSubmit vrsRaceReviewDropDown HWNDwidget26 Hidden, % values2String("|", choices*)
 
@@ -151,9 +151,9 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		local ignore, simulator, simulatorConfiguration
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		raceReportsPathEdit := getConfigurationValue(configuration, "Race Strategist Reports", "Database", false)
+		raceReportsPathEdit := getMultiMapValue(configuration, "Race Strategist Reports", "Database", false)
 
 		if !raceReportsPathEdit
 			raceReportsPathEdit := ""
@@ -164,12 +164,12 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 		for ignore, simulator in this.Simulators {
 			simulatorConfiguration := {}
 
-			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".LearningLaps", 1)
-			simulatorConfiguration["ConsideredHistoryLaps"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".ConsideredHistoryLaps", 5)
-			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Strategist Analysis", simulator . ".HistoryLapsDamping", 0.2)
-			simulatorConfiguration["SaveRaceReport"] := getConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", "Never")
-			simulatorConfiguration["SaveTelemetry"] := getConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveTelemetry", "Always")
-			simulatorConfiguration["RaceReview"] := getConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".RaceReview", "Yes")
+			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Race Strategist Analysis", simulator . ".LearningLaps", 1)
+			simulatorConfiguration["ConsideredHistoryLaps"] := getMultiMapValue(configuration, "Race Strategist Analysis", simulator . ".ConsideredHistoryLaps", 5)
+			simulatorConfiguration["HistoryLapsDamping"] := getMultiMapValue(configuration, "Race Strategist Analysis", simulator . ".HistoryLapsDamping", 0.2)
+			simulatorConfiguration["SaveRaceReport"] := getMultiMapValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", "Never")
+			simulatorConfiguration["SaveTelemetry"] := getMultiMapValue(configuration, "Race Strategist Shutdown", simulator . ".SaveTelemetry", "Always")
+			simulatorConfiguration["RaceReview"] := getMultiMapValue(configuration, "Race Strategist Shutdown", simulator . ".RaceReview", "Yes")
 
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -178,21 +178,21 @@ class RaceStrategistConfigurator extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		local simulator, simulatorConfiguration, ignore, key
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		this.saveSimulatorConfiguration()
 
 		GuiControlGet raceReportsPathEdit
 
-		setConfigurationValue(configuration, "Race Strategist Reports", "Database", (raceReportsPathEdit != "") ? raceReportsPathEdit : false)
+		setMultiMapValue(configuration, "Race Strategist Reports", "Database", (raceReportsPathEdit != "") ? raceReportsPathEdit : false)
 
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
 			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"]
-				setConfigurationValue(configuration, "Race Strategist Analysis", simulator . "." . key, simulatorConfiguration[key])
+				setMultiMapValue(configuration, "Race Strategist Analysis", simulator . "." . key, simulatorConfiguration[key])
 
-			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", simulatorConfiguration["SaveRaceReport"])
-			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".SaveTelemetry", simulatorConfiguration["SaveTelemetry"])
-			setConfigurationValue(configuration, "Race Strategist Shutdown", simulator . ".RaceReview", simulatorConfiguration["RaceReview"])
+			setMultiMapValue(configuration, "Race Strategist Shutdown", simulator . ".SaveRaceReport", simulatorConfiguration["SaveRaceReport"])
+			setMultiMapValue(configuration, "Race Strategist Shutdown", simulator . ".SaveTelemetry", simulatorConfiguration["SaveTelemetry"])
+			setMultiMapValue(configuration, "Race Strategist Shutdown", simulator . ".RaceReview", simulatorConfiguration["RaceReview"])
 		}
 	}
 
@@ -344,7 +344,7 @@ initializeRaceStrategistConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Race Strategist"), new RaceStrategistConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Race Strategist"), RaceStrategistConfigurator(editor, editor.Configuration))
 	}
 }
 

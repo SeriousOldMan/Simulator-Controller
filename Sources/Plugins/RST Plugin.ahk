@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 startRST() {
-	local rstApplication := new Application("RST Telemetry", SimulatorController.Instance.Configuration)
+	local rstApplication := Application("RST Telemetry", SimulatorController.Instance.Configuration)
 	local pid
 
 	if !rstApplication.isRunning() {

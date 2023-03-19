@@ -77,13 +77,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		iUpdateLabelsTask := false
 
-		Mode[] {
+		Mode {
 			Get {
 				return kMotionMode
 			}
 		}
 
-		SelectedEffect[] {
+		SelectedEffect {
 			Get {
 				if ((this.iSelectedEffect != false) && (this.iSelectedEffect != kUndefined))
 					return this.iSelectedEffect
@@ -92,7 +92,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 		}
 
-		PendingEffect[] {
+		PendingEffect {
 			Get {
 				return (this.iSelectedEffect == kUndefined)
 			}
@@ -156,21 +156,21 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		activate() {
-			base.activate()
+			super.activate()
 
 			this.deselectEffect()
 
 			this.updateActionStates()
 
 			if !this.iUpdateLabelsTask {
-				this.iUpdateLabelsTask := new PeriodicTask(ObjBindMethod(this, "updateEffectLabels"), 1500, kLowPriority)
+				this.iUpdateLabelsTask := PeriodicTask(ObjBindMethod(this, "updateEffectLabels"), 1500, kLowPriority)
 
 				this.iUpdateLabelsTask.start()
 			}
 		}
 
 		deactivate() {
-			base.deactivate()
+			super.deactivate()
 
 			if this.iUpdateLabelsTask {
 				this.iUpdateLabelsTask.stop()
@@ -190,13 +190,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	class MotionToggleAction extends ControllerAction {
-		Plugin[] {
+		Plugin {
 			Get {
 				return this.Controller.findPlugin(kMotionFeedbackPlugin)
 			}
 		}
 
-		Active[] {
+		Active {
 			Get {
 				return this.Plugin.MotionActive
 			}
@@ -215,13 +215,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	class MotionModeAction extends ControllerAction {
 		iMotionMode := false
 
-		Mode[] {
+		Mode {
 			Get {
 				return this.iMotionMode
 			}
 		}
 
-		Plugin[] {
+		Plugin {
 			Get {
 				return this.Mode.Plugin
 			}
@@ -230,13 +230,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		__New(function, motionMode, label, icon) {
 			this.iMotionMode := motionMode
 
-			base.__New(function, label, icon)
+			super.__New(function, label, icon)
 		}
 	}
 
 	class MotionIntensityAction extends MotionFeedbackPlugin.MotionModeAction {
 		__New(function, motionMode, label, icon) {
-			base.__New(function, motionMode, label, icon)
+			super.__New(function, motionMode, label, icon)
 		}
 
 		fireAction(function, trigger) {
@@ -269,13 +269,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	class EffectToggleAction extends MotionFeedbackPlugin.MotionModeAction {
 		iEffect := false
 
-		Effect[] {
+		Effect {
 			Get {
 				return this.iEffect
 			}
 		}
 
-		Active[] {
+		Active {
 			Get {
 				return this.Plugin.getEffectState(this.Effect)
 			}
@@ -286,7 +286,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.iEffect := effect
 
-			base.__New(function, motionMode, motionMode.Plugin.getLabel(descriptor, effect), motionMode.Plugin.getIcon(descriptor))
+			super.__New(function, motionMode, motionMode.Plugin.getLabel(descriptor, effect), motionMode.Plugin.getIcon(descriptor))
 		}
 
 		fireAction(function, trigger) {
@@ -326,7 +326,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		__New(function, motionMode, label, icon, direction := false) {
 			this.iDirection := direction
 
-			base.__New(function, motionMode, label, icon)
+			super.__New(function, motionMode, label, icon)
 		}
 
 		fireAction(function, trigger) {
@@ -378,19 +378,19 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 	}
 
-	Application[] {
+	Application {
 		Get {
 			return this.iMotionApplication
 		}
 	}
 
-	MotionActive[] {
+	MotionActive {
 		Get {
 			return this.iIsMotionActive
 		}
 	}
 
-	MotionIntensity[] {
+	MotionIntensity {
 		Get {
 			return this.iCurrentMotionIntensity
 		}
@@ -400,10 +400,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		local function, motionArguments, motionEffectsArguments, motionEffectIntensityArguments, initialIntensity
 		local effectFunctions, ignore, index, effect, descriptor, motionMode, increaseAction, decreaseAction, intensityDialAction
 
-		base.__New(controller, name, configuration, false)
+		super.__New(controller, name, configuration, false)
 
 		if (this.Active || isDebug()) {
-			this.iMotionApplication := new Application(this.getArgumentValue("controlApplication", kMotionFeedbackPlugin), configuration)
+			this.iMotionApplication := Application(this.getArgumentValue("controlApplication", kMotionFeedbackPlugin), configuration)
 
 			kSimFeedback := this.iMotionApplication.ExePath
 
@@ -455,12 +455,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor("Motion", "Toggle")
 
-				this.registerAction(new this.MotionToggleAction(function, this.getLabel(descriptor, "Motion"), this.getIcon(descriptor)))
+				this.registerAction(this.MotionToggleAction(function, this.getLabel(descriptor, "Motion"), this.getIcon(descriptor)))
 				}
 			else
 				this.logFunctionNotFound(descriptor)
 
-			motionMode := new this.MotionMode(this)
+			motionMode := this.MotionMode(this)
 
 			this.iMotionMode := motionMode
 
@@ -471,7 +471,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if (function != false) {
 					descriptor := ConfigurationItem.descriptor("MotionIntensity", "Dial")
 
-					motionMode.registerAction(new this.MotionIntensityAction(function, motionMode, this.getLabel(descriptor, "Motion Intensity"), this.getIcon(descriptor)))
+					motionMode.registerAction(this.MotionIntensityAction(function, motionMode, this.getLabel(descriptor, "Motion Intensity"), this.getIcon(descriptor)))
 				}
 				else
 					this.logFunctionNotFound(descriptor)
@@ -484,7 +484,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			function := this.Controller.findFunction(descriptor)
 
 			if (function != false)
-				motionMode.registerAction(new this.EffectSelectorAction(function, "Effect Intensity", this.getIcon(ConfigurationItem.descriptor("EffectIntensity", "Activate"))))
+				motionMode.registerAction(this.EffectSelectorAction(function, "Effect Intensity", this.getIcon(ConfigurationItem.descriptor("EffectIntensity", "Activate"))))
 			else
 				this.logFunctionNotFound(descriptor)
 
@@ -498,7 +498,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if (function != false) {
 					descriptor := ConfigurationItem.descriptor("EffectIntensity", "Decrease")
 
-					decreaseAction := new this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kDecrease)
+					decreaseAction := this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kDecrease)
 
 					motionMode.registerAction(decreaseAction)
 				}
@@ -511,7 +511,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if (function != false) {
 					descriptor := ConfigurationItem.descriptor("EffectIntensity", "Increase")
 
-					increaseAction := new this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kIncrease)
+					increaseAction := this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kIncrease)
 
 					motionMode.registerAction(increaseAction)
 				}
@@ -528,7 +528,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if (function != false) {
 					descriptor := ConfigurationItem.descriptor("EffectIntensity", "Dial")
 
-					intensityDialAction := new this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor))
+					intensityDialAction := this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor))
 
 					motionMode.registerAction(intensityDialAction)
 					motionMode.registerIntensityActions(intensityDialAction)
@@ -554,12 +554,12 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 	writePluginState(configuration) {
 		if this.Active {
-			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 
-			setConfigurationValue(configuration, this.Plugin, "Information", translate("Motion: ") . translate(this.MotionActive ? "On" : "Off"))
+			setMultiMapValue(configuration, this.Plugin, "Information", translate("Motion: ") . translate(this.MotionActive ? "On" : "Off"))
 		}
 		else
-			base.writePluginState(configuration)
+			super.writePluginState(configuration)
 	}
 
 	loadEffectStateFromSimFeedback(effect) {
@@ -605,7 +605,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if ((posX && (posX != "")) && (posY && (posY != "")))
 					isActive := true
 			}
-			catch exception {
+			catch Any as exception {
 			}
 
 			this.iIsMotionActive := isActive
@@ -637,7 +637,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		local function := this.Controller.findFunction(functionDescriptor)
 
 		if (function != false)
-			mode.registerAction(new this.EffectToggleAction(function, mode, effect))
+			mode.registerAction(this.EffectToggleAction(function, mode, effect))
 		else
 			this.logFunctionNotFound(functionDescriptor)
 	}
@@ -645,7 +645,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	activate() {
 		local action, isRunning
 
-		base.activate()
+		super.activate()
 
 		isRunning := this.Application.isRunning()
 
@@ -655,7 +655,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 
 		if !this.iUpdateMotionStateTask {
-			this.iUpdateMotionStateTask := new PeriodicTask(ObjBindMethod(this, "updateMotionState"), 100, kLowPriority)
+			this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 100, kLowPriority)
 
 			this.iUpdateMotionStateTask.start()
 		}
@@ -668,7 +668,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.iUpdateMotionStateTask := false
 		}
 
-		base.deactivate()
+		super.deactivate()
 	}
 
 	actionLabel(action) {
@@ -697,7 +697,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 				return result
 			}
-			catch exception {
+			catch Any as exception {
 				message := (IsObject(exception) ? exception.Message : exception)
 
 				logMessage(kLogCritical, "Error while connecting to SimFeedback (" . kSimFeedbackConnector . "): " . message . " - please check the configuration")
@@ -1168,7 +1168,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 ;;;-------------------------------------------------------------------------;;;
 
 startSimFeedback(stayOpen := false) {
-	local simFeedback := new Application("Motion Feedback", SimulatorController.Instance.Configuration)
+	local simFeedback := Application("Motion Feedback", SimulatorController.Instance.Configuration)
 	local pid, windowTitle
 
 	if simFeedback.isRunning()

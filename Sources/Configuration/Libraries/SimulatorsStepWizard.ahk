@@ -32,7 +32,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	iCachedActions := {}
 	iCachedSimulator := false
 
-	Pages[] {
+	Pages {
 		Get {
 			local wizard := this.SetupWizard
 			local ignore, simulator
@@ -51,7 +51,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local simulators := []
 		local function, action, ignore, simulator, code, arguments, descriptor, key, value, mode, actions
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
@@ -103,7 +103,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 				new Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
 		}
 
-		setConfigurationValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
+		setMultiMapValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
 	}
 
 	createGui(wizard, x, y, width, height) {
@@ -155,7 +155,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		for ignore, simulator in this.Definition {
 			code := getApplicationDescriptor(simulator)[1]
-			keys := getConfigurationValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . code, false)
+			keys := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . code, false)
 
 			if keys {
 				this.iSimulatorMFDKeys[simulator] := []
@@ -166,7 +166,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					default := key[2]
 					key := key[1]
 
-					label := getConfigurationValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . key . "." . getLanguage(), key)
+					label := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . key . "." . getLanguage(), key)
 
 					Gui %window%:Add, Text, x%x% y%keyY% w148 h23 +0x200 HWNDlabelHandle Hidden, % label
 					Gui %window%:Add, Edit, x%secondX% yp w60 h23 +0x200 HWNDeditHandle Hidden, % default
@@ -189,9 +189,9 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, Norm, Arial
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
+		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", collect(["Mode", "Action", "Label", "Function"], "translate")*)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -211,7 +211,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iSimulatorMFDKeys := {}
 		this.iControllerWidgets := []
@@ -224,7 +224,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local simulators := []
 		local ignore, simulator
 
-		base.updateState()
+		super.updateState()
 
 		for ignore, simulator in this.Definition
 			if wizard.isApplicationSelected(simulator)
@@ -239,7 +239,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		this.iCurrentSimulator := ((chosen > 0) ? this.iSimulators[chosen] : false)
 
-		base.showPage(page)
+		super.showPage(page)
 
 		if !this.SetupWizard.isModuleSelected("Controller")
 			for ignore, widget in this.iControllerWidgets
@@ -252,7 +252,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	hidePage(page) {
-		if base.hidePage(page) {
+		if super.hidePage(page) {
 			this.saveSimulatorMFDKeys(this.iCurrentSimulator)
 
 			return true
@@ -283,7 +283,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			wizard := this.SetupWizard
 
 			code := getApplicationDescriptor(simulator)[1]
-			actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code)))
+			actions := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Simulators", (mode = "Assistant") ? "Simulators.Actions.Assistant" : ("Simulators.Settings.Pitstop." . code)))
 
 			this.iCachedActions[mode] := actions
 
@@ -368,12 +368,12 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 						isInformationRequest := false
 					}
 
-					label := getConfigurationValue(pluginLabels, code, subAction . ".Toggle", kUndefined)
+					label := getMultiMapValue(pluginLabels, code, subAction . ".Toggle", kUndefined)
 
 					if (label == kUndefined) {
 						isToggle := false
 
-						label := getConfigurationValue(pluginLabels, code, subAction . ".Dial", kUndefined)
+						label := getMultiMapValue(pluginLabels, code, subAction . ".Dial", kUndefined)
 
 						if (label != kUndefined) {
 							this.setAction(count, mode, action, [isInformationRequest, "Dial", "Increase", "Decrease"], label)
@@ -382,7 +382,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 							isDial := true
 						}
 						else {
-							label := getConfigurationValue(pluginLabels, code, subAction . ".Activate", "")
+							label := getMultiMapValue(pluginLabels, code, subAction . ".Activate", "")
 
 							this.setAction(count, mode, action, [isInformationRequest, "Activate"], label)
 
@@ -393,7 +393,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					else {
 						isToggle := true
 
-						if (getConfigurationValue(pluginLabels, code, subAction . ".Increase", kUndefined) != kUndefined)
+						if (getMultiMapValue(pluginLabels, code, subAction . ".Increase", kUndefined) != kUndefined)
 							this.setAction(count, mode, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 						else
 							this.setAction(count, mode, action, [isInformationRequest, "Toggle", false, false], label)
@@ -408,8 +408,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ((isDial ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
 						else {
-							onLabel := getConfigurationValue(pluginLabels, code, subAction . ".Increase", false)
-							offLabel := getConfigurationValue(pluginLabels, code, subAction . ".Decrease", false)
+							onLabel := getMultiMapValue(pluginLabels, code, subAction . ".Increase", false)
+							offLabel := getMultiMapValue(pluginLabels, code, subAction . ".Decrease", false)
 
 							if (onLabel && (function[1] != ""))
 								this.setActionLabel(count, function[1], onLabel)
@@ -498,7 +498,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local simulator := this.iCurrentSimulator
 		local function, action, ignore, preview, targetMode, mode, partFunction, row, column
 
-		base.loadControllerLabels()
+		super.loadControllerLabels()
 
 		for ignore, preview in this.ControllerPreviews {
 			targetMode := preview.Mode
@@ -537,7 +537,7 @@ chooseSimulator() {
 }
 
 initializeSimulatorsStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new SimulatorsStepWizard(SetupWizard.Instance, "Simulators", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(SimulatorsStepWizard(SetupWizard.Instance, "Simulators", kSimulatorConfiguration))
 }
 
 

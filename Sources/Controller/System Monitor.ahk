@@ -212,8 +212,8 @@ systemMonitor(command := false, arguments*) {
 
 			if (monitorTabView = 1) {
 				controllerState := getControllerState(false)
-				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
-				trackMapperState := readConfiguration(kTempDirectory . "Track Mapper.state")
+				databaseState := readMultiMap(kTempDirectory . "Database Synchronizer.state")
+				trackMapperState := readMultiMap(kTempDirectory . "Track Mapper.state")
 
 				updateSimulationState(controllerState)
 				updateAssistantsState(controllerState)
@@ -223,7 +223,7 @@ systemMonitor(command := false, arguments*) {
 				updateMapperState(trackMapperState)
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 		finally {
@@ -245,16 +245,16 @@ systemMonitor(command := false, arguments*) {
 
 			if (monitorTabView = 2) {
 				controllerState := getControllerState(false)
-				databaseState := readConfiguration(kTempDirectory . "Database Synchronizer.state")
-				trackMapperState := readConfiguration(kTempDirectory . "Track Mapper.state")
+				databaseState := readMultiMap(kTempDirectory . "Database Synchronizer.state")
+				trackMapperState := readMultiMap(kTempDirectory . "Track Mapper.state")
 
 				icons := []
 				modules := []
 				messages := []
 
-				for ignore, plugin in string2Values("|", getConfigurationValue(controllerState, "Modules", "Plugins")) {
+				for ignore, plugin in string2Values("|", getMultiMapValue(controllerState, "Modules", "Plugins")) {
 					if plugin {
-						state := getConfigurationValue(controllerState, plugin, "State")
+						state := getMultiMapValue(controllerState, plugin, "State")
 
 						if stateIcons.HasKey(state)
 							icons.Push(stateIcons[state])
@@ -263,11 +263,11 @@ systemMonitor(command := false, arguments*) {
 
 						modules.Push(translate(plugin))
 
-						messages.Push(getConfigurationValue(controllerState, plugin, "Information", ""))
+						messages.Push(getMultiMapValue(controllerState, plugin, "Information", ""))
 					}
 				}
 
-				state := getConfigurationValue(databaseState, "Database Synchronizer", "State", "Disabled")
+				state := getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled")
 
 				if stateIcons.HasKey(state)
 					icons.Push(stateIcons[state])
@@ -276,10 +276,10 @@ systemMonitor(command := false, arguments*) {
 
 				modules.Push(translate("Database Synchronization"))
 
-				messages.Push(getConfigurationValue(databaseState, "Database Synchronizer", "Information", ""))
+				messages.Push(getMultiMapValue(databaseState, "Database Synchronizer", "Information", ""))
 
 				if (controllerState.Count() > 0) {
-					state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
+					state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
 
 					if stateIcons.HasKey(state)
 						icons.Push(stateIcons[state])
@@ -288,9 +288,9 @@ systemMonitor(command := false, arguments*) {
 
 					modules.Push(translate("Track Mapping"))
 
-					messages.Push(getConfigurationValue(trackMapperState, "Track Mapper", "Information", ""))
+					messages.Push(getMultiMapValue(trackMapperState, "Track Mapper", "Information", ""))
 
-					state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
+					state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
 
 					if stateIcons.HasKey(state)
 						icons.Push(stateIcons[state])
@@ -299,7 +299,7 @@ systemMonitor(command := false, arguments*) {
 
 					modules.Push(translate("Track Automation"))
 
-					messages.Push(getConfigurationValue(controllerState, "Track Automation", "Information", ""))
+					messages.Push(getMultiMapValue(controllerState, "Track Automation", "Information", ""))
 				}
 
 				if (!stateModules || !listEqual(modules, stateModules)) {
@@ -324,7 +324,7 @@ systemMonitor(command := false, arguments*) {
 				LV_ModifyCol(2, "AutoHdr")
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 		finally {
@@ -360,7 +360,7 @@ systemMonitor(command := false, arguments*) {
 				controllerState := getControllerState(false)
 
 				if (controllerState.Count() > 0) {
-					state := getConfigurationValue(controllerState, "Team Server", "State", "Unknown")
+					state := getMultiMapValue(controllerState, "Team Server", "State", "Unknown")
 
 					if kStateIcons.HasKey(state)
 						icon := kStateIcons[state]
@@ -372,7 +372,7 @@ systemMonitor(command := false, arguments*) {
 					if ((state != "Unknown") && (state != "Disabled")) {
 						state := {}
 
-						for ignore, property in string2Values(";", getConfigurationValue(controllerState, "Team Server", "Properties")) {
+						for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
 							property := StrSplit(property, ":", " `t", 2)
 
 							state[property[1]] := property[2]
@@ -483,7 +483,7 @@ systemMonitor(command := false, arguments*) {
 			else
 				LV_ModifyCol(4, "AutoHdr")
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 		finally {
@@ -512,7 +512,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Add, Text, x8 yp+26 w790 0x10
 
-		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", map(["Dashboard", "Modules", "Team Session", "Logs"], "translate")*)
+		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", collect(["Dashboard", "Modules", "Team Session", "Logs"], "translate")*)
 
 		Gui Tab, 1
 
@@ -568,7 +568,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui Tab, 2
 
-		Gui SM:Add, ListView, x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDstateListView gnoSelect, % values2String("|", map(["Module", "Information"], "translate")*)
+		Gui SM:Add, ListView, x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDstateListView gnoSelect, % values2String("|", collect(["Module", "Information"], "translate")*)
 
 		Gui Tab, 3
 
@@ -606,7 +606,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Font, Norm, Arial
 
-		Gui SM:Add, ListView, x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdriversListView gnoSelect, % values2String("|", map(["Driver", "Active"], "translate")*)
+		Gui SM:Add, ListView, x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdriversListView gnoSelect, % values2String("|", collect(["Driver", "Active"], "translate")*)
 
 		Gui SM:Font, Italic, Arial
 
@@ -627,7 +627,7 @@ systemMonitor(command := false, arguments*) {
 
 		Gui SM:Font, s8 Norm, Arial
 
-		Gui SM:Add, ListView, x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlogMessageListView gnoSelect, % values2String("|", map(["Application", "Time", "Category", "Message"], "translate")*)
+		Gui SM:Add, ListView, x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlogMessageListView gnoSelect, % values2String("|", collect(["Application", "Time", "Category", "Message"], "translate")*)
 
 		Gui SM:Add, Text, x24 yp+320 w95 h20, % translate("Log Buffer")
 		Gui SM:Add, Edit, x120 yp-2 w50 h20 Limit3 Number VlogBufferEdit, 999
@@ -638,7 +638,7 @@ systemMonitor(command := false, arguments*) {
 		choices := kLogLevelNames
 		chosen := getLogLevel()
 
-		Gui SM:Add, DropDownList, x689 yp-1 w91 AltSubmit Choose%chosen% VlogLevelDropDown gchooseLogLevel, % values2String("|", map(choices, "translate")*)
+		Gui SM:Add, DropDownList, x689 yp-1 w91 AltSubmit Choose%chosen% VlogLevelDropDown gchooseLogLevel, % values2String("|", collect(choices, "translate")*)
 
 		Gui Tab
 
@@ -703,7 +703,7 @@ chooseLogLevel() {
 }
 
 updateSimulationState(controllerState) {
-	local state := getConfigurationValue(controllerState, "Simulation", "State", "Disabled")
+	local state := getMultiMapValue(controllerState, "Simulation", "State", "Disabled")
 	local html, icon, displayState
 
 	if kStateIcons.HasKey(state)
@@ -713,16 +713,16 @@ updateSimulationState(controllerState) {
 
 	GuiControl, , simulationState, %icon%
 
-	displayState := getConfigurationValue(controllerState, "Simulation", "Session")
+	displayState := getMultiMapValue(controllerState, "Simulation", "Session")
 
 	if (displayState = "Qualification")
 		displayState := "Qualifying"
 
 	if (state = "Active") {
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Car") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getConfigurationValue(controllerState, "Simulation", "Track") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Car") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Track") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(displayState) . "</td></tr>")
 		html .= "</table>"
 	}
@@ -743,7 +743,7 @@ updateAssistantsState(controllerState) {
 	local info := ""
 	local assistant, state, configuration
 
-	for key, state in getConfigurationSectionValues(controllerState, "Race Assistants", {}) {
+	for key, state in getMultiMapValues(controllerState, "Race Assistants") {
 		if ((key = "Mode") || (key = "Session"))
 			info .= ("<tr><td><b>" . translate(key . ":") . "</b></td><td>" . translate(state) . "</td></tr>")
 		else {
@@ -752,13 +752,13 @@ updateAssistantsState(controllerState) {
 
 				state := translate("Active")
 
-				if getConfigurationValue(controllerState, key, "Muted", false)
+				if getMultiMapValue(controllerState, key, "Muted", false)
 					state .= translate(" (Muted)")
 				else {
-					configuration := readConfiguration(kTempDirectory . key . ".state")
+					configuration := readMultiMap(kTempDirectory . key . ".state")
 
-					if (getConfigurationValue(configuration, "Voice", "Muted", false)
-					 || !getConfigurationValue(configuration, "Voice", "Speaker", true))
+					if (getMultiMapValue(configuration, "Voice", "Muted", false)
+					 || !getMultiMapValue(configuration, "Voice", "Speaker", true))
 						state .= translate(" (Muted)")
 				}
 			}
@@ -788,7 +788,7 @@ updateAssistantsState(controllerState) {
 }
 
 updateSessionState(controllerState) {
-	local state := getConfigurationValue(controllerState, "Team Server", "State", "Disabled")
+	local state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
 	local html, icon, ignore, property, key, value
 
 	if kStateIcons.HasKey(state)
@@ -801,7 +801,7 @@ updateSessionState(controllerState) {
 	if ((state != "Unknown") && (state != "Disabled")) {
 		state := {}
 
-		for ignore, property in string2Values(";", getConfigurationValue(controllerState, "Team Server", "Properties")) {
+		for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
 			property := StrSplit(property, ":", " `t", 2)
 
 			state[property[1]] := property[2]
@@ -828,7 +828,7 @@ updateSessionState(controllerState) {
 }
 
 updateDataState(databaseState) {
-	local state := getConfigurationValue(databaseState, "Database Synchronizer", "State", "Disabled")
+	local state := getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled")
 	local html, icon, serverURL, serverToken, action, counter, identifier
 
 	if kStateIcons.HasKey(state)
@@ -839,18 +839,18 @@ updateDataState(databaseState) {
 	GuiControl, , dataState, %icon%
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		serverURL := getConfigurationValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
-		serverToken := getConfigurationValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined)
+		serverURL := getMultiMapValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
+		serverToken := getMultiMapValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined)
 
-		if !getConfigurationValue(databaseState, "Database Synchronizer", "Connected", true)
+		if !getMultiMapValue(databaseState, "Database Synchronizer", "Connected", true)
 			action := "Disconnected"
 		else
-			action := getConfigurationValue(databaseState, "Database Synchronizer", "Synchronization", false)
+			action := getMultiMapValue(databaseState, "Database Synchronizer", "Synchronization", false)
 
 		html := "<table>"
 
 		/*
-		identifier := getConfigurationValue(databaseState, "Database Synchronizer", "Identifier", false)
+		identifier := getMultiMapValue(databaseState, "Database Synchronizer", "Identifier", false)
 
 		if identifier
 			html .= ("<tr><td><b>" . translate("Name:") . "</b></td><td>" . identifier . "</td></tr>")
@@ -863,14 +863,14 @@ updateDataState(databaseState) {
 			html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
 
 		html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>"
-							   . getConfigurationValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
+							   . getMultiMapValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Database:") . "</b></td><td>"
-							   . getConfigurationValue(databaseState, "Database Synchronizer", "DatabaseID") . "</td></tr>")
+							   . getMultiMapValue(databaseState, "Database Synchronizer", "DatabaseID") . "</td></tr>")
 
 		if action {
 			switch action {
 				case "Running":
-					counter := getConfigurationValue(databaseState, "Database Synchronizer", "Counter", false)
+					counter := getMultiMapValue(databaseState, "Database Synchronizer", "Counter", false)
 
 					if counter
 						action := substituteVariables(translate("Synchronizing (%counter% objects transferred)..."), {counter: counter})
@@ -904,7 +904,7 @@ updateDataState(databaseState) {
 }
 
 updateAutomationState(controllerState) {
-	local state := getConfigurationValue(controllerState, "Track Automation", "State", "Disabled")
+	local state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
 	local html, icon, automation
 
 	if kStateIcons.HasKey(state)
@@ -921,18 +921,18 @@ updateAutomationState(controllerState) {
 			html .= "</table>"
 		}
 		else {
-			automation := getConfigurationValue(controllerState, "Track Automation", "Automation", false)
+			automation := getMultiMapValue(controllerState, "Track Automation", "Automation", false)
 
 			if !automation
 				automation := translate("Not available")
 
 			html := "<table>"
 			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"
-								   . getConfigurationValue(controllerState, "Track Automation", "Simulator") . "</td></tr>")
+								   . getMultiMapValue(controllerState, "Track Automation", "Simulator") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>"
-								   . getConfigurationValue(controllerState, "Track Automation", "Car") . "</td></tr>")
+								   . getMultiMapValue(controllerState, "Track Automation", "Car") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
-								   . getConfigurationValue(controllerState, "Track Automation", "Track") . "</td></tr>")
+								   . getMultiMapValue(controllerState, "Track Automation", "Track") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Automation:") . "</b></td><td>" . automation . "</td></tr>")
 			html .= "</table>"
 		}
@@ -944,7 +944,7 @@ updateAutomationState(controllerState) {
 }
 
 updateMapperState(trackMapperState) {
-	local state := getConfigurationValue(trackMapperState, "Track Mapper", "State", "Disabled")
+	local state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
 	local html, icon, simulator, track, action, points
 
 	if kStateIcons.HasKey(state)
@@ -955,13 +955,13 @@ updateMapperState(trackMapperState) {
 	GuiControl, , mapperState, %icon%
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		action := getConfigurationValue(trackMapperState, "Track Mapper", "Action", "Waiting")
+		action := getMultiMapValue(trackMapperState, "Track Mapper", "Action", "Waiting")
 
 		html := "<table>"
 		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"
-							   . getConfigurationValue(trackMapperState, "Track Mapper", "Simulator") . "</td></tr>")
+							   . getMultiMapValue(trackMapperState, "Track Mapper", "Simulator") . "</td></tr>")
 		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
-							   . getConfigurationValue(trackMapperState, "Track Mapper", "Track") . "</td></tr>")
+							   . getMultiMapValue(trackMapperState, "Track Mapper", "Track") . "</td></tr>")
 
 		switch action {
 			case "Waiting":
@@ -986,7 +986,7 @@ updateMapperState(trackMapperState) {
 				throw "Unknown action detected in updateDataState..."
 		}
 
-		action := substituteVariables(action, {points: getConfigurationValue(trackMapperState, "Track Mapper", "Points", 0)})
+		action := substituteVariables(action, {points: getMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)})
 
 		html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
 		html .= "</table>"

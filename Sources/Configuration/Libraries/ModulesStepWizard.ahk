@@ -23,7 +23,7 @@
 class NamedPreset extends Preset {
 	iName := false
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
@@ -45,7 +45,7 @@ class SilentAssistant extends NamedPreset {
 	iAssistant := false
 	iDisabled := true
 
-	Assistant[] {
+	Assistant {
 		Get {
 			return this.iAssistant
 		}
@@ -55,7 +55,7 @@ class SilentAssistant extends NamedPreset {
 		this.iAssistant := assistant
 		this.iDisabled := ((full = kTrue) ? true : ((full = kFalse) ? false : full))
 
-		base.__New(name)
+		super.__New(name)
 	}
 
 	getArguments() {
@@ -66,8 +66,8 @@ class SilentAssistant extends NamedPreset {
 		local assistant
 
 		if wizard.isModuleSelected(this.Assistant)
-			if (getConfigurationValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
-				assistant := new Plugin(this.Assistant, simulatorConfiguration)
+			if (getMultiMapValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
+				assistant := Plugin(this.Assistant, simulatorConfiguration)
 
 				if this.iDisabled {
 					assistant.setArgumentValue("raceAssistantSpeaker", "Off")
@@ -88,11 +88,11 @@ class PassiveEngineer extends NamedPreset {
 		if wizard.isModuleSelected("Race Engineer") {
 			definition := wizard.Definition
 
-			for ignore, descriptor in getConfigurationSectionValues(definition, "Applications.Simulators", Object()) {
+			for ignore, descriptor in getMultiMapValues(definition, "Applications.Simulators") {
 				name := string2Values("|", descriptor)[1]
 
-				if (getConfigurationValue(simulatorConfiguration, "Plugins", name, kUndefined) != kUndefined) {
-					assistant := new Plugin(name, simulatorConfiguration)
+				if (getMultiMapValue(simulatorConfiguration, "Plugins", name, kUndefined) != kUndefined) {
+					assistant := Plugin(name, simulatorConfiguration)
 
 					assistant.setArgumentValue("openPitstopMFD", "Off")
 
@@ -108,9 +108,9 @@ class DifferentVoices extends NamedPreset {
 		local synthesizer, language, speaker, voices, ignore, voice, found, candidate, voice1, voice2, assistant
 
 		if wizard.isModuleSelected("Voice Control") {
-			synthesizer := getConfigurationValue(simulatorConfiguration, "Voice Control", "Synthesizer")
-			language := getConfigurationValue(simulatorConfiguration, "Voice Control", "Language")
-			speaker := getConfigurationValue(simulatorConfiguration, "Voice Control", "Speaker")
+			synthesizer := getMultiMapValue(simulatorConfiguration, "Voice Control", "Synthesizer")
+			language := getMultiMapValue(simulatorConfiguration, "Voice Control", "Language")
+			speaker := getMultiMapValue(simulatorConfiguration, "Voice Control", "Speaker")
 
 			voices := []
 
@@ -138,10 +138,10 @@ class DifferentVoices extends NamedPreset {
 			if (voices.Length() > 0) {
 				voices := reverse(voices)
 
-				for ignore, assistant in string2Values("|", getConfigurationValue(wizard.Definition, "Setup.Modules", "Modules.Definition.Assistants")) {
+				for ignore, assistant in string2Values("|", getMultiMapValue(wizard.Definition, "Setup.Modules", "Modules.Definition.Assistants")) {
 					if wizard.isModuleSelected(assistant)
-						if (getConfigurationValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
-							assistant := new Plugin(assistant, simulatorConfiguration)
+						if (getMultiMapValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
+							assistant := Plugin(assistant, simulatorConfiguration)
 
 							assistant.setArgumentValue("raceAssistantSpeaker", voices.Pop())
 
@@ -159,14 +159,14 @@ class DifferentVoices extends NamedPreset {
 class DefaultButtonBox extends NamedPreset {
 	iFile := false
 
-	File[] {
+	File {
 		Get {
 			return this.iFile
 		}
 	}
 
 	__New(name, file) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iFile := substituteVariables(file)
 	}
@@ -181,19 +181,19 @@ class DefaultButtonBox extends NamedPreset {
 
 		try {
 			if FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini") {
-				config := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+				config := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 
-				for section, values in readConfiguration(file)
+				for section, values in readMultiMap(file)
 					for key, value in values
-						if (getConfigurationValue(config, section, key, kUndefined) == kUndefined)
-							setConfigurationValue(config, section, key, value)
+						if (getMultiMapValue(config, section, key, kUndefined) == kUndefined)
+							setMultiMapValue(config, section, key, value)
 
-				writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", config)
+				writeMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini", config)
 			}
 			else
 				FileCopy %file%, %kUserHomeDirectory%Setup\Button Box Configuration.ini, 1
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -202,14 +202,14 @@ class DefaultButtonBox extends NamedPreset {
 class DefaultStreamDeck extends NamedPreset {
 	iFile := false
 
-	File[] {
+	File {
 		Get {
 			return this.iFile
 		}
 	}
 
 	__New(name, file) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iFile := substituteVariables(file)
 	}
@@ -224,19 +224,19 @@ class DefaultStreamDeck extends NamedPreset {
 
 		try {
 			if FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini") {
-				config := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+				config := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
-				for section, values in readConfiguration(file)
+				for section, values in readMultiMap(file)
 					for key, value in values
-						if (getConfigurationValue(config, section, key, kUndefined) == kUndefined)
-							setConfigurationValue(config, section, key, value)
+						if (getMultiMapValue(config, section, key, kUndefined) == kUndefined)
+							setMultiMapValue(config, section, key, value)
 
-				writeConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", config)
+				writeMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", config)
 			}
 			else
 				FileCopy %file%, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, 1
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -245,13 +245,13 @@ class DefaultStreamDeck extends NamedPreset {
 class FilesPreset extends NamedPreset {
 	iFiles := []
 
-	Directory[] {
+	Directory {
 		Get {
 			throw "Virtual property FilesPreset.Directory must be implemented in a subclass..."
 		}
 	}
 
-	Files[] {
+	Files {
 		Get {
 			return this.iFiles
 		}
@@ -260,7 +260,7 @@ class FilesPreset extends NamedPreset {
 	__New(name, files*) {
 		local index, file
 
-		base.__New(name)
+		super.__New(name)
 
 		for index, file in files
 			files[index] := substituteVariables(file)
@@ -280,7 +280,7 @@ class FilesPreset extends NamedPreset {
 			try {
 				FileCopy %file%, %directory%, 1
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 	}
@@ -298,7 +298,7 @@ class FilesPreset extends NamedPreset {
 }
 
 class StreamDeckIcons extends FilesPreset {
-	Directory[] {
+	Directory {
 		Get {
 			return kUserTranslationsDirectory
 		}
@@ -306,7 +306,7 @@ class StreamDeckIcons extends FilesPreset {
 }
 
 class P2TConfiguration extends FilesPreset {
-	Directory[] {
+	Directory {
 		Get {
 			return kUserConfigDirectory
 		}
@@ -316,14 +316,14 @@ class P2TConfiguration extends FilesPreset {
 class PitstopImages extends NamedPreset {
 	iDirectory := false
 
-	Directory[] {
+	Directory {
 		Get {
 			return this.iDirectory
 		}
 	}
 
 	__New(name, directory) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iDirectory := substituteVariables(directory)
 	}
@@ -343,7 +343,7 @@ class PitstopImages extends NamedPreset {
 		try {
 			FileCopy %directory%\*.*, %kUserHomeDirectory%Screen Images\%name%, 1
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -363,8 +363,8 @@ class TeamServerAlwaysOn extends NamedPreset {
 		local thePlugin
 
 		if (wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
-			if (getConfigurationValue(simulatorConfiguration, "Plugins", "Team Server", kUndefined) != kUndefined) {
-				thePlugin := new Plugin("Team Server", simulatorConfiguration)
+			if (getMultiMapValue(simulatorConfiguration, "Plugins", "Team Server", kUndefined) != kUndefined) {
+				thePlugin := Plugin("Team Server", simulatorConfiguration)
 
 				thePlugin.setArgumentValue("teamServer", "On")
 
@@ -376,14 +376,14 @@ class TeamServerAlwaysOn extends NamedPreset {
 class SetupPatch extends NamedPreset {
 	iFile := false
 
-	File[] {
+	File {
 		Get {
 			return this.iFile
 		}
 	}
 
 	__New(name, file) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iFile := substituteVariables(file)
 	}
@@ -401,7 +401,7 @@ class SetupPatch extends NamedPreset {
 		try {
 			Run notepad %kUserHomeDirectory%Setup\%name%
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -415,7 +415,7 @@ class SetupPatch extends NamedPreset {
 		try {
 			FileCopy %file%, %kUserHomeDirectory%Setup\%name%, 1
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
@@ -447,19 +447,19 @@ class ModulesStepWizard extends StepWizard {
 	iAvailablePresetsListView := false
 	iSelectedPresetsListView := false
 
-	Pages[] {
+	Pages {
 		Get {
 			return Ceil(this.Definition.Length() / 3) + 1
 		}
 	}
 
-	AvailablePresetsListView[] {
+	AvailablePresetsListView {
 		Get {
 			return this.iAvailablePresetsListView
 		}
 	}
 
-	SelectedPresetsListView[] {
+	SelectedPresetsListView {
 		Get {
 			return this.iSelectedPresetsListView
 		}
@@ -528,8 +528,8 @@ class ModulesStepWizard extends StepWizard {
 			module := definition[A_Index]
 			selected := this.SetupWizard.isModuleSelected(module)
 
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
-			module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
+			module := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
 
 			label := substituteVariables(translate("Module: %module%"), {module: module})
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
@@ -570,9 +570,9 @@ class ModulesStepWizard extends StepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailablePresetsListViewHandle gchooseAvailablePreset Hidden Section, % values2String("|", map(["Available Presets"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailablePresetsListViewHandle gchooseAvailablePreset Hidden Section, % values2String("|", collect(["Available Presets"], "translate")*)
 
-		Gui %window%:Add, ListView, x%x2% ys w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedPresetsListViewHandle gchooseSelectedPreset Hidden, % values2String("|", map(["Selected Presets"], "translate")*)
+		Gui %window%:Add, ListView, x%x2% ys w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedPresetsListViewHandle gchooseSelectedPreset Hidden, % values2String("|", collect(["Selected Presets"], "translate")*)
 
 		Gui %window%:Font, s10 Bold, Arial
 
@@ -581,7 +581,7 @@ class ModulesStepWizard extends StepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -601,13 +601,13 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iModuleSelectors := []
 	}
 
 	showPage(page) {
-		base.showPage(page)
+		super.showPage(page)
 
 		if (page = this.Pages) {
 			this.loadAvailablePresets()
@@ -621,7 +621,7 @@ class ModulesStepWizard extends StepWizard {
 		local window := this.Window
 		local variable, definition, name, chosen
 
-		base.updateState()
+		super.updateState()
 
 		Gui %window%:Default
 
@@ -679,15 +679,15 @@ class ModulesStepWizard extends StepWizard {
 			module := definition[A_Index]
 
 			if this.SetupWizard.isModuleSelected(module) {
-				modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
+				modulePresets := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 
 				for ignore, preset in string2Values("|", modulePresets)
-					LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+					LV_Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 			}
 		}
 
-		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
-			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+		for ignore, preset in string2Values("|", substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			LV_Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
@@ -705,7 +705,7 @@ class ModulesStepWizard extends StepWizard {
 		LV_Delete()
 
 		for ignore, preset in this.SetupWizard.Presets
-			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset.Name . "." . getLanguage()))
+			LV_Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset.Name . "." . getLanguage()))
 
 		LV_ModifyCol()
 		LV_ModifyCol(1, "AutoHdr")
@@ -719,15 +719,15 @@ class ModulesStepWizard extends StepWizard {
 		{
 			module := definition[A_Index]
 
-			modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
+			modulePresets := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 
 			for ignore, preset in string2Values("|", modulePresets)
-				if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+				if (label = getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 					return preset
 		}
 
-		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
-			if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+		for ignore, preset in string2Values("|", substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			if (label = getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 				return preset
 
 		return false
@@ -764,7 +764,7 @@ class ModulesStepWizard extends StepWizard {
 			if enable
 				GuiControl Enable, installPresetButton
 
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 		}
 
 		Gui ListView, % this.SelectedPresetsListView
@@ -779,12 +779,12 @@ class ModulesStepWizard extends StepWizard {
 
 				preset := this.presetName(preset)
 
-				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
+				info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 			}
 		}
 
 		if !info
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
@@ -810,10 +810,10 @@ class ModulesStepWizard extends StepWizard {
 
 			preset := this.presetName(label)
 
-			class := getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
-			arguments := string2Values(",", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments"))
+			class := getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
+			arguments := string2Values(",", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments"))
 
-			this.SetupWizard.installPreset(new %class%(preset, arguments*))
+			this.SetupWizard.installPreset(%class%(preset, arguments*))
 
 			this.loadSelectedPresets()
 
@@ -927,7 +927,7 @@ updateSelectedModules() {
 }
 
 initializeModulesStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new ModulesStepWizard(SetupWizard.Instance, "Modules", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(ModulesStepWizard(SetupWizard.Instance, "Modules", kSimulatorConfiguration))
 }
 
 

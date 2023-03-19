@@ -67,25 +67,25 @@ class TeamServerConfigurator extends ConfigurationItem {
 	iSessions := {}
 	iSelectedSession := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	Connector[] {
+	Connector {
 		Get {
 			return this.iConnector
 		}
 	}
 
-	Token[] {
+	Token {
 		Get {
 			return this.iToken
 		}
 	}
 
-	Initialized[] {
+	Initialized {
 		Get {
 			return this.iInitialized
 		}
@@ -97,7 +97,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	SelectedTeam[] {
+	SelectedTeam {
 		Get {
 			return this.iSelectedTeam
 		}
@@ -109,7 +109,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	SelectedDriver[] {
+	SelectedDriver {
 		Get {
 			return this.iSelectedDriver
 		}
@@ -121,7 +121,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	SelectedSession[] {
+	SelectedSession {
 		Get {
 			return this.iSelectedSession
 		}
@@ -132,7 +132,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		dllName := "Team Server Connector.dll"
 		dllFile := kBinariesDirectory . dllName
@@ -146,7 +146,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 			this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
@@ -192,9 +192,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		Gui %window%:Add, Text, x%lineX% yp+30 w%lineW% 0x10 HWNDwidget30 Hidden
 
-		settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+		serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
 		chosen := inList(serverURLs, teamServerURLEdit)
 		if (!chosen && ((serverURLs.Length() > 0) || (StrLen(teamServerURLEdit) > 0)))
@@ -278,18 +278,18 @@ class TeamServerConfigurator extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
 		if FileExist(kUserConfigDirectory . "Team Server.ini")
-			configuration := readConfiguration(kUserConfigDirectory . "Team Server.ini")
+			configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")
 
-		teamServerURLEdit := getConfigurationValue(configuration, "Team Server", "Server.URL", "https://localhost:5001")
-		teamServerNameEdit := getConfigurationValue(configuration, "Team Server", "Account.Name", "")
-		this.iToken := getConfigurationValue(configuration, "Team Server", "Account.Token", "")
-		teamServerSessionTokenEdit := getConfigurationValue(configuration, "Team Server", "Session.Token", "")
-		teamServerDataTokenEdit := getConfigurationValue(configuration, "Team Server", "Data.Token", "")
+		teamServerURLEdit := getMultiMapValue(configuration, "Team Server", "Server.URL", "https://localhost:5001")
+		teamServerNameEdit := getMultiMapValue(configuration, "Team Server", "Account.Name", "")
+		this.iToken := getMultiMapValue(configuration, "Team Server", "Account.Token", "")
+		teamServerSessionTokenEdit := getMultiMapValue(configuration, "Team Server", "Session.Token", "")
+		teamServerDataTokenEdit := getMultiMapValue(configuration, "Team Server", "Data.Token", "")
 
-		sessionStorePathEdit := getConfigurationValue(configuration, "Team Server", "Session.Folder", "")
+		sessionStorePathEdit := getMultiMapValue(configuration, "Team Server", "Session.Folder", "")
 
 		if !teamServerSessionTokenEdit
 			teamServerSessionTokenEdit := ""
@@ -302,7 +302,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		local window := this.Editor.Window
 		local tsConfiguration
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		Gui %window%:Default
 
@@ -313,19 +313,19 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControlGet teamServerDataTokenEdit
 		GuiControlGet sessionStorePathEdit
 
-		setConfigurationValue(configuration, "Team Server", "Server.URL", teamServerURLEdit)
-		setConfigurationValue(configuration, "Team Server", "Session.Token", teamServerSessionTokenEdit)
-		setConfigurationValue(configuration, "Team Server", "Data.Token", teamServerDataTokenEdit)
-		setConfigurationValue(configuration, "Team Server", "Account.Name", teamServerNameEdit)
-		setConfigurationValue(configuration, "Team Server", "Account.Token", this.Token)
+		setMultiMapValue(configuration, "Team Server", "Server.URL", teamServerURLEdit)
+		setMultiMapValue(configuration, "Team Server", "Session.Token", teamServerSessionTokenEdit)
+		setMultiMapValue(configuration, "Team Server", "Data.Token", teamServerDataTokenEdit)
+		setMultiMapValue(configuration, "Team Server", "Account.Name", teamServerNameEdit)
+		setMultiMapValue(configuration, "Team Server", "Account.Token", this.Token)
 
-		setConfigurationValue(configuration, "Team Server", "Session.Folder", sessionStorePathEdit)
+		setMultiMapValue(configuration, "Team Server", "Session.Folder", sessionStorePathEdit)
 
-		tsConfiguration := newConfiguration()
+		tsConfiguration := newMultiMap()
 
-		setConfigurationSectionValues(tsConfiguration, "Team Server", getConfigurationSectionValues(configuration, "Team Server"))
+		setMultiMapValues(tsConfiguration, "Team Server", getMultiMapValues(configuration, "Team Server"))
 
-		writeConfiguration(kUserConfigDirectory . "Team Server.ini", tsConfiguration)
+		writeMultiMap(kUserConfigDirectory . "Team Server.ini", tsConfiguration)
 	}
 
 	activate() {
@@ -376,14 +376,14 @@ class TeamServerConfigurator extends ConfigurationItem {
 					this.iToken := token
 				}
 
-				sessionDB := new SessionDatabase()
+				sessionDB := SessionDatabase()
 
 				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Manager")
 
 				if keepAliveTask
 					keepAliveTask.stop()
 
-				keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+				keepAliveTask := PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
 
 				keepAliveTask.start()
 
@@ -394,27 +394,27 @@ class TeamServerConfigurator extends ConfigurationItem {
 				try {
 					teamServerSessionTokenEdit := connector.GetSessionToken()
 				}
-				catch exception {
+				catch Any as exception {
 					teamServerSessionTokenEdit := ""
 				}
 
 				try {
 					teamServerDataTokenEdit := connector.GetDataToken()
 				}
-				catch exception {
+				catch Any as exception {
 					teamServerDataTokenEdit := ""
 				}
 
-				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				serverURLs := string2Values(";", getConfigurationValue(settings, "Team Server", "Server URLs", ""))
+				serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
 				if !inList(serverURLs, teamServerURLEdit) {
 					serverURLs.Push(teamServerURLEdit)
 
-					setConfigurationValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
+					setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
 
-					writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 					GuiControl, , teamServerURLEdit, % ("|" . values2String("|", serverURLs*))
 					GuiControl Choose, teamServerURLEdit, % inList(serverURLs, teamServerURLEdit)
@@ -427,7 +427,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
-			catch exception {
+			catch Any as exception {
 				GuiControl, , teamServerSessionTokenEdit, % ""
 				GuiControl, , teamServerDataTokenEdit, % ""
 				GuiControl +cGray, teamServerTimeText
@@ -533,7 +533,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		try {
 			teamServerDataTokenEdit := connector.RenewDataToken()
 		}
-		catch exception {
+		catch Any as exception {
 			teamServerDataTokenEdit := ""
 		}
 
@@ -553,7 +553,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 			try {
 				identifiers := string2Values(";", connector.GetAllTeams())
 			}
-			catch exception {
+			catch Any as exception {
 				identifiers := []
 			}
 
@@ -566,7 +566,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					else
 						this.iTeams[team.Name] := team.Identifier
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 		}
@@ -598,7 +598,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 			try {
 				identifiers := string2Values(";", connector.GetTeamDrivers(this.Teams[this.SelectedTeam]))
 			}
-			catch exception {
+			catch Any as exception {
 				identifiers := []
 			}
 
@@ -613,7 +613,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					else
 						this.iDrivers[name] := driver.Identifier
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 			}
@@ -644,7 +644,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 			try {
 				identifiers := string2Values(";", connector.GetTeamSessions(this.Teams[this.SelectedTeam]))
 			}
-			catch exception {
+			catch Any as exception {
 				identifiers := []
 			}
 
@@ -657,7 +657,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 					else
 						this.iSessions[session.Name] := session.Identifier
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 			}
@@ -670,7 +670,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 			try {
 				stints := string2Values(";", connector.GetSessionStints(identifier)).Length()
 			}
-			catch exception {
+			catch Any as exception {
 				stints := 0
 			}
 
@@ -680,7 +680,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 				try {
 					laps := this.parseObject(connector.GetLap(connector.GetSessionLastLap(identifier))).Nr
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 
@@ -891,7 +891,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		try {
 			return %function%(arguments*)
 		}
-		catch exception {
+		catch Any as exception {
 			title := translate("Error")
 
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
@@ -989,7 +989,7 @@ changePassword() {
 
 			GuiControl, , teamServerPasswordEdit, % firstPassword
 		}
-		catch exception {
+		catch Any as exception {
 			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 			MsgBox 262160, %errorTitle%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
 			OnMessage(0x44, "")
@@ -1225,7 +1225,7 @@ initializeTeamServerConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Team Server"), new TeamServerConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Team Server"), TeamServerConfigurator(editor, editor.Configuration))
 	}
 }
 

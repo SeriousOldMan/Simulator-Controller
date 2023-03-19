@@ -36,25 +36,25 @@ class StrategySimulation {
 	iTyreCompoundColor := false
 	iTyreCompoundVariation := 0
 
-	StrategyManager[] {
+	StrategyManager {
 		Get {
 			return this.iStrategyManager
 		}
 	}
 
-	TelemetryDatabase[] {
+	TelemetryDatabase {
 		Get {
 			return this.iTelemetryDatabase
 		}
 	}
 
-	SessionType[] {
+	SessionType {
 		Get {
 			return this.iSessionType
 		}
 	}
 
-	TyreCompoundColors[] {
+	TyreCompoundColors {
 		Get {
 			return this.iTyreCompoundColors
 		}
@@ -64,7 +64,7 @@ class StrategySimulation {
 		}
 	}
 
-	TyreCompound[] {
+	TyreCompound {
 		Get {
 			return this.iTyreCompound
 		}
@@ -74,7 +74,7 @@ class StrategySimulation {
 		}
 	}
 
-	TyreCompoundColor[] {
+	TyreCompoundColor {
 		Get {
 			return this.iTyreCompoundColor
 		}
@@ -84,7 +84,7 @@ class StrategySimulation {
 		}
 	}
 
-	TyreCompoundVariation[] {
+	TyreCompoundVariation {
 		Get {
 			return this.iTyreCompoundVariation
 		}
@@ -101,9 +101,9 @@ class StrategySimulation {
 	}
 
 	createKnowledgeBase(facts, productions, reductions) {
-		local engine := new RuleEngine(productions, reductions, facts)
+		local engine := RuleEngine(productions, reductions, facts)
 
-		return new KnowledgeBase(engine, engine.createFacts(), engine.createRules())
+		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
 	}
 
 	loadRules(compiler, validator, ByRef productions, ByRef reductions) {
@@ -122,7 +122,7 @@ class StrategySimulation {
 			if (rules != "")
 				compiler.compileRules(rules, productions, reductions)
 		}
-		catch exception {
+		catch Any as exception {
 			message := (IsObject(exception) ? exception.Message : exception)
 			title := translate("Error")
 
@@ -217,7 +217,7 @@ class StrategySimulation {
 			static lastValidator := false
 
 			if !compiler {
-				compiler := new RuleCompiler()
+				compiler := RuleCompiler()
 				goal := compiler.compileGoal("validScenario()")
 			}
 
@@ -909,49 +909,49 @@ class TrafficSimulation extends StrategySimulation {
 	iOverTakeDelta := false
 	iConsideredTraffic := false
 
-	RandomFactor[] {
+	RandomFactor {
 		Get {
 			return this.iRandomFactor
 		}
 	}
 
-	NumScenarios[] {
+	NumScenarios {
 		Get {
 			return this.iNumScenarios
 		}
 	}
 
-	VariationWindow[] {
+	VariationWindow {
 		Get {
 			return this.iVariationWindow
 		}
 	}
 
-	UseLapTimeVariation[] {
+	UseLapTimeVariation {
 		Get {
 			return this.iUseLapTimeVariation
 		}
 	}
 
-	UseDriverErrors[] {
+	UseDriverErrors {
 		Get {
 			return this.iUseDriverErrors
 		}
 	}
 
-	UsePitstops[] {
+	UsePitstops {
 		Get {
 			return this.iUsePitstops
 		}
 	}
 
-	OverTakeDelta[] {
+	OverTakeDelta {
 		Get {
 			return this.iOverTakeDelta
 		}
 	}
 
-	ConsideredTraffic[] {
+	ConsideredTraffic {
 		Get {
 			return this.iConsideredTraffic
 		}
@@ -1020,12 +1020,12 @@ class TrafficSimulation extends StrategySimulation {
 					else if (density1 > density2)
 						return scenario2
 					else
-						return base.compareScenarios(scenario1, scenario2)
+						return super.compareScenarios(scenario1, scenario2)
 				}
 			}
 		}
 		else
-			return base.compareScenarios(scenario1, scenario2)
+			return super.compareScenarios(scenario1, scenario2)
 	}
 
 	createScenarios(electronicsData, tyresData, verbose, ByRef progress) {
@@ -1418,103 +1418,103 @@ class Strategy extends ConfigurationItem {
 			}
 		}
 
-		Duration[] {
+		Duration {
 			Get {
 				return this.iDuration
 			}
 		}
 
-		Weather[] {
+		Weather {
 			Get {
 				return this.iWeather
 			}
 		}
 
-		AirTemperature[] {
+		AirTemperature {
 			Get {
 				return this.iAirTemperature
 			}
 		}
 
-		TrackTemperature[] {
+		TrackTemperature {
 			Get {
 				return this.iTrackTemperature
 			}
 		}
 
-		TyreChange[] {
+		TyreChange {
 			Get {
 				return this.iTyreChange
 			}
 		}
 
-		TyreCompound[] {
+		TyreCompound {
 			Get {
 				return this.iTyreCompound
 			}
 		}
 
-		TyreCompoundColor[] {
+		TyreCompoundColor {
 			Get {
 				return this.iTyreCompoundColor
 			}
 		}
 
-		RefuelAmount[] {
+		RefuelAmount {
 			Get {
 				return this.iRefuelAmount
 			}
 		}
 
-		StintLaps[] {
+		StintLaps {
 			Get {
 				return this.iStintLaps
 			}
 		}
 
-		Fixed[] {
+		Fixed {
 			Get {
 				return this.iFixed
 			}
 		}
 
-		Map[] {
+		Map {
 			Get {
 				return this.iMap
 			}
 		}
 
-		FuelConsumption[] {
+		FuelConsumption {
 			Get {
 				return this.iFuelConsumption
 			}
 		}
 
-		AvgLapTime[] {
+		AvgLapTime {
 			Get {
 				return this.iAvgLapTime
 			}
 		}
 
-		RemainingSessionLaps[] {
+		RemainingSessionLaps {
 			Get {
 				return this.iRemainingSessionLaps
 			}
 		}
 
-		RemainingSessionTime[] {
+		RemainingSessionTime {
 			Get {
 				return this.iRemainingSessionTime
 			}
 		}
 
-		RemainingTyreLaps[] {
+		RemainingTyreLaps {
 			Get {
 				return this.iRemainingTyreLaps
 			}
 		}
 
-		RemainingFuel[] {
+		RemainingFuel {
 			Get {
 				return this.iRemainingFuel
 			}
@@ -1527,9 +1527,9 @@ class Strategy extends ConfigurationItem {
 			this.iDriver := driver
 
 			if driver
-				this.iDriverName := new SessionDatabase().getDriverName(strategy.Simulator, driver)
+				this.iDriverName := SessionDatabase().getDriverName(strategy.Simulator, driver)
 
-			base.__New(configuration)
+			super.__New(configuration)
 
 			if !configuration
 				this.initialize(tyreCompound, tyreCompoundColor, adjustments)
@@ -1686,107 +1686,107 @@ class Strategy extends ConfigurationItem {
 		loadFromConfiguration(configuration) {
 			local lap := this.Lap
 
-			base.loadFromConfiguration(configuration)
+			super.loadFromConfiguration(configuration)
 
-			this.iDriver := getConfigurationValue(configuration, "Pitstop", "Driver." . lap, false)
-			this.iDriverName := getConfigurationValue(configuration, "Pitstop", "DriverName." . lap, "John Doe (JD)")
+			this.iDriver := getMultiMapValue(configuration, "Pitstop", "Driver." . lap, false)
+			this.iDriverName := getMultiMapValue(configuration, "Pitstop", "DriverName." . lap, "John Doe (JD)")
 
-			this.iTime := getConfigurationValue(configuration, "Pitstop", "Time." . lap, 0)
-			this.iDuration := getConfigurationValue(configuration, "Pitstop", "Duration." . lap, 0)
+			this.iTime := getMultiMapValue(configuration, "Pitstop", "Time." . lap, 0)
+			this.iDuration := getMultiMapValue(configuration, "Pitstop", "Duration." . lap, 0)
 
-			this.iWeather := getConfigurationValue(configuration, "Pitstop", "Weather." . lap, this.Strategy.Weather)
-			this.iAirTemperature := getConfigurationValue(configuration, "Pitstop", "AirTemperature." . lap, this.Strategy.AirTemperature)
-			this.iTrackTemperature := getConfigurationValue(configuration, "Pitstop", "TrackTemperature." . lap, this.Strategy.TrackTemperature)
+			this.iWeather := getMultiMapValue(configuration, "Pitstop", "Weather." . lap, this.Strategy.Weather)
+			this.iAirTemperature := getMultiMapValue(configuration, "Pitstop", "AirTemperature." . lap, this.Strategy.AirTemperature)
+			this.iTrackTemperature := getMultiMapValue(configuration, "Pitstop", "TrackTemperature." . lap, this.Strategy.TrackTemperature)
 
-			this.iRefuelAmount := getConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, 0)
-			this.iTyreChange := getConfigurationValue(configuration, "Pitstop", "TyreChange." . lap, false)
+			this.iRefuelAmount := getMultiMapValue(configuration, "Pitstop", "RefuelAmount." . lap, 0)
+			this.iTyreChange := getMultiMapValue(configuration, "Pitstop", "TyreChange." . lap, false)
 
 			if this.iTyreChange {
-				this.iTyreCompound := getConfigurationValue(configuration, "Pitstop", "TyreCompound." . lap, this.Strategy.TyreCompound)
-				this.iTyreCompoundColor := getConfigurationValue(configuration, "Pitstop", "TyreCompoundColor." . lap, this.Strategy.TyreCompoundColor)
+				this.iTyreCompound := getMultiMapValue(configuration, "Pitstop", "TyreCompound." . lap, this.Strategy.TyreCompound)
+				this.iTyreCompoundColor := getMultiMapValue(configuration, "Pitstop", "TyreCompoundColor." . lap, this.Strategy.TyreCompoundColor)
 			}
 
-			this.iStintLaps := getConfigurationValue(configuration, "Pitstop", "StintLaps." . lap, 0)
+			this.iStintLaps := getMultiMapValue(configuration, "Pitstop", "StintLaps." . lap, 0)
 
-			this.iMap := getConfigurationValue(configuration, "Pitstop", "Map." . lap, 0)
-			this.iAvgLapTime := getConfigurationValue(configuration, "Pitstop", "AvgLapTime." . lap, 0)
-			this.iFuelConsumption := getConfigurationValue(configuration, "Pitstop", "FuelConsumption." . lap, 0)
+			this.iMap := getMultiMapValue(configuration, "Pitstop", "Map." . lap, 0)
+			this.iAvgLapTime := getMultiMapValue(configuration, "Pitstop", "AvgLapTime." . lap, 0)
+			this.iFuelConsumption := getMultiMapValue(configuration, "Pitstop", "FuelConsumption." . lap, 0)
 
-			this.iRemainingSessionLaps := getConfigurationValue(configuration, "Pitstop", "RemainingSessionLaps." . lap
-															  , getConfigurationValue(configuration, "Pitstop", "RemainingLaps." . lap, 0))
-			this.iRemainingSessionTime := getConfigurationValue(configuration, "Pitstop", "RemainingSessionTime." . lap
-															  , getConfigurationValue(configuration, "Pitstop", "RemainingTime." . lap, 0))
-			this.iRemainingTyreLaps := getConfigurationValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, 0)
-			this.iRemainingFuel := getConfigurationValue(configuration, "Pitstop", "RemainingFuel." . lap, 0.0)
+			this.iRemainingSessionLaps := getMultiMapValue(configuration, "Pitstop", "RemainingSessionLaps." . lap
+															  , getMultiMapValue(configuration, "Pitstop", "RemainingLaps." . lap, 0))
+			this.iRemainingSessionTime := getMultiMapValue(configuration, "Pitstop", "RemainingSessionTime." . lap
+															  , getMultiMapValue(configuration, "Pitstop", "RemainingTime." . lap, 0))
+			this.iRemainingTyreLaps := getMultiMapValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, 0)
+			this.iRemainingFuel := getMultiMapValue(configuration, "Pitstop", "RemainingFuel." . lap, 0.0)
 		}
 
 		saveToConfiguration(configuration) {
 			local lap := this.Lap
 
-			base.saveToConfiguration(configuration)
+			super.saveToConfiguration(configuration)
 
-			setConfigurationValue(configuration, "Pitstop", "Driver." . lap, this.Driver)
-			setConfigurationValue(configuration, "Pitstop", "DriverName." . lap, this.DriverName)
+			setMultiMapValue(configuration, "Pitstop", "Driver." . lap, this.Driver)
+			setMultiMapValue(configuration, "Pitstop", "DriverName." . lap, this.DriverName)
 
-			setConfigurationValue(configuration, "Pitstop", "Time." . lap, this.Time)
-			setConfigurationValue(configuration, "Pitstop", "Duration." . lap, this.Duration)
+			setMultiMapValue(configuration, "Pitstop", "Time." . lap, this.Time)
+			setMultiMapValue(configuration, "Pitstop", "Duration." . lap, this.Duration)
 
-			setConfigurationValue(configuration, "Pitstop", "Weather." . lap, this.Weather)
-			setConfigurationValue(configuration, "Pitstop", "AirTemperature." . lap, this.AirTemperature)
-			setConfigurationValue(configuration, "Pitstop", "TrackTemperature." . lap, this.TrackTemperature)
+			setMultiMapValue(configuration, "Pitstop", "Weather." . lap, this.Weather)
+			setMultiMapValue(configuration, "Pitstop", "AirTemperature." . lap, this.AirTemperature)
+			setMultiMapValue(configuration, "Pitstop", "TrackTemperature." . lap, this.TrackTemperature)
 
-			setConfigurationValue(configuration, "Pitstop", "RefuelAmount." . lap, Ceil(this.RefuelAmount))
-			setConfigurationValue(configuration, "Pitstop", "TyreChange." . lap, this.TyreChange)
+			setMultiMapValue(configuration, "Pitstop", "RefuelAmount." . lap, Ceil(this.RefuelAmount))
+			setMultiMapValue(configuration, "Pitstop", "TyreChange." . lap, this.TyreChange)
 
 			if this.iTyreChange {
-				setConfigurationValue(configuration, "Pitstop", "TyreCompound." . lap, this.TyreCompound)
-				setConfigurationValue(configuration, "Pitstop", "TyreCompoundColor." . lap, this.TyreCompoundColor)
+				setMultiMapValue(configuration, "Pitstop", "TyreCompound." . lap, this.TyreCompound)
+				setMultiMapValue(configuration, "Pitstop", "TyreCompoundColor." . lap, this.TyreCompoundColor)
 			}
 
-			setConfigurationValue(configuration, "Pitstop", "StintLaps." . lap, this.StintLaps)
+			setMultiMapValue(configuration, "Pitstop", "StintLaps." . lap, this.StintLaps)
 
-			setConfigurationValue(configuration, "Pitstop", "Map." . lap, this.Map)
-			setConfigurationValue(configuration, "Pitstop", "AvgLapTime." . lap, this.AvgLapTime)
-			setConfigurationValue(configuration, "Pitstop", "FuelConsumption." . lap, this.FuelConsumption)
+			setMultiMapValue(configuration, "Pitstop", "Map." . lap, this.Map)
+			setMultiMapValue(configuration, "Pitstop", "AvgLapTime." . lap, this.AvgLapTime)
+			setMultiMapValue(configuration, "Pitstop", "FuelConsumption." . lap, this.FuelConsumption)
 
-			setConfigurationValue(configuration, "Pitstop", "RemainingSessionLaps." . lap, this.RemainingSessionLaps)
-			setConfigurationValue(configuration, "Pitstop", "RemainingSessionTime." . lap, this.RemainingSessionTime)
-			setConfigurationValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, this.RemainingTyreLaps)
-			setConfigurationValue(configuration, "Pitstop", "RemainingFuel." . lap, this.RemainingFuel)
+			setMultiMapValue(configuration, "Pitstop", "RemainingSessionLaps." . lap, this.RemainingSessionLaps)
+			setMultiMapValue(configuration, "Pitstop", "RemainingSessionTime." . lap, this.RemainingSessionTime)
+			setMultiMapValue(configuration, "Pitstop", "RemainingTyreLaps." . lap, this.RemainingTyreLaps)
+			setMultiMapValue(configuration, "Pitstop", "RemainingFuel." . lap, this.RemainingFuel)
 		}
 	}
 
-	StrategyManager[] {
+	StrategyManager {
 		Get {
 			return this.iStrategyManager
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	Version[] {
+	Version {
 		Get {
 			return this.iVersion
 		}
 	}
 
-	Simulator[] {
+	Simulator {
 		Get {
 			return this.iSimulator
 		}
 	}
 
-	Car[] {
+	Car {
 		Get {
 			return this.iCar
 		}
 	}
 
-	Track[] {
+	Track {
 		Get {
 			return this.iTrack
 		}
@@ -1825,13 +1825,13 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	SessionType[] {
+	SessionType {
 		Get {
 			return this.iSessionType
 		}
 	}
 
-	SessionLength[] {
+	SessionLength {
 		Get {
 			return this.iSessionLength
 		}
@@ -1846,13 +1846,13 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	TC[] {
+	TC {
 		Get {
 			return this.iTC
 		}
 	}
 
-	ABS[] {
+	ABS {
 		Get {
 			return this.iABS
 		}
@@ -1894,91 +1894,91 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	TyrePressureFL[] {
+	TyrePressureFL {
 		Get {
 			return this.iTyrePressureFL
 		}
 	}
 
-	TyrePressureFR[] {
+	TyrePressureFR {
 		Get {
 			return this.iTyrePressureFR
 		}
 	}
 
-	TyrePressureRL[] {
+	TyrePressureRL {
 		Get {
 			return this.iTyrePressureRL
 		}
 	}
 
-	TyrePressureRR[] {
+	TyrePressureRR {
 		Get {
 			return this.iTyrePressureRR
 		}
 	}
 
-	StintLength[] {
+	StintLength {
 		Get {
 			return this.iStintLength
 		}
 	}
 
-	FormationLap[] {
+	FormationLap {
 		Get {
 			return this.iFormationLap
 		}
 	}
 
-	PostRaceLap[] {
+	PostRaceLap {
 		Get {
 			return this.iPostRaceLap
 		}
 	}
 
-	FuelCapacity[] {
+	FuelCapacity {
 		Get {
 			return this.iFuelCapacity
 		}
 	}
 
-	SafetyFuel[] {
+	SafetyFuel {
 		Get {
 			return this.iSafetyFuel
 		}
 	}
 
-	PitstopDelta[] {
+	PitstopDelta {
 		Get {
 			return this.iPitstopDelta
 		}
 	}
 
-	PitstopFuelService[] {
+	PitstopFuelService {
 		Get {
 			return this.iPitstopFuelService
 		}
 	}
 
-	PitstopTyreService[] {
+	PitstopTyreService {
 		Get {
 			return this.iPitstopTyreService
 		}
 	}
 
-	PitstopServiceOrder[] {
+	PitstopServiceOrder {
 		Get {
 			return this.iPitstopServiceOrder
 		}
 	}
 
-	Validator[] {
+	Validator {
 		Get {
 			return this.iValidator
 		}
 	}
 
-	PitstopRule[] {
+	PitstopRule {
 		Get {
 			return this.iPitstopRule
 		}
@@ -1988,13 +1988,13 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	RefuelRule[] {
+	RefuelRule {
 		Get {
 			return this.iRefuelRule
 		}
 	}
 
-	TyreChangeRule[] {
+	TyreChangeRule {
 		Get {
 			return this.iTyreChangeRule
 		}
@@ -2006,25 +2006,25 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	StartStint[] {
+	StartStint {
 		Get {
 			return this.iStartStint
 		}
 	}
 
-	StartLap[] {
+	StartLap {
 		Get {
 			return this.iStartLap
 		}
 	}
 
-	StintStartTime[] {
+	StintStartTime {
 		Get {
 			return this.iStintStartTime
 		}
 	}
 
-	SessionStartTime[] {
+	SessionStartTime {
 		Get {
 			return this.iSessionStartTime
 		}
@@ -2039,13 +2039,13 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	MaxTyreLaps[] {
+	MaxTyreLaps {
 		Get {
 			return this.iMaxTyreLaps
 		}
 	}
 
-	TyreLapsVariation[] {
+	TyreLapsVariation {
 		Get {
 			return this.iTyreLapsVariation
 		}
@@ -2078,7 +2078,7 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	StartFuel[] {
+	StartFuel {
 		Get {
 			return this.iStartFuelAmount
 		}
@@ -2134,13 +2134,13 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	Driver[] {
+	Driver {
 		Get {
 			return this.iDriver
 		}
 	}
 
-	DriverName[] {
+	DriverName {
 		Get {
 			return this.iDriverName
 		}
@@ -2152,7 +2152,7 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	LastPitstop[] {
+	LastPitstop {
 		Get {
 			local length := this.Pitstops.Length()
 
@@ -2160,37 +2160,37 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	UseInitialConditions[] {
+	UseInitialConditions {
 		Get {
 			return this.iUseInitialConditions
 		}
 	}
 
-	UseTelemetryData[] {
+	UseTelemetryData {
 		Get {
 			return this.iUseTelemetryData
 		}
 	}
 
-	ConsumptionVariation[] {
+	ConsumptionVariation {
 		Get {
 			return this.iConsumptionVariation
 		}
 	}
 
-	InitialFuelVariation[] {
+	InitialFuelVariation {
 		Get {
 			return this.iInitialFuelVariation
 		}
 	}
 
-	TyreUsageVariation[] {
+	TyreUsageVariation {
 		Get {
 			return this.iTyreUsageVariation
 		}
 	}
 
-	TyreCompoundVariation[] {
+	TyreCompoundVariation {
 		Get {
 			return this.iTyreCompoundVariation
 		}
@@ -2218,7 +2218,7 @@ class Strategy extends ConfigurationItem {
 		this.iStrategyManager := strategyManager
 		this.iDriver := driver
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		if !configuration {
 			simulator := false
@@ -2258,7 +2258,7 @@ class Strategy extends ConfigurationItem {
 			this.iTyrePressureRR := tyrePressures[4]
 
 			if driver
-				this.iDriverName := new SessionDatabase().getDriverName(simulator, driver)
+				this.iDriverName := SessionDatabase().getDriverName(simulator, driver)
 
 			stintLength := false
 			formationLap := false
@@ -2365,211 +2365,211 @@ class Strategy extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		local tyreSets, defaultPressure, ignore, lap, weatherForecast
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.iName := getConfigurationValue(configuration, "General", "Name", translate("Unnamed"))
-		this.iVersion := getConfigurationValue(configuration, "General", "Version", false)
+		this.iName := getMultiMapValue(configuration, "General", "Name", translate("Unnamed"))
+		this.iVersion := getMultiMapValue(configuration, "General", "Version", false)
 
-		this.iSimulator := getConfigurationValue(configuration, "Session", "Simulator", "Unknown")
-		this.iCar := getConfigurationValue(configuration, "Session", "Car", "Unknown")
-		this.iTrack := getConfigurationValue(configuration, "Session", "Track", "Unknown")
+		this.iSimulator := getMultiMapValue(configuration, "Session", "Simulator", "Unknown")
+		this.iCar := getMultiMapValue(configuration, "Session", "Car", "Unknown")
+		this.iTrack := getMultiMapValue(configuration, "Session", "Track", "Unknown")
 
-		this.iWeather := getConfigurationValue(configuration, "Weather", "Weather", "Dry")
-		this.iAirTemperature := getConfigurationValue(configuration, "Weather", "AirTemperature", 23)
-		this.iTrackTemperature := getConfigurationValue(configuration, "Weather", "TrackTemperature", 27)
+		this.iWeather := getMultiMapValue(configuration, "Weather", "Weather", "Dry")
+		this.iAirTemperature := getMultiMapValue(configuration, "Weather", "AirTemperature", 23)
+		this.iTrackTemperature := getMultiMapValue(configuration, "Weather", "TrackTemperature", 27)
 
 		weatherForecast := []
 
-		loop % getConfigurationValue(configuration, "Weather", "Forecasts", 0)
-			weatherForecast.Push(string2Values(",", getConfigurationValue(configuration, "Weather", "Forecast." . A_Index)))
+		loop % getMultiMapValue(configuration, "Weather", "Forecasts", 0)
+			weatherForecast.Push(string2Values(",", getMultiMapValue(configuration, "Weather", "Forecast." . A_Index)))
 
 		this.iWeatherForecast := weatherForecast
 
-		this.iFuelCapacity := getConfigurationValue(configuration, "Settings", "FuelCapacity", 0)
-		this.iSafetyFuel := getConfigurationValue(configuration, "Settings", "SafetyFuel", 0)
+		this.iFuelCapacity := getMultiMapValue(configuration, "Settings", "FuelCapacity", 0)
+		this.iSafetyFuel := getMultiMapValue(configuration, "Settings", "SafetyFuel", 0)
 
-		this.iSessionType := getConfigurationValue(configuration, "Session", "SessionType", "Duration")
-		this.iSessionLength := getConfigurationValue(configuration, "Session", "SessionLength", 0)
-		this.iFormationLap := getConfigurationValue(configuration, "Session", "FormationLap", false)
-		this.iPostRaceLap := getConfigurationValue(configuration, "Session", "PostRaceLap", false)
+		this.iSessionType := getMultiMapValue(configuration, "Session", "SessionType", "Duration")
+		this.iSessionLength := getMultiMapValue(configuration, "Session", "SessionLength", 0)
+		this.iFormationLap := getMultiMapValue(configuration, "Session", "FormationLap", false)
+		this.iPostRaceLap := getMultiMapValue(configuration, "Session", "PostRaceLap", false)
 
-		this.iStintLength := getConfigurationValue(configuration, "Session", "StintLength", 0)
+		this.iStintLength := getMultiMapValue(configuration, "Session", "StintLength", 0)
 
-		this.iPitstopDelta := getConfigurationValue(configuration, "Settings", "PitstopDelta", 0)
-		this.iPitstopFuelService := string2Values(":", getConfigurationValue(configuration, "Settings", "PitstopFuelService", 0.0))
+		this.iPitstopDelta := getMultiMapValue(configuration, "Settings", "PitstopDelta", 0)
+		this.iPitstopFuelService := string2Values(":", getMultiMapValue(configuration, "Settings", "PitstopFuelService", 0.0))
 
 		if (this.iPitstopFuelService.Length() = 1)
 			this.iPitstopFuelService := this.iPitstopFuelService[1]
 
-		this.iPitstopTyreService := getConfigurationValue(configuration, "Settings", "PitstopTyreService", 0.0)
-		this.iPitstopServiceOrder := getConfigurationValue(configuration, "Settings", "PitstopServiceOrder", "Simultaneous")
+		this.iPitstopTyreService := getMultiMapValue(configuration, "Settings", "PitstopTyreService", 0.0)
+		this.iPitstopServiceOrder := getMultiMapValue(configuration, "Settings", "PitstopServiceOrder", "Simultaneous")
 
-		this.iValidator := getConfigurationValue(configuration, "Settings", "Validator", false)
+		this.iValidator := getMultiMapValue(configuration, "Settings", "Validator", false)
 
-		this.iPitstopRule := getConfigurationValue(configuration, "Settings", "PitstopRule", kUndefined)
+		this.iPitstopRule := getMultiMapValue(configuration, "Settings", "PitstopRule", kUndefined)
 
 		if (this.iPitstopRule == kUndefined)
-			this.iPitstopRule := getConfigurationValue(configuration, "Settings", "PitstopRequired", false)
+			this.iPitstopRule := getMultiMapValue(configuration, "Settings", "PitstopRequired", false)
 
 		if this.iPitstopRule
 			if InStr(this.iPitstopRule, "-")
 				this.iPitstopRule := string2Values("-", this.iPitstopRule)
 
-		this.iRefuelRule := getConfigurationValue(configuration, "Settings", "PitstopRefuel", "Optional")
+		this.iRefuelRule := getMultiMapValue(configuration, "Settings", "PitstopRefuel", "Optional")
 
 		if (this.iRefuelRule == false)
 			this.iRefuelRule := "Optional"
 		else if (this.iRefuelRule == true)
 			this.iRefuelRule := "Required"
 
-		this.iTyreChangeRule := getConfigurationValue(configuration, "Settings", "PitstopTyreChange", false)
+		this.iTyreChangeRule := getMultiMapValue(configuration, "Settings", "PitstopTyreChange", false)
 
 		if (this.iTyreChangeRule == false)
 			this.iTyreChangeRule := "Optional"
 		else if (this.iTyreChangeRule == true)
 			this.iTyreChangeRule := "Required"
 
-		tyreSets := string2Values(";", getConfigurationValue(configuration, "Settings", "TyreSets", []))
+		tyreSets := string2Values(";", getMultiMapValue(configuration, "Settings", "TyreSets", []))
 
 		loop % tyreSets.Length()
 			tyreSets[A_Index] := string2Values(":", tyreSets[A_Index])
 
 		this.iTyreSets := tyreSets
 
-		this.iMap := getConfigurationValue(configuration, "Setup", "Map", "n/a")
-		this.iTC := getConfigurationValue(configuration, "Setup", "TC", "n/a")
-		this.iABS := getConfigurationValue(configuration, "Setup", "ABS", "n/a")
+		this.iMap := getMultiMapValue(configuration, "Setup", "Map", "n/a")
+		this.iTC := getMultiMapValue(configuration, "Setup", "TC", "n/a")
+		this.iABS := getMultiMapValue(configuration, "Setup", "ABS", "n/a")
 
-		this.iStartStint := getConfigurationValue(configuration, "Session", "StartStint", 1)
-		this.iStartLap := getConfigurationValue(configuration, "Session", "StartLap", 0)
-		this.iStintStartTime := getConfigurationValue(configuration, "Session", "StintStartTime", 0)
-		this.iSessionStartTime := getConfigurationValue(configuration, "Session", "SessionStartTime"
-													  , getConfigurationValue(configuration, "Session", "StartTime", 0))
+		this.iStartStint := getMultiMapValue(configuration, "Session", "StartStint", 1)
+		this.iStartLap := getMultiMapValue(configuration, "Session", "StartLap", 0)
+		this.iStintStartTime := getMultiMapValue(configuration, "Session", "StintStartTime", 0)
+		this.iSessionStartTime := getMultiMapValue(configuration, "Session", "SessionStartTime"
+													  , getMultiMapValue(configuration, "Session", "StartTime", 0))
 
-		this.iFuelAmount := getConfigurationValue(configuration, "Setup", "FuelAmount", 0.0)
-		this.iStartFuelAmount := getConfigurationValue(configuration, "Setup", "StartFuelAmount", this.iFuelAmount)
-		this.iTyreLaps:= getConfigurationValue(configuration, "Setup", "TyreLaps", 0)
+		this.iFuelAmount := getMultiMapValue(configuration, "Setup", "FuelAmount", 0.0)
+		this.iStartFuelAmount := getMultiMapValue(configuration, "Setup", "StartFuelAmount", this.iFuelAmount)
+		this.iTyreLaps:= getMultiMapValue(configuration, "Setup", "TyreLaps", 0)
 
-		this.iTyreCompound := getConfigurationValue(configuration, "Setup", "TyreCompound", "Dry")
-		this.iTyreCompoundColor := getConfigurationValue(configuration, "Setup", "TyreCompoundColor", "Black")
+		this.iTyreCompound := getMultiMapValue(configuration, "Setup", "TyreCompound", "Dry")
+		this.iTyreCompoundColor := getMultiMapValue(configuration, "Setup", "TyreCompoundColor", "Black")
 
 		defaultPressure := ((this.iTyreCompound = "Dry") ? 27.7 : 30.0)
 
-		this.iTyrePressureFL := getConfigurationValue(configuration, "Setup", "TyrePressureFL", defaultPressure)
-		this.iTyrePressureFR := getConfigurationValue(configuration, "Setup", "TyrePressureFR", defaultPressure)
-		this.iTyrePressureRL := getConfigurationValue(configuration, "Setup", "TyrePressureRL", defaultPressure)
-		this.iTyrePressureRR := getConfigurationValue(configuration, "Setup", "TyrePressureRR", defaultPressure)
+		this.iTyrePressureFL := getMultiMapValue(configuration, "Setup", "TyrePressureFL", defaultPressure)
+		this.iTyrePressureFR := getMultiMapValue(configuration, "Setup", "TyrePressureFR", defaultPressure)
+		this.iTyrePressureRL := getMultiMapValue(configuration, "Setup", "TyrePressureRL", defaultPressure)
+		this.iTyrePressureRR := getMultiMapValue(configuration, "Setup", "TyrePressureRR", defaultPressure)
 
-		this.iStintLaps := getConfigurationValue(configuration, "Strategy", "StintLaps", 0)
-		this.iMaxTyreLaps := getConfigurationValue(configuration, "Strategy", "MaxTyreLaps", 0)
+		this.iStintLaps := getMultiMapValue(configuration, "Strategy", "StintLaps", 0)
+		this.iMaxTyreLaps := getMultiMapValue(configuration, "Strategy", "MaxTyreLaps", 0)
 
-		this.iAvgLapTime := getConfigurationValue(configuration, "Strategy", "AvgLapTime", 0)
-		this.iFuelConsumption := getConfigurationValue(configuration, "Strategy", "FuelConsumption", 0)
+		this.iAvgLapTime := getMultiMapValue(configuration, "Strategy", "AvgLapTime", 0)
+		this.iFuelConsumption := getMultiMapValue(configuration, "Strategy", "FuelConsumption", 0)
 
-		this.iDriver := getConfigurationValue(configuration, "Strategy", "Driver", false)
-		this.iDriverName := getConfigurationValue(configuration, "Strategy", "DriverName", "John Doe (JD)")
+		this.iDriver := getMultiMapValue(configuration, "Strategy", "Driver", false)
+		this.iDriverName := getMultiMapValue(configuration, "Strategy", "DriverName", "John Doe (JD)")
 
-		for ignore, lap in string2Values(",", getConfigurationValue(configuration, "Strategy", "Pitstops", ""))
+		for ignore, lap in string2Values(",", getMultiMapValue(configuration, "Strategy", "Pitstops", ""))
 			this.Pitstops.Push(this.createPitstop(this.StartStint + A_Index - 1, lap, this.Driver
 												, this.TyreCompound, this.TyreCompoundColor, configuration))
 
-		this.iUseInitialConditions := getConfigurationValue(configuration, "Simulation", "UseInitialConditions", true)
-		this.iUseTelemetryData := getConfigurationValue(configuration, "Simulation", "UseTelemetryData", true)
+		this.iUseInitialConditions := getMultiMapValue(configuration, "Simulation", "UseInitialConditions", true)
+		this.iUseTelemetryData := getMultiMapValue(configuration, "Simulation", "UseTelemetryData", true)
 
-		this.iConsumptionVariation := getConfigurationValue(configuration, "Simulation", "ConsumptionVariation", 0)
-		this.iInitialFuelVariation := getConfigurationValue(configuration, "Simulation", "InitialFuelVariation", 0)
-		this.iTyreUsageVariation := getConfigurationValue(configuration, "Simulation", "TyreUsageVariation", 0)
-		this.iTyreCompoundVariation := getConfigurationValue(configuration, "Simulation", "TyreCompoundVariation", 0)
+		this.iConsumptionVariation := getMultiMapValue(configuration, "Simulation", "ConsumptionVariation", 0)
+		this.iInitialFuelVariation := getMultiMapValue(configuration, "Simulation", "InitialFuelVariation", 0)
+		this.iTyreUsageVariation := getMultiMapValue(configuration, "Simulation", "TyreUsageVariation", 0)
+		this.iTyreCompoundVariation := getMultiMapValue(configuration, "Simulation", "TyreCompoundVariation", 0)
 	}
 
 	saveToConfiguration(configuration) {
 		local pitstopRule, tyreSets, ignore, descriptor, pitstops, ignore, pitstop
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		setConfigurationValue(configuration, "General", "Name", this.Name)
-		setConfigurationValue(configuration, "General", "Version", this.iVersion)
+		setMultiMapValue(configuration, "General", "Name", this.Name)
+		setMultiMapValue(configuration, "General", "Version", this.iVersion)
 
-		setConfigurationValue(configuration, "Settings", "FuelCapacity", this.FuelCapacity)
-		setConfigurationValue(configuration, "Settings", "SafetyFuel", this.SafetyFuel)
+		setMultiMapValue(configuration, "Settings", "FuelCapacity", this.FuelCapacity)
+		setMultiMapValue(configuration, "Settings", "SafetyFuel", this.SafetyFuel)
 
-		setConfigurationValue(configuration, "Settings", "PitstopDelta", this.PitstopDelta)
+		setMultiMapValue(configuration, "Settings", "PitstopDelta", this.PitstopDelta)
 
 		if IsObject(this.PitstopFuelService)
-			setConfigurationValue(configuration, "Settings", "PitstopFuelService", values2String(":", this.PitstopFuelService*))
+			setMultiMapValue(configuration, "Settings", "PitstopFuelService", values2String(":", this.PitstopFuelService*))
 		else
-			setConfigurationValue(configuration, "Settings", "PitstopFuelService", this.PitstopFuelService)
+			setMultiMapValue(configuration, "Settings", "PitstopFuelService", this.PitstopFuelService)
 
-		setConfigurationValue(configuration, "Settings", "PitstopTyreService", this.PitstopTyreService)
-		setConfigurationValue(configuration, "Settings", "PitstopServiceOrder", this.PitstopServiceOrder)
+		setMultiMapValue(configuration, "Settings", "PitstopTyreService", this.PitstopTyreService)
+		setMultiMapValue(configuration, "Settings", "PitstopServiceOrder", this.PitstopServiceOrder)
 
-		setConfigurationValue(configuration, "Settings", "Validator", this.Validator)
+		setMultiMapValue(configuration, "Settings", "Validator", this.Validator)
 
 		pitstopRule := this.PitstopRule
 
 		if IsObject(pitstopRule)
 			pitstopRule := values2String("-", pitstopRule*)
 
-		setConfigurationValue(configuration, "Settings", "PitstopRule", pitstopRule)
-		setConfigurationValue(configuration, "Settings", "PitstopRefuel", this.RefuelRule)
-		setConfigurationValue(configuration, "Settings", "PitstopTyreChange", this.TyreChangeRule)
+		setMultiMapValue(configuration, "Settings", "PitstopRule", pitstopRule)
+		setMultiMapValue(configuration, "Settings", "PitstopRefuel", this.RefuelRule)
+		setMultiMapValue(configuration, "Settings", "PitstopTyreChange", this.TyreChangeRule)
 
 		tyreSets := []
 
 		for ignore, descriptor in this.TyreSets
 			tyreSets.Push(values2String(":", descriptor*))
 
-		setConfigurationValue(configuration, "Settings", "TyreSets", values2String(";", tyreSets*))
+		setMultiMapValue(configuration, "Settings", "TyreSets", values2String(";", tyreSets*))
 
-		setConfigurationValue(configuration, "Weather", "Weather", this.Weather)
-		setConfigurationValue(configuration, "Weather", "AirTemperature", this.AirTemperature)
-		setConfigurationValue(configuration, "Weather", "TrackTemperature", this.TrackTemperature)
+		setMultiMapValue(configuration, "Weather", "Weather", this.Weather)
+		setMultiMapValue(configuration, "Weather", "AirTemperature", this.AirTemperature)
+		setMultiMapValue(configuration, "Weather", "TrackTemperature", this.TrackTemperature)
 
-		setConfigurationValue(configuration, "Weather", "Forecasts", this.WeatherForecast.Length())
+		setMultiMapValue(configuration, "Weather", "Forecasts", this.WeatherForecast.Length())
 
 		loop % this.WeatherForecast.Length()
-			setConfigurationValue(configuration, "Weather", "Forecast." . A_Index, values2String(",", this.WeatherForecast[A_Index]*))
+			setMultiMapValue(configuration, "Weather", "Forecast." . A_Index, values2String(",", this.WeatherForecast[A_Index]*))
 
-		setConfigurationValue(configuration, "Session", "Simulator", this.Simulator)
-		setConfigurationValue(configuration, "Session", "Car", this.Car)
-		setConfigurationValue(configuration, "Session", "Track", this.Track)
+		setMultiMapValue(configuration, "Session", "Simulator", this.Simulator)
+		setMultiMapValue(configuration, "Session", "Car", this.Car)
+		setMultiMapValue(configuration, "Session", "Track", this.Track)
 
-		setConfigurationValue(configuration, "Session", "SessionType", this.SessionType)
-		setConfigurationValue(configuration, "Session", "SessionLength", this.SessionLength)
-		setConfigurationValue(configuration, "Session", "FormationLap", this.FormationLap)
-		setConfigurationValue(configuration, "Session", "PostRaceLap", this.PostRaceLap)
+		setMultiMapValue(configuration, "Session", "SessionType", this.SessionType)
+		setMultiMapValue(configuration, "Session", "SessionLength", this.SessionLength)
+		setMultiMapValue(configuration, "Session", "FormationLap", this.FormationLap)
+		setMultiMapValue(configuration, "Session", "PostRaceLap", this.PostRaceLap)
 
-		setConfigurationValue(configuration, "Session", "StintLength", this.StintLength)
+		setMultiMapValue(configuration, "Session", "StintLength", this.StintLength)
 
-		setConfigurationValue(configuration, "Setup", "Map", this.Map)
-		setConfigurationValue(configuration, "Setup", "TC", this.TC)
-		setConfigurationValue(configuration, "Setup", "ABS", this.ABS)
+		setMultiMapValue(configuration, "Setup", "Map", this.Map)
+		setMultiMapValue(configuration, "Setup", "TC", this.TC)
+		setMultiMapValue(configuration, "Setup", "ABS", this.ABS)
 
-		setConfigurationValue(configuration, "Session", "StartStint", this.StartStint)
-		setConfigurationValue(configuration, "Session", "StartLap", this.StartLap)
-		setConfigurationValue(configuration, "Session", "StintStartTime", this.StintStartTime)
-		setConfigurationValue(configuration, "Session", "SessionStartTime", this.SessionStartTime)
+		setMultiMapValue(configuration, "Session", "StartStint", this.StartStint)
+		setMultiMapValue(configuration, "Session", "StartLap", this.StartLap)
+		setMultiMapValue(configuration, "Session", "StintStartTime", this.StintStartTime)
+		setMultiMapValue(configuration, "Session", "SessionStartTime", this.SessionStartTime)
 
-		setConfigurationValue(configuration, "Setup", "StartFuelAmount", this.StartFuel)
-		setConfigurationValue(configuration, "Setup", "FuelAmount", this.RemainingFuel)
-		setConfigurationValue(configuration, "Setup", "TyreLaps", this.RemainingTyreLaps)
+		setMultiMapValue(configuration, "Setup", "StartFuelAmount", this.StartFuel)
+		setMultiMapValue(configuration, "Setup", "FuelAmount", this.RemainingFuel)
+		setMultiMapValue(configuration, "Setup", "TyreLaps", this.RemainingTyreLaps)
 
-		setConfigurationValue(configuration, "Setup", "TyreCompound", this.TyreCompound)
-		setConfigurationValue(configuration, "Setup", "TyreCompoundColor", this.TyreCompoundColor)
+		setMultiMapValue(configuration, "Setup", "TyreCompound", this.TyreCompound)
+		setMultiMapValue(configuration, "Setup", "TyreCompoundColor", this.TyreCompoundColor)
 
-		setConfigurationValue(configuration, "Setup", "TyrePressureFL", this.TyrePressureFL)
-		setConfigurationValue(configuration, "Setup", "TyrePressureFR", this.TyrePressureFR)
-		setConfigurationValue(configuration, "Setup", "TyrePressureRL", this.TyrePressureRL)
-		setConfigurationValue(configuration, "Setup", "TyrePressureRR", this.TyrePressureRR)
+		setMultiMapValue(configuration, "Setup", "TyrePressureFL", this.TyrePressureFL)
+		setMultiMapValue(configuration, "Setup", "TyrePressureFR", this.TyrePressureFR)
+		setMultiMapValue(configuration, "Setup", "TyrePressureRL", this.TyrePressureRL)
+		setMultiMapValue(configuration, "Setup", "TyrePressureRR", this.TyrePressureRR)
 
-		setConfigurationValue(configuration, "Strategy", "StintLaps", this.StintLaps)
-		setConfigurationValue(configuration, "Strategy", "MaxTyreLaps", this.MaxTyreLaps)
+		setMultiMapValue(configuration, "Strategy", "StintLaps", this.StintLaps)
+		setMultiMapValue(configuration, "Strategy", "MaxTyreLaps", this.MaxTyreLaps)
 
-		setConfigurationValue(configuration, "Strategy", "AvgLapTime", this.AvgLapTime)
-		setConfigurationValue(configuration, "Strategy", "FuelConsumption", this.FuelConsumption)
+		setMultiMapValue(configuration, "Strategy", "AvgLapTime", this.AvgLapTime)
+		setMultiMapValue(configuration, "Strategy", "FuelConsumption", this.FuelConsumption)
 
-		setConfigurationValue(configuration, "Strategy", "Driver", this.Driver)
-		setConfigurationValue(configuration, "Strategy", "DriverName", this.DriverName)
+		setMultiMapValue(configuration, "Strategy", "Driver", this.Driver)
+		setMultiMapValue(configuration, "Strategy", "DriverName", this.DriverName)
 
 		pitstops := []
 
@@ -2579,15 +2579,15 @@ class Strategy extends ConfigurationItem {
 			pitstop.saveToConfiguration(configuration)
 		}
 
-		setConfigurationValue(configuration, "Strategy", "Pitstops", values2String(", ", pitstops*))
+		setMultiMapValue(configuration, "Strategy", "Pitstops", values2String(", ", pitstops*))
 
-		setConfigurationValue(configuration, "Simulation", "UseInitialConditions", this.UseInitialConditions)
-		setConfigurationValue(configuration, "Simulation", "UseTelemetryData", this.UseTelemetryData)
+		setMultiMapValue(configuration, "Simulation", "UseInitialConditions", this.UseInitialConditions)
+		setMultiMapValue(configuration, "Simulation", "UseTelemetryData", this.UseTelemetryData)
 
-		setConfigurationValue(configuration, "Simulation", "ConsumptionVariation", this.ConsumptionVariation)
-		setConfigurationValue(configuration, "Simulation", "InitialFuelVariation", this.InitialFuelVariation)
-		setConfigurationValue(configuration, "Simulation", "TyreUsageVariation", this.TyreUsageVariation)
-		setConfigurationValue(configuration, "Simulation", "TyreCompoundVariation", this.TyreCompoundVariation)
+		setMultiMapValue(configuration, "Simulation", "ConsumptionVariation", this.ConsumptionVariation)
+		setMultiMapValue(configuration, "Simulation", "InitialFuelVariation", this.InitialFuelVariation)
+		setMultiMapValue(configuration, "Simulation", "TyreUsageVariation", this.TyreUsageVariation)
+		setMultiMapValue(configuration, "Simulation", "TyreCompoundVariation", this.TyreCompoundVariation)
 	}
 
 	initializeAvailableTyreSets() {
@@ -2620,7 +2620,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	createPitstop(nr, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		return new this.Pitstop(this, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration, adjustments)
+		return this.Pitstop(this, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration, adjustments)
 	}
 
 	setName(name) {
@@ -3208,7 +3208,7 @@ class Strategy extends ConfigurationItem {
 class TrafficStrategy extends Strategy {
 	iTrafficScenario := false
 
-	TrafficScenario[] {
+	TrafficScenario {
 		Get {
 			return this.iTrafficScenario
 		}
@@ -3263,7 +3263,7 @@ class TrafficStrategy extends Strategy {
 	}
 
 	createPitstop(id, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		local pitstop := new this.TrafficPitstop(this, id, lap, driver, tyreCompound, tyreCompoundColor
+		local pitstop := this.TrafficPitstop(this, id, lap, driver, tyreCompound, tyreCompoundColor
 											   , configuration, adjustments)
 
 		if ((id == 1) && !this.TrafficScenario)
@@ -3275,7 +3275,7 @@ class TrafficStrategy extends Strategy {
 	calcNextPitstopLap(pitstopNr, currentLap
 					 , remainingStintLaps, remainingSessionLaps, remainingTyreLaps, remainingFuel
 					 , ByRef adjusted) {
-		local targetLap := base.calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps
+		local targetLap := super.calcNextPitstopLap(pitstopNr, currentLap, remainingStintLaps, remainingSessionLaps
 												 , remainingTyreLaps, remainingFuel, adjusted)
 		local pitstopRule := this.PitstopRule
 		local variationWindow, moreLaps, rnd, avgLapTime, openingLap, closingLap

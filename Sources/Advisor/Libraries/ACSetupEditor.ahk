@@ -32,18 +32,18 @@ class ACSetup extends FileSetup {
 
 	Setup[original := false] {
 		Get {
-			return base.Setup[original]
+			return super.Setup[original]
 		}
 
 		Set {
 			local setup
 
-			setup := parseConfiguration(value)
+			setup := parseMultiMap(value)
 
-			setConfigurationValue(setup, "ROD_LENGTH_RF", "VALUE", getConfigurationValue(setup, "ROD_LENGTH_LF", "VALUE"))
-			setConfigurationValue(setup, "ROD_LENGTH_RR", "VALUE", getConfigurationValue(setup, "ROD_LENGTH_LR", "VALUE"))
+			setMultiMapValue(setup, "ROD_LENGTH_RF", "VALUE", getMultiMapValue(setup, "ROD_LENGTH_LF", "VALUE"))
+			setMultiMapValue(setup, "ROD_LENGTH_RR", "VALUE", getMultiMapValue(setup, "ROD_LENGTH_LR", "VALUE"))
 
-			value := printConfiguration(setup)
+			value := printMultiMap(setup)
 
 			return (base.Setup[original] := StrReplace(StrReplace(value, "=true", "=1"), "=false", "=0"))
 		}
@@ -52,20 +52,20 @@ class ACSetup extends FileSetup {
 	__New(editor, originalFileName := false) {
 		iEditor := editor
 
-		base.__New(editor, originalFileName)
+		super.__New(editor, originalFileName)
 
-		this.iOriginalData := parseConfiguration(this.Setup[true])
-		this.iModifiedData := parseConfiguration(this.Setup[false])
+		this.iOriginalData := parseMultiMap(this.Setup[true])
+		this.iModifiedData := parseMultiMap(this.Setup[false])
 	}
 
 	getValue(setting, original := false, default := false) {
-		return getConfigurationValue(this.Data[original], getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE")
+		return getMultiMapValue(this.Data[original], getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE")
 	}
 
 	setValue(setting, value, display := false) {
 		local data := (display ? display : this.Data)
 
-		setConfigurationValue(data, getConfigurationValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE", value)
+		setMultiMapValue(data, getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting), "VALUE", value)
 
 		if !display
 			this.Setup := this.printSetup(data)
@@ -74,37 +74,37 @@ class ACSetup extends FileSetup {
 	}
 
 	printSetup(setup) {
-		local display := newConfiguration()
+		local display := newMultiMap()
 		local ignore, setting, section, values, key, value
 
 		for section, values in setup
 			for key, value in values
-				setConfigurationValue(display, section, key, value)
+				setMultiMapValue(display, section, key, value)
 
 		for ignore, setting in this.Editor.Advisor.Settings
 			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
 
-		return printConfiguration(display)
+		return printMultiMap(display)
 	}
 
 	enable(setting) {
-		base.enable(setting)
+		super.enable(setting)
 
 		if setting
 			this.setValue(setting, this.getValue(setting))
 	}
 
 	disable(setting) {
-		base.disable(setting)
+		super.disable(setting)
 
 		if setting
 			this.setValue(setting, this.getValue(setting))
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
-		this.iModifiedData := parseConfiguration(this.Setup[false])
+		this.iModifiedData := parseMultiMap(this.Setup[false])
 	}
 }
 
@@ -113,14 +113,14 @@ class ACSetup extends FileSetup {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ACSetupEditor extends FileSetupEditor {
-	SetupClass[] {
+	SetupClass {
 		Get {
 			return "ACSetup"
 		}
 	}
 
 	chooseSetup(load := true) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
@@ -146,7 +146,7 @@ class ACSetupEditor extends FileSetupEditor {
 		OnMessage(0x44, "")
 
 		if fileName {
-			theSetup := new ACSetup(this, fileName)
+			theSetup := ACSetup(this, fileName)
 
 			if load
 				this.loadSetup(theSetup)
@@ -195,7 +195,7 @@ class ACSetupEditor extends FileSetupEditor {
 
 class ACSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
@@ -221,7 +221,7 @@ class ACSetupComparator extends FileSetupComparator {
 		OnMessage(0x44, "")
 
 		if fileName {
-			theSetup := new ACSetup(this, fileName)
+			theSetup := ACSetup(this, fileName)
 
 			if load {
 				if (type = "A")

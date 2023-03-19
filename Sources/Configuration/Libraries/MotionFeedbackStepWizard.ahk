@@ -35,7 +35,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	iCachedActions := {}
 
-	Pages[] {
+	Pages {
 		Get {
 			local wizard := this.SetupWizard
 
@@ -51,14 +51,14 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local function, action, connector, arguments, parameters, actionArguments, motionIntensity
 		local effectSelector, effectIntensity, ignore, mode, actions
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		if wizard.isModuleSelected("Motion Feedback") {
 			connector := wizard.softwarePath("StreamDeck Extension")
 
 			arguments := ((connector && (connector != "")) ? ("connector: " . connector) : "")
 
-			parameters := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Parameters", ""))
+			parameters := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Parameters", ""))
 
 			function := wizard.getModuleActionFunction("Motion Feedback", false, "Motion")
 			actionArguments := wizard.getModuleActionArgument("Motion Feedback", false, "Motion")
@@ -223,9 +223,9 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDmotionFeedbackListViewHandle gupdateMotionFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "State", "Intensity", "Function"], "translate")*)
+		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDmotionFeedbackListViewHandle gupdateMotionFeedbackActionFunction Hidden, % values2String("|", collect(["Mode", "Action", "Label", "State", "Intensity", "Function"], "translate")*)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -251,7 +251,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		motionIntensityField := false
 		effectSelectorField := false
@@ -269,7 +269,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local ignore, widget, row, column, preview
 
-		base.showPage(page)
+		super.showPage(page)
 
 		for ignore, widget in this.iDisabledWidgets
 			GuiControl Disable, %widget%
@@ -382,7 +382,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				return false
 		}
 
-		if base.hidePage(page) {
+		if super.hidePage(page) {
 			wizard := this.SetupWizard
 
 			GuiControlGet motionIntensityField
@@ -430,7 +430,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 			if (actions.Length() == 0) {
 				if mode
-					actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback." . mode . ".Effects", ""))
+					actions := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback." . mode . ".Effects", ""))
 				else
 					actions := ["Motion"]
 
@@ -447,7 +447,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local function, ignore, functions
 
-		base.setAction(row, mode, action, actionDescriptor, label, argument)
+		super.setAction(row, mode, action, actionDescriptor, label, argument)
 
 		if inList(this.getActions(false), action) {
 			functions := this.getActionFunction(this.getActionMode(row), action)
@@ -460,7 +460,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	clearActionFunction(mode, action, function) {
-		base.clearActionFunction(mode, action, function)
+		super.clearActionFunction(mode, action, function)
 
 		if inList(this.getActions(false), action)
 			this.SetupWizard.removeModuleStaticFunction("Motion Feedback", function)
@@ -470,7 +470,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local window := this.Window
 		local function, action, row, column, ignore, preview, mode
 
-		base.loadControllerLabels()
+		super.loadControllerLabels()
 
 		Gui %window%:Default
 
@@ -563,10 +563,10 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 							this.setActionArgument(count, arguments)
 					}
 
-					label := getConfigurationValue(pluginLabels, "Motion Feedback", action . ".Toggle", kUndefined)
+					label := getMultiMapValue(pluginLabels, "Motion Feedback", action . ".Toggle", kUndefined)
 
 					if (label == kUndefined)
-						label := getConfigurationValue(pluginLabels, "Motion Feedback", action . ".Activate", "")
+						label := getMultiMapValue(pluginLabels, "Motion Feedback", action . ".Activate", "")
 
 					this.setAction(count, mode, action, [false, "Activate"], label)
 
@@ -872,7 +872,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	createActionsMenu(title, row) {
-		local contextMenu := base.createActionsMenu(title, row)
+		local contextMenu := super.createActionsMenu(title, row)
 		local menuItem, handler
 
 		Menu %contextMenu%, Add
@@ -891,7 +891,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	createControlMenu(title, preview, element, function, row, column) {
-		local contextMenu := base.createControlMenu(title, preview, element, function, row, column)
+		local contextMenu := super.createControlMenu(title, preview, element, function, row, column)
 		local functionType := ConfigurationItem.splitDescriptor(function)[1]
 		local menuItem, handler
 
@@ -968,7 +968,7 @@ updateMotionFeedbackActionFunction() {
 }
 
 initializeMotionFeedbackStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new MotionFeedbackStepWizard(SetupWizard.Instance, "Motion Feedback", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(MotionFeedbackStepWizard(SetupWizard.Instance, "Motion Feedback", kSimulatorConfiguration))
 }
 
 

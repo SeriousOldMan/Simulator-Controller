@@ -32,20 +32,20 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopFuelMFDHotkey := false
 	iPitstopTyreMFDHotkey := false
 
-	PitstopFuelMFDHotkey[] {
+	PitstopFuelMFDHotkey {
 		Get {
 			return this.iPitstopFuelMFDHotkey
 		}
 	}
 
-	PitstopTyreMFDHotkey[] {
+	PitstopTyreMFDHotkey {
 		Get {
 			return this.iPitstopTyreMFDHotkey
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iPitstopFuelMFDHotkey := this.getArgumentValue("togglePitstopFuelMFD", false)
@@ -74,7 +74,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 				else
 					RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
 			}
-			catch exception {
+			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
 														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 														   . kBinariesDirectory . translate(")"))
@@ -212,29 +212,29 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	prepareSession(settings, data) {
-		new SessionDatabase().registerTrack(getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-										  , getConfigurationValue(data, "Session Data", "Car", "Unknown")
-										  , getConfigurationValue(data, "Session Data", "Track", "Unknown")
-										  , getConfigurationValue(data, "Session Data", "TrackShortName", "Unknown")
-										  , getConfigurationValue(data, "Session Data", "TrackLongName", "Unknown"))
+		new SessionDatabase().registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+										  , getMultiMapValue(data, "Session Data", "Car", "Unknown")
+										  , getMultiMapValue(data, "Session Data", "Track", "Unknown")
+										  , getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
+										  , getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown"))
 
-		base.prepareSession(settings, data)
+		super.prepareSession(settings, data)
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		base.startPitstopSetup()
+		super.startPitstopSetup()
 
 		openPitstopMFD()
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		base.finishPitstopSetup()
+		super.finishPitstopSetup()
 
 		closePitstopMFD()
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		this.openPitstopMFD("Fuel")
 
@@ -242,7 +242,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		this.openPitstopMFD("Tyre")
 
@@ -250,7 +250,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		this.openPitstopMFD("Tyre")
 
@@ -259,7 +259,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		this.openPitstopMFD("Fuel")
 
@@ -267,11 +267,11 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
-		base.updatePositionsData(data)
+		super.updatePositionsData(data)
 
-		loop % getConfigurationValue(data, "Position Data", "Car.Count", 0)
-			setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr"
-								, StrReplace(getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
+		loop % getMultiMapValue(data, "Position Data", "Car.Count", 0)
+			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
+								, StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
 	}
 }
 

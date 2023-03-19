@@ -26,7 +26,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 	iCachedActions := {}
 
-	Pages[] {
+	Pages {
 		Get {
 			local wizard := this.SetupWizard
 
@@ -42,12 +42,12 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		local arguments := ""
 		local function, action, parameters, ignore, mode, actions
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		if wizard.isModuleSelected("Tactile Feedback") {
-			parameters := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Parameters", ""))
+			parameters := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Parameters", ""))
 
-			for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", "")) {
+			for ignore, action in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", "")) {
 				function := wizard.getModuleActionFunction("Tactile Feedback", false, action)
 
 				if !IsObject(function)
@@ -159,9 +159,9 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDtactileFeedbackListViewHandle gupdateTactileFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
+		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDtactileFeedbackListViewHandle gupdateTactileFeedbackActionFunction Hidden, % values2String("|", collect(["Mode", "Action", "Label", "Function"], "translate")*)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -182,7 +182,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iPedalEffectsList := {}
 		this.iChassisEffectsList := {}
@@ -203,7 +203,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 				return false
 		}
 
-		return base.hidePage(page)
+		return super.hidePage(page)
 	}
 
 	getModule() {
@@ -226,10 +226,10 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 			if (actions.Length() == 0) {
 				if mode
-					actions := concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Effects", ""))
-										 , string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Intensity", "")))
+					actions := concatenate(string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Effects", ""))
+										 , string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Intensity", "")))
 				else
-					actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", ""))
+					actions := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", ""))
 
 				wizard.setModuleAvailableActions("Tactile Feedback", mode, actions)
 			}
@@ -244,7 +244,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local function, functions, ignore
 
-		base.setAction(row, mode, action, actionDescriptor, label, argument)
+		super.setAction(row, mode, action, actionDescriptor, label, argument)
 
 		if inList(this.getActions(false), action) {
 			functions := this.getActionFunction(this.getActionMode(row), action)
@@ -257,7 +257,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	clearActionFunction(mode, action, function) {
-		base.clearActionFunction(mode, action, function)
+		super.clearActionFunction(mode, action, function)
 
 		if inList(this.getActions(false), action)
 			this.SetupWizard.removeModuleStaticFunction("Tactile Feedback", function)
@@ -309,10 +309,10 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 							this.setActionFunction(mode, action, (IsObject(function) ? function : Array(function)))
 					}
 
-					label := getConfigurationValue(pluginLabels, "Tactile Feedback", action . (mode ? ".Dial" : ".Toggle"), kUndefined)
+					label := getMultiMapValue(pluginLabels, "Tactile Feedback", action . (mode ? ".Dial" : ".Toggle"), kUndefined)
 
 					if (label == kUndefined) {
-						label := getConfigurationValue(pluginLabels, "Tactile Feednack", action . ".Activate", kUndefined)
+						label := getMultiMapValue(pluginLabels, "Tactile Feednack", action . ".Activate", kUndefined)
 
 						if (label == kUndefined) {
 							label := ""
@@ -342,8 +342,8 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 						if (function.Length() == 1)
 							function := (!isBinary ? function[1] : ((mode ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
 						else {
-							onLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Increase", false)
-							offLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Decrease", false)
+							onLabel := getMultiMapValue(pluginLabels, "Tactile Feedback", action . ".Increase", false)
+							offLabel := getMultiMapValue(pluginLabels, "Tactile Feedback", action . ".Decrease", false)
 
 							if (onLabel && (function[1] != ""))
 								this.setActionLabel(count, function[1], onLabel)
@@ -429,7 +429,7 @@ updateTactileFeedbackActionFunction() {
 }
 
 initializeTactileFeedbackStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new TactileFeedbackStepWizard(SetupWizard.Instance, "Tactile Feedback", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(TactileFeedbackStepWizard(SetupWizard.Instance, "Tactile Feedback", kSimulatorConfiguration))
 }
 
 

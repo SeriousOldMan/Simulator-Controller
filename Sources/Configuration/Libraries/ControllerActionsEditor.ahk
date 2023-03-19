@@ -52,13 +52,13 @@ class ControllerActionsEditor extends ConfigurationItem {
 		}
 	}
 
-	SelectedLanguage[] {
+	SelectedLanguage {
 		Get {
 			return this.iSelectedLanguage
 		}
 	}
 
-	SelectedPlugin[] {
+	SelectedPlugin {
 		Get {
 			return this.iSelectedPlugin
 		}
@@ -92,9 +92,9 @@ class ControllerActionsEditor extends ConfigurationItem {
 	}
 
 	__New(configuration) {
-		this.iPluginActionsList := new PluginActionsList(configuration)
+		this.iPluginActionsList := PluginActionsList(configuration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ControllerActionsEditor.Instance := this
 
@@ -153,15 +153,15 @@ class ControllerActionsEditor extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.iSelectedLanguage := getConfigurationValue(configuration, "Configuration", "Language")
+		this.iSelectedLanguage := getMultiMapValue(configuration, "Configuration", "Language")
 
 		this.loadPluginActions()
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		return this.savePluginActions()
 	}
@@ -176,11 +176,11 @@ class ControllerActionsEditor extends ConfigurationItem {
 			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
 				fileName := "Controller Action Labels.EN"
 
-			labels := readConfiguration(getFileName(fileName, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
+			labels := readMultiMap(getFileName(fileName, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
 
-			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+			for section, values in readMultiMap(kUserTranslationsDirectory . fileName)
 				for key, value in values
-					setConfigurationValue(labels, section, key, value)
+					setMultiMapValue(labels, section, key, value)
 
 			this.iActionLabels[language] := labels
 
@@ -189,11 +189,11 @@ class ControllerActionsEditor extends ConfigurationItem {
 			if !FileExist(getFileName(fileName, kUserTranslationsDirectory, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
 				fileName := "Controller Action Icons.EN"
 
-			icons := readConfiguration(getFileName(fileName, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
+			icons := readMultiMap(getFileName(fileName, kTranslationsDirectory, kResourcesDirectory . "Templates\"))
 
-			for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+			for section, values in readMultiMap(kUserTranslationsDirectory . fileName)
 				for key, value in values
-					setConfigurationValue(icons, section, key, value)
+					setMultiMapValue(icons, section, key, value)
 
 			this.iActionIcons[language] := icons
 
@@ -214,14 +214,14 @@ class ControllerActionsEditor extends ConfigurationItem {
 		local configuration, stdConfiguration, section, values, key, value
 
 		if FileExist(kTranslationsDirectory . fileName) {
-			configuration := newConfiguration()
-			stdConfiguration := readConfiguration(kTranslationsDirectory . fileName)
+			configuration := newMultiMap()
+			stdConfiguration := readMultiMap(kTranslationsDirectory . fileName)
 
 			for section, values in actions
 				for key, value in values
 					if (type = "Labels") {
-						if (getConfigurationValue(stdConfiguration, section, key, kUndefined) != value)
-							setConfigurationValue(configuration, section, key, value)
+						if (getMultiMapValue(stdConfiguration, section, key, kUndefined) != value)
+							setMultiMapValue(configuration, section, key, value)
 					}
 					else {
 						if (value == false)
@@ -229,14 +229,14 @@ class ControllerActionsEditor extends ConfigurationItem {
 						else if (InStr(value, kResourcesDirectory) == 1)
 							value := StrReplace(value, kResourcesDirectory, "%kResourcesDirectory%")
 
-						if (value != getConfigurationValue(stdConfiguration, section, key, ""))
-							setConfigurationValue(configuration, section, key, value)
+						if (value != getMultiMapValue(stdConfiguration, section, key, ""))
+							setMultiMapValue(configuration, section, key, value)
 					}
 		}
 		else
 			configuration := actions
 
-		writeConfiguration(kUserTranslationsDirectory . "Controller Action " . type "." . language, configuration)
+		writeMultiMap(kUserTranslationsDirectory . "Controller Action " . type "." . language, configuration)
 	}
 
 	savePluginActions() {
@@ -356,21 +356,21 @@ global iconEdit
 class PluginActionsList extends ConfigurationItemList {
 	iCurrentIcon := false
 
-	AutoSave[] {
+	AutoSave {
 		Get {
 			return false
 		}
 	}
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		PluginActionsList.Instance := this
 	}
 
 	createGui(configuration) {
 		Gui PAE:Add, ListView, x16 y120 w377 h240 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginActionsListViewHandle VpluginActionsListView glistEvent
-							 , % values2String("|", map(["Action", "Trigger", "Label", "Icon"], "translate")*)
+							 , % values2String("|", collect(["Action", "Trigger", "Label", "Icon"], "translate")*)
 
 		Gui PAE:Add, Text, x16 y370 w76, % translate("Label && Icon")
 		Gui PAE:Add, Edit, x100 yp w110 h45 VlabelEdit, %labelEdit%
@@ -388,7 +388,7 @@ class PluginActionsList extends ConfigurationItemList {
 		local actions := {}
 		local action, theAction, label, trigger, icon, items, ignore
 
-		for theAction, label in getConfigurationSectionValues(editor.ActionLabels, plugin, Object()) {
+		for theAction, label in getMultiMapValues(editor.ActionLabels, plugin) {
 			action := ConfigurationItem.splitDescriptor(theAction)
 			trigger := action[action.Length()]
 
@@ -399,7 +399,7 @@ class PluginActionsList extends ConfigurationItemList {
 			actions[theAction] := Array(false, action, trigger, label)
 		}
 
-		for theAction, icon in getConfigurationSectionValues(editor.ActionIcons, plugin, Object()) {
+		for theAction, icon in getMultiMapValues(editor.ActionIcons, plugin) {
 			action := ConfigurationItem.splitDescriptor(theAction)
 			trigger := action[action.Length()]
 
@@ -433,8 +433,8 @@ class PluginActionsList extends ConfigurationItemList {
 		this.clearEditor()
 		this.selectItem(false)
 
-		actionLabels := getConfigurationSectionValues(editor.ActionLabels, plugin)
-		actionIcons := getConfigurationSectionValues(editor.ActionIcons, plugin)
+		actionLabels := getMultiMapValues(editor.ActionLabels, plugin)
+		actionIcons := getMultiMapValues(editor.ActionIcons, plugin)
 
 		changed := false
 
@@ -471,8 +471,8 @@ class PluginActionsList extends ConfigurationItemList {
 		if changed {
 			editor.setChanged(language, true)
 
-			setConfigurationSectionValues(editor.ActionLabels, plugin, actionLabels)
-			setConfigurationSectionValues(editor.ActionIcons, plugin, actionIcons)
+			setMultiMapValues(editor.ActionLabels, plugin, actionLabels)
+			setMultiMapValues(editor.ActionIcons, plugin, actionIcons)
 		}
 
 		return true
@@ -494,7 +494,7 @@ class PluginActionsList extends ConfigurationItemList {
 		}
 
 		if (line)
-			base.selectEvent(line)
+			super.selectEvent(line)
 	}
 
 	loadList(items) {
@@ -531,7 +531,7 @@ class PluginActionsList extends ConfigurationItemList {
 	updateState() {
 		Gui PAE:Default
 
-		base.updateState()
+		super.updateState()
 
 		if this.CurrentItem {
 			GuiControl Enable, labelEdit
@@ -557,7 +557,7 @@ class PluginActionsList extends ConfigurationItemList {
 		try {
 			GuiControl, , iconEdit, % ("*w43 *h43 " . icon)
 		}
-		catch exception {
+		catch Any as exception {
 			item[1] := false
 
 			GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
@@ -665,7 +665,7 @@ clickIcon() {
 				try {
 					GuiControl, , iconEdit, % ("*w43 *h43 " . icon)
 				}
-				catch exception {
+				catch Any as exception {
 					pictureFile := false
 
 					GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")

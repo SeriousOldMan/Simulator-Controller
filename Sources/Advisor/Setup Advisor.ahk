@@ -105,13 +105,13 @@ class SetupAdvisor extends ConfigurationItem {
 
 	iKnowledgeBase := false
 
-	Window[] {
+	Window {
 		Get {
 			return "Advisor"
 		}
 	}
 
-	ProgressCount[] {
+	ProgressCount {
 		Get {
 			return this.iProgressCount
 		}
@@ -121,43 +121,43 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 
-	SettingsViewer[] {
+	SettingsViewer {
 		Get {
 			return settingsViewer
 		}
 	}
 
-	Definition[] {
+	Definition {
 		Get {
 			return this.iDefinition
 		}
 	}
 
-	SimulatorDefinition[] {
+	SimulatorDefinition {
 		Get {
 			return this.iSimulatorDefinition
 		}
 	}
 
-	SimulatorSettings[] {
+	SimulatorSettings {
 		Get {
 			return this.iSimulatorSettings
 		}
 	}
 
-	Characteristics[] {
+	Characteristics {
 		Get {
 			return this.iCharacteristics
 		}
 	}
 
-	Settings[] {
+	Settings {
 		Get {
 			return this.iSettings
 		}
 	}
 
-	CharacteristicsArea[] {
+	CharacteristicsArea {
 		Get {
 			return this.iCharacteristicsArea
 		}
@@ -236,25 +236,25 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 
-	SelectedWeather[] {
+	SelectedWeather {
 		Get {
 			return this.iSelectedWeather
 		}
 	}
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	Setup[] {
+	Setup {
 		Get {
 			return this.iSetup
 		}
 	}
 
-	KnowledgeBase[] {
+	KnowledgeBase {
 		Get {
 			return this.iKnowledgeBase
 		}
@@ -273,25 +273,25 @@ class SetupAdvisor extends ConfigurationItem {
 			this.iSelectedWeather := weather
 		}
 
-		definition := readConfiguration(kResourcesDirectory . "Advisor\Setup Advisor.ini")
+		definition := readMultiMap(kResourcesDirectory . "Advisor\Setup Advisor.ini")
 
 		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
 			if FileExist(rootDirectory . "Setup Advisor." . getLanguage()) {
 				found := true
 
-				for section, values in readConfiguration(rootDirectory . "Setup Advisor." . getLanguage())
+				for section, values in readMultiMap(rootDirectory . "Setup Advisor." . getLanguage())
 					for key, value in values
-						setConfigurationValue(definition, section, key, value)
+						setMultiMapValue(definition, section, key, value)
 			}
 
 		if !found
-			for section, values in readConfiguration(kTranslationsDirectory . "Setup Advisor.en")
+			for section, values in readMultiMap(kTranslationsDirectory . "Setup Advisor.en")
 				for key, value in values
-					setConfigurationValue(definition, section, key, value)
+					setMultiMapValue(definition, section, key, value)
 
 		this.iDefinition := definition
 
-		base.__New(kSimulatorConfiguration)
+		super.__New(kSimulatorConfiguration)
 
 		SetupAdvisor.Instance := this
 	}
@@ -356,7 +356,7 @@ class SetupAdvisor extends ConfigurationItem {
 		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
 
 		weather := this.SelectedWeather
-		choices := map(kWeatherConditions, "translate")
+		choices := collect(kWeatherConditions, "translate")
 		chosen := inList(kWeatherConditions, weather)
 
 		if (!chosen && (choices.Length() > 0)) {
@@ -416,15 +416,15 @@ class SetupAdvisor extends ConfigurationItem {
 
 		state := this.SimulatorDefinition.Clone()
 
-		setConfigurationValue(state, "State", "Simulator", this.SelectedSimulator["*"])
-		setConfigurationValue(state, "State", "Car", this.SelectedCar["*"])
-		setConfigurationValue(state, "State", "Track", this.SelectedTrack["*"])
-		setConfigurationValue(state, "State", "Weather", this.SelectedWeather)
+		setMultiMapValue(state, "State", "Simulator", this.SelectedSimulator["*"])
+		setMultiMapValue(state, "State", "Car", this.SelectedCar["*"])
+		setMultiMapValue(state, "State", "Track", this.SelectedTrack["*"])
+		setMultiMapValue(state, "State", "Weather", this.SelectedWeather)
 
-		setConfigurationValue(state, "State", "Characteristics", values2String(",", this.Characteristics*))
-		setConfigurationValue(state, "State", "Settings", values2String(",", this.Settings*))
+		setMultiMapValue(state, "State", "Characteristics", values2String(",", this.Characteristics*))
+		setMultiMapValue(state, "State", "Settings", values2String(",", this.Settings*))
 
-		setConfigurationValue(state, "Characteristics", "Characteristics", values2String(",", this.SelectedCharacteristics*))
+		setMultiMapValue(state, "Characteristics", "Characteristics", values2String(",", this.SelectedCharacteristics*))
 
 		window := this.Window
 
@@ -436,13 +436,13 @@ class SetupAdvisor extends ConfigurationItem {
 			GuiControlGet value1, , % widgets[1]
 			GuiControlGet value2, , % widgets[2]
 
-			setConfigurationValue(state, "Characteristics", characteristic . ".Weight", value1)
-			setConfigurationValue(state, "Characteristics", characteristic . ".Value", value2)
+			setMultiMapValue(state, "Characteristics", characteristic . ".Weight", value1)
+			setMultiMapValue(state, "Characteristics", characteristic . ".Value", value2)
 		}
 
-		setConfigurationSectionValues(state, "KnowledgeBase", this.KnowledgeBase.Facts.Facts)
+		setMultiMapValues(state, "KnowledgeBase", this.KnowledgeBase.Facts.Facts)
 
-		writeConfiguration(fileName, state)
+		writeMultiMap(fileName, state)
 	}
 
 	restoreState(fileName := false) {
@@ -453,12 +453,12 @@ class SetupAdvisor extends ConfigurationItem {
 			fileName := (kUserConfigDirectory . "Advisor.setup")
 
 		if FileExist(fileName) {
-			state := readConfiguration(fileName)
+			state := readMultiMap(fileName)
 
-			simulator := getConfigurationValue(state, "State", "Simulator")
-			car := getConfigurationValue(state, "State", "Car")
-			track := getConfigurationValue(state, "State", "Track")
-			weather := getConfigurationValue(state, "State", "Weather")
+			simulator := getMultiMapValue(state, "State", "Simulator")
+			car := getMultiMapValue(state, "State", "Car")
+			track := getMultiMapValue(state, "State", "Track")
+			weather := getMultiMapValue(state, "State", "Weather")
 
 			if (simulator = "*")
 				simulator := true
@@ -474,9 +474,9 @@ class SetupAdvisor extends ConfigurationItem {
 			this.loadTrack(track)
 			this.loadWeather(weather)
 
-			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
+			characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
 
-			characteristics := string2Values(",", getConfigurationValue(state, "Characteristics", "Characteristics"))
+			characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
 
 			if (characteristics.Length() > 0) {
 				window := this.Window
@@ -494,8 +494,8 @@ class SetupAdvisor extends ConfigurationItem {
 					for ignore, characteristic in characteristics {
 						showProgress({progress: (this.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
 
-						this.addCharacteristic(characteristic, getConfigurationValue(state, "Characteristics", characteristic . ".Weight")
-															 , getConfigurationValue(state, "Characteristics", characteristic . ".Value")
+						this.addCharacteristic(characteristic, getMultiMapValue(state, "Characteristics", characteristic . ".Weight")
+															 , getMultiMapValue(state, "Characteristics", characteristic . ".Value")
 															 , false)
 					}
 
@@ -565,7 +565,7 @@ class SetupAdvisor extends ConfigurationItem {
 					width := this.SettingsViewer.Width
 					height := (this.SettingsViewer.Height - 110 - 1)
 
-					info := getConfigurationValue(this.Definition, "Setup.Info", "ChangeWarning", "")
+					info := getMultiMapValue(this.Definition, "Setup.Info", "ChangeWarning", "")
 
 					iWidth := width - 10
 					iHeight := 90
@@ -782,8 +782,8 @@ class SetupAdvisor extends ConfigurationItem {
 					cars.Push(car)
 			}
 
-			if (this.SimulatorDefinition && (getConfigurationValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
-				sessionDB := new SessionDatabase()
+			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
+				sessionDB := SessionDatabase()
 
 				for ignore, car in sessionDB.getCars(simulator) {
 					car := sessionDB.getCarName(simulator, car)
@@ -803,7 +803,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local tracks := []
 
 		if (car && (car != true))
-			tracks := new SessionDatabase().getTracks(simulator, car)
+			tracks := SessionDatabase().getTracks(simulator, car)
 
 		tracks.InsertAt(1, "*")
 
@@ -814,7 +814,7 @@ class SetupAdvisor extends ConfigurationItem {
 		if ((track = "*") || (track == true))
 			return translate("All")
 		else
-			return new SessionDatabase().getTrackName(simulator, track)
+			return SessionDatabase().getTrackName(simulator, track)
 	}
 
 	dumpKnowledgeBase(knowledgeBase) {
@@ -835,7 +835,7 @@ class SetupAdvisor extends ConfigurationItem {
 		else
 			GuiControl Disable, characteristicsButton
 
-		if (this.SimulatorDefinition && getConfigurationValue(this.SimulatorDefinition, "Setup", "Editor", false))
+		if (this.SimulatorDefinition && getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false))
 			GuiControl Enable, editSetupButton
 		else
 			GuiControl Disable, editSetupButton
@@ -860,7 +860,7 @@ class SetupAdvisor extends ConfigurationItem {
 		productions := false
 		reductions := false
 
-		compiler := new RuleCompiler()
+		compiler := RuleCompiler()
 
 		compiler.compileRules(rules, productions, reductions)
 
@@ -876,7 +876,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 	loadCharacteristics(definition, simulator := false, car := false, track := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
+		local characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
 		local compiler, group, ignore, groupOption, option, characteristic
 
 		this.iCharacteristics := []
@@ -884,9 +884,9 @@ class SetupAdvisor extends ConfigurationItem {
 		if !simulator
 			knowledgeBase.addFact("Characteristics.Count", 0)
 
-		compiler := new RuleCompiler()
+		compiler := RuleCompiler()
 
-		for group, definition in getConfigurationSectionValues(definition, "Setup.Characteristics")
+		for group, definition in getMultiMapValues(definition, "Setup.Characteristics")
 			for ignore, groupOption in string2Values(";", definition) {
 				if InStr(groupOption, ":") {
 					groupOption := string2Values(":", groupOption)
@@ -942,7 +942,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 	loadSettings(definition, simulator := false, car := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels")
+		local settingsLabels := getMultiMapValues(this.Definition, "Setup.Settings.Labels")
 		local compiler, group, ignore, groupOption, option, setting
 
 		this.iSettings := []
@@ -950,9 +950,9 @@ class SetupAdvisor extends ConfigurationItem {
 		if !simulator
 			knowledgeBase.setFact("Settings.Count", 0)
 
-		compiler := new RuleCompiler()
+		compiler := RuleCompiler()
 
-		for group, definition in getConfigurationSectionValues(definition, "Setup.Settings")
+		for group, definition in getMultiMapValues(definition, "Setup.Settings")
 			for ignore, groupOption in string2Values(";", definition) {
 				if InStr(groupOption, ":") {
 					groupOption := string2Values(":", groupOption)
@@ -1008,14 +1008,14 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	createKnowledgeBase(facts, productions, reductions) {
-		local engine := new RuleEngine(productions, reductions, facts)
+		local engine := RuleEngine(productions, reductions, facts)
 
-		return new KnowledgeBase(engine, engine.createFacts(), engine.createRules())
+		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
 	}
 
 	initializeSimulator(name) {
-		local definition := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . name . ".ini")
-		local simulator := getConfigurationValue(definition, "Simulator", "Simulator")
+		local definition := readMultiMap(kResourcesDirectory . "Advisor\Definitions\" . name . ".ini")
+		local simulator := getMultiMapValue(definition, "Simulator", "Simulator")
 		local cars, tracks
 
 		this.iSimulatorDefinition := definition
@@ -1123,14 +1123,14 @@ class SetupAdvisor extends ConfigurationItem {
 			try {
 				this.iSelectedSimulator := simulator
 
-				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 				if (simulator == true)
-					removeConfigurationValue(settings, "Setup Advisor", "Simulator")
+					removeMultiMapValue(settings, "Setup Advisor", "Simulator")
 				else
-					setConfigurationValue(settings, "Setup Advisor", "Simulator", simulator)
+					setMultiMapValue(settings, "Setup Advisor", "Simulator", simulator)
 
-				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				this.initializeSimulator((simulator == true) ? "Generic" : simulator)
 
@@ -1159,7 +1159,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.iSelectedCar := ((cars[1] = translate("All")) ? true : cars[1])
 
 		tracks := this.getTracks(this.SelectedSimulator, this.SelectedCar).Clone()
-		trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
+		trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 
 		GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
 		GuiControl Choose, trackDropDown, 1
@@ -1177,19 +1177,19 @@ class SetupAdvisor extends ConfigurationItem {
 			try {
 				this.iSelectedCar := car
 
-				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 				if (car == true)
-					removeConfigurationValue(settings, "Setup Advisor", "Car")
+					removeMultiMapValue(settings, "Setup Advisor", "Car")
 				else
-					setConfigurationValue(settings, "Setup Advisor", "Car", car)
+					setMultiMapValue(settings, "Setup Advisor", "Car", car)
 
-				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				GuiControl Choose, carDropDown, % inList(this.AvailableCars, this.SelectedCar)
 
 				tracks := this.getTracks(this.SelectedSimulator, car).Clone()
-				trackNames := map(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
+				trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 
 				GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
 				GuiControl Choose, trackDropDown, 1
@@ -1214,14 +1214,14 @@ class SetupAdvisor extends ConfigurationItem {
 			try {
 				this.iSelectedTrack := track
 
-				settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 				if (track == true)
-					removeConfigurationValue(settings, "Setup Advisor", "Track")
+					removeMultiMapValue(settings, "Setup Advisor", "Track")
 				else
-					setConfigurationValue(settings, "Setup Advisor", "Track", track)
+					setMultiMapValue(settings, "Setup Advisor", "Track", track)
 
-				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
 				if (track != true) {
 					track := inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track)
@@ -1242,7 +1242,7 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	startTelemetryAnalyzer() {
-		local analyzerClass := getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+		local analyzerClass := getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
 		if analyzerClass
 			new %analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
@@ -1269,7 +1269,7 @@ class SetupAdvisor extends ConfigurationItem {
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
-			characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
+			characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
 
 			this.SelectedCharacteristics.Push(characteristic)
 
@@ -1364,15 +1364,15 @@ class SetupAdvisor extends ConfigurationItem {
 		try {
 			Menu CharacteristicsMenu, DeleteAll
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
-		characteristicLabels := getConfigurationSectionValues(this.Definition, "Setup.Characteristics.Labels")
+		characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
 
 		menuIndex := 1
 
-		groups := getConfigurationSectionValues(this.Definition, "Setup.Characteristics")
+		groups := getMultiMapValues(this.Definition, "Setup.Characteristics")
 		translatedGroups := {}
 
 		for group, definition in groups
@@ -1387,7 +1387,7 @@ class SetupAdvisor extends ConfigurationItem {
 			try {
 				Menu %groupMenu%, DeleteAll
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -1400,7 +1400,7 @@ class SetupAdvisor extends ConfigurationItem {
 					try {
 						Menu %optionMenu%, DeleteAll
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 					}
 
@@ -1454,8 +1454,8 @@ class SetupAdvisor extends ConfigurationItem {
 
 		Menu CharacteristicsMenu, Add, %label%, %handler%
 
-		if (!this.SimulatorDefinition || !getConfigurationValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
-									  || !inList(getKeys(getConfigurationSectionValues(getControllerState(), "Simulators", Object())), this.SelectedSimulator))
+		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
+									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
 			Menu CharacteristicsMenu, Disable, %label%
 
 		Menu CharacteristicsMenu, Show
@@ -1498,7 +1498,7 @@ class SetupAdvisor extends ConfigurationItem {
 				this.dumpKnowledgeBase(this.KnowledgeBase)
 
 			if draw {
-				settingsLabels := getConfigurationSectionValues(this.Definition, "Setup.Settings.Labels")
+				settingsLabels := getMultiMapValues(this.Definition, "Setup.Settings.Labels")
 
 				settings := []
 
@@ -1525,11 +1525,11 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	editSetup() {
-		local editorClass := getConfigurationValue(this.SimulatorDefinition, "Setup", "Editor", false)
+		local editorClass := getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false)
 		local editor, aWindow, eWindow
 
 		if editorClass {
-			editor := new %editorClass%(this)
+			editor := %editorClass%(this)
 
 			this.iEditor := editor
 
@@ -1562,13 +1562,13 @@ class TelemetryAnalyzer {
 	iAdvisor := false
 	iSimulator := false
 
-	Advisor[] {
+	Advisor {
 		Get {
 			return this.iAdvisor
 		}
 	}
 
-	Simulator[] {
+	Simulator {
 		Get {
 			return this.iSimulator
 		}
@@ -1596,13 +1596,13 @@ class Setup {
 
 	iEnabledSettings := {}
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			throw "Virtual property Setup.Name must be implemented in a subclass..."
 		}
@@ -1664,7 +1664,7 @@ class FileSetup extends Setup {
 	iOriginalFileName := false
 	iModifiedFileName := false
 
-	Name[] {
+	Name {
 		Get {
 			local fileName := this.FileName[true]
 
@@ -1687,7 +1687,7 @@ class FileSetup extends Setup {
 	__New(editor, originalFileName := false, modifiedFileName := false) {
 		local setup
 
-		base.__New(editor)
+		super.__New(editor)
 
 		this.iOriginalFileName := originalFileName
 		this.iModifiedFileName := modifiedFileName
@@ -1745,13 +1745,13 @@ class SettingHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class NumberHandler extends SettingHandler {
-	MinValue[] {
+	MinValue {
 		Get {
 			return -2147483648
 		}
 	}
 
-	MaxValue[] {
+	MaxValue {
 		Get {
 			return 2147483647
 		}
@@ -1772,27 +1772,27 @@ class DiscreteValuesHandler extends NumberHandler {
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
 
-	Zero[] {
+	Zero {
 		Get {
 			return this.iZero
 		}
 	}
 
-	Increment[] {
+	Increment {
 		Get {
 			return this.iIncrement
 		}
 	}
 
-	MinValue[] {
+	MinValue {
 		Get {
-			return ((this.iMinValue != kUndefined) ? this.iMinValue : base.MinValue)
+			return ((this.iMinValue != kUndefined) ? this.iMinValue : super.MinValue)
 		}
 	}
 
-	MaxValue[] {
+	MaxValue {
 		Get {
-			return ((this.iMaxValue != kUndefined) ? this.iMaxValue : base.MaxValue)
+			return ((this.iMaxValue != kUndefined) ? this.iMaxValue : super.MaxValue)
 		}
 	}
 
@@ -1836,7 +1836,7 @@ class DiscreteValuesHandler extends NumberHandler {
 
 class RawHandler extends DiscreteValuesHandler {
 	__New(increment := 1, minValue := "__Undefined__", maxValue := "__Undefined__") {
-		base.__New(0, increment, minValue, maxValue)
+		super.__New(0, increment, minValue, maxValue)
 	}
 
 	convertToDisplayValue(rawValue) {
@@ -1871,7 +1871,7 @@ class IntegerHandler extends DiscreteValuesHandler {
 class DecimalHandler extends DiscreteValuesHandler {
 	iPrecision := false
 
-	Precision[] {
+	Precision {
 		Get {
 			return this.iPrecision
 		}
@@ -1880,7 +1880,7 @@ class DecimalHandler extends DiscreteValuesHandler {
 	__New(zero := 0.0, increment := 1.0, precision := 0, minValue := "__Undefined__", maxValue := "__Undefined__") {
 		this.iPrecision := precision
 
-		base.__New(zero, increment, minValue, maxValue)
+		super.__New(zero, increment, minValue, maxValue)
 	}
 
 	validValue(displayValue) {
@@ -1907,7 +1907,7 @@ class FloatHandler extends DecimalHandler {
 
 class ClicksHandler extends IntegerHandler {
 	__New(minValue := 0, maxValue := "__Undefined__") {
-		base.__New(minValue, 1, minValue, maxValue)
+		super.__New(minValue, 1, minValue, maxValue)
 	}
 }
 
@@ -1936,25 +1936,25 @@ class SetupEditor extends ConfigurationItem {
 
 	iClosed := false
 
-	Advisor[] {
+	Advisor {
 		Get {
 			return this.iAdvisor
 		}
 	}
 
-	Comparator[] {
+	Comparator {
 		Get {
 			return this.iComparator
 		}
 	}
 
-	SetupClass[] {
+	SetupClass {
 		Get {
 			throw "Virtual property FileSetupComparator.SetupClass must be implemented in a subclass..."
 		}
 	}
 
-	Setup[] {
+	Setup {
 		Get {
 			return this.iSetup
 		}
@@ -1974,13 +1974,13 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
-	SettingsListView[] {
+	SettingsListView {
 		Get {
 			return this.iSettingsListView
 		}
 	}
 
-	Window[] {
+	Window {
 		Get {
 			return "Editor"
 		}
@@ -1995,22 +1995,22 @@ class SetupEditor extends ConfigurationItem {
 			simulator := advisor.SelectedSimulator
 			car := advisor.SelectedCar[false]
 
-			configuration := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
+			configuration := readMultiMap(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
 
-			for section, values in readConfiguration(kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".Generic.ini")
+			for section, values in readMultiMap(kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".Generic.ini")
 				for key, value in values
-					setConfigurationValue(configuration, section, key, value)
+					setMultiMapValue(configuration, section, key, value)
 
 			if (car != true) {
 				fileName := ("Advisor\Definitions\Cars\" . simulator . "." . car . ".ini")
 
-				for section, values in readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
+				for section, values in readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
 					for key, value in values
-						setConfigurationValue(configuration, section, key, value)
+						setMultiMapValue(configuration, section, key, value)
 			}
 		}
 
-		base.__New(configuration)
+		super.__New(configuration)
 	}
 
 	createGui(configuration) {
@@ -2039,7 +2039,7 @@ class SetupEditor extends ConfigurationItem {
 		Gui %window%:Add, Text, x85 ys+14 w193 vsetupNameViewer
 		Gui %window%:Add, Button, x280 ys+10 w80 gresetSetup vresetSetupButton, % translate("&Reset")
 
-		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", map(["Category", "Setting", "Value", "Unit"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", collect(["Category", "Setting", "Value", "Unit"], "translate")*)
 
 		this.iSettingsListView := settingsListView
 
@@ -2084,7 +2084,7 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	editSetup(setup := false) {
-		this.Setup := (setup ? setup : new Setup())
+		this.Setup := (setup ? setup : Setup())
 
 		this.show()
 
@@ -2152,7 +2152,7 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	createSettingHandler(setting) {
-		local handler := getConfigurationValue(this.Configuration, "Setup.Settings.Handler", setting, false)
+		local handler := getMultiMapValue(this.Configuration, "Setup.Settings.Handler", setting, false)
 		local handlerClass
 
 		if (handler && (handler != "")) {
@@ -2160,7 +2160,7 @@ class SetupEditor extends ConfigurationItem {
 
 			handlerClass := handler[1]
 
-			return new %handlerClass%(string2Values(",", handler[2])*)
+			return %handlerClass%(string2Values(",", handler[2])*)
 		}
 		else
 			throw "Unknown handler encountered in SetupEditor.createSettingHandler..."
@@ -2193,16 +2193,16 @@ class SetupEditor extends ConfigurationItem {
 		GuiControl Text, setupNameViewer, % (setup ? setup.Name : "")
 		GuiControl Text, setupViewer, % (setup ? setup.Setup : "")
 
-		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Advisor.Definition, "Setup.Categories")
 
-		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Categories.Labels")
 
-		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels")
+		settingsLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Settings.Labels")
 
-		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units." . getLanguage(), {})
+		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
 
 		if (settingsUnits.Count() = 0)
-			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN")
+			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
 		window := this.Window
 
@@ -2386,7 +2386,7 @@ class SetupEditor extends ConfigurationItem {
 			increment := Round((delta / min) * (percentage / 100))
 
 			if (increment != 0) {
-				if getConfigurationValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
+				if getMultiMapValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
 					increment *= -1
 
 				if (increment < 0)
@@ -2455,11 +2455,11 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	compareSetup() {
-		local comparatorClass := getConfigurationValue(this.Configuration, "Setup", "Comparator", false)
+		local comparatorClass := getMultiMapValue(this.Configuration, "Setup", "Comparator", false)
 		local comparator, aWindow, cWindow, newSetup
 
 		if comparatorClass {
-			comparator := new %comparatorClass%(this)
+			comparator := %comparatorClass%(this)
 
 			this.iComparator := comparator
 
@@ -2511,25 +2511,25 @@ class SetupComparator extends ConfigurationItem {
 
 	iClosed := false
 
-	Advisor[] {
+	Advisor {
 		Get {
 			return this.Editor.Advisor
 		}
 	}
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	SetupClass[] {
+	SetupClass {
 		Get {
 			return this.Editor.SetupClass
 		}
 	}
 
-	SetupA[] {
+	SetupA {
 		Get {
 			return this.iSetupA
 		}
@@ -2539,7 +2539,7 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	SetupB[] {
+	SetupB {
 		Get {
 			return this.iSetupB
 		}
@@ -2549,7 +2549,7 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	SetupAB[] {
+	SetupAB {
 		Get {
 			return this.iSetupAB
 		}
@@ -2569,13 +2569,13 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	SettingsListView[] {
+	SettingsListView {
 		Get {
 			return this.iSettingsListView
 		}
 	}
 
-	Window[] {
+	Window {
 		Get {
 			return "Comparator"
 		}
@@ -2593,22 +2593,22 @@ class SetupComparator extends ConfigurationItem {
 			simulator := advisor.SelectedSimulator
 			car := advisor.SelectedCar[false]
 
-			configuration := readConfiguration(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
+			configuration := readMultiMap(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
 
-			for section, values in readConfiguration(kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".Generic.ini")
+			for section, values in readMultiMap(kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".Generic.ini")
 				for key, value in values
-					setConfigurationValue(configuration, section, key, value)
+					setMultiMapValue(configuration, section, key, value)
 
 			if (car != true) {
 				fileName := ("Advisor\Definitions\Cars\" . simulator . "." . car . ".ini")
 
-				for section, values in readConfiguration(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
+				for section, values in readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
 					for key, value in values
-						setConfigurationValue(configuration, section, key, value)
+						setMultiMapValue(configuration, section, key, value)
 			}
 		}
 
-		base.__New(configuration)
+		super.__New(configuration)
 	}
 
 	createGui(configuration) {
@@ -2638,7 +2638,7 @@ class SetupComparator extends ConfigurationItem {
 		Gui %window%:Add, Button, x16 ys+34 w60 gchooseSetupBFile, % translate("Setup B:")
 		Gui %window%:Add, Text, x85 ys+38 w193 vsetupNameBViewer
 
-		Gui %window%:Add, ListView, x16 ys+64 w784 h350 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectABSetting, % values2String("|", map(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], "translate")*)
+		Gui %window%:Add, ListView, x16 ys+64 w784 h350 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectABSetting, % values2String("|", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], "translate")*)
 
 		Gui %window%:Add, Button, x16 yp+354 w80 Disabled vdecreaseABSettingButton gdecreaseABSetting, % translate("Decrease")
 		Gui %window%:Add, Button, x720 yp w80 Disabled vincreaseABSettingButton gincreaseABSetting, % translate("Increase")
@@ -2707,22 +2707,22 @@ class SetupComparator extends ConfigurationItem {
 
 		setupClass := this.SetupClass
 
-		setupAB := new %setupClass%(this.Editor, setupA.getInitializationArguments()*)
+		setupAB := %setupClass%(this.Editor, setupA.getInitializationArguments()*)
 
 		setupAB.Setup[false] := setupA.Setup[false]
 
 		this.SetupAB := setupAB
 
-		categories := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Advisor.Definition, "Setup.Categories")
 
-		categoriesLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Categories.Labels")
 
-		settingsLabels := getConfigurationSectionValues(this.Advisor.Definition, "Setup.Settings.Labels")
+		settingsLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Settings.Labels")
 
-		settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units", {})
+		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units")
 
 		if (settingsUnits.Count() = 0)
-			settingsUnits := getConfigurationSectionValues(this.Configuration, "Setup.Settings.Units.EN")
+			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
 		LV_Delete()
 
@@ -2825,7 +2825,7 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	compareSetup(setup := false) {
-		this.SetupB := (setup ? setup : new Setup())
+		this.SetupB := (setup ? setup : Setup())
 
 		this.show()
 
@@ -2982,7 +2982,7 @@ class FileSetupEditor extends SetupEditor {
 			theSetup := this.chooseSetup(false)
 
 		if theSetup
-			return base.editSetup(theSetup)
+			return super.editSetup(theSetup)
 		else {
 			this.destroy()
 
@@ -3009,7 +3009,7 @@ class FileSetupComparator extends SetupComparator {
 			theSetup := this.chooseSetup("B", false)
 
 		if theSetup
-			return base.compareSetup(theSetup)
+			return super.compareSetup(theSetup)
 		else {
 			this.destroy()
 
@@ -3018,7 +3018,7 @@ class FileSetupComparator extends SetupComparator {
 	}
 
 	loadSetups(ByRef setupA := false, ByRef setupB := false, mix := 0) {
-		base.loadSetups(setupA, setupB, mix)
+		super.loadSetups(setupA, setupB, mix)
 
 		if this.SetupAB
 			this.SetupAB.FileName[false] := setupA.FileName[false]
@@ -3249,7 +3249,7 @@ chooseTrack() {
 	else {
 		simulator := advisor.SelectedSimulator
 		tracks := advisor.getTracks(simulator, advisor.SelectedCar)
-		trackNames := map(tracks, ObjBindMethod(advisor, "getTrackName", simulator))
+		trackNames := collect(tracks, ObjBindMethod(advisor, "getTrackName", simulator))
 
 		advisor.loadTrack(tracks[inList(trackNames, trackDropDown)])
 	}
@@ -3274,10 +3274,10 @@ chooseCharacteristic() {
 
 runSetupAdvisor() {
 	local icon := kIconsDirectory . "Setup.ico"
-	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getConfigurationValue(settings, "Setup Advisor", "Simulator", false)
-	local car := getConfigurationValue(settings, "Setup Advisor", "Car", false)
-	local track := getConfigurationValue(settings, "Setup Advisor", "Track", false)
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	local simulator := getMultiMapValue(settings, "Setup Advisor", "Simulator", false)
+	local car := getMultiMapValue(settings, "Setup Advisor", "Car", false)
+	local track := getMultiMapValue(settings, "Setup Advisor", "Track", false)
 	local weather := false
 	local index := 1
 	local advisor, label, callback
@@ -3307,9 +3307,9 @@ runSetupAdvisor() {
 	fixIE(11)
 
 	if car
-		car := new SessionDatabase().getCarName(simulator, car)
+		car := SessionDatabase().getCarName(simulator, car)
 
-	advisor := new SetupAdvisor(simulator, car, track, weather)
+	advisor := SetupAdvisor(simulator, car, track, weather)
 
 	Menu SupportMenu, Insert, 1&
 

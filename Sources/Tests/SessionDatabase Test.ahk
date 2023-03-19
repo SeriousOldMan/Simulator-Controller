@@ -44,7 +44,7 @@ class DatabaseTest extends Assert {
 
 	updatePressures(database, simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, coldPressures) {
 		if !database
-			database := new TyresDatabase()
+			database := TyresDatabase()
 
 		for ignore, pressures in coldPressures
 			database.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
@@ -182,19 +182,19 @@ class InitializeDatabase extends DatabaseTest {
 
 class SimplePressures extends PressuresAssert {
 	SimpleReadPressure_Test() {
-		pressures := new TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black")
+		pressures := TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 25, "Dry", "Black")
 
 		this.AssertExactResult(pressures, 26.1, 26.2, 26.3, 26.4)
 	}
 
 	ExtendedReadPressure_Test() {
-		this.AssertExactResult(new TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4)
+		this.AssertExactResult(TyresDatabase().getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 26, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4)
 	}
 }
 
 class ExtrapolatedPressures extends PressuresAssert {
 	ReadPressure_Test() {
-		tyresDB := new TyresDatabase()
+		tyresDB := TyresDatabase()
 
 		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 27, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -1)
 		this.AssertExtrapolatedResult(tyresDB.getPressures("Unknown", "TestCar", "TestTrack", "Dry", 25, 28, "Dry", "Black"), 26.3, 26.5, 26.4, 26.4, 0, -2)
@@ -204,7 +204,7 @@ class ExtrapolatedPressures extends PressuresAssert {
 	}
 
 	ReadSetup_Test() {
-		tyresDB := new TyresDatabase()
+		tyresDB := TyresDatabase()
 
 		compound := false
 		compoundColor := false
@@ -233,7 +233,7 @@ class ExtrapolatedPressures extends PressuresAssert {
 
 class DifferentCompoundPressures extends PressuresAssert {
 	CompoundSetup_Test() {
-		tyresDB := new TyresDatabase()
+		tyresDB := TyresDatabase()
 
 		compound := false
 		compoundColor := false

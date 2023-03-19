@@ -26,7 +26,7 @@ class ControllerConfigurator extends ConfigurationItem {
 	iControllerList := false
 	iFunctionsist := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
@@ -35,10 +35,10 @@ class ControllerConfigurator extends ConfigurationItem {
 	__New(editor, configuration) {
 		this.iEditor := editor
 
-		this.iControllerList := new ControllerList(configuration)
-		this.iFunctionsList := new FunctionsList(configuration)
+		this.iControllerList := ControllerList(configuration)
+		this.iFunctionsList := FunctionsList(configuration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ControllerConfigurator.Instance := this
 	}
@@ -53,7 +53,7 @@ class ControllerConfigurator extends ConfigurationItem {
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		this.iControllerList.saveToConfiguration(configuration)
 		this.iFunctionsList.saveToConfiguration(configuration)
@@ -79,7 +79,7 @@ global controllerUpdateButton
 
 class ControllerList extends ConfigurationItemList {
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ControllerList.Instance := this
 	}
@@ -114,12 +114,12 @@ class ControllerList extends ConfigurationItemList {
 		local items := []
 		local ignore, controller
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
+		for ignore, controller in string2Values("|", getMultiMapValue(configuration, "Controller Layouts", "Button Boxes", ""))
 			items.Push(string2Values(":", controller))
 
-		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Stream Decks", ""))
+		for ignore, controller in string2Values("|", getMultiMapValue(configuration, "Controller Layouts", "Stream Decks", ""))
 			items.Push(string2Values(":", controller))
 
 		this.ItemList := items
@@ -128,19 +128,19 @@ class ControllerList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		local bbController := []
 		local sdController := []
-		local sdConfiguration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+		local sdConfiguration := readMultiMap(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 		local ignore, item
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, item in this.ItemList
-			if getConfigurationValue(sdConfiguration, "Layouts", item[2] . ".Layout", false)
+			if getMultiMapValue(sdConfiguration, "Layouts", item[2] . ".Layout", false)
 				sdController.Push(values2String(":", item*))
 			else
 				bbController.Push(values2String(":", item*))
 
-		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", bbController*))
-		setConfigurationValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", sdController*))
+		setMultiMapValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", bbController*))
+		setMultiMapValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", sdController*))
 	}
 
 	clickEvent(line, count) {
@@ -188,7 +188,7 @@ class ControllerList extends ConfigurationItemList {
 		try {
 			GuiControl Choose, controllerLayoutDropDown, % item[2]
 		}
-		catch exception {
+		catch Any as exception {
 			GuiControl Choose, controllerLayoutDropDown, 0
 		}
 	}
@@ -220,20 +220,20 @@ class ControllerList extends ConfigurationItemList {
 		local descriptor, definition
 
 		if !bbConfiguration
-			bbConfiguration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+			bbConfiguration := readMultiMap(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 
 		if !sdConfiguration
-			sdConfiguration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+			sdConfiguration := readMultiMap(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 
 
-		for descriptor, definition in getConfigurationSectionValues(bbConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(bbConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 			if !inList(layouts, descriptor[1])
 				layouts.Push(descriptor[1])
 		}
 
-		for descriptor, definition in getConfigurationSectionValues(sdConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(sdConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 			if !inList(layouts, descriptor[1])
@@ -296,7 +296,7 @@ class FunctionsList extends ConfigurationItemList {
 	iFunctions := {}
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		FunctionsList.Instance := this
 	}
@@ -305,11 +305,11 @@ class FunctionsList extends ConfigurationItemList {
 		local window := editor.Window
 
 		Gui %window%:Add, ListView, x16 y200 w457 h150 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
-						, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
+						, % values2String("|", collect(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
 
 		Gui %window%:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
 		Gui %window%:Add, DropDownList, x124 y360 w91 AltSubmit Choose%functionTypeDropDown% VfunctionTypeDropDown gupdateFunctionEditorState
-								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], "translate")*)
+								, % values2String("|", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], "translate")*)
 		Gui %window%:Add, Edit, x220 y360 w40 h21 Number Limit3 VfunctionNumberEdit, %functionNumberEdit%
 		Gui %window%:Add, UpDown, Range1-999 x260 y360 w17 h21, 1
 
@@ -351,9 +351,9 @@ class FunctionsList extends ConfigurationItemList {
 	loadFromConfiguration(configuration) {
 		local descriptor, ignore, func
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, ignore in getConfigurationSectionValues(configuration, "Controller Functions", Object()) {
+		for descriptor, ignore in getMultiMapValues(configuration, "Controller Functions") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			descriptor := ConfigurationItem.descriptor(descriptor[1], descriptor[2])
 
@@ -369,7 +369,7 @@ class FunctionsList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		local ignore, theFunction
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, theFunction in this.ItemList
 			theFunction.saveToConfiguration(configuration)
@@ -378,7 +378,7 @@ class FunctionsList extends ConfigurationItemList {
 	updateState() {
 		local functionType
 
-		base.updateState()
+		super.updateState()
 
 		GuiControlGet functionType, , functionTypeDropDown
 
@@ -546,7 +546,7 @@ class FunctionsList extends ConfigurationItemList {
 			else {
 				this.iFunctions[function.Descriptor] := function
 
-				base.addItem()
+				super.addItem()
 
 				this.selectItem(inList(this.ItemList, function))
 			}
@@ -555,7 +555,7 @@ class FunctionsList extends ConfigurationItemList {
 	deleteItem() {
 		this.iFunctions.Delete(this.ItemList[this.CurrentItem].Descriptor)
 
-		base.deleteItem()
+		super.deleteItem()
 	}
 
 	updateItem() {
@@ -572,7 +572,7 @@ class FunctionsList extends ConfigurationItemList {
 			else {
 				this.iFunctions[function.Descriptor] := function
 
-				base.updateItem()
+				super.updateItem()
 			}
 	}
 }
@@ -622,7 +622,7 @@ initializeControllerConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Controller"), new ControllerConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Controller"), ControllerConfigurator(editor, editor.Configuration))
 	}
 }
 

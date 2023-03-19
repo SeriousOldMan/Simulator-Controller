@@ -30,16 +30,16 @@ class ControllerStepWizard extends StepWizard {
 
 	class StepControllerEditor extends ControllerEditor {
 		configurationChanged(type, name) {
-			local bbConfiguration := newConfiguration()
-			local sdConfiguration := newConfiguration()
+			local bbConfiguration := newMultiMap()
+			local sdConfiguration := newMultiMap()
 			local oldGui, controllerWizard
 
-			base.configurationChanged(type, name)
+			super.configurationChanged(type, name)
 
 			this.saveToConfiguration(bbConfiguration, sdConfiguration)
 
-			writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", bbConfiguration)
-			writeConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", sdConfiguration)
+			writeMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini", bbConfiguration)
+			writeMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", sdConfiguration)
 
 			oldGui := A_DefaultGui
 
@@ -58,7 +58,7 @@ class ControllerStepWizard extends StepWizard {
 		}
 	}
 
-	Pages[] {
+	Pages {
 		Get {
 			return (this.SetupWizard.isModuleSelected("Controller") ? 1 : 0)
 		}
@@ -69,15 +69,15 @@ class ControllerStepWizard extends StepWizard {
 		local buttonBoxConfiguration, streamDeckConfiguration, streamDeckControllers, controller, definition
 		local ignore, theFunction, controls, buttonBoxControllers, control, descriptor, functionTriggers
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+		buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
 		if wizard.isModuleSelected("Controller") {
 			streamDeckControllers := []
 
-			for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+			for controller, definition in getMultiMapValues(streamDeckConfiguration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 
 				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -95,10 +95,10 @@ class ControllerStepWizard extends StepWizard {
 			controls := {}
 			buttonBoxControllers := []
 
-			for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
+			for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
 				controls[control] := string2Values(";", descriptor)[1]
 
-			for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
+			for controller, definition in getMultiMapValues(buttonBoxConfiguration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 
 				if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -133,7 +133,7 @@ class ControllerStepWizard extends StepWizard {
 					buttonBoxControllers[A_Index] := (buttonBoxControllers[A_Index] . ":" . buttonBoxControllers[A_Index])
 				}
 
-				setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", buttonBoxControllers*))
+				setMultiMapValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", buttonBoxControllers*))
 			}
 
 			if (streamDeckControllers.Length() > 0) {
@@ -142,7 +142,7 @@ class ControllerStepWizard extends StepWizard {
 					streamDeckControllers[A_Index] := (streamDeckControllers[A_Index] . ":" . streamDeckControllers[A_Index])
 				}
 
-				setConfigurationValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", streamDeckControllers*))
+				setMultiMapValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", streamDeckControllers*))
 			}
 		}
 	}
@@ -169,9 +169,9 @@ class ControllerStepWizard extends StepWizard {
 
 		Gui %window%:Font, s8 Norm, Arial
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", map(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
+		Gui %window%:Add, ListView, x%x% yp+30 w%width% h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
 		Sleep 200
@@ -189,7 +189,7 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iFunctionsListView := false
 		this.iFunctionTriggers := false
@@ -204,31 +204,31 @@ class ControllerStepWizard extends StepWizard {
 	saveFunctions(buttonBoxConfiguration := false, streamDeckConfiguration := false) {
 		if this.iFunctionTriggers {
 			if !buttonBoxConfiguration
-				buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+				buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 
 			if !streamDeckConfiguration
-				streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+				streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
 			this.SetupWizard.setControllerFunctions(this.controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration))
 		}
 	}
 
 	showPage(page) {
-		base.showPage(page)
+		super.showPage(page)
 
-		this.iControllerEditor := new this.StepControllerEditor("Default", this.SetupWizard.Configuration
+		this.iControllerEditor := this.StepControllerEditor("Default", this.SetupWizard.Configuration
 															  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
 															  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)
 
 		this.iControllerEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450), "Center")
 
-		this.loadFunctions(readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-						 , readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"), true)
+		this.loadFunctions(readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+						 , readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"), true)
 	}
 
 	hidePage(page) {
-		local buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-		local streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+		local buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		local streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 		local function, title, window, streamDeckFunctions, controller, definition, ignore
 
 		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
@@ -247,7 +247,7 @@ class ControllerStepWizard extends StepWizard {
 
 		streamDeckFunctions := 0
 
-		for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+		for controller, definition in getMultiMapValues(streamDeckConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
@@ -266,13 +266,13 @@ class ControllerStepWizard extends StepWizard {
 				return false
 		}
 
-		if base.hidePage(page) {
+		if super.hidePage(page) {
 			this.iControllerEditor.close(true)
 
 			this.iControllerEditor := false
 
-			buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-			streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+			buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+			streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
 			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
@@ -289,10 +289,10 @@ class ControllerStepWizard extends StepWizard {
 		local functions := {}
 		local function, control, descriptor, controller, definition, ignore
 
-		for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
+		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 
-		for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
+		for controller, definition in getMultiMapValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
@@ -309,7 +309,7 @@ class ControllerStepWizard extends StepWizard {
 				}
 		}
 
-		for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+		for controller, definition in getMultiMapValues(streamDeckConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
@@ -327,10 +327,10 @@ class ControllerStepWizard extends StepWizard {
 		local conflict := false
 		local function, control, descriptor, controller, definition, ignore
 
-		for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
+		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 
-		for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
+		for controller, definition in getMultiMapValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -384,7 +384,7 @@ class ControllerStepWizard extends StepWizard {
 		local function, ignore, control, descriptor, first, conflict, trigger, triggers
 		local functionConflicts, triggerConflicts, controller, definition, functionTriggers
 
-		for control, descriptor in getConfigurationSectionValues(buttonBoxConfiguration, "Controls")
+		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 
 		Gui %window%:Default
@@ -399,7 +399,7 @@ class ControllerStepWizard extends StepWizard {
 		functionConflicts := this.conflictingFunctions(buttonBoxConfiguration)
 		triggerConflicts := this.conflictingTriggers(buttonBoxConfiguration)
 
-		for controller, definition in getConfigurationSectionValues(buttonBoxConfiguration, "Layouts") {
+		for controller, definition in getMultiMapValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -457,7 +457,7 @@ class ControllerStepWizard extends StepWizard {
 			}
 		}
 
-		for controller, definition in getConfigurationSectionValues(streamDeckConfiguration, "Layouts") {
+		for controller, definition in getMultiMapValues(streamDeckConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible")) {
@@ -584,8 +584,8 @@ class ControllerStepWizard extends StepWizard {
 			else
 				this.iFunctionTriggers[function] := [key1]
 
-			buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-			streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+			buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+			streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
 			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 			this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
@@ -664,8 +664,8 @@ class ControllerStepWizard extends StepWizard {
 
 		wizard.toggleTriggerDetector()
 
-		buttonBoxConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
-		streamDeckConfiguration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+		buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+		streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
 		this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 		this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
@@ -689,27 +689,27 @@ class ControllerPreviewStepWizard extends StepWizard {
 	iControllerPreviews := []
 	iControllerPreviewCenterY := 0
 
-	ControllerPreviews[] {
+	ControllerPreviews {
 		Get {
 			return this.iControllerPreviews
 		}
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.closeControllerPreviews()
 	}
 
 	showPage(page) {
-		base.showPage(page)
+		super.showPage(page)
 
 		if this.SetupWizard.isModuleSelected("Controller")
 			this.openControllerPreviews()
 	}
 
 	hidePage(page) {
-		if base.hidePage(page) {
+		if super.hidePage(page) {
 			if this.SetupWizard.isModuleSelected("Controller")
 				this.closeControllerPreviews()
 
@@ -745,9 +745,9 @@ class ControllerPreviewStepWizard extends StepWizard {
 
 	createControllerPreview(type, controller, configuration) {
 		if (type = "Button Box")
-			return new ButtonBoxPreview(this, controller, configuration)
+			return ButtonBoxPreview(this, controller, configuration)
 		else
-			return new StreamDeckPreview(this, controller, configuration)
+			return StreamDeckPreview(this, controller, configuration)
 	}
 
 	openControllerPreviews() {
@@ -759,9 +759,9 @@ class ControllerPreviewStepWizard extends StepWizard {
 			controllers := []
 			found := []
 
-			configuration := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 
-			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+			for controller, definition in getMultiMapValues(configuration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 
 				if !inList(found, controller[1]) {
@@ -770,9 +770,9 @@ class ControllerPreviewStepWizard extends StepWizard {
 				}
 			}
 
-			configuration := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+			configuration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
-			for controller, definition in getConfigurationSectionValues(configuration, "Layouts") {
+			for controller, definition in getMultiMapValues(configuration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
 
 				if !inList(found, controller[1]) {
@@ -859,7 +859,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 		iModes := []
 
-		Mode[] {
+		Mode {
 			Get {
 				local mode, ignore, candidate
 
@@ -881,7 +881,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		__New(previewManager, name, configuration, modes) {
 			this.iModes := modes
 
-			base.__New(previewManager, name, configuration)
+			super.__New(previewManager, name, configuration)
 		}
 
 		createGui(configuration) {
@@ -890,7 +890,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			local modes := []
 			local ignore, mode
 
-			base.createGui(configuration)
+			super.createGui(configuration)
 
 			for ignore, mode in this.iModes
 				if mode
@@ -913,7 +913,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 		iModes := []
 
-		Mode[] {
+		Mode {
 			Get {
 				local mode, ignore, candidate
 
@@ -935,7 +935,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		__New(previewManager, name, configuration, modes) {
 			this.iModes := modes
 
-			base.__New(previewManager, name, configuration)
+			super.__New(previewManager, name, configuration)
 		}
 
 		createGui(configuration) {
@@ -944,7 +944,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			local modes := []
 			local ignore, mode
 
-			base.createGui(configuration)
+			super.createGui(configuration)
 
 			for ignore, mode in this.iModes
 				if mode
@@ -962,20 +962,20 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		}
 	}
 
-	ActionsListView[] {
+	ActionsListView {
 		Get {
 			return this.iActionsListView
 		}
 	}
 
-	CurrentActionsStep[] {
+	CurrentActionsStep {
 		Get {
 			return ActionsStepWizard.sCurrentActionsStep
 		}
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iActionsListView := false
 
@@ -987,7 +987,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	showPage(page) {
 		ActionsStepWizard.sCurrentActionsStep := this
 
-		base.showPage(page)
+		super.showPage(page)
 
 		if this.SetupWizard.isModuleSelected("Controller")
 			this.loadActions(true)
@@ -996,7 +996,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	hidePage(page) {
-		if base.hidePage(page) {
+		if super.hidePage(page) {
 			ActionsStepWizard.sCurrentActionsStep := false
 
 			if this.SetupWizard.isModuleSelected("Controller")
@@ -1167,13 +1167,13 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 	createControllerPreview(type, controller, configuration) {
 		if (type = "Button Box")
-			return new this.ActionsButtonBoxPreview(this, controller, configuration, this.getModes())
+			return this.ActionsButtonBoxPreview(this, controller, configuration, this.getModes())
 		else
-			return new this.ActionsStreamDeckPreview(this, controller, configuration, this.getModes())
+			return this.ActionsStreamDeckPreview(this, controller, configuration, this.getModes())
 	}
 
 	openControllerPreviews() {
-		base.openControllerPreviews()
+		super.openControllerPreviews()
 
 		this.iPendingFunctionRegistration := false
 		this.iPendingActionRegistration := false
@@ -1183,7 +1183,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		local wizard := this.SetupWizard
 		local function, action, module, row, column, ignore, preview, targetMode, mode, partFunction
 
-		base.loadControllerLabels()
+		super.loadControllerLabels()
 
 		module := this.getModule()
 
@@ -1296,7 +1296,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		try {
 			Menu ContextMenu, DeleteAll
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
@@ -1343,7 +1343,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		try {
 			Menu ContextMenu, DeleteAll
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
@@ -1577,7 +1577,7 @@ updateFunctionTriggers() {
 			try {
 				Menu ContextMenu, DeleteAll
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 
@@ -1622,7 +1622,7 @@ updateFunctionTriggers() {
 }
 
 initializeControllerStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new ControllerStepWizard(SetupWizard.Instance, "Controller", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(ControllerStepWizard(SetupWizard.Instance, "Controller", kSimulatorConfiguration))
 }
 
 

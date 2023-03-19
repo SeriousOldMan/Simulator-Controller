@@ -59,7 +59,7 @@ class TyresDatabase extends SessionDatabase {
 	iDatabase := false
 	iShared := true
 
-	DatabaseDirectory[] {
+	DatabaseDirectory {
 		Get {
 			return this.iDatabaseDirectory
 		}
@@ -69,13 +69,13 @@ class TyresDatabase extends SessionDatabase {
 		}
 	}
 
-	Database[] {
+	Database {
 		Get {
 			return this.iDatabase
 		}
 	}
 
-	Shared[] {
+	Shared {
 		Get {
 			return this.iShared
 		}
@@ -95,7 +95,7 @@ class TyresDatabase extends SessionDatabase {
 
 		FileCreateDir %directory%
 
-		return new Database(directory . "\", kTyresSchemas)
+		return Database(directory . "\", kTyresSchemas)
 	}
 
 	requireDatabase(simulator, car, track, scope := "User") {
@@ -114,7 +114,7 @@ class TyresDatabase extends SessionDatabase {
 				try {
 					this.unlock()
 				}
-				catch exception {
+				catch Any as exception {
 				}
 
 			this.iDatabase := false
@@ -231,10 +231,10 @@ class TyresDatabase extends SessionDatabase {
 		else
 			compounds := [Array(compound, compoundColor)]
 
-		settings := new SettingsDatabase().loadSettings(simulator, car, track, weather)
+		settings := SettingsDatabase().loadSettings(simulator, car, track, weather)
 
-		correctionAir := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
-		correctionTrack := getConfigurationValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)
+		correctionAir := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Air", -0.1)
+		correctionTrack := getMultiMapValue(settings, "Session Settings", "Tyre.Pressure.Correction.Temperature.Track", -0.02)
 
 		thePressures := []
 		theCertainty := 1.0
@@ -400,14 +400,14 @@ class TyresDatabase extends SessionDatabase {
 		try {
 			this.Database.unlock("Tyres.Pressures")
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
 		try {
 			this.Database.unlock("Tyres.Pressures.Distribution")
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -491,7 +491,7 @@ class TyresDatabase extends SessionDatabase {
 							, Compound: compound, "Compound.Color": compoundColor
 							, Type: type, Tyre: tyre, "Pressure": pressure, Count: count})
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 	}
@@ -523,7 +523,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 					track := pressures.Track
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
-						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
 
 						lastSimulator := simulator
 						lastCar := car
@@ -549,7 +549,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 													 , "Tyre.Pressure.Hot.Rear.Left": pressures.HotPressureRearLeft
 													 , "Tyre.Pressure.Hot.Rear.Right": pressures.HotPressureRearRight}, true)
 						}
-						catch exception {
+						catch Any as exception {
 							logError(exception)
 						}
 					}
@@ -570,7 +570,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 					count := pressures.Count
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
-						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
 
 						lastSimulator := simulator
 						lastCar := car
@@ -590,7 +590,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 						try {
 							db.add("Tyres.Pressures.Distribution", properties, true)
 						}
-						catch exception {
+						catch Any as exception {
 							logError(exception)
 						}
 					}
@@ -614,7 +614,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 
 				for ignore, car in sessionDB.getCars(simulator)
 					for ignore, track in sessionDB.getTracks(simulator, car) {
-						db := new Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
 
 						if db.lock("Tyres.Pressures", false)
 							try {

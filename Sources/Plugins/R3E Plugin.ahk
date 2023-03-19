@@ -50,50 +50,50 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopOptions := []
 	iPitstopOptionStates := []
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	ClosePitstopMFDHotkey[] {
+	ClosePitstopMFDHotkey {
 		Get {
 			return this.iClosePitstopMFDHotkey
 		}
 	}
 
-	PreviousOptionHotkey[] {
+	PreviousOptionHotkey {
 		Get {
 			return this.iPreviousOptionHotkey
 		}
 	}
 
-	NextOptionHotkey[] {
+	NextOptionHotkey {
 		Get {
 			return this.iNextOptionHotkey
 		}
 	}
 
-	PreviousChoiceHotkey[] {
+	PreviousChoiceHotkey {
 		Get {
 			return this.iPreviousChoiceHotkey
 		}
 	}
 
-	NextChoiceHotkey[] {
+	NextChoiceHotkey {
 		Get {
 			return this.iNextChoiceHotkey
 		}
 	}
 
-	AcceptChoiceHotkey[] {
+	AcceptChoiceHotkey {
 		Get {
 			return this.iAcceptChoiceHotkey
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
@@ -276,7 +276,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 		else {
-			pitMenuState := getConfigurationSectionValues(readSimulatorData(this.Code), "Pit Menu State")
+			pitMenuState := getMultiMapValues(readSimulatorData(this.Code), "Pit Menu State")
 
 			if (pitMenuState["Strategy"] != "Unavailable") {
 				this.iPitstopOptions.Push("Strategy")
@@ -516,7 +516,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		base.startPitstopSetup()
+		super.startPitstopSetup()
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -527,7 +527,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		base.finishPitstopSetup()
+		super.finishPitstopSetup()
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.activateWindow()
@@ -540,7 +540,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Refuel") {
@@ -559,7 +559,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		local changed
 
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
 			if this.optionAvailable("Change Front Tyres")
@@ -595,11 +595,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Repair Suspension")
@@ -661,26 +661,26 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	updatePositionsData(data) {
 		local carID
 
-		base.updatePositionsData(data)
+		super.updatePositionsData(data)
 
 		loop {
-			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+			carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 			if (carID == kUndefined)
 				break
 			else {
-				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
 
-				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class"
-									, this.getClassName(getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class")))
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class"
+									, this.getClassName(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")))
 			}
 		}
 	}
 
 	updateTelemetryData(data) {
-		setConfigurationValue(data, "Session Data", "Car", this.getCarName(getConfigurationValue(data, "Session Data", "Car", "")))
+		setMultiMapValue(data, "Session Data", "Car", this.getCarName(getMultiMapValue(data, "Session Data", "Car", "")))
 
-		base.updateTelemetryData(data)
+		super.updateTelemetryData(data)
 	}
 
 	getImageFileNames(imageNames*) {

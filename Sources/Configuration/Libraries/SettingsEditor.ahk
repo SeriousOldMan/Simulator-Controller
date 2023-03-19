@@ -57,7 +57,7 @@ startConfiguration() {
 
 		editSettings("Restart")
 	}
-	catch exception {
+	catch Any as exception {
 		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
 		title := translate("Error")
 		MsgBox 262160, %title%, % translate("Cannot start the configuration tool - please check the installation...")
@@ -161,11 +161,11 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		modes := getSelectedModes(modesListViewHandle)
 
 		if !selectedSimulator
-			setConfigurationValue(newSettings, "Modes", "Default", values2String(",", modes*))
+			setMultiMapValue(newSettings, "Modes", "Default", values2String(",", modes*))
 		else if !selectedSession
-			setConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), values2String(",", modes*))
+			setMultiMapValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), values2String(",", modes*))
 		else
-			setConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, simulatorSessions[selectedSession]), values2String(",", modes*))
+			setMultiMapValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, simulatorSessions[selectedSession]), values2String(",", modes*))
 	}
 
 	if (settingsOrCommand = kUpdate) {
@@ -175,7 +175,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		modes := []
 
 		if (modeSimulatorDropDown == 1) {
-			modes := string2Values(",", getConfigurationValue(newSettings, "Modes", "Default", ""))
+			modes := string2Values(",", getMultiMapValue(newSettings, "Modes", "Default", ""))
 
 			selectedSimulator := false
 			selectedSession := false
@@ -190,33 +190,33 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 				modeSessionDropDown := 1
 				selectedSession := false
 
-				simulatorSessions := string2Values(",", string2Values("|", getConfigurationValue(configuration, "Simulators", selectedSimulator, ""))[2])
+				simulatorSessions := string2Values(",", string2Values("|", getMultiMapValue(configuration, "Simulators", selectedSimulator, ""))[2])
 
 				for index, session in simulatorSessions
 					if (session = "Qualification")
 						simulatorSessions[index] := "Qualifying"
 
-				GuiControl Text, modeSessionDropDown, % "|" . translate("Inactive") . "|" . values2String("|", map(simulatorSessions, "translate")*)
+				GuiControl Text, modeSessionDropDown, % "|" . translate("Inactive") . "|" . values2String("|", collect(simulatorSessions, "translate")*)
 				GuiControl Choose, modeSessionDropDown, 1
 
 				for index, session in simulatorSessions
 					if (session = "Qualifying")
 						simulatorSessions[index] := "Qualification"
 
-				modes := string2Values(",", getConfigurationValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), ""))
+				modes := string2Values(",", getMultiMapValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), ""))
 			}
 			else {
 				if (selectedSession != (modeSessionDropDown - 1))
 					selectedSession := modeSessionDropDown - 1
 
-				modes := string2Values(",", getConfigurationValue(newSettings, "Modes"
+				modes := string2Values(",", getMultiMapValue(newSettings, "Modes"
 																, ConfigurationItem.descriptor(selectedSimulator, !selectedSession ? "Default" : simulatorSessions[selectedSession]), ""))
 			}
 		}
 
 		row := 1
 
-		for thePlugin, pluginConfiguration in getConfigurationSectionValues(configuration, "Plugins", Object()) {
+		for thePlugin, pluginConfiguration in getMultiMapValues(configuration, "Plugins") {
 			pluginConfiguration := string2Values("|", pluginConfiguration)
 
 			for ignore, mode in string2Values(",", pluginConfiguration[3])
@@ -236,9 +236,9 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 	}
 	else if IsObject(settingsOrCommand) {
 		result := false
-		newSettings := newConfiguration()
+		newSettings := newMultiMap()
 
-		setConfigurationSectionValues(newSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes"))
+		setMultiMapValues(newSettings, "Modes", getMultiMapValues(settingsOrCommand, "Modes"))
 
 		Gui ME:Default
 
@@ -267,7 +267,7 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 
 		configuration := getControllerState()
 
-		for simulator, options in getConfigurationSectionValues(configuration, "Simulators", Object())
+		for simulator, options in getMultiMapValues(configuration, "Simulators")
 			simulators.Push(simulator)
 
 		Gui ME:Add, Text, x8 y60 w86 h23 +0x200, % translate("Simulator")
@@ -279,9 +279,9 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		Gui ME:Add, Text, x8 y108 w80 h23 +0x200, % translate("Modes")
 		Gui ME:Add, ListView, x100 y108 w240 h162 -Multi -LV0x10 Checked NoSort NoSortHdr HwndmodesListViewHandle VmodesListView, % translate("Plugin") . "|" . translate("Mode") . "|" . translate("Simulator(s)")
 
-		defaultModes := string2Values(",", getConfigurationValue(newSettings, "Modes", "Default", ""))
+		defaultModes := string2Values(",", getMultiMapValue(newSettings, "Modes", "Default", ""))
 
-		for thePlugin, pluginConfiguration in getConfigurationSectionValues(configuration, "Plugins", Object()) {
+		for thePlugin, pluginConfiguration in getMultiMapValues(configuration, "Plugins") {
 			pluginConfiguration := string2Values("|", pluginConfiguration)
 
 			if pluginConfiguration[1] {
@@ -395,48 +395,48 @@ restartSettings:
 	if (settingsOrCommand == kSave) {
 		Gui SE:Submit
 
-		newSettings := newConfiguration()
+		newSettings := newMultiMap()
 
 		for index, coreDescriptor in coreSettings {
 			if (index > 1) {
 				coreVariable := "coreVariable" . index
 
-				setConfigurationValue(newSettings, "Core", coreDescriptor[1], %coreVariable%)
+				setMultiMapValue(newSettings, "Core", coreDescriptor[1], %coreVariable%)
 			}
 		}
 
 		for index, feedbackDescriptor in feedbackSettings {
 			feedbackVariable := "feedbackVariable" . index
 
-			setConfigurationValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%)
+			setMultiMapValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%)
 		}
 
-		setConfigurationValue(newSettings, "Tray Tip", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
-		setConfigurationValue(newSettings, "Tray Tip", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
-		setConfigurationValue(newSettings, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
-		setConfigurationValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
+		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
+		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
+		setMultiMapValue(newSettings, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
+		setMultiMapValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
 
 		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
 
-		setConfigurationValue(newSettings, "Button Box", "Button Box Position", positions[inList(map(positions, "translate"), buttonBoxPosition)])
+		setMultiMapValue(newSettings, "Button Box", "Button Box Position", positions[inList(collect(positions, "translate"), buttonBoxPosition)])
 
 		positions := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
 
-		applicationSettings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		applicationSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		setConfigurationValue(applicationSettings, "General", "Popup Position", positions[inList(map(positions, "translate"), popupPosition)])
+		setMultiMapValue(applicationSettings, "General", "Popup Position", positions[inList(collect(positions, "translate"), popupPosition)])
 
-		writeConfiguration(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
+		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
 
 		for descriptor, value in lastPositions
-			setConfigurationValue(newSettings, "Button Box", descriptor, value)
+			setMultiMapValue(newSettings, "Button Box", descriptor, value)
 
-		setConfigurationValue(newSettings, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
-		setConfigurationValue(newSettings, "Startup", "Simulator", (startup ? startupOption : false))
+		setMultiMapValue(newSettings, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
+		setMultiMapValue(newSettings, "Startup", "Simulator", (startup ? startupOption : false))
 
 		Gui SE:Destroy
 
-		setConfigurationSectionValues(newSettings, "Modes", getConfigurationSectionValues(modeSettings, "Modes"))
+		setMultiMapValues(newSettings, "Modes", getMultiMapValues(modeSettings, "Modes"))
 
 		if fromSetup
 			return newSettings
@@ -461,9 +461,9 @@ restartSettings:
 	}
 	else {
 		configuration := (fromSetup ? fromSetup : kSimulatorConfiguration)
-		modeSettings := newConfiguration()
+		modeSettings := newMultiMap()
 
-		setConfigurationSectionValues(modeSettings, "Modes", getConfigurationSectionValues(settingsOrCommand, "Modes", Object()))
+		setMultiMapValues(modeSettings, "Modes", getMultiMapValues(settingsOrCommand, "Modes"))
 
 		result := false
 		restart := false
@@ -481,17 +481,17 @@ restartSettings:
 		Gui SE:Add, Text, x68 YP+20 w100 cBlue Center gopenSettingsDocumentation, % translate("Settings")
 
 		coreSettings := [["Simulator Controller", true, false]
-					   , ["System Monitor", getConfigurationValue(settingsOrCommand, "Core", "System Monitor", false), true]]
+					   , ["System Monitor", getMultiMapValue(settingsOrCommand, "Core", "System Monitor", false), true]]
 		feedbackSettings := []
 
-		for descriptor, applicationName in getConfigurationSectionValues(configuration, "Applications", Object()) {
+		for descriptor, applicationName in getMultiMapValues(configuration, "Applications") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
-			enabled := (getConfigurationValue(configuration, applicationName, "Exe Path", "") != "")
+			enabled := (getMultiMapValue(configuration, applicationName, "Exe Path", "") != "")
 
 			if (descriptor[1] == "Core")
-				coreSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Core", applicationName, false), enabled))
+				coreSettings.Push(Array(applicationName, getMultiMapValue(settingsOrCommand, "Core", applicationName, false), enabled))
 			else if (descriptor[1] == "Feedback")
-				feedbackSettings.Push(Array(applicationName, getConfigurationValue(settingsOrCommand, "Feedback", applicationName, false), enabled))
+				feedbackSettings.Push(Array(applicationName, getMultiMapValue(settingsOrCommand, "Feedback", applicationName, false), enabled))
 		}
 
 		if (coreSettings.Length() > 8)
@@ -542,18 +542,18 @@ restartSettings:
 			}
 		}
 
-		trayTipDuration := getConfigurationValue(settingsOrCommand, "Tray Tip", "Tray Tip Duration", 1500)
-		trayTipSimulationDuration := getConfigurationValue(settingsOrCommand, "Tray Tip", "Tray Tip Simulation Duration", 1500)
-		buttonBoxDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Duration", false)
-		buttonBoxSimulationDuration := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
-		buttonBoxPosition := getConfigurationValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
+		trayTipDuration := getMultiMapValue(settingsOrCommand, "Tray Tip", "Tray Tip Duration", 1500)
+		trayTipSimulationDuration := getMultiMapValue(settingsOrCommand, "Tray Tip", "Tray Tip Simulation Duration", 1500)
+		buttonBoxDuration := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Duration", false)
+		buttonBoxSimulationDuration := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
+		buttonBoxPosition := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
 
-		popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 										     , "General", "Popup Position", "Bottom")
 
 		lastPositions := {}
 
-		for descriptor, value in getConfigurationSectionValues(settingsOrCommand, "Button Box", Object())
+		for descriptor, value in getMultiMapValues(settingsOrCommand, "Button Box")
 			if InStr(descriptor, ".Position.")
 				lastPositions[descriptor] := value
 
@@ -601,7 +601,7 @@ restartSettings:
 		if !chosen
 			chosen := 4
 
-		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", map(choices, "translate")*)
+		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", collect(choices, "translate")*)
 
 		Gui SE:Add, Text, XS YP+30, % translate("Overlay Position")
 
@@ -611,14 +611,14 @@ restartSettings:
 		if !chosen
 			chosen := 1
 
-		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vpopupPosition, % values2String("|", map(choices, "translate")*)
+		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vpopupPosition, % values2String("|", collect(choices, "translate")*)
 
 		if fromSetup
 			Gui SE:Add, Button, X10 Y+15 w220 Disabled gopenModesEditor, % translate("Controller Automation...")
 		else
 			Gui SE:Add, Button, X10 Y+15 w220 gopenModesEditor, % translate("Controller Automation...")
 
-		splashTheme := getConfigurationValue(settingsOrCommand, "Startup", "Splash Theme", false)
+		splashTheme := getMultiMapValue(settingsOrCommand, "Startup", "Splash Theme", false)
 
 		themes := getAllThemes(configuration)
 		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
@@ -627,12 +627,12 @@ restartSettings:
 		Gui SE:Add, Text, X10 Y+20, % translate("Theme")
 		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
 
-		startupOption := getConfigurationValue(settingsOrCommand, "Startup", "Simulator", false)
+		startupOption := getMultiMapValue(settingsOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)
 
 		Gui SE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
 
-		simulators := string2Values("|", getConfigurationValue(configuration, "Configuration", "Simulators", ""))
+		simulators := string2Values("|", getMultiMapValue(configuration, "Configuration", "Simulators", ""))
 
 		chosen := inList(simulators, startupOption)
 
@@ -664,7 +664,7 @@ restartSettings:
 		else
 			Gui SE:Show, AutoSize x%x% y%y%
 
-		if (!fromSetup && (readConfiguration(kSimulatorConfigurationFile).Count() == 0))
+		if (!fromSetup && (readMultiMap(kSimulatorConfigurationFile).Count() == 0))
 			startConfiguration()
 
 		if fromSetup

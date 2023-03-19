@@ -39,13 +39,13 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	iSimulatorConfigurations := {}
 	iCurrentSimulator := false
 
-	Editor[] {
+	Editor {
 		Get {
 			return this.iEditor
 		}
 	}
 
-	Simulators[] {
+	Simulators {
 		Get {
 			return this.iSimulators
 		}
@@ -54,7 +54,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	__New(editor, configuration := false) {
 		this.iEditor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		RaceSpotterConfigurator.Instance := this
 	}
@@ -162,7 +162,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	loadFromConfiguration(configuration) {
 		local ignore, simulator, simulatorConfiguration, key, default
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
 		if (this.Simulators.Length() = 0)
 			this.iSimulators := this.getSimulators()
@@ -170,20 +170,20 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		for ignore, simulator in this.Simulators {
 			simulatorConfiguration := {}
 
-			simulatorConfiguration["LearningLaps"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulator . ".LearningLaps", 1)
-			simulatorConfiguration["ConsideredHistoryLaps"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulator . ".ConsideredHistoryLaps", 5)
-			simulatorConfiguration["HistoryLapsDamping"] := getConfigurationValue(configuration, "Race Spotter Analysis", simulator . ".HistoryLapsDamping", 0.2)
+			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".LearningLaps", 1)
+			simulatorConfiguration["ConsideredHistoryLaps"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".ConsideredHistoryLaps", 5)
+			simulatorConfiguration["HistoryLapsDamping"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".HistoryLapsDamping", 0.2)
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "SessionInformation", "TacticalAdvices", "PitWindow", "CutWarnings", "PenaltyInformation"]
-				simulatorConfiguration[key] := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
+				simulatorConfiguration[key] := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . "." . key, true)
 
-			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
-			default := getConfigurationValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)
+			default := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . ".PerformanceUpdates", 2)
+			default := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)
 
-			simulatorConfiguration["DeltaInformation"] := getConfigurationValue(configuration, "Race Spotter Announcements"
+			simulatorConfiguration["DeltaInformation"] := getMultiMapValue(configuration, "Race Spotter Announcements"
 																			  , simulator . ".DeltaInformation", default)
-			simulatorConfiguration["DeltaInformationMethod"] := getConfigurationValue(configuration, "Race Spotter Announcements"
+			simulatorConfiguration["DeltaInformationMethod"] := getMultiMapValue(configuration, "Race Spotter Announcements"
 																					, simulator . ".DeltaInformationMethod", "Both")
 
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
@@ -193,18 +193,18 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	saveToConfiguration(configuration) {
 		local simulator, simulatorConfiguration, ignore, key
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		this.saveSimulatorConfiguration()
 
 		for simulator, simulatorConfiguration in this.iSimulatorConfigurations {
 			for ignore, key in ["LearningLaps", "ConsideredHistoryLaps", "HistoryLapsDamping"]
-				setConfigurationValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
+				setMultiMapValue(configuration, "Race Spotter Analysis", simulator . "." . key, simulatorConfiguration[key])
 
 			for ignore, key in ["SideProximity", "RearProximity", "YellowFlags", "BlueFlags"
 							  , "SessionInformation", "DeltaInformation", "DeltaInformationMethod", "TacticalAdvices", "PitWindow"
 							  , "CutWarnings", "PenaltyInformation"]
-				setConfigurationValue(configuration, "Race Spotter Announcements", simulator . "." . key, simulatorConfiguration[key])
+				setMultiMapValue(configuration, "Race Spotter Announcements", simulator . "." . key, simulatorConfiguration[key])
 		}
 	}
 
@@ -387,7 +387,7 @@ initializeRaceSpotterConfigurator() {
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Race Spotter"), new RaceSpotterConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Race Spotter"), RaceSpotterConfigurator(editor, editor.Configuration))
 	}
 }
 

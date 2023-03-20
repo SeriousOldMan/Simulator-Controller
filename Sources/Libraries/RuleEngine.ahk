@@ -538,18 +538,17 @@ class Variable extends Primary {
 
 	substituteVariables(variables) {
 		local name := this.Variable[true]
-		local var := StrUpper(name)
 		local newVariable
 
-		if variables.Has(var)
-			return variables[var]
+		if variables.Has(name)
+			return variables[name]
 		else {
 			if !this.iProperty
 				newVariable := Variable(name)
 			else
 				newVariable := Variable(this.Variable, this.Property, this.RootVariable.substituteVariables(variables))
 
-			variables[var] := newVariable
+			variables[name] := newVariable
 
 			return newVariable
 		}
@@ -1524,12 +1523,16 @@ class Nil extends Term {
 class Variables {
 	iVariables := Map()
 
+	__New() {
+		this.iVariables.CaseSense := false
+	}
+
 	setValue(variable, value) {
-		this.iVariables[StrUpper(variable.Variable[true])] := value
+		this.iVariables[variable.Variable[true]] := value
 	}
 
 	getValue(variable, default := "__NotInitialized__") {
-		local fullName := StrUpper(variable.Variable[true])
+		local fullName := variable.Variable[true]
 
 		if this.iVariables.Has(fullName)
 			return this.iVariables[fullName]
@@ -2859,8 +2862,10 @@ class Facts {
 			local facts := Map()
 			local key, theValue
 
+			facts.CaseSense := false
+
 			for key, theValue in value
-				facts[StrUpper(key)] := theValue
+				facts[key] := theValue
 
 			return (this.iFacts := facts)
 		}
@@ -2873,6 +2878,8 @@ class Facts {
 	}
 
 	__New(ruleEngine, initialFacts) {
+		this.iFacts.CaseSense := false
+
 		this.iRuleEngine := ruleEngine
 		this.Facts := initialFacts
 
@@ -2881,8 +2888,6 @@ class Facts {
 	}
 
 	setValue(fact, value, propagate := false) {
-		local key
-
 		if (value == kNotInitialized)
 			this.clearFact(fact)
 		else
@@ -2890,12 +2895,10 @@ class Facts {
 				if (this.RuleEngine.TraceLevel <= kTraceMedium)
 					this.RuleEngine.trace(kTraceMedium, "Setting fact " . fact . " to " . value)
 
-				key := StrUpper(fact)
-
-				if ((this.iFacts[key] != value) || propagate) {
+				if ((this.iFacts[fact] != value) || propagate) {
 					this.iGeneration += 1
 
-					this.iFacts[key] := value
+					this.iFacts[fact] := value
 
 					if this.hasObserver(fact)
 						this.getObserver(fact).factChanged()
@@ -2907,16 +2910,13 @@ class Facts {
 
 	getValue(fact, default := "__NotInitialized__") {
 		local facts := this.Facts
-		local key
 
 		if (fact is Variable)
 			fact := fact.Variable[true]
 		else if (fact is Literal)
 			fact := fact.Literal
 
-		key := StrUpper(fact)
-
-		return (facts.Has(key) ? facts[key] : default)
+		return (facts.Has(fact) ? facts[fact] : default)
 	}
 
 	setFact(fact, value, propagate := false) {
@@ -2927,13 +2927,11 @@ class Facts {
 	}
 
 	clearFact(fact) {
-		local key := StrUpper(fact)
-
-		if this.Facts.Has(key) {
+		if this.Facts.Has(fact) {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
 				this.RuleEngine.trace(kTraceMedium, "Deleting fact " . fact)
 
-			this.Facts.Delete(key)
+			this.Facts.Delete(fact)
 
 			this.iGeneration += 1
 
@@ -2943,20 +2941,19 @@ class Facts {
 	}
 
 	hasFact(fact) {
-		return this.Facts.Has(StrUpper(fact))
+		return this.Facts.Has(fact)
 	}
 
 	addFact(fact, value) {
 		local facts := this.Facts
-		local key := StrUpper(fact)
 
-		if facts.Has(key)
+		if facts.Has(fact)
 			throw "Duplicate fact `"" . fact . "`" encountered in Facts.addFact..."
 		else if (value != kNotInitialized) {
 			if (this.RuleEngine.TraceLevel <= kTraceMedium)
 				this.RuleEngine.trace(kTraceMedium, "Adding fact " . fact . " as " . value)
 
-			facts[key] := value
+			facts[fact] := value
 
 			this.iGeneration += 1
 
@@ -2972,27 +2969,24 @@ class Facts {
 	}
 
 	registerObserver(fact, observer) {
-		local key := StrUpper(fact)
-
-		if this.iObservers.Has(key)
+		if this.iObservers.Has(fact)
 			throw "Observer already registered for fact `"" . fact . "`""
 
-		this.iObservers[key] := observer
+		this.iObservers[fact] := observer
 	}
 
 	deregisterObservers(fact, observer) {
-		this.iObservers.Delete(StrUpper(fact))
+		this.iObservers.Delete(fact)
 	}
 
 	hasObserver(fact) {
-		return this.iObservers.Has(StrUpper(fact))
+		return this.iObservers.Has(fact)
 	}
 
 	getObserver(fact) {
 		local observers := this.iObservers
-		local key := StrUpper(fact)
 
-		return (observers.Has(key) ? observers[key] : false)
+		return (observers.Has(fact) ? observers[fact] : false)
 	}
 
 	dumpFacts(name := false) {
@@ -3205,7 +3199,7 @@ class Rules {
 			local key
 
 			if functor {
-				key := StrUpper(functor) . "." . arity
+				key := functor . "." . arity
 
 				if reductions.Has(key)
 					return reductions[key]
@@ -3229,6 +3223,9 @@ class Rules {
 		local last := false
 		local index, production, entry, ignore, reduction, key
 
+		this.iReductions.CaseSense := false
+		this.iProductionRules.CaseSense := false
+
 		this.iRuleEngine := ruleEngine
 
 		productions := productions.Clone()
@@ -3242,7 +3239,7 @@ class Rules {
 		}
 
 		for ignore, reduction in reductions {
-			key := (StrUpper(reduction.Head.Functor) . "." . reduction.Head.Arity)
+			key := (reduction.Head.Functor . "." . reduction.Head.Arity)
 
 			if !this.iReductions.Has(key)
 				this.iReductions[key] := Array()

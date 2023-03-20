@@ -23,10 +23,10 @@ createGUID() {
     pGuid := Buffer(16, 0)
 
 	if !DllCall("ole32.dll\CoCreateGuid", "ptr", pGuid) {
-		size := VarSetStrCapacity(&sGuid, 38 + 1)
+		sGuid := Buffer((38 + 1) * 2, 0)
 
-        if (DllCall("ole32.dll\StringFromGUID2", "ptr", pGuid, "ptr", sGuid, "int", size)) {
-			guid := StrGet(&sGuid)
+        if (DllCall("ole32.dll\StringFromGUID2", "ptr", pGuid, "ptr", sGuid, "int", sGuid.Size)) {
+			guid := StrGet(sGuid)
 
             return SubStr(SubStr(guid, 1, StrLen(guid) - 1), 2)
 		}

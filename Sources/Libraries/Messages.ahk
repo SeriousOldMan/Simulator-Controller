@@ -38,7 +38,7 @@ global kFileMessage := 3
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class MessageManager extends PeriodicTask {
-	static sMessageHandlers := Map()
+	static sMessageHandlers := false
 	static sOutgoingMessages := []
 
 	iPaused := false
@@ -132,11 +132,15 @@ class MessageManager extends PeriodicTask {
 
 	static MessageHandlers[key := false] {
 		Get {
-			return (key ? MessageManager.sMessageHandlers[StrUpper(key)] : MessageManager.sMessageHandlers)
+			MessageManager.initializeMessageHandlers()
+
+			return (key ? MessageManager.sMessageHandlers[key] : MessageManager.sMessageHandlers)
 		}
 
 		Set {
-			return (key ? (MessageManager.sMessageHandlers[StrUpper(key)] := value) : (MessageManager.sMessageHandlers := value))
+			MessageManager.initializeMessageHandlers()
+
+			return (key ? (MessageManager.sMessageHandlers[key] := value) : (MessageManager.sMessageHandlers := value))
 		}
 	}
 
@@ -154,6 +158,16 @@ class MessageManager extends PeriodicTask {
 		MessageManager.Instance := this
 
 		super.__New(false, 4000, kHighPriority)
+	}
+
+	static initializeMessageHandlers() {
+		if !MessageManager.sMessageHandlers {
+			local cMap := Map()
+
+			cMap.CaseSens := false
+
+			MessageManager.sMessageHandlers := cMap
+		}
 	}
 
 	pause() {
@@ -178,7 +192,7 @@ class MessageManager extends PeriodicTask {
 			if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
 				loop Read, pipeName {
 					data := StrSplit(A_LoopReadLine, ":", , 2)
-					category := StrUpper(data[1])
+					category := data[1]
 
 					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
 
@@ -224,7 +238,7 @@ class MessageManager extends PeriodicTask {
 					break
 
 				data := StrSplit(line, ":", , 2)
-				category := StrUpper(data[1])
+				category := data[1]
 
 				messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
 
@@ -337,8 +351,6 @@ class MessageManager extends PeriodicTask {
 
 	messageSend(messageType, category, data, target := false, request := "NORM") {
 		local messageHandlers, messageHandler
-
-		category := StrUpper(category)
 
 		switch messageType {
 			case kLocalMessage:
@@ -500,7 +512,7 @@ receiveWindowMessage(wParam, lParam, *) {
 		throw "Unhandled message received: " . request . " in receiveWindowMessage..."
 
 	data := StrSplit(data, ":", , 2)
-	category := StrUpper(data[1])
+	category := data[1]
 
 	messageHandlers := MessageManager.MessageHandlers
 

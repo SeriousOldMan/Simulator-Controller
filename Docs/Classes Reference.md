@@ -137,12 +137,12 @@ Creates an instance of a specific subclass of *Function* according to the given 
 
 ***
 
-## 2WayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## TwoWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
 Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger[]* are ["On", "Off"].
 
 ***
 
-## 1WayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## OneWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
 Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger[]* are ["On"].
 
 ***
@@ -478,12 +478,12 @@ Disconnects the function from the given action. Normally, functions will be disc
 
 ***
 
-## Controller2WayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## ControllerTwoWayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger[]* are ["On", "Off"].
 
 ***
 
-## Controller1WayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## ControllerOneWayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger[]* are ["On"].
 
 ***

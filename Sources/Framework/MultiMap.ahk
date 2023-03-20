@@ -20,7 +20,19 @@
 ;;;-------------------------------------------------------------------------;;;
 
 newMultiMap() {
-	return Map()
+	local multiMap := Map()
+
+	multiMap.CaseSense := false
+
+	return multiMap
+}
+
+newSectionMap() {
+	local sectionMap := Map()
+
+	sectionMap.CaseSense := false
+
+	return sectionMap
 }
 
 readMultiMap(multiMapFile) {
@@ -67,9 +79,9 @@ readMultiMap(multiMapFile) {
 				if (firstChar = ";")
 					continue
 				else if (firstChar = "[") {
-					section := StrUpper(StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", ""))
+					section := StrReplace(StrReplace(RTrim(currentLine), "[", ""), "]", "")
 
-					multiMap[section] := Map()
+					multiMap[section] := newSectionMap()
 				}
 				else if section {
 					keyValue := LTrim(currentLine)
@@ -77,7 +89,7 @@ readMultiMap(multiMapFile) {
 					if ((SubStr(keyValue, 1, 2) != "//") && (SubStr(keyValue, 1, 1) != ";")) {
 						keyValue := StrSplit(StrReplace(StrReplace(StrReplace(keyValue, "\=", "_#_EQ-#_"), "\\", "_#_AC-#_"), "\n", "_#_CR-#_"), "=", "", 2)
 
-						key := StrUpper(StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n"))
+						key := StrReplace(StrReplace(StrReplace(keyValue[1], "_#_EQ-#_", "="), "_#_AC-#_", "\\"), "_#_CR-#_", "`n")
 						value := StrReplace(StrReplace(StrReplace(keyValue[2], "_#_EQ-#_", "="), "_#_AC-#_", "\"), "_#_CR-#_", "`n")
 
 						multiMap[section][key] := ((value = kTrue) ? true : ((value = kFalse) ? false : value))
@@ -181,9 +193,6 @@ printMultiMap(multiMap, symbolic := true) {
 getMultiMapValue(multiMap, section, key, default := false) {
 	local value
 
-	section := StrUpper(section)
-	key := StrUpper(key)
-
 	if multiMap.Has(section) {
 		value := multiMap[section]
 
@@ -195,25 +204,18 @@ getMultiMapValue(multiMap, section, key, default := false) {
 }
 
 getMultiMapValues(multiMap, section, default := unset) {
-	section := StrUpper(section)
-
-	return multiMap.Has(section) ? multiMap[section].Clone() : (isSet(default) ? default : Map())
+	return multiMap.Has(section) ? multiMap[section].Clone() : (isSet(default) ? default : newSectionMap())
 }
 
 setMultiMapValue(multiMap, section, key, value) {
-	section := StrUpper(section)
-	key := StrUpper(key)
-
 	if !multiMap.Has(section)
-		multiMap[section] := Map()
+		multiMap[section] := newSectionMap()
 
-	multiMap[section, key] := value
+	multiMap[section][key] := value
 }
 
 setMultiMapValues(multiMap, section, values) {
 	local key, value
-
-	section := StrUpper(section)
 
 	removeMultiMapValues(multiMap, section)
 
@@ -229,15 +231,11 @@ addMultiMapValues(multiMap, otherMultiMap) {
 }
 
 removeMultiMapValue(multiMap, section, key) {
-	section := StrUpper(section)
-
 	if multiMap.Has(section)
-		multiMap[section].Delete(StrUpper(key))
+		multiMap[section].Delete(key)
 }
 
 removeMultiMapValues(multiMap, section) {
-	section := StrUpper(section)
-
 	if multiMap.Has(section)
 		multiMap.Delete(section)
 }

@@ -204,6 +204,10 @@ class SpeechRecognizer {
 		local dllFile := kBinariesDirectory . dllName
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
 
+		this.iChoices.CaseSense := false
+		this._grammarCallbacks.CaseSense := false
+		this._grammars.CaseSense := false
+
 		this.iEngine := engine
 		this.Instance := false
 		this.RecognizerList := []
@@ -434,8 +438,6 @@ class SpeechRecognizer {
 	}
 
 	getChoices(name) {
-		name := StrUpper(name)
-
 		if this.iChoices.Has(name)
 			return this.iChoices[name]
 		else if (this.iEngine = "Azure")
@@ -445,7 +447,7 @@ class SpeechRecognizer {
 	}
 
 	setChoices(name, choices) {
-		this.iChoices[StrUpper(name)] := this.newChoices(choices)
+		this.iChoices[name] := this.newChoices(choices)
 	}
 
 	newGrammar() {
@@ -477,17 +479,15 @@ class SpeechRecognizer {
 	}
 
 	loadGrammar(name, grammar, callback) {
-		local key := StrUpper(name)
-
-		if (this._grammarCallbacks.Has(key))
+		if (this._grammarCallbacks.Has(name))
 			throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
 
-		this._grammarCallbacks[key] := callback
+		this._grammarCallbacks[name] := callback
 
 		if (this.iEngine = "Azure") {
 			grammar := Map("Name", name, "Grammar", grammar, "Callback", callback)
 
-			this._grammars[key] := grammar
+			this._grammars[name] := grammar
 
 			return grammar
 		}
@@ -549,7 +549,7 @@ class SpeechRecognizer {
 	}
 
 	_onGrammarCallback(name, wordArr) {
-		this._grammarCallbacks[StrUpper(name)].Call(name, this.getWords(wordArr))
+		this._grammarCallbacks[name].Call(name, this.getWords(wordArr))
 	}
 
 	_onTextCallback(text) {

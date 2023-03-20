@@ -30,11 +30,14 @@
 ;;;-------------------------------------------------------------------------;;;
 
 doApplications(applications, callback) {
-	local ignore, application
+	local ignore, application, pid
 
-	for ignore, application in applications
-		if ProcessExist(InStr(application, ".exe") ? application : (application . ".exe"))
-			%callback%(ErrorLevel)
+	for ignore, application in applications {
+		pid := ProcessExist(InStr(application, ".exe") ? application : (application . ".exe"))
+
+		if pid
+			callback.Call(pid)
+	}
 }
 
 consentDialog(id, consent := false) {
@@ -233,7 +236,7 @@ checkForNews() {
 startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, shareRaceStrategies, options, consent
 
-	if ((StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") && !ProcessExist("Database Synchronizer.exe") {
+	if ((StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") && !ProcessExist("Database Synchronizer.exe")) {
 		idFileName := kUserConfigDirectory . "ID"
 
 		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
@@ -249,7 +252,7 @@ startDatabaseSynchronizer() {
 			shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
 			shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
 
-			options := ("-ID """ . ID . """ -Synchronize " . true)
+			options := ("-ID `"" . ID . "`" -Synchronize " . true)
 
 			if shareTyrePressures
 				options .= " -Pressures"
@@ -274,7 +277,7 @@ startDatabaseSynchronizer() {
 }
 
 checkForUpdates() {
-	local check, lastModified, release, version, current, releasePostFix, currentPostFix, title, automaticUpdates
+	local check, lastModified, release, version, current, releasePostFix, currentPostFix, automaticUpdates
 	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments, versionPostfix, msgResult
 
 	if isDetachedInstallation()
@@ -294,9 +297,6 @@ checkForUpdates() {
 		if check {
 			try {
 				Download("https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1", kUserConfigDirectory . "VERSION")
-
-				if ErrorLevel
-					throw "Error while checking VERSION..."
 			}
 			catch Any as exception {
 				check := false
@@ -327,10 +327,9 @@ checkForUpdates() {
 				current := values2String("", current*)
 
 				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
-					OnMessage(0x44, translateMsgBoxButtons.Bind(["Yes", "No"]))
-					title := translate("Update")
-					msgResult := MsgBox(translate("A newer version of Simulator Controller is available. Do you want to download it now?"), title, 262436)
-					OnMessage(0x44)
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := MsgBox(translate("A newer version of Simulator Controller is available. Do you want to download it now?"), translate("Update"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
 
 					if (msgResult = "Yes") {
 						automaticUpdates := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)

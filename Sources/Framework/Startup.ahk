@@ -33,7 +33,7 @@ global kDetachedInstallation := false
 ;;;-------------------------------------------------------------------------;;;
 
 loadSimulatorConfiguration() {
-	global kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode
+	global kSimulatorConfiguration, kVersion, kDatabaseDirectory, kAHKDirectory, kMSBuildDirectory, kNirCmd, kSox, kSilentMode
 
 	local version, section, pid, path
 
@@ -126,8 +126,8 @@ loadSimulatorConfiguration() {
 }
 
 initializeEnvironment() {
-	global kDetachedInstallation
-	local installOptions, installLocation, install, title, newID, idFileName, ID, ticks, wait, major, minor, msgResult
+	global kSimulatorConfiguration, kDetachedInstallation
+	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult
 
 	if A_IsCompiled {
 		if FileExist(kConfigDirectory . "Simulator Controller.install") {
@@ -155,10 +155,10 @@ initializeEnvironment() {
 				else
 					setLanguage(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 
-				OnMessage(0x44, translateMsgBoxButtons.Bind(["Yes", "No"]))
-				title := translate("Installation")
-				msgResult := MsgBox(translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?"), title, 262436)
-				OnMessage(0x44)
+				handler := translateMsgBoxButtons.Bind(["Yes", "No"])
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?"), translate("Installation"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
 					Run("*RunAs " . kBinariesDirectory . "Simulator Tools.exe")
@@ -253,7 +253,7 @@ getControllerState(configuration := "__Undefined__") {
 
 				writeMultiMap(fileName, configuration)
 
-				options := (" -Configuration """ . fileName . """")
+				options := (" -Configuration `"" . fileName . "`"")
 			}
 			else
 				options := ""

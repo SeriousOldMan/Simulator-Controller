@@ -2327,7 +2327,7 @@ class RaceEngineer extends RaceAssistant {
 
 		writeMultiMap(filename, pitstopHistory)
 
-		sendMessage(kFileMessage, callbackCategory, callbackMessage . ":" . fileName, callbackPID)
+		messageSend(kFileMessage, callbackCategory, callbackMessage . ":" . fileName, callbackPID)
 	}
 
 	lowFuelWarning(remainingLaps) {

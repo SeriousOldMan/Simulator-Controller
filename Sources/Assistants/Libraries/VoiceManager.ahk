@@ -154,7 +154,7 @@ class VoiceManager {
 				this.iFocus := (this.iFocus || focus)
 			}
 			else
-				sendMessage(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
+				messageSend(kFileMessage, "Voice", "speak:" . values2String(";", this.VoiceManager.Name, text, focus), this.VoiceManager.VoiceServer)
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false) {
@@ -576,7 +576,7 @@ class VoiceManager {
 		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			Process Exist
 
-			sendMessage(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ErrorLevel), this.VoiceServer)
+			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ErrorLevel), this.VoiceServer)
 		}
 
 		return false
@@ -670,7 +670,7 @@ class VoiceManager {
 				activationCommand := getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
-				sendMessage(kFileMessage, "Voice"
+				messageSend(kFileMessage, "Voice"
 						  , "registerVoiceClient:" . values2String(";", this.Name, this.Routing, pid
 																	  , activationCommand
 																	  , "remoteActivationRecognized", "remoteDeactivationRecognized"
@@ -820,7 +820,7 @@ class VoiceManager {
 			if speechRecognizer
 				speechRecognizer.setChoices(name, choices)
 			else
-				sendMessage(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
+				messageSend(kFileMessage, "Voice", "registerChoices:" . values2String(";", this.Name, name, string2Values(",", choices)*), this.VoiceServer)
 
 		for grammar, definition in getMultiMapValues(grammars, "Listener Grammars") {
 			definition := substituteVariables(definition, {name: this.Name})
@@ -846,7 +846,7 @@ class VoiceManager {
 				}
 			}
 			else if (grammar != "Call")
-				sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
+				messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, grammar, definition, "remoteCommandRecognized"), this.VoiceServer)
 		}
 
 		/*
@@ -858,16 +858,16 @@ class VoiceManager {
 				logError(exception)^
 			}
 		else
-			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 		*/
 
 		if !speechRecognizer
-			sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
+			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 
 	}
 
 	raisePhraseRecognized(grammar, words) {
-		sendMessage(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
+		messageSend(kLocalMessage, "Voice", "localPhraseRecognized:" . values2String(";", grammar, words*))
 	}
 
 	localPhraseRecognized(grammar, words*) {
@@ -902,12 +902,12 @@ class VoiceManager {
 	}
 
 	recognizeActivation(grammar, words) {
-		sendMessage(kFileMessage, "Voice", "recognizeActivation:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
+		messageSend(kFileMessage, "Voice", "recognizeActivation:" . values2String(";", this.Name, grammar, words*), this.VoiceServer)
 	}
 
 	recognizeCommand(grammar, words) {
 		if this.VoiceServer
-			sendMessage(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
+			messageSend(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
 		else if this.Grammars.HasKey(grammar)
 			this.phraseRecognized(grammar, words)
 	}

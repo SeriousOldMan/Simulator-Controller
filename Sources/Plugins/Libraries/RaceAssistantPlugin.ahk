@@ -88,7 +88,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			else
 				return
 
-			sendMessage(kFileMessage, this.iRemoteEvent, function . ":" . values2String(";", arguments*), this.RemotePID)
+			messageSend(kFileMessage, this.iRemoteEvent, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
 		shutdown(arguments*) {

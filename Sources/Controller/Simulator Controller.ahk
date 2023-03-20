@@ -599,9 +599,9 @@ class SimulatorController extends ConfigurationItem {
 
 		switch descriptor[1] {
 			case k2WayToggleType:
-				return Controller2WayToggleFunction(this, descriptor[2], configuration)
+				return ControllerTwoWayToggleFunction(this, descriptor[2], configuration)
 			case k1WayToggleType:
-				return Controller1WayToggleFunction(this, descriptor[2], configuration)
+				return ControllerOneWayToggleFunction(this, descriptor[2], configuration)
 			case kButtonType:
 				return ControllerButtonFunction(this, descriptor[2], configuration)
 			case kDialType:
@@ -819,7 +819,7 @@ class SimulatorController extends ConfigurationItem {
 						songFile := (theme ? getMultiMapValue(this.Configuration, "Splash Themes", theme . ".Song", false) : false)
 
 						if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-							sendMessage(kLocalMessage, "Startup", "playStartupSong:" . songFile)
+							messageSend(kLocalMessage, "Startup", "playStartupSong:" . songFile)
 
 						name := application.Application
 
@@ -872,7 +872,7 @@ class SimulatorController extends ConfigurationItem {
 				if !registered {
 					activationCommand := getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false)
 
-					sendMessage(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
+					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
 																								 , activationCommand, "activationCommand", false
 																								 , false, false, false, true, true)
 							  , this.VoiceServer)
@@ -881,7 +881,7 @@ class SimulatorController extends ConfigurationItem {
 				}
 
 				if !registeredCommands.HasKey(command) {
-					sendMessage(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
+					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand"), this.VoiceServer)
 
 					registeredCommands[command] := true
 				}
@@ -1398,8 +1398,8 @@ class ControllerFunction {
 	}
 }
 
-class Controller1WayToggleFunction extends ControllerFunction {
-	class Inner1WayToggleFunction extends 1WayToggleFunction {
+class ControllerOneWayToggleFunction extends ControllerFunction {
+	class InnerOneWayToggleFunction extends OneWayToggleFunction {
 		iOuterFunction := false
 
 		__New(outerFunction, functionNumber, configuration := false) {
@@ -1414,12 +1414,12 @@ class Controller1WayToggleFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, this.Inner1WayToggleFunction(this, number, configuration))
+		super.__New(controller, this.InnerOneWayToggleFunction(this, number, configuration))
 	}
 }
 
-class Controller2WayToggleFunction extends ControllerFunction {
-	class Inner2WayToggleFunction extends 2WayToggleFunction {
+class ControllerTwoWayToggleFunction extends ControllerFunction {
+	class InnerTwoWayToggleFunction extends TwoWayToggleFunction {
 		iOuterFunction := false
 
 		__New(outerFunction, functionNumber, configuration := false) {
@@ -1434,7 +1434,7 @@ class Controller2WayToggleFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, this.Inner2WayToggleFunction(this, number, configuration))
+		super.__New(controller, this.InnerTwoWayToggleFunction(this, number, configuration))
 	}
 }
 

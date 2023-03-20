@@ -58,7 +58,7 @@ collect(list, function) {
 	local ignore, value
 
 	for ignore, value in list
-		result.Push(%function%(value))
+		result.Push(function.Call(value))
 
 	return result
 }
@@ -67,7 +67,7 @@ do(list, function) {
 	local ignore, value
 
 	for ignore, value in list
-		%function%(value)
+		function.Call(value)
 }
 
 remove(list, object) {

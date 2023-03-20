@@ -87,7 +87,7 @@ class JSON {
 	}
 
 	removeKey(script, key, indent := "") {
-		local sign, result, match, match1, match2
+		local sign, result, match
 
 		if !this.verify(script)
 			return false

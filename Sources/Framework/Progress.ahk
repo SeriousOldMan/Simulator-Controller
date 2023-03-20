@@ -22,6 +22,7 @@
 showProgress(options := unset) {
 	local x, y, w, h, color, count
 	local secondScreen, secondScreenLeft, secondScreenRight, secondScreenTop, secondScreenBottom
+	local newOptions, key, value
 
 	static popupPosition := false
 
@@ -41,15 +42,27 @@ showProgress(options := unset) {
 				popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 													 , "General", "Popup Position", "Bottom")
 
+			if !isSet(options)
+				options := Map()
+			else {
+				newOptions := Map()
+				newOptions.CaseSense := false
+
+				for key, value in options
+					newOptions[key] := value
+
+				options := newOptions
+			}
+
 			if options.Has("X")
-				x := options.X
+				x := options["X"]
 			else if options.Has("Width")
-				x := Round((A_ScreenWidth - options.Width) / 2)
+				x := Round((A_ScreenWidth - options["Width"]) / 2)
 			else
 				x := Round((A_ScreenWidth - 300) / 2)
 
 			if options.Has("Y")
-				y := options.Y
+				y := options["Y"]
 			else {
 				count := MonitorGetCount()
 
@@ -65,14 +78,14 @@ showProgress(options := unset) {
 			}
 
 			if options.Has("Width")
-				w := (options.Width - 20)
+				w := (options["Width"] - 20)
 			else
 				w := 280
 
-			color := (options.Has("Color") ? options.color : "Green")
+			color := (options.Has("Color") ? options["Color"] : "Green")
 
 			progressGui := Gui()
-			
+
 			progressGui.Opt("-Border") ; -Caption
 			progressGui.BackColor := "D0D0D0"
 
@@ -90,22 +103,17 @@ showProgress(options := unset) {
 			progressGui.Show("x" . x . " y" . y . " AutoSize NoActivate")
 		}
 
-		if isSet(options) {
-			if options.Has("title")
-				progressTitle.Value := options.title
+		if options.Has("title")
+			progressTitle.Value := options["title"]
 
-			if options.Has("message")
-				progressMessage.Value := options.message
+		if options.Has("message")
+			progressMessage.Value := options["message"]
 
-			if options.Has("progress")
-				progressBar.Value := Round(options.progress)
+		if options.Has("progress")
+			progressBar.Value := Round(options["progress"])
 
-			if options.Has("color") {
-				color := options.color
-
-				progressBar.Options("+c" . color)
-			}
-		}
+		if options.Has("color")
+			progressBar.Opt("+c" . options["color"])
 	}
 
 	return progressGui

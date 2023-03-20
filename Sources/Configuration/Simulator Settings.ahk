@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,14 +25,14 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Application.ahk
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Libraries Include Secion                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Configuration\Libraries\SettingsEditor.ahk
+#Include "..\Configuration\Libraries\SettingsEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -43,15 +43,15 @@ showSettingsEditor() {
 	local icon := kIconsDirectory . "Settings.ico"
 	local settings
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Simulator Settings
+	TraySetIcon(icon, "1")
+	A_IconTip := "Simulator Settings"
 
 	settings := readMultiMap(kSimulatorSettingsFile)
 
-	if (editSettings(settings) == kSave)
+	if (editSettings(&settings) == kSave)
 		writeMultiMap(kSimulatorSettingsFile, settings)
 
-	ExitApp 0
+	ExitApp(0)
 }
 
 

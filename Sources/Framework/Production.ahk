@@ -5,7 +5,7 @@
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#Requires v2.0
+#Requires AutoHotkey >=v2.0
 #SingleInstance Force			; Ony one instance allowed
 #Warn All, Off					; Disable warnings in the production code.
 

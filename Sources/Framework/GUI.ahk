@@ -61,27 +61,27 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;						B = Botton Margin
 ;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
 
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+	RegExMatch(options, "i)w\K\d+", &W), !W ? W := 16 : W := W[]
+	RegExMatch(options, "i)h\K\d+", &H), !H ? H := 16 : H := H[]
+	RegExMatch(options, "i)s\K\d+", &S), S ? W := H := S[] :
+	RegExMatch(options, "i)l\K\d+", &L), !L ? L := 0 : L := L[]
+	RegExMatch(options, "i)t\K\d+", &T), !T ? T := 0 : T := T[]
+	RegExMatch(options, "i)r\K\d+", &R), !R ? R := 0 : R := R[]
+	RegExMatch(options, "i)b\K\d+", &B), !B ? B := 0 : B := B[]
+	RegExMatch(options, "i)a\K\d+", &A), !A ? A := 4 : A := A[]
 
 	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
 
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
+	button_il := Buffer(20 + ptrSize, 0)
 
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+	NumPut(Ptr, normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0)	; Width & Height
+	NumPut(DW, L, button_il, 0 + ptrSize)		; Left Margin
+	NumPut(DW, T, button_il, 4 + ptrSize)		; Top Margin
+	NumPut(DW, R, button_il, 8 + ptrSize)		; Right Margin
+	NumPut(DW, B, button_il, 12 + ptrSize)		; Bottom Margin
+	NumPut(DW, A, button_il, 16 + ptrSize)		; Alignment
 
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+	SendMessage(BCM_SETIMAGELIST := 5634, 0, button_il, , "AHK_ID " . buttonHandle)
 
 	return IL_Add(normal_il, file, index)
 }
@@ -116,13 +116,14 @@ fixIE(version := 0, exeName := "") {
 	return previousValue
 }
 
-moveByMouse(dialog, descriptor := false) {
+openDocumentation(dialog, url, *) {
+	Run(url)
+}
+
+moveByMouse(dialog, descriptor := false, *) {
 	local curCoordMode := A_CoordModeMouse
 	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
 	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
-
-	if !isInstance(dialog, Gui)
-		dialog := A_Gui
 
 	CoordMode("Mouse", "Screen")
 
@@ -180,7 +181,7 @@ getWindowPosition(descriptor, &x, &y) {
 	}
 }
 
-translateMsgBoxButtons(buttonLabels) {
+translateMsgBoxButtons(buttonLabels, *) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local index, label
 
@@ -201,6 +202,10 @@ translateMsgBoxButtons(buttonLabels) {
 		DetectHiddenWindows(curDetectHiddenWindows)
 	}
 }
+
+translateYesNoButtons := translateMsgBoxButtons.Bind(["Yes", "No"])
+translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
+translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
 
 getControllerActionLabels() {
 	return getControllerActionDefinitions("Labels")

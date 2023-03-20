@@ -113,7 +113,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 
 		callRemote(function, arguments*) {
-			sendMessage(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
+			messageSend(kFileMessage, this.Event, function . ":" . values2String(";", arguments*), this.RemotePID)
 		}
 
 		saveSessionState(arguments*) {

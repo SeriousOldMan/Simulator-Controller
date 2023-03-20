@@ -263,11 +263,8 @@ class Application extends ConfigurationItem {
 		DetectHiddenWindows(true)
 
 		try {
-			if (this.iRunningPID > 0) {
-				ErrorLevel := ProcessExist(this.iRunningPID)
-
-				processID := ((ErrorLevel != 0) || WinExist("ahk_pid " . this.iRunningPID)) ? this.iRunningPID : 0
-			}
+			if (this.iRunningPID > 0)
+				processID := ((ProcessExist(this.iRunningPID) != 0) || WinExist("ahk_pid " . this.iRunningPID)) ? this.iRunningPID : 0
 
 			if (!processID && (this.WindowTitle != ""))
 				if WinExist(this.WindowTitle)
@@ -289,15 +286,13 @@ class Application extends ConfigurationItem {
 
 		try {
 			if InStr(exePath, A_Space)
-				exePath := ("""" . exePath . """")
+				exePath := ("`"" . exePath . "`"")
 
 			if InStr(workingDirectory, A_Space)
-				workingDirectory := ("""" . workingDirectory . """")
+				workingDirectory := ("`"" . workingDirectory . "`"")
 
 			if wait {
-				RunWait(exePath, workingDirectory, options)
-
-				result := ErrorLevel
+				result := RunWait(exePath, workingDirectory, options)
 
 				logMessage(kLogInfo, translate("Application ") . application . translate(" executed with result code ") . result)
 
@@ -384,7 +379,7 @@ class Function extends ConfigurationItem {
 
 	Actions[trigger := false, asText := false] {
 		Get {
-			local ignore, action, arguments, index, argument, theAction, result, actions, callables
+			local ignore, action, arguments, index, argument, result, actions, callables
 
 			if trigger {
 				actions := this.iActions[trigger]
@@ -435,8 +430,8 @@ class Function extends ConfigurationItem {
 						if asText {
 							arguments := []
 
-							if (theAction && (theAction.Length == 2)) {
-								arguments := theAction[2].Clone()
+							if (action && (action.Length == 2)) {
+								arguments := action[2].Clone()
 
 								for index, argument in arguments
 									if (argument == true)
@@ -445,8 +440,8 @@ class Function extends ConfigurationItem {
 										arguments[index] := kFalse
 							}
 
-							if theAction
-								callables.Push((theAction && (theAction.Length == 2)) ? (theAction[1] . "(" . values2String(", ", arguments*) . ")") : "")
+							if action
+								callables.Push((action && (action.Length == 2)) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
 						}
 						else
 							callables.Push(this.actionCallable(trigger, action))
@@ -523,9 +518,9 @@ class Function extends ConfigurationItem {
 
 		switch descriptor[1] {
 			case k1WayToggleType:
-				return 1WayToggleFunction(descriptor[2], configuration, onHotkeys, onAction)
+				return OneWayToggleFunction(descriptor[2], configuration, onHotkeys, onAction)
 			case k2WayToggleType:
-				return 2WayToggleFunction(descriptor[2], configuration, onHotkeys, onAction, offHotkeys, offAction)
+				return TwoWayToggleFunction(descriptor[2], configuration, onHotkeys, onAction, offHotkeys, offAction)
 			case kButtonType:
 				return ButtonFunction(descriptor[2], configuration, onHotkeys, onAction)
 			case kDialType:
@@ -589,7 +584,7 @@ class Function extends ConfigurationItem {
 ;;; [Controller Functions}:  Function for 1-way Toggle Switches             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class 1WayToggleFunction extends Function {
+class OneWayToggleFunction extends Function {
 	Type {
 		Get {
 			return k1WayToggleType
@@ -607,7 +602,7 @@ class 1WayToggleFunction extends Function {
 ;;; [Controller Functions}:  Function for 2-way Toggle Switches             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class 2WayToggleFunction extends Function {
+class TwoWayToggleFunction extends Function {
 	Type {
 		Get {
 			return k2WayToggleType
@@ -800,11 +795,11 @@ class Plugin extends ConfigurationItem {
 		local arguments := Map()
 
 		loop {
-			startPos := InStr(string, """")
+			startPos := InStr(string, "`"")
 
 			if startPos {
 				startPos += 1
-				endPos := InStr(string, """", false, startPos)
+				endPos := InStr(string, "`"", false, startPos)
 
 				if endPos {
 					argument := SubStr(string, startPos, endPos - startPos)
@@ -812,10 +807,10 @@ class Plugin extends ConfigurationItem {
 
 					arguments[key] := argument
 
-					string := StrReplace(string, """" . argument . """", key)
+					string := StrReplace(string, "`"" . argument . "`"", key)
 				}
 				else
-					throw "Second "" not found while parsing (" . string . ") for quoted argument values in Plugin.parseValues..."
+					throw "Second `" not found while parsing (" . string . ") for quoted argument values in Plugin.parseValues..."
 			}
 			else
 				break

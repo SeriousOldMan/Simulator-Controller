@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Shared Database Creator         ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,37 +9,36 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Requires AutoHotkey >=v2.0
 #SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
+SendMode("Input")					; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
-SetBatchLines -1				; Maximize CPU utilization
-ListLines Off					; Disable execution history
+ListLines(false)					; Disable execution history
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
 ;@Ahk2Exe-ExeName Shared Database Creator.exe
 
-global vBuildConfiguration := "Development"
+global kBuildConfiguration := "Development"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Application.ahk
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\FTP.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include "..\Libraries\FTP.ahk"
+; #Include "..\Assistants\Libraries\SessionDatabase.ahk"
+; #Include "..\Assistants\Libraries\TyresDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -118,48 +117,44 @@ class DatabaseCreator {
 
 		this.iTyresDatabase := database
 
-		loop Files, %sourceDirectory%*.*, D
+		loop Files, sourceDirectory . "*.*", "D"
 			this.loadDatabase(A_LoopFilePath . "\")
 	}
 
 	loadDatabase(databaseDirectory) {
-		loop Files, %databaseDirectory%*.*, D									; Simulator
-		{
+		loop Files, databaseDirectory . "*.*", "D" {
 			simulator := A_LoopFileName
 
 			if ((simulator = "1") || (simulator = "Unknown"))
 				deleteDirectory(databaseDirectory . simulator)
 			else
-				loop Files, %databaseDirectory%%simulator%\*.*, D					; Car
-				{
+				loop Files, databaseDirectory . simulator . "\*.*", "D" {
 					car := A_LoopFileName
 
 					if ((car = "1") || (car = "Unknown"))
 						deleteDirectory(databaseDirectory . simulator . "\" . car)
 					else
-						loop Files, %databaseDirectory%%simulator%\%car%\*.*, D		; Track
-						{
+						loop Files, databaseDirectory .simulator . "\" . car . "\*.*", "D" {
 							track := A_LoopFileName
 
 							if ((track = "1") || (track = "Unknown"))
 								deleteDirectory(databaseDirectory . simulator . "\" . car . "\" . track)
 							else {
-								directory = %databaseDirectory%%simulator%\%car%\%track%\
+								directory := databaseDirectory . simulator . "\" . car . "\" . track . "\"
 
 								if FileExist(directory . "Setup.Pressures.Distribution.CSV")
-									FileMove %directory%Setup.Pressures.Distribution.CSV, %directory%Tyres.Pressures.Distribution.CSV
+									FileMove(directory . "Setup.Pressures.Distribution.CSV", directory . "Tyres.Pressures.Distribution.CSV")
 
 								if FileExist(directory . "Tyres.Pressures.Distribution.CSV")
 									this.loadPressures(simulator, car, track, Database(directory, kTyresSchemas))
 
-								loop Files, %databaseDirectory%%simulator%\%car%\%track%\Race Strategies\*.*
+								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Race Strategies\*.*"
 									this.loadRaceStrategy(simulator, car, track, A_LoopFilePath)
 
-								loop Files, %databaseDirectory%%simulator%\%car%\%track%\Car Setups\*.*, D
-								{
+								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Car Setups\*.*", "D" {
 									type := A_LoopFileName
 
-									loop Files, %databaseDirectory%%simulator%\%car%\Car Setups\%type%\*.*
+									Loop Files, databaseDirectory . simulator . "\" . car . "\Car Setups\" . type . "\*.*"
 										this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
 								}
 							}
@@ -196,11 +191,11 @@ class DatabaseCreator {
 		local directory := this.TargetDirectory
 
 		if this.IncludeStrategies {
-			updateProgress("Strategies: " simulator . " / " . car . " / " . track . "...")
+			updateProgress("Strategies: " . simulator . " / " . car . " / " . track . "...")
 
-			FileCreateDir %directory%Community\%simulator%\%car%\%track%\Race Strategies
+			DirCreate(directory . "Community\" . simulator . "\" . car . "\" . track . "\Race Strategies")
 
-			FileCopy %strategyFile%, %directory%Community\%simulator%\%car%\%track%\Race Strategies, 1
+			FileCopy(strategyFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Race Strategies", 1)
 		}
 	}
 
@@ -208,11 +203,11 @@ class DatabaseCreator {
 		local directory := this.TargetDirectory
 
 		if this.IncludeSetups {
-			updateProgress("Setups: " simulator . " / " . car . " / " . track . "...")
+			updateProgress("Setups: " . simulator . " / " . car . " / " . track . "...")
 
-			FileCreateDir %directory%Community\%simulator%\%car%\%track%\Car Setups\%type%
+			DirCreate(directory . "Community\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type)
 
-			FileCopy %setupFile%, %directory%Community\%simulator%\%car%\%track%\Car Setups\%type%, 1
+			FileCopy(setupFile, directory . "Community\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type, 1)
 		}
 	}
 }
@@ -223,12 +218,14 @@ class DatabaseCreator {
 ;;;-------------------------------------------------------------------------;;;
 
 updateProgress(message) {
+	global vProgressCount
+
 	vProgressCount += 5
 
 	if (vProgressCount > 100)
 		vProgressCount := 0
 
-	showProgress({progress: vProgressCount, message: message})
+	showProgress(Map("progress", vProgressCount, "message", message))
 }
 
 windowsPath(path) {
@@ -242,7 +239,7 @@ downloadUserDatabases(directory) {
 	wDirectory := windowsPath(directory)
 
 	for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-uploads") {
-		SplitPath fileName, , , , idName
+		SplitPath(fileName, , , , &idName)
 
 		idName := StrReplace(idName, "Database.", "")
 
@@ -252,22 +249,22 @@ downloadUserDatabases(directory) {
 
 		updateProgress("Extracting " . idName . "...")
 
-		RunWait PowerShell.exe -Command Expand-Archive -LiteralPath '%directory%%fileName%' -DestinationPath '%wDirectory%', , Hide
+		RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . directory . fileName . "' -DestinationPath '" . wDirectory . "'", , "Hide")
 
 		deleteFile(directory . fileName)
 
 		if FileExist(directory . "Shared Database Creator")
-			FileMoveDir %directory%Shared Database Creator, %directory%%idName%, R
+			DirMove(directory "Shared Database Creator", directory . idName, "R")
 		else if FileExist(directory . "Shared Database")
-			FileMoveDir %directory%Shared Database, %directory%%idName%, R
+			DirMove(directory "Shared Database", directory . idName, "R")
 		else if FileExist(directory . "Community")
-			FileMoveDir %directory%Community, %directory%%idName%, R
+			DirMove(directory "Community", directory . idName, "R")
 		else if FileExist(directory . "DBase")
-			FileMoveDir %directory%DBase, %directory%%idName%, R
+			DirMove(directory "DBase", directory . idName, "R")
 		else if FileExist(directory . "Dabase")
-			FileMoveDir %directory%Dabase, %directory%%idName%, R
+			DirMove(directory "Dabase", directory . idName, "R")
 		else if FileExist(directory . "SetupDabase")
-			FileMoveDir %directory%SetupDabase, %directory%%idName%, R
+			DirMove(directory "SetupDabase", directory . idName, "R")
 	}
 }
 
@@ -276,12 +273,12 @@ createDatabases(inputDirectory, outputDirectory) {
 
 	archives := []
 
-	Random version1, 1, 1000
-	Random version2, 1, 1000
+	version1 := Random(1, 1000)
+	version2 := Random(1, 1000)
 
-	for strategiesLabel, strategiesEnabled in {Strategies: true, "No Strategies": false}
-		for setupsLabel, setupsEnabled in {Setups: true, "No Setups": false}
-			for pressuresLabel, pressuresEnabled in {Pressures: true, "No Pressures": false}
+	for strategiesLabel, strategiesEnabled in Map("Strategies", true, "No Strategies", false)
+		for setupsLabel, setupsEnabled in Map("Setups", true, "No Setups", false)
+			for pressuresLabel, pressuresEnabled in Map("Pressures", true, "No Pressures", false)
 				if (pressuresEnabled || setupsEnabled || strategiesEnabled) {
 					updateProgress("Processing [" . strategiesLabel . " | " . setupsLabel . " | " . pressuresLabel . "]...")
 
@@ -289,16 +286,16 @@ createDatabases(inputDirectory, outputDirectory) {
 
 					database := (outputDirectory . type . "." . version1 . "." . version2)
 
-					new DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, strategiesEnabled).createDatabase()
+					DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, strategiesEnabled).createDatabase()
 
-					RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+					RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
 
-					if FileExist(database ".zip")
-						archives.Push(database ".zip")
+					if FileExist(database . ".zip")
+						archives.Push(database . ".zip")
 				}
 
-	for setupsLabel, setupsEnabled in {Setups: true, "No Setups": false}
-		for pressuresLabel, pressuresEnabled in {Pressures: true, "No Pressures": false}
+	for setupsLabel, setupsEnabled in Map("Setups", true, "No Setups", false)
+		for pressuresLabel, pressuresEnabled in Map("Pressures", true, "No Pressures", false)
 			if (pressuresEnabled || setupsEnabled) {
 				updateProgress("Processing [" . setupsLabel . " | " . pressuresLabel . "]...")
 
@@ -306,42 +303,44 @@ createDatabases(inputDirectory, outputDirectory) {
 
 				database := (outputDirectory . type . "." . version1 . "." . version2)
 
-				new DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, false).createDatabase()
+				DatabaseCreator(inputDirectory, database . "\", pressuresEnabled, setupsEnabled, false).createDatabase()
 
-				RunWait PowerShell.exe -Command Compress-Archive -LiteralPath '%database%\Community' -CompressionLevel Optimal -DestinationPath '%database%.zip', , Hide
+				RunWait("PowerShell.exe -Command Compress-Archive -LiteralPath '" . database . "\Community' -CompressionLevel Optimal -DestinationPath '" . database . ".zip'", , "Hide")
 
-				if FileExist(database ".zip")
-					archives.Push(database ".zip")
+				if FileExist(database . ".zip")
+					archives.Push(database . ".zip")
 			}
 
 	return archives
 }
 
 createSharedDatabases() {
+	global vProgressCount
+
 	local command, ignore, file
 
 	vProgressCount := 0
 
-	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database..."})
+	showProgress(Map("color", "Blue", "title", "Creating Shared Database", "message", "Cleaning temporary database..."))
 
-	Sleep 500
+	Sleep(500)
 
 	databaseDirectory := (kTempDirectory . "Shared Database Creator")
 
 	deleteDirectory(databaseDirectory)
 
-	FileCreateDir %databaseDirectory%\Input
-	FileCreateDir %databaseDirectory%\Output
+	DirCreate(databaseDirectory . "\Input")
+	DirCreate(databaseDirectory . "\Output")
 
-	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
+	showProgress(Map("progress", (vProgressCount := vProgressCount + 2), "title", "Downloading Community Content", "message", "..."))
 
 	downloadUserDatabases(databaseDirectory . "\Input\")
 
-	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
+	showProgress(Map("progress", (vProgressCount := vProgressCount + 2), "color", "Green", "title", "Processing Community Content", "message", "..."))
 
 	archives := createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\")
 
-	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "Cleaning remote repository..."})
+	showProgress(Map("progress", (vProgressCount := vProgressCount + 2), "color", "Green", "title", "Uploading Community Content", "message", "Cleaning remote repository..."))
 
 	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads")
 	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
@@ -350,7 +349,7 @@ createSharedDatabases() {
 	for ignore, file in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
 		deleteFile(A_Temp . "\clearRemoteDirectory.txt")
 
-		command =
+		command := "
 (
 open ftpupload.net
 epiz_32854064
@@ -359,36 +358,36 @@ cd simulator-controller
 cd database-downloads
 del %file%
 quit
-)
-		FileAppend %command%, %A_Temp%\clearRemoteDirectory.txt
+)"
+		FileAppend(command, A_Temp . "\clearRemoteDirectory.txt")
 
 		deleteFile(A_Temp . "\clearRemoteDirectory.bat")
 
 		command := "ftp -s:clearRemoteDirectory.txt"
 
-		FileAppend %command%, %A_Temp%\clearRemoteDirectory.bat
+		FileAppend(command, A_Temp . "\clearRemoteDirectory.bat")
 
-		RunWait "%A_Temp%\clearRemoteDirectory.bat", %A_Temp%, Hide
+		RunWait("`"" . A_Temp . "\clearRemoteDirectory.bat`"", A_Temp, "Hide")
 	}
 
 	deleteFile(A_Temp . "\clearRemoteDirectory.txt")
 	deleteFile(A_Temp . "\clearRemoteDirectory.bat")
 
 	for ignore, filePath in archives {
-		SplitPath filePath, fileName
+		SplitPath(filePath, &fileName)
 
 		updateProgress("Uploading " . fileName . "...")
 
 		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "simulator-controller/database-downloads/" . fileName)
 	}
 
-	showProgress({progress: 100, message: "Finished..."})
+	showProgress(Map("progress", 100, "message", "Finished..."))
 
-	Sleep 500
+	Sleep(500)
 
 	hideProgress()
 
-	ExitApp 0
+	ExitApp(0)
 }
 
 

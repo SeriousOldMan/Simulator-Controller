@@ -346,7 +346,7 @@ class SystemPlugin extends ControllerPlugin {
 		if this.ChildProcess {
 			; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 			;
-			; sendMessage(kPipeMessage, "Startup", "exitStartup")
+			; messageSend(kPipeMessage, "Startup", "exitStartup")
 			;
 			; Using a sempahore file instead...
 

@@ -170,7 +170,7 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 		images := string2Values(",", getMultiMapValue(kSimulatorConfiguration, "Splash Themes", theme . ".Images", false))
 	}
 	else {
-		logMessage(kLogCritical, translate("Theme """) . theme . translate(""" not found - please check the configuration"))
+		logMessage(kLogCritical, translate("Theme `"") . theme . translate("`" not found - please check the configuration"))
 
 		images := getFileNames("*.jpg", kUserSplashMediaDirectory, kSplashMediaDirectory)
 	}

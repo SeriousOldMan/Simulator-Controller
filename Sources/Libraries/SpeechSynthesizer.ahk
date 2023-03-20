@@ -165,10 +165,12 @@ class SpeechSynthesizer {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
 		local player, copied, configuration
 
+
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
 		DirCreate(kTempDirectory . dirName)
 
+		this.iCache.CaseSense := false
 		this.iCacheDirectory := (kTempDirectory . dirName . "\")
 
 		this.clearCache()
@@ -414,14 +416,12 @@ class SpeechSynthesizer {
 	}
 
 	cacheFileName(cacheKey, fileName := false) {
-		local key := StrUpper(cacheKey)
-
-		if this.iCache.Has(key)
-			return this.iCache[key]
+		if this.iCache.Has(cacheKey)
+			return this.iCache[cacheKey]
 		else {
 			fileName := (this.iCacheDirectory . (fileName ? fileName : cacheKey) . ".wav")
 
-			this.iCache[key] := fileName
+			this.iCache[cacheKey] := fileName
 
 			return fileName
 		}

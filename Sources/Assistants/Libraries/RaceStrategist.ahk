@@ -1847,7 +1847,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				Process Exist
 
-				sendMessage(kFileMessage, "Race Engineer"
+				messageSend(kFileMessage, "Race Engineer"
 						  , "requestPitstopHistory:Race Strategist;runSimulation;" . ErrorLevel, engineerPID)
 			}
 			else if this.Speaker
@@ -2399,13 +2399,13 @@ class RaceStrategist extends GridRaceAssistant {
 		if ErrorLevel
 			if plannedLap {
 				if (refuel != kUndefined)
-					sendMessage(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:")
+					messageSend(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:")
 															 . values2String(";", "!" . plannedLap, refuel, tyreChange, kUndefined, tyreCompound, tyreCompoundColor), ErrorLevel)
 				else
-					sendMessage(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:") . plannedLap, ErrorLevel)
+					messageSend(kFileMessage, "Race Engineer", (this.TeamSession ? "planDriverSwap:" : "planPitstop:") . plannedLap, ErrorLevel)
 			}
 			else
-				sendMessage(kFileMessage, "Race Engineer", this.TeamSession ? "planDriverSwap" : "planPitstop:Now", ErrorLevel)
+				messageSend(kFileMessage, "Race Engineer", this.TeamSession ? "planDriverSwap" : "planPitstop:Now", ErrorLevel)
 	}
 
 	executePitstop(lapNumber) {

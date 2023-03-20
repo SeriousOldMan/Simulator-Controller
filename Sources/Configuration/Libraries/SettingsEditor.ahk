@@ -17,68 +17,61 @@ global kEditModes := "Edit"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Private Constant Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global trayTipCheck
+global trayTipDurationInput
+global trayTipSimulationCheck
+global trayTipSimulationDurationInput
+global buttonBoxCheck
+global buttonBoxDurationInput
+global buttonBoxSimulationCheck
+global buttonBoxSimulationDurationInput
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-saveModes() {
-	editModes(kSave)
-}
-
-cancelModes() {
-	editModes(kCancel)
-}
-
-saveSettings() {
-	editSettings(kSave)
-}
-
-continueSettings() {
-	editSettings(kContinue)
-}
-
-cancelSettings() {
-	editSettings(kCancel)
-}
-
-setInputState(input, enabled) {
-	if enabled
-		GuiControl Enable, %input%
-	else {
-		GuiControl Disable, %input%
-		GuiControl Text, %input%, 0
-	}
-}
-
-startConfiguration() {
-	local title
+startConfiguration(*) {
+	local restart := "Restart"
 
 	try {
-		RunWait % kBinariesDirectory . "Simulator Configuration.exe"
+		RunWait(kBinariesDirectory . "Simulator Configuration.exe")
 
-		editSettings("Restart")
+		editSettings(&restart)
 	}
 	catch Any as exception {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		title := translate("Error")
-		MsgBox 262160, %title%, % translate("Cannot start the configuration tool - please check the installation...")
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateOkButton)
+		MsgBox(translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
+		OnMessage(0x44, translateOkButton, 0)
 	}
 }
 
-checkTrayTipDuration() {
-	setInputState(trayTipDurationInput, (trayTipEnabled := !trayTipEnabled))
+setInputState(input, enabler) {
+	if enabler.Value
+		input.Enabled := true
+	else {
+		input.Enabled := false
+		input.Text := 0
+	}
 }
 
-checkTrayTipSimulationDuration() {
-	setInputState(trayTipSimulationDurationInput, (trayTipSimulationEnabled := !trayTipSimulationEnabled))
+checkTrayTipDuration(*) {
+	setInputState(trayTipDurationInput, trayTipCheck)
 }
 
-checkButtonBoxDuration() {
-	setInputState(buttonBoxDurationInput, (buttonBoxEnabled := !buttonBoxEnabled))
+checkTrayTipSimulationDuration(*) {
+	setInputState(trayTipSimulationDurationInput, trayTipSimulationCheck)
 }
 
-checkButtonBoxSimulationDuration() {
-	setInputState(buttonBoxSimulationDurationInput, (buttonBoxSimulationEnabled := !buttonBoxSimulationEnabled))
+checkButtonBoxDuration(*) {
+	setInputState(buttonBoxDurationInput, buttonBoxCheck)
+}
+
+checkButtonBoxSimulationDuration(*) {
+	setInputState(buttonBoxSimulationDurationInput, buttonBoxSimulationCheck)
 }
 
 computeStartupSongs() {
@@ -87,7 +80,7 @@ computeStartupSongs() {
 	local index, fileName, soundFile
 
 	for index, fileName in files {
-		SplitPath fileName, soundFile
+		SplitPath(fileName, &soundFile)
 
 		files[index] := soundFile
 	}
@@ -95,49 +88,25 @@ computeStartupSongs() {
 	return files
 }
 
-moveSettingsEditor() {
-	moveByMouse("SE", "Simulator Settings")
-}
-
-moveModesEditor() {
-	moveByMouse("ME", "Simulator Settings.Automation")
-}
-
-openModesEditor() {
-	editSettings(kEditModes)
-}
-
-openSettingsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings
-}
-
-getSelectedModes(modesListViewHandle) {
+getSelectedModes(modesListView) {
 	local rowNumber := 0
 	local modes := []
-	local thePlugin, theMode
-
-	Gui ListView, % modesListViewHandle
 
 	loop {
-		rowNumber := LV_GetNext(rowNumber, "C")
+		rowNumber := modesListView.GetNext(rowNumber, "C")
 
 		if !rowNumber
 			break
 
-		LV_GetText(thePlugin, rowNumber, 1)
-		LV_GetText(theMode, rowNumber, 2)
-
-		modes.Push(ConfigurationItem.descriptor(thePlugin, theMode))
+		modes.Push(ConfigurationItem.descriptor(modesListView.GetText(rowNumber, 1), modesListView.GetText(rowNumber, 2)))
 	}
 
 	return modes
 }
 
-updateModes() {
-	editModes(kUpdate)
-}
+editModes(&settingsOrCommand, arguments*) {
+	global kSave, kCancel, kUpdate
 
-editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 	local modes, row, thePlugin, pluginConfiguration, ignore, mode, simulator, options
 	Local defaultModes, pluginSimulators, x, y
 	local index, session
@@ -152,13 +121,13 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 	static selectedSession := false
 	static simulatorSessions := []
 
+	static modesEditorGui
 	static modeSimulatorDropDown
 	static modeSessionDropDown
 	static modesListView
-	static modesListViewHandle
 
 	if ((settingsOrCommand = kSave) || (settingsOrCommand = kUpdate)) {
-		modes := getSelectedModes(modesListViewHandle)
+		modes := getSelectedModes(modesListView)
 
 		if !selectedSimulator
 			setMultiMapValue(newSettings, "Modes", "Default", values2String(",", modes*))
@@ -169,25 +138,23 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 	}
 
 	if (settingsOrCommand = kUpdate) {
-		GuiControlGet modeSimulatorDropDown
-		GuiControlGet modeSessionDropDown
-
 		modes := []
 
-		if (modeSimulatorDropDown == 1) {
+		if (modeSimulatorDropDown.Value == 1) {
 			modes := string2Values(",", getMultiMapValue(newSettings, "Modes", "Default", ""))
 
 			selectedSimulator := false
 			selectedSession := false
 			simulatorSessions := []
 
-			GuiControl Text, modeSessionDropDown, % "|" . translate("Inactive")
-			GuiControl Choose, modeSessionDropDown, 1
+			modeSessionDropDown.Delete()
+			modeSessionDropDown.Add([translate("Inactive")])
+			modeSessionDropDown.Choose(1)
 		}
 		else {
 			if (selectedSimulator != simulators[modeSimulatorDropDown - 1]) {
 				selectedSimulator := simulators[modeSimulatorDropDown - 1]
-				modeSessionDropDown := 1
+				modeSessionDropDown.Choose(1)
 				selectedSession := false
 
 				simulatorSessions := string2Values(",", string2Values("|", getMultiMapValue(configuration, "Simulators", selectedSimulator, ""))[2])
@@ -196,8 +163,9 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 					if (session = "Qualification")
 						simulatorSessions[index] := "Qualifying"
 
-				GuiControl Text, modeSessionDropDown, % "|" . translate("Inactive") . "|" . values2String("|", collect(simulatorSessions, "translate")*)
-				GuiControl Choose, modeSessionDropDown, 1
+				modeSessionDropDown.Delete()
+				modeSessionDropDown.Add(concatenate([translate("Inactive")], collect(simulatorSessions, translate)))
+				modeSessionDropDown.Choose(1)
 
 				for index, session in simulatorSessions
 					if (session = "Qualifying")
@@ -206,11 +174,11 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 				modes := string2Values(",", getMultiMapValue(newSettings, "Modes", ConfigurationItem.descriptor(selectedSimulator, "Default"), ""))
 			}
 			else {
-				if (selectedSession != (modeSessionDropDown - 1))
-					selectedSession := modeSessionDropDown - 1
+				if (selectedSession != (modeSessionDropDown.Value - 1))
+					selectedSession := modeSessionDropDown.Value - 1
 
 				modes := string2Values(",", getMultiMapValue(newSettings, "Modes"
-																, ConfigurationItem.descriptor(selectedSimulator, !selectedSession ? "Default" : simulatorSessions[selectedSession]), ""))
+														   , ConfigurationItem.descriptor(selectedSimulator, !selectedSession ? "Default" : simulatorSessions[selectedSession]), ""))
 			}
 		}
 
@@ -220,17 +188,17 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 			pluginConfiguration := string2Values("|", pluginConfiguration)
 
 			for ignore, mode in string2Values(",", pluginConfiguration[3])
-				LV_Modify(row++, inList(modes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "-Check")
+				modesListView.Modify(row++, inList(modes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "-Check")
 		}
 	}
 
 	if (settingsOrCommand = kSave) {
-		Gui ME:Destroy
+		modesEditorGui.Destroy()
 
 		result := kSave
 	}
 	else if (settingsOrCommand = kCancel) {
-		Gui ME:Destroy
+		modesEditorGui.Destroy()
 
 		result := kCancel
 	}
@@ -240,24 +208,24 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 
 		setMultiMapValues(newSettings, "Modes", getMultiMapValues(settingsOrCommand, "Modes"))
 
-		Gui ME:Default
+		modesEditorGui := Gui()
 
-		Gui ME:-Border ; -Caption
-		Gui ME:Color, D0D0D0, D8D8D8
+		modesEditorGui.Opt("-Border") ; -Caption
+		modesEditorGui.BackColor := "D0D0D0"
 
-		Gui ME:Font, Bold, Arial
+		modesEditorGui.SetFont("Bold", "Arial")
 
-		Gui ME:Add, Text, w330 Center gmoveModesEditor, % translate("Modular Simulator Controller System")
+		modesEditorGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(modesEditorGui, "Simulator Settings.Automation"))
 
-		Gui ME:Font, Norm, Arial
-		Gui ME:Font, Italic Underline, Arial
+		modesEditorGui.SetFont("Norm", "Arial")
+		modesEditorGui.SetFont("Italic Underline", "Arial")
 
-		Gui ME:Add, Text, x108 YP+20 w130 cBlue Center gopenSettingsDocumentation, % translate("Controller Automation")
+		modesEditorGui.Add("Text", "x108 YP+20 w130 cBlue Center", translate("Controller Automation")).OnEvent("Click", openDocumentation.Bind("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings"))
 
-		Gui ME:Font, Norm, Arial
+		modesEditorGui.SetFont("Norm", "Arial")
 
-		Gui ME:Add, Button, x170 y280 w80 h23 Default gsaveModes, % translate("Ok")
-		Gui ME:Add, Button, x260 y280 w80 h23 gcancelModes, % translate("&Cancel")
+		modesEditorGui.Add("Button", "x170 y280 w80 h23 Default", translate("Ok")).OnEvent("Click", editModes.Bind(&kSave))
+		modesEditorGui.Add("Button", "x260 y280 w80 h23", translate("&Cancel")).OnEvent("Click", editModes.Bind(&kCancel))
 
 		simulators := []
 
@@ -270,14 +238,16 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 		for simulator, options in getMultiMapValues(configuration, "Simulators")
 			simulators.Push(simulator)
 
-		Gui ME:Add, Text, x8 y60 w86 h23 +0x200, % translate("Simulator")
-		Gui ME:Add, DropDownList, x100 y60 w240 Choose1 AltSubmit gupdateModes VmodeSimulatorDropDown, % translate("Inactive") . ((simulators.Length() > 0) ? "|" : "") . values2String("|", simulators*)
+		modesEditorGui.Add("Text", "x8 y60 w86 h23 +0x200", translate("Simulator"))
+		modeSimulatorDropDown := modesEditorGui.Add("DropDownList", "x100 y60 w240 Choose1", concatenate([translate("Inactive")], simulators))
+		modeSimulatorDropDown.OnEvent("Change", editModes.Bind(&kUpdate))
 
-		Gui ME:Add, Text, x8 y84 w86 h23 +0x200, % translate("Session")
-		Gui ME:Add, DropDownList, x100 y84 w100 Choose1 AltSubmit gupdateModes VmodeSessionDropDown, % translate("Inactive")
+		modesEditorGui.Add("Text", "x8 y84 w86 h23 +0x200", translate("Session"))
+		modeSessionDropDown := modesEditorGui.Add("DropDownList", "x100 y84 w100 Choose1", [translate("Inactive")])
+		modeSessionDropDown.OnEvent("Change", editModes.Bind(&kUpdate))
 
-		Gui ME:Add, Text, x8 y108 w80 h23 +0x200, % translate("Modes")
-		Gui ME:Add, ListView, x100 y108 w240 h162 -Multi -LV0x10 Checked NoSort NoSortHdr HwndmodesListViewHandle VmodesListView, % translate("Plugin") . "|" . translate("Mode") . "|" . translate("Simulator(s)")
+		modesEditorGui.Add("Text", "x8 y108 w80 h23 +0x200", translate("Modes"))
+		modesListView := modesEditorGui.Add("ListView", "x100 y108 w240 h162 -Multi -LV0x10 Checked NoSort NoSortHdr", [translate("Plugin"), translate("Mode"), translate("Simulator(s)")])
 
 		defaultModes := string2Values(",", getMultiMapValue(newSettings, "Modes", "Default", ""))
 
@@ -288,29 +258,31 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 				pluginSimulators := values2String(", ", string2Values(",", pluginConfiguration[2])*)
 
 				for ignore, mode in string2Values(",", pluginConfiguration[3])
-					LV_Add(inList(defaultModes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "", thePlugin, mode, pluginSimulators)
+					modesListView.Add(inList(defaultModes, ConfigurationItem.descriptor(thePlugin, mode)) ? "Check" : "", thePlugin, mode, pluginSimulators)
 			}
 		}
 
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
+		modesListView.ModifyCol(1, "AutoHdr")
+		modesListView.ModifyCol(2, "AutoHdr")
+		modesListView.ModifyCol(3, "AutoHdr")
 
-		Gui ME:Margin, 10, 10
+		modesEditorGui.MarginX := "10", modesEditorGui.MarginY := "10"
 
-		if getWindowPosition("Simulator Settings.Automation", x, y)
-			Gui ME:Show, x%x% y%y%
+		if getWindowPosition("Simulator Settings.Automation", &x, &y)
+			modesEditorGui.Show("x" . x . " y" . y)
 		else
-			Gui ME:Show
+			modesEditorGui.Show()
 
-		Gui ME:+OwnerSE
-		Gui SE:+Disabled
+		modesEditorGui.Opt("+Owner" . arguments[1].Hwnd)
 
-		loop {
-			Sleep 200
-		} until result
+		arguments[1].Opt("+Disabled")
 
-		Gui SE:-Disabled
+		loop
+			Sleep(200)
+		until result
+
+		arguments[1].Opt("-Disabled")
+		arguments[1].Show("NoActivate")
 
 		if (result == kSave)
 			settingsOrCommand := newSettings
@@ -324,19 +296,15 @@ editModes(ByRef settingsOrCommand, globalConfiguration := false) {
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global trayTipEnabled
-global trayTipDurationInput
-global trayTipSimulationEnabled
-global trayTipSimulationDurationInput
-global buttonBoxEnabled
-global buttonBoxDurationInput
-global buttonBoxSimulationEnabled
-global buttonBoxSimulationDurationInput
+editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
+	global kSave, kCancel, kContinue, kEditModes
 
-editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
+	global trayTipCheck, trayTipDurationInput, trayTipSimulationCheck, trayTipSimulationDurationInput
+	global buttonBoxCheck, buttonBoxDurationInput, buttonBoxSimulationCheck, buttonBoxSimulationDurationInput
+
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
 	local descriptor, value, simulators, margin, choices, chosen, themes
-	local descriptor, applicationName, enabled, disabled, coreHeight, index, coreDescriptor
+	local descriptor, applicationName, enabled, coreHeight, index, coreDescriptor
 	local coreOption, coreLabel, checked, feedbackHeight, feedbackDescriptor, feedbackOption, feedbackLabel
 	local applicationSettings
 
@@ -347,20 +315,13 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	static restart
 	static newSettings
 
+	static settingsEditorGui
 	static voiceRecognition
 	static faceRecognition
 	static viewTracking
 	static simulatorController
 	static tactileFeedback
 	static motionFeedback
-	static trayTip
-	static trayTipDuration
-	static trayTipSimulation
-	static trayTipSimulationDuration
-	static buttonBox
-	static buttonBoxDuration
-	static buttonBoxSimulation
-	static buttonBoxSimulationDuration
 	static buttonBoxPosition
 	static popupPosition
 	static lastPositions
@@ -391,50 +352,47 @@ editSettings(ByRef settingsOrCommand, withContinue := false, fromSetup := false,
 	static feedbackVariable7
 	static feedbackVariable8
 
-restartSettings:
 	if (settingsOrCommand == kSave) {
-		Gui SE:Submit
-
 		newSettings := newMultiMap()
 
 		for index, coreDescriptor in coreSettings {
 			if (index > 1) {
 				coreVariable := "coreVariable" . index
 
-				setMultiMapValue(newSettings, "Core", coreDescriptor[1], %coreVariable%)
+				setMultiMapValue(newSettings, "Core", coreDescriptor[1], %coreVariable%.Value)
 			}
 		}
 
 		for index, feedbackDescriptor in feedbackSettings {
 			feedbackVariable := "feedbackVariable" . index
 
-			setMultiMapValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%)
+			setMultiMapValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%.Value)
 		}
 
-		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Duration", (trayTip ? trayTipDuration : false))
-		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Simulation Duration", (trayTipSimulation ? trayTipSimulationDuration : false))
-		setMultiMapValue(newSettings, "Button Box", "Button Box Duration", (buttonBox ? buttonBoxDuration : false))
-		setMultiMapValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulation ? buttonBoxSimulationDuration : false))
+		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Duration", (trayTipCheck.Value ? trayTipDurationInput.Value : false))
+		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Simulation Duration", (trayTipSimulationCheck.Value ? trayTipSimulationDurationInput.Value : false))
+		setMultiMapValue(newSettings, "Button Box", "Button Box Duration", (buttonBoxCheck.Value ? buttonBoxDurationInput.Value : false))
+		setMultiMapValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulationCheck.Value ? buttonBoxSimulationDurationInput.Value : false))
 
 		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
 
-		setMultiMapValue(newSettings, "Button Box", "Button Box Position", positions[inList(collect(positions, "translate"), buttonBoxPosition)])
+		setMultiMapValue(newSettings, "Button Box", "Button Box Position", positions[inList(collect(positions, translate), buttonBoxPosition.Text)])
 
 		positions := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
 
 		applicationSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		setMultiMapValue(applicationSettings, "General", "Popup Position", positions[inList(collect(positions, "translate"), popupPosition)])
+		setMultiMapValue(applicationSettings, "General", "Popup Position", positions[inList(collect(positions, translate), popupPosition.Text)])
 
 		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
 
 		for descriptor, value in lastPositions
 			setMultiMapValue(newSettings, "Button Box", descriptor, value)
 
-		setMultiMapValue(newSettings, "Startup", "Splash Theme", (splashTheme == translate("None")) ? false : splashTheme)
-		setMultiMapValue(newSettings, "Startup", "Simulator", (startup ? startupOption : false))
+		setMultiMapValue(newSettings, "Startup", "Splash Theme", (splashTheme.Text = translate("None")) ? false : splashTheme.Text)
+		setMultiMapValue(newSettings, "Startup", "Simulator", (startup.Value ? startupOption.Text : false))
 
-		Gui SE:Destroy
+		settingsEditorGui.Destroy()
 
 		setMultiMapValues(newSettings, "Modes", getMultiMapValues(modeSettings, "Modes"))
 
@@ -444,21 +402,20 @@ restartSettings:
 			result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kContinue) {
-		Gui SE:Destroy
+		settingsEditorGui.Destroy()
 
 		result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kCancel) {
-		Gui SE:Destroy
+		settingsEditorGui.Destroy()
 
 		result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kEditModes) {
-		editModes(modeSettings, configuration)
+		editModes(&modeSettings, settingsEditorGui, configuration)
 	}
-	else if (settingsOrCommand = "Restart") {
+	else if (settingsOrCommand = "Restart")
 		restart := true
-	}
 	else {
 		configuration := (fromSetup ? fromSetup : kSimulatorConfiguration)
 		modeSettings := newMultiMap()
@@ -468,20 +425,21 @@ restartSettings:
 		result := false
 		restart := false
 
-		Gui SE:-Border ; -Caption
-		Gui SE:Color, D0D0D0, D8D8D8
+		settingsEditorGui := Gui()
 
-		Gui SE:Font, Bold, Arial
+		settingsEditorGui.Opt("-Border") ; -Caption
+		settingsEditorGui.BackColor := "D0D0D0"
 
-		Gui SE:Add, Text, w220 Center gmoveSettingsEditor, % translate("Modular Simulator Controller System")
+		settingsEditorGui.SetFont("Bold", "Arial")
 
-		Gui SE:Font, Norm, Arial
-		Gui SE:Font, Italic Underline, Arial
+		settingsEditorGui.Add("Text", "w220 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsEditorGui, "Simulator Settings"))
 
-		Gui SE:Add, Text, x68 YP+20 w100 cBlue Center gopenSettingsDocumentation, % translate("Settings")
+		settingsEditorGui.SetFont("Norm", "Arial")
+		settingsEditorGui.SetFont("Italic Underline", "Arial")
 
-		coreSettings := [["Simulator Controller", true, false]
-					   , ["System Monitor", getMultiMapValue(settingsOrCommand, "Core", "System Monitor", false), true]]
+		settingsEditorGui.Add("Text", "x68 YP+20 w100 cBlue Center", translate("Settings")).OnEvent("Click", openDocumentation.Bind("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings"))
+
+		coreSettings := [["Simulator Controller", true, false], ["System Monitor", getMultiMapValue(settingsOrCommand, "Core", "System Monitor", false), true]]
 		feedbackSettings := []
 
 		for descriptor, applicationName in getMultiMapValues(configuration, "Applications") {
@@ -494,20 +452,20 @@ restartSettings:
 				feedbackSettings.Push(Array(applicationName, getMultiMapValue(settingsOrCommand, "Feedback", applicationName, false), enabled))
 		}
 
-		if (coreSettings.Length() > 8)
+		if (coreSettings.Length > 8)
 			throw "Too many Core Components detected in editSettings..."
 
-		if (feedbackSettings.Length() > 8)
+		if (feedbackSettings.Length > 8)
 			throw "Too many Feedback Components detected in editSettings..."
 
-		coreHeight := 20 + (coreSettings.Length() * 20)
+		coreHeight := 20 + (coreSettings.Length * 20)
 
-		Gui SE:Font, Norm, Arial
-		Gui SE:Font, Italic, Arial
+		settingsEditorGui.SetFont("Norm", "Arial")
+		settingsEditorGui.SetFont("Italic", "Arial")
 
-		Gui SE:Add, GroupBox, -Theme x8 YP+30 w220 h%coreHeight%, % translate("Start Core System")
+		settingsEditorGui.Add("GroupBox", "-Theme x8 YP+30 w220 h" . coreHeight, translate("Start Core System"))
 
-		Gui SE:Font, Norm, Arial
+		settingsEditorGui.SetFont("Norm", "Arial")
 
 		for index, coreDescriptor in coreSettings {
 			coreOption := coreDescriptor[3] ? "" : "Disabled"
@@ -517,18 +475,18 @@ restartSettings:
 			if (index == 1)
 				coreOption := coreOption . " YP+20 X20"
 
-			Gui SE:Add, CheckBox, %coreOption% Checked%checked% vcoreVariable%index%, %coreLabel%
+			%"coreVariable" . index% := settingsEditorGui.Add("CheckBox", coreOption . " Checked" . checked, coreLabel)
 		}
 
-		if (feedbackSettings.Length() > 0) {
-			feedbackHeight := 20 + (feedbackSettings.Length() * 20)
+		if (feedbackSettings.Length > 0) {
+			feedbackHeight := 20 + (feedbackSettings.Length * 20)
 
-			Gui SE:Font, Norm, Arial
-			Gui SE:Font, Italic, Arial
+			settingsEditorGui.SetFont("Norm", "Arial")
+			settingsEditorGui.SetFont("Italic", "Arial")
 
-			Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h%feedbackHeight%, % translate("Start Feedback System")
+			settingsEditorGui.Add("GroupBox", "-Theme XP-10 YP+30 w220 h" . feedbackHeight, translate("Start Feedback System"))
 
-			Gui SE:Font, Norm, Arial
+			settingsEditorGui.SetFont("Norm", "Arial")
 
 			for index, feedbackDescriptor in feedbackSettings {
 				feedbackOption := feedbackDescriptor[3] ? "" : "Disabled"
@@ -538,59 +496,57 @@ restartSettings:
 				if (index == 1)
 					feedbackOption := feedbackOption . " YP+20 X20"
 
-				Gui SE:Add, CheckBox, %feedbackOption% Checked%checked% vfeedbackVariable%index%, %feedbackLabel%
+				%"feedbackVariable" . index% := settingsEditorGui.Add("CheckBox", feedbackOption . " Checked" . checked, feedbackLabel)
 			}
 		}
 
-		trayTipDuration := getMultiMapValue(settingsOrCommand, "Tray Tip", "Tray Tip Duration", 1500)
-		trayTipSimulationDuration := getMultiMapValue(settingsOrCommand, "Tray Tip", "Tray Tip Simulation Duration", 1500)
-		buttonBoxDuration := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Duration", false)
-		buttonBoxSimulationDuration := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
+		trayTipDurationInput := getMultiMapValue(settingsOrCommand, "Tray Tip", "Tray Tip Duration", 1500)
+		trayTipSimulationDurationInput := getMultiMapValue(settingsOrCommand, "Tray Tip", "Tray Tip Simulation Duration", 1500)
+		buttonBoxDurationInput := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Duration", false)
+		buttonBoxSimulationDurationInput := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
 
-		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-										     , "General", "Popup Position", "Bottom")
+		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "Popup Position", "Bottom")
 
-		lastPositions := {}
+		lastPositions := map()
 
 		for descriptor, value in getMultiMapValues(settingsOrCommand, "Button Box")
 			if InStr(descriptor, ".Position.")
 				lastPositions[descriptor] := value
 
-		trayTip := (trayTipDuration != 0) ? true : false
-		trayTipSimulation := (trayTipSimulationDuration != 0) ? true : false
-		buttonBox := (buttonBoxDuration != 0) ? true : false
-		buttonBoxSimulation := (buttonBoxSimulationDuration != 0) ? true : false
+		trayTipCheck := (trayTipDurationInput != 0) ? true : false
+		trayTipSimulationCheck := (trayTipSimulationDurationInput != 0) ? true : false
+		buttonBoxCheck := (buttonBoxDurationInput != 0) ? true : false
+		buttonBoxSimulationCheck := (buttonBoxSimulationDurationInput != 0) ? true : false
 
-		trayTipEnabled := trayTip
-		trayTipSimulationEnabled := trayTipSimulation
-		buttonBoxEnabled := buttonBox
-		buttonBoxSimulationEnabled := buttonBoxSimulation
+		settingsEditorGui.SetFont("Norm", "Arial")
+		settingsEditorGui.SetFont("Italic", "Arial")
 
-		Gui SE:Font, Norm, Arial
-		Gui SE:Font, Italic, Arial
+		settingsEditorGui.Add("GroupBox", "-Theme XP-10 YP+30 w220 h160", translate("Controller Notifications"))
 
-		Gui SE:Add, GroupBox, -Theme XP-10 YP+30 w220 h160, % translate("Controller Notifications")
+		settingsEditorGui.SetFont("Norm", "Arial")
 
-		Gui SE:Font, Norm, Arial
+		trayTipCheck := settingsEditorGui.Add("CheckBox", "X20 YP+20 Checked" . trayTipCheck . " Section", translate("Tray Tips"))
+		trayTipCheck.OnEvent("Click", checkTrayTipDuration)
+		trayTipDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!trayTipCheck.Value ? "Disabled" : ""), trayTipDurationInput)
+		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))
 
-		Gui SE:Add, CheckBox, X20 YP+20 Checked%trayTip% Section vtrayTip gcheckTrayTipDuration, % translate("Tray Tips")
-		disabled := !trayTip ? "Disabled" : ""
-		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipDuration HwndtrayTipDurationInput, %trayTipDuration%
-		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, XS YP+20 Checked%trayTipSimulation% vtrayTipSimulation gcheckTrayTipSimulationDuration, % translate("Tray Tips (Simulation)")
-		disabled := !trayTipSimulation ? "Disabled" : ""
-		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vtrayTipSimulationDuration HwndtrayTipSimulationDurationInput, %trayTipSimulationDuration%
-		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, XS YP+20 Checked%buttonBox% vbuttonBox gcheckButtonBoxDuration, % translate("Button Box")
-		disabled := !buttonBox ? "Disabled" : ""
-		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxDuration HwndbuttonBoxDurationInput, %buttonBoxDuration%
-		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, CheckBox, XS YP+20 Checked%buttonBoxSimulation% vbuttonBoxSimulation gcheckButtonBoxSimulationDuration, % translate("Button Box (Simulation)")
-		disabled := !buttonBoxSimulation ? "Disabled" : ""
-		Gui SE:Add, Edit, X160 YP-5 w40 h20 Limit5 Number %disabled% vbuttonBoxSimulationDuration HwndbuttonBoxSimulationDurationInput, %buttonBoxSimulationDuration%
-		Gui SE:Add, Text, X205 YP+5, % translate("ms")
-		Gui SE:Add, Text, XS YP+30, % translate("Button Box Position")
+		trayTipSimulationCheck := settingsEditorGui.Add("CheckBox", "XS YP+20 Checked" . trayTipSimulationCheck, translate("Tray Tips (Simulation)"))
+		trayTipSimulationCheck.OnEvent("Click", checkTrayTipSimulationDuration)
+		trayTipSimulationDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!trayTipSimulationCheck.Value ? "Disabled" : ""), trayTipSimulationDurationInput)
+		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))
+
+		buttonBoxCheck := settingsEditorGui.Add("CheckBox", "XS YP+20 Checked" . buttonBoxCheck, translate("Button Box"))
+		buttonBoxCheck.OnEvent("Click", checkButtonBoxDuration)
+		buttonBoxDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!buttonBoxCheck.Value ? "Disabled" : ""), buttonBoxDurationInput)
+		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))
+
+		buttonBoxSimulationCheck := settingsEditorGui.Add("CheckBox", "XS YP+20 Checked" . buttonBoxSimulationCheck, translate("Button Box (Simulation)"))
+		buttonBoxSimulationCheck.OnEvent("Click", checkButtonBoxSimulationDuration)
+		buttonBoxSimulationDurationInput := settingsEditorGui.Add("Edit", "X160 YP-5 w40 h20 Limit5 Number " . (!buttonBoxSimulationCheck.Value ? "Disabled" : ""), buttonBoxSimulationDurationInput)
+		settingsEditorGui.Add("Text", "X205 YP+5", translate("ms"))
+
+		settingsEditorGui.Add("Text", "XS YP+30", translate("Button Box Position"))
 
 		if (buttonBoxPosition = "Secondary Screen")
 			buttonBoxPosition := "2nd Screen"
@@ -601,9 +557,9 @@ restartSettings:
 		if !chosen
 			chosen := 4
 
-		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vbuttonBoxPosition, % values2String("|", collect(choices, "translate")*)
+		buttonBoxPosition := settingsEditorGui.Add("DropDownList", "X120 YP-5 w100 Choose" . chosen, collect(choices, translate))
 
-		Gui SE:Add, Text, XS YP+30, % translate("Overlay Position")
+		settingsEditorGui.Add("Text", "XS YP+30", translate("Overlay Position"))
 
 		choices := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
 		chosen := inList(choices, popupPosition)
@@ -611,77 +567,77 @@ restartSettings:
 		if !chosen
 			chosen := 1
 
-		Gui SE:Add, DropDownList, X120 YP-5 w100 Choose%chosen% vpopupPosition, % values2String("|", collect(choices, "translate")*)
+		popupPosition := settingsEditorGui.Add("DropDownList", "X120 YP-5 w100 Choose" . chosen, collect(choices, translate))
 
 		if fromSetup
-			Gui SE:Add, Button, X10 Y+15 w220 Disabled gopenModesEditor, % translate("Controller Automation...")
+			settingsEditorGui.Add("Button", "X10 Y+15 w220 Disabled", translate("Controller Automation..."))
 		else
-			Gui SE:Add, Button, X10 Y+15 w220 gopenModesEditor, % translate("Controller Automation...")
+			settingsEditorGui.Add("Button", "X10 Y+15 w220", translate("Controller Automation...")).OnEvent("Click", editSettings.Bind(&kEditModes))
 
 		splashTheme := getMultiMapValue(settingsOrCommand, "Startup", "Splash Theme", false)
 
 		themes := getAllThemes(configuration)
 		chosen := (splashTheme ? inList(themes, splashTheme) + 1 : 1)
-		themes := translate("None") "|" + values2String("|", themes*)
+		themes := concatenate([translate("None")], themes)
 
-		Gui SE:Add, Text, X10 Y+20, % translate("Theme")
-		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vsplashTheme, %themes%
+		settingsEditorGui.Add("Text", "X10 Y+20", translate("Theme"))
+		splashTheme := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, themes)
 
 		startupOption := getMultiMapValue(settingsOrCommand, "Startup", "Simulator", false)
 		startup := (startupOption != false)
 
-		Gui SE:Add, CheckBox, X10 Checked%startup% vstartup, % translate("Start")
+		startup := settingsEditorGui.Add("CheckBox", "X10 Checked" . startup, translate("Start"))
 
 		simulators := string2Values("|", getMultiMapValue(configuration, "Configuration", "Simulators", ""))
 
 		chosen := inList(simulators, startupOption)
 
-		if ((chosen == 0) && (simulators.Length() > 0))
+		if ((chosen == 0) && (simulators.Length > 0))
 			chosen := 1
 
-		Gui SE:Add, DropDownList, X90 YP-5 w140 Choose%chosen% vstartupOption, % values2String("|", simulators*)
+		startupOption := settingsEditorGui.Add("DropDownList", "X90 YP-5 w140 Choose" . chosen, simulators)
 
 		if !fromSetup {
-			Gui SE:Add, Button, X10 Y+20 w220 gstartConfiguration, % translate("Configuration...")
+			settingsEditorGui.Add("Button", "X10 Y+20 w220", translate("Configuration...")).OnEvent("Click", startConfiguration)
 
 			margin := (withContinue ? "Y+20" : "")
 
-			Gui SE:Add, Button, Default X10 %margin% w100 gsaveSettings, % translate("Save")
-			Gui SE:Add, Button, X+20 w100 gcancelSettings, % translate("&Cancel")
+			settingsEditorGui.Add("Button", "Default X10 " . margin . " w100", translate("Save")).OnEvent("Click", editSettings.Bind(&kSave))
+			settingsEditorGui.Add("Button", "X+20 w100", translate("&Cancel")).OnEvent("Click", editSettings.Bind(&kCancel))
 
 			if withContinue
-				Gui SE:Add, Button, X10 w220 gcontinueSettings, % translate("Co&ntinue w/o Save")
+				settingsEditorGui.Add("Button", "X10 w220", translate("Co&ntinue w/o Save")).OnEvent("Click", editSettings.Bind(&kContinue))
 		}
 
-		Gui SE:Margin, 10, 10
+		settingsEditorGui.MarginX := "10", settingsEditorGui.MarginY := "10"
 
 		if ((x = kUndefined) || (y = kUndefined)) {
-			if getWindowPosition("Simulator Settings", x, y)
-				Gui SE:Show, x%x% y%y%
+			if getWindowPosition("Simulator Settings", &x, &y)
+				settingsEditorGui.Show("x" . x . " y" . y)
 			else
-				Gui SE:Show
+				settingsEditorGui.Show()
 		}
 		else
-			Gui SE:Show, AutoSize x%x% y%y%
+			settingsEditorGui.Show("AutoSize x" . x . " y" . y)
 
-		if (!fromSetup && (readMultiMap(kSimulatorConfigurationFile).Count() == 0))
+		if (!fromSetup && (readMultiMap(kSimulatorConfigurationFile).Count == 0))
 			startConfiguration()
 
 		if fromSetup
 			return false
 		else {
-			loop {
-				Sleep 200
-			} until (result || restart)
+			loop
+				Sleep(200)
+			until (result || restart)
 
 			if (restart && (result != kCancel)) {
 				restart := false
 
-				Gui SE:Destroy
+				settingsEditorGui.Destroy()
 
 				loadSimulatorConfiguration()
 
-				Goto restartSettings
+				result := editSettings(&settingsOrCommand)
 			}
 
 			if (result == kSave)

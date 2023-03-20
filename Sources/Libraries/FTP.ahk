@@ -20,155 +20,155 @@
 class FTP {
 	static hWININET := DllCall("LoadLibrary", "str", "wininet.dll", "ptr")
 
-	open(agent, proxy := "", proxyBypass := "") {
-		if (hInternet := this.internetOpen(agent, proxy, proxyBypass))
+	static open(agent, proxy := "", proxyBypass := "") {
+		if (hInternet := FTP.internetOpen(agent, proxy, proxyBypass))
 			return hInternet
 		else
 			return false
 	}
 
-	close(hInternet) {
-		if (hInternet && this.internetCloseHandle(hInternet))
+	static close(hInternet) {
+		if (hInternet && FTP.internetCloseHandle(hInternet))
 			return true
 		else
 			return false
 	}
 
-	connect(hInternet, serverName, userName := "", password := "", port := 21, FTP_PASV := 1) {
+	static connect(hInternet, serverName, userName := "", password := "", port := 21, FTP_PASV := 1) {
 		local hConnect
 
-		if (hConnect := this.internetConnect(hInternet, serverName, port, userName, password, FTP_PASV))
+		if (hConnect := FTP.internetConnect(hInternet, serverName, port, userName, password, FTP_PASV))
 			return hConnect
 		else
 			return false
 	}
 
-	disconnect(hConnect) {
-		if (hConnect && this.internetCloseHandle(hConnect))
+	static disconnect(hConnect) {
+		if (hConnect && FTP.internetCloseHandle(hConnect))
 			return true
 		else
 			return false
 	}
 
-	createDirectory(hConnect, directory) {
-		if (DllCall("wininet\FtpCreateDirectory", "ptr", hConnect, "ptr", directory))
+	static createDirectory(hConnect, directory) {
+		if (DllCall("wininet\FtpCreateDirectory", "ptr", hConnect, "str", directory))
 			return true
 		else
 			return false
 	}
 
-	removeDirectory(hConnect, directory) {
-		if (DllCall("wininet\FtpRemoveDirectory", "ptr", hConnect, "ptr", directory))
+	static removeDirectory(hConnect, directory) {
+		if (DllCall("wininet\FtpRemoveDirectory", "ptr", hConnect, "str", directory))
 			return true
 		else
 			return false
 	}
 
-	getCurrentDirectory(hConnect) {
-		local currentDirectory, size
+	static getCurrentDirectory(hConnect) {
+		local currentDirectory
 
 		static MAX_PATH := 260 + 8
 
-		size := VarSetStrCapacity(&currentDirectory, MAX_PATH)
+		currentDirectory := Buffer(MAX_PATH, 0)
 
-		if (DllCall("wininet\FtpGetCurrentDirectory", "ptr", hConnect, "ptr", currentDirectory, "uint*", &size))
+		if (DllCall("wininet\FtpGetCurrentDirectory", "ptr", hConnect, "ptr", currentDirectory, "uint*", currentDirectory.Size))
 			return StrGet(currentDirectory)
 		else
 			return false
 	}
 
-	setCurrentDirectory(hconnect, directory) {
-		if (DllCall("wininet\FtpSetCurrentDirectory", "ptr", hConnect, "ptr", directory))
+	static setCurrentDirectory(hconnect, directory) {
+		if (DllCall("wininet\FtpSetCurrentDirectory", "ptr", hConnect, "str", directory))
 			return true
 		else
 			return false
 	}
 
-	findFiles(hConnect, pattern := "*.*") {
+	static findFiles(hConnect, pattern := "*.*") {
 		local hEnum
 		local files := []
-		local find := this.findFirstFile(hConnect, &hEnum, pattern)
+		local find := FTP.findFirstFile(hConnect, &hEnum, pattern)
 
 		static FILE_ATTRIBUTE_DIRECTORY := 0x10
 
 		if find {
-			if !(find.FileAttr & FILE_ATTRIBUTE_DIRECTORY)
+			if !(find["FileAttr"] & FILE_ATTRIBUTE_DIRECTORY)
 				files.Push(find)
 
-			while (find := this.FindNextFile(hEnum))
-				if !(find.FileAttr & FILE_ATTRIBUTE_DIRECTORY)
+			while (find := FTP.findNextFile(hEnum))
+				if !(find["FileAttr"] & FILE_ATTRIBUTE_DIRECTORY)
 					files.Push(find)
 		}
 
-		this.close(hEnum)
+		FTP.close(hEnum)
 
 		return files
 	}
 
-	findFolders(hConnect, pattern := "*.*") {
+	static findFolders(hConnect, pattern := "*.*") {
 		local hEnum
 		local folders := []
-		local find := this.findFirstFile(hConnect, &hEnum, pattern)
+		local find := FTP.findFirstFile(hConnect, &hEnum, pattern)
 
 		static FILE_ATTRIBUTE_DIRECTORY := 0x10
 
 		if find {
-			if (find.FileAttr & FILE_ATTRIBUTE_DIRECTORY)
+			if (find["FileAttr"] & FILE_ATTRIBUTE_DIRECTORY)
 				folders.Push(find)
 
-			while (find := this.findNextFile(hEnum))
-				if (find.FileAttr & FILE_ATTRIBUTE_DIRECTORY)
+			while (find := FTP.findNextFile(hEnum))
+				if (find["FileAttr"] & FILE_ATTRIBUTE_DIRECTORY)
 					folders.Push(find)
 		}
 
-		this.close(hEnum)
+		FTP.close(hEnum)
 
 		return folders
 	}
 
-	putFile(hConnect, localFile, remoteFile, flags := 0) {
+	static putFile(hConnect, localFile, remoteFile, flags := 0) {
 		if (DllCall("wininet\FtpPutFile", "ptr", hConnect, "ptr", localFile, "ptr", remoteFile, "uint", flags, "uptr", 0))
 			return true
 		else
 			return false
 	}
 
-	renameFile(hConnect, existingFile, newName) {
-		if (DllCall("wininet\FtpRenameFile", "ptr", hConnect, "ptr", existingFile, "ptr", newName))
+	static renameFile(hConnect, existingFile, newName) {
+		if (DllCall("wininet\FtpRenameFile", "ptr", hConnect, "str", existingFile, "str", newName))
 			return true
 		else
 			return false
 	}
 
-	deleteFile(hConnect, fileName) {
-		if (DllCall("wininet\FtpDeleteFile", "ptr", hConnect, "ptr", fileName))
+	static deleteFile(hConnect, fileName) {
+		if (DllCall("wininet\FtpDeleteFile", "ptr", hConnect, "str", fileName))
 			return true
 		else
 			return false
 	}
 
-	getFile(hConnect, remoteFile, localFile, overWrite := false, flags := 0) {
-		if (DllCall("wininet\FtpGetFile", "ptr", hConnect, "ptr", remoteFile, "ptr", localFile, "int", !overWrite, "uint", 0, "uint", flags, "uptr", 0))
+	static getFile(hConnect, remoteFile, localFile, overWrite := false, flags := 0) {
+		if (DllCall("wininet\FtpGetFile", "ptr", hConnect, "str", remoteFile, "str", localFile, "int", !overWrite, "uint", 0, "uint", flags, "uptr", 0))
 			return true
 		else
 			return false
 	}
 
-	getFileSize(hConnect, fileName, sizeFormat := "auto", sizeSuffix := false) {
+	static getFileSize(hConnect, fileName, sizeFormat := "auto", sizeSuffix := false) {
 		local hFile, fileSizeHigh, fileSizeLow
 
 		static GENERIC_READ := 0x80000000
 
-		if (hFile := this.openFile(hConnect, fileName, GENERIC_READ)) {
+		if (hFile := FTP.openFile(hConnect, fileName, GENERIC_READ)) {
 			fileSizeHigh := 0
 
 			if (fileSizeLow := DllCall("wininet\FtpGetFileSize", "ptr", hFile, "uint*", &fileSizeHigh, "uint")) {
-				this.internetCloseHandle(hFile)
+				FTP.internetCloseHandle(hFile)
 
-				return this.formatBytes(fileSizeLow + (fileSizeHigh << 32), sizeFormat, sizeSuffix)
+				return FTP.formatBytes(fileSizeLow + (fileSizeHigh << 32), sizeFormat, sizeSuffix)
 			}
 			else {
-				this.internetCloseHandle(hFile)
+				FTP.internetCloseHandle(hFile)
 
 				return false
 			}
@@ -177,7 +177,7 @@ class FTP {
 			return false
 	}
 
-	fileAttributes(attributes) {
+	static fileAttributes(attributes) {
 		local fileAttributes := []
 		local k, v
 
@@ -195,49 +195,49 @@ class FTP {
 		return fileAttributes
 	}
 
-	findData(WIN32_FIND_DATA, sizeFormat := "auto", sizeSuffix := false) {
+	static findData(WIN32_FIND_DATA, sizeFormat := "auto", sizeSuffix := false) {
 		local result := Map()
 
 		static MAX_PATH := 260
 		static MAXDWORD := 0xffffffff
 
 		result["FileAttr"]          := NumGet(WIN32_FIND_DATA, 0, "uint")
-		result["FileAttributes"]    := this.fileAttributes(NumGet(WIN32_FIND_DATA, 0, "uint"))
-		result["CreationTime"]      := this.fileTime(NumGet(WIN32_FIND_DATA,  4, "uint64"))
-		result["LastAccessTime"]    := this.fileTime(NumGet(WIN32_FIND_DATA, 12, "uint64"))
-		result["LastWriteTime"]     := this.fileTime(NumGet(WIN32_FIND_DATA, 20, "uint64"))
-		result["FileSize"]          := this.formatBytes((NumGet(WIN32_FIND_DATA, 28, "uint") * (MAXDWORD + 1)) + NumGet(WIN32_FIND_DATA, 32, "uint"), sizeFormat, sizeSuffix)
+		result["FileAttributes"]    := FTP.fileAttributes(NumGet(WIN32_FIND_DATA, 0, "uint"))
+		result["CreationTime"]      := FTP.fileTime(NumGet(WIN32_FIND_DATA,  4, "uint64"))
+		result["LastAccessTime"]    := FTP.fileTime(NumGet(WIN32_FIND_DATA, 12, "uint64"))
+		result["LastWriteTime"]     := FTP.fileTime(NumGet(WIN32_FIND_DATA, 20, "uint64"))
+		result["FileSize"]          := FTP.formatBytes((NumGet(WIN32_FIND_DATA, 28, "uint") * (MAXDWORD + 1)) + NumGet(WIN32_FIND_DATA, 32, "uint"), sizeFormat, sizeSuffix)
 		result["FileName"]          := StrGet(WIN32_FIND_DATA, 44, "utf-16")
-		result["AlternateFileName"] := StrGet(WIN32_FIND_DATA, 44 + MAX_PATH * 2, "utf-16")
+		result["AlternateFileName"] := StrGet(WIN32_FIND_DATA, 44 + (MAX_PATH * 2), "utf-16")
 
 		return result
 	}
 
-	findFirstFile(hConnect, &hFind, pattern := "*.*", sizeFormat := "auto", sizeSuffix := false) {
+	static findFirstFile(hConnect, &hFind, pattern := "*.*", sizeFormat := "auto", sizeSuffix := false) {
 		local zero := 0
 
 		WIN32_FIND_DATA := Buffer(592, 0)
 
-		if (hFind := DllCall("wininet\FtpFindFirstFile", "ptr", hConnect, "str", pattern, "ptr", WIN32_FIND_DATA, "uint", 0, "uint*", &zero))
-			return this.findData(WIN32_FIND_DATA, sizeFormat, sizeSuffix)
+		if (hFind := DllCall("wininet\FtpFindFirstFile", "ptr", hConnect, "ptr", StrPtr(pattern), "ptr", WIN32_FIND_DATA, "uint", 0, "uint*", zero))
+			return FTP.findData(WIN32_FIND_DATA, sizeFormat, sizeSuffix)
 
 		WIN32_FIND_DATA := Buffer(0)
 
 		return false
 	}
 
-	findNextFile(hFind, pattern := "*.*", sizeFormat := "auto", sizeSuffix := false) {
+	static findNextFile(hFind, pattern := "*.*", sizeFormat := "auto", sizeSuffix := false) {
 		WIN32_FIND_DATA := Buffer(592, 0)
 
 		if (DllCall("wininet\InternetFindNextFile", "ptr", hFind, "ptr", WIN32_FIND_DATA))
-			return this.FindData(WIN32_FIND_DATA, sizeFormat, sizeSuffix)
+			return FTP.findData(WIN32_FIND_DATA, sizeFormat, sizeSuffix)
 
 		WIN32_FIND_DATA := Buffer(0)
 
 		return false
 	}
 
-	systemTimeToTzSpecificLocalTime(systemTime, ByRef localTime) {
+	static systemTimeToTzSpecificLocalTime(systemTime, &localTime) {
 		localTime := Buffer(16, 0)
 
 		if (DllCall("SystemTimeToTzSpecificLocalTime", "ptr", 0, "ptr", systemTime, "ptr", localTime))
@@ -246,12 +246,12 @@ class FTP {
 			return false
 	}
 
-	fileTime(addr) {
-		local systemTime
+	static fileTime(addr) {
+		local systemTime, localTime
 
-		this.fileTimeToSystemTime(addr, &systemTime)
+		FTP.fileTimeToSystemTime(addr, &systemTime)
 
-		this.systemTimeToTzSpecificLocalTime(&systemTime, localTime)
+		FTP.systemTimeToTzSpecificLocalTime(systemTime, &localTime)
 
 		return Format("{:04}{:02}{:02}{:02}{:02}{:02}"
 					, NumGet(localTime, 0, "ushort")
@@ -262,7 +262,7 @@ class FTP {
 					, NumGet(localTime, 12, "ushort"))
 	}
 
-	fileTimeToSystemTime(fileTime, &systemTime) {
+	static fileTimeToSystemTime(fileTime, &systemTime) {
 		systemTime := Buffer(16, 0)
 
 		if (DllCall("FileTimeToSystemTime", "int64*", &fileTime, "ptr", systemTime))
@@ -271,7 +271,7 @@ class FTP {
 			return false
 	}
 
-	formatBytes(bytes, sizeFormat := "auto", suffix := false) {
+	static formatBytes(bytes, sizeFormat := "auto", suffix := false) {
 		local size, buf, output
 
 		static SFBS_FLAGS_ROUND_TO_NEAREST_DISPLAYED_DIGIT    := 0x0001
@@ -279,10 +279,10 @@ class FTP {
 		static S_OK := 0
 
 		if (sizeFormat = "auto") {
-			size := VarSetStrCapacity(&buf, 1024)
+			buf := Buffer(1024, 0)
 
-			if (DllCall("shlwapi\StrFormatByteSizeEx", "int64", bytes, "int", SFBS_FLAGS_ROUND_TO_NEAREST_DISPLAYED_DIGIT, "str", buf, "uint", size) = S_OK)
-				output := buf
+			if (DllCall("shlwapi\StrFormatByteSizeEx", "int64", bytes, "int", SFBS_FLAGS_ROUND_TO_NEAREST_DISPLAYED_DIGIT, "ptr", buf, "uint", buf.Size) = S_OK)
+				output := StrGet(buf)
 		}
 		else if (sizeFormat = "kilobytes" || sizeFormat = "kb")
 			output := Round(bytes / 1024, 2) . (suffix ? " KB" : "")
@@ -298,47 +298,47 @@ class FTP {
 		return output
 	}
 
-	internetOpen(agent, proxy := "", proxyBypass := "") {
+	static internetOpen(agent, proxy := "", proxyBypass := "") {
 		local hInternet
 
 		static INTERNET_OPEN_TYPE_DIRECT := 1
 		static INTERNET_OPEN_TYPE_PROXY  := 3
 
-		if (hInternet := DllCall("wininet\InternetOpen", "ptr", agent, "uint", (proxy ? INTERNET_OPEN_TYPE_PROXY : INTERNET_OPEN_TYPE_DIRECT)
-													   , "ptr", (proxy ? proxy : 0), "ptr", (proxyBypass ? proxyBypass : 0), "uint", 0, "ptr"))
+		if (hInternet := DllCall("wininet\InternetOpen", "str", agent, "uint", (proxy ? INTERNET_OPEN_TYPE_PROXY : INTERNET_OPEN_TYPE_DIRECT)
+													   , "ptr", (proxy ? StrPtr(proxy) : 0), "ptr", (proxyBypass ? StrPtr(proxyBypass) : 0), "uint", 0, "ptr"))
 			return hInternet
 		else
 			return false
 	}
 
-	internetConnect(hInternet, serverName, port := 21, userName := "", password := "", FTP_PASV := 1) {
+	static internetConnect(hInternet, serverName, port := 21, userName := "", password := "", FTP_PASV := 1) {
 		local hConnect
 
 		static INTERNET_DEFAULT_FTP_PORT := 21
 		static INTERNET_SERVICE_FTP      := 1
 		static INTERNET_FLAG_PASSIVE     := 0x08000000
 
-		if (hConnect := DllCall("wininet\InternetConnect", "ptr", hInternet, "ptr", serverName, "ushort", (port = 21 ? INTERNET_DEFAULT_FTP_PORT : port)
-														 , "ptr", (userName ? userName : 0), "ptr", (password ? password : 0)
+		if (hConnect := DllCall("wininet\InternetConnect", "ptr", hInternet, "ptr", StrPtr(serverName), "ushort", (port = 21 ? INTERNET_DEFAULT_FTP_PORT : port)
+														 , "ptr", (userName ? StrPtr(userName) : 0), "ptr", (password ? StrPtr(password) : 0)
 														 , "uint", INTERNET_SERVICE_FTP, "uint", (FTP_PASV ? INTERNET_FLAG_PASSIVE : 0), "uptr", 0, "ptr"))
 			return hConnect
 		else
 			return false
 	}
 
-	internetCloseHandle(hInternet) {
+	static internetCloseHandle(hInternet) {
 		if (DllCall("wininet\InternetCloseHandle", "ptr", hInternet))
 			return true
 		else
 			return false
 	}
 
-	openFile(hConnect, fileName, access) {
+	static openFile(hConnect, fileName, access) {
 		local hFTPSession
 
 		static FTP_TRANSFER_TYPE_BINARY := 2
 
-		if (hFTPSession := DllCall("wininet\FtpOpenFile", "ptr", hConnect, "ptr", fileName, "uint", access, "uint", FTP_TRANSFER_TYPE_BINARY, "uptr", 0))
+		if (hFTPSession := DllCall("wininet\FtpOpenFile", "ptr", hConnect, "ptr", StrPtr(fileName), "uint", access, "uint", FTP_TRANSFER_TYPE_BINARY, "uptr", 0))
 			return hFTPSession
 		else
 			return false
@@ -416,11 +416,14 @@ ftpUpload(server, user, password, localFile, remoteFile) {
     if (!m || !h)
         return false
 
-	f := DllCall("wininet\InternetConnect", "ptr", h, "ptr", server, "ushort", 21, "ptr", user, "ptr", password, "uint", 1, "uint", 0x08000000, "uptr", 0, "ptr")
+	f := DllCall("wininet\InternetConnect", "ptr", h, "ptr", StrPtr(server), "ushort", 21, "ptr", StrPtr(user), "ptr", StrPtr(password), "uint", 1, "uint", 0x08000000, "uptr", 0, "ptr")
 
     if f {
-        if !DllCall("wininet\FtpPutFile", "ptr", f, "ptr", localFile, "ptr", remoteFile, "uint", 0, "uptr", 0)
-            return false, (DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m))
+        if !DllCall("wininet\FtpPutFile", "ptr", f, "ptr", StrPtr(localFile), "ptr", StrPtr(remoteFile), "uint", 0, "uptr", 0) {
+			DllCall("wininet\InternetCloseHandle", "ptr", h) && DllCall("FreeLibrary", "ptr", m)
+
+			return false
+		}
 
         DllCall("wininet\InternetCloseHandle", "ptr", f)
     }

@@ -5,7 +5,7 @@
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#Requires v2.0
+#Requires AutoHotkey >=v2.0
 #SingleInstance Force			; Ony one instance allowed
 #Warn							; Enable warnings to assist with detecting common errors.
 

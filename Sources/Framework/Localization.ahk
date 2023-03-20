@@ -405,6 +405,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 	}
 
 	translations := Map()
+	translations.CaseSense := false
 
 	for ignore, fileName in fileNames
 		loop Read, fileName {
@@ -417,14 +418,15 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 			translation := StrSplit(translation, "=>")
 			enString := translation[1]
 
-			if ((SubStr(enString, 1, 1) != "[") && (enString != targetLanguageCode))
-				if ((A_Index == 1) && (translations.Has(enString) && (translations[enString] != translation[2])))
+			if ((SubStr(enString, 1, 1) != "[") && (targetLanguageCode != "en"))
+				if ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2]))) {
 					if isDebug()
 						throw "Inconsistent translation encountered for `"" . enString . "`" in readTranslations..."
 					else
 						logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...")
-
-				translations[enString] := translation[2]
+				}
+				else
+					translations[enString] := translation[2]
 		}
 
 	return translations
@@ -506,7 +508,7 @@ translate(string, targetLanguageCode := false) {
 			translations := readTranslations(currentLanguageCode)
 		}
 
-		if translations.Has(string) {
+		if (translations && translations.Has(string)) {
 			translation := translations[string]
 
 			return ((translation != "") ? translation : string)

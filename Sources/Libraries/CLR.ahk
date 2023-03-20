@@ -183,7 +183,7 @@ CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain 
 }
 
 CLR_GUID(&GUID, sGUID) {
-	VarSetStrCapacity(&GUID, 16)
+	GUID := Buffer(16, 0)
 
 	return ((DllCall("ole32\CLSIDFromString", "wstr", sGUID, "ptr", GUID) >= 0) ? GUID : "")
 }

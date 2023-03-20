@@ -483,13 +483,13 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				sendMessage(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+				messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
 		}
 
 		deactivate() {
 			if this.DeactivationCallback
-				sendMessage(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
+				messageSend(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
 
 		recognizeVoiceCommand(grammar, words) {
@@ -1141,7 +1141,7 @@ class VoiceServer extends ConfigurationItem {
 		if this.Debug[kDebugRecognitions]
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
 
-		sendMessage(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
+		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
 	}
 }
 

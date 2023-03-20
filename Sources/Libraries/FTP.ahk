@@ -207,8 +207,15 @@ class FTP {
 		result["LastAccessTime"]    := FTP.fileTime(NumGet(WIN32_FIND_DATA, 12, "uint64"))
 		result["LastWriteTime"]     := FTP.fileTime(NumGet(WIN32_FIND_DATA, 20, "uint64"))
 		result["FileSize"]          := FTP.formatBytes((NumGet(WIN32_FIND_DATA, 28, "uint") * (MAXDWORD + 1)) + NumGet(WIN32_FIND_DATA, 32, "uint"), sizeFormat, sizeSuffix)
-		result["FileName"]          := StrGet(WIN32_FIND_DATA, 44, "utf-16")
-		result["AlternateFileName"] := StrGet(WIN32_FIND_DATA, 44 + (MAX_PATH * 2), "utf-16")
+		try
+			result["FileName"]      := StrGet(WIN32_FIND_DATA.Ptr + 44, MAX_PATH, "utf-16")
+		catch Any
+			result["FileName"]      := ""
+
+		try
+			result["AlternateFileName"] := StrGet(WIN32_FIND_DATA.Ptr + 44 + MAX_PATH, MAX_PATH, "utf-16")
+		catch Any
+			result["AlternateFileName"] := ""
 
 		return result
 	}
@@ -218,7 +225,7 @@ class FTP {
 
 		WIN32_FIND_DATA := Buffer(592, 0)
 
-		if (hFind := DllCall("wininet\FtpFindFirstFile", "ptr", hConnect, "ptr", StrPtr(pattern), "ptr", WIN32_FIND_DATA, "uint", 0, "uint*", zero))
+		if (hFind := DllCall("wininet\FtpFindFirstFile", "ptr", hConnect, "str", pattern, "ptr", WIN32_FIND_DATA, "uint", 0, "uint*", zero))
 			return FTP.findData(WIN32_FIND_DATA, sizeFormat, sizeSuffix)
 
 		WIN32_FIND_DATA := Buffer(0)
@@ -357,7 +364,7 @@ ftpListFiles(server, user, password, path) {
 	local ignore, file
 
 	for ignore, file in FTP.findFiles(hSession, path)
-		files.Push(file.FileName)
+		files.Push(file["FileName"])
 
 	FTP.disconnect(hSession)
 
@@ -372,7 +379,7 @@ ftpClearDirectory(server, user, password, directory) {
 	local ignore, file
 
 	for ignore, file in FTP.findFiles(hSession, directory)
-		FTP.deleteFile(hSession, directory . "\" . file.FileName)
+		FTP.deleteFile(hSession, directory . "\" . file["FileName"])
 
 	FTP.disconnect(hSession)
 

@@ -37,8 +37,8 @@ global kBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\FTP.ahk"
-; #Include "..\Assistants\Libraries\SessionDatabase.ahk"
-; #Include "..\Assistants\Libraries\TyresDatabase.ahk"
+#Include "..\Assistants\Libraries\SessionDatabase.ahk"
+#Include "..\Assistants\Libraries\TyresDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -238,6 +238,18 @@ windowsPath(path) {
 downloadUserDatabases(directory) {
 	wDirectory := windowsPath(directory)
 
+	renameDirectory(directory, newName) {
+		loop 5 {
+			try {
+				DirMove(directory, newName, "R")
+
+				break
+			}
+			catch Any
+				Sleep(100)
+		}
+	}
+
 	for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-uploads") {
 		SplitPath(fileName, , , , &idName)
 
@@ -254,17 +266,17 @@ downloadUserDatabases(directory) {
 		deleteFile(directory . fileName)
 
 		if FileExist(directory . "Shared Database Creator")
-			DirMove(directory "Shared Database Creator", directory . idName, "R")
+			renameDirectory(directory . "Shared Database Creator", directory . idName)
 		else if FileExist(directory . "Shared Database")
-			DirMove(directory "Shared Database", directory . idName, "R")
+			renameDirectory(directory . "Shared Database", directory . idName)
 		else if FileExist(directory . "Community")
-			DirMove(directory "Community", directory . idName, "R")
+			renameDirectory(directory . "Community", directory . idName)
 		else if FileExist(directory . "DBase")
-			DirMove(directory "DBase", directory . idName, "R")
+			renameDirectory(directory . "DBase", directory . idName)
 		else if FileExist(directory . "Dabase")
-			DirMove(directory "Dabase", directory . idName, "R")
+			renameDirectory(directory . "Dabase", directory . idName)
 		else if FileExist(directory . "SetupDabase")
-			DirMove(directory "SetupDabase", directory . idName, "R")
+			renameDirectory(directory . "SetupDabase", directory . idName)
 	}
 }
 

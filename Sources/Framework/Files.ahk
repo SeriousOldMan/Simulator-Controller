@@ -112,7 +112,7 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 		try {
 			recurse := (recurse != false)
 
-			DirDelete(directoryName, %recurse%)
+			DirDelete(directoryName, recurse)
 
 			return true
 		}

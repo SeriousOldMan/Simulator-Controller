@@ -83,10 +83,6 @@ loadSimulatorConfiguration() {
 
 		logMessage(kLogInfo, translate("AutoHotkey path set to ") . path)
 	}
-	/*
-	else
-		logMessage(kLogWarn, translate("AutoHotkey path not set"))
-	*/
 
 	path := getMultiMapValue(kSimulatorConfiguration, "Configuration", "MSBuild Path")
 	if path {
@@ -94,10 +90,6 @@ loadSimulatorConfiguration() {
 
 		logMessage(kLogInfo, translate("MSBuild path set to ") . path)
 	}
-	/*
-	else
-		logMessage(kLogWarn, translate("MSBuild path not set"))
-	*/
 
 	path := getMultiMapValue(kSimulatorConfiguration, "Configuration", "NirCmd Path")
 	if path {
@@ -129,7 +121,7 @@ initializeEnvironment() {
 	global kSimulatorConfiguration, kDetachedInstallation
 	local installOptions, installLocation, install, newID, idFileName, ID, ticks, wait, major, minor, msgResult
 
-	if A_IsCompiled {
+	if !isDebug() {
 		if FileExist(kConfigDirectory . "Simulator Controller.install") {
 			installOptions := readMultiMap(kConfigDirectory . "Simulator Controller.install")
 			installLocation := getMultiMapValue(installOptions, "Install", "Location", "..\")
@@ -139,7 +131,7 @@ initializeEnvironment() {
 		}
 
 		if !isDetachedInstallation() {
-			installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation")
+			installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation", "")
 
 			installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 			installLocation := getMultiMapValue(installOptions, "Install", "Location", installLocation)
@@ -155,7 +147,6 @@ initializeEnvironment() {
 				else
 					setLanguage(getMultiMapValue(kSimulatorConfiguration, "Configuration", "Language", getSystemLanguage()))
 
-				handler := translateMsgBoxButtons.Bind(["Yes", "No"])
 				OnMessage(0x44, translateYesNoButtons)
 				msgResult := MsgBox(translate("You have to install Simulator Controller before starting any of the applications. Do you want run the Setup now?"), translate("Installation"), 262436)
 				OnMessage(0x44, translateYesNoButtons, 0)

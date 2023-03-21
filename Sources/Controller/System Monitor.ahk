@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,16 +25,16 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Application.ahk
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Messages.ahk"
+#Include "..\Assistants\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -43,12 +43,12 @@
 
 global kClose := "Close"
 
-global kStateIcons := {Disabled: kIconsDirectory . "Black.ico"
-					 , Passive: kIconsDirectory . "Gray.ico"
-					 , Active: kIconsDirectory . "Green.ico"
-					 , Warning: kIconsDirectory . "Yellow.ico"
-					 , Critical: kIconsDirectory . "Red.ico"
-					 , Unknown: kIconsDirectory . "Empty.png"}
+global kStateIcons := Map("DISABLED", kIconsDirectory . "Black.ico"
+						, "PASSIVE", kIconsDirectory . "Gray.ico"
+						, "ACTIVE", kIconsDirectory . "Green.ico"
+						, "WARNING", kIconsDirectory . "Yellow.ico"
+						, "CRITICAL", kIconsDirectory . "Red.ico"
+						, "UNKNOWN", kIconsDirectory . "Empty.png")
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -65,8 +65,8 @@ global vStartupFinished := false
 getTableCSS() {
 	local script
 
-	script =
-	(
+	script := "
+(
 		.table-std, .th-std, .td-std {
 			border-collapse: collapse;
 			padding: .3em .5em;
@@ -108,19 +108,18 @@ getTableCSS() {
 		.table-std tbody tr:nth-child(odd) {
 			background-color: #D0D0D0;
 		}
-	)
+)"
 
 	return script
 }
 
 updateDashboard(viewer, html := "") {
-	local tableCSS := getTableCSS()
 	local script, ignore, chart
 
 	if (html == false)
 		html := ""
 
-	script =
+	script := "
 	(
 		<meta charset='utf-8'>
 		<head>
@@ -131,7 +130,9 @@ updateDashboard(viewer, html := "") {
 				%tableCSS%
 			</style>
 		</head>
-	)
+	)"
+
+	script := substituteVariables(script, {tableCSS: getTableCSS()})
 
 	html := ("<html>" . script . "<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
@@ -157,14 +158,23 @@ global mapperState
 global logLevelDropDown
 
 systemMonitor(command := false, arguments*) {
-	local x, y, time, logLevel, defaultGui, defaultListView
+	global vStartupFinished
+
+	global simulationDashboard, assistantsDashboard, sessionDashboard, dataDashboard, automationDashboard, mapperDashboard
+	global simulationState, assistantsState, sessionState, dataState, automationState, mapperState, logLevelDropDown
+
+	local x, y, time, logLevel
 	local controllerState, databaseState, trackMapperState, ignore, plugin, icons, modules, key, value
 	local icon, state, property, drivers, choices, chosen
 
+	local serverURLValue, serverTokenValue, serverDriverValue, serverTeamValue, serverSessionValue
+	local stintNrValue, stintLapValue, stintDriverValue
+
+	static systemMonitorGui
 	static monitorTabView
 
 	static stateIconsList := false
-	static stateIcons := {}
+	static stateIcons := false
 	static stateModules := false
 
 	static serverState
@@ -188,29 +198,26 @@ systemMonitor(command := false, arguments*) {
 	static logMessageListView
 	static logBufferEdit
 
+	if !stateIcons {
+		stateIcons := Map()
+		stateIcons.CaseSense := false
+	}
+
 	if !stateIconsList {
-		stateIconsList := IL_Create(kStateIcons.Count())
+		stateIconsList := IL_Create(kStateIcons.Count)
 
 		for key, icon in kStateIcons {
 			IL_Add(stateIconsList, icon)
 
 			stateIcons[key] := A_Index
 		}
-
-		LV_SetImageList(stateIconsList)
 	}
 
 	if (command = kClose)
 		result := kClose
 	else if (command = "UpdateDashboard") {
-		defaultGui := A_DefaultGui
-
-		Gui SM:Default
-
 		try {
-			GuiControlGet monitorTabView
-
-			if (monitorTabView = 1) {
+			if (monitorTabView.Value = 1) {
 				controllerState := getControllerState(false)
 				databaseState := readMultiMap(kTempDirectory . "Database Synchronizer.state")
 				trackMapperState := readMultiMap(kTempDirectory . "Track Mapper.state")
@@ -226,24 +233,10 @@ systemMonitor(command := false, arguments*) {
 		catch Any as exception {
 			logError(exception)
 		}
-		finally {
-			Gui %defaultGui%:Default
-		}
-
 	}
 	else if (command = "UpdateModules") {
-		defaultGui := A_DefaultGui
-
-		Gui SM:Default
-
-		defaultListView := A_DefaultListView
-
-		Gui ListView, % stateListView
-
 		try {
-			GuiControlGet monitorTabView
-
-			if (monitorTabView = 2) {
+			if (monitorTabView.Value = 2) {
 				controllerState := getControllerState(false)
 				databaseState := readMultiMap(kTempDirectory . "Database Synchronizer.state")
 				trackMapperState := readMultiMap(kTempDirectory . "Track Mapper.state")
@@ -256,7 +249,7 @@ systemMonitor(command := false, arguments*) {
 					if plugin {
 						state := getMultiMapValue(controllerState, plugin, "State")
 
-						if stateIcons.HasKey(state)
+						if stateIcons.Has(state)
 							icons.Push(stateIcons[state])
 						else
 							icons.Push(stateIcons["Unknown"])
@@ -269,7 +262,7 @@ systemMonitor(command := false, arguments*) {
 
 				state := getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled")
 
-				if stateIcons.HasKey(state)
+				if stateIcons.Has(state)
 					icons.Push(stateIcons[state])
 				else
 					icons.Push(stateIcons["Unknown"])
@@ -278,10 +271,10 @@ systemMonitor(command := false, arguments*) {
 
 				messages.Push(getMultiMapValue(databaseState, "Database Synchronizer", "Information", ""))
 
-				if (controllerState.Count() > 0) {
+				if (controllerState.Count > 0) {
 					state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
 
-					if stateIcons.HasKey(state)
+					if stateIcons.Has(state)
 						icons.Push(stateIcons[state])
 					else
 						icons.Push(stateIcons["Unknown"])
@@ -292,7 +285,7 @@ systemMonitor(command := false, arguments*) {
 
 					state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
 
-					if stateIcons.HasKey(state)
+					if stateIcons.Has(state)
 						icons.Push(stateIcons[state])
 					else
 						icons.Push(stateIcons["Unknown"])
@@ -303,146 +296,117 @@ systemMonitor(command := false, arguments*) {
 				}
 
 				if (!stateModules || !listEqual(modules, stateModules)) {
-					LV_Delete()
+					stateListView.Delete()
 
-					LV_SetImageList(stateIconsList)
+					stateListView.SetImageList(stateIconsList)
 
 					for ignore, plugin in modules
-						LV_Add("Icon" . icons[A_Index], "    " . plugin, messages[A_Index])
+						stateListView.Add("Icon" . icons[A_Index], "    " . plugin, messages[A_Index])
 
-					LV_ModifyCol()
-					LV_ModifyCol(1, "AutoHdr")
+					stateListView.ModifyCol()
+					stateListView.ModifyCol(1, "AutoHdr")
 
 					stateModules := modules
 				}
 				else
 					for ignore, plugin in modules {
-						LV_Modify(A_Index, "Icon" . icons[A_Index])
-						LV_Modify(A_Index, "Col2", messages[A_Index])
+						stateListView.Modify(A_Index, "Icon" . icons[A_Index])
+						stateListView.Modify(A_Index, "Col2", messages[A_Index])
 					}
 
-				LV_ModifyCol(2, "AutoHdr")
+				stateListView.ModifyCol(2, "AutoHdr")
 			}
 		}
 		catch Any as exception {
 			logError(exception)
 		}
-		finally {
-			Gui %defaultGui%:Default
-			Gui ListView, %defaultListView%
-		}
 	}
 	else if (command = "UpdateServer") {
-		serverURL := translate("Not connected")
-		serverToken := translate("Not connected")
-		serverDriver := translate("Not connected")
-		serverTeam := translate("Not connected")
-		serverSession := translate("Not connected")
+		serverURLValue := translate("Not connected")
+		serverTokenValue := translate("Not connected")
+		serverDriverValue := translate("Not connected")
+		serverTeamValue := translate("Not connected")
+		serverSessionValue := translate("Not connected")
 
-		stintNr := translate("Not started")
-		stintLap := translate("Not started")
-		stintDriver := translate("Not started")
+		stintNrValue := translate("Not started")
+		stintLapValue := translate("Not started")
+		stintDriverValue := translate("Not started")
 
 		drivers := []
 
-		defaultGui := A_DefaultGui
+		if (monitorTabView.Value = 3) {
+			controllerState := getControllerState(false)
 
-		Gui SM:Default
+			if (controllerState.Count > 0) {
+				state := StrUpper(getMultiMapValue(controllerState, "Team Server", "State", "Unknown"))
 
-		defaultListView := A_DefaultListView
+				if kStateIcons.Has(state)
+					icon := kStateIcons[state]
+				else
+					icon := kStateIcons["Unknown"]
 
-		Gui ListView, % driversListView
+				serverState.Value := icon
 
-		try {
-			GuiControlGet monitorTabView
+				if ((state != "Unknown") && (state != "Disabled")) {
+					state := Map()
+					state.CaseSense := false
 
-			if (monitorTabView = 3) {
-				controllerState := getControllerState(false)
+					for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
+						property := StrSplit(property, ":", " `t", 2)
 
-				if (controllerState.Count() > 0) {
-					state := getMultiMapValue(controllerState, "Team Server", "State", "Unknown")
+						state[property[1]] := property[2]
+					}
 
-					if kStateIcons.HasKey(state)
-						icon := kStateIcons[state]
-					else
-						icon := kStateIcons["Unknown"]
+					for key, value in state {
+						if (value = "Invalid")
+							value := translate("Not valid")
+						else if (value = "Mismatch")
+							value := translate("No match")
 
-					GuiControl, , serverState, %icon%
-
-					if ((state != "Unknown") && (state != "Disabled")) {
-						state := {}
-
-						for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
-							property := StrSplit(property, ":", " `t", 2)
-
-							state[property[1]] := property[2]
-						}
-
-						for key, value in state {
-							if (value = "Invalid")
-								value := translate("Not valid")
-							else if (value = "Mismatch")
-								value := translate("No match")
-
-							switch key {
-								case "ServerURL":
-									serverURL := value
-								case "SessionToken":
-									serverToken := value
-								case "Driver":
-									serverDriver := value
-								case "Team":
-									serverTeam := value
-								case "Session":
-									serverSession := value
-								case "Drivers":
-									drivers := string2Values("|", value)
-								case "StintNr":
-									stintNr := value
-								case "StintLap":
-									stintLap := value
-								case "StintDriver":
-									stintDriver := value
-							}
+						switch key, false {
+							case "ServerURL":
+								serverURLValue := value
+							case "SessionToken":
+								serverTokenValue := value
+							case "Driver":
+								serverDriverValue := value
+							case "Team":
+								serverTeamValue := value
+							case "Session":
+								serverSessionValue := value
+							case "Drivers":
+								drivers := string2Values("|", value)
+							case "StintNr":
+								stintNrValue := value
+							case "StintLap":
+								stintLapValue := value
+							case "StintDriver":
+								stintDriverValue := value
 						}
 					}
 				}
-
-				GuiControl, , serverURL, %serverURL%
-				GuiControl, , serverToken, %serverToken%
-				GuiControl, , serverDriver, %serverDriver%
-				GuiControl, , serverTeam, %serverTeam%
-				GuiControl, , serverSession, %serverSession%
-				GuiControl, , stintNr, %stintNr%
-				GuiControl, , stintLap, %stintLap%
-				GuiControl, , stintDriver, %stintDriver%
-
-				LV_Delete()
-
-				for ignore, driver in drivers
-					LV_Add("", driver, (driver = stintDriver) ? translate("x") : "")
-
-				LV_ModifyCol()
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
 			}
-		}
-		finally {
-			Gui %defaultGui%:Default
-			Gui ListView, %defaultListView%
+
+			serverURL.Value := serverURL
+			serverToken.Value := serverToken
+			serverDriver.Value := serverDriver
+			serverTeam.Value := serverTeam
+			serverSession.Value := serverSession
+			stintNr.Value := stintNr
+			stintLap.Value := stintLap
+			stintDriver.Value := stintDriver
+
+			driversListView.Delete()
+
+			for ignore, driver in drivers
+				driversListView.Add("", driver, (driver = stintDriver) ? translate("x") : "")
+
+			driversListView.ModifyCol()
+			driversListView.ModifyCol(1, "AutoHdr")
+			driversListView.ModifyCol(2, "AutoHdr")
 		}
 	}
 	else if (command = "LogMessage") {
-		defaultGui := A_DefaultGui
-
-		Gui SM:Default
-
-		defaultListView := A_DefaultListView
-
-		Gui ListView, % logMessageListView
-
-		GuiControlGet logBufferEdit
-
 		try {
 			logLevel := arguments[3]
 
@@ -463,198 +427,201 @@ systemMonitor(command := false, arguments*) {
 
 			time := arguments[2]
 
-			FormatTime, time, %time%, dd.MM.yy hh:mm:ss tt
+			time := FormatTime(time, "dd.MM.yy hh:mm:ss tt")
 
-			if (LV_GetCount() > 0)
-				while (LV_GetCount() >= logBufferEdit)
-					LV_Delete(1)
+			if (logMessageListView.GetCount() > 0)
+				while (logMessageListView.GetCount() >= logBufferEdit.Value)
+					logMessageListView.Delete(1)
 
-			LV_Add("", arguments[1], time, translate(logLevel), arguments[4])
-			LV_Modify(LV_GetCount(), "Vis")
+			logMessageListView.Add("", arguments[1], time, translate(logLevel), arguments[4])
+			logMessageListView.Modify(logMessageListView.GetCount(), "Vis")
 
 			if first {
 				first := false
 
-				LV_ModifyCol()
+				logMessageListView.ModifyCol()
 
-				loop 4
-					LV_ModifyCol(A_Index, "AutoHdr")
+				Loop 4
+					logMessageListView.ModifyCol(A_Index, "AutoHdr")
 			}
 			else
-				LV_ModifyCol(4, "AutoHdr")
+				logMessageListView.ModifyCol(4, "AutoHdr")
 		}
 		catch Any as exception {
 			logError(exception)
-		}
-		finally {
-			Gui %defaultGui%:Default
-			Gui ListView, %defaultListView%
 		}
 	}
 	else {
 		result := false
 
-		Gui SM:Default
+		systemMonitorGui := Gui()
 
-		Gui SM:-Border ; -Caption
-		Gui SM:Color, D0D0D0, D8D8D8
+		systemMonitorGui.Opt("-Border") ; -Caption
+		systemMonitorGui.BackColor := "D0D0D0"
 
-		Gui SM:Font, s10 Bold, Arial
+		systemMonitorGui.SetFont("s10 Bold", "Arial")
 
-		Gui SM:Add, Text, w780 Center gmoveSystemMonitor, % translate("Modular Simulator Controller System")
+		systemMonitorGui.Add("Text", "w780 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(systemMonitorGui, "System Monitor"))
 
-		Gui SM:Font, s9 Norm, Arial
-		Gui SM:Font, Italic Underline, Arial
+		systemMonitorGui.SetFont("s9 Norm", "Arial")
+		systemMonitorGui.SetFont("Italic Underline", "Arial")
 
-		Gui SM:Add, Text, x333 YP+20 w140 cBlue Center gopenSystemMonitorDocumentation, % translate("Monitoring")
+		systemMonitorGui.Add("Text", "x333 YP+20 w140 cBlue Center", translate("Monitoring")).OnEvent("Click", openDocumentation.Bind(systemMonitorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities"))
 
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Text, x8 yp+26 w790 0x10
+		systemMonitorGui.Add("Text", "x8 yp+26 w790 0x10")
 
-		Gui SM:Add, Tab3, x16 yp+14 w773 h375 AltSubmit -Wrap Section vmonitorTabView, % values2String("|", collect(["Dashboard", "Modules", "Team Session", "Logs"], "translate")*)
+		monitorTabView := systemMonitorGui.Add("Tab3", "x16 yp+14 w773 h375 AltSubmit -Wrap Section", collect(["Dashboard", "Modules", "Team Session", "Logs"], translate))
 
-		Gui Tab, 1
+		monitorTabView.UseTab(1)
 
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x24 ys+28 w375 h9, % translate("Simulation")
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
+		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+28 w375 h9", translate("Simulation"))
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Picture, x34 ys+73 w32 h32 vsimulationState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x94 ys+46 w300 h90 vsimulationDashboard, shell.explorer
+		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
+		simulationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+46 w300 h90", "shell.explorer").Value
 		simulationDashboard.Navigate("about:blank")
 
-		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x405 ys+28 w375 h9, % translate("Race Assistants")
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
+		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+28 w375 h9", translate("Race Assistants"))
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Picture, x415 ys+73 w32 h32 vassistantsState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x475 ys+46 w300 h90 vassistantsDashboard, shell.explorer
+		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
+		assistantsDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+46 w300 h90 vassistantsDashboard", "shell.explorer").Value
 		assistantsDashboard.Navigate("about:blank")
 
-		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x24 ys+138 w375 h9, % translate("Team Session")
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
+		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+138 w375 h9", translate("Team Session"))
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Picture, x34 ys+183 w32 h32 vsessionState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x94 ys+156 w300 h90 vsessionDashboard, shell.explorer
+		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
+		sessionDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+156 w300 h90 vsessionDashboard", "shell.explorer").Value
 		sessionDashboard.Navigate("about:blank")
 
-		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x405 ys+138 w375 h9, % translate("Data Synchronization")
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
+		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+138 w375 h9", translate("Data Synchronization"))
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Picture, x415 ys+183 w32 h32 vdataState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x475 ys+156 w300 h90 vdataDashboard, shell.explorer
+		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
+		dataDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+156 w300 h90 vdataDashboard", "shell.explorer").Value
 		dataDashboard.Navigate("about:blank")
 
-		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x24 ys+248 w375 h9, % translate("Track Automation")
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
+		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+248 w375 h9", translate("Track Automation"))
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Picture, x34 ys+293 w32 h32 vautomationState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x94 ys+266 w300 h90 vautomationDashboard, shell.explorer
+		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
+		automationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+266 w300 h90 vautomationDashboard", "shell.explorer").Value
 		automationDashboard.Navigate("about:blank")
 
-		Gui SM:Font, Italic, Arial
-		Gui SM:Add, GroupBox, -Theme x405 ys+248 w375 h9, % translate("Track Mapping")
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
+		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+248 w375 h9", translate("Track Mapping"))
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Picture, x415 ys+293 w32 h32 vmapperState, % kIconsDirectory . "Black.ico"
-		Gui SM:Add, ActiveX, x475 ys+266 w300 h90 vmapperDashboard, shell.explorer
+		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
+		mapperDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+266 w300 h90 vmapperDashboard", "shell.explorer").Value
 		mapperDashboard.Navigate("about:blank")
 
-		Gui Tab, 2
+		monitorTabView.UseTab(2)
 
-		Gui SM:Add, ListView, x24 ys+28 w756 h336 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDstateListView gnoSelect, % values2String("|", collect(["Module", "Information"], "translate")*)
+		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 BackgroundD0D0D0 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))
+		stateListView.OnEvent("Click", noSelect.Bind(stateListView))
+		stateListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
 
-		Gui Tab, 3
+		monitorTabView.UseTab(3)
 
-		Gui SM:Font, s10 Bold, Arial
+		systemMonitorGui.SetFont("s10 Bold", "Arial")
 
-		Gui SM:Add, Text, x160 ys+28 w104 h30 Center, % translate("State")
-		Gui SM:Add, Picture, x180 ys+75 w64 h64 vServerState, % kIconsDirectory . "Black.ico"
+		systemMonitorGui.Add("Text", "x160 ys+28 w104 h30 Center", translate("State"))
+		serverState := systemMonitorGui.Add("Picture", "x180 ys+75 w64 h64", kIconsDirectory . "Black.ico")
 
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Font, Italic, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
 
-		Gui SM:Add, GroupBox, -Theme x405 ys+28 w375 h150, % translate("Connection")
+		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+28 w375 h150", translate("Connection"))
 
-		Gui SM:Font, Norm, Arial
+		systemMonitorGui.SetFont("Norm", "Arial")
 
-		Gui SM:Add, Text, x413 yp+21 w120, % translate("Server URL")
-		Gui SM:Add, Text, x528 yp w230 vserverURL
+		systemMonitorGui.Add("Text", "x413 yp+21 w120", translate("Server URL"))
+		serverURL := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui SM:Add, Text, x413 yp+24 w120, % translate("Session Token")
-		Gui SM:Add, Text, x528 yp w230 vserverToken
+		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Session Token"))
+		serverToken := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui SM:Add, Text, x413 yp+28 w120, % translate("Team")
-		Gui SM:Add, Text, x528 yp w230 vserverTeam
+		systemMonitorGui.Add("Text", "x413 yp+28 w120", translate("Team"))
+		serverTeam := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui SM:Add, Text, x413 yp+24 w120, % translate("Driver")
-		Gui SM:Add, Text, x528 yp w230 vserverDriver
+		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Driver"))
+		serverDriver := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui SM:Add, Text, x413 yp+24 w120, % translate("Session")
-		Gui SM:Add, Text, x528 yp w230 vserverSession
+		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Session"))
+		serverSession := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui SM:Font, Italic, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
 
-		Gui SM:Add, GroupBox, -Theme x24 ys+188 w375 h9, % translate("Drivers")
+		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+188 w375 h9", translate("Drivers"))
 
-		Gui SM:Font, Norm, Arial
+		systemMonitorGui.SetFont("Norm", "Arial")
 
-		Gui SM:Add, ListView, x24 yp+21 w375 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDdriversListView gnoSelect, % values2String("|", collect(["Driver", "Active"], "translate")*)
+		driversListView := systemMonitorGui.Add("ListView", "x24 yp+21 w375 h120 -Multi -LV0x10 BackgroundD0D0D0 AltSubmit NoSort NoSortHdr", collect(["Driver", "Active"], translate))
+		driversListView.OnEvent("Click", noSelect.Bind(stateListView))
+		driversListView.OnEvent("DoubleClick", noSelect.Bind(stateListView))
 
-		Gui SM:Font, Italic, Arial
+		systemMonitorGui.SetFont("Italic", "Arial")
 
-		Gui SM:Add, GroupBox, -Theme x405 ys+188 w375 h142, % translate("Stint")
+		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+188 w375 h142", translate("Stint"))
 
-		Gui SM:Font, Norm, Arial
+		systemMonitorGui.SetFont("Norm", "Arial")
 
-		Gui SM:Add, Text, x413 yp+28 w120, % translate("Stint")
-		Gui SM:Add, Text, x528 yp w230 vstintNr
+		systemMonitorGui.Add("Text", "x413 yp+28 w120", translate("Stint"))
+		stintNr := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui SM:Add, Text, x413 yp+24 w120, % translate("Laps")
-		Gui SM:Add, Text, x528 yp w230 vstintLap
+		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Laps"))
+		stintLap := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui SM:Add, Text, x413 yp+24 w120, % translate("Driver")
-		Gui SM:Add, Text, x528 yp w230 vstintDriver
+		systemMonitorGui.Add("Text", "x413 yp+24 w120", translate("Driver"))
+		stintDriver := systemMonitorGui.Add("Text", "x528 yp w230")
 
-		Gui Tab, 4
+		monitorTabView.UseTab(4)
 
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, ListView, x24 ys+28 w756 h312 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlogMessageListView gnoSelect, % values2String("|", collect(["Application", "Time", "Category", "Message"], "translate")*)
+		logMessageListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h312 -Multi -LV0x10 BackgroundD0D0D0 AltSubmit NoSort NoSortHdr", collect(["Application", "Time", "Category", "Message"], translate))
+		logMessageListView.OnEvent("Click", noSelect.Bind(logMessageListView))
+		logMessageListView.OnEvent("DoubleClick", noSelect.Bind(logMessageListView))
 
-		Gui SM:Add, Text, x24 yp+320 w95 h20, % translate("Log Buffer")
-		Gui SM:Add, Edit, x120 yp-2 w50 h20 Limit3 Number VlogBufferEdit, 999
-		Gui SM:Add, UpDown, x158 yp w18 h20 Range100-999, 999
+		systemMonitorGui.Add("Text", "x24 yp+320 w95 h20", translate("Log Buffer"))
+		logBufferEdit := systemMonitorGui.Add("Edit", "x120 yp-2 w50 h20 Limit3 Number", "999")
+		systemMonitorGui.Add("UpDown", "x158 yp w18 h20 Range100-999", "999")
 
-		Gui SM:Add, Text, x590 yp w95 h23 +0x200, % translate("Log Level")
+		systemMonitorGui.Add("Text", "x590 yp w95 h23 +0x200", translate("Log Level"))
 
 		choices := kLogLevelNames
 		chosen := getLogLevel()
 
-		Gui SM:Add, DropDownList, x689 yp-1 w91 AltSubmit Choose%chosen% VlogLevelDropDown gchooseLogLevel, % values2String("|", collect(choices, "translate")*)
+		logLevelDropDown := systemMonitorGui.Add("DropDownList", "x689 yp-1 w91 AltSubmit Choose" . chosen, collect(choices, translate))
+		logLevelDropDown.OnEvent("Change", chooseLogLevel)
 
-		Gui Tab
+		monitorTabView.UseTab()
 
-		Gui SM:Font, s8 Norm, Arial
+		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
-		Gui SM:Add, Text, x8 ys+385 w790 0x10
+		systemMonitorGui.Add("Text", "x8 ys+385 w790 0x10")
 
-		Gui SM:Add, Button, x367 yp+10 w80 h23 Default GcloseSystemMonitor, % translate("Close")
+		systemMonitorGui.Add("Button", "x367 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", closeSystemMonitor)
 
 		x := false
 		y := false
 
-		if getWindowPosition("System Monitor", x, y)
-			Gui SM:Show, x%x% y%y%
+		if getWindowPosition("System Monitor", &x, &y)
+			systemMonitorGui.Show("x" . x . " y" . y)
 		else
-			Gui SM:Show
+			systemMonitorGui.Show()
 
 		updateDashboard(simulationDashboard)
 		updateDashboard(assistantsDashboard)
@@ -663,55 +630,45 @@ systemMonitor(command := false, arguments*) {
 		updateDashboard(automationDashboard)
 		updateDashboard(mapperDashboard)
 
-		new PeriodicTask(Func("systemMonitor").Bind("UpdateDashboard"), 2000, kLowPriority).start()
-		new PeriodicTask(Func("systemMonitor").Bind("UpdateModules"), 2000, kLowPriority).start()
-		new PeriodicTask(Func("systemMonitor").Bind("UpdateServer"), 5000, kLowPriority).start()
+		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
+		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()
+		PeriodicTask(systemMonitor.Bind("UpdateServer"), 5000, kLowPriority).start()
 
 		vStartupFinished := true
 
-		loop
-			Sleep 100
+		Loop
+			Sleep(100)
 		until result
 
-		Gui SM:Destroy
+		systemMonitorGui.Destroy()
 
 		return ((result = kClose) ? false : true)
 	}
 }
 
-closeSystemMonitor() {
-	ExitApp 0
+closeSystemMonitor(*) {
+	ExitApp(0)
 }
 
-moveSystemMonitor() {
-	moveByMouse("SM", "System Monitor")
+noSelect(listView, *) {
+	Loop listView.GetCount()
+		listView.Modify(A_Index, "-Select")
 }
 
-openSystemMonitorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities
-}
-
-noSelect() {
-	loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
-}
-
-chooseLogLevel() {
-	GuiControlGet logLevelDropDown
-
-	broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "System Monitor")), "setLogLevel", logLevelDropDown)
+chooseLogLevel(*) {
+	broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "System Monitor")), "setLogLevel", logLevelDropDown.Value)
 }
 
 updateSimulationState(controllerState) {
-	local state := getMultiMapValue(controllerState, "Simulation", "State", "Disabled")
+	local state := StrUpper(getMultiMapValue(controllerState, "Simulation", "State", "Disabled"))
 	local html, icon, displayState
 
-	if kStateIcons.HasKey(state)
+	if kStateIcons.Has(state)
 		icon := kStateIcons[state]
 	else
 		icon := kStateIcons["Unknown"]
 
-	GuiControl, , simulationState, %icon%
+	simulationState.Value := icon
 
 	displayState := getMultiMapValue(controllerState, "Simulation", "Session")
 
@@ -777,7 +734,7 @@ updateAssistantsState(controllerState) {
 
 	html .= info
 
-	GuiControl, , assistantsState, % kStateIcons[overallState]
+	assistantsState.Value := kStateIcons[StrUpper(overallState)]
 
 	if (overallState = "Disabled")
 		html := ""
@@ -788,18 +745,19 @@ updateAssistantsState(controllerState) {
 }
 
 updateSessionState(controllerState) {
-	local state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
+	local state := StrUpper(getMultiMapValue(controllerState, "Team Server", "State", "Disabled"))
 	local html, icon, ignore, property, key, value
 
-	if kStateIcons.HasKey(state)
+	if kStateIcons.Has(state)
 		icon := kStateIcons[state]
 	else
 		icon := kStateIcons["Unknown"]
 
-	GuiControl, , sessionState, %icon%
+	sessionState.Value := icon
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		state := {}
+		state := Map()
+		state.CaseSense := false
 
 		for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
 			property := StrSplit(property, ":", " `t", 2)
@@ -828,15 +786,15 @@ updateSessionState(controllerState) {
 }
 
 updateDataState(databaseState) {
-	local state := getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled")
+	local state := StrUpper(getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled"))
 	local html, icon, serverURL, serverToken, action, counter, identifier
 
-	if kStateIcons.HasKey(state)
+	if kStateIcons.Has(state)
 		icon := kStateIcons[state]
 	else
 		icon := kStateIcons["Unknown"]
 
-	GuiControl, , dataState, %icon%
+	dataState.Value := icon
 
 	if ((state != "Unknown") && (state != "Disabled")) {
 		serverURL := getMultiMapValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
@@ -862,13 +820,11 @@ updateDataState(databaseState) {
 		if (serverToken != kUndefined)
 			html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
 
-		html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>"
-							   . getMultiMapValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Database:") . "</b></td><td>"
-							   . getMultiMapValue(databaseState, "Database Synchronizer", "DatabaseID") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>" . getMultiMapValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Database:") . "</b></td><td>" . getMultiMapValue(databaseState, "Database Synchronizer", "DatabaseID") . "</td></tr>")
 
 		if action {
-			switch action {
+			switch action, false {
 				case "Running":
 					counter := getMultiMapValue(databaseState, "Database Synchronizer", "Counter", false)
 
@@ -904,15 +860,15 @@ updateDataState(databaseState) {
 }
 
 updateAutomationState(controllerState) {
-	local state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
+	local state := StrUpper(getMultiMapValue(controllerState, "Track Automation", "State", "Disabled"))
 	local html, icon, automation
 
-	if kStateIcons.HasKey(state)
+	if kStateIcons.Has(state)
 		icon := kStateIcons[state]
 	else
 		icon := kStateIcons["Unknown"]
 
-	GuiControl, , automationState, %icon%
+	automationState.Value := icon
 
 	if ((state != "Unknown") && (state != "Disabled")) {
 		if (state = "Passive") {
@@ -927,12 +883,9 @@ updateAutomationState(controllerState) {
 				automation := translate("Not available")
 
 			html := "<table>"
-			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"
-								   . getMultiMapValue(controllerState, "Track Automation", "Simulator") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>"
-								   . getMultiMapValue(controllerState, "Track Automation", "Car") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
-								   . getMultiMapValue(controllerState, "Track Automation", "Track") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Simulator") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Car") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Track") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Automation:") . "</b></td><td>" . automation . "</td></tr>")
 			html .= "</table>"
 		}
@@ -944,26 +897,24 @@ updateAutomationState(controllerState) {
 }
 
 updateMapperState(trackMapperState) {
-	local state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
+	local state := StrUpper(getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled"))
 	local html, icon, simulator, track, action, points
 
-	if kStateIcons.HasKey(state)
+	if kStateIcons.Has(state)
 		icon := kStateIcons[state]
 	else
 		icon := kStateIcons["Unknown"]
 
-	GuiControl, , mapperState, %icon%
+	mapperState.Value := icon
 
 	if ((state != "Unknown") && (state != "Disabled")) {
 		action := getMultiMapValue(trackMapperState, "Track Mapper", "Action", "Waiting")
 
 		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>"
-							   . getMultiMapValue(trackMapperState, "Track Mapper", "Simulator") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>"
-							   . getMultiMapValue(trackMapperState, "Track Mapper", "Track") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(trackMapperState, "Track Mapper", "Simulator") . "</td></tr>")
+		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(trackMapperState, "Track Mapper", "Track") . "</td></tr>")
 
-		switch action {
+		switch action, false {
 			case "Waiting":
 				action := translate("Waiting for track scanner...")
 			case "Scanning":
@@ -1003,10 +954,10 @@ clearOrphaneStateFiles() {
 	static stateFiles := {}
 
 	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
-		if !stateFiles.HasKey(fileName)
+		if !stateFiles.Has(fileName)
 			stateFiles[fileName] := 0
 
-		FileGetTime modTime, %fileName%, M
+		modTime := FileGetTime(fileName, "M")
 
 		if (stateFiles[fileName] != modTime)
 			stateFiles[fileName] := modTime
@@ -1019,24 +970,24 @@ startSystemMonitor() {
 	local icon := kIconsDirectory . "Monitoring.ico"
 	local noLaunch
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, System Monitor
+	TraySetIcon(icon, "1")
+	A_IconTip := "System Monitor"
 
 	fixIE(11)
 
-	registerMessageHandler("Monitoring", "monitoringMessageHandler")
+	registerMessageHandler("Monitoring", monitoringMessageHandler)
 
-	new SessionDatabase() ; so that file Simulator Controller.state can be deleted...
+	SessionDatabase()
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")
 
-	new PeriodicTask(Func("clearOrphaneStateFiles"), 60000, kLowPriority).start()
+	PeriodicTask(clearOrphaneStateFiles, 60000, kLowPriority).start()
 
 	systemMonitor()
 
-	ExitApp 0
+	ExitApp(0)
 }
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1044,11 +995,13 @@ startSystemMonitor() {
 ;;;-------------------------------------------------------------------------;;;
 
 monitoringMessageHandler(category, data) {
+	global vStartupFinished
+
 	if vStartupFinished
 		if (InStr(data, "logMessage") = 1) {
 			data := StrSplit(StrSplit(data, ":", , 2)[2], ";", " `t", 5)
 
-			return withProtection("systemMonitor", "LogMessage", data[1], data[2], data[3], data[4])
+			return withProtection(systemMonitor, "LogMessage", data[1], data[2], data[3], data[4])
 		}
 		else
 			return functionMessageHandler(category, data)

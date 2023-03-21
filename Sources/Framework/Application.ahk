@@ -40,7 +40,7 @@ doApplications(applications, callback) {
 	}
 }
 
-consentDialog(id, consent := false) {
+consentDialog(id, consent := false, *) {
 	local language, texts, chosen, x, y, rootDirectory, ignore, section, keyValues, key, value
 	local consentGui
 
@@ -122,10 +122,13 @@ consentDialog(id, consent := false) {
 		Sleep(100)
 	until closed
 
-	consentGui.Destroy()
-
-	return {TyrePressures: ["Yes", "No", "Retry"][tyrePressuresConsentDropDown.Value], CarSetups: ["Yes", "No", "Retry"][carSetupsConsentDropDown.Value]
-		  , RaceStrategies: ["Yes", "No", "Retry"][raceStrategiesConsentDropDown.Value]}
+	try {
+		return Map("TyrePressures", ["Yes", "No", "Retry"][tyrePressuresConsentDropDown.Value]
+				 , "CarSetups", ["Yes", "No", "Retry"][carSetupsConsentDropDown.Value]
+				 , "RaceStrategies", ["Yes", "No", "Retry"][raceStrategiesConsentDropDown.Value])
+	}
+	finally
+		consentGui.Destroy()
 }
 
 requestShareSessionDatabaseConsent() {
@@ -161,7 +164,7 @@ requestShareSessionDatabaseConsent() {
 				setMultiMapValue(newConsent, "General", "ID", id)
 				setMultiMapValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 
-				if (getFileNames("Consent.*", kTranslationsDirectory).Length() > 0)
+				if (getFileNames("Consent.*", kTranslationsDirectory).Length > 0)
 					result := consentDialog(id, consent)
 				else {
 					result := {}
@@ -171,9 +174,8 @@ requestShareSessionDatabaseConsent() {
 					result["CarSetups"] := "Retry"
 				}
 
-				for type, key in {TyrePressures: "Share Tyre Pressures", RaceStrategies: "Share Race Strategies"
-								, CarSetups: "Share Car Setups"}
-					switch result[type] {
+				for type, key in Map("TyrePressures", "Share Tyre Pressures", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups")
+					switch result[type], false {
 						case "Yes":
 							setMultiMapValue(newConsent, "Consent", key, "Yes")
 						case "No":
@@ -342,7 +344,7 @@ checkForUpdates() {
 						ExitApp(0)
 					}
 					else if FileExist(kUserConfigDirectory . "VERSION")
-						FileSetTime("A_Now", kUserConfigDirectory . "VERSION")
+						FileSetTime(A_Now, kUserConfigDirectory . "VERSION")
 				}
 			}
 		}
@@ -361,52 +363,9 @@ checkForUpdates() {
 
 	if (!inList(A_Args, "-NoUpdate") && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1])) {
 		updates := readMultiMap(getFileName("UPDATES", kUserConfigDirectory))
-restartUpdate:
+
 		for target, arguments in getMultiMapValues(toolTargets, "Update")
 			if !getMultiMapValue(updates, "Processed", target, false) {
-				/*
-				SoundPlay *32
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Never"]))
-				title := translate("Update")
-				MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
-				OnMessage(0x44, "")
-
-				IfMsgBox Cancel
-				{
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-					title := translate("Update")
-					MsgBox 262436, %title%, % translate("Are you really sure, you want to skip the automated update procedure?")
-					OnMessage(0x44, "")
-
-					IfMsgBox Yes
-					{
-						for target, arguments in getMultiMapValues(toolTargets, "Update")
-							setMultiMapValue(updates, "Processed", target, true)
-
-						writeMultiMap(getFileName("UPDATES", kUserConfigDirectory), updates)
-
-						break
-					}
-
-					Goto restartUpdate
-				}
-
-				IfMsgBox Yes
-				{
-					RunWait % kBinariesDirectory . "Simulator Tools.exe -Update"
-
-					loadSimulatorConfiguration()
-
-					break
-				}
-
-				IfMsgBox No
-				{
-					break
-				}
-				*/
-
 				RunWait(kBinariesDirectory . "Simulator Tools.exe -Update")
 
 				loadSimulatorConfiguration()
@@ -481,7 +440,7 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 	}
 
 	if (x = kUndefined)
-		switch x {
+		switch x, false {
 			case "Left":
 				x := 25
 			case "Right":
@@ -491,7 +450,7 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 		}
 
 	if (y = kUndefined)
-		switch y {
+		switch y, false {
 			case "Top":
 				y := 25
 			case "Bottom":

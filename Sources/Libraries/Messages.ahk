@@ -124,7 +124,12 @@ class MessageManager extends PeriodicTask {
 			local ignore, message
 
 			for ignore, message in this.iMessages
-				withProtection(ObjBindMethod(message[1], "call", message[2], message[3]))
+				try {
+					withProtection(ObjBindMethod(message[1], "call", message[2], message[3]))
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			return false
 		}

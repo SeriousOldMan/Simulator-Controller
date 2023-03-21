@@ -185,7 +185,7 @@ class Task {
 
 	run() {
 		local callable := this.Callable
-		local result := (isInstance(callable, Task) ? callable.run() : %callable%())
+		local result := (isInstance(callable, Task) ? callable.run() : callable.Call())
 
 		return (isInstance(result, Task) ? result : false)
 	}

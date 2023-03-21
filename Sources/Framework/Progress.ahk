@@ -21,10 +21,10 @@
 
 showProgress(options := unset) {
 	local x, y, w, h, color, count
-	local secondScreen, secondScreenLeft, secondScreenRight, secondScreenTop, secondScreenBottom
+	local screenLeft, screenRight, screenTop, screenBottom
 	local newOptions, key, value
 
-	static popupPosition := false
+	static popupPosition
 
 	static progressGui := false
 	static progressBar
@@ -38,51 +38,52 @@ showProgress(options := unset) {
 	}
 	else {
 		if !progressGui {
-			if !popupPosition
+			if !isSet(popupPosition)
 				popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-													 , "General", "Popup Position", "Bottom")
+												, "General", "Popup Position", "Bottom")
 
 			if !isSet(options)
-				options := Map()
-			else {
-				newOptions := Map()
-				newOptions.CaseSense := false
+				options := {}
 
-				for key, value in options
-					newOptions[key] := value
+			w := (options.HasProp("Width") ? (options.Width - 20) : 280)
+			h := 90
 
-				options := newOptions
-			}
-
-			if options.Has("X")
-				x := options["X"]
-			else if options.Has("Width")
-				x := Round((A_ScreenWidth - options["Width"]) / 2)
+			if options.HasProp("X")
+				x := options.X
 			else
-				x := Round((A_ScreenWidth - 300) / 2)
+				x := "Center"
 
-			if options.Has("Y")
-				y := options["Y"]
-			else {
-				count := MonitorGetCount()
-
-				if (count > 1)
-					MonitorGetWorkArea(2, &secondScreenLeft, &secondScreenTop, &secondScreenRight, &secondScreenBottom)
-
-				if ((count > 1) && (popupPosition = "2nd Screen Top"))
-					y := (secondScreenTop + 150)
-				else if ((count > 1) && (popupPosition = "2nd Screen Bottom"))
-					y := (secondScreenTop + (secondScreenBottom - secondScreenTop) - 150)
-				else
-					y := ((popupPosition = "Top") ? 150 : A_ScreenHeight - 150)
-			}
-
-			if options.Has("Width")
-				w := (options["Width"] - 20)
+			if options.HasProp("Y")
+				y := options.Y
 			else
-				w := 280
+				y := popupPosition
 
-			color := (options.Has("Color") ? options["Color"] : "Green")
+			if InStr(popupPosition, "2nd Screen")
+				MonitorGetWorkArea(1 + ((MonitorGetCount() > 1) ? 1 : 0), &screenLeft, &screenTop, &screenRight, &screenBottom)
+			else
+				MonitorGetWorkArea(, &screenLeft, &screenTop, &screenRight, &screenBottom)
+
+			if !isInteger(x)
+				switch x, false {
+					case "Left":
+						x := 25
+					case "Right":
+						x := screenRight - w - 25
+					default:
+						x := Round(screenLeft + ((screenRight - screenLeft) / 2) - (w / 2))
+				}
+
+			if !isInteger(y)
+				switch y, false {
+					case "Top", "2nd Screen Top":
+						y := screenTop + 25
+					case "Bottom", "2nd Screen Bottom":
+						y := screenBottom - h - 25
+					default:
+						y := Round(screenTop + ((screenBottom - screenTop) / 2) - (h / 2))
+				}
+
+			color := (options.HasProp("Color") ? options.Color : "Green")
 
 			progressGui := Gui()
 
@@ -93,27 +94,27 @@ showProgress(options := unset) {
 
 			progressTitle := progressGui.Add("Text", "x10 w" . w . " Center vvProgressTitle")
 
-			progressBar := progressGui.Add("Progress", "x10 y30 w" . w . " h20 c" . color . " BackgroundGray vvProgressBar", "0")
+			progressBar := progressGui.Add("Progress", "x10 y30 w" . w . " h20 c" . color . " BackgroundGray", "0")
 
 			progressGui.SetFont("s8 Norm", "Arial")
 
-			progressMessage := progressGui.Add("Text", "x10 y55 w" . w . " Center vvProgressMessage")
+			progressMessage := progressGui.Add("Text", "x10 y55 w" . w . " Center")
 
 			progressGui.Opt("+AlwaysOnTop")
 			progressGui.Show("x" . x . " y" . y . " AutoSize NoActivate")
 		}
 
-		if options.Has("title")
-			progressTitle.Value := options["title"]
+		if options.HasProp("title")
+			progressTitle.Value := options.Title
 
-		if options.Has("message")
-			progressMessage.Value := options["message"]
+		if options.HasProp("message")
+			progressMessage.Value := options.Message
 
-		if options.Has("progress")
-			progressBar.Value := Round(options["progress"])
+		if options.HasProp("progress")
+			progressBar.Value := Round(options.Progress)
 
-		if options.Has("color")
-			progressBar.Opt("+c" . options["color"])
+		if options.HasProp("color")
+			progressBar.Opt("+c" . options.Color)
 	}
 
 	return progressGui

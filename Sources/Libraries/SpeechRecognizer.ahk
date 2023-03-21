@@ -254,7 +254,7 @@ class SpeechRecognizer {
 
 				if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
 					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 				}
@@ -278,7 +278,7 @@ class SpeechRecognizer {
 
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
+				logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
 				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
@@ -414,7 +414,7 @@ class SpeechRecognizer {
 				audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 				try {
-					Run("`"" - kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
+					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
 				catch Any as exception {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
@@ -452,7 +452,7 @@ class SpeechRecognizer {
 
 	newGrammar() {
 		if this.Instance
-			switch this.iEngine {
+			switch this.iEngine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
 				case "Azure":
@@ -466,7 +466,7 @@ class SpeechRecognizer {
 
 	newChoices(choices) {
 		if this.Instance
-			switch this.iEngine {
+			switch this.iEngine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
 				case "Azure":
@@ -667,7 +667,7 @@ class GrammarCompiler {
 		grammar := this.readGrammar(&text, &nextCharIndex)
 
 		if !grammar
-			throw "Syntax error detected in """ . text . """ at 1 in GrammarCompiler.compileGrammar..."
+			throw "Syntax error detected in `"" . text . "`" at 1 in GrammarCompiler.compileGrammar..."
 
 		return this.parseGrammar(grammar)
 	}
@@ -679,7 +679,7 @@ class GrammarCompiler {
 			if (level = 0)
 				return this.readGrammars(&text, &nextCharIndex, level)
 			else
-				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
+				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
 		}
 		else
 			return this.readList(&text, &nextCharIndex)
@@ -738,7 +738,7 @@ class GrammarCompiler {
 			if literalValue
 				grammars.Push(literalValue)
 			else
-				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readChoices..."
+				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readChoices..."
 
 			if !this.skipDelimiter(",", &text, &nextCharIndex, false)
 				break
@@ -760,7 +760,7 @@ class GrammarCompiler {
 		if literalValue
 			builtin := literalValue.Value
 		else
-			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
 
 		this.skipDelimiter(")", &text, &nextCharIndex)
 
@@ -824,7 +824,7 @@ class GrammarCompiler {
 			return true
 		}
 		else if throwError
-			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
+			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
 		else
 			return false
 	}

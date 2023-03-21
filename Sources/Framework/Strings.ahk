@@ -23,7 +23,12 @@ substituteVariables(string, values := false) {
 			if endPos {
 				variable := Trim(SubStr(result, startPos, endPos - startPos))
 
-				value := (values && values.Has(variable)) ? values[variable] : %variable%
+				if (values is Map)
+					value := (values && values.Has(variable)) ? values[variable] : %variable%
+				else if (values is Object)
+					value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
+				else
+					value := %variable%
 
 				result := StrReplace(result, "%" . variable . "%", value)
 			}

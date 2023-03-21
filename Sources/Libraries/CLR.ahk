@@ -20,30 +20,29 @@
 ;;;-------------------------------------------------------------------------;;;
 
 CLR_LoadLibrary(AssemblyName, AppDomain := 0) {
-	local e, assembly, args, typeofAssembly
+	local assembly, args, typeofAssembly
 
 	if !AppDomain
 		AppDomain := CLR_GetDefaultDomain()
 
-	e := ComObjError(0)
+	try
+		loop 1 {
+			if assembly := AppDomain.Load_2(AssemblyName)
+				break
 
-	loop 1 {
-		if assembly := AppDomain.Load_2(AssemblyName)
-			break
+			static _null := ComValue(13, 0)
 
-		static _null := ComValue(13, 0)
+			args := ComObjArray(0xC, 1),  args[0] := AssemblyName
+			typeofAssembly := AppDomain.GetType().Assembly.GetType()
 
-		args := ComObjArray(0xC, 1),  args[0] := AssemblyName
-		typeofAssembly := AppDomain.GetType().Assembly.GetType()
+			if assembly := typeofAssembly.InvokeMember_3("LoadWithPartialName", 0x158, _null, _null, args)
+				break
 
-		if assembly := typeofAssembly.InvokeMember_3("LoadWithPartialName", 0x158, _null, _null, args)
-			break
-
-		if assembly := typeofAssembly.InvokeMember_3("LoadFrom", 0x158, _null, _null, args)
-			break
-	}
-
-	ComObjError(e)
+			if assembly := typeofAssembly.InvokeMember_3("LoadFrom", 0x158, _null, _null, args)
+				break
+		}
+	catch Any
+		return ""
 
 	return assembly
 }
@@ -65,7 +64,7 @@ CLR_CreateObject(Assembly, TypeName, Args*) {
 	return Assembly.CreateInstance_3(TypeName, true, 0, _null, vargs, _null, Array_Empty)
 }
 
-CLR_CompileC#(Code, References = "", AppDomain = 0, FileName = "", CompilerOptions = "") {
+CLR_CompileCSharp(Code, References := "", AppDomain := 0, FileName := "", CompilerOptions := "") {
 	return CLR_CompileAssembly(Code, References, "System", "Microsoft.CSharp.CSharpCodeProvider", AppDomain, FileName, CompilerOptions)
 }
 

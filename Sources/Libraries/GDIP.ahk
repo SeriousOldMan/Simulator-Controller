@@ -1278,7 +1278,7 @@ Gdip_DrawImagePointsRect(pGraphics, pBitmap, Points, sx:="", sy:="", sw:="", sh:
 		NumPut(Coord[1], PointF, 8*(A_Index-1), "float"), NumPut(Coord[2], PointF, (8*(A_Index-1))+4, "float")
 	}
 
-	if !IsNumber(Matrix)
+	if !isNumber(Matrix)
 		ImageAttr := Gdip_SetImageAttributesColorMatrix(Matrix)
 	else if (Matrix != 1)
 		ImageAttr := Gdip_SetImageAttributesColorMatrix("1|0|0|0|0|0|1|0|0|0|0|0|1|0|0|0|0|0|" Matrix "|0|0|0|0|0|1")
@@ -1349,7 +1349,7 @@ Gdip_DrawImage(pGraphics, pBitmap, dx:="", dy:="", dw:="", dh:="", sx:="", sy:="
 {
 	Ptr := A_PtrSize ? "UPtr" : "UInt"
 
-	if !IsNumber(Matrix)
+	if !isNumber(Matrix)
 		ImageAttr := Gdip_SetImageAttributesColorMatrix(Matrix)
 	else if (Matrix != 1)
 		ImageAttr := Gdip_SetImageAttributesColorMatrix("1|0|0|0|0|0|1|0|0|0|0|0|1|0|0|0|0|0|" Matrix "|0|0|0|0|0|1")
@@ -3003,7 +3003,7 @@ IsInteger(Var) {
 	Return False
 }
 
-IsNumber(Var) {
+isNumber(Var) {
 	Static number := "number"
 	If Var Is number
 		Return True

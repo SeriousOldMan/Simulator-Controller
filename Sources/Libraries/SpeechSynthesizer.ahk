@@ -235,7 +235,7 @@ class SpeechSynthesizer {
 
 				if !this.iSpeechSynthesizer.Connect(synthesizer[2], synthesizer[3]) {
 					logMessage(kLogCritical, translate("Could not communicate with speech synthesizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
 					throw "Could not communicate with speech synthesizer library (" . dllName . ")..."
 				}
@@ -301,7 +301,7 @@ class SpeechSynthesizer {
 		if (pid && kNirCmd) {
 			if ProcessExist(pid) {
 				try {
-					Run("`"" kNirCmd "`" setappvolume /" pid " " level)
+					Run("`"" . kNirCmd . "`" setappvolume /" . pid . A_Space . level)
 				}
 				catch Any as exception {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
@@ -349,9 +349,9 @@ class SpeechSynthesizer {
 
 			SplitPath(kSox, , &workingDirectory)
 
-			option := (SpeechSynthesizer.sAudioDevice ? ("""" . SpeechSynthesizer.sAudioDevice . """") : "")
+			option := (SpeechSynthesizer.sAudioDevice ? ("`"" . SpeechSynthesizer.sAudioDevice . "`"") : "")
 
-			Run("`"" kTempDirectory "" player "`" `"" soundFile "`" -t waveaudio " option, workingDirectory, "HIDE", &pid)
+			Run("`"" . kTempDirectory . player . "`" `"" . soundFile . "`" -t waveaudio " . option, workingDirectory, "HIDE", &pid)
 
 			if callback
 				%callback%("Start")
@@ -582,19 +582,19 @@ class SpeechSynthesizer {
 			}
 		}
 		else if ((this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
-			ssml := "<speak version=""1.0"" xmlns=""http://www.w3.org/2001/10/synthesis"" xml:lang=""%language%"">"
-		    ssml .= " <voice name=""%voice%"">"
+			ssml := "<speak version=`"1.0`" xmlns=`"http://www.w3.org/2001/10/synthesis`" xml:lang=`"%language%`">"
+		    ssml .= " <voice name=`"%voice%`">"
 
 			if (this.Synthesizer = "Azure") {
-				ssml .= "  <prosody pitch=""%pitch%"" rate=""%rate%"""
+				ssml .= "  <prosody pitch=`"%pitch%`" rate=`"%rate%`""
 
 				if !kSoX
-					ssml .= " volume=""%volume%"""
+					ssml .= " volume=`"%volume%`""
 
 				ssml .= ">"
 			}
 			else
-				ssml .= "  <prosody pitch=""%pitch%"">"
+				ssml .= "  <prosody pitch=`"%pitch%`">"
 
 			ssml .= "  %text%"
 			ssml .= "  </prosody>"
@@ -610,7 +610,7 @@ class SpeechSynthesizer {
 			}
 			catch Any as exception {
 				if (this.Synthesizer = "Azure")
-					new SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
+					SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Azure Cognitive Services. Maybe your monthly contingent is exhausted.")
 			}
 		}
 	}

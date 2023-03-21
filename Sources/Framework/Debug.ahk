@@ -196,7 +196,7 @@ toggleDebug(*) {
 }
 
 setDebug(debug, *) {
-	global SupportMenu, vDebug
+	global vDebug
 	local title, state
 
 	if hasTrayMenu()
@@ -216,7 +216,7 @@ setDebug(debug, *) {
 }
 
 setLogLevel(level, *) {
-	global LogMenu, vLogLevel
+	global vLogLevel
 
 	local ignore, title, state
 

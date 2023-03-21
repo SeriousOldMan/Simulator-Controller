@@ -51,7 +51,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 	else {
 		image := getFileName(image, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
-		if (++vSplashCounter > 10) {
+		if (++splashCounter > 10) {
 			splashCounter := 1
 
 			if splashGuis[splashCounter] {

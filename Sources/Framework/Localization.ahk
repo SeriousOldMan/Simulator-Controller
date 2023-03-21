@@ -109,7 +109,7 @@ getVolumeUnit(translate := false) {
 displayTemperatureValue(celsius, round) {
 	global vTemperatureUnit
 
-	switch vTemperatureUnit {
+	switch vTemperatureUnit, false {
 		case "Celsius":
 			return (round ? Round(celsius, 1) : celsius)
 		case "Fahrenheit":
@@ -122,7 +122,7 @@ displayTemperatureValue(celsius, round) {
 displayPressureValue(psi, round) {
 	global vPressureUnit
 
-	switch vPressureUnit {
+	switch vPressureUnit, false {
 		case "PSI":
 			return (round ? Round(psi, 1) : psi)
 		case "Bar":
@@ -137,7 +137,7 @@ displayPressureValue(psi, round) {
 displayLengthValue(meter, round) {
 	global vLengthUnit
 
-	switch vLengthUnit {
+	switch vLengthUnit, false {
 		case "Meter":
 			return (round ? Round(meter, 1) : meter)
 		case "Foot":
@@ -150,7 +150,7 @@ displayLengthValue(meter, round) {
 displaySpeedValue(kmh, round) {
 	global vSpeedUnit
 
-	switch vSpeedUnit {
+	switch vSpeedUnit, false {
 		case "km/h":
 			return (round ? Round(kmh, 1) : kmh)
 		case "mph":
@@ -163,7 +163,7 @@ displaySpeedValue(kmh, round) {
 displayMassValue(kilogram, round) {
 	global vMassUnit
 
-	switch vMassUnit {
+	switch vMassUnit, false {
 		case "Kilogram":
 			return (round ? Round(kilogram, 1) : kilogram)
 		case "Pound":
@@ -176,7 +176,7 @@ displayMassValue(kilogram, round) {
 displayVolumeValue(liter, round) {
 	global vVolumeUnit
 
-	switch vVolumeUnit {
+	switch vVolumeUnit, false {
 		case "Liter":
 			return (round ? Round(liter, 1) : liter)
 		case "Gallon (US)":
@@ -224,7 +224,7 @@ displayTimeValue(time, arguments*) {
 internalPressureValue(value, round) {
 	global vPressureUnit
 
-	switch vPressureUnit {
+	switch vPressureUnit, false {
 		case "PSI":
 			return (round ? Round(value, 1) : value)
 		case "Bar":
@@ -239,7 +239,7 @@ internalPressureValue(value, round) {
 internalTemperatureValue(value, round) {
 	global vTemperatureUnit
 
-	switch vTemperatureUnit {
+	switch vTemperatureUnit, false {
 		case "Celsius":
 			return (round ? Round(value, 1) : value)
 		case "Fahrenheit":
@@ -252,7 +252,7 @@ internalTemperatureValue(value, round) {
 internalLengthValue(value, round) {
 	global vLengthUnit
 
-	switch vLengthUnit {
+	switch vLengthUnit, false {
 		case "Meter":
 			return (round ? Round(value, 1) : value)
 		case "Foot":
@@ -265,7 +265,7 @@ internalLengthValue(value, round) {
 internalSpeedValue(value, round) {
 	global vSpeedUnit
 
-	switch vSpeedUnit {
+	switch vSpeedUnit, false {
 		case "km/h":
 			return (round ? Round(value, 1) : value)
 		case "mph":
@@ -278,7 +278,7 @@ internalSpeedValue(value, round) {
 internalMassValue(value, round) {
 	global vMassUnit
 
-	switch vMassUnit {
+	switch vMassUnit, false {
 		case "Kilogram":
 			return (round ? Round(value, 1) : value)
 		case "Pound":
@@ -291,7 +291,7 @@ internalMassValue(value, round) {
 internalVolumeValue(value, round) {
 	global vVolumeUnit
 
-	switch vVolumeUnit {
+	switch vVolumeUnit, false {
 		case "Liter":
 			return (round ? Round(value, 1) : value)
 		case "Gallon (US)":
@@ -339,7 +339,7 @@ internalTimeValue(time, arguments*) {
 
 		seconds := StrSplit(seconds, ":")
 
-		switch seconds.Length {
+		switch seconds.Length, false {
 			case 3:
 				return ((seconds[1] * 3600) + (seconds[2] * 60) + seconds[3] + fraction)
 			case 2:
@@ -565,7 +565,7 @@ registerLocalizationCallback(callback) {
 }
 
 getUnit(type, translate := false) {
-	switch type {
+	switch type, false {
 		case "Pressure":
 			return getPressureUnit(translate)
 		case "Temperature":
@@ -591,7 +591,7 @@ getFloatSeparator() {
 
 convertUnit(type, value, display := true, round := true) {
 	if display
-		switch type {
+		switch type, false {
 			case "Pressure":
 				return displayPressureValue(value, round)
 			case "Temperature":
@@ -608,7 +608,7 @@ convertUnit(type, value, display := true, round := true) {
 				throw "Unknown unit type detected in convertUnit..."
 		}
 	else
-		switch type {
+		switch type, false {
 			case "Pressure":
 				return internalPressureValue(value, round)
 			case "Temperature":
@@ -627,7 +627,7 @@ convertUnit(type, value, display := true, round := true) {
 }
 
 displayValue(type, value, arguments*) {
-	switch type {
+	switch type, false {
 		case "Float":
 			return displayFloatValue(value, arguments*)
 		case "Time":
@@ -638,7 +638,7 @@ displayValue(type, value, arguments*) {
 }
 
 internalValue(type, value, arguments*) {
-	switch type {
+	switch type, false {
 		case "Float":
 			return internalFloatValue(value, arguments*)
 		case "Time":
@@ -665,7 +665,7 @@ validNumber(value, display := false) {
 getFormat(type) {
 	global vNumberFormat, vTimeFormat
 
-	switch type {
+	switch type, false {
 		case "Float":
 			return vNumberFormat
 		case "Time":
@@ -680,7 +680,7 @@ setFormat(type, format) {
 
 	local oldFormat
 
-	switch type {
+	switch type, false {
 		case "Float":
 			oldFormat := vNumberFormat
 

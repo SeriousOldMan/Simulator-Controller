@@ -516,7 +516,7 @@ class Function extends ConfigurationItem {
 	createFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
 		descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
-		switch descriptor[1] {
+		switch descriptor[1], false {
 			case k1WayToggleType:
 				return OneWayToggleFunction(descriptor[2], configuration, onHotkeys, onAction)
 			case k2WayToggleType:

@@ -206,7 +206,8 @@ class SimulatorStartup extends ConfigurationItem {
 		catch Any as exception {
 			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-			showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			showMessage(substituteVariables(translate("Cannot start Simulator Controller (%kBinariesDirectory%Simulator Controller.exe) - please rebuild the applications..."))
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
 			return 0
 		}
@@ -229,7 +230,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 			if getMultiMapValue(this.Settings, section, component, false) {
 				if !kSilentMode
-					showProgress(Map("message", translate("Start: ") . component . translate("...")))
+					showProgress({message: translate("Start: ") . component . translate("...")})
 
 				logMessage(kLogInfo, translate("Component ") . component . translate(" is activated"))
 
@@ -241,7 +242,7 @@ class SimulatorStartup extends ConfigurationItem {
 				logMessage(kLogInfo, translate("Component ") . component . translate(" is deactivated"))
 
 			if !kSilentMode
-				showProgress(Map("progress", Round((runningIndex++ / (this.iCoreComponents.Length + this.iFeedbackComponents.Length)) * 90)))
+				showProgress({progress: Round((runningIndex++ / (this.iCoreComponents.Length + this.iFeedbackComponents.Length)) * 90)})
 		}
 	}
 
@@ -271,17 +272,17 @@ class SimulatorStartup extends ConfigurationItem {
 				showSplashTheme(this.iSplashTheme, "playSong")
 
 			if !kSilentMode
-				showProgress(Map("color", "Blue", "message", translate("Start: Simulator Controller"), "title", translate("Initialize Core System")))
+				showProgress({color: "Blue", message: translate("Start: Simulator Controller"), title: translate("Initialize Core System")})
 
 			loop 50 {
 				if !kSilentMode
-					showProgress(Map("progress", A_Index * 2))
+					showProgress({progress: A_Index * 2})
 
 				Sleep(20)
 			}
 
 			if !kSilentMode
-				showProgress(Map("progress", 0, "color", "Green", "message", translate("..."), "title", translate("Starting System Components")))
+				showProgress({progress: 0, color: "Green", message: translate("..."), title: translate("Starting System Components")})
 
 			runningIndex := 1
 
@@ -289,7 +290,7 @@ class SimulatorStartup extends ConfigurationItem {
 			this.startComponents("Feedback", this.iFeedbackComponents, &startSimulator, &runningIndex)
 
 			if !kSilentMode
-				showProgress(Map("progress", 100, "message", translate("Done")))
+				showProgress({progress: 100, message: translate("Done")})
 
 			Sleep(500)
 
@@ -729,7 +730,7 @@ clearStartupSemaphore(*) {
 startupSimulator() {
 	local fileName
 
-	Hotkey("Escape", "On")
+	Hotkey("Escape", cancelStartup, "On")
 
 	SimulatorStartup.Instance := SimulatorStartup(kSimulatorConfiguration, readMultiMap(kSimulatorSettingsFile))
 
@@ -755,6 +756,8 @@ startSimulator() {
 	local icon := kIconsDirectory . "Startup.ico"
 	local noLaunch
 
+	Hotkey("Escape", cancelStartup, "Off")
+
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Startup"
 
@@ -776,7 +779,7 @@ playSong(songFile) {
 		messageSend(kFileMessage, "Startup", "playStartupSong:" . songFile, SimulatorStartup.Instance.ControllerPID)
 }
 
-cancelStartup() {
+cancelStartup(*) {
 	local startupManager := SimulatorStartup.Instance
 	local msgResult
 
@@ -827,7 +830,7 @@ exitStartup(sayGoodBye := false) {
 		Task.startTask(exitStartup, 2000)
 	}
 	else {
-		Hotkey("Escape", "Off")
+		Hotkey("Escape", cancelStartup, "Off")
 
 		if SimulatorStartup.Instance
 			SimulatorStartup.Instance.cancelStartup()
@@ -844,23 +847,7 @@ exitStartup(sayGoodBye := false) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-Hotkey("Escape", "Off")
-
 startSimulator()
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                         Hotkey & Label Section                          ;;;
-;;;-------------------------------------------------------------------------;;;
-
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Escape::                   Cancel Startup                               ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-Escape:: {
-	cancelStartup()
-
-	return
-}
 
 
 

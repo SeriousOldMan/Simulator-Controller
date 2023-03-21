@@ -225,7 +225,7 @@ updateProgress(message) {
 	if (vProgressCount > 100)
 		vProgressCount := 0
 
-	showProgress(Map("progress", vProgressCount, "message", message))
+	showProgress({progress: vProgressCount, message: message})
 }
 
 windowsPath(path) {
@@ -333,7 +333,7 @@ createSharedDatabases() {
 
 	vProgressCount := 0
 
-	showProgress(Map("color", "Blue", "title", "Creating Shared Database", "message", "Cleaning temporary database..."))
+	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database..."})
 
 	Sleep(500)
 
@@ -344,15 +344,15 @@ createSharedDatabases() {
 	DirCreate(databaseDirectory . "\Input")
 	DirCreate(databaseDirectory . "\Output")
 
-	showProgress(Map("progress", (vProgressCount := vProgressCount + 2), "title", "Downloading Community Content", "message", "..."))
+	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
 
 	downloadUserDatabases(databaseDirectory . "\Input\")
 
-	showProgress(Map("progress", (vProgressCount := vProgressCount + 2), "color", "Green", "title", "Processing Community Content", "message", "..."))
+	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
 
 	archives := createDatabases(databaseDirectory . "\Input\", databaseDirectory . "\Output\")
 
-	showProgress(Map("progress", (vProgressCount := vProgressCount + 2), "color", "Green", "title", "Uploading Community Content", "message", "Cleaning remote repository..."))
+	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Uploading Community Content", message: "Cleaning remote repository..."})
 
 	ftpClearDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads")
 	ftpRemoveDirectory("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller", "database-downloads")
@@ -393,7 +393,7 @@ quit
 		ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", filePath, "simulator-controller/database-downloads/" . fileName)
 	}
 
-	showProgress(Map("progress", 100, "message", "Finished..."))
+	showProgress({progress: 100, message: "Finished..."})
 
 	Sleep(500)
 

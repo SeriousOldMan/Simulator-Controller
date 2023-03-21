@@ -21,18 +21,17 @@
 
 showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		  , x := "Center", y := "__Undefined__", width := 400, height := 100, *) {
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, messageGui
+	local screenLeft, screenRight, screenTop, screenBottom, messageGui
 	local innerWidth := width - 16
 
-	static popupPosition := false
+	static popupPosition
 
-	if (y = kUndefined) {
-		if !popupPosition
-			popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-												 , "General", "Popup Position", "Bottom")
+	if !isSet(popupPosition)
+		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+										, "General", "Popup Position", "Bottom")
 
+	if (y = kUndefined)
 		y := popupPosition
-	}
 
 	if (icon = kUndefined)
 		icon := "Information.png"
@@ -57,26 +56,29 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 	else
 		messageGui.Add("Text", "X8 YP+30 W" . innerWidth . " H" . height, message)
 
-	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
+	if InStr(popupPosition, "2nd Screen")
+		MonitorGetWorkArea(1 + ((MonitorGetCount() > 1) ? 1 : 0), &screenLeft, &screenTop, &screenRight, &screenBottom)
+	else
+		MonitorGetWorkArea(, &screenLeft, &screenTop, &screenRight, &screenBottom)
 
 	if !isInteger(x)
-		switch x {
+		switch x, false {
 			case "Left":
 				x := 25
 			case "Right":
-				x := mainScreenRight - width - 25
+				x := screenRight - width - 25
 			default:
-				x := "Center"
+				x := Round(screenLeft + ((screenRight - screenLeft) / 2) - (width / 2))
 		}
 
 	if !isInteger(y)
-		switch y {
-			case "Top":
-				y := 25
-			case "Bottom":
-				y := mainScreenBottom - height - 25
+		switch y, false {
+			case "Top", "2nd Screen Top":
+				y := screenTop + 25
+			case "Bottom", "2nd Screen Bottom":
+				y := screenBottom - height - 25
 			default:
-				y := "Center"
+				y := Round(screenTop + ((screenBottom - screenTop) / 2) - (height / 2))
 		}
 
 	messageGui.Opt("+AlwaysOnTop")

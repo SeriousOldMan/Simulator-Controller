@@ -405,7 +405,7 @@ class SpeechSynthesizer {
 		}
 	}
 
-	clearCache() {
+	clearCache(*) {
 		local directory := this.iCacheDirectory
 
 		if directory

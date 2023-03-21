@@ -463,7 +463,7 @@ class VoiceServer extends ConfigurationItem {
 			if this.VoiceServer.Debug[kDebugGrammars] {
 				nextCharIndex := 1
 
-				showMessage("Register command phrase: " . GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())
+				showMessage("Register command phrase: " . GrammarCompiler(recognizer).readGrammar(&command, &nextCharIndex).toString())
 			}
 
 			try {
@@ -986,7 +986,7 @@ class VoiceServer extends ConfigurationItem {
 			if this.Debug[kDebugGrammars] {
 				nextCharIndex := 1
 
-				showMessage("Register activation phrase: " . GrammarCompiler(recognizer).readGrammar(activationCommand, nextCharIndex).toString())
+				showMessage("Register activation phrase: " . GrammarCompiler(recognizer).readGrammar(&activationCommand, &nextCharIndex).toString())
 			}
 
 			try {
@@ -1244,4 +1244,5 @@ handleVoiceMessage(category, data) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+setLogLevel(kLogDebug)
 startupVoiceServer()

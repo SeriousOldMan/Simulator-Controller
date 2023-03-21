@@ -831,7 +831,7 @@ class VoiceManager {
 				if this.Debug[kDebugGrammars] {
 					nextCharIndex := 1
 
-					showMessage("Register command phrase: " . new GrammarCompiler(speechRecognizer).readGrammar(definition, nextCharIndex).toString())
+					showMessage("Register command phrase: " . new GrammarCompiler(speechRecognizer).readGrammar(&definition, &nextCharIndex).toString())
 				}
 
 				try {

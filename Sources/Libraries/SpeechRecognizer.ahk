@@ -297,8 +297,8 @@ class SpeechRecognizer {
 
 			if ((recognizer == true) && language) {
 				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor["Language"] = language) {
-						recognizer := recognizerDescriptor["ID"]
+					if (recognizerDescriptor.Language = language) {
+						recognizer := recognizerDescriptor.ID
 
 						found := true
 
@@ -307,8 +307,8 @@ class SpeechRecognizer {
 			}
 			else if (recognizer && (recognizer != true))
 				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor["Name"] = recognizer) {
-						recognizer := recognizerDescriptor["ID"]
+					if (recognizerDescriptor.Name = recognizer) {
+						recognizer := recognizerDescriptor.ID
 
 						found := true
 
@@ -364,9 +364,9 @@ class SpeechRecognizer {
 				recognizer := {ID: index, Culture: this.Instance.GetRecognizerCultureName(index), Language: this.Instance.GetRecognizerTwoLetterISOLanguageName(index)}
 
 				if (this.iEngine = "Server")
-					recognizer["Name"] := this.Instance.GetRecognizerName(index)
+					recognizer.Name := this.Instance.GetRecognizerName(index)
 				else
-					recognizer["Name"] := (this.Instance.GetRecognizerName(index) . " (" . recognizer["Culture"] . ")")
+					recognizer.Name := (this.Instance.GetRecognizerName(index) . " (" . recognizer.Culture . ")")
 
 				recognizerList.Push(recognizer)
 			}
@@ -378,7 +378,7 @@ class SpeechRecognizer {
 	initialize(id) {
 		if this.Instance
 			if (this.iEngine = "Azure")
-				this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
+				this.Instance.SetLanguage(this.getRecognizerList()[id + 1].Culture)
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
@@ -518,7 +518,7 @@ class SpeechRecognizer {
 			}
 
 		if (ratings.Length > 0) {
-			bubbleSort(ratings, "compareRating")
+			bubbleSort(ratings, compareRating)
 
 			return {BestMatch: ratings[1], Ratings: ratings}
 		}
@@ -611,7 +611,7 @@ class SpeechRecognizer {
 	match(words, grammar, minRating := 0.7, maxRating := 0.85) {
 		local matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
 
-		return (matches.Has("BestMatch") ? matches["BestMatch"]["Rating"] : false)
+		return (matches.HasProp("BestMatch") ? matches.BestMatch.Rating : false)
 	}
 }
 

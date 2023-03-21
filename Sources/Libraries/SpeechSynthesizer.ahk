@@ -165,7 +165,6 @@ class SpeechSynthesizer {
 		local dllName, dllFile, voices, languageCode, voiceInfos, ignore, voiceInfo, dirName
 		local player, copied, configuration
 
-
 		dirName := ("PhraseCache." . StrSplit(A_ScriptName, ".")[1] . "." . kVersion)
 
 		DirCreate(kTempDirectory . dirName)

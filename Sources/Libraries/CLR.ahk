@@ -32,7 +32,7 @@ CLR_LoadLibrary(AssemblyName, AppDomain := 0) {
 
 			static _null := ComValue(13, 0)
 
-			args := ComObjArray(0xC, 1),  args[0] := AssemblyName
+			args := ComObjArray(0xC, 1), args[0] := AssemblyName
 			typeofAssembly := AppDomain.GetType().Assembly.GetType()
 
 			if assembly := typeofAssembly.InvokeMember_3("LoadWithPartialName", 0x158, _null, _null, args)
@@ -41,8 +41,11 @@ CLR_LoadLibrary(AssemblyName, AppDomain := 0) {
 			if assembly := typeofAssembly.InvokeMember_3("LoadFrom", 0x158, _null, _null, args)
 				break
 		}
-	catch Any
+	catch Any as exception {
+		logError(exception)
+
 		return ""
+	}
 
 	return assembly
 }
@@ -109,7 +112,7 @@ CLR_Start(Version := "") {
 
 	if (Version = "")
 		loop Files, SystemRoot . "\Microsoft.NET\Framework" . (A_PtrSize = 8 ? "64" : "") "\*", "D"
-			if (FileExist(A_LoopFilePath "\mscorlib.dll") && A_LoopFileName > Version)
+			if (FileExist(A_LoopFilePath . "\mscorlib.dll") && ((Version = "") || (A_LoopFileName > Version)))
 				Version := A_LoopFileName
 
 	if (DllCall("mscoree\CorBindToRuntimeEx", "wstr", Version, "ptr", 0, "uint", 0
@@ -128,7 +131,7 @@ CLR_GetDefaultDomain() {
 
 	if !defaultDomain {
 		if (DllCall(NumGet(NumGet(RtHst := CLR_Start(), 0, "UPtr"), 13 * A_PtrSize, "UPtr"), "ptr", RtHst, "ptr*", &p) >= 0)
-			defaultDomain := ComValue(p), ObjRelease(p)
+			defaultDomain := ComValue(9, p), ObjRelease(p)
 	}
 
 	return defaultDomain

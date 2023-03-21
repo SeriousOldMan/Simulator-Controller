@@ -50,7 +50,7 @@ class ConfigurationItem {
 	saveToConfiguration(configuration) {
 	}
 
-	descriptor(values*) {
+	static descriptor(values*) {
 		local result := ""
 		local index, value
 
@@ -64,8 +64,16 @@ class ConfigurationItem {
 		return result
 	}
 
-	splitDescriptor(descriptor) {
+	descriptor(values*) {
+		return ConfigurationItem.descriptor(values*)
+	}
+
+	static splitDescriptor(descriptor) {
 		return StrSplit(descriptor, ".")
+	}
+
+	splitDescriptor(descriptor) {
+		return ConfigurationItem.splitDescriptor(descriptor)
 	}
 }
 

@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\Math.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -102,7 +102,7 @@ class RaceReportReader {
 					carName := getMultiMapValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
 
 					if (drivers.Length() > 0) {
-						parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
+						parseDriverName(drivers[1][car], &driverForname, &driverSurname, &driverNickname)
 					}
 					else {
 						driverForname := "John"
@@ -120,7 +120,7 @@ class RaceReportReader {
 				carName := getMultiMapValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
 
 				if (drivers.Length() > 0) {
-					parseDriverName(drivers[1][car], driverForname, driverSurname, driverNickname)
+					parseDriverName(drivers[1][car], &driverForname, &driverSurname, &driverNickname)
 				}
 				else {
 					driverForname := "John"
@@ -204,7 +204,7 @@ class RaceReportReader {
 					surName := false
 					nickName := false
 
-					parseDriverName(drivers[1][A_Index], forName, surName, nickName)
+					parseDriverName(drivers[1][A_Index], &forName, &surName, &nickName)
 
 					if driverFornames
 						driverFornames.Push(forName)
@@ -220,7 +220,7 @@ class RaceReportReader {
 				classPositions := overallPositions.Clone()
 
 				for ignore, class in classes {
-					bubbleSort(class, "comparePositions")
+					bubbleSort(&class, comparePositions)
 
 					for position, car in class
 						classPositions[car[1]] := position

@@ -96,7 +96,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 
 		LV_Delete()
 
-		bubbleSort(items, "compareLaunchApplications")
+		bubbleSort(&items, compareLaunchApplications)
 
 		this.ItemList := items
 

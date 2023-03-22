@@ -32,8 +32,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\SettingsDatabase.ahk
-#Include Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\SettingsDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
 #Include Libraries\Strategy.ahk
 #Include Libraries\StrategyViewer.ahk
 
@@ -1674,7 +1674,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				compoundColor := false
 
-				splitCompound(compound, compound, compoundColor)
+				splitCompound(compound, &compound, &compoundColor)
 
 				this.iSelectedCompound := compound
 				this.iSelectedCompoundColor := compoundColor
@@ -2170,7 +2170,7 @@ class StrategyWorkbench extends ConfigurationItem {
 									compound := SessionDatabase().getTyreCompoundName(simulator, car, track, compound, false)
 
 									if compound
-										splitCompound(compound, compound, compoundColor)
+										splitCompound(compound, &compound, &compoundColor)
 									else
 										compound := kUndefined
 								}
@@ -2572,7 +2572,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		compound := false
 		compoundColor := false
 
-		splitCompound(this.TyreCompounds[simCompoundDropDown], compound, compoundColor)
+		splitCompound(this.TyreCompounds[simCompoundDropDown], &compound, &compoundColor)
 
 		tyreCompound := compound
 		tyreCompoundColor := compoundColor
@@ -2685,7 +2685,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			LV_GetText(compound, A_Index, 1)
 			LV_GetText(count, A_Index, 2)
 
-			splitCompound(this.TyreCompounds[inList(translatedCompounds, compound)], compound, compoundColor)
+			splitCompound(this.TyreCompounds[inList(translatedCompounds, compound)], &compound, &compoundColor)
 
 			tyreSets.Push(Array(compound, compoundColor, count))
 		}
@@ -2751,7 +2751,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								  , tAirTemperature, tTrackTemperature))
 			}
 
-			bubbleSort(weathers, "compareTime")
+			bubbleSort(&weathers, compareTime)
 
 			hour := Floor(minute / 60)
 			minute := minute - (hour * 60)

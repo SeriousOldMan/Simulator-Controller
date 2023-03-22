@@ -12,7 +12,7 @@
 
 #Include ..\Libraries\CLR.ahk
 #Include ..\Libraries\Task.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -788,7 +788,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		local nickName := ""
 		local initialForName, initialSurName
 
-		parseDriverName(name, forName, surName, nickName)
+		parseDriverName(name, &forName, &surName, &nickName)
 
 		if (nickName = "") {
 			StringUpper initialForName, % SubStr(forName, 1, 1)
@@ -810,7 +810,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 		name := this.normalizeDriverName(name)
 
-		parseDriverName(name, forName, surName, nickName)
+		parseDriverName(name, &forName, &surName, &nickName)
 
 		identifier := this.Connector.CreateDriver(this.Teams[this.SelectedTeam], forName, surName, nickName)
 

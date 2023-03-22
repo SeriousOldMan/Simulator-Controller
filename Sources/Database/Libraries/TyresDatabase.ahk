@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Tyres Database                  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,31 +9,31 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Database.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include "..\Libraries\Database.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTyresSchemas := {"Tyres.Pressures": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
-										   , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
-										   , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
-										   , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
-										   , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"
-										   , "Identifier", "Synchronized"]
-					   , "Tyres.Pressures.Distribution": ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
-														, "Type", "Tyre", "Pressure", "Count", "Driver"
-														, "Identifier", "Synchronized"]}
+global kTyresSchemas := Map("Tyres.Pressures", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
+											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
+											  , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
+											  , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"
+											  , "Identifier", "Synchronized"]
+						  , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+															, "Type", "Tyre", "Pressure", "Count", "Driver"
+															, "Identifier", "Synchronized"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -93,7 +93,7 @@ class TyresDatabase extends SessionDatabase {
 
 		directory := (this.DatabaseDirectory . scope . "\" . this.getSimulatorCode(simulator) . "\" . car . "\" . track)
 
-		FileCreateDir %directory%
+		DirCreate(directory)
 
 		return Database(directory . "\", kTyresSchemas)
 	}
@@ -133,9 +133,9 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor
-						   , ByRef distributions, driver := "__Undefined__") {
-		local where := {"Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
-					  , Compound: compound, "Compound.Color": compoundColor, Type: "Cold"}
+						   , &distributions, driver := "__Undefined__") {
+		local where := Map("Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+						 , "Compound", compound, "Compound.Color", compoundColor, "Type", "Cold")
 		local ignore, pressureData, tyre, pressure
 
 		if ((driver != kUndefined) && driver)
@@ -172,7 +172,8 @@ class TyresDatabase extends SessionDatabase {
 
 		path := (this.getSimulatorCode(simulator) . "\" . car . "\" . track . "\")
 
-		conditions := {}
+		conditions := Map()
+		conditions.CaseSense := false
 
 		database := this.requireDatabase(simulator, car, track)
 
@@ -185,8 +186,7 @@ class TyresDatabase extends SessionDatabase {
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
-			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
-																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				conditions[values2String("|", condition*)] := true
 		}
 
@@ -199,7 +199,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature
-			   , ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty, driver := "__Undefined__") {
+			   , &compound, &compoundColor, &pressures, &certainty, driver := "__Undefined__") {
 		local condition, weatherIndex, visited, compounds, theCompound, conditionIndex, valid
 		local settings, correctionAir, correctionTrack, thePressures, theCertainty, compoundInfo
 		local theCompound, theCompoundColor, ignore, pressureInfo, deltaAir, deltaTrack
@@ -253,7 +253,7 @@ class TyresDatabase extends SessionDatabase {
 				theCertainty := Min(theCertainty, 1.0 - (Abs(deltaAir + deltaTrack) / (kMaxTemperatureDelta + 1)))
 			}
 
-			if (thePressures.Length() > 0) {
+			if (thePressures.Length > 0) {
 				compound := theCompound
 				compoundColor := theCompoundColor
 				certainty := theCertainty
@@ -306,7 +306,7 @@ class TyresDatabase extends SessionDatabase {
 			   , compound, compoundColor, driver := false) {
 		local weatherBaseIndex, weatherCandidateOffsets, localTyresDatabase, globalTyresDatabase
 		local ignore, weatherOffset, airDelta, trackDelta, distributions, thePressures, index, tyre
-		local bestPressure, bestCount, pressure, pressureCount, tyrePressures
+		local bestPressure, bestCount, pressure, pressureCount, tyrePressures, key
 
 		if !driver
 			driver := [this.ID]
@@ -333,24 +333,35 @@ class TyresDatabase extends SessionDatabase {
 		globalTyresDatabase := (this.UseCommunity ? this.getTyresDatabase(simulator, car, track, "Community") : false)
 
 		for ignore, weatherOffset in weatherCandidateOffsets {
-			weather := kWeatherConditions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherConditions.Length()))]
+			weather := kWeatherConditions[Max(0, Min(weatherBaseIndex + weatherOffset, kWeatherConditions.Length))]
 
 			for ignore, airDelta in kTemperatureDeltas {
 				for ignore, trackDelta in kTemperatureDeltas {
-					distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
+					distributions := Map()
+					distributions.CaseSense := false
+
+					for index, tyre in ["FL", "FR", "RL", "RR"] {
+						tyrePressures := Map()
+						tyrePressures.CaseSense := false
+
+						distributions[tyre] := tyrePressures
+					}
 
 					this.getPressureDistributions(localTyresDatabase, weather, Round(airTemperature) + airDelta, Round(trackTemperature) + trackDelta
-												, compound, compoundColor, distributions, driver*)
+											    , compound, compoundColor, distributions, driver*)
 
 					if this.UseCommunity
 						this.getPressureDistributions(globalTyresDatabase, weather, Round(airTemperature) + airDelta, Round(trackTemperature) + trackDelta
 													, compound, compoundColor, distributions, false)
 
 					if (distributions["FL"].Count() != 0) {
-						thePressures := {}
+						thePressures := Map()
+						thePressures.CaseSense := false
 
 						for index, tyre in ["FL", "FR", "RL", "RR"] {
-							thePressures[tyre] := {}
+							thePressures[tyre] := Map()
+							thePressures[tyre].CaseSense := false
+
 							tyrePressures := distributions[tyre]
 
 							bestPressure := false
@@ -374,7 +385,7 @@ class TyresDatabase extends SessionDatabase {
 			}
 		}
 
-		return {}
+		return Map()
 	}
 
 	lock(simulator, car, track, wait := true) {
@@ -424,17 +435,18 @@ class TyresDatabase extends SessionDatabase {
 
 		database := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
 
-		database.add("Tyres.Pressures", {Driver: driver, Weather: weather
-									   , "Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
-									   , Compound: compound, "Compound.Color": compoundColor
-									   , "Tyre.Pressure.Cold.Front.Left": coldPressures[1]
-									   , "Tyre.Pressure.Cold.Front.Right": coldPressures[2]
-									   , "Tyre.Pressure.Cold.Rear.Left": coldPressures[3]
-									   , "Tyre.Pressure.Cold.Rear.Right": coldPressures[4]
-									   , "Tyre.Pressure.Hot.Front.Left": hotPressures[1]
-									   , "Tyre.Pressure.Hot.Front.Right": hotPressures[2]
-									   , "Tyre.Pressure.Hot.Rear.Left": hotPressures[3]
-									   , "Tyre.Pressure.Hot.Rear.Right": hotPressures[4]}, flush)
+		database.add("Tyres.Pressures", Map("Driver", driver, "Weather", weather
+										  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+										  , "Compound", compound, "Compound.Color", compoundColor
+										  , "Tyre.Pressure.Cold.Front.Left", coldPressures[1]
+										  , "Tyre.Pressure.Cold.Front.Right", coldPressures[2]
+										  , "Tyre.Pressure.Cold.Rear.Left", coldPressures[3]
+										  , "Tyre.Pressure.Cold.Rear.Right", coldPressures[4]
+										  , "Tyre.Pressure.Hot.Front.Left", hotPressures[1]
+										  , "Tyre.Pressure.Hot.Front.Right", hotPressures[2]
+										  , "Tyre.Pressure.Hot.Rear.Left", hotPressures[3]
+										  , "Tyre.Pressure.Hot.Rear.Right", hotPressures[4])
+									  , flush)
 
 		tyres := ["FL", "FR", "RL", "RR"]
 		types := ["Cold", "Hot"]
@@ -467,12 +479,12 @@ class TyresDatabase extends SessionDatabase {
 			database := this.iDatabase
 
 		rows := database.query("Tyres.Pressures.Distribution"
-							 , {Where: {Driver: driver, Weather: weather
-									  , "Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
-									  , Compound: compound, "Compound.Color": compoundColor
-									  , Type: type, Tyre: tyre, "Pressure": pressure}})
+							 , {Where: Map("Driver", driver, "Weather", weather
+										 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+										 , "Compound", compound, "Compound.Color", compoundColor
+										 , "Type", type, "Tyre", tyre, "Pressure", pressure)})
 
-		if (rows.Length() > 0) {
+		if (rows.Length > 0) {
 			row := rows[1]
 
 			row.Count := row.Count + count
@@ -486,10 +498,10 @@ class TyresDatabase extends SessionDatabase {
 		else
 			try {
 				database.add("Tyres.Pressures.Distribution"
-						   , {Driver: driver, Weather: weather
-							, "Temperature.Air": Round(airTemperature), "Temperature.Track": Round(trackTemperature)
-							, Compound: compound, "Compound.Color": compoundColor
-							, Type: type, Tyre: tyre, "Pressure": pressure, Count: count})
+						   , Map("Driver", driver, "Weather", weather
+							   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+							   , "Compound", compound, "Compound.Color", compoundColor
+							   , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count))
 			}
 			catch Any as exception {
 				logError(exception)
@@ -505,22 +517,22 @@ class TyresDatabase extends SessionDatabase {
 	}
 }
 
-synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, ByRef counter) {
+synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, lastSynchronization, force, &counter) {
 	local lastSimulator := false
 	local lastCar := false
 	local lastTrack := false
-	local ignore, simulator, car, track, db, modified, identifier, pressures, properties, count
+	local ignore, simulator, car, track, db, modified, identifier, pressures, oldPressures, properties, count
 
 	if inList(groups, "Pressures")
 		try {
 			for ignore, identifier in string2Values(";", connector.QueryData("TyresPressures", "Modified > " . lastSynchronization)) {
 				pressures := parseData(connector.GetData("TyresPressures", identifier))
 
-				simulator := pressures.Simulator
+				simulator := pressures["Simulator"]
 
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
-					car := pressures.Car
-					track := pressures.Track
+					car := pressures["Car"]
+					track := pressures["Track"]
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
 						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
@@ -534,20 +546,21 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 						counter += 1
 
 						try {
-							db.add("Tyres.Pressures", {Identifier: identifier, Synchronized: timestamp
-													 , Driver: pressures.Driver, Weather: pressures.Weather
-													 , "Temperature.Air": pressures.AirTemperature
-													 , "Temperature.Track": pressures.TrackTemperature
-													 , Compound: pressures.TyreCompound
-													 , "Compound.Color": pressures.TyreCompoundColor
-													 , "Tyre.Pressure.Cold.Front.Left": pressures.ColdPressureFrontLeft
-													 , "Tyre.Pressure.Cold.Front.Right": pressures.ColdPressureFrontRight
-													 , "Tyre.Pressure.Cold.Rear.Left": pressures.ColdPressureRearLeft
-													 , "Tyre.Pressure.Cold.Rear.Right": pressures.ColdPressureRearRight
-													 , "Tyre.Pressure.Hot.Front.Left": pressures.HotPressureFrontLeft
-													 , "Tyre.Pressure.Hot.Front.Right": pressures.HotPressureFrontRight
-													 , "Tyre.Pressure.Hot.Rear.Left": pressures.HotPressureRearLeft
-													 , "Tyre.Pressure.Hot.Rear.Right": pressures.HotPressureRearRight}, true)
+							db.add("Tyres.Pressures", Map("Identifier", identifier, "Synchronized", timestamp
+														, "Driver", pressures["Driver"], "Weather", pressures["Weather"]
+														, "Temperature.Air", pressures["AirTemperature"]
+														, "Temperature.Track", pressures["TrackTemperature"]
+														, "Compound", pressures["TyreCompound"]
+														, "Compound.Color", pressures["TyreCompoundColor"]
+														, "Tyre.Pressure.Cold.Front.Left", pressures["ColdPressureFrontLeft"]
+														, "Tyre.Pressure.Cold.Front.Right", pressures["ColdPressureFrontRight"]
+														, "Tyre.Pressure.Cold.Rear.Left", pressures["ColdPressureRearLeft"]
+														, "Tyre.Pressure.Cold.Rear.Right", pressures["ColdPressureRearRight"]
+														, "Tyre.Pressure.Hot.Front.Left", pressures["HotPressureFrontLeft"]
+														, "Tyre.Pressure.Hot.Front.Right", pressures["HotPressureFrontRight"]
+														, "Tyre.Pressure.Hot.Rear.Left", pressures["HotPressureRearLeft"]
+														, "Tyre.Pressure.Hot.Rear.Right", pressures["HotPressureRearRight"])
+													, true)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -559,15 +572,15 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 			for ignore, identifier in string2Values(";", connector.QueryData("TyresPressuresDistribution", "Modified > " . lastSynchronization)) {
 				pressures := parseData(connector.GetData("TyresPressuresDistribution", identifier))
 
-				simulator := pressures.Simulator
+				simulator := pressures["Simulator"]
 
 				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
-					car := pressures.Car
-					track := pressures.Track
+					car := pressures["Car"]
+					track := pressures["Track"]
 
 					counter += 1
 
-					count := pressures.Count
+					count := pressures["Count"]
 
 					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
 						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
@@ -577,18 +590,16 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 						lastTrack := track
 					}
 
-					properties := {Identifier: pressures.Identifier, Synchronized: timestamp
-								 , Driver: pressures.Driver, Weather: pressures.Weather
-								 , "Temperature.Air": pressures.AirTemperature, "Temperature.Track": pressures.TrackTemperature
-								 , Compound: pressures.TyreCompound, "Compound.Color": pressures.TyreCompoundColor
-								 , Type: pressures.Type, Tyre: pressures.Tyre, Pressure: pressures.Pressure, Count: count}
+					oldPressures := db.query("Tyres.Pressures.Distribution", {Where: {Identifier: identifier} })
 
-
-					pressures := db.query("Tyres.Pressures.Distribution", {Where: {Identifier: identifier} })
-
-					if (pressures.Length() = 0) {
+					if (oldPressures.Length = 0) {
 						try {
-							db.add("Tyres.Pressures.Distribution", properties, true)
+							db.add("Tyres.Pressures.Distribution", Map("Identifier", pressures["Identifier"], "Synchronized", timestamp
+																	 , "Driver", pressures["Driver"], "Weather", pressures["Weather"]
+																	 , "Temperature.Air", pressures["AirTemperature"], "Temperature.Track", pressures["TrackTemperature"]
+																	 , "Compound", pressures["TyreCompound"], "Compound.Color", pressures["TyreCompoundColor"]
+																	 , "Type", pressures["Type"], "Tyre", pressures["Tyre"], "Pressure", pressures["Pressure"], "Count", count)
+																 , true)
 						}
 						catch Any as exception {
 							logError(exception)
@@ -599,7 +610,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 							try {
 								db.changed("Tyres.Pressures.Distribution")
 
-								pressures[1].Count := Max(pressures[1].Count, count)
+								oldPressures[1]["Count"] := Max(oldPressures[1]["Count"], count)
 							}
 							finally {
 								db.flush("Tyres.Pressures.Distribution")
@@ -622,15 +633,15 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 
 								for ignore, pressures in db.query("Tyres.Pressures", {Where: force ? {Driver: sessionDB.ID}
 																								   : {Synchronized: kNull, Driver: sessionDB.ID} }) {
-									if (pressures.Identifier = kNull)
-										pressures.Identifier := createGUID()
+									if (pressures["Identifier"] = kNull)
+										pressures["Identifier"] := createGUID()
 
-									pressures.Synchronized := timestamp
+									pressures["Synchronized"] := timestamp
 
 									db.changed("Tyres.Pressures")
 									modified := true
 
-									if (connector.CountData("TyresPressures", "Identifier = '" . pressures.Identifier . "'") = 0) {
+									if (connector.CountData("TyresPressures", "Identifier = '" . pressures["Identifier"] . "'") = 0) {
 										connector.CreateData("TyresPressures"
 														   , substituteVariables("Identifier=%Identifier%`nDriver=%Driver%`n"
 																			   . "Simulator=%Simulator%`nCar=%Car%`nTrack=%Track%`n"
@@ -645,12 +656,12 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 																			   . "ColdPressureFrontRight=%ColdPressureFrontRight%`n"
 																			   . "ColdPressureRearLeft=%ColdPressureRearLeft%`n"
 																			   . "ColdPressureRearRight=%ColdPressureRearRight%"
-																			   , {Identifier: pressures.Identifier, Driver: pressures.Driver
+																			   , {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
 																				, Simulator: simulator, Car: car, Track: track
-																				, Weather: pressures.Weather
+																				, Weather: pressures["Weather"]
 																				, AirTemperature: pressures["Temperature.Air"]
 																				, TrackTemperature: pressures["Temperature.Track"]
-																				, TyreCompound: pressures.Compound, TyreCompoundColor: pressures["Compound.Color"]
+																				, TyreCompound: pressures["Compound"], TyreCompoundColor: pressures["Compound.Color"]
 																				, HotPressureFrontLeft: pressures["Tyre.Pressure.Hot.Front.Left"]
 																				, HotPressureFrontRight: pressures["Tyre.Pressure.Hot.Front.Right"]
 																				, HotPressureRearLeft: pressures["Tyre.Pressure.Hot.Rear.Left"]
@@ -677,15 +688,15 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 
 								for ignore, pressures in db.query("Tyres.Pressures.Distribution", {Where: force ? {Driver: sessionDB.ID}
 																												: {Synchronized: kNull, Driver: sessionDB.ID} }) {
-									if (pressures.Identifier = kNull) {
+									if (pressures["Identifier"] = kNull) {
 										identifier := createGUID()
 
-										pressures.Identifier := identifier
+										pressures["Identifier"] := identifier
 									}
 									else
-										identifier := pressures.Identifier
+										identifier := pressures["Identifier"]
 
-									pressures.Synchronized := timestamp
+									pressures["Synchronized"] := timestamp
 
 									db.changed("Tyres.Pressures.Distribution")
 									modified := true
@@ -699,13 +710,13 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 																	. "Weather=%Weather%`nAirTemperature=%AirTemperature%`nTrackTemperature=%TrackTemperature%`n"
 																	. "TyreCompound=%TyreCompound%`nTyreCompoundColor=%TyreCompoundColor%`n"
 																	. "Type=%Type%`nTyre=%Tyre%`nPressure=%Pressure%`nCount=%Count%"
-																	, {Identifier: pressures.Identifier, Driver: pressures.Driver
+																	, {Identifier: pressures["Identifier"], Driver: pressures["Driver"]
 																	 , Simulator: simulator, Car: car, Track: track
-																	 , Weather: pressures.Weather
+																	 , Weather: pressures["Weather"]
 																	 , AirTemperature: pressures["Temperature.Air"], TrackTemperature: pressures["Temperature.Track"]
-																	 , TyreCompound: pressures.Compound, TyreCompoundColor: pressures["Compound.Color"]
-																	 , Type: pressures.Type, Tyre: pressures.Tyre
-																	 , Pressure: pressures.Pressure, Count: pressures.Count})
+																	 , TyreCompound: pressures["Compound, TyreCompoundColor: pressures["Compound.Color"]
+																	 , Type: pressures["Type"], Tyre: pressures["Tyre"]
+																	 , Pressure: pressures["Pressure"], Count: pressures["Count})
 
 									if identifier
 										connector.UpdateData("TyresPressuresDistribution", identifier, properties)

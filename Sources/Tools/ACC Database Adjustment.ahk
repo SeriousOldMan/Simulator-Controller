@@ -37,8 +37,8 @@ global vBuildConfiguration := "Development"
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

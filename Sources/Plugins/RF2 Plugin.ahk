@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -141,7 +141,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		local ignore := false
 		local candidate
 
-		this.getPitstopActions(actions, ignore)
+		this.getPitstopActions(&actions, &ignore)
 
 		for ignore, candidate in actions
 			if (candidate = option)
@@ -213,7 +213,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 					compoundColor := false
 
 					if compound
-						splitCompound(compound, compound, compoundColor)
+						splitCompound(compound, &compound, &compoundColor)
 
 					return [compound, compoundColor]
 				case "Repair Suspension":

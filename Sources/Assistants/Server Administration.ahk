@@ -34,7 +34,7 @@
 
 #Include ..\Libraries\CLR.ahk
 #Include ..\Libraries\Task.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

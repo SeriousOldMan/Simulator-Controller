@@ -33,9 +33,9 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\Database.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2873,7 +2873,7 @@ prepareTargets(ByRef buildProgress, updateOnly) {
 		Sleep 50
 	}
 
-	bubbleSort(vUpdateTargets, "compareUpdateTargets")
+	bubbleSort(&vUpdateTargets, compareUpdateTargets)
 
 	if !updateOnly {
 		cleanupTargets := getMultiMapValues(targets, "Cleanup")

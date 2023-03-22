@@ -37,8 +37,8 @@ global kBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Libraries\FTP.ahk"
-#Include "..\Assistants\Libraries\SessionDatabase.ahk"
-#Include "..\Assistants\Libraries\TyresDatabase.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\TyresDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

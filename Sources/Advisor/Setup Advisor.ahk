@@ -35,7 +35,7 @@
 #Include ..\Libraries\Task.ahk
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

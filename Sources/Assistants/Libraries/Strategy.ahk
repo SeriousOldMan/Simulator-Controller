@@ -17,7 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -377,7 +377,7 @@ class StrategySimulation {
 			candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
 
 			if candidate
-				splitCompound(candidate, tyreCompound, tyreCompoundColor)
+				splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
 		}
 
 		if verbose {
@@ -797,7 +797,7 @@ class VariationSimulation extends StrategySimulation {
 			candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
 
 			if candidate
-				splitCompound(candidate, targetTyreCompound, targetTyreCompoundColor)
+				splitCompound(candidate, &targetTyreCompound, &targetTyreCompoundColor)
 
 		}
 
@@ -1158,7 +1158,7 @@ class TrafficSimulation extends StrategySimulation {
 				candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
 
 				if candidate
-					splitCompound(candidate, targetTyreCompound, targetTyreCompoundColor)
+					splitCompound(candidate, &targetTyreCompound, &targetTyreCompoundColor)
 
 			}
 
@@ -3044,7 +3044,7 @@ class Strategy extends ConfigurationItem {
 														   , getKeys(this.AvailableTyreSets))
 
 				if candidate
-					splitCompound(candidate, tyreCompound, tyreCompoundColor)
+					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
 				else {
 					tyreCompound := this.TyreCompound[true]
 					tyreCompoundColor := this.TyreCompoundColor[true]

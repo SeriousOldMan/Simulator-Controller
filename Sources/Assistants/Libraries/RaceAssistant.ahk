@@ -19,9 +19,9 @@
 
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\VoiceManager.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SettingsDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -858,7 +858,7 @@ class RaceAssistant extends ConfigurationItem {
 																	 , knowledgeBase.getValue("Session.Track")) {
 			compoundColor := false
 
-			splitCompound(compound, compound, compoundColor)
+			splitCompound(compound, &compound, &compoundColor)
 
 			knowledgeBase.addRule(compiler.compileRule("availableTyreCompound(" . compound . "," . compoundColor . ")"))
 		}
@@ -1592,7 +1592,7 @@ class GridRaceAssistant extends RaceAssistant {
 							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
 								positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
 
-				bubbleSort(positions, "compareClassPositions")
+				bubbleSort(&positions, compareClassPositions)
 
 				for ignore, position in positions
 					classGrid.Push(position[1])

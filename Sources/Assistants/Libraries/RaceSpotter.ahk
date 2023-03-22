@@ -3143,7 +3143,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			for ignore, class in classes {
-				bubbleSort(class, "compareClassPositions")
+				bubbleSort(&class, compareClassPositions)
 
 				for carClassPosition, car in class
 					carClassPositions[car[1]] := carClassPosition
@@ -3165,7 +3165,7 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 
 			if hasDriver {
-				bubbleSort(carPositions, "trackOrder")
+				bubbleSort(&carPositions, trackOrder)
 
 				positions["Driver"] := driver
 				positions["Count"] := count

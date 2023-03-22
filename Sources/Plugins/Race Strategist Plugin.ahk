@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
 #Include ..\Assistants\Libraries\RaceReportReader.ahk
 
 
@@ -685,7 +685,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 								classPositions.Push(Array(A_Index, position))
 							}
 
-						bubbleSort(classPositions, "comparePositions")
+						bubbleSort(&classPositions, comparePositions)
 
 						for car, candidate in classPositions {
 							if (car = 1)

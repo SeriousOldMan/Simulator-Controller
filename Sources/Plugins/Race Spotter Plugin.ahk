@@ -11,7 +11,7 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

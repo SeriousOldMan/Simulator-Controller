@@ -518,7 +518,7 @@ class SpeechRecognizer {
 			}
 
 		if (ratings.Length > 0) {
-			bubbleSort(ratings, compareRating)
+			bubbleSort(&ratings, compareRating)
 
 			return {BestMatch: ratings[1], Ratings: ratings}
 		}

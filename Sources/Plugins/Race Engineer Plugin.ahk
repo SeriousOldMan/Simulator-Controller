@@ -11,7 +11,7 @@
 
 #Include ..\Libraries\Task.ahk
 #Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -206,7 +206,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			pressures := {}
 			certainty := 1.0
 
-			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty, true) {
+			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, &compound, &compoundColor, &pressures, &certainty, true) {
 				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
 				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
 

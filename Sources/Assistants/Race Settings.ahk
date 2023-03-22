@@ -34,7 +34,7 @@
 
 #Include ..\Libraries\Messages.ahk
 #Include ..\Libraries\CLR.ahk
-#Include Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -785,7 +785,7 @@ restart:
 		setMultiMapValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
 		setMultiMapValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
 
-		splitCompound(vTyreCompounds[spSetupTyreCompoundDropDown], compound, compoundColor)
+		splitCompound(vTyreCompounds[spSetupTyreCompoundDropDown], &compound, &compoundColor)
 
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound", compound)
 		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color", compoundColor)
@@ -1505,7 +1505,7 @@ readSimulatorData(simulator) {
 			if compound {
 				compoundColor := false
 
-				splitCompound(compound, compound, compoundColor)
+				splitCompound(compound, &compound, &compoundColor)
 
 				setMultiMapValue(data, "Car Data", "TyreCompound", compound)
 				setMultiMapValue(data, "Car Data", "TyreCompoundColor", compoundColor)

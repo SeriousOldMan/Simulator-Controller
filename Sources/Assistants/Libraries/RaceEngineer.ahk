@@ -19,7 +19,7 @@
 #Include ..\Libraries\Task.ahk
 #Include ..\Libraries\RuleEngine.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -653,7 +653,7 @@ class RaceEngineer extends RaceAssistant {
 																			  , knowledgeBase.getValue("Session.Car")
 																			  , knowledgeBase.getValue("Session.Track"))
 					if (InStr(candidate, compound) = 1) {
-						splitCompound(compound, compound, compoundColor)
+						splitCompound(compound, &compound, &compoundColor)
 
 						speaker.speakPhrase("ConfirmCompoundChange", {compound: fragments[compound . "Tyre"]}, true)
 
@@ -2535,7 +2535,7 @@ class RaceEngineer extends RaceAssistant {
 
 		return this.TyresDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator")
 											 , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-											 , weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty, true)
+											 , weather, airTemperature, trackTemperature, &compound, &compoundColor, &pressures, &certainty, true)
 	}
 }
 

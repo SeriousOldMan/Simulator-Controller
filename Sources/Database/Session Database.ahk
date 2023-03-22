@@ -35,9 +35,9 @@
 #Include ..\Libraries\Task.ahk
 #Include ..\Libraries\GDIP.ahk
 #Include ..\Libraries\CLR.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\SettingsDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
 #Include ..\Assistants\Libraries\PressuresEditor.ahk
 
 
@@ -1247,7 +1247,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			userStrategies := true
 			communityStrategies := this.UseCommunity
 
-			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userStrategies, communityStrategies)
+			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userStrategies, &communityStrategies)
 
 			Gui ListView, % this.StrategyListView
 
@@ -1313,7 +1313,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				userSetups := true
 				communitySetups := this.UseCommunity
 
-				this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
+				this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userSetups, &communitySetups)
 
 				userSetups := userSetups[setupType]
 
@@ -2802,7 +2802,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			userStrategies := true
 			communityStrategies := true
 
-			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userStrategies, communityStrategies)
+			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userStrategies, &communityStrategies)
 
 			LV_Add("", translate("User"), userStrategies.Length())
 
@@ -2843,7 +2843,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			userSetups := true
 			communitySetups := true
 
-			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, userSetups, communitySetups)
+			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userSetups, &communitySetups)
 
 			for type, setups in userSetups
 				LV_Add("", translate("User"), translate(kSetupNames[type]), setups.Length())
@@ -3372,7 +3372,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					compound := false
 					compoundColor := false
 
-					splitCompound(compounds[chosenCompound], compound, compoundColor)
+					splitCompound(compounds[chosenCompound], &compound, &compoundColor)
 
 					this.iTyreCompound := compound
 					this.iTyreCompoundColor := compoundColor
@@ -3648,7 +3648,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (fileName != "") {
 			size := false
 
-			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, size)
+			setupData := this.SessionDatabase.readSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName, &size)
 
 			deleteFile(fileName)
 
@@ -5214,7 +5214,7 @@ chooseSettingAsync() {
 		for ignore, descriptor in settings
 			labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
 
-		bubbleSort(labels)
+		bubbleSort(&labels)
 
 		GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
 		GuiControl Choose, settingDropDown, % inList(labels, setting)
@@ -6204,7 +6204,7 @@ transferPressures() {
 	compound := false
 	compoundColor := false
 
-	splitCompound(compounds[tyreCompoundDropDown], compound, compoundColor)
+	splitCompound(compounds[tyreCompoundDropDown], &compound, &compoundColor)
 
 	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
 																			, editor.SelectedTrack, editor.SelectedWeather

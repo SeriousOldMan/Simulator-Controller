@@ -32,7 +32,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 #Include ..\Libraries\GDIP.ahk
 
 

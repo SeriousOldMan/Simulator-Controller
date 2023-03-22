@@ -21,8 +21,8 @@
 #Include ..\Libraries\Database.ahk
 #Include ..\Assistants\Libraries\RaceAssistant.ahk
 #Include ..\Assistants\Libraries\Strategy.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1992,7 +1992,7 @@ class RaceStrategist extends GridRaceAssistant {
 																								 , strategyTask.UsedTyreSets)))
 
 				if candidate
-					splitCompound(candidate, tyreCompound, tyreCompoundColor)
+					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
 			}
 
 			sessionType := strategy.SessionType
@@ -2933,7 +2933,7 @@ updatePositions(context, futureLap) {
 		}
 	}
 
-	bubbleSort(cars, "comparePositions")
+	bubbleSort(&cars, comparePositions)
 
 	loop {
 		if (A_Index > count)
@@ -2942,7 +2942,7 @@ updatePositions(context, futureLap) {
 		knowledgeBase.setFact("Standings.Extrapolated." . futureLap . ".Car." . cars[A_Index][1] . ".Position", A_Index)
 	}
 
-	bubbleSort(cars, "compareSequences")
+	bubbleSort(&cars, compareSequences)
 
 	loop {
 		if (A_Index > count)

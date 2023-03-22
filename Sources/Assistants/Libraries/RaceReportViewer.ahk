@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Libraries\Math.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 #Include ..\Assistants\Libraries\RaceReportReader.ahk
 
 
@@ -372,7 +372,7 @@ class RaceReportViewer extends RaceReportReader {
 				classResults := {}
 
 				for ignore, class in classes {
-					bubbleSort(class, "comparePositions")
+					bubbleSort(&class, comparePositions)
 
 					for ignore, car in class {
 						result := car[2]

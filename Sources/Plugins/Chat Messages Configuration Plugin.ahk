@@ -96,7 +96,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		LV_Delete()
 
-		bubbleSort(items, "compareChatMessages")
+		bubbleSort(&items, compareChatMessages)
 
 		this.ItemList := items
 

@@ -33,7 +33,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Libraries\RaceReportViewer.ahk
-#Include Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -38,10 +38,10 @@
 #Include ..\Libraries\Math.ahk
 #Include ..\Libraries\CLR.ahk
 #Include ..\Libraries\GDIP.ahk
-#Include Libraries\SessionDatabase.ahk
-#Include Libraries\SettingsDatabase.ahk
-#Include Libraries\TyresDatabase.ahk
-#Include Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SettingsDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
 #Include Libraries\RaceReportViewer.ahk
 #Include Libraries\Strategy.ahk
 #Include Libraries\StrategyViewer.ahk
@@ -1985,7 +1985,7 @@ class RaceCenter extends ConfigurationItem {
 				if (!class || (class = getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
 					positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 
-			bubbleSort(positions, "compareClassPositions")
+			bubbleSort(&positions, compareClassPositions)
 
 			for ignore, position in positions
 				classGrid.Push(position[1])
@@ -2754,7 +2754,7 @@ class RaceCenter extends ConfigurationItem {
 					surName := false
 					nickName := false
 
-					parseDriverName(driver, forName, surName, nickName)
+					parseDriverName(driver, &forName, &surName, &nickName)
 
 					found := false
 
@@ -2763,7 +2763,7 @@ class RaceCenter extends ConfigurationItem {
 						sSurName := false
 						sNickName := false
 
-						parseDriverName(candidate, sForName, sSurName, sNickName)
+						parseDriverName(candidate, &sForName, &sSurName, &sNickName)
 
 						if ((sForName = forName) && (sSurName = surName)) {
 							found := true
@@ -3248,7 +3248,7 @@ class RaceCenter extends ConfigurationItem {
 							surName := ""
 							nickName := ""
 
-							parseDriverName(candidate, forName, surName, nickName)
+							parseDriverName(candidate, &forName, &surName, &nickName)
 
 							return this.createDriver({Forname: forName, Surname: surName, Nickname: nickName, Identifier: this.SessionDrivers[candidate]})
 						}
@@ -3671,7 +3671,7 @@ class RaceCenter extends ConfigurationItem {
 
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Set", tyreSet)
 
-			splitCompound(this.TyreCompounds[pitstopTyreCompoundDropDown - 1], compound, compoundColor)
+			splitCompound(this.TyreCompounds[pitstopTyreCompoundDropDown - 1], &compound, &compoundColor)
 
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound", compound)
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Compound.Color", compoundColor)
@@ -4354,7 +4354,7 @@ class RaceCenter extends ConfigurationItem {
 		tyrePressures := false
 		fuel := lap.FuelRemaining
 
-		splitCompound(lap.Compound, tyreCompound, tyreCompoundColor)
+		splitCompound(lap.Compound, &tyreCompound, &tyreCompoundColor)
 
 		if lap.Telemetry
 			tyreSet := getMultiMapValue(parseMultiMap(lap.Telemetry), "Car Data", "TyreSet", false)
@@ -4493,7 +4493,7 @@ class RaceCenter extends ConfigurationItem {
 														   , getKeys(this.computeAvailableTyreSets(strategy.AvailableTyreSets)))
 
 				if candidate
-					splitCompound(candidate, tyreCompound, tyreCompoundColor)
+					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
 			}
 
 			sessionType := strategy.SessionType
@@ -5173,7 +5173,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		bubbleSort(newStints, "objectOrder")
+		bubbleSort(&newStints, objectOrder)
 
 		return newStints
 	}
@@ -5194,7 +5194,7 @@ class RaceCenter extends ConfigurationItem {
 					newLaps.Push(newLap)
 			}
 
-		bubbleSort(newLaps, "objectOrder")
+		bubbleSort(&newLaps, objectOrder)
 
 		count := newLaps.Length()
 
@@ -7461,7 +7461,7 @@ class RaceCenter extends ConfigurationItem {
 				compoundColor := false
 
 				splitCompound(this.TyreCompounds[inList(collect(this.TyreCompounds, "translate"), compound)]
-							, compound, compoundColor)
+							, &compound, &compoundColor)
 
 				pressures := string2Values(", ", pressures)
 
@@ -11274,12 +11274,12 @@ class RaceCenter extends ConfigurationItem {
 						carPositions.Push(Array(A_Index, lapTime, running))
 					}
 
-					bubbleSort(carPositions, "positionsOrder")
+					bubbleSort(&carPositions, positionsOrder)
 
 					for nr, position in carPositions
 						position[3] += ((lastPositions[position[1]] - nr) * (overTakeDelta / position[2]))
 
-					bubbleSort(carPositions, "positionsOrder")
+					bubbleSort(&carPositions, positionsOrder)
 
 					nextPositions := []
 

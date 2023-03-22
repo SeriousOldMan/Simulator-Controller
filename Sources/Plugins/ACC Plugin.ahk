@@ -13,7 +13,7 @@
 #Include ..\Libraries\JSON.ahk
 #Include ..\Libraries\Math.ahk
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include ..\Database\Libraries\SettingsDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -2056,35 +2056,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.iSelectedDriver := nextDriver[2]
 		}
-	}
-
-	restoreSessionState(sessionSettings, sessionState) {
-		local pitstop
-
-		super.restoreSessionState(sessionSettings, sessionState)
-
-		/*
-		if sessionState {
-			sessionState := getMultiMapValues(sessionState, "Session State")
-
-			if sessionState.HasKey("Pitstop.Last") {
-				pitstop := sessionState["Pitstop.Last"]
-
-				this.iRepairSuspensionChosen := sessionState["Pitstop." . pitstop . ".Repair.Suspension"]
-				this.iRepairBodyworkChosen := sessionState["Pitstop." . pitstop . ".Repair.Bodywork"]
-
-				if (this.iRepairSuspensionChosen = kTrue)
-					this.iRepairSuspensionChosen := true
-				else if (this.iRepairSuspensionChosen = kFalse)
-					this.iRepairSuspensionChosen := false
-
-				if (this.iRepairBodyworkChosen = kTrue)
-					this.iRepairBodyworkChosen := true
-				else if (this.iRepairBodyworkChosen = kFalse)
-					this.iRepairBodyworkChosen := false
-			}
-		}
-		*/
 	}
 }
 

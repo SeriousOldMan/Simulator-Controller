@@ -20,8 +20,6 @@
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Database Update.ico
 ;@Ahk2Exe-ExeName Database Synchronizer.exe
 
-#MaxMem 1024
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
@@ -36,9 +34,9 @@
 
 #Include ..\Libraries\FTP.ahk
 #Include ..\Libraries\Task.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

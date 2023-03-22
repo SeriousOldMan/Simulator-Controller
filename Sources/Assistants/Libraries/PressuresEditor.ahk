@@ -16,7 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -161,7 +161,7 @@ class PressuresEditor {
 				compounds.Push(compound)
 		}
 
-		bubbleSort(compounds)
+		bubbleSort(&compounds)
 
 		this.iCompounds := compounds
 
@@ -317,7 +317,7 @@ class PressuresEditor {
 
 			GuiControl Choose, compoundDropDown, % inList(this.Compounds, compound)
 
-			splitCompound(compound, compound, compoundColor)
+			splitCompound(compound, &compound, &compoundColor)
 
 			for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
 														  , {Select: ["Temperature.Air", "Temperature.Track"]
@@ -333,7 +333,7 @@ class PressuresEditor {
 
 			this.iTemperatures := []
 
-			bubbleSort(temperatures)
+			bubbleSort(&temperatures)
 
 			loop % temperatures.Length()
 			{
@@ -375,7 +375,7 @@ class PressuresEditor {
 
 				this.iSelectedTemperatures := [airTemperature, trackTemperature]
 
-				splitCompound(this.SelectedCompound, compound, compoundColor)
+				splitCompound(this.SelectedCompound, &compound, &compoundColor)
 
 				this.loadPressures(compound, compoundColor, airTemperature, trackTemperature)
 			}
@@ -409,7 +409,7 @@ class PressuresEditor {
 																   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature}})
 				pressures.Push(Array(tyres[row.Tyre], displayValue("Float", convertUnit("Pressure", row.Pressure)), row.Count))
 
-			bubbleSort(pressures, "comparePressures")
+			bubbleSort(&pressures, comparePressures)
 
 			lastTyre := false
 
@@ -441,7 +441,7 @@ class PressuresEditor {
 		local tyre, pressure, count, lastTyre, oldPressure
 		local compound, compoundColor, ignore, entry, prototype
 
-		splitCompound(this.SelectedCompound, compound, compoundColor)
+		splitCompound(this.SelectedCompound, &compound, &compoundColor)
 
 		tyres[translate("Front Left")] := "FL"
 		tyres[translate("Front Right")] := "FR"

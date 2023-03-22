@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Settings Database               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,28 +9,28 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Database.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include "..\..\Libraries\Database.ahk"
+#Include "SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSettingsDataSchemas := {"Settings": ["Owner", "Car", "Track", "Weather", "Section", "Key", "Value"]}
+global kSettingsDataSchemas := {Settings: ["Owner", "Car", "Track", "Weather", "Section", "Key", "Value"]}
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-
+/*
 class SettingsDatabase extends SessionDatabase {
 	iLastSimulator := false
 	iUserDatabase := false
@@ -47,7 +47,7 @@ class SettingsDatabase extends SessionDatabase {
 		return ((type = "User") ? this.iUserDatabase : this.iCommunityDatabase)
 	}
 
-	querySettings(simulator, car, track, weather, ByRef userSettings, ByRef communitySettings) {
+	querySettings(simulator, car, track, weather, &userSettings, &communitySettings) {
 		local database
 		local id := this.ID
 		local result, ignore, setting
@@ -56,7 +56,8 @@ class SettingsDatabase extends SessionDatabase {
 		track := this.getCarCode(simulator, track)
 
 		if userSettings {
-			result := {}
+			result := Map()
+			result.CaseSense := false
 
 			readSettings(this, simulator, result, id, true, false, "*", "*", "*")
 			readSettings(this, simulator, result, id, true, false, car, "*", "*")
@@ -74,7 +75,8 @@ class SettingsDatabase extends SessionDatabase {
 		}
 
 		if communitySettings {
-			result := {}
+			result := Map()
+			result.CaseSense := false
 
 			readSettings(this, simulator, result, id, false, true, "*", "*", "*")
 			readSettings(this, simulator, result, id, false, true, car, "*", "*")
@@ -95,18 +97,18 @@ class SettingsDatabase extends SessionDatabase {
 	doSettings(simulator, car, track, weather, function, userSettings := true, communitySettings := true) {
 		local ignore, setting
 
-		this.querySettings(simulator, car, track, weather, userSettings, communitySettings)
+		this.querySettings(simulator, car, track, weather, &userSettings, &communitySettings)
 
 		car := this.getCarCode(simulator, car)
 		track := this.getCarCode(simulator, track)
 
 		if userSettings
 			for ignore, setting in userSettings
-				%function%(simulator, car, track, weather, setting)
+				function.Call(simulator, car, track, weather, setting)
 
 		if communitySettings
 			for ignore, setting in communitySettings
-				%function%(simulator, car, track, weather, setting)
+				function.Call(simulator, car, track, weather, setting)
 	}
 
 	loadSettings(simulator, car, track, weather, community := "__Undefined__") {
@@ -144,10 +146,12 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	readSettings(simulator, car, track, weather, inherited := true, community := "__Undefined__") {
-		local result := {}
+		local result := Map()
 		local id := this.ID
 		local settings := []
 		local ignore, setting
+
+		result.CaseSense := false
 
 		if (community = kUndefined)
 			community := this.UseCommunity
@@ -235,7 +239,7 @@ class SettingsDatabase extends SessionDatabase {
 															  , Car: car, Track: track, Weather: weather
 															  , Section: section, Key: key}})
 
-					return ((rows.Length() > 0) ? rows[1].Value : default)
+					return ((rows.Length > 0) ? rows[1].Value : default)
 				}
 				catch Any as exception {
 					return default
@@ -244,7 +248,7 @@ class SettingsDatabase extends SessionDatabase {
 					database.unlock("Settings")
 				}
 
-			Sleep 200
+			Sleep(200)
 		}
 
 		return default
@@ -264,9 +268,9 @@ class SettingsDatabase extends SessionDatabase {
 				try {
 					entry := database.query("Settings", {Where: {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}})
 
-					if (entry.Length() > 0) {
-						if (entry[1].Value != cValue) {
-							entry[1].Value := value
+					if (entry.Length > 0) {
+						if (entry[1]["Value"] != cValue) {
+							entry[1]["Value"] := value
 
 							database.changed("Settings")
 						}
@@ -283,7 +287,7 @@ class SettingsDatabase extends SessionDatabase {
 					database.unlock("Settings")
 				}
 
-			Sleep 200
+			Sleep(200)
 		}
 	}
 
@@ -298,7 +302,7 @@ class SettingsDatabase extends SessionDatabase {
 			if database.lock("Settings")
 				try {
 					database.remove("Settings", {Owner: this.ID, Car: car, Track: track, Weather: weather, Section: section, Key: key}
-											  , Func("always").Bind(true), true)
+											   , always.Bind(true), true)
 
 					return
 				}
@@ -309,11 +313,11 @@ class SettingsDatabase extends SessionDatabase {
 					database.unlock("Settings")
 				}
 
-			Sleep 200
+			Sleep(200)
 		}
 	}
 }
-
+*/
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
@@ -344,10 +348,10 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 														, Section: section, Key: key
 														, Owner: owner}})
 
-			if (rows.Length() > 0)
+			if (rows.Length > 0)
 				return rows[1].Value
 		}
-		catch Any as exception {
+		catch Any {
 		}
 		finally {
 			settingsDB.unlock("Settings")
@@ -359,21 +363,21 @@ readSetting(database, simulator, owner, user, community, car, track, weather
 																					, {Where: {Car: car, Track: track
 																							 , Weather: weather
 																							 , Section: section, Key: key}})
-			if (row.Owner != owner)
-				return rows[1].Value
+			if (row["Owner"] != owner)
+				return rows[1]["Value"]
 
 	return default
 }
 
 readSettings(database, simulator, settings, owner, user, community, car, track, weather) {
 	local result := []
-	local ignore, row, filtered, visited
+	local ignore, row, filtered, visited, key
 	local settingsDB
 
 	if community
 		for ignore, row in database.getSettingsDatabase(simulator, "Community").query("Settings"
 																					, {Where: {Car: car, Track: track, Weather: weather}})
-			if (row.Owner != owner)
+			if (row["Owner"] != owner)
 				result.Push(row)
 
 	if user {
@@ -383,7 +387,7 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 
 		try {
 			for ignore, row in settingsDB.query("Settings", {Where: {Car: car, Track: track
-																										, Weather: weather, Owner: owner}})
+																   , Weather: weather, Owner: owner}})
 				result.Push(row)
 		}
 		finally {
@@ -392,22 +396,28 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 	}
 
 	filtered := []
-	visited := {}
 
-	for ignore, row in reverse(result)
-		if !visited.HasKey(row.Section . "." . row.Key) {
-			visited[row.Section . "." . row.Key] := true
+	visited := Map()
+	visited.CaseSense := false
+
+	for ignore, row in reverse(result) {
+		key := row["Section"] . "." . row["Key"]
+
+		if !visited.Has(key) {
+			visited[key] := true
 
 			filtered.Push(row)
 		}
 
 	for ignore, row in reverse(filtered)
-		settings[row.Section . "." . row.Key] := row
+		settings[row["Section"] . "." . row["Key"]] := row
 }
 
 loadSettings(database, simulator, settings, owner, user, community, car, track, weather) {
-	local values := {}
+	local values := Map()
 	local ignore, setting
+
+	values.CaseSense := false
 
 	readSettings(database, simulator, values, owner, user, community, car, track, weather)
 

@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include Libraries\Strategy.ahk
-#Include Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;

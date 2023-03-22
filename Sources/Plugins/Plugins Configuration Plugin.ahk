@@ -145,7 +145,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		Gui ListView, % this.ListHandle
 
-		bubbleSort(items, "comparePlugins")
+		bubbleSort(&items, comparePlugins)
 
 		this.ItemList := items
 

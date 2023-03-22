@@ -26,9 +26,9 @@
 class Database {
 	iDirectory := false
 	iSchemas := false
-	iTables := {}
-	iFiles := {}
-	iTableChanged := {}
+	iTables := Map()
+	iFiles := Map()
+	iTableChanged := Map()
 
 	Directory {
 		Get {
@@ -108,8 +108,23 @@ class Database {
 	}
 
 	__New(directory, schemas) {
+		local name, fields
+
+		this.iTables.CaseSense := false
+		this.iFiles.CaseSense := false
+		this.iTableChanged.CaseSense := false
+
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
-		this.iSchemas := schemas
+
+		this.iSchemas := Map()
+		this.iSchemas.CaseSense := false
+
+		if schemas is Map
+			for name, fields in schemas
+				this.iSchemas[name] := fields
+		else
+			for name, fields in schemas.OwnProps()
+				this.iSchemas[name] := fields
 	}
 
 	lock(name := false, wait := true) {
@@ -203,38 +218,39 @@ class Database {
 		rows := this.Tables[name]
 		needsClone := true
 
-		if query.Has("Where") {
-			predicate := query["Where"]
+		if query.HasProp("Where") {
+			predicate := query.Where
 			selection := []
 
-			if !predicate.MinParams
+			if (!(predicate is Func) || !predicate.MinParams)
 				predicate := constraintColumns.Bind(predicate)
 
 			for ignore, row in rows
-				if %predicate%(row)
+				if predicate.Call(row)
 					selection.Push(row)
 
 			rows := selection
 			needsClone := false
 		}
 
-		if query.Has("Transform") {
-			transform := query["Transform"]
+		if query.HasProp("Transform") {
+			transform := query.Transform
 
-			rows := %transform%(rows)
+			rows := transform.Call(rows)
 		}
 
-		if (query.Has("Group") || query.Has("By")) {
-			rows := groupRows(query.Has("By") ? query["By"] : [], query.Has("Group") ? query["Group"] : [], rows)
+		if (query.HasProp("Group") || query.HasProp("By")) {
+			rows := groupRows(query.HasProp("By") ? query.By : [], query.HasProp("Group") ? query.Group : [], rows)
 			needsClone := false
 		}
 
-		if query.Has("Select") {
-			projection := query["Select"]
+		if query.HasProp("Select") {
+			projection := query.Select
 			projectedRows := []
 
 			for ignore, row in rows {
-				projectedRow := {}
+				projectedRow := Map()
+				projectedRow.CaseSense := false
 
 				for ignore, column in projection
 					projectedRow[column] := row[column]
@@ -258,7 +274,17 @@ class Database {
 
 	add(name, values, flush := false) {
 		local tries := 10
-		local row, directory, fileName, ignore, column, file
+		local row, directory, fileName, ignore, column, value, newValues, file
+
+		if (!(values is Map) || !values.CaseSense) {
+			newValues := Map()
+			newValues.CaseSense := false
+
+			for column, value in values.OwnProps()
+				newValues[column] := value
+
+			values := newValues
+		}
 
 		this.Tables[name].Push(values)
 
@@ -323,7 +349,7 @@ class Database {
 			where := constraintColumns.Bind(where)
 
 		for ignore, row in this.Tables[name]
-			if (!where || %where%(row)) {
+			if (!where || where.Call(row)) {
 				if (!predicate || !%predicate%(row))
 					rows.Push(row)
 			}
@@ -439,9 +465,15 @@ always(value, ignore*) {
 constraintColumns(constraints, row) {
 	local column, value
 
-	for column, value in constraints
-		if (row.Has(column) && (row[column] != value))
-			return false
+	if (constraints is Map) {
+		for column, value in constraints
+			if (row.Has(column) && (row[column] != value))
+				return false
+	}
+	else
+		for column, value in constraints.OwnProps()
+			if (row.Has(column) && (row[column] != value))
+				return false
 
 	return true
 }
@@ -450,6 +482,8 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 	local values := Map()
 	local function, ignore, row, column, key, result, group, groupedRows, columnValues
 	local resultRow, valueColumn, resultColumn, columnDescriptor
+
+	values.CaseSense := false
 
 	if !IsObject(groupedByColumns)
 		groupedByColumns := Array(groupedByColumns)
@@ -473,7 +507,8 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 	for group, groupedRows in values {
 		group := string2Values("|", group)
 
-		resultRow := {}
+		resultRow := Map()
+		resultRow.CaseSense := false
 
 		for ignore, column in groupedByColumns
 			resultRow[column] := group[A_Index]

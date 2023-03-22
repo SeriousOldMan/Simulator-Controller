@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include ..\Database\Libraries\SessionDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -159,7 +159,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		local ignore := false
 		local candidate
 
-		this.getPitstopActions(actions, ignore)
+		this.getPitstopActions(&actions, &ignore)
 
 		for ignore, candidate in actions
 			if (candidate = option)

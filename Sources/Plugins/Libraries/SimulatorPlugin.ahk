@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Simulator Plugin                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -140,7 +140,7 @@ class PitstopAction extends ControllerAction {
 		this.iOption := option
 		this.iSteps := steps
 
-		if (moreArguments.Length() > 0)
+		if (moreArguments.Length > 0)
 			throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
 
 		super.__New(function, label, icon)
@@ -370,12 +370,12 @@ class SimulatorPlugin extends ControllerPlugin {
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
 		local function, decreaseFunction, mode, label, icon, actions, selectActions, descriptor
 
-		this.getPitstopActions(actions, selectActions)
+		this.getPitstopActions(&actions, &selectActions)
 
-		if actions.HasKey(action) {
+		if actions.Has(action) {
 			decreaseFunction := false
 
-			if (moreArguments.Length() > 0) {
+			if (moreArguments.Length > 0) {
 				decreaseFunction := moreArguments[1]
 
 				if (controller.findFunction(decreaseFunction) != false)
@@ -440,11 +440,13 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+		logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := Map()
+		allActions.CaseSense := false
+
 		selectActions := []
 	}
 
@@ -471,9 +473,9 @@ class SimulatorPlugin extends ControllerPlugin {
 					setMultiMapValue(configuration, "Simulation", "Track", track)
 
 					setMultiMapValue(configuration, this.Plugin, "Information"
-										, values2String("; ", translate("Simulator: ") . simulator
-															, translate("Car: ") . car
-															, translate("Track: ") . track))
+								   , values2String("; ", translate("Simulator: ") . simulator
+								   , translate("Car: ") . car
+								   , translate("Track: ") . track))
 				}
 				else
 					setMultiMapValue(configuration, "Simulation", "State", "Passive")
@@ -491,7 +493,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				showMessage(this.Simulator[true] . " not found...")
 
 		if !WinActive(window)
-			WinActivate %window%
+			WinActivate(window)
 	}
 
 	sendCommand(command) {
@@ -500,15 +502,15 @@ class SimulatorPlugin extends ControllerPlugin {
 		try {
 			switch this.CommandMode {
 				case "Event":
-					SendEvent %command%
+					SendEvent(command)
 				case "Input":
-					SendInput %command%
+					SendInput(command)
 				case "Play":
-					SendPlay %command%
+					SendPlay(command)
 				case "Raw":
-					SendRaw %command%
+					Send("{Raw}" . command)
 				default:
-					Send %command%
+					Send(command)
 			}
 		}
 		catch Any as exception {
@@ -518,7 +520,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		delay := this.CommandDelay
 
 		if delay
-			Sleep %delay%
+			Sleep(delay)
 	}
 
 	runningSimulator() {
@@ -601,7 +603,9 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	getPitstopAllOptionValues() {
-		local options := {}
+		local options := Map()
+
+		options.CaseSense := false
 
 		options["Refuel"] := this.getPitstopOptionValues("Refuel")
 		options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")
@@ -696,7 +700,7 @@ class RaceAssistantAction extends ControllerAction {
 			case "Reject":
 				plugin.reject()
 			default:
-				throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
+				throw "Invalid action `"" . this.Action . "`" detected in RaceAssistantAction.fireAction...."
 		}
 	}
 }
@@ -792,7 +796,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				mode.registerAction(RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
 			}
 			else
-				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+				logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
 		else
 			this.logFunctionNotFound(actionFunction)
@@ -1028,7 +1032,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				for ignore, theHotkey in string2Values("|", action.Action) {
 					this.sendCommand(theHotKey)
 
-					Sleep 25
+					Sleep(25)
 				}
 			}
 			else if (action.Type = "Command")
@@ -1070,7 +1074,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				compound := "Dry"
 				compoundColor := "Black"
 
-				splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+				splitCompound(this.CurrentTyreCompound, &compound, &compoundColor)
 
 				setMultiMapValue(data, "Car Data", "TyreCompound", compound)
 				setMultiMapValue(data, "Car Data", "TyreCompoundColor", compoundColor)
@@ -1089,7 +1093,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	updatePositionsData(data) {
 	}
 
-	saveSessionState(ByRef sessionSettings, ByRef sessionState) {
+	saveSessionState(&sessionSettings, &sessionState) {
 		local compound, compoundColor
 
 		if !sessionSettings
@@ -1099,7 +1103,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			compound := "Dry"
 			compoundColor := "Black"
 
-			splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+			splitCompound(this.CurrentTyreCompound, &compound, &compoundColor)
 
 			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", compound)
 			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound.Color", compoundColor)
@@ -1109,14 +1113,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			compound := "Dry"
 			compoundColor := "Black"
 
-			splitCompound(this.RequestedTyreCompound, compound, compoundColor)
+			splitCompound(this.RequestedTyreCompound, &compound, &compoundColor)
 
 			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", compound)
 			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound.Color", compoundColor)
 		}
 	}
 
-	restoreSessionState(ByRef sessionSettings, ByRef sessionState) {
+	restoreSessionState(&sessionSettings, &sessionState) {
 		local compound
 
 		this.CurrentTyreCompound := false
@@ -1127,13 +1131,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 			if compound
 				this.CurrentTyreCompound := compound(compound, getMultiMapValue(sessionSettings
-																				   , "Simulator Settings", "Tyre.Current.Compound.Color"))
+																			  , "Simulator Settings", "Tyre.Current.Compound.Color"))
 
 			compound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", false)
 
 			if compound
 				this.RequestedTyreCompound := compound(compound, getMultiMapValue(sessionSettings
-																					 , "Simulator Settings", "Tyre.Requested.Compound.Color"))
+																				, "Simulator Settings", "Tyre.Requested.Compound.Color"))
 		}
 	}
 
@@ -1148,14 +1152,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		code := this.Code
 		trackData := sessionDB.getTrackData(code, this.Track)
 
-		return (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
+		return (trackData ? readSimulatorData(code, "-Track `"" . trackData . "`"") : readSimulatorData(code))
 	}
 
 	acquirePositionsData(telemetryData) {
 		local cars := []
 		local positionsData, count
 
-		if telemetryData.HasKey("Position Data") {
+		if telemetryData.Has("Position Data") {
 			positionsData := newMultiMap()
 
 			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
@@ -1165,14 +1169,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
-		loop %count%
+		loop count
 			cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
 								   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
 
-		bubbleSort(cars, "compareCarPositions")
+		bubbleSort(&cars, compareCarPositions)
 
 		if isDebug()
-			loop %count% {
+			loop count {
 				if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position") != A_Index)
 					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index] . ": "
 										. getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position")
@@ -1181,13 +1185,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
 			}
 		else
-			loop %count%
+			loop count
 				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
 
 		return positionsData
 	}
 
-	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
+	acquireSessionData(&telemetryData, &positionsData) {
 		local data := newMultiMap()
 		local section, values
 
@@ -1218,12 +1222,12 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
 	local dataFile, data
 
-	FileCreateDir %kTempDirectory%%simulator% Data
+	DirCreate(kTempDirectory . simulator . " Data")
 
 	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
 
 	try {
-		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
+		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" .dataFile . "`"`", , Hide")
 	}
 	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
@@ -1261,7 +1265,7 @@ getCurrentSimulatorPlugin(option := false) {
 			actions := false
 			ignore := false
 
-			SimulatorPlugin.ActiveSimulator.getPitstopActions(actions, ignore)
+			SimulatorPlugin.ActiveSimulator.getPitstopActions(&actions, &ignore)
 
 			for ignore, candidate in actions
 				if (candidate = option)
@@ -1322,55 +1326,55 @@ closePitstopMFD() {
 
 changePitstopStrategy(selection, steps := 1) {
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported strategy selection """) . selection . translate(""" detected in changePitstopStrategy - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported strategy selection `"") . selection . translate("`" detected in changePitstopStrategy - please check the configuration"))
 
 	changePitstopOption("Strategy", selection, steps)
 }
 
 changePitstopFuelAmount(direction, liters := 5) {
 	if !inList(["Increase", "Decrease"], direction)
-		logMessage(kLogWarn, translate("Unsupported fuel amount """) . direction . translate(""" detected in changePitstopFuelAmount - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported fuel amount `"") . direction . translate("`" detected in changePitstopFuelAmount - please check the configuration"))
 
 	changePitstopOption("Refuel", direction, liters)
 }
 
 changePitstopTyreCompound(selection) {
 	if !inList(["Next", "Previous", "Increase", "Decrease"], selection)
-		logMessage(kLogWarn, translate("Unsupported tyre compound selection """) . selection . translate(""" detected in changePitstopTyreCompound - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported tyre compound selection `"") . selection . translate("`" detected in changePitstopTyreCompound - please check the configuration"))
 
 	changePitstopOption("Tyre Compound", selection)
 }
 
 changePitstopTyreSet(selection, steps := 1) {
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported tyre set selection """) . selection . translate(""" detected in changePitstopTyreSet - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported tyre set selection `"") . selection . translate("`" detected in changePitstopTyreSet - please check the configuration"))
 
 	changePitstopOption("Tyre Set", selection, steps)
 }
 
 changePitstopTyrePressure(tyre, direction, increments := 1) {
 	if !inList(["All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"], tyre)
-		logMessage(kLogWarn, translate("Unsupported tyre position """) . tyre . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported tyre position `"") . tyre . translate("`" detected in changePitstopTyrePressure - please check the configuration"))
 
 	if !inList(["Increase", "Decrease"], direction)
-		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported pressure change `"") . direction . translate("`" detected in changePitstopTyrePressure - please check the configuration"))
 
 	changePitstopOption(tyre, direction, increments)
 }
 
 changePitstopBrakePadType(brake, selection) {
 	if !inList(["Front Brake", "Rear Brake"], brake)
-		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake unit `"") . brake . translate("`" detected in changePitstopBrakePadType - please check the configuration"))
 
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake selection `"") . selection . translate("`" detected in changePitstopBrakePadType - please check the configuration"))
 
 	changePitstopOption(brake, selection)
 }
 
 changePitstopDriver(selection) {
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported driver selection """) . selection . translate(""" detected in changePitstopDriver - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported driver selection `"") . selection . translate("`" detected in changePitstopDriver - please check the configuration"))
 
 	changePitstopOption("Driver", selection)
 }
@@ -1383,7 +1387,7 @@ changePitstopOption(option, selection := "Next", increments := 1) {
 	else if (selection = "Previous")
 		selection := "Decrease"
 	else if !inList(["Increase", "Decrease"], selection)
-		logMessage(kLogWarn, translate("Unsupported option selection """) . selection . translate(""" detected in changePitstopOption - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported option selection `"") . selection . translate("`" detected in changePitstopOption - please check the configuration"))
 
 	plugin := getCurrentSimulatorPlugin(option)
 

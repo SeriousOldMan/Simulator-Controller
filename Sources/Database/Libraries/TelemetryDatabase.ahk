@@ -9,16 +9,16 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Math.ahk"
+#Include "..\..\Libraries\Math.ahk"
 #Include "..\Libraries\Database.ahk"
-#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -781,4 +781,4 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-SessionDatabase.registerSynchronizer("synchronizeTelemetry")
+SessionDatabase.registerSynchronizer(synchronizeTelemetry)

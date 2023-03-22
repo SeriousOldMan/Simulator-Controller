@@ -30,7 +30,7 @@ global kSettingsDataSchemas := {Settings: ["Owner", "Car", "Track", "Weather", "
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
-/*
+
 class SettingsDatabase extends SessionDatabase {
 	iLastSimulator := false
 	iUserDatabase := false
@@ -317,7 +317,6 @@ class SettingsDatabase extends SessionDatabase {
 		}
 	}
 }
-*/
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
@@ -408,6 +407,7 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 
 			filtered.Push(row)
 		}
+	}
 
 	for ignore, row in reverse(filtered)
 		settings[row["Section"] . "." . row["Key"]] := row

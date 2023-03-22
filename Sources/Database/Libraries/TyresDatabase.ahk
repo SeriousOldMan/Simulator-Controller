@@ -9,16 +9,16 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Database.ahk"
-#Include "..\Database\Libraries\SessionDatabase.ahk"
-#Include "..\Database\Libraries\SettingsDatabase.ahk"
+#Include "..\..\Libraries\Database.ahk"
+#Include "SessionDatabase.ahk"
+#Include "SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -33,7 +33,7 @@ global kTyresSchemas := Map("Tyres.Pressures", ["Weather", "Temperature.Air", "T
 											  , "Identifier", "Synchronized"]
 						  , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
 															, "Type", "Tyre", "Pressure", "Count", "Driver"
-															, "Identifier", "Synchronized"]}
+															, "Identifier", "Synchronized"])
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -714,9 +714,9 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 																	 , Simulator: simulator, Car: car, Track: track
 																	 , Weather: pressures["Weather"]
 																	 , AirTemperature: pressures["Temperature.Air"], TrackTemperature: pressures["Temperature.Track"]
-																	 , TyreCompound: pressures["Compound, TyreCompoundColor: pressures["Compound.Color"]
+																	 , TyreCompound: pressures["Compound"], TyreCompoundColor: pressures["Compound.Color"]
 																	 , Type: pressures["Type"], Tyre: pressures["Tyre"]
-																	 , Pressure: pressures["Pressure"], Count: pressures["Count})
+																	 , Pressure: pressures["Pressure"], Count: pressures["Count"]})
 
 									if identifier
 										connector.UpdateData("TyresPressuresDistribution", identifier, properties)
@@ -740,4 +740,4 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-SessionDatabase.registerSynchronizer("synchronizeTyresPressures")
+SessionDatabase.registerSynchronizer(synchronizeTyresPressures)

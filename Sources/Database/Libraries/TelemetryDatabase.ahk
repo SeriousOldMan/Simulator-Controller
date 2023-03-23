@@ -17,7 +17,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Libraries\Math.ahk"
-#Include "..\Libraries\Database.ahk"
+#Include "..\..\Libraries\Database.ahk"
 #Include "SessionDatabase.ahk"
 
 
@@ -344,7 +344,7 @@ class TelemetryDatabase extends SessionDatabase {
 											  , "Fuel.Consumption", valueOrNull(fuelConsumption)
 											  , "Lap.Time", valueOrNull(lapTime)
 											  , "Map", map, "TC", tc, "ABS", abs
-											  , "Identifier", identifier ? identifier : kNull}
+											  , "Identifier", identifier ? identifier : kNull)
 										  , true)
 			}
 			finally {
@@ -364,7 +364,7 @@ class TelemetryDatabase extends SessionDatabase {
 
 		if (!this.Shared || database.lock("Tyres", false))
 			try {
-				this.Database.add("Tyres", Map("Driver: driver, Weather: weather
+				this.Database.add("Tyres", Map("Driver: driver, Weather: weather"
 											 , "Temperature.Air", valueOrNull(airTemperature)
 											 , "Temperature.Track", valueOrNull(trackTemperature)
 											 , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
@@ -383,7 +383,7 @@ class TelemetryDatabase extends SessionDatabase {
 											 , "Tyre.Wear.Front.Right", valueOrNull(wearFR)
 											 , "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
 											 , "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
-											 , "Identifier", identifier ? identifier : kNull}
+											 , "Identifier", identifier ? identifier : kNull)
 								, true)
 			}
 			finally {
@@ -518,9 +518,10 @@ validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
 
 invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
 	local driver := row["Driver"]
+
 	if ((drivers = kUndefined)
 	 || (IsObject(drivers) && inList(drivers, driver))
-	 || ((drivers == true) && (drier = SessionDatabase.ID))
+	 || ((drivers == true) && (driver = SessionDatabase.ID))
 	 || (drivers = driver))
 		return !validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)
 	else
@@ -594,7 +595,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 													, "Tyre.Compound", telemetry["TyreCompound"]
 													, "Tyre.Compound.Color", telemetry["TyreCompoundColor"]
 													, "Fuel.Remaining", telemetry["FuelRemaining"], "Fuel.Consumption", telemetry["FuelConsumption"]
-													, "Lap.Time", telemetry["LapTime"], "Map", telemetry["Map"], "TC", telemetry["TC"], "ABS", telemetry["ABS"]}
+													, "Lap.Time", telemetry["LapTime"], "Map", telemetry["Map"], "TC", telemetry["TC"], "ABS", telemetry["ABS"])
 												, true)
 						}
 						catch Any as exception {
@@ -644,7 +645,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 											  , "Tyre.Wear.Front.Left", telemetry["WearFrontLeft"]
 											  , "Tyre.Wear.Front.Right", telemetry["WearFrontRight"]
 											  , "Tyre.Wear.Rear.Left", telemetry["WearRearLeft"]
-											  , "Tyre.Wear.Rear.Right", telemetry["WearRearRight"]}
+											  , "Tyre.Wear.Rear.Right", telemetry["WearRearRight"])
 										  , true)
 						}
 						catch Any as exception {

@@ -104,6 +104,8 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		Set {
+			global kDatabaseDirectory
+
 			local configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
 			value := (normalizeDirectoryPath(value) . "\")

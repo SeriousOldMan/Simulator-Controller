@@ -34,9 +34,9 @@
 
 #Include "..\Libraries\FTP.ahk"
 #Include "..\Libraries\Task.ahk"
-#Include "..\Database\Libraries\SessionDatabase.ahk"
-#Include "..\Database\Libraries\TelemetryDatabase.ahk"
-#Include "..\Database\Libraries\TyresDatabase.ahk"
+#Include "Libraries\SessionDatabase.ahk"
+#Include "Libraries\TelemetryDatabase.ahk"
+#Include "Libraries\TyresDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -30,7 +30,7 @@ class Database {
 	iFiles := CaseInsenseMap()
 	iTableChanged := CaseInsenseMap()
 
-	classe Row extends CaseInsenseMap {
+	class Row extends CaseInsenseMap {
 	}
 
 	Directory {
@@ -75,7 +75,7 @@ class Database {
 								line := Trim(file.ReadLine(), " `t`n`r")
 
 								row := Database.Row()
-								
+
 								values := string2Values(";", line)
 								length := values.Length
 
@@ -91,7 +91,7 @@ class Database {
 						else if FileExist(this.Directory . name . ".CSV")
 							loop Read, (this.Directory . name . ".CSV") {
 								row := Database.Row()
-								
+
 								values := string2Values(";", A_LoopReadLine)
 								length := values.Length
 

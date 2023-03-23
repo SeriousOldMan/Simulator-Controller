@@ -284,9 +284,9 @@ class TyresDatabase extends SessionDatabase {
 		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color", "Driver"]
 																		 , Where: where})
-			info.Push({Source: "User", Driver: row.Driver
-					 , Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-					 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
+			info.Push({Source: "User", Driver: row["Driver"]
+					 , Weather: row["Weather"], AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+					 , Compound: compound(row["Compound"], row["Compound.Color"]), Count: row["Count"]})
 
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
@@ -294,8 +294,8 @@ class TyresDatabase extends SessionDatabase {
 			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				info.Push({Source: "Community", Driver: false
-						 , Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-						 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
+						 , Weather: row["Weather"], AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+						 , Compound: compound(row["Compound"], row["Compound.Color"]), Count: row["Count"]})
 		}
 
 		return info
@@ -479,8 +479,8 @@ class TyresDatabase extends SessionDatabase {
 		if (rows.Length > 0) {
 			row := rows[1]
 
-			row.Count := row.Count + count
-			row.Synchronized := kNull
+			row["Count"] := row["Count"] + count
+			row["Synchronized"] := kNull
 
 			if flush
 				this.flush()

@@ -584,7 +584,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 						lastTrack := track
 					}
 
-					if (db.query("Electronics", {Where: {Identifier: identifier} }).Length() = 0) {
+					if (db.query("Electronics", {Where: {Identifier: identifier} }).Length = 0) {
 						counter += 1
 
 						try {
@@ -622,7 +622,7 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 						lastTrack := track
 					}
 
-					if (db.query("Tyres", {Where: {Identifier: identifier} }).Length() = 0) {
+					if (db.query("Tyres", {Where: {Identifier: identifier} }).Length = 0) {
 						counter += 1
 
 						try {

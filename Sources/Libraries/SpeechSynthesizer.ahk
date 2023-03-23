@@ -332,7 +332,7 @@ class SpeechSynthesizer {
 
 			callback := this.SpeechStatusCallback
 
-			%callback%("Stop")
+			callback.Call("Stop")
 
 			return false
 		}
@@ -353,7 +353,7 @@ class SpeechSynthesizer {
 			Run("`"" . kTempDirectory . player . "`" `"" . soundFile . "`" -t waveaudio " . option, workingDirectory, "HIDE", &pid)
 
 			if callback
-				%callback%("Start")
+				callback.Call("Start")
 
 			Sleep(500)
 
@@ -381,7 +381,7 @@ class SpeechSynthesizer {
 				this.iSoundPlayer := false
 
 				if callback
-					%callback%("Stop")
+					callback.Call("Stop")
 			}
 			else if callback
 				Task.startTask(ObjBindMethod(this, "updateSpeechStatus", pid), 500, kHighPriority)
@@ -389,16 +389,16 @@ class SpeechSynthesizer {
 		else {
 			if wait {
 				if callback
-					%callback%("Start")
+					callback.Call("Start")
 
 				SoundPlay(soundFile, "Wait")
 
 				if callback
-					%callback%("Stop")
+					callback.Call("Stop")
 			}
 			else {
 				if callback
-					%callback%("Play")
+					callback.Call("Play")
 
 				SoundPlay(soundFile)
 			}
@@ -473,12 +473,12 @@ class SpeechSynthesizer {
 
 				if (this.Synthesizer = "Windows") {
 					if callback
-						%callback%(wait ? "Start" : "Play")
+						callback.Call(wait ? "Start" : "Play")
 
 					this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 
 					if (callback && wait)
-						%callback%("Stop")
+						callback.Call("Stop")
 				}
 
 				return

@@ -951,7 +951,12 @@ updateMapperState(trackMapperState) {
 clearOrphaneStateFiles() {
 	local ignore, fileName, modTime
 
-	static stateFiles := {}
+	static stateFiles := false
+
+	if !stateFiles {
+		stateFiles := Map()
+		stateFiles.CaseSense := false
+	}
 
 	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
 		if !stateFiles.Has(fileName)

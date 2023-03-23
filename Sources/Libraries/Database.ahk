@@ -44,7 +44,11 @@ class Database {
 
 	Files[name := false] {
 		Get {
-			return (name ? this.iFiles[name] : this.iFiles)
+			return (name ? (this.iFiles.Has(name) ? this.iFiles[name] : false) : this.iFiles)
+		}
+
+		Set {
+			return (name ? (this.iFiles[name] := value) : this.iFiles := value)
 		}
 	}
 
@@ -62,12 +66,13 @@ class Database {
 						file := this.Files[name]
 
 						if file {
-							file.Position := 0
+							file.Pos := 0
 
 							while !file.AtEOF {
 								line := Trim(file.ReadLine(), " `t`n`r")
 
 								row := Map()
+								row.CaseSense := false
 								values := string2Values(";", line)
 								length := values.Length
 
@@ -80,10 +85,10 @@ class Database {
 								data.Push(row)
 							}
 						}
-						else
-							loop Read, (this.Directory . name . ".CSV")
-							{
+						else if FileExist(this.Directory . name . ".CSV")
+							loop Read, (this.Directory . name . ".CSV") {
 								row := Map()
+								row.CaseSense := false
 								values := string2Values(";", A_LoopReadLine)
 								length := values.Length
 
@@ -119,9 +124,10 @@ class Database {
 		this.iSchemas := Map()
 		this.iSchemas.CaseSense := false
 
-		if schemas is Map
+		if (schemas is Map) {
 			for name, fields in schemas
 				this.iSchemas[name] := fields
+		}
 		else
 			for name, fields in schemas.OwnProps()
 				this.iSchemas[name] := fields
@@ -297,7 +303,7 @@ class Database {
 			file := this.Files[name]
 
 			if file {
-				file.Position := file.Length
+				file.Pos := file.Length
 
 				file.WriteLine(values2String(";", row*))
 			}
@@ -387,7 +393,7 @@ class Database {
 
 				if file {
 					try {
-						file.Position := 0
+						file.Pos := 0
 
 						bakFile := FileOpen(fileName . ".bak", "w")
 

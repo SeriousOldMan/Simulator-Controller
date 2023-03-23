@@ -354,7 +354,7 @@ class TyresDatabase extends SessionDatabase {
 						this.getPressureDistributions(globalTyresDatabase, weather, Round(airTemperature) + airDelta, Round(trackTemperature) + trackDelta
 													, compound, compoundColor, distributions, false)
 
-					if (distributions["FL"].Count() != 0) {
+					if (distributions["FL"].Count != 0) {
 						thePressures := Map()
 						thePressures.CaseSense := false
 
@@ -521,7 +521,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 	local lastSimulator := false
 	local lastCar := false
 	local lastTrack := false
-	local ignore, simulator, car, track, db, modified, identifier, pressures, oldPressures, properties, count
+	local ignore, simulator, car, track, db, modified, identifier, pressures, oldPressures, properties, count, pressuresLocked
 
 	if inList(groups, "Pressures")
 		try {
@@ -542,7 +542,7 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 						lastTrack := track
 					}
 
-					if (db.query("Tyres.Pressures", {Where: {Identifier: identifier} }).Length() = 0) {
+					if (db.query("Tyres.Pressures", {Where: {Identifier: identifier} }).Length = 0) {
 						counter += 1
 
 						try {
@@ -569,54 +569,73 @@ synchronizeTyresPressures(groups, sessionDB, connector, simulators, timestamp, l
 				}
 			}
 
-			for ignore, identifier in string2Values(";", connector.QueryData("TyresPressuresDistribution", "Modified > " . lastSynchronization)) {
-				pressures := parseData(connector.GetData("TyresPressuresDistribution", identifier))
+			pressuresLocked := false
 
-				simulator := pressures["Simulator"]
+			try {
+				for ignore, identifier in string2Values(";", connector.QueryData("TyresPressuresDistribution", "Modified > " . lastSynchronization)) {
+					pressures := parseData(connector.GetData("TyresPressuresDistribution", identifier))
 
-				if inList(simulators, sessionDB.getSimulatorName(simulator)) {
-					car := pressures["Car"]
-					track := pressures["Track"]
+					simulator := pressures["Simulator"]
 
-					counter += 1
+					if inList(simulators, sessionDB.getSimulatorName(simulator)) {
+						car := pressures["Car"]
+						track := pressures["Track"]
 
-					count := pressures["Count"]
+						count := pressures["Count"]
 
-					if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
-						db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+						if ((simulator != lastSimulator) || (car != lastCar) || (track != lastTrack)) {
+							if pressuresLocked {
+								db.flush("Tyres.Pressures.Distribution")
 
-						lastSimulator := simulator
-						lastCar := car
-						lastTrack := track
-					}
+								db.unlock("Tyres.Pressures.Distribution")
 
-					oldPressures := db.query("Tyres.Pressures.Distribution", {Where: {Identifier: identifier} })
+								pressuresLocked := false
+							}
 
-					if (oldPressures.Length = 0) {
-						try {
-							db.add("Tyres.Pressures.Distribution", Map("Identifier", pressures["Identifier"], "Synchronized", timestamp
-																	 , "Driver", pressures["Driver"], "Weather", pressures["Weather"]
-																	 , "Temperature.Air", pressures["AirTemperature"], "Temperature.Track", pressures["TrackTemperature"]
-																	 , "Compound", pressures["TyreCompound"], "Compound.Color", pressures["TyreCompoundColor"]
-																	 , "Type", pressures["Type"], "Tyre", pressures["Tyre"], "Pressure", pressures["Pressure"], "Count", count)
-																 , true)
+							db := Database(kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track, kTyresSchemas)
+
+							lastSimulator := simulator
+							lastCar := car
+							lastTrack := track
 						}
-						catch Any as exception {
-							logError(exception)
-						}
-					}
-					else
-						if db.lock("Tyres.Pressures.Distribution", false)
+
+						oldPressures := db.query("Tyres.Pressures.Distribution", {Where: {Identifier: identifier} })
+
+						if (oldPressures.Length = 0) {
 							try {
+								db.add("Tyres.Pressures.Distribution", Map("Identifier", pressures["Identifier"], "Synchronized", timestamp
+																		 , "Driver", pressures["Driver"], "Weather", pressures["Weather"]
+																		 , "Temperature.Air", pressures["AirTemperature"], "Temperature.Track", pressures["TrackTemperature"]
+																		 , "Compound", pressures["TyreCompound"], "Compound.Color", pressures["TyreCompoundColor"]
+																		 , "Type", pressures["Type"], "Tyre", pressures["Tyre"], "Pressure", pressures["Pressure"], "Count", count)
+																	 , true)
+								counter += 1
+							}
+							catch Any as exception {
+								logError(exception)
+							}
+						}
+						else if (oldPressures[1]["Count"] != count) {
+							if !pressuresLocked
+								if db.lock("Tyres.Pressures.Distribution", false)
+									pressuresLocked := true
+
+							if pressuresLocked {
+								counter += 1
+
 								db.changed("Tyres.Pressures.Distribution")
 
 								oldPressures[1]["Count"] := Max(oldPressures[1]["Count"], count)
 							}
-							finally {
-								db.flush("Tyres.Pressures.Distribution")
+						}
+					}
+				}
+			}
+			finally {
+				if pressuresLocked {
+					db.flush("Tyres.Pressures.Distribution")
 
-								db.unlock("Tyres.Pressures.Distribution")
-							}
+					db.unlock("Tyres.Pressures.Distribution")
 				}
 			}
 

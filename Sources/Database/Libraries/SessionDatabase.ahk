@@ -19,6 +19,7 @@
 
 #Include "..\..\Libraries\CLR.ahk"
 #Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\Database.ahk"
 #Include "SettingsDatabase.ahk"
 
 
@@ -140,7 +141,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	static DatabaseVersion {
+	DatabaseVersion {
 		Get {
 			return SessionDatabase.DatabaseVersion
 		}
@@ -290,7 +291,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ServerURL[identifier] {
 		Get {
-			return SessionDatbase.ServerURLs[identifier]
+			return SessionDatabase.ServerURLs[identifier]
 		}
 	}
 
@@ -579,26 +580,12 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	getDriverID(simulator, name) {
-		local ids := this.getDriverIDs(simulator, name)
-
-		return ((ids.Length > 0) ? ids[1] : false)
-	}
-
 	static getUserName() {
 		return SessionDatabase.getDriverNames(false, this.ID)[1]
 	}
 
 	getUserName() {
 		return SessionDatabase.getUserName()
-	}
-
-	static getDriverName(simulator, id) {
-		return SessionDatabase.getDriverNames(simulator, id)[1]
-	}
-
-	getDriverName(simulator, id) {
-		return SessionDatabase.getDriverName(simulator, id)
 	}
 
 	static getDriverIDs(simulator, name, sessionDB := false) {
@@ -661,6 +648,24 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getDriverNames(simulator, id, sessionDB)
 	}
 
+	static getDriverID(simulator, name) {
+		local ids := this.getDriverIDs(simulator, name)
+
+		return ((ids.Length > 0) ? ids[1] : false)
+	}
+
+	getDriverID(simulator, name) {
+		return SessionDatabase.getDriverID(simulator, name)
+	}
+
+	static getDriverName(simulator, id) {
+		return SessionDatabase.getDriverNames(simulator, id)[1]
+	}
+
+	getDriverName(simulator, id) {
+		return SessionDatabase.getDriverName(simulator, id)
+	}
+
 	hasTrackMap(simulator, track) {
 		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 
@@ -673,7 +678,7 @@ class SessionDatabase extends ConfigurationItem {
 		local tracks := []
 		local track
 
-		loop Files, kDatabaseDirectory ."User\Tracks\" . code . "\*.map", "F" {
+		loop Files, kDatabaseDirectory . "User\Tracks\" . code . "\*.map", "F" {
 			SplitPath(A_LoopFileName, , , , &track)
 
 			tracks.Push(track)
@@ -1793,7 +1798,6 @@ class SessionDatabase extends ConfigurationItem {
 	}
 }
 
-
 ;;;-------------------------------------------------------------------------;;;
 ;;;                  Internal Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -2281,6 +2285,6 @@ keepAlive(identifier, connector, connection) {
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-SessionDatabase.registerSynchronizer("synchronizeDrivers")
-SessionDatabase.registerSynchronizer("synchronizeSetups")
-SessionDatabase.registerSynchronizer("synchronizeStrategies")
+SessionDatabase.registerSynchronizer(synchronizeDrivers)
+SessionDatabase.registerSynchronizer(synchronizeSetups)
+SessionDatabase.registerSynchronizer(synchronizeStrategies)

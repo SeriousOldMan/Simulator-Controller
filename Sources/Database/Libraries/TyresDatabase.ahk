@@ -417,7 +417,7 @@ class TyresDatabase extends SessionDatabase {
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
 				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false) {
-		local database, tyres, types, typeIndex, tPressures, tyreIndex, pressure
+		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure
 
 		if !driver
 			driver := this.ID
@@ -425,19 +425,19 @@ class TyresDatabase extends SessionDatabase {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 
-		database := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
+		db := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
 
-		database.add("Tyres.Pressures", Database.Row("Driver", driver, "Weather", weather
-												   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-												   , "Compound", compound, "Compound.Color", compoundColor
-												   , "Tyre.Pressure.Cold.Front.Left", coldPressures[1]
-												   , "Tyre.Pressure.Cold.Front.Right", coldPressures[2]
-												   , "Tyre.Pressure.Cold.Rear.Left", coldPressures[3]
-												   , "Tyre.Pressure.Cold.Rear.Right", coldPressures[4]
-												   , "Tyre.Pressure.Hot.Front.Left", hotPressures[1]
-												   , "Tyre.Pressure.Hot.Front.Right", hotPressures[2]
-												   , "Tyre.Pressure.Hot.Rear.Left", hotPressures[3]
-												   , "Tyre.Pressure.Hot.Rear.Right", hotPressures[4])
+		db.add("Tyres.Pressures", Database.Row("Driver", driver, "Weather", weather
+											 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+											 , "Compound", compound, "Compound.Color", compoundColor
+											 , "Tyre.Pressure.Cold.Front.Left", coldPressures[1]
+											 , "Tyre.Pressure.Cold.Front.Right", coldPressures[2]
+											 , "Tyre.Pressure.Cold.Rear.Left", coldPressures[3]
+											 , "Tyre.Pressure.Cold.Rear.Right", coldPressures[4]
+											 , "Tyre.Pressure.Hot.Front.Left", hotPressures[1]
+											 , "Tyre.Pressure.Hot.Front.Right", hotPressures[2]
+											 , "Tyre.Pressure.Hot.Rear.Left", hotPressures[3]
+											 , "Tyre.Pressure.Hot.Rear.Right", hotPressures[4])
 									  , flush)
 
 		tyres := ["FL", "FR", "RL", "RR"]
@@ -457,7 +457,7 @@ class TyresDatabase extends SessionDatabase {
 
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false) {
-		local database, rows, row
+		local db, rows, row
 
 		if !driver
 			driver := this.ID
@@ -466,11 +466,11 @@ class TyresDatabase extends SessionDatabase {
 			compoundColor := "Black"
 
 		if require
-			database := this.requireDatabase(simulator, car, track, scope)
+			db := this.requireDatabase(simulator, car, track, scope)
 		else
-			database := this.iDatabase
+			db := this.iDatabase
 
-		rows := database.query("Tyres.Pressures.Distribution"
+		rows := db.query("Tyres.Pressures.Distribution"
 							 , {Where: Map("Driver", driver, "Weather", weather
 										 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
 										 , "Compound", compound, "Compound.Color", compoundColor
@@ -485,15 +485,15 @@ class TyresDatabase extends SessionDatabase {
 			if flush
 				this.flush()
 			else
-				database.changed("Tyres.Pressures.Distribution")
+				db.changed("Tyres.Pressures.Distribution")
 		}
 		else
 			try {
-				database.add("Tyres.Pressures.Distribution"
-						   , Database.Row("Driver", driver, "Weather", weather
-									    , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-									    , "Compound", compound, "Compound.Color", compoundColor
-									    , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count))
+				db.add("Tyres.Pressures.Distribution"
+					 , Database.Row("Driver", driver, "Weather", weather
+								  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+								  , "Compound", compound, "Compound.Color", compoundColor
+								  , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count))
 			}
 			catch Any as exception {
 				logError(exception)

@@ -45,7 +45,7 @@ showProgress(options := unset) {
 			if !isSet(options)
 				options := {}
 
-			w := (options.HasProp("Width") ? (options.Width - 20) : 280)
+			w := (options.HasProp("Width") ? options.Width : 280)
 			h := 90
 
 			if options.HasProp("X")
@@ -92,13 +92,13 @@ showProgress(options := unset) {
 
 			progressGui.SetFont("s10 Bold", "Arial")
 
-			progressTitle := progressGui.Add("Text", "x10 w" . w . " Center vvProgressTitle")
+			progressTitle := progressGui.Add("Text", "x10 w" . (w - 20) . " Center")
 
-			progressBar := progressGui.Add("Progress", "x10 y30 w" . w . " h20 c" . color . " BackgroundGray", "0")
+			progressBar := progressGui.Add("Progress", "x10 y30 w" . (w - 20) . " h20 c" . color . " BackgroundGray", "0")
 
 			progressGui.SetFont("s8 Norm", "Arial")
 
-			progressMessage := progressGui.Add("Text", "x10 y55 w" . w . " Center")
+			progressMessage := progressGui.Add("Text", "x10 y55 w" . (w - 20) . " Center")
 
 			progressGui.Opt("+AlwaysOnTop")
 			progressGui.Show("x" . x . " y" . y . " AutoSize NoActivate")

@@ -1521,11 +1521,7 @@ class Nil extends Term {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Variables {
-	iVariables := Map()
-
-	__New() {
-		this.iVariables.CaseSense := false
-	}
+	iVariables := CaseInsenseMap()
 
 	setValue(variable, value) {
 		this.iVariables[variable.Variable[true]] := value
@@ -2843,8 +2839,8 @@ class KnowledgeBase {
 
 class Facts {
 	iRuleEngine := false
-	iFacts := Map()
-	iObservers := Map()
+	iFacts := CaseInsenseMap()
+	iObservers := CaseInsenseMap()
 	iGeneration := 0
 
 	RuleEngine {
@@ -2859,15 +2855,17 @@ class Facts {
 		}
 
 		Set {
-			local facts := Map()
-			local key, theValue
+			if !(value is CaseInsenseMap) {
+				local facts := CaseInsenseMap()
+				local key, theValue
 
-			facts.CaseSense := false
+				for key, theValue in value
+					facts[key] := theValue
 
-			for key, theValue in value
-				facts[key] := theValue
+				value := facts
+			}
 
-			return (this.iFacts := facts)
+			return (this.iFacts := value)
 		}
 	}
 
@@ -2878,8 +2876,6 @@ class Facts {
 	}
 
 	__New(ruleEngine, initialFacts) {
-		this.iFacts.CaseSense := false
-
 		this.iRuleEngine := ruleEngine
 		this.Facts := initialFacts
 
@@ -3074,10 +3070,10 @@ class FactRules {
 class Rules {
 	iRuleEngine := false
 	iProductions := false
-	iReductions := Map()
+	iReductions := CaseInsenseMap()
 	iGeneration := 1
 
-	iProductionRules := Map()
+	iProductionRules := CaseInsenseMap()
 
 	class Production {
 		iNext := false
@@ -3222,9 +3218,6 @@ class Rules {
 	__New(ruleEngine, productions, reductions) {
 		local last := false
 		local index, production, entry, ignore, reduction, key
-
-		this.iReductions.CaseSense := false
-		this.iProductionRules.CaseSense := false
 
 		this.iRuleEngine := ruleEngine
 

@@ -444,8 +444,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	getPitstopActions(&allActions, &selectActions) {
-		allActions := Map()
-		allActions.CaseSense := false
+		allActions := CaseInsenseMap()
 
 		selectActions := []
 	}
@@ -603,9 +602,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	getPitstopAllOptionValues() {
-		local options := Map()
-
-		options.CaseSense := false
+		local options := CaseInsenseMap()
 
 		options["Refuel"] := this.getPitstopOptionValues("Refuel")
 		options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")

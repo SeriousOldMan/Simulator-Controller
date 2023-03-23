@@ -167,14 +167,14 @@ initializeAzureLanguages()
 
 class SpeechRecognizer {
 	iEngine := false
-	iChoices := Map()
+	iChoices := CaseInsenseMap()
 
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
 	static sDefaultAudioDevice := false
 
-	_grammarCallbacks := Map()
-	_grammars := Map()
+	_grammarCallbacks := CaseInsenseMap()
+	_grammars := CaseInsenseMap()
 
 	Routing {
 		Get {
@@ -203,10 +203,6 @@ class SpeechRecognizer {
 		local dllName := "Speech.Recognizer.dll"
 		local dllFile := kBinariesDirectory . dllName
 		local instance, choices, found, ignore, recognizerDescriptor, configuration, audioDevice
-
-		this.iChoices.CaseSense := false
-		this._grammarCallbacks.CaseSense := false
-		this._grammars.CaseSense := false
 
 		this.iEngine := engine
 		this.Instance := false

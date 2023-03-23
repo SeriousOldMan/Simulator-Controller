@@ -53,17 +53,17 @@ class SessionDatabase extends ConfigurationItem {
 	static sConfiguration := false
 	static sControllerState := false
 
-	static sCarData := Map()
-	static sTrackData := Map()
-	static sTyreData := Map()
+	static sCarData := CaseInsenseMap()
+	static sTrackData := CaseInsenseMap()
+	static sTyreData := CaseInsenseMap()
 
 	static sID := false
 
-	static sConnectors := Map()
-	static sServerURLs := Map()
-	static sServerTokens := Map()
+	static sConnectors := CaseInsenseMap()
+	static sServerURLs := CaseInsenseMap()
+	static sServerTokens := CaseInsenseMap()
 
-	static sConnected := Map()
+	static sConnected := CaseInsenseMap()
 
 	static sSynchronizers := []
 
@@ -238,10 +238,8 @@ class SessionDatabase extends ConfigurationItem {
 
 	static Connectors {
 		Get {
-			local result := Map()
+			local result := CaseInsenseMap()
 			local connector, identifier, serverURL
-
-			result.CaseSense := false
 
 			for identifier, serverURL in stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard") {
 				connector := SessionDatabase.Connector[identifier]
@@ -435,17 +433,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !SessionDatabase.sConfiguration {
 			SessionDatabase.sConfiguration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-			SessionDatabase.sCarData.CaseSense := false
-			SessionDatabase.sTrackData.CaseSense := false
-			SessionDatabase.sTyreData.CaseSense := false
-
 			SessionDatabase.sID := FileRead(kUserConfigDirectory . "ID")
-
-			SessionDatabase.sConnectors.CaseSense := false
-			SessionDatabase.sServerURLs.CaseSense := false
-			SessionDatabase.sServerTokens.CaseSense := false
-
-			SessionDatabase.sConnected.CaseSense := false
 
 			SessionDatabase.sControllerState := getControllerState()
 		}
@@ -458,13 +446,9 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	reloadConfiguration() {
-		SessionDatabase.sConnectors := Map()
-		SessionDatabase.sServerURLs := Map()
-		SessionDatabase.sServerTokens := Map()
-
-		SessionDatabase.sConnectors.CaseSense := false
-		SessionDatabase.sServerURLs.CaseSense := false
-		SessionDatabase.sServerTokens.CaseSense := false
+		SessionDatabase.sConnectors := CaseInsenseMap()
+		SessionDatabase.sServerURLs := CaseInsenseMap()
+		SessionDatabase.sServerTokens := CaseInsenseMap()
 
 		SessionDatabase.sConfiguration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 	}
@@ -582,7 +566,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			if (sessionDB.query("Drivers", {Where: {ID: id, Forname: forName, Surname: surName}}).Length = 0)
 				try {
-					sessionDB.add("Drivers", {ID: id, Forname: forName, Surname: surName, Nickname: nickName}, true)
+					sessionDB.add("Drivers", Database.Row("ID", id, "Forname", forName, "Surname", surName, "Nickname", nickName), true)
 				}
 				catch Any as exception {
 					logError(exception)
@@ -1095,16 +1079,8 @@ class SessionDatabase extends ConfigurationItem {
 		local code, cache, key, compounds, data, cds, nms, ignore, compound, candidate
 
 		static settingsDB := false
-		static sNames := false
-		static sCodes := false
-
-		if !sNames {
-			sNames := Map()
-			sNames.CaseSense := false
-
-			sCodes := Map()
-			sCodes.CaseSense := false
-		}
+		static sNames := CaseInsenseMap()
+		static sCodes := CaseInsenseMap()
 
 		car := this.getCarCode(simulator, car)
 
@@ -1334,8 +1310,7 @@ class SessionDatabase extends ConfigurationItem {
 		car := this.getCarCode(simulator, car)
 
 		if userSetups {
-			userSetups := Map()
-			userSetups.CaseSense := false
+			userSetups := CaseInsenseMap()
 
 			for ignore, type in kSetupTypes {
 				setups := []
@@ -1352,8 +1327,7 @@ class SessionDatabase extends ConfigurationItem {
 		}
 
 		if communitySetups {
-			communitySetups := Map()
-			communitySetups.CaseSense := false
+			communitySetups := CaseInsenseMap()
 
 			for ignore, type in kSetupTypes {
 				setups := []
@@ -1837,10 +1811,8 @@ class SessionDatabase extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 
 stringToMap(elementSeparator, valueSeparator, text, default := "Standard") {
-	local result := Map()
+	local result := CaseInsenseMap()
 	local ignore, keyValue
-
-	result.CaseSense := false
 
 	for ignore, keyValue in string2Values(elementSeparator, text) {
 		keyValue := string2Values(valueSeparator, keyValue)
@@ -2019,11 +1991,9 @@ synchronizeDatabase(command := false) {
 ;;;-------------------------------------------------------------------------;;;
 
 parseData(properties) {
-	local result := Map()
+	local result := CaseInsenseMap()
 	local property
-
-	result.CaseSense := false
-
+	
 	properties := StrReplace(properties, "`r", "")
 
 	loop Parse, properties, "`n" {

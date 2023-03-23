@@ -20,19 +20,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 newMultiMap() {
-	local multiMap := Map()
-
-	multiMap.CaseSense := false
-
-	return multiMap
+	return CaseInsenseMap()
 }
 
 newSectionMap() {
-	local sectionMap := Map()
-
-	sectionMap.CaseSense := false
-
-	return sectionMap
+	return CaseInsenseMap()
 }
 
 readMultiMap(multiMapFile) {

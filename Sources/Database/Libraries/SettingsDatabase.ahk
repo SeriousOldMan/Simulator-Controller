@@ -56,8 +56,7 @@ class SettingsDatabase extends SessionDatabase {
 		track := this.getCarCode(simulator, track)
 
 		if userSettings {
-			result := Map()
-			result.CaseSense := false
+			result := CaseInsenseMap()
 
 			readSettings(this, simulator, result, id, true, false, "*", "*", "*")
 			readSettings(this, simulator, result, id, true, false, car, "*", "*")
@@ -75,8 +74,7 @@ class SettingsDatabase extends SessionDatabase {
 		}
 
 		if communitySettings {
-			result := Map()
-			result.CaseSense := false
+			result := CaseInsenseMap()
 
 			readSettings(this, simulator, result, id, false, true, "*", "*", "*")
 			readSettings(this, simulator, result, id, false, true, car, "*", "*")
@@ -146,12 +144,10 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	readSettings(simulator, car, track, weather, inherited := true, community := "__Undefined__") {
-		local result := Map()
+		local result := CaseInsenseMap()
 		local id := this.ID
 		local settings := []
 		local ignore, setting
-
-		result.CaseSense := false
 
 		if (community = kUndefined)
 			community := this.UseCommunity
@@ -396,8 +392,7 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 
 	filtered := []
 
-	visited := Map()
-	visited.CaseSense := false
+	visited := CaseInsenseMap()
 
 	for ignore, row in reverse(result) {
 		key := row["Section"] . "." . row["Key"]
@@ -414,10 +409,8 @@ readSettings(database, simulator, settings, owner, user, community, car, track, 
 }
 
 loadSettings(database, simulator, settings, owner, user, community, car, track, weather) {
-	local values := Map()
+	local values := CaseInsenseMap()
 	local ignore, setting
-
-	values.CaseSense := false
 
 	readSettings(database, simulator, values, owner, user, community, car, track, weather)
 

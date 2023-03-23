@@ -147,7 +147,7 @@ class GuiFunctionController extends FunctionController {
 	iWindowWidth := 0
 	iWindowHeight := 0
 
-	iControlHandles := Map()
+	iControlHandles := CaseInsenseMap()
 
 	iIsVisible := false
 	iIsPositioned := false
@@ -176,8 +176,6 @@ class GuiFunctionController extends FunctionController {
 	}
 
 	__New(controller, configuration := false) {
-		this.iControlHandles.CaseSense := false
-
 		super.__New(controller, configuration)
 
 		this.createGui()
@@ -439,16 +437,16 @@ class SimulatorController extends ConfigurationItem {
 	iSettings := false
 
 	iPlugins := []
-	iFunctions := Map()
+	iFunctions := CaseInsenseMap()
 	iFunctionController := []
 
 	iModes := []
 	iActiveModes := []
 
-	iFunctionActions := Map()
+	iFunctionActions := CaseInsenseMap()
 
 	iVoiceServer := false
-	iVoiceCommands := Map()
+	iVoiceCommands := CaseInsenseMap()
 
 	iLastEvent := A_TickCount
 
@@ -552,10 +550,6 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	__New(configuration, settings, voiceServer := false) {
-		this.iFunctions.CaseSense := false
-		this.iFunctionActions.CaseSense := false
-		this.iVoiceCommands := false
-
 		identifier := FileRead(kUserConfigDirectory . "ID")
 
 		this.iID := identifier
@@ -856,10 +850,8 @@ class SimulatorController extends ConfigurationItem {
 		static registered := false
 		static registeredCommands := false
 
-		if !registeredCommands {
-			registeredCommands := Map()
-			registeredCommands.CaseSense := false
-		}
+		if !registeredCommands
+			registeredCommands := CaseInsenseMap()
 
 		if this.iVoiceCommands.Has(command)
 			return this.iVoiceCommands[command]
@@ -1168,7 +1160,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	writeControllerState(periodic := true) {
-		local plugins := Map()
+		local plugins := CaseInsenseMap()
 		local controller, configuration, ignore, thePlugin, modes, states, name, theMode, simulators, simulator, fnController
 
 		configuration := newMultiMap()
@@ -1228,8 +1220,8 @@ class ControllerFunction {
 	iController := false
 	iFunction := false
 
-	iEnabledActions := Map()
-	iCachedActions := Map()
+	iEnabledActions := CaseInsenseMap()
+	iCachedActions := CaseInsenseMap()
 
 	Controller {
 		Get {
@@ -1292,9 +1284,6 @@ class ControllerFunction {
 	}
 
 	__New(controller, function) {
-		this.iEnabledActions.CaseSense := false
-		this.iCachedActions.CaseSense := false
-
 		this.iController := controller
 		this.iFunction := function
 	}

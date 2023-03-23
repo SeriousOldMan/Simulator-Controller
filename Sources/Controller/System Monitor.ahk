@@ -198,10 +198,8 @@ systemMonitor(command := false, arguments*) {
 	static logMessageListView
 	static logBufferEdit
 
-	if !stateIcons {
-		stateIcons := Map()
-		stateIcons.CaseSense := false
-	}
+	if !stateIcons
+		stateIcons := CaseInsenseMap()
 
 	if !stateIconsList {
 		stateIconsList := IL_Create(kStateIcons.Count)
@@ -348,8 +346,7 @@ systemMonitor(command := false, arguments*) {
 				serverState.Value := icon
 
 				if ((state != "Unknown") && (state != "Disabled")) {
-					state := Map()
-					state.CaseSense := false
+					state := CaseInsenseMap()
 
 					for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
 						property := StrSplit(property, ":", " `t", 2)
@@ -756,8 +753,7 @@ updateSessionState(controllerState) {
 	sessionState.Value := icon
 
 	if ((state != "Unknown") && (state != "Disabled")) {
-		state := Map()
-		state.CaseSense := false
+		state := CaseInsenseMap()
 
 		for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
 			property := StrSplit(property, ":", " `t", 2)
@@ -953,10 +949,8 @@ clearOrphaneStateFiles() {
 
 	static stateFiles := false
 
-	if !stateFiles {
-		stateFiles := Map()
-		stateFiles.CaseSense := false
-	}
+	if !stateFiles
+		stateFiles := CaseInsenseMap()
 
 	for ignore, fileName in getFileNames("*.state", kTempDirectory) {
 		if !stateFiles.Has(fileName)

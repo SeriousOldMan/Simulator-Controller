@@ -173,14 +173,14 @@ class Database {
 		}
 	}
 
-	unlock(name := false) {
+	unlock(name := false, backup := false) {
 		local file, ignore
 
-		if name {
+		if (name && (name != true)) {
 			file := this.Files[name]
 
 			if file {
-				this.flush(name)
+				this.flush(name, backup)
 
 				this.Files.Delete(name)
 
@@ -191,8 +191,7 @@ class Database {
 		}
 		else
 			for name, ignore in getKeys(this.Schemas)
-				this.unlock(name)
-
+				this.unlock(name, backup)
 	}
 
 	query(name, query) {
@@ -249,9 +248,9 @@ class Database {
 		return (needsClone ? rows.Clone() : rows)
 	}
 
-	reload(name, flush := true) {
+	reload(name, flush := true, backup := false) {
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 
 		this.iTables.Delete(name)
 	}
@@ -315,7 +314,7 @@ class Database {
 		return results
 	}
 
-	remove(name, where, predicate := false, flush := false) {
+	remove(name, where, predicate := false, flush := false, backup := false) {
 		local rows := []
 		local ignore, row
 
@@ -334,45 +333,46 @@ class Database {
 		this.iTableChanged[name] := true
 
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 	}
 
-	clear(name, flush := false) {
+	clear(name, flush := false, backup := false) {
 		this.iTables[name] := []
 		this.iTableChanged[name] := true
 
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 	}
 
 	changed(name) {
 		this.iTableChanged[name] := true
 	}
 
-	flush(name := false) {
+	flush(name := false, backup := false) {
 		local bakFile := false
 		local directory, fileName, schema, ignore, row, values, column, file
 
-		if name {
+		if (name && (name != true)) {
 			if (this.Tables.HasKey(name) && this.iTableChanged.HasKey(name)) {
 				directory := this.Directory
 				fileName := (directory . name . ".CSV")
 				file := this.Files[name]
 
 				if file {
-					try {
-						file.Position := 0
+					if backup
+						try {
+							file.Position := 0
 
-						bakFile := FileOpen(fileName . ".bak", "w")
+							bakFile := FileOpen(fileName . ".bak", "w")
 
-						bakFile.Write(file.Read())
-					}
-					catch exception {
-					}
-					finally {
-						if bakFile
-							bakFile.Close()
-					}
+							bakFile.Write(file.Read())
+						}
+						catch exception {
+						}
+						finally {
+							if bakFile
+								bakFile.Close()
+						}
 
 					file.Length := 0
 
@@ -393,7 +393,15 @@ class Database {
 
 					FileCreateDir %directory%
 
-					deleteFile(fileName, true)
+					if backup
+						try {
+							FileMove %fileName%, %fileName%.bak, 1
+						}
+						catch exception {
+							logError(exception)
+						}
+					else
+						deleteFile(fileName, true)
 
 					schema := this.Schemas[name]
 
@@ -414,7 +422,7 @@ class Database {
 		}
 		else
 			for name, ignore in this.Tables
-				this.flush(name)
+				this.flush(name, backup)
 	}
 }
 

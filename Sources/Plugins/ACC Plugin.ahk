@@ -706,6 +706,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.iPSBrakeOptionPosition := inList(this.iPSOptions, "Change Brakes")
 
 			this.sendCommand(this.OpenPitstopMFDHotkey)
+
+			this.toggleActivity("Repair Suspension")
+			this.toggleActivity("Repair Suspension")
+			this.toggleActivity("Repair Bodywork")
+
+			if this.iRepairBodyworkChosen
+				this.toggleActivity("Repair Bodywork")
+
+			if this.iRepairSuspensionChosen
+				this.toggleActivity("Repair Suspension")
+
+			this.iRepairBodyworkChosen := (this.iRepairBodyworkChosen || this.iRepairSuspensionChosen)
 		}
 		finally {
 			protectionOff(true, true)

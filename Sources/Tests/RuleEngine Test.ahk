@@ -92,7 +92,7 @@ global kExecutionTestRules := "
 
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate())
-				{Any: [?Paul.grandchild], [?Willy.grandchild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
+				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandChild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 
 				{All: [?Peter], {Prove: isHappy(?Peter, ?gf)}} => (Prove: father(?father, ?gf)), (Call: celebrate())
 )"

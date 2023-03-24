@@ -57,7 +57,7 @@ class SpeechSynthesizer {
 	iPitch := 0
 	iVolume := 100
 
-	iCache := Map()
+	iCache := CaseInsenseMap()
 	iCacheDirectory := false
 
 	static sAudioRoutingInitialized := false
@@ -169,7 +169,6 @@ class SpeechSynthesizer {
 
 		DirCreate(kTempDirectory . dirName)
 
-		this.iCache.CaseSense := false
 		this.iCacheDirectory := (kTempDirectory . dirName . "\")
 
 		this.clearCache()

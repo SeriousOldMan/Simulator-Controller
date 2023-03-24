@@ -418,7 +418,7 @@ ftpUpload(server, user, password, localFile, remoteFile) {
     static a := "AHK-FTP"
 
 	m := DllCall("LoadLibrary", "str", "wininet.dll", "ptr")
-	h := DllCall("wininet\InternetOpen", "ptr", a, "uint", 1, "ptr", 0, "ptr", 0, "uint", 0, "ptr")
+	h := DllCall("wininet\InternetOpen", "ptr", StrPtr(a), "uint", 1, "ptr", 0, "ptr", 0, "uint", 0, "ptr")
 
     if (!m || !h)
         return false

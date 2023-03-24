@@ -55,7 +55,7 @@ global kDebugRecognitions := 4
 class VoiceServer extends ConfigurationItem {
 	iDebug := kDebugOff
 
-	iVoiceClients := Map()
+	iVoiceClients := CaseInsenseMap()
 	iActiveVoiceClient := false
 
 	iLanguage := "en"
@@ -107,7 +107,7 @@ class VoiceServer extends ConfigurationItem {
 
 		iActivationCallback := false
 		iDeactivationCallback := false
-		iVoiceCommands := Map()
+		iVoiceCommands := CaseInsenseMap()
 
 		class ClientSpeechSynthesizer extends SpeechSynthesizer {
 			iVoiceClient := false
@@ -309,8 +309,6 @@ class VoiceServer extends ConfigurationItem {
 		__New(voiceServer, descriptor, routing, pid
 			, language, synthesizer, speaker, recognizer, listener
 			, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback) {
-			this.iVoiceCommands.CaseSense := false
-
 			this.iVoiceServer := voiceServer
 			this.iDescriptor := descriptor
 			this.iRouting := routing
@@ -626,8 +624,6 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	__New(configuration := false) {
-		this.iVoiceClients.CaseSense := false
-
 		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
 
 		super.__New(configuration)

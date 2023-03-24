@@ -404,8 +404,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 			fileNames.Push(fileName)
 	}
 
-	translations := Map()
-	translations.CaseSense := false
+	translations := CaseInsenseMap()
 
 	for ignore, fileName in fileNames
 		loop Read, fileName {

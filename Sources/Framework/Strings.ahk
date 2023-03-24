@@ -61,10 +61,8 @@ values2String(delimiter, values*) {
 }
 
 string2Map(elementSeparator, valueSeparator, text) {
-	local result := Map()
+	local result := CaseInsenseMap()
 	local ignore, keyValue
-
-	result.CaseSense := false
 
 	for ignore, keyValue in string2Values(elementSeparator, text) {
 		keyValue := string2Values(valueSeparator, keyValue)

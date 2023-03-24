@@ -25,10 +25,13 @@
 
 class Database {
 	iDirectory := false
-	iSchemas := false
-	iTables := Map()
-	iFiles := Map()
-	iTableChanged := Map()
+	iSchemas := CaseInsenseMap()
+	iTables := CaseInsenseMap()
+	iFiles := CaseInsenseMap()
+	iTableChanged := CaseInsenseMap()
+
+	class Row extends CaseInsenseMap {
+	}
 
 	Directory {
 		Get {
@@ -72,8 +75,8 @@ class Database {
 							while !file.AtEOF {
 								line := Trim(file.ReadLine(), " `t`n`r")
 
-								row := Map()
-								row.CaseSense := false
+								row := Database.Row()
+
 								values := string2Values(";", line)
 								length := values.Length
 
@@ -90,8 +93,8 @@ class Database {
 							loop {
 								try {
 									loop Read, (this.Directory . name . ".CSV") {
-										row := Map()
-										row.CaseSense := false
+										row := Database.Row()
+
 										values := string2Values(";", A_LoopReadLine)
 										length := values.Length
 
@@ -129,14 +132,7 @@ class Database {
 	__New(directory, schemas) {
 		local name, fields
 
-		this.iTables.CaseSense := false
-		this.iFiles.CaseSense := false
-		this.iTableChanged.CaseSense := false
-
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
-
-		this.iSchemas := Map()
-		this.iSchemas.CaseSense := false
 
 		if (schemas is Map) {
 			for name, fields in schemas
@@ -269,8 +265,7 @@ class Database {
 			projectedRows := []
 
 			for ignore, row in rows {
-				projectedRow := Map()
-				projectedRow.CaseSense := false
+				projectedRow := Database.Row()
 
 				for ignore, column in projection
 					projectedRow[column] := row[column]
@@ -296,9 +291,8 @@ class Database {
 		local tries := 10
 		local row, directory, fileName, ignore, column, value, newValues, file
 
-		if (!(values is Map) || !values.CaseSense) {
-			newValues := Map()
-			newValues.CaseSense := false
+		if !(values is Database.Row) {
+			newValues := Database.Row()
 
 			for column, value in values.OwnProps()
 				newValues[column] := value
@@ -508,11 +502,9 @@ constraintColumns(constraints, row) {
 }
 
 groupRows(groupedByColumns, groupedColumns, rows) {
-	local values := Map()
+	local values := CaseInsenseMap()
 	local function, ignore, row, column, key, result, group, groupedRows, columnValues
 	local resultRow, valueColumn, resultColumn, columnDescriptor
-
-	values.CaseSense := false
 
 	if !IsObject(groupedByColumns)
 		groupedByColumns := Array(groupedByColumns)
@@ -536,8 +528,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 	for group, groupedRows in values {
 		group := string2Values("|", group)
 
-		resultRow := Map()
-		resultRow.CaseSense := false
+		resultRow := Database.Row()
 
 		for ignore, column in groupedByColumns
 			resultRow[column] := group[A_Index]

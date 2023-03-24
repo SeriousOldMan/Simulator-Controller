@@ -330,26 +330,26 @@ class TelemetryDatabase extends SessionDatabase {
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
 					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
 					 , driver := false, identifier := false) {
-		local database := this.Database
+		local db := this.Database
 
 		if !driver
 			driver := this.ID
 
-		if (!this.Shared || database.lock("Electronics", false))
+		if (!this.Shared || db.lock("Electronics", false))
 			try {
-				database.add("Electronics", Map("Driver", driver, "Weather", weather
-											  , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-											  , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
-											  , "Fuel.Remaining", valueOrNull(fuelRemaining)
-											  , "Fuel.Consumption", valueOrNull(fuelConsumption)
-											  , "Lap.Time", valueOrNull(lapTime)
-											  , "Map", map, "TC", tc, "ABS", abs
-											  , "Identifier", identifier ? identifier : kNull)
+				db.add("Electronics", Database.Row("Driver", driver, "Weather", weather
+											     , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+											     , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
+											     , "Fuel.Remaining", valueOrNull(fuelRemaining)
+											     , "Fuel.Consumption", valueOrNull(fuelConsumption)
+											     , "Lap.Time", valueOrNull(lapTime)
+											     , "Map", map, "TC", tc, "ABS", abs
+											     , "Identifier", identifier ? identifier : kNull)
 										  , true)
 			}
 			finally {
 				if this.Shared
-					database.unlock("Electronics")
+					db.unlock("Electronics")
 			}
 	}
 
@@ -357,38 +357,38 @@ class TelemetryDatabase extends SessionDatabase {
 			   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
 			   , wearFL, wearFR, wearRL, wearRR, fuelConsumption, fuelRemaining, lapTime
 			   , driver := false, identifier := false) {
-		local database := this.Database
+		local db := this.Database
 
 		if !driver
 			driver := this.ID
 
-		if (!this.Shared || database.lock("Tyres", false))
+		if (!this.Shared || db.lock("Tyres", false))
 			try {
-				this.Database.add("Tyres", Map("Driver: driver, Weather: weather"
-											 , "Temperature.Air", valueOrNull(airTemperature)
-											 , "Temperature.Track", valueOrNull(trackTemperature)
-											 , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
-											 , "Fuel.Remaining", valueOrNull(fuelRemaining)
-											 , "Fuel.Consumption", valueOrNull(fuelConsumption)
-											 , "Lap.Time", valueOrNull(lapTime), "Tyre.Laps", valueOrNull(tyreLaps)
-											 , "Tyre.Pressure.Front.Left", valueOrNull(pressureFL)
-											 , "Tyre.Pressure.Front.Right", valueOrNull(pressureFR)
-											 , "Tyre.Pressure.Rear.Left", valueOrNull(pressureRL)
-											 , "Tyre.Pressure.Rear.Right", valueOrNull(pressureRR)
-											 , "Tyre.Temperature.Front.Left", valueOrNull(temperatureFL)
-											 , "Tyre.Temperature.Front.Right", valueOrNull(temperatureFR)
-											 , "Tyre.Temperature.Rear.Left", valueOrNull(temperatureRL)
-											 , "Tyre.Temperature.Rear.Right", valueOrNull(temperatureRR)
-											 , "Tyre.Wear.Front.Left", valueOrNull(wearFL)
-											 , "Tyre.Wear.Front.Right", valueOrNull(wearFR)
-											 , "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
-											 , "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
-											 , "Identifier", identifier ? identifier : kNull)
+				this.db.add("Tyres", Database.Row("Driver: driver, Weather: weather"
+												, "Temperature.Air", valueOrNull(airTemperature)
+												, "Temperature.Track", valueOrNull(trackTemperature)
+												, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
+												, "Fuel.Remaining", valueOrNull(fuelRemaining)
+												, "Fuel.Consumption", valueOrNull(fuelConsumption)
+												, "Lap.Time", valueOrNull(lapTime), "Tyre.Laps", valueOrNull(tyreLaps)
+												, "Tyre.Pressure.Front.Left", valueOrNull(pressureFL)
+												, "Tyre.Pressure.Front.Right", valueOrNull(pressureFR)
+												, "Tyre.Pressure.Rear.Left", valueOrNull(pressureRL)
+												, "Tyre.Pressure.Rear.Right", valueOrNull(pressureRR)
+												, "Tyre.Temperature.Front.Left", valueOrNull(temperatureFL)
+												, "Tyre.Temperature.Front.Right", valueOrNull(temperatureFR)
+												, "Tyre.Temperature.Rear.Left", valueOrNull(temperatureRL)
+												, "Tyre.Temperature.Rear.Right", valueOrNull(temperatureRR)
+												, "Tyre.Wear.Front.Left", valueOrNull(wearFL)
+												, "Tyre.Wear.Front.Right", valueOrNull(wearFR)
+												, "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
+												, "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
+												, "Identifier", identifier ? identifier : kNull)
 								, true)
 			}
 			finally {
 				if this.Shared
-					database.unlock("Tyres")
+					db.unlock("Tyres")
 			}
 	}
 }
@@ -399,11 +399,9 @@ class TelemetryDatabase extends SessionDatabase {
 ;;;-------------------------------------------------------------------------;;;
 
 countValues(groupedColumn, countColumn, rows) {
-	local values := Map()
+	local values := CaseInsenseMap()
 	local result := []
 	local ignore, row, value, count, entry
-
-	values.CaseSense := false
 
 	for ignore, row in rows {
 		value := row[groupedColumn]
@@ -415,8 +413,7 @@ countValues(groupedColumn, countColumn, rows) {
 	}
 
 	for value, count in values {
-		entry := Map()
-		entry.CaseSense := false
+		entry := CaseInsenseMap()
 
 		entry[groupedColumn] := value
 		entry[countColumn] := count
@@ -588,14 +585,14 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 						counter += 1
 
 						try {
-							db.add("Electronics", Map("Identifier", identifier, "Synchronized", timestamp
-													, "Driver", telemetry["Driver"], "Weather", telemetry["Weather"]
-													, "Temperature.Air", telemetry["AirTemperature"]
-													, "Temperature.Track", telemetry["TrackTemperature"]
-													, "Tyre.Compound", telemetry["TyreCompound"]
-													, "Tyre.Compound.Color", telemetry["TyreCompoundColor"]
-													, "Fuel.Remaining", telemetry["FuelRemaining"], "Fuel.Consumption", telemetry["FuelConsumption"]
-													, "Lap.Time", telemetry["LapTime"], "Map", telemetry["Map"], "TC", telemetry["TC"], "ABS", telemetry["ABS"])
+							db.add("Electronics", Database.Row("Identifier", identifier, "Synchronized", timestamp
+															 , "Driver", telemetry["Driver"], "Weather", telemetry["Weather"]
+															 , "Temperature.Air", telemetry["AirTemperature"]
+															 , "Temperature.Track", telemetry["TrackTemperature"]
+															 , "Tyre.Compound", telemetry["TyreCompound"]
+															 , "Tyre.Compound.Color", telemetry["TyreCompoundColor"]
+															 , "Fuel.Remaining", telemetry["FuelRemaining"], "Fuel.Consumption", telemetry["FuelConsumption"]
+															 , "Lap.Time", telemetry["LapTime"], "Map", telemetry["Map"], "TC", telemetry["TC"], "ABS", telemetry["ABS"])
 												, true)
 						}
 						catch Any as exception {
@@ -626,26 +623,26 @@ synchronizeTelemetry(groups, sessionDB, connector, simulators, timestamp, lastSy
 						counter += 1
 
 						try {
-							db.add("Tyres", Map("Identifier", identifier, "Synchronized", timestamp
-											  , "Driver", telemetry["Driver"], "Weather", telemetry["Weather"]
-											  , "Temperature.Air", telemetry["AirTemperature"]
-											  , "Temperature.Track", telemetry["TrackTemperature"]
-											  , "Tyre.Compound", telemetry["TyreCompound"]
-											  , "Tyre.Compound.Color", telemetry["TyreCompoundColor"]
-											  , "Fuel.Remaining", telemetry["FuelRemaining"], "Fuel.Consumption", telemetry["FuelConsumption"]
-											  , "Lap.Time", telemetry["LapTime"], "Tyre.Laps", telemetry["Laps"]
-											  , "Tyre.Pressure.Front.Left", telemetry["PressureFrontLeft"]
-											  , "Tyre.Pressure.Front.Right", telemetry["PressureFrontRight"]
-											  , "Tyre.Pressure.Rear.Left", telemetry["PressureRearLeft"]
-											  , "Tyre.Pressure.Rear.Right", telemetry["PressureRearRight"]
-											  , "Tyre.Temperature.Front.Left", telemetry["TemperatureFrontLeft"]
-											  , "Tyre.Temperature.Front.Right", telemetry["TemperatureFrontRight"]
-											  , "Tyre.Temperature.Rear.Left", telemetry["TemperatureRearLeft"]
-											  , "Tyre.Temperature.Rear.Right", telemetry["TemperatureRearRight"]
-											  , "Tyre.Wear.Front.Left", telemetry["WearFrontLeft"]
-											  , "Tyre.Wear.Front.Right", telemetry["WearFrontRight"]
-											  , "Tyre.Wear.Rear.Left", telemetry["WearRearLeft"]
-											  , "Tyre.Wear.Rear.Right", telemetry["WearRearRight"])
+							db.add("Tyres", Database.Row("Identifier", identifier, "Synchronized", timestamp
+													   , "Driver", telemetry["Driver"], "Weather", telemetry["Weather"]
+													   , "Temperature.Air", telemetry["AirTemperature"]
+													   , "Temperature.Track", telemetry["TrackTemperature"]
+													   , "Tyre.Compound", telemetry["TyreCompound"]
+													   , "Tyre.Compound.Color", telemetry["TyreCompoundColor"]
+													   , "Fuel.Remaining", telemetry["FuelRemaining"], "Fuel.Consumption", telemetry["FuelConsumption"]
+													   , "Lap.Time", telemetry["LapTime"], "Tyre.Laps", telemetry["Laps"]
+													   , "Tyre.Pressure.Front.Left", telemetry["PressureFrontLeft"]
+													   , "Tyre.Pressure.Front.Right", telemetry["PressureFrontRight"]
+													   , "Tyre.Pressure.Rear.Left", telemetry["PressureRearLeft"]
+													   , "Tyre.Pressure.Rear.Right", telemetry["PressureRearRight"]
+													   , "Tyre.Temperature.Front.Left", telemetry["TemperatureFrontLeft"]
+													   , "Tyre.Temperature.Front.Right", telemetry["TemperatureFrontRight"]
+													   , "Tyre.Temperature.Rear.Left", telemetry["TemperatureRearLeft"]
+													   , "Tyre.Temperature.Rear.Right", telemetry["TemperatureRearRight"]
+													   , "Tyre.Wear.Front.Left", telemetry["WearFrontLeft"]
+													   , "Tyre.Wear.Front.Right", telemetry["WearFrontRight"]
+													   , "Tyre.Wear.Rear.Left", telemetry["WearRearLeft"]
+													   , "Tyre.Wear.Rear.Right", telemetry["WearRearRight"])
 										  , true)
 						}
 						catch Any as exception {

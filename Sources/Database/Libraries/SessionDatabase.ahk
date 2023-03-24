@@ -1993,7 +1993,7 @@ synchronizeDatabase(command := false) {
 parseData(properties) {
 	local result := CaseInsenseMap()
 	local property
-	
+
 	properties := StrReplace(properties, "`r", "")
 
 	loop Parse, properties, "`n" {
@@ -2284,11 +2284,17 @@ keepAlive(identifier, connector, connection) {
 	SessionDatabase.Connected[identifier] := connector.KeepAlive(connection)
 }
 
+initializeSessionDatabase() {
+	SessionDatabase()
+
+	SessionDatabase.registerSynchronizer(synchronizeDrivers)
+	SessionDatabase.registerSynchronizer(synchronizeSetups)
+	SessionDatabase.registerSynchronizer(synchronizeStrategies)
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-SessionDatabase.registerSynchronizer(synchronizeDrivers)
-SessionDatabase.registerSynchronizer(synchronizeSetups)
-SessionDatabase.registerSynchronizer(synchronizeStrategies)
+initializeSessionDatabase()

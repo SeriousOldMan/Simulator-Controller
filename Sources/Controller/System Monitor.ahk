@@ -976,8 +976,6 @@ startSystemMonitor() {
 
 	registerMessageHandler("Monitoring", monitoringMessageHandler)
 
-	SessionDatabase()
-
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")
 	deleteFile(kTempDirectory . "Track Mapper.state")

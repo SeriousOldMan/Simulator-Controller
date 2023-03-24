@@ -640,6 +640,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	initializePitstopMFD() {
+		local repairBodyworkChosen := this.iRepairBodyworkChosen
+		local repairSuspensionChosen := this.iRepairSuspensionChosen
 		local availableOptions, currentPressures, tyreChange
 
 		protectionOn(true, true)
@@ -711,13 +713,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			this.toggleActivity("Repair Suspension")
 			this.toggleActivity("Repair Bodywork")
 
-			if this.iRepairBodyworkChosen
+			if repairBodyworkChosen
 				this.toggleActivity("Repair Bodywork")
 
-			if this.iRepairSuspensionChosen
+			if repairSuspensionChosen
 				this.toggleActivity("Repair Suspension")
 
-			this.iRepairBodyworkChosen := (this.iRepairBodyworkChosen || this.iRepairSuspensionChosen)
+			this.iRepairSuspensionChosen := repairSuspensionChosen
+			this.iRepairBodyworkChosen := (repairBodyworkChosen || repairSuspensionChosen)
 		}
 		finally {
 			protectionOff(true, true)

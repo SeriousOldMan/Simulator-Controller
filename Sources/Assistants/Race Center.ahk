@@ -2581,7 +2581,7 @@ class RaceCenter extends ConfigurationItem {
 	releaseSetups(verbose := true) {
 		local session, version, info, fileName, setups, title
 
-		if this.SessionActive
+		if this.SessionActive {
 			try {
 				session := this.SelectedSession[true]
 
@@ -2612,6 +2612,7 @@ class RaceCenter extends ConfigurationItem {
 			catch Any as exception {
 				logError(exception)
 			}
+		}
 		else if verbose {
 			title := translate("Information")
 
@@ -3042,7 +3043,7 @@ class RaceCenter extends ConfigurationItem {
 	releasePlan(verbose := true) {
 		local session, version, info, fileName, plan, title
 
-		if this.SessionActive
+		if this.SessionActive {
 			try {
 				session := this.SelectedSession[true]
 
@@ -3075,6 +3076,7 @@ class RaceCenter extends ConfigurationItem {
 			catch Any as exception {
 				logError(exception)
 			}
+		}
 		else if verbose {
 			title := translate("Information")
 

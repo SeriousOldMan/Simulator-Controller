@@ -132,7 +132,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			Get {
 				local plugin := this.Plugin
 
-				if plugin
+				if plugin {
 					switch this.Command {
 						case "togglePedalVibration":
 							return this.Plugin.PedalVibrationEnabled
@@ -143,6 +143,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 						default:
 							throw "Unsupported command detected in FXToggleAction.Active..."
 					}
+				}
 				else
 					return false
 			}
@@ -152,7 +153,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			Get {
 				local plugin := this.Plugin
 
-				if plugin
+				if plugin {
 					switch this.Command {
 						case "togglePedalVibration":
 							return "PedalVibration"
@@ -163,6 +164,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 						default:
 							throw "Unsupported command detected in FXToggleAction.Action..."
 					}
+				}
 				else
 					throw "Inconsistent state detected in FXToggleAction.Action..."
 			}
@@ -171,7 +173,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (this.Active && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
+			if (this.Active && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
 				switch this.Action {
 					case "PedalVibration":
 						plugin.disablePedalVibration()
@@ -182,6 +184,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 					default:
 						throw "Unsupported action detected in FXToggleAction.Action..."
 				}
+			}
 			else if (!this.Active && ((trigger = "On") || (trigger == "Push")))
 				switch this.Action {
 					case "PedalVibration":

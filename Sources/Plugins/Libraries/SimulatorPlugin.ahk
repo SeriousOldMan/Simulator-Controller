@@ -1172,7 +1172,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		bubbleSort(&cars, compareCarPositions)
 
-		if isDebug()
+		if isDebug() {
 			loop count {
 				if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position") != A_Index)
 					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index] . ": "
@@ -1181,6 +1181,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
 			}
+		}
 		else
 			loop count
 				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)

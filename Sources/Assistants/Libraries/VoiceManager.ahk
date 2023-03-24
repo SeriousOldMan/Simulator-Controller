@@ -850,13 +850,14 @@ class VoiceManager {
 		}
 
 		/*
-		if speechRecognizer
+		if speechRecognizer {
 			try {
 				speechRecognizer.loadGrammar("?", speechRecognizer.compileGrammar("[Unknown]"), ObjBindMethod(this, "raisePhraseRecognized"))
 			}
 			catch Any as exception {
 				logError(exception)^
 			}
+		}
 		else
 			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", this.Name, "?", "[Unknown]", "remoteCommandRecognized"), this.VoiceServer)
 		*/

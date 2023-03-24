@@ -117,6 +117,7 @@ class Database {
 									else
 										throw exception
 								}
+							}
 					}
 
 					this.iTables[name] := data
@@ -434,15 +435,7 @@ class Database {
 
 					DirCreate(directory)
 
-					if backup
-						try {
-							FileMove(fileName, fileName . ".bak", true)
-						}
-						catch Any as exception {
-							logError(exception)
-						}
-					else
-						deleteFile(fileName, true)
+					deleteFile(fileName, backup)
 
 					schema := this.Schemas[name]
 

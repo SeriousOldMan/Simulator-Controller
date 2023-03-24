@@ -114,6 +114,7 @@ class DatabaseCreator {
 		database := TyresDatabase()
 
 		database.DatabaseDirectory := this.TargetDirectory
+		database.Shared := false
 
 		this.iTyresDatabase := database
 
@@ -339,14 +340,20 @@ createSharedDatabases() {
 
 	databaseDirectory := (kTempDirectory . "Shared Database Creator")
 
+	if false {
 	deleteDirectory(databaseDirectory)
 
 	DirCreate(databaseDirectory . "\Input")
 	DirCreate(databaseDirectory . "\Output")
+	}
+	else {
+	deleteDirectory(databaseDirectory . "\Output")
+	DirCreate(databaseDirectory . "\Output")
+	}
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
 
-	downloadUserDatabases(databaseDirectory . "\Input\")
+	; downloadUserDatabases(databaseDirectory . "\Input\")
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
 

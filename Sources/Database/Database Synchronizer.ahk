@@ -56,6 +56,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 			return
 
 	targetDB.DatabaseDirectory := (kTempDirectory . "Shared Database\")
+	targetDB.Shared := false
 
 	try {
 		configuration := newMultiMap()

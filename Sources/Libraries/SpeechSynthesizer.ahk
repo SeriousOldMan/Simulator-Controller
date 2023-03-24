@@ -642,9 +642,10 @@ class SpeechSynthesizer {
 	}
 
 	wait() {
-		if this.iSoundPlayer
+		if this.iSoundPlayer {
 			while this.isSpeaking()
 				Sleep(1)
+		}
 		else
 			this.stop()
 	}

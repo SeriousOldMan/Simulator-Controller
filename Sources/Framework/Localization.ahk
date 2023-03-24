@@ -589,7 +589,7 @@ getFloatSeparator() {
 }
 
 convertUnit(type, value, display := true, round := true) {
-	if display
+	if display {
 		switch type, false {
 			case "Pressure":
 				return displayPressureValue(value, round)
@@ -606,6 +606,7 @@ convertUnit(type, value, display := true, round := true) {
 			default:
 				throw "Unknown unit type detected in convertUnit..."
 		}
+	}
 	else
 		switch type, false {
 			case "Pressure":

@@ -242,9 +242,10 @@ class InstallationStepWizard extends StepWizard {
 
 		for software, widgets in this.iPages[page]
 			if !getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
-				if !this.SetupWizard.isSoftwareRequested(software)
+				if !this.SetupWizard.isSoftwareRequested(software) {
 					for ignore, widget in widgets
 						GuiControl Disable, %widget%
+				}
 				else {
 					this.SetupWizard.locateSoftware(software)
 

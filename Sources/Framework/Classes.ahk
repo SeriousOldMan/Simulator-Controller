@@ -233,7 +233,7 @@ class Application extends ConfigurationItem {
 			this.iRunningPID := 0
 		}
 		else {
-			if (this.iRunningPID > 0)
+			if (this.iRunningPID > 0) {
 				try {
 					WinClose("ahk_pid " . this.iRunningPID)
 					ProcessClose(this.iRunningPID)
@@ -241,8 +241,10 @@ class Application extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 				}
-			else if (this.ExePath != "")
+			}
+			else if (this.ExePath != "") {
 				WinClose("ahk_exe " . this.ExePath)
+			}
 			else if (this.WindowTitle != "")
 				WinClose(this.WindowTitle)
 

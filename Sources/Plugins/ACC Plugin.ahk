@@ -435,7 +435,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	computeBrakePadWear(location, compound, thickness) {
-		if (location = "Front")
+		if (location = "Front") {
 			switch compound {
 				case 1, 4:
 					return Max(0, Min(100, 100 - ((thickness - 15) / 14 * 100)))
@@ -446,6 +446,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				default:
 					return Max(0, Min(100, 100 - ((thickness - 14.5) / 14.5 * 100)))
 			}
+		}
 		else
 			switch compound {
 				case 1, 4:
@@ -884,9 +885,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						this.activateWindow()
 
-						if (targetSelectedOption > this.iPSSelectedOption)
+						if (targetSelectedOption > this.iPSSelectedOption) {
 							loop % targetSelectedOption - this.iPSSelectedOption
 								this.sendCommand("{Down}")
+						}
 						else
 							loop % this.iPSSelectedOption - targetSelectedOption
 								this.sendCommand("{Up}")

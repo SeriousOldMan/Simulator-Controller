@@ -54,6 +54,7 @@ class Database {
 
 	Tables[name := false] {
 		Get {
+			local tries := 10
 			local schema, data, row, values, length, ignore, column
 			local file, line
 
@@ -86,20 +87,33 @@ class Database {
 							}
 						}
 						else if FileExist(this.Directory . name . ".CSV")
-							loop Read, (this.Directory . name . ".CSV") {
-								row := Map()
-								row.CaseSense := false
-								values := string2Values(";", A_LoopReadLine)
-								length := values.Length
+							loop {
+								try {
+									loop Read, (this.Directory . name . ".CSV") {
+										row := Map()
+										row.CaseSense := false
+										values := string2Values(";", A_LoopReadLine)
+										length := values.Length
 
-								for ignore, column in schema
-									if (length >= A_Index)
-										row[column] := values[A_Index]
+										for ignore, column in schema
+											if (length >= A_Index)
+												row[column] := values[A_Index]
+											else
+												row[column] := kNull
+
+										data.Push(row)
+									}
+
+									break
+								}
+								catch Any as exception {
+									data := []
+
+									if (tries-- > 0)
+										Sleep(200)
 									else
-										row[column] := kNull
-
-								data.Push(row)
-							}
+										throw exception
+								}
 					}
 
 					this.iTables[name] := data
@@ -194,14 +208,14 @@ class Database {
 		}
 	}
 
-	unlock(name := false) {
+	unlock(name := false, backup := false) {
 		local file, ignore
 
-		if name {
+		if (name && (name != true)) {
 			file := this.Files[name]
 
 			if file {
-				this.flush(name)
+				this.flush(name, backup)
 
 				this.Files.Delete(name)
 
@@ -212,7 +226,7 @@ class Database {
 		}
 		else
 			for name, ignore in getKeys(this.Schemas)
-				this.unlock(name)
+				this.unlock(name, backup)
 
 	}
 
@@ -271,9 +285,9 @@ class Database {
 		return (needsClone ? rows.Clone() : rows)
 	}
 
-	reload(name, flush := true) {
+	reload(name, flush := true, backup := false) {
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 
 		this.iTables.Delete(name)
 	}
@@ -323,9 +337,9 @@ class Database {
 					}
 					catch Any as exception {
 						if (tries-- > 0)
-							Sleep(10)
+							Sleep(200)
 						else
-							throw Exception
+							throw exception
 					}
 			}
 		}
@@ -347,7 +361,7 @@ class Database {
 		return results
 	}
 
-	remove(name, where, predicate := false, flush := false) {
+	remove(name, where, predicate := false, flush := false, backup := false) {
 		local rows := []
 		local ignore, row
 
@@ -366,45 +380,46 @@ class Database {
 		this.iTableChanged[name] := true
 
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 	}
 
-	clear(name, flush := false) {
+	clear(name, flush := false, backup := false) {
 		this.iTables[name] := []
 		this.iTableChanged[name] := true
 
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 	}
 
 	changed(name) {
 		this.iTableChanged[name] := true
 	}
 
-	flush(name := false) {
+	flush(name := false, backup := false) {
 		local bakFile := false
 		local directory, fileName, schema, ignore, row, values, column, file
 
-		if name {
+		if (name && (name != true)) {
 			if (this.Tables.Has(name) && this.iTableChanged.Has(name)) {
 				directory := this.Directory
 				fileName := (directory . name . ".CSV")
 				file := this.Files[name]
 
 				if file {
-					try {
-						file.Pos := 0
+					if backup
+						try {
+							file.Pos := 0
 
-						bakFile := FileOpen(fileName . ".bak", "w")
+							bakFile := FileOpen(fileName . ".bak", "w")
 
-						bakFile.Write(file.Read())
-					}
-					catch Any as exception {
-					}
-					finally {
-						if bakFile
-							bakFile.Close()
-					}
+							bakFile.Write(file.Read())
+						}
+						catch Any as exception {
+						}
+						finally {
+							if bakFile
+								bakFile.Close()
+						}
 
 					file.Length := 0
 
@@ -425,7 +440,15 @@ class Database {
 
 					DirCreate(directory)
 
-					deleteFile(fileName, true)
+					if backup
+						try {
+							FileMove(fileName, fileName . ".bak", true)
+						}
+						catch Any as exception {
+							logError(exception)
+						}
+					else
+						deleteFile(fileName, true)
 
 					schema := this.Schemas[name]
 
@@ -446,7 +469,7 @@ class Database {
 		}
 		else
 			for name, ignore in this.Tables
-				this.flush(name)
+				this.flush(name, backup)
 	}
 }
 

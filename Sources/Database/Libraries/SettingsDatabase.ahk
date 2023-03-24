@@ -284,7 +284,7 @@ class SettingsDatabase extends SessionDatabase {
 					return
 				}
 				finally {
-					database.unlock("Settings")
+					database.unlock("Settings", true)
 				}
 
 			Sleep(200)
@@ -310,7 +310,7 @@ class SettingsDatabase extends SessionDatabase {
 					return
 				}
 				finally {
-					database.unlock("Settings")
+					database.unlock("Settings", true)
 				}
 
 			Sleep(200)

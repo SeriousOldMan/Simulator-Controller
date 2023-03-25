@@ -70,7 +70,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 
 		splashGuis[splashCounter] := splashGui
 
-		splashGui.Opt("-Border -Caption")
+		splashGui.Opt("-Border -Caption +0x800000")
 		splashGui.BackColor := "D0D0D0"
 
 		splashGui.SetFont("s10 Bold", "Arial")

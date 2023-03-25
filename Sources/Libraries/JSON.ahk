@@ -16,6 +16,8 @@
 
 #Include "..\Framework\Framework.ahk"
 
+global kBuildConfiguration := "Development"
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
@@ -24,60 +26,60 @@
 class JSON {
 	static JS := JSON._GetJScriptObject(), true := {}, false := {}, null := {}
 
-	parse(script, js := false)  {
+	static parse(script, js := false)  {
 		local jsObject
 
-		if jsObject := this.verify(script)
-			return js ? jsObject : this._CreateObject(jsObject)
+		if jsObject := JSON.verify(script)
+			return js ? jsObject : JSON._CreateMap(jsObject)
 		else
 			return false
 	}
 
-	print(object, js := false, indent := "") {
+	static print(obj, js := false, indent := "") {
 		local text
 
 		if js
-			text := this.JS.JSON.stringify(object, "", indent)
+			text := JSON.JS.JSON.stringify(obj, "", indent)
 		else
-			text := this.JS.eval("JSON.stringify(" . this._ObjToString(object) . ",'','" . indent . "')")
+			text := JSON.JS.eval("JSON.stringify(" . JSON._ObjToString(obj) . ",'','" . indent . "')")
 
 		if !js
-			text := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(text, "\n", "`n"), "\r", "`r"), "\t", "`t"), "\""", """"), "\\", "\")
+			text := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(text, "\n", "`n"), "\r", "`r"), "\t", "`t"), "\`"", "`""), "\\", "\")
 
 		return text
 	}
 
-	stringify(object, js := false, indent := "") {
+	static stringify(obj, js := false, indent := "") {
 		if js
-			return this.JS.JSON.stringify(object, "", indent)
+			return JSON.JS.JSON.stringify(obj, "", indent)
 		else
-			return this.JS.eval("JSON.stringify(" . this._ObjToString(object) . ",'','" . indent . "')")
+			return JSON.JS.eval("JSON.stringify(" . JSON._ObjToString(obj) . ",'','" . indent . "')")
 	}
 
-	getKey(script, key, indent := "") {
-		if !this.verify(script)
+	static getKey(script, key, indent := "") {
+		if !JSON.verify(script)
 			return false
 
 		try {
-			return this.JS.eval("JSON.stringify((" . script . ")" . ((SubStr(key, 1, 1) = "[") ? "" : ".") . key . ",'','" . indent . "')")
+			return JSON.JS.eval("JSON.stringify((" . script . ")" . ((SubStr(key, 1, 1) = "[") ? "" : ".") . key . ",'','" . indent . "')")
 		}
 		catch Any as exception {
 			return false
 		}
 	}
 
-	setKey(script, key, value, indent := "") {
+	static setKey(script, key, value, indent := "") {
 		local result
 
-		if (!this.verify(script) || !this.verify(value))
+		if (!JSON.verify(script) || !JSON.verify(value))
 			return false
 
 		try {
-			result := this.JS.eval("var obj = (" . script . ");"
+			result := JSON.JS.eval("var obj = (" . script . ");"
 								 . "obj" . ((SubStr(key, 1, 1) = "[") ? "" : ".") . key . "=" . value . ";"
 								 . "JSON.stringify(obj,'','" . indent . "')")
 
-			this.JS.eval("obj = ''")
+			JSON.JS.eval("obj = ''")
 
 			return result
 		}
@@ -86,23 +88,23 @@ class JSON {
 		}
 	}
 
-	removeKey(script, key, indent := "") {
+	static removeKey(script, key, indent := "") {
 		local sign, result, match
 
-		if !this.verify(script)
+		if !JSON.verify(script)
 			return false
 
 		sign := ((SubStr(key, 1, 1) = "[") ? "" : ".")
 
 		try {
 			if !RegExMatch(key, "(.*)\[(\d+)]$", &match)
-				result := this.JS.eval("var obj = (" . script . "); delete obj" . sign . key . "; JSON.stringify(obj,'','" . indent . "')")
+				result := JSON.JS.eval("var obj = (" . script . "); delete obj" . sign . key . "; JSON.stringify(obj,'','" . indent . "')")
 			else
-				result := this.JS.eval("var obj = (" . script . ");"
+				result := JSON.JS.eval("var obj = (" . script . ");"
 									 . "obj" . (match[1] != "" ? sign . match[1] : "") . ".splice(" . match[2] . ", 1);"
 									 . "JSON.stringify(obj,'','" . indent . "')")
 
-			this.JS.eval("obj = ''")
+			JSON.JS.eval("obj = ''")
 
 			return result
 		}
@@ -111,46 +113,46 @@ class JSON {
 		}
 	}
 
-	enum(script, key := "", indent := "") {
-		local jsObject, object, result, concatenated, keys, k
+	static enum(script, key := "", indent := "") {
+		local jsObject, obj, result, concatenated, keys, k
 
-		if !this.verify(script)
+		if !JSON.verify(script)
 			return false
 
 		concatenated := (key ? ((SubStr(key, 1, 1) = "[" ? "" : ".") . key) : "")
 
 		try {
-			jsObject := this.JS.eval("(" . script . ")" . concatenated)
+			jsObject := JSON.JS.eval("(" . script . ")" . concatenated)
 			result := jsObject.IsArray()
 
 			if (result = "")
 				return false
 
-			object := Map()
+			obj := Map()
 
 			if (result = -1) {
 				loop jsObject.length
-					object[A_Index - 1] := this.JS.eval("JSON.stringify((" . script . ")" . concatenated . "[" . (A_Index - 1) . "],'','" . indent . "')")
+					obj[A_Index - 1] := JSON.JS.eval("JSON.stringify((" . script . ")" . concatenated . "[" . (A_Index - 1) . "],'','" . indent . "')")
 			}
 			else if (result = 0) {
 				keys := jsObject.GetKeys()
 
 				loop keys.length
-					k := keys[A_Index - 1], object[k] := this.JS.eval("JSON.stringify((" . script . ")" . concatenated . "['" . k . "'],'','" . indent . "')")
+					k := keys[A_Index - 1], obj[k] := JSON.JS.eval("JSON.stringify((" . script . ")" . concatenated . "['" . k . "'],'','" . indent . "')")
 			}
 
-			return object
+			return obj
 		}
 		catch Any as exception {
 			return false
 		}
 	}
 
-	verify(script) {
+	static verify(script) {
 		local jsObject
 
 		try
-			jsObject := this.JS.eval("(" . script . ")")
+			jsObject := JSON.JS.eval("(" . script . ")")
 		catch {
 			return false
 		}
@@ -158,48 +160,48 @@ class JSON {
 		return (IsObject(jsObject) ? jsObject : true)
 	}
 
-	_ObjToString(object) {
-		local key, value, isArray, string
+	static _ObjToString(obj) {
+		local key, value, isArray, result
 
-		if IsObject(object) {
+		if obj is Map {
 			for key, value in ["true", "false", "null"]
-				if (object = this[value])
+				if (obj = JSON.%value%)
 					return value
 
 			isArray := true
 
-			for key in object {
-				if IsObject(key)
+			for key, value in obj.OwnProps() {
+				if (IsObject(key) || (key is Map))
 					throw "Invalid key detected in JSON._ObjToString..."
 
 				if !((key = A_Index) || (isArray := false))
 					break
 			}
 
-			string := ""
+			result := ""
 
-			for key, value in object
-				string .= ((A_Index = 1) ? "" : "," ) . (isArray ? "" : ("""" . key . """:")) . this._ObjToString(value)
+			for key, value in obj.OwnProps()
+				result .= ((A_Index = 1) ? "" : "," ) . (isArray ? "" : ("`"" . key . "`":")) . JSON._ObjToString(value)
 
-			return (isArray ? ("[" . string . "]") : ("{" . string . "}"))
+			return (isArray ? ("[" . result . "]") : ("{" . result . "}"))
 		}
-		else if !(((object * 1) = "") || RegExMatch(object, "\s"))
-			return object
+		else if !(((obj * 1) = "") || RegExMatch(obj, "\s"))
+			return obj
 
-		for key, value in [["\", "\\"], [A_Tab, "\t"], ["""", "\"""], ["/", "\/"], ["`n", "\n"], ["`r", "\r"], [Chr(12), "\f"], [Chr(08), "\b"]]
-			object := StrReplace(object, value[1], value[2])
+		for key, value in [["\", "\\"], [A_Tab, "\t"], ["`"", "\`""], ["/", "\/"], ["`n", "\n"], ["`r", "\r"], [Chr(12), "\f"], [Chr(08), "\b"]]
+			obj := StrReplace(obj, value[1], value[2])
 
-		return """" . object . """"
+		return "`"" . obj . "`""
 	}
 
-	_GetJScriptObject() {
+	static _GetJScriptObject() {
 		local JS
 
 		static document
 
 		document := ComObject("htmlfile")
 
-		document.write("<meta http-equiv=""X-UA-Compatible"" content=""IE=9"">")
+		document.write("<meta http-equiv=`"X-UA-Compatible`" content=`"IE=9`">")
 
 		JS := document.parentWindow
 
@@ -208,7 +210,7 @@ class JSON {
 		return JS
 	}
 
-	_AddMethods(JS) {
+	static _AddMethods(JS) {
 		local script
 
 		script := "
@@ -231,9 +233,9 @@ class JSON {
 
 		JS.eval(script)
 	}
-
-	_CreateObject(jsObject) {
-		local result, object, keys, k
+https://github.com/Chunjee/json.ahk
+	static _CreateMap(jsObject) {
+		local result, obj, keys, k
 
 		if !IsObject(jsObject)
 			return jsObject
@@ -243,19 +245,28 @@ class JSON {
 		if (result = "")
 			return jsObject
 		else if (result = -1) {
-			object := []
+			obj := []
 
-			Loop jsObject.length
-				object[A_Index] := this._CreateObject(jsObject[A_Index - 1])
+			loop jsObject.length
+				obj[A_Index] := JSON._CreateMap(jsObject[A_Index - 1])
 		}
 		else if (result = 0) {
-			object := map()
+			obj := CaseInsenseMap()
 			keys := jsObject.GetKeys()
+			type := ComObjType(keys)
 
-			Loop keys.length
-				k := keys[A_Index - 1], object[k] := this._CreateObject(jsObject[k])
+			loop keys.length
+				k := keys[A_Index - 1], obj[k] := JSON._CreateMap(jsObject[k])
 		}
 
-		return object
+		return obj
 	}
 }
+
+data := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json"))
+
+msgbox "INspect"
+
+data := JSON.print(data)
+
+msgbox "Inspect"

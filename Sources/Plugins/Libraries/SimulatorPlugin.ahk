@@ -499,7 +499,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		local delay
 
 		try {
-			switch this.CommandMode {
+			switch this.CommandMode, false {
 				case "Event":
 					SendEvent(command)
 				case "Input":
@@ -587,7 +587,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		local newValues
 
 		if this.RaceEngineer
-			switch option {
+			switch option, false {
 				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					newValues := this.getPitstopOptionValues(option)
 
@@ -677,7 +677,7 @@ class RaceAssistantAction extends ControllerAction {
 	fireAction(function, trigger) {
 		local plugin := this.Plugin
 
-		switch this.Action {
+		switch this.Action, false {
 			case "InformationRequest":
 				plugin.requestInformation(this.Arguments*)
 			case "PitstopRecommend":

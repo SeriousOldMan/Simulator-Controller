@@ -210,7 +210,7 @@ editModes(&settingsOrCommand, arguments*) {
 
 		modesEditorGui := Gui()
 
-		modesEditorGui.Opt("-Border") ; -Caption
+		modesEditorGui.Opt("-Border -Caption +0x800000")
 		modesEditorGui.BackColor := "D0D0D0"
 
 		modesEditorGui.SetFont("Bold", "Arial")
@@ -427,7 +427,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 
 		settingsEditorGui := Gui()
 
-		settingsEditorGui.Opt("-Border") ; -Caption
+		settingsEditorGui.Opt("-Border -Caption +0x800000")
 		settingsEditorGui.BackColor := "D0D0D0"
 
 		settingsEditorGui.SetFont("Bold", "Arial")

@@ -74,7 +74,7 @@ consentDialog(id, consent := false, *) {
 		texts := readMultiMap(kTranslationsDirectory . "Consent.en")
 
 	consentGui := Gui()
-	consentGui.Opt("-Border") ; -Caption
+	consentGui.Opt("-Border -Caption +0x800000")
 	consentGui.BackColor := "D0D0D0"
 
 	consentGui.SetFont("s10 Bold")
@@ -411,7 +411,7 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 	innerWidth := width - 16
 
 	htmlGui := Gui()
-	htmlGui.Opt("-Border -Caption")
+	htmlGui.Opt("-Border -Caption +0x800000")
 	htmlGui.BackColor := "D0D0D0"
 
 	htmlGui.SetFont("s10 Bold")

@@ -87,7 +87,7 @@ showProgress(options := unset) {
 
 			progressGui := Gui()
 
-			progressGui.Opt("-Border") ; -Caption
+			progressGui.Opt("-Border -Caption +0x800000")
 			progressGui.BackColor := "D0D0D0"
 
 			progressGui.SetFont("s10 Bold", "Arial")

@@ -1,10 +1,9 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - JSON Parser                     ;;;
 ;;;                                                                         ;;;
-;;;   This code is based on work of teadrinker. See                         ;;;
-;;;   https://www.autohotkey.com/boards/viewtopic.php?f=76&t=65631&start=40 ;;;
-;;;   for more information and also some sample usage code. The class JSON  ;;;
-;;;   also shows, how to embed JavaScript code into AHK programs.           ;;;
+;;;   Based on JXON published on GitHub. See                                ;;;
+;;;   https://github.com/TheArkive/JXON_ahk2/blob/master/_JXON.ahk          ;;;
+;;;   for more information and also some sample usage code.                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -16,257 +15,180 @@
 
 #Include "..\Framework\Framework.ahk"
 
-global kBuildConfiguration := "Development"
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 class JSON {
-	static JS := JSON._GetJScriptObject(), true := {}, false := {}, null := {}
+	static parse(src, args*) {
+		key := "", is_key := false
+		stack := [ tree := [] ]
+		next := '"{[01234567890-tfn'
+		pos := 0
 
-	static parse(script, js := false)  {
-		local jsObject
+		while ( (ch := SubStr(src, ++pos, 1)) != "" ) {
+			if InStr(" `t`n`r", ch)
+				continue
+			if !InStr(next, ch, true) {
+				testArr := StrSplit(SubStr(src, 1, pos), "`n")
 
-		if jsObject := JSON.verify(script)
-			return js ? jsObject : JSON._CreateMap(jsObject)
-		else
-			return false
-	}
+				ln := testArr.Length
+				col := pos - InStr(src, "`n",, -(StrLen(src)-pos+1))
 
-	static print(obj, js := false, indent := "") {
-		local text
+				msg := Format("{}: line {} col {} (char {})"
+				,   (next == "")      ? ["Extra data", ch := SubStr(src, pos)][1]
+				  : (next == "'")     ? "Unterminated string starting at"
+				  : (next == "\")     ? "Invalid \escape"
+				  : (next == ":")     ? "Expecting ':' delimiter"
+				  : (next == '"')     ? "Expecting object key enclosed in double quotes"
+				  : (next == '"}')    ? "Expecting object key enclosed in double quotes or object closing '}'"
+				  : (next == ",}")    ? "Expecting ',' delimiter or object closing '}'"
+				  : (next == ",]")    ? "Expecting ',' delimiter or array closing ']'"
+				  : [ "Expecting JSON value(string, number, [true, false, null], object or array)"
+					, ch := SubStr(src, pos, (SubStr(src, pos)~="[\]\},\s]|$")-1) ][1]
+				, ln, col, pos)
 
-		if js
-			text := JSON.JS.JSON.stringify(obj, "", indent)
-		else
-			text := JSON.JS.eval("JSON.stringify(" . JSON._ObjToString(obj) . ",'','" . indent . "')")
-
-		if !js
-			text := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(text, "\n", "`n"), "\r", "`r"), "\t", "`t"), "\`"", "`""), "\\", "\")
-
-		return text
-	}
-
-	static stringify(obj, js := false, indent := "") {
-		if js
-			return JSON.JS.JSON.stringify(obj, "", indent)
-		else
-			return JSON.JS.eval("JSON.stringify(" . JSON._ObjToString(obj) . ",'','" . indent . "')")
-	}
-
-	static getKey(script, key, indent := "") {
-		if !JSON.verify(script)
-			return false
-
-		try {
-			return JSON.JS.eval("JSON.stringify((" . script . ")" . ((SubStr(key, 1, 1) = "[") ? "" : ".") . key . ",'','" . indent . "')")
-		}
-		catch Any as exception {
-			return false
-		}
-	}
-
-	static setKey(script, key, value, indent := "") {
-		local result
-
-		if (!JSON.verify(script) || !JSON.verify(value))
-			return false
-
-		try {
-			result := JSON.JS.eval("var obj = (" . script . ");"
-								 . "obj" . ((SubStr(key, 1, 1) = "[") ? "" : ".") . key . "=" . value . ";"
-								 . "JSON.stringify(obj,'','" . indent . "')")
-
-			JSON.JS.eval("obj = ''")
-
-			return result
-		}
-		catch Any as exception {
-			return false
-		}
-	}
-
-	static removeKey(script, key, indent := "") {
-		local sign, result, match
-
-		if !JSON.verify(script)
-			return false
-
-		sign := ((SubStr(key, 1, 1) = "[") ? "" : ".")
-
-		try {
-			if !RegExMatch(key, "(.*)\[(\d+)]$", &match)
-				result := JSON.JS.eval("var obj = (" . script . "); delete obj" . sign . key . "; JSON.stringify(obj,'','" . indent . "')")
-			else
-				result := JSON.JS.eval("var obj = (" . script . ");"
-									 . "obj" . (match[1] != "" ? sign . match[1] : "") . ".splice(" . match[2] . ", 1);"
-									 . "JSON.stringify(obj,'','" . indent . "')")
-
-			JSON.JS.eval("obj = ''")
-
-			return result
-		}
-		catch Any as exception {
-			return false
-		}
-	}
-
-	static enum(script, key := "", indent := "") {
-		local jsObject, obj, result, concatenated, keys, k
-
-		if !JSON.verify(script)
-			return false
-
-		concatenated := (key ? ((SubStr(key, 1, 1) = "[" ? "" : ".") . key) : "")
-
-		try {
-			jsObject := JSON.JS.eval("(" . script . ")" . concatenated)
-			result := jsObject.IsArray()
-
-			if (result = "")
-				return false
-
-			obj := Map()
-
-			if (result = -1) {
-				loop jsObject.length
-					obj[A_Index - 1] := JSON.JS.eval("JSON.stringify((" . script . ")" . concatenated . "[" . (A_Index - 1) . "],'','" . indent . "')")
-			}
-			else if (result = 0) {
-				keys := jsObject.GetKeys()
-
-				loop keys.length
-					k := keys[A_Index - 1], obj[k] := JSON.JS.eval("JSON.stringify((" . script . ")" . concatenated . "['" . k . "'],'','" . indent . "')")
+				throw Error(msg, -1, ch)
 			}
 
-			return obj
+			obj := stack[1]
+			is_array := (obj is Array)
+
+			if i := InStr("{[", ch) { ; start new object / map?
+				val := (i = 1) ? CaseInsenseMap() : Array()	; ahk v2
+
+				is_array ? obj.Push(val) : obj[key] := val
+				stack.InsertAt(1,val)
+
+				next := '"' ((is_key := (ch == "{")) ? "}" : "{[]0123456789-tfn")
+			} else if InStr("}]", ch) {
+				stack.RemoveAt(1)
+				next := (stack[1]==tree) ? "" : (stack[1] is Array) ? ",]" : ",}"
+			} else if InStr(",:", ch) {
+				is_key := (!is_array && ch == ",")
+				next := is_key ? '"' : '"{[0123456789-tfn'
+			} else { ; string | number | true | false | null
+				if (ch == '"') { ; string
+					i := pos
+					while i := InStr(src, '"',, i+1) {
+						val := StrReplace(SubStr(src, pos+1, i-pos-1), "\\", "\u005C")
+						if (SubStr(val, -1) != "\")
+							break
+					}
+					if !i ? (pos--, next := "'") : 0
+						continue
+
+					pos := i ; update pos
+
+					val := StrReplace(val, "\/", "/")
+					val := StrReplace(val, '\"', '"')
+					, val := StrReplace(val, "\b", "`b")
+					, val := StrReplace(val, "\f", "`f")
+					, val := StrReplace(val, "\n", "`n")
+					, val := StrReplace(val, "\r", "`r")
+					, val := StrReplace(val, "\t", "`t")
+
+					i := 0
+					while i := InStr(val, "\",, i+1) {
+						if (SubStr(val, i+1, 1) != "u") ? (pos -= StrLen(SubStr(val, i)), next := "\") : 0
+							continue 2
+
+						xxxx := Abs("0x" . SubStr(val, i+2, 4)) ; \uXXXX - JSON unicode escape sequence
+						if (xxxx < 0x100)
+							val := SubStr(val, 1, i-1) . Chr(xxxx) . SubStr(val, i+6)
+					}
+
+					if is_key {
+						key := val, next := ":"
+						continue
+					}
+				} else { ; number | true | false | null
+					val := SubStr(src, pos, i := RegExMatch(src, "[\]\},\s]|$",, pos)-pos)
+
+					if IsInteger(val)
+						val += 0
+					else if IsFloat(val)
+						val += 0
+					else if (val == "true" || val == "false")
+						val := (val == "true")
+					else if (val == "null")
+						val := ""
+					else if is_key {
+						pos--, next := "#"
+						continue
+					}
+
+					pos += i-1
+				}
+
+				is_array ? obj.Push(val) : obj[key] := val
+				next := obj == tree ? "" : is_array ? ",]" : ",}"
+			}
 		}
-		catch Any as exception {
-			return false
-		}
+
+		return tree[1]
 	}
 
-	static verify(script) {
-		local jsObject
+	static print(obj, indent:="", lvl:=1) {
+		if IsObject(obj) {
+			If !(obj is Array || obj is Map || obj is String || obj is Number)
+				throw Error("Object type not supported.", -1, Format("<Object at 0x{:p}>", ObjPtr(obj)))
 
-		try
-			jsObject := JSON.JS.eval("(" . script . ")")
-		catch {
-			return false
-		}
+			if isInteger(indent)
+			{
+				if (indent < 0)
+					throw Error("Indent parameter must be a postive integer.", -1, indent)
+				spaces := indent, indent := ""
 
-		return (IsObject(jsObject) ? jsObject : true)
-	}
+				loop spaces ; ===> changed
+					indent .= " "
+			}
+			indt := ""
 
-	static _ObjToString(obj) {
-		local key, value, isArray, result
+			loop indent ? lvl : 0
+				indt .= indent
 
-		if obj is Map {
-			for key, value in ["true", "false", "null"]
-				if (obj = JSON.%value%)
-					return value
+			is_array := (obj is Array)
 
-			isArray := true
+			lvl += 1, out := "" ; Make #Warn happy
+			for k, v in obj {
+				if IsObject(k) || (k == "")
+					throw Error("Invalid object key.", -1, k ? Format("<Object at 0x{:p}>", ObjPtr(obj)) : "<blank>")
 
-			for key, value in obj.OwnProps() {
-				if (IsObject(key) || (key is Map))
-					throw "Invalid key detected in JSON._ObjToString..."
+				if !is_array ;// key ; ObjGetCapacity([k], 1)
+					out .= (ObjGetCapacity([k]) ? JSON.print(k) : escape_str(k)) (indent ? ": " : ":") ; token + padding
 
-				if !((key = A_Index) || (isArray := false))
-					break
+				out .= JSON.print(v, indent, lvl) ; value
+					.  ( indent ? ",`n" . indt : "," ) ; token + indent
 			}
 
-			result := ""
+			if (out != "") {
+				out := Trim(out, ",`n" . indent)
 
-			for key, value in obj.OwnProps()
-				result .= ((A_Index = 1) ? "" : "," ) . (isArray ? "" : ("`"" . key . "`":")) . JSON._ObjToString(value)
+				if (indent != "")
+					out := "`n" . indt . out . "`n" . SubStr(indt, StrLen(indent)+1)
+			}
 
-			return (isArray ? ("[" . result . "]") : ("{" . result . "}"))
-		}
-		else if !(((obj * 1) = "") || RegExMatch(obj, "\s"))
+			return is_array ? "[" . out . "]" : "{" . out . "}"
+
+		} else if (obj is Number)
 			return obj
 
-		for key, value in [["\", "\\"], [A_Tab, "\t"], ["`"", "\`""], ["/", "\/"], ["`n", "\n"], ["`r", "\r"], [Chr(12), "\f"], [Chr(08), "\b"]]
-			obj := StrReplace(obj, value[1], value[2])
+		else ; String
+			return escape_str(obj)
 
-		return "`"" . obj . "`""
-	}
+		escape_str(obj) {
+			obj := StrReplace(obj,"\","\\")
+			obj := StrReplace(obj,"`t","\t")
+			obj := StrReplace(obj,"`r","\r")
+			obj := StrReplace(obj,"`n","\n")
+			obj := StrReplace(obj,"`b","\b")
+			obj := StrReplace(obj,"`f","\f")
+			obj := StrReplace(obj,"/","\/")
+			obj := StrReplace(obj,'"','\"')
 
-	static _GetJScriptObject() {
-		local JS
-
-		static document
-
-		document := ComObject("htmlfile")
-
-		document.write("<meta http-equiv=`"X-UA-Compatible`" content=`"IE=9`">")
-
-		JS := document.parentWindow
-
-		JSON._AddMethods(JS)
-
-		return JS
-	}
-
-	static _AddMethods(JS) {
-		local script
-
-		script := "
-		(
-			Object.prototype.GetKeys = function () {
-				var keys = []
-
-				for (var k in this)
-					if (this.hasOwnProperty(k))
-						keys.push(k)
-
-				return keys
-			}
-			Object.prototype.IsArray = function () {
-				var toStandardString = {}.toString
-
-				return toStandardString.call(this) == '[object Array]'
-			}
-		)"
-
-		JS.eval(script)
-	}
-https://github.com/Chunjee/json.ahk
-	static _CreateMap(jsObject) {
-		local result, obj, keys, k
-
-		if !IsObject(jsObject)
-			return jsObject
-
-		result := jsObject.IsArray()
-
-		if (result = "")
-			return jsObject
-		else if (result = -1) {
-			obj := []
-
-			loop jsObject.length
-				obj[A_Index] := JSON._CreateMap(jsObject[A_Index - 1])
+			return '"' obj '"'
 		}
-		else if (result = 0) {
-			obj := CaseInsenseMap()
-			keys := jsObject.GetKeys()
-			type := ComObjType(keys)
-
-			loop keys.length
-				k := keys[A_Index - 1], obj[k] := JSON._CreateMap(jsObject[k])
-		}
-
-		return obj
 	}
 }
-
-data := JSON.parse(FileRead(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json"))
-
-msgbox "INspect"
-
-data := JSON.print(data)
-
-msgbox "Inspect"

@@ -114,6 +114,7 @@ class DatabaseCreator {
 		database := TyresDatabase()
 
 		database.DatabaseDirectory := this.TargetDirectory
+		database.Shared := false
 
 		this.iTyresDatabase := database
 
@@ -134,7 +135,7 @@ class DatabaseCreator {
 					if ((car = "1") || (car = "Unknown"))
 						deleteDirectory(databaseDirectory . simulator . "\" . car)
 					else
-						loop Files, databaseDirectory .simulator . "\" . car . "\*.*", "D" {
+						loop Files, databaseDirectory . simulator . "\" . car . "\*.*", "D" {
 							track := A_LoopFileName
 
 							if ((track = "1") || (track = "Unknown"))
@@ -154,7 +155,7 @@ class DatabaseCreator {
 								loop Files, databaseDirectory . simulator . "\" . car . "\" . track . "\Car Setups\*.*", "D" {
 									type := A_LoopFileName
 
-									Loop Files, databaseDirectory . simulator . "\" . car . "\Car Setups\" . type . "\*.*"
+									loop Files, databaseDirectory . simulator . "\" . car . "\Car Setups\" . type . "\*.*"
 										this.loadCarSetup(simulator, car, track, type, A_LoopFilePath)
 								}
 							}
@@ -168,7 +169,7 @@ class DatabaseCreator {
 			updateProgress("Pressures: " simulator . A_Space . car . A_Space . track . "...")
 
 			for ignore, row in database.Tables["Tyres.Pressures.Distribution"] {
-				compound := row.Compound
+				compound := row["Compound"]
 				color := row["Compound.Color"]
 
 				if ((compound = kNull) || !compound || (StrLen(compound) = 0))
@@ -177,10 +178,10 @@ class DatabaseCreator {
 				if ((color = kNull) || !color || (StrLen(color) = 0))
 					color := "Black"
 
-				this.TyresDatabase.updatePressure(simulator, car, track, row.Weather
+				this.TyresDatabase.updatePressure(simulator, car, track, row["Weather"]
 												, row["Temperature.Air"], row["Temperature.Track"]
-												, compound, color, row.Type, row.Tyre
-												, row.Pressure, row.Count, false, true, "Community", kNull)
+												, compound, color, row["Type"], row["Tyre"]
+												, row["Pressure"], row["Count"], false, true, "Community", kNull)
 			}
 
 			this.TyresDatabase.flush()
@@ -333,7 +334,7 @@ createSharedDatabases() {
 
 	vProgressCount := 0
 
-	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database..."})
+	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database...", width: 400})
 
 	Sleep(500)
 
@@ -371,6 +372,9 @@ cd database-downloads
 del %file%
 quit
 )"
+
+		command := substituteVariables(command, {file: file})
+
 		FileAppend(command, A_Temp . "\clearRemoteDirectory.txt")
 
 		deleteFile(A_Temp . "\clearRemoteDirectory.bat")

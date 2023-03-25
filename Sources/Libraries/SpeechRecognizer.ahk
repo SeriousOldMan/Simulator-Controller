@@ -447,7 +447,7 @@ class SpeechRecognizer {
 	}
 
 	newGrammar() {
-		if this.Instance
+		if this.Instance {
 			switch this.iEngine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
@@ -456,12 +456,13 @@ class SpeechRecognizer {
 				case "Server":
 					return this.Instance.NewServerGrammar()
 			}
+		}
 		else
 			return false
 	}
 
 	newChoices(choices) {
-		if this.Instance
+		if this.Instance {
 			switch this.iEngine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
@@ -470,6 +471,7 @@ class SpeechRecognizer {
 				case "Server":
 					return this.Instance.NewServerChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
 			}
+		}
 		else
 			return false
 	}

@@ -2389,9 +2389,10 @@ class SetupEditor extends ConfigurationItem {
 				if getMultiMapValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
 					increment *= -1
 
-				if (increment < 0)
+				if (increment < 0) {
 					loop % Abs(increment)
 						this.decreaseSetting(setting)
+				}
 				else
 					loop % Abs(increment)
 						this.increaseSetting(setting)

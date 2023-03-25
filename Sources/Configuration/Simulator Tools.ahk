@@ -117,7 +117,7 @@ installOptions(options) {
 		empty := true
 
 		if !update
-			if !FileExist(directory)
+			if !FileExist(directory) {
 				try {
 					FileCreateDir %directory%
 				}
@@ -130,6 +130,7 @@ installOptions(options) {
 
 					valid := false
 				}
+			}
 			else if (InStr(kHomeDirectory, directory) != 1)
 				loop Files, %directory%\*.*, FD
 				{
@@ -342,7 +343,7 @@ chooseInstallLocationPath() {
 		valid := true
 		empty := true
 
-		if !FileExist(directory)
+		if !FileExist(directory) {
 			try {
 				FileCreateDir %directory%
 			}
@@ -354,6 +355,7 @@ chooseInstallLocationPath() {
 
 				valid := false
 			}
+		}
 		else if (InStr(kHomeDirectory, directory) != 1)
 			loop Files, %directory%\*.*, FD
 			{
@@ -1298,11 +1300,12 @@ editTargets(command := "") {
 
 			Gui TE:Font, Norm, Arial
 
-			if (vUpdateSettings.Count() > 0)
+			if (vUpdateSettings.Count() > 0) {
 				for target, setting in vUpdateSettings {
 					if (A_Index == vUpdateSettings.Count())
 						Gui TE:Add, CheckBox, YP+20 XP+10 Disabled Checked%setting% vupdateVariable%A_Index%, %target%
 				}
+			}
 			else
 				Gui TE:Add, Text, YP+20 XP+10, % translate("No updates required...")
 
@@ -1323,7 +1326,7 @@ editTargets(command := "") {
 
 		Gui TE:Font, Norm, Arial
 
-		if (vCleanupSettings.Count() > 0)
+		if (vCleanupSettings.Count() > 0) {
 			for target, setting in vCleanupSettings {
 				option := ""
 
@@ -1332,6 +1335,7 @@ editTargets(command := "") {
 
 				Gui TE:Add, CheckBox, %option% Checked%setting% vcleanupVariable%A_Index%, %target%
 			}
+		}
 		else
 			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 
@@ -1347,7 +1351,7 @@ editTargets(command := "") {
 
 		Gui TE:Font, Norm, Arial
 
-		if (vCopySettings.Count() > 0)
+		if (vCopySettings.Count() > 0) {
 			for target, setting in vCopySettings {
 				option := ""
 
@@ -1356,6 +1360,7 @@ editTargets(command := "") {
 
 				Gui TE:Add, CheckBox, %option% Checked%setting% vcopyVariable%A_Index%, %target%
 			}
+		}
 		else
 			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 
@@ -1371,7 +1376,7 @@ editTargets(command := "") {
 
 		Gui TE:Font, Norm, Arial
 
-		if (vBuildSettings.Count() > 0)
+		if (vBuildSettings.Count() > 0) {
 			for target, setting in vBuildSettings {
 				option := ""
 
@@ -1383,6 +1388,7 @@ editTargets(command := "") {
 
 				Gui TE:Add, CheckBox, %option% Checked%setting% vbuildVariable%A_Index%, %target%
 			}
+		}
 		else
 			Gui TE:Add, Text, YP+20 XP+10, % translate("No targets found...")
 

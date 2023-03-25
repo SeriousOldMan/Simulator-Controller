@@ -730,7 +730,7 @@ class RaceAssistant extends ConfigurationItem {
 		hasJoke := (rnd > 1)
 
 		if hasJoke
-			if (this.VoiceManager.Language = "EN")
+			if (this.VoiceManager.Language = "EN") {
 				try {
 					URLDownloadToFile https://api.chucknorris.io/jokes/random, %kTempDirectory%joke.json
 
@@ -754,7 +754,8 @@ class RaceAssistant extends ConfigurationItem {
 				catch Any as exception {
 					hasJoke := false
 				}
-			else if (this.VoiceManager.Language = "DE")
+			}
+			else if (this.VoiceManager.Language = "DE") {
 				try {
 					URLDownloadToFile http://www.hahaha.de/witze/zufallswitz.js.php, %kTempDirectory%joke.json
 
@@ -789,6 +790,7 @@ class RaceAssistant extends ConfigurationItem {
 				catch Any as exception {
 					hasJoke := false
 				}
+			}
 			else
 				hasJoke := false
 

@@ -361,7 +361,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 		GuiControlGet teamServerNameEdit
 		GuiControlGet teamServerPasswordEdit
 
-		if ((teamServerURLEdit != "") && (teamServerNameEdit != ""))
+		if ((teamServerURLEdit != "") && (teamServerNameEdit != "")) {
 			try {
 				connector.Initialize(teamServerURLEdit)
 
@@ -443,6 +443,7 @@ class TeamServerConfigurator extends ConfigurationItem {
 
 				this.iToken := false
 			}
+		}
 		else {
 			GuiControl, , teamServerSessionTokenEdit, % ""
 			GuiControl, , teamServerDataTokenEdit, % ""

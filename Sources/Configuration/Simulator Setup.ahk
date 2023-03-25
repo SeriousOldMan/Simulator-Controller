@@ -2130,7 +2130,7 @@ class StartStepWizard extends StepWizard {
 
 			this.registerWidgets(2, iconHandle, labelHandle, infoTextHandle, restartButtonHandle)
 		}
-		else if A_IsAdmin
+		else
 			for ignore, directory in [kBinariesDirectory, kResourcesDirectory . "Setup\Installer\"] {
 				currentDirectory := A_WorkingDir
 

@@ -30,7 +30,7 @@ class Database {
 	iFiles := CaseInsenseMap()
 	iTableChanged := CaseInsenseMap()
 
-	classe Row extends CaseInsenseMap {
+	class Row extends CaseInsenseMap {
 	}
 
 	Directory {
@@ -57,6 +57,7 @@ class Database {
 
 	Tables[name := false] {
 		Get {
+			local tries := 10
 			local schema, data, row, values, length, ignore, column
 			local file, line
 
@@ -89,19 +90,33 @@ class Database {
 							}
 						}
 						else if FileExist(this.Directory . name . ".CSV")
-							loop Read, (this.Directory . name . ".CSV") {
-								row := Database.Row()
+							loop {
+								try {
+									loop Read, (this.Directory . name . ".CSV") {
+										row := Database.Row()
 
-								values := string2Values(";", A_LoopReadLine)
-								length := values.Length
+										values := string2Values(";", A_LoopReadLine)
+										length := values.Length
 
-								for ignore, column in schema
-									if (length >= A_Index)
-										row[column] := values[A_Index]
+										for ignore, column in schema
+											if (length >= A_Index)
+												row[column] := values[A_Index]
+											else
+												row[column] := kNull
+
+										data.Push(row)
+									}
+
+									break
+								}
+								catch Any as exception {
+									data := []
+
+									if (tries-- > 0)
+										Sleep(200)
 									else
-										row[column] := kNull
-
-								data.Push(row)
+										throw exception
+								}
 							}
 					}
 
@@ -266,9 +281,9 @@ class Database {
 		return (needsClone ? rows.Clone() : rows)
 	}
 
-	reload(name, flush := true) {
+	reload(name, flush := true, backup := false) {
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 
 		this.iTables.Delete(name)
 	}
@@ -317,9 +332,9 @@ class Database {
 					}
 					catch Any as exception {
 						if (tries-- > 0)
-							Sleep(10)
+							Sleep(200)
 						else
-							throw Exception
+							throw exception
 					}
 			}
 		}
@@ -341,7 +356,7 @@ class Database {
 		return results
 	}
 
-	remove(name, where, predicate := false, flush := false) {
+	remove(name, where, predicate := false, flush := false, backup := false) {
 		local rows := []
 		local ignore, row
 
@@ -360,15 +375,15 @@ class Database {
 		this.iTableChanged[name] := true
 
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 	}
 
-	clear(name, flush := false) {
+	clear(name, flush := false, backup := false) {
 		this.iTables[name] := []
 		this.iTableChanged[name] := true
 
 		if flush
-			this.flush(name)
+			this.flush(name, backup)
 	}
 
 	changed(name) {
@@ -420,7 +435,7 @@ class Database {
 
 					DirCreate(directory)
 
-					deleteFile(fileName, true)
+					deleteFile(fileName, backup)
 
 					schema := this.Schemas[name]
 

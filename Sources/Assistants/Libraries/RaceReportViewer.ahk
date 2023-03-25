@@ -1518,12 +1518,13 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 								{
 									if (endLap = startLap)
 										laps[startLap] := startLap
-									else if (endLap < startLap)
+									else if (endLap < startLap) {
 										loop {
 											index := endLap + A_Index - 1
 
 											laps[index] := index
 										} until (index = startLap)
+									}
 									else
 										loop {
 											index := startLap + A_Index - 1

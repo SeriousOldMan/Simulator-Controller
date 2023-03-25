@@ -108,14 +108,10 @@ class TyresDatabase extends SessionDatabase {
 
 		if (this.iDatabase && ((this.iLastSimulator != simulator) || (this.iLastCar != car)
 							|| (this.iLastTrack != track) || (this.iLastScope != scope))) {
-			this.flush()
-
 			if this.Shared
-				try {
-					this.unlock()
-				}
-				catch Any as exception {
-				}
+				this.unlock()
+			else
+				this.flush()
 
 			this.iDatabase := false
 		}
@@ -284,9 +280,9 @@ class TyresDatabase extends SessionDatabase {
 		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color", "Driver"]
 																		 , Where: where})
-			info.Push({Source: "User", Driver: row.Driver
-					 , Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-					 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
+			info.Push({Source: "User", Driver: row["Driver"]
+					 , Weather: row["Weather"], AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+					 , Compound: compound(row["Compound"], row["Compound.Color"]), Count: row["Count"]})
 
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
@@ -294,8 +290,8 @@ class TyresDatabase extends SessionDatabase {
 			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
 																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				info.Push({Source: "Community", Driver: false
-						 , Weather: row.Weather, AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
-						 , Compound: compound(row.Compound, row["Compound.Color"]), Count: row.Count})
+						 , Weather: row["Weather"], AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]
+						 , Compound: compound(row["Compound"], row["Compound.Color"]), Count: row["Count"]})
 		}
 
 		return info
@@ -400,24 +396,28 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	unlock() {
-		try {
-			this.Database.unlock("Tyres.Pressures")
-		}
-		catch Any as exception {
-			logError(exception)
-		}
+		db := this.Database
 
-		try {
-			this.Database.unlock("Tyres.Pressures.Distribution")
-		}
-		catch Any as exception {
-			logError(exception)
+		if db {
+			try {
+				this.Database.unlock("Tyres.Pressures")
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+			try {
+				this.Database.unlock("Tyres.Pressures.Distribution")
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 	}
 
 	updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
 				  , compound, compoundColor, coldPressures, hotPressures, flush := true, driver := false) {
-		local database, tyres, types, typeIndex, tPressures, tyreIndex, pressure
+		local db, tyres, types, typeIndex, tPressures, tyreIndex, pressure
 
 		if !driver
 			driver := this.ID
@@ -425,19 +425,19 @@ class TyresDatabase extends SessionDatabase {
 		if (!compoundColor || (compoundColor = ""))
 			compoundColor := "Black"
 
-		database := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
+		db := ((this.Shared && flush) ? this.lock(simulator, car, track) : this.requireDatabase(simulator, car, track))
 
-		database.add("Tyres.Pressures", Database.Row("Driver", driver, "Weather", weather
-												   , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-												   , "Compound", compound, "Compound.Color", compoundColor
-												   , "Tyre.Pressure.Cold.Front.Left", coldPressures[1]
-												   , "Tyre.Pressure.Cold.Front.Right", coldPressures[2]
-												   , "Tyre.Pressure.Cold.Rear.Left", coldPressures[3]
-												   , "Tyre.Pressure.Cold.Rear.Right", coldPressures[4]
-												   , "Tyre.Pressure.Hot.Front.Left", hotPressures[1]
-												   , "Tyre.Pressure.Hot.Front.Right", hotPressures[2]
-												   , "Tyre.Pressure.Hot.Rear.Left", hotPressures[3]
-												   , "Tyre.Pressure.Hot.Rear.Right", hotPressures[4])
+		db.add("Tyres.Pressures", Database.Row("Driver", driver, "Weather", weather
+											 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+											 , "Compound", compound, "Compound.Color", compoundColor
+											 , "Tyre.Pressure.Cold.Front.Left", Round(coldPressures[1], 1)
+											 , "Tyre.Pressure.Cold.Front.Right", Round(coldPressures[2], 1)
+											 , "Tyre.Pressure.Cold.Rear.Left", Round(coldPressures[3], 1)
+											 , "Tyre.Pressure.Cold.Rear.Right", Round(coldPressures[4], 1)
+											 , "Tyre.Pressure.Hot.Front.Left", Round(hotPressures[1], 1)
+											 , "Tyre.Pressure.Hot.Front.Right", Round(hotPressures[2], 1)
+											 , "Tyre.Pressure.Hot.Rear.Left", Round(hotPressures[3], 1)
+											 , "Tyre.Pressure.Hot.Rear.Right", Round(hotPressures[4], 1))
 									  , flush)
 
 		tyres := ["FL", "FR", "RL", "RR"]
@@ -457,7 +457,7 @@ class TyresDatabase extends SessionDatabase {
 
 	updatePressure(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
 				 , type, tyre, pressure, count := 1, flush := true, require := true, scope := "User", driver := false) {
-		local database, rows, row
+		local db, rows, row
 
 		if !driver
 			driver := this.ID
@@ -466,11 +466,14 @@ class TyresDatabase extends SessionDatabase {
 			compoundColor := "Black"
 
 		if require
-			database := this.requireDatabase(simulator, car, track, scope)
+			db := ((this.Shared && flush && (scope = "User")) ? this.lock(simulator, car, track)
+															  : this.requireDatabase(simulator, car, track, scope))
 		else
-			database := this.iDatabase
+			db := this.iDatabase
 
-		rows := database.query("Tyres.Pressures.Distribution"
+		pressure := Round(pressure, 1)
+
+		rows := db.query("Tyres.Pressures.Distribution"
 							 , {Where: Map("Driver", driver, "Weather", weather
 										 , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
 										 , "Compound", compound, "Compound.Color", compoundColor
@@ -479,21 +482,25 @@ class TyresDatabase extends SessionDatabase {
 		if (rows.Length > 0) {
 			row := rows[1]
 
-			row.Count := row.Count + count
-			row.Synchronized := kNull
+			row["Count"] := row["Count"] + count
+			row["Synchronized"] := kNull
 
-			if flush
-				this.flush()
+			if flush {
+				if (this.Shared && (scope = "User"))
+					this.unlock()
+				else
+					this.flush()
+			}
 			else
-				database.changed("Tyres.Pressures.Distribution")
+				db.changed("Tyres.Pressures.Distribution")
 		}
 		else
 			try {
-				database.add("Tyres.Pressures.Distribution"
-						   , Database.Row("Driver", driver, "Weather", weather
-									    , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
-									    , "Compound", compound, "Compound.Color", compoundColor
-									    , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count))
+				db.add("Tyres.Pressures.Distribution"
+					 , Database.Row("Driver", driver, "Weather", weather
+								  , "Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
+								  , "Compound", compound, "Compound.Color", compoundColor
+								  , "Type", type, "Tyre", tyre, "Pressure", pressure, "Count", count))
 			}
 			catch Any as exception {
 				logError(exception)
@@ -501,8 +508,8 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	flush() {
-		if this.iDatabase {
-			this.iDatabase.flush()
+		if this.Database {
+			this.Database.flush()
 
 			this.iDatabase := false
 		}

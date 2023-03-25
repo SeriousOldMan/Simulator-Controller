@@ -1012,7 +1012,7 @@ class SimulatorController extends ConfigurationItem {
 		local position := false
 		local ignore, mode, fnController, modeController, position, targetMode, index, found
 
-		if controller
+		if controller {
 			for ignore, mode in this.ActiveModes {
 				for ignore, fnController in controller {
 					for ignore, modeController in mode.FunctionController
@@ -1030,6 +1030,7 @@ class SimulatorController extends ConfigurationItem {
 				if position
 					break
 			}
+		}
 		else
 			position := inList(modes, this.ActiveModes[1])
 
@@ -1312,9 +1313,10 @@ class ControllerFunction {
 		for ignore, fnController in this.Controller.FunctionController
 			fnController.enable(this, action)
 
-		if (trigger == kAllTrigger)
+		if (trigger == kAllTrigger) {
 			for ignore, trigger in this.Trigger
 				setHotkeyEnabled(this, trigger, true)
+		}
 		else
 			setHotkeyEnabled(this, trigger, true)
 	}
@@ -1328,9 +1330,10 @@ class ControllerFunction {
 			fnController.disable(this, action)
 
 		if !this.Enabled
-			if (trigger == kAllTrigger)
+			if (trigger == kAllTrigger) {
 				for ignore, trigger in this.Trigger
 					setHotkeyEnabled(this, trigger, false)
+			}
 			else
 				setHotkeyEnabled(this, trigger, false)
 	}

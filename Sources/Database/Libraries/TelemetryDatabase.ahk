@@ -330,26 +330,26 @@ class TelemetryDatabase extends SessionDatabase {
 	addElectronicEntry(weather, airTemperature, trackTemperature, compound, compoundColor
 					 , map, tc, abs, fuelConsumption, fuelRemaining, lapTime
 					 , driver := false, identifier := false) {
-		local database := this.Database
+		local db := this.Database
 
 		if !driver
 			driver := this.ID
 
-		if (!this.Shared || database.lock("Electronics", false))
+		if (!this.Shared || db.lock("Electronics", false))
 			try {
-				database.add("Electronics", Database.Row("Driver", driver, "Weather", weather
-													   , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
-													   , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
-													   , "Fuel.Remaining", valueOrNull(fuelRemaining)
-													   , "Fuel.Consumption", valueOrNull(fuelConsumption)
-													   , "Lap.Time", valueOrNull(lapTime)
-													   , "Map", map, "TC", tc, "ABS", abs
-													   , "Identifier", identifier ? identifier : kNull)
+				db.add("Electronics", Database.Row("Driver", driver, "Weather", weather
+											     , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+											     , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
+											     , "Fuel.Remaining", valueOrNull(fuelRemaining)
+											     , "Fuel.Consumption", valueOrNull(fuelConsumption)
+											     , "Lap.Time", valueOrNull(lapTime)
+											     , "Map", map, "TC", tc, "ABS", abs
+											     , "Identifier", identifier ? identifier : kNull)
 										  , true)
 			}
 			finally {
 				if this.Shared
-					database.unlock("Electronics")
+					db.unlock("Electronics")
 			}
 	}
 
@@ -357,38 +357,38 @@ class TelemetryDatabase extends SessionDatabase {
 			   , pressureFL, pressureFR, pressureRL, pressureRR, temperatureFL, temperatureFR, temperatureRL, temperatureRR
 			   , wearFL, wearFR, wearRL, wearRR, fuelConsumption, fuelRemaining, lapTime
 			   , driver := false, identifier := false) {
-		local database := this.Database
+		local db := this.Database
 
 		if !driver
 			driver := this.ID
 
-		if (!this.Shared || database.lock("Tyres", false))
+		if (!this.Shared || db.lock("Tyres", false))
 			try {
-				this.Database.add("Tyres", Database.Row("Driver: driver, Weather: weather"
-													  , "Temperature.Air", valueOrNull(airTemperature)
-													  , "Temperature.Track", valueOrNull(trackTemperature)
-													  , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
-													  , "Fuel.Remaining", valueOrNull(fuelRemaining)
-													  , "Fuel.Consumption", valueOrNull(fuelConsumption)
-													  , "Lap.Time", valueOrNull(lapTime), "Tyre.Laps", valueOrNull(tyreLaps)
-													  , "Tyre.Pressure.Front.Left", valueOrNull(pressureFL)
-													  , "Tyre.Pressure.Front.Right", valueOrNull(pressureFR)
-													  , "Tyre.Pressure.Rear.Left", valueOrNull(pressureRL)
-													  , "Tyre.Pressure.Rear.Right", valueOrNull(pressureRR)
-													  , "Tyre.Temperature.Front.Left", valueOrNull(temperatureFL)
-													  , "Tyre.Temperature.Front.Right", valueOrNull(temperatureFR)
-													  , "Tyre.Temperature.Rear.Left", valueOrNull(temperatureRL)
-													  , "Tyre.Temperature.Rear.Right", valueOrNull(temperatureRR)
-													  , "Tyre.Wear.Front.Left", valueOrNull(wearFL)
-													  , "Tyre.Wear.Front.Right", valueOrNull(wearFR)
-													  , "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
-													  , "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
-													  , "Identifier", identifier ? identifier : kNull)
+				this.db.add("Tyres", Database.Row("Driver: driver, Weather: weather"
+												, "Temperature.Air", valueOrNull(airTemperature)
+												, "Temperature.Track", valueOrNull(trackTemperature)
+												, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
+												, "Fuel.Remaining", valueOrNull(fuelRemaining)
+												, "Fuel.Consumption", valueOrNull(fuelConsumption)
+												, "Lap.Time", valueOrNull(lapTime), "Tyre.Laps", valueOrNull(tyreLaps)
+												, "Tyre.Pressure.Front.Left", valueOrNull(pressureFL)
+												, "Tyre.Pressure.Front.Right", valueOrNull(pressureFR)
+												, "Tyre.Pressure.Rear.Left", valueOrNull(pressureRL)
+												, "Tyre.Pressure.Rear.Right", valueOrNull(pressureRR)
+												, "Tyre.Temperature.Front.Left", valueOrNull(temperatureFL)
+												, "Tyre.Temperature.Front.Right", valueOrNull(temperatureFR)
+												, "Tyre.Temperature.Rear.Left", valueOrNull(temperatureRL)
+												, "Tyre.Temperature.Rear.Right", valueOrNull(temperatureRR)
+												, "Tyre.Wear.Front.Left", valueOrNull(wearFL)
+												, "Tyre.Wear.Front.Right", valueOrNull(wearFR)
+												, "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
+												, "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
+												, "Identifier", identifier ? identifier : kNull)
 								, true)
 			}
 			finally {
 				if this.Shared
-					database.unlock("Tyres")
+					db.unlock("Tyres")
 			}
 	}
 }

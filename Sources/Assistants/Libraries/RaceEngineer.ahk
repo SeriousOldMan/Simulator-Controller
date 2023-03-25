@@ -1631,7 +1631,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	supportsPitstop() {
-		if this.RemoteHandler
+		if this.RemoteHandler {
 			switch this.Session {
 				case kSessionPractice:
 					return getMultiMapValue(this.Settings, "Session Settings", "Pitstop.Practice", false)
@@ -1642,6 +1642,7 @@ class RaceEngineer extends RaceAssistant {
 				default:
 					return false
 			}
+		}
 		else
 			return false
 	}

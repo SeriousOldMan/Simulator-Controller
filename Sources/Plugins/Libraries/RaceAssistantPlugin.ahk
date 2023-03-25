@@ -194,7 +194,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				enabled := (this.Plugin.RaceAssistant != false)
 
 			if enabled
-				switch action {
+				switch action, false {
 					case "InformationRequest":
 						this.Plugin.requestInformation(this.Arguments*)
 					case "Call":
@@ -398,25 +398,43 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	CollectorTask {
+	static CollectorTask {
 		Get {
 			return RaceAssistantPlugin.sCollectorTask
 		}
 	}
 
-	Assistants[key := false] {
+	CollectorTask {
+		Get {
+			return RaceAssistantPlugin.CollectorTask
+		}
+	}
+
+	static Assistants[key := false] {
 		Get {
 			return (key ? RaceAssistantPlugin.sAssistants[key] : RaceAssistantPlugin.sAssistants)
 		}
 	}
 
-	Simulator {
+	Assistants[key := false] {
+		Get {
+			return RaceAssistantPlugin.Assistants[key]
+		}
+	}
+
+	static Simulator {
 		Get {
 			return RaceAssistantPlugin.sSimulator
 		}
 	}
 
-	WaitForShutdown[teamServer := false] {
+	Simulator {
+		Get {
+			return RaceAssistantPlugin.Simulator
+		}
+	}
+
+	static WaitForShutdown[teamServer := false] {
 		Get {
 			return (A_TickCount < (teamServer ? RaceAssistantPlugin.sTeamServerWaitForShutdown
 											  : RaceAssistantPlugin.sAssistantWaitForShutdown))
@@ -432,33 +450,105 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	Finished {
+	WaitForShutdown[teamServer := false] {
+		Get {
+			return RaceAssistantPlugin.WaitForShutdown[teamServer]
+		}
+	}
+
+	static Finished {
 		Get {
 			return RaceAssistantPlugin.sFinished
 		}
 	}
 
-	LastLap {
+	Finished {
+		Get {
+			return RaceAssistantPlugin.Finished
+		}
+	}
+
+	static LastLap {
 		Get {
 			return RaceAssistantPlugin.sLastLap
 		}
 	}
 
-	LapRunning {
+	LastLap {
+		Get {
+			return RaceAssistantPlugin.LastLap
+		}
+	}
+
+	static LapRunning {
 		Get {
 			return RaceAssistantPlugin.sLapRunning
 		}
 	}
 
-	Session {
+	LapRunning {
+		Get {
+			return RaceAssistantPlugin.LapRunning
+		}
+	}
+
+	static Session {
 		Get {
 			return RaceAssistantPlugin.sSession
 		}
 	}
 
-	InPit {
+	Session {
+		Get {
+			return RaceAssistantPlugin.Session
+		}
+	}
+
+	static InPit {
 		Get {
 			return RaceAssistantPlugin.sInPit
+		}
+	}
+
+	InPit {
+		Get {
+			return RaceAssistantPlugin.InPit
+		}
+	}
+
+	static TeamServer {
+		Get {
+			return RaceAssistantPlugin.sTeamServer
+		}
+	}
+
+	TeamServer {
+		Get {
+			return RaceAssistantPlugin.TeamServer
+		}
+	}
+
+	static TeamSession {
+		Get {
+			return RaceAssistantPlugin.sTeamSession
+		}
+	}
+
+	TeamSession {
+		Get {
+			return RaceAssistantPlugin.TeamSession
+		}
+	}
+
+	static TeamSessionActive {
+		Get {
+			return RaceAssistantPlugin.sTeamSessionActive
+		}
+	}
+
+	TeamSessionActive {
+		Get {
+			return RaceAssistantPlugin.TeamSessionActive
 		}
 	}
 
@@ -497,24 +587,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		Set {
 			return (this.iRaceAssistantActive := value)
-		}
-	}
-
-	TeamServer {
-		Get {
-			return RaceAssistantPlugin.sTeamServer
-		}
-	}
-
-	TeamSession {
-		Get {
-			return RaceAssistantPlugin.sTeamSession
-		}
-	}
-
-	TeamSessionActive {
-		Get {
-			return RaceAssistantPlugin.sTeamSessionActive
 		}
 	}
 
@@ -730,29 +802,29 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				action := values2String("", arguments*)
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
+				this.registerAction(RaceAssistantPlugin.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
 			else if inList(["Call", "Accept", "Reject", "Mute", "Unmute"], action) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(this.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+				this.registerAction(RaceAssistantPlugin.RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
 			}
 			else if (action = "RaceAssistant") {
 				descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-				this.registerAction(this.RaceAssistantToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+				this.registerAction(RaceAssistantPlugin.RaceAssistantToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else if (action = "TeamServer") {
 				descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-				this.registerAction(this.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+				this.registerAction(RaceAssistantPlugin.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else if ((action = "RaceSettingsOpen") || (action = "SetupImport")
 				  || (action = "SessionDatabaseOpen") || (action = "SetupAdvisorOpen")
 				  || (action = "StrategyWorkbenchOpen") || (action = "RaceCenterOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(this.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+				this.registerAction(RaceAssistantPlugin.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
 			}
 			else
 				logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -1243,7 +1315,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 	}
 
 	createRaceAssistant(pid) {
-		return this.RemoteRaceAssistant(pid)
+		return RaceAssistantPlugin.RemoteRaceAssistant(pid)
 	}
 
 	requireRaceAssistant() {
@@ -1452,7 +1524,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 					value := options[key]
 
 					if value
-						switch key {
+						switch key, false {
 							case "Tyre Compound":
 								setMultiMapValue(data, "Pitstop", "Tyre.Compound", value[1])
 								setMultiMapValue(data, "Pitstop", "Tyre.Compound.Color", value[2])
@@ -1610,7 +1682,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	restoreSessionState(data) {
 		if (this.RaceAssistant && this.TeamSessionActive)
-			new this.RestoreSessionStateTask(this, data).start()
+			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 
 	driverActive(data) {
@@ -1910,7 +1982,7 @@ getDataSession(data, &finished) {
 		if getMultiMapValue(data, "Session Data", "Paused", false)
 			return kSessionPaused
 		else
-			switch getMultiMapValue(data, "Session Data", "Session", "Other") {
+			switch getMultiMapValue(data, "Session Data", "Session", "Other"), false {
 				case "Race":
 					return kSessionRace
 				case "Practice":
@@ -1947,19 +2019,17 @@ prepareSessionDatabase(data) {
 	local sessionDB, simulator, car, track
 
 	if (plugin  && plugin.Simulator) {
-		sessionDB := SessionDatabase()
-
 		simulator := plugin.Simulator.runningSimulator()
 		car := getMultiMapValue(data, "Session Data", "Car", kUndefined)
 		track := getMultiMapValue(data, "Session Data", "Track", kUndefined)
 
 		if ((car != kUndefined) && (track != kUndefined))
-			sessionDB.prepareDatabase(simulator, car, track, data)
+			SessionDatabase.prepareDatabase(simulator, car, track, data)
 
-		sessionDB.registerDriver(simulator, plugin.Controller.ID
-							   , computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname")
-							   , getMultiMapValue(data, "Stint Data", "DriverSurname")
-							   , getMultiMapValue(data, "Stint Data", "DriverNickname")))
+		SessionDatabase.registerDriver(simulator, plugin.Controller.ID
+									 , computeDriverName(getMultiMapValue(data, "Stint Data", "DriverForname")
+									 , getMultiMapValue(data, "Stint Data", "DriverSurname")
+									 , getMultiMapValue(data, "Stint Data", "DriverNickname")))
 	}
 }
 
@@ -1973,7 +2043,7 @@ getSimulatorOptions(plugin := false) {
 		data := readSimulatorData(plugin.Simulator.Code)
 
 		if getMultiMapValue(data, "Session Data", "Active", false) {
-			options := "-Simulator `"" . new SessionDatabase().getSimulatorName(plugin.Simulator.runningSimulator()) . "`""
+			options := "-Simulator `"" . SessionDatabase.getSimulatorName(plugin.Simulator.runningSimulator()) . "`""
 			options .= " -Car `"" . getMultiMapValue(data, "Session Data", "Car", "Unknown") . "`""
 			options .= " -Track `"" . getMultiMapValue(data, "Session Data", "Track", "Unknown") . "`""
 			options .= " -Weather " . getMultiMapValue(data, "Weather Data", "Weather", "Dry")
@@ -2095,7 +2165,7 @@ openRaceCenter(plugin := false) {
 	try {
 		options := getSimulatorOptions(plugin)
 
-		Run("`"" .exePath . "`" " . options, kBinariesDirectory)
+		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))

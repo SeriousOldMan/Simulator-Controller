@@ -40,7 +40,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		title := translate("Modular Simulator Controller System")
 
 	messageGui := Gui()
-	messageGui.Opt("-Border -Caption")
+	messageGui.Opt("-Border -Caption +0x800000")
 	messageGui.BackColor := "D0D0D0"
 	messageGui.SetFont("s10 Bold")
 	messageGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)

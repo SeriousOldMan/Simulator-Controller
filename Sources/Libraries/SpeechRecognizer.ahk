@@ -516,7 +516,7 @@ class SpeechRecognizer {
 			}
 
 		if (ratings.Length > 0) {
-			bubbleSort(&ratings, compareRating)
+			bubbleSort(&ratings, (r1, r2) => r1.Rating < r2.Rating)
 
 			return {BestMatch: ratings[1], Ratings: ratings}
 		}
@@ -1309,12 +1309,4 @@ matchWords(string1, string2) {
 	}
 
 	return (recognizer ? recognizer.Compare(string1, string2) : false)
-}
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-compareRating(r1, r2) {
-	return (r1.Rating < r2.Rating)
 }

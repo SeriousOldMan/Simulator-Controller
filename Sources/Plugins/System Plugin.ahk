@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - System Plugin (required)        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Messages.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -378,7 +378,7 @@ class SystemPlugin extends ControllerPlugin {
 				songFile := getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
 				if FileExist(songFile) {
-					SoundPlay %songFile%
+					SoundPlay(songFile)
 
 					this.iStartupSongIsPlaying := true
 				}
@@ -396,7 +396,7 @@ class SystemPlugin extends ControllerPlugin {
 			masterVolume := fadeOut()
 
 		try {
-			SoundPlay NonExistent.avi
+			SoundPlay("NonExistent.avi")
 		}
 		catch Any as exception {
 			logError(exception)
@@ -426,7 +426,7 @@ class SystemPlugin extends ControllerPlugin {
 fadeOut() {
 	local masterVolume, currentVolume
 
-	SoundGet masterVolume, MASTER
+	masterVolume := SoundGetVolume()
 
 	currentVolume := masterVolume
 
@@ -436,9 +436,9 @@ fadeOut() {
 		if (currentVolume <= 0)
 			break
 		else {
-			SoundSet %currentVolume%, MASTER
+			SoundSetVolume(currentVolume)
 
-			Sleep 100
+			Sleep(100)
 		}
 	}
 
@@ -454,13 +454,13 @@ fadeIn(masterVolume) {
 		if (currentVolume >= masterVolume)
 			break
 		else {
-			SoundSet %currentVolume%, MASTER
+			SoundSetVolume(currentVolume)
 
-			Sleep 100
+			Sleep(100)
 		}
 	}
 
-	SoundSet %masterVolume%, MASTER
+	SoundSetVolume(masterVolume)
 }
 
 mouseClicked(clicked := true) {
@@ -477,7 +477,7 @@ restoreSimulatorVolume() {
 			if (simulator != false) {
 				pid := (Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
 
-				Run "%kNirCmd%" setappvolume /%pid% 1.0
+				Run("`"" . kNirCmd . "`" setappvolume /" . pid . " 1.0")
 			}
 		}
 		catch Any as exception {
@@ -491,27 +491,27 @@ muteSimulator() {
 	local pid
 
 	if (simulator != false) {
-		SetTimer muteSimulator, Off
+		SetTimer(muteSimulator, 0)
 
-		Sleep 5000
+		Sleep(5000)
 
 		if kNirCmd
 			try {
 				pid := (Application(simulator, SimulatorController.Instance.Configuration)).CurrentPID
 
-				Run "%kNirCmd%" setappvolume /%pid% 0.0
+				Run("`"" . kNirCmd . "`" setappvolume /" . pid . " 0.0")
 			}
 			catch Any as exception {
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 
-		SetTimer unmuteSimulator, 500
+		SetTimer(unmuteSimulator, 500)
 
 		mouseClicked(false)
 
-		HotKey Escape, mouseClicked
-		HotKey ~LButton, mouseClicked
+		Hotkey("Escape", mouseClicked)
+		Hotkey("~LButton", mouseClicked)
 	}
 }
 
@@ -519,10 +519,10 @@ unmuteSimulator() {
 	local plugin := SimulatorController.Instance.findPlugin(kSystemPlugin)
 
 	if (plugin.MouseClicked || GetKeyState("LButton") || GetKeyState("Escape")) {
-		HotKey ~LButton, Off
-		HotKey Escape, Off
+		Hotkey("~LButton", "Off")
+		Hotkey("Escape", "Off")
 
-		SetTimer unmuteSimulator, Off
+		SetTimer(unmuteSimulator, 0)
 
 		plugin.stopStartupSong("restoreSimulatorVolume")
 	}
@@ -645,13 +645,13 @@ shutdownSimulator(simulator) {
 playStartupSong(songFile) {
 	SimulatorController.Instance.findPlugin(kSystemPlugin).playStartupSong(songFile)
 
-	SetTimer muteSimulator, 1000
+	SetTimer(muteSimulator, 1000)
 }
 
 stopStartupSong() {
 	SimulatorController.Instance.findPlugin(kSystemPlugin).stopStartupSong()
 
-	SetTimer muteSimulator, Off
+	SetTimer(muteSimulator, 0)
 }
 
 startupExited() {
@@ -672,14 +672,14 @@ execute(command) {
 		thePlugin.activateWindow()
 
 	try {
-		Run % substituteVariables(command)
+		Run(substituteVariables(command))
 	}
 	catch Any as exception {
 		logMessage(kLogWarn, substituteVariables(translate("Cannot execute command (%command%) - please check the configuration"), {command: command}))
 	}
 }
 
-hotkey(hotkeys, method := "Event") {
+trigger(hotkeys, method := "Event") {
 	local thePlugin := false
 	local ignore, theHotkey
 
@@ -690,17 +690,17 @@ hotkey(hotkeys, method := "Event") {
 
 	for ignore, theHotkey in string2Values("|", hotkeys)
 		try {
-			switch method {
+			switch method, false {
 				case "Event":
-					SendEvent %theHotkey%
+					SendEvent(theHotkey)
 				case "Input":
-					SendInput %theHotkey%
+					SendInput(theHotkey)
 				case "Play":
-					SendPlay %theHotkey%
+					SendPlay(theHotkey)
 				case "Raw":
-					SendRaw %theHotkey%
+					Send("{Raw}" . theHotkey)
 				default:
-					Send %theHotkey%
+					Send(theHotkey)
 			}
 		}
 		catch Any as exception {
@@ -716,7 +716,7 @@ startSimulation(name := false) {
 		if !name {
 			simulators := string2Values("|", getMultiMapValue(controller.Configuration, "Configuration", "Simulators", ""))
 
-			if (simulators.Length() > 0)
+			if (simulators.Length > 0)
 				name := simulators[1]
 		}
 
@@ -732,16 +732,16 @@ stopSimulation() {
 }
 
 shutdownSystem() {
-	local title := translate("Shutdown")
+	local msgResult
 
-	SoundPlay *32
+	SoundPlay("*32")
 
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	MsgBox 262436, %title%, % translate("Shutdown Simulator?")
-	OnMessage(0x44, "")
+	OnMessage(0x44, translateYesNoButtons)
+	msgResult := MsgBox(translate("Shutdown Simulator?"), translate("Shutdown"), 262436)
+	OnMessage(0x44)
 
-	IfMsgBox Yes
-		Shutdown 1
+	if (msgResult = "Yes")
+		Shutdown(1)
 }
 
 

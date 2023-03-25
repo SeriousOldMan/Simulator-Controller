@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Team Server Plugin              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -40,7 +40,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	iConnection := false
 	iLastMessage := ""
 
-	iState := {}
+	iState := CaseInsenseMap()
 
 	iSimulator := false
 	iTeam := false
@@ -50,7 +50,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	iSession := false
 	iSessionName := ""
 
-	iCachedObjects := {}
+	iCachedObjects := CaseInsenseMap()
 
 	iDriverForName := false
 	iDriverSurName := false
@@ -59,7 +59,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	iTeamServerEnabled := false
 
 	iSessionActive := false
-	iLapData := {Telemetry: {}, Positions: {}}
+	iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 
 	class TeamServerToggleAction extends ControllerAction {
 		iPlugin := false
@@ -111,10 +111,11 @@ class TeamServerPlugin extends ControllerPlugin {
 			local exePath := kBinariesDirectory . "Race Settings.exe"
 
 			try {
-				Run "%exePath%", %kBinariesDirectory%
+				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
 				showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -141,10 +142,11 @@ class TeamServerPlugin extends ControllerPlugin {
 			local exePath := kBinariesDirectory . "Race Center.exe"
 
 			try {
-				Run "%exePath%", %kBinariesDirectory%
+				Run("`"" . exePath . "`"", kBinariesDirectory)
 			}
 			catch Any as exception {
-				logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+				logMessage(kLogCritical, translate("Cannot start the Race Center tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
 				showMessage(substituteVariables(translate("Cannot start the Race Center tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
@@ -210,7 +212,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	Stalled {
 		Get {
-			return (this.State.HasKey("Stalled") ? this.State["Stalled"] : false)
+			return (this.State.Has("Stalled") ? this.State["Stalled"] : false)
 		}
 	}
 
@@ -320,15 +322,15 @@ class TeamServerPlugin extends ControllerPlugin {
 			if teamServerToggle {
 				arguments := string2Values(A_Space, teamServerToggle)
 
-				if (arguments.Length() == 0)
+				if (arguments.Length == 0)
 					arguments := ["On"]
 
-				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+				if ((arguments.Length == 1) && !inList(["On", "Off"], arguments[1]))
 					arguments.InsertAt(1, "Off")
 
 				this.iTeamServerEnabled := (arguments[1] = "On")
 
-				if (arguments.Length() > 1)
+				if (arguments.Length > 1)
 					this.createTeamServerAction(controller, "TeamServer", arguments[2])
 			}
 			else
@@ -366,17 +368,17 @@ class TeamServerPlugin extends ControllerPlugin {
 			if (action = "TeamServer") {
 				descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-				this.registerAction(this.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+				this.registerAction(TeamServerPlugin.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else if (action = "RaceSettingsOpen") {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(this.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+				this.registerAction(TeamServerPlugin.RaceSettingsAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else if (action = "RaceSettingsOpen") {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(this.RaceCenterAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+				this.registerAction(TeamServerPlugin.RaceCenterAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else
 				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
@@ -391,7 +393,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		try {
 			for ignore, connection in string2Values(";", this.Connector.GetSessionConnections(this.Session)) {
-				if !this.iCachedObjects.HasKey(connection)
+				if !this.iCachedObjects.Has(connection)
 					this.iCachedObjects[connection] := this.parseObject(this.Connector.GetConnection(connection))
 
 				connection := this.iCachedObjects[connection]
@@ -416,17 +418,17 @@ class TeamServerPlugin extends ControllerPlugin {
 				stint := this.Connector.GetSessionCurrentStint(this.Session)
 
 				if (stint && (stint != "")) {
-					if !this.iCachedObjects.HasKey(stint)
+					if !this.iCachedObjects.Has(stint)
 						this.iCachedObjects[stint] := this.parseObject(this.Connector.GetStint(stint))
 
 					lap := this.Connector.GetSessionLastLap(this.Session)
 
-					if !this.iCachedObjects.HasKey(lap)
+					if !this.iCachedObjects.Has(lap)
 						this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
 
 					driver := this.Connector.GetStintDriver(stint)
 
-					if !this.iCachedObjects.HasKey(driver)
+					if !this.iCachedObjects.Has(driver)
 						this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
 
 					state.Push("StintNr: " . this.iCachedObjects[stint].Nr)
@@ -464,9 +466,9 @@ class TeamServerPlugin extends ControllerPlugin {
 							setMultiMapValue(configuration, this.Plugin, "State", "Active")
 
 						setMultiMapValue(configuration, this.Plugin, "Information"
-											, values2String("; ", translate("Team: ") . this.Team[true]
-																, translate("Driver: ") . this.Driver[true] . (driverMismatch ? translate(" (No match)") : "")
-																, translate("Session: ") . ((this.Session[true] = "Qualification") ? "Qualifiying" : "Qualification")))
+													  , values2String("; ", translate("Team: ") . this.Team[true]
+																		  , translate("Driver: ") . this.Driver[true] . (driverMismatch ? translate(" (No match)") : "")
+																		  , translate("Session: ") . ((this.Session[true] = "Qualification") ? "Qualifiying" : "Qualification")))
 					}
 				}
 				else if this.Session {
@@ -525,25 +527,21 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	updateTrayLabel(label, enabled) {
-		local callback, index
-
 		static hasTrayMenu := false
 
 		label := StrReplace(label, "`n", A_Space)
 
 		if !hasTrayMenu {
-			callback := ObjBindMethod(this, "toggleTeamServer")
-
-			Menu Tray, Insert, 1&
-			Menu Tray, Insert, 1&, %label%, %callback%
+			A_TrayMenu.Insert("1&")
+			A_TrayMenu.Insert("1&", label, ObjBindMethod(this, "toggleTeamServer"))
 
 			hasTrayMenu := true
 		}
 
 		if enabled
-			Menu Tray, Check, %label%
+			Tray.Check(label)
 		else
-			Menu Tray, Uncheck, %label%
+			Tray.Uncheck(label)
 	}
 
 	enableTeamServer(label := false, force := false) {
@@ -572,7 +570,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.disconnect(true, true)
 
-			Menu Tray, Tip, % string2Values(".", A_ScriptName)[1]
+			A_IconTip := (string2Values(".", A_ScriptName)[1])
 
 			this.iTeamServerEnabled := false
 
@@ -583,13 +581,12 @@ class TeamServerPlugin extends ControllerPlugin {
 	}
 
 	parseObject(properties) {
-		local result := {}
+		local result := CaseInsenseMap()
 		local property
 
 		properties := StrReplace(properties, "`r", "")
 
-		loop Parse, properties, `n
-		{
+		loop Parse, properties, "`n" {
 			property := string2Values("=", A_LoopField)
 
 			result[property[1]] := property[2]
@@ -636,7 +633,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		this.setSession(team, driver, session)
 
 		this.LastMessage := ""
-		this.iCachedObjects := {}
+		this.iCachedObjects := CaseInsenseMap()
 
 		this.keepAlive()
 
@@ -647,11 +644,11 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			if verbose
 				showMessage(translate("Successfully connected to the Team Server.") . "`n`n" . translate("Team: ") . this.Team[true] . "`n"
-						  . translate("Driver: ") . this.Driver[true] . "`n"
-						  . translate("Session: ") . this.Session[true]
+									. translate("Driver: ") . this.Driver[true] . "`n"
+									. translate("Session: ") . this.Session[true]
 						  , false, "Information.png", 5000, "Center", "Bottom", 400, 120)
 
-			Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")")
+			A_IconTip := (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
 		}
 
 		return (this.Connected && this.Team && this.Driver && this.Session)
@@ -673,7 +670,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 			this.LastMessage := ""
 
-			this.iCachedObjects := {}
+			this.iCachedObjects := CaseInsenseMap()
 
 			this.keepAlive()
 		}
@@ -687,12 +684,12 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if stint is Integer
+				if isInteger(stint)
 					stint := this.Connector.GetSessionStint(session, stint)
 
 				driver := this.Connector.GetStintDriver(stint)
 
-				if !this.iCachedObjects.HasKey(driver)
+				if !this.iCachedObjects.Has(driver)
 					this.iCachedObjects[driver] := this.Connector.GetDriver(driver)
 
 				driver := this.iCachedObjects[driver]
@@ -715,7 +712,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if (!this.iDriverForName && (ignore || this.TeamServerActive)) {
 			try {
-				if !this.iCachedObjects.HasKey(this.Driver)
+				if !this.iCachedObjects.Has(this.Driver)
 					this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 				driver := this.iCachedObjects[this.Driver]
@@ -763,7 +760,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				showMessage("Starting team session: " . car . ", " . track)
 
 			try {
-				this.iLapData := {Telemetry: {}, Positions: {}}
+				this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap()}
 				this.iSimulator := simulator
 
 				this.Connector.StartSession(this.Session, duration, car, track)
@@ -815,7 +812,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 		}
 
-		this.iLapData := {Telemetry: {}, Positions: {}}
+		this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 		this.iSessionActive := false
 		this.iSimulator := false
 
@@ -835,7 +832,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					if isDebug()
 						showMessage("Joining team session: " . car . ", " . track)
 
-					this.iLapData := {Telemetry: {}, Positions: {}}
+					this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 					this.iSessionActive := true
 					this.iSimulator := simulator
 				}
@@ -859,7 +856,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.finishSession()
 		}
 		else {
-			this.iLapData := {Telemetry: {}, Positions: {}}
+			this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 			this.iSessionActive := false
 			this.iSimulator := false
 		}
@@ -952,7 +949,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if stint is Integer
+				if isInteger(stint)
 					value := this.Connector.GetSessionStintValue(session, stint, name)
 				else
 					value := this.Connector.GetStintValue(stint, name)
@@ -986,13 +983,13 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Saving value for stint " . stint . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
-					if stint is Integer
+					if isInteger(stint)
 						this.Connector.DeleteSessionStintValue(session, stint, name)
 					else
 						this.Connector.DeleteStintValue(stint, name, value)
 				}
 				else {
-					if stint is Integer
+					if isInteger(stint)
 						this.Connector.SetSessionStintValue(session, stint, name, value)
 					else
 						this.Connector.SetStintValue(stint, name, value)
@@ -1016,7 +1013,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if stint is Integer
+				if isInteger(stint)
 					stint := this.Connector.GetSessionStint(session, stint)
 
 				return this.Connector.GetStintSession(stint)
@@ -1042,7 +1039,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			try {
 				lap := this.Connector.GetSessionLastLap(session)
 
-				if !this.iCachedObjects.HasKey(lap)
+				if !this.iCachedObjects.Has(lap)
 					this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
 
 				lapNr := this.iCachedObjects[lap].Nr
@@ -1069,7 +1066,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if lap is Integer
+				if isInteger(lap)
 					lap := this.Connector.GetSessionLap(session, lap)
 
 				return this.Connector.GetLapStint(lap)
@@ -1093,7 +1090,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if lap is Integer
+				if isInteger(lap)
 					value := this.Connector.GetSessionLapValue(session, lap, name)
 				else
 					value := this.Connector.GetLapValue(lap, name)
@@ -1127,7 +1124,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
-					if lap is Integer
+					if isInteger(lap)
 						this.Connector.DeleteSessionLapValue(session, lap, name)
 					else
 						this.Connector.DeleteLapValue(lap, name, value)
@@ -1136,7 +1133,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						logMessage(kLogInfo, translate("Deleting lap data (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Name: ") . name . translate(")"))
 				}
 				else {
-					if lap is Integer
+					if isInteger(lap)
 						this.Connector.SetSessionLapValue(session, lap, name, value)
 					else
 						this.Connector.SetLapValue(lap, name, value)
@@ -1222,7 +1219,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				lap := this.Connector.CreateLap(stint, lapNumber)
 
-				if (telemetryData && (telemetryData.Count() > 0) && !this.iLapData["Telemetry"].HasKey(lapNumber)) {
+				if (telemetryData && (telemetryData.Count > 0) && !this.iLapData["Telemetry"].HasKey(lapNumber)) {
 					telemetryData := printMultiMap(telemetryData)
 
 					if isDebug()
@@ -1233,7 +1230,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					this.iLapData["Telemetry"][lapNumber] := true
 				}
 
-				if (positionsData && (positionsData.Count() > 0) && !this.iLapData["Positions"].HasKey(lapNumber)) {
+				if (positionsData && (positionsData.Count > 0) && !this.iLapData["Positions"].HasKey(lapNumber)) {
 					positionsData := printMultiMap(positionsData)
 
 					if isDebug()
@@ -1278,15 +1275,15 @@ class TeamServerPlugin extends ControllerPlugin {
 						this.iConnection := this.Connector.Connect(this.ServerToken
 																 , SessionDatabase().ID
 																 , computeDriverName(this.DriverForName[true]
-																				   , this.DriverSurName[true]
-																				   , this.DriverNickName[true])
+																 , this.DriverSurName[true]
+																 , this.DriverNickName[true])
 																 , "Driver", this.Session)
 
 						this.State["ServerURL"] := this.ServerURL
 						this.State["SessionToken"] := this.ServerToken
 
 						try {
-							if !this.iCachedObjects.HasKey(this.Team)
+							if !this.iCachedObjects.Has(this.Team)
 								this.iCachedObjects[this.Team] := this.parseObject(this.Connector.GetTeam(this.Team))
 
 							this.iTeamName := this.iCachedObjects[this.Team].Name
@@ -1300,7 +1297,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						}
 
 						try {
-							if !this.iCachedObjects.HasKey(this.Driver)
+							if !this.iCachedObjects.Has(this.Driver)
 								this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 							driverObject := this.iCachedObjects[this.Driver]
@@ -1315,7 +1312,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						}
 
 						try {
-							if !this.iCachedObjects.HasKey(this.Session)
+							if !this.iCachedObjects.Has(this.Session)
 								this.iCachedObjects[this.Session] := this.parseObject(this.Connector.GetSession(this.Session))
 
 							this.iSessionName := this.iCachedObjects[this.Session].Name
@@ -1331,7 +1328,7 @@ class TeamServerPlugin extends ControllerPlugin {
 						if invalid
 							throw invalid
 						else
-							Menu Tray, Tip, % (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
+							A_IconTip := (string2Values(".", A_ScriptName)[1] . translate(" (Team: ") . this.Team[true] . translate(")"))
 					}
 					else {
 						this.State["ServerURL"] := this.ServerURL
@@ -1342,7 +1339,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				}
 			}
 			catch Any as exception {
-				Menu Tray, Tip, % string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)")
+				A_IconTip := (string2Values(".", A_ScriptName)[1] . translate(" (Team: Error)"))
 
 				this.iDriverName := ""
 				this.iTeamName := ""

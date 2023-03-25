@@ -3350,13 +3350,9 @@ class Rules {
 	sortProductions(productions) {
 		productions := productions.Clone()
 
-		bubbleSort(&productions, ObjBindMethod(this, "compareProductions"))
+		bubbleSort(&productions, (r1, r2)  => r1.Priority < r2.Priority)
 
 		return productions
-	}
-
-	compareProductions(r1, r2) {
-		return (r1.Priority < r2.Priority)
 	}
 
 	dumpRules(name := false) {

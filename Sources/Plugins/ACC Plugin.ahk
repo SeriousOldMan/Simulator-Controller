@@ -202,6 +202,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					 , BrakeChange: "Change Brakes", FrontBrake: "Front Brake", RearBrake: "Rear Brake"
 					 , DriverSelect: "Driver"
 					 , SuspensionRepair: "Repair Suspension", BodyworkRepair: "Repair Bodywork"}
+
 		selectActions := ["NoRefuel", "TyreChange", "BrakeChange", "SuspensionRepair", "BodyworkRepair"]
 	}
 
@@ -231,8 +232,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: "ACC", protocol: "UDP"})
-														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-														   . kBinariesDirectory . translate(")"))
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
 				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 											  , {exePath: exePath, simulator: "ACC", protocol: "UDP"})

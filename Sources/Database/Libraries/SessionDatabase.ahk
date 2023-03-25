@@ -552,7 +552,7 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getAllDrivers(simulator, names)
 	}
 
-	registerDriver(simulator, id, name) {
+	static registerDriver(simulator, id, name) {
 		local sessionDB, forName, surName, nickName
 
 		if (simulator && id && name && (name != "John Doe (JD)")) {
@@ -572,6 +572,10 @@ class SessionDatabase extends ConfigurationItem {
 					logError(exception)
 				}
 		}
+	}
+
+	registerDriver(simulator, id, name) {
+		SessionDatabase.registerDriver(simulator, id, name)
 	}
 
 	static getUserName() {
@@ -2304,11 +2308,17 @@ keepAlive(identifier, connector, connection) {
 	SessionDatabase.Connected[identifier] := connector.KeepAlive(connection)
 }
 
+initializeSessionDatabase() {
+	SessionDatabase()
+
+	SessionDatabase.registerSynchronizer(synchronizeDrivers)
+	SessionDatabase.registerSynchronizer(synchronizeSetups)
+	SessionDatabase.registerSynchronizer(synchronizeStrategies)
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                           Initialization Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-SessionDatabase.registerSynchronizer(synchronizeDrivers)
-SessionDatabase.registerSynchronizer(synchronizeSetups)
-SessionDatabase.registerSynchronizer(synchronizeStrategies)
+initializeSessionDatabase()

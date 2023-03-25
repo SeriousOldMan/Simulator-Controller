@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AC Plugin                       ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
-#Include ..\Database\Libraries\SettingsDatabase.ahk
+#Include "Libraries\SimulatorPlugin.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -42,7 +42,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopAutoClose := false
 
 	iSettingsDatabase := false
-	iCarMetaData := {}
+	iCarMetaData := CaseInsenseMap()
 
 	OpenPitstopMFDHotkey {
 		Get {
@@ -92,6 +92,10 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		Get {
 			return (key ? this.iCarMetaData[key] : this.iCarMetaData)
 		}
+
+		Set {
+			return (key ? (this.iCarMetaData[key] := value) : (this.iCarMetaData := value))
+		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
@@ -107,10 +111,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
-					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
-					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension", EngineRepair: "Repair Engine"}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel"
+								   , "TyreCompound", "Tyre Compound", "TyreAllAround", "All Around"
+								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right"
+								   , "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension", "EngineRepair", "Repair Engine")
 		selectActions := []
 	}
 
@@ -148,7 +154,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			name := string2Values(A_Space, forName, 2)
 
 			setMultiMapValue(data, "Stint Data", "DriverForname", name[1])
-			setMultiMapValue(data, "Stint Data", "DriverSurname", (name.Length() > 1) ? name[2] : "")
+			setMultiMapValue(data, "Stint Data", "DriverSurname", (name.Length > 1) ? name[2] : "")
 			setMultiMapValue(data, "Stint Data", "DriverNickname", "")
 		}
 
@@ -169,7 +175,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		local key := (car . "." . meta)
 		local value, settings
 
-		if this.CarMetaData.HasKey(key)
+		if this.CarMetaData.Has(key)
 			return this.CarMetaData[key]
 		else {
 			value := getMultiMapValue(readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
@@ -196,7 +202,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
 
 				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+									, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 
 			return false
@@ -225,7 +231,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			return true
 		}
 		else {
-			Sleep 1200
+			Sleep(1200)
 
 			this.iPitstopAutoClose := (A_TickCount + 4000)
 
@@ -276,19 +282,19 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				return true
 			}
 			else if (option = "Repair Bodywork") {
-				loop % 7 + this.getCarMetaData("CarSettings")
+				loop 7 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Suspension") {
-				loop % 8 + this.getCarMetaData("CarSettings")
+				loop 8 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Engine") {
-				loop % 9 + this.getCarMetaData("CarSettings")
+				loop 9 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
@@ -302,19 +308,19 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	dialPitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			switch action {
+			switch action, false {
 				case "Increase":
 					this.activateWindow()
 
-					loop %steps%
+					loop steps
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
 					this.activateWindow()
 
-					loop %steps%
+					loop steps
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
+					throw "Unsupported change operation `"" . action . "`" detected in ACPlugin.dialPitstopOption..."
 			}
 	}
 
@@ -334,23 +340,23 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Repair Bodywork") {
 				this.dialPitstopOption("Repair Bodywork", action, steps)
 
-				loop %steps%
+				loop steps
 					this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
 			}
 			else if (option = "Repair Suspension") {
 				this.dialPitstopOption("Repair Suspension", action, steps)
 
-				loop %steps%
+				loop steps
 					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
 			}
 			else if (option = "Repair Engine") {
 				this.dialPitstopOption("Repair Engine", action, steps)
 
-				loop %steps%
+				loop steps
 					this.iRepairEngineChosen := !this.iRepairEngineChosen
 			}
 			else
-				throw "Unsupported change operation """ . action . """ detected in ACPlugin.changePitstopOption..."
+				throw "Unsupported change operation `"" . action . "`" detected in ACPlugin.changePitstopOption..."
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
@@ -395,28 +401,28 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			if this.selectPitstopOption("Front Left") {
 				this.dialPitstopOption("Front Left", "Decrease", 30)
 
-				loop % Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
+				loop Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
 					this.dialPitstopOption("Front Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Front Right") {
 				this.dialPitstopOption("Front Right", "Decrease", 30)
 
-				loop % Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
+				loop Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
 					this.dialPitstopOption("Front Right", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Left") {
 				this.dialPitstopOption("Rear Left", "Decrease", 30)
 
-				loop % Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
+				loop Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
 					this.dialPitstopOption("Rear Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Right") {
 				this.dialPitstopOption("Rear Right", "Decrease", 30)
 
-				loop % Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
+				loop Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
 					this.dialPitstopOption("Rear Right", "Increase")
 			}
 		}
@@ -468,7 +474,7 @@ startAC() {
 initializeACPlugin() {
 	local controller := SimulatorController.Instance
 
-	new ACPlugin(controller, kACPlugin, kACApplication, controller.Configuration)
+	ACPlugin(controller, kACPlugin, kACApplication, controller.Configuration)
 }
 
 

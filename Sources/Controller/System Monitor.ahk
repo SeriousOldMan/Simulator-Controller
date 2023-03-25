@@ -453,7 +453,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui := Gui()
 
-		systemMonitorGui.Opt("-Border") ; -Caption
+		systemMonitorGui.Opt("-Border -Caption +0x800000")
 		systemMonitorGui.BackColor := "D0D0D0"
 
 		systemMonitorGui.SetFont("s10 Bold", "Arial")
@@ -488,7 +488,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		assistantsDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+46 w300 h90 vassistantsDashboard", "shell.explorer").Value
+		assistantsDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+46 w300 h90", "shell.explorer").Value
 		assistantsDashboard.Navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -496,7 +496,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
-		sessionDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+156 w300 h90 vsessionDashboard", "shell.explorer").Value
+		sessionDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+156 w300 h90", "shell.explorer").Value
 		sessionDashboard.Navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -504,7 +504,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
-		dataDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+156 w300 h90 vdataDashboard", "shell.explorer").Value
+		dataDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+156 w300 h90", "shell.explorer").Value
 		dataDashboard.Navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -512,7 +512,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
-		automationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+266 w300 h90 vautomationDashboard", "shell.explorer").Value
+		automationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+266 w300 h90", "shell.explorer").Value
 		automationDashboard.Navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -520,7 +520,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
-		mapperDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+266 w300 h90 vmapperDashboard", "shell.explorer").Value
+		mapperDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+266 w300 h90", "shell.explorer").Value
 		mapperDashboard.Navigate("about:blank")
 
 		monitorTabView.UseTab(2)
@@ -975,8 +975,6 @@ startSystemMonitor() {
 	fixIE(11)
 
 	registerMessageHandler("Monitoring", monitoringMessageHandler)
-
-	SessionDatabase()
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")
 	deleteFile(kTempDirectory . "Database Synchronizer.state")

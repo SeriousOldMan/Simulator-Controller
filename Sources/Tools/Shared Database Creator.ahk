@@ -334,26 +334,20 @@ createSharedDatabases() {
 
 	vProgressCount := 0
 
-	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database..."})
+	showProgress({color: "Blue", title: "Creating Shared Database", message: "Cleaning temporary database...", width: 400})
 
 	Sleep(500)
 
 	databaseDirectory := (kTempDirectory . "Shared Database Creator")
 
-	if false {
 	deleteDirectory(databaseDirectory)
 
 	DirCreate(databaseDirectory . "\Input")
 	DirCreate(databaseDirectory . "\Output")
-	}
-	else {
-	deleteDirectory(databaseDirectory . "\Output")
-	DirCreate(databaseDirectory . "\Output")
-	}
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), title: "Downloading Community Content", message: "..."})
 
-	; downloadUserDatabases(databaseDirectory . "\Input\")
+	downloadUserDatabases(databaseDirectory . "\Input\")
 
 	showProgress({progress: (vProgressCount := vProgressCount + 2), color: "Green", title: "Processing Community Content", message: "..."})
 
@@ -378,6 +372,9 @@ cd database-downloads
 del %file%
 quit
 )"
+
+		command := substituteVariables(command, {file: file})
+
 		FileAppend(command, A_Temp . "\clearRemoteDirectory.txt")
 
 		deleteFile(A_Temp . "\clearRemoteDirectory.bat")

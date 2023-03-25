@@ -75,7 +75,7 @@ class Database {
 								line := Trim(file.ReadLine(), " `t`n`r")
 
 								row := Database.Row()
-								
+
 								values := string2Values(";", line)
 								length := values.Length
 
@@ -91,7 +91,7 @@ class Database {
 						else if FileExist(this.Directory . name . ".CSV")
 							loop Read, (this.Directory . name . ".CSV") {
 								row := Database.Row()
-								
+
 								values := string2Values(";", A_LoopReadLine)
 								length := values.Length
 
@@ -190,14 +190,14 @@ class Database {
 		}
 	}
 
-	unlock(name := false) {
+	unlock(name := false, backup := false) {
 		local file, ignore
 
-		if name {
+		if (name && (name != true)) {
 			file := this.Files[name]
 
 			if file {
-				this.flush(name)
+				this.flush(name, backup)
 
 				this.Files.Delete(name)
 
@@ -208,7 +208,7 @@ class Database {
 		}
 		else
 			for name, ignore in getKeys(this.Schemas)
-				this.unlock(name)
+				this.unlock(name, backup)
 
 	}
 
@@ -375,30 +375,31 @@ class Database {
 		this.iTableChanged[name] := true
 	}
 
-	flush(name := false) {
+	flush(name := false, backup := false) {
 		local bakFile := false
 		local directory, fileName, schema, ignore, row, values, column, file
 
-		if name {
+		if (name && (name != true)) {
 			if (this.Tables.Has(name) && this.iTableChanged.Has(name)) {
 				directory := this.Directory
 				fileName := (directory . name . ".CSV")
 				file := this.Files[name]
 
 				if file {
-					try {
-						file.Pos := 0
+					if backup
+						try {
+							file.Pos := 0
 
-						bakFile := FileOpen(fileName . ".bak", "w")
+							bakFile := FileOpen(fileName . ".bak", "w")
 
-						bakFile.Write(file.Read())
-					}
-					catch Any as exception {
-					}
-					finally {
-						if bakFile
-							bakFile.Close()
-					}
+							bakFile.Write(file.Read())
+						}
+						catch Any as exception {
+						}
+						finally {
+							if bakFile
+								bakFile.Close()
+						}
 
 					file.Length := 0
 
@@ -438,9 +439,9 @@ class Database {
 				this.iTableChanged.Delete(name)
 			}
 		}
-		else
+		else if
 			for name, ignore in this.Tables
-				this.flush(name)
+				this.flush(name, backup)
 	}
 }
 

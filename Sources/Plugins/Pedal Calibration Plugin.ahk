@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Pedal Calibration Plugin        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -86,7 +86,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			if !this.iSelectionIndex
 				throw "Unknown calibration shape """ . shape . """ detected in CurveShapeAction.__New..."
 
-			switch pedal {
+			switch pedal, false {
 				case "Clutch":
 					this.iSelectionXPosition := kClutchXPosition
 				case "Brake":
@@ -110,66 +110,66 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				application.startup()
 
 			try {
-				WinWait %windowTitle%, , 5
+				WinWait(windowTitle, , 5)
 
 				if kNeedsActivation {
-					WinMove %windowTitle%, , 50, 50
-					WinSet AlwaysOnTop, On, %windowTitle%
-					WinSet Top, , %windowTitle%
+					WinMove(50, 50, , , windowTitle)
+					WinSetAlwaysOnTop(1, windowTitle)
+					WinMoveTop(, windowTitle)
 
-					WinActivate %windowTitle%
+					WinActivate(windowTitle)
 
 					if (!WinActive(windowTitle) && SimulatorController.Instance.ActiveSimulator) {
-						Send !{Tab}
+						Send("!{Tab}")
 
-						WinActivate %windowTitle%
+						WinActivate(windowTitle)
 					}
 
 					if WinActive(windowTitle) {
 						xPosition := this.iSelectionXPosition
 						yPosition := kShapeYPosition
 
-						MouseClick Left, %xPosition%, %yPosition%
+						MouseClick("Left", xPosition, yPosition)
 
-						Sleep 500
+						Sleep(500)
 
 						yPosition += (this.iSelectionIndex * kShapeYDelta)
 
-						MouseClick Left, %xPosition%, %yPosition%
+						MouseClick("Left", xPosition, yPosition)
 
-						Sleep 500
+						Sleep(500)
 
-						MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
+						MouseClick("Left", kSaveToPedalX, kSaveToPedalY)
 					}
 				}
 				else {
 					xPosition := this.iSelectionXPosition
 					yPosition := kShapeYPosition
 
-					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+					ControlClick("X" . xPosition . " Y" . yPosition, windowTitle, , , , "NA")
 
-					Sleep 500
+					Sleep(500)
 
 					yPosition += (this.iSelectionIndex * kShapeYDelta)
 
-					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+					ControlClick("X" . xPosition . " Y" . yPosition, windowTitle, , , , "NA")
 
-					Sleep 500
+					Sleep(500)
 
-					ControlClick X%kSaveToPedalX% Y%yPosition%, %kSaveToPedalY%, , , , NA
+					ControlClick("X" . kSaveToPedalX . " Y" . yPosition, kSaveToPedalY, , , , "NA")
 				}
 
 				trayMessage(translate(this.Pedal), translate("Calibration: ") . this.Shape)
 
-				Sleep 500
+				Sleep(500)
 			}
 			finally {
 				if !wasRunning
 					application.shutdown()
 				else {
-					WinSet AlwaysOnTop, Off, %windowTitle%
+					WinSetAlwaysOnTop(0, windowTitle)
 
-					WinMinimize %windowTitle%
+					WinMinimize(windowTitle)
 				}
 			}
 		}

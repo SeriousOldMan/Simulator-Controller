@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Tactile Feedback Plugin         ;;;
 ;;;                                         (Powered by SimHub)             ;;;
 ;;;                                                                         ;;;
@@ -10,7 +10,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -133,7 +133,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				local plugin := this.Plugin
 
 				if plugin {
-					switch this.Command {
+					switch this.Command, false {
 						case "togglePedalVibration":
 							return this.Plugin.PedalVibrationEnabled
 						case "toggleFrontChassisVibration":
@@ -154,7 +154,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				local plugin := this.Plugin
 
 				if plugin {
-					switch this.Command {
+					switch this.Command, false {
 						case "togglePedalVibration":
 							return "PedalVibration"
 						case "toggleFrontChassisVibration":
@@ -174,7 +174,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			local plugin := this.Plugin
 
 			if (this.Active && ((trigger = "On") || (trigger = "Off") || (trigger == "Push"))) {
-				switch this.Action {
+				switch this.Action, false {
 					case "PedalVibration":
 						plugin.disablePedalVibration()
 					case "FrontVibration":
@@ -186,7 +186,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				}
 			}
 			else if (!this.Active && ((trigger = "On") || (trigger == "Push")))
-				switch this.Action {
+				switch this.Action, false {
 					case "PedalVibration":
 						plugin.enablePedalVibration()
 					case "FrontVibration":
@@ -221,12 +221,12 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.iUpChange := upChange
 			this.iDownChange := downChange
 
-			StringLower upChange, upChange
+			upChange := StrLower(upChange)
 
 			upChange := upChange . effect . "Vibration"
 
 			if downChange {
-				StringLower downChange, downChange
+				downChange := StrLower(downChange)
 
 				downChange := downChange . effect . "Vibration"
 			}
@@ -241,13 +241,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 			change := (((trigger = "On") || (trigger = kIncrease) || (trigger == "Push")) ? this.UpChange : this.DownChange)
 
-			StringUpper change, change, T
+			change := StrTitle(change)
 
 			trayMessage(translate(this.iEffect), translate(change) . translate(" Vibration"))
 
 			this.Function.setLabel(((change = kIncrease) ? "+ " : "- ") . kVibrationIntensityIncrement . "%", "Black", true)
 
-			Sleep 500
+			Sleep(500)
 
 			this.Function.setLabel(translate(this.Label))
 		}
@@ -301,18 +301,18 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			frontChassisVibrationArguments := string2Values(A_Space, this.getArgumentValue("frontChassisVibration", ""))
 			rearChassisVibrationArguments := string2Values(A_Space, this.getArgumentValue("rearChassisVibration", ""))
 
-			if (pedalVibrationArguments.Length() > 0)
+			if (pedalVibrationArguments.Length > 0)
 				this.createToggleAction("PedalVibration", "togglePedalVibration", pedalVibrationArguments[2], (pedalVibrationArguments[1] = "On"))
-			if (frontChassisVibrationArguments.Length() > 0)
+			if (frontChassisVibrationArguments.Length > 0)
 				this.createToggleAction("FrontVibration", "toggleFrontChassisVibration", frontChassisVibrationArguments[2], (frontChassisVibrationArguments[1] = "On"))
-			if (rearChassisVibrationArguments.Length() > 0)
+			if (rearChassisVibrationArguments.Length > 0)
 				this.createToggleAction("RearVibration", "toggleRearChassisVibration", rearChassisVibrationArguments[2], (rearChassisVibrationArguments[1] = "On"))
 
 			pedalMode := this.PedalVibrationMode(this)
 
 			this.iPedalVibrationMode := pedalMode
 
-			if (pedalVibrationArguments.Length() > 2)
+			if (pedalVibrationArguments.Length > 2)
 				this.createDialAction(pedalMode, "Pedal", pedalVibrationArguments[3])
 
 			for ignore, effect in string2Values(",", this.getArgumentValue("pedalEffects", ""))
@@ -322,10 +322,10 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 
 			this.iChassisVibrationMode := chassisMode
 
-			if (frontChassisVibrationArguments.Length() > 2)
+			if (frontChassisVibrationArguments.Length > 2)
 				this.createDialAction(chassisMode, "FrontChassis", frontChassisVibrationArguments[3])
 
-			if (rearChassisVibrationArguments.Length() > 2)
+			if (rearChassisVibrationArguments.Length > 2)
 				this.createDialAction(chassisMode, "RearChassis", rearChassisVibrationArguments[3])
 
 			for ignore, effect in string2Values(",", this.getArgumentValue("chassisEffects", ""))
@@ -423,9 +423,9 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 
 			setMultiMapValue(configuration, this.Plugin, "Information"
-								, values2String("; ", translate("Pedal Vibration: ") . translate(this.PedalVibrationEnabled ? "On" : "Off")
-													, translate("Front Vibration: ") . translate(this.FrontVibrationEnabled ? "On" : "Off")
-													, translate("Rear Vibration: ") . translate(this.RearVibrationEnabled ? "On" : "Off")))
+										  , values2String("; ", translate("Pedal Vibration: ") . translate(this.PedalVibrationEnabled ? "On" : "Off")
+															  , translate("Front Vibration: ") . translate(this.FrontVibrationEnabled ? "On" : "Off")
+															  , translate("Rear Vibration: ") . translate(this.RearVibrationEnabled ? "On" : "Off")))
 		}
 		else
 			super.writePluginState(configuration)
@@ -476,7 +476,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			this.Application.startup()
 
 			loop 20
-				Sleep 500
+				Sleep(500)
 			until this.Application.isRunning()
 
 			this.deactivate()
@@ -506,29 +506,25 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	updateTrayLabel(label, enabled, callback) {
-		local handler
-
-		static hasTrayMenu := {}
+		static hasTrayMenu := CaseInsenseMap()
 		static first := true
 
 		label := StrReplace(label, "`n", A_Space)
 
-		if !hasTrayMenu.HasKey(callback) {
-			handler := ObjBindMethod(this, callback)
-
+		if !hasTrayMenu.Has(callback) {
 			if first
-				Menu Tray, Insert, 1&
+				A_TrayMenu.Insert("1&")
 
-			Menu Tray, Insert, 1&, %label%, %handler%
+			A_TrayMenu.Insert("1&", label, ObjBindMethod(this, callback))
 
 			hasTrayMenu[callback] := true
 			first := false
 		}
 
 		if enabled
-			Menu Tray, Check, %label%
+			A_TrayMenu.Check(label)
 		else
-			Menu Tray, Uncheck, %label%
+			A_TrayMenu.Uncheck(label)
 	}
 
 	enableFX(label, action, command, call := true) {
@@ -715,7 +711,7 @@ callSimHub(command) {
 	try {
 		logMessage(kLogInfo, translate("Sending command '") . command . translate("' to SimHub (") . kSimHub . translate(")"))
 
-		RunWait "%kSimHub%" -triggerinput %command%, , Hide
+		RunWait("`"" . kSimHub . "`" -triggerinput " . command, , "Hide")
 	}
 	catch Any as exception {
 		message := (IsObject(exception) ? exception.Message : exception)

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Motion Feedback Plugin          ;;;
 ;;;                                         (Powered by SimFeedback)        ;;;
 ;;;                                                                         ;;;
@@ -10,7 +10,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -253,7 +253,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			function.setLabel(currentIntensity . translate("%"), "Black", true)
 
-			Sleep 500
+			Sleep(500)
 
 			function.setLabel(translate("Motion Intensity"))
 		}
@@ -354,7 +354,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 				function.setLabel(currentIntensity, "Black", true)
 
-				Sleep 500
+				Sleep(500)
 
 				function.setLabel(effect)
 			}
@@ -426,7 +426,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			motionEffectsArguments := string2Values(",", this.getArgumentValue("motionEffects", ""))
 			motionEffectIntensityArguments := string2Values(A_Space, this.getArgumentValue("motionEffectIntensity", ""))
 
-			if (motionArguments.Length() == 4) {
+			if (motionArguments.Length == 4) {
 				initialIntensity := motionArguments[4]
 
 				this.kInitialMotionIntensity := initialIntensity
@@ -464,7 +464,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.iMotionMode := motionMode
 
-			if (motionArguments.Length() > 2) {
+			if (motionArguments.Length > 2) {
 				descriptor := motionArguments[3]
 				function := this.Controller.findFunction(descriptor)
 
@@ -488,7 +488,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			else
 				this.logFunctionNotFound(descriptor)
 
-			if (motionEffectIntensityArguments.Length() > 2) {
+			if (motionEffectIntensityArguments.Length > 2) {
 				descriptor := motionEffectIntensityArguments[2]
 				function := this.Controller.findFunction(descriptor)
 
@@ -600,7 +600,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			isActive := false
 
 			try {
-				ControlGetPos, posX, posY, , , Stop, % this.Application.WindowTitle
+				ControlGetPos(&posX, &posY, , , "Stop", this.Application.WindowTitle)
 
 				if ((posX && (posX != "")) && (posY && (posY != "")))
 					isActive := true
@@ -689,7 +689,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 				arguments := values2String(A_Space, arguments*)
 
-				RunWait "%kSimFeedbackConnector%" %arguments%, , Hide
+				RunWait("`"" . kSimFeedbackConnector . "`" " . arguments, , "Hide")
 
 				result := ErrorLevel
 
@@ -735,9 +735,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 				yCoordinate := kEffectMuteToggleY[effect]
 
-				ControlClick X%kEffectMuteToggleX% Y%yCoordinate%, % this.Application.WindowTitle
+				ControlClick("X" . kEffectMuteToggleX . " Y" . yCoordinate, this.Application.WindowTitle)
 
-				Sleep 100
+				Sleep(100)
 
 				this.iCurrentEffectStates[effect] := !this.iCurrentEffectStates[effect]
 			}
@@ -760,12 +760,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if (targetIntensity != currentIntensity) {
 					sliderY := kEffectsSliderY[effect]
 
-					MouseClickDrag Left, kEffectsSliderMinX + Round(kEffectsSliderWidth * (currentIntensity / kEffectIntensityRange))
-									   , sliderY
-									   , kEffectsSliderMinX + Round(kEffectsSliderWidth * (targetIntensity / kEffectIntensityRange))
-									   , sliderY
+					MouseClickDrag("Left", kEffectsSliderMinX + Round(kEffectsSliderWidth * (currentIntensity / kEffectIntensityRange)), sliderY
+										 , kEffectsSliderMinX + Round(kEffectsSliderWidth * (targetIntensity / kEffectIntensityRange)), sliderY)
 
-					Sleep 100
+					Sleep(100)
 
 					this.iCurrentEffectIntensities[effect] := targetIntensity
 				}
@@ -782,12 +780,10 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 			else
 				if (targetIntensity != this.iCurrentMotionIntensity) {
-					MouseClickDrag Left, kMotionSliderMinX + Round(kMotionSliderWidth * (this.iCurrentMotionIntensity / kMotionIntensityRange))
-									   , kMotionSliderY
-									   , kMotionSliderMinX + Round(kMotionSliderWidth * (targetIntensity / kMotionIntensityRange))
-									   , kMotionSliderY
+					MouseClickDrag("Left", kMotionSliderMinX + Round(kMotionSliderWidth * (this.iCurrentMotionIntensity / kMotionIntensityRange)), kMotionSliderY
+										 , kMotionSliderMinX + Round(kMotionSliderWidth * (targetIntensity / kMotionIntensityRange)), kMotionSliderY)
 
-					Sleep 100
+					Sleep(100)
 
 					this.iCurrentMotionIntensity := targetIntensity
 				}
@@ -808,9 +804,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		else if !kSimFeedbackConnector {
 			windowTitle := this.Application.WindowTitle
 
-			WinWait %windowTitle%, , 20
-			WinActivate %windowTitle%
-			WinMaximize %windowTitle%
+			WinWait(windowTitle, , 20)
+			WinActivate(windowTitle)
+			WinMaximize(windowTitle)
 		}
 
 		if (isRunning && needsInitialize) {
@@ -821,7 +817,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		if !isRunning
 			loop 20
-				Sleep 500
+				Sleep(500)
 			until this.Application.isRunning()
 
 		return this.Application.isRunning()
@@ -870,7 +866,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if !this.getEffectState(effect) {
 				this.toggleEffect(effect)
 
-				Sleep 100
+				Sleep(100)
 			}
 
 			if wasHidden
@@ -889,7 +885,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if this.getEffectState(effect) {
 				this.toggleEffect(effect)
 
-				Sleep 100
+				Sleep(100)
 			}
 
 			if wasHidden
@@ -907,7 +903,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] + kEffectIntensityIncrement)
 
-			Sleep 100
+			Sleep(100)
 
 			if wasHidden
 				this.hideMotionWindow()
@@ -924,7 +920,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 			this.setEffectIntensity(effect, this.iCurrentEffectIntensities[inList(this.kEffects, effect)] - kEffectIntensityIncrement)
 
-			Sleep 100
+			Sleep(100)
 
 			if wasHidden
 				this.hideMotionWindow()
@@ -938,7 +934,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if (this.iCurrentEffectStates[index] != this.kInitialEffectStates[index]) {
 				this.toggleEffect(effect)
 
-				Sleep 50
+				Sleep(50)
 			}
 		}
 	}
@@ -952,7 +948,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if (this.iCurrentEffectIntensities[index] != initialIntensity) {
 				this.setEffectIntensity(effect, initialIntensity, false)
 
-				Sleep 50
+				Sleep(50)
 			}
 		}
 	}
@@ -969,19 +965,19 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			window := this.Application.WindowTitle
 
 			if !WinActive(window)
-				WinActivate %window%
+				WinActivate(window)
 
-			Sleep 100
+			Sleep(100)
 		}
 		else
-			Exit
+			Exit()
 
 		return wasHidden
 	}
 
 	hideMotionWindow() {
 		if this.Application.isRunning()
-			WinMinimize % this.Application.WindowTitle
+			WinMinimize(this.Application.WindowTitle)
 	}
 
 	resetToInitialState() {
@@ -1007,16 +1003,16 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if !hasTrayMenu {
 			callback := ObjBindMethod(this, "toggleMotion")
 
-			Menu Tray, Insert, 1&
-			Menu Tray, Insert, 1&, %label%, %callback%
+			A_TrayMenu.Insert("1&")
+			A_TrayMenu.Insert("1&", label, callback)
 
 			hasTrayMenu := true
 		}
 
 		if enabled
-			Menu Tray, Check, %label%
+			A_TrayMenu.Check(label)
 		else
-			Menu Tray, Uncheck, %label%
+			A_TrayMenu.Uncheck(label)
 	}
 
 	startMotion(label := false, force := false) {
@@ -1032,7 +1028,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			if kSimFeedbackConnector {
 				this.callSimFeedback("StartMotion")
 
-				Sleep 5000
+				Sleep(5000)
 
 				this.loadMotionStateFromSimFeedback()
 			}
@@ -1040,9 +1036,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				wasHidden := this.showMotionWindow()
 
 				if !this.MotionActive {
-					ControlClick Start, % this.Application.WindowTitle
+					ControlClick("Start", this.Application.WindowTitle)
 
-					Sleep 100
+					Sleep(100)
 
 					this.iIsMotionActive := true
 				}
@@ -1083,7 +1079,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 						this.callSimFeedback("StopMotion")
 
-						Sleep 5000
+						Sleep(5000)
 
 						this.loadMotionStateFromSimFeedback()
 					}
@@ -1094,9 +1090,9 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 					if this.MotionActive {
 						this.resetToInitialState()
 
-						ControlClick Stop, % this.Application.WindowTitle
+						ControlClick("Stop", this.Application.WindowTitle)
 
-						Sleep 100
+						Sleep(100)
 
 						this.iIsMotionActive := false
 					}
@@ -1179,15 +1175,15 @@ startSimFeedback(stayOpen := false) {
 	if pid {
 		windowTitle := simFeedback.WindowTitle
 
-		WinWait %windowTitle%, , 20
+		WinWait(windowTitle, , 20)
 
 		if !kSimFeedbackConnector
-			WinMaximize %windowTitle%
+			WinMaximize(windowTitle)
 		else
-			WinActivate %windowTitle%
+			WinActivate(windowTitle)
 
 		if !stayOpen
-			WinMinimize %windowTitle%
+			WinMinimize(windowTitle)
 	}
 
 	return pid

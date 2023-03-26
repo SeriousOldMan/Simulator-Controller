@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - iRacing Plugin                  ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "Libraries\SimulatorPlugin.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,10 +53,11 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {NoRefuel: "No Refuel", Refuel: "Refuel", TyreChange: "Change Tyres", TyreAllAround: "All Around"
-					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
-					 , RepairRequest: "Repair"}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreChange", "Change Tyres", "TyreAllAround", "All Around"
+								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
+								   , "RepairRequest", "Repair"}
+
 		selectActions := []
 	}
 
@@ -70,14 +71,14 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 			try {
 				if operation
-					RunWait %ComSpec% /c ""%exePath%" -%command% %operation% "%message%:%arguments%"", , Hide
+					RunWait(A_ComSpec . " /c `"`"" . exePath ."`" -" . command . A_Space . operation . " `"" . message . ":" . arguments . "`"`", , Hide")
 				else
-					RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
+					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . "`", , Hide")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
-														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-														   . kBinariesDirectory . translate(")"))
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
 				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
@@ -169,7 +170,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	changePitstopOption(option, action, steps := 1) {
-		switch option {
+		switch option, false {
 			case "Refuel":
 				if ((steps == 1) && (getUnit("Volume") = "Liter"))
 					steps := 4
@@ -212,11 +213,11 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	prepareSession(settings, data) {
-		new SessionDatabase().registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
-										  , getMultiMapValue(data, "Session Data", "Car", "Unknown")
-										  , getMultiMapValue(data, "Session Data", "Track", "Unknown")
-										  , getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
-										  , getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown"))
+		SessionDatabase.registerTrack(getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+									, getMultiMapValue(data, "Session Data", "Car", "Unknown")
+									, getMultiMapValue(data, "Session Data", "Track", "Unknown")
+									, getMultiMapValue(data, "Session Data", "TrackShortName", "Unknown")
+									, getMultiMapValue(data, "Session Data", "TrackLongName", "Unknown"))
 
 		super.prepareSession(settings, data)
 	}
@@ -269,9 +270,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	updatePositionsData(data) {
 		super.updatePositionsData(data)
 
-		loop % getMultiMapValue(data, "Position Data", "Car.Count", 0)
+		Loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
 			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
-								, StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
+								 , StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
 	}
 }
 

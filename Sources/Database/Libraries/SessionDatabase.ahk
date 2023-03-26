@@ -987,8 +987,8 @@ class SessionDatabase extends ConfigurationItem {
 		cache.Delete(simulator)
 	}
 
-	registerCar(simulator, car, name) {
-		local simulatorCode := this.getSimulatorCode(simulator)
+	static registerCar(simulator, car, name) {
+		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Car Data.ini")
 		local carData := readMultiMap(fileName)
 
@@ -1000,8 +1000,12 @@ class SessionDatabase extends ConfigurationItem {
 
 			writeMultiMap(fileName, carData)
 
-			this.clearCache(this.sCarData, this.getSimulatorCode(simulator))
+			SessionDatabase.clearData(SessionDatabase.sCarData, SessionDatabase.getSimulatorCode(simulator))
 		}
+	}
+
+	registerCar(simulator, car, name) {
+		SessionDatabase.registerCar(simulator, car, name)
 	}
 
 	static getCarName(simulator, car) {
@@ -1032,8 +1036,8 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getCarCode(simulator, car)
 	}
 
-	registerTrack(simulator, car, track, shortName, longName) {
-		local simulatorCode := this.getSimulatorCode(simulator)
+	static registerTrack(simulator, car, track, shortName, longName) {
+		local simulatorCode := SessionDatabase.getSimulatorCode(simulator)
 		local fileName := (kUserHomeDirectory . "Simulator Data\" . simulatorCode . "\" . "Track Data.ini")
 		local trackData := readMultiMap(fileName)
 
@@ -1047,8 +1051,12 @@ class SessionDatabase extends ConfigurationItem {
 
 			writeMultiMap(fileName, trackData)
 
-			this.clearCache(this.sTrackData, this.getSimulatorCode(simulator))
+			SessionDatabase.clearData(SessionDatabase.sTrackData, SessionDatabase.getSimulatorCode(simulator))
 		}
+	}
+
+	registerTrack(simulator, car, track, shortName, longName) {
+		SessionDatabase.registerTrack(simulator, car, track, shortName, longName)
 	}
 
 	static getTrackName(simulator, track, long := true) {
@@ -1079,16 +1087,16 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getTrackCode(simulator, track)
 	}
 
-	getTyreCompounds(simulator, car, track, codes := false) {
+	static getTyreCompounds(simulator, car, track, codes := false) {
 		local code, cache, key, compounds, data, cds, nms, ignore, compound, candidate
 
 		static settingsDB := false
 		static sNames := CaseInsenseMap()
 		static sCodes := CaseInsenseMap()
 
-		car := this.getCarCode(simulator, car)
+		car := SessionDatabase.getCarCode(simulator, car)
 
-		code := this.getSimulatorCode(simulator)
+		code := SessionDatabase.getSimulatorCode(simulator)
 		cache := (codes ? sCodes : sNames)
 		key := (code . "." . car . "." . track)
 
@@ -1101,7 +1109,7 @@ class SessionDatabase extends ConfigurationItem {
 			compounds := settingsDB.readSettingValue(simulator, car, track, "*"
 												   , "Session Settings", "Tyre.Compound.Choices"
 												   , kUndefined)
-			data := SessionDatabase.loadData(this.sTyreData, code, "Tyre Data.ini")
+			data := SessionDatabase.loadData(SessionDatabase.sTyreData, code, "Tyre Data.ini")
 
 			if ((compounds == kUndefined) || (compounds = "")) {
 				compounds := getMultiMapValue(data, "Cars", car . ";" . track, kUndefined)
@@ -1150,30 +1158,42 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
+	getTyreCompounds(simulator, car, track, codes := false) {
+		return SessionDatabase.getTyreCompounds(simulator, car, track, codes)
+	}
+
+	static getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
 		local index, code
 
-		for index, code in this.getTyreCompounds(simulator, car, track, true)
+		for index, code in SessionDatabase.getTyreCompounds(simulator, car, track, true)
 			if (code = compound)
-				return this.getTyreCompounds(simulator, car, track)[index]
+				return SessionDatabase.getTyreCompounds(simulator, car, track)[index]
 
 		return ((default = kUndefined) ? compound : default)
 	}
 
-	getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
+	getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
+		return SessionDatabase.getTyreCompoundName(simulator, car, track, compound, default)
+	}
+
+	static getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
 		local index, name, code
 
 		if compound
 			compound := normalizeCompound(compound)
 
-		for index, name in this.getTyreCompounds(simulator, car, track)
+		for index, name in SessionDatabase.getTyreCompounds(simulator, car, track)
 			if (name = compound) {
-				code := this.getTyreCompounds(simulator, car, track, true)[index]
+				code := SessionDatabase.getTyreCompounds(simulator, car, track, true)[index]
 
 				return ((code != "*") ? code : false)
 			}
 
 		return default
+	}
+
+	getTyreCompoundCode(simulator, car, track, compound, default := "Dry") {
+		return SessionDatabase.getTyreCompoundCode(simulator, car, track, compound, default)
 	}
 
 	suitableTyreCompound(simulator, car, track, weather, compound) {

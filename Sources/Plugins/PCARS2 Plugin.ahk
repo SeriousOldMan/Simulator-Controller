@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - PCARS2 Plugin                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Database\Libraries\SettingsDatabase.ahk
+#Include "Libraries\SimulatorPlugin.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -81,8 +82,9 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {NoRefuel: "NoRefuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap("NoRefuel", "NoRefuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound"
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension"}
 		selectActions := []
 	}
 
@@ -187,15 +189,15 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	dialPitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			switch action {
+			switch action, false {
 				case "Increase":
-					loop %steps%
+					loop steps
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					loop %steps%
+					loop steps
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+					throw "Unsupported change operation `"" . action . "`" detected in AMS2Plugin.dialPitstopOption..."
 			}
 	}
 
@@ -214,9 +216,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Tyre Compound") {
 				this.iTyreCompoundChosen += 1
 
-				if (this.iTyreCompoundChosen > new SessionDatabase().getTyreCompounds(this.Simulator[true]
-																					, this.Car
-																					, this.Track).Length())
+				if (this.iTyreCompoundChosen > SessionDatabase.getTyreCompounds(this.Simulator[true], this.Car, this.Track).Length)
 					this.iTyreCompoundChosen := 0
 
 				this.dialPitstopOption("Tyre Compound", "Decrease", 10)

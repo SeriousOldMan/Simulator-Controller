@@ -903,15 +903,14 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	prepareSession(settings, data) {
-		local sessionDB := SessionDatabase()
 		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 
-		sessionDB.registerCar(simulator, car, sessionDB.getCarName(simulator, car))
+		SessionDatabase.registerCar(simulator, car, sessionDB.getCarName(simulator, car))
 
-		sessionDB.registerTrack(simulator, car, track
-							  , sessionDB.getTrackName(simulator, track, false), sessionDB.getTrackName(simulator, track, true))
+		SessionDatabase.registerTrack(simulator, car, track
+									, SessionDatabase.getTrackName(simulator, track, false), SessionDatabase.getTrackName(simulator, track, true))
 	}
 
 	startSession(settings, data) {

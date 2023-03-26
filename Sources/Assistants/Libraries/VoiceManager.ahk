@@ -572,7 +572,7 @@ class VoiceManager {
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
 	}
 
-	shutdownVoiceManager() {
+	shutdownVoiceManager(*) {
 		if (this.VoiceServer && this.iSpeechSynthesizer) {
 			Process Exist
 

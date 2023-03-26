@@ -362,7 +362,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	stopTelemetryAnalyzer() {
+	stopTelemetryAnalyzer(*) {
 		local pid := this.iAnalyzerPID
 		local tries
 

@@ -789,7 +789,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	finishSession() {
+	finishSession(*) {
 		if this.TeamServerActive {
 			try {
 				if this.DriverActive {

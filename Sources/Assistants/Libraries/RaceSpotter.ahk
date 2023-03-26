@@ -2589,7 +2589,7 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
-	shutdownSpotter(force := false) {
+	shutdownSpotter(force := false, *) {
 		local pid := this.iSpotterPID
 		local processName, tries
 

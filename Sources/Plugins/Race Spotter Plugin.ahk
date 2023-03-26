@@ -350,7 +350,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	shutdownTrackAutomation(force := false) {
+	shutdownTrackAutomation(force := false, *) {
 		local pid := this.iAutomationPID
 		local processName, tries
 
@@ -545,7 +545,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		}
 	}
 
-	shutdownTrackMapper(force := false) {
+	shutdownTrackMapper(force := false, *) {
 		local pid, processName, tries
 
 		if (force || (this.iMapperPID && (this.iMapperPhase = "Collect"))) {

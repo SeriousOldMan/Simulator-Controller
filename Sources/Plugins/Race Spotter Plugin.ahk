@@ -125,14 +125,14 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if ((function != false) && (action = "TrackAutomation")) {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
-			this.registerAction(this.TrackAutomationToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+			this.registerAction(RaceSpotterPlugin.TrackAutomationToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else
 			super.createRaceAssistantAction(controller, action, actionFunction, arguments*)
 	}
 
 	createRaceAssistant(pid) {
-		return this.RemoteRaceSpotter(this, pid)
+		return RaceSpotterPlugin.RemoteRaceSpotter(this, pid)
 	}
 
 	writePluginState(configuration) {

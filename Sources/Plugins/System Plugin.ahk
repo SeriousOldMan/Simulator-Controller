@@ -282,7 +282,7 @@ class SystemPlugin extends ControllerPlugin {
 		super.loadFromConfiguration(configuration)
 
 		for descriptor, name in getMultiMapValues(configuration, "Applications")
-			this.RunnableApplications.Push(this.RunnableApplication(name, configuration))
+			this.RunnableApplications.Push(SystemPlugin.RunnableApplication(name, configuration))
 
 		for descriptor, appDescriptor in getMultiMapValues(configuration, "Launchpad") {
 			function := this.Controller.findFunction(descriptor)

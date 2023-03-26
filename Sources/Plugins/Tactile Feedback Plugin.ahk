@@ -310,7 +310,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (rearChassisVibrationArguments.Length > 0)
 				this.createToggleAction("RearVibration", "toggleRearChassisVibration", rearChassisVibrationArguments[2], (rearChassisVibrationArguments[1] = "On"))
 
-			pedalMode := this.PedalVibrationMode(this)
+			pedalMode := TactileFeedbackPlugin.PedalVibrationMode(this)
 
 			this.iPedalVibrationMode := pedalMode
 
@@ -320,7 +320,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			for ignore, effect in string2Values(",", this.getArgumentValue("pedalEffects", ""))
 				this.createEffectAction(controller, pedalMode, string2Values(A_Space, effect)*)
 
-			chassisMode := this.ChassisVibrationMode(this)
+			chassisMode := TactileFeedbackPlugin.ChassisVibrationMode(this)
 
 			this.iChassisVibrationMode := chassisMode
 
@@ -380,7 +380,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if (function != false) {
 			descriptor := ConfigurationItem.descriptor(effect, "Dial")
 
-			mode.registerAction(this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
+			mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
 		}
 		else
 			this.logFunctionNotFound(descriptor)
@@ -394,7 +394,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(effect, "Dial")
 
-				mode.registerAction(this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
+				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease, kDecrease))
 			}
 			else
 				this.logFunctionNotFound(increaseFunction)
@@ -403,7 +403,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(effect, "Increase")
 
-				mode.registerAction(this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease))
+				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kIncrease))
 			}
 			else
 				this.logFunctionNotFound(increaseFunction)
@@ -413,7 +413,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(effect, "Decrease")
 
-				mode.registerAction(this.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kDecrease))
+				mode.registerAction(TactileFeedbackPlugin.FXChangeAction(function, this.getLabel(descriptor, effect), this.getIcon(descriptor), effect, kDecrease))
 			}
 			else
 				this.logFunctionNotFound(decreaseFunction)
@@ -583,7 +583,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if theAction
 			theAction.Function.setLabel(actionLabel, "Black")
 
-		this["i" . action . "Enabled"] := false
+		this.%"i" . action . "Enabled"% := false
 
 		this.updateActions()
 

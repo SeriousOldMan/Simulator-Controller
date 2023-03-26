@@ -160,9 +160,9 @@ trayMessage(title, message, duration := false, async := true) {
 				TrayTip()
 
 				if SubStr(A_OSVersion, 1, 3) = "10." {
-					A_TrayMenu.NoIcon()
+					A_IconHidden := true
 					Sleep(200)  ; It may be necessary to adjust this sleep...
-					A_TrayMenu.Icon()
+					A_IconHidden := false
 				}
 			}
 			finally {

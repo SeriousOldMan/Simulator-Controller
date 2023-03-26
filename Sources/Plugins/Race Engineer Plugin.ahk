@@ -168,7 +168,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				action := this.RaceEngineerAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action)
+				action := RaceEngineerPlugin.RaceEngineerAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action)
 
 				this.registerAction(action)
 			}
@@ -180,7 +180,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	}
 
 	createRaceAssistant(pid) {
-		return this.RemoteRaceEngineer(this, pid)
+		return RaceEngineerPlugin.RemoteRaceEngineer(this, pid)
 	}
 
 	prepareSettings(data) {
@@ -321,7 +321,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					teamServer.setSessionValue(this.Plugin . " Driver Swap Plan", "")
 					teamServer.setSessionValue(this.Plugin . " Driver Swap Request", values2String(";", arguments*))
 
-					this.DriverSwapTask(this).start()
+					RaceEngineerPlugin.DriverSwapTask(this).start()
 				}
 				else
 					this.RaceEngineer.planDriverSwap(false)

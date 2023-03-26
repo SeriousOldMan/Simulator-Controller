@@ -335,8 +335,8 @@ class Application extends ConfigurationItem {
 
 class Function extends ConfigurationItem {
 	iNumber := 0
-	iHotkeys := {}
-	iActions := {}
+	iHotkeys := CaseInsenseMap()
+	iActions := CaseInsenseMap()
 
 	Type {
 		Get {
@@ -375,7 +375,7 @@ class Function extends ConfigurationItem {
 				return result
 			}
 			else if asText {
-				result := {}
+				result := CaseInsenseMap()
 
 				for trigger, hotkeys in this.iHotkeys
 					result[trigger] := values2String(" | ", hotkeys*)
@@ -427,11 +427,11 @@ class Function extends ConfigurationItem {
 							callables.Push(action)
 					}
 
-					return ((callables.Length > 0) ? Func("callActions").Bind(callables*) : false)
+					return ((callables.Length > 0) ? callActions.Bind(callables*) : false)
 				}
 			}
 			else {
-				result := {}
+				result := CaseInsenseMap()
 
 				for trigger, actions in this.iActions {
 					callables := []
@@ -463,7 +463,7 @@ class Function extends ConfigurationItem {
 							callables.Push(action)
 					}
 
-					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length > 0) ? Func("callActions").Bind(callables*) : false))
+					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length > 0) ? callActions.Bind(callables*) : false))
 				}
 
 				return result
@@ -688,7 +688,7 @@ class Plugin extends ConfigurationItem {
 	iPlugin := ""
 	iIsActive := false
 	iSimulators := []
-	iArguments := {}
+	iArguments := CaseInsenseMap()
 
 	Name {
 		Get {
@@ -774,7 +774,7 @@ class Plugin extends ConfigurationItem {
 
 	computeArgments(arguments) {
 		local ignore, argument
-		local result := {}
+		local result := CaseInsenseMap()
 
 		for ignore, argument in string2Values(";", arguments) {
 			argument := string2Values(":", argument, 2)

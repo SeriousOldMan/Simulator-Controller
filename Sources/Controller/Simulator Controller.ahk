@@ -1412,7 +1412,7 @@ class ControllerOneWayToggleFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, this.InnerOneWayToggleFunction(this, number, configuration))
+		super.__New(controller, ControllerOneWayToggleFunction.InnerOneWayToggleFunction(this, number, configuration))
 	}
 }
 
@@ -1432,7 +1432,7 @@ class ControllerTwoWayToggleFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, this.InnerTwoWayToggleFunction(this, number, configuration))
+		super.__New(controller, ControllerTwoWayToggleFunction.InnerTwoWayToggleFunction(this, number, configuration))
 	}
 }
 
@@ -1452,7 +1452,7 @@ class ControllerButtonFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, this.InnerButtonFunction(this, number, configuration))
+		super.__New(controller, ControllerButtonFunction.InnerButtonFunction(this, number, configuration))
 	}
 }
 
@@ -1472,7 +1472,7 @@ class ControllerDialFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, this.InnerDialFunction(this, number, configuration))
+		super.__New(controller, ControllerTwoWayToggleFunction.InnerDialFunction(this, number, configuration))
 	}
 }
 
@@ -1492,7 +1492,7 @@ class ControllerCustomFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, this.InnerCustomFunction(this, number, configuration))
+		super.__New(controller, ControllerCustomFunction.InnerCustomFunction(this, number, configuration))
 
 		this.connectAction(false, false)
 	}
@@ -1615,10 +1615,10 @@ class ControllerPlugin extends Plugin {
 	getLabel(descriptor, default := false) {
 		local label
 
-		if !this.sLabelsDatabase
+		if !ControllerPlugin.sLabelsDatabase
 			ControllerPlugin.sLabelsDatabase := getControllerActionLabels()
 
-		label := getMultiMapValue(this.sLabelsDatabase, this.Plugin, descriptor, false)
+		label := getMultiMapValue(ControllerPlugin.sLabelsDatabase, this.Plugin, descriptor, false)
 
 		if (!label || (label == ""))
 			label := default
@@ -1629,10 +1629,10 @@ class ControllerPlugin extends Plugin {
 	getIcon(descriptor, default := false) {
 		local icon
 
-		if !this.sIconsDatabase
+		if !ControllerPlugin.sIconsDatabase
 			ControllerPlugin.sIconsDatabase := getControllerActionIcons()
 
-		icon := getMultiMapValue(this.sIconsDatabase, this.Plugin, descriptor, false)
+		icon := getMultiMapValue(ControllerPlugin.sIconsDatabase, this.Plugin, descriptor, false)
 
 		if (!icon || (icon == ""))
 			icon := default

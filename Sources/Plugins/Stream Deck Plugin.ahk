@@ -150,8 +150,8 @@ class StreamDeck extends FunctionController {
 					if this.iModes.Has(icon)
 						return this.iModes[icon]
 
-					if this.sModes.Has(icon)
-						return this.sModes[icon]
+					if StreamDeck.sModes.Has(icon)
+						return StreamDeck.sModes[icon]
 				}
 
 				return (this.iModes.Has(function) ? this.iModes[function] : kIconOrLabel)
@@ -196,7 +196,7 @@ class StreamDeck extends FunctionController {
 
 		super.loadFromConfiguration(configuration)
 
-		if !this.sModes {
+		if !StreamDeck.sModes {
 			StreamDeck.sModes := CaseInsenseMap()
 
 			loop {
@@ -207,7 +207,7 @@ class StreamDeck extends FunctionController {
 				else {
 					special := string2values(";", special)
 
-					this.sModes[special[1]] := special[2]
+					StreamDeck.sModes[special[1]] := special[2]
 				}
 			}
 		}

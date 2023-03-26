@@ -451,18 +451,20 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			this.iCurrentEffectStates := this.kInitialEffectStates.Clone()
 			this.iCurrentEffectIntensities := this.kInitialEffectIntensities.Clone()
 
-			descriptor := motionArguments[2]
-			function := this.Controller.findFunction(descriptor)
+			if (motionArguments.Length > 1) {
+				descriptor := motionArguments[2]
+				function := this.Controller.findFunction(descriptor)
 
-			if (function != false) {
-				descriptor := ConfigurationItem.descriptor("Motion", "Toggle")
+				if (function != false) {
+					descriptor := ConfigurationItem.descriptor("Motion", "Toggle")
 
-				this.registerAction(this.MotionToggleAction(function, this.getLabel(descriptor, "Motion"), this.getIcon(descriptor)))
+					this.registerAction(MotionFeedbackPlugin.MotionToggleAction(function, this.getLabel(descriptor, "Motion"), this.getIcon(descriptor)))
 				}
-			else
-				this.logFunctionNotFound(descriptor)
+				else
+					this.logFunctionNotFound(descriptor)
+			}
 
-			motionMode := this.MotionMode(this)
+			motionMode := MotionFeedbackPlugin.MotionMode(this)
 
 			this.iMotionMode := motionMode
 
@@ -473,7 +475,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				if (function != false) {
 					descriptor := ConfigurationItem.descriptor("MotionIntensity", "Dial")
 
-					motionMode.registerAction(this.MotionIntensityAction(function, motionMode, this.getLabel(descriptor, "Motion Intensity"), this.getIcon(descriptor)))
+					motionMode.registerAction(MotionFeedbackPlugin.MotionIntensityAction(function, motionMode, this.getLabel(descriptor, "Motion Intensity"), this.getIcon(descriptor)))
 				}
 				else
 					this.logFunctionNotFound(descriptor)
@@ -482,70 +484,76 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			for index, effect in this.kEffects
 				this.createEffectToggleAction(controller, motionMode, effectFunctions[index], effect)
 
-			descriptor := motionEffectIntensityArguments[1]
-			function := this.Controller.findFunction(descriptor)
-
-			if (function != false)
-				motionMode.registerAction(this.EffectSelectorAction(function, "Effect Intensity", this.getIcon(ConfigurationItem.descriptor("EffectIntensity", "Activate"))))
-			else
-				this.logFunctionNotFound(descriptor)
-
-			if (motionEffectIntensityArguments.Length > 2) {
-				descriptor := motionEffectIntensityArguments[2]
+			if (motionEffectIntensityArguments.Length > 0) {
+				descriptor := motionEffectIntensityArguments[1]
 				function := this.Controller.findFunction(descriptor)
 
-				decreaseAction := false
-				increaseAction := false
-
-				if (function != false) {
-					descriptor := ConfigurationItem.descriptor("EffectIntensity", "Decrease")
-
-					decreaseAction := this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kDecrease)
-
-					motionMode.registerAction(decreaseAction)
-				}
+				if (function != false)
+					motionMode.registerAction(MotionFeedbackPlugin.EffectSelectorAction(function, "Effect Intensity", this.getIcon(ConfigurationItem.descriptor("EffectIntensity", "Activate"))))
 				else
 					this.logFunctionNotFound(descriptor)
 
-				descriptor := motionEffectIntensityArguments[3]
-				function := this.Controller.findFunction(descriptor)
+				if (motionEffectIntensityArguments.Length > 2) {
+					descriptor := motionEffectIntensityArguments[2]
+					function := this.Controller.findFunction(descriptor)
 
-				if (function != false) {
-					descriptor := ConfigurationItem.descriptor("EffectIntensity", "Increase")
+					decreaseAction := false
+					increaseAction := false
 
-					increaseAction := this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kIncrease)
+					if (function != false) {
+						descriptor := ConfigurationItem.descriptor("EffectIntensity", "Decrease")
 
-					motionMode.registerAction(increaseAction)
+						decreaseAction := MotionFeedbackPlugin.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kDecrease)
+
+						motionMode.registerAction(decreaseAction)
+					}
+					else
+						this.logFunctionNotFound(descriptor)
+
+					descriptor := motionEffectIntensityArguments[3]
+					function := this.Controller.findFunction(descriptor)
+
+					if (function != false) {
+						descriptor := ConfigurationItem.descriptor("EffectIntensity", "Increase")
+
+						increaseAction := MotionFeedbackPlugin.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor), kIncrease)
+
+						motionMode.registerAction(increaseAction)
+					}
+					else
+						this.logFunctionNotFound(descriptor)
+
+					if (increaseAction && decreaseAction)
+						motionMode.registerIntensityActions(decreaseAction, increaseAction)
 				}
-				else
-					this.logFunctionNotFound(descriptor)
+				else {
+					descriptor := motionEffectIntensityArguments[2]
+					function := this.Controller.findFunction(descriptor)
 
-				if (increaseAction && decreaseAction)
-					motionMode.registerIntensityActions(decreaseAction, increaseAction)
-			}
-			else {
-				descriptor := motionEffectIntensityArguments[2]
-				function := this.Controller.findFunction(descriptor)
+					if (function != false) {
+						descriptor := ConfigurationItem.descriptor("EffectIntensity", "Dial")
 
-				if (function != false) {
-					descriptor := ConfigurationItem.descriptor("EffectIntensity", "Dial")
+						intensityDialAction := MotionFeedbackPlugin.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor))
 
-					intensityDialAction := this.EffectIntensityAction(function, motionMode, this.getLabel(descriptor), this.getIcon(descriptor))
-
-					motionMode.registerAction(intensityDialAction)
-					motionMode.registerIntensityActions(intensityDialAction)
+						motionMode.registerAction(intensityDialAction)
+						motionMode.registerIntensityActions(intensityDialAction)
+					}
+					else
+						this.logFunctionNotFound(descriptor)
 				}
-				else
-					this.logFunctionNotFound(descriptor)
 			}
 
 			if register
 				controller.registerPlugin(this)
 
-			if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
-				this.startMotion(false, true)
-			else if ((motionArguments[1] = "Off") && this.Application.isRunning())
-				this.stopMotion(false, true)
+			if (motionArguments.Length > 0) {
+				if ((motionArguments[1] = "On") && !this.MotionActive && !this.Application.isRunning())
+					this.startMotion(false, true)
+				else if ((motionArguments[1] = "Off") && this.Application.isRunning())
+					this.stopMotion(false, true)
+				else
+					this.stopMotion(false, true, false)
+			}
 			else
 				this.stopMotion(false, true, false)
 
@@ -639,7 +647,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		local function := this.Controller.findFunction(functionDescriptor)
 
 		if (function != false)
-			mode.registerAction(this.EffectToggleAction(function, mode, effect))
+			mode.registerAction(MotionFeedbackPlugin.EffectToggleAction(function, mode, effect))
 		else
 			this.logFunctionNotFound(functionDescriptor)
 	}

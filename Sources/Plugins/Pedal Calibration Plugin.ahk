@@ -198,7 +198,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					return false
 			}
 
-			this.iPedalProfileMode := this.PedalProfileMode(this)
+			this.iPedalProfileMode := PedalCalibrationPlugin.PedalProfileMode(this)
 
 			this.registerMode(this.iPedalProfileMode)
 
@@ -223,7 +223,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		if (function != false) {
 			icon := this.getIcon("CurveShape." . shape . ".Activate", this.getIcon("CurveShape.Activate"))
 
-			this.iPedalProfileMode.registerAction(this.CurveShapeAction(function, label, icon, pedal, shape))
+			this.iPedalProfileMode.registerAction(PedalCalibrationPlugin.CurveShapeAction(function, label, icon, pedal, shape))
 		}
 		else
 			this.logFunctionNotFound(descriptor)

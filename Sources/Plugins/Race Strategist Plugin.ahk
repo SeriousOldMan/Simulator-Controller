@@ -120,7 +120,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				this.registerAction(this.RaceStrategistAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+				this.registerAction(RaceStrategistPlugin.RaceStrategistAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
 			}
 			else
 				this.logFunctionNotFound(actionFunction)
@@ -130,7 +130,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	}
 
 	createRaceAssistant(pid) {
-		return this.RemoteRaceStrategist(this, pid)
+		return RaceStrategistPlugin.RemoteRaceStrategist(this, pid)
 	}
 
 	startSession(settings, data) {

@@ -84,8 +84,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound"
-								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension", "DriverSwap", "Swap Driver"})
-
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension", "DriverSwap", "Swap Driver")
 		selectActions := []
 	}
 

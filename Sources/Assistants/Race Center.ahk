@@ -7071,7 +7071,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getCar(lap, carID, ByRef car, ByRef carNumber, ByRef carName, ByRef driverForname, ByRef driverSurname, ByRef driverNickname) {
-		return this.ReportViewer.getCar(lap.Nr, carID, car, carNumber, carName, driverForname, driverSurname, driverNickname)
+		return this.ReportViewer.getCar(lap.Nr, &carID, &car, &carNumber, &carName, &driverForname, &driverSurname, &driverNickname)
 	}
 
 	getStandings(lap, ByRef cars, ByRef ids, ByRef overallPositions, ByRef classPositions, ByRef carNumbers, ByRef carNames
@@ -7087,8 +7087,8 @@ class RaceCenter extends ConfigurationItem {
 		local tDriverNicknames := driverNicknames
 		local index, multiClass
 
-		multiClass := this.ReportViewer.getStandings(lap.Nr, tCars, tIDs, tOPositions, tCPositions, tCarNumbers, tCarNames
-												   , tDriverFornames, tDriverSurnames, tDriverNicknames)
+		multiClass := this.ReportViewer.getStandings(lap.Nr, &tCars, &tIDs, &tOPositions, &tCPositions, &tCarNumbers, &tCarNames
+														   , &tDriverFornames, &tDriverSurnames, &tDriverNicknames)
 
 		if cars
 			cars := []
@@ -7260,7 +7260,7 @@ class RaceCenter extends ConfigurationItem {
 			try {
 				this.ReportViewer.Settings["Laps"] := laps
 
-				this.ReportViewer.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+				this.ReportViewer.getDriverStatistics(raceData, cars, positions, times, &potentials, &raceCrafts, &speeds, &consistencies, &carControls)
 			}
 			finally {
 				if oldLapSettings
@@ -9981,7 +9981,7 @@ class RaceCenter extends ConfigurationItem {
 
 					car := entry.Car
 
-					if this.getCar(lap, (entry.ID != kNull) ? entry.ID : false, car, carNumber, carName, driverForname, driverSurname, driverNickname) {
+					if this.getCar(lap, (entry.ID != kNull) ? entry.ID : false, &car, &carNumber, &carName, &driverForname, &driverSurname, &driverNickname) {
 						driverFullname := computeDriverName(driverForname, driverSurname, driverNickname)
 						delta := entry.Delta
 					}
@@ -10030,7 +10030,7 @@ class RaceCenter extends ConfigurationItem {
 		local driverNicknames := true
 		local index, position, lapTime, laps, delta, result, multiClass, numPitstops, ignore, pitstop, pitstops, pitstopLaps
 
-		multiClass := this.getStandings(lap, cars, carIDs, overallPositions, classPositions, carNumbers, carNames, driverFornames, driverSurnames, driverNicknames)
+		multiClass := this.getStandings(lap, &cars, &carIDs, &overallPositions, &classPositions, &carNumbers, &carNames, &driverFornames, &driverSurnames, &driverNicknames)
 
 		html .= ("<tr><th class=""th-std"">" . translate("#") . "</th>"
 			   . "<th class=""th-std"">" . translate("Nr.") . "</th>"
@@ -11157,7 +11157,7 @@ class RaceCenter extends ConfigurationItem {
 		try {
 			this.ReportViewer.Settings["Laps"] := laps
 
-			this.ReportViewer.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+			this.ReportViewer.getDriverStatistics(raceData, cars, positions, times, &potentials, &raceCrafts, &speeds, &consistencies, &carControls)
 		}
 		finally {
 			if oldLapSettings

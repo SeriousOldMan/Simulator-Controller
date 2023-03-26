@@ -9,11 +9,11 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Libraries\Task.ahk"
-#Include "..\Libraries\Messages.ahk"
-#Include "..\Plugins\Libraries\SimulatorPlugin.ahk"
-#Include "..\Database\Libraries\SessionDatabase.ahk"
-#Include "..\Database\Libraries\SettingsDatabase.ahk"
+#Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\Messages.ahk"
+#Include "SimulatorPlugin.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Race Engineer Plugin            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
-#Include ..\Database\Libraries\TyresDatabase.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "Libraries\RaceAssistantPlugin.ahk"
+#Include "..\Database\Libraries\TyresDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -203,7 +203,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 
 			compound := false
 			compoundColor := false
-			pressures := {}
+			pressures := []
 			certainty := 1.0
 
 			if tyresDB.getTyreSetup(simulatorName, car, track, weather, airTemperature, trackTemperature, &compound, &compoundColor, &pressures, &certainty, true) {
@@ -225,7 +225,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		}
 		else if (tpSetting = "Setup") {
 			pressures := string2Values(",", getMultiMapValue(data, "Car Data", "TyrePressure", ""))
-			
+
 			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FL", Round(pressures[1], 1))
 			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.FR", Round(pressures[2], 1))
 			setMultiMapValue(settings, "Session Setup", "Tyre." . compound . ".Pressure.RL", Round(pressures[3], 1))
@@ -312,7 +312,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		local teamServer
 
 		if this.RaceEngineer {
-			if (arguments.Length() = 0)
+			if (arguments.Length = 0)
 				this.RaceEngineer.planDriverSwap()
 			else {
 				teamServer := this.TeamServer
@@ -431,12 +431,12 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		if (teamServer && teamServer.SessionActive)
 			teamServer.setLapValue(lapNumber, this.Plugin . " Pressures"
 								 , values2String(";", simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor
-													, coldPressures, hotPressures, pressuresLosses))
+								 , coldPressures, hotPressures, pressuresLosses))
 		else
-			this.LapDatabase.add("Pressures", {Lap: lapNumber, Simulator: simulator, Car: car, Track: track
-											 , Weather: weather, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-											 , "Compound": compound, "Compound.Color": compoundColor
-											 , "Pressures.Cold": coldPressures, "Pressures.Hot": hotPressures, "Pressures.Losses": pressuresLosses})
+			this.LapDatabase.add("Pressures", Database.Row("Lap", lapNumber, "Simulator", simulator, "Car", car, "Track", track
+														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+														 , "Compound", compound, "Compound.Color", compoundColor
+														 , "Pressures.Cold", coldPressures, "Pressures.Hot", hotPressures, "Pressures.Losses", pressuresLosses))
 	}
 
 	updateTyresDatabase() {
@@ -452,7 +452,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 				lastStint := false
 				driverID := kNull
 
-				loop % teamServer.getCurrentLap(session)
+				loop teamServer.getCurrentLap(session)
 					try {
 						stint := teamServer.getLapStint(A_Index, session)
 						newStint := (stint != lastStint)
@@ -500,7 +500,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						if first {
 							first := false
 
-							tyresDB.lock(lapData.Simulator, lapData.Car, lapData.Track)
+							tyresDB.lock(lapData["Simulator"], lapData["Car"], lapData["Track"])
 						}
 
 						coldPressures := string2Values(",", lapData["Pressures.Cold"])
@@ -509,9 +509,9 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 						loop 4
 							coldPressures[A_Index] -= pressureLosses[A_Index]
 
-						tyresDB.updatePressures(lapData.Simulator, lapData.Car, lapData.Track, lapData.Weather
+						tyresDB.updatePressures(lapData["Simulator"], lapData["Car"], lapData["Track"], lapData["Weather"]
 											  , lapData["Temperature.Air"], lapData["Temperature.Track"]
-											  , lapData.Compound, lapData["Compound.Color"]
+											  , lapData["Compound"], lapData["Compound.Color"]
 											  , coldPressures, string2Values(",", lapData["Pressures.Hot"]), false)
 					}
 				}

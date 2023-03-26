@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Race Spotter Plugin             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Plugins\Libraries\RaceAssistantPlugin.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "Libraries\RaceAssistantPlugin.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -93,15 +93,15 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			if trackAutomation {
 				arguments := string2Values(A_Space, trackAutomation)
 
-				if (arguments.Length() == 0)
+				if (arguments.Length == 0)
 					arguments := ["On"]
 
-				if ((arguments.Length() == 1) && !inList(["On", "Off"], arguments[1]))
+				if ((arguments.Length == 1) && !inList(["On", "Off"], arguments[1]))
 					arguments.InsertAt(1, "Off")
 
 				this.iTrackAutomationEnabled := (arguments[1] = "On")
 
-				if (arguments.Length() > 1)
+				if (arguments.Length > 1)
 					this.createRaceAssistantAction(controller, "TrackAutomation", arguments[2])
 			}
 			else
@@ -167,14 +167,14 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						setMultiMapValue(configuration, "Track Automation", "State", "Warning")
 
 						setMultiMapValue(configuration, "Track Automation", "Information"
-														   , translate("Message: ") . translate("No track automation available..."))
+													  , translate("Message: ") . translate("No track automation available..."))
 					}
 				}
 				else {
 					setMultiMapValue(configuration, "Track Automation", "State", "Passive")
 
 					setMultiMapValue(configuration, "Track Automation", "Information"
-													   , translate("Message: ") . translate("Waiting for simulation..."))
+												  , translate("Message: ") . translate("Waiting for simulation..."))
 				}
 			}
 			else
@@ -224,16 +224,16 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		if !hasTrayMenu {
 			callback := ObjBindMethod(this, "toggleTrackAutomation")
 
-			Menu Tray, Insert, 1&
-			Menu Tray, Insert, 1&, %label%, %callback%
+			A_TrayMenu.Insert("1&")
+			A_TrayMenu.Insert("1&", label, callback)
 
 			hasTrayMenu := true
 		}
 
 		if enabled
-			Menu Tray, Check, %label%
+			A_TrayMenu.Check(label)
 		else
-			Menu Tray, Uncheck, %label%
+			A_TrayMenu.Uncheck(label)
 	}
 
 	enableTrackAutomation(label := false, force := false) {
@@ -275,7 +275,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 		if this.Simulator {
 			trackAutomations := SessionDatabase().getTrackAutomations(this.Simulator.Simulator[true]
-																		, this.Simulator.Car, this.Simulator.Track)
+																	, this.Simulator.Car, this.Simulator.Track)
 
 			for ignore, candidate in trackAutomations
 				if ((name && (candidate.Name = name)) || (!name && candidate.Active)) {
@@ -326,9 +326,9 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					try {
 						if data
-							Run "%exePath%" -Trigger "%data%" %positions%, %kBinariesDirectory%, Hide, pid
+							Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
 						else
-							Run "%exePath%" -Trigger %positions%, %kBinariesDirectory%, Hide, pid
+							Run("`"" . exePath . "`" -Trigger " . positions, kBinariesDirectory, "Hide", &pid)
 					}
 					catch Any as exception {
 						logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (")
@@ -353,11 +353,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		local processName, tries
 
 		if pid {
-			Process Close, %pid%
+			ErrorLevel := ProcessClose(pid)
 
-			Sleep 500
+			Sleep(500)
 
-			Process Exist, %pid%
+			ErrorLevel := ProcessExist(pid)
 
 			if (force && ErrorLevel) {
 				processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
@@ -365,12 +365,12 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				tries := 5
 
 				while (tries-- > 0) {
-					Process Exist, %processName%
+					ErrorLevel := ProcessExist(processName)
 
 					if ErrorLevel {
-						Process Close, %ErrorLevel%
+						ErrorLevel := ProcessClose(ErrorLevel)
 
-						Sleep 500
+						Sleep(500)
 					}
 					else
 						break
@@ -441,7 +441,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 						try {
 							this.iMapperPhase := "Collect"
 
-							Run %ComSpec% /c ""%exePath%" -Map > "%dataFile%"", %kBinariesDirectory%, Hide UseErrorLevel, pid
+							Run(A_ComSpec . " /c `"`"" . exePath . "`" -Map > `"" . dataFile . "`"`"", kBinariesDirectory, "Hide", &pid)
 
 							this.iMapperPID := pid
 						}
@@ -499,7 +499,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		local pid := this.iMapperPID
 
 		if pid {
-			Process Exist, %pid%
+			ErrorLevel := ProcessExist(pid)
 
 			if ErrorLevel
 				Task.startTask(Task.CurrentTask, 10000)
@@ -507,7 +507,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				try {
 					this.iMapperPhase := "Map"
 
-					Run %ComSpec% /c ""%kBinariesDirectory%Track Mapper.exe" -Simulator "%simulator%" -Track "%track%" -Data "%datafile%"", %kBinariesDirectory%, UserErrorLevel Hide, pid
+					Run(A_ComSpec . " /c `"`"" . kBinariesDirectory . "Track Mapper.exe`" -Simulator `"" . simulator . "`" -Track `"" . track . "`" -Data `"" . datafile . "`"`""
+					  , kBinariesDirectory, "Hide", &pid)
 				}
 				catch Any as exception {
 					logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
@@ -531,7 +532,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		local pid := this.iMapperPID
 
 		if pid {
-			Process Exist, %pid%
+			ErrorLevel := ProcessExist(pid)
 
 			if ErrorLevel
 				Task.startTask(Task.CurrentTask, 10000)
@@ -551,28 +552,23 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			pid := this.iMapperPID
 
 			if (force || pid) {
-				Process Close, %pid%
+				ProcessClose(pid)
 
-				Sleep 500
+				Sleep(500)
 
-				Process Exist, %pid%
-
-				if (force && ErrorLevel) {
+				if (force && ProcessExist(pid)) {
 					processName := (SessionDatabase().getSimulatorCode(this.Simulator) . " SHM Spotter.exe")
 
 					tries := 5
 
-					while (tries-- > 0) {
-						Process Exist, %processName%
+					while (tries-- > 0)
+						if ProcessExist(processName) {
+							ProcessClose(ErrorLevel)
 
-						if ErrorLevel {
-							Process Close, %ErrorLevel%
-
-							Sleep 500
+							Sleep(500)
 						}
 						else
 							break
-					}
 				}
 			}
 		}

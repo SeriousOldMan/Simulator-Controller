@@ -1,65 +1,9 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Button Box Plugin               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global bbControl1
-global bbControl2
-global bbControl3
-global bbControl4
-global bbControl5
-global bbControl6
-global bbControl7
-global bbControl8
-global bbControl9
-global bbControl10
-global bbControl11
-global bbControl12
-global bbControl13
-global bbControl14
-global bbControl15
-global bbControl16
-global bbControl17
-global bbControl18
-global bbControl19
-global bbControl20
-global bbControl21
-global bbControl22
-global bbControl23
-global bbControl24
-global bbControl25
-global bbControl26
-global bbControl27
-global bbControl28
-global bbControl29
-global bbControl30
-global bbControl31
-global bbControl32
-global bbControl33
-global bbControl34
-global bbControl35
-global bbControl36
-global bbControl37
-global bbControl38
-global bbControl39
-global bbControl40
-global bbControl41
-global bbControl42
-global bbControl43
-global bbControl44
-global bbControl45
-global bbControl46
-global bbControl47
-global bbControl48
-global bbControl49
-global bbControl50
-
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
@@ -72,7 +16,7 @@ class ButtonBox extends GuiFunctionController {
 		}
 	}
 
-	findButtonBox(window) {
+	static findButtonBox(window) {
 		return GuiFunctionController.findFunctionController(window)
 	}
 }
@@ -87,9 +31,6 @@ class GridButtonBox extends ButtonBox {
 	static kSidesMargin := 20
 	static kBottomMargin := 15
 
-	static sWindowCounter := 1
-	static sHandleCounter := 1
-
 	iName := false
 	iLayout := false
 
@@ -101,7 +42,7 @@ class GridButtonBox extends ButtonBox {
 	iBottomMargin := this.kBottomMargin
 
 	iRowDefinitions := []
-	iControls := {}
+	iControls := CaseInsenseMap()
 
 	Descriptor {
 		Get {
@@ -180,16 +121,16 @@ class GridButtonBox extends ButtonBox {
 
 		layout := string2Values(",", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 
-		if (layout.Length() > 1)
+		if (layout.Length > 1)
 			this.iRowMargin := layout[2]
 
-		if (layout.Length() > 2)
+		if (layout.Length > 2)
 			this.iColumnMargin := layout[3]
 
-		if (layout.Length() > 3)
+		if (layout.Length > 3)
 			this.iSidesMargin := layout[4]
 
-		if (layout.Length() > 4)
+		if (layout.Length > 4)
 			this.iBottomMargin := layout[5]
 
 		layout := string2Values("x", layout[1])
@@ -199,14 +140,14 @@ class GridButtonBox extends ButtonBox {
 
 		rows := []
 
-		loop % this.Rows
+		loop this.Rows
 			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), "")))
 
 		this.iRowDefinitions := rows
 	}
 
 	createGui() {
-		local window := "bbWindow" . GridButtonBox.sWindowCounter++
+		local buttonBoxGui, control
 		local num1WayToggles := 0
 		local num2WayToggles := 0
 		local numButtons := 0
@@ -217,50 +158,57 @@ class GridButtonBox extends ButtonBox {
 		local descriptor, label, labelWidth, labelHeight, number, image, imageWidth, imageHeight
 		local x, y, variable
 
-		this.computeLayout(rowHeights, columnWidths)
+		moveButtonBox(buttonBoxGui, *) {
+			ButtonBox.findButtonBox(buttonBoxGui).moveByMouse(buttonBoxGui)
+		}
+
+		this.computeLayout(&rowHeights, &columnWidths)
 
 		height := 0
 
-		loop % rowHeights.Length()
+		loop rowHeights.Length
 			height += rowHeights[A_Index]
 
 		width := 0
 
-		loop % columnWidths.Length()
+		loop columnWidths.Length
 			width += columnWidths[A_Index]
 
-		height += ((rowHeights.Length() - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
-		width += ((columnWidths.Length() - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
+		height += ((rowHeights.Length - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
+		width += ((columnWidths.Length - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
 
-		Gui %window%:-Border -Caption +AlwaysOnTop
+		buttonBoxGui := Gui()
+		buttonBoxGui.Opt("-Border -Caption")
 
-		Gui %window%:Add, Picture, x-10 y-10, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
+		buttonBoxGui.Add("Picture", "x-10 y-10", kButtonBoxImagesDirectory . "Photorealistic\CF Background.png")
 
-		Gui %window%:Font, s12 Bold cSilver
-		Gui %window%:Add, Text, x0 y8 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate("Modular Simulator Controller System")
-		Gui %window%:Font, s10 cSilver
-		Gui %window%:Add, Text, x0 y28 w%width% h23 +0x200 +0x1 BackgroundTrans gmoveButtonBox, % translate(this.Name)
-		Gui %window%:Color, 0x000000
-		Gui %window%:Font, s8 Norm, Arial
+		buttonBoxGui.SetFont("s12 Bold cSilver")
+
+		buttonBoxGui.Add("Text", "x0 y8 w" . width . " h23 +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveButtonBox.Bind(buttonBoxGui))
+
+		buttonBoxGui.SetFont("s10 cSilver")
+
+		buttonBoxGui.Add("Text", "x0 y28 w" . width . " h23 +0x200 +0x1 BackgroundTrans", translate(this.Name)).OnEvent("Click", moveButtonBox.Bind(buttonBoxGui))
+
+		buttonBoxGui.BackColor := "0x000000"
+		buttonBoxGui.SetFont("s8 Norm", "Arial")
 
 		vertical := this.kHeaderHeight
 
-		loop % this.Rows
-		{
+		loop this.Rows {
 			rowHeight := rowHeights[A_Index]
 			rowDefinition := this.RowDefinitions[A_Index]
 
 			horizontal := this.SidesMargin
 
-			loop % this.Columns
-			{
+			loop this.Columns {
 				columnWidth := columnWidths[A_Index]
 				descriptor := rowDefinition[A_Index]
 
 				if (StrLen(descriptor) > 0) {
 					descriptor := string2Values(",", descriptor)
 
-					if (descriptor.Length() > 1) {
+					if (descriptor.Length > 1) {
 						label := string2Values("x", getMultiMapValue(this.Configuration, "Labels", descriptor[2], ""))
 						labelWidth := label[1]
 						labelHeight := label[2]
@@ -275,7 +223,7 @@ class GridButtonBox extends ButtonBox {
 
 					descriptor := string2Values(";", getMultiMapValue(this.Configuration, "Controls", descriptor[1], ""))
 
-					if (descriptor.Length() > 0) {
+					if (descriptor.Length > 0) {
 						function := descriptor[1]
 						image := substituteVariables(descriptor[2])
 
@@ -283,7 +231,7 @@ class GridButtonBox extends ButtonBox {
 						imageWidth := descriptor[1]
 						imageHeight := descriptor[2]
 
-						switch function {
+						switch function, false {
 							case k1WayToggleType:
 								num1WayToggles += 1
 							case k2WayToggleType:
@@ -301,21 +249,20 @@ class GridButtonBox extends ButtonBox {
 						x := horizontal + Round((columnWidth - imageWidth) / 2)
 						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 
-						variable := "bbControl" + GridButtonBox.sHandleCounter++
+						control := buttonBoxGui.Add("Picture", "x" . x . " y" . y . " w" . imageWidth . " h" . imageHeight . " BackgroundTrans", image)
+						control.OnEvent("Click", controlEvent.Bind(control))
 
-						Gui %window%:Add, Picture, x%x% y%y% w%imageWidth% h%imageHeight% BackgroundTrans v%variable% gcontrolEvent, %image%
-
-						this.registerControl(variable, function, x, y, imageWidth, imageHeight)
+						this.registerControl(control, function, x, y, imageWidth, imageHeight)
 
 						if ((labelWidth > 0) && (labelHeight > 0)) {
-							Gui %window%:Font, s8 Norm
+							buttonBoxGui.SetFont("s8 Norm")
 
 							x := horizontal + Round((columnWidth - labelWidth) / 2)
 							y := vertical + rowHeight - labelHeight
 
-							Gui %window%:Add, Text, x%x% y%y% w%labelWidth% h%labelHeight% Hwnd%variable% +Border -Background  +0x1000 +0x1
+							control := buttonBoxGui.Add("Text", "x" . x . " y" . y . " w" . labelWidth . " h" . labelHeight . " +Border -Background  +0x1000 +0x1")
 
-							this.registerControlHandle(function, %variable%)
+							this.registerControlLabel(function, control)
 						}
 					}
 				}
@@ -326,36 +273,34 @@ class GridButtonBox extends ButtonBox {
 			vertical += (rowHeight + this.RowMargin)
 		}
 
-		Gui %window%:Add, Picture, x-10 y-10 gmoveButtonBox 0x4000000, % kButtonBoxImagesDirectory . "Photorealistic\CF Background.png"
-		Gui %window%:+AlwaysOnTop
+		buttonBoxGui.Add("Picture", "x-10 y-10  0x4000000", kButtonBoxImagesDirectory . "Photorealistic\CF Background.png").OnEvent("Click", moveButtonBox.Bind(buttonBoxGui))
+		buttonBoxGui.Opt("+AlwaysOnTop")
 
 		this.associateGui(window, width, height, num1WayToggles, num2WayToggles, numButtons, numDials)
 	}
 
-	computeLayout(ByRef rowHeights, ByRef columnWidths) {
+	computeLayout(&rowHeights, &columnWidths) {
 		local rowHeight, rowDefinition, descriptor, label, labelWidth, labelHeight, descriptor
 		local imageHeight, imageWidth, columnWidth
 
 		columnWidths := []
 		rowHeights := []
 
-		loop % this.Columns
+		loop this.Columns
 			columnWidths.Push(0)
 
-		loop % this.Rows
-		{
+		loop this.Rows {
 			rowHeight := 0
 
 			rowDefinition := this.RowDefinitions[A_Index]
 
-			loop % this.Columns
-			{
+			loop this.Columns {
 				descriptor := rowDefinition[A_Index]
 
 				if (StrLen(descriptor) > 0) {
 					descriptor := string2Values(",", descriptor)
 
-					if (descriptor.Length() > 1) {
+					if (descriptor.Length > 1) {
 						label := getMultiMapValue(this.Configuration, "Labels", descriptor[2], "")
 						label := string2Values("x", label)
 						labelWidth := label[1]
@@ -368,7 +313,7 @@ class GridButtonBox extends ButtonBox {
 
 					descriptor := string2Values(";", getMultiMapValue(this.Configuration, "Controls", ConfigurationItem.splitDescriptor(descriptor[1])[1], ""))
 
-					if (descriptor.Length() > 0) {
+					if (descriptor.Length > 0) {
 						descriptor := string2Values("x", descriptor[3])
 
 						imageWidth := descriptor[1]
@@ -389,12 +334,12 @@ class GridButtonBox extends ButtonBox {
 		}
 	}
 
-	registerControl(variable, function, x, y, width, height) {
-		this.iControls[variable] := Array(function, x, y, width, height)
+	registerControl(control, function, x, y, width, height) {
+		this.iControls[control] := Array(function, x, y, width, height)
 	}
 
 	findControl(variable) {
-		if this.iControls.HasKey(variable)
+		if this.iControls.Has(variable)
 			return this.iControls[variable]
 		else
 			return false
@@ -406,19 +351,19 @@ class GridButtonBox extends ButtonBox {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-controlEvent() {
+controlEvent(control, *) {
 	local function, x, y, descriptor
 
-	MouseGetPos x, y
+	MouseGetPos(&x, &y)
 
-	function := ButtonBox.findButtonBox(A_Gui).findControl(A_GuiControl)
+	function := ButtonBox.findButtonBox(A_Gui).findControl(control)
 
 	if function {
-		MouseGetPos x, y
+		MouseGetPos(&x, &y)
 
 		descriptor := ConfigurationItem.splitDescriptor(function[1])
 
-		switch descriptor[1] {
+		switch descriptor[1], false {
 			case kButtonType:
 				pushButton(descriptor[2])
 			case kDialType:
@@ -431,10 +376,6 @@ controlEvent() {
 	}
 }
 
-moveButtonBox() {
-	ButtonBox.findButtonBox(A_Gui).moveByMouse(A_Gui)
-}
-
 initializeButtonBoxPlugin() {
 	local controller := SimulatorController.Instance
 	local configuration := readMultiMap(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
@@ -444,7 +385,7 @@ initializeButtonBoxPlugin() {
 		btnBox := string2Values(":", btnBox)
 
 		if getMultiMapValue(configuration, "Layouts", btnBox[2] . ".Visible", true)
-			new GridButtonBox(btnBox[1], btnBox[2], controller, configuration)
+			GridButtonBox(btnBox[1], btnBox[2], controller, configuration)
 	}
 }
 

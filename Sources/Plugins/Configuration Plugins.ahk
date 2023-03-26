@@ -6,13 +6,13 @@
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#Include ..\Plugins\Voice Control Configuration Plugin.ahk
-#Include ..\Plugins\Plugins Configuration Plugin.ahk
-#Include ..\Plugins\Applications Configuration Plugin.ahk
-#Include ..\Plugins\Controller Configuration Plugin.ahk
-#Include ..\Plugins\Launchpad Configuration Plugin.ahk
-#Include ..\Plugins\Chat Messages Configuration Plugin.ahk
-#Include ..\Plugins\Race Engineer Configuration Plugin.ahk
-#Include ..\Plugins\Race Strategist Configuration Plugin.ahk
-#Include ..\Plugins\Race Spotter Configuration Plugin.ahk
-#Include ..\Plugins\Team Server Configuration Plugin.ahk
+#Include "Voice Control Configuration Plugin.ahk"
+#Include "Plugins Configuration Plugin.ahk"
+#Include "Applications Configuration Plugin.ahk"
+#Include "Controller Configuration Plugin.ahk"
+#Include "Launchpad Configuration Plugin.ahk"
+#Include "Chat Messages Configuration Plugin.ahk"
+#Include "Race Engineer Configuration Plugin.ahk"
+#Include "Race Strategist Configuration Plugin.ahk"
+#Include "Race Spotter Configuration Plugin.ahk"
+#Include "Team Server Configuration Plugin.ahk"

@@ -147,7 +147,7 @@ class GuiFunctionController extends FunctionController {
 	iWindowWidth := 0
 	iWindowHeight := 0
 
-	iControlHandles := CaseInsenseMap()
+	iControlLabels := CaseInsenseMap()
 
 	iIsVisible := false
 	iIsPositioned := false
@@ -197,15 +197,19 @@ class GuiFunctionController extends FunctionController {
 		logMessage(kLogInfo, translate("Controller layout initialized:") . " #" . num1WayToggles . A_Space . translate("1-Way Toggles") . ", #" . num2WayToggles . A_Space . translate("2-Way Toggles") . ", #" . numButtons . A_Space . translate("Buttons") . ", #" . numDials . A_Space . translate("Dials"))
 	}
 
-	findFunctionController(window) {
+	static findFunctionController(window) {
 		if GuiFunctionController.sGuiFunctionController.Has(window)
 			return GuiFunctionController.sGuiFunctionController[window]
 		else
 			return false
 	}
 
+	findFunctionController(window) {
+		return GuiFunctionController.findFunctionController(window)
+	}
+
 	hasFunction(function) {
-		return (this.getControlHandle(function.Descriptor) != false)
+		return (this.getControlLabel(function.Descriptor) != false)
 	}
 
 	connectAction(plugin, function, action) {
@@ -216,27 +220,27 @@ class GuiFunctionController extends FunctionController {
 		this.setControlLabel(function, "")
 	}
 
-	registerControlHandle(descriptor, handle) {
-		this.iControlHandles[descriptor] := handle
+	registerControlLabel(descriptor, label) {
+		this.iControlLabels[descriptor] := label
 	}
 
-	getControlHandle(descriptor) {
-		if this.iControlHandles.Has(descriptor)
-			return this.iControlHandles[descriptor]
+	getControlLabel(descriptor) {
+		if this.iControlLabels.Has(descriptor)
+			return this.iControlLabels[descriptor]
 		else
 			return false
 	}
 
 	setControlLabel(function, text, color := "Black", overlay := false) {
 		local window := this.iWindow
-		local handle
+		local label
 
 		if (window != false) {
-			handle := this.getControlHandle(function.Descriptor)
+			label := this.getControlLabel(function.Descriptor)
 
-			if (handle != false) {
-				handle.SetFont("s8 c" . color, "Arial")
-				handleText := text
+			if (label != false) {
+				label.SetFont("s8 c" . color, "Arial")
+				label.Value := text
 
 				this.show()
 			}
@@ -392,7 +396,7 @@ class GuiFunctionController extends FunctionController {
 		}
 	}
 
-	moveByMouse(window, button := "LButton") {
+	moveByMouse(window, *) {
 		local curCoordMode := A_CoordModeMouse
 		local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h, settings
 
@@ -405,7 +409,7 @@ class GuiFunctionController extends FunctionController {
 			newX := winX
 			newY := winY
 
-			while GetKeyState(button, "P") {
+			while GetKeyState("LButton", "P") {
 				MouseGetPos(&x, &y)
 
 				newX := winX + (x - anchorX)

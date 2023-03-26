@@ -2479,10 +2479,10 @@ Gdip_StringFormatCreate(Format:=0, Lang:=0)
 ; BoldItalic = 3
 ; Underline = 4
 ; Strikeout = 8
-Gdip_FontCreate(hFamily, Size[0], Style:=0)
+Gdip_FontCreate(hFamily, Size, Style:=0)
 {
 	hFont := 0
-	DllCall("gdiplus\GdipCreateFont", "Ptr", hFamily, "float", Size[0], "int", Style, "int", 0, "PtrP", &hFont)
+	DllCall("gdiplus\GdipCreateFont", "Ptr", hFamily, "float", Size, "int", Style, "int", 0, "PtrP", &hFont)
 	return hFont
 }
 
@@ -2648,28 +2648,28 @@ Gdip_ResetWorldTransform(pGraphics)
 	return DllCall("gdiplus\GdipResetWorldTransform", "Ptr", pGraphics)
 }
 
-Gdip_GetRotatedTranslation(Width[0], Height[0], Angle, &xTranslation, &yTranslation)
+Gdip_GetRotatedTranslation(Width, Height, Angle, &xTranslation, &yTranslation)
 {
 	pi := 3.14159, TAngle := Angle*(pi/180)
 
 	Bound := (Angle >= 0) ? Mod(Angle, 360) : 360-Mod(-Angle, -360)
 	if ((Bound >= 0) && (Bound <= 90))
-		xTranslation := Height[0]*Sin(TAngle), yTranslation := 0
+		xTranslation := Height*Sin(TAngle), yTranslation := 0
 	else if ((Bound > 90) && (Bound <= 180))
-		xTranslation := (Height[0]*Sin(TAngle))-(Width[0]*Cos(TAngle)), yTranslation := -Height[0]*Cos(TAngle)
+		xTranslation := (Height*Sin(TAngle))-(Width*Cos(TAngle)), yTranslation := -Height*Cos(TAngle)
 	else if ((Bound > 180) && (Bound <= 270))
-		xTranslation := -(Width[0]*Cos(TAngle)), yTranslation := -(Height[0]*Cos(TAngle))-(Width[0]*Sin(TAngle))
+		xTranslation := -(Width*Cos(TAngle)), yTranslation := -(Height*Cos(TAngle))-(Width*Sin(TAngle))
 	else if ((Bound > 270) && (Bound <= 360))
-		xTranslation := 0, yTranslation := -Width[0]*Sin(TAngle)
+		xTranslation := 0, yTranslation := -Width*Sin(TAngle)
 }
 
-Gdip_GetRotatedDimensions(Width[0], Height[0], Angle, &RWidth, &RHeight)
+Gdip_GetRotatedDimensions(Width, Height, Angle, &RWidth, &RHeight)
 {
 	pi := 3.14159, TAngle := Angle*(pi/180)
-	if !(Width[0] && Height[0])
+	if !(Width && Height)
 		return -1
-	RWidth := Ceil(Abs(Width[0]*Cos(TAngle))+Abs(Height[0]*Sin(TAngle)))
-	RHeight := Ceil(Abs(Width[0]*Sin(TAngle))+Abs(Height[0]*Cos(Tangle)))
+	RWidth := Ceil(Abs(Width*Cos(TAngle))+Abs(Height*Sin(TAngle)))
+	RHeight := Ceil(Abs(Width*Sin(TAngle))+Abs(Height*Cos(Tangle)))
 }
 
 ; RotateNoneFlipNone   = 0
@@ -2853,20 +2853,20 @@ Gdip_PixelateBitmap(pBitmap, &pBitmapOut, BlockSize)
 		DllCall("VirtualProtect", "Ptr", PixelateBitmap, "Ptr", VarSetStrCapacity(&PixelateBitmap), "uint", 0x40, "PtrP", &null := 0)
 	}
 
-	Gdip_GetImageDimensions(pBitmap, Width[0], Height[0])
+	Gdip_GetImageDimensions(pBitmap, Width, Height)
 
-	if (Width[0] != Gdip_GetImageWidth(pBitmapOut) || Height[0] != Gdip_GetImageHeight(pBitmapOut))
+	if (Width != Gdip_GetImageWidth(pBitmapOut) || Height != Gdip_GetImageHeight(pBitmapOut))
 		return -1
-	if (BlockSize > Width[0] || BlockSize > Height[0])
+	if (BlockSize > Width || BlockSize > Height)
 		return -2
 
-	E1 := Gdip_LockBits(pBitmap, 0, 0, Width[0], Height[0], Stride1, Scan01, BitmapData1)
-	E2 := Gdip_LockBits(pBitmapOut, 0, 0, Width[0], Height[0], Stride2, Scan02, BitmapData2)
+	E1 := Gdip_LockBits(pBitmap, 0, 0, Width, Height, Stride1, Scan01, BitmapData1)
+	E2 := Gdip_LockBits(pBitmapOut, 0, 0, Width, Height, Stride2, Scan02, BitmapData2)
 	if (E1 || E2)
 		return -3
 
 	; E := - unused exit code
-	DllCall(PixelateBitmap, "Ptr", Scan01, "Ptr", Scan02, "int", Width[0], "int", Height[0], "int", Stride1, "int", BlockSize)
+	DllCall(PixelateBitmap, "Ptr", Scan01, "Ptr", Scan02, "int", Width, "int", Height, "int", Stride1, "int", BlockSize)
 
 	Gdip_UnlockBits(pBitmap, BitmapData1), Gdip_UnlockBits(pBitmapOut, BitmapData2)
 	return 0

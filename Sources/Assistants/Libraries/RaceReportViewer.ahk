@@ -235,7 +235,7 @@ class RaceReportViewer extends RaceReportReader {
 	}
 
 	loadReportData(laps, ByRef raceData, ByRef drivers, ByRef positions, ByRef times) {
-		return this.loadData(laps, raceData, drivers, positions, times)
+		return this.loadData(laps, &raceData, &drivers, &positions, &times)
 	}
 
 	editReportSettings(settings*) {
@@ -542,7 +542,7 @@ class RaceReportViewer extends RaceReportReader {
 			consistencies := false
 			carControls := false
 
-			this.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+			this.getDriverStatistics(raceData, cars, positions, times, &potentials, &raceCrafts, &speeds, &consistencies, &carControls)
 
 			if (potentials && (potentials.Length() > 0)) {
 				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["

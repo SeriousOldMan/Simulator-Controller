@@ -760,7 +760,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				showMessage("Starting team session: " . car . ", " . track)
 
 			try {
-				this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap()}
+				this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
 				this.iSimulator := simulator
 
 				this.Connector.StartSession(this.Session, duration, car, track)

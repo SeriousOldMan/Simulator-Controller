@@ -347,7 +347,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				hasDNF := (hasDNF || (result = "DNF"))
 
-				nr := StrReplace(cars[A_Index][1], """", "")
+				nr := cars[A_Index][1]
 
 				if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 					class := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)

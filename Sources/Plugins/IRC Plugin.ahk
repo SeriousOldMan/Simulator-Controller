@@ -56,7 +56,7 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreChange", "Change Tyres", "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
-								   , "RepairRequest", "Repair"}
+								   , "RepairRequest", "Repair")
 
 		selectActions := []
 	}
@@ -71,9 +71,9 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 			try {
 				if operation
-					RunWait(A_ComSpec . " /c `"`"" . exePath ."`" -" . command . A_Space . operation . " `"" . message . ":" . arguments . "`"`", , Hide")
+					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . A_Space . operation . " `"" . message . ":" . arguments . "`"`"", , "Hide")
 				else
-					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . "`", , Hide")
+					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . "`"", , "Hide")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
@@ -266,14 +266,6 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendPitstopCommand("Pitstop", "Set", "Repair", (repairBodywork || repairSuspension) ? "true" : "false")
 	}
-
-	updatePositionsData(data) {
-		super.updatePositionsData(data)
-
-		Loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
-			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
-								 , StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), """", ""))
-	}
 }
 
 
@@ -294,7 +286,7 @@ startIRC() {
 initializeIRCPlugin() {
 	local controller := SimulatorController.Instance
 
-	new IRCPlugin(controller, kIRCPlugin, kIRCApplication, controller.Configuration)
+	IRCPlugin(controller, kIRCPlugin, kIRCApplication, controller.Configuration)
 }
 
 

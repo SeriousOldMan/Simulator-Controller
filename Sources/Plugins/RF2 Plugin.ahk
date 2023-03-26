@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - RF2 Plugin                      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "Libraries\SimulatorPlugin.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -53,10 +53,11 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {NoRefuel: "No Refuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
-					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
-					 , DriverSelect: "Driver", RepairRequest: "Repair"}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound", "TyreAllAround", "All Around"
+								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
+								   , "DriverSelect", "Driver", "RepairRequest", "Repair")
+
 		selectActions := []
 	}
 
@@ -70,14 +71,14 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 			try {
 				if operation
-					RunWait %ComSpec% /c ""%exePath%" -%command% "%operation%:%message%:%arguments%"", , Hide
+					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . " `"" . operation . ":" . message . ":" . arguments . "`"`"", , "Hide")
 				else
-					RunWait %ComSpec% /c ""%exePath%" -%command%", , Hide
+					RunWait(A_ComSpec . " /c `"`"" . exePath . "`" -" . command . "`"", , "Hide")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"})
-														   . exePath . translate(") - please rebuild the applications in the binaries folder (")
-														   . kBinariesDirectory . translate(")"))
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
 
 				showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Provider (%exePath%) - please check the configuration...")
 											  , {exePath: exePath, simulator: simulator, protocol: "SHM"})
@@ -152,7 +153,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 	changePitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			switch option {
+			switch option, false {
 				case "Refuel":
 					this.sendPitstopCommand("Pitstop", action, "Refuel", Round(steps))
 				case "No Refuel":
@@ -191,7 +192,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 		local data, compound, compoundColor
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			switch option {
+			switch option, false {
 				case "Refuel":
 					data := readSimulatorData(this.Code, "-Setup")
 
@@ -205,7 +206,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 					data := readSimulatorData(this.Code, "-Setup")
 
 					compound := getMultiMapValue(data, "Setup Data", "TyreCompoundRaw")
-					compound := SessionDatabase().getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
+					compound := SessionDatabase.getTyreCompoundName(this.Simulator[true], this.Car, this.Track, compound, kUndefined)
 
 					if (compound = kUndefined)
 						compound := normalizeCompound("Dry")
@@ -297,7 +298,7 @@ class RF2Plugin extends RaceAssistantSimulatorPlugin {
 
 			delta := (nextDriver[2] - this.iSelectedDriver)
 
-			loop % Abs(delta)
+			loop Abs(delta)
 				this.changePitstopOption("Driver", (delta < 0) ? "Decrease" : "Increase")
 
 			this.iSelectedDriver := nextDriver[2]
@@ -331,7 +332,7 @@ startRF2() {
 initializeRF2Plugin() {
 	local controller := SimulatorController.Instance
 
-	new RF2Plugin(controller, kRF2Plugin, kRF2Application, controller.Configuration)
+	RF2Plugin(controller, kRF2Plugin, kRF2Application, controller.Configuration)
 }
 
 

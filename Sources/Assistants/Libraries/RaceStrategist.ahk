@@ -1244,9 +1244,6 @@ class RaceStrategist extends GridRaceAssistant {
 		loop %carCount% {
 			carNr := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr")
 
-			if InStr(carNr, """")
-				carNr := StrReplace(carNr, """", "")
-
 			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr", carNr)
 			setMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"
 										  , getMultiMapValue(data, "Position Data", "Car." . A_Index . ".ID", A_Index))
@@ -2668,9 +2665,6 @@ class RaceStrategist extends GridRaceAssistant {
 				loop %carCount% {
 					carNr := knowledgeBase.getValue("Car." . A_Index . ".Nr", 0)
 					carID := knowledgeBase.getValue("Car." . A_Index . ".ID", A_Index)
-
-					if InStr(carNr, """")
-						carNr := StrReplace(carNr, """", "")
 
 					if slots {
 						key := ("#" . carNr)

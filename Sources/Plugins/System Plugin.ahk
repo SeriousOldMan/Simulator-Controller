@@ -413,8 +413,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	initializeBackgroundTasks() {
-		new PeriodicTask("updateApplicationStates", 5000, kLowPriority).start()
-		new PeriodicTask("updateModeSelector", 500, kLowPriority).start()
+		PeriodicTask("updateApplicationStates", 5000, kLowPriority).start()
+		PeriodicTask("updateModeSelector", 500, kLowPriority).start()
 	}
 }
 
@@ -603,9 +603,9 @@ updateModeSelector() {
 initializeSystemPlugin() {
 	local controller := SimulatorController.Instance
 
-	new SystemPlugin(controller, kSystemPlugin, controller.Configuration)
+	SystemPlugin(controller, kSystemPlugin, controller.Configuration)
 
-	registerMessageHandler("Startup", "functionMessageHandler")
+	registerMessageHandler("Startup", functionMessageHandler)
 }
 
 
@@ -738,7 +738,7 @@ shutdownSystem() {
 
 	OnMessage(0x44, translateYesNoButtons)
 	msgResult := MsgBox(translate("Shutdown Simulator?"), translate("Shutdown"), 262436)
-	OnMessage(0x44)
+	OnMessage(0x44, translateYesNoButtons, 0)
 
 	if (msgResult = "Yes")
 		Shutdown(1)

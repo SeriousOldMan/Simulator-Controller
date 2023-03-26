@@ -84,7 +84,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "NoRefuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound"
-								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension"}
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension")
 		selectActions := []
 	}
 
@@ -255,7 +255,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.closePitstopMFD("Repair Suspension")
 			}
 			else
-				throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+				throw "Unsupported change operation `"" . action . "`" detected in AMS2Plugin.changePitstopOption..."
 		}
 	}
 
@@ -347,7 +347,7 @@ startPCARS2() {
 initializePCARS2Plugin() {
 	local controller := SimulatorController.Instance
 
-	new PCARS2Plugin(controller, kPCARS2Plugin, kPCARS2Application, controller.Configuration)
+	PCARS2Plugin(controller, kPCARS2Plugin, kPCARS2Application, controller.Configuration)
 }
 
 

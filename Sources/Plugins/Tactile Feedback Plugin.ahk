@@ -55,7 +55,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 
 		isActive() {
-			return (base.isActive() && this.Plugin.Application.isRunning())
+			return (super.isActive() && this.Plugin.Application.isRunning())
 		}
 	}
 
@@ -67,7 +67,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		}
 
 		isActive() {
-			return (base.isActive() && this.Plugin.Application.isRunning())
+			return (super.isActive() && this.Plugin.Application.isRunning())
 		}
 	}
 
@@ -278,6 +278,8 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
+		global kSimHub
+
 		local simFeedbackApplication, pedalVibrationArguments, frontChassisVibrationArguments, rearChassisVibrationArguments
 		local pedalMode, chassisMode, ignore, effect
 
@@ -432,7 +434,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 	}
 
 	getLabel(descriptor, default := false) {
-		local label := translate(base.getLabel(descriptor, default))
+		local label := translate(super.getLabel(descriptor, default))
 
 		return StrReplace(StrReplace(label, "Increase", translate("Increase")), "Decrease", translate("Decrease"))
 	}
@@ -768,7 +770,7 @@ deactivateRearChassisVibration() {
 initializeTactileFeedbackPlugin() {
 	local controller := SimulatorController.Instance
 
-	new TactileFeedbackPlugin(controller, kTactileFeedbackPlugin, controller.Configuration)
+	TactileFeedbackPlugin(controller, kTactileFeedbackPlugin, controller.Configuration)
 }
 
 

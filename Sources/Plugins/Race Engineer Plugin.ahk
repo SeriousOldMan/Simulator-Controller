@@ -321,7 +321,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 					teamServer.setSessionValue(this.Plugin . " Driver Swap Plan", "")
 					teamServer.setSessionValue(this.Plugin . " Driver Swap Request", values2String(";", arguments*))
 
-					new this.DriverSwapTask(this).start()
+					this.DriverSwapTask(this).start()
 				}
 				else
 					this.RaceEngineer.planDriverSwap(false)
@@ -585,7 +585,7 @@ preparePitstop() {
 initializeRaceEngineerPlugin() {
 	local controller := SimulatorController.Instance
 
-	new RaceEngineerPlugin(controller, kRaceEngineerPlugin, controller.Configuration)
+	RaceEngineerPlugin(controller, kRaceEngineerPlugin, controller.Configuration)
 }
 
 ;;;-------------------------------------------------------------------------;;;

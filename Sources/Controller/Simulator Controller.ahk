@@ -1139,7 +1139,7 @@ class SimulatorController extends ConfigurationItem {
 
 			videoPlayer.Document.Write(html)
 
-			logoGui.Show("X" . x . " Y". y . " W209 H180")
+			logoGui.Show("X" . x . " Y" . y . " W209 H180")
 
 			WinSetTransparent(255, , translate("Creative Commons - BY-NC-SA"))
 
@@ -1158,8 +1158,8 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	initializeBackgroundTasks() {
-		new PeriodicTask(updateSimulatorState, 10000, kLowPriority).start()
-		new PeriodicTask(externalCommandManager, 100, kLowPriority).start()
+		PeriodicTask(updateSimulatorState, 10000, kLowPriority).start()
+		PeriodicTask(externalCommandManager, 100, kLowPriority).start()
 
 		this.iShowLogo := (this.iShowLogo && !kSilentMode)
 	}
@@ -2211,7 +2211,7 @@ initializeSimulatorController()
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Plugins\Controller Plugins.ahk"
-#Include A_MyDocuments . "\Simulator Controller\Plugins\Controller Plugins.ahk"
+#Include "%A_MyDocuments%\Simulator Controller\Plugins\Controller Plugins.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

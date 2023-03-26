@@ -152,7 +152,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		}
 
 		isActive() {
-			return (base.isActive() && this.Plugin.Application.isRunning())
+			return (super.isActive() && this.Plugin.Application.isRunning())
 		}
 
 		activate() {
@@ -397,6 +397,8 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	__New(controller, name, configuration := false, register := true) {
+		global kSimFeedbackConnector
+
 		local function, motionArguments, motionEffectsArguments, motionEffectIntensityArguments, initialIntensity
 		local effectFunctions, ignore, index, effect, descriptor, motionMode, increaseAction, decreaseAction, intensityDialAction
 
@@ -675,7 +677,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		if isInstance(action, MotionFeedbackPlugin.EffectToggleAction)
 			return action.Label
 		else
-			return translate(base.actionLabel(action))
+			return translate(super.actionLabel(action))
 	}
 
 	callSimFeedback(arguments*) {
@@ -685,13 +687,11 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			try {
 				for index, argument in arguments
 					if InStr(argument, A_Space)
-						arguments[index] := """" . argument . """"
+						arguments[index] := "`"" . argument . "`""
 
 				arguments := values2String(A_Space, arguments*)
 
-				RunWait("`"" . kSimFeedbackConnector . "`" " . arguments, , "Hide")
-
-				result := ErrorLevel
+				result := RunWait("`"" . kSimFeedbackConnector . "`" " . arguments, , "Hide")
 
 				logMessage(kLogInfo, translate("Invoking SimFeedback connector with arguments: ") . arguments . " => " . result)
 
@@ -1192,7 +1192,7 @@ startSimFeedback(stayOpen := false) {
 initializeMotionFeedbackPlugin() {
 	local controller := SimulatorController.Instance
 
-	new MotionFeedbackPlugin(controller, kMotionFeedbackPlugin, controller.Configuration)
+	MotionFeedbackPlugin(controller, kMotionFeedbackPlugin, controller.Configuration)
 }
 
 

@@ -324,6 +324,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 				if FileExist(exePath) {
 					this.shutdownTrackAutomation()
 
+					pid := false
+
 					try {
 						if data
 							Run("`"" . exePath . "`" -Trigger `"" . data . "`" " . positions, kBinariesDirectory, "Hide", &pid)
@@ -341,7 +343,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 					}
 
-					if ((ErrorLevel != "Error") && pid)
+					if pid
 						this.iAutomationPID := pid
 				}
 			}
@@ -353,22 +355,20 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		local processName, tries
 
 		if pid {
-			ErrorLevel := ProcessClose(pid)
+			ProcessClose(pid)
 
 			Sleep(500)
 
-			ErrorLevel := ProcessExist(pid)
-
-			if (force && ErrorLevel) {
+			if (force && ProcessExist(pid)) {
 				processName := (SessionDatabase().getSimulatorCode(this.Simulator.Simulator[true]) . " SHM Spotter.exe")
 
 				tries := 5
 
 				while (tries-- > 0) {
-					ErrorLevel := ProcessExist(processName)
+					pid := ProcessExist(processName)
 
-					if ErrorLevel {
-						ErrorLevel := ProcessClose(ErrorLevel)
+					if pid {
+						ProcessClose(pid)
 
 						Sleep(500)
 					}
@@ -458,7 +458,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 							this.iMapperPID := false
 						}
 
-						if ((ErrorLevel != "Error") && this.iMapperPID) {
+						if this.iMapperPID {
 							trackMapperState := newMultiMap()
 
 							setMultiMapValue(trackMapperState, "Track Mapper", "State", "Active")
@@ -499,9 +499,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		local pid := this.iMapperPID
 
 		if pid {
-			ErrorLevel := ProcessExist(pid)
-
-			if ErrorLevel
+			if ProcessExist(pid)
 				Task.startTask(Task.CurrentTask, 10000)
 			else {
 				try {
@@ -519,10 +517,14 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 					pid := false
 				}
 
-				if ((ErrorLevel != "Error") && pid) {
+				if pid {
 					this.iMapperPID := pid
 
 					Task.startTask(ObjBindMethod(this, "finalizeTrackMap"), 120000, kLowPriority)
+				}
+				else {
+					this.iMapperPhase := false
+					this.iMapperPID := false
 				}
 			}
 		}
@@ -532,9 +534,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 		local pid := this.iMapperPID
 
 		if pid {
-			ErrorLevel := ProcessExist(pid)
-
-			if ErrorLevel
+			if ProcessExist(pid)
 				Task.startTask(Task.CurrentTask, 10000)
 			else {
 				this.iMapperPID := false
@@ -561,14 +561,17 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 
 					tries := 5
 
-					while (tries-- > 0)
-						if ProcessExist(processName) {
-							ProcessClose(ErrorLevel)
+					while (tries-- > 0) {
+						pid := ProcessExist(processName)
+
+						if pid {
+							ProcessClose(pid)
 
 							Sleep(500)
 						}
 						else
 							break
+					}
 				}
 			}
 		}
@@ -590,7 +593,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 initializeRaceSpotterPlugin() {
 	local controller := SimulatorController.Instance
 
-	new RaceSpotterPlugin(controller, kRaceSpotterPlugin, controller.Configuration)
+	RaceSpotterPlugin(controller, kRaceSpotterPlugin, controller.Configuration)
 }
 
 

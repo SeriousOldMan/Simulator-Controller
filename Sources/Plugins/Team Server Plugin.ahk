@@ -381,7 +381,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.registerAction(TeamServerPlugin.RaceCenterAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else
-				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+				logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
 		else
 			this.logFunctionNotFound(actionFunction)
@@ -539,9 +539,9 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 
 		if enabled
-			Tray.Check(label)
+			A_TrayMenu.Check(label)
 		else
-			Tray.Uncheck(label)
+			A_TrayMenu.Uncheck(label)
 	}
 
 	enableTeamServer(label := false, force := false) {
@@ -1208,7 +1208,7 @@ class TeamServerPlugin extends ControllerPlugin {
 					car := getMultiMapValue(telemetryData, "Session Data", "Car", "Unknown")
 					track := getMultiMapValue(telemetryData, "Session Data", "Track", "Unknown")
 
-					new SessionDatabase().registerDriver(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
+					SessionDatabase.registerDriver(simulator, this.ID, computeDriverName(driverForName, driverSurName, driverNickName))
 
 					stint := this.joinSession(simulator, car, track, lapNumber)
 				}
@@ -1389,7 +1389,7 @@ class TeamServerPlugin extends ControllerPlugin {
 initializeTeamServerPlugin() {
 	local controller := SimulatorController.Instance
 
-	new TeamServerPlugin(controller, kTeamServerPlugin, controller.Configuration)
+	TeamServerPlugin(controller, kTeamServerPlugin, controller.Configuration)
 }
 
 

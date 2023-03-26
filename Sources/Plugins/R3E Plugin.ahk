@@ -121,7 +121,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	static loadDatabase() {
 		local data
 
-		if !RE3Plugin.sCarDB {
+		if !R3EPlugin.sCarDB {
 			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
 
 			R3EPlugin.sCarDB := data["cars"]
@@ -811,7 +811,7 @@ startR3E() {
 initializeR3EPlugin() {
 	local controller := SimulatorController.Instance
 
-	new R3EPlugin(controller, kR3EPlugin, kR3EApplication, controller.Configuration)
+	R3EPlugin(controller, kR3EPlugin, kR3EApplication, controller.Configuration)
 }
 
 

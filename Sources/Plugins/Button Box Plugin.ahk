@@ -250,7 +250,7 @@ class GridButtonBox extends ButtonBox {
 						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
 
 						control := buttonBoxGui.Add("Picture", "x" . x . " y" . y . " w" . imageWidth . " h" . imageHeight . " BackgroundTrans", image)
-						control.OnEvent("Click", controlEvent.Bind(control))
+						control.OnEvent("Click", controlEvent.Bind(buttonBoxGui, control))
 
 						this.registerControl(control, function, x, y, imageWidth, imageHeight)
 
@@ -276,7 +276,7 @@ class GridButtonBox extends ButtonBox {
 		buttonBoxGui.Add("Picture", "x-10 y-10  0x4000000", kButtonBoxImagesDirectory . "Photorealistic\CF Background.png").OnEvent("Click", moveButtonBox.Bind(buttonBoxGui))
 		buttonBoxGui.Opt("+AlwaysOnTop")
 
-		this.associateGui(window, width, height, num1WayToggles, num2WayToggles, numButtons, numDials)
+		this.associateGui(buttonBoxGui, width, height, num1WayToggles, num2WayToggles, numButtons, numDials)
 	}
 
 	computeLayout(&rowHeights, &columnWidths) {
@@ -351,12 +351,12 @@ class GridButtonBox extends ButtonBox {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-controlEvent(control, *) {
+controlEvent(window, control, *) {
 	local function, x, y, descriptor
 
 	MouseGetPos(&x, &y)
 
-	function := ButtonBox.findButtonBox(A_Gui).findControl(control)
+	function := ButtonBox.findButtonBox(window).findControl(control)
 
 	if function {
 		MouseGetPos(&x, &y)

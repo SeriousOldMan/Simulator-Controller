@@ -614,12 +614,12 @@ initializeStreamDeckPlugin() {
 	for ignore, strmDeck in string2Values("|", getMultiMapValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
 		strmDeck := string2Values(":", strmDeck)
 
-		new StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
+		StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
 	}
 
 	registerMessageHandler("Stream Deck", "handleStreamDeckMessage")
 
-	new PeriodicTask("refreshStreamDecks", 5000, kLowPriority).start()
+	PeriodicTask("refreshStreamDecks", 5000, kLowPriority).start()
 }
 
 

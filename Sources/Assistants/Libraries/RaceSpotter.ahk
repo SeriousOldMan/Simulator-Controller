@@ -3090,7 +3090,7 @@ class RaceSpotter extends GridRaceAssistant {
 		{
 			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
 			 || getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPit", false)) {
-				carNr := StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index), """", "")
+				carNr := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", A_Index)
 
 				pitstops := this.Pitstops[carNr]
 
@@ -3194,7 +3194,7 @@ class RaceSpotter extends GridRaceAssistant {
 						carBehindDelta := ((driverRunning - carRunning) * lapTime * -1)
 					}
 
-					positions[carIndex] := Array(StrReplace(getMultiMapValue(data, "Position Data", prefix . ".Nr"), """", "")
+					positions[carIndex] := Array(getMultiMapValue(data, "Position Data", prefix . ".Nr")
 											   , getMultiMapValue(data, "Position Data", prefix . ".Car", "Unknown")
 											   , this.getClass(carIndex, data)
 											   , computeDriverName(getMultiMapValue(data, "Position Data", prefix . ".Driver.Forname", "John")

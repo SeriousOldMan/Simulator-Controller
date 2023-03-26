@@ -35,6 +35,8 @@ class RaceReportReader {
 	}
 
 	__New(report := false) {
+		global kUnknown
+
 		this.iReport := report
 
 		if !kUnknown
@@ -57,15 +59,15 @@ class RaceReportReader {
 	getClasses(raceData) {
 		local classes := []
 		local unknown := translate("Unknown")
-		local class
+		local carClass
 
 
 		loop getMultiMapValue(raceData, "Cars", "Count")
 			if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
-				class := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", unknown)
+				carClass := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", unknown)
 
-				if !inList(classes, class)
-					classes.Push(class)
+				if !inList(classes, carClass)
+					classes.Push(carClass)
 			}
 
 		return classes
@@ -142,7 +144,7 @@ class RaceReportReader {
 		local tPositions := true
 		local tTimes := true
 		local classes := CaseInsenseMap()
-		local forName, surName, nickName, position
+		local forName, surName, nickName, position, carClass
 
 		comparePositions(c1, c2) {
 			local pos1 := c1[2]
@@ -200,12 +202,12 @@ class RaceReportReader {
 					if overallPositions
 						overallPositions.Push(position)
 
-					class := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
+					carClass := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
 
-					if !classes.Has(class)
-						classes[class] := [Array(A_Index, position)]
+					if !classes.Has(carClass)
+						classes[carClass] := [Array(A_Index, position)]
 					else
-						classes[class].Push(Array(A_Index, position))
+						classes[carClass].Push(Array(A_Index, position))
 
 					if carNumbers
 						carNumbers.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
@@ -232,10 +234,10 @@ class RaceReportReader {
 			if (classes.Count() > 1) {
 				classPositions := overallPositions.Clone()
 
-				for ignore, class in classes {
-					bubbleSort(&class, comparePositions)
+				for ignore, carClass in classes {
+					bubbleSort(&carClass, comparePositions)
 
-					for position, car in class
+					for position, car in carClass
 						classPositions[car[1]] := position
 				}
 

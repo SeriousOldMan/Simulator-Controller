@@ -258,7 +258,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.deselectPitstopOption("Repair All")
 			}
 			else
-				throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+				throw "Unsupported change operation `"" . action . "`" detected in AMS2Plugin.changePitstopOption..."
 		}
 	}
 
@@ -362,7 +362,7 @@ startAMS2() {
 initializeAMS2Plugin() {
 	local controller := SimulatorController.Instance
 
-	new AMS2Plugin(controller, kAMS2Plugin, kAMS2Application, controller.Configuration)
+	AMS2Plugin(controller, kAMS2Plugin, kAMS2Application, controller.Configuration)
 }
 
 

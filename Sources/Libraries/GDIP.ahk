@@ -337,8 +337,7 @@ Gdip_BitmapFromScreen(Screen:=0, Raster:="")
 	}
 	else if IsInteger(Screen)
 	{
-		M := GetMonitorInfo(Screen)
-		_x := M.Left, _y := M.Top, _w := M.Right-M.Left, _h := M.Bottom-M.Top
+		throw "Not yet implemented..."
 	}
 	else
 	{
@@ -1633,7 +1632,9 @@ Gdip_SaveBitmapToFile(pBitmap, sOutput, Quality:=75)
 				if (NumGet(EncoderParameters, elem+16, "UInt") = 1) && (NumGet(EncoderParameters, elem+20, "UInt") = 6)
 				{
 					_p := elem+&EncoderParameters-pad-4
-					NumPut(NumGet(NumPut(NumPut("UPtr", 1, _p+0)+20), "UPtr"))
+
+					NumPut("UInt", Quality, NumGet(NumPut("UInt", 4, NumPut("UPtr", 1, _p+0)+20), "UPtr"))
+
 					break
 				}
 			}
@@ -1747,16 +1748,16 @@ Gdip_GetImageDimensions(pBitmap, &Width, &Height)
 
 Gdip_GetDimensions(pBitmap, &Width, &Height)
 {
-	Gdip_GetImageDimensions(pBitmap, Width, Height)
+	Gdip_GetImageDimensions(pBitmap, &Width, &Height)
 }
 
 ;#####################################################################################
 
 Gdip_GetImagePixelFormat(pBitmap)
 {
-	Format := 0
-	DllCall("gdiplus\GdipGetImagePixelFormat", "Ptr", pBitmap, "PtrP", &Format)
-	return Format
+	lFormat := 0
+	DllCall("gdiplus\GdipGetImagePixelFormat", "Ptr", pBitmap, "PtrP", &lFormat)
+	return lFormat
 }
 
 ;#####################################################################################
@@ -2853,22 +2854,22 @@ Gdip_PixelateBitmap(pBitmap, &pBitmapOut, BlockSize)
 		DllCall("VirtualProtect", "Ptr", PixelateBitmap, "Ptr", VarSetStrCapacity(&PixelateBitmap), "uint", 0x40, "PtrP", &null := 0)
 	}
 
-	Gdip_GetImageDimensions(pBitmap, Width, Height)
+	Gdip_GetImageDimensions(pBitmap, &Width, &Height)
 
 	if (Width != Gdip_GetImageWidth(pBitmapOut) || Height != Gdip_GetImageHeight(pBitmapOut))
 		return -1
 	if (BlockSize > Width || BlockSize > Height)
 		return -2
 
-	E1 := Gdip_LockBits(pBitmap, 0, 0, Width, Height, Stride1, Scan01, BitmapData1)
-	E2 := Gdip_LockBits(pBitmapOut, 0, 0, Width, Height, Stride2, Scan02, BitmapData2)
+	E1 := Gdip_LockBits(pBitmap, 0, 0, Width, Height, &Stride1, &Scan01, &BitmapData1)
+	E2 := Gdip_LockBits(pBitmapOut, 0, 0, Width, Height, &Stride2, &Scan02, &BitmapData2)
 	if (E1 || E2)
 		return -3
 
 	; E := - unused exit code
 	DllCall(PixelateBitmap, "Ptr", Scan01, "Ptr", Scan02, "int", Width, "int", Height, "int", Stride1, "int", BlockSize)
 
-	Gdip_UnlockBits(pBitmap, BitmapData1), Gdip_UnlockBits(pBitmapOut, BitmapData2)
+	Gdip_UnlockBits(pBitmap, &BitmapData1), Gdip_UnlockBits(pBitmapOut, &BitmapData2)
 	return 0
 }
 

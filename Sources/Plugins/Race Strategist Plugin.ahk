@@ -92,7 +92,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			if value
 				this.iRaceStrategist := value
 
-			return (base.RaceAssistant := value)
+			return (super.RaceAssistant := value)
 		}
 	}
 
@@ -771,7 +771,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 initializeRaceStrategistPlugin() {
 	local controller := SimulatorController.Instance
 
-	new RaceStrategistPlugin(controller, kRaceStrategistPlugin, controller.Configuration)
+	RaceStrategistPlugin(controller, kRaceStrategistPlugin, controller.Configuration)
 }
 
 ;;;-------------------------------------------------------------------------;;;

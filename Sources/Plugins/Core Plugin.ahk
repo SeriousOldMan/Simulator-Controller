@@ -111,5 +111,5 @@ startVoiceMacro() {
 		return pid
 	}
 	else
-		return voiceMarco.CurrentPID
+		return voiceMacro.CurrentPID
 }

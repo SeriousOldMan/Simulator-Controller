@@ -118,7 +118,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		Set {
 			this.iImageSearch := kUndefined
 
-			return (base.Car := value)
+			return (super.Car := value)
 		}
 	}
 
@@ -126,7 +126,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		Set {
 			this.iImageSearch := kUndefined
 
-			return (base.Track := value)
+			return (super.Track := value)
 		}
 	}
 
@@ -198,7 +198,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel"
 								   , "TyreChange", "Change Tyres", "TyreSet", "Tyre Set"
-								   , "TyreCompound". "Tyre Compound", "TyreAllAround". "All Around"
+								   , "TyreCompound", "Tyre Compound", "TyreAllAround", "All Around"
 								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right", "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
 								   , "BrakeChange", "Change Brakes", "FrontBrake", "Front Brake", "RearBrake", "Rear Brake", "DriverSelect", "Driver"
 								   , "SuspensionRepair", "Repair Suspension", "BodyworkRepair", "Repair Bodywork")
@@ -1047,19 +1047,19 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	changeTyreCompound(type) {
+	changeTyreCompound(selection) {
 		protectionOn(true, true)
 
 		try {
 			if (this.requirePitstopMFD() && this.selectPitstopOption("Tyre Compound"))
-				if (InStr(type, "Wet") = 1)
+				if (InStr(selection, "Wet") = 1)
 					this.changePitstopOption("Tyre Compound", "Increase")
-				else if (InStr(type, "Dry") = 1)
+				else if (InStr(selection, "Dry") = 1)
 					this.changePitstopOption("Tyre Compound", "Decrease")
 				else
-					switch type, false {
+					switch selection, false {
 						case "Increase", "Decrease":
-							this.changePitstopOption("Tyre Compound", type)
+							this.changePitstopOption("Tyre Compound", selection)
 						default:
 							throw "Unsupported selection `"" . selection . "`" detected in ACCPlugin.changeTyreCompound..."
 					}

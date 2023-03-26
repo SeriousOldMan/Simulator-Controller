@@ -907,7 +907,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 
-		SessionDatabase.registerCar(simulator, car, sessionDB.getCarName(simulator, car))
+		SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
 
 		SessionDatabase.registerTrack(simulator, car, track
 									, SessionDatabase.getTrackName(simulator, track, false), SessionDatabase.getTrackName(simulator, track, true))
@@ -1087,6 +1087,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updatePositionsData(data) {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
+			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
+								 , StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", ""))
 	}
 
 	saveSessionState(&sessionSettings, &sessionState) {
@@ -1224,7 +1227,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
 
 	try {
-		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" .dataFile . "`"`", , Hide")
+		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" .dataFile . "`"`"", , "Hide")
 	}
 	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")

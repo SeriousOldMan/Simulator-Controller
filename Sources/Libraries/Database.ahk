@@ -454,7 +454,7 @@ class Database {
 				this.iTableChanged.Delete(name)
 			}
 		}
-		else
+		else if
 			for name, ignore in this.Tables
 				this.flush(name, backup)
 	}

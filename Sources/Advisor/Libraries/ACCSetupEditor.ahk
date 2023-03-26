@@ -119,7 +119,7 @@ class ACCSetup extends FileSetup {
 		for ignore, setting in this.Editor.Advisor.Settings
 			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
 
-		return JSON.print(display, false, "  ")
+		return JSON.print(display, "  ")
 	}
 
 	enable(setting) {

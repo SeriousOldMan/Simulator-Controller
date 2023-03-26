@@ -3350,7 +3350,7 @@ class Rules {
 	sortProductions(productions) {
 		productions := productions.Clone()
 
-		bubbleSort(&productions, (r1, r2)  => r1.Priority < r2.Priority)
+		bubbleSort(&productions, (r1, r2) => r1.Priority < r2.Priority)
 
 		return productions
 	}

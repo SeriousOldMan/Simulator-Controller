@@ -9,14 +9,14 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Database\Libraries\TyresDatabase.ahk
+#Include "TyresDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -27,20 +27,15 @@
 ;;; PressuresEditor                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global pressuresViewer
-global temperaturesDropDown
-global compoundDropDown
-
-global upPressureButton
-global downPressureButton
-global clearPressureButton
-
 class PressuresEditor {
+	iWindow := false
+
 	iSessionDatabase := false
 	iClosed := false
 
 	iPressuresDatabase := false
 
+	iPressuresViewer := false
 	iPressuresListView := false
 
 	iCompounds := []
@@ -51,6 +46,18 @@ class PressuresEditor {
 	iSelectedTemperatures := [false, false]
 
 	iModifications := []
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Field[name] {
+		Get {
+			return this.iWindow[name]
+		}
+	}
 
 	SessionDatabase {
 		Get {
@@ -94,6 +101,12 @@ class PressuresEditor {
 		}
 	}
 
+	PressuresViewer {
+		Get {
+			return this.iPressuresViewer
+		}
+	}
+
 	PressuresListView {
 		Get {
 			return this.iPressuresListView
@@ -103,8 +116,8 @@ class PressuresEditor {
 	__New(sessionDatabase, compound, compoundColor, airTemperature, trackTemperature) {
 		this.iSessionDatabase := sessionDatabase
 		this.iPressuresDatabase := TyresDatabase().getTyresDatabase(sessionDatabase.SelectedSimulator
-																	  , sessionDatabase.SelectedCar
-																	  , sessionDatabase.SelectedTrack)
+																  , sessionDatabase.SelectedCar
+																  , sessionDatabase.SelectedTrack)
 
 		PressuresEditor.Instance := this
 
@@ -114,48 +127,50 @@ class PressuresEditor {
 	createGui(tyreCompound, tyreCompoundColor, airTemperature, trackTemperature) {
 		local sessionDatabase := this.SessionDatabase
 		local compounds := []
-		local weather, ignore, row, compound
+		local weather, ignore, row, compound, pressuresEditorGui
 
-		Gui PE:Default
+		pressuresEditorGui := Gui()
 
-		Gui PE:-Border ; -Caption
-		Gui PE:Color, D0D0D0, D8D8D8
+		this.iWindow := pressuresEditorGui
 
-		Gui PE:Font, s10 Bold, Arial
+		pressuresEditorGui.Opt("-Border -Caption +0x800000")
+		pressuresEditorGui.BackColor := "D0D0D0"
 
-		Gui PE:Add, Text, w388 Center gmovePressuresEditor, % translate("Modular Simulator Controller System")
+		pressuresEditorGui.SetFont("s10 Bold", "Arial")
 
-		Gui PE:Font, s9 Norm, Arial
-		Gui PE:Font, Italic Underline, Arial
+		pressuresEditorGui.Add("Text", "w388 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(pressuresEditorGui, "Session Database.Pressures Editor"))
 
-		Gui PE:Add, Text, x158 YP+20 w88 cBlue Center gopenPressuresDocumentation, % translate("Tyre Pressures")
+		pressuresEditorGui.SetFont("s9 Norm", "Arial")
+		pressuresEditorGui.SetFont("Italic Underline", "Arial")
 
-		Gui PE:Font, s8 Norm, Arial
+		pressuresEditorGui.Add("Text", "x158 YP+20 w88 cBlue Center", translate("Tyre Pressures")).OnEvent("Click", openDocumentation.Bind(pressuresEditorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures"))
 
-		Gui PE:Add, Text, x8 yp+30 w410 0x10
+		pressuresEditorGui.SetFont("s8 Norm", "Arial")
 
-		Gui PE:Font, Norm, Arial
+		pressuresEditorGui.Add("Text", "x8 yp+30 w410 0x10")
 
-		Gui PE:Add, Text, x16 yp+10 w80 h23 +0x200, % translate("Simulator")
-		Gui PE:Add, Text, x100 yp+4 w160 h23, % sessionDatabase.SelectedSimulator
+		pressuresEditorGui.SetFont("Norm", "Arial")
 
-		Gui PE:Add, Text, x16 yp+20 w80 h23 +0x200, % translate("Car")
-		Gui PE:Add, Text, x100 yp+4 w160 h23, % sessionDatabase.getCarName(sessionDatabase.SelectedSimulator, sessionDatabase.SelectedCar)
+		pressuresEditorGui.Add("Text", "x16 yp+10 w80 h23 +0x200", translate("Simulator"))
+		pressuresEditorGui.Add("Text", "x100 yp+4 w160 h23", sessionDatabase.SelectedSimulator)
 
-		Gui PE:Add, Text, x16 yp+20 w80 h23 +0x200, % translate("Track")
-		Gui PE:Add, Text, x100 yp+4 w160 h23, % sessionDatabase.getTrackName(sessionDatabase.SelectedSimulator, sessionDatabase.SelectedTrack)
+		pressuresEditorGui.Add("Text", "x16 yp+20 w80 h23 +0x200", translate("Car"))
+		pressuresEditorGui.Add("Text", "x100 yp+4 w160 h23", sessionDatabase.getCarName(sessionDatabase.SelectedSimulator, sessionDatabase.SelectedCar))
+
+		pressuresEditorGui.Add("Text", "x16 yp+20 w80 h23 +0x200", translate("Track"))
+		pressuresEditorGui.Add("Text", "x100 yp+4 w160 h23", sessionDatabase.getTrackName(sessionDatabase.SelectedSimulator, sessionDatabase.SelectedTrack))
 
 		weather := sessionDatabase.SelectedWeather
 
 		this.iSelectedWeather := weather
 
-		Gui PE:Add, Text, x16 yp+20 w80 h23 +0x200, % translate("Weather")
-		Gui PE:Add, Text, x100 yp+4 w160 h23, % translate(weather)
+		pressuresEditorGui.Add("Text", "x16 yp+20 w80 h23 +0x200", translate("Weather"))
+		pressuresEditorGui.Add("Text", "x100 yp+4 w160 h23", translate(weather))
 
 		for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
 													  , {Select: ["Compound", "Compound.Color"], By: ["Compound", "Compound.Color"]
 													   , Where: {Weather: weather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID}}) {
-			compound := compound(row.Compound, row["Compound.Color"])
+			compound := compound(row["Compound"], row["Compound.Color"])
 
 			if !inList(compounds, compound)
 				compounds.Push(compound)
@@ -165,39 +180,36 @@ class PressuresEditor {
 
 		this.iCompounds := compounds
 
-		Gui PE:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Compound")
+		pressuresEditorGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Compound"))
 
-		Gui PE:Add, DropDownList, x96 yp w100 vcompoundDropDown gchooseCompound, % values2String("|", compounds*)
+		pressuresEditorGui.Add("DropDownList", "x96 yp w100 vcompoundDropDown", compounds).OnEvent("Change", chooseCompound)
+		pressuresEditorGui.Add("DropDownList", "x205 yp w60 AltSubmit vtemperaturesDropDown").OnEvent("Change", chooseTemperatures)
 
-		Gui PE:Add, DropDownList, x205 yp w60 AltSubmit vtemperaturesDropDown gchooseTemperatures
+		pressuresEditorGui.Add("Text", "x270 yp w140 h23 +0x200", substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)}))
 
-		Gui PE:Add, Text, x270 yp w140 h23 +0x200, % substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)})
+		this.iPressuresViewer := pressuresEditorGui.Add("ActiveX", "x16 yp+30 w394 h160 Border vpressuresViewer", "shell.explorer").Value
+		this.PressuresViewer.Navigate("about:blank")
+		this.PressuresViewer.Document.Write("<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 
-		Gui PE:Add, ActiveX, x16 yp+30 w394 h160 Border vpressuresViewer, shell.explorer
+		this.iPressuresListView := pressuresEditorGui.Add("ListView", "x16 yp+170 w394 h160 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit", collect(["Tyre", "Pressure", "#"], translate))
+		this.iPressuresListView.OnEvent("Click", choosePressure)
 
-		pressuresViewer.Navigate("about:blank")
-		pressuresViewer.Document.Write("<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
+		pressuresEditorGui.Add("Button", "x338 yp+162 w23 h23 vupPressureButton").OnEvent("Click", upPressure)
+		pressuresEditorGui.Add("Button", "xp+24 yp w23 h23 vdownPressureButton").OnEvent("Click", downPressure)
+		pressuresEditorGui.Add("Button", "xp+24 yp w23 h23 vclearPressureButton").OnEvent("Click", clearPressure.Bind("Normal"))
 
-		Gui PE:Add, ListView, x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit HwndpressuresListViewHandle gchoosePressure, % values2String("|", collect(["Tyre", "Pressure", "#"], "translate")*) ; NoSort NoSortHdr
+		setButtonIcon(pressuresEditorGui["upPressureButton"], kIconsDirectory . "Up Arrow.ico", 1, "W12 H12 L6 T6 R6 B6")
+		setButtonIcon(pressuresEditorGui["downPressureButton"], kIconsDirectory . "Down Arrow.ico", 1, "W12 H12 L4 T4 R4 B4")
+		setButtonIcon(pressuresEditorGui["clearPressureButton"], kIconsDirectory . "Minus.ico", 1, "W12 H12 L4 T4 R4 B4")
 
-		this.iPressuresListView := pressuresListViewHandle
+		pressuresEditorGui.SetFont("s8 Norm", "Arial")
 
-		Gui PE:Add, Button, x338 yp+162 w23 h23 HWNDupPressureButtonHandle vupPressureButton gupPressure
-		Gui PE:Add, Button, xp+24 yp w23 h23 HWNDdownPressureButtonHandle vdownPressureButton gdownPressure
-		Gui PE:Add, Button, xp+24 yp w23 h23 HWNDclearPressureButtonHandle vclearPressureButton gclearPressure
+		pressuresEditorGui.Add("Text", "x8 yp+30 w410 0x10")
 
-		setButtonIcon(upPressureButtonHandle, kIconsDirectory . "Up Arrow.ico", 1, "W12 H12 L6 T6 R6 B6")
-		setButtonIcon(downPressureButtonHandle, kIconsDirectory . "Down Arrow.ico", 1, "W12 H12 L4 T4 R4 B4")
-		setButtonIcon(clearPressureButtonHandle, kIconsDirectory . "Minus.ico", 1, "W12 H12 L4 T4 R4 B4")
+		pressuresEditorGui.Add("Button", "x126 yp+10 w80 h23 Default", translate("Save")).OnEvent("Click", savePressuresEditor)
+		ogcButtontranslateCancel := pressuresEditorGui.Add("Button", "x214 yp w80 h23", translate("&Cancel")).OnEvent("Click", cancelPressuresEditor)
 
-		Gui PE:Font, s8 Norm, Arial
-
-		Gui PE:Add, Text, x8 yp+30 w410 0x10
-
-		Gui PE:Add, Button, x126 yp+10 w80 h23 Default GsavePressuresEditor, % translate("Save")
-		Gui PE:Add, Button, x214 yp w80 h23 GcancelPressuresEditor, % translate("&Cancel")
-
-		if (compounds.Length() > 0) {
+		if (compounds.Length > 0) {
 			this.loadCompound(compound(tyreCompound, tyreCompoundColor), true)
 			this.loadTemperatures(airTemperature, trackTemperature, true)
 		}
@@ -215,15 +227,15 @@ class PressuresEditor {
 
 		try {
 			for ignore, update in this.iModifications
-				switch update[1] {
+				switch update[1], false {
 					case "Update":
 						entry := database.query("Tyres.Pressures.Distribution", {Where: update[2]})
 
-						if (entry.Length() > 0) {
+						if (entry.Length > 0) {
 							entry := entry[1]
 
-							entry.Count := update[3]
-							entry.Synchronized := kNull
+							entry["Count"] := update[3]
+							entry["Synchronized"] := kNull
 
 							database.changed("Tyres.Pressures.Distribution")
 						}
@@ -233,14 +245,14 @@ class PressuresEditor {
 						for ignore, connector in connectors
 							try {
 								for ignore, row in database.query("Tyres.Pressures.Distribution", {Where: update[2]})
-									if (row.Identifier != kNull)
-										connector.DeleteData("TyresPressuresDistribution", row.Identifier)
+									if (row["Identifier"] != kNull)
+										connector.DeleteData("TyresPressuresDistribution", row["Identifier"])
 							}
 							catch Any as exception {
 								logError(exception, true)
 							}
 
-						database.remove("Tyres.Pressures.Distribution", update[2], Func("always").Bind(true))
+						database.remove("Tyres.Pressures.Distribution", update[2], always.Bind(true))
 				}
 		}
 		finally {
@@ -251,13 +263,15 @@ class PressuresEditor {
 	editPressures() {
 		local x, y
 
-		if getWindowPosition("Session Database.Pressures Editor", x, y)
-			Gui PE:Show, x%x% y%y%
+		this.Window.Opt("+Owner" . this.SessionDatabase.Window.Hwnd)
+
+		if getWindowPosition("Session Database.Pressures Editor", &x, &y)
+			this.Window.Show("x" . x . " y" . y)
 		else
-			Gui PE:Show
+			this.Window.Show()
 
 		loop
-			Sleep 200
+			Sleep(200)
 		until this.iClosed
 
 		try {
@@ -270,7 +284,9 @@ class PressuresEditor {
 				return false
 		}
 		finally {
-			Gui PE:Destroy
+			this.Window.Destroy()
+
+			this.iWindow := false
 		}
 	}
 
@@ -281,28 +297,24 @@ class PressuresEditor {
 	updateState() {
 		local index, count
 
-		Gui PE:Default
-
-		Gui ListView, % this.PressuresListView
-
-		index := LV_GetNext(0)
+		index := this.PressuresListView.GetNext(0)
 
 		if index {
-			LV_GetText(count, index, 3)
+			count := this.PressuresListView.GetText(index, 1)
 
-			GuiControl Enable, upPressureButton
+			this.Field["upPressureButton"].Enabled := true
 
 			if (count > 1)
-				GuiControl Enable, downPressureButton
+				this.Field["downPressureButton"].Enabled := true
 			else
-				GuiControl Disable, downPressureButton
+				this.Field["downPressureButton"].Enabled := false
 
-			GuiControl Enable, clearPressureButton
+			this.Field["clearPressureButton"].Enabled := true
 		}
 		else {
-			GuiControl Disable, upPressureButton
-			GuiControl Disable, downPressureButton
-			GuiControl Disable, clearPressureButton
+			this.Field["upPressureButton"].Enabled := false
+			this.Field["downPressureButton"].Enabled := false
+			this.Field["clearPressureButton"].Enabled := false
 		}
 	}
 
@@ -311,11 +323,9 @@ class PressuresEditor {
 		local temperature, ignore, row, compoundColor
 
 		if (force || (compound != this.SelectedCompound)) {
-			Gui PE:Default
-
 			this.iSelectedCompound := compound
 
-			GuiControl Choose, compoundDropDown, % inList(this.Compounds, compound)
+			this.Field["compoundDropDown"].Choose(inList(this.Compounds, compound))
 
 			splitCompound(compound, &compound, &compoundColor)
 
@@ -335,8 +345,7 @@ class PressuresEditor {
 
 			bubbleSort(&temperatures)
 
-			loop % temperatures.Length()
-			{
+			loop temperatures.Length {
 				temperature := string2Values(translate(" / "), temperatures[A_Index])
 
 				this.Temperatures.Push(Array(temperature[1] + 0, temperature[2] + 0))
@@ -344,9 +353,10 @@ class PressuresEditor {
 				temperatures[A_Index] := (Round(convertUnit("Temperature", temperature[1])) . translate(" / ") . Round(convertUnit("Temperature", temperature[2])))
 			}
 
-			GuiControl, , temperaturesDropDown, % ("|" . values2String("|", temperatures*))
+			this.Field["temperaturesDropDown"].Delete()
+			this.Field["temperaturesDropDown"].Add(temperatures)
 
-			if (temperatures.Length() > 0)
+			if (temperatures.Length > 0)
 				this.loadTemperatures(this.Temperatures[1][1], this.Temperatures[1][2], true)
 			else
 				this.loadPressures(false, false)
@@ -366,7 +376,7 @@ class PressuresEditor {
 				}
 
 			if (airTemperature && trackTemperature) {
-				if ((chosen = 0) && (this.Temperatures.Length() > 0)) {
+				if ((chosen = 0) && (this.Temperatures.Length > 0)) {
 					airTemperature := this.Temperatures[1][1]
 					trackTemperature := this.Temperatures[1][2]
 
@@ -385,31 +395,27 @@ class PressuresEditor {
 				this.loadPressures(false, false)
 			}
 
-			GuiControl Choose, temperaturesDropDown, %chosen%
+			this.Field["temperaturesDropDown"].Choose(chosen)
 		}
 	}
 
 	loadPressures(compound, compoundColor, airTemperature := false, trackTemperature := false) {
-		local tyres := {FL: translate("Front Left"), FR: translate("Front Right")
-					  , RL: translate("Rear Left"), RR: translate("Rear Right")}
+		local tyres := CaseInsenseMap("FL", translate("Front Left"), "FR", translate("Front Right")
+									, "RL", translate("Rear Left"), "RR", translate("Rear Right"))
 		local pressures := []
 		local ignore, row, lastTyre
 
-		Gui PE:Default
-
-		Gui ListView, % this.PressuresListView
-
-		LV_Delete()
+		this.PressuresListView.Delete()
 
 		if (compound && compoundColor) {
 			for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
 														  , {Select: ["Count", "Tyre", "Pressure"]
-														   , Where: {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
-																   , Compound: compound, "Compound.Color": compoundColor
-																   , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature}})
-				pressures.Push(Array(tyres[row.Tyre], displayValue("Float", convertUnit("Pressure", row.Pressure)), row.Count))
+														   , Where: Map("Weather", this.SelectedWeather, "Type", "Cold", "Driver", this.SessionDatabase.SessionDatabase.ID
+																      , "Compound", compound, "Compound.Color", compoundColor
+																	  , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature)})
+				pressures.Push(Array(tyres[row["Tyre"]], displayValue("Float", convertUnit("Pressure", row["Pressure"])), row["Count"]))
 
-			bubbleSort(&pressures, comparePressures)
+			bubbleSort(&pressures, (a, b) => a[1] > b[1])
 
 			lastTyre := false
 
@@ -419,13 +425,13 @@ class PressuresEditor {
 				else
 					lastTyre := pressures[A_Index][1]
 
-			loop % pressures.Length()
-				LV_Add("", pressures[A_Index, 1], pressures[A_Index, 2], pressures[A_Index, 3])
+			loop pressures.Length
+				this.PressuresListView.Add("", pressures[A_Index, 1], pressures[A_Index, 2], pressures[A_Index, 3])
 
-			LV_ModifyCol()
+			this.PressuresListView.ModifyCol()
 
 			loop 3
-				LV_ModifyCol(A_Index, "AutoHdr")
+				this.PressuresListView.ModifyCol(A_Index, "AutoHdr")
 		}
 
 		this.updateState()
@@ -434,8 +440,8 @@ class PressuresEditor {
 
 	savePressures() {
 		local pressuresDB := this.PressuresDatabase
-		local pressures := {}
-		local tyres := {}
+		local pressures := CaseInsenseMap()
+		local tyres := CaseInsenseMap()
 		local airTemperature := this.SelectedTemperatures[1]
 		local trackTemperature := this.SelectedTemperatures[2]
 		local tyre, pressure, count, lastTyre, oldPressure
@@ -448,15 +454,10 @@ class PressuresEditor {
 		tyres[translate("Rear Left")] := "RL"
 		tyres[translate("Rear Right")] := "RR"
 
-		Gui PE:Default
-
-		Gui ListView, % this.PressuresListView
-
-		loop % LV_GetCount()
-		{
-			LV_GetText(tyre, A_Index, 1)
-			LV_GetText(pressure, A_Index, 2)
-			LV_GetText(count, A_Index, 3)
+		loop this.PressuresListView.GetCount() {
+			tyre := this.PressuresListView.GetText(A_Index, 1)
+			pressure := this.PressuresListView.GetText(A_Index, 2)
+			count := this.PressuresListView.GetText(A_Index, 3)
 
 			if (tyre != "")
 				lastTyre := tyres[tyre]
@@ -465,14 +466,14 @@ class PressuresEditor {
 
 			pressures[lastTyre . "." . pressure] := true
 
-			prototype := {Weather: this.SelectedWeather, Driver: this.SessionDatabase.SessionDatabase.ID
-						, Compound: compound, "Compound.Color": compoundColor, Tyre: lastTyre, Type: "Cold"
-						, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-						, Pressure: pressure}
+			prototype := CaseInsenseMap("Weather", this.SelectedWeather, "Driver", this.SessionDatabase.SessionDatabase.ID
+									  , "Compound", compound, "Compound.Color", compoundColor, "Tyre", lastTyre, "Type", "Cold"
+									  , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+									  , "Pressure", pressure)
 
 			oldPressure := pressuresDB.query("Tyres.Pressures.Distribution", {Where: prototype})
 
-			if (oldPressure.Length() > 0) {
+			if (oldPressure.Length > 0) {
 				if (oldPressure[1].Count != count) {
 					oldPressure[1].Count := count
 
@@ -491,16 +492,16 @@ class PressuresEditor {
 
 		for ignore, entry in pressuresDB.query("Tyres.Pressures.Distribution"
 											 , {Select: ["Tyre", "Pressure"]
-											  , Where: {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
-													  , Compound: compound, "Compound.Color": compoundColor
-													  , "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature}})
-			if !pressures.HasKey(entry.Tyre . "." . entry.Pressure) {
-				where := {Weather: this.SelectedWeather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID
-						, Compound: compound, "Compound.Color": compoundColor
-						, "Temperature.Air": airTemperature, "Temperature.Track": trackTemperature
-						, Tyre: Entry.Tyre, Pressure: entry.Pressure}
+											  , Where: Map("Weather", this.SelectedWeather, "Type", "Cold", "Driver", this.SessionDatabase.SessionDatabase.ID
+														 , "Compound", compound, "Compound.Color", compoundColor
+														 , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature)})
+			if !pressures.Has(entry["Tyre"] . "." . entry["Pressure"]) {
+				where := Map("Weather", this.SelectedWeather, "Type", "Cold", "Driver", this.SessionDatabase.SessionDatabase.ID
+						   , "Compound", compound, "Compound.Color", compoundColor
+						   , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
+						   , "Tyre", entry["Tyre"], "Pressure", entry["Pressure"])
 
-				pressuresDB.remove("Tyres.Pressures.Distribution", where, Func("always").Bind(true))
+				pressuresDB.remove("Tyres.Pressures.Distribution", where, always.Bind(true))
 
 				this.iModifications.Push(Array("Remove", where))
 			}
@@ -509,12 +510,10 @@ class PressuresEditor {
 	showStatisticsChart(drawChartFunction) {
 		local before, after, width, height, html
 
-		Gui PE:Default
-
-		pressuresViewer.Document.open()
+		this.PressuresViewer.Document.open()
 
 		if (drawChartFunction && (drawChartFunction != "")) {
-			before =
+			before := "
 			(
 			<html>
 				<meta charset='utf-8'>
@@ -528,12 +527,12 @@ class PressuresEditor {
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
-			)
+			)"
 
-			width := pressuresViewer.Width
-			height := (pressuresViewer.Height - 1)
+			width := this.PressuresViewer.Width
+			height := (this.PressuresViewer.Height - 1)
 
-			after =
+			after := "
 			(
 					</script>
 				</head>
@@ -541,45 +540,40 @@ class PressuresEditor {
 					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
-			)
+			)"
 
 			html := (before . drawChartFunction . after)
 
-			pressuresViewer.Document.write(html)
+			this.PressuresViewer.Document.write(html)
 		}
 		else {
 			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-			pressuresViewer.Document.write(html)
+			this.PressuresViewer.Document.write(html)
 		}
 
-		pressuresViewer.Document.close()
+		this.PressuresViewer.Document.close()
 	}
 
 	updateStatistics() {
 		local drawChartFunction := "function drawChart() {`nvar array = [`n"
-		local tyreData := {}
+		local tyreData := CaseInsenseMap()
 		local tyreDatas := []
 		local lastTyre := false
 		local ignore, index, tyre, pressure, count, maxCount, text
 
-		Gui PE:Default
-
-		Gui ListView, % this.PressuresListView
-
 		for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"]
 			tyreData[translate(tyre)] := Array()
 
-		loop % LV_GetCount()
-		{
-			LV_GetText(tyre, A_Index, 1)
-			LV_GetText(pressure, A_Index, 2)
-			LV_GetText(count, A_Index, 3)
+		loop this.PressuresListView.GetCount() {
+			tyre := this.PressuresListView.GetText(A_Index, 1)
+			pressure := this.PressuresListView.GetText(A_Index, 2)
+			count := this.PressuresListView.GetText(A_Index, 3)
 
 			if (tyre != "")
 				lastTyre := tyre
 
-			loop %count%
+			loop count
 				tyreData[lastTyre].Push(internalValue("Float", pressure))
 		}
 
@@ -594,7 +588,7 @@ class PressuresEditor {
 		for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"] {
 			tyre := translate(tyre)
 
-			loop %maxCount%
+			loop maxCount
 				if (tyreData[tyre].Length() < maxCount)
 					tyreData[tyre].Push(average(tyreData[tyre]))
 				else
@@ -609,10 +603,10 @@ class PressuresEditor {
 		drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 		drawChartFunction .= "`ndata.addColumn('string', '" . translate("Tyre") . "');"
 
-		loop %maxCount%
+		loop maxCount
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Pressure") . A_Space . A_Index . "');"
 
-		text =
+		text := "
 		(
 		data.addColumn({id:'max', type:'number', role:'interval'});
 		data.addColumn({id:'min', type:'number', role:'interval'});
@@ -620,7 +614,7 @@ class PressuresEditor {
 		data.addColumn({id:'median', type:'number', role:'interval'});
 		data.addColumn({id:'mean', type:'number', role:'interval'});
 		data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
-		)
+		)"
 
 		drawChartFunction .= ("`n" . text)
 
@@ -628,19 +622,19 @@ class PressuresEditor {
 
 		drawChartFunction .= ("`n" . getBoxAndWhiskerJSFunctions())
 
-		text =
+		text := "
 		(
 		var options = {
-			backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
+			backgroundColor: 'D8D8D8', chartArea: { left: '10%', top: '5%', right: '5%', bottom: '20%' },
 			legend: { position: 'none' },
-		)
+		)"
 
 		drawChartFunction .= text
 
-		text =
+		text := "
 		(
-			hAxis: { title: '`%tyres`%', gridlines: {count: 0} },
-			vAxis: { title: '`%pressures`%', gridlines: {count: 0} },
+			hAxis: { title: '%tyres%', gridlines: {count: 0} },
+			vAxis: { title: '%pressures%', gridlines: {count: 0} },
 			lineWidth: 0,
 			series: [ { 'color': 'D8D8D8' } ],
 			intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
@@ -648,7 +642,7 @@ class PressuresEditor {
 						min: { style: 'bars', fillOpacity: 1, color: '#777' },
 						mean: { style: 'points', color: 'grey', pointsize: 5 } }
 		};
-		)
+		)"
 
 		drawChartFunction .= ("`n" . substituteVariables(text, {tyres: translate("Tyres"), pressures: translate("Pressure")}))
 
@@ -666,7 +660,7 @@ class PressuresEditor {
 getBoxAndWhiskerJSFunctions() {
 	local script
 
-	script =
+	script := "
 	(
 	/**
 	* Takes an array of input data and returns an
@@ -684,7 +678,7 @@ getBoxAndWhiskerJSFunctions() {
 			var median = getMedian(arr);
 			var average = getAverage(arr);
 
-			if (arr.length `% 2 === 0) {
+			if (arr.length % 2 === 0) {
 				var midUpper = arr.length / 2;
 				var midLower = midUpper - 1;
 
@@ -719,7 +713,7 @@ getBoxAndWhiskerJSFunctions() {
 		* middle-most values. Otherwise the
 		* median is the middle-most value.
 		*/
-		if (length `% 2 === 0) {
+		if (length % 2 === 0) {
 			var midUpper = length / 2;
 			var midLower = midUpper - 1;
 
@@ -741,59 +735,41 @@ getBoxAndWhiskerJSFunctions() {
 			return 0;
 		else {
 			for (var i = 0; i < array.length; i++)
-				value = value + array[i];
+				value := "value + array[i]"
 
 			return value / array.length;
 		}
 	}
-	)
+	)"
 
 	return script
 }
 
-comparePressures(a, b) {
-	return (a[1] > b[1])
+chooseCompound(dropDown, *) {
+	PressuresEditor.Instance.loadCompound(dropDown.Text)
 }
 
-chooseCompound() {
+chooseTemperatures(dropDown, *) {
 	local editor := PressuresEditor.Instance
+	local index := dropDown.Value
 
-	Gui PE:Default
-
-	GuiControlGet compoundDropDown
-
-	editor.loadCompound(compoundDropDown)
+	editor.loadTemperatures(editor.Temperatures[index][1], editor.Temperatures[index][2])
 }
 
-chooseTemperatures() {
-	local editor := PressuresEditor.Instance
-
-	Gui PE:Default
-
-	GuiControlGet temperaturesDropDown
-
-	editor.loadTemperatures(editor.Temperatures[temperaturesDropDown][1], editor.Temperatures[temperaturesDropDown][2])
+choosePressure(*) {
+	PressuresEditor.Instance.updateState()
 }
 
-choosePressure() {
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
-		PressuresEditor.Instance.updateState()
-}
-
-upPressure() {
+upPressure(*) {
 	local editor := PressuresEditor.Instance
 	local index, count
 
-	Gui PE:Default
-
-	Gui ListView, % editor.PressuresListView
-
-	index := LV_GetNext(0)
+	index := editor.PressuresListView.GetNext(0)
 
 	if index {
-		LV_GetText(count, index, 3)
+		count := editor.PressuresListView.GetText(index, 3)
 
-		LV_Modify(index, "Col3", count + 1)
+		editor.PressuresListView.Modify(index, "Col3", count + 1)
 	}
 
 	editor.savePressures()
@@ -801,20 +777,16 @@ upPressure() {
 	editor.updateStatistics()
 }
 
-downPressure() {
+downPressure(*) {
 	local editor := PressuresEditor.Instance
 	local index, count
 
-	Gui PE:Default
-
-	Gui ListView, % editor.PressuresListView
-
-	index := LV_GetNext(0)
+	index := editor.PressuresListView.GetNext(0)
 
 	if index {
-		LV_GetText(count, index, 3)
+		count := editor.PressuresListView.GetText(index, 3)
 
-		LV_Modify(index, "Col3", count - 1)
+		editor.PressuresListView.Modify(index, "Col3", count - 1)
 	}
 
 	editor.savePressures()
@@ -822,27 +794,23 @@ downPressure() {
 	editor.updateStatistics()
 }
 
-clearPressure() {
+clearPressure(*) {
 	local editor := PressuresEditor.Instance
 	local index, tyre, nextTyre
 
-	Gui PE:Default
-
-	Gui ListView, % editor.PressuresListView
-
-	index := LV_GetNext(0)
+	index := editor.PressuresListView.GetNext(0)
 
 	if index {
-		LV_GetText(tyre, index)
+		tyre := editor.PressuresListView.GetText(index)
 
-		if ((tyre != "") && (index < LV_GetCount())) {
-			LV_GetText(nextTyre, index + 1)
+		if ((tyre != "") && (index < editor.PressuresListView.GetCount())) {
+			nextTyre := editor.PressuresListView.GetText(index + 1, 1)
 
 			if (nextTyre = "")
-				LV_Modify(index + 1, "", tyre)
+				editor.PressuresListView.Modify(index + 1, "", tyre)
 		}
 
-		LV_Delete(index)
+		editor.PressuresListView.Delete(index)
 	}
 
 	editor.savePressures()
@@ -850,7 +818,7 @@ clearPressure() {
 	editor.updateStatistics()
 }
 
-savePressuresEditor() {
+savePressuresEditor(*) {
 	protectionOn()
 
 	try {
@@ -861,7 +829,7 @@ savePressuresEditor() {
 	}
 }
 
-cancelPressuresEditor() {
+cancelPressuresEditor(*) {
 	protectionOn()
 
 	try {
@@ -870,12 +838,4 @@ cancelPressuresEditor() {
 	finally {
 		protectionOff()
 	}
-}
-
-movePressuresEditor() {
-	moveByMouse("PE", "Session Database.Pressures Editor")
-}
-
-openPressuresDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#browsing-and-editing-tyre-pressures
 }

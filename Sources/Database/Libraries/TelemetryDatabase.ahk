@@ -25,19 +25,18 @@
 ;;;                    Public Variable Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTelemetrySchemas := {Electronics: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-										 , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"
-										 , "Identifier", "Synchronized"]
-						   , Tyres: ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
-								   , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
-								   , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
-								   , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
-								   , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
-								   , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
-								   , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
-								   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"
-								   , "Identifier", "Synchronized"]}
-
+global kTelemetrySchemas := CaseInsenseMap("Electronics", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+														 , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Map", "TC", "ABS", "Driver"
+														 , "Identifier", "Synchronized"]
+										 , "Tyres", ["Weather", "Temperature.Air", "Temperature.Track", "Tyre.Compound", "Tyre.Compound.Color"
+												   , "Fuel.Remaining", "Fuel.Consumption", "Lap.Time", "Tyre.Laps"
+												   , "Tyre.Pressure.Front.Left", "Tyre.Pressure.Front.Right"
+												   , "Tyre.Pressure.Rear.Left", "Tyre.Pressure.Rear.Right"
+												   , "Tyre.Temperature.Front.Left", "Tyre.Temperature.Front.Right"
+												   , "Tyre.Temperature.Rear.Left", "Tyre.Temperature.Rear.Right"
+												   , "Tyre.Wear.Front.Left", "Tyre.Wear.Front.Right"
+												   , "Tyre.Wear.Rear.Left", "Tyre.Wear.Rear.Right", "Driver"
+												   , "Identifier", "Synchronized"])
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;

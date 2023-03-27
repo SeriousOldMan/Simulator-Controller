@@ -25,15 +25,15 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTyresSchemas := Map("Tyres.Pressures", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
-											  , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
-											  , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
-											  , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
-											  , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"
-											  , "Identifier", "Synchronized"]
-						  , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
-															, "Type", "Tyre", "Pressure", "Count", "Driver"
-															, "Identifier", "Synchronized"])
+global kTyresSchemas := CaseInsenseMap("Tyres.Pressures", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+														 , "Tyre.Pressure.Cold.Front.Left", "Tyre.Pressure.Cold.Front.Right"
+														 , "Tyre.Pressure.Cold.Rear.Left", "Tyre.Pressure.Cold.Rear.Right"
+														 , "Tyre.Pressure.Hot.Front.Left", "Tyre.Pressure.Hot.Front.Right"
+														 , "Tyre.Pressure.Hot.Rear.Left", "Tyre.Pressure.Hot.Rear.Right", "Driver"
+														 , "Identifier", "Synchronized"]
+									 , "Tyres.Pressures.Distribution", ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"
+																	  , "Type", "Tyre", "Pressure", "Count", "Driver"
+																	  , "Identifier", "Synchronized"])
 
 
 ;;;-------------------------------------------------------------------------;;;

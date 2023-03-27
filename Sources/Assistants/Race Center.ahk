@@ -58,7 +58,7 @@ global kEvent := "Event"
 global kSessionReports := concatenate(["Track"], kRaceReports, ["Pressures", "Brakes", "Temperatures", "Free"])
 global kDetailReports := ["Plan", "Stint", "Lap", "Session", "Drivers", "Strategy", "Pitstop", "Pitstops", "Setups"]
 
-global kSessionDataSchemas := {"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
+global kSessionDataSchemas := CaseInsenseMap{"Stint.Data": ["Nr", "Lap", "Driver.Forname", "Driver.Surname", "Driver.Nickname"
 											, "Weather", "Compound", "Lap.Time.Average", "Lap.Time.Best", "Fuel.Consumption", "Accidents"
 											, "Position.Start", "Position.End", "Time.Start", "Driver.ID", "Penalties", "Time.End"]
 							 , "Driver.Data": ["Forname", "Surname", "Nickname", "Nr", "ID"]

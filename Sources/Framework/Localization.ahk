@@ -70,119 +70,119 @@ readLanguage(targetLanguageCode) {
 		logError("Inconsistent translation encountered for `"" . targetLanguageCode . "`" in readLanguage...")
 }
 
-getTemperatureUnit(translate := false) {
+getTemperatureUnit(trans := false) {
 	global vTemperatureUnit
 
-	return (translate ? translate(vTemperatureUnit) : vTemperatureUnit)
+	return (trans ? translate(vTemperatureUnit) : vTemperatureUnit)
 }
 
-getPressureUnit(translate := false) {
+getPressureUnit(trans := false) {
 	global vPressureUnit
 
-	return (translate ? translate(vPressureUnit) : vPressureUnit)
+	return (trans ? translate(vPressureUnit) : vPressureUnit)
 }
 
-getSpeedUnit(translate := false) {
+getSpeedUnit(trans := false) {
 	global vSpeedUnit
 
-	return (translate ? translate(vSpeedUnit) : vSpeedUnit)
+	return (trans ? translate(vSpeedUnit) : vSpeedUnit)
 }
 
-getLengthUnit(translate := false) {
+getLengthUnit(trans := false) {
 	global vLengthUnit
 
-	return (translate ? translate(vLengthUnit) : vLengthUnit)
+	return (trans ? translate(vLengthUnit) : vLengthUnit)
 }
 
-getMassUnit(translate := false) {
+getMassUnit(trans := false) {
 	global vMassUnit
 
-	return (translate ? translate(vMassUnit) : vMassUnit)
+	return (trans ? translate(vMassUnit) : vMassUnit)
 }
 
-getVolumeUnit(translate := false) {
+getVolumeUnit(trans := false) {
 	global vVolumeUnit
 
-	return (translate ? translate(vVolumeUnit) : vVolumeUnit)
+	return (trans ? translate(vVolumeUnit) : vVolumeUnit)
 }
 
-displayTemperatureValue(celsius, round) {
+displayTemperatureValue(celsius, rnd) {
 	global vTemperatureUnit
 
 	switch vTemperatureUnit, false {
 		case "Celsius":
-			return (round ? Round(celsius, 1) : celsius)
+			return (rnd ? Round(celsius, 1) : celsius)
 		case "Fahrenheit":
-			return (round ? Round(((celsius * 1.8) + 32), 1) : ((celsius * 1.8) + 32))
+			return (rnd ? Round(((celsius * 1.8) + 32), 1) : ((celsius * 1.8) + 32))
 		default:
 			throw "Unknown temperature unit detected in displayTemperatureValue..."
 	}
 }
 
-displayPressureValue(psi, round) {
+displayPressureValue(psi, rnd) {
 	global vPressureUnit
 
 	switch vPressureUnit, false {
 		case "PSI":
-			return (round ? Round(psi, 1) : psi)
+			return (rnd ? Round(psi, 1) : psi)
 		case "Bar":
-			return (round ? Round(psi / 14.503773, 2) : (psi / 14.503773))
+			return (rnd ? Round(psi / 14.503773, 2) : (psi / 14.503773))
 		case "KPa":
-			return (round ? Round(psi * 6.894757) : (psi * 6.894757))
+			return (rnd ? Round(psi * 6.894757) : (psi * 6.894757))
 		default:
 			throw "Unknown pressure unit detected in displayPressureValue..."
 	}
 }
 
-displayLengthValue(meter, round) {
+displayLengthValue(meter, rnd) {
 	global vLengthUnit
 
 	switch vLengthUnit, false {
 		case "Meter":
-			return (round ? Round(meter, 1) : meter)
+			return (rnd ? Round(meter, 1) : meter)
 		case "Foot":
-			return (round ? Round(meter * 3.280840) : (meter * 3.280840))
+			return (rnd ? Round(meter * 3.280840) : (meter * 3.280840))
 		default:
 			throw "Unknown length unit detected in displayLengthValue..."
 	}
 }
 
-displaySpeedValue(kmh, round) {
+displaySpeedValue(kmh, rnd) {
 	global vSpeedUnit
 
 	switch vSpeedUnit, false {
 		case "km/h":
-			return (round ? Round(kmh, 1) : kmh)
+			return (rnd ? Round(kmh, 1) : kmh)
 		case "mph":
-			return (round ? Round(kmh / 1.609344, 1) : (kmh / 1.609344))
+			return (rnd ? Round(kmh / 1.609344, 1) : (kmh / 1.609344))
 		default:
 			throw "Unknown speed unit detected in displaySpeedValue..."
 	}
 }
 
-displayMassValue(kilogram, round) {
+displayMassValue(kilogram, rnd) {
 	global vMassUnit
 
 	switch vMassUnit, false {
 		case "Kilogram":
-			return (round ? Round(kilogram, 1) : kilogram)
+			return (rnd ? Round(kilogram, 1) : kilogram)
 		case "Pound":
-			return (round ? Round(kilogram * 2.204623): (kilogram * 2.204623))
+			return (rnd ? Round(kilogram * 2.204623): (kilogram * 2.204623))
 		default:
 			throw "Unknown mass unit detected in displayMassValue..."
 	}
 }
 
-displayVolumeValue(liter, round) {
+displayVolumeValue(liter, rnd) {
 	global vVolumeUnit
 
 	switch vVolumeUnit, false {
 		case "Liter":
-			return (round ? Round(liter, 1) : liter)
+			return (rnd ? Round(liter, 1) : liter)
 		case "Gallon (US)":
-			return (round ? Round(liter / 3.785411, 2) : (liter / 3-785411))
+			return (rnd ? Round(liter / 3.785411, 2) : (liter / 3-785411))
 		case "Gallon (GB)", "Gallon":
-			return (round ? Round(liter / 4.546092, 2) : (liter / 4.546092))
+			return (rnd ? Round(liter / 4.546092, 2) : (liter / 4.546092))
 		default:
 			throw "Unknown volume unit detected in displayVolumeValue..."
 	}
@@ -221,83 +221,83 @@ displayTimeValue(time, arguments*) {
 	}
 }
 
-internalPressureValue(value, round) {
+internalPressureValue(value, rnd) {
 	global vPressureUnit
 
 	switch vPressureUnit, false {
 		case "PSI":
-			return (round ? Round(value, 1) : value)
+			return (rnd ? Round(value, 1) : value)
 		case "Bar":
-			return (round ? Round(value * 14.503773, 2) : (value * 14.503773))
+			return (rnd ? Round(value * 14.503773, 2) : (value * 14.503773))
 		case "KPa":
-			return (round ? Round(value / 6.894757) : (value / 6.894757))
+			return (rnd ? Round(value / 6.894757) : (value / 6.894757))
 		default:
 			throw "Unknown pressure unit detected in internalPressureValue..."
 	}
 }
 
-internalTemperatureValue(value, round) {
+internalTemperatureValue(value, rnd) {
 	global vTemperatureUnit
 
 	switch vTemperatureUnit, false {
 		case "Celsius":
-			return (round ? Round(value, 1) : value)
+			return (rnd ? Round(value, 1) : value)
 		case "Fahrenheit":
-			return (round ? Round((value - 32) / 1.8, 1) : ((value - 32) / 1.8))
+			return (rnd ? Round((value - 32) / 1.8, 1) : ((value - 32) / 1.8))
 		default:
 			throw "Unknown temperature unit detected in internalTemperatureValue..."
 	}
 }
 
-internalLengthValue(value, round) {
+internalLengthValue(value, rnd) {
 	global vLengthUnit
 
 	switch vLengthUnit, false {
 		case "Meter":
-			return (round ? Round(value, 1) : value)
+			return (rnd ? Round(value, 1) : value)
 		case "Foot":
-			return (round ? Round(value / 3.280840) : (value / 3.280840))
+			return (rnd ? Round(value / 3.280840) : (value / 3.280840))
 		default:
 			throw "Unknown length unit detected in internalLengthValue..."
 	}
 }
 
-internalSpeedValue(value, round) {
+internalSpeedValue(value, rnd) {
 	global vSpeedUnit
 
 	switch vSpeedUnit, false {
 		case "km/h":
-			return (round ? Round(value, 1) : value)
+			return (rnd ? Round(value, 1) : value)
 		case "mph":
-			return (round ? Round(value * 1.609344, 1) : (value * 1.609344))
+			return (rnd ? Round(value * 1.609344, 1) : (value * 1.609344))
 		default:
 			throw "Unknown speed unit detected in internalSpeedValue..."
 	}
 }
 
-internalMassValue(value, round) {
+internalMassValue(value, rnd) {
 	global vMassUnit
 
 	switch vMassUnit, false {
 		case "Kilogram":
-			return (round ? Round(value, 1) : value)
+			return (rnd ? Round(value, 1) : value)
 		case "Pound":
-			return (round ? Round(value / 2.204623) : (value / 2.204623))
+			return (rnd ? Round(value / 2.204623) : (value / 2.204623))
 		default:
 			throw "Unknown mass unit detected in internalMassValue..."
 	}
 }
 
-internalVolumeValue(value, round) {
+internalVolumeValue(value, rnd) {
 	global vVolumeUnit
 
 	switch vVolumeUnit, false {
 		case "Liter":
-			return (round ? Round(value, 1) : value)
+			return (rnd ? Round(value, 1) : value)
 		case "Gallon (US)":
-			return (round ? Round(value * 3.785411, 2) : (value * 3.785411))
+			return (rnd ? Round(value * 3.785411, 2) : (value * 3.785411))
 		case "Gallon (GB)", "Gallon":
-			return (round ? Round(value * 4.546092, 2) : (value * 4.546092))
+			return (rnd ? Round(value * 4.546092, 2) : (value * 4.546092))
 		default:
 			throw "Unknown volume unit detected in internalVolumeValue..."
 	}
@@ -588,21 +588,21 @@ getFloatSeparator() {
 	return (vNumberFormat == "#.##" ? "." : ",")
 }
 
-convertUnit(type, value, display := true, round := true) {
+convertUnit(type, value, display := true, rnd := true) {
 	if display {
 		switch type, false {
 			case "Pressure":
-				return displayPressureValue(value, round)
+				return displayPressureValue(value, rnd)
 			case "Temperature":
-				return displayTemperatureValue(value, round)
+				return displayTemperatureValue(value, rnd)
 			case "Length":
-				return displayLengthValue(value, round)
+				return displayLengthValue(value, rnd)
 			case "Speed":
-				return displaySpeedValue(value, round)
+				return displaySpeedValue(value, rnd)
 			case "Mass":
-				return displayMassValue(value, round)
+				return displayMassValue(value, rnd)
 			case "Volume":
-				return displayVolumeValue(value, round)
+				return displayVolumeValue(value, rnd)
 			default:
 				throw "Unknown unit type detected in convertUnit..."
 		}
@@ -610,17 +610,17 @@ convertUnit(type, value, display := true, round := true) {
 	else
 		switch type, false {
 			case "Pressure":
-				return internalPressureValue(value, round)
+				return internalPressureValue(value, rnd)
 			case "Temperature":
-				return internalTemperatureValue(value, round)
+				return internalTemperatureValue(value, rnd)
 			case "Length":
-				return internalLengthValue(value, round)
+				return internalLengthValue(value, rnd)
 			case "Speed":
-				return internalSpeedValue(value, round)
+				return internalSpeedValue(value, rnd)
 			case "Mass":
-				return internalMassValue(value, round)
+				return internalMassValue(value, rnd)
 			case "Volume":
-				return internalVolumeValue(value, round)
+				return internalVolumeValue(value, rnd)
 			default:
 				throw "Unknown unit type detected in convertUnit..."
 		}

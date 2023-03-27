@@ -780,7 +780,7 @@ Gdip_BitmapFromBRA(&BRAFromMemIn, File, Alternate := 0) {
 	OffsetTOC := StrPut(Headers[1], "CP0") + StrPut(Headers[2], "CP0") ;  + 2
 	OffsetData := _Info[2]
 	SearchIndex := Alternate ? 1 : 2
-	TOC := StrGet(&BRAFromMemIn + OffsetTOC, OffsetData - OffsetTOC - 1, "CP0")
+	TOC := StrGet(BRAFromMemIn.Ptr + OffsetTOC, OffsetData - OffsetTOC - 1, "CP0")
 	RX1 := "mi`n)^"
 	Offset := Size := 0
 	If RegExMatch(TOC, RX1 . (Alternate ? File "\|.+?" : "\d+\|" . File) . "\|(\d+)\|(\d+)$", &FileInfo) {
@@ -1594,7 +1594,7 @@ Gdip_SaveBitmapToFile(pBitmap, sOutput, Quality:=75)
 			if !InStr(sString, "*" Extension)
 				continue
 
-			pCodec := &ci+idx
+			pCodec := ci.Ptr+idx
 			break
 		}
 	} else {
@@ -1608,7 +1608,7 @@ Gdip_SaveBitmapToFile(pBitmap, sOutput, Quality:=75)
 			if !InStr(sString, "*" Extension)
 				continue
 
-			pCodec := &ci+76*(A_Index-1)
+			pCodec := ci.Ptr+76*(A_Index-1)
 			break
 		}
 	}
@@ -1631,7 +1631,7 @@ Gdip_SaveBitmapToFile(pBitmap, sOutput, Quality:=75)
 				elem := (24+(A_PtrSize ? A_PtrSize : 4))*(A_Index-1) + 4 + (pad := A_PtrSize = 8 ? 4 : 0)
 				if (NumGet(EncoderParameters, elem+16, "UInt") = 1) && (NumGet(EncoderParameters, elem+20, "UInt") = 6)
 				{
-					_p := elem+&EncoderParameters-pad-4
+					_p := elem+EncoderParameters.Ptr-pad-4
 
 					NumPut("UInt", Quality, NumGet(NumPut("UInt", 4, NumPut("UPtr", 1, _p+0)+20), "UPtr"))
 
@@ -1641,18 +1641,7 @@ Gdip_SaveBitmapToFile(pBitmap, sOutput, Quality:=75)
 		}
 	}
 
-	if (!1)
-	{
-		nSize := DllCall("MultiByteToWideChar", "uint", 0, "uint", 0, "Ptr", sOutput, "int", -1, "Ptr", 0, "int", 0)
-		VarSetStrCapacity(&wOutput, nSize*2)
-		DllCall("MultiByteToWideChar", "uint", 0, "uint", 0, "Ptr", sOutput, "int", -1, "Ptr", wOutput, "int", nSize)
-		VarSetStrCapacity(&wOutput, -1)
-		if !VarSetStrCapacity(&wOutput)
-			return -4
-		_E := DllCall("gdiplus\GdipSaveImageToFile", "Ptr", pBitmap, "Ptr", wOutput, "Ptr", pCodec, "uint", _p ? _p : 0)
-	}
-	else
-		_E := DllCall("gdiplus\GdipSaveImageToFile", "Ptr", pBitmap, "Ptr", sOutput, "Ptr", pCodec, "uint", _p ? _p : 0)
+	_E := DllCall("gdiplus\GdipSaveImageToFile", "Ptr", pBitmap, "Str", sOutput, "Ptr", pCodec, "uint", _p ? _p : 0)
 	return _E ? -5 : 0
 }
 
@@ -1874,14 +1863,7 @@ Gdip_CreateBitmapFromFile(sFile, IconNumber:=1, IconSize:="")
 	}
 	else
 	{
-		if (!1)
-		{
-			VarSetStrCapacity(&wFile, 1024) ; V1toV2: if 'wFile' is NOT a UTF-16 string, use 'wFile := Buffer(1024)'
-			DllCall("kernel32\MultiByteToWideChar", "uint", 0, "uint", 0, "Ptr", sFile, "int", -1, "Ptr", wFile, "int", 512)
-			DllCall("gdiplus\GdipCreateBitmapFromFile", "Ptr", wFile, PtrA, &pBitmap)
-		}
-		else
-			DllCall("gdiplus\GdipCreateBitmapFromFile", "Ptr", sFile, PtrA, &pBitmap)
+		DllCall("gdiplus\GdipCreateBitmapFromFile", "Str", sFile, PtrA, &pBitmap)
 	}
 
 	return pBitmap

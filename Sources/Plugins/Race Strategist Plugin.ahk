@@ -31,9 +31,9 @@ global kRaceStrategistPlugin := "Race Strategist"
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceStrategistPlugin extends RaceAssistantPlugin  {
-	static kLapDataSchemas := {Telemetry: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
-										 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
-										 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear"]}
+	static kLapDataSchemas := CaseInsenseMap("Telemetry", ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
+														 , "Fuel.Consumption", "Fuel.Remaining", "LapTime", "Pitstop", "Map", "TC", "ABS"
+														 , "Compound", "Compound.Color", "Pressures", "Temperatures", "Wear"])
 
 	iRaceStrategist := false
 

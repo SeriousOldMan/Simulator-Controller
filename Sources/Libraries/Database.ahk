@@ -344,10 +344,24 @@ class Database {
 
 	combine(table, query, field, values) {
 		local results := []
-		local ignore, value, result
+		local ignore, key, value, result, where
+
+		query := query.Clone()
+		where := query.Where
+
+		if (where is Map)
+			where := where.Clone()
+		else {
+			where := CaseInsenseMap()
+
+			for key, value in query.Where.OwnProps()
+				where[key] := value
+		}
+
+		query.Where := where
 
 		for ignore, value in values {
-			query.Where[field] := value
+			where[field] := value
 
 			for ignore, result in this.query(table, query)
 				results.Push(result)

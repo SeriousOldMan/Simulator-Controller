@@ -81,7 +81,7 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	NumPut(DW, B, button_il, 12 + ptrSize)		; Bottom Margin
 	NumPut(DW, A, button_il, 16 + ptrSize)		; Alignment
 
-	SendMessage(BCM_SETIMAGELIST := 5634, 0, button_il, , "AHK_ID " . buttonHandle)
+	SendMessage(BCM_SETIMAGELIST := 5634, 0, button_il, , "AHK_ID " . (buttonHandle is Gui.Control) ? buttonHandle.Hwnd : buttonHandle)
 
 	return IL_Add(normal_il, file, index)
 }
@@ -211,6 +211,8 @@ translateMsgBoxButtons(buttonLabels, *) {
 translateYesNoButtons := translateMsgBoxButtons.Bind(["Yes", "No"])
 translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
 translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
+translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
+translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
 
 getControllerActionLabels() {
 	return getControllerActionDefinitions("Labels")

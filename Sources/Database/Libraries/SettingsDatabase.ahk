@@ -24,7 +24,7 @@
 ;;;                         Public Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kSettingsDataSchemas := {Settings: ["Owner", "Car", "Track", "Weather", "Section", "Key", "Value"]}
+global kSettingsDataSchemas := CaseInsenseMap("Settings", ["Owner", "Car", "Track", "Weather", "Section", "Key", "Value"])
 
 
 ;;;-------------------------------------------------------------------------;;;

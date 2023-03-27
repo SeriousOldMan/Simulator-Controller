@@ -26,8 +26,8 @@ global kRaceEngineerPlugin := "Race Engineer"
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceEngineerPlugin extends RaceAssistantPlugin  {
-	static kLapDataSchemas := {Pressures: ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
-										 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot", "Pressures.Losses"]}
+	static kLapDataSchemas := CaseInsenseMap("Pressures", ["Lap", "Simulator", "Car", "Track", "Weather", "Temperature.Air", "Temperature.Track"
+														 , "Compound", "Compound.Color", "Pressures.Cold", "Pressures.Hot", "Pressures.Losses"])
 
 	iPitstopPending := false
 

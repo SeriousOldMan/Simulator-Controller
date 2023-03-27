@@ -504,7 +504,7 @@ launchPad(command := false, arguments*) {
 
 		settingsButton := launchPadGui.Add("Button", "x573 yp+4 w23 h23")
 		settingsButton.OnEvent("Click", modifySettings.Bind(launchPadGui))
-		setButtonIcon(settingsButton.Hwnd, kIconsDirectory . "General Settings.ico", 1)
+		setButtonIcon(settingsButton, kIconsDirectory . "General Settings.ico", 1)
 
 		launchPadGui.Add("Text", "x8 yp+26 w590 0x10")
 

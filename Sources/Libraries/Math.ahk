@@ -33,16 +33,16 @@ maximum(numbers) {
 
 average(numbers) {
 	local avg := 0
-	local ignore, value, count
+	local ignore, value, cnt
 
 	for ignore, value in numbers
 		if isNumber(value)
 			avg += value
 
-	count := count(numbers, false)
+	cnt := count(numbers, false)
 
-	if (count > 0)
-		return (avg / count)
+	if (cnt > 0)
+		return (avg / cnt)
 	else
 		return false
 }
@@ -50,13 +50,17 @@ average(numbers) {
 stdDeviation(numbers) {
 	local avg := average(numbers)
 	local squareSum := 0
-	local ignore, value
+	local ignore, value, cnt
 
-	for ignore, value in numbers
-		if isNumber(value)
-			squareSum += ((value - avg) * (value - avg))
+	cnt := count(numbers, false)
 
-	squareSum := (squareSum / count(numbers, false))
+	if (cnt > 0) {
+		for ignore, value in numbers
+			if isNumber(value)
+				squareSum += ((value - avg) * (value - avg))
+
+		squareSum := (squareSum / cnt)
+	}
 
 	return Sqrt(squareSum)
 }

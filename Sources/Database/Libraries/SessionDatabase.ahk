@@ -42,7 +42,7 @@ global kWetRaceSetup := "WR"
 
 global kSetupTypes := [kDryQualificationSetup, kDryRaceSetup, kWetQualificationSetup, kWetRaceSetup]
 
-global kSessionSchemas := {Drivers: ["ID", "Forname", "Surname", "Nickname", "Identifier", "Synchronized"]}
+global kSessionSchemas := CaseInsenseMap("Drivers", ["ID", "Forname", "Surname", "Nickname", "Identifier", "Synchronized"])
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -1272,19 +1272,22 @@ class SessionDatabase extends ConfigurationItem {
 
 	readNotes(simulator, car, track) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local notes
+		local fileName
 
-		car := this.getCarCode(simulator, car)
+		if (car && (car != true))
+			car := this.getCarCode(simulator, car)
+
+		if (car && (car != true)) {
+			if (track && (track != true))
+				fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Notes.txt")
+			else
+				fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\Notes.txt")
+		}
+		else
+			fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\Notes.txt")
 
 		try {
-			if (track && (track != true))
-				notes := FileRead(kDatabaseDirectory "User\" simulatorCode "\" car "\" track "\Notes.txt")
-			else if (car && (car != true))
-				notes := FileRead(kDatabaseDirectory "User\" simulatorCode "\" car "\Notes.txt")
-			else
-				notes := FileRead(kDatabaseDirectory "User\" simulatorCode "\Notes.txt")
-
-			return notes
+			return FileExist(fileName) ? FileRead(fileName) : ""
 		}
 		catch Any as exception {
 			return ""
@@ -1293,38 +1296,25 @@ class SessionDatabase extends ConfigurationItem {
 
 	writeNotes(simulator, car, track, notes) {
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local fileName
+		local directory, fileName
 
-		car := this.getCarCode(simulator, car)
+		if (car && (car != true))
+			car := this.getCarCode(simulator, car)
 
 		if (car && (car != true)) {
 			if (track && (track != true))
-				fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Notes.txt)"
+				directory := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track
 			else
-				fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\Notes.txt"
+				directory := kDatabaseDirectory . "User\" . simulatorCode . "\" . car
 		}
 		else
-			fileName := kDatabaseDirectory . "User\" . simulatorCode . "\Notes.txt"
+			directory := kDatabaseDirectory . "User\" . simulatorCode
 
-		deleteFile(fileName)
+		DirCreate(directory)
 
-		if (car && (car != true)) {
-			if (track && (track != true)) {
-				DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track)
+		deleteFile(directory . "\Notes.txt")
 
-				FileAppend(notes, kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Notes.txt", "UTF-16")
-			}
-			else {
-				DirCreate(kDatabaseDirectory . "User\" . simulatorCode . "\" car)
-
-				FileAppend(notes, kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\Notes.txt", "UTF-16")
-			}
-		}
-		else {
-			DirCreate(kDatabaseDirectory . "User\" . simulatorCode)
-
-			FileAppend(notes, kDatabaseDirectory . "User\" . simulatorCode . "\Notes.txt", "UTF-16")
-		}
+		FileAppend(notes, directory . "\Notes.txt", "UTF-16")
 	}
 
 	getSetupNames(simulator, car, track, &userSetups, &communitySetups) {
@@ -1374,8 +1364,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		car := this.getCarCode(simulator, car)
 
-		data := false
-		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
+		´fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
 
 		if !FileExist(fileName)
 			fileName := kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
@@ -1386,6 +1375,8 @@ class SessionDatabase extends ConfigurationItem {
 			if file {
 				size := file.Length
 
+				data := Buffer(size)
+
 				file.RawRead(data, size)
 
 				file.Close()
@@ -1395,13 +1386,13 @@ class SessionDatabase extends ConfigurationItem {
 			else {
 				size := 0
 
-				return ""
+				return Buffer(0)
 			}
 		}
 		else {
 			size := 0
 
-			return ""
+			return Buffer(0)
 		}
 	}
 

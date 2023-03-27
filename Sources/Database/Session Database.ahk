@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,20 +25,20 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Application.ahk
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\GDIP.ahk
-#Include ..\Libraries\CLR.ahk
-#Include ..\Database\Libraries\SettingsDatabase.ahk
-#Include ..\Database\Libraries\TelemetryDatabase.ahk
-#Include ..\Database\Libraries\TyresDatabase.ahk
-#Include ..\Assistants\Libraries\PressuresEditor.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\GDIP.ahk"
+#Include "..\Libraries\CLR.ahk"
+#Include "Libraries\SettingsDatabase.ahk"
+#Include "Libraries\TelemetryDatabase.ahk"
+#Include "Libraries\TyresDatabase.ahk"
+#Include "Libraries\PressuresEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -49,128 +49,16 @@ global kOk := "Ok"
 global kCancel := "Cancel"
 global kClose := "Close"
 
-global kSetupNames := {DQ: "Qualifying (Dry)", DR: "Race (Dry)", WQ: "Qualifying (Wet)", WR: "Race (Wet)"}
+global kSetupNames := CaseInsenseMap("DQ", "Qualifying (Dry)", "DR", "Race (Dry)", "WQ", "Qualifying (Wet)", "WR", "Race (Wet)")
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global databaseScopeDropDown
-
-global simulatorDropDown
-global carDropDown
-global trackDropDown
-global weatherDropDown
-
-global notesEdit
-
-global settingsTab
-
-global settingsImg1
-global settingsImg2
-global settingsImg3
-global settingsImg4
-global settingsImg5
-global settingsImg6
-global settingsTab1
-global settingsTab2
-global settingsTab3
-global settingsTab4
-global settingsTab5
-global settingsTab6
-
-global settingDropDown
-global settingValueDropDown
-global settingValueEdit
-global settingValueText
-global settingValueCheck
-
-global addSettingButton
-global deleteSettingButton
-
-global dataSelectCheck
-
-global exportDataButton
-global importDataButton
-global deleteDataButton
-
-global trackDisplay
-
-global trackAutomationNameEdit
-global trackAutomationNameHandle
-global trackAutomationInfoEdit
-global addTrackAutomationButton
-global deleteTrackAutomationButton
-global saveTrackAutomationButton
-
-global uploadStrategyButton
-global downloadStrategyButton
-global renameStrategyButton
-global deleteStrategyButton
-
-global shareStrategyWithCommunityCheck
-global shareStrategyWithTeamServerCheck
-
-global setupTypeDropDown
-global uploadSetupButton
-global downloadSetupButton
-global renameSetupButton
-global deleteSetupButton
-
-global shareSetupWithCommunityCheck
-global shareSetupWithTeamServerCheck
-
-global dryQualificationDropDown
-global uploadDryQualificationButton
-global downloadDryQualificationButton
-global deleteDryQualificationButton
-global dryRaceDropDown
-global uploadDryRaceButton
-global downloadDryRaceButton
-global deleteDryRaceButton
-global wetQualificationDropDown
-global uploadWetQualificationButton
-global downloadWetQualificationButton
-global deleteWetQualificationButton
-global wetRaceDropDown
-global uploadWetRaceButton
-global downloadWetRaceButton
-global deleteWetRaceButton
-
-global driverDropDown
-global editPressuresButton
-global tyreCompoundDropDown
-global airTemperatureEdit
-global trackTemperatureEdit
-
-global flPressure1
-global flPressure2
-global flPressure3
-global flPressure4
-global flPressure5
-
-global frPressure1
-global frPressure2
-global frPressure3
-global frPressure4
-global frPressure5
-
-global rlPressure1
-global rlPressure2
-global rlPressure3
-global rlPressure4
-global rlPressure5
-
-global rrPressure1
-global rrPressure2
-global rrPressure3
-global rrPressure4
-global rrPressure5
-
-global transferPressuresButton
-
 class SessionDatabaseEditor extends ConfigurationItem {
+	iWindow := false
+
 	iRequestorPID := false
 	iSettingDescriptors := newMultiMap()
 
@@ -188,7 +76,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	iTyreCompound := false
 	iTyreCompoundColor := false
 
-	iAvailableModules := {Settings: false, Setups: false, Pressures: false}
+	iAvailableModules := CaseInsenseMap("Settings", false, "Setups", false, "Pressures", false)
 	iSelectedModule := false
 
 	iSelectedSetupType := false
@@ -211,6 +99,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	iSettings := []
 
+	iSelectedValue := false
+
 	class EditorTyresDatabase extends TyresDatabase {
 		__New(controllerState := false) {
 			super.__New()
@@ -221,7 +111,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	Window {
 		Get {
-			return "SDE"
+			return this.iWindow
+		}
+	}
+
+	Field[name] {
+		Get {
+			return this.iWindow[name]
 		}
 	}
 
@@ -393,38 +289,40 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		SessionDatabaseEditor.Instance := this
 
-		OnMessage(0x0200, "WM_MOUSEMOVE")
+		OnMessage(0x0200, WM_MOUSEMOVE)
 	}
 
 	createGui(configuration) {
 		local window := this.Window
-		local x, y, car, track, weather, simulators, simulator, choices, chosen, tabs
+		local x, y, car, track, weather, simulators, simulator, choices, chosen, tabs, button, editorGui
 
-		Gui %window%:Default
+		editorGui := Gui()
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		this.iWindow := editorGui
 
-		Gui %window%:Font, s10 Bold, Arial
+		editorGui.Opt("-Border -Caption +0x800000")
+		editorGui.BackColor := "D0D0D0"
 
-		Gui %window%:Add, Text, w664 Center gmoveSessionDatabaseEditor, % translate("Modular Simulator Controller System")
+		editorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+		editorGui.Add("Text", "w664 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Session Database"))
 
-		Gui %window%:Add, Text, x258 YP+20 w164 cBlue Center gopenSessionDatabaseEditorDocumentation, % translate("Session Database")
+		editorGui.SetFont("s9 Norm", "Arial")
+		editorGui.SetFont("Italic Underline", "Arial")
 
-		Gui %window%:Add, Text, x8 yp+30 w670 0x10
+		editorGui.Add("Text", "x258 YP+20 w164 cBlue Center", translate("Session Database")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold, Arial
+		editorGui.Add("Text", "x8 yp+30 w670 0x10")
 
-		Gui %window%:Add, Picture, x16 yp+12 w30 h30 Section, %kIconsDirectory%Road.ico
-		Gui %window%:Add, Text, x50 yp+5 w120 h26, % translate("Selection")
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section", kIconsDirectory . "Road.ico")
+		editorGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
 
-		Gui %window%:Add, Text, x16 yp+32 w80 h23 +0x200, % translate("Simulator")
+		editorGui.SetFont("s8 Norm", "Arial")
+
+		editorGui.Add("Text", "x16 yp+32 w80 h23 +0x200", translate("Simulator"))
 
 		car := this.SelectedCar
 		track := this.SelectedTrack
@@ -433,7 +331,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		simulators := this.getSimulators()
 		simulator := 0
 
-		if (simulators.Length() > 0) {
+		if (simulators.Length > 0) {
 			if this.SelectedSimulator
 				simulator := inList(simulators, this.SelectedSimulator)
 
@@ -441,289 +339,280 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				simulator := 1
 		}
 
-		Gui %window%:Add, DropDownList, x100 yp w160 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
+		editorGui.Add("DropDownList", "x100 yp w160 vsimulatorDropDown Choose" . simulator, simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
 		else
 			simulator := false
 
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Car")
-		Gui %window%:Add, DropDownList, x100 yp w160 Choose1 vcarDropDown gchooseCar, % translate("All")
+		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Car"))
+		editorGui.Add("DropDownList", "x100 yp w160 vcarDropDown Choose1", [translate("All")]).OnEvent("Change", chooseCar)
 
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
-		Gui %window%:Add, DropDownList, x100 yp w160 Choose1 vtrackDropDown gchooseTrack, % translate("All")
+		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Track"))
+		editorGui.Add("DropDownList", "x100 yp w160 vtrackDropDown Choose1", [translate("All")]).OnEvent("Change", chooseTrack)
 
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Weather")
+		editorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Weather"))
 
-		choices := collect(kWeatherConditions, "translate")
+		choices := collect(kWeatherConditions, translate)
 		choices.InsertAt(1, translate("All"))
 		chosen := inList(kWeatherConditions, weather)
 
-		if (!chosen && (choices.Length() > 0)) {
+		if (!chosen && (choices.Length > 0)) {
 			weather := true
 			chosen := 1
 		}
 
-		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
+		editorGui.Add("DropDownList", "x100 yp w160 vweatherDropDown Choose" . chosen, choices).OnEvent("Change", chooseWeather)
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold, Arial
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Picture, x280 ys w30 h30 Section, %kIconsDirectory%Report.ico
-		Gui %window%:Add, Text, xp+34 yp+5 w120 h26, % translate("Notes")
+		editorGui.Add("Picture", "x280 ys w30 h30 Section", kIconsDirectory . "Report.ico")
+		editorGui.Add("Text", "xp+34 yp+5 w120 h26", translate("Notes"))
 
-		Gui %window%:Add, Button, x647 yp w23 h23 HwndgeneralSettingsButtonHandle gshowSettings
-		setButtonIcon(generalSettingsButtonHandle, kIconsDirectory . "General Settings.ico", 1)
+		button := editorGui.Add("Button", "x647 yp w23 h23")
+		button.OnEvent("Click", showSettings)
+		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
 
-		Gui %window%:Font, s8 Norm, Arial
+		editorGui.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, Edit, x280 yp+32 w390 h94 -Background gupdateNotes vnotesEdit
+		editorGui.Add("Edit", "x280 yp+32 w390 h94 -Background vnotesEdit").OnEvent("Change", updateNotes)
 
-		Gui %window%:Add, Text, x16 yp+104 w654 0x10
+		editorGui.Add("Text", "x16 yp+104 w654 0x10")
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold, Arial
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Picture, x16 yp+12 w30 h30 Section vsettingsImg1 gchooseTab1, %kIconsDirectory%General Settings.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab1 gchooseTab1, % translate("Race Settings")
+		editorGui.Add("Picture", "x16 yp+12 w30 h30 Section vsettingsImg1", kIconsDirectory . "General Settings.ico").OnEvent("Click", chooseTab.Bind("Settings"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab1", translate("Race Settings")).OnEvent("Click", chooseTab.Bind("Settings"))
 
-		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold cGray, Arial
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold cGray", "Arial")
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg2 gchooseTab2, %kIconsDirectory%Strategy.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab2 gchooseTab2, % translate("Strategies")
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg2", kIconsDirectory . "Strategy.ico").OnEvent("Click", chooseTab.Bind("Strategies"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab2", translate("Strategies")).OnEvent("Click", chooseTab.Bind("Strategies"))
 
-		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold cGray, Arial
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold cGray", "Arial")
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg3 gchooseTab3, %kIconsDirectory%Tools BW.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab3 gchooseTab3, % translate("Setups")
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg3", kIconsDirectory . "Tools BW.ico").OnEvent("Click", chooseTab.Bind("Setups"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab3", translate("Setups")).OnEvent("Click", chooseTab.Bind("Setups"))
 
-		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold cGray, Arial
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold cGray", "Arial")
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg4 gchooseTab4, %kIconsDirectory%Pressure.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab4 gchooseTab4, % translate("Tyre Pressures")
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg4", kIconsDirectory . "Pressure.ico").OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab4", translate("Tyre Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
-		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold cGray, Arial
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold cGray", "Arial")
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg5 gchooseTab5, %kIconsDirectory%Road.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab5 gchooseTab5, % translate("Automations")
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg5", kIconsDirectory . "Road.ico").OnEvent("Click", chooseTab.Bind("Automation"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab5", translate("Automations")).OnEvent("Click", chooseTab.Bind("Automation"))
 
-		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold cGray, Arial
+		editorGui.SetFont("Norm")
+		editorGui.SetFont("s10 Bold cGray", "Arial")
 
-		Gui %window%:Add, Picture, x16 yp+10 w30 h30 vsettingsImg6 gchooseTab6, %kIconsDirectory%Sensor.ico
-		Gui %window%:Add, Text, x50 yp+5 w220 h26 vsettingsTab6 gchooseTab6, % translate("Administration")
+		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", kIconsDirectory . "Sensor.ico").OnEvent("Click", chooseTab.Bind("Data"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 vsettingsTab6", translate("Administration")).OnEvent("Click", chooseTab.Bind("Data"))
 
-		Gui %window%:Add, Text, x16 yp+32 w267 0x10
+		editorGui.Add("Text", "x16 yp+32 w267 0x10")
 
-		Gui %window%:Font, s8 Norm cBlack, Arial
+		editorGui.SetFont("s8 Norm cBlack", "Arial")
 
-		Gui %window%:Add, GroupBox, x280 ys-8 w390 h476
+		editorGui.Add("GroupBox", "x280 ys-8 w390 h476")
 
-		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], "translate")
+		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
-		Gui %window%:Add, Tab2, x296 ys+16 w0 h0 -Wrap vsettingsTab Section, % values2String("|", tabs*)
+		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
-		Gui Tab, 1
+		editorGui["settingsTab"].UseTab(1)
 
-		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndsettingsListViewHandle gchooseSetting, % values2String("|", collect(["Setting", "Value"], "translate")*)
+		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h326 -Multi -LV0x10 BackgroundD8D8D8 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
+		this.iSettingsListView.OnEvent("Click", chooseSetting)
 
-		this.iSettingsListView := settingsListViewHandle
+		editorGui.Add("Text", "x296 yp+332 w80 h23 +0x200", translate("Setting"))
+		editorGui.Add("DropDownList", "xp+90 yp w270 vsettingDropDown").OnEvent("Change", selectSetting)
 
-		Gui %window%:Add, Text, x296 yp+332 w80 h23 +0x200, % translate("Setting")
-		Gui %window%:Add, DropDownList, xp+90 yp w270 vsettingDropDown gselectSetting
+		editorGui.Add("Text", "x296 yp+24 w80 h23 +0x200", translate("Value"))
+		editorGui.Add("DropDownList", "xp+90 yp w180 vsettingValueDropDown").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w50 vsettingValueEdit").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w210 h57 vsettingValueText").OnEvent("Change", changeSetting)
+		editorGui.Add("CheckBox", "xp yp+4 vsettingValueCheck").OnEvent("Click", changeSetting)
 
-		Gui %window%:Add, Text, x296 yp+24 w80 h23 +0x200, % translate("Value")
-		Gui %window%:Add, DropDownList, xp+90 yp w180 vsettingValueDropDown gchangeSetting
-		Gui %window%:Add, Edit, xp yp w50 vsettingValueEdit gchangeSetting
-		Gui %window%:Add, Edit, xp yp w210 h57 vsettingValueText gchangeSetting
-		Gui %window%:Add, CheckBox, xp yp+4 vsettingValueCheck gchangeSetting
+		editorGui.Add("Button", "x606 yp+30 w23 h23 vaddSettingButton").OnEvent("Click", addSetting)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteSettingButton").OnEvent("Click", deleteSetting)
+		setButtonIcon(editorGui["addSettingButton"], kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(editorGui["deleteSettingButton"], kIconsDirectory . "Minus.ico", 1)
 
-		Gui %window%:Add, Button, x606 yp+30 w23 h23 HWNDaddSettingButtonHandle gaddSetting vaddSettingButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSettingButtonHandle gdeleteSetting vdeleteSettingButton
-		setButtonIcon(addSettingButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		setButtonIcon(deleteSettingButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		editorGui.Add("Button", "x440 yp+30 w80 h23", translate("Test...")).OnEvent("Click", testSettings.Bind("Normal"))
 
-		Gui %window%:Add, Button, x440 yp+30 w80 h23 gtestSettings, % translate("Test...")
+		editorGui["settingsTab"].UseTab(2)
 
-		Gui Tab, 2
+		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h326 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iStrategyListView.OnEvent("Click", chooseStrategy)
 
-		Gui %window%:Add, ListView, x296 ys w360 h326 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseStrategy, % values2String("|", collect(["Source", "Name"], "translate")*)
+		editorGui.Add("Button", "xp+260 yp+328 w23 h23 vuploadStrategyButton").OnEvent("Click", uploadStrategy)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vdownloadStrategyButton").OnEvent("Click", downloadStrategy)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vrenameStrategyButton").OnEvent("Click", renameStrategy)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteStrategyButton").OnEvent("Click", deleteStrategy)
+		setButtonIcon(editorGui["uploadStrategyButton"], kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(editorGui["downloadStrategyButton"], kIconsDirectory . "Download.ico", 1)
+		setButtonIcon(editorGui["renameStrategyButton"], kIconsDirectory . "Pencil.ico", 1)
+		setButtonIcon(editorGui["deleteStrategyButton"], kIconsDirectory . "Minus.ico", 1)
 
-		this.iStrategyListView := listViewHandle
+		editorGui.Add("Text", "x296 yp w80 h23 +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess) ; -Theme
+		editorGui.Add("CheckBox", "xp yp+24 w140 vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess) ; -Theme
 
-		Gui %window%:Add, Button, xp+260 yp+328 w23 h23 HwnduploadStrategyButtonHandle guploadStrategy vuploadStrategyButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadStrategyButtonHandle gdownloadStrategy vdownloadStrategyButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameStrategyButtonHandle grenameStrategy vrenameStrategyButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteStrategyButtonHandle gdeleteStrategy vdeleteStrategyButton
-		setButtonIcon(uploadStrategyButtonHandle, kIconsDirectory . "Upload.ico", 1)
-		setButtonIcon(downloadStrategyButtonHandle, kIconsDirectory . "Download.ico", 1)
-		setButtonIcon(renameStrategyButtonHandle, kIconsDirectory . "Pencil.ico", 1)
-		setButtonIcon(deleteStrategyButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		editorGui["settingsTab"].UseTab(3)
 
-		Gui %window%:Add, Text, x296 yp w80 h23 +0x200, % translate("Share")
-		Gui %window%:Add, CheckBox, xp+90 yp+4 w140 vshareStrategyWithCommunityCheck gupdateStrategyAccess, % translate("with Community") ; -Theme
-		Gui %window%:Add, CheckBox, xp yp+24 w140 vshareStrategyWithTeamServerCheck gupdateStrategyAccess, % translate("on Team Server") ; -Theme
+		editorGui.Add("Text", "x296 ys w80 h23 +0x200", translate("Purpose"))
+		editorGui.Add("DropDownList", "xp+90 yp w270 Choose2 vsetupTypeDropDown"
+					, collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], translate)).OnEvent("Change", chooseSetupType)
 
-		Gui Tab, 3
+		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h302 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSetupListView.OnEvent("Click", chooseSetup)
 
-		Gui %window%:Add, Text, x296 ys w80 h23 +0x200, % translate("Purpose")
-		Gui %window%:Add, DropDownList, xp+90 yp w270 AltSubmit Choose2 vsetupTypeDropDown gchooseSetupType, % values2String("|", collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], "translate")*)
-
-		Gui %window%:Add, ListView, x296 yp+24 w360 h302 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gchooseSetup, % values2String("|", collect(["Source", "Name"], "translate")*)
-
-		this.iSetupListView := listViewHandle
 		this.iSelectedSetupType := kDryRaceSetup
 
-		Gui %window%:Add, Button, xp+260 yp+304 w23 h23 HwnduploadSetupButtonHandle guploadSetup vuploadSetupButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddownloadSetupButtonHandle gdownloadSetup vdownloadSetupButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwndrenameSetupButtonHandle grenameSetup vrenameSetupButton
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteSetupButtonHandle gdeleteSetup vdeleteSetupButton
-		setButtonIcon(uploadSetupButtonHandle, kIconsDirectory . "Upload.ico", 1)
-		setButtonIcon(downloadSetupButtonHandle, kIconsDirectory . "Download.ico", 1)
-		setButtonIcon(renameSetupButtonHandle, kIconsDirectory . "Pencil.ico", 1)
-		setButtonIcon(deleteSetupButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		editorGui.Add("Button", "xp+260 yp+304 w23 h23 vuploadSetupButton").OnEvent("Click", uploadSetup)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vdownloadSetupButton").OnEvent("Click", downloadSetup)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vrenameSetupButton").OnEvent("Click", renameSetup)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteSetupButton").OnEvent("Click", deleteSetup)
+		setButtonIcon(editorGui["uploadSetupButton"], kIconsDirectory . "Upload.ico", 1)
+		setButtonIcon(editorGui["downloadSetupButton"], kIconsDirectory . "Download.ico", 1)
+		setButtonIcon(editorGui["renameSetupButton"], kIconsDirectory . "Pencil.ico", 1)
+		setButtonIcon(editorGui["deleteSetupButton"], kIconsDirectory . "Minus.ico", 1)
 
-		Gui %window%:Add, Text, x296 yp w80 h23 +0x200, % translate("Share")
-		Gui %window%:Add, CheckBox, xp+90 yp+4 w140 vshareSetupWithCommunityCheck gupdateSetupAccess, % translate("with Community") ; -Theme
-		Gui %window%:Add, CheckBox, xp yp+24 w140 vshareSetupWithTeamServerCheck gupdateSetupAccess, % translate("on Team Server") ; -Theme
+		editorGui.Add("Text", "x296 yp w80 h23 +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
+		editorGui.Add("CheckBox", "xp yp+24 w140 vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
 
-		Gui Tab, 4
+		editorGui["settingsTab"].UseTab(4)
 
-		Gui %window%:Add, Text, x296 ys w85 h23 +0x200, % translate("Driver")
-		Gui %window%:Add, DropDownList, x386 yp w100 vdriverDropDown gloadPressures
+		editorGui.Add("Text", "x296 ys w85 h23 +0x200", translate("Driver"))
+		editorGui.Add("DropDownList", "x386 yp w100 vdriverDropDown").OnEvent("Change", loadPressures)
 
-		Gui %window%:Add, Button, x494 yp w22 h22 HWNDeditPressuresButtonHandle veditPressuresButton geditPressures
-		setButtonIcon(editPressuresButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L2 T2 R2 B2")
+		editorGui.Add("Button", "x494 yp w22 h22 veditPressuresButton").OnEvent("Click", editPressures)
+		setButtonIcon(editorGui["editPressuresButton"], kIconsDirectory . "Pencil.ico", 1, "L2 T2 R2 B2")
 
-		Gui %window%:Add, Text, x296 yp+24 w85 h23 +0x200, % translate("Compound")
-		Gui %window%:Add, DropDownList, x386 yp w100 AltSubmit gloadPressures vtyreCompoundDropDown
+		editorGui.Add("Text", "x296 yp+24 w85 h23 +0x200", translate("Compound"))
+		editorGui.Add("DropDownList", "x386 yp w100 vtyreCompoundDropDown").OnEvent("Change", loadPressures)
 
-		Gui %window%:Add, Edit, x494 yp w40 -Background Number Limit2 gloadPressures vairTemperatureEdit, % Round(convertUnit("Temperature", this.iAirTemperature))
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iAirTemperature))
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature", true)})
+		editorGui.Add("Edit", "x494 yp w40 -Background Number Limit2 vairTemperatureEdit"
+					, Round(convertUnit("Temperature", this.iAirTemperature))).OnEvent("Change", loadPressures)
+		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range0-99", Round(convertUnit("Temperature", this.iAirTemperature)))
+		editorGui.Add("Text", "xp+42 yp+2 w120 h23 +0x200", substituteVariables(translate("Temp. Air (%unit%)"), {unit: getUnit("Temperature", true)}))
 
-		Gui %window%:Add, Edit, x494 yp+24 w40 -Background Number Limit2 gloadPressures vtrackTemperatureEdit, % Round(convertUnit("Temperature", this.iTrackTemperature))
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range0-99, % Round(convertUnit("Temperature", this.iTrackTemperature))
-		Gui %window%:Add, Text, xp+42 yp+2 w120 h23 +0x200, % substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature", true)})
+		editorGui.Add("Edit", "x494 yp+24 w40 -Background Number Limit2 vtrackTemperatureEdit"
+					, Round(convertUnit("Temperature", this.iTrackTemperature))).OnEvent("Change", loadPressures)
+		editorGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range0-99", Round(convertUnit("Temperature", this.iTrackTemperature)))
+		editorGui.Add("Text", "xp+42 yp+2 w120 h23 +0x200", substituteVariables(translate("Temp. Track (%unit%)"), {unit: getUnit("Temperature", true)}))
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Bold Italic, Arial
+		editorGui.SetFont("Norm", "Arial")
+		editorGui.SetFont("Bold Italic", "Arial")
 
-		Gui %window%:Add, Text, x342 yp+30 w267 0x10
-		Gui %window%:Add, Text, x296 yp+10 w370 h20 Center BackgroundTrans, % substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure")})
+		editorGui.Add("Text", "x342 yp+30 w267 0x10")
+		editorGui.Add("Text", "x296 yp+10 w370 h20 Center BackgroundTrans", substituteVariables(translate("Pressures (%unit%)"), {unit: getUnit("Pressure")}))
 
-		Gui %window%:Font, Norm, Arial
+		editorGui.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Front Left")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vflPressure1, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure2, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vflPressure3, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure4, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vflPressure5, % displayValue("Float", 0.0)
+		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Front Left"))
+		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vflPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vflPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vflPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vflPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vflPressure5", displayValue("Float", 0.0))
 
-		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Front Right")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vfrPressure1, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure2, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vfrPressure3, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure4, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vfrPressure5, % displayValue("Float", 0.0)
+		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Front Right"))
+		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vfrPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vfrPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vfrPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vfrPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vfrPressure5", displayValue("Float", 0.0))
 
-		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Rear Left")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vrlPressure1, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure2, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vrlPressure3, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure4, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrlPressure5, % displayValue("Float", 0.0)
+		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Rear Left"))
+		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vrlPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrlPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vrlPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrlPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrlPressure5", displayValue("Float", 0.0))
 
-		Gui %window%:Add, Text, x296 yp+30 w85 h23 +0x200, % translate("Rear Right")
-		Gui %window%:Add, Edit, xp+90 yp w50 Disabled Center vrrPressure1, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure2, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Center +Background vrrPressure3, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure4, % displayValue("Float", 0.0)
-		Gui %window%:Add, Edit, xp+54 yp w50 Disabled Center vrrPressure5, % displayValue("Float", 0.0)
+		editorGui.Add("Text", "x296 yp+30 w85 h23 +0x200", translate("Rear Right"))
+		editorGui.Add("Edit", "xp+90 yp w50 Disabled Center vrrPressure1", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure2", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Center +Background vrrPressure3", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure4", displayValue("Float", 0.0))
+		editorGui.Add("Edit", "xp+54 yp w50 Disabled Center vrrPressure5", displayValue("Float", 0.0))
 
 		if this.RequestorPID
-			Gui %window%:Add, Button, x440 yp+50 w80 h23 gtransferPressures vtransferPressuresButton, % translate("Load")
+			editorGui.Add("Button", "x440 yp+50 w80 h23 vtransferPressuresButton", translate("Load")).OnEvent("Click", transferPressures)
 
-		Gui Tab, 5
+		editorGui["settingsTab"].UseTab(5)
 
 		this.iTrackDisplayArea := [297, 239, 358, 350, 0, 0]
 
-		Gui %window%:Add, Picture, x296 y238 w360 h352 Border
-		Gui %window%:Add, Picture, x297 y239 w358 h350 HWNDtrackDisplay vtrackDisplay gselectTrackAction
+		editorGui.Add("Picture", "x296 y238 w360 h352 Border")
+		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 w358 h350 vtrackDisplay")
+		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
-		this.iTrackDisplay := trackDisplay
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 
-		Gui %window%:Add, ListView, x296 y597 w110 h85 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDtrackAutomationsListViewHandle gselectTrackAutomation, % values2String("|", collect(["Name", "#"], "translate")*)
+		editorGui.Add("Text", "x415 yp w60 h23 +0x200", translate("Name"))
+		editorGui.Add("Edit", "xp+60 yp w109 vtrackAutomationNameEdit")
 
-		this.iTrackAutomationsListView := trackAutomationsListViewHandle
+		editorGui.Add("Button", "x584 yp w23 h23 vaddTrackAutomationButton").OnEvent("Click", addTrackAutomation)
+		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteTrackAutomationButton").OnEvent("Click", deleteTrackAutomation)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Center +0x200 vsaveTrackAutomationButton").OnEvent("Click", saveTrackAutomation)
+		setButtonIcon(editorGui["addTrackAutomationButton"], kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(editorGui["deleteTrackAutomationButton"], kIconsDirectory . "Minus.ico", 1)
+		setButtonIcon(editorGui["saveTrackAutomationButton"], kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		Gui %window%:Add, Text, x415 yp w60 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, xp+60 yp w109 HWNDtrackAutomationNameHandle vtrackAutomationNameEdit
+		editorGui.Add("Text", "x415 yp+24 w60 h23 +0x200", translate("Actions"))
+		editorGui.Add("Edit", "xp+60 yp w181 h61 ReadOnly -Wrap vtrackAutomationInfoEdit")
 
-		Gui %window%:Add, Button, x584 yp w23 h23 HWNDaddTrackAutomationButtonHandle vaddTrackAutomationButton gaddTrackAutomation
-		Gui %window%:Add, Button, xp+25 yp w23 h23 HwnddeleteTrackAutomationButtonHandle vdeleteTrackAutomationButton gdeleteTrackAutomation
-		Gui %window%:Add, Button, xp+25 yp w23 h23 Center +0x200 HWNDsaveTrackAutomationButtonHandle vsaveTrackAutomationButton gsaveTrackAutomation
-		setButtonIcon(addTrackAutomationButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		setButtonIcon(deleteTrackAutomationButtonHandle, kIconsDirectory . "Minus.ico", 1)
-		setButtonIcon(saveTrackAutomationButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
+		editorGui["settingsTab"].UseTab(6)
 
-		Gui %window%:Add, Text, x415 yp+24 w60 h23 +0x200, % translate("Actions")
-		Gui %window%:Add, Edit, xp+60 yp w181 h61 ReadOnly -Wrap vtrackAutomationInfoEdit
+		editorGui.Add("CheckBox", "+Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
 
-		Gui Tab, 6
+		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
+		this.iAdministrationListView.OnEvent("Click", noSelect)
+		this.iAdministrationListView.OnEvent("DoubleClick", noSelect)
 
-		Gui %window%:Add, CheckBox, +Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck gselectAllData
+		editorGui.Add("Button", "x314 yp+419 w90 h23 vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
+		editorGui.Add("Button", "xp+95 yp w90 h23 vimportDataButton", translate("Import...")).OnEvent("Click", importData)
 
-		Gui %window%:Add, ListView, x314 ys w342 h404 -Multi -LV0x10 Checked AltSubmit HwndadministrationListViewHandle gselectData, % values2String("|", collect(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
+		editorGui.Add("Button", "x566 yp w90 h23 vdeleteDataButton", translate("Delete...")).OnEvent("Click", deleteData)
 
-		this.iAdministrationListView := administrationListViewHandle
+		editorGui["settingsTab"].UseTab()
 
-		Gui %window%:Add, Button, x314 yp+419 w90 h23 vexportDataButton gexportData, % translate("Export...")
-		Gui %window%:Add, Button, xp+95 yp w90 h23 vimportDataButton gimportData, % translate("Import...")
-
-		Gui %window%:Add, Button, x566 yp w90 h23 vdeleteDataButton gdeleteData, % translate("Delete...")
-
-		Gui Tab
-
-		Gui %window%:Add, Text, x16 ys+277 w100 h23 +0x200, % translate("Available Data")
+		editorGui.Add("Text", "x16 ys+277 w100 h23 +0x200", translate("Available Data"))
 
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
-		Gui %window%:Add, DropDownList, x120 yp w140 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", collect(choices, "translate")*)
+		editorGui.Add("DropDownList", "x120 yp w140 AltSubmit Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
-		Gui %window%:Add, ListView, x16 ys+301 w244 h151 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDlistViewHandle gnoSelect, % values2String("|", collect(["Source", "Type", "#"], "translate")*)
+		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
+		this.iDataListView.OnEvent("Click", noSelect)
+		this.iDataListView.OnEvent("DoubleClick", noSelect)
+		editorGui.Add("Text", "x8 y700 w670 0x10")
 
-		this.iDataListView := listViewHandle
-
-		Gui %window%:Add, Text, x8 y700 w670 0x10
-
-		/*
-		choices := ["User", "User & Community"]
-		chosen := (this.UseCommunity ? 2 : 1)
-
-		Gui %window%:Add, Text, x16 y661 w55 h23 +0x200, % translate("Scope")
-		Gui %window%:Add, DropDownList, x100 yp w160 AltSubmit Choose%chosen% gchooseDatabaseScope vdatabaseScopeDropDown, % values2String("|", collect(choices, "translate")*)
-		*/
-
-
-		Gui %window%:Add, Button, x304 y708 w80 h23 GcloseSessionDatabaseEditor, % translate("Close")
+		editorGui.Add("Button", "x304 y708 w80 h23", translate("Close")).OnEvent("Click", closeSessionDatabaseEditor)
 
 		this.loadSimulator(simulator, true)
 		this.loadCar(car, true)
@@ -742,10 +631,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local x, y
 
-		if getWindowPosition("Session Database", x, y)
-			Gui %window%:Show, x%x% y%y%
+		if getWindowPosition("Session Database", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui %window%:Show
+			window.Show()
 	}
 
 	getSimulators() {
@@ -762,7 +651,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if !car
 			return []
 		else if ((car == true) || (car = "*")) {
-			if (this.iAllTracks.Length() > 0)
+			if (this.iAllTracks.Length > 0)
 				return this.iAllTracks
 			else {
 				tracks := []
@@ -800,10 +689,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	updateState() {
 		local window := this.Window
 		local sessionDB := this.SessionDatabase
-		local simulator, car, track, defaultListView, selected, selectedEntries, row, type
+		local simulator, car, track, selected, selectedEntries, row, type
 		local name, info, index, driver
-
-		Gui %window%:Default
 
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar
@@ -816,304 +703,280 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		if this.moduleAvailable("Settings") {
-			GuiControl Enable, settingsImg1
-			GuiControl, , settingsImg1, %kIconsDirectory%General Settings.ico
-			Gui Font, s10 Bold cGray, Arial
+			window["settingsImg1"].Enabled := true
+			window["settingsImg1"].Value := kIconsDirectory . "General Settings.ico"
+			window["settingsTab1"].SetFont("s10 Bold cGray", "Arial")
 		}
 		else {
-			GuiControl Disable, settingsImg1
-			GuiControl, , settingsImg1, %kIconsDirectory%General Settings Gray.ico
-			Gui Font, s10 Bold cSilver, Arial
+			window["settingsImg1"].Enabled := false
+			window["settingsImg1"].Value := kIconsDirectory . "General Settings Gray.ico"
+			window["settingsTab1"].SetFont("s10 Bold cSilver", "Arial")
 		}
-
-		GuiControl Font, settingsTab1
 
 		if this.moduleAvailable("Strategies") {
-			GuiControl Enable, settingsImg2
-			GuiControl, , settingsImg2, %kIconsDirectory%Strategy.ico
-			Gui Font, s10 Bold cGray, Arial
+			window["settingsImg2"].Enabled := true
+			window["settingsImg2"].Value := kIconsDirectory . "Strategy.ico"
+			window["settingsTab2"].SetFont("s10 Bold cGray", "Arial")
 		}
 		else {
-			GuiControl Disable, settingsImg3
-			GuiControl, , settingsImg2, %kIconsDirectory%Strategy Gray.ico
-			Gui Font, s10 Bold cSilver, Arial
+			window["settingsImg2"].Enabled := false
+			window["settingsImg2"].Value := kIconsDirectory . "Strategy Gray.ico"
+			window["settingsTab2"].SetFont("s10 Bold cSilver", "Arial")
 		}
-
-		GuiControl Font, settingsTab2
 
 		if this.moduleAvailable("Setups") {
-			GuiControl Enable, settingsImg3
-			GuiControl, , settingsImg3, %kIconsDirectory%Tools BW.ico
-			Gui Font, s10 Bold cGray, Arial
+			window["settingsImg3"].Enabled := true
+			window["settingsImg3"].Value := kIconsDirectory . "Tools BW.ico"
+			window["settingsTab3"].SetFont("s10 Bold cGray", "Arial")
 		}
 		else {
-			GuiControl Disable, settingsImg3
-			GuiControl, , settingsImg3, %kIconsDirectory%Tools Gray.ico
-			Gui Font, s10 Bold cSilver, Arial
+			window["settingsImg3"].Enabled := false
+			window["settingsImg3"].Value := kIconsDirectory . "Tools Gray.ico"
+			window["settingsTab3"].SetFont("s10 Bold cSilver", "Arial")
 		}
-
-		GuiControl Font, settingsTab3
 
 		if this.moduleAvailable("Pressures") {
-			GuiControl Enable, settingsImg4
-			GuiControl, , settingsImg4, %kIconsDirectory%Pressure.ico
-			Gui Font, s10 Bold cGray, Arial
+			window["settingsImg4"].Enabled := true
+			window["settingsImg4"].Value := kIconsDirectory . "Pressure.ico"
+			window["settingsTab4"].SetFont("s10 Bold cGray", "Arial")
 		}
 		else {
-			GuiControl Disable, settingsImg4
-			GuiControl, , settingsImg4, %kIconsDirectory%Pressure Gray.ico
-			Gui Font, s10 Bold cSilver, Arial
+			window["settingsImg4"].Enabled := false
+			window["settingsImg4"].Value := kIconsDirectory . "Pressure Gray.ico"
+			window["settingsTab4"].SetFont("s10 Bold cSilver", "Arial")
 		}
-
-		GuiControl Font, settingsTab4
 
 		if this.moduleAvailable("Automation") {
-			GuiControl Enable, settingsImg5
-			GuiControl, , settingsImg5, %kIconsDirectory%Road.ico
-			Gui Font, s10 Bold cGray, Arial
+			window["settingsImg5"].Enabled := true
+			window["settingsImg5"].Value := kIconsDirectory . "Road.ico"
+			window["settingsTab5"].SetFont("s10 Bold cGray", "Arial")
 		}
 		else {
-			GuiControl Disable, settingsImg5
-			GuiControl, , settingsImg5, %kIconsDirectory%Road Gray.ico
-			Gui Font, s10 Bold cSilver, Arial
+			window["settingsImg5"].Enabled := false
+			window["settingsImg5"].Value := kIconsDirectory . "Road Gray.ico"
+			window["settingsTab5"].SetFont("s10 Bold cSilver", "Arial")
 		}
-
-		GuiControl Font, settingsTab5
 
 		if this.moduleAvailable("Data") {
-			GuiControl Enable, settingsImg6
-			GuiControl, , settingsImg6, %kIconsDirectory%Sensor.ico
-			Gui Font, s10 Bold cGray, Arial
+			window["settingsImg6"].Enabled := true
+			window["settingsImg6"].Value := kIconsDirectory . "Sensor.ico"
+			window["settingsTab6"].SetFont("s10 Bold cGray", "Arial")
 		}
 		else {
-			GuiControl Disable, settingsImg6
-			GuiControl, , settingsImg6, %kIconsDirectory%Sensor Gray.ico
-			Gui Font, s10 Bold cSilver, Arial
+			window["settingsImg6"].Enabled := false
+			window["settingsImg6"].Value := kIconsDirectory . "Sensor Gray.ico"
+			window["settingsTab6"].SetFont("s10 Bold cSilver", "Arial")
 		}
 
-		GuiControl Font, settingsTab6
+		window.SetFont("s10 Bold cBlack", "Arial")
 
-		Gui Font, s10 Bold cBlack, Arial
-
-		switch this.SelectedModule {
+		switch this.SelectedModule, false {
 			case "Settings":
-				GuiControl Font, settingsTab1
-				GuiControl Choose, settingsTab, 1
+				window["settingsTab1"].SetFont()
+
+				window["settingsTab"].Choose(1)
 			case "Strategies":
-				GuiControl Font, settingsTab2
-				GuiControl Choose, settingsTab, 2
+				window["settingsTab2"].SetFont()
+
+				window["settingsTab"].Choose(2)
 			case "Setups":
-				GuiControl Font, settingsTab3
-				GuiControl Choose, settingsTab, 3
+				window["settingsTab3"].SetFont()
+
+				window["settingsTab"].Choose(3)
 			case "Pressures":
-				GuiControl Font, settingsTab4
-				GuiControl Choose, settingsTab, 4
-				GuiControl Disable, editPressuresButton
+				window["settingsTab4"].SetFont()
+
+				window["settingsTab"].Choose(4)
+
+				window["editPressuresButton"].Enabled := false
 
 				if ((this.SelectedWeather != true) && !this.UseCommunity)
 					for index, driver in sessionDB.getAllDrivers(this.SelectedSimulator)
 						if (driver = sessionDB.ID) {
-							GuiControlGet driverDropDown
-
-							if (driverDropDown = sessionDB.getDriverName(this.SelectedSimulator, driver))
-								GuiControl Enable, editPressuresButton
+							if (window["driverDropDown"].Text = sessionDB.getDriverName(this.SelectedSimulator, driver))
+								window["editPressuresButton"].Enabled := true
 
 							break
 						}
 			case "Automation":
-				GuiControl Font, settingsTab5
-				GuiControl Choose, settingsTab, 5
+				window["settingsTab5"].SetFont()
+
+				window["settingsTab"].Choose(5)
 			case "Data":
-				GuiControl Font, settingsTab6
-				GuiControl Choose, settingsTab, 6
+				window["settingsTab6"].SetFont()
+
+				window["settingsTab"].Choose(6)
 		}
 
-		defaultListView := A_DefaultListView
+		selected := this.StrategyListView.GetNext(0)
 
-		try {
-			Gui ListView, % this.StrategyListView
+		if selected {
+			type := this.StrategyListView.GetText(selected, 1)
+			name := this.StrategyListView.GetText(selected, 2)
 
-			selected := LV_GetNext(0)
+			window["downloadStrategyButton"].Enabled := true
 
-			if selected {
-				LV_GetText(type, selected, 1)
-				LV_GetText(name, selected, 2)
+			if (type != translate("Community")) {
+				info := this.SessionDatabase.readStrategyInfo(simulator, car, track, name)
 
-				GuiControl Enable, downloadStrategyButton
+				window["deleteStrategyButton"].Enabled := true
 
-				if (type != translate("Community")) {
-					info := this.SessionDatabase.readStrategyInfo(simulator, car, track, name)
-
-					GuiControl Enable, deleteStrategyButton
-
-					if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
-						GuiControl Enable, renameStrategyButton
-						GuiControl Enable, shareStrategyWithCommunityCheck
-						GuiControl Enable, shareStrategyWithTeamServerCheck
-					}
-					else {
-						GuiControl Disable, renameStrategyButton
-						GuiControl Disable, shareStrategyWithCommunityCheck
-						GuiControl Disable, shareStrategyWithTeamServerCheck
-
-						GuiControl, , shareStrategyWithCommunityCheck, 0
-						GuiControl, , shareStrategyWithTeamServerCheck, 0
-					}
+				if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+					window["renameStrategyButton"].Enabled := true
+					window["shareStrategyWithCommunityCheck"].Enabled := true
+					window["shareStrategyWithTeamServerCheck"].Enabled := true
 				}
 				else {
-					GuiControl Disable, deleteStrategyButton
-					GuiControl Disable, renameStrategyButton
-					GuiControl Disable, shareStrategyWithCommunityCheck
-					GuiControl Disable, shareStrategyWithTeamServerCheck
+					window["renameStrategyButton"].Enabled := false
+					window["shareStrategyWithCommunityCheck"].Enabled := false
+					window["shareStrategyWithTeamServerCheck"].Enabled := false
 
-					GuiControl, , shareStrategyWithCommunityCheck, 0
-					GuiControl, , shareStrategyWithTeamServerCheck, 0
+					window["shareStrategyWithCommunityCheck"].Value := 0
+					window["shareStrategyWithTeamServerCheck"].Value := 0
 				}
 			}
 			else {
-				GuiControl Disable, downloadStrategyButton
-				GuiControl Disable, deleteStrategyButton
-				GuiControl Disable, renameStrategyButton
-				GuiControl Disable, shareStrategyWithCommunityCheck
-				GuiControl Disable, shareStrategyWithTeamServerCheck
+				window["deleteStrategyButton"].Enabled := false
+				window["renameStrategyButton"].Enabled := false
+				window["shareStrategyWithCommunityCheck"].Enabled := false
+				window["shareStrategyWithTeamServerCheck"].Enabled := false
 
-				GuiControl, , shareStrategyWithCommunityCheck, 0
-				GuiControl, , shareStrategyWithTeamServerCheck, 0
-			}
-
-			Gui ListView, % this.SetupListView
-
-			selected := LV_GetNext(0)
-
-			if selected {
-				LV_GetText(type, selected, 1)
-				LV_GetText(name, selected, 2)
-
-				GuiControl Enable, downloadSetupButton
-
-				if (type != translate("Community")) {
-					GuiControlGet setupTypeDropDown
-
-					info := this.SessionDatabase.readSetupInfo(simulator, car, track, kSetupTypes[setupTypeDropDown], name)
-
-					GuiControl Enable, deleteSetupButton
-
-					if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
-						GuiControl Enable, renameSetupButton
-						GuiControl Enable, shareSetupWithCommunityCheck
-						GuiControl Enable, shareSetupWithTeamServerCheck
-					}
-					else {
-						GuiControl Disable, renameSetupButton
-						GuiControl Disable, shareSetupWithCommunityCheck
-						GuiControl Disable, shareSetupWithTeamServerCheck
-
-						GuiControl, , shareSetupWithCommunityCheck, 0
-						GuiControl, , shareSetupWithTeamServerCheck, 0
-					}
-				}
-				else {
-					GuiControl Disable, deleteSetupButton
-					GuiControl Disable, renameSetupButton
-					GuiControl Disable, shareSetupWithCommunityCheck
-					GuiControl Disable, shareSetupWithTeamServerCheck
-
-					GuiControl, , shareSetupWithCommunityCheck, 0
-					GuiControl, , shareSetupWithTeamServerCheck, 0
-				}
-			}
-			else {
-				GuiControl Disable, downloadSetupButton
-				GuiControl Disable, deleteSetupButton
-				GuiControl Disable, renameSetupButton
-				GuiControl Disable, shareSetupWithCommunityCheck
-				GuiControl Disable, shareSetupWithTeamServerCheck
-
-				GuiControl, , shareSetupWithCommunityCheck, 0
-				GuiControl, , shareSetupWithTeamServerCheck, 0
-			}
-
-			Gui ListView, % this.SettingsListView
-
-			selected := LV_GetNext(0)
-
-			if selected {
-				GuiControl Enable, deleteSettingButton
-				GuiControl Enable, settingDropDown
-				GuiControl Enable, settingValueDropDown
-				GuiControl Enable, settingValueEdit
-				GuiControl Enable, settingValueText
-				GuiControl Enable, settingValueCheck
-			}
-			else {
-				GuiControl Disable, deleteSettingButton
-				GuiControl Disable, settingDropDown
-				GuiControl Hide, settingValueDropDown
-				GuiControl Disable, settingValueDropDown
-				GuiControl Hide, settingValueCheck
-				GuiControl Disable, settingValueCheck
-				GuiControl Hide, settingValueText
-				GuiControl Disable, settingValueText
-				GuiControl Show, settingValueEdit
-				GuiControl Disable, settingValueEdit
-
-				GuiControl Choose, settingDropDown, 0
-				GuiControl Choose, settingValueDropDown, 0
-
-				settingValueEdit := ""
-				GuiControl, , settingValueEdit, %settingValueEdit%
-			}
-
-			if (this.getAvailableSettings().Length() == 0)
-				GuiControl Disable, addSettingButton
-			else
-				GuiControl Enable, addSettingButton
-
-			Gui ListView, % this.AdministrationListView
-
-			selectedEntries := 0
-
-			row := LV_GetNext(0, "C")
-
-			while row {
-				selectedEntries += 1
-
-				row := LV_GetNext(row, "C")
-			}
-
-			GuiControl Enable, importDataButton
-
-			if (selectedEntries > 0) {
-				GuiControl Enable, exportDataButton
-				GuiControl Enable, deleteDataButton
-			}
-			else {
-				GuiControl Disable, exportDataButton
-				GuiControl Disable, deleteDataButton
-			}
-
-			if (selectedEntries = LV_GetCount())
-				GuiControl, , dataSelectCheck, 1
-			else if (selectedEntries > 0)
-				GuiControl, , dataSelectCheck, -1
-			else
-				GuiControl, , dataSelectCheck, 0
-
-			GuiControl Enable, addTrackAutomationButton
-
-			if this.SelectedTrackAutomation {
-				GuiControl Enable, trackAutomationNameEdit
-				GuiControl Enable, deleteTrackAutomationButton
-				GuiControl Enable, saveTrackAutomationButton
-			}
-			else {
-				GuiControl Disable, trackAutomationNameEdit
-				GuiControl Disable, deleteTrackAutomationButton
-				GuiControl Disable, saveTrackAutomationButton
+				window["shareStrategyWithCommunityCheck"].Value := 0
+				window["shareStrategyWithTeamServerCheck"].Value := 0
 			}
 		}
-		finally {
-			Gui ListView, %defaultListView%
+		else {
+			window["downloadStrategyButton"].Enabled := false
+			window["deleteStrategyButton"].Enabled := false
+			window["renameStrategyButton"].Enabled := false
+			window["shareStrategyWithCommunityCheck"].Enabled := false
+			window["shareStrategyWithTeamServerCheck"].Enabled := false
+
+			window["shareStrategyWithCommunityCheck"].Value := 0
+			window["shareStrategyWithTeamServerCheck"].Value := 0
+		}
+
+		selected := this.SetupListView.GetNext(0)
+
+		if selected {
+			type := this.SetupListView.GetText(selected, 1)
+			name := this.SetupListView.GetText(selected, 2)
+
+			window["downloadSetupButton"].Enabled := true
+
+			if (type != translate("Community")) {
+				info := this.SessionDatabase.readSetupInfo(simulator, car, track, kSetupTypes[window["setupTypeDropDown"].Value], name)
+
+				window["deleteSetupButton"].Enabled := true
+
+				if (!info || (getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID)) {
+					window["renameSetupButton"].Enabled := true
+					window["shareSetupWithCommunityCheck"].Enabled := true
+					window["shareSetupWithTeamServerCheck"].Enabled := true
+				}
+				else {
+					window["renameSetupButton"].Enabled := false
+					window["shareSetupWithCommunityCheck"].Enabled := false
+					window["shareSetupWithTeamServerCheck"].Enabled := false
+
+					window["shareSetupWithCommunityCheck"].Value := 0
+					window["shareSetupWithTeamServerCheck"].Value := 0
+				}
+			}
+			else {
+				window["deleteSetupButton"].Enabled := false
+				window["renameSetupButton"].Enabled := false
+				window["shareSetupWithCommunityCheck"].Enabled := false
+				window["shareSetupWithTeamServerCheck"].Enabled := false
+
+				window["shareSetupWithCommunityCheck"].Value := 0
+				window["shareSetupWithTeamServerCheck"].Value := 0
+			}
+		}
+		else {
+			window["downloadSetupButton"].Enabled := false
+			window["deleteSetupButton"].Enabled := false
+			window["renameSetupButton"].Enabled := false
+			window["shareSetupWithCommunityCheck"].Enabled := false
+			window["shareSetupWithTeamServerCheck"].Enabled := false
+
+			window["shareSetupWithCommunityCheck"].Value := 0
+			window["shareSetupWithTeamServerCheck"].Value := 0
+		}
+
+		selected := this.SettingsListView.GetNext(0)
+
+		if selected {
+			window["deleteSettingButton"].Enabled := true
+			window["settingDropDown"].Enabled := true
+			window["settingValueDropDown"].Enabled := true
+			window["settingValueEdit"].Enabled := true
+			window["settingValueText"].Enabled := true
+			window["settingValueCheck"].Enabled := true
+		}
+		else {
+			window["deleteSettingButton"].Enabled := false
+			window["settingDropDown"].Enabled := false
+			window["settingValueDropDown"].Visible := false
+			window["settingValueDropDown"].Enabled := false
+			window["settingValueCheck"].Visible := false
+			window["settingValueCheck"].Enabled := false
+			window["settingValueText"].Visible := false
+			window["settingValueText"].Enabled := false
+			window["settingValueEdit"].Visible := true
+			window["settingValueEdit"].Enabled := false
+
+			window["settingDropDown"].Choose(0)
+			window["settingValueDropDown"].Choose(0)
+
+			this.iSelectedValue := ""
+			window["settingValueEdit"].Text := ""
+		}
+
+		if (this.getAvailableSettings().Length == 0)
+			window["addSettingButton"].Enabled := false
+		else
+			window["addSettingButton"].Enabled := true
+
+		selectedEntries := 0
+
+		row := this.AdministrationListView.GetNext(0, "C")
+
+		while row {
+			selectedEntries += 1
+
+			row := this.AdministrationListView.GetNext(row, "C")
+		}
+
+		window["importDataButton"].Enabled := true
+
+		if (selectedEntries > 0) {
+			window["exportDataButton"].Enabled := true
+			window["deleteDataButton"].Enabled := true
+		}
+		else {
+			window["exportDataButton"].Enabled := false
+			window["deleteDataButton"].Enabled := false
+		}
+
+		if (selectedEntries = this.AdministrationListView.GetCount())
+			window["dataSelectCheck"].Value := 1
+		else if (selectedEntries > 0)
+			window["dataSelectCheck"].Value := -1
+		else
+			window["dataSelectCheck"].Value := 0
+
+		window["addTrackAutomationButton"].Enabled := true
+
+		if this.SelectedTrackAutomation {
+			window["trackAutomationNameEdit"].Enabled := true
+			window["deleteTrackAutomationButton"].Enabled := true
+			window["saveTrackAutomationButton"].Enabled := true
+		}
+		else {
+			window["trackAutomationNameEdit"].Enabled := false
+			window["deleteTrackAutomationButton"].Enabled := false
+			window["saveTrackAutomationButton"].Enabled := false
 		}
 	}
 
@@ -1122,8 +985,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
-
-			Gui %window%:Default
 
 			this.iSelectedSimulator := simulator
 
@@ -1135,7 +996,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.iAllTracks := []
 
-			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
+			window["simulatorDropDown"].Choose(inList(this.getSimulators(), simulator))
 
 			choices := this.getCars(simulator)
 
@@ -1144,7 +1005,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			choices.InsertAt(1, translate("All"))
 
-			GuiControl, , carDropDown, % "|" . values2String("|", choices*)
+			window["carDropDown"].Delete()
+			window["carDropDown"].Add(choices)
 
 			this.loadCar(true, true)
 		}
@@ -1164,12 +1026,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			window := this.Window
 
-			Gui %window%:Default
-
 			if (car == true)
-				GuiControl Choose, carDropDown, 1
+				window["carDropDown"].Choose(1)
 			else
-				GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car) + 1
+				window["carDropDown"].Choose(inList(this.getCars(this.SelectedSimulator), car) + 1)
 
 			tracks := this.getTracks(this.SelectedSimulator, car).Clone()
 			trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
@@ -1177,7 +1037,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			tracks.InsertAt(1, true)
 			trackNames.InsertAt(1, translate("All"))
 
-			GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
+			window["trackDropDown"].Delete()
+			window["trackDropDown"].Add(trackNames)
 
 			this.loadTrack(true, true)
 		}
@@ -1197,15 +1058,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			window := this.Window
 
-			Gui %window%:Default
-
 			if (track == true) {
 				this.iSelectedTrack := true
 
-				GuiControl Choose, trackDropDown, 1
+				window["trackDropDown"].Choose(1)
 			}
 			else
-				GuiControl Choose, trackDropDown, % (inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1)
+				window["trackDropDown"].Choose(inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), track) + 1)
 
 			this.updateModules()
 		}
@@ -1219,40 +1078,83 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			window := this.Window
 
-			Gui %window%:Default
-
 			if (weather == true)
-				GuiControl Choose, weatherDropDown, 1
+				window["weatherDropDown"].Choose(1)
 			else
-				GuiControl Choose, weatherDropDown, % inList(kWeatherConditions, weather) + 1
+				window["weatherDropDown"].Choose(inList(kWeatherConditions, weather) + 1)
 
 			this.updateModules()
 		}
 	}
 
 	loadStrategies(select := false) {
-		local window, defaultListView, userStrategies, communityStrategies, ignore, name, info, origin
+		local window := this.Window
+		local userStrategies, communityStrategies, ignore, name, info, origin
 
-		window := this.Window
+		this.StrategyListView.Delete()
 
-		Gui %window%:Default
+		userStrategies := true
+		communityStrategies := this.UseCommunity
 
-		defaultListView := A_DefaultListView
+		this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userStrategies, &communityStrategies)
 
-		try {
-			Gui ListView, % this.StrategyListView
+		for ignore, name in userStrategies {
+			info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
 
-			LV_Delete()
+			if !info
+				origin := translate("User")
+			else {
+				origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
 
-			userStrategies := true
-			communityStrategies := this.UseCommunity
+				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
+			}
 
-			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userStrategies, &communityStrategies)
+			if (select = name) {
+				this.StrategyListView.Add("Select Vis", origin, name)
 
-			Gui ListView, % this.StrategyListView
+				select := this.StrategyListView.GetCount()
+			}
+			else
+				this.StrategyListView.Add("", origin, name)
+		}
 
-			for ignore, name in userStrategies {
-				info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+		if communityStrategies
+			for ignore, name in communityStrategies
+				if !inList(userStrategies, name)
+					this.StrategyListView.Add("", translate("Community"), name)
+
+		this.StrategyListView.ModifyCol()
+
+		loop 2
+			this.StrategyListView.ModifyCol(A_Index, "AutoHdr")
+
+		if select
+			this.selectStrategy(select)
+		else
+			this.updateState()
+	}
+
+	loadSetups(setupType, force := false, select := false) {
+		local window, userSetups, communitySetups, ignore, name, info, origin
+
+		if (force || (setupType != this.SelectedSetupType)) {
+			window := this.Window
+
+			this.SetupListView.Delete()
+
+			this.iSelectedSetupType := setupType
+
+			window["setupTypeDropDown"].Choose(inList(kSetupTypes, setupType))
+
+			userSetups := true
+			communitySetups := this.UseCommunity
+
+			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userSetups, &communitySetups)
+
+			userSetups := userSetups[setupType]
+
+			for ignore, name in userSetups {
+				info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, name)
 
 				if !info
 					origin := translate("User")
@@ -1263,232 +1165,131 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 
 				if (select = name) {
-					LV_Add("Select Vis", origin, name)
+					this.SetupListView.Add("Select Vis", origin, name)
 
-					select := LV_GetCount()
+					select := this.SetupListView.GetCount()
 				}
 				else
-					LV_Add("", origin, name)
+					this.SetupListView.Add("", origin, name)
 			}
 
-			if communityStrategies
-				for ignore, name in communityStrategies
-					if !inList(userStrategies, name)
-						LV_Add("", translate("Community"), name)
+			if communitySetups
+				for ignore, name in communitySetups[setupType]
+					if !inList(userSetups, name)
+						this.SetupListView.Add("", translate("Community"), name)
 
-			LV_ModifyCol()
+			this.SetupListView.ModifyCol()
 
 			loop 2
-				LV_ModifyCol(A_Index, "AutoHdr")
+				this.SetupListView.ModifyCol(A_Index, "AutoHdr")
 
 			if select
-				this.selectStrategy(select)
+				this.selectSetup(select)
 			else
 				this.updateState()
-		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
-	}
-
-	loadSetups(setupType, force := false, select := false) {
-		local window, defaultListView, userSetups, communitySetups, ignore, name, info, origin
-
-		if (force || (setupType != this.SelectedSetupType)) {
-			window := this.Window
-
-			Gui %window%:Default
-
-			defaultListView := A_DefaultListView
-
-			try {
-				Gui ListView, % this.SetupListView
-
-				LV_Delete()
-
-				this.iSelectedSetupType := setupType
-
-				GuiControl Choose, setupTypeDropDown, % inList(kSetupTypes, setupType)
-
-				userSetups := true
-				communitySetups := this.UseCommunity
-
-				this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userSetups, &communitySetups)
-
-				userSetups := userSetups[setupType]
-
-				Gui ListView, % this.SetupListView
-
-				for ignore, name in userSetups {
-					info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, name)
-
-					if !info
-						origin := translate("User")
-					else {
-						origin := getMultiMapValue(info, "Origin", "Driver", this.SessionDatabase.ID)
-
-						origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
-					}
-
-					if (select = name) {
-						LV_Add("Select Vis", origin, name)
-
-						select := LV_GetCount()
-					}
-					else
-						LV_Add("", origin, name)
-				}
-
-				if communitySetups
-					for ignore, name in communitySetups[setupType]
-						if !inList(userSetups, name)
-							LV_Add("", translate("Community"), name)
-
-				LV_ModifyCol()
-
-				loop 2
-					LV_ModifyCol(A_Index, "AutoHdr")
-
-				if select
-					this.selectSetup(select)
-				else
-					this.updateState()
-			}
-			finally {
-				Gui ListView, %defaultListView%
-			}
 		}
 	}
 
 	loadSettings() {
 		local window := this.Window
-		local defaultListView, ignore, setting, type, value
+		local ignore, setting, type, value
 
-		Gui %window%:Default
+		this.SettingsListView.Delete()
 
-		defaultListView := A_DefaultListView
+		this.iSettings := []
 
-		try {
-			Gui ListView, % this.SettingsListView
+		for ignore, setting in SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
+															 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+															 , false, false) {
+			type := this.getSettingType(setting["Section"], setting["Key"], &ignore)
 
-			LV_Delete()
+			if type {
+				if IsObject(type)
+					value := translate(setting["Value"])
+				else if (type = "Boolean")
+					value := (setting["Value"] ? "x" : "")
+				else if (type = "Float")
+					value := displayValue("Float", setting["Value"])
+				else
+					value := setting["Value"]
 
-			this.iSettings := []
+				this.iSettings.Push(Array(setting["Section"], setting["Key"]))
 
-			for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-																	 , this.SelectedTrack["*"], this.SelectedWeather["*"]
-																	 , false, false) {
-				type := this.getSettingType(setting.Section, setting.Key, ignore)
-
-				if type {
-					if IsObject(type)
-						value := translate(setting.Value)
-					else if (type = "Boolean")
-						value := (setting.Value ? "x" : "")
-					else if (type = "Float")
-						value := displayValue("Float", setting.Value)
-					else
-						value := setting.Value
-
-					this.iSettings.Push(Array(setting.Section, setting.Key))
-
-					Gui ListView, % this.SettingsListView
-
-					LV_Add("", this.getSettingLabel(setting.Section, setting.Key), value)
-				}
+				this.SettingsListView.Add("", this.getSettingLabel(setting["Section"], setting["Key"]), value)
 			}
-
-			LV_ModifyCol()
-
-			loop 3
-				LV_ModifyCol(A_Index, "AutoHdr")
-
-			this.updateState()
 		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+
+		this.SettingsListView.ModifyCol()
+
+		loop 3
+			this.SettingsListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.updateState()
 	}
 
 	selectSettings(load := true) {
 		local window := this.Window
-		local defaultListView, ignore, column, references, setting, reference, count
+		local ignore, column, references, setting, reference, count
 
-		Gui %window%:Default
+		this.DataListView.Delete()
 
-		defaultListView := A_DefaultListView
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
 
-		try {
-			Gui ListView, % this.DataListView
+		for ignore, column in collect(["Reference", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
 
-			LV_Delete()
+		references := {Car: 0, AllCar: 0, Track: 0, AllTrack: 0, Weather: 0, AllWeather: 0}
 
-			while LV_DeleteCol(1)
-				ignore := 1
+		for ignore, setting in SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
+															 , this.SelectedTrack["*"], this.SelectedWeather["*"]
+															 , true, false) {
+			if (setting["Car"]!= "*")
+				references.Car += 1
+			else
+				references.AllCar += 1
 
-			for ignore, column in collect(["Reference", "#"], "translate") {
-				Gui ListView, % this.DataListView
+			if (setting["Track"] != "*")
+				references.Track += 1
+			else
+				references.AllTrack += 1
 
-				LV_InsertCol(A_Index, "", column)
-			}
+			if (setting["Weather"] != "*")
+				references.Weather += 1
+			else
+				references.AllWeather += 1
+		}
 
-			references := {Car: 0, AllCar: 0, Track: 0, AllTrack: 0, Weather: 0, AllWeather: 0}
-
-			for ignore, setting in new SettingsDatabase().readSettings(this.SelectedSimulator, this.SelectedCar["*"]
-																	 , this.SelectedTrack["*"], this.SelectedWeather["*"]
-																	 , true, false) {
-				if (setting.Car != "*")
-					references.Car += 1
-				else
-					references.AllCar += 1
-
-				if (setting.Track != "*")
-					references.Track += 1
-				else
-					references.AllTrack += 1
-
-				if (setting.Weather != "*")
-					references.Weather += 1
-				else
-					references.AllWeather += 1
-			}
-
-			for reference, count in references
-				if (count > 0) {
-					switch reference {
-						case "AllCar":
-							reference := (translate("Car: ") . translate("All"))
-						case "AllTrack":
-							reference := (translate("Track: ") . translate("All"))
-						case "AllWeather":
-							reference := (translate("Weather: ") . translate("All"))
-						case "Car":
-							reference := (translate("Car: ") . this.getCarName(this.SelectedSimulator, this.SelectedCar))
-						case "Track":
-							reference := (translate("Track: ") . this.getTrackName(this.SelectedSimulator, this.SelectedTrack))
-						case "Weather":
-							reference := (translate("Weather: ") . translate(this.SelectedWeather))
-					}
-
-					Gui ListView, % this.DataListView
-
-					LV_Add("", reference, count)
+		for reference, count in references.OwnProps()
+			if (count > 0) {
+				switch reference, false {
+					case "AllCar":
+						reference := (translate("Car: ") . translate("All"))
+					case "AllTrack":
+						reference := (translate("Track: ") . translate("All"))
+					case "AllWeather":
+						reference := (translate("Weather: ") . translate("All"))
+					case "Car":
+						reference := (translate("Car: ") . this.getCarName(this.SelectedSimulator, this.SelectedCar))
+					case "Track":
+						reference := (translate("Track: ") . this.getTrackName(this.SelectedSimulator, this.SelectedTrack))
+					case "Weather":
+						reference := (translate("Weather: ") . translate(this.SelectedWeather))
 				}
 
-			LV_ModifyCol()
+				this.DataListView.Add("", reference, count)
+			}
 
-			loop 2
-				LV_ModifyCol(A_Index, "AutoHdr")
+		this.DataListView.ModifyCol()
 
-			if load
-				this.loadSettings()
-		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+		loop 2
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
+
+		if load
+			this.loadSettings()
 	}
 
-	findTrackCoordinate(x, y, ByRef coordinateX, ByRef coordinateY, threshold := 40) {
+	findTrackCoordinate(x, y, &coordinateX, &coordinateY, threshold := 40) {
 		local trackMap := this.TrackMap
 		local trackImage := this.TrackImage
 		local scale, offsetX, offsetY, marginX, marginY, width, height, imgWidth, imgHeight, imgScale
@@ -1524,8 +1325,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			threshold := (threshold / scale)
 
-			loop % getMultiMapValue(trackMap, "Map", "Points")
-			{
+			loop getMultiMapValue(trackMap, "Map", "Points") {
 				coordX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
 				coordY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
 
@@ -1588,11 +1388,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local oldCoordMode := A_CoordModeMouse
 		local x, y, action
 
-		CoordMode Mouse, Screen
+		CoordMode("Mouse", "Screen")
 
-		MouseGetPos x, y
+		MouseGetPos(&x, &y)
 
-		CoordMode Mouse, %oldCoordMode%
+		CoordMode("Mouse", oldCoordMode)
 
 		action := actionDialog(x, y)
 
@@ -1608,11 +1408,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local oldCoordMode := A_CoordModeMouse
 		local x, y
 
-		CoordMode Mouse, Screen
+		CoordMode("Mouse", "Screen")
 
-		MouseGetPos x, y
+		MouseGetPos(&x, &y)
 
-		CoordMode Mouse, %oldCoordMode%
+		CoordMode("Mouse", oldCoordMode)
 
 		action := actionDialog(x, y, action)
 
@@ -1660,19 +1460,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.readTrackAutomations()
 
-		this.iSelectedTrackAutomation := {Name: "...", Actions: []}
+		this.iSelectedTrackAutomation := CaseInsenseMap("Name", "...", "Actions", [])
 
 		this.updateState()
 
-		Gui %window%:Default
+		window["trackAutomationNameEdit"].Value := ""
 
-		GuiControl, , trackAutomationNameEdit, % ""
-
-		ControlFocus, , ahk_id %trackAutomationNameHandle%
+		ControlFocus(window["trackAutomationNameEdit"])
 	}
 
 	deleteTrackAutomation() {
-		if this.SelectedTrackAutomation.HasKey("Origin") {
+		if this.SelectedTrackAutomation.Has("Origin") {
 			this.TrackAutomations.RemoveAt(inList(this.TrackAutomations, this.SelectedTrackAutomation.Origin))
 
 			this.writeTrackAutomations()
@@ -1690,35 +1488,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	saveTrackAutomation() {
 		local window := this.Window
-		local trackAutomation, origin, defaultListView, newTrackAutomation
-
-		Gui %window%:Default
-
-		GuiControlGet trackAutomationNameEdit
+		local trackAutomation, origin, newTrackAutomation
 
 		trackAutomation := this.SelectedTrackAutomation
 
-		trackAutomation.Name := trackAutomationNameEdit
+		trackAutomation.Name := window["trackAutomationNameEdit"].Value
 
-		if trackAutomation.HasKey("Origin") {
+		if trackAutomation.HasOwnProp("Origin") {
 			origin := this.SelectedTrackAutomation.Origin
 
-			origin.Name := trackAutomationNameEdit
+			origin.Name := trackAutomation.Name
 			origin.Actions := trackAutomation.Actions.Clone()
 
-			defaultListView := A_DefaultListView
-
-			try {
-				Gui ListView, % this.TrackAutomationsListView
-
-				LV_Modify(LV_GetNext(0), "", trackAutomationNameEdit, trackAutomation.Actions.Length())
-
-				loop 2
-					LV_ModifyCol(A_Index, "AutoHdr")
-			}
-			finally {
-				Gui ListView, %defaultListView%
-			}
+			this.TrackAutomationsListView.Modify(this.TrackAutomationsListView.GetNext(0), "", trackAutomation.Name, trackAutomation.Actions.Length)
 		}
 		else {
 			newTrackAutomation := trackAutomation.Clone()
@@ -1728,20 +1510,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.TrackAutomations.Push(newTrackAutomation)
 
-			defaultListView := A_DefaultListView
-
-			try {
-				Gui ListView, % this.TrackAutomationsListView
-
-				LV_Modify(LV_Add("Select", trackAutomationNameEdit, trackAutomation.Actions.Length()), "Vis")
-
-				loop 2
-					LV_ModifyCol(A_Index, "AutoHdr")
-			}
-			finally {
-				Gui ListView, %defaultListView%
-			}
+			this.TrackAutomationsListView.Modify(this.TrackAutomationsListView.Add("Select", trackAutomation.Name, trackAutomation.Actions.Length), "Vis")
 		}
+
+		loop 2
+			this.TrackAutomationsListView.ModifyCol(A_Index, "AutoHdr")
 
 		this.writeTrackAutomations(false)
 	}
@@ -1749,48 +1522,37 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	clearTrackAutomationEditor() {
 		local window := this.Window
 
-		Gui %window%:Default
-
-		GuiControl, , trackAutomationNameEdit, % ""
-		GuiControl, , trackAutomationInfoEdit, % ""
+		window["trackAutomationNameEdit"].Value := ""
+		window["trackAutomationInfoEdit"].Value := ""
 	}
 
 	readTrackAutomations() {
-		local defaultListView, trackAutomations, ignore, trackAutomation, option
+		local trackAutomations, ignore, trackAutomation, option
 
 		this.clearTrackAutomationEditor()
 
 		this.TrackAutomations := []
 		this.iSelectedTrackAutomation := false
 
-		defaultListView := A_DefaultListView
+		this.TrackAutomationsListView.Delete()
 
-		try {
-			Gui ListView, % this.TrackAutomationsListView
+		trackAutomations := this.SessionDatabase.getTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
-			LV_Delete()
+		this.iTrackAutomations := trackAutomations
 
-			trackAutomations := this.SessionDatabase.getTrackAutomations(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		for ignore, trackAutomation in trackAutomations {
+			option := (trackAutomation.Active ? "Check" : "")
 
-			this.iTrackAutomations := trackAutomations
-
-			for ignore, trackAutomation in trackAutomations {
-				option := (trackAutomation.Active ? "Check" : "")
-
-				LV_Add(option, trackAutomation.Name, trackAutomation.Actions.Length())
-			}
-
-			LV_ModifyCol()
-
-			loop 2
-				LV_ModifyCol(A_Index, "AutoHdr")
+			this.TrackAutomationsListView.Add(option, trackAutomation.Name, trackAutomation.Actions.Length)
 		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+
+		this.TrackAutomationsListView.ModifyCol()
+
+		loop 2
+			this.TrackAutomationsListView.ModifyCol(A_Index, "AutoHdr")
 
 		this.loadTrackMap(this.SessionDatabase.getTrackMap(this.SelectedSimulator, this.SelectedTrack)
-						, this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
+														 , this.SessionDatabase.getTrackImage(this.SelectedSimulator, this.SelectedTrack))
 
 		this.updateState()
 	}
@@ -1860,8 +1622,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		window := this.Window
 
-		Gui %window%:Default
-
 		pictureX := this.iTrackDisplayArea[1]
 		pictureY := this.iTrackDisplayArea[2]
 		pictureW := this.iTrackDisplayArea[3]
@@ -1876,8 +1636,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackDisplayArea[5] := deltaX
 		this.iTrackDisplayArea[6] := deltaY
 
-		GuiControl Move, trackDisplay, x%pictureX%, y%pictureY%
-		GuiControl, , %trackDisplay%, *w%imgWidth% *h%imgHeight% %trackImage%
+		window["trackDisplay"].Move(pictureX, pictureY)
+		window["trackDisplay"].Value := "*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage
 	}
 
 	updateTrackMap() {
@@ -1885,11 +1645,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	updateTrackAutomationInfo() {
-		local window := this.Window
 		local info := ""
 		local index, action
-
-		Gui %window%:Default
 
 		for index, action in this.SelectedTrackAutomation.Actions {
 			if (index > 1)
@@ -1900,7 +1657,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				   . action.Action)
 		}
 
-		GuiControl, , trackAutomationInfoEdit, %info%
+		this.Field["trackAutomationInfoEdit"].Value := info
 	}
 
 	loadTrackMap(trackMap, trackImage) {
@@ -1908,7 +1665,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		deleteDirectory(directory)
 
-		FileCreateDir %directory%
+		DirCreate(directory)
 
 		this.iTrackMap := trackMap
 		this.iTrackImage := trackImage
@@ -1917,49 +1674,35 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	unloadTrackMap() {
-		local display :=  this.iTrackDisplay
-
-		GuiControl, , %display%, % (kIconsDirectory . "Empty.png")
+		this.iTrackDisplay.Value := (kIconsDirectory . "Empty.png")
 
 		this.iTrackMap := false
 		this.iTrackImage := false
 	}
 
 	selectAutomation() {
-		local window := this.Window
-		local defaultListView, ignore, column
+		local ignore, column
 
 		if this.TrackMap
 			this.unloadTrackMap()
 
 		this.readTrackAutomations()
 
-		Gui %window%:Default
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
 
-		defaultListView := A_DefaultListView
+		for ignore, column in collect(["Type", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
 
-		try {
-			Gui ListView, % this.DataListView
+		this.DataListView.Delete()
 
-			while LV_DeleteCol(1)
-				ignore := 1
+		this.DataListView.Add("", translate("Track: "), 1)
+		this.DataListView.Add("", translate("Automations: "), this.TrackAutomations.Length)
 
-			for ignore, column in collect(["Type", "#"], "translate")
-				LV_InsertCol(A_Index, "", column)
+		this.DataListView.ModifyCol()
 
-			LV_Delete()
-
-			LV_Add("", translate("Track: "), 1)
-			LV_Add("", translate("Automations: "), this.TrackAutomations.Length())
-
-			LV_ModifyCol()
-
-			loop 2
-				LV_ModifyCol(A_Index, "AutoHdr")
-		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+		loop 2
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
 	}
 
 	deleteEntries(connectors, database, localTable, serverTable, driver) {
@@ -1972,14 +1715,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				for ignore, connector in connectors
 					try {
 						for ignore, row in database.query(localTable, {Where: {Driver: driver}})
-							if (row.Identifier != kNull)
-								connector.DeleteData(serverTable, row.Identifier)
+							if (row["Identifier"] != kNull)
+								connector.DeleteData(serverTable, row["Identifier"])
 					}
 					catch Any as exception {
 						logError(exception, true)
 					}
 
-			database.remove(localTable, {Driver: driver}, Func("always").Bind(true))
+			database.remove(localTable, {Driver: driver}, always.Bind(true))
 		}
 		finally {
 			database.unlock(localTable)
@@ -1989,40 +1732,33 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	deleteData() {
 		local connectors := this.SessionDatabase.Connectors
 		local window := this.Window
-		local progressWindow, defaultListView, simulator, count, row, type, data, car, track
+		local progressWindow, simulator, count, row, type, data, car, track
 		local driver, telemetryDB, tyresDB, code, candidate, progress
 		local ignore, identifier, identifiers, name, extension
 
-		Gui %window%:Default
-
 		progressWindow := showProgress({color: "Green", title: translate("Deleting Data")})
 
-		Gui %progressWindow%:+Owner%window%
-		Gui %window%:Default
-		Gui %window%:+Disabled
-
-		defaultListView := A_DefaultListView
+		progressWindow.Opt("+Owner" . window.Hwnd)
+		window.Opt("+Disabled")
 
 		try {
-			Gui ListView, % this.AdministrationListView
-
 			simulator := this.SelectedSimulator
 
 			count := 1
 
-			row := LV_GetNext(0, "C")
+			row := this.AdministrationListView.GetNext(0, "C")
 
-			while (row := LV_GetNext(row, "C"))
+			while (row := this.AdministrationListView.GetNext(row, "C"))
 				count += 1
 
-			row := LV_GetNext(0, "C")
+			row := this.AdministrationListView.GetNext(0, "C")
 			progress := 0
 
 			while row {
 				progress += 1
 
-				LV_GetText(type, row, 1)
-				LV_GetText(data, row, 2)
+				type := this.AdministrationListView.GetText(row, 1)
+				data := this.AdministrationListView.GetText(row, 2)
 
 				if InStr(data, " / ") {
 					data := string2Values(" / ", data)
@@ -2039,16 +1775,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					track := "-"
 				}
 
-				LV_GetText(driver, row, 3)
+				driver := this.AdministrationListView.GetText(row, 3)
 
-				showProgress({progress: Round((progress / count) * 100)
-							, message: translate("Car: ") . car . translate(", Track: ") . track})
+				showProgress({progress: Round((progress / count) * 100), message: translate("Car: ") . car . translate(", Track: ") . track})
 
 				driver := this.SessionDatabase.getDriverID(simulator, driver)
 				car := this.getCarCode(simulator, car)
 				track := this.getTrackCode(simulator, track)
 
-				switch type {
+				switch type, false {
 					case translate("Telemetry"):
 						telemetryDB := TelemetryDatabase(simulator, car, track).Database
 
@@ -2062,15 +1797,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.strategy, F
+						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies\*.strategy", "F"
 							this.SessionDatabase.removeStrategy(simulator, car, track, A_LoopFileName)
 					case translate("Setups"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
 						for ignore, type in kSetupTypes
-							loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Car Setups\%type%\*.*, F
-							{
-								SplitPath A_LoopFileName, name, , extension
+							loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Car Setups\" . type . "\*.*", "F" {
+								SplitPath(A_LoopFileName, &name, , &extension)
 
 								if (extension != "info")
 									this.SessionDatabase.removeSetup(simulator, car, track, type, name)
@@ -2078,27 +1812,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
-						{
-							SplitPath A_LoopFileName, , , , candidate
+						loop Files, kDatabaseDirectory . "User\Tracks\" . code . "\*.*", "F" {
+
+							SplitPath(A_LoopFileName, , , , &candidate)
 
 							if (candidate = track)
-								deleteFile(A_LoopFileLongPath)
+								deleteFile(A_LoopFileFullPath)
 						}
 					case translate("Automations"):
 						if this.SessionDatabase.hasTrackAutomations(simulator, car, track)
 							this.SessionDatabase.setTrackAutomations(simulator, car, track, [])
 				}
 
-				Gui %window%:Default
-				Gui ListView, % this.AdministrationListView
-
-				row := LV_GetNext(row, "C")
+				row := this.AdministrationListView.GetNext(row, "C")
 			}
 		}
 		finally {
-			Gui ListView, %defaultListView%
-			Gui %window%:-Disabled
+			window.Opt("-Disabled")
 
 			hideProgress()
 		}
@@ -2109,41 +1839,36 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	exportData(directory) {
 		local window := this.Window
 		local progressWindow := showProgress({color: "Green", title: translate("Exporting Data")})
-		local defaultListView, simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
+		local simulator, count, row, drivers, schemas, progress, type, data, car, track, driver, id
 		local targetDirectory, sourceDB, targetDB, ignore, type, entry, code, candidate
 		local trackAutomations, info, id, name, schema, fields
 
 		directory := normalizeDirectoryPath(directory)
 
-		Gui %progressWindow%:+Owner%window%
-		Gui %window%:Default
-		Gui %window%:+Disabled
-
-		defaultListView := A_DefaultListView
+		progressWindow.Opt("+Owner" . window.Hwnd)
+		window.Opt("+Disabled")
 
 		try {
-			Gui ListView, % this.AdministrationListView
-
 			simulator := this.SelectedSimulator
 
 			count := 1
 
-			row := LV_GetNext(0, "C")
+			row := this.AdministrationListView.GetNext(0, "C")
 
-			while (row := LV_GetNext(row, "C"))
+			while (row := this.AdministrationListView.GetNext(row, "C"))
 				count += 1
 
-			row := LV_GetNext(0, "C")
+			row := this.AdministrationListView.GetNext(0, "C")
 
-			drivers := {}
-			schemas := {}
+			drivers := CaseInsenseMap()
+			schemas := CaseInsenseMap()
 			progress := 0
 
 			while row {
 				progress += 1
 
-				LV_GetText(type, row, 1)
-				LV_GetText(data, row, 2)
+				type := this.AdministrationListView.GetText(row, 1)
+				data := this.AdministrationListView.GetText(row, 2)
 
 				if InStr(data, " / ") {
 					data := string2Values(" / ", data)
@@ -2160,12 +1885,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					track := "-"
 				}
 
-				LV_GetText(driver, row, 3)
+				driver := this.AdministrationListView.GetText(row, 3)
 
 				id := this.SessionDatabase.getDriverID(simulator, driver)
 
-				showProgress({progress: Round((progress / count) * 100)
-							, message: translate("Car: ") . car . translate(", Track: ") . track})
+				showProgress({progress: Round((progress / count) * 100), message: translate("Car: ") . car . translate(", Track: ") . track})
 
 				if id {
 					drivers[id] := driver
@@ -2178,7 +1902,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				targetDirectory := (directory . "\" . car . "\" . track . "\")
 
-				switch type {
+				switch type, false {
 					case translate("Telemetry"):
 						sourceDB := TelemetryDatabase(simulator, car, track).Database
 						targetDB := Database(targetDirectory, kTelemetrySchemas)
@@ -2206,11 +1930,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Strategies"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						FileCreateDir %targetDirectory%Race Strategies
+						DirCreate(targetDirectory . "Race Strategies")
 
-						loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Race Strategies\*.*, F
+						loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies\*.*", "F"
 							try {
-								FileCopy %A_LoopFileLongPath%, %targetDirectory%Race Strategies\%A_LoopFileName%
+								FileCopy(A_LoopFileFullPath, targetDirectory . "Race Strategies\" . A_LoopFileName)
 							}
 							catch Any as exception {
 								logError(exception)
@@ -2219,12 +1943,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
 						for ignore, type in kSetupTypes
-							loop Files, %kDatabaseDirectory%User\%code%\%car%\%track%\Car Setups\%type%\*.*, F
-							{
-								FileCreateDir %targetDirectory%Car Setups\%type%
+							loop Files, kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Car Setups\" . type . "\*.*", "F" {
+								DirCreate(targetDirectory . "Car Setups\" . type)
 
 								try {
-									FileCopy %A_LoopFileLongPath%, %targetDirectory%Car Setups\%type%\%A_LoopFileName%
+									FileCopy(A_LoopFileFullPath, targetDirectory . "Car Setups\" . type . "\" . A_LoopFileName)
 								}
 								catch Any as exception {
 									logError(exception)
@@ -2233,15 +1956,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					case translate("Tracks"):
 						code := this.SessionDatabase.getSimulatorCode(simulator)
 
-						FileCreateDir %directory%\.Tracks
+						DirCreate(directory . "\.Tracks")
 
-						loop Files, %kDatabaseDirectory%User\Tracks\%code%\*.*, F
-						{
-							SplitPath A_LoopFileName, , , , candidate
+						loop Files, kDatabaseDirectory . "User\Tracks\" . code . "\*.*", "F" {
+
+							SplitPath(A_LoopFileName, , , , &candidate)
 
 							if (candidate = track)
 								try {
-									FileCopy %A_LoopFileLongPath%, %directory%\.Tracks\%A_LoopFileName%
+									FileCopy(A_LoopFileFullPath, directory . "\.Tracks\" . A_LoopFileName)
 								}
 								catch Any as exception {
 									logError(exception)
@@ -2253,10 +1976,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						this.SessionDatabase.saveTrackAutomations(trackAutomations, targetDirectory . "Track.automations")
 				}
 
-				Gui %window%:Default
-				Gui ListView, % this.AdministrationListView
-
-				row := LV_GetNext(row, "C")
+				row := this.AdministrationListView.GetNext(row, "C")
 			}
 
 			info := newMultiMap()
@@ -2277,8 +1997,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			logError(exception)
 		}
 		finally {
-			Gui ListView, %defaultListView%
-			Gui %window%:-Disabled
+			window.Opt("-Disabled")
 
 			hideProgress()
 		}
@@ -2288,7 +2007,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local simulator := this.SelectedSimulator
 		local info := readMultiMap(directory . "\Export.info")
-		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field
+		local progressWindow, schemas, schema, fields, id, name, progress, tracks, code, ignore, row, field, type
 		local targetDirectory, car, carName, track, trackName, key, sourceDirectory, driver, sourceDB, targetDB
 		local tyresDB, data, targetName, name, fileName, automations, automation, trackAutomations, trackName, extension
 
@@ -2297,11 +2016,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if (this.SessionDatabase.getSimulatorName(getMultiMapValue(info, "General", "Simulator", "")) = simulator) {
 			progressWindow := showProgress({color: "Green", title: translate("Importing Data")})
 
-			Gui %progressWindow%:+Owner%window%
-			Gui %window%:Default
-			Gui %window%:+Disabled
+			progressWindow.Opt("+Owner" . window.Hwnd)
+			window.Opt("+Disabled")
 
-			schemas := {}
+			schemas := CaseInsenseMap()
 
 			schemas["Electronics"] := kTelemetrySchemas["Electronics"]
 			schemas["Tyres"] := kTelemetrySchemas["Tyres"]
@@ -2322,45 +2040,47 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					code := this.SessionDatabase.getSimulatorCode(simulator)
 
-					loop Files, %directory%\.Tracks\*.*, F	; Track
-					{
-						SplitPath A_LoopFileName, , , , track
+					loop Files, directory . "\.Tracks\*.*", "F" {
+						SplitPath(A_LoopFileName, , , , &track)
 
 						if !inList(tracks, track)
 							tracks.Push(track)
 					}
 
 					for ignore, track in tracks
-						if selection.HasKey("-." . track . ".Tracks") {
+						if selection.Has("-." . track . ".Tracks") {
 							targetDirectory := (kDatabaseDirectory . "User\Tracks\" . code)
 
-							FileCreateDir %targetDirectory%
+							DirCreate(targetDirectory)
 
-							FileCopy %directory%\.Tracks\%track%.*, %targetDirectory%, 1
+							try {
+								FileCopy(directory . "\.Tracks\" . track . ".*", targetDirectory, 1)
+							}
+							catch Any as exception {
+							   logError(exception)
+							}
 						}
 				}
 
-				loop Files, %directory%\*.*, D	; Car
+				loop Files, directory . "\*.*", "D"	; Car
 					if (InStr(A_LoopFileName, ".") != 1) {
 						car := A_LoopFileName
 						carName := this.getCarName(simulator, car)
 
-						loop Files, %directory%\%car%\*.*, D	; Track
-						{
+						loop Files, directory . "\" . car . "\*.*", "D" {
 							track := A_LoopFileName
 							trackName := this.getTrackName(simulator, track)
 
 							key := (car . "." . track . ".")
 
-							showProgress({progress: ++progress
-										, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+							showProgress({progress: ++progress, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
 
 							if (progress >= 100)
 								progress := 0
 
 							sourceDirectory := (A_LoopFileDir . "\" . track)
 
-							if selection.HasKey(key . "Telemetry") {
+							if selection.Has(key . "Telemetry") {
 								driver := selection[key . "Telemetry"]
 
 								sourceDB := Database(sourceDirectory . "\", schemas)
@@ -2370,7 +2090,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								try {
 									for ignore, row in sourceDB.query("Electronics", {Where: {Driver: driver}}) {
-										data := Object()
+										data := Database.Row()
 
 										for ignore, field in schemas["Electronics"]
 											data[field] := row[field]
@@ -2386,7 +2106,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								try {
 									for ignore, row in sourceDB.query("Tyres", {Where: {Driver: driver}}) {
-										data := Object()
+										data := Database.Row()
 
 										for ignore, field in schemas["Tyres"]
 											data[field] := row[field]
@@ -2399,7 +2119,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								}
 							}
 
-							if selection.HasKey(key . "Pressures") {
+							if selection.Has(key . "Pressures") {
 								driver := selection[key . "Pressures"]
 
 								tyresDB := TyresDatabase()
@@ -2408,7 +2128,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 								try {
 									for ignore, row in sourceDB.query("Tyres.Pressures", {Where: {Driver: driver}}) {
-										data := Object()
+										data := Database.Row()
 
 										for ignore, field in schemas["Tyres.Pressures"]
 											data[field] := row[field]
@@ -2417,10 +2137,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									}
 
 									for ignore, row in sourceDB.query("Tyres.Pressures.Distribution", {Where: {Driver: driver}}) {
-										tyresDB.updatePressure(simulator, car, track
-															 , row.Weather, row["Temperature.Air"], row["Temperature.Track"]
-															 , row.Compound, row["Compound.Color"]
-															 , row.Type, row.Tyre, row.Pressure, row.Count
+										tyresDB.updatePressure(simulator, car, track, row["Weather"], row["Temperature.Air"], row["Temperature.Track"]
+															 , row["Compound"], row["Compound.Color"]
+															 , row["Type"], row["Tyre"], row["Pressure"], row["Count"]
 															 , false, true, "User", driver)
 									}
 								}
@@ -2429,54 +2148,72 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								}
 							}
 
-							if (selection.HasKey(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
+							if (selection.Has(key . "Strategies") && FileExist(sourceDirectory . "\Race Strategies")) {
 								code := this.SessionDatabase.getSimulatorCode(simulator)
 
 								targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Race Strategies")
 
-								FileCreateDir %targetDirectory%
+								DirCreate(targetDirectory)
 
-								loop Files, %sourceDirectory%\Race Strategies\*.strategy, F
-								{
+								loop Files, sourceDirectory . "\Race Strategies\*.strategy", "F" {
 									fileName := A_LoopFileName
 									targetName := fileName
 
 									while FileExist(targetDirectory . "\" . targetName) {
-										SplitPath targetName, , , , name
+										SplitPath(targetName, , , , &name)
 
 										targetName := (name . " (" . (A_Index + 1) . ").strategy")
 									}
 
-									FileCopy %A_LoopFilePath%, %targetDirectory%\%targetName%
+									try {
+										FileCopy(A_LoopFilePath, targetDirectory . "\" . targetName)
+									}
+									catch Any as exception {
+										logError(exception)
+									}
 
 									if FileExist(A_LoopFilePath . ".info")
-										FileCopy %A_LoopFilePath%.info, %targetDirectory%\%targetName%.info
+										try {
+											FileCopy(A_LoopFilePath . ".info", targetDirectory . "\" . targetName ".info")
+										}
+										catch Any as exception {
+											logError(exception)
+										}
 								}
 							}
 
-							if (selection.HasKey(key . "Setups") && FileExist(sourceDirectory . "\Car Setups")) {
+							if (selection.Has(key . "Setups") && FileExist(sourceDirectory . "\Car Setups")) {
 								code := this.SessionDatabase.getSimulatorCode(simulator)
 
 								for ignore, type in kSetupTypes {
 									targetDirectory := (kDatabaseDirectory . "User\" . code . "\" . car . "\" . track . "\Car Setups\" . type)
 
-									FileCreateDir %targetDirectory%
+									DirCreate(targetDirectory)
 
-									loop Files, %sourceDirectory%\Car Setups\%type%\*.*, F
-									{
-										SplitPath A_LoopFileName, , , extension
+									loop Files, sourceDirectory . "\Car Setups\" . type . "\*.*", "F" {
+										SplitPath(A_LoopFileName, , , &extension)
 
 										if (extension != "info") {
-											FileCopy %A_LoopFilePath%, %targetDirectory%\%A_LoopFileName%
+											try {
+												FileCopy(A_LoopFilePath, targetDirectory . "\" . A_LoopFileName)
+											}
+											catch Any as exception {
+												logError(exception)
+											}
 
 											if FileExist(A_LoopFilePath . ".info")
-												FileCopy %A_LoopFilePath%.info, %targetDirectory%\%A_LoopFileName%.info
+												try {
+													FileCopy(A_LoopFilePath . ".info", targetDirectory . "\" . A_LoopFileName . ".info")
+												}
+												catch Any as exception {
+													logError(exception)
+												}
 										}
 									}
 								}
 							}
 
-							if (selection.HasKey(key . "Automations") && FileExist(sourceDirectory . "\Track.automations")) {
+							if (selection.Has(key . "Automations") && FileExist(sourceDirectory . "\Track.automations")) {
 								code := this.SessionDatabase.getSimulatorCode(simulator)
 
 								automations := this.SessionDatabase.loadTrackAutomations(sourceDirectory . "\Track.automations")
@@ -2498,7 +2235,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				logError(exception)
 			}
 			finally {
-				Gui %window%:-Disabled
+				window.Opt("-Disabled")
 
 				hideProgress()
 			}
@@ -2510,20 +2247,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	loadData() {
 		local window := this.Window
 		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
-		local defaultListView, selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
+		local selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
 		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, count, strategies
 		local automations, trackName, setups, ignore, type, extension
 
-		Gui %progressWindow%:+Owner%window%
-		Gui %window%:Default
-		Gui %window%:+Disabled
-
-		defaultListView := A_DefaultListView
+		progressWindow.Opt("+Owner" . window.Hwnd)
+		window.Opt("+Disabled")
 
 		try {
-			Gui ListView, % this.AdministrationListView
-
-			LV_Delete()
+			this.AdministrationListView.Delete()
 
 			selectedSimulator := this.SelectedSimulator
 			selectedCar := this.SelectedCar
@@ -2537,41 +2269,34 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				tracks := []
 
-				loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Tracks
-				{
-					SplitPath A_LoopFileName, , , , track
+				loop Files, kDatabaseDirectory . "User\Tracks\" . simulator . "\*.*", "F" {
+					SplitPath(A_LoopFileName, , , , &track)
 
 					if (((selectedTrack = true) || (track = selectedTrack)) && !inList(tracks, track)) {
-						LV_Add("", translate("Tracks"), this.getTrackName(selectedSimulator, track)
-							 , "-", 1)
+						this.AdministrationListView.Add("", translate("Tracks"), this.getTrackName(selectedSimulator, track), "-", 1)
 
 						tracks.Push(track)
 					}
 				}
 
-				loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
+				loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D"
 					if (InStr(A_LoopFileName, ".") != 1) {
 						car := A_LoopFileName
 
 						if ((selectedCar == true) || (car = selectedCar)) {
 							carName := this.getCarName(selectedSimulator, car)
 
-							loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
-							{
+							loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
 								track := A_LoopFileName
 
 								if ((selectedTrack == true) || (track = selectedTrack)) {
 									trackName := this.getTrackName(selectedSimulator, track)
 									found := false
 
-									showProgress({progress: ++progress
-												, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+									showProgress({progress: ++progress, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
 
 									if (progress >= 100)
 										progress := 0
-
-									Gui %window%:Default
-									Gui ListView, % this.AdministrationListView
 
 									targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
 
@@ -2581,9 +2306,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
 										if (count > 0)
-											LV_Add("", translate("Telemetry"), (carName . " / " . trackName)
-													 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
-													 , count)
+											this.AdministrationListView.Add("", translate("Telemetry"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), count)
 									}
 
 									tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
@@ -2592,327 +2315,271 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
 																				  , Where: {Driver: driver}})
 
-										count := ((result.Length() > 0) ? result[1].Count : 0)
+										count := ((result.Length > 0) ? result[1].Count : 0)
 
-										result := tyresDB.query("Tyres.Pressures.Distribution"
-															  , {Group: [["Driver", "count", "Count"]]
-															   , Where: {Driver: driver}})
+										result := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", "count", "Count"]]
+																							   , Where: {Driver: driver}})
 
-										count += ((result.Length() > 0) ? result[1].Count : 0)
+										count += ((result.Length > 0) ? result[1].Count : 0)
 
 										if (count > 0)
-											LV_Add("", translate("Pressures"), (carName . " / " . trackName)
-													 , this.SessionDatabase.getDriverName(selectedSimulator, driver)
-													 , count)
+											this.AdministrationListView.Add("", translate("Pressures"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), count)
 									}
 
 									strategies := 0
 
-									loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.strategy, F		; Strategies
+									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Strategies\*.strategy", "F"
 										strategies += 1
 
 									if (strategies > 0)
-										LV_Add("", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
+										this.AdministrationListView.Add("", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
 
 									setups := 0
 
 									for ignore, type in kSetupTypes
-										loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\%type%\*.*, F		; Setups
-										{
-											SplitPath A_LoopFileName, , , extension
+										loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type . "\*.*", "F" {
+											SplitPath(A_LoopFileName, , , &extension)
 
 											if (extension != "info")
 												setups += 1
 										}
 
 									if (setups > 0)
-										LV_Add("", translate("Setups"), (carName . " / " . trackName), "-", setups)
+										this.AdministrationListView.Add("", translate("Setups"), (carName . " / " . trackName), "-", setups)
 
-									automations := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length()
+									automations := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length
 
 									if (automations > 0)
-										LV_Add("", translate("Automations"), (carName . " / " . trackName), "-", automations)
+										this.AdministrationListView.Add("", translate("Automations"), (carName . " / " . trackName), "-", automations)
 								}
 							}
 						}
 					}
 			}
 
-			LV_ModifyCol()
+			this.AdministrationListView.ModifyCol()
 
 			loop 4
-				LV_ModifyCol(A_Index, "AutoHdr")
+				this.AdministrationListView.ModifyCol(A_Index, "AutoHdr")
 
 			this.updateState()
 		}
 		finally {
-			Gui ListView, %defaultListView%
-			Gui %window%:-Disabled
+			window.Opt("-Disabled")
 
 			hideProgress()
 		}
 	}
 
 	selectData(load := true) {
-		local window := this.Window
-		local defaultListView, ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
+		local ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
 		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory, count
 		local ignore, type, extension, setups
 
-		Gui %window%:Default
+		this.DataListView.Delete()
 
-		defaultListView := A_DefaultListView
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
 
-		try {
-			Gui ListView, % this.DataListView
+		for ignore, column in collect(["Type", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
 
-			LV_Delete()
+		selectedSimulator := this.SelectedSimulator
+		selectedCar := this.SelectedCar
+		selectedTrack := this.SelectedTrack
 
-			while LV_DeleteCol(1)
-				ignore := 1
+		if selectedSimulator {
+			drivers := this.SessionDatabase.getAllDrivers(selectedSimulator)
+			cars := []
+			telemetry := 0
+			pressures := 0
+			strategies := 0
+			setups := 0
+			automations := 0
+			tracks := 0
 
-			for ignore, column in collect(["Type", "#"], "translate")
-				LV_InsertCol(A_Index, "", column)
+			simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
 
-			selectedSimulator := this.SelectedSimulator
-			selectedCar := this.SelectedCar
-			selectedTrack := this.SelectedTrack
+			tracks := []
 
-			if selectedSimulator {
-				drivers := this.SessionDatabase.getAllDrivers(selectedSimulator)
-				cars := []
-				telemetry := 0
-				pressures := 0
-				strategies := 0
-				setups := 0
-				automations := 0
-				tracks := 0
+			loop Files, kDatabaseDirectory . "User\Tracks\" . simulator . "\*.*", "F" {
+				SplitPath(A_LoopFileName, , , , &track)
 
-				simulator := this.SessionDatabase.getSimulatorCode(selectedSimulator)
-
-				tracks := []
-
-				loop Files, %kDatabaseDirectory%User\Tracks\%simulator%\*.*, F		; Strategies
-				{
-					SplitPath A_LoopFileName, , , , track
-
-					if (((selectedTrack = true) || (track = selectedTrack)) && !inList(tracks, track))
-						tracks.Push(track)
-				}
-
-				loop Files, %kDatabaseDirectory%User\%simulator%\*.*, D					; Car
-					if (InStr(A_LoopFileName, ".") != 1) {
-						car := A_LoopFileName
-
-						if ((selectedCar == true) || (car = selectedCar))
-							loop Files, %kDatabaseDirectory%User\%simulator%\%car%\*.*, D		; Track
-							{
-								track := A_LoopFileName
-
-								if ((selectedTrack == true) || (track = selectedTrack)) {
-									found := false
-
-									targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
-
-									if (FileExist(targetDirectory . "Electronics.CSV") || FileExist(targetDirectory . "Tyres.CSV")) {
-										found := true
-
-										telemetry += 1
-									}
-
-									if (FileExist(targetDirectory . "Tyres.Pressures.CSV")
-									 || FileExist(targetDirectory . "Tyres.Pressures.Distribution.CSV")) {
-										found := true
-
-										pressures += 1
-									}
-
-									loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Race Strategies\*.*, F		; Strategies
-									{
-										found := true
-
-										strategies += 1
-									}
-
-									for ignore, type in kSetupTypes
-										loop Files, %kDatabaseDirectory%User\%simulator%\%car%\%track%\Car Setups\%type%\*.*, F		; Setups
-										{
-											SplitPath A_LoopFileName, , , extension
-
-											if (extension != "info")
-												setups += 1
-										}
-
-									count := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length()
-
-									if (count > 0) {
-										automations += count
-
-										found := true
-									}
-
-									if (found && !inList(cars, car))
-										cars.Push(car)
-								}
-							}
-				}
-
-				LV_Add("", translate("Tracks"), tracks.Length())
-				LV_Add("", translate("Automations"), automations)
-				LV_Add("", translate("Drivers"), drivers.Length())
-				LV_Add("", translate("Cars"), cars.Length())
-				LV_Add("", translate("Telemetry"), telemetry)
-				LV_Add("", translate("Pressures"), pressures)
-				LV_Add("", translate("Strategies"), strategies)
-				LV_Add("", translate("Setups"), setups)
-
-				LV_ModifyCol()
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
+				if (((selectedTrack = true) || (track = selectedTrack)) && !inList(tracks, track))
+					tracks.Push(track)
 			}
 
-			if load
-				this.loadData()
+			loop Files, kDatabaseDirectory . "User\" . simulator . "\*.*", "D"
+				if (InStr(A_LoopFileName, ".") != 1) {
+					car := A_LoopFileName
+
+					if ((selectedCar == true) || (car = selectedCar))
+						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\*.*", "D" {
+							track := A_LoopFileName
+
+							if ((selectedTrack == true) || (track = selectedTrack)) {
+								found := false
+
+								targetDirectory := (kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\")
+
+								if (FileExist(targetDirectory . "Electronics.CSV") || FileExist(targetDirectory . "Tyres.CSV")) {
+									found := true
+
+									telemetry += 1
+								}
+
+								if (FileExist(targetDirectory . "Tyres.Pressures.CSV")
+								 || FileExist(targetDirectory . "Tyres.Pressures.Distribution.CSV")) {
+									found := true
+
+									pressures += 1
+								}
+
+								loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Race Strategies\*.*", "F" {
+									found := true
+
+									strategies += 1
+								}
+
+								for ignore, type in kSetupTypes
+									loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type . "\*.*", "F" {
+										SplitPath(A_LoopFileName, , , &extension)
+
+										if (extension != "info") {
+											found := true
+
+											setups += 1
+										}
+									}
+
+								count := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length
+
+								if (count > 0) {
+									automations += count
+
+									found := true
+								}
+
+								if (found && !inList(cars, car))
+									cars.Push(car)
+							}
+						}
+			}
+
+			this.DataListView.Add("", translate("Tracks"), tracks.Length)
+			this.DataListView.Add("", translate("Automations"), automations)
+			this.DataListView.Add("", translate("Drivers"), drivers.Length)
+			this.DataListView.Add("", translate("Cars"), cars.Length)
+			this.DataListView.Add("", translate("Telemetry"), telemetry)
+			this.DataListView.Add("", translate("Pressures"), pressures)
+			this.DataListView.Add("", translate("Strategies"), strategies)
+			this.DataListView.Add("", translate("Setups"), setups)
+
+			this.DataListView.ModifyCol()
+			this.DataListView.ModifyCol(1, "AutoHdr")
+			this.DataListView.ModifyCol(2, "AutoHdr")
 		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+
+		if load
+			this.loadData()
 	}
 
 	selectStrategies() {
-		local window := this.Window
-		local defaultListView, ignore, column, userSetups, communitySetups, type, setups
+		local ignore, column, userSetups, communitySetups, type, setups
 		local info, origin
 
-		Gui %window%:Default
+		this.DataListView.Delete()
 
-		defaultListView := A_DefaultListView
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
 
-		try {
-			Gui ListView, % this.DataListView
+		for ignore, column in collect(["Source", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
 
-			LV_Delete()
+		userStrategies := true
+		communityStrategies := true
 
-			while LV_DeleteCol(1)
-				ignore := 1
+		this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userStrategies, &communityStrategies)
 
-			for ignore, column in collect(["Source", "#"], "translate")
-				LV_InsertCol(A_Index, "", column)
+		this.DataListView.Add("", translate("User"), userStrategies.Length)
 
-			userStrategies := true
-			communityStrategies := true
+		this.DataListView.Add("", translate("Community"), communityStrategies.Length)
 
-			this.SessionDatabase.getStrategyNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userStrategies, &communityStrategies)
+		this.DataListView.ModifyCol()
 
-			LV_Add("", translate("User"), userStrategies.Length())
+		loop 2
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
 
-			LV_Add("", translate("Community"), communityStrategies.Length())
-
-			LV_ModifyCol()
-
-			loop 2
-				LV_ModifyCol(A_Index, "AutoHdr")
-
-			this.loadStrategies()
-		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+		this.loadStrategies()
 	}
 
 	selectSetups() {
-		local window := this.Window
-		local defaultListView, ignore, column, userSetups, communitySetups, type, setups
+		local ignore, column, userSetups, communitySetups, type, setups
 		local info, origin
 
-		Gui %window%:Default
+		this.DataListView.Delete()
 
-		defaultListView := A_DefaultListView
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
 
-		try {
-			Gui ListView, % this.DataListView
+		for ignore, column in collect(["Source", "Type", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
 
-			LV_Delete()
+		userSetups := true
+		communitySetups := true
 
-			while LV_DeleteCol(1)
-				ignore := 1
+		this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userSetups, &communitySetups)
 
-			for ignore, column in collect(["Source", "Type", "#"], "translate")
-				LV_InsertCol(A_Index, "", column)
+		for type, setups in userSetups
+			this.DataListView.Add("", translate("User"), translate(kSetupNames[type]), setups.Length)
 
-			userSetups := true
-			communitySetups := true
+		for type, setups in communitySetups
+			this.DataListView.Add("", translate("Community"), translate(kSetupNames[type]), setups.Length)
 
-			this.SessionDatabase.getSetupNames(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, &userSetups, &communitySetups)
+		this.DataListView.ModifyCol()
 
-			for type, setups in userSetups
-				LV_Add("", translate("User"), translate(kSetupNames[type]), setups.Length())
+		loop 3
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
 
-			for type, setups in communitySetups
-				LV_Add("", translate("Community"), translate(kSetupNames[type]), setups.Length())
-
-			LV_ModifyCol()
-
-			loop 3
-				LV_ModifyCol(A_Index, "AutoHdr")
-
-			this.loadSetups(this.SelectedSetupType, true)
-		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+		this.loadSetups(this.SelectedSetupType, true)
 	}
 
 	selectPressures() {
-		local window := this.Window
-		local defaultListView, ignore, column, info, source, simulator
+		local ignore, column, info, source, simulator
 
-		Gui %window%:Default
+		this.DataListView.Delete()
 
-		defaultListView := A_DefaultListView
+		loop this.DataListView.GetCount("Col")
+			this.DataListView.DeleteCol(1)
 
-		try {
-			Gui ListView, % this.DataListView
+		for ignore, column in collect(["Source", "Weather", "T Air", "T Track", "Compound", "#"], translate)
+			this.DataListView.InsertCol(A_Index, "", column)
 
-			LV_Delete()
+		sessionDB := this.SessionDatabase
+		simulator := this.SelectedSimulator
 
-			while LV_DeleteCol(1)
-				ignore := 1
-
-			for ignore, column in collect(["Source", "Weather", "T Air", "T Track", "Compound", "#"], "translate")
-				LV_InsertCol(A_Index, "", column)
-
-			sessionDB := this.SessionDatabase
-			simulator := this.SelectedSimulator
-
-			for ignore, info in new this.EditorTyresDatabase().getPressureInfo(simulator, this.SelectedCar
-																			 , this.SelectedTrack, this.SelectedWeather) {
-				if (info.Source = "User") {
-					if (info.Driver = kNull)
-						source := translate("User")
-					else
-						source := sessionDB.getDriverName(simulator, info.Driver)
-				}
+		for ignore, info in SessionDatabaseEditor.EditorTyresDatabase().getPressureInfo(simulator, this.SelectedCar
+																					  , this.SelectedTrack, this.SelectedWeather) {
+			if (info.Source = "User") {
+				if (info.Driver = kNull)
+					source := translate("User")
 				else
-					source := translate("Community")
-
-				LV_Add("", source
-						 , translate(info.Weather)
-						 , Round(convertUnit("Temperature", info.AirTemperature))
-						 , Round(convertUnit("Temperature", info.TrackTemperature))
-						 , translate(info.Compound), info.Count)
+					source := sessionDB.getDriverName(simulator, info.Driver)
 			}
+			else
+				source := translate("Community")
 
-			LV_ModifyCol()
-
-			loop 6
-				LV_ModifyCol(A_Index, "AutoHdr")
-
-			this.loadPressures()
+			this.DataListView.Add("", source
+									, translate(info.Weather), Round(convertUnit("Temperature", info.AirTemperature)), Round(convertUnit("Temperature", info.TrackTemperature))
+									, translate(info.Compound), info.Count)
 		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
+
+		this.DataListView.ModifyCol()
+
+		loop 6
+			this.DataListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.loadPressures()
 	}
 
 	moduleAvailable(module) {
@@ -2958,15 +2625,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				window := this.Window
 
-				Gui %window%:Default
-
 				if ((module != "Automation") && this.TrackMap)
 					this.unloadTrackMap()
 
 				if (module != "Pressures")
-					Gui %window%:Color, D0D0D0, D8D8D8
+					window.BackColor := "D0D0D0"
 
-				switch module {
+				switch module, false {
 					case "Settings":
 						this.selectSettings()
 					case "Data":
@@ -2989,12 +2654,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	updateModules() {
 		local window := this.Window
 
-		Gui %window%:Default
-		Gui %window%:Color, D0D0D0, D8D8D8
+		window.BackColor := "D0D0D0"
 
-		GuiControl, , notesEdit, % this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
+		window["notesEdit"].Value := this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 
-		if this.moduleAvailable(this.SelectedModule)
+		if (this.SelectedModule && this.moduleAvailable(this.SelectedModule))
 			this.selectModule(this.SelectedModule, true)
 		else
 			this.selectModule("Settings", true)
@@ -3005,58 +2669,32 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	getSettingLabel(section := false, key := false) {
-		local window, defaultListView, selected
+		local selected
 
 		if !section {
-			window := this.Window
+			selected := this.SettingsListView.GetNext(0)
 
-			Gui %window%:Default
-
-			defaultListView := A_DefaultListView
-
-			try {
-				Gui ListView, % this.SettingsListView
-
-				selected := LV_GetNext(0)
-
-				if selected {
-					section := this.iSettings[selected][1]
-					key := this.iSettings[selected][2]
-				}
-			}
-			finally {
-				Gui ListView, %defaultListView%
+			if selected {
+				section := this.iSettings[selected][1]
+				key := this.iSettings[selected][2]
 			}
 		}
 
 		return getMultiMapValue(this.SettingDescriptors, section . ".Labels", key, "")
 	}
 
-	getSettingType(section := false, key := false, ByRef default := false) {
-		local window, defaultListView, selected, type
+	getSettingType(section := false, key := false, &default := false) {
+		local selected, type
 
 		if !section {
-			window := this.Window
+			selected := this.SettingsListView.GetNext(0)
 
-			Gui %window%:Default
-
-			defaultListView := A_DefaultListView
-
-			try {
-				Gui ListView, % this.SettingsListView
-
-				selected := LV_GetNext(0)
-
-				if selected {
-					section := this.iSettings[selected][1]
-					key := this.iSettings[selected][2]
-				}
-				else
-					return default
+			if selected {
+				section := this.iSettings[selected][1]
+				key := this.iSettings[selected][2]
 			}
-			finally {
-				Gui ListView, %defaultListView%
-			}
+			else
+				return default
 		}
 
 		type := getMultiMapValue(this.SettingDescriptors, section . ".Types", key, false)
@@ -3092,7 +2730,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local fileName, settingDescriptors, section, values, key, value, settings, skip, ignore
 		local available, index, candidate, rootDirectory
 
-		if (this.SettingDescriptors.Count() = 0) {
+		if (this.SettingDescriptors.Count = 0) {
 			settingDescriptors := readMultiMap(kResourcesDirectory . "Database\Settings.ini")
 
 			for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
@@ -3145,21 +2783,16 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	addSetting(section, key, value) {
 		local window := this.Window
-		local defaultListView, type, ignore, display
+		local type, ignore, display
 
-		Gui %window%:Default
-		Gui %window%:+Disabled
-
-		defaultListView := A_DefaultListView
+		window.Opt("+Disabled")
 
 		try {
-			Gui ListView, % this.SettingsListView
-
 			this.iSettings.Push(Array(section, key))
 
 			ignore := false
 
-			type := this.getSettingType(section, key, ignore)
+			type := this.getSettingType(section, key, &ignore)
 
 			if IsObject(type)
 				display := translate(value)
@@ -3172,50 +2805,44 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else
 				display := value
 
-			LV_Modify(LV_Add("Select", this.getSettingLabel(section, key), display), "Vis")
+			this.SettingsListView.Modify(this.SettingsListView.Add("Select", this.getSettingLabel(section, key), display), "Vis")
 
-			LV_ModifyCol()
+			this.SettingsListView.ModifyCol()
 
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
+			this.SettingsListView.ModifyCol(1, "AutoHdr")
+			this.SettingsListView.ModifyCol(2, "AutoHdr")
 
-			new SettingsDatabase().setSettingValue(this.SelectedSimulator
-												 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-												 , section, key, value)
+			SettingsDatabase().setSettingValue(this.SelectedSimulator
+											 , this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+											 , section, key, value)
 
 			this.selectSettings(false)
 			this.updateState()
 		}
 		finally {
-			Gui %window%:-Disabled
-			Gui ListView, %defaultListView%
+			window.Opt("-Disabled")
 		}
 	}
 
 	deleteSetting(section, key) {
 		local window := this.Window
-		local defaultListView, selected
+		local selected
 
-		Gui %window%:Default
-		Gui %window%:+Disabled
-
-		defaultListView := A_DefaultListView
+		window.Opt("+Disabled")
 
 		try {
-			Gui ListView, % this.SettingsListView
+			selected := this.SettingsListView.GetNext(0)
 
-			selected := LV_GetNext(0)
+			this.SettingsListView.Delete(selected)
 
-			LV_Delete(selected)
+			this.SettingsListView.ModifyCol()
 
-			LV_ModifyCol()
+			this.SettingsListView.ModifyCol(1, "AutoHdr")
+			this.SettingsListView.ModifyCol(2, "AutoHdr")
 
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
-
-			new SettingsDatabase().removeSettingValue(this.SelectedSimulator
-													, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
-													, section, key)
+			SettingsDatabase().removeSettingValue(this.SelectedSimulator
+												, this.SelectedCar["*"], this.SelectedTrack["*"], this.SelectedWeather["*"]
+												, section, key)
 
 			this.iSettings.RemoveAt(selected)
 
@@ -3223,28 +2850,22 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.updateState()
 		}
 		finally {
-			Gui %window%:-Disabled
-			Gui ListView, %defaultListView%
+			window.Opt("-Disabled")
 		}
 	}
 
 	updateSetting(section, key, value) {
 		local window := this.Window
-		local defaultListView, selected, type, ignore, display, settingsDB
+		local selected, type, ignore, display, settingsDB
 
-		Gui %window%:Default
-		Gui %window%:+Disabled
-
-		defaultListView := A_DefaultListView
+		window.Opt("+Disabled")
 
 		try {
-			Gui ListView, % this.SettingsListView
-
-			selected := LV_GetNext(0)
+			selected := this.SettingsListView.GetNext(0)
 
 			ignore := false
 
-			type := this.getSettingType(section, key, ignore)
+			type := this.getSettingType(section, key, &ignore)
 
 			if IsObject(type)
 				display := translate(value)
@@ -3257,12 +2878,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else
 				display := value
 
-			LV_Modify(selected, "", this.getSettingLabel(section, key), display)
+			this.SettingsListView.Modify(selected, "", this.getSettingLabel(section, key), display)
 
-			LV_ModifyCol()
+			this.SettingsListView.ModifyCol()
 
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
+			this.SettingsListView.ModifyCol(1, "AutoHdr")
+			this.SettingsListView.ModifyCol(2, "AutoHdr")
 
 			settingsDB := SettingsDatabase()
 
@@ -3283,8 +2904,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			this.updateState()
 		}
 		finally {
-			Gui %window%:-Disabled
-			Gui ListView, %defaultListView%
+			window.Opt("-Disabled")
 		}
 	}
 
@@ -3298,36 +2918,31 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		static lastCar := false
 		static lastTrack := false
 		static lastCommunity := "__Undefined__"
+		static lastColor := "D0D0D0"
 
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
 		 && this.SelectedTrack && (this.SelectedSimulator != true)) {
 			window := this.Window
 
-			Gui %window%:Default
-
-			static lastColor := "D0D0D0"
+			lastColor := "D0D0D0"
 
 			try {
-				GuiControlGet airTemperatureEdit
-				GuiControlGet trackTemperatureEdit
-				GuiControlGet tyreCompoundDropDown
-
 				compounds := sessionDB.getTyreCompounds(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
-
-				GuiControl, , tyreCompoundDropDown, % ("|" . values2String("|", collect(compounds, "translate")*))
 
 				chosenCompound := 0
 
 				if ((this.SelectedSimulator = lastSimulator) && (this.SelectedCar = lastCar) && (this.SelectedTrack = lastTrack))
-					chosenCompound := tyreCompoundDropDown
+					chosenCompound := window["tyreCompoundDropDown"].Text
 				else if this.iTyreCompound
 					chosenCompound := inList(compounds, compound(this.iTyreCompound, this.iTyreCompoundColor))
 
-				if ((chosenCompound == 0) && (compounds.Length() > 0))
+				if ((chosenCompound == 0) && (compounds.Length > 0))
 					chosenCompound := 1
 
-				GuiControl Choose, tyreCompoundDropDown, %chosenCompound%
+				window["tyreCompoundDropDown"].Delete()
+				window["tyreCompoundDropDown"].Add(collect(compounds, "translate"))
+				window["tyreCompoundDropDown"].Choose(chosenCompound)
 
 				if ((this.SelectedSimulator != lastSimulator) || (this.UseCommunity != lastCommunity)) {
 					drivers := [translate("All")]
@@ -3341,26 +2956,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							drivers.Push(sessionDB.getDriverName(this.SelectedSimulator, driver))
 						}
 
-					GuiControl, , driverDropDown, % "|" . values2String("|", drivers*)
+					window["driverDropDown"].Add(drivers)
 
 					if selectedDriver {
-						GuiControl Choose, driverDropDown, % inList(sessionDB.getAllDrivers(this.SelectedSimulator), selectedDriver) + 1
+						window["driverDropDown"].Choose(inList(sessionDB.getAllDrivers(this.SelectedSimulator), selectedDriver) + 1)
 
 						driver := [[selectedDriver]]
 					}
 					else {
-						GuiControl Choose, driverDropDown, 1
+						window["driverDropDown"].Text.Choose(1)
 
 						driver := [true]
 					}
 				}
 				else {
-					GuiControlGet driverDropDown
-
-					if (driverDropDown = translate("All"))
+					if (window["driverDropDown"].Text = translate("All"))
 						driver := [true]
 					else
-						driver := [[sessionDB.getDriverID(this.SelectedSimulator, driverDropDown)]]
+						driver := [[sessionDB.getDriverID(this.SelectedSimulator, window["driverDropDown"].Text)]]
 				}
 
 				lastSimulator := this.SelectedSimulator
@@ -3377,25 +2990,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					this.iTyreCompound := compound
 					this.iTyreCompoundColor := compoundColor
 
-					pressureInfos := this.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
-																			   , this.SelectedTrack, this.SelectedWeather
-																			   , convertUnit("Temperature", airTemperatureEdit, false)
-																			   , convertUnit("Temperature", trackTemperatureEdit, false)
-																			   , compound, compoundColor, driver*)
+					pressureInfos := SessionDatabaseEditor.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar																			   			  , this.SelectedTrack, this.SelectedWeather
+																							, convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
+																							, convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
+																							, compound, compoundColor, driver*)
 				}
 				else
 					pressureInfos := []
 
-				if (pressureInfos.Count() == 0) {
+				if (pressureInfos.Count == 0) {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
 						for ignore, postfix in ["1", "2", "3", "4", "5"] {
-							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", 0.0)
-							GuiControl +Background, %tyre%Pressure%postfix%
-							GuiControl Disable, %tyre%Pressure%postfix%
+							window[tyre . "Pressure" . postfix].Text := displayValue("Float", 0.0)
+							window[tyre . "Pressure" . postfix].Options("+Background")
+							window[tyre . "Pressure" . postfix].Enabled := false
 						}
 
 					if this.RequestorPID
-						GuiControl Disable, transferPressuresButton
+						window["transferPressuresButton"].Enabled := false
 				}
 				else {
 					for tyre, pressureInfo in pressureInfos {
@@ -3415,26 +3027,26 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						if (true || (color != lastColor)) {
 							lastColor := color
 
-							Gui %window%:Color, D0D0D0, %color%
+							window.BackColor := lastColor
 						}
 
 						for index, postfix in ["1", "2", "3", "4", "5"] {
-							GuiControl Text, %tyre%Pressure%postfix%, % displayValue("Float", convertUnit("Pressure", pressure))
+							window[tyre . "Pressure" . postfix].Text := displayValue("Float", convertUnit("Pressure", pressure))
 
 							if (index = (3 + airDelta)) {
-								GuiControl +Background, %tyre%Pressure%postfix%
-								GuiControl Enable, %tyre%Pressure%postfix%
+								window[tyre . "Pressure" . postfix].Options("+Background")
+								window[tyre . "Pressure" . postfix].Enabled := true
 							}
 							else {
-								GuiControl -Background, %tyre%Pressure%postfix%
-								GuiControl Disable, %tyre%Pressure%postfix%
+								window[tyre . "Pressure" . postfix].Options("-Background")
+								window[tyre . "Pressure" . postfix].Enabled := false
 							}
 
 							pressure += 0.1
 						}
 
 						if this.RequestorPID
-							GuiControl Enable, transferPressuresButton
+							window["transferPressuresButton"].Enabled := true
 					}
 				}
 			}
@@ -3450,42 +3062,31 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local configuration
 
-		Gui PE:+Owner%window%
-		Gui %window%:+Disabled
+		window.Opt("+Disabled")
 
-		Gui %window%:Default
-
-		GuiControlGet airTemperatureEdit
-		GuiControlGet trackTemperatureEdit
-		GuiControlGet tyreCompoundDropDown
-
-		if new PressuresEditor(this, this.iTyreCompound, this.iTyreCompoundColor
-								   , Round(convertUnit("Temperature", airTemperatureEdit, false))
-								   , Round(convertUnit("Temperature", trackTemperatureEdit, false))).editPressures()
-			this.selectPressures()
-
-		Gui %window%:-Disabled
+		try {
+			if PressuresEditor(this, this.iTyreCompound, this.iTyreCompoundColor
+							 , Round(convertUnit("Temperature", window["airTemperatureEdit"].Value, false))
+							 , Round(convertUnit("Temperature", window["trackTemperatureEdit"].Value, false))).editPressures()
+				this.selectPressures()
+		}
+		finally {
+			window.Opt("-Disabled")
+		}
 	}
 
 	selectStrategy(row) {
 		local window := this.Window
-		local name, info
-
-		Gui %window%:Default
-
-		Gui ListView, % this.StrategyListView
-
-		LV_GetText(name, row, 2)
-
-		info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name)
+		local info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+														  , this.StrategyListView.GetText(row, 2))
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
-			GuiControl, , shareStrategyWithCommunityCheck, % getMultiMapValue(info, "Access", "Share", false)
-			GuiControl, , shareStrategyWithTeamServerCheck, % getMultiMapValue(info, "Access", "Synchronize", false)
+			window["shareStrategyWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
+			window["shareStrategyWithTeamServerCheck"].Value := getMultiMapValue(info, "Access", "Synchronize", false)
 		}
 		else {
-			GuiControl, , shareStrategyWithCommunityCheck, 0
-			GuiControl, , shareStrategyWithTeamServerCheck, 0
+			window["shareStrategyWithCommunityCheck"].Value := 0
+			window["shareStrategyWithTeamServerCheck"].Value := 0
 		}
 
 		this.updateState()
@@ -3493,27 +3094,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	selectSetup(row) {
 		local window := this.Window
-		local type, name, info
+		local name, info
 
-		Gui %window%:Default
+		name := this.SetupListView.GetText(row, 2)
 
-		GuiControlGet setupTypeDropDown
-
-		type := kSetupTypes[setupTypeDropDown]
-
-		Gui ListView, % this.SetupListView
-
-		LV_GetText(name, row, 2)
-
-		info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, type, name)
+		info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+												 , kSetupTypes[window["setupTypeDropDown"].Value], name)
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
-			GuiControl, , shareSetupWithCommunityCheck, % getMultiMapValue(info, "Access", "Share", false)
-			GuiControl, , shareSetupWithTeamServerCheck, % getMultiMapValue(info, "Access", "Synchronize", false)
+			window["shareSetupWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)
+			window["shareSetupWithTeamServerCheck"].Value := getMultiMapValue(info, "Access", "Synchronize", false)
 		}
 		else {
-			GuiControl, , shareSetupWithCommunityCheck, 0
-			GuiControl, , shareSetupWithTeamServerCheck, 0
+			window["shareSetupWithCommunityCheck"].Value := 0
+			window["shareSetupWithTeamServerCheck"].Value := 0
 		}
 
 		this.updateState()
@@ -3521,20 +3115,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	uploadStrategy() {
 		local window := this.Window
-		local title := translate("Upload Strategy File...")
 		local fileName, strategy
 
-		Gui %window%:Default
-		Gui +OwnDialogs
+		window.Opt("+OwnDialogs")
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-		FileSelectFile fileName, 1, , %title%, , Strategy (*.strategy)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := FileSelect(1, "", translate("Upload Strategy File..."))
+		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if (fileName != "") {
 			strategy := readMultiMap(fileName)
 
-			SplitPath fileName, fileName
+			SplitPath(fileName, &fileName)
 
 			this.SessionDatabase.writeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, fileName, strategy, false, true)
 
@@ -3544,15 +3136,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	downloadStrategy(strategyName) {
 		local window := this.Window
-		local title := translate("Download Strategy File...")
 		local fileName
 
-		Gui %window%:Default
-		Gui +OwnDialogs
+		window.Opt("+OwnDialogs")
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-		FileSelectFile fileName, S16, %strategyName%, %title%, Strategy (*.strategy)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateSaveCancelButtons)
+		fileName := FileSelect("S16", strategyName, translate("Download Strategy File..."), "Strategy (*.strategy)")
+		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
 			deleteFile(fileName)
@@ -3562,17 +3152,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteStrategy(strategyName) {
-		local window := this.Window
-		local title := translate("Delete")
+		local msgResult
 
-		Gui %window%:Default
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to delete the selected strategy?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		MsgBox 262436, %title%, % translate("Do you really want to delete the selected strategy?")
-		OnMessage(0x44, "")
-
-		IfMsgBox Yes
-		{
+		if (msgResult = "Yes") {
 			this.SessionDatabase.removeStrategy(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, strategyName)
 
 			this.loadStrategies()
@@ -3581,18 +3167,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	renameStrategy(strategyName) {
 		local window := this.Window
-		local title := translate("Rename")
-		local prompt := translate("Please enter the new name for the selected strategy:")
 		local locale := ((getLanguage() = "en") ? "" : "Locale")
-		local newName, curExtension, curName
+		local result, newName, curExtension, curName
 
-		Gui %window%:Default
+		window.Opt("+OwnDialogs")
 
-		SplitPath strategyName, , , curExtension, curName
+		SplitPath(strategyName, , , &curExtension, &curName)
 
-		InputBox newName, %title%, %prompt%, , 300, 200, , , %locale%, , % curName
+		result := InputBox(translate("Please enter the new name for the selected strategy:"), translate("Rename"), "w300 h200", curName)
 
-		if !ErrorLevel {
+		if (result.Result = "Ok") {
+			newName := result.Value
+
 			if (StrLen(curExtension) > 0)
 				newName .= ("." . curExtension)
 
@@ -3604,15 +3190,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	uploadSetup(setupType) {
 		local window := this.Window
-		local title := translate("Upload Setup File...")
 		local fileName, file, size, setup
 
-		Gui %window%:Default
-		Gui +OwnDialogs
+		window.Opt("+OwnDialogs")
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-		FileSelectFile fileName, 1, , %title%
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := FileSelect(1, "", translate("Upload Setup File..."))
+		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if (fileName != "") {
 			file := FileOpen(fileName, "r")
@@ -3620,11 +3204,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if file {
 				size := file.Length
 
+				setup := Buffer(size)
+
 				file.RawRead(setup, size)
 
 				file.Close()
 
-				SplitPath fileName, fileName
+				setup := StrGet(setup)
+
+				SplitPath(fileName, &fileName)
 
 				this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, false, true)
 
@@ -3635,15 +3223,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	downloadSetup(setupType, setupName) {
 		local window := this.Window
-		local title := translate("Download Setup File...")
 		local fileName, setupData, file, size
 
-		Gui %window%:Default
-		Gui +OwnDialogs
+		window.Opt("+OwnDialogs")
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-		FileSelectFile fileName, S16, %setupName%, %title%
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateSaveCancelButtons)
+		fileName := FileSelect("S16", setupName, translate("Download Setup File..."))
+		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
 			size := false
@@ -3664,17 +3250,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteSetup(setupType, setupName) {
-		local window := this.Window
-		local title := translate("Delete")
+		local msgResult
 
-		Gui %window%:Default
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to delete the selected setup?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		MsgBox 262436, %title%, % translate("Do you really want to delete the selected setup?")
-		OnMessage(0x44, "")
-
-		IfMsgBox Yes
-		{
+		if (msgResult = "Yes") {
 			this.SessionDatabase.removeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, setupName)
 
 			this.loadSetups(this.SelectedSetupType, true)
@@ -3683,18 +3265,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	renameSetup(setupType, setupName) {
 		local window := this.Window
-		local title := translate("Rename")
-		local prompt := translate("Please enter the new name for the selected setup:")
 		local locale := ((getLanguage() = "en") ? "" : "Locale")
-		local newName, curExtension, curName
+		local result, newName, curExtension, curName
 
-		Gui %window%:Default
+		window.Opt("+OwnDialogs")
 
-		SplitPath setupName, , , curExtension, curName
+		SplitPath(setupName, , , &curExtension, &curName)
 
-		InputBox newName, %title%, %prompt%, , 300, 200, , , %locale%, , % curName
+		result := InputBox(translate("Please enter the new name for the selected setup:"), translate("Rename"), "w300 h200", curName)
 
-		if !ErrorLevel {
+		if (result.Result = "Ok") {
+			newName := result.Value
+
 			if (StrLen(curExtension) > 0)
 				newName .= ("." . curExtension)
 
@@ -3710,7 +3292,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-WM_MOUSEMOVE() {
+WM_MOUSEMOVE(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local x, y, coordinateX, coordinateY, window
 
@@ -3718,26 +3300,38 @@ WM_MOUSEMOVE() {
 	static previousAction := false
 	static actionInfo := ""
 
+    displayToolTip() {
+		SetTimer(displayToolTip, 0)
+
+		ToolTip(actionInfo)
+
+		SetTimer(removeToolTip, 10000)
+	}
+
+    removeToolTip() {
+		SetTimer(removeToolTip, 0)
+
+		ToolTip()
+	}
+
 	if (editor.SelectedModule = "Automation") {
 		window := editor.Window
 
-		Gui %window%:Default
-
-		MouseGetPos x, y
+		MouseGetPos(&x, &y)
 
 		coordinateX := false
 		coordinateY := false
 
 		if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
 									, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
-									, coordinateX, coordinateY) {
+									, &coordinateX, &coordinateY) {
 			currentAction := editor.findTrackAction(coordinateX, coordinateY)
 
 			if !currentAction
 				currentAction := (coordinateX . ";" . coordinateY)
 
 			if (currentAction && (currentAction != previousAction)) {
-				ToolTip
+				ToolTip()
 
 				if IsObject(currentAction) {
 					actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
@@ -3751,49 +3345,31 @@ WM_MOUSEMOVE() {
 				else
 					actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
 
-				SetTimer RemoveToolTip, Off
-				SetTimer DisplayToolTip, 1000
+				SetTimer(removeToolTip, 0)
+				SetTimer(displayToolTip, 1000)
 
 				previousAction := currentAction
 			}
 			else if !currentAction {
-				ToolTip
+				ToolTip()
 
-				SetTimer RemoveToolTip, Off
+				SetTimer(removeToolTip, 0)
 
 				previousAction := false
 			}
 		}
 		else {
-			ToolTip
+			ToolTip()
 
-			SetTimer RemoveToolTip, Off
+			SetTimer(removeToolTip, 0)
 
 			previousAction := false
 		}
 	}
-
-	return
-
-    DisplayToolTip:
-		SetTimer DisplayToolTip, Off
-
-		ToolTip %actionInfo%
-
-		SetTimer RemoveToolTip, 10000
-
-		return
-
-    RemoveToolTip:
-		SetTimer RemoveToolTip, Off
-
-		ToolTip
-
-		return
 }
 
-actionDialog(xOrCommand := false, y := false, action := false) {
-	local window, title, fileName, chosen, x
+actionDialog(xOrCommand := false, y := false, action := false, *) {
+	local fileName, chosen, x, translator
 
 	static result := false
 
@@ -3802,129 +3378,143 @@ actionDialog(xOrCommand := false, y := false, action := false) {
 	static actionEdit
 	static commandChooserButton
 
+	static actionDialogGui
+
 	if (xOrCommand == kOk)
 		result := kOk
 	else if (xOrCommand == kCancel)
 		result := kCancel
 	else if (xOrCommand = "Type") {
-		GuiControl, , actionEdit, % ""
+		actionEdit.Value := ""
 
 		actionDialog("Update")
 	}
 	else if (xOrCommand = "Update") {
-		GuiControlGet actionTypeDropDown
+		actionLabel.Text := translate((actionTypeDropDown.Value = 1) ? "Hotkey(s)" : "Command")
 
-		GuiControl, , actionLabel, % translate((actionTypeDropDown = 1) ? "Hotkey(s)" : "Command")
-
-		if (actionTypeDropDown = 1)
-			GuiControl Disable, commandChooserButton
+		if (actionTypeDropDown.Value = 1)
+			commandChooserButton.Enabled := false
 		else
-			GuiControl Enable, commandChooserButton
+			commandChooserButton.Enabled := true
 	}
 	else if (xOrCommand = "Command") {
-		GuiControlGet actionEdit
+		actionDialogGui.Opt("+OwnDialogs")
 
-		title := translate("Select executable file...")
+		translator := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-		FileSelectFile fileName, 1, %actionEdit%, %title%, Script (*.*)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translator)
+		fileName := FileSelect(1, actionEdit.Text, translate("Select executable file..."), "Script (*.*)")
+		OnMessage(0x44, translator, 0)
 
 		if fileName
-			GuiControl, , actionEdit, %fileName%
+			actionEdit.Text := fileName
 	}
 	else {
 		result := false
-		window := "EE"
 
-		Gui %window%:New
+		actionDialogGui := Gui()
 
-		Gui %window%:Default
+		actionDialogGui.Opt("-Border -Caption +0x800000")
+		actionDialogGui.BackColor := "D0D0D0"
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		actionDialogGui.SetFont("Norm", "Arial")
 
-		Gui %window%:Font, Norm, Arial
-
-		Gui %window%:Add, Text, x16 y16 w70 h23 +0x200, % translate("Action")
+		actionDialogGui.Add("Text", "x16 y16 w70 h23 +0x200", translate("Action"))
 
 		if action {
 			chosen := inList(["Hotkey", "Command"], action.Type)
+
 			actionEdit := action.Action
 		}
 		else {
 			chosen := 1
+
 			actionEdit := ""
 		}
 
-		Gui %window%:Add, DropDownList, x90 yp+1 w180 AltSubmit Choose%chosen% VactionTypeDropDown gchooseActionType, % values2String("|", collect(["Hotkey(s)", "Command"], "translate")*)
+		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 AltSubmit Choose" . chosen, collect(["Hotkey(s)", "Command"], translate))
+		actionTypeDropDown.OnEvent("Change", actionDialog.Bind("Type"))
 
-		Gui %window%:Add, Text, x16 yp+23 w70 h23 +0x200 vactionLabel, % translate("Hotkey(s)")
-		Gui %window%:Add, Edit, x90 yp+1 w155 h21 VactionEdit, %actionEdit%
-		Gui %window%:Add, Button, x247 yp w23 h23 vcommandChooserButton gchooseActionCommand, % translate("...")
+		actionLabel := actionDialogGui.Add("Text", "x16 yp+23 w70 h23 +0x200", translate("Hotkey(s)"))
+		actionEdit := actionDialogGui.Add("Edit", "x90 yp+1 w155 h21", actionEdit)
+		commandChooserButton := actionDialogGui.Add("Button", "x247 yp w23 h23", translate("..."))
+		commandChooserButton.OnEvent("Click", actionDialog.Bind("Command"))
 
-		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptAction, % translate("Ok")
-		Gui %window%:Add, Button, x146 yp w80 h23 gcancelAction, % translate("&Cancel")
+		actionDialogGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", actionDialog.Bind(kOk))
+		actionDialogGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", actionDialog.Bind(kCancel))
 
 		x := (xOrCommand - 150)
 		y := (y - 35)
 
 		actionDialog("Update")
 
-		Gui %window%:Show, x%x% y%y% AutoSize
+		actionDialogGui.Show("x" . x . " y" . y . " AutoSize")
 
 		while !result
-			Sleep 100
+			Sleep(100)
 
-		Gui %window%:Submit
-		Gui %window%:Destroy
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				if action
+					action := action.Clone()
+				else
+					action := Object()
 
-		if (result == kCancel)
-			return false
-		else if (result == kOk) {
-			GuiControlGet actionTypeDropDown
-			GuiControlGet actionEdit
+				action.Type := ["Hotkey", "Command"][actionTypeDropDown.Value]
+				action.Action := actionEdit.Text
 
-			if action
-				action := action.Clone()
-			else
-				action := Object()
-
-			action.Type := ["Hotkey", "Command"][actionTypeDropDown]
-			action.Action := actionEdit
-
-			return action
+				return action
+			}
+		}
+		finally {
+			actionDialogGui.Destroy()
 		}
 	}
 }
 
-chooseActionType() {
-	actionDialog("Type")
-}
-
-chooseActionCommand() {
-	actionDialog("Command")
-}
-
-acceptAction() {
-	actionDialog(kOk)
-}
-
-cancelAction() {
-	actionDialog(kCancel)
-}
-
-global importSelectCheck
-
-selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
-	local x, y, editor, owner, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
+selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
+	local x, y, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
 	local strategies, automations, row, selection, data, type, count
 
-	static importListViewHandle := false
+	static importDataGui
+	static importSelectCheck
+	static importListView := false
 	static result := false
+
+	selectAllImportEntries(*) {
+		if (importSelectCheck.Value == -1) {
+			importSelectCheck.Value := 0
+
+			importSelectCheck.Value := 0
+		}
+
+		loop importListView.GetCount()
+			importListView.Modify(A_Index, importSelectCheck.Value ? "Check" : "-Check")
+	}
+
+	selectImportEntry(*) {
+		local selected := 0
+		local row := 0
+
+		loop {
+			row := importListView.GetNext(row, "C")
+
+			if row
+				selected += 1
+			else
+				break
+		}
+
+		if (selected == 0)
+			importSelectCheck.Value := 0
+		else if (selected < importListView.GetCount())
+			importSelectCheck.Value := -1
+		else
+			importSelectCheck.Value := 1
+	}
 
 	if (sessionDatabaseEditorOrCommand = kCancel)
 		result := kCancel
@@ -3933,38 +3523,41 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 	else {
 		result := false
 
-		Gui IDS:Default
+		importDataGui := Gui()
 
-		Gui IDS:-Border ; -Caption
-		Gui IDS:Color, D0D0D0, D8D8D8
+		importDataGui.Opt("-Border -Caption +0x800000")
+		importDataGui.BackColor := "D0D0D0"
 
-		Gui IDS:Font, s10 Bold, Arial
+		importDataGui.SetFont("s10 Bold", "Arial")
 
-		Gui IDS:Add, Text, w394 Center gmoveImport, % translate("Modular Simulator Controller System")
+		importDataGui.Add("Text", "w394 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(importDataGui, "Session Database.Import"))
 
-		Gui IDS:Font, s9 Norm, Arial
-		Gui IDS:Font, Italic Underline, Arial
+		importDataGui.SetFont("s9 Norm", "Arial")
+		importDataGui.SetFont("Italic Underline", "Arial")
 
-		Gui IDS:Add, Text, x153 YP+20 w104 cBlue Center gopenSettingsDocumentation, % translate("Database Location")
+		importDataGui.Add("Text", "x153 YP+20 w104 cBlue Center", translate("Database Location")).OnEvent("Click", openDocumentation.Bind(importDataGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
 
-		Gui IDS:Font, s8 Norm, Arial
+		importDataGui.SetFont("s8 Norm", "Arial")
 
-		Gui IDS:Add, Text, x8 yp+30 w410 0x10
+		importDataGui.Add("Text", "x8 yp+30 w410 0x10")
 
-		Gui IDS:Add, CheckBox, Check3 x16 yp+12 w15 h23 vimportSelectCheck gselectAllImportEntries ; +Theme
+		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
+		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		Gui IDS:Add, ListView, x34 yp-2 w375 h400 -Multi -LV0x10 Checked AltSubmit HwndimportListViewHandle gselectImportEntry, % values2String("|", collect(["Type", "Car / Track", "Driver", "#"], "translate")*) ; NoSort NoSortHdr
+		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		importListView.OnEvent("Click", noSelect)
+		importListView.OnEvent("DoubleClick", noSelect)
+		importListView.OnEvent("ItemCheck", selectImportEntry)
 
 		directory := normalizeDirectoryPath(directory)
 		editor := sessionDatabaseEditorOrCommand
-		owner := editor.Window
 
 		simulator := editor.SelectedSimulator
 		code := editor.SessionDatabase.getSimulatorCode(simulator)
 
 		info := readMultiMap(directory . "\Export.info")
 
-		drivers := {}
+		drivers := CaseInsenseMap()
 
 		for id, name in getMultiMapValues(info, "Driver") {
 			drivers[id] := name
@@ -3973,23 +3566,16 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 		progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 
-		Gui %progressWindow%:+Owner%owner%
-		Gui %owner%:+Disabled
+		progressWindow.Opt("+Owner" . owner.Hwnd)
 
 		try {
-			tracks := 0
-
-			Gui IDS:Default
-			Gui ListView, %importListViewHandle%
-
 			tracks := []
 
-			loop Files, %directory%\.Tracks\*.*, F
-			{
-				SplitPath A_LoopFileName, , , , track
+			loop Files, directory . "\.Tracks\*.*", "F" {
+				SplitPath(A_LoopFileName, , , , &track)
 
 				if !inList(tracks, track) {
-					LV_Add("Check", translate("Tracks"), editor.getTrackName(simulator, track), "-", 1)
+					importListView.Add("Check", translate("Tracks"), editor.getTrackName(simulator, track), "-", 1)
 
 					tracks.Push(track)
 				}
@@ -3997,24 +3583,18 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 
 			progress := 0
 
-			loop Files, %directory%\*.*, D	; Car
-			{
+			loop Files, directory . "\*.*", "D" {
 				car := A_LoopFileName
 				carName := editor.getCarName(simulator, car)
 
-				loop Files, %directory%\%car%\*.*, D	; Track
-				{
+				loop Files, directory . "\" . car . "\*.*", "D" {
 					track := A_LoopFileName
 					trackName := editor.getTrackName(simulator, track)
 
-					showProgress({progress: ++progress
-								, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
+					showProgress({progress: ++progress, message: translate("Car: ") . carName . translate(", Track: ") . trackName})
 
 					if (progress >= 100)
 						progress := 0
-
-					Gui IDS:Default
-					Gui ListView, %importListViewHandle%
 
 					sourceDirectory := (A_LoopFileDir . "\" . track)
 
@@ -4028,7 +3608,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 						count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
 						if (count > 0)
-							LV_Add("Check", translate("Telemetry"), (carName . " / " . trackName), driverName, count)
+							importListView.Add("Check", translate("Telemetry"), (carName . " / " . trackName), driverName, count)
 					}
 
 					tyresDB := Database(sourceDirectory . "\", kTyresSchemas)
@@ -4037,85 +3617,71 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 						rows := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
 																, Where: {Driver: driver}})
 
-						count := ((rows.Length() > 0) ? rows[1].Count : 0)
+						count := ((rows.Length > 0) ? rows[1].Count : 0)
 
-						rows := tyresDB.query("Tyres.Pressures.Distribution"
-											, {Group: [["Driver", "count", "Count"]]
-											 , Where: {Driver: driver}})
+						rows := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", "count", "Count"]]
+																			 , Where: {Driver: driver}})
 
-						count += ((rows.Length() > 0) ? rows[1].Count : 0)
+						count += ((rows.Length > 0) ? rows[1].Count : 0)
 
 						if (count > 0)
-							LV_Add("Check", translate("Pressures"), (carName . " / " . trackName), driverName, count)
+							importListView.Add("Check", translate("Pressures"), (carName . " / " . trackName), driverName, count)
 					}
 
 					strategies := 0
 
-					loop Files, %sourceDirectory%\Race Strategies\*.*, F		; Strategies
+					loop Files, sourceDirectory "\Race Strategies\*.*", "F"		; Strategies
 						strategies += 1
 
 					if (strategies > 0)
-						LV_Add("Check", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
+						importListView.Add("Check", translate("Strategies"), (carName . " / " . trackName), "-", strategies)
 
 					if FileExist(sourceDirectory . "\Track.automations") {
-						automations := editor.SessionDatabase.loadTrackAutomations(sourceDirectory . "\Track.automations").Length()
+						automations := editor.SessionDatabase.loadTrackAutomations(sourceDirectory . "\Track.automations").Length
 
 						if (automations > 0)
-							LV_Add("Check", translate("Automations"), (carName . " / " . trackName), "-", automations)
+							importListView.Add("Check", translate("Automations"), (carName . " / " . trackName), "-", automations)
 					}
 				}
 			}
 		}
 		finally {
-			Gui %owner%:+Disabled
-
 			hideProgress()
 		}
 
-		Gui IDS:Default
-		Gui ListView, %importListViewHandle%
+		importSelectCheck.Value := ((importListView.GetCount() > 0) ? 1 : 0)
 
-		GuiControl, , importSelectCheck, % ((LV_GetCount() > 0) ? 1 : 0)
-
-		LV_ModifyCol()
+		importListView.ModifyCol()
 
 		loop 4
-			LV_ModifyCol(A_Index, "AutoHdr")
+			importListView.ModifyCol(A_Index, "AutoHdr")
 
-		Gui IDS:Font, s8 Norm, Arial
+		importDataGui.SetFont("s8 Norm", "Arial")
 
-		Gui IDS:Add, Text, x8 yp+410 w410 0x10
+		importDataGui.Add("Text", "x8 yp+410 w410 0x10")
 
-		Gui IDS:Add, Button, x123 yp+10 w80 h23 Default GacceptImport, % translate("Ok")
-		Gui IDS:Add, Button, x226 yp w80 h23 GcancelImport, % translate("&Cancel")
+		importDataGui.Add("Button", "x123 yp+10 w80 h23 Default GacceptImport", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
+		importDataGui.Add("Button", "x226 yp w80 h23 GcancelImport", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))
 
-		Gui IDS:+Owner%owner%
-		Gui %owner%:+Disabled
+		importDataGui.Opt("+Owner" . owner.Hwnd)
 
-		try {
-			if getWindowPosition("Session Database.Import", x, y)
-				Gui IDS:Show, x%x% y%y%
-			else
-				Gui IDS:Show
+		if getWindowPosition("Session Database.Import", &x, &y)
+			importDataGui.Show("x" . x . " y" . y)
+		else
+			importDataGui.Show()
 
-			loop
-				Sleep 100
-			until result
-		}
-		finally {
-			Gui %owner%:-Disabled
-		}
+		loop
+			Sleep(100)
+		until result
 
 		if (result = kOk) {
-			Gui ListView, %importListViewHandle%
-
 			row := 0
 
-			selection := {}
+			selection := CaseInsenseMap()
 
-			while (row := LV_GetNext(row, "C")) {
-				LV_GetText(type, row, 1)
-				LV_GetText(data, row, 2)
+			while (row := importListView.GetNext(row, "C")) {
+				type := importListView.GetText(row, 1)
+				data := importListView.GetText(row, 2)
 
 				if InStr(data, " / ") {
 					data := string2Values(" / ", data)
@@ -4132,9 +3698,9 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 					track := "-"
 				}
 
-				LV_GetText(driver, row, 3)
+				driver := importListView.GetText(row, 3)
 
-				switch type {
+				switch type, false {
 					case translate("Tracks"):
 						type := "Tracks"
 					case translate("Telemetry"):
@@ -4150,8 +3716,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 				else if (car = "-")
 					selection["-." . editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]
 				else
-					selection[editor.getCarCode(simulator, car) . "."
-							. editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]
+					selection[editor.getCarCode(simulator, car) . "." . editor.getTrackCode(simulator, track) . "." . type] := drivers[driver]
 			}
 
 			result := selection
@@ -4159,93 +3724,26 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false) {
 		else
 			result := false
 
-		Gui IDS:Destroy
+		importDataGui.Destroy()
 
 		return result
 	}
 }
 
-acceptImport() {
-	selectImportData(kOk)
-}
-
-cancelImport() {
-	selectImportData(kCancel)
-}
-
-selectAllImportEntries() {
-	GuiControlGet importSelectCheck
-
-	if (importSelectCheck == -1) {
-		importSelectCheck := 0
-
-		GuiControl, , importSelectCheck, 0
-	}
-
-	loop % LV_GetCount()
-		LV_Modify(A_Index, importSelectCheck ? "Check" : "-Check")
-}
-
-selectImportEntry() {
-	local selected := 0
-	local row := 0
-
-	loop {
-		row := LV_GetNext(row, "C")
-
-		if row
-			selected += 1
-		else
-			break
-	}
-
-	if (selected == 0)
-		GuiControl, , importSelectCheck, 0
-	else if (selected < LV_GetCount())
-		GuiControl, , importSelectCheck, -1
-	else
-		GuiControl, , importSelectCheck, 1
-}
-
-moveImport() {
-	moveByMouse("IDS", "Session Database.Import")
-}
-
-openImportDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
-}
-
-showSettings() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-
-	protectionOn()
-
-	Gui SE:+Owner%window%
-	Gui %window%:+Disabled
-
-	try {
-		editSettings(editor)
-	}
-	finally {
-		Gui %window%:-Disabled
-
-		protectionOff()
-	}
-}
-
 editSettings(editorOrCommand, arguments*) {
-	local title, window, x, y, done, configuration, dllName, dllFile, connector, connection
+	local x, y, done, configuration, dllName, dllFile, connector, connection
 	local directory, empty, original, changed, restart, groups, replication
-	local oldConnections, ignore, group, enabled
+	local oldConnections, ignore, group, enabled, values
 	local identifier, serverURL, serverToken, serverURLs, serverTokens
-	local availableServerURLs, settings, chosen
+	local availableServerURLs, settings, chosen, translator, msgResult
 
 	static result := false
 	static sessionDB := false
 
 	static connections := []
 	static currentConnection := 0
+
+	static settingsEditorGui
 
 	static addConnectionButton
 	static deleteConnectionButton
@@ -4261,16 +3759,27 @@ editSettings(editorOrCommand, arguments*) {
 	static serverURLEdit := ""
 	static serverTokenEdit := ""
 	static serverUpdateEdit := 0
-	static tokenButtonHandle
+	static validateTokenButton
 	static rebuildButton
+
+	rebuildDatabase(*) {
+		local msgResult
+
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to rebuild the local database?"), translate("Team Server"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes")
+			editSettings("Rebuild")
+	}
 
 	if (editorOrCommand == kOk) {
 		if currentConnection
 			editSettings("SaveConnection")
 
-		serverURLs := {}
-		serverTokens := {}
-		groups := {}
+		serverURLs := CaseInsenseMap()
+		serverTokens := CaseInsenseMap()
+		groups := CaseInsenseMap()
 
 		for ignore, connection in connections {
 			serverURLs[connection[1]] := connection[2]
@@ -4278,11 +3787,10 @@ editSettings(editorOrCommand, arguments*) {
 			groups[connection[1]] := values2String(",", connection[4]*)
 		}
 
-		if ((groups.Count() != connections.Length()) || (serverURLs.Count() != connections.Length()) || (serverTokens.Count() != connections.Length())) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+		if ((groups.Count() != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length)) {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 		}
 		else
 			result := kOk
@@ -4294,12 +3802,12 @@ editSettings(editorOrCommand, arguments*) {
 
 		connections.Push([translate("Standard"), "https://localhost:5001", "", ["Telemetry"]])
 
-		editSettings("LoadConnection", connections.Length())
+		editSettings("LoadConnection", connections.Length)
 	}
 	else if (editorOrCommand == "DeleteConnection") {
 		connections.RemoveAt(currentConnection)
 
-		if (connections.Length() > 0)
+		if (connections.Length > 0)
 			editSettings("LoadConnection", 1)
 		else {
 			currentConnection := false
@@ -4324,59 +3832,43 @@ editSettings(editorOrCommand, arguments*) {
 	else if (editorOrCommand == "LoadConnection") {
 		currentConnection := arguments[1]
 
-		serverIdentifierEdit := connections[currentConnection][1]
-		serverURLEdit := connections[currentConnection][2]
-		serverTokenEdit := connections[currentConnection][3]
-
-		GuiControl, , serverIdentifierEdit, %serverIdentifierEdit%
+		serverIdentifierEdit.Text := connections[currentConnection][1]
 
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
-		if (!inList(availableServerURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
-			availableServerURLs.Push(serverURLEdit)
+		if (!inList(availableServerURLs, connections[currentConnection][2]) && StrLen(connections[currentConnection][2]) > 0)
+			availableServerURLs.Push(connections[currentConnection][2])
 
-		chosen := inList(availableServerURLs, serverURLEdit)
-		if (!chosen && (availableServerURLs.Length() > 0))
+		chosen := inList(availableServerURLs, connections[currentConnection][2])
+		if (!chosen && (availableServerURLs.Length > 0))
 			chosen := 1
 
-		GuiControl, , serverURLEdit, % ("|" . values2String("|", availableServerURLs*))
-		GuiControl Choose, serverURLEdit, %chosen%
-		GuiControl, , serverTokenEdit, %serverTokenEdit%
+		serverURLEdit.Delete()
+		serverURLEdit.Add(availableServerURLs)
+		serverURLEdit.Choose(chosen)
+		serverTokenEdit.Text := connections[currentConnection][3]
 
 		groups := connections[currentConnection][4]
 
-		synchTelemetryCheck := (inList(groups, "Telemetry") != false)
-		synchPressuresCheck := (inList(groups, "Pressures") != false)
-		synchSetupsCheck := (inList(groups, "Setups") != false)
-		synchStrategiesCheck := (inList(groups, "Strategies") != false)
-
-		GuiControl, , synchTelemetryCheck, %synchTelemetryCheck%
-		GuiControl, , synchPressuresCheck, %synchPressuresCheck%
-		GuiControl, , synchSetupsCheck, %synchSetupsCheck%
-		GuiControl, , synchStrategiesCheck, %synchStrategiesCheck%
+		synchTelemetryCheck.Value := (inList(groups, "Telemetry") != false)
+		synchPressuresCheck.Value := (inList(groups, "Pressures") != false)
+		synchSetupsCheck.Value := (inList(groups, "Setups") != false)
+		synchStrategiesCheck.Value := (inList(groups, "Strategies") != false)
 
 		editSettings("UpdateState")
 	}
 	else if (editorOrCommand == "SaveConnection") {
 		if currentConnection {
-			GuiControlGet serverIdentifierEdit
-			GuiControlGet serverURLEdit
-			GuiControlGet serverTokenEdit
-			GuiControlGet synchTelemetryCheck
-			GuiControlGet synchPressuresCheck
-			GuiControlGet synchSetupsCheck
-			GuiControlGet synchStrategiesCheck
-
-			connections[currentConnection][1] := serverIdentifierEdit
-			connections[currentConnection][2] := serverURLEdit
-			connections[currentConnection][3] := serverTokenEdit
+			connections[currentConnection][1] := serverIdentifierEdit.Text
+			connections[currentConnection][2] := serverURLEdit.Text
+			connections[currentConnection][3] := serverTokenEdit.Text
 
 			groups := []
 
-			for group, enabled in {Telemetry: synchTelemetryCheck, Pressures: synchPressuresCheck
-								 , Setups: synchSetupsCheck, Strategies: synchStrategiesCheck}
+			for group, enabled in Map("Telemetry", synchTelemetryCheck.Value, "Pressures", synchPressuresCheck.Value
+									, "Setups", synchSetupsCheck.Value, "Strategies", synchStrategiesCheck.Value)
 				if enabled
 					groups.Push(group)
 
@@ -4386,27 +3878,23 @@ editSettings(editorOrCommand, arguments*) {
 	else if (editorOrCommand = "Rebuild") {
 		configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-		setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
+		setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", CaseInsenseMap()))
 
 		writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 	}
 	else if (editorOrCommand = "DatabaseLocation") {
-		Gui +OwnDialogs
+		settingsEditorGui.Opt("+OwnDialogs")
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%kDatabaseDirectory%, 0, % translate("Select Session Database folder...")
-		OnMessage(0x44, "")
+		translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
-		if (directory != "") {
-			databaseLocationEdit := directory
+		OnMessage(0x44, translator)
+		directory := DirSelect("*" kDatabaseDirectory, 0, translate("Select Session Database folder..."))
+		OnMessage(0x44, translator, 0)
 
-			GuiControl, , databaseLocationEdit, %databaseLocationEdit%
-		}
+		if (directory != "")
+			databaseLocationEdit.Text := directory
 	}
 	else if (editorOrCommand = "ValidateToken") {
-		GuiControlGet serverURLEdit
-		GuiControlGet serverTokenEdit
-
 		dllName := "Data Store Connector.dll"
 		dllFile := kBinariesDirectory . dllName
 
@@ -4429,31 +3917,27 @@ editSettings(editorOrCommand, arguments*) {
 		}
 
 		if GetKeyState("Ctrl", "P") {
-			Gui TSL:+OwnerSE
-			Gui SE:+Disabled
+			settingsEditorGui.Opt("+Disabled")
 
 			try {
-				token := loginDialog(connector, serverURLEdit)
+				token := loginDialog(connector, serverURLEdit.Text, settingsEditorGui)
 
-				if token {
-					serverTokenEdit := token
-
-					Gui SE:Default
-
-					GuiControl Text, serverTokenEdit, %serverTokenEdit%
-				}
+				if token
+					serverTokenEdit.Text := token
 				else
 					return
 			}
 			finally {
-				Gui SE:-Disabled
+				settingsEditorGui.Opt("-Disabled")
 			}
 		}
 
-		try {
-			connector.Initialize(serverURLEdit, serverTokenEdit)
+		serverURL := serverURLEdit.Text
 
-			connection := connector.Connect(serverTokenEdit, sessionDB.ID, sessionDB.getUserName())
+		try {
+			connector.Initialize(serverURL, serverTokenEdit.Text)
+
+			connection := connector.Connect(serverTokenEdit.Text, sessionDB.ID, sessionDB.getUserName())
 
 			if (connection && (connection != "")) {
 				connector.ValidateDataToken()
@@ -4462,115 +3946,99 @@ editSettings(editorOrCommand, arguments*) {
 
 				availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
-				if !inList(availableServerURLs, serverURLEdit) {
-					availableServerURLs.Push(serverURLEdit)
+				if !inList(availableServerURLs, serverURL) {
+					availableServerURLs.Push(serverURL)
 
 					setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", availableServerURLs*))
 
 					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-					GuiControl, , serverURLEdit, % ("|" . values2String("|", availableServerURLs*))
-					GuiControl Choose, serverURLEdit, % inList(availableServerURLs, serverURLEdit)
+					serverURLEdit.Delete()
+					serverURLEdit.Add(availableServerURLs)
+					serverURLEdit.Choose(inList(availableServerURLs, serverURL))
 				}
 
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
 		catch Any as exception {
-			title := translate("Error")
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateOkButton)
+			MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
 	}
 	else if (editorOrCommand = "UpdateState") {
-		GuiControlGet synchTelemetryCheck
-		GuiControlGet synchPressuresCheck
-		GuiControlGet synchSetupsCheck
-		GuiControlGet synchStrategiesCheck
+		addConnectionButton.Enabled := true
 
-		GuiControl Enable, addConnectionButton
-
-		if (connections.Length() > 0) {
-			GuiControl Enable, deleteConnectionButton
-			GuiControl Enable, synchTelemetryCheck
-			GuiControl Enable, synchPressuresCheck
-			GuiControl Enable, synchSetupsCheck
-			GuiControl Enable, synchStrategiesCheck
+		if (connections.Length > 0) {
+			deleteConnectionButton.Enabled := true
+			synchTelemetryCheck.Enabled := true
+			synchPressuresCheck.Enabled := true
+			synchSetupsCheck.Enabled := true
+			synchStrategiesCheck.Enabled := true
 		}
 		else {
-			GuiControl Disable, deleteConnectionButton
-			GuiControl Disable, synchTelemetryCheck
-			GuiControl Disable, synchPressuresCheck
-			GuiControl Disable, synchSetupsCheck
-			GuiControl Disable, synchStrategiesCheck
+			deleteConnectionButton.Enabled := false
+			synchTelemetryCheck.Enabled := false
+			synchPressuresCheck.Enabled := false
+			synchSetupsCheck.Enabled := false
+			synchStrategiesCheck.Enabled := false
 
-			GuiControl, , synchTelemetryCheck, 0
-			GuiControl, , synchPressuresCheck, 0
-			GuiControl, , synchSetupsCheck, 0
-			GuiControl, , synchStrategiesCheck, 0
-
-			synchTelemetryCheck := false
-			synchPressuresCheck := false
-			synchSetupsCheck := false
-			synchStrategiesCheck := false
+			synchTelemetryCheck.Value := 0
+			synchPressuresCheck.Value := 0
+			synchSetupsCheck.Value := 0
+			synchStrategiesCheck.Value := 0
 		}
 
-		if (connections.Length() > 1) {
+		if (connections.Length > 1) {
 			if (currentConnection = 1)
-				GuiControl Disable, previousConnectionButton
+				previousConnectionButton.Enabled := false
 			else
-				GuiControl Enable, previousConnectionButton
+				previousConnectionButton.Enabled := true
 
-			if (currentConnection = connections.Length())
-				GuiControl Disable, nextConnectionButton
+			if (currentConnection = connections.Length)
+				nextConnectionButton.Enabled := false
 			else
-				GuiControl Enable, nextConnectionButton
+				nextConnectionButton.Enabled := true
 		}
 		else {
-			GuiControl Disable, nextConnectionButton
-			GuiControl Disable, previousConnectionButton
+			nextConnectionButton.Enabled := false
+			previousConnectionButton.Enabled := false
 		}
 
-		if ((connections.Length() > 0) && !synchTelemetryCheck && !synchPressuresCheck && !synchSetupsCheck && !synchStrategiesCheck) {
+		if ((connections.Length > 0) && !synchTelemetryCheck && !synchPressuresCheck && !synchSetupsCheck && !synchStrategiesCheck) {
 			synchTelemetryCheck := true
 
-			GuiControl, , synchTelemetryCheck, 1
+			synchTelemetryCheck.Value := 1
 		}
 
-		if (synchTelemetryCheck || synchPressuresCheck || synchSetupsCheck || synchStrategiesCheck) {
-			GuiControl Enable, serverIdentifierEdit
-			GuiControl Enable, serverURLEdit
-			GuiControl Enable, serverTokenEdit
-			GuiControl Enable, serverUpdateEdit
-			GuiControl Enable, %tokenButtonHandle%
-			GuiControl Enable, rebuildButton
+		if (synchTelemetryCheck.Value || synchPressuresCheck.Value || synchSetupsCheck.Value || synchStrategiesCheck.Value) {
+			serverIdentifierEdit.Enabled := true
+			serverURLEdit.Enabled := true
+			serverTokenEdit.Enabled := true
+			serverUpdateEdit.Enabled := true
+			validateTokenButton.Enabled := true
+			rebuildButton.Enabled := true
 
-			GuiControlGet serverUpdateEdit
+			serverUpdateEdit := serverUpdateEdit.Text
 
 			if (serverUpdateEdit = "")
-				GuiControl, , serverUpdateEdit, 10
+				serverUpdateEdit.Value := 10
 		}
 		else {
-			GuiControl Disable, serverIdentifierEdit
-			GuiControl Disable, serverURLEdit
-			GuiControl Disable, serverTokenEdit
-			GuiControl Disable, serverUpdateEdit
-			GuiControl Disable, %tokenButtonHandle%
-			GuiControl Disable, rebuildButton
+			serverIdentifierEdit.Enabled := false
+			serverURLEdit.Enabled := false
+			serverTokenEdit.Enabled := false
+			serverUpdateEdit.Enabled := false
+			validateTokenButton.Enabled := false
+			rebuildButton.Enabled := false
 
-			serverIdentifierEdit := ""
-			serverURLEdit := ""
-			serverTokenEdit := ""
-			serverUpdateEdit := ""
-
-			GuiControl, , serverIdentifierEdit, %serverIdentifierEdit%
-			GuiControl Choose, serverURLEdit, 0
-			GuiControl, , serverTokenEdit, %serverTokenEdit%
-			GuiControl, , serverUpdateEdit, %serverUpdateEdit%
+			serverIdentifierEdit.Text := ""
+			serverURLEdit.Choose(0)
+			serverTokenEdit.Text := ""
+			serverUpdateEdit.Text := ""
 		}
 	}
 	else {
@@ -4578,12 +4046,10 @@ editSettings(editorOrCommand, arguments*) {
 		result := false
 		sessionDB := editorOrCommand.SessionDatabase
 
-		window := "SE"
-
 		for identifier, serverURL in sessionDB.ServerURLs
 			connections.Push([identifier, serverURL, sessionDB.ServerToken[identifier], sessionDB.Groups[identifier]])
 
-		currentConnection := ((connections.Length() = 0) ? 0 : 1)
+		currentConnection := ((connections.Length = 0) ? 0 : 1)
 
 		configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
@@ -4596,7 +4062,7 @@ editSettings(editorOrCommand, arguments*) {
 		else
 			groups := []
 
-		if (groups.Length() > 0) {
+		if (groups.Length > 0) {
 			synchTelemetryCheck := (inList(groups, "Telemetry") != false)
 			synchPressuresCheck := (inList(groups, "Pressures") != false)
 			synchSetupsCheck := (inList(groups, "Setups") != false)
@@ -4619,10 +4085,10 @@ editSettings(editorOrCommand, arguments*) {
 				serverIdentifierEdit := "Standard"
 
 				serverURLEdit := stringToMap("|", "->", getMultiMapValue(configuration, "Team Server", "Server.URL", ""), "Standard")
-				serverURLEdit := (serverURLEdit.HasKey("Standard") ? serverURLEdit["Standard"] : "")
+				serverURLEdit := (serverURLEdit.Has("Standard") ? serverURLEdit["Standard"] : "")
 
 				serverTokenEdit := stringToMap("|", "->", getMultiMapValue(configuration, "Team Server", "Server.Token", ""), "Standard")
-				serverTokenEdit := (serverTokenEdit.HasKey("Standard") ? serverTokenEdit["Standard"] : "")
+				serverTokenEdit := (serverTokenEdit.Has("Standard") ? serverTokenEdit["Standard"] : "")
 
 				serverUpdateEdit := replication
 			}
@@ -4634,47 +4100,51 @@ editSettings(editorOrCommand, arguments*) {
 			serverUpdateEdit := ""
 		}
 
-		Gui %window%:New
+		settingsEditorGui := Gui()
 
-		Gui %window%:Default
+		settingsEditorGui.Opt("-Border -Caption +0x800000")
+		settingsEditorGui.BackColor := "D0D0D0"
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		settingsEditorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Font, s10 Bold, Arial
+		settingsEditorGui.Add("Text", "w394 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsEditorGui, "Session Database.Settings"))
 
-		Gui %window%:Add, Text, w394 Center gmoveSettings, % translate("Modular Simulator Controller System")
+		settingsEditorGui.SetFont("s9 Norm", "Arial")
+		settingsEditorGui.SetFont("Italic Underline", "Arial")
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+		settingsEditorGui.Add("Text", "x133 YP+20 w144 cBlue Center", translate("Database Settings")).OnEvent("Click", openDocumentation.Bind(settingsEditorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration"))
 
-		Gui %window%:Add, Text, x133 YP+20 w144 cBlue Center gopenSettingsDocumentation, % translate("Database Settings")
+		settingsEditorGui.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		settingsEditorGui.Add("Text", "x16 y60 w90 h23 +0x200", translate("Database Folder"))
+		databaseLocationEdit := settingsEditorGui.Add("Edit", "x146 yp w234 h21", databaseLocationEdit)
+		settingsEditorGui.Add("Button", "x382 yp-1 w23 h23", translate("...")).OnEvent("Click", editSettings.Bind("DatabaseLocation"))
 
-		Gui %window%:Add, Text, x16 y60 w90 h23 +0x200, % translate("Database Folder")
-		Gui %window%:Add, Edit, x146 yp w234 h21 VdatabaseLocationEdit, %databaseLocationEdit%
-		Gui %window%:Add, Button, x382 yp-1 w23 h23 gchooseDatabaseLocation, % translate("...")
+		settingsEditorGui.SetFont("Italic", "Arial")
 
-		Gui %window%:Font, Italic, Arial
+		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section", translate("Team Data"))
 
-		Gui %window%:Add, GroupBox, x16 yp+30 w388 h216 Section, % translate("Team Data")
+		settingsEditorGui.SetFont("Norm", "Arial")
 
-		Gui %window%:Font, Norm, Arial
+		values := [synchTelemetryCheck, synchPressuresCheck, synchSetupsCheck, synchStrategiesCheck]
 
-		Gui %window%:Add, Text, x24 yp+16 w90 h23 +0x200, % translate("Synchronization")
-		Gui %window%:Add, CheckBox, x146 yp+2 w120 h21 vsynchTelemetryCheck gupdateSettingsState, % translate("Telemetry Data")
-		Gui %window%:Add, CheckBox, x266 yp w120 h21 vsynchStrategiesCheck gupdateSettingsState, % translate("Race Strategies")
-		Gui %window%:Add, CheckBox, x146 yp+24 w120 h21 vsynchPressuresCheck gupdateSettingsState, % translate("Pressures Data")
-		Gui %window%:Add, CheckBox, x266 yp w120 h21 vsynchSetupsCheck gupdateSettingsState, % translate("Car Setups")
+		settingsEditorGui.Add("Text", "x24 yp+16 w90 h23 +0x200", translate("Synchronization"))
+		synchTelemetryCheck := settingsEditorGui.Add("CheckBox", "x146 yp+2 w120 h21", translate("Telemetry Data"))
+		synchTelemetryCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		synchStrategiesCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Race Strategies"))
+		synchStrategiesCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		synchPressuresCheck := settingsEditorGui.Add("CheckBox", "x146 yp+24 w120 h21", translate("Pressures Data"))
+		synchPressuresCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
+		synchSetupsCheck := settingsEditorGui.Add("CheckBox", "x266 yp w120 h21", translate("Car Setups"))
+		synchSetupsCheck.OnEvent("Click", editSettings.Bind("UpdateState"))
 
-		GuiControl, , synchTelemetryCheck, %synchTelemetryCheck%
-		GuiControl, , synchPressuresCheck, %synchPressuresCheck%
-		GuiControl, , synchSetupsCheck, %synchSetupsCheck%
-		GuiControl, , synchStrategiesCheck, %synchStrategiesCheck%
+		synchTelemetryCheck.Value := values[1]
+		synchPressuresCheck.Value := values[2]
+		synchSetupsCheck.Value := values[3]
+		synchStrategiesCheck.Value := values[4]
 
-		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, x146 yp+1 w246 vserverIdentifierEdit, %serverIdentifierEdit%
+		settingsEditorGui.Add("Text", "x24 yp+30 w90 h23 +0x200", translate("Name"))
+		serverIdentifierEdit := settingsEditorGui.Add("Edit", "x146 yp+1 w246", serverIdentifierEdit)
 
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
@@ -4684,42 +4154,56 @@ editSettings(editorOrCommand, arguments*) {
 			availableServerURLs.Push(serverURLEdit)
 
 		chosen := inList(availableServerURLs, serverURLEdit)
-		if (!chosen && (availableServerURLs.Length() > 0))
+		if (!chosen && (availableServerURLs.Length > 0))
 			chosen := 1
 
-		Gui %window%:Add, Text, x24 yp+30 w90 h23 +0x200, % translate("Server URL")
-		Gui %window%:Add, ComboBox, x146 yp+1 w246 Choose%chosen% vserverURLEdit, % values2String("|", availableServerURLs*)
+		settingsEditorGui.Add("Text", "x24 yp+30 w90 h23 +0x200", translate("Server URL"))
+		serverURLEdit := settingsEditorGui.Add("ComboBox", "x146 yp+1 w246 Choose" . chosen, availableServerURLs)
 
-		Gui %window%:Add, Text, x24 yp+23 w90 h23 +0x200, % translate("Data Token")
-		Gui %window%:Add, Edit, x146 yp w246 h21 vserverTokenEdit, %serverTokenEdit%
-		Gui %window%:Add, Button, x122 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gvalidateServerToken
-		setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+		settingsEditorGui.Add("Text", "x24 yp+23 w90 h23 +0x200", translate("Data Token"))
+		serverTokenEdit := settingsEditorGui.Add("Edit", "x146 yp w246 h21", serverTokenEdit)
 
-		Gui %window%:Add, Button, x296 yp+30 w23 h23 Center +0x200 HWNDbuttonHandle vaddConnectionButton gaddConnection
-		setButtonIcon(buttonHandle, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle vdeleteConnectionButton gdeleteConnection
-		setButtonIcon(buttonHandle, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle vpreviousConnectionButton gpreviousConnection
-		setButtonIcon(buttonHandle, kIconsDirectory . "Previous.ico", 1, "L4 T4 R4 B4")
-		Gui %window%:Add, Button, xp+24 yp w23 h23 Center +0x200 HWNDbuttonHandle vnextConnectionButton gnextConnection
-		setButtonIcon(buttonHandle, kIconsDirectory . "Next.ico", 1, "L4 T4 R4 B4")
+		validateTokenButton := settingsEditorGui.Add("Button", "x122 yp-1 w23 h23 Center +0x200")
+		validateTokenButton.OnEvent("Click", editSettings.Bind("ValidateToken"))
+		setButtonIcon(validateTokenButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, Text, x24 yp+30 w110 h23 +0x200, % translate("Synchronize each")
-		Gui %window%:Add, Edit, x146 yp w40 Number Limit2 vserverUpdateEdit, %serverUpdateEdit%
-		Gui %window%:Add, UpDown, xp+32 yp-2 w18 h20 Range10-90, %serverUpdateEdit%
-		Gui %window%:Add, Text, x190 yp w90 h23 +0x200, % translate("Minutes")
+		addConnectionButton := settingsEditorGui.Add("Button", "x296 yp+30 w23 h23 Center +0x200")
+		addConnectionButton.OnEvent("Click", editSettings.Bind("AddConnection"))
+		setButtonIcon(addConnectionButton, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, Button, x296 yp w96 vrebuildButton grebuildDatabase, % translate("Rebuild...")
+		deleteConnectionButton := settingsEditorGui.Add("Button", "xp+24 yp w23 h23 Center +0x200")
+		deleteConnectionButton.OnEvent("Click", editSettings.Bind("DeleteConnection"))
+		setButtonIcon(deleteConnectionButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, Button, x122 ys+224 w80 h23 gacceptSettings, % translate("Ok")
-		Gui %window%:Add, Button, x216 yp w80 h23 gcancelSettings, % translate("&Cancel")
+		previousConnectionButton := settingsEditorGui.Add("Button", "xp+24 yp w23 h23 Center +0x200")
+		previousConnectionButton.OnEvent("Click", editSettings.Bind("PreviousConnection"))
+		setButtonIcon(previousConnectionButton, kIconsDirectory . "Previous.ico", 1, "L4 T4 R4 B4")
 
-		updateSettingsState()
+		nextConnectionButton := settingsEditorGui.Add("Button", "xp+24 yp w23 h23 Center +0x200")
+		nextConnectionButton.OnEvent("Click", editSettings.Bind("NextConnection"))
+		setButtonIcon(nextConnectionButton, kIconsDirectory . "Next.ico", 1, "L4 T4 R4 B4")
 
-		if getWindowPosition("Session Database.Settings", x, y)
-			Gui %window%:Show, x%x% y%y%
+		values := serverUpdateEdit
+
+		settingsEditorGui.Add("Text", "x24 yp+30 w110 h23 +0x200", translate("Synchronize each"))
+		serverUpdateEdit := settingsEditorGui.Add("Edit", "x146 yp w40 Number Limit2", values)
+		settingsEditorGui.Add("UpDown", "xp+32 yp-2 w18 h20 Range10-90", values)
+		settingsEditorGui.Add("Text", "x190 yp w90 h23 +0x200", translate("Minutes"))
+
+		rebuildButton := settingsEditorGui.Add("Button", "x296 yp w96", translate("Rebuild..."))
+		rebuildButton.OnEvent("Click", rebuildDatabase)
+
+		settingsEditorGui.Add("Button", "x122 ys+224 w80 h23", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
+		settingsEditorGui.Add("Button", "x216 yp w80 h23", translate("&Cancel")).OnEvent("Click", editSettings.Bind(kCancel))
+
+		editSettings("UpdateState")
+
+		settingsEditorGui.Opt("+Owner" . arguments[1].Hwnd)
+
+		if getWindowPosition("Session Database.Settings", &x, &y)
+			settingsEditorGui.Show("x" . x . " y" . y)
 		else
-			Gui %window%:Show, AutoSize Center
+			settingsEditorGui.Show("AutoSize Center")
 
 		done := false
 
@@ -4727,77 +4211,59 @@ editSettings(editorOrCommand, arguments*) {
 			result := false
 
 			while !result
-				Sleep 100
+				Sleep(100)
 
 			if (result == kCancel)
 				done := true
 			else if (result == kOk) {
-				GuiControlGet databaseLocationEdit
-				GuiControlGet synchTelemetryCheck
-				GuiControlGet synchPressuresCheck
-				GuiControlGet synchSetupsCheck
-				GuiControlGet synchStrategiesCheck
-				GuiControlGet serverIdentifierEdit
-				GuiControlGet serverURLEdit
-				GuiControlGet serverTokenEdit
-				GuiControlGet serverUpdateEdit
-
 				changed := false
 				restart := false
 
-				if (databaseLocationEdit = "") {
-					title := translate("Error")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262160, %title%, % translate("You must enter a valid directory.")
-					OnMessage(0x44, "")
+				if (databaseLocationEdit.Text = "") {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must enter a valid directory."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
 
 					continue
 				}
-				else if (normalizeDirectoryPath(databaseLocationEdit) != normalizeDirectoryPath(kDatabaseDirectory)) {
-					if !FileExist(databaseLocationEdit)
+				else if (normalizeDirectoryPath(databaseLocationEdit.Text) != normalizeDirectoryPath(kDatabaseDirectory)) {
+					if !FileExist(databaseLocationEdit.Text)
 						try {
-							FileCreateDir %databaseLocationEdit%
+							DirCreate(databaseLocationEdit.Text)
 						}
 						catch Any as exception {
-							title := translate("Error")
-
-							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-							MsgBox 262160, %title%, % translate("You must enter a valid directory.")
-							OnMessage(0x44, "")
+							OnMessage(0x44, translateOkButton)
+							MsgBox(translate("You must enter a valid directory."), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
 
 							continue
 						}
 
-					SoundPlay *32
+					SoundPlay("*32")
 
-					title := translate("Information")
+					translator := translateMsgBoxButtons.Bind(["Yes", "No", "Cancel"])
 
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Cancel"]))
-					title := translate("Session Database")
-					MsgBox 262179, %title%, % translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
-					OnMessage(0x44, "")
+					OnMessage(0x44, translator)
+					msgResult := MsgBox(translate("You are about to change the session database location. Do you want to transfer the current content to the new location?")
+									  , translate("Session Database"), 262179)
+					OnMessage(0x44, translator, 0)
 
-					IfMsgBox Cancel
+					if (msgResult = "Cancel")
 						continue
 
-					IfMsgBox Yes
-					{
+					if (msgResult = "Yes") {
 						empty := true
 
-						loop Files, %databaseLocationEdit%\*.*, FD
-						{
+						loop Files, databaseLocationEdit.Text . "\*.*", "FD" {
 							empty := false
 
 							break
 						}
 
 						if !empty {
-							title := translate("Error")
-
-							OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-							MsgBox 262160, %title%, % translate("The new database folder must be empty.")
-							OnMessage(0x44, "")
+							OnMessage(0x44, translateOkButton)
+							MsgBox(translate("The new database folder must be empty."), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
 
 							continue
 						}
@@ -4806,18 +4272,16 @@ editSettings(editorOrCommand, arguments*) {
 
 						showProgress({color: "Green", title: translate("Transfering Session Database"), message: translate("...")})
 
-						copyFiles(original, databaseLocationEdit)
+						copyFiles(original, databaseLocationEdit.Text)
 
 						showProgress({progress: 100, message: translate("Finished...")})
 
-						Sleep 200
+						Sleep(200)
 
 						hideProgress()
 					}
 
-					sessionDB.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit) . "\")
-
-					title := translate("Information")
+					sessionDB.DatabasePath := (normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
 
 					changed := true
 					restart := true
@@ -4829,13 +4293,13 @@ editSettings(editorOrCommand, arguments*) {
 					for identifier, serverURL in sessionDB.ServerURLs
 						oldConnections.Push([identifier, serverURL, sessionDB.ServerToken[identifier], sessionDB.Groups[identifier]])
 
-					if (oldConnections.Length() != connections.Length()) {
+					if (oldConnections.Length != connections.Length) {
 						changed := true
 						restart := true
 					}
 					else
-						loop % connections.Length()
-						{
+						loop connections.Length {
+
 							currentConnection := A_Index
 
 							loop 3
@@ -4855,18 +4319,16 @@ editSettings(editorOrCommand, arguments*) {
 
 				configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
-				setMultiMapValue(configuration, "Team Server", "Replication", serverUpdateEdit)
+				setMultiMapValue(configuration, "Team Server", "Replication", serverUpdateEdit.Text)
 
 				if changed {
-					setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", {}))
+					setMultiMapValue(configuration, "Team Server", "Synchronization", mapToString("|", "->", CaseInsenseMap()))
 
-					databaseLocationEdit := (normalizeDirectoryPath(databaseLocationEdit) . "\")
+					setMultiMapValue(configuration, "Database", "Path", normalizeDirectoryPath(databaseLocationEdit.Text) . "\")
 
-					setMultiMapValue(configuration, "Database", "Path", databaseLocationEdit)
-
-					serverURLs := {}
-					serverTokens := {}
-					groups := {}
+					serverURLs := CaseInsenseMap()
+					serverTokens := CaseInsenseMap()
+					groups := CaseInsenseMap()
 
 					for ignore, connection in connections {
 						serverURLs[connection[1]] := connection[2]
@@ -4881,11 +4343,10 @@ editSettings(editorOrCommand, arguments*) {
 					writeMultiMap(kUserConfigDirectory . "Session Database.ini", configuration)
 
 					if restart {
-						title := translate("Information")
-
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						MsgBox 262192, %title%, % translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
-						OnMessage(0x44, "")
+						OnMessage(0x44, translateOkButton)
+						MsgBox(translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
+							 , translate("Information"), 262192)
+						OnMessage(0x44, translateOkButton, 0)
 
 						broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exit")
 					}
@@ -4899,67 +4360,12 @@ editSettings(editorOrCommand, arguments*) {
 			}
 		}
 
-		Gui %window%:Destroy
+		settingsEditorGui.Destroy()
 	}
 }
 
-acceptSettings() {
-	editSettings(kOk)
-}
-
-cancelSettings() {
-	editSettings(kCancel)
-}
-
-chooseDatabaseLocation() {
-	editSettings("DatabaseLocation")
-}
-
-addConnection() {
-	editSettings("AddConnection")
-}
-
-deleteConnection() {
-	editSettings("DeleteConnection")
-}
-
-nextConnection() {
-	editSettings("NextConnection")
-}
-
-previousConnection() {
-	editSettings("PreviousConnection")
-}
-
-rebuildDatabase() {
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	title := translate("Team Server")
-	MsgBox 262436, %title%, % translate("Do you really want to rebuild the local database?")
-	OnMessage(0x44, "")
-
-	IfMsgBox Yes
-		editSettings("Rebuild")
-}
-
-validateServerToken() {
-	editSettings("ValidateToken")
-}
-
-updateSettingsState() {
-	editSettings("UpdateState")
-}
-
-moveSettings() {
-	moveByMouse("SE", "Session Database.Settings")
-}
-
-openSettingsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#database-configuration
-}
-
-loginDialog(connectorOrCommand := false, teamServerURL := false) {
-	local window := "TSL"
-	local title
+loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false, *) {
+	local loginGui
 
 	static result := false
 	static nameEdit := ""
@@ -4972,100 +4378,106 @@ loginDialog(connectorOrCommand := false, teamServerURL := false) {
 	else {
 		result := false
 
-		Gui %window%:New
+		loginGui := Gui()
 
-		Gui %window%:Default
+		loginGui.Opt("-Border -Caption +0x800000")
+		loginGui.BackColor := "D0D0D0"
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		loginGui.SetFont("Norm", "Arial")
 
-		Gui %window%:Font, Norm, Arial
+		loginGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Server URL"))
+		loginGui.Add("Text", "x110 yp w160 h23 +0x200", teamServerURL)
 
-		Gui %window%:Add, Text, x16 y16 w90 h23 +0x200, % translate("Server URL")
-		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
+		loginGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Name"))
+		nameEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21", nameEdit)
 
-		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, x110 yp+1 w160 h21 VnameEdit, %nameEdit%
-		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
-		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
+		loginGui.Add("Text", "x16 yp+23 w90 h23 +0x200", translate("Password"))
+		passwordEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21 Password", passwordEdit)
 
-		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptLogin, % translate("Ok")
-		Gui %window%:Add, Button, x146 yp w80 h23 gcancelLogin, % translate("&Cancel")
+		loginGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", loginDialog.Bind(kOk))
+		loginGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", loginDialog.Bind(kCancel))
 
-		Gui %window%:Show, AutoSize Center
+		loginGui.Opt("+Owner" . owner.Hwnd)
+
+		loginGui.Show("AutoSize Center")
 
 		while !result
-			Sleep 100
+			Sleep(100)
 
-		Gui %window%:Submit
-		Gui %window%:Destroy
-
-		if (result == kCancel)
-			return false
-		else if (result == kOk) {
-			try {
-				connectorOrCommand.Initialize(teamServerURL)
-
-				connectorOrCommand.Login(nameEdit, passwordEdit)
-
-				return connectorOrCommand.GetDataToken()
-			}
-			catch Any as exception {
-				title := translate("Error")
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
-				OnMessage(0x44, "")
-
+		try {
+			if (result == kCancel)
 				return false
+			else if (result == kOk) {
+				nameEdit := loginGui["nameEdit"]
+				passwordEdit := loginGui["passwordEdit"]
+
+				try {
+					connectorOrCommand.Initialize(teamServerURL)
+
+					connectorOrCommand.Login(nameEdit, passwordEdit)
+
+					return connectorOrCommand.GetDataToken()
+				}
+				catch Any as exception {
+					OnMessage(0x44, translateOkButton)
+					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+
+					return false
+				}
 			}
+		}
+		finally {
+			loginGui.Destroy()
 		}
 	}
 }
 
-acceptLogin() {
-	loginDialog(kOk)
+closeSessionDatabaseEditor(*) {
+	ExitApp(0)
 }
 
-cancelLogin() {
-	loginDialog(kCancel)
+showSettings(*) {
+	local editor := SessionDatabaseEditor.Instance
+	local window := editor.Window
+
+	protectionOn()
+
+	window.Opt("+Disabled")
+
+	try {
+		editSettings(editor, window)
+	}
+	finally {
+		window.Opt("-Disabled")
+
+		protectionOff()
+	}
 }
 
-moveSessionDatabaseEditor() {
-	moveByMouse(SessionDatabaseEditor.Instance.Window, "Session Database")
-}
-
-closeSessionDatabaseEditor() {
-	ExitApp 0
-}
-
-openSessionDatabaseEditorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database
-}
-
-copyDirectory(source, destination, progressStep, ByRef count) {
+copyDirectory(source, destination, progressStep, &count) {
 	local files := []
 	local ignore, fileName, file, subDirectory
 
-	FileCreateDir %destination%
+	DirCreate(destination)
 
-	loop Files, %source%\*.*, DF
+	loop Files, source . "\*.*", "DF"
 		files.Push(A_LoopFilePath)
 
 	for ignore, fileName in files {
-		SplitPath fileName, file
+		SplitPath(fileName, &file)
 
 		count += 1
 
 		showProgress({progress: Round(50 + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
 
 		if InStr(FileExist(fileName), "D") {
-			SplitPath fileName, subDirectory
+			SplitPath(fileName, &subDirectory)
 
-			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, count)
+			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
 		}
 		else
-			FileCopy %fileName%, %destination%, 1
+			FileCopy(fileName, destination, 1)
 	}
 }
 
@@ -5079,43 +4491,34 @@ copyFiles(source, destination) {
 
 	showProgress({color: "Blue"})
 
-	loop Files, %source%\*, DFR
-	{
+	loop Files, source . "\*", "DFR" {
+
 		if (Mod(count, 20) == 0)
 			progress += 1
 
 		showProgress({progress: Min(progress, 50), message: translate("Validating ") . A_LoopFileName . translate("...")})
 
-		Sleep 1
+		Sleep(1)
 
 		count += 1
 	}
 
 	showProgress({progress: 50, color: "Green"})
 
-	copyDirectory(source, destination, 50 / count, step)
+	copyDirectory(source, destination, 50 / count, &step)
 }
 
-chooseSimulator() {
+chooseSimulator(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
 
-	Gui %window%:Default
-
-	GuiControlGet simulatorDropDown
-
-	editor.loadSimulator(simulatorDropDown)
+	editor.loadSimulator(editor.Field["simulatorDropDown"].Text)
 }
 
-chooseCar() {
+chooseCar(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local simulator := editor.SelectedSimulator
-	local window := editor.Window
+	local carDropDown := editor.Field["carDropDown"].Text
 	local index, car
-
-	Gui %window%:Default
-
-	GuiControlGet carDropDown
 
 	if (carDropDown = translate("All"))
 		editor.loadCar(true)
@@ -5128,14 +4531,10 @@ chooseCar() {
 			}
 }
 
-chooseTrack() {
+chooseTrack(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
+	local trackDropDown := editor.Field["trackDropDown"].Text
 	local simulator, tracks, trackNames
-
-	Gui %window%:Default
-
-	GuiControlGet trackDropDown
 
 	if (trackDropDown = translate("All"))
 		editor.loadTrack(true)
@@ -5148,287 +4547,319 @@ chooseTrack() {
 	}
 }
 
-chooseWeather() {
+chooseWeather(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-
-	Gui %window%:Default
-
-	GuiControlGet weatherDropDown
+	local weatherDropDown := editor.Field["weatherDropDown"].Value
 
 	editor.loadWeather((weatherDropDown == 1) ? true : kWeatherConditions[weatherDropDown - 1])
 }
 
-updateNotes() {
+updateNotes(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
 
-	Gui %window%:Default
-
-	GuiControlGet notesEdit
-
-	editor.updateNotes(notesEdit)
+	editor.updateNotes(editor.Field["notesEdit"].Text)
 }
 
-chooseSetting() {
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
-		Task.startTask("chooseSettingAsync")
+chooseSetting(*) {
+	Task.startTask(chooseSettingAsync)
 }
 
 chooseSettingAsync() {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
-	local defaultListView, selected, setting, value, settings, section, key, ignore, candidate
+	local selected, setting, value, settings, section, key, ignore, candidate
 	local labels, descriptor, type
 
-	Gui %window%:Default
+	selected := editor.SettingsListView.GetNext(0)
 
-	defaultListView := A_DefaultListView
+	if !selected
+		return
 
-	try {
-		Gui ListView, % editor.SettingsListView
+	setting := editor.SettingsListView.GetText(selected, 1)
+	value := editor.SettingsListView.GetText(selected, 2)
 
-		selected := LV_GetNext(0)
+	settings := editor.getAvailableSettings(selected)
 
-		if !selected
-			return
+	section := false
+	key := false
 
-		LV_GetText(setting, selected, 1)
-		LV_GetText(value, selected, 2)
+	for ignore, candidate in settings
+		if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
+			section := candidate[1]
+			key := candidate[2]
 
-		settings := editor.getAvailableSettings(selected)
-
-		section := false
-		key := false
-
-		for ignore, candidate in settings
-			if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
-				section := candidate[1]
-				key := candidate[2]
-
-				break
-			}
-
-		labels := []
-
-		for ignore, descriptor in settings
-			labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
-
-		bubbleSort(&labels)
-
-		GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
-		GuiControl Choose, settingDropDown, % inList(labels, setting)
-
-		ignore := false
-
-		type := editor.getSettingType(section, key, ignore)
-
-		if IsObject(type) {
-			GuiControl Hide, settingValueEdit
-			GuiControl Hide, settingValueText
-			GuiControl Hide, settingValueCheck
-			GuiControl Show, settingValueDropDown
-			GuiControl Enable, settingValueDropDown
-
-			labels := collect(type, "translate")
-
-			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-			GuiControl Choose, settingValueDropDown, % inList(labels, value)
-		}
-		else if (type = "Boolean") {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueEdit
-			GuiControl Hide, settingValueText
-			GuiControl Show, settingValueCheck
-			GuiControl Enable, settingValueCheck
-
-			GuiControlGet settingValueCheck
-
-			if (settingValueCheck != value)
-				GuiControl, , settingValueCheck, % (value = "x") ? true : false
-		}
-		else if (type = "Text") {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueCheck
-			GuiControl Hide, settingValueEdit
-			GuiControl Show, settingValueText
-			GuiControl Enable, settingValueText
-
-			GuiControlGet settingValueText
-
-			if (settingValueText != value) {
-				settingValueText := value
-
-				GuiControl, , settingValueText, %value%
-			}
-		}
-		else {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueCheck
-			GuiControl Hide, settingValueText
-			GuiControl Show, settingValueEdit
-			GuiControl Enable, settingValueEdit
-
-			GuiControlGet settingValueEdit
-
-			if (settingValueEdit != value) {
-				settingValueEdit := value
-
-				GuiControl, , settingValueEdit, %value%
-			}
+			break
 		}
 
-		editor.updateState()
+	labels := []
+
+	for ignore, descriptor in settings
+		labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
+
+	bubbleSort(&labels)
+
+	window["settingDropDown"].Delete()
+	window["settingDropDown"].Add(labels)
+	window["settingDropDown"].Choose(inList(labels, setting))
+
+	ignore := false
+
+	type := editor.getSettingType(section, key, &ignore)
+
+	if IsObject(type) {
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueDropDown"].Visible := true
+		window["settingValueDropDown"].Enabled := true
+
+		labels := collect(type, translate)
+
+		window["settingValueDropDown"].Delete()
+		window["settingValueDropDown"].Add(labels)
+		window["settingValueDropDown"].Choose(inList(labels, value))
 	}
-	finally {
-		Gui ListView, %defaultListView%
+	else if (type = "Boolean") {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueCheck"].Visible := true
+		window["settingValueCheck"].Enabled := true
+
+		if (window["settingValueCheck"].Value != value)
+			window["settingValueCheck"].Value := (value = "x") ? true : false
 	}
+	else if (type = "Text") {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := true
+		window["settingValueText"].Enabled := true
+
+		if (window["settingValueText"].Text != value)
+			window["settingValueText"].Text := value
+	}
+	else {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueEdit"].Visible := true
+		window["settingValueEdit"].Enabled := true
+
+		editor.iSelectedValue := value
+
+		if (window["settingValueEdit"].Text != value)
+			window["settingValueEdit"].Text := value
+	}
+
+	editor.updateState()
 }
 
-addSetting() {
+addSetting(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
-	local defaultListView, settings, labels, ignore, setting, type, value, default
+	local settings, labels, ignore, setting, type, value, default
 
-	Gui %window%:Default
+	settings := editor.getAvailableSettings(false)
 
-	defaultListView := A_DefaultListView
+	labels := []
 
-	try {
-		Gui ListView, % editor.SettingsListView
+	for ignore, setting in settings
+		labels.Push(editor.getSettingLabel(setting[1], setting[2]))
 
-		settings := editor.getAvailableSettings(false)
+	window["settingDropDown"].Enabled := true
 
-		labels := []
+	window["settingDropDown"].Delete()
+	window["settingDropDown"].Add(labels)
+	window["settingDropDown"].Choose(1)
 
-		for ignore, setting in settings
-			labels.Push(editor.getSettingLabel(setting[1], setting[2]))
+	default := false
 
-		GuiControl Enable, settingDropDown
-		GuiControl, , settingDropDown, % "|" . values2String("|", labels*)
-		GuiControl Choose, settingDropDown, 1
+	type := editor.getSettingType(settings[1][1], settings[1][2], &default)
 
-		default := false
+	if IsObject(type) {
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueDropDown"].Visible := true
+		window["settingValueDropDown"].Enabled := true
 
-		type := editor.getSettingType(settings[1][1], settings[1][2], default)
+		labels := collect(type, translate)
 
-		if IsObject(type) {
-			GuiControl Hide, settingValueEdit
-			GuiControl Hide, settingValueText
-			GuiControl Hide, settingValueCheck
-			GuiControl Show, settingValueDropDown
-			GuiControl Enable, settingValueDropDown
+		window["settingValueDropDown"].Delete()
+		window["settingValueDropDown"].Add(labels)
+		window["settingValueDropDown"].Choose(inList(type, default))
 
-			labels := collect(type, "translate")
-
-			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-			GuiControl Choose, settingValueDropDown, % inList(type, default)
-
-			value := default
-		}
-		else if (type = "Boolean") {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueEdit
-			GuiControl Hide, settingValueText
-			GuiControl Show, settingValueCheck
-			GuiControl Enable, settingValueCheck
-
-			GuiControl, , settingValueCheck, %default%
-
-			value := default
-		}
-		else if (type = "Text") {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueCheck
-			GuiControl Hide, settingValueEdit
-			GuiControl Show, settingValueText
-			GuiControl Enable, settingValueText
-
-			GuiControl, , settingValueText, %default%
-
-			value := default
-		}
-		else {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueCheck
-			GuiControl Hide, settingValueText
-			GuiControl Show, settingValueEdit
-			GuiControl Enable, settingValueEdit
-
-			value := default
-
-			settingValueEdit := displayValue("Float", default)
-			GuiControl, , settingValueEdit, %settingValueEdit%
-		}
-
-		editor.addSetting(settings[1][1], settings[1][2], value)
+		value := default
 	}
-	finally {
-		Gui ListView, %defaultListView%
+	else if (type = "Boolean") {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueCheck"].Visible := true
+		window["settingValueCheck"].Enabled := true
+
+		window["settingValueCheck"].Value := default
+
+		value := default
 	}
+	else if (type = "Text") {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := true
+		window["settingValueText"].Enabled := true
+
+		window["settingValueText"].Text := default
+
+		value := default
+	}
+	else {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueEdit"].Visible := true
+		window["settingValueEdit"].Enabled := true
+
+		value := default
+
+		editor.iSelectedValue := displayValue("Float", value)
+		window["settingValueEdit"].Text := editor.iSelectedValue
+	}
+
+	editor.addSetting(settings[1][1], settings[1][2], value)
 }
 
-deleteSetting() {
+deleteSetting(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
-	local defaultListView, selected, settings, section, key, ignore, setting
+	local settingDropDown := window["settingDropDown"].Text
+	local selected, settings, section, key, ignore, setting
 
-	Gui %window%:Default
+	selected := editor.SettingsListView.GetNext(0)
 
-	defaultListView := A_DefaultListView
+	if !selected
+		return
 
-	try {
-		Gui ListView, % editor.SettingsListView
+	settings := editor.getAvailableSettings(selected)
 
-		selected := LV_GetNext(0)
+	section := false
+	key := false
 
-		if !selected
-			return
+	for ignore, setting in settings
+		if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+			section := setting[1]
+			key := setting[2]
 
-		GuiControlGet settingDropDown
+			break
+		}
 
-		settings := editor.getAvailableSettings(selected)
-
-		section := false
-		key := false
-
-		for ignore, setting in settings
-			if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-				section := setting[1]
-				key := setting[2]
-
-				break
-			}
-
-		SessionDatabaseEditor.Instance.deleteSetting(section, key)
-	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
+	SessionDatabaseEditor.Instance.deleteSetting(section, key)
 }
 
-selectSetting() {
-	Task.startTask("selectSettingAsync")
+selectSetting(*) {
+	Task.startTask(selectSettingAsync)
 }
 
 selectSettingAsync() {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
-	local defaultListView, selected, settings, section, key, ignore, setting, type, value, default, labels
+	local settingDropDown := window["settingDropDown"].Text
+	local selected, settings, section, key, ignore, setting, type, value, default, labels
 
-	Gui %window%:Default
+	selected := editor.SettingsListView.GetNext(0)
 
-	defaultListView := A_DefaultListView
+	if !selected
+		return
 
-	try {
-		Gui ListView, % editor.SettingsListView
+	settings := editor.getAvailableSettings(selected)
 
-		selected := LV_GetNext(0)
+	section := false
+	key := false
+
+	for ignore, setting in settings
+		if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+			section := setting[1]
+			key := setting[2]
+
+			break
+		}
+
+	default := false
+
+	type := editor.getSettingType(section, key, &default)
+
+	if IsObject(type) {
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueDropDown"].Visible := true
+		window["settingValueDropDown"].Enabled := true
+
+		labels := collect(type, translate)
+
+		window["settingValueDropDown"].Delete()
+		window["settingValueDropDown"].Add(labels)
+		window["settingValueDropDown"].Choose(inList(type, default))
+
+		value := default
+	}
+	else if (type = "Boolean") {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueEdit"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueCheck"].Visible := true
+		window["settingValueCheck"].Enabled := true
+
+		window["settingValueCheck"].Value := default
+
+		value := default
+	}
+	else if (type = "Text") {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueEdit"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueText"].Visible := true
+		window["settingValueText"].Enabled := true
+
+		window["settingValueText"].Text := default
+
+		value := default
+	}
+	else {
+		window["settingValueDropDown"].Visible := false
+		window["settingValueCheck"].Visible := false
+		window["settingValueText"].Visible := false
+		window["settingValueEdit"].Visible := true
+		window["settingValueEdit"].Enabled := true
+
+		value := default
+
+		editor.iSelectedValue := displayValue("Float", value)
+		window["settingValueEdit"].Text := editor.iSelectedValue
+	}
+
+	editor.updateSetting(section, key, value)
+}
+
+changeSetting(*) {
+	Task.startTask(changeSettingAsync)
+}
+
+changeSettingAsync() {
+	local editor := SessionDatabaseEditor.Instance
+	local window, selected, settings, section, key, ignore, setting
+	local type, value, oldValue, settingDropDown, settingValue
+
+	if (editor.SelectedModule = "Settings") {
+		window := editor.Window
+
+		selected := editor.SettingsListView.GetNext(0)
 
 		if !selected
 			return
 
-		GuiControlGet settingDropDown
+		settingDropDown := window["settingDropDown"].Text
 
 		settings := editor.getAvailableSettings(selected)
 
@@ -5443,455 +4874,191 @@ selectSettingAsync() {
 				break
 			}
 
-		default := false
+		ignore := false
 
-		type := editor.getSettingType(section, key, default)
+		type := editor.getSettingType(section, key, &ignore)
 
-		if IsObject(type) {
-			GuiControl Hide, settingValueEdit
-			GuiControl Hide, settingValueText
-			GuiControl Hide, settingValueCheck
-			GuiControl Show, settingValueDropDown
-			GuiControl Enable, settingValueDropDown
-
-			labels := collect(type, "translate")
-
-			GuiControl, , settingValueDropDown, % "|" . values2String("|", labels*)
-			GuiControl Choose, settingValueDropDown, % inList(type, default)
-
-			value := default
-		}
-		else if (type = "Boolean") {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueEdit
-			GuiControl Hide, settingValueText
-			GuiControl Show, settingValueCheck
-			GuiControl Enable, settingValueCheck
-
-			GuiControl, , settingValueCheck, %default%
-
-			value := default
-		}
+		if IsObject(type)
+			value := type[inList(collect(type, translate), window["settingValueDropDown"].Text)]
+		else if (type = "Boolean")
+			value := window["settingValueCheck"].Value
 		else if (type = "Text") {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueEdit
-			GuiControl Hide, settingValueCheck
-			GuiControl Show, settingValueText
-			GuiControl Enable, settingValueText
+			settingValue := window["settingValueText"].Value
 
-			GuiControl, , settingValueText, %default%
+			if InStr(settingValue, "`n") {
+				settingValue := StrReplace(settingValue, "`n", A_Space)
 
-			value := default
+				window["settingValueText"].Value := settingValue
+			}
+
+			value := settingValue
 		}
 		else {
-			GuiControl Hide, settingValueDropDown
-			GuiControl Hide, settingValueCheck
-			GuiControl Hide, settingValueText
-			GuiControl Show, settingValueEdit
-			GuiControl Enable, settingValueEdit
+			oldValue := editor.iSelectedValue
 
-			value := default
+			settingValue := window["settingValueEdit"].Text
 
-			settingValueEdit := displayValue("Float", value)
-			GuiControl, , settingValueEdit, %settingValueEdit%
+			if (type = "Integer") {
+				if !isInteger(settingValue) {
+					settingValue := oldValue
+
+					window["settingValueEdit"].Text := oldValue
+				}
+
+				value := settingValue
+			}
+			else if (type = "Float") {
+				value := internalValue("Float", window["settingValueEdit"])
+
+				if !isNumber(value) {
+					window["settingValueEdit"].Text := oldValue
+
+					value := internalValue("Float", oldValue)
+				}
+			}
 		}
 
 		editor.updateSetting(section, key, value)
 	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
 }
 
-changeSetting() {
-	Task.startTask("changeSettingAsync")
+chooseStrategy(listView, line, *) {
+	SessionDatabaseEditor.Instance.selectStrategy(line)
 }
 
-changeSettingAsync() {
-	local editor := SessionDatabaseEditor.Instance
-	local window, defaultListView, selected, settings, section, key, ignore, setting
-	local type, value, oldValue
-
-	if (editor.SelectedModule = "Settings") {
-		window := editor.Window
-
-		Gui %window%:Default
-
-		defaultListView := A_DefaultListView
-
-		try {
-			Gui ListView, % editor.SettingsListView
-
-			selected := LV_GetNext(0)
-
-			if !selected
-				return
-
-			GuiControlGet settingDropDown
-
-			settings := editor.getAvailableSettings(selected)
-
-			section := false
-			key := false
-
-			for ignore, setting in settings
-				if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-					section := setting[1]
-					key := setting[2]
-
-					break
-				}
-
-			ignore := false
-
-			type := editor.getSettingType(section, key, ignore)
-
-			if IsObject(type) {
-				GuiControlGet settingValueDropDown
-
-				value := type[inList(collect(type, "translate"), settingValueDropDown)]
-			}
-			else if (type = "Boolean") {
-				GuiControlGet settingValueCheck
-
-				value := settingValueCheck
-			}
-			else if (type = "Text") {
-				GuiControlGet settingValueText
-
-				if InStr(settingValueText, "`n") {
-					settingValueText := StrReplace(settingValueText, "`n", A_Space)
-
-					GuiControl, , settingValueText, %settingValueText%
-				}
-
-				value := settingValueText
-			}
-			else {
-				oldValue := settingValueEdit
-
-				GuiControlGet settingValueEdit
-
-				if (type = "Integer") {
-					if settingValueEdit is not Integer
-					{
-						settingValueEdit := oldValue
-
-						GuiControl, , settingValueEdit, %settingValueEdit%
-					}
-
-					value := settingValueEdit
-				}
-				else if (type = "Float") {
-					value := internalValue("Float", settingValueEdit)
-
-					if value is not Number
-					{
-						settingValueEdit := oldValue
-
-						GuiControl, , settingValueEdit, %settingValueEdit%
-
-						value := internalValue("Float", settingValueEdit)
-					}
-				}
-			}
-
-			editor.updateSetting(section, key, value)
-		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
-	}
-}
-
-chooseStrategy() {
-	local editor := SessionDatabaseEditor.Instance
-
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
-		editor.selectStrategy(A_EventInfo)
-}
-
-updateStrategyAccess() {
+updateStrategyAccess(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local sessionDB := editor.SessionDatabase
 	local selected, type, name
 
-	GuiControlGet shareStrategyWithCommunityCheck
-	GuiControlGet shareStrategyWithTeamServerCheck
-
-	Gui ListView, % editor.StrategyListView
-
-	selected := LV_GetNext(0)
+	selected := editor.StrategyListView.GetNext(0)
 
 	if selected {
-		LV_GetText(name, selected, 2)
+		name := editor.StrategyListView.GetText(selected, 2)
 
 		info := sessionDB.readStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
 
 		setMultiMapValue(info, "Strategy", "Synchronized", false)
-		setMultiMapValue(info, "Access", "Share", shareStrategyWithCommunityCheck)
-		setMultiMapValue(info, "Access", "Synchronize", shareStrategyWithTeamServerCheck)
+		setMultiMapValue(info, "Access", "Share", editor.Field["shareStrategyWithCommunityCheck"].Value)
+		setMultiMapValue(info, "Access", "Synchronize", editor.Field["shareStrategyWithTeamServerCheck"].Value)
 
 		sessionDB.writeStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
 	}
 }
 
-uploadStrategy() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-
-	Gui %window%:Default
-
-	editor.uploadStrategy()
+uploadStrategy(*) {
+	SessionDatabaseEditor.Instance.uploadStrategy()
 }
 
-downloadStrategy() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local defaultListView, name
-
-	Gui %window%:Default
-
-	defaultListView := A_DefaultListView
-
-	try {
-		Gui ListView, % editor.StrategyListView
-
-		LV_GetText(name, LV_GetNext(0), 2)
-
-		editor.downloadStrategy(name)
-	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
-}
-
-renameStrategy() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local defaultListView, name
-
-	Gui %window%:Default
-
-	defaultListView := A_DefaultListView
-
-	try {
-		Gui ListView, % editor.StrategyListView
-
-		LV_GetText(name, LV_GetNext(0), 2)
-
-		editor.renameStrategy(name)
-	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
-}
-
-deleteStrategy() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local defaultListView, name
-
-	Gui %window%:Default
-
-	defaultListView := A_DefaultListView
-
-	try {
-		Gui ListView, % editor.StrategyListView
-
-		LV_GetText(name, LV_GetNext(0), 2)
-
-		editor.deleteStrategy(name)
-	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
-}
-
-chooseSetupType() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-
-	Gui %window%:Default
-
-	GuiControlGet setupTypeDropDown
-
-	editor.loadSetups(kSetupTypes[setupTypeDropDown])
-}
-
-chooseSetup() {
+downloadStrategy(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0))
-		editor.selectSetup(A_EventInfo)
+	editor.downloadStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0)))
 }
 
-updateSetupAccess() {
+renameStrategy(*) {
+	local editor := SessionDatabaseEditor.Instance
+
+	editor.renameStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0)))
+}
+
+deleteStrategy(*) {
+	local editor := SessionDatabaseEditor.Instance
+
+	editor.deleteStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0)))
+}
+
+chooseSetupType(dropDown, *) {
+	SessionDatabaseEditor.Instance.loadSetups(kSetupTypes[dropDown.Value])
+}
+
+chooseSetup(listView, line, *) {
+	SessionDatabaseEditor.Instance.selectSetup(line)
+}
+
+updateSetupAccess(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local sessionDB := editor.SessionDatabase
 	local selected, type, name
 
-	GuiControlGet shareSetupWithCommunityCheck
-	GuiControlGet shareSetupWithTeamServerCheck
-	GuiControlGet setupTypeDropDown
+	type := kSetupTypes[editor.Field["setupTypeDropDown"].Value]
 
-	type := kSetupTypes[setupTypeDropDown]
-
-	Gui ListView, % editor.SetupListView
-
-	selected := LV_GetNext(0)
+	selected := editor.SetupListView.GetNext(0)
 
 	if selected {
-		LV_GetText(name, selected, 2)
+		name := editor.SetupListView.GetText(selected)
 
 		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
 
 		setMultiMapValue(info, "Setup", "Synchronized", false)
-		setMultiMapValue(info, "Access", "Share", shareSetupWithCommunityCheck)
-		setMultiMapValue(info, "Access", "Synchronize", shareSetupWithTeamServerCheck)
+		setMultiMapValue(info, "Access", "Share", editor.Field["shareSetupWithCommunityCheck"].Value)
+		setMultiMapValue(info, "Access", "Synchronize", editor.Field["shareSetupWithTeamServerCheck"].Value)
 
 		sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
 	}
 }
 
-uploadSetup() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-
-	Gui %window%:Default
-
-	GuiControlGet setupTypeDropDown
-
-	editor.uploadSetup(kSetupTypes[setupTypeDropDown])
+uploadSetup(dropDown, *) {
+	SessionDatabaseEditor.Instance.uploadSetup(kSetupTypes[dropDown.Value])
 }
 
-downloadSetup() {
+downloadSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local defaultListView, name
 
-	Gui %window%:Default
-
-	GuiControlGet setupTypeDropDown
-
-	defaultListView := A_DefaultListView
-
-	try {
-		Gui ListView, % editor.SetupListView
-
-		LV_GetText(name, LV_GetNext(0), 2)
-
-		editor.downloadSetup(kSetupTypes[setupTypeDropDown], name)
-	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
+	editor.downloadSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0)))
 }
 
-renameSetup() {
+renameSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local defaultListView, name
 
-	Gui %window%:Default
-
-	GuiControlGet setupTypeDropDown
-
-	defaultListView := A_DefaultListView
-
-	try {
-		Gui ListView, % editor.SetupListView
-
-		LV_GetText(name, LV_GetNext(0), 2)
-
-		editor.renameSetup(kSetupTypes[setupTypeDropDown], name)
-	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
+	editor.renameSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0)))
 }
 
-deleteSetup() {
+deleteSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local defaultListView, name
 
-	Gui %window%:Default
-
-	GuiControlGet setupTypeDropDown
-
-	defaultListView := A_DefaultListView
-
-	try {
-		Gui ListView, % editor.SetupListView
-
-		LV_GetText(name, LV_GetNext(0), 2)
-
-		editor.deleteSetup(kSetupTypes[setupTypeDropDown], name)
-	}
-	finally {
-		Gui ListView, %defaultListView%
-	}
+	editor.deleteSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0)))
 }
 
-loadPressures() {
+loadPressures(*) {
 	local editor := SessionDatabaseEditor.Instance
 
 	if (editor.SelectedModule = "Pressures")
-		new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "loadPressures"), 100).start()
+		WindowTask(editor.Window, ObjBindMethod(editor, "loadPressures"), 100).start()
 }
 
-editPressures() {
+editPressures(*) {
 	local editor := SessionDatabaseEditor.Instance
 
 	if (editor.SelectedModule = "Pressures")
-		new WindowTask(editor.Window, ObjBindMethod(SessionDatabaseEditor.Instance, "openPressuresEditor"), 100).start()
+		WindowTask(editor.Window, ObjBindMethod(editor, "openPressuresEditor"), 100).start()
 }
 
-noSelect() {
-	local editor, window, defaultListView
-
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
-		editor := SessionDatabaseEditor.Instance
-		window := editor.Window
-
-		Gui %window%:Default
-
-		defaultListView := A_DefaultListView
-
-		try {
-			Gui ListView, % editor.DataListView
-
-			LV_Modify(A_EventInfo, "-Select")
-		}
-		finally {
-			Gui ListView, %defaultListView%
-		}
-	}
+noSelect(listView, line, *) {
+	listView.Modify(line, "-Select")
 }
 
-selectTrackAction() {
+selectTrackAction(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local coordinateX := false
 	local coordinateY := false
 	local action := false
-	local x, y, title, originalX, originalY, currentX, currentY
+	local x, y, originalX, originalY, currentX, currentY, msgResult
 
-	MouseGetPos x, y
+	MouseGetPos(&x, &y)
 
 	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
 								, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
-								, coordinateX, coordinateY) {
+								, &coordinateX, &coordinateY) {
 		action := editor.findTrackAction(coordinateX, coordinateY)
 
 		if action {
 			if GetKeyState("Ctrl", "P") {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-				title := translate("Delete")
-				MsgBox 262436, %title%, % translate("Do you really want to delete the selected action?")
-				OnMessage(0x44, "")
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
 
-				IfMsgBox Yes
+				if (msgResult = "Yes")
 					editor.deleteTrackAction(action)
 			}
 			else {
@@ -5899,11 +5066,11 @@ selectTrackAction() {
 				originalY := action.Y
 
 				while (GetKeyState("LButton", "P")) {
-					MouseGetPos x, y
+					MouseGetPos(&x, &y)
 
 					if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
 												, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
-												, coordinateX, coordinateY) {
+												, &coordinateX, &coordinateY) {
 						action.X := coordinateX
 						action.Y := coordinateY
 
@@ -5933,269 +5100,211 @@ selectTrackAction() {
 	}
 }
 
-selectTrackAutomation() {
+selectTrackAutomation(listView, line, *) {
 	local editor := SessionDatabaseEditor.Instance
 	local window := editor.Window
-	local index, trackAutomation, checkedRows, checked, changed, ignore, row, defaultListView
+	local index, trackAutomation, checkedRows, checked, changed, ignore, row
 
-	Gui %window%:Default
+	trackAutomation := editor.TrackAutomations[line].Clone()
+	trackAutomation.Actions := trackAutomation.Actions.Clone()
+	trackAutomation.Origin := editor.TrackAutomations[line]
 
-	if (((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) && (A_EventInfo > 0)) {
-		trackAutomation := editor.TrackAutomations[A_EventInfo].Clone()
-		trackAutomation.Actions := trackAutomation.Actions.Clone()
-		trackAutomation.Origin := editor.TrackAutomations[A_EventInfo]
+	editor.iSelectedTrackAutomation := trackAutomation
 
-		editor.iSelectedTrackAutomation := trackAutomation
+	window["trackAutomationNameEdit"].Value := trackAutomation.Name
 
-		GuiControl, , trackAutomationNameEdit, % trackAutomation.Name
+	editor.updateTrackAutomationInfo()
 
-		editor.updateTrackAutomationInfo()
+	editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
 
-		editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
+	editor.updateState()
 
-		editor.updateState()
+	checkedRows := []
+	checked := editor.TrackAutomationsListView.GetNext(0, "C")
+
+	while checked {
+		checkedRows.Push(checked)
+
+		checked := editor.TrackAutomationsListView.GetNext(checked, "C")
 	}
 
-	defaultListView := A_DefaultListView
+	changed := false
 
-	try {
-		Gui ListView, % editor.TrackAutomationsListView
-
-		checkedRows := []
-		checked := LV_GetNext(0, "C")
-
-		while checked {
-			checkedRows.Push(checked)
-
-			checked := LV_GetNext(checked, "C")
-		}
-
-		changed := false
-
-		for index, trackAutomation in editor.TrackAutomations
-			if !inList(checkedRows, index)
-				if trackAutomation.Active {
-					trackAutomation.Active := false
-
-					changed := true
-				}
-
-		for index, row in checkedRows
-			if !editor.TrackAutomations[row].Active {
-				editor.TrackAutomations[row].Active := true
-
-				checkedRows.RemoveAt(index)
+	for index, trackAutomation in editor.TrackAutomations
+		if !inList(checkedRows, index)
+			if trackAutomation.Active {
+				trackAutomation.Active := false
 
 				changed := true
-
-				break
 			}
 
-		if changed {
-			for ignore, row in checkedRows {
-				editor.TrackAutomations[row].Active := false
+	for index, row in checkedRows
+		if !editor.TrackAutomations[row].Active {
+			editor.TrackAutomations[row].Active := true
 
-				LV_Modify(row, "-Check")
-			}
+			checkedRows.RemoveAt(index)
 
-			editor.writeTrackAutomations(false)
+			changed := true
 
+			break
 		}
-	}
-	finally {
-		Gui ListView, %defaultListView%
+
+	if changed {
+		for ignore, row in checkedRows {
+			editor.TrackAutomations[row].Active := false
+
+			editor.TrackAutomationsListView.Modify(row, "-Check")
+		}
+
+		editor.writeTrackAutomations(false)
 	}
 }
 
-addTrackAutomation() {
+addTrackAutomation(*) {
 	SessionDatabaseEditor.Instance.addTrackAutomation()
 }
 
-deleteTrackAutomation() {
-	local title := translate("Delete")
+deleteTrackAutomation(*) {
+	local msgResult
 
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	MsgBox 262436, %title%, % translate("Do you really want to delete the selected automation?")
-	OnMessage(0x44, "")
+	OnMessage(0x44, translateYesNoButtons)
+	msgResult := MsgBox(translate("Do you really want to delete the selected automation?"), translate("Delete"), 262436)
+	OnMessage(0x44, translateYesNoButtons, 0)
 
-	IfMsgBox Yes
+	if (msgResult = "Yes")
 		SessionDatabaseEditor.Instance.deleteTrackAutomation()
 }
 
-saveTrackAutomation() {
+saveTrackAutomation(*) {
 	SessionDatabaseEditor.Instance.saveTrackAutomation()
 }
 
-selectData() {
+selectData(*) {
 	SessionDatabaseEditor.Instance.updateState()
 }
 
-selectAllData() {
-	GuiControlGet dataSelectCheck
+selectAllData(*) {
+	local editor := SessionDatabaseEditor.Instance
+	local listView := editor.AdministrationListView
+	local dataSelectCheck := editor.Field["dataSelectCheck"].Value
 
 	if (dataSelectCheck == -1) {
 		dataSelectCheck := 0
 
-		GuiControl, , dataSelectCheck, 0
+		editor.Field["dataSelectCheck"].Value := 0
 	}
 
-	Gui ListView, % SessionDatabaseEditor.Instance.AdministrationListView
+	loop listView.GetCount()
+		listView.Modify(A_Index, dataSelectCheck ? "Check" : "-Check")
 
-	loop % LV_GetCount()
-		LV_Modify(A_Index, dataSelectCheck ? "Check" : "-Check")
-
-	SessionDatabaseEditor.Instance.updateState()
+	editor.updateState()
 }
 
-exportData() {
-	local title := translate("Select target folder...")
+exportData(*) {
+	local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 	local folder
 
-	Gui +OwnDialogs
+	SessionDatabaseEditor.Instance.Window.Opt("+OwnDialogs")
 
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-	FileSelectFolder folder, *%kDatabaseDirectory%, 0, %title%
-	OnMessage(0x44, "")
+	OnMessage(0x44, translator)
+	folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select target folder..."))
+	OnMessage(0x44, translator, 0)
 
 	if (folder != "")
 		SessionDatabaseEditor.Instance.exportData(folder . "\Export_" . A_Now)
 }
 
-importData() {
-	local title := translate("Select export folder...")
+importData(*) {
+	local window := SessionDatabaseEditor.Instance.Window
+	local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 	local folder, info, selection
 
-	Gui +OwnDialogs
+	window.Opt("+OwnDialogs")
 
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-	FileSelectFolder folder, *%kDatabaseDirectory%, 0, %title%
-	OnMessage(0x44, "")
+	OnMessage(0x44, translator)
+	folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select export folder..."))
+	OnMessage(0x44, translator, 0)
 
 	if (folder != "")
 		if FileExist(folder . "\Export.info") {
 			info := readMultiMap(folder . "\Export.info")
 
 			if (getMultiMapValue(info, "General", "Simulator") = SessionDatabaseEditor.Instance.SelectedSimulator) {
-				selection := selectImportData(SessionDatabaseEditor.Instance, folder)
+				window.Opt("+Disabled")
 
-				if selection
-					SessionDatabaseEditor.Instance.importData(folder, selection)
+				try {
+					selection := selectImportData(SessionDatabaseEditor.Instance, folder, window)
+
+					if selection
+						SessionDatabaseEditor.Instance.importData(folder, selection)
+				}
+				finally {
+					window.Opt("-Disabled")
+				}
 			}
 			else {
-				title := translate("Error")
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262160, %title%, % translate("The data has not been exported for the currently selected simulator.")
-				OnMessage(0x44, "")
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
 		else {
-			title := translate("Error")
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %title%, % translate("This is not a valid folder with exported data.")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("This is not a valid folder with exported data."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 		}
 }
 
-deleteData() {
-	local title := translate("Delete")
+deleteData(*) {
+	local msgResult
 
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	MsgBox 262436, %title%, % translate("Do you really want to delete the selected data?")
-	OnMessage(0x44, "")
+	OnMessage(0x44, translateYesNoButtons)
+	msgResult := MsgBox(translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+	OnMessage(0x44, translateYesNoButtons, 0)
 
-	IfMsgBox Yes
+	if (msgResult = "Yes")
 		SessionDatabaseEditor.Instance.deleteData()
 }
 
-chooseTab1() {
+chooseTab(module, *) {
 	local editor := SessionDatabaseEditor.Instance
 
-	if editor.moduleAvailable("Settings")
-		editor.selectModule("Settings")
+	if editor.moduleAvailable(module)
+		editor.selectModule(module)
 }
 
-chooseTab2() {
+chooseDatabaseScope(*) {
 	local editor := SessionDatabaseEditor.Instance
-
-	if editor.moduleAvailable("Strategies")
-		editor.selectModule("Strategies")
-}
-
-chooseTab3() {
-	local editor := SessionDatabaseEditor.Instance
-
-	if editor.moduleAvailable("Setups")
-		editor.selectModule("Setups")
-}
-
-chooseTab4() {
-	local editor := SessionDatabaseEditor.Instance
-
-	if editor.moduleAvailable("Pressures")
-		editor.selectModule("Pressures")
-}
-
-chooseTab5() {
-	local editor := SessionDatabaseEditor.Instance
-
-	if editor.moduleAvailable("Automation")
-		editor.selectModule("Automation")
-}
-
-chooseTab6() {
-	local editor := SessionDatabaseEditor.Instance
-
-	if editor.moduleAvailable("Data")
-		editor.selectModule("Data")
-}
-
-chooseDatabaseScope() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local persistent, title
-
-	Gui %window%:Default
-
-	GuiControlGet databaseScopeDropDown
+	local persistent, msgResult
 
 	persistent := false
 
 	if GetKeyState("Ctrl", "P") {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Modular Simulator Controller System")
-		MsgBox 262436, %title%, % translate("Do you really want to change the scope for all applications?")
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to change the scope for all applications?"), translate("Modular Simulator Controller System"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
 
-		IfMsgBox Yes
+		if (msgResult = "Yes")
 			persistent := true
 	}
 
-	if (persistent || ((databaseScopeDropDown == 2) != editor.UseCommunity)) {
-		editor.UseCommunity[persistent] := (databaseScopeDropDown == 2)
+	if (persistent || ((editor.Field["databaseScopeDropDown"].Value == 2) != editor.UseCommunity)) {
+		editor.UseCommunity[persistent] := (editor.Field["databaseScopeDropDown"].Value == 2)
 
 		editor.loadSimulator(editor.SelectedSimulator, true)
 	}
 }
 
-transferPressures() {
+transferPressures(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local sessionDB := editor.SessionDatabase
 	local window := editor.Window
 	local tyrePressures, compounds, compound, compoundColor, ignore, pressureInfo, driver
 
-	Gui %window%:Default
-
-	GuiControlGet airTemperatureEdit
-	GuiControlGet trackTemperatureEdit
-	GuiControlGet tyreCompoundDropDown
-	GuiControlGet driverDropDown
-
-	if (driverDropDown = translate("All"))
+	if (window["driverDropDown"].Text = translate("All"))
 		driver := [true]
 	else
-		driver := [sessionDB.getDriverID(editor.SelectedSimulator, driverDropDown)]
+		driver := [sessionDB.getDriverID(editor.SelectedSimulator, window["driverDropDown"].Text)]
 
 	tyrePressures := []
 
@@ -6204,19 +5313,19 @@ transferPressures() {
 	compound := false
 	compoundColor := false
 
-	splitCompound(compounds[tyreCompoundDropDown], &compound, &compoundColor)
+	splitCompound(compounds[window["tyreCompoundDropDown"].Value], &compound, &compoundColor)
 
-	for ignore, pressureInfo in new editor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
-																			, editor.SelectedTrack, editor.SelectedWeather
-																			, convertUnit("Temperature", airTemperatureEdit, false)
-																			, convertUnit("Temperature", trackTemperatureEdit, false)
-																			, compound, compoundColor, driver*)
+	for ignore, pressureInfo in SessionDatabaseEditor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
+																					   , editor.SelectedTrack, editor.SelectedWeather
+																					   , convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
+																					   , convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
+																					   , compound, compoundColor, driver*)
 		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
 
 	messageSend(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)
 }
 
-testSettings() {
+testSettings(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local exePath := kBinariesDirectory . "Race Settings.exe"
 	local fileName := kTempDirectory . "Temp.settings"
@@ -6225,25 +5334,25 @@ testSettings() {
 	try {
 		settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
 
-		for section, values in new SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
-																 , editor.SelectedTrack["*"], editor.SelectedWeather["*"], false)
+		for section, values in SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
+															 , editor.SelectedTrack["*"], editor.SelectedWeather["*"], false)
 			for key, value in values
 				setMultiMapValue(settings, section, key, value)
 
 		writeMultiMap(fileName, settings)
 
-		options := "-NoTeam -Test -File """ . fileName . """"
+		options := "-NoTeam -Test -File `"" . fileName . "`""
 
 		if (editor.SelectedSimulator)
-			options .= (" -Simulator """ . editor.SelectedSimulator . """")
+			options .= (" -Simulator `"" . editor.SelectedSimulator . "`"")
 
 		if (editor.SelectedCar)
-			options .= (" -Car """ . editor.SelectedCar . """")
+			options .= (" -Car `"" . editor.SelectedCar . "`"")
 
 		if (editor.SelectedTrack)
-			options .= (" -Track """ . editor.SelectedTrack . """")
+			options .= (" -Track `"" . editor.SelectedTrack . "`"")
 
-		Run "%exePath%" %options%, %kBinariesDirectory%
+		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
 		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -6268,11 +5377,11 @@ showSessionDatabaseEditor() {
 	local index := 1
 	local editor
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Session Database
+	TraySetIcon(icon, "1")
+	A_IconTip := "Session Database"
 
-	while (index < A_Args.Length()) {
-		switch A_Args[index] {
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
 			case "-Simulator":
 				simulator := A_Args[index + 1]
 				index += 2

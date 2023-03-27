@@ -138,7 +138,14 @@ getValues(map) {
 	return result
 }
 
-bubbleSort(&array, comparator := (a, b) => a > b) {
+greaterCompare(a, b) {
+	if (isNumber(a) && isNumber(b))
+		return (a > b)
+	else
+		StrCompare(a, b, false)
+}
+
+bubbleSort(&array, comparator := greaterCompare) {
 	local n := array.Length
 	local newN, i, j, lineI, lineJ
 

@@ -224,7 +224,6 @@ class Database {
 		else
 			for name, ignore in getKeys(this.Schemas)
 				this.unlock(name, backup)
-
 	}
 
 	query(name, query) {

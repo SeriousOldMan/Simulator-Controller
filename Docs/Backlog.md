@@ -16,6 +16,7 @@
   3. More (configurable) verbosity for the Spotter, for example earlier announcements of cars approaching from behind (depending on the distance of the car behind)
   4. Controller action and voice command to enable/disable data collection
   5. Multi-category awareness (Pro, Pro-AM, ...)
+  6. Graphical Editor for Vocalics Settings inkl. Test-Modus...
 
 #### Race Center
   1. Multi-category awareness (Pro, Pro-AM, ...)

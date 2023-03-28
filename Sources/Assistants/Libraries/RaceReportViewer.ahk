@@ -296,7 +296,7 @@ class RaceReportViewer extends RaceReportReader {
 					if (positions.Length >= lap) {
 						if (positions[lap].Has(car) && isNumber(positions[lap][car]) && (positions[lap][car] > 0))
 							valid := true
-						else
+						else if positions[lap].Has(car)
 							positions[lap][car] := kNull ; carsCount
 					}
 					else
@@ -322,12 +322,16 @@ class RaceReportViewer extends RaceReportReader {
 			loop carsCount {
 				car := A_Index
 
-				result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
+				if positions[lapsCount].Has(car)
+					result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
+				else
+					result := "DNF"
+
 				lapTimes := []
 				hasNull := false
 
 				loop lapsCount {
-					lapTime := times[A_Index][car]
+					lapTime := (times[A_Index].Has(car) ? times[A_Index][car] : 0)
 
 					if (!extendedIsNull(lapTime, A_Index < 2) && (lapTime > 0))
 						lapTimes.Push(lapTime)
@@ -465,7 +469,7 @@ class RaceReportViewer extends RaceReportReader {
 				if isNumber(consumption)
 					consumption := displayValue("Float", convertUnit("Volume", consumption))
 
-				lapTime := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".LapTime", "n/a")
+				lapTime := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".LapTime", "-")
 
 				if (lapTime != "-")
 					lapTime := Round(lapTime / 1000, 1)
@@ -614,8 +618,8 @@ class RaceReportViewer extends RaceReportReader {
 					newMaxPosition := maxPosition
 
 					for ignore, lap in this.getReportLaps(raceData)
-						if (positions.Has(lap) && times.Has(lap))
-							if (positions[lap].Has(car) && !extendedIsNull(positions[lap][car]) && (positions[lap][car] > 0)
+						if (positions.Has(lap) && times.Has(lap) && positions[lap].Has(car))
+							if (!extendedIsNull(positions[lap][car]) && (positions[lap][car] > 0)
 							 && times[lap].Has(car) && !extendedIsNull(times[lap][car], lap < 2)) {
 								valid := true
 

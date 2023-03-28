@@ -67,6 +67,12 @@ class RaceReports extends ConfigurationItem {
 
 	iReportViewer := false
 
+	class ReportResizer extends ResizeableGui.Resizer {
+		Resize(*) {
+			RaceReports.Instance.loadReport(RaceReports.Instance.SelectedReport, true)
+		}
+	}
+
 	Window {
 		Get {
 			return this.iWindow
@@ -167,7 +173,7 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local stepWizard, simulators, simulator
+		local stepWizard, simulators, simulator, control
 
 		static raceReportsGui
 
@@ -219,7 +225,9 @@ class RaceReports extends ConfigurationItem {
 			ExitApp(0)
 		}
 
-		raceReportsGui := Gui()
+		raceReportsGui := ResizeableGui()
+
+		raceReportsGui.Descriptor := "Race Reports"
 
 		this.iWindow := raceReportsGui
 
@@ -228,14 +236,18 @@ class RaceReports extends ConfigurationItem {
 
 		raceReportsGui.SetFont("s10 Bold", "Arial")
 
-		raceReportsGui.Add("Text", "w1184 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(raceReportsGui, "Race Reports"))
+		control := raceReportsGui.Add("Text", "w1184 Center", translate("Modular Simulator Controller System"))
+		control.OnEvent("Click", moveByMouse.Bind(raceReportsGui, "Race Reports"))
+		raceReportsGui.DefineResizeRule(control, "X:Center")
 
 		raceReportsGui.SetFont("s9 Norm", "Arial")
 		raceReportsGui.SetFont("Italic Underline", "Arial")
 
-		raceReportsGui.Add("Text", "x508 YP+20 w184 cBlue Center", translate("Race Reports")).OnEvent("Click", openDocumentation.Bind(raceReportsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
+		control := raceReportsGui.Add("Text", "x508 YP+20 w184 cBlue Center", translate("Race Reports"))
+		control.OnEvent("Click", openDocumentation.Bind(raceReportsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
+		raceReportsGui.DefineResizeRule(control, "X:Center")
 
-		raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10")
+		raceReportsGui.DefineResizeRule(raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10"), "W:Grow")
 
 		raceReportsGui.SetFont("s8 Norm", "Arial")
 
@@ -262,15 +274,19 @@ class RaceReports extends ConfigurationItem {
 
 		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
 		this.iRacesListView.OnEvent("Click", chooseRace)
+		raceReportsGui.DefineResizeRule(this.iRacesListView, "H:Grow")
 
 		raceReportsGui.Add("Button", "x62 yp+205 w23 h23 vreloadReportsButton").OnEvent("Click", reloadRaceReports)
 		setButtonIcon(raceReportsGui["reloadReportsButton"], kIconsDirectory . "Renew.ico", 1)
+		raceReportsGui.DefineResizeRule(raceReportsGui["reloadReportsButton"], "Y:Move")
 
 		raceReportsGui.Add("Button", "x62 yp+24 w23 h23 vdeleteReportButton").OnEvent("Click", deleteRaceReport)
 		setButtonIcon(raceReportsGui["deleteReportButton"], kIconsDirectory . "Minus.ico", 1)
+		raceReportsGui.DefineResizeRule(raceReportsGui["deleteReportButton"], "Y:Move")
 
-		raceReportsGui.Add("Text", "x16 yp+30 w70 h23 +0x200", translate("Info"))
+		raceReportsGui.DefineResizeRule(raceReportsGui.Add("Text", "x16 yp+30 w70 h23 +0x200", translate("Info")), "Y:Move")
 		raceReportsGui.Add("ActiveX", "x90 yp-2 w180 h170 Border vinfoViewer", "shell.explorer").Value.Navigate("about:blank")
+		raceReportsGui.DefineResizeRule(raceReportsGui["infoViewer"], "Y:Move")
 
 		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200", translate("Report"))
 		raceReportsGui.Add("DropDownList", "x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
@@ -278,25 +294,35 @@ class RaceReports extends ConfigurationItem {
 		raceReportsGui.Add("Button", "x1177 yp w23 h23 vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)
 
+		raceReportsGui.DefineResizeRule(raceReportsGui["reportSettingsButton"], "X:Move")
+
 		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
+		raceReportsGui.DefineResizeRule(raceReportsGui["chartViewer"], "W:Grow;H:Grow")
 
 		this.iReportViewer := RaceReportViewer(raceReportsGui, raceReportsGui["chartViewer"].Value, raceReportsGui["infoViewer"].Value)
 
 		this.loadSimulator(simulator, true)
 
-		raceReportsGui.Add("Text", "x8 y574 w1200 0x10")
+		raceReportsGui.DefineResizeRule(raceReportsGui.Add("Text", "x8 y574 w1200 0x10"), "Y:Move;W:Grow")
 
-		raceReportsGui.Add("Button", "x574 y580 w80 h23", translate("Close")).OnEvent("Click", closeReports)
+		control := raceReportsGui.Add("Button", "x574 y580 w80 h23", translate("Close"))
+		control.OnEvent("Click", closeReports)
+		raceReportsGui.DefineResizeRule(control, "X:Center;Y:Move")
+
+		raceReportsGui.AddResizer(RaceReports.ReportResizer(raceReportsGui))
 	}
 
 	show() {
 		local window := this.Window
-		local x, y
+		local x, y, w, h
 
 		if getWindowPosition("Race Reports", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
+
+		if getWindowSize("Race Reports", &w, &h)
+			window.Resize("Initialize", w, h)
 	}
 
 	showOverviewReport(reportDirectory) {
@@ -670,10 +696,10 @@ class RaceReports extends ConfigurationItem {
 			deleteDirectory(prefix . car . "\" . track, true, false)
 			deleteDirectory(prefix . car, true, false)
 
-			if (this.getReports(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).Length() > 0)
+			if (this.getReports(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack).Length > 0)
 				this.loadTrack(this.SelectedTrack, true)
 			else {
-				if (this.getTracks(this.SelectedSimulator, this.SelectedCar).Length() > 0)
+				if (this.getTracks(this.SelectedSimulator, this.SelectedCar).Length > 0)
 					this.loadCar(this.SelectedCar, true)
 				else {
 					simulators := this.getSimulators()
@@ -694,10 +720,10 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 
-	loadReport(report) {
+	loadReport(report, force := false) {
 		local reportDirectory, raceData, drivers, simulator, car, track
 
-		if (report != this.SelectedReport) {
+		if (force || (report != this.SelectedReport)) {
 			if report {
 				this.iSelectedReport := report
 

@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,15 +25,15 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Application.ahk
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\RaceReportViewer.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "Libraries\RaceReportViewer.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -48,18 +48,9 @@ global kCancel := "Cancel"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global simulatorDropDown
-global carDropDown
-global trackDropDown
-global reportsDropDown
-global reportSettingsButton
-global chartViewer
-global infoViewer
-
-global reloadRaceReportsButtonHandle
-global deleteRaceReportButtonHandle
-
 class RaceReports extends ConfigurationItem {
+	iWindow := false
+
 	iDatabase := false
 
 	iSessionDatabase := SessionDatabase()
@@ -78,7 +69,13 @@ class RaceReports extends ConfigurationItem {
 
 	Window {
 		Get {
-			return "Reports"
+			return this.iWindow
+		}
+	}
+
+	Field[name] {
+		Get {
+			return this.iWindow[name]
 		}
 	}
 
@@ -170,100 +167,146 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local window := this.Window
 		local stepWizard, simulators, simulator
 
-		Gui %window%:Default
+		static raceReportsGui
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		chooseSimulator(*) {
+			RaceReports.Instance.loadSimulator(raceReportsGui["simulatorDropDown"].Text)
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		chooseCar(*) {
+			local reports := RaceReports.Instance
+			local sessionDB := reports.SessionDatabase
+			local simulator := reports.SelectedSimulator
+			local index, car
 
-		Gui %window%:Add, Text, w1184 Center gmoveReports, % translate("Modular Simulator Controller System")
+			for index, car in reports.getCars(simulator)
+				if (sessionDB.getCarName(simulator, car) = raceReportsGui["carDropDown"].Text)
+					reports.loadCar(car)
+		}
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+		chooseTrack(*) {
+			local reports := RaceReports.Instance
+			local simulator := reports.SelectedSimulator
+			local tracks := reports.getTracks(simulator, reports.SelectedCar)
+			local trackNames := collect(tracks, ObjBindMethod(reports.SessionDatabase, "getTrackName", simulator))
 
-		Gui %window%:Add, Text, x508 YP+20 w184 cBlue Center gopenReportsDocumentation, % translate("Race Reports")
+			reports.loadTrack(tracks[inList(trackNames, raceReportsGui["trackDropDown"].Text)])
+		}
 
-		Gui %window%:Add, Text, x8 yp+30 w1200 0x10
+		chooseRace(listView, line, *) {
+			RaceReports.Instance.loadRace(line)
+		}
 
-		Gui %window%:Font, s8 Norm, Arial
+		chooseReport(*) {
+			RaceReports.Instance.loadReport(kRaceReports[raceReportsGui["reportsDropDown"].Value])
+		}
 
-		Gui %window%:Add, Text, x16 yp+10 w70 h23 +0x200 Section, % translate("Simulator")
+		reportSettings(*) {
+			RaceReports.Instance.reportSettings(kRaceReports[raceReportsGui["reportsDropDown"].Value])
+		}
+
+		reloadRaceReports(*) {
+			RaceReports.Instance.loadTrack(RaceReports.Instance.SelectedTrack, true)
+		}
+
+		deleteRaceReport(*) {
+			RaceReports.Instance.deleteRace()
+		}
+
+		closeReports(*) {
+			ExitApp(0)
+		}
+
+		raceReportsGui := Gui()
+
+		this.iWindow := raceReportsGui
+
+		raceReportsGui.Opt("-Border -Caption +0x800000")
+		raceReportsGui.BackColor := "D0D0D0"
+
+		raceReportsGui.SetFont("s10 Bold", "Arial")
+
+		raceReportsGui.Add("Text", "w1184 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(raceReportsGui, "Race Reports"))
+
+		raceReportsGui.SetFont("s9 Norm", "Arial")
+		raceReportsGui.SetFont("Italic Underline", "Arial")
+
+		raceReportsGui.Add("Text", "x508 YP+20 w184 cBlue Center", translate("Race Reports")).OnEvent("Click", openDocumentation.Bind(raceReportsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
+
+		raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10")
+
+		raceReportsGui.SetFont("s8 Norm", "Arial")
+
+		raceReportsGui.Add("Text", "x16 yp+10 w70 h23 +0x200 Section", translate("Simulator"))
 
 		simulators := this.getSimulators()
 
-		simulator := ((simulators.Length() > 0) ? 1 : 0)
+		simulator := ((simulators.Length > 0) ? 1 : 0)
 
-		Gui %window%:Add, DropDownList, x90 yp w180 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
+		raceReportsGui.Add("DropDownList", "x90 yp w180 Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
 		else
 			simulator := false
 
-		Gui %window%:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Car")
-		Gui %window%:Add, DropDownList, x90 yp w180 vcarDropDown gchooseCar
+		raceReportsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Car"))
+		raceReportsGui.Add("DropDownList", "x90 yp w180 vcarDropDown").OnEvent("Change", chooseCar)
 
-		Gui %window%:Add, Text, x16 yp24 w70 h23 +0x200, % translate("Track")
-		Gui %window%:Add, DropDownList, x90 yp w180 vtrackDropDown gchooseTrack
+		raceReportsGui.Add("Text", "x16 yp24 w70 h23 +0x200", translate("Track"))
+		raceReportsGui.Add("DropDownList", "x90 yp w180 vtrackDropDown").OnEvent("Change", chooseTrack)
 
-		Gui %window%:Add, Text, x16 yp+26 w70 h23 +0x200, % translate("Races")
+		raceReportsGui.Add("Text", "x16 yp+26 w70 h23 +0x200", translate("Races"))
 
-		Gui %window%:Add, ListView, x90 yp-2 w180 h252 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDraceListView gchooseRace, % values2String("|", collect(["Date", "Time", "Duration", "Starting Grid"], "translate")*)
+		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
+		this.iRacesListView.OnEvent("Click", chooseRace)
 
-		this.iRacesListView := raceListView
+		raceReportsGui.Add("Button", "x62 yp+205 w23 h23 vreloadReportsButton").OnEvent("Click", reloadRaceReports)
+		setButtonIcon(raceReportsGui["reloadReportsButton"], kIconsDirectory . "Renew.ico", 1)
 
-		Gui %window%:Add, Button, x62 yp+205 w23 h23 HwndreloadRaceReportsButtonHandle greloadRaceReports
-		setButtonIcon(reloadRaceReportsButtonHandle, kIconsDirectory . "Renew.ico", 1)
+		raceReportsGui.Add("Button", "x62 yp+24 w23 h23 vdeleteReportButton").OnEvent("Click", deleteRaceReport)
+		setButtonIcon(raceReportsGui["deleteReportButton"], kIconsDirectory . "Minus.ico", 1)
 
-		Gui %window%:Add, Button, x62 yp+24 w23 h23 HwnddeleteRaceReportButtonHandle gdeleteRaceReport
-		setButtonIcon(deleteRaceReportButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		raceReportsGui.Add("Text", "x16 yp+30 w70 h23 +0x200", translate("Info"))
+		raceReportsGui.Add("ActiveX", "x90 yp-2 w180 h170 Border vinfoViewer", "shell.explorer").Value.Navigate("about:blank")
 
-		Gui %window%:Add, Text, x16 yp+30 w70 h23 +0x200, % translate("Info")
-		Gui %window%:Add, ActiveX, x90 yp-2 w180 h170 Border vinfoViewer, shell.explorer
+		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200", translate("Report"))
+		raceReportsGui.Add("DropDownList", "x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
 
-		infoViewer.Navigate("about:blank")
+		raceReportsGui.Add("Button", "x1177 yp w23 h23 vreportSettingsButton").OnEvent("Click", reportSettings)
+		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)
 
-		Gui %window%:Add, Text, x290 ys w40 h23 +0x200, % translate("Report")
-		Gui %window%:Add, DropDownList, x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown gchooseReport, % values2String("|", collect(kRaceReports, "translate")*)
+		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
 
-		Gui %window%:Add, Button, x1177 yp w23 h23 HwndreportSettingsButtonHandle vreportSettingsButton greportSettings
-		setButtonIcon(reportSettingsButtonHandle, kIconsDirectory . "Report Settings.ico", 1)
-
-		Gui %window%:Add, ActiveX, x290 yp+24 w910 h475 Border vchartViewer, shell.explorer
-
-		chartViewer.Navigate("about:blank")
-
-		this.iReportViewer := RaceReportViewer(window, chartViewer, infoViewer)
+		this.iReportViewer := RaceReportViewer(raceReportsGui, raceReportsGui["chartViewer"].Value, raceReportsGui["infoViewer"].Value)
 
 		this.loadSimulator(simulator, true)
 
-		Gui %window%:Add, Text, x8 y574 w1200 0x10
+		raceReportsGui.Add("Text", "x8 y574 w1200 0x10")
 
-		Gui %window%:Add, Button, x574 y580 w80 h23 GcloseReports, % translate("Close")
+		raceReportsGui.Add("Button", "x574 y580 w80 h23", translate("Close")).OnEvent("Click", closeReports)
 	}
 
 	show() {
 		local window := this.Window
 		local x, y
 
-		if getWindowPosition("Race Reports", x, y)
-			Gui %window%:Show, x%x% y%y%
+		if getWindowPosition("Race Reports", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui %window%:Show
+			window.Show()
 	}
 
 	showOverviewReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Overview")
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Overview"))
 
 			this.iSelectedReport := "Overview"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -274,12 +317,12 @@ class RaceReports extends ConfigurationItem {
 
 	showCarReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Car")
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Car"))
 
 			this.iSelectedReport := "Car"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -290,13 +333,13 @@ class RaceReports extends ConfigurationItem {
 
 	showDriverReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Drivers")
+			this.Field["reportSettingsButton"].Enabled := true
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Drivers"))
 
 			this.iSelectedReport := "Drivers"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -313,13 +356,13 @@ class RaceReports extends ConfigurationItem {
 
 	showPositionsReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Positions")
+			this.Field["reportSettingsButton"].Enabled := true
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Positions"))
 
 			this.iSelectedReport := "Positions"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -336,13 +379,13 @@ class RaceReports extends ConfigurationItem {
 
 	showLapTimesReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Lap Times")
+			this.Field["reportSettingsButton"].Enabled := true
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Lap Times"))
 
 			this.iSelectedReport := "Lap Times"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -359,13 +402,13 @@ class RaceReports extends ConfigurationItem {
 
 	showConsistencyReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Consistency")
+			this.Field["reportSettingsButton"].Enabled := true
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Consistency"))
 
 			this.iSelectedReport := "Consistency"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -382,13 +425,13 @@ class RaceReports extends ConfigurationItem {
 
 	showPaceReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Pace")
+			this.Field["reportSettingsButton"].Enabled := true
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Pace"))
 
 			this.iSelectedReport := "Pace"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -405,13 +448,13 @@ class RaceReports extends ConfigurationItem {
 
 	showPerformanceReport(reportDirectory) {
 		if reportDirectory {
-			GuiControl Enable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Performance")
+			this.Field["reportSettingsButton"].Enabled := true
+			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Performance"))
 
 			this.iSelectedReport := "Performance"
 		}
 		else {
-			GuiControl Choose, reportsDropDown, 0
+			this.Field["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -433,8 +476,7 @@ class RaceReports extends ConfigurationItem {
 		for ignore, simulator in this.SessionDatabase.getSimulators() {
 			hasReports := false
 
-			loop Files, % this.Database . "\" . this.SessionDatabase.getSimulatorCode(simulator) . "\*.*", D
-			{
+			loop Files, this.Database . "\" . this.SessionDatabase.getSimulatorCode(simulator) . "\*.*", "D" {
 				hasReports := true
 
 				break
@@ -453,7 +495,7 @@ class RaceReports extends ConfigurationItem {
 
 		simulator := this.SessionDatabase.getSimulatorCode(simulator)
 
-		loop Files, %database%\%simulator%\*.*, D
+		loop Files, database . "\" . simulator . "\*.*", "D"
 			result.Push(A_LoopFileName)
 
 		return result
@@ -467,7 +509,7 @@ class RaceReports extends ConfigurationItem {
 		simulator := sessionDB.getSimulatorCode(simulator)
 		car := sessionDB.getCarCode(simulator, car)
 
-		loop Files, %database%\%simulator%\%car%\*.*, D
+		loop Files, database . "\" . simulator . "\" . car . "\*.*", "D"
 			result.Push(A_LoopFileName)
 
 		return result
@@ -482,7 +524,7 @@ class RaceReports extends ConfigurationItem {
 		car := sessionDB.getCarCode(simulator, car)
 		track := sessionDB.getTrackCode(simulator, track)
 
-		loop Files, %database%\%simulator%\%car%\%track%\*.*, D
+		loop Files, database . "\" . simulator . "\" . car . "\" . track . "\*.*", "D"
 			reports.Push(A_LoopFilePath)
 
 		return reports
@@ -494,8 +536,6 @@ class RaceReports extends ConfigurationItem {
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
 
-			Gui %window%:Default
-
 			this.iSelectedSimulator := simulator
 
 			sessionDB := this.SessionDatabase
@@ -506,40 +546,36 @@ class RaceReports extends ConfigurationItem {
 			for index, car in cars
 				carNames[index] := sessionDB.getCarName(simulator, car)
 
-			GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
-			GuiControl, , carDropDown, % "|" . values2String("|", carNames*)
+			this.Field["simulatorDropDown"].Choose(inList(this.getSimulators(), simulator))
 
-			this.loadCar((cars.Length() > 0) ? cars[1] : false, true)
+			this.Field["carDropDown"].Delete()
+			this.Field["carDropDown"].Add(carNames)
+
+			this.loadCar((cars.Length > 0) ? cars[1] : false, true)
 		}
 	}
 
 	loadCar(car, force := false) {
-		local window, tracks
+		local tracks
 
 		if (force || (car != this.SelectedCar)) {
-			window := this.Window
-
-			Gui %window%:Default
-
 			this.iSelectedCar := car
 
 			tracks := this.getTracks(this.SelectedSimulator, car)
 
-			GuiControl Choose, carDropDown, % inList(this.getCars(this.SelectedSimulator), car)
-			GuiControl, , trackDropDown, % "|" . values2String("|", collect(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator))*)
+			this.Field["carDropDown"].Choose(inList(this.getCars(this.SelectedSimulator), car))
 
-			this.loadTrack((tracks.Length() > 0) ? tracks[1] : false, true)
+			this.Field["trackDropDown"].Delete()
+			this.Field["trackDropDown"].Add(collect(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator)))
+
+			this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
 		}
 	}
 
 	loadTrack(track, force := false) {
-		local window, simulator, ignore, report, fileName, raceData, date, time
+		local simulator, ignore, report, fileName, raceData, date, time
 
 		if (force || (track != this.SelectedTrack)) {
-			window := this.Window
-
-			Gui %window%:Default
-
 			simulator := this.SelectedSimulator
 
 			this.iSelectedTrack := track
@@ -547,56 +583,55 @@ class RaceReports extends ConfigurationItem {
 			this.iSelectedRace := false
 			this.iSelectedReport := false
 
-			GuiControl Choose, trackDropDown, % inList(this.getTracks(simulator, this.SelectedCar), track)
-			GuiControl Disable, reportsDropDown
-			GuiControl Disable, reportSettingsButton
-			GuiControl Choose, reportsDropDown, 0
-			GuiControl Disable, %deleteRaceReportButtonHandle%
+			this.Field["trackDropDown"].Choose(inList(this.getTracks(simulator, this.SelectedCar), track))
+			this.Field["reportsDropDown"].Enabled := false
+			this.Field["reportSettingsButton"].Enabled := false
+			this.Field["reportsDropDown"].Choose(0)
+
+			this.Field["deleteReportButton"].Enabled := false
 
 			if track
-				GuiControl Enable, %reloadRaceReportsButtonHandle%
+				this.Field["reloadReportsButton"].Enabled := true
 			else
-				GuiControl Disable, %reloadRaceReportsButtonHandle%
+				this.Field["reloadReportsButton"].Enabled := false
 
 			this.ReportViewer.showReportChart(false)
 			this.ReportViewer.showReportInfo(false)
 
-			Gui ListView, % this.RacesListView
-
-			LV_Delete()
+			this.RacesListView.Delete()
 
 			if track {
 				for ignore, report in this.getReports(simulator, this.SelectedCar, track) {
-					SplitPath report, fileName
+					SplitPath(report, &fileName)
 
-					FormatTime date, %fileName%, ShortDate
-					FormatTime time, %fileName%, HH:mm
+					date := FormatTime(fileName, "ShortDate")
+					time := FormatTime(fileName, "HH:mm")
 
 					raceData := readMultiMap(report . "\Race.data")
 
 					if ((getMultiMapValue(raceData, "Session", "Car") = this.SelectedCar) && (getMultiMapValue(raceData, "Session", "Track") = track)) {
 						this.AvailableRaces.Push(fileName)
 
-						LV_Add("", date, time, Round(getMultiMapValue(raceData, "Session", "Duration") / 60), getMultiMapValue(raceData, "Cars", "Count"))
+						this.RacesListView.Add("", date, time, Round(getMultiMapValue(raceData, "Session", "Duration") / 60), getMultiMapValue(raceData, "Cars", "Count"))
 					}
 				}
 
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
-				LV_ModifyCol(3, "AutoHdr")
-				LV_ModifyCol(4, "AutoHdr")
+				this.RacesListView.ModifyCol(1, "AutoHdr")
+				this.RacesListView.ModifyCol(2, "AutoHdr")
+				this.RacesListView.ModifyCol(3, "AutoHdr")
+				this.RacesListView.ModifyCol(4, "AutoHdr")
 			}
 		}
 	}
 
 	loadRace(raceNr) {
 		if (raceNr != this.SelectedRace) {
-			this.Settings := {}
+			this.Settings := CaseInsenseMap()
 
 			if raceNr {
-				GuiControl Enable, reportsDropDown
-				GuiControl Choose, reportsDropDown, % inList(kRaceReports, "Overview")
-				GuiControl Enable, %deleteRaceReportButtonHandle%
+				this.Field["reportsDropDown"].Enabled := true
+				this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Overview"))
+				this.Field["deleteReportButton"].Enabled := true
 
 				this.iSelectedRace := raceNr
 				this.iSelectedReport := false
@@ -604,10 +639,10 @@ class RaceReports extends ConfigurationItem {
 				this.loadReport("Overview")
 			}
 			else {
-				GuiControl Disable, reportsDropDown
-				GuiControl Disable, reportSettingsButton
-				GuiControl Choose, reportsDropDown, 0
-				GuiControl Disable, %deleteRaceReportButtonHandle%
+				this.Field["reportsDropDown"].Enabled := false
+				this.Field["reportSettingsButton"].Enabled := false
+				this.Field["reportsDropDown"].Choose(0)
+				this.Field["deleteReportButton"].Enabled := false
 
 				this.iSelectedRace := false
 
@@ -618,15 +653,13 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	deleteRace() {
-		local title := translate("Delete")
-		local raceDirectory, simulators, window, prefix, simulator, car, track
+		local raceDirectory, simulators, window, prefix, simulator, car, track, msgResult
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		MsgBox 262436, %title%, % translate("Do you really want to delete the selected report?")
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to delete the selected report?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
 
-		IfMsgBox Yes
-		{
+		if (msgResult = "Yes") {
 			simulator := this.SessionDatabase.getSimulatorCode(this.SelectedSimulator)
 			car := this.SessionDatabase.getCarCode(this.SelectedSimulator, this.SelectedCar)
 			track := this.SessionDatabase.getTrackCode(this.SelectedSimulator, this.SelectedTrack)
@@ -648,16 +681,13 @@ class RaceReports extends ConfigurationItem {
 					if inList(simulators, this.SelectedSimulator)
 						this.loadSimulator(this.SelectedSimulator, true)
 					else {
-						window := this.Window
+						this.Field["simulatorDropDown"].Delete()
+						this.Field["simulatorDropDown"].Add(simulators)
 
-						Gui %window%:Default
-
-						GuiControl, , simulatorDropDown, % ("|" . values2String("|", simulators*))
-
-						if (simulators.Length() > 0)
+						if (simulators.Length > 0)
 							this.loadSimulator(simulators[1], true)
 						else
-							GuiControl Choose, simulatorDropDown, 0
+							this.Field["simulatorDropDown"].Choose(0)
 					}
 				}
 			}
@@ -669,12 +699,10 @@ class RaceReports extends ConfigurationItem {
 
 		if (report != this.SelectedReport) {
 			if report {
-				GuiControlGet simulatorDropDown
-
 				this.iSelectedReport := report
 
-				GuiControl Choose, reportsDropDown, % inList(kRaceReports, report)
-				GuiControl Disable, reportSettingsButton
+				this.Field["reportsDropDown"].Choose(inList(kRaceReports, report))
+				this.Field["reportSettingsButton"].Enabled := false
 
 				simulator := this.SessionDatabase.getSimulatorCode(this.SelectedSimulator)
 				car := this.SessionDatabase.getCarCode(this.SelectedSimulator, this.SelectedCar)
@@ -682,20 +710,21 @@ class RaceReports extends ConfigurationItem {
 
 				reportDirectory := (this.Database . "\" . simulator . "\" . car . "\" . track . "\" . this.AvailableRaces[this.SelectedRace])
 
-				switch report {
+				switch report, false {
 					case "Overview":
 						this.showOverviewReport(reportDirectory)
 					case "Car":
 						this.showCarReport(reportDirectory)
 					case "Drivers":
-						if !this.ReportViewer.Settings.HasKey("Drivers") {
+						if !this.ReportViewer.Settings.Has("Drivers") {
 							raceData := true
+							ignore := false
 
-							this.ReportViewer.loadReportData(false, raceData, false, false, false)
+							this.ReportViewer.loadReportData(false, &raceData, &ignore, &ignore, &ignore)
 
 							drivers := []
 
-							loop % Min(5, getMultiMapValue(raceData, "Cars", "Count"))
+							loop Min(5, getMultiMapValue(raceData, "Cars", "Count"))
 								drivers.Push(A_Index)
 
 							this.ReportViewer.Settings["Drivers"] := drivers
@@ -707,14 +736,15 @@ class RaceReports extends ConfigurationItem {
 					case "Lap Times":
 						this.showLapTimesReport(reportDirectory)
 					case "Consistency":
-						if !this.ReportViewer.Settings.HasKey("Drivers") {
+						if !this.ReportViewer.Settings.Has("Drivers") {
 							raceData := true
+							ignore := false
 
-							this.ReportViewer.loadReportData(false, raceData, false, false, false)
+							this.ReportViewer.loadReportData(false, &raceData, &ignore, &ignore, &ignore)
 
 							drivers := []
 
-							loop % Min(5, getMultiMapValue(raceData, "Cars", "Count"))
+							loop Min(5, getMultiMapValue(raceData, "Cars", "Count"))
 								drivers.Push(A_Index)
 
 							this.ReportViewer.Settings["Drivers"] := drivers
@@ -728,7 +758,7 @@ class RaceReports extends ConfigurationItem {
 				}
 			}
 			else {
-				GuiControl Choose, reportsDropDown, 0
+				this.Field["reportsDropDown"].Choose(0)
 
 				this.iSelectedReport := false
 
@@ -744,7 +774,7 @@ class RaceReports extends ConfigurationItem {
 		local track := this.SessionDatabase.getTrackCode(this.SelectedSimulator, this.SelectedTrack)
 		local reportDirectory := (this.Database . "\" . simulator . "\" . car . "\" . track . "\" . this.AvailableRaces[this.SelectedRace])
 
-		switch report {
+		switch report, false {
 			case "Drivers":
 				if this.editDriverReportSettings(reportDirectory)
 					this.showDriverReport(reportDirectory)
@@ -772,95 +802,23 @@ class RaceReports extends ConfigurationItem {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-closeReports() {
-	ExitApp 0
-}
-
-moveReports() {
-	moveByMouse(RaceReports.Instance.Window, "Race Reports")
-}
-
-openReportsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports
-}
-
-chooseSimulator() {
-	local reports := RaceReports.Instance
-
-	GuiControlGet simulatorDropDown
-
-	reports.loadSimulator(simulatorDropDown)
-}
-
-chooseCar() {
-	local reports := RaceReports.Instance
-	local sessionDB := reports.SessionDatabase
-	local simulator := reports.SelectedSimulator
-	local index, car
-
-	GuiControlGet carDropDown
-
-	for index, car in reports.getCars(simulator)
-		if (sessionDB.getCarName(simulator, car) = carDropDown)
-			reports.loadCar(car)
-}
-
-chooseTrack() {
-	local reports := RaceReports.Instance
-	local simulator := reports.SelectedSimulator
-	local tracks := reports.getTracks(simulator, reports.SelectedCar)
-	local trackNames := collect(tracks, ObjBindMethod(reports.SessionDatabase, "getTrackName", simulator))
-
-	GuiControlGet trackDropDown
-
-	reports.loadTrack(tracks[inList(trackNames, trackDropDown)])
-}
-
-chooseRace() {
-	if (A_GuiEvent = "Normal")
-		RaceReports.Instance.loadRace(A_EventInfo)
-}
-
-chooseReport() {
-	local reports := RaceReports.Instance
-
-	GuiControlGet reportsDropDown
-
-	RaceReports.Instance.loadReport(kRaceReports[reportsDropDown])
-}
-
-reportSettings() {
-	GuiControlGet reportsDropDown
-
-	RaceReports.Instance.reportSettings(kRaceReports[reportsDropDown])
-}
-
-reloadRaceReports() {
-	RaceReports.Instance.loadTrack(RaceReports.Instance.SelectedTrack, true)
-}
-
-deleteRaceReport() {
-	RaceReports.Instance.deleteRace()
-}
-
 runRaceReports() {
 	local icon := kIconsDirectory . "Chart.ico"
 	local reportsDirectory := getMultiMapValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false)
-	local title := translate("Configuration")
-	local reports, simulators
+	local reports, simulators, msgResult
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Race Reports
+	TraySetIcon(icon, "1")
+	A_IconTip := "Race Reports"
 
 	if !reportsDirectory {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		MsgBox 262436, %title%, % translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?")
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("The Reports folder has not been configured yet. Do you want to start the Configuration tool now?"), translate("Configuration"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
 
-		IfMsgBox Yes
-			Run %kBinariesDirectory%Simulator Configuration.exe
+		if (msgResult = "Yes")
+			Run(kBinariesDirectory . "Simulator Configuration.exe")
 
-		ExitApp 0
+		ExitApp(0)
 	}
 
 	fixIE(11)
@@ -872,7 +830,7 @@ runRaceReports() {
 
 	simulators := reports.getSimulators()
 
-	if (simulators.Length() > 0)
+	if (simulators.Length > 0)
 		reports.loadSimulator(simulators[1])
 
 	return

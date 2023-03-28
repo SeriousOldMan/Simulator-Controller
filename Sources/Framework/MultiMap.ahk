@@ -223,7 +223,7 @@ addMultiMapValues(multiMap, otherMultiMap) {
 }
 
 removeMultiMapValue(multiMap, section, key) {
-	if multiMap.Has(section)
+	if (multiMap.Has(section) && multiMap[section].Has(key))
 		multiMap[section].Delete(key)
 }
 

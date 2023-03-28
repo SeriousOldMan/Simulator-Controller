@@ -10,25 +10,25 @@
 ;;;-------------------------------------------------------------------------;;;
 
 minimum(numbers) {
-	local min := kUndefined
+	local theMin := kUndefined
 	local ignore, value
 
 	for ignore, value in numbers
 		if isNumber(value)
-			min := ((min == kUndefined) ? value : Min(min, value))
+			theMin := ((theMin == kUndefined) ? value : Min(theMin, value))
 
-	return ((min == kUndefined) ? 0 : min)
+	return ((theMin == kUndefined) ? 0 : theMin)
 }
 
 maximum(numbers) {
-	local max := kUndefined
+	local theMax := kUndefined
 	local ignore, value
 
 	for ignore, value in numbers
 		if isNumber(value)
-			max := ((max == kUndefined) ? value : Max(max, value))
+			theMax := ((theMax == kUndefined) ? value : Max(theMax, value))
 
-	return ((max == kUndefined) ? 0 : max)
+	return ((theMax == kUndefined) ? 0 : theMax)
 }
 
 average(numbers) {

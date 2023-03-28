@@ -3004,7 +3004,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
 						for ignore, postfix in ["1", "2", "3", "4", "5"] {
 							window[tyre . "Pressure" . postfix].Text := displayValue("Float", 0.0)
-							window[tyre . "Pressure" . postfix].Opt("BackgroundD0D0D0")
+							window[tyre . "Pressure" . postfix].Opt("Background" . "D0D0D0")
 							window[tyre . "Pressure" . postfix].Enabled := false
 						}
 
@@ -3037,7 +3037,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 								window[tyre . "Pressure" . postfix].Enabled := true
 							}
 							else {
-								window[tyre . "Pressure" . postfix].Opt("BackgroundD0D0D0 cBlack")
+								window[tyre . "Pressure" . postfix].Opt("Background" . "D0D0D0" . " cBlack")
 								window[tyre . "Pressure" . postfix].Enabled := false
 							}
 

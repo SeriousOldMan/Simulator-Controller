@@ -266,7 +266,7 @@ class RaceReportReader {
 
 		for ignore, lap in this.getLaps(raceData)
 			if positions.Has(lap)
-				result.Push(positions[lap].HasKey(car) ? positions[lap][car] : kNull)
+				result.Push(positions[lap].Has(car) ? positions[lap][car] : kNull)
 
 		return result
 	}
@@ -282,7 +282,7 @@ class RaceReportReader {
 		if this.getDriverPace(raceData, times, car, &min, &max, &avg, &stdDev)
 			for ignore, lap in this.getLaps(raceData)
 				if times.Has(lap) {
-					time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+					time := (times[lap].Has(car) ? times[lap][car] : 0)
 					time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
 
 					if (time > 0) {
@@ -304,7 +304,7 @@ class RaceReportReader {
 
 		for ignore, lap in this.getLaps(raceData)
 			if times.Has(lap) {
-				time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+				time := (times[lap].Has(car) ? times[lap][car] : 0)
 				time := (isNull(time) ? 0 : Round(time, 1))
 
 				if (time > 0)
@@ -413,7 +413,7 @@ class RaceReportReader {
 
 			for ignore, lap in this.getLaps(raceData)
 				if times.Has(lap) {
-					time := (times[lap].HasKey(car) ? times[lap][car] : 0)
+					time := (times[lap].Has(car) ? times[lap][car] : 0)
 					time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
 
 					if (time > 0)

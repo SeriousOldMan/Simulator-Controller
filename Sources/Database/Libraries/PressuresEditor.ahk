@@ -508,7 +508,7 @@ class PressuresEditor {
 	}
 
 	showStatisticsChart(drawChartFunction) {
-		local before, after, width, height, html
+		local before, after, html
 
 		this.PressuresViewer.Document.Open()
 
@@ -529,9 +529,6 @@ class PressuresEditor {
 						google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
 			)"
 
-			width := this.PressuresViewer.Width
-			height := (this.PressuresViewer.Height - 1)
-
 			after := "
 			(
 					</script>
@@ -542,7 +539,7 @@ class PressuresEditor {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after, {width: width, height: height}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.Width, height: this.PressuresViewer.Height - 1}))
 
 			this.PressuresViewer.Document.Write(html)
 		}

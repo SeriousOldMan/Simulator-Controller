@@ -99,7 +99,7 @@ deleteFile(fileName, backup := false) {
 		return true
 	}
 	catch Any as exception {
-		logError(exception)
+		logError(exception, false, false)
 
 		return false
 	}

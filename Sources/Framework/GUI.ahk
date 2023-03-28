@@ -115,7 +115,7 @@ fixIE(version := 0, exeName := "") {
 		}
 	}
 	catch Any as exception {
-		logError(exception)
+		logError(exception, false, false)
 	}
 
 	return previousValue

@@ -415,5 +415,5 @@ loadSettings(database, simulator, settings, owner, user, community, car, track, 
 	readSettings(database, simulator, values, owner, user, community, car, track, weather)
 
 	for ignore, setting in values
-		setMultiMapValue(settings, setting.Section, setting.Key, setting.Value)
+		setMultiMapValue(settings, setting["Section"], setting["Key"], setting["Value"])
 }

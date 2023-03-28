@@ -129,7 +129,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor
-						   , &distributions, driver := "__Undefined__") {
+						   , distributions, driver := "__Undefined__") {
 		local where := Map("Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
 						 , "Compound", compound, "Compound.Color", compoundColor, "Type", "Cold")
 		local ignore, pressureData, tyre, pressure
@@ -141,13 +141,13 @@ class TyresDatabase extends SessionDatabase {
 			where["Weather"] := weather
 
 		for ignore, pressureData in database.query("Tyres.Pressures.Distribution", {Where: where}) {
-			tyre := pressureData.Tyre
-			pressure := pressureData.Pressure
+			tyre := pressureData["Tyre"]
+			pressure := pressureData["Pressure"]
 
-			if distributions[tyre].HasKey(pressure)
-				distributions[tyre][pressure] += pressureData.Count
+			if distributions[tyre].Has(pressure)
+				distributions[tyre][pressure] += pressureData["Count"]
 			else
-				distributions[tyre][pressure] := pressureData.Count
+				distributions[tyre][pressure] := pressureData["Count"]
 		}
 	}
 
@@ -175,14 +175,16 @@ class TyresDatabase extends SessionDatabase {
 		for ignore, condition in database.query("Tyres.Pressures.Distribution"
 											  , {By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
 											   , Where: where})
-			conditions[values2String("|", condition.Weather, condition["Temperature.Air"], condition["Temperature.Track"]
-										, condition.Compound, condition["Compound.Color"])] := true
+			conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
+										, condition["Compound"], condition["Compound.Color"])] := true
 
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
-			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
-				conditions[values2String("|", condition*)] := true
+			for ignore, condition in database.query("Tyres.Pressures", {Group: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]
+																	  , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
+				conditions[values2String("|", condition["Weather"], condition["Temperature.Air"], condition["Temperature.Track"]
+										    , condition["Compound"], condition["Compound.Color"])] := true
 		}
 
 		result := []

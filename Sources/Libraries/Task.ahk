@@ -175,7 +175,7 @@ class Task {
 		}
 	}
 
-	__New(callable := false, sleep := 0, priority := 2) {
+	__New(callable := false, sleep := "__Undefined__", priority := "__Undefined__") {
 		this.iSleep := ((sleep = kUndefined) ? 0 : sleep)
 		this.iNextExecution := (A_TickCount + this.iSleep)
 

@@ -168,7 +168,7 @@ logMessage(logLevel, message) {
 	}
 }
 
-logError(exception, unhandled := false) {
+logError(exception, unhandled := false, report := true) {
 	local message
 
 	if IsObject(exception) {
@@ -182,6 +182,12 @@ logError(exception, unhandled := false) {
 	else if !isNumber(exception)
 		logMessage(unhandled ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
+
+	if (report && !unhandled && isDevelopment() && isDebug())
+		if IsObject(exception)
+			MsgBox(translate("Handled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
+		else
+			MsgBox(translate("Handled exception encountered: ") . exception)
 
 	return ((isDevelopment() || isDebug()) ? false : true)
 }

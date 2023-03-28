@@ -127,7 +127,7 @@ class PressuresEditor {
 	createGui(tyreCompound, tyreCompoundColor, airTemperature, trackTemperature) {
 		local sessionDatabase := this.SessionDatabase
 		local compounds := []
-		local weather, ignore, row, compound, pressuresEditorGui
+		local weather, ignore, row, theCompound, pressuresEditorGui
 
 		pressuresEditorGui := Gui()
 
@@ -170,10 +170,10 @@ class PressuresEditor {
 		for ignore, row in this.PressuresDatabase.query("Tyres.Pressures.Distribution"
 													  , {Select: ["Compound", "Compound.Color"], By: ["Compound", "Compound.Color"]
 													   , Where: {Weather: weather, Type: "Cold", Driver: this.SessionDatabase.SessionDatabase.ID}}) {
-			compound := compound(row["Compound"], row["Compound.Color"])
+			theCompound := compound(row["Compound"], row["Compound.Color"])
 
-			if !inList(compounds, compound)
-				compounds.Push(compound)
+			if !inList(compounds, theCompound)
+				compounds.Push(theCompound)
 		}
 
 		bubbleSort(&compounds)
@@ -207,7 +207,7 @@ class PressuresEditor {
 		pressuresEditorGui.Add("Text", "x8 yp+30 w410 0x10")
 
 		pressuresEditorGui.Add("Button", "x126 yp+10 w80 h23 Default", translate("Save")).OnEvent("Click", savePressuresEditor)
-		ogcButtontranslateCancel := pressuresEditorGui.Add("Button", "x214 yp w80 h23", translate("&Cancel")).OnEvent("Click", cancelPressuresEditor)
+		pressuresEditorGui.Add("Button", "x214 yp w80 h23", translate("&Cancel")).OnEvent("Click", cancelPressuresEditor)
 
 		if (compounds.Length > 0) {
 			this.loadCompound(compound(tyreCompound, tyreCompoundColor), true)
@@ -300,7 +300,7 @@ class PressuresEditor {
 		index := this.PressuresListView.GetNext(0)
 
 		if index {
-			count := this.PressuresListView.GetText(index, 1)
+			count := this.PressuresListView.GetText(index, 3)
 
 			this.Field["upPressureButton"].Enabled := true
 
@@ -415,7 +415,7 @@ class PressuresEditor {
 																	  , "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature)})
 				pressures.Push(Array(tyres[row["Tyre"]], displayValue("Float", convertUnit("Pressure", row["Pressure"])), row["Count"]))
 
-			bubbleSort(&pressures, (a, b) => a[1] > b[1])
+			bubbleSort(&pressures, (a, b) => strGreater(a[1], b[1]))
 
 			lastTyre := false
 
@@ -426,7 +426,7 @@ class PressuresEditor {
 					lastTyre := pressures[A_Index][1]
 
 			loop pressures.Length
-				this.PressuresListView.Add("", pressures[A_Index, 1], pressures[A_Index, 2], pressures[A_Index, 3])
+				this.PressuresListView.Add("", pressures[A_Index][1], pressures[A_Index][2], pressures[A_Index][3])
 
 			this.PressuresListView.ModifyCol()
 
@@ -474,15 +474,15 @@ class PressuresEditor {
 			oldPressure := pressuresDB.query("Tyres.Pressures.Distribution", {Where: prototype})
 
 			if (oldPressure.Length > 0) {
-				if (oldPressure[1].Count != count) {
-					oldPressure[1].Count := count
+				if (oldPressure[1]["Count"] != count) {
+					oldPressure[1]["Count"] := count
 
 					this.iModifications.Push(Array("Update", prototype, count))
 				}
 			}
 			else {
 				prototype := prototype.Clone()
-				prototype.Count := count
+				prototype["Count"] := count
 
 				pressuresDB.add("Tyres.Pressures.Distribution", prototype)
 
@@ -510,7 +510,7 @@ class PressuresEditor {
 	showStatisticsChart(drawChartFunction) {
 		local before, after, width, height, html
 
-		this.PressuresViewer.Document.open()
+		this.PressuresViewer.Document.Open()
 
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before := "
@@ -542,14 +542,14 @@ class PressuresEditor {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . after)
+			html := (before . drawChartFunction . substituteVariables(after, {width: width, height: height}))
 
-			this.PressuresViewer.Document.write(html)
+			this.PressuresViewer.Document.Write(html)
 		}
 		else {
 			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-			this.PressuresViewer.Document.write(html)
+			this.PressuresViewer.Document.Write(html)
 		}
 
 		this.PressuresViewer.Document.close()
@@ -582,14 +582,14 @@ class PressuresEditor {
 		for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"] {
 			tyre := translate(tyre)
 
-			maxCount := Max(maxCount, tyreData[tyre].Length())
+			maxCount := Max(maxCount, tyreData[tyre].Length)
 		}
 
 		for ignore, tyre in ["Front Left", "Front Right", "Rear Left", "Rear Right"] {
 			tyre := translate(tyre)
 
 			loop maxCount
-				if (tyreData[tyre].Length() < maxCount)
+				if (tyreData[tyre].Length < maxCount)
 					tyreData[tyre].Push(average(tyreData[tyre]))
 				else
 					break
@@ -735,7 +735,7 @@ getBoxAndWhiskerJSFunctions() {
 			return 0;
 		else {
 			for (var i = 0; i < array.length; i++)
-				value := "value + array[i]"
+				value = value + array[i]
 
 			return value / array.length;
 		}

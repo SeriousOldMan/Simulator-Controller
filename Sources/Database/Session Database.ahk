@@ -473,8 +473,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["deleteStrategyButton"], kIconsDirectory . "Minus.ico", 1)
 
 		editorGui.Add("Text", "x296 yp w80 h23 +0x200", translate("Share"))
-		editorGui.Add("CheckBox", "xp+90 yp+4 w140 vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess) ; -Theme
-		editorGui.Add("CheckBox", "xp yp+24 w140 vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess) ; -Theme
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
+		editorGui.Add("CheckBox", "xp yp+24 w140 vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
 		editorGui["settingsTab"].UseTab(3)
 
@@ -586,7 +586,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(6)
 
-		editorGui.Add("CheckBox", "+Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
+		editorGui.Add("CheckBox", "-Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
 
 		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
@@ -2933,7 +2933,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				chosenCompound := 0
 
 				if ((this.SelectedSimulator = lastSimulator) && (this.SelectedCar = lastCar) && (this.SelectedTrack = lastTrack))
-					chosenCompound := window["tyreCompoundDropDown"].Text
+					chosenCompound := window["tyreCompoundDropDown"].Value
 				else if this.iTyreCompound
 					chosenCompound := inList(compounds, compound(this.iTyreCompound, this.iTyreCompoundColor))
 
@@ -2941,7 +2941,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					chosenCompound := 1
 
 				window["tyreCompoundDropDown"].Delete()
-				window["tyreCompoundDropDown"].Add(collect(compounds, "translate"))
+				window["tyreCompoundDropDown"].Add(collect(compounds, translate))
 				window["tyreCompoundDropDown"].Choose(chosenCompound)
 
 				if ((this.SelectedSimulator != lastSimulator) || (this.UseCommunity != lastCommunity)) {
@@ -2956,6 +2956,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							drivers.Push(sessionDB.getDriverName(this.SelectedSimulator, driver))
 						}
 
+					window["driverDropDown"].Delete()
 					window["driverDropDown"].Add(drivers)
 
 					if selectedDriver {
@@ -2964,7 +2965,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						driver := [[selectedDriver]]
 					}
 					else {
-						window["driverDropDown"].Text.Choose(1)
+						window["driverDropDown"].Choose(1)
 
 						driver := [true]
 					}
@@ -2990,7 +2991,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					this.iTyreCompound := compound
 					this.iTyreCompoundColor := compoundColor
 
-					pressureInfos := SessionDatabaseEditor.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar																			   			  , this.SelectedTrack, this.SelectedWeather
+					pressureInfos := SessionDatabaseEditor.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
+																							, this.SelectedTrack, this.SelectedWeather
 																							, convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
 																							, convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
 																							, compound, compoundColor, driver*)
@@ -3002,7 +3004,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
 						for ignore, postfix in ["1", "2", "3", "4", "5"] {
 							window[tyre . "Pressure" . postfix].Text := displayValue("Float", 0.0)
-							window[tyre . "Pressure" . postfix].Options("+Background")
+							window[tyre . "Pressure" . postfix].Opt("BackgroundD0D0D0")
 							window[tyre . "Pressure" . postfix].Enabled := false
 						}
 
@@ -3024,21 +3026,18 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						else
 							color := "Yellow"
 
-						if (true || (color != lastColor)) {
+						if (true || (color != lastColor))
 							lastColor := color
-
-							window.BackColor := lastColor
-						}
 
 						for index, postfix in ["1", "2", "3", "4", "5"] {
 							window[tyre . "Pressure" . postfix].Text := displayValue("Float", convertUnit("Pressure", pressure))
 
 							if (index = (3 + airDelta)) {
-								window[tyre . "Pressure" . postfix].Options("+Background")
+								window[tyre . "Pressure" . postfix].Opt("ReadOnly Background" . color . ((color = "Green") ? " cWhite" : ""))
 								window[tyre . "Pressure" . postfix].Enabled := true
 							}
 							else {
-								window[tyre . "Pressure" . postfix].Options("-Background")
+								window[tyre . "Pressure" . postfix].Opt("BackgroundD0D0D0 cBlack")
 								window[tyre . "Pressure" . postfix].Enabled := false
 							}
 
@@ -3210,8 +3209,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				file.Close()
 
-				setup := StrGet(setup)
-
 				SplitPath(fileName, &fileName)
 
 				this.SessionDatabase.writeSetup(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, setupType, fileName, setup, size, false, true)
@@ -3241,7 +3238,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			file := FileOpen(fileName, "w", "")
 
 			if file {
-				file.Length := size
 				file.RawWrite(setupData, size)
 
 				file.Close()
@@ -3559,6 +3555,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		drivers := CaseInsenseMap()
 
+		drivers["-"] := false
+
 		for id, name in getMultiMapValues(info, "Driver") {
 			drivers[id] := name
 			drivers[name] := id
@@ -3660,8 +3658,8 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.Add("Text", "x8 yp+410 w410 0x10")
 
-		importDataGui.Add("Button", "x123 yp+10 w80 h23 Default GacceptImport", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
-		importDataGui.Add("Button", "x226 yp w80 h23 GcancelImport", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))
+		importDataGui.Add("Button", "x123 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
+		importDataGui.Add("Button", "x226 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))
 
 		importDataGui.Opt("+Owner" . owner.Hwnd)
 
@@ -4953,19 +4951,19 @@ uploadStrategy(*) {
 downloadStrategy(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.downloadStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0)))
+	editor.downloadStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
 }
 
 renameStrategy(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.renameStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0)))
+	editor.renameStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
 }
 
 deleteStrategy(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.deleteStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0)))
+	editor.deleteStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
 }
 
 chooseSetupType(dropDown, *) {
@@ -4986,7 +4984,7 @@ updateSetupAccess(*) {
 	selected := editor.SetupListView.GetNext(0)
 
 	if selected {
-		name := editor.SetupListView.GetText(selected)
+		name := editor.SetupListView.GetText(selected, 2)
 
 		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
 
@@ -4998,26 +4996,28 @@ updateSetupAccess(*) {
 	}
 }
 
-uploadSetup(dropDown, *) {
-	SessionDatabaseEditor.Instance.uploadSetup(kSetupTypes[dropDown.Value])
+uploadSetup(*) {
+	local editor := SessionDatabaseEditor.Instance
+
+	editor.uploadSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value])
 }
 
 downloadSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.downloadSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0)))
+	editor.downloadSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
 }
 
 renameSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.renameSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0)))
+	editor.renameSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
 }
 
 deleteSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.deleteSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0)))
+	editor.deleteSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
 }
 
 loadPressures(*) {

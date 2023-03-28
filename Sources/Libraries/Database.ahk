@@ -237,9 +237,10 @@ class Database {
 
 		if query.HasProp("Where") {
 			predicate := query.Where
+
 			selection := []
 
-			if (!(predicate is Func) || !predicate.MinParams)
+			if !(predicate is Func)
 				predicate := constraintColumns.Bind(predicate)
 
 			for ignore, row in rows
@@ -374,12 +375,12 @@ class Database {
 		local rows := []
 		local ignore, row
 
-		if (where && !where.MinParams)
+		if (where && !(where is Func))
 			where := constraintColumns.Bind(where)
 
 		for ignore, row in this.Tables[name]
 			if (!where || where.Call(row)) {
-				if (!predicate || !%predicate%(row))
+				if (!predicate || !predicate.Call(row))
 					rows.Push(row)
 			}
 			else

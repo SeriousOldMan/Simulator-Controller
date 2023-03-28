@@ -1009,7 +1009,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarName(simulator, car) {
-		local name := getMultiMapValue(SessionDatabase.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
 									 , "Car Names", car, car)
 
 		if (!name || (name = ""))
@@ -1023,7 +1023,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getCarCode(simulator, car) {
-		local code := getMultiMapValue(SessionDatabase.loadData(this.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
+		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sCarData, this.getSimulatorCode(simulator), "Car Data.ini")
 									 , "Car Codes", car, car)
 
 		if (!code || (code = ""))
@@ -1060,7 +1060,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getTrackName(simulator, track, long := true) {
-		local name := getMultiMapValue(SessionDatabase.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local name := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
 									 , long ? "Track Names Long" : "Track Names Short", track, track)
 
 		if (!name || (name = ""))
@@ -1074,7 +1074,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static getTrackCode(simulator, track) {
-		local code := getMultiMapValue(SessionDatabase.loadData(this.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
+		local code := getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTrackData, this.getSimulatorCode(simulator), "Track Data.ini")
 									 , "Track Codes", track, track)
 
 		if (!code || (code = ""))
@@ -1225,7 +1225,7 @@ class SessionDatabase extends ConfigurationItem {
 		if !availableTyreCompounds
 			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
 
-		compounds := collect(collect(availableTyreCompounds, "compound"), "normalizeCompound")
+		compounds := collect(collect(availableTyreCompounds, compound), normalizeCompound)
 
 		switch weather {
 			case "Dry":
@@ -1262,12 +1262,12 @@ class SessionDatabase extends ConfigurationItem {
 		return false
 	}
 
-	optimalTyrePressure(simulator, car, compound, default := false) {
+	optimalTyrePressure(simulator, car, tyreCompound, default := false) {
 		car := this.getCarCode(simulator, car)
-		compound := compound(compound)
+		tyreCompound := compound(tyreCompound)
 
-		return getMultiMapValue(SessionDatabase.loadData(this.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
-							  , "Pressures", car . ";" . compound, default)
+		return getMultiMapValue(SessionDatabase.loadData(SessionDatabase.sTyreData, this.getSimulatorCode(simulator), "Tyre Data.ini")
+							  , "Pressures", car . ";" . tyreCompound, default)
 	}
 
 	readNotes(simulator, car, track) {
@@ -1364,7 +1364,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		car := this.getCarCode(simulator, car)
 
-		´fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
+		fileName := kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
 
 		if !FileExist(fileName)
 			fileName := kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name
@@ -1655,7 +1655,7 @@ class SessionDatabase extends ConfigurationItem {
 		setMultiMapValue(info, "Access", "Share", share)
 		setMultiMapValue(info, "Access", "Synchronize", synchronize)
 
-		this.writeSetupInfo(simulator, car, track, name, info)
+		this.writeStrategyInfo(simulator, car, track, name, info)
 	}
 
 	writeStrategyInfo(simulator, car, track, name, info) {
@@ -1872,17 +1872,17 @@ compoundColor(compound) {
 		return SubStr(compound[2], 2, StrLen(compound[2]) - 2)
 }
 
-splitCompound(qualifiedCompound, &compound, &compoundColor) {
-	compound := compound(qualifiedCompound)
-	compoundColor := compoundColor(qualifiedCompound)
+splitCompound(qualifiedCompound, &tyreCompound, &tyreCompoundColor) {
+	tyreCompound := compound(qualifiedCompound)
+	tyreCompoundColor := compoundColor(qualifiedCompound)
 }
 
 normalizeCompound(qualifiedCompound) {
-	local compound, compoundColor
+	local tyreCompound, tyreCompoundColor
 
-	splitCompound(qualifiedCompound, &compound, &compoundColor)
+	splitCompound(qualifiedCompound, &tyreCompound, &tyreCompoundColor)
 
-	return compound(compound, compoundColor)
+	return compound(tyreCompound, tyreCompoundColor)
 }
 
 parseDriverName(fullName, &forName, &surName, &nickName) {

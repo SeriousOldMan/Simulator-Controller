@@ -433,7 +433,7 @@ class RaceReportViewer extends RaceReportReader {
 	showCarReport() {
 		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 		local report := this.Report
-		local compound, cars, rows, raceData, pitstops, ignore, lap, weather, consumption, lapTime, pitstop, row
+		local tyreCompound, cars, rows, raceData, pitstops, ignore, lap, weather, consumption, lapTime, pitstop, row
 
 		if report {
 			raceData := readMultiMap(report . "\Race.data")
@@ -448,10 +448,10 @@ class RaceReportViewer extends RaceReportReader {
 				weather := (weather ? translate(weather) : "n/a")
 
 				if getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", false)
-					compound := translate(compound(getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
-												 , getMultiMapValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
+					tyreCompound := translate(compound(getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
+													 , getMultiMapValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
 				else
-					compound := "-"
+					tyreCompound := "-"
 
 				consumption := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
 
@@ -471,7 +471,7 @@ class RaceReportViewer extends RaceReportReader {
 				row := values2String(", "
 									, lap
 									, "'" . weather . "'"
-									, "'" . compound . "'"
+									, "'" . tyreCompound . "'"
 									, "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
 									, "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
 									, "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"

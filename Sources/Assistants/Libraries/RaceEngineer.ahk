@@ -2622,23 +2622,23 @@ requestPitstopDriver(context, pitstopNumber, driver) {
 	return true
 }
 
-setupTyrePressures(context, weather, airTemperature, trackTemperature, compound, compoundColor) {
+setupTyrePressures(context, weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor) {
 	local knowledgeBase := context.KnowledgeBase
 	local pressures := false
 	local certainty := 1.0
 
-	if !inList(kTyreCompounds, compound(compound, compoundColor)) {
-		compound := false
-		compoundColor := false
+	if !inList(kTyreCompounds, compound(tyreCompound, tyreCompoundColor)) {
+		tyreCompound := false
+		tyreCompoundColor := false
 	}
 
 	airTemperature := Round(airTemperature)
 	trackTemperature := Round(trackTemperature)
 
-	if context.KnowledgeBase.RaceAssistant.getTyrePressures(weather, airTemperature, trackTemperature, compound, compoundColor, pressures, certainty) {
+	if context.KnowledgeBase.RaceAssistant.getTyrePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, pressures, certainty) {
 		knowledgeBase.setFact("Tyre.Setup.Certainty", certainty)
-		knowledgeBase.setFact("Tyre.Setup.Compound", compound)
-		knowledgeBase.setFact("Tyre.Setup.Compound.Color", compoundColor)
+		knowledgeBase.setFact("Tyre.Setup.Compound", tyreCompound)
+		knowledgeBase.setFact("Tyre.Setup.Compound.Color", tyreCompoundColor)
 		knowledgeBase.setFact("Tyre.Setup.Weather", weather)
 		knowledgeBase.setFact("Tyre.Setup.Temperature.Air", airTemperature)
 		knowledgeBase.setFact("Tyre.Setup.Temperature.Track", trackTemperature)

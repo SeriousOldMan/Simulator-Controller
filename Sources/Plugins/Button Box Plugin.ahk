@@ -36,10 +36,10 @@ class GridButtonBox extends ButtonBox {
 
 	iRows := 0
 	iColumns := 0
-	iRowMargin := this.kRowMargin
-	iColumnMargin := this.kColumnMargin
-	iSidesMargin := this.kSidesMargin
-	iBottomMargin := this.kBottomMargin
+	iRowMargin := GridButtonBox.kRowMargin
+	iColumnMargin := GridButtonBox.kColumnMargin
+	iSidesMargin := GridButtonBox.kSidesMargin
+	iBottomMargin := GridButtonBox.kBottomMargin
 
 	iRowDefinitions := []
 	iControls := CaseInsenseMap()
@@ -174,7 +174,7 @@ class GridButtonBox extends ButtonBox {
 		loop columnWidths.Length
 			width += columnWidths[A_Index]
 
-		height += ((rowHeights.Length - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
+		height += ((rowHeights.Length - 1) * this.RowMargin) + GridButtonBox.kHeaderHeight + this.BottomMargin
 		width += ((columnWidths.Length - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
 
 		buttonBoxGui := Window({Options: "-0x800000"})
@@ -192,7 +192,7 @@ class GridButtonBox extends ButtonBox {
 		buttonBoxGui.BackColor := "0x000000"
 		buttonBoxGui.SetFont("s8 Norm", "Arial")
 
-		vertical := this.kHeaderHeight
+		vertical := GridButtonBox.kHeaderHeight
 
 		loop this.Rows {
 			rowHeight := rowHeights[A_Index]
@@ -246,7 +246,7 @@ class GridButtonBox extends ButtonBox {
 						function := ConfigurationItem.descriptor(function, number)
 
 						x := horizontal + Round((columnWidth - imageWidth) / 2)
-						y := vertical + Round((rowHeight - (labelHeight + this.kLabelMargin) - imageHeight) / 2)
+						y := vertical + Round((rowHeight - (labelHeight + GridButtonBox.kLabelMargin) - imageHeight) / 2)
 
 						control := buttonBoxGui.Add("Picture", "x" . x . " y" . y . " w" . imageWidth . " h" . imageHeight . " BackgroundTrans", image)
 						control.OnEvent("Click", controlEvent.Bind(buttonBoxGui, control))
@@ -323,7 +323,7 @@ class GridButtonBox extends ButtonBox {
 						imageHeight := 0
 					}
 
-					rowHeight := Max(rowHeight, imageHeight + ((labelHeight > 0) ? (this.kLabelMargin + labelHeight) : 0))
+					rowHeight := Max(rowHeight, imageHeight + ((labelHeight > 0) ? (GridButtonBox.kLabelMargin + labelHeight) : 0))
 
 					columnWidths[A_Index] := Max(columnWidths[A_Index], Max(imageWidth, labelWidth))
 				}

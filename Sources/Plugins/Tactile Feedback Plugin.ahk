@@ -365,13 +365,13 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if (function != false) {
 				descriptor := ConfigurationItem.descriptor(toggle, "Toggle")
 
-				this.registerAction(this.FXToggleAction(function, this.getLabel(descriptor, toggle), this.getIcon(descriptor), command))
+				this.registerAction(TactileFeedbackPlugin.FXToggleAction(function, this.getLabel(descriptor, toggle), this.getIcon(descriptor), command))
 			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
 
-		this["i" . toggle . "Enabled"] := initialState
+		this.%"i" . toggle . "Enabled"% := initialState
 	}
 
 	createDialAction(mode, effect, descriptor) {
@@ -552,7 +552,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		if theAction
 			theAction.Function.setLabel(actionLabel, "Green")
 
-		this["i" . action . "Enabled"] := true
+		this.%"i" . action . "Enabled"% := true
 
 		if call
 			callSimHub(command)

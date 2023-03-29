@@ -898,19 +898,19 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			super.writePluginState(configuration)
 	}
 
-	startSimulation(simulator) {
+	static startSimulation(simulator) {
 		if (RaceAssistantPlugin.Simulator && (RaceAssistantPlugin.Simulator != simulator))
 			RaceAssistantPlugin.stopSimulation(RaceAssistantPlugin.Simulator)
 
 		RaceAssistantPlugin.sSimulator := simulator
 	}
 
-	stopSimulation(simulator) {
+	static stopSimulation(simulator) {
 		if (RaceAssistantPlugin.Simulator == simulator)
 			RaceAssistantPlugin.sSimulator := false
 	}
 
-	connectTeamSession() {
+	static connectTeamSession() {
 		local teamServer := RaceAssistantPlugin.TeamServer
 		local settings, sessionIdentifier, serverURL, accessToken, teamIdentifier, driverIdentifier
 
@@ -941,7 +941,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return RaceAssistantPlugin.TeamSessionActive
 	}
 
-	disconnectTeamSession() {
+	static disconnectTeamSession() {
 		local teamServer := RaceAssistantPlugin.TeamServer
 
 		RaceAssistantPlugin.sTeamSessionActive := false
@@ -950,7 +950,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			teamServer.disconnect()
 	}
 
-	initializeAssistantsState() {
+	static initializeAssistantsState() {
 		RaceAssistantPlugin.sSession := kSessionFinished
 		RaceAssistantPlugin.sLastLap := 0
 		RaceAssistantPlugin.sLapRunning := 0
@@ -958,7 +958,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		RaceAssistantPlugin.sFinished := false
 	}
 
-	requireAssistants() {
+	static requireAssistants() {
 		local activeAssistant := false
 		local ignore, assistant
 
@@ -975,7 +975,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return activeAssistant
 	}
 
-	prepareAssistantsSession(data) {
+	static prepareAssistantsSession(data) {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -983,7 +983,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.prepareSession(assistant.prepareSettings(data), data)
 	}
 
-	startAssistantsSession(data) {
+	static startAssistantsSession(data) {
 		local lap := getMultiMapValue(data, "Stint Data", "Laps", false)
 		local start := ((lap = 1) || RaceAssistantPlugin.TeamSessionActive)
 		local first := true
@@ -1014,7 +1014,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
+	static finishAssistantsSession(shutdownAssistant := true, shutdownTeamSession := true) {
 		local session := this.Session
 		local finalizeAssistant := shutdownAssistant
 		local ignore, assistant
@@ -1055,7 +1055,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	addAssistantsLap(data, telemetryData, positionsData) {
+	static addAssistantsLap(data, telemetryData, positionsData) {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -1066,7 +1066,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			RaceAssistantPlugin.TeamServer.addLap(RaceAssistantPlugin.LastLap, telemetryData, positionsData)
 	}
 
-	updateAssistantsLap(data) {
+	static updateAssistantsLap(data) {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -1074,7 +1074,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.updateLap(RaceAssistantPlugin.LastLap, RaceAssistantPlugin.LapRunning, data)
 	}
 
-	performAssistantsPitstop(lapNumber) {
+	static performAssistantsPitstop(lapNumber) {
 		local options := false
 		local ignore, assistant
 
@@ -1089,7 +1089,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			RaceAssistantPlugin.Simulator.performPitstop(lapNumber, options)
 	}
 
-	restoreAssistantsSessionState(data) {
+	static restoreAssistantsSessionState(data) {
 		local ignore, assistant
 
 		for ignore, assistant in RaceAssistantPlugin.Assistants
@@ -1097,7 +1097,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.restoreSessionState(data)
 	}
 
-	updateAssistantsSession(session := "__Undefined__") {
+	static updateAssistantsSession(session := "__Undefined__") {
 		local ignore, assistant
 
 		if (session == kUndefined)
@@ -1113,7 +1113,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.updateSession(session)
 	}
 
-	updateAssistantsTelemetryData(data) {
+	static updateAssistantsTelemetryData(data) {
 		local teamServer := this.TeamServer
 		local simulator, car, track, maxFuel, compound, compoundColor
 		local ignore, assistant, section
@@ -1160,7 +1160,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.updateTelemetryData(data)
 	}
 
-	updateAssistantsPositionsData(data) {
+	static updateAssistantsPositionsData(data) {
 		local ignore, assistant
 
 		RaceAssistantPlugin.Simulator.updatePositionsData(data)
@@ -1703,7 +1703,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		return getMultiMapValue(data, "Stint Data", "Laps", 0)
 	}
 
-	collectSessionData() {
+	static collectSessionData() {
 		local finished := false
 		local joinedSession := false
 		local teamSessionActive := false

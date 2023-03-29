@@ -223,7 +223,7 @@ class SystemPlugin extends ControllerPlugin {
 					function := controller.findFunction(descriptor)
 
 					if (function != false) {
-						action := this.ModeSelectorAction(function, "", this.getIcon("ModeSelector.Activate"))
+						action := SystemPlugin.ModeSelectorAction(function, "", this.getIcon("ModeSelector.Activate"))
 
 						this.iModeSelectors.Push(action)
 
@@ -243,9 +243,9 @@ class SystemPlugin extends ControllerPlugin {
 
 				if (function != false) {
 					if !this.iLaunchMode
-						this.iLaunchMode := this.LaunchMode(this)
+						this.iLaunchMode := SystemPlugin.LaunchMode(this)
 
-					this.iLaunchMode.registerAction(this.LogoToggleAction(function, ""))
+					this.iLaunchMode.registerAction(SystemPlugin.LogoToggleAction(function, ""))
 				}
 				else
 					this.logFunctionNotFound(descriptor)
@@ -258,9 +258,9 @@ class SystemPlugin extends ControllerPlugin {
 
 				if (function != false) {
 					if !this.iLaunchMode
-						this.iLaunchMode := this.LaunchMode(this)
+						this.iLaunchMode := SystemPlugin.LaunchMode(this)
 
-					this.iLaunchMode.registerAction(this.SystemShutdownAction(function, "Shutdown"))
+					this.iLaunchMode.registerAction(SystemPlugin.SystemShutdownAction(function, "Shutdown"))
 				}
 				else
 					this.logFunctionNotFound(descriptor)
@@ -293,10 +293,10 @@ class SystemPlugin extends ControllerPlugin {
 				runnable := this.findRunnableApplication(appDescriptor[2])
 
 				if (runnable != false) {
-					action := this.LaunchAction(function, appDescriptor[1], this.getIcon("Launch.Activate"), appDescriptor[2])
+					action := SystemPlugin.LaunchAction(function, appDescriptor[1], this.getIcon("Launch.Activate"), appDescriptor[2])
 
 					if !this.iLaunchMode
-						this.iLaunchMode := this.LaunchMode(this)
+						this.iLaunchMode := SystemPlugin.LaunchMode(this)
 
 					this.iLaunchMode.registerAction(action)
 
@@ -319,10 +319,10 @@ class SystemPlugin extends ControllerPlugin {
 			runnable := this.findRunnableApplication(application)
 
 			if (runnable != false) {
-				action := this.LaunchAction(function, label, this.getIcon("Launch.Activate"), application)
+				action := SystemPlugin.LaunchAction(function, label, this.getIcon("Launch.Activate"), application)
 
 				if !this.iLaunchMode
-					this.iLaunchMode := this.LaunchMode(this)
+					this.iLaunchMode := SystemPlugin.LaunchMode(this)
 
 				this.iLaunchMode.registerAction(action)
 
@@ -413,8 +413,8 @@ class SystemPlugin extends ControllerPlugin {
 	}
 
 	initializeBackgroundTasks() {
-		PeriodicTask("updateApplicationStates", 5000, kLowPriority).start()
-		PeriodicTask("updateModeSelector", 500, kLowPriority).start()
+		PeriodicTask(updateApplicationStates, 5000, kLowPriority).start()
+		PeriodicTask(updateModeSelector, 500, kLowPriority).start()
 	}
 }
 

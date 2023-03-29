@@ -57,7 +57,8 @@ global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
 
 reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 	if isDebug() {
-		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
+		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: "
+												   . String(p1) . "; " . String(p2) . "; " . String(p3) . "; " . String(p4)
 				  , false, kUndefined, 5000)
 
 		if isDevelopment()

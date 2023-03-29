@@ -291,15 +291,12 @@ class Application extends ConfigurationItem {
 		return (this.iRunningPID := processID)
 	}
 
-	run(application, exePath, workingDirectory, options := "", wait := false) {
+	static run(application, exePath, workingDirectory, options := "", wait := false) {
 		local pid, message, result
 
 		try {
 			if InStr(exePath, A_Space)
 				exePath := ("`"" . exePath . "`"")
-
-			if InStr(workingDirectory, A_Space)
-				workingDirectory := ("`"" . workingDirectory . "`"")
 
 			if wait {
 				result := RunWait(exePath, workingDirectory, options)
@@ -391,6 +388,13 @@ class Function extends ConfigurationItem {
 		Get {
 			local ignore, action, arguments, index, argument, result, actions, callables
 
+			callActions(actions, *) {
+				local ignore, action
+
+				for ignore, action in actions
+					action.Call()
+			}
+
 			if trigger {
 				actions := this.iActions[trigger]
 				callables := []
@@ -427,7 +431,7 @@ class Function extends ConfigurationItem {
 							callables.Push(action)
 					}
 
-					return ((callables.Length > 0) ? callActions.Bind(callables*) : false)
+					return ((callables.Length > 0) ? callActions.Bind(callables.Clone()) : false)
 				}
 			}
 			else {
@@ -463,7 +467,7 @@ class Function extends ConfigurationItem {
 							callables.Push(action)
 					}
 
-					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length > 0) ? callActions.Bind(callables*) : false))
+					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length > 0) ? callActions.Bind(callables.Clone()) : false))
 				}
 
 				return result
@@ -577,7 +581,20 @@ class Function extends ConfigurationItem {
 	}
 
 	actionCallable(trigger, action) {
-		local function := (action != false) ? %action[1]% : false
+		local function := false
+
+		if (action != false) {
+			function := action[1]
+
+			try {
+				function := %function%
+			}
+			catch Any as exception {
+				logError(exception)
+
+				function := false
+			}
+		}
 
 		return (function != false) ? function.Bind(action[2]*) : false
 	}
@@ -586,7 +603,7 @@ class Function extends ConfigurationItem {
 		local action := this.Actions[trigger]
 
 		if action
-			%action%()
+			action.Call()
 	}
 }
 
@@ -833,16 +850,4 @@ class Plugin extends ConfigurationItem {
 
 		return result
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Function Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-callActions(actions*) {
-	local ignore, action
-
-	for ignore, action in actions
-		%action%()
 }

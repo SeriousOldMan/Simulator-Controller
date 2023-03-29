@@ -1138,7 +1138,7 @@ class SimulatorController extends ConfigurationItem {
 
 			videoPlayer.Document.Write(html)
 
-			logoGui.Show("X" . x . " Y" . y . " W209 H180")
+			logoGui.Show("X" . x . " Y" . y . " W239 H259")
 
 			WinSetTransparent(255, , translate("Creative Commons - BY-NC-SA"))
 
@@ -1327,7 +1327,8 @@ class ControllerFunction {
 	disable(trigger := "__All Trigger__", action := false) {
 		local ignore, fnController
 
-		this.iEnabledActions.Delete(action)
+		if this.iEnabledActions.Has(action)
+			this.iEnabledActions.Delete(action)
 
 		for ignore, fnController in this.Controller.FunctionController
 			fnController.disable(this, action)
@@ -1380,7 +1381,8 @@ class ControllerFunction {
 		local controller := this.Controller
 		local ignore, trigger, theHotkey, handler
 
-		this.iEnabledActions.Delete(action)
+		if this.iEnabledActions.Has(action)
+			this.iEnabledActions.Delete(action)
 
 		for ignore, trigger in this.Trigger {
 			handler := this.Actions[trigger]
@@ -1471,7 +1473,7 @@ class ControllerDialFunction extends ControllerFunction {
 	}
 
 	__New(controller, number, configuration := false) {
-		super.__New(controller, ControllerTwoWayToggleFunction.InnerDialFunction(this, number, configuration))
+		super.__New(controller, ControllerDialFunction.InnerDialFunction(this, number, configuration))
 	}
 }
 
@@ -1844,7 +1846,13 @@ setHotkeyEnabled(function, trigger, enabled) {
 }
 
 functionActionCallable(function, trigger, action) {
-	return (action ? action : fireControllerActions.Bind(function, trigger))
+	local handler := (action ? action : fireControllerActions.Bind(function, trigger))
+
+	actionCallable(*) {
+		handler.Call()
+	}
+
+	return actionCallable
 }
 
 fireControllerActions(function, trigger, fromTask := false) {
@@ -1866,7 +1874,7 @@ fireControllerActions(function, trigger, fromTask := false) {
 				while (pending.Length > 0) {
 					callable := pending.RemoveAt(1)
 
-					%callable%()
+					callable.Call()
 				}
 			}
 			finally {

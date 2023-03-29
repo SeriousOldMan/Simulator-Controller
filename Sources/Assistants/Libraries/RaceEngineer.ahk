@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AI Race Engineer                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,17 +9,17 @@
 ;;;                        Global Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\RaceAssistant.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\RuleEngine.ahk"
+#Include "RaceAssistant.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -132,32 +132,28 @@ class RaceEngineer extends RaceAssistant {
 	updateConfigurationValues(values) {
 		super.updateConfigurationValues(values)
 
-		if values.HasKey("AdjustLapTime")
-			this.iAdjustLapTime := values["AdjustLapTime"]
+		if values.HasProp("AdjustLapTime")
+			this.iAdjustLapTime := values.AdjustLapTime
 
-		if values.HasKey("SaveTyrePressures") {
-			this.iSaveTyrePressures := values["SaveTyrePressures"]
+		if values.HasProp("SaveTyrePressures") {
+			this.iSaveTyrePressures := values.SaveTyrePressures
 
 			logMessage(kLogDebug, "SaveTyrePressures is now " . this.iSaveTyrePressures)
 		}
 	}
 
-	updateSessionValues(values) {
-		super.updateSessionValues(values)
-	}
-
 	updateDynamicValues(values) {
 		super.updateDynamicValues(values)
 
-		if values.HasKey("HasPressureData") {
-			this.iHasPressureData := values["HasPressureData"]
+		if values.HasProp("HasPressureData") {
+			this.iHasPressureData := values.HasPressureData
 
 			logMessage(kLogDebug, "HasPressureData is now " . this.iHasPressureData)
 		}
 	}
 
 	handleVoiceCommand(grammar, words) {
-		switch grammar {
+		switch grammar, false {
 			case "LapsRemaining":
 				this.lapInfoRecognized(words)
 			case "FuelRemaining":
@@ -190,7 +186,7 @@ class RaceEngineer extends RaceAssistant {
 					Task.yield()
 
 					loop 10
-						Sleep 500
+						Sleep(500)
 
 					this.planPitstopRecognized(words)
 				}
@@ -219,7 +215,7 @@ class RaceEngineer extends RaceAssistant {
 					Task.yield()
 
 					loop 10
-						Sleep 500
+						Sleep(500)
 
 					this.driverSwapRecognized(words)
 				}
@@ -467,13 +463,13 @@ class RaceEngineer extends RaceAssistant {
 										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
 			speaker.speakPhrase("BrakeFR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.FR")), 0)
-										 , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
 			speaker.speakPhrase("BrakeRL", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RL")), 0)
-										 , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 
 			speaker.speakPhrase("BrakeRR", {value: speaker.number2Speech(convertUnit("Temperature", knowledgeBase.getValue("Lap." . lap . ".Brake.Temperature.RR")), 0)
-										 , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
+										  , unit: (fragments["Degrees"] . A_Space . fragments[getUnit("Temperature")])})
 		}
 		finally {
 			speaker.endTalk()
@@ -542,7 +538,7 @@ class RaceEngineer extends RaceAssistant {
 		Task.yield()
 
 		loop 10
-			Sleep 500
+			Sleep(500)
 
 		this.preparePitstop()
 	}
@@ -649,9 +645,9 @@ class RaceEngineer extends RaceAssistant {
 				compound := "Dry"
 
 			if compound {
-				for ignore, candidate in new SessionDatabase().getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
-																			  , knowledgeBase.getValue("Session.Car")
-																			  , knowledgeBase.getValue("Session.Track"))
+				for ignore, candidate in SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
+																		, knowledgeBase.getValue("Session.Car")
+																		, knowledgeBase.getValue("Session.Track"))
 					if (InStr(candidate, compound) = 1) {
 						splitCompound(compound, &compound, &compoundColor)
 
@@ -727,8 +723,7 @@ class RaceEngineer extends RaceAssistant {
 				}
 				else
 					for ignore, word in words {
-						if word is Float
-						{
+						if isFloat(word) {
 							pressureValue := Floor(word)
 							tenthPressureValue := Round((word - pressureValue) * 10)
 
@@ -739,7 +734,7 @@ class RaceEngineer extends RaceAssistant {
 						else {
 							startChar := SubStr(word, 1, 1)
 
-							if startChar is Integer
+							if isInteger(startChar)
 								if (StrLen(word) = 2) {
 									found := (this.isNumber(startChar, &pressureValue) && this.isNumber(SubStr(word, 2, 1), tenthPressureValue))
 
@@ -1086,86 +1081,69 @@ class RaceEngineer extends RaceAssistant {
 		return getMultiMapValue(this.Settings, "Session Settings", "Pressures." . session, default)
 	}
 
-	readSettings(ByRef settings) {
+	readSettings(&settings) {
 		return combine(base.readSettings(&settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
-																			  , getDeprecatedConfigurationValue(settings
-																											  , "Session Settings"
-																											  , "Race Settings"
-																											  , "Pitstop.Delta", 30))
-					  , "Session.Settings.Damage.Suspension.Repair", getDeprecatedConfigurationValue(settings, "Session Settings"
-																								   , "Race Settings"
-																								   , "Damage.Suspension.Repair", "Always")
-					  , "Session.Settings.Damage.Suspension.Repair.Threshold", getDeprecatedConfigurationValue(settings, "Session Settings"
-																										     , "Race Settings"
-																										     , "Damage.Suspension.Repair.Threshold", 0)
-					  , "Session.Settings.Damage.Bodywork.Repair", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																								 , "Damage.Bodywork.Repair", "Impact")
-					  , "Session.Settings.Damage.Bodywork.Repair.Threshold", getDeprecatedConfigurationValue(settings, "Session Settings"
-																										   , "Race Settings"
-																										   , "Damage.Bodywork.Repair.Threshold", 1)
-					  , "Session.Settings.Damage.Engine.Repair", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																							   , "Damage.Engine.Repair", "Impact")
-					  , "Session.Settings.Damage.Engine.Repair.Threshold", getDeprecatedConfigurationValue(settings, "Session Settings"
-																										 , "Race Settings"
-																										 , "Damage.Engine.Repair.Threshold", 1)
-					  , "Session.Settings.Tyre.Compound.Change", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																										 , "Tyre.Compound.Change", "Never")
-					  , "Session.Settings.Tyre.Compound.Change.Threshold", getDeprecatedConfigurationValue(settings, "Session Settings"
-																										 , "Race Settings"
-																										 , "Tyre.Compound.Change.Threshold", 0)
-					  , "Session.Settings.Tyre.Pressure.Correction.Temperature", getMultiMapValue(settings, "Session Settings"
-																									 , "Tyre.Pressure.Correction.Temperature", true)
-					  , "Session.Settings.Tyre.Pressure.Correction.Setup", getMultiMapValue(settings, "Session Settings"
-																							   , "Tyre.Pressure.Correction.Setup", false)
-					  , "Session.Settings.Tyre.Pressure.Correction.Pressure", getMultiMapValue(settings, "Session Settings"
-																								  , "Tyre.Pressure.Correction.Pressure", false)
-					  , "Session.Settings.Tyre.Dry.Pressure.Target.FL", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Dry.Pressure.Target.FL", 27.7)
-					  , "Session.Settings.Tyre.Dry.Pressure.Target.FR", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Dry.Pressure.Target.FR", 27.7)
-					  , "Session.Settings.Tyre.Dry.Pressure.Target.RL", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Dry.Pressure.Target.RL", 27.7)
-					  , "Session.Settings.Tyre.Dry.Pressure.Target.RR", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Dry.Pressure.Target.RR", 27.7)
-					  , "Session.Settings.Tyre.Wet.Pressure.Target.FL", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Wet.Pressure.Target.FL", 30.0)
-					  , "Session.Settings.Tyre.Wet.Pressure.Target.FR", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Wet.Pressure.Target.FR", 30.0)
-					  , "Session.Settings.Tyre.Wet.Pressure.Target.RL", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Wet.Pressure.Target.RL", 30.0)
-					  , "Session.Settings.Tyre.Wet.Pressure.Target.RR", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Wet.Pressure.Target.RR", 30.0)
-					  , "Session.Settings.Tyre.Pressure.Deviation", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									  , "Race Settings"
-																									  , "Tyre.Pressure.Deviation", 0.2)
-					  , "Session.Setup.Tyre.Set.Fresh", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup"
-																					  , "Tyre.Set.Fresh", 8)
-					  , "Session.Setup.Tyre.Set", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 7)
-					  , "Session.Setup.Tyre.Dry.Pressure.FL", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)
-					  , "Session.Setup.Tyre.Dry.Pressure.FR", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)
-					  , "Session.Setup.Tyre.Dry.Pressure.RL", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)
-					  , "Session.Setup.Tyre.Dry.Pressure.RR", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)
-					  , "Session.Setup.Tyre.Wet.Pressure.FL", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Wet.Pressure.FL", 28.2)
-					  , "Session.Setup.Tyre.Wet.Pressure.FR", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Wet.Pressure.FR", 28.2)
-					  , "Session.Setup.Tyre.Wet.Pressure.RL", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Wet.Pressure.RL", 28.2)
-					  , "Session.Setup.Tyre.Wet.Pressure.RR", getDeprecatedConfigurationValue(settings, "Session Setup"
-																							, "Race Setup", "Tyre.Wet.Pressure.RR", 28.2)))
+																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
+									, "Session.Settings.Damage.Suspension.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																											  , "Damage.Suspension.Repair", "Always")
+									, "Session.Settings.Damage.Suspension.Repair.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																														, "Damage.Suspension.Repair.Threshold", 0)
+									, "Session.Settings.Damage.Bodywork.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																											, "Damage.Bodywork.Repair", "Impact")
+									, "Session.Settings.Damage.Bodywork.Repair.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																													  , "Damage.Bodywork.Repair.Threshold", 1)
+									, "Session.Settings.Damage.Engine.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																										  , "Damage.Engine.Repair", "Impact")
+									, "Session.Settings.Damage.Engine.Repair.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																													, "Damage.Engine.Repair.Threshold", 1)
+									, "Session.Settings.Tyre.Compound.Change", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																										  , "Tyre.Compound.Change", "Never")
+									, "Session.Settings.Tyre.Compound.Change.Threshold", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																													, "Tyre.Compound.Change.Threshold", 0)
+									, "Session.Settings.Tyre.Pressure.Correction.Temperature", getMultiMapValue(settings, "Session Settings"
+																														, "Tyre.Pressure.Correction.Temperature", true)
+									, "Session.Settings.Tyre.Pressure.Correction.Setup", getMultiMapValue(settings, "Session Settings"
+																												  , "Tyre.Pressure.Correction.Setup", false)
+									, "Session.Settings.Tyre.Pressure.Correction.Pressure", getMultiMapValue(settings, "Session Settings"
+																													 , "Tyre.Pressure.Correction.Pressure", false)
+									, "Session.Settings.Tyre.Dry.Pressure.Target.FL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Dry.Pressure.Target.FL", 27.7)
+									, "Session.Settings.Tyre.Dry.Pressure.Target.FR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Dry.Pressure.Target.FR", 27.7)
+									, "Session.Settings.Tyre.Dry.Pressure.Target.RL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Dry.Pressure.Target.RL", 27.7)
+									, "Session.Settings.Tyre.Dry.Pressure.Target.RR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Dry.Pressure.Target.RR", 27.7)
+									, "Session.Settings.Tyre.Wet.Pressure.Target.FL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Wet.Pressure.Target.FL", 30.0)
+									, "Session.Settings.Tyre.Wet.Pressure.Target.FR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Wet.Pressure.Target.FR", 30.0)
+									, "Session.Settings.Tyre.Wet.Pressure.Target.RL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Wet.Pressure.Target.RL", 30.0)
+									, "Session.Settings.Tyre.Wet.Pressure.Target.RR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																												 , "Tyre.Wet.Pressure.Target.RR", 30.0)
+									, "Session.Settings.Tyre.Pressure.Deviation", getDeprecatedValue(settings, "Session Settings", "Race Settings"
+																											 , "Tyre.Pressure.Deviation", 0.2)
+									, "Session.Setup.Tyre.Set.Fresh", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																								 , "Tyre.Set.Fresh", 8)
+									, "Session.Setup.Tyre.Set", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 7)
+									, "Session.Setup.Tyre.Dry.Pressure.FL", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Dry.Pressure.FL", 26.1)
+									, "Session.Setup.Tyre.Dry.Pressure.FR", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Dry.Pressure.FR", 26.1)
+									, "Session.Setup.Tyre.Dry.Pressure.RL", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Dry.Pressure.RL", 26.1)
+									, "Session.Setup.Tyre.Dry.Pressure.RR", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Dry.Pressure.RR", 26.1)
+									, "Session.Setup.Tyre.Wet.Pressure.FL", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Wet.Pressure.FL", 28.2)
+									, "Session.Setup.Tyre.Wet.Pressure.FR", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Wet.Pressure.FR", 28.2)
+									, "Session.Setup.Tyre.Wet.Pressure.RL", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Wet.Pressure.RL", 28.2)
+									, "Session.Setup.Tyre.Wet.Pressure.RR", getDeprecatedValue(settings, "Session Setup", "Race Setup"
+																									   , "Tyre.Wet.Pressure.RR", 28.2)))
 	}
 
 	createSession(&settings, &data) {
@@ -1189,10 +1167,10 @@ class RaceEngineer extends RaceAssistant {
 
 		facts["Session.Setup.Tyre.Compound"]
 			:= getMultiMapValue(data, "Car Data", "TyreCompound"
-								   , getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
+									, getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry"))
 		facts["Session.Setup.Tyre.Compound.Color"]
 			:= getMultiMapValue(data, "Car Data", "TyreCompoundColor"
-								   , getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
+									, getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black"))
 
 		if (this.Session = kSessionPractice)
 			this.updateConfigurationValues({Announcements: {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Practice.LowFuel", true)
@@ -1206,9 +1184,9 @@ class RaceEngineer extends RaceAssistant {
 														  , PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Qualification.Pressure", true)}})
 		else if (this.Session = kSessionRace)
 			this.updateConfigurationValues({Announcements: {FuelWarning: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.LowFuel", true)
-														  , DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
-														  , DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
-														  , PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Pressure", true)}})
+										  , DamageReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
+										  , DamageAnalysis: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Damage", true)
+										  , PressureReporting: getMultiMapValue(settings, "Assistant.Engineer", "Announcement.Race.Pressure", true)}})
 
 		return facts
 	}
@@ -1216,12 +1194,6 @@ class RaceEngineer extends RaceAssistant {
 	startSession(settings, data) {
 		local facts, simulatorName, configuration, deprecated, saveSettings, speaker, strategistPlugin, strategistName
 		local knowledgeBase
-
-		if !IsObject(settings)
-			settings := readMultiMap(settings)
-
-		if !IsObject(data)
-			data := readMultiMap(data)
 
 		facts := this.createSession(&settings, &data)
 
@@ -1249,9 +1221,7 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase("GreetingEngineer")
 
-				Process Exist, Race Strategist.exe
-
-				if ErrorLevel {
+				if ProcessExist("Race Strategist.exe") {
 					strategistPlugin := Plugin("Race Strategist", kSimulatorConfiguration)
 					strategistName := strategistPlugin.getArgumentValue("raceAssistantName", false)
 
@@ -1285,12 +1255,9 @@ class RaceEngineer extends RaceAssistant {
 			logMessage(kLogDebug, "Finish: HasPressureData is " . this.HasPressureData)
 			logMessage(kLogDebug, "Finish: collectTyrePressures() is " . this.collectTyrePressures())
 
-			if (this.Session == kSessionRace) {
-				Process Exist, Race Strategist.exe
-
-				if ErrorLevel
-					Sleep 5000
-			}
+			if (this.Session == kSessionRace)
+				if ProcessExist("Race Strategist.exe")
+					Sleep(5000)
 
 			if (shutdown && this.Speaker)
 				this.getSpeaker().speakPhrase("Bye")
@@ -1494,9 +1461,9 @@ class RaceEngineer extends RaceAssistant {
 					logMessage(kLogDebug, "Saving pressures for " . lapNumber)
 
 					this.savePressureData(lapNumber, knowledgeBase.getValue("Session.Simulator")
-										, knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
-										, weatherNow, airTemperature, trackTemperature
-										, currentCompound, currentCompoundColor, coldPressures, hotPressures, pressuresLosses)
+												   , knowledgeBase.getValue("Session.Car"), knowledgeBase.getValue("Session.Track")
+												   , weatherNow, airTemperature, trackTemperature
+												   , currentCompound, currentCompoundColor, coldPressures, hotPressures, pressuresLosses)
 				}
 			}
 		}
@@ -1648,7 +1615,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	requestInformation(category, arguments*) {
-		switch category {
+		switch category, false {
 			case "Time":
 				this.timeRecognized([])
 			case "LapsRemaining":
@@ -1695,15 +1662,14 @@ class RaceEngineer extends RaceAssistant {
 			force := true
 		}
 		else if (optionsOrLap != kUndefined) {
-			if optionsOrLap is Number
-			{
+			if isNumber(optionsOrLap) {
 				options := true
 
 				if (optionsOrLap != false)
 					plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
 			}
-			else if (IsObject(optionsOrLap) && optionsOrLap.HasKey("Confirm"))
-				confirm := optionsOrLap["Confirm"]
+			else if (IsObject(optionsOrLap) && optionsOrLap.HasProp("Confirm"))
+				confirm := optionsOrLap.Confirm
 		}
 
 		if (!force && !plannedLap)
@@ -1717,7 +1683,7 @@ class RaceEngineer extends RaceAssistant {
 			return false
 		}
 
-		knowledgeBase.addFact("Pitstop.Plan", ((options == true) || !options.HasKey("Update") || !options.Update) ? true : false)
+		knowledgeBase.addFact("Pitstop.Plan", ((options == true) || !options.HasProp("Update") || !options.Update) ? true : false)
 
 		correctedFuel := false
 
@@ -1804,10 +1770,10 @@ class RaceEngineer extends RaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				if ((options == true) || options.Intro)
+				if ((options == true) || (options.HasProp("Intro") && options.Intro))
 					speaker.speakPhrase("Pitstop", {number: pitstopNumber})
 
-				if ((options == true) || options.Fuel) {
+				if ((options == true) || (options.HasProp("Fuel") && options.Fuel)) {
 					fuel := Round(knowledgeBase.getValue("Pitstop.Planned.Fuel", 0))
 
 					if (fuel == 0)
@@ -1821,7 +1787,7 @@ class RaceEngineer extends RaceAssistant {
 
 				compound := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound", false)
 
-				if ((options == true) || options.Compound) {
+				if ((options == true) || (options.HasProp("Compound") && options.Compound)) {
 					if compound {
 						color := knowledgeBase.getValue("Pitstop.Planned.Tyre.Compound.Color")
 						tyreSet := knowledgeBase.getValue("Pitstop.Planned.Tyre.Set", 0)
@@ -1841,7 +1807,7 @@ class RaceEngineer extends RaceAssistant {
 
 				debug := this.VoiceManager.Debug[kDebugPhrases]
 
-				if (compound && ((options == true) || options.Pressures)) {
+				if (compound && ((options == true) || (options.HasProp("Pressures") && options.Pressures))) {
 					incrementFL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FL.Increment", 0), 1)
 					incrementFR := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.FR.Increment", 0), 1)
 					incrementRL := Round(knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.RL.Increment", 0), 1)
@@ -1893,7 +1859,7 @@ class RaceEngineer extends RaceAssistant {
 					}
 				}
 
-				if ((options == true) || options.Repairs
+				if ((options == true) || (options.HasProp("Repairs") && options.Repairs)
 				 || (repairBodywork != kUndefined) || (repairSuspension != kUndefined) || (repairEngine != kUndefined)) {
 					if knowledgeBase.getValue("Pitstop.Planned.Repair.Suspension", false)
 						speaker.speakPhrase("RepairSuspension")
@@ -1937,7 +1903,7 @@ class RaceEngineer extends RaceAssistant {
 
 		static lastRequest := []
 
-		if (arguments.Length() == 0) {
+		if (arguments.Length == 0) {
 			if this.RemoteHandler {
 				repairBodywork := knowledgeBase.getValue("Damage.Repair.Bodywork.Target", false)
 				repairSuspension := knowledgeBase.getValue("Damage.Repair.Suspension.Target", false)
@@ -2044,7 +2010,7 @@ class RaceEngineer extends RaceAssistant {
 		local prssKey, incrKey, targetPressure, index, suffix
 
 		if this.hasPreparedPitstop() {
-			switch option {
+			switch option, false {
 				case "Refuel":
 					knowledgeBase.setFact("Pitstop.Planned.Fuel", values[1])
 				case "Tyre Compound":
@@ -2191,7 +2157,7 @@ class RaceEngineer extends RaceAssistant {
 				Task.yield()
 
 				loop 10
-					Sleep 500
+					Sleep(500)
 			}
 
 			this.planPitstop()
@@ -2235,7 +2201,7 @@ class RaceEngineer extends RaceAssistant {
 				Task.yield()
 
 				loop 10
-					Sleep 500
+					Sleep(500)
 			}
 
 			this.planDriverSwap()
@@ -2255,7 +2221,7 @@ class RaceEngineer extends RaceAssistant {
 			Task.yield()
 
 			loop 10
-				Sleep 500
+				Sleep(500)
 
 			if lap
 				this.preparePitstop(lap)
@@ -2273,21 +2239,20 @@ class RaceEngineer extends RaceAssistant {
 		local fileName, pitstopLap, tyreCompound, tyreCompoundColor, tyreSet
 
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.Compound"
-											, knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
+					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound"))
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.CompoundColor"
-											, knowledgeBase.getValue("Session.Setup.Tyre.Compound.Color"))
+					   , knowledgeBase.getValue("Session.Setup.Tyre.Compound.Color"))
 		setMultiMapValue(pitstopHistory, "TyreSets", "1.Set"
-											, knowledgeBase.getValue("Session.Setup.Tyre.Set"))
+					   , knowledgeBase.getValue("Session.Setup.Tyre.Set"))
 
-		loop % knowledgeBase.getValue("Pitstop.Last")
-		{
+		loop knowledgeBase.getValue("Pitstop.Last") {
 			numPitstops += 1
 
 			pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")
 
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel"
-												, knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel"))
+						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel"))
 
 			tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound")
 			tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color")
@@ -2312,11 +2277,11 @@ class RaceEngineer extends RaceAssistant {
 				setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)
 
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
-												, knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork"))
+						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork"))
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension"
-												, knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension"))
+						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension"))
 			setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine"
-												, knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Engine", false))
+						   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Engine", false))
 		}
 
 		setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", knowledgeBase.getValue("Lap") - lastLap)
@@ -2450,9 +2415,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
-		Process Exist, Race Strategist.exe
-
-		if !ErrorLevel
+		if !ProcessExist("Race Strategist.exe")
 			if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 				speaker := this.getSpeaker()
 
@@ -2464,9 +2427,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		Process Exist, Race Strategist.exe
-
-		if (!ErrorLevel && (knowledgeBase.getValue("Lap.Remaining") > 3))
+		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining") > 3))
 			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
@@ -2531,7 +2492,7 @@ class RaceEngineer extends RaceAssistant {
 			this.RemoteHandler.requestPitstopDriver(pitstopNumber, driver)
 	}
 
-	getTyrePressures(weather, airTemperature, trackTemperature, ByRef compound, ByRef compoundColor, ByRef pressures, ByRef certainty) {
+	getTyrePressures(weather, airTemperature, trackTemperature, &compound, &compoundColor, &pressures, &certainty) {
 		local knowledgeBase := this.KnowledgeBase
 
 		return this.TyresDatabase.getTyreSetup(knowledgeBase.getValue("Session.Simulator")

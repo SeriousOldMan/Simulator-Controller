@@ -202,7 +202,7 @@ startRaceSpotter() {
 	if spotter.Debug[kDebugKnowledgebase]
 		Menu SupportMenu, Check, %label%
 
-	registerMessageHandler("Race Spotter", "handleSpotterMessage")
+	registerMessageHandler("Race Spotter", handleSpotterMessage)
 
 	if (debug && spotterSpeaker) {
 		RaceSpotter.Instance.getSpeaker()

@@ -107,33 +107,48 @@ removeDuplicates(list) {
 	return result
 }
 
-combine(maps*) {
-	local result := Map()
-	local ignore, map, key, value
+combine(map, collections*) {
+	local result := map.Clone()
+	local ignore, collection, key, value
 
-	for ignore, map in maps
-		for key, value in map
-			result[key] := value
+	for ignore, collection in collections
+		if (collection is Map) {
+			for key, value in collection
+				result[key] := value
+		}
+		else
+			for key, value in collection.OwnProps()
+				result[key] := value
 
 	return result
 }
 
-getKeys(map) {
+getKeys(collection) {
 	local result := []
 	local ignore, key
 
-	for key, ignore in map
-		result.Push(key)
+	if (collection is Map) {
+		for key, ignore in collection
+			result.Push(key)
+	}
+	else
+		for key, ignore in collection.OwnProps()
+			result.Push(key)
 
 	return result
 }
 
-getValues(map) {
+getValues(collection) {
 	local result := []
 	local ignore, value
 
-	for ignore, value in map
-		result.Push(value)
+	if (collection is Map) {
+		for ignore, value in collection
+			result.Push(value)
+	}
+	else
+		for ignore, value in collection.OwnProps()
+			result.Push(value)
 
 	return result
 }

@@ -1743,7 +1743,7 @@ showRaceSettingsEditor() {
 		writeMultiMap(fileName, settings)
 	}
 	else {
-		registerMessageHandler("Setup", "functionMessageHandler")
+		registerMessageHandler("Setup", functionMessageHandler)
 
 		if (editRaceSettings(settings) = kOk) {
 			writeMultiMap(fileName, settings)

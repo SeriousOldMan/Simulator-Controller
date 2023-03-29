@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\Strategy.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "Strategy.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -47,7 +47,7 @@ class StrategyViewer {
 	lapTimeDisplayValue(lapTime) {
 		local seconds, fraction, minutes
 
-		if lapTime is Number
+		if isNumber(lapTime)
 			return displayValue("Time", lapTime)
 		else
 			return lapTime
@@ -83,7 +83,7 @@ class StrategyViewer {
 		local html := "<table>"
 		local pressures := strategy.TyrePressures
 
-		loop % pressures.Length()
+		loop pressures.Length
 			pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressures[A_Index]))
 
 		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . displayValue("Float", convertUnit("Volume", strategy.StartFuel)) . A_Space . getUnit("Volume", true) . "</td></tr>")
@@ -97,7 +97,7 @@ class StrategyViewer {
 		return html
 	}
 
-	createStintsInfo(strategy, ByRef timeSeries, ByRef lapSeries, ByRef fuelSeries, ByRef tyreSeries) {
+	createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries) {
 		local startStint := strategy.StartStint
 		local html := "<table class=""table-std"">"
 		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopLaps, refuels, tyreChanges, weathers
@@ -183,7 +183,7 @@ class StrategyViewer {
 				tyreSeries.Push(lastTyreLaps)
 			}
 
-			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length() + startStint) . "</th>")
+			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length + startStint) . "</th>")
 			drivers.Push("<td class=""td-std"">" . lastDriver . "</td>")
 			maps.Push("<td class=""td-std"">" . lastMap . "</td>")
 			laps.Push("<td class=""td-std"">" . strategy.LastPitstop.StintLaps . "</td>")
@@ -202,18 +202,18 @@ class StrategyViewer {
 			html .= "<table class=""table-std"">"
 
 			html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
-			       . "<th class=""th-std"">" . translate("Driver") . "</th>"
-			       . "<th class=""th-std"">" . translate("Weather") . "</th>"
-			       . "<th class=""th-std"">" . translate("Laps") . "</th>"
-			       . "<th class=""th-std"">" . translate("Map") . "</th>"
-			       . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
-			       . "<th class=""th-std"">" . translate("Consumption") . "</th>"
-			       . "<th class=""th-std"">" . translate("Pitstop Lap") . "</th>"
-			       . "<th class=""th-std"">" . translate("Refuel Amount") . "</th>"
-			       . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
-			   . "</tr>")
+					   . "<th class=""th-std"">" . translate("Driver") . "</th>"
+					   . "<th class=""th-std"">" . translate("Weather") . "</th>"
+					   . "<th class=""th-std"">" . translate("Laps") . "</th>"
+					   . "<th class=""th-std"">" . translate("Map") . "</th>"
+					   . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
+					   . "<th class=""th-std"">" . translate("Consumption") . "</th>"
+					   . "<th class=""th-std"">" . translate("Pitstop Lap") . "</th>"
+					   . "<th class=""th-std"">" . translate("Refuel Amount") . "</th>"
+					   . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
+				   . "</tr>")
 
-			loop % stints.Length()
+			loop stints.Length
 				html .= ("<tr>" . stints[A_Index]
 								. drivers[A_Index]
 								. weathers[A_Index]
@@ -232,7 +232,7 @@ class StrategyViewer {
 		return html
 	}
 
-	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, ByRef drawChartFunction, ByRef chartID) {
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID) {
 		local durationSession := (strategy.SessionType = "Duration")
 		local ignore, time, xAxis
 
@@ -259,11 +259,12 @@ class StrategyViewer {
 			drawChartFunction .= ("[" . xAxis . ", " . convertUnit("Volume", fuelSeries[A_Index]) . ", " . tyreSeries[A_Index] . "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '"
+							. (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
-		return ("<div id=""chart_" . chartID . """ style=""width: " . width . "px; height: " . height . "px"">")
+		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . width . "px; height: " . height . "px`">")
 	}
 
 	showStrategyInfo(strategy) {
@@ -301,9 +302,9 @@ class StrategyViewer {
 
 			width := (this.StrategyViewer.Width - 10)
 
-			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID)
+			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, &chartID)
 
-			before =
+			before := "
 			(
 				<meta charset='utf-8'>
 				<head>
@@ -315,13 +316,13 @@ class StrategyViewer {
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%chartID%);
-			)
+			)"
 
-			after =
+			after := "
 			(
 					</script>
 				</head>
-			)
+			)"
 		}
 		else {
 			before := ""
@@ -335,9 +336,9 @@ class StrategyViewer {
 		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		if this.StrategyViewer {
-			this.StrategyViewer.Document.Open()
-			this.StrategyViewer.Document.Write(html)
-			this.StrategyViewer.Document.Close()
+			this.StrategyViewer.Document.open()
+			this.StrategyViewer.Document.write(html)
+			this.StrategyViewer.Document.close()
 		}
 	}
 }
@@ -350,7 +351,7 @@ class StrategyViewer {
 getTableCSS() {
 	local script
 
-	script =
+	script := "
 	(
 		.table-std, .th-std, .td-std {
 			border-collapse: collapse;
@@ -397,7 +398,7 @@ getTableCSS() {
 		.table-std tbody tr:nth-child(odd) {
 			background-color: #D0D0D0;
 		}
-	)
+	)"
 
 	return script
 }

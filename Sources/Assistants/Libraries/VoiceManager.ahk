@@ -563,10 +563,10 @@ class VoiceManager {
 		if !this.Speaker
 			this.iListener := false
 
-		registerMessageHandler("Voice", "methodMessageHandler", this)
+		registerMessageHandler("Voice", methodMessageHandler, this)
 
 		if (!this.VoiceServer && this.PushToTalk)
-			new PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority).start()
+			PeriodicTask(ObjBindMethod(this, "listen"), 100, kHighPriority).start()
 
 		if this.VoiceServer
 			OnExit(ObjBindMethod(this, "shutdownVoiceManager"))
@@ -646,8 +646,14 @@ class VoiceManager {
 		if variables {
 			variables := variables.Clone()
 
-			variables["Name"] := this.Name
-			variables["User"] := this.User
+			if (variables is Map) {
+				variables["Name"] := this.Name
+				variables["User"] := this.User
+			}
+			else {
+				variables.Name := this.Name
+				variables.User := this.User
+			}
 
 			return variables
 		}
@@ -674,14 +680,14 @@ class VoiceManager {
 																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
 										, this.VoiceServer)
 
-				this.iSpeechSynthesizer := this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-															, this.buildFragments(this.Language)
-															, this.buildPhrases(this.Language))
+				this.iSpeechSynthesizer := VoiceManager.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+																	, this.buildFragments(this.Language)
+																	, this.buildPhrases(this.Language))
 			}
 			else {
-				this.iSpeechSynthesizer := this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-														   , this.buildFragments(this.Language)
-														   , this.buildPhrases(this.Language))
+				this.iSpeechSynthesizer := VoiceManager.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
+																   , this.buildFragments(this.Language)
+																   , this.buildPhrases(this.Language))
 
 				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 				this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -705,7 +711,7 @@ class VoiceManager {
 			if this.VoiceServer
 				this.buildGrammars(false, this.Language)
 			else {
-				recognizer := this.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language)
+				recognizer := VoiceManager.LocalRecognizer(this, this.Recognizer, this.Listener, this.Language)
 
 				this.buildGrammars(recognizer, this.Language)
 
@@ -826,7 +832,7 @@ class VoiceManager {
 				if this.Debug[kDebugGrammars] {
 					nextCharIndex := 1
 
-					showMessage("Register command phrase: " . new GrammarCompiler(speechRecognizer).readGrammar(&definition, &nextCharIndex).toString())
+					showMessage("Register command phrase: " . GrammarCompiler(speechRecognizer).readGrammar(&definition, &nextCharIndex).toString())
 				}
 
 				try {

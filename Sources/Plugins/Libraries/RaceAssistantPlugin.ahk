@@ -770,7 +770,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 			controller.registerPlugin(this)
 
-			registerMessageHandler(this.Plugin, "methodMessageHandler", this)
+			registerMessageHandler(this.Plugin, methodMessageHandler, this)
 
 			if this.RaceAssistantEnabled
 				this.enableRaceAssistant(false, true)

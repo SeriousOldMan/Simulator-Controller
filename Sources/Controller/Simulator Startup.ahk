@@ -735,7 +735,7 @@ startupSimulator() {
 
 	; Looks like we have recurring deadlock situations with bidirectional pipes in case of process exit situations...
 	;
-	; registerMessageHandler("Startup", "functionMessageHandler")
+	; registerMessageHandler("Startup", functionMessageHandler)
 	;
 	; Using a sempahore file instead...
 

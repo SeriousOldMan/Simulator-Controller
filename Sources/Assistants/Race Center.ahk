@@ -12930,7 +12930,7 @@ startupRaceCenter() {
 
 	rCenter.connect(true)
 
-	registerMessageHandler("Setup", "functionMessageHandler")
+	registerMessageHandler("Setup", functionMessageHandler)
 
 	rCenter.show()
 

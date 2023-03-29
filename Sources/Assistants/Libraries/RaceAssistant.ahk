@@ -155,7 +155,11 @@ class RaceAssistant extends ConfigurationItem {
 		getPhraseVariables(variables := false) {
 			variables := super.getPhraseVariables(variables)
 
-			variables["Driver"] := variables["User"]
+			if variables
+				if (variables is Map)
+					variables["Driver"] := variables["User"]
+				else
+					variables.Driver := variables.User
 
 			return variables
 		}
@@ -480,7 +484,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	createVoiceManager(name, options) {
-		return this.RaceVoiceManager(this, name, options)
+		return RaceAssistant.RaceVoiceManager(this, name, options)
 	}
 
 	updateConfigurationValues(values) {
@@ -628,8 +632,13 @@ class RaceAssistant extends ConfigurationItem {
 		local announcements := []
 		local key, value, announcement, score, ignore, fragment, fragmentScore
 
-		for key, value in this.Announcements
-			announcements.Push(key)
+		if (this.Announcements is Map) {
+			for key, value in this.Announcements
+				announcements.Push(key)
+		}
+		else
+			for key, value in this.Announcements.OwnProps()
+				announcements.Push(key)
 
 		announcement := false
 		score := 0
@@ -853,11 +862,11 @@ class RaceAssistant extends ConfigurationItem {
 
 		engine := RuleEngine(productions, reductions, facts)
 
-		knowledgeBase := this.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
+		knowledgeBase := RaceAssistant.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
 
-		for ignore, compound in new SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
-																   , knowledgeBase.getValue("Session.Car")
-																   , knowledgeBase.getValue("Session.Track")) {
+		for ignore, compound in SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
+															   , knowledgeBase.getValue("Session.Car")
+															   , knowledgeBase.getValue("Session.Track")) {
 			compoundColor := false
 
 			splitCompound(compound, &compound, &compoundColor)
@@ -967,8 +976,8 @@ class RaceAssistant extends ConfigurationItem {
 
 	initializeSessionFormat(facts, settings, data, lapTime) {
 		local sessionFormat := getMultiMapValue(data, "Session Data", "SessionFormat", "Time")
-		local sessionTimeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
-		local sessionLapsRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+		local sessionTimeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+		local sessionLapsRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 		local dataDuration := Round((sessionTimeRemaining + lapTime) / 1000)
 		local laps := sessionLapsRemaining
 		local duration := dataDuration
@@ -1009,18 +1018,12 @@ class RaceAssistant extends ConfigurationItem {
 		if !IsObject(settings)
 			settings := readMultiMap(settings)
 
-		return CaseInsenseMap("Session.Settings.Lap.Formation", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																							  , "Lap.Formation", true)
-						    , "Session.Settings.Lap.PostRace", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																						     , "Lap.PostRace", true)
-						    , "Session.Settings.Lap.AvgTime", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																						    , "Lap.AvgTime", 0)
-						    , "Session.Settings.Lap.PitstopWarning", getDeprecatedConfigurationValue(settings, "Session Settings"
-																								   , "Race Settings", "Lap.PitstopWarning", 5)
-							, "Session.Settings.Fuel.AvgConsumption", getDeprecatedConfigurationValue(settings, "Session Settings"
-																									, "Race Settings", "Fuel.AvgConsumption", 0)
-							, "Session.Settings.Fuel.SafetyMargin", getDeprecatedConfigurationValue(settings, "Session Settings"
-																								  , "Race Settings", "Fuel.SafetyMargin", 5))
+		return CaseInsenseMap("Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
+						    , "Session.Settings.Lap.PostRace", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.PostRace", true)
+						    , "Session.Settings.Lap.AvgTime", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", 0)
+						    , "Session.Settings.Lap.PitstopWarning", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.PitstopWarning", 5)
+							, "Session.Settings.Fuel.AvgConsumption", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 0)
+							, "Session.Settings.Fuel.SafetyMargin", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 5))
 	}
 
 	updateSettings(settings) {
@@ -1072,7 +1075,7 @@ class RaceAssistant extends ConfigurationItem {
 		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
 
 		if this.AdjustLapTime {
-			settingsLapTime := (getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+			settingsLapTime := (getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 
 			if ((lapTime / settingsLapTime) > 1.2)
 				lapTime := settingsLapTime
@@ -1083,8 +1086,8 @@ class RaceAssistant extends ConfigurationItem {
 									  , "Session.Car", getMultiMapValue(data, "Session Data", "Car", "")
 									  , "Session.Track", getMultiMapValue(data, "Session Data", "Track", "")
 									  , "Session.Type", this.Session
-									  , "Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
-									  , "Session.Lap.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+									  , "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+									  , "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 									  , "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
 									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)})
 
@@ -1203,8 +1206,8 @@ class RaceAssistant extends ConfigurationItem {
 
 		this.updateDynamicValues({EnoughData: enoughData})
 
-		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
-		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
+		knowledgeBase.setFact("Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0))
+		knowledgeBase.setFact("Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0))
 
 		driverForname := getMultiMapValue(data, "Stint Data", "DriverForname", this.DriverForName)
 		driverSurname := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
@@ -1233,7 +1236,7 @@ class RaceAssistant extends ConfigurationItem {
 		if (tyreSet != kUndefined)
 			knowledgeBase.addFact("Lap." . lapNumber . ".Tyre.Set", tyreSet)
 
-		timeRemaining := getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+		timeRemaining := getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 
 		knowledgeBase.setFact("Driver.Time.Remaining", getMultiMapValue(data, "Stint Data", "DriverTimeRemaining", timeRemaining))
 		knowledgeBase.setFact("Driver.Time.Stint.Remaining", getMultiMapValue(data, "Stint Data", "StintTimeRemaining", timeRemaining))
@@ -1261,7 +1264,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if (lapNumber <= 2) {
 			if this.AdjustLapTime {
-				settingsLapTime := (getDeprecatedConfigurationValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
+				settingsLapTime := (getDeprecatedValue(this.Settings, "Session Settings", "Race Settings", "Lap.AvgTime", lapTime / 1000) * 1000)
 
 				if ((lapTime / settingsLapTime) > 1.2) {
 					lapTime := settingsLapTime
@@ -1747,7 +1750,7 @@ parseList(list) {
 	return compiler.createTermParser(term).parse(term).toObject()
 }
 
-getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
+getDeprecatedValue(data, newSection, oldSection, key, default := false) {
 	local value := getMultiMapValue(data, newSection, key, kUndefined)
 
 	if (value != kUndefined)

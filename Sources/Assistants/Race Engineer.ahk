@@ -194,7 +194,7 @@ startRaceEngineer() {
 	if engineer.Debug[kDebugKnowledgebase]
 		Menu SupportMenu, Check, %label%
 
-	registerMessageHandler("Race Engineer", "handleEngineerMessage")
+	registerMessageHandler("Race Engineer", handleEngineerMessage)
 
 	if (debug && engineerSpeaker) {
 		engineer.getSpeaker()

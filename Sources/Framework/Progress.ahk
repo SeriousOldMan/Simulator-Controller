@@ -13,6 +13,7 @@
 #Include "..\Framework\Variables.ahk"
 #Include "..\Framework\Localization.ahk"
 #Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\GUI.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -85,10 +86,7 @@ showProgress(options := unset) {
 
 			color := (options.HasProp("Color") ? options.Color : "Green")
 
-			progressGui := Gui()
-
-			progressGui.Opt("-Border -Caption +0x800000")
-			progressGui.BackColor := "D0D0D0"
+			progressGui := Window()
 
 			progressGui.SetFont("s10 Bold", "Arial")
 

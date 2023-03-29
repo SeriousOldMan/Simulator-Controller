@@ -68,9 +68,9 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
-	; "".base.__Get := "".base.__Set := "".base.__Call := reportNonObjectUsage
+	"".base.__Get := "".base.__Set := "".base.__Call := reportNonObjectUsage
 
-	; OnError(logUnhandledError)
+	OnError(logUnhandledError)
 }
 
 logUnhandledError(error, *) {

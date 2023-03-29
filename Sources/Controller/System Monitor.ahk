@@ -451,10 +451,7 @@ systemMonitor(command := false, arguments*) {
 	else {
 		result := false
 
-		systemMonitorGui := Gui()
-
-		systemMonitorGui.Opt("-Border -Caption +0x800000")
-		systemMonitorGui.BackColor := "D0D0D0"
+		systemMonitorGui := Window()
 
 		systemMonitorGui.SetFont("s10 Bold", "Arial")
 

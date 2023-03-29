@@ -1231,10 +1231,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if isDebug() {
 			SplitPath(image, &fileName)
 
-			labelGui := Gui()
-
-			labelGui.Opt("-Border -Caption +0x800000 +AlwaysOnTop")
-			labelGui.BackColor := "D0D0D0"
+			labelGui := Window({Options: "+AlwaysOnTop")
 
 			labelGui.Add("Text", "x0 y0 w100 h23 +0x200 +0x1 BackgroundTrans", fileName)
 

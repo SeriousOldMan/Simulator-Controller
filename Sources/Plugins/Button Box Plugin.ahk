@@ -177,8 +177,7 @@ class GridButtonBox extends ButtonBox {
 		height += ((rowHeights.Length - 1) * this.RowMargin) + this.kHeaderHeight + this.BottomMargin
 		width += ((columnWidths.Length - 1) * this.ColumnMargin) + (2 * this.SidesMargin)
 
-		buttonBoxGui := Gui()
-		buttonBoxGui.Opt("-Border -Caption")
+		buttonBoxGui := Window({Options: "-0x800000"})
 
 		buttonBoxGui.Add("Picture", "x-10 y-10", kButtonBoxImagesDirectory . "Photorealistic\CF Background.png")
 

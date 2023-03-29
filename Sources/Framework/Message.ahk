@@ -13,6 +13,7 @@
 #Include "..\Framework\Variables.ahk"
 #Include "..\Framework\Localization.ahk"
 #Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\GUI.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -39,9 +40,8 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 	if (!title || (title = ""))
 		title := translate("Modular Simulator Controller System")
 
-	messageGui := Gui()
-	messageGui.Opt("-Border -Caption +0x800000")
-	messageGui.BackColor := "D0D0D0"
+	messageGui := Window()
+	
 	messageGui.SetFont("s10 Bold")
 	messageGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
 	messageGui.SetFont()

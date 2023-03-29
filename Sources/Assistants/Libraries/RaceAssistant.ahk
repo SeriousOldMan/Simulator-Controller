@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AI Race Assistant               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,19 +9,19 @@
 ;;;                        Global Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
-#Include ..\Libraries\JSON.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\VoiceManager.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
-#Include ..\Database\Libraries\SettingsDatabase.ahk
-#Include ..\Database\Libraries\TyresDatabase.ahk
+#Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Libraries\RuleEngine.ahk"
+#Include "VoiceManager.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Database\Libraries\SettingsDatabase.ahk"
+#Include "..\..\Database\Libraries\TyresDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -51,7 +51,7 @@ global kUnknown := false
 
 class RaceAssistant extends ConfigurationItem {
 	iDebug := kDebugOff
-	iOptions := {}
+	iOptions := CaseInsenseMap()
 
 	iAssistantType := ""
 	iSettings := false
@@ -411,7 +411,8 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
-	    , synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
+		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
+		global kUnknown
 		local options
 
 		if !kUnknown
@@ -483,40 +484,40 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	updateConfigurationValues(values) {
-		if values.HasKey("Settings")
-			this.iSettings := values["Settings"]
+		if values.HasProp("Settings")
+			this.iSettings := values.Settings
 
-		if values.HasKey("SaveSettings")
-			this.iSaveSettings := values["SaveSettings"]
+		if values.HasProp("SaveSettings")
+			this.iSaveSettings := values.SaveSettings
 
-		if values.HasKey("LearningLaps")
-			this.iLearningLaps := values["LearningLaps"]
+		if values.HasProp("LearningLaps")
+			this.iLearningLaps := values.LearningLaps
 
-		if values.HasKey("Announcements")
-			this.iAnnouncements := values["Announcements"]
+		if values.HasProp("Announcements")
+			this.iAnnouncements := values.Announcements
 	}
 
 	updateSessionValues(values) {
-		if values.HasKey("SessionDuration")
-			this.iSessionDuration := values["SessionDuration"]
+		if values.HasProp("SessionDuration")
+			this.iSessionDuration := values.SessionDuration
 
-		if values.HasKey("SessionLaps")
-			this.iSessionLaps := values["SessionLaps"]
+		if values.HasProp("SessionLaps")
+			this.iSessionLaps := values.SessionLaps
 
-		if values.HasKey("SessionTime")
-			this.iSessionTime := values["SessionTime"]
+		if values.HasProp("SessionTime")
+			this.iSessionTime := values.SessionTime
 
-		if values.HasKey("Simulator")
-			this.iSimulator := values["Simulator"]
+		if values.HasProp("Simulator")
+			this.iSimulator := values.Simulator
 
-		if values.HasKey("Driver")
-			this.iDriverForName := values["Driver"]
+		if values.HasProp("Driver")
+			this.iDriverForName := values.Driver
 
-		if values.HasKey("DriverFullName")
-			this.iDriverFullName := values["DriverFullName"]
+		if values.HasProp("DriverFullName")
+			this.iDriverFullName := values.DriverFullName
 
-		if values.HasKey("Session") {
-			this.iSession := values["Session"]
+		if values.HasProp("Session") {
+			this.iSession := values.Session
 
 			if (this.Session == kSessionFinished) {
 				this.iTeamSession := false
@@ -529,40 +530,40 @@ class RaceAssistant extends ConfigurationItem {
 			}
 		}
 
-		if values.HasKey("TeamSession")
-			this.iTeamSession := values["TeamSession"]
+		if values.HasProp("TeamSession")
+			this.iTeamSession := values.TeamSession
 	}
 
 	updateDynamicValues(values) {
-		if values.HasKey("KnowledgeBase")
-			this.iKnowledgeBase := values["KnowledgeBase"]
+		if values.HasProp("KnowledgeBase")
+			this.iKnowledgeBase := values.KnowledgeBase
 
-		if values.HasKey("OverallTime")
-			this.iOverallTime := values["OverallTime"]
+		if values.HasProp("OverallTime")
+			this.iOverallTime := values.OverallTime
 
-		if values.HasKey("BestLapTime")
-			this.iBestLapTime := values["BestLapTime"]
+		if values.HasProp("BestLapTime")
+			this.iBestLapTime := values.BestLapTime
 
-		if values.HasKey("BaseLap")
-			this.iBaseLap := values["BaseLap"]
+		if values.HasProp("BaseLap")
+			this.iBaseLap := values.BaseLap
 
-		if values.HasKey("LastFuelAmount")
-			this.iLastFuelAmount := values["LastFuelAmount"]
+		if values.HasProp("LastFuelAmount")
+			this.iLastFuelAmount := values.LastFuelAmount
 
-		if values.HasKey("InitialFuelAmount")
-			this.iInitialFuelAmount := values["InitialFuelAmount"]
+		if values.HasProp("InitialFuelAmount")
+			this.iInitialFuelAmount := values.InitialFuelAmount
 
-		if values.HasKey("AvgFuelConsumption")
-			this.iAvgFuelConsumption := values["AvgFuelConsumption"]
+		if values.HasProp("AvgFuelConsumption")
+			this.iAvgFuelConsumption := values.AvgFuelConsumption
 
-		if values.HasKey("EnoughData")
-			this.iEnoughData := values["EnoughData"]
+		if values.HasProp("EnoughData")
+			this.iEnoughData := values.EnoughData
 	}
 
 	handleVoiceCommand(grammar, words) {
 		local continuation
 
-		switch grammar {
+		switch grammar, false {
 			case "Time":
 				this.timeRecognized(words)
 			case "Yes":
@@ -616,7 +617,7 @@ class RaceAssistant extends ConfigurationItem {
 	timeRecognized(words) {
 		local time
 
-		FormatTime time, %A_Now%, Time
+		time := FormatTime(A_Now, "Time")
 
 		this.getSpeaker().speakPhrase("Time", {time: time})
 	}
@@ -634,7 +635,7 @@ class RaceAssistant extends ConfigurationItem {
 		score := 0
 
 		for ignore, fragment in announcements
-			if fragments.HasKey(fragment) {
+			if fragments.Has(fragment) {
 				fragmentScore := matchFragment(words, fragments[fragment])
 
 				if (fragmentScore > score) {
@@ -725,16 +726,16 @@ class RaceAssistant extends ConfigurationItem {
 	jokeRecognized(words) {
 		local rnd, joke, speaker, html, index, hasJoke
 
-		Random rnd, 0, 4
+		rnd := Random(0, 4)
 
 		hasJoke := (rnd > 1)
 
 		if hasJoke
 			if (this.VoiceManager.Language = "EN") {
 				try {
-					URLDownloadToFile https://api.chucknorris.io/jokes/random, %kTempDirectory%joke.json
+					Download("https://api.chucknorris.io/jokes/random", kTempDirectory . "joke.json")
 
-					FileRead joke, %kTempDirectory%joke.json
+					joke := FileRead(kTempDirectory . "joke.json")
 
 					joke := JSON.parse(joke)
 
@@ -751,17 +752,17 @@ class RaceAssistant extends ConfigurationItem {
 						speaker.endTalk()
 					}
 				}
-				catch Any as exception {
+				catch Any {
 					hasJoke := false
 				}
 			}
 			else if (this.VoiceManager.Language = "DE") {
 				try {
-					URLDownloadToFile http://www.hahaha.de/witze/zufallswitz.js.php, %kTempDirectory%joke.json
+					Download("http://www.hahaha.de/witze/zufallswitz.js.php", kTempDirectory . "joke.json")
 
-					FileRead joke, %kTempDirectory%joke.json
+					joke := FileRead(kTempDirectory . "joke.json")
 
-					html := ComObjCreate("HtmlFile")
+					html := ComObject("HtmlFile")
 
 					html.write(joke)
 
@@ -787,7 +788,7 @@ class RaceAssistant extends ConfigurationItem {
 						speaker.endTalk()
 					}
 				}
-				catch Any as exception {
+				catch Any {
 					hasJoke := false
 				}
 			}
@@ -798,13 +799,12 @@ class RaceAssistant extends ConfigurationItem {
 			this.getSpeaker().speakPhrase("NoJoke")
 	}
 
-	isNumber(word, ByRef number) {
+	isNumber(word, &number) {
 		local fragments, index, fragment
 
 		static numberFragmentsLookup := false
 
-		if word is Number
-		{
+		if isNumber(word) {
 			number := word
 
 			return true
@@ -813,13 +813,13 @@ class RaceAssistant extends ConfigurationItem {
 			if !numberFragmentsLookup {
 				fragments := this.getSpeaker().Fragments
 
-				numberFragmentsLookup := {}
+				numberFragmentsLookup := CaseInsenseMap()
 
 				for index, fragment in ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"]
 					numberFragmentsLookup[fragment] := index - 1
 			}
 
-			if numberFragmentsLookup.HasKey(word) {
+			if numberFragmentsLookup.Has(word) {
 				number := numberFragmentsLookup[word]
 
 				return true
@@ -844,7 +844,7 @@ class RaceAssistant extends ConfigurationItem {
 		local compiler := RuleCompiler()
 		local rules, productions, reductions, engine, knowledgeBase, ignore, compound, compoundColor
 
-		FileRead rules, % getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory)
+		rules := FileRead(getFileName(this.AssistantType . ".rules", kUserRulesDirectory, kRulesDirectory))
 
 		productions := false
 		reductions := false
@@ -855,9 +855,9 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase := this.RaceKnowledgeBase(this, engine, engine.createFacts(), engine.createRules())
 
-		for ignore, compound in new SessionDatabase().getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
-																	 , knowledgeBase.getValue("Session.Car")
-																	 , knowledgeBase.getValue("Session.Track")) {
+		for ignore, compound in new SessionDatabase.getTyreCompounds(knowledgeBase.getValue("Session.Simulator")
+																   , knowledgeBase.getValue("Session.Car")
+																   , knowledgeBase.getValue("Session.Track")) {
 			compoundColor := false
 
 			splitCompound(compound, &compound, &compoundColor)
@@ -879,7 +879,7 @@ class RaceAssistant extends ConfigurationItem {
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
 
-		switch option {
+		switch option, false {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
 
@@ -895,9 +895,9 @@ class RaceAssistant extends ConfigurationItem {
 		try {
 			if label
 				if enabled
-					Menu SupportMenu, Check, %label%
+					SupportMenu.Check(label)
 				else
-					Menu SupportMenu, Uncheck, %label%
+					SupportMenu.Uncheck(label)
 		}
 		catch Any as exception {
 			logError(exception)
@@ -923,9 +923,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	prepareSession(ByRef settings, ByRef data) {
-		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname
-
+	callPrepareSession(settings, data) {
 		if (settings && !IsObject(settings))
 			settings := readMultiMap(settings)
 
@@ -933,6 +931,12 @@ class RaceAssistant extends ConfigurationItem {
 			data := readMultiMap(data)
 		else if !data
 			data := newMultiMap()
+
+		this.prepareSession(&settings, &data)
+	}
+
+	prepareSession(&settings, &data) {
+		local simulator, simulatorName, session, driverForname, driverSurname, driverNickname
 
 		if settings
 			this.updateConfigurationValues({Settings: settings})
@@ -942,7 +946,7 @@ class RaceAssistant extends ConfigurationItem {
 		simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		switch getMultiMapValue(data, "Session Data", "Session", "Practice") {
+		switch getMultiMapValue(data, "Session Data", "Session", "Practice"), false {
 			case "Practice":
 				session := kSessionPractice
 			case "Qualification":
@@ -958,8 +962,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now
-								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 	}
 
 	initializeSessionFormat(facts, settings, data, lapTime) {
@@ -990,10 +993,10 @@ class RaceAssistant extends ConfigurationItem {
 			facts.setValue("Session.Format", sessionFormat)
 		}
 		else {
-			if (!facts.HasKey("Session.Duration") || (facts["Session.Duration"] == 0))
+			if (!facts.Has("Session.Duration") || (facts["Session.Duration"] == 0))
 				facts["Session.Duration"] := duration
 
-			if (!facts.HasKey("Session.Laps") || (facts["Session.Laps"] == 0))
+			if (!facts.Has("Session.Laps") || (facts["Session.Laps"] == 0))
 				facts["Session.Laps"] := laps
 
 			facts["Session.Format"] := sessionFormat
@@ -1002,22 +1005,22 @@ class RaceAssistant extends ConfigurationItem {
 		this.updateSessionValues({SessionDuration: duration * 1000, SessionLaps: laps, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")})
 	}
 
-	readSettings(ByRef settings) {
+	readSettings(&settings) {
 		if !IsObject(settings)
 			settings := readMultiMap(settings)
 
-		return {"Session.Settings.Lap.Formation": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																				, "Lap.Formation", true)
-			  , "Session.Settings.Lap.PostRace": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																			   , "Lap.PostRace", true)
-			  , "Session.Settings.Lap.AvgTime": getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
-																			  , "Lap.AvgTime", 0)
-			  , "Session.Settings.Lap.PitstopWarning": getDeprecatedConfigurationValue(settings, "Session Settings"
-																				     , "Race Settings", "Lap.PitstopWarning", 5)
-			  , "Session.Settings.Fuel.AvgConsumption": getDeprecatedConfigurationValue(settings, "Session Settings"
-			 																		  , "Race Settings", "Fuel.AvgConsumption", 0)
-			  , "Session.Settings.Fuel.SafetyMargin": getDeprecatedConfigurationValue(settings, "Session Settings"
-																					, "Race Settings", "Fuel.SafetyMargin", 5)}
+		return CaseInsenseMap("Session.Settings.Lap.Formation", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
+																							  , "Lap.Formation", true)
+						    , "Session.Settings.Lap.PostRace", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
+																						     , "Lap.PostRace", true)
+						    , "Session.Settings.Lap.AvgTime", getDeprecatedConfigurationValue(settings, "Session Settings", "Race Settings"
+																						    , "Lap.AvgTime", 0)
+						    , "Session.Settings.Lap.PitstopWarning", getDeprecatedConfigurationValue(settings, "Session Settings"
+																								   , "Race Settings", "Lap.PitstopWarning", 5)
+							, "Session.Settings.Fuel.AvgConsumption", getDeprecatedConfigurationValue(settings, "Session Settings"
+																									, "Race Settings", "Fuel.AvgConsumption", 0)
+							, "Session.Settings.Fuel.SafetyMargin", getDeprecatedConfigurationValue(settings, "Session Settings"
+																								  , "Race Settings", "Fuel.SafetyMargin", 5))
 	}
 
 	updateSettings(settings) {
@@ -1025,11 +1028,11 @@ class RaceAssistant extends ConfigurationItem {
 		local facts, key, value
 
 		if knowledgeBase
-			for key, value in this.readSettings(settings)
+			for key, value in this.readSettings(&settings)
 				knowledgeBase.setFact(key, value)
 	}
 
-	createSession(ByRef settings, ByRef data) {
+	createSession(&settings, &data) {
 		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
 		local lapTime, settingsLapTime, facts
 
@@ -1048,7 +1051,7 @@ class RaceAssistant extends ConfigurationItem {
 		simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
 		simulatorName := this.SettingsDatabase.getSimulatorName(simulator)
 
-		switch getMultiMapValue(data, "Session Data", "Session", "Practice") {
+		switch getMultiMapValue(data, "Session Data", "Session", "Practice"), false {
 			case "Practice":
 				session := kSessionPractice
 			case "Qualification":
@@ -1064,8 +1067,7 @@ class RaceAssistant extends ConfigurationItem {
 		driverNickname := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		this.updateSessionValues({Simulator: simulatorName, Session: session, TeamSession: (getMultiMapValue(data, "Session Data", "Mode", "Solo") = "Team")
-								, SessionTime: A_Now
-								, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
+								, SessionTime: A_Now, Driver: driverForname, DriverFullName: computeDriverName(driverForName, driverSurName, driverNickName)})
 
 		lapTime := getMultiMapValue(data, "Stint Data", "LapLastTime", 0)
 
@@ -1076,19 +1078,29 @@ class RaceAssistant extends ConfigurationItem {
 				lapTime := settingsLapTime
 		}
 
-		facts := combine(this.readSettings(settings)
-					   , {"Session.Simulator": simulator
-						, "Session.Car": getMultiMapValue(data, "Session Data", "Car", "")
-						, "Session.Track": getMultiMapValue(data, "Session Data", "Track", "")
-						, "Session.Type": this.Session
-						, "Session.Time.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
-						, "Session.Lap.Remaining": getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
-						, "Session.Settings.Lap.Time.Adjust": this.AdjustLapTime
-						, "Session.Settings.Fuel.Max": getMultiMapValue(data, "Session Data", "FuelAmount", 0)})
+		facts := combine(this.readSettings(&settings)
+					   , CaseInsenseMap("Session.Simulator", simulator
+									  , "Session.Car", getMultiMapValue(data, "Session Data", "Car", "")
+									  , "Session.Track", getMultiMapValue(data, "Session Data", "Track", "")
+									  , "Session.Type", this.Session
+									  , "Session.Time.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
+									  , "Session.Lap.Remaining", getDeprecatedConfigurationValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
+									  , "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
+									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)})
 
 		this.initializeSessionFormat(facts, settings, data, lapTime)
 
 		return facts
+	}
+
+	callStartSession(settings, data) {
+		if (settings && !IsObject(settings))
+			settings := readMultiMap(settings)
+
+		if (data && !IsObject(data))
+			data := readMultiMap(data)
+
+		this.startSession(settings, data)
 	}
 
 	startSession(settings, data) {
@@ -1148,16 +1160,20 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	prepareData(lapNumber, data) {
-		if !IsObject(data)
-			data := readMultiMap(data)
-
 		if !this.KnowledgeBase
 			this.startSession(this.Settings, data)
 
 		return data
 	}
 
-	addLap(lapNumber, ByRef data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
+	callAddLap(lapNumber, data) {
+		if !IsObject(data)
+			data := readMultiMap(data)
+
+		this.addLap(lapNumber, data)
+	}
+
+	addLap(lapNumber, &data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
@@ -1291,7 +1307,7 @@ class RaceAssistant extends ConfigurationItem {
 
 		if (lapTime > 0) {
 			if ((lapNumber > this.LearningLaps) && lapValid && !adjustedLapTime)
-				values["BestLapTime"] := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
+				values.BestLapTime := (this.BestLapTime = 0) ? lapTime : Min(this.BestLapTime, lapTime)
 
 			this.updateDynamicValues(values)
 		}
@@ -1382,7 +1398,14 @@ class RaceAssistant extends ConfigurationItem {
 		return result
 	}
 
-	updateLap(lapNumber, ByRef data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
+	callUpdateLap(lapNumber, data) {
+		if !IsObject(data)
+			data := readMultiMap(data)
+
+		this.updateLap(lapNumber, &data)
+	}
+
+	updateLap(lapNumber, &data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
 		local knowledgeBase := this.KnowledgeBase
 		local result
 
@@ -1535,14 +1558,14 @@ class GridRaceAssistant extends RaceAssistant {
 		static lastKnowledgeBase := false
 
 		if (data || !lastKnowledgeBase || (lastKnowledgebase != knowledgeBase) || !classes) {
-			classes := {}
+			classes := CaseInsenseMap()
 
-			loop % (data ? getMultiMapValue(data, "Position Data", "Car.Count") : knowledgeBase.getValue("Car.Count"))
+			loop (data ? getMultiMapValue(data, "Position Data", "Car.Count") : knowledgeBase.getValue("Car.Count"))
 				if (data || knowledgeBase.getValue("Car." . A_Index . ".Car", false)) {
 					class := (data ? getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)
 								   : knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown))
 
-					if !classes.HasKey(class)
+					if !classes.Has(class)
 						classes[class] := true
 				}
 
@@ -1584,12 +1607,12 @@ class GridRaceAssistant extends RaceAssistant {
 				positions := []
 
 				if data {
-					loop % getMultiMapValue(data, "Position Data", "Car.Count")
+					loop getMultiMapValue(data, "Position Data", "Car.Count")
 						if (!class || (class = getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
 							positions.Push(Array(A_Index, getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position")))
 				}
 				else
-					loop % knowledgeBase.getValue("Car.Count")
+					loop knowledgeBase.getValue("Car.Count")
 						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
 							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
 								positions.Push(Array(A_Index, knowledgeBase.getValue("Car." . A_Index . ".Position")))
@@ -1601,12 +1624,12 @@ class GridRaceAssistant extends RaceAssistant {
 			}
 			else {
 				if data {
-					loop % getMultiMapValue(data, "Position Data", "Car.Count")
+					loop getMultiMapValue(data, "Position Data", "Car.Count")
 						if (!class || (class = getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class", kUnknown)))
 							classGrid.Push(A_Index)
 				}
 				else
-					loop % knowledgeBase.getValue("Car.Count")
+					loop knowledgeBase.getValue("Car.Count")
 						if (!class || (class = knowledgeBase.getValue("Car." . A_Index . ".Class", kUnknown)))
 							if knowledgeBase.getValue("Car." . A_Index . ".Car", false)
 								classGrid.Push(A_Index)
@@ -1667,11 +1690,8 @@ class GridRaceAssistant extends RaceAssistant {
 		return data
 	}
 
-	addLap(lapNumber, ByRef data) {
+	addLap(lapNumber, &data) {
 		local driver, lapValid, lapPenalty
-
-		if !IsObject(data)
-			data := readMultiMap(data)
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 
@@ -1683,15 +1703,12 @@ class GridRaceAssistant extends RaceAssistant {
 			lapPenalty := getMultiMapValue(data, "Position Data", "Car." . driver . ".Lap.Penalty", lapPenalty)
 		}
 
-		return super.addLap(lapNumber, data, true, lapValid, lapPenalty)
+		return super.addLap(lapNumber, &data, true, lapValid, lapPenalty)
 	}
 
-	updateLap(lapNumber, ByRef data) {
+	updateLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driver, lapValid, lapPenalty, result
-
-		if !IsObject(data)
-			data := readMultiMap(data)
 
 		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
 		lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
@@ -1708,7 +1725,7 @@ class GridRaceAssistant extends RaceAssistant {
 		if lapPenalty
 			knowledgeBase.setFact("Lap." . (lapNumber + 1) . ".Penalty", lapPenalty)
 
-		result := super.updateLap(lapNumber, data, false, lapValid, lapPenalty)
+		result := super.updateLap(lapNumber, &data, false, lapValid, lapPenalty)
 
 		if this.Debug[kDebugKnowledgeBase]
 			this.dumpKnowledgeBase(knowledgeBase)
@@ -1748,10 +1765,10 @@ compareClassPositions(c1, c2) {
 	local pos1 := c1[2]
 	local pos2 := c2[2]
 
-	if pos1 is not Number
+	if !isNumber(pos1)
 		pos1 := 999
 
-	if pos2 is not Number
+	if !isNumber(pos2)
 		pos2 := 999
 
 	return (pos1 > pos2)
@@ -1776,5 +1793,5 @@ matchFragment(words, fragment) {
 		score += wordScore
 	}
 
-	return (score / fragmentWords.Length())
+	return (score / fragmentWords.Length)
 }

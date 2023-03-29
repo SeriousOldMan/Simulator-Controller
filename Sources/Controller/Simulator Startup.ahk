@@ -482,10 +482,7 @@ launchPad(command := false, arguments*) {
 		icons["SetupAdvisor"] := kIconsDirectory . "Setup.ico"
 		icons["SystemMonitor"] := kIconsDirectory . "Monitoring.ico"
 
-		launchPadGui := Gui()
-
-		launchPadGui.Opt("-Border -Caption +0x800000")
-		launchPadGui.BackColor := "D0D0D0"
+		launchPadGui := Window()
 
 		launchPadGui.SetFont("s10 Bold", "Arial")
 

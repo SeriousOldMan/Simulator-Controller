@@ -67,7 +67,7 @@ class RaceReports extends ConfigurationItem {
 
 	iReportViewer := false
 
-	class ReportResizer extends ResizeableGui.Resizer {
+	class ReportResizer extends Window.Resizer {
 		Resize(*) {
 			RaceReports.Instance.loadReport(RaceReports.Instance.SelectedReport, true)
 		}
@@ -173,7 +173,7 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local stepWizard, simulators, simulator, control
+		local stepWizard, simulators, simulator
 
 		static raceReportsGui
 
@@ -225,29 +225,20 @@ class RaceReports extends ConfigurationItem {
 			ExitApp(0)
 		}
 
-		raceReportsGui := ResizeableGui()
-
-		raceReportsGui.Descriptor := "Race Reports"
+		raceReportsGui := Window({Descriptor: "Race Reports", Resizeable: true, Closeable: true})
 
 		this.iWindow := raceReportsGui
 
-		raceReportsGui.Opt("-Border -Caption +0x800000")
-		raceReportsGui.BackColor := "D0D0D0"
-
 		raceReportsGui.SetFont("s10 Bold", "Arial")
 
-		control := raceReportsGui.Add("Text", "w1184 Center", translate("Modular Simulator Controller System"))
-		control.OnEvent("Click", moveByMouse.Bind(raceReportsGui, "Race Reports"))
-		raceReportsGui.DefineResizeRule(control, "X:Center")
+		raceReportsGui.Add("Text", "w1184 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(raceReportsGui, "Race Reports"))
 
 		raceReportsGui.SetFont("s9 Norm", "Arial")
 		raceReportsGui.SetFont("Italic Underline", "Arial")
 
-		control := raceReportsGui.Add("Text", "x508 YP+20 w184 cBlue Center", translate("Race Reports"))
-		control.OnEvent("Click", openDocumentation.Bind(raceReportsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
-		raceReportsGui.DefineResizeRule(control, "X:Center")
+		raceReportsGui.Add("Text", "x508 YP+20 w184 cBlue Center H:Center", translate("Race Reports")).OnEvent("Click", openDocumentation.Bind(raceReportsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
 
-		raceReportsGui.DefineResizeRule(raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10"), "W:Grow")
+		raceReportsGui.Add("Text", "x8 yp+30 w1200 0x10 W:Grow")
 
 		raceReportsGui.SetFont("s8 Norm", "Arial")
 
@@ -272,44 +263,35 @@ class RaceReports extends ConfigurationItem {
 
 		raceReportsGui.Add("Text", "x16 yp+26 w70 h23 +0x200", translate("Races"))
 
-		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
+		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
 		this.iRacesListView.OnEvent("Click", chooseRace)
-		raceReportsGui.DefineResizeRule(this.iRacesListView, "H:Grow")
 
-		raceReportsGui.Add("Button", "x62 yp+205 w23 h23 vreloadReportsButton").OnEvent("Click", reloadRaceReports)
+		raceReportsGui.Add("Button", "x62 yp+205 w23 h23 Y:Move vreloadReportsButton").OnEvent("Click", reloadRaceReports)
 		setButtonIcon(raceReportsGui["reloadReportsButton"], kIconsDirectory . "Renew.ico", 1)
-		raceReportsGui.DefineResizeRule(raceReportsGui["reloadReportsButton"], "Y:Move")
 
-		raceReportsGui.Add("Button", "x62 yp+24 w23 h23 vdeleteReportButton").OnEvent("Click", deleteRaceReport)
+		raceReportsGui.Add("Button", "x62 yp+24 w23 h23 Y:Move vdeleteReportButton").OnEvent("Click", deleteRaceReport)
 		setButtonIcon(raceReportsGui["deleteReportButton"], kIconsDirectory . "Minus.ico", 1)
-		raceReportsGui.DefineResizeRule(raceReportsGui["deleteReportButton"], "Y:Move")
 
-		raceReportsGui.DefineResizeRule(raceReportsGui.Add("Text", "x16 yp+30 w70 h23 +0x200", translate("Info")), "Y:Move")
-		raceReportsGui.Add("ActiveX", "x90 yp-2 w180 h170 Border vinfoViewer", "shell.explorer").Value.Navigate("about:blank")
-		raceReportsGui.DefineResizeRule(raceReportsGui["infoViewer"], "Y:Move")
+		raceReportsGui.Add("Text", "x16 yp+30 w70 h23 Y:Move +0x200", translate("Info"))
+		raceReportsGui.Add("ActiveX", "x90 yp-2 w180 h170 Y:Move Border vinfoViewer", "shell.explorer").Value.Navigate("about:blank")
 
 		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200", translate("Report"))
 		raceReportsGui.Add("DropDownList", "x334 yp w120 AltSubmit Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
 
-		raceReportsGui.Add("Button", "x1177 yp w23 h23 vreportSettingsButton").OnEvent("Click", reportSettings)
+		raceReportsGui.Add("Button", "x1177 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)
 
-		raceReportsGui.DefineResizeRule(raceReportsGui["reportSettingsButton"], "X:Move")
-
-		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
-		raceReportsGui.DefineResizeRule(raceReportsGui["chartViewer"], "W:Grow;H:Grow")
+		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 W:Grow H:Grow Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
 
 		this.iReportViewer := RaceReportViewer(raceReportsGui, raceReportsGui["chartViewer"].Value, raceReportsGui["infoViewer"].Value)
 
 		this.loadSimulator(simulator, true)
 
-		raceReportsGui.DefineResizeRule(raceReportsGui.Add("Text", "x8 y574 w1200 0x10"), "Y:Move;W:Grow")
+		raceReportsGui.Add("Text", "x8 y574 w1200 0x10 Y:Move W:Grow")
 
-		control := raceReportsGui.Add("Button", "x574 y580 w80 h23", translate("Close"))
-		control.OnEvent("Click", closeReports)
-		raceReportsGui.DefineResizeRule(control, "X:Center;Y:Move")
+		raceReportsGui.Add("Button", "x574 y580 w80 h23 H:Center Y:Move", translate("Close")).OnEvent("Click", closeReports)
 
-		raceReportsGui.AddResizer(RaceReports.ReportResizer(raceReportsGui))
+		raceReportsGui.Add(RaceReports.ReportResizer(raceReportsGui))
 	}
 
 	show() {

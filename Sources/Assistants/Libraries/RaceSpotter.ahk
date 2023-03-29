@@ -2624,8 +2624,8 @@ class RaceSpotter extends GridRaceAssistant {
 		return false
 	}
 
-	createSession(settings, data) {
-		local facts := super.createSession(settings, data)
+	createSession(&settings, &data) {
+		local facts := super.createSession(&settings, &data)
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local configuration := this.Configuration
 
@@ -2671,20 +2671,20 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	prepareSession(settings, data) {
+	prepareSession(&settings, &data) {
 		local speaker := this.getSpeaker()
 		local fragments := speaker.Fragments
 		local facts, weather, airTemperature, trackTemperature, weatherNow, weather10Min, weather30Min, driver
 		local position, length
 
-		super.prepareSession(settings, data)
+		super.prepareSession(&settings, &data)
 
 		this.iWasStartDriver := true
 
 		this.initializeAnnouncements(data)
 		this.initializeGridPosition(data, true)
 
-		facts := this.createSession(settings, data)
+		facts := this.createSession(&settings, &data)
 
 		if this.Speaker {
 			speaker.beginTalk()
@@ -2767,12 +2767,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 		joined := !this.iWasStartDriver
 
-		if !IsObject(settings)
-			settings := readMultiMap(settings)
-
-		if !IsObject(data)
-			data := readMultiMap(data)
-
 		if joined {
 			this.initializeAnnouncements(data)
 
@@ -2780,7 +2774,7 @@ class RaceSpotter extends GridRaceAssistant {
 				this.getSpeaker().speakPhrase("GreetingIntro")
 		}
 
-		facts := this.createSession(settings, data)
+		facts := this.createSession(&settings, &data)
 
 		simulatorName := this.Simulator
 		configuration := this.Configuration
@@ -2908,7 +2902,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	addLap(lapNumber, data) {
+	addLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastPenalty := false
 		local wasValid := true
@@ -2926,7 +2920,7 @@ class RaceSpotter extends GridRaceAssistant {
 			lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		}
 
-		result := super.addLap(lapNumber, data)
+		result := super.addLap(lapNumber, &data)
 
 		if !this.MultiClass {
 			gapAhead := getMultiMapValue(data, "Stint Data", "GapAhead", kUndefined)
@@ -2998,7 +2992,7 @@ class RaceSpotter extends GridRaceAssistant {
 		return result
 	}
 
-	updateLap(lapNumber, data) {
+	updateLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local lastPenalty := knowledgeBase.getValue("Lap.Penalty", false)
 		local wasValid := knowledgeBase.getValue("Lap.Valid", true)
@@ -3038,7 +3032,7 @@ class RaceSpotter extends GridRaceAssistant {
 			this.updateDriver(lapNumber, sector, this.Positions)
 		}
 
-		result := super.updateLap(lapNumber, data)
+		result := super.updateLap(lapNumber, &data)
 
 		loop % knowledgeBase.getValue("Car.Count")
 		{

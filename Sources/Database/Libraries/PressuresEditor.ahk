@@ -129,12 +129,9 @@ class PressuresEditor {
 		local compounds := []
 		local weather, ignore, row, theCompound, pressuresEditorGui
 
-		pressuresEditorGui := Gui()
+		pressuresEditorGui := Window()
 
 		this.iWindow := pressuresEditorGui
-
-		pressuresEditorGui.Opt("-Border -Caption +0x800000")
-		pressuresEditorGui.BackColor := "D0D0D0"
 
 		pressuresEditorGui.SetFont("s10 Bold", "Arial")
 

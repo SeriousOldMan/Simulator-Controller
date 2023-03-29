@@ -293,15 +293,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local window := this.Window
 		local x, y, car, track, weather, simulators, simulator, choices, chosen, tabs, button, editorGui
 
-		editorGui := Gui()
+		editorGui := Window()
 
 		this.iWindow := editorGui
-
-		editorGui.Opt("-Border -Caption +0x800000")
-		editorGui.BackColor := "D0D0D0"
 
 		editorGui.SetFont("s10 Bold", "Arial")
 
@@ -3288,80 +3284,58 @@ class SessionDatabaseEditor extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-WM_MOUSEMOVE(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local x, y, coordinateX, coordinateY, window
 
-	static currentAction := false
-	static previousAction := false
-	static actionInfo := ""
+copyDirectory(source, destination, progressStep, &count) {
+	local files := []
+	local ignore, fileName, file, subDirectory
 
-    displayToolTip() {
-		SetTimer(displayToolTip, 0)
+	DirCreate(destination)
 
-		ToolTip(actionInfo)
+	loop Files, source . "\*.*", "DF"
+		files.Push(A_LoopFilePath)
 
-		SetTimer(removeToolTip, 10000)
-	}
+	for ignore, fileName in files {
+		SplitPath(fileName, &file)
 
-    removeToolTip() {
-		SetTimer(removeToolTip, 0)
+		count += 1
 
-		ToolTip()
-	}
+		showProgress({progress: Round(50 + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
 
-	if (editor.SelectedModule = "Automation") {
-		window := editor.Window
+		if InStr(FileExist(fileName), "D") {
+			SplitPath(fileName, &subDirectory)
 
-		MouseGetPos(&x, &y)
-
-		coordinateX := false
-		coordinateY := false
-
-		if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
-									, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
-									, &coordinateX, &coordinateY) {
-			currentAction := editor.findTrackAction(coordinateX, coordinateY)
-
-			if !currentAction
-				currentAction := (coordinateX . ";" . coordinateY)
-
-			if (currentAction && (currentAction != previousAction)) {
-				ToolTip()
-
-				if IsObject(currentAction) {
-					actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
-																												: "Hotkey: ")
-																			: "Command: ")
-					actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
-								 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
-								 . translate(" -> ")
-								 . actionInfo . currentAction.Action)
-				}
-				else
-					actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
-
-				SetTimer(removeToolTip, 0)
-				SetTimer(displayToolTip, 1000)
-
-				previousAction := currentAction
-			}
-			else if !currentAction {
-				ToolTip()
-
-				SetTimer(removeToolTip, 0)
-
-				previousAction := false
-			}
+			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
 		}
-		else {
-			ToolTip()
-
-			SetTimer(removeToolTip, 0)
-
-			previousAction := false
-		}
+		else
+			FileCopy(fileName, destination, 1)
 	}
+}
+
+copyFiles(source, destination) {
+	local count := 0
+	local progress := 0
+	local step := 0
+
+	source := normalizeDirectoryPath(source)
+	destination := normalizeDirectoryPath(destination)
+
+	showProgress({color: "Blue"})
+
+	loop Files, source . "\*", "DFR" {
+
+		if (Mod(count, 20) == 0)
+			progress += 1
+
+		showProgress({progress: Min(progress, 50), message: translate("Validating ") . A_LoopFileName . translate("...")})
+
+		Sleep(1)
+
+		count += 1
+	}
+
+	showProgress({progress: 50, color: "Green"})
+
+	copyDirectory(source, destination, 50 / count, &step)
 }
 
 actionDialog(xOrCommand := false, y := false, action := false, *) {
@@ -3408,10 +3382,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 	else {
 		result := false
 
-		actionDialogGui := Gui()
-
-		actionDialogGui.Opt("-Border -Caption +0x800000")
-		actionDialogGui.BackColor := "D0D0D0"
+		actionDialogGui := Window()
 
 		actionDialogGui.SetFont("Norm", "Arial")
 
@@ -3519,10 +3490,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 	else {
 		result := false
 
-		importDataGui := Gui()
-
-		importDataGui.Opt("-Border -Caption +0x800000")
-		importDataGui.BackColor := "D0D0D0"
+		importDataGui := Window()
 
 		importDataGui.SetFont("s10 Bold", "Arial")
 
@@ -4098,10 +4066,7 @@ editSettings(editorOrCommand, arguments*) {
 			serverUpdateEdit := ""
 		}
 
-		settingsEditorGui := Gui()
-
-		settingsEditorGui.Opt("-Border -Caption +0x800000")
-		settingsEditorGui.BackColor := "D0D0D0"
+		settingsEditorGui := Window()
 
 		settingsEditorGui.SetFont("s10 Bold", "Arial")
 
@@ -4376,10 +4341,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	else {
 		result := false
 
-		loginGui := Gui()
-
-		loginGui.Opt("-Border -Caption +0x800000")
-		loginGui.BackColor := "D0D0D0"
+		loginGui := Window()
 
 		loginGui.SetFont("Norm", "Arial")
 
@@ -4431,6 +4393,82 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	}
 }
 
+WM_MOUSEMOVE(*) {
+	local editor := SessionDatabaseEditor.Instance
+	local x, y, coordinateX, coordinateY, window
+
+	static currentAction := false
+	static previousAction := false
+	static actionInfo := ""
+
+    displayToolTip() {
+		SetTimer(displayToolTip, 0)
+
+		ToolTip(actionInfo)
+
+		SetTimer(removeToolTip, 10000)
+	}
+
+    removeToolTip() {
+		SetTimer(removeToolTip, 0)
+
+		ToolTip()
+	}
+
+	if (editor.SelectedModule = "Automation") {
+		window := editor.Window
+
+		MouseGetPos(&x, &y)
+
+		coordinateX := false
+		coordinateY := false
+
+		if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
+									, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
+									, &coordinateX, &coordinateY) {
+			currentAction := editor.findTrackAction(coordinateX, coordinateY)
+
+			if !currentAction
+				currentAction := (coordinateX . ";" . coordinateY)
+
+			if (currentAction && (currentAction != previousAction)) {
+				ToolTip()
+
+				if IsObject(currentAction) {
+					actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
+																												: "Hotkey: ")
+																			: "Command: ")
+					actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
+								 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
+								 . translate(" -> ")
+								 . actionInfo . currentAction.Action)
+				}
+				else
+					actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
+
+				SetTimer(removeToolTip, 0)
+				SetTimer(displayToolTip, 1000)
+
+				previousAction := currentAction
+			}
+			else if !currentAction {
+				ToolTip()
+
+				SetTimer(removeToolTip, 0)
+
+				previousAction := false
+			}
+		}
+		else {
+			ToolTip()
+
+			SetTimer(removeToolTip, 0)
+
+			previousAction := false
+		}
+	}
+}
+
 closeSessionDatabaseEditor(*) {
 	ExitApp(0)
 }
@@ -4451,59 +4489,6 @@ showSettings(*) {
 
 		protectionOff()
 	}
-}
-
-copyDirectory(source, destination, progressStep, &count) {
-	local files := []
-	local ignore, fileName, file, subDirectory
-
-	DirCreate(destination)
-
-	loop Files, source . "\*.*", "DF"
-		files.Push(A_LoopFilePath)
-
-	for ignore, fileName in files {
-		SplitPath(fileName, &file)
-
-		count += 1
-
-		showProgress({progress: Round(50 + (count * progressStep)), message: translate("Copying ") . file . translate("...")})
-
-		if InStr(FileExist(fileName), "D") {
-			SplitPath(fileName, &subDirectory)
-
-			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
-		}
-		else
-			FileCopy(fileName, destination, 1)
-	}
-}
-
-copyFiles(source, destination) {
-	local count := 0
-	local progress := 0
-	local step := 0
-
-	source := normalizeDirectoryPath(source)
-	destination := normalizeDirectoryPath(destination)
-
-	showProgress({color: "Blue"})
-
-	loop Files, source . "\*", "DFR" {
-
-		if (Mod(count, 20) == 0)
-			progress += 1
-
-		showProgress({progress: Min(progress, 50), message: translate("Validating ") . A_LoopFileName . translate("...")})
-
-		Sleep(1)
-
-		count += 1
-	}
-
-	showProgress({progress: 50, color: "Green"})
-
-	copyDirectory(source, destination, 50 / count, &step)
 }
 
 chooseSimulator(*) {

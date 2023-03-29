@@ -16,6 +16,7 @@
 #Include "..\Framework\Collections.ahk"
 #Include "..\Framework\Localization.ahk"
 #Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\GUI.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -66,12 +67,9 @@ showSplash(image, alwaysOnTop := true, video := false) {
 
 		SplitPath(image, , , &extension)
 
-		splashGui := Gui()
+		splashGui := Window()
 
 		splashGuis[splashCounter] := splashGui
-
-		splashGui.Opt("-Border -Caption +0x800000")
-		splashGui.BackColor := "D0D0D0"
 
 		splashGui.SetFont("s10 Bold", "Arial")
 

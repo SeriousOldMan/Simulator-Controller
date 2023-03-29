@@ -11206,8 +11206,8 @@ class RaceCenter extends ConfigurationItem {
 				pitstopTyreService := false
 				pitstopServiceOrder := "Simultaneous"
 
-				this.getSessionSettings(stintLength, formationLap, postRaceLap, fuelCapacity, safetyFuel
-									  , pitstopDelta, pitstopFuelService, pitstopTyreService, pitstopServiceOrder)
+				this.getSessionSettings(&stintLength, &formationLap, &postRaceLap, &fuelCapacity, &safetyFuel
+									  , &pitstopDelta, &pitstopFuelService, &pitstopTyreService, &pitstopServiceOrder)
 
 				lastPositions := []
 				lastRunnings := []

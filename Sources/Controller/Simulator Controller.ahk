@@ -1122,8 +1122,7 @@ class SimulatorController extends ConfigurationItem {
 			x := mainScreenRight - 229
 			y := mainScreenBottom - 259
 
-			logoGui := Gui()
-			logoGui.Opt("-Border -Caption +0x800000")
+			logoGui := Window()
 
 			logoGui.SetFont("Bold")
 			logoGui.AddText("w200 Center", translate("Modular Simulator") . "`n" . translate("Controller System"))

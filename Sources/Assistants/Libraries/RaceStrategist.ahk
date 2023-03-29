@@ -702,7 +702,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if lapPosition {
 			lapDelta := words[lapPosition - 1]
 
-			if this.isNumber(lapDelta, lapDelta) {
+			if this.isNumber(lapDelta, &lapDelta) {
 				currentLap := knowledgeBase.getValue("Lap")
 				lap := (currentLap + lapDelta)
 
@@ -1054,7 +1054,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if lapPosition {
 				lap := words[lapPosition + 1]
 
-				if !this.isNumber(lap, lap)
+				if !this.isNumber(lap, &lap)
 					lap := false
 			}
 			else
@@ -1205,34 +1205,34 @@ class RaceStrategist extends GridRaceAssistant {
 
 	readSettings(ByRef settings) {
 		return combine(base.readSettings(settings)
-					 , {"Session.Settings.Pitstop.Delta": getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
+					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																			  , getMultiMapValue(settings, "Session Settings"
 																									, "Pitstop.Delta", 30))
-					  , "Session.Settings.Standings.Extrapolation.Laps": getMultiMapValue(settings, "Strategy Settings"
+					  , "Session.Settings.Standings.Extrapolation.Laps", getMultiMapValue(settings, "Strategy Settings"
 																							 , "Extrapolation.Laps", 2)
-					  , "Session.Settings.Standings.Extrapolation.Overtake.Delta": Round(getMultiMapValue(settings
+					  , "Session.Settings.Standings.Extrapolation.Overtake.Delta", Round(getMultiMapValue(settings
 																											 , "Strategy Settings"
 																											 , "Overtake.Delta", 1) * 1000)
-					  , "Session.Settings.Strategy.Traffic.Considered": (getMultiMapValue(settings, "Strategy Settings"
+					  , "Session.Settings.Strategy.Traffic.Considered", (getMultiMapValue(settings, "Strategy Settings"
 																							 , "Traffic.Considered", 5) / 100)
-					  , "Session.Settings.Pitstop.Service.Refuel": getMultiMapValue(settings, "Strategy Settings"
+					  , "Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, "Strategy Settings"
 																					   , "Service.Refuel.Rule", "Dynamic")
-					  , "Session.Settings.Pitstop.Service.Refuel": getMultiMapValue(settings, "Strategy Settings"
+					  , "Session.Settings.Pitstop.Service.Refuel", getMultiMapValue(settings, "Strategy Settings"
 																					   , "Service.Refuel", 1.5)
-					  , "Session.Settings.Pitstop.Service.Tyres": getMultiMapValue(settings, "Strategy Settings"
+					  , "Session.Settings.Pitstop.Service.Tyres", getMultiMapValue(settings, "Strategy Settings"
 																					  , "Service.Tyres", 30)
-					  , "Session.Settings.Pitstop.Service.Order": getMultiMapValue(settings, "Strategy Settings"
+					  , "Session.Settings.Pitstop.Service.Order", getMultiMapValue(settings, "Strategy Settings"
 																					  , "Service.Order", "Simultaneous")
-					  , "Session.Settings.Pitstop.Strategy.Window.Considered": getMultiMapValue(settings, "Strategy Settings"
-																								   , "Strategy.Window.Considered", 2)})
+					  , "Session.Settings.Pitstop.Strategy.Window.Considered", getMultiMapValue(settings, "Strategy Settings"
+																								   , "Strategy.Window.Considered", 2)))
 	}
 
-	prepareSession(settings, data) {
+	prepareSession(&settings, &data) {
 		local raceData, carCount,  carNr
 
 		this.updateSessionValues({RaceInfo: false})
 
-		super.prepareSession(settings, data)
+		super.prepareSession(&settings, &data)
 
 		raceData := newMultiMap()
 
@@ -1256,8 +1256,8 @@ class RaceStrategist extends GridRaceAssistant {
 		this.updateRaceInfo(raceData)
 	}
 
-	createSession(settings, data) {
-		local facts := super.createSession(settings, data)
+	createSession(&settings, &data) {
+		local facts := super.createSession(&settings, &data)
 		local simulatorName := this.SettingsDatabase.getSimulatorName(facts["Session.Simulator"])
 		local theStrategy, applicableStrategy, simulator, car, track
 		local sessionType, sessionLength, duration, laps, configuration
@@ -1314,13 +1314,7 @@ class RaceStrategist extends GridRaceAssistant {
 	startSession(settings, data) {
 		local facts, simulatorName, configuration, raceEngineer, saveSettings, deprecated, telemetryDB
 
-		if !IsObject(settings)
-			settings := readMultiMap(settings)
-
-		if !IsObject(data)
-			data := readMultiMap(data)
-
-		facts := this.createSession(settings, data)
+		facts := this.createSession(&settings, &data)
 
 		simulatorName := this.Simulator
 		configuration := this.Configuration
@@ -1473,7 +1467,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	addLap(lapNumber, data) {
+	addLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local driverForname := ""
 		local driverSurname := ""
@@ -1500,7 +1494,7 @@ class RaceStrategist extends GridRaceAssistant {
 			driverNickname := knowledgeBase.getValue("Driver.Nickname", "JDO")
 		}
 
-		result := super.addLap(lapNumber, data)
+		result := super.addLap(lapNumber, &data)
 
 		if !result
 			return false
@@ -1633,7 +1627,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return result
 	}
 
-	updateLap(lapNumber, data) {
+	updateLap(lapNumber, &data) {
 		local knowledgeBase := this.KnowledgeBase
 		local sector, result, gapAhead, gapBehind, valid
 
@@ -1650,7 +1644,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.KnowledgeBase.addFact("Sector", sector)
 		}
 
-		result := super.updateLap(lapNumber, data)
+		result := super.updateLap(lapNumber, &data)
 
 		loop % knowledgeBase.getValue("Car.Count")
 		{

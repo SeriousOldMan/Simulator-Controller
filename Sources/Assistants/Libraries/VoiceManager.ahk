@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Voice Chat Manager              ;;;
 ;;;                                         Client for Voice Server         ;;;
 ;;;                                                                         ;;;
@@ -10,17 +10,17 @@
 ;;;                        Global Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
-#Include ..\Libraries\SpeechSynthesizer.ahk
-#Include ..\Libraries\SpeechRecognizer.ahk
+#Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\Messages.ahk"
+#Include "..\..\Libraries\SpeechSynthesizer.ahk"
+#Include "..\..\Libraries\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,7 +56,7 @@ class VoiceManager {
 	iListener := false
 
 	iVoiceServer := false
-	iGrammars := {}
+	iGrammars := CaseInsenseMap()
 
 	iPushToTalk := false
 
@@ -69,8 +69,8 @@ class VoiceManager {
 
 	class RemoteSpeaker {
 		iVoiceManager := false
-		iFragments := {}
-		iPhrases := {}
+		iFragments := CaseInsenseMap()
+		iPhrases := CaseInsenseMap()
 
 		iSpeaker := false
 		iLanguage := false
@@ -161,10 +161,10 @@ class VoiceManager {
 			local phrases := this.Phrases
 			local index
 
-			if phrases.HasKey(phrase) {
+			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				Random index, 1, % phrases.Length()
+				index := Random(1, phrases.Length)
 
 				if cache
 					cache .= ("." . index)
@@ -194,8 +194,8 @@ class VoiceManager {
 
 	class LocalSpeaker extends SpeechSynthesizer {
 		iVoiceManager := false
-		iFragments := {}
-		iPhrases := {}
+		iFragments := CaseInsenseMap()
+		iPhrases := CaseInsenseMap()
 
 		iIsTalking := false
 		iText := ""
@@ -306,10 +306,10 @@ class VoiceManager {
 			local phrases := this.Phrases
 			local index
 
-			if phrases.HasKey(phrase) {
+			if phrases.Has(phrase) {
 				phrases := phrases[phrase]
 
-				Random index, 1, % phrases.Length()
+				index := Random(1, phrases.Length)
 
 				if cache
 					cache .= ("." . index)
@@ -573,11 +573,8 @@ class VoiceManager {
 	}
 
 	shutdownVoiceManager(*) {
-		if (this.VoiceServer && this.iSpeechSynthesizer) {
-			Process Exist
-
-			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ErrorLevel), this.VoiceServer)
-		}
+		if (this.VoiceServer && this.iSpeechSynthesizer)
+			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.Name, ProcessExist()), this.VoiceServer)
 
 		return false
 	}
@@ -585,47 +582,47 @@ class VoiceManager {
 	initialize(options) {
 		local vocalics
 
-		if options.HasKey("Vocalics") {
+		if options.Has("Vocalics") {
 			vocalics := options["Vocalics"]
 
-			if !options.HasKey("SpeakerVolume")
+			if !options.Has("SpeakerVolume")
 				options["SpeakerVolume"] := vocalics[1]
 
-			if !options.HasKey("SpeakerPitch")
+			if !options.Has("SpeakerPitch")
 				options["SpeakerPitch"] := vocalics[2]
 
-			if !options.HasKey("SpeakerSpeed")
+			if !options.Has("SpeakerSpeed")
 				options["SpeakerSpeed"] := vocalics[3]
 		}
 
-		if options.HasKey("Language")
+		if options.Has("Language")
 			this.iLanguage := options["Language"]
 
-		if options.HasKey("Synthesizer")
+		if options.Has("Synthesizer")
 			this.iSynthesizer := options["Synthesizer"]
 
-		if options.HasKey("Speaker")
+		if options.Has("Speaker")
 			this.iSpeaker := options["Speaker"]
 
-		if options.HasKey("SpeakerVolume")
+		if options.Has("SpeakerVolume")
 			this.iSpeakerVolume := options["SpeakerVolume"]
 
-		if options.HasKey("SpeakerPitch")
+		if options.Has("SpeakerPitch")
 			this.iSpeakerPitch := options["SpeakerPitch"]
 
-		if options.HasKey("SpeakerSpeed")
+		if options.Has("SpeakerSpeed")
 			this.iSpeakerSpeed := options["SpeakerSpeed"]
 
-		if options.HasKey("Recognizer")
+		if options.Has("Recognizer")
 			this.iRecognizer := options["Recognizer"]
 
-		if options.HasKey("Listener")
+		if options.Has("Listener")
 			this.iListener := options["Listener"]
 
-		if options.HasKey("PushToTalk")
+		if options.Has("PushToTalk")
 			this.iPushToTalk := options["PushToTalk"]
 
-		if options.HasKey("VoiceServer")
+		if options.Has("VoiceServer")
 			this.iVoiceServer := options["VoiceServer"]
 	}
 
@@ -663,30 +660,28 @@ class VoiceManager {
 
 		if (this.Speaker && !this.iSpeechSynthesizer) {
 			if this.VoiceServer {
-				Process Exist
-
-				pid := ErrorLevel
+				pid := ProcessExist()
 
 				activationCommand := getMultiMapValue(this.getGrammars(this.Language), "Listener Grammars", "Call", false)
 				activationCommand := substituteVariables(activationCommand, {name: this.Name})
 
 				messageSend(kFileMessage, "Voice"
-						  , "registerVoiceClient:" . values2String(";", this.Name, this.Routing, pid
-																	  , activationCommand
-																	  , "remoteActivationRecognized", "remoteDeactivationRecognized"
-																	  , this.Language, this.Synthesizer, this.Speaker
-																	  , this.Recognizer, this.Listener
-																	  , this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
-						  , this.VoiceServer)
+										, "registerVoiceClient:" . values2String(";", this.Name, this.Routing, ProcessExist()
+																					, activationCommand
+																					, "remoteActivationRecognized", "remoteDeactivationRecognized"
+																					, this.Language, this.Synthesizer, this.Speaker
+																					, this.Recognizer, this.Listener
+																					, this.SpeakerVolume, this.SpeakerPitch, this.SpeakerSpeed)
+										, this.VoiceServer)
 
 				this.iSpeechSynthesizer := this.RemoteSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-																, this.buildFragments(this.Language)
-																, this.buildPhrases(this.Language))
+															, this.buildFragments(this.Language)
+															, this.buildPhrases(this.Language))
 			}
 			else {
 				this.iSpeechSynthesizer := this.LocalSpeaker(this, this.Synthesizer, this.Speaker, this.Language
-															   , this.buildFragments(this.Language)
-															   , this.buildPhrases(this.Language))
+														   , this.buildFragments(this.Language)
+														   , this.buildPhrases(this.Language))
 
 				this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 				this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -733,7 +728,7 @@ class VoiceManager {
 				return false
 			}
 			else {
-				SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+				SoundPlay(kResourcesDirectory . "Sounds\Talk.wav")
 
 				this.iIsListening := true
 
@@ -763,7 +758,7 @@ class VoiceManager {
 
 		if voiceServer
 			try {
-				FileAppend TRUE, %kTempDirectory%Voice.mute
+				FileAppend("TRUE", kTempDirectory . "Voice.mute")
 			}
 			catch Any as exception {
 				logError(exception)
@@ -782,7 +777,7 @@ class VoiceManager {
 	}
 
 	buildFragments(language) {
-		local fragments := {}
+		local fragments := CaseInsenseMap()
 		local grammars := this.getGrammars(language)
 		local fragment, word
 
@@ -793,7 +788,7 @@ class VoiceManager {
 	}
 
 	buildPhrases(language, section := "Speaker Phrases") {
-		local phrases := {}
+		local phrases := CaseInsenseMap()
 		local grammars := this.getGrammars(language)
 		local key, value
 
@@ -803,7 +798,7 @@ class VoiceManager {
 			if this.Debug[kDebugPhrases]
 				showMessage("Register voice phrase: " . key . " = " . value)
 
-			if phrases.HasKey(key)
+			if phrases.Has(key)
 				phrases[key].Push(value)
 			else
 				phrases[key] := Array(value)
@@ -876,7 +871,7 @@ class VoiceManager {
 	}
 
 	remoteActivationRecognized(words*) {
-		if (words.Length() > 0)
+		if (words.Length > 0)
 			this.phraseRecognized("Call", words, true)
 	}
 
@@ -909,7 +904,7 @@ class VoiceManager {
 	recognizeCommand(grammar, words) {
 		if this.VoiceServer
 			messageSend(kFileMessage, "Voice", "recognizeCommand:" . values2String(";", grammar, words*), this.VoiceServer)
-		else if this.Grammars.HasKey(grammar)
+		else if this.Grammars.Has(grammar)
 			this.phraseRecognized(grammar, words)
 	}
 

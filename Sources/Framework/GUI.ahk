@@ -42,7 +42,10 @@ getControllerActionDefinitions(type) {
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class ResizeableGui extends Gui {
+class Window extends Gui {
+	iCloseable := false
+	iResizeable := false
+
 	iMinWidth := 0
 	iMinHeight := 0
 
@@ -54,16 +57,16 @@ class ResizeableGui extends Gui {
 	iDescriptor := false
 
 	class Resizer {
-		iGui := false
+		iWindow := false
 
-		Gui {
+		Window {
 			Get {
-				return this.iGui
+				return this.iWindow
 			}
 		}
 
-		__New(resizeableGui) {
-			this.iGui := resizeableGui
+		__New(window) {
+			this.iWindow := window
 		}
 
 		Initialize() {
@@ -77,7 +80,7 @@ class ResizeableGui extends Gui {
 		}
 	}
 
-	class ControlResizer extends ResizeableGui.Resizer {
+	class ControlResizer extends Window.Resizer {
 		iRule := false
 		iControl := false
 
@@ -122,11 +125,11 @@ class ResizeableGui extends Gui {
 			}
 		}
 
-		__New(resizeableGui, control, rule) {
+		__New(window, control, rule) {
 			this.iControl := control
 			this.iRule := rule
 
-			super.__New(resizeableGui)
+			super.__New(window)
 		}
 
 		Initialize() {
@@ -159,6 +162,10 @@ class ResizeableGui extends Gui {
 					variable := "w"
 				else if (variable = "Height")
 					variable := "h"
+				else if (variable = "Horizontal")
+					variable := "h"
+				else if (variable = "Vertical")
+					variable := "h"
 
 				horizontal := ((variable = "x") || (variable = "w"))
 
@@ -167,15 +174,19 @@ class ResizeableGui extends Gui {
 						%variable% += (horizontal ? deltaWidth : deltaHeight)
 					case "Move/2":
 						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 2)
+					case "Move/3":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3)
 					case "Grow":
 						%variable% += (horizontal ? deltaWidth : deltaHeight)
 					case "Grow/2":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 2)
+						%variable% += (horizontal ? deltaWidth : deltaHeight)
+					case "Grow/3":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3)
 					case "Center":
-						if horizontal
-							x := Round((this.Gui.Width / 2) - (w / 2))
+						if (variable = "h")
+							x := Round((this.Window.Width / 2) - (w / 2))
 						else
-							y := Round((this.Gui.Height / 2) - (h / 2))
+							y := Round((this.Window.Height / 2) - (h / 2))
 				}
 			}
 
@@ -195,15 +206,45 @@ class ResizeableGui extends Gui {
 		}
 	}
 
+	Closeable {
+		Get {
+			return this.iCloseable
+		}
+	}
+
+	Resizeable {
+		Get {
+			return this.iResizeable
+		}
+	}
+
 	MinWidth {
 		Get {
 			return this.iMinWidth
+		}
+
+		Set {
+			try {
+				return (this.iMinWidth := value)
+			}
+			finally {
+				this.Resize("Auto", this.Width, this.Height)
+			}
 		}
 	}
 
 	MinHeight {
 		Get {
 			return this.iMinHeight
+		}
+
+		Set {
+			try {
+				return (this.iMinHeight := value)
+			}
+			finally {
+				this.Resize("Auto", this.Width, this.Height)
+			}
 		}
 	}
 
@@ -225,12 +266,69 @@ class ResizeableGui extends Gui {
 		}
 	}
 
-	__New(arguments*) {
-		super.__New(arguments*)
+	__New(options := {}, name := Strsplit(A_ScriptName, ".")[1], arguments*) {
+		local backColor := "D0D0D0"
+		local ignore, argument
 
-		this.Opt("+Resize -MaximizeBox")
+		for name, argument in options.OwnProps()
+			switch name, false {
+				case "Closeable":
+					this.iCloseable := argument
+				case "Resizeable":
+					this.iResizeable := argument
+				case "Descriptor":
+					this.iDescriptor := argument
+				case "Options":
+					options := argument
+				case "BackColor":
+					backColor := argument
+			}
 
-		this.OnEvent("Size", this.Resize)
+		super.__New("", name, arguments*)
+
+		this.OnEvent("Close", this.Close)
+
+		if this.Resizeable {
+			this.Opt("+Resize")
+
+			this.OnEvent("Size", this.Resize)
+		}
+		else
+			this.Opt("-SysMenu -Border -Caption +0x800000")
+
+		if !IsObject(options)
+			this.Opt(options)
+
+		this.BackColor := backColor
+	}
+
+	Add(type, options := "", arguments*) {
+		local rules := false
+		local newOptions, ignore, option, control
+
+		if type is Window.Resizer
+			return this.AddResizer(type)
+		else {
+			if RegExMatch(options, "i)[xywhv].*:") {
+				newOptions := []
+				rules := []
+
+				for ignore, option in string2Values(A_Space, options)
+					if RegExMatch(option, "i)[xywhv].*:")
+						rules.Push(option)
+					else
+						newOptions.Push(option)
+
+				options := values2String(A_Space, newOptions*)
+			}
+
+			control := super.Add(type, options, arguments*)
+
+			if rules
+				this.DefineResizeRule(control, values2String(";", rules*))
+
+			return control
+		}
 	}
 
 	Show(arguments*) {
@@ -240,8 +338,12 @@ class ResizeableGui extends Gui {
 
 		WinGetPos(&x, &y, &width, &height, this)
 
-		this.iMinWidth := width
-		this.iMinHeight := height
+		if !this.MinWidth
+			this.iMinWidth := width
+
+		if !this.MinHeight
+			this.iMinHeight := height
+
 		this.iWidth := width
 		this.iHeight := height
 
@@ -251,10 +353,19 @@ class ResizeableGui extends Gui {
 
 	AddResizer(resizer) {
 		this.Resizers.Push(resizer)
+
+		return resizer
 	}
 
 	DefineResizeRule(control, rule) {
-		this.AddResizer(ResizeableGui.ControlResizer(this, control, rule))
+		this.AddResizer(Window.ControlResizer(this, control, rule))
+	}
+
+	Close(*) {
+		if this.Closeable
+			ExitApp(0)
+		else
+			return true
 	}
 
 	Resize(minMax, width, height) {

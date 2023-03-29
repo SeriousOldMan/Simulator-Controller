@@ -100,11 +100,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		prepareSession(arguments*) {
-			this.callRemote("prepareSession", arguments*)
+			this.callRemote("callPrepareSession", arguments*)
 		}
 
 		startSession(arguments*) {
-			this.callRemote("startSession", arguments*)
+			this.callRemote("callStartSession", arguments*)
 		}
 
 		finishSession(arguments*) {
@@ -112,11 +112,11 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 
 		addLap(arguments*) {
-			this.callRemote("addLap", arguments*)
+			this.callRemote("callAddLap", arguments*)
 		}
 
 		updateLap(arguments*) {
-			this.callRemote("updateLap", arguments*)
+			this.callRemote("callUpdateLap", arguments*)
 		}
 
 		call(arguments*) {

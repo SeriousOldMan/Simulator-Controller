@@ -11,11 +11,65 @@
 
 #Include "..\Framework\Constants.ahk"
 #Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\Files.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+getControllerState(configuration := "__Undefined__") {
+	local load := true
+	local pid, tries, options, exePath, fileName
+
+	if (configuration == false)
+		load := false
+	else if (configuration = kUndefined)
+		configuration := false
+
+	pid := ProcessExist("Simulator Controller.exe")
+
+	if (load && !pid && (configuration || !FileExist(kTempDirectory . "Simulator Controller.state")))
+		try {
+			if configuration {
+				fileName := temporaryFileName("Config", "ini")
+
+				writeMultiMap(fileName, configuration)
+
+				options := (" -Configuration `"" . fileName . "`"")
+			}
+			else
+				options := ""
+
+			exePath := ("`"" . kBinariesDirectory . "Simulator Controller.exe`" -NoStartup -NoUpdate" .  options)
+
+			Run(exePath, kBinariesDirectory, , &pid)
+
+			Sleep(1000)
+
+			tries := 30
+
+			while (tries > 0) {
+				Sleep(200)
+
+				if !ProcessExist(pid)
+					break
+			}
+
+			if configuration
+				deleteFile(fileName)
+		}
+		catch Any as exception {
+			logMessage(kLogCritical, translate("Cannot start Simulator Controller (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+
+			return newMultiMap()
+		}
+
+
+	return readMultiMap(kTempDirectory . "Simulator Controller.state")
+}
 
 createGUID() {
 	local guid, pGuid, sGuid, size

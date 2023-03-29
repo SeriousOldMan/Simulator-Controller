@@ -424,12 +424,12 @@ exitProcesses(silent := false, force := false) {
 
 		if hasFGProcesses
 			if force
-				broadcastMessage(concatenate(kForegroundApps, ["Race Settings"]), "exit")
+				broadcastMessage(concatenate(kForegroundApps, ["Race Settings"]), "exitApplication")
 			else
 				return false
 
 		if hasBGProcesses
-			broadcastMessage(remove(kBackgroundApps, "Simulator Tools"), "exit")
+			broadcastMessage(remove(kBackgroundApps, "Simulator Tools"), "exitApplication")
 
 		return true
 	}

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Session Database Test           ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10,25 +10,21 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
+SendMode("Input")				; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
-; SetBatchLines -1				; Maximize CPU utilization
-; ListLines Off					; Disable execution history
-
-global vBuildConfiguration := "Development"
+global kBuildConfiguration := "Development"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Database\Libraries\TyresDatabase.ahk
-#Include AHKUnit\AHKUnit.ahk
+#Include "..\Database\Libraries\TyresDatabase.ahk"
+#Include "AHKUnit\AHKUnit.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -56,9 +52,9 @@ class DatabaseTest extends Assert {
 
 class PressuresAssert extends DatabaseTest {
 	pressuresEqual(list1, list2) {
-		if (list1.Length() == list2.Length()) {
+		if (list1.Length == list2.Length) {
 			for index, value in list1
-				if (Round(list2[index], 1) != Round(value, 2))
+				if (Round(list2[index], 1) != Round(value, 1))
 					return false
 
 			return true
@@ -140,7 +136,7 @@ class InitializeDatabase extends DatabaseTest {
 
 		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 
-		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
+		line := FileRead((kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV"))
 
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
@@ -153,7 +149,7 @@ class InitializeDatabase extends DatabaseTest {
 
 		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 
-		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
+		line := FileRead((kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV"))
 
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
 	}
@@ -163,10 +159,10 @@ class InitializeDatabase extends DatabaseTest {
 
 		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV") != false), "Database file has not been created...")
 
-		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
+		line := FileRead((kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV"))
 
 		this.AssertEqual(true, (line != ""), "Temperature entry has not been created...")
-		this.AssertEqual(true, InStr(line, "Drizzle") && InStr(line, "Red"), "Database file has not been created...")
+		this.AssertTrue(InStr(line, "Drizzle") && InStr(line, "Red"), "Database file has not been created...")
 		this.AssertTrue(InStr(line, "17;18;"), "Temperature entry has not been created...")
 		this.AssertEqual(false, InStr(line, "Wet") && InStr(line, "Black"), "Unexpected temperature entry detected...")
 
@@ -174,7 +170,7 @@ class InitializeDatabase extends DatabaseTest {
 
 		this.AssertEqual(true, (FileExist(kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyre Setup Wet MediumRain.data") != false), "Database file has not been created...")
 
-		FileRead line, % (kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV")
+		line := FileRead((kDatabaseDirectory . "User\Unknown\TestCar\TestTrack\Tyres.Pressures.Distribution.CSV"))
 
 		this.AssertFalse(false, InStr(line, "Wet") && InStr(line, "Black"), "Unexpected temperature entry detected...")
 	}

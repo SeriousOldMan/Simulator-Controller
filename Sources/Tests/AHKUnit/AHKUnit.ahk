@@ -18,6 +18,8 @@
 class AhkUnit {
 	static Runner := false
 	static sDefaultRunner := false
+	static testClasses := []
+	static nesting := 0
 
 	__New() {
 	}
@@ -40,7 +42,7 @@ class AhkUnit {
 	}
 
 	static AddTestClass(testClass) {
-		AhkUnit.testClasses.InsertAt(1, testClass)
+		AhkUnit.testClasses.Push(testClass)
 	}
 
 	static Run(runner := false) {
@@ -52,7 +54,7 @@ class AhkUnit {
 			runner.Default()
 		}
 		for key, value in AhkUnit.testClasses {
-			runner.Run(AhkUnit.testClasses[key])
+			runner.Run(value)
 		}
 	}
 
@@ -126,10 +128,7 @@ class AhkUnit {
 	}
 }
 
-AhkUnit.nesting := 0
-AhkUnit.testClasses := []
 AhkUnit.SetDefaultRunner(AhkUnit.Runner)
-
 
 class AhkUnit_GuiRunner extends AhkUnit_Runner {
 	myGui := false
@@ -343,7 +342,7 @@ class AhkUnit_Assert {
 	}
 
 	class AssertFalse extends AhkUnit_Assert.Arg1_ {
-		; isStrict
+		isStrict := false
 
 		Strict() {
 			this.isStrict := true

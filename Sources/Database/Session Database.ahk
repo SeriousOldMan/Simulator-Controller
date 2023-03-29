@@ -4311,7 +4311,7 @@ editSettings(editorOrCommand, arguments*) {
 							 , translate("Information"), 262192)
 						OnMessage(0x44, translateOkButton, 0)
 
-						broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exit")
+						broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitApplication")
 					}
 				}
 				else

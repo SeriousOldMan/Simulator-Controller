@@ -241,7 +241,7 @@ class TyresDatabase extends SessionDatabase {
 			theCompoundColor := compoundInfo[2]
 
 			for ignore, pressureInfo in this.getPressures(simulator, car, track, weather, Round(airTemperature), Round(trackTemperature)
-														, theCompound, theCompoundColor, driver) {
+														, theCompound, theCompoundColor, (driver = kUndefined) ? false : driver) {
 				deltaAir := pressureInfo["Delta Air"]
 				deltaTrack := pressureInfo["Delta Track"]
 

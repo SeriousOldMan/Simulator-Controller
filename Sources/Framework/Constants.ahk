@@ -55,9 +55,9 @@ global kSimulatorSettingsFile := "Simulator Settings.ini"
 
 global kUndefined := "__Undefined__"
 
-global kVersion := kUndefined
+global kVersion := "0.0.0.0-dev"
 
-global kSimulatorConfiguration
+global kSimulatorConfiguration := Map()
 
 global kSilentMode := false
 

@@ -11,6 +11,7 @@
 
 #Include "..\..\Framework\Framework.ahk"
 #Include "..\..\Framework\Classes.ahk"
+#Include "..\..\Framework\Utils.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

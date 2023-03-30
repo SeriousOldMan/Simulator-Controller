@@ -48,6 +48,8 @@ class Window extends Gui {
 
 	iMinWidth := 0
 	iMinHeight := 0
+	iMaxWidth := 0
+	iMaxHeight := 0
 
 	iWidth := 0
 	iHeight := 0
@@ -77,6 +79,9 @@ class Window extends Gui {
 		}
 
 		Resize(deltaWidth, deltaHeight) {
+		}
+
+		Redraw() {
 		}
 	}
 
@@ -176,12 +181,24 @@ class Window extends Gui {
 						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 2)
 					case "Move/3":
 						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3)
+					case "Move/4":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4)
+					case "Move\3":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3 * 2)
+					case "Move\4":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4 * 3)
 					case "Grow":
 						%variable% += (horizontal ? deltaWidth : deltaHeight)
 					case "Grow/2":
 						%variable% += (horizontal ? deltaWidth : deltaHeight)
 					case "Grow/3":
 						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3)
+					case "Grow\3":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3 * 2)
+					case "Grow/4":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4)
+					case "Grow\4":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4 * 3)
 					case "Center":
 						if (variable = "h")
 							x := Round((this.Window.Width / 2) - (w / 2))
@@ -191,7 +208,9 @@ class Window extends Gui {
 			}
 
 			ControlMove(x, y, w, h, this.Control)
+		}
 
+		Redraw() {
 			this.Control.Redraw()
 		}
 	}
@@ -241,6 +260,36 @@ class Window extends Gui {
 		Set {
 			try {
 				return (this.iMinHeight := value)
+			}
+			finally {
+				this.Resize("Auto", this.Width, this.Height)
+			}
+		}
+	}
+
+	MaxWidth {
+		Get {
+			return this.iMaxWidth
+		}
+
+		Set {
+			try {
+				return (this.iMaxWidth := value)
+			}
+			finally {
+				this.Resize("Auto", this.Width, this.Height)
+			}
+		}
+	}
+
+	MaxHeight {
+		Get {
+			return this.iMaxHeight
+		}
+
+		Set {
+			try {
+				return (this.iMaxHeight := value)
 			}
 			finally {
 				this.Resize("Auto", this.Width, this.Height)
@@ -370,6 +419,7 @@ class Window extends Gui {
 
 	Resize(minMax, width, height) {
 		local descriptor := this.Descriptor
+		local restricted := false
 		local x, y, w, h, settings
 
 		if (minMax = "Initialize") {
@@ -379,6 +429,8 @@ class Window extends Gui {
 			this.iHeight := height
 
 			WinMove(x, y, width, height, this)
+
+			WinRedraw(this)
 		}
 		else {
 			if !this.Width
@@ -389,35 +441,48 @@ class Window extends Gui {
 			width := w
 			height := h
 
-			if ((width < this.iMinWidth) || (height < this.iMinHeight)) {
-				this.iWidth := this.MinWidth
-				this.iHeight := this.MinHeight
-
-				WinMove(x, y, this.MinWidth, this.MinHeight, this)
-
-				this.ControlsResize(this.MinWidth, this.MinHeight)
+			if (width < this.MinWidth) {
+				width := this.MinWidth
+				restricted := true
 			}
-			else if ((this.Resizers.Length = 0) || !this.ControlsCanResize(width, height)) {
-				if (this.Width && this.Height)
-					WinMove(x, y, this.Width, this.Height, this)
+			else if (this.MaxWidth && (width > this.MaxWidth)) {
+				width := this.MaxWidth
+				restricted := true
 			}
-			else {
-				this.iWidth := width
-				this.iHeight := height
 
-				this.ControlsResize(width, height)
+			if (height < this.MinHeight) {
+				height := this.MinHeight
+				restricted := true
+			}
+			else if (this.MaxHeight && (height > this.MaxHeight)) {
+				height := this.MaxHeight
+				restricted := true
+			}
 
-				WinRedraw(this)
+			if (!restricted && (this.Resizers.Length > 0) && !this.ControlsCanResize(width, height)) {
+				width := this.Width
+				height := this.Height
+				restricted := true
 			}
 
 			if descriptor {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				setMultiMapValue(settings, "Window Positions", descriptor . ".Width", this.Width)
-				setMultiMapValue(settings, "Window Positions", descriptor . ".Height", this.Height)
+				setMultiMapValue(settings, "Window Positions", descriptor . ".Width", width)
+				setMultiMapValue(settings, "Window Positions", descriptor . ".Height", height)
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 			}
+
+			this.iWidth := width
+			this.iHeight := height
+
+			this.ControlsResize(width, height)
+
+			if restricted
+				WinMove(x, y, width, height, this)
+
+			WinRedraw(this)
 		}
 	}
 

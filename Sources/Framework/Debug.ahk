@@ -9,7 +9,7 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vDebug := false
+global vDebug := (kBuildConfiguration = "Development")
 global vLogLevel := kLogWarn
 
 
@@ -57,7 +57,7 @@ global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
 
 reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 	if isDebug() {
-		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: "
+		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . String(reference) . " was used as an object: "
 												   . String(p1) . "; " . String(p2) . "; " . String(p3) . "; " . String(p4)
 				  , false, kUndefined, 5000)
 
@@ -69,7 +69,12 @@ reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 }
 
 initializeDebugging() {
-	"".base.__Get := "".base.__Set := "".base.__Call := reportNonObjectUsage
+	String.__Call := reportNonObjectUsage
+	String.__Get := reportNonObjectUsage
+	String.__Set := reportNonObjectUsage
+	Number.__Get := reportNonObjectUsage
+	Number.__Call := reportNonObjectUsage
+	Number.__Set := reportNonObjectUsage
 
 	OnError(logUnhandledError)
 }
@@ -89,6 +94,10 @@ isDebug() {
 	global vDebug
 
 	return vDebug
+}
+
+isLogLevel(logLevel) {
+	return (logLevel >= vLogLevel)
 }
 
 isDevelopment() {
@@ -112,7 +121,7 @@ logMessage(logLevel, message) {
 
 	static sending := false
 
-	if (logLevel >= vLogLevel) {
+	if isLogLevel(logLevel) {
 		level := ""
 
 		switch logLevel {
@@ -231,7 +240,7 @@ setLogLevel(level, *) {
 		for ignore, label in ["Off", "Info", "Warn", "Critical"]
 			LogMenu.Uncheck(translate(label))
 
-	switch level {
+	switch level, false {
 		case "Debug":
 			level := kLogDebug
 		case "Info":

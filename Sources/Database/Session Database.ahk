@@ -2308,12 +2308,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
 
 									for ignore, driver in drivers {
-										result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
+										result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", count, "Count"]]
 																				  , Where: {Driver: driver}})
 
 										count := ((result.Length > 0) ? result[1].Count : 0)
 
-										result := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", "count", "Count"]]
+										result := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", count, "Count"]]
 																							   , Where: {Driver: driver}})
 
 										count += ((result.Length > 0) ? result[1].Count : 0)
@@ -3580,12 +3580,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 					tyresDB := Database(sourceDirectory . "\", kTyresSchemas)
 
 					for driver, driverName in drivers {
-						rows := tyresDB.query("Tyres.Pressures", {Group: [["Driver", "count", "Count"]]
+						rows := tyresDB.query("Tyres.Pressures", {Group: [["Driver", count, "Count"]]
 																, Where: {Driver: driver}})
 
 						count := ((rows.Length > 0) ? rows[1].Count : 0)
 
-						rows := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", "count", "Count"]]
+						rows := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", count, "Count"]]
 																			 , Where: {Driver: driver}})
 
 						count += ((rows.Length > 0) ? rows[1].Count : 0)

@@ -380,13 +380,13 @@ class VoiceManager {
 			this.iContinuation := continuation
 		}
 
-		continue() {
+		next() {
 			local continuation := this.Continuation
 
 			if isInstance(continuation, VoiceManager.VoiceContinuation)
-				continuation.continue()
+				continuation.next()
 			else if continuation
-				%continuation%()
+				continuation()
 		}
 
 		cancel() {
@@ -416,11 +416,11 @@ class VoiceManager {
 			super.__New(manager, continuation)
 		}
 
-		continue() {
+		next() {
 			if (this.Manager.Speaker && this.Accept)
 				this.Manager.getSpeaker().speakPhrase(this.Accept)
 
-			super.continue()
+			super.next()
 		}
 
 		cancel() {
@@ -467,7 +467,7 @@ class VoiceManager {
 		}
 	}
 
-	Muted[]  {
+	Muted {
 		Get {
 			return this.iMuted
 		}
@@ -646,7 +646,7 @@ class VoiceManager {
 		if variables {
 			variables := variables.Clone()
 
-			if (variables is Map) {
+			if isInstance(variables, Map) {
 				variables["Name"] := this.Name
 				variables["User"] := this.User
 			}
@@ -840,9 +840,9 @@ class VoiceManager {
 						throw "Recognizer not running..."
 				}
 				catch Any as exception {
-					logMessage(kLogCritical, translate("Error while registering voice command """) . definition . translate(""" - please check the configuration"))
+					logMessage(kLogCritical, translate("Error while registering voice command `"") . definition . translate("`" - please check the configuration"))
 
-					showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: definition})
+					showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: definition})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
 			}

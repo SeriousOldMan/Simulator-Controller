@@ -500,7 +500,7 @@ class StreamDeck extends FunctionController {
 			}
 
 			for ignore, update in this.iPendingUpdates
-				%update%()
+				update.Call()
 
 			this.iPendingUpdates := []
 		}

@@ -528,7 +528,7 @@ setLanguage(languageCode) {
 		vTargetLanguageCode := languageCode
 
 		for ignore, callback in vLocalizationCallbacks.Clone()
-			%callback%({Language: languageCode})
+			callback.Call({Language: languageCode})
 	}
 }
 
@@ -700,7 +700,7 @@ withFormat(type, format, function, arguments*) {
 	local oldFormat := setFormat(type, format)
 
 	try {
-		%function%(arguments*)
+		function.Call(arguments*)
 	}
 	finally {
 		setFormat(type, oldFormat)

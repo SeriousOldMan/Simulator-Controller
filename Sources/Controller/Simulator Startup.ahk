@@ -269,7 +269,7 @@ class SimulatorStartup extends ConfigurationItem {
 				exitStartup(true)
 
 			if (!kSilentMode && this.iSplashTheme)
-				showSplashTheme(this.iSplashTheme, "playSong")
+				showSplashTheme(this.iSplashTheme, playSong)
 
 			if !kSilentMode
 				showProgress({color: "Blue", message: translate("Start: Simulator Controller"), title: translate("Initialize Core System")})

@@ -756,7 +756,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			this.leaveSession()
 
 		if (this.TeamServerActive && !this.SessionActive) {
-			if isDebug()
+			if (isDebug() && isLogLevel(kLogDebug))
 				showMessage("Starting team session: " . car . ", " . track)
 
 			try {
@@ -793,7 +793,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.TeamServerActive {
 			try {
 				if this.DriverActive {
-					if isDebug()
+					if (isDebug() && isLogLevel(kLogDebug))
 						showMessage("Finishing team session")
 
 					this.Connector.FinishSession(this.Session)
@@ -823,13 +823,13 @@ class TeamServerPlugin extends ControllerPlugin {
 		if this.TeamServerActive {
 			if !this.SessionActive {
 				if (lapNumber = 1) {
-					if isDebug()
+					if (isDebug() && isLogLevel(kLogDebug))
 						showMessage("Creating team session: " . car . ", " . track)
 
 					this.startSession(simulator, car, track, duration)
 				}
 				else {
-					if isDebug()
+					if (isDebug() && isLogLevel(kLogDebug))
 						showMessage("Joining team session: " . car . ", " . track)
 
 					this.iLapData := CaseInsenseMap("Telemetry", CaseInsenseMap(), "Positions", CaseInsenseMap())
@@ -847,7 +847,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 	leaveSession() {
 		if this.DriverActive {
-			if isDebug()
+			if (isDebug() && isLogLevel(kLogDebug))
 				showMessage("Leaving team session")
 
 			if (getLogLevel() <= kLogInfo)
@@ -894,7 +894,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			try {
 				value := this.Connector.GetSessionValue(this.Session, name)
 
-				if isDebug()
+				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Fetching session value: " . name . " => " . value)
 
 				if ((getLogLevel() <= kLogInfo) && value && (value != ""))
@@ -916,7 +916,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	setSessionValue(name, value) {
 		if this.SessionActive {
 			try {
-				if isDebug()
+				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Saving session value: " . name . " => " . value)
 
 				if (!value || (value == "")) {
@@ -954,7 +954,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				else
 					value := this.Connector.GetStintValue(stint, name)
 
-				if isDebug()
+				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Fetching value for " . stint . ": " . name . " => " . value)
 
 				if ((getLogLevel() <= kLogInfo) && value && (value != ""))
@@ -979,7 +979,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if isDebug()
+				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Saving value for stint " . stint . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
@@ -1095,7 +1095,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				else
 					value := this.Connector.GetLapValue(lap, name)
 
-				if isDebug()
+				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Fetching value for " . lap . ": " . name . " => " . value)
 
 				if ((getLogLevel() <= kLogInfo) && value && (value != ""))
@@ -1120,7 +1120,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if session {
 			try {
-				if isDebug()
+				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Saving value for lap " . lap . ": " . name . " => " . value)
 
 				if (!value || (value == "")) {
@@ -1159,7 +1159,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if !this.SessionActive
 					throw "Cannot add a stint to an inactive session..."
 
-				if isDebug()
+				if (isDebug() && isLogLevel(kLogDebug))
 					showMessage("Updating stint in lap " . lapNumber . " for team session")
 
 				stint := this.Connector.StartStint(this.Session, this.Driver, lapNumber)
@@ -1194,7 +1194,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				driverSurName := getMultiMapValue(telemetryData, "Stint Data", "DriverSurname", "Doe")
 				driverNickName := getMultiMapValue(telemetryData, "Stint Data", "DriverNickname", "JDO")
 
-				if isDebug() {
+				if (isDebug() && isLogLevel(kLogDebug)) {
 					showMessage("Updating lap for team session: " . lapNumber)
 
 					if (isDevelopment() && ((this.DriverForName != driverForName) || (this.DriverSurName != driverSurName)))
@@ -1222,7 +1222,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (telemetryData && (telemetryData.Count > 0) && !this.iLapData["Telemetry"].HasKey(lapNumber)) {
 					telemetryData := printMultiMap(telemetryData)
 
-					if isDebug()
+					if (isDebug() && isLogLevel(kLogDebug))
 						showMessage("Setting telemetry data for lap " . lapNumber . ": " . telemetryData)
 
 					this.setLapValue(lapNumber, "Telemetry Data", telemetryData)
@@ -1233,7 +1233,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if (positionsData && (positionsData.Count > 0) && !this.iLapData["Positions"].HasKey(lapNumber)) {
 					positionsData := printMultiMap(positionsData)
 
-					if isDebug()
+					if (isDebug() && isLogLevel(kLogDebug))
 						showMessage("Setting standings data for lap " . lapNumber . ": " . positionsData)
 
 					this.setLapValue(lapNumber, "Positions Data", positionsData)

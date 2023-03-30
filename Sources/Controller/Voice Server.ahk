@@ -1132,7 +1132,7 @@ class VoiceServer extends ConfigurationItem {
 				if command {
 					command := command[2]
 
-					%command%()
+					command.Call()
 				}
 			}
 		}

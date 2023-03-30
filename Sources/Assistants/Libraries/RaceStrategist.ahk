@@ -1131,7 +1131,7 @@ class RaceStrategist extends GridRaceAssistant {
 		if isInstance(continuation, RaceStrategist.RaceReviewContinuation) {
 			this.clearContinuation()
 
-			continuation.continue()
+			continuation.next()
 		}
 	}
 
@@ -1200,7 +1200,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	readSettings(&settings) {
-		return combine(base.readSettings(settings)
+		return combine(super.readSettings(settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																								 , getMultiMapValue(settings, "Session Settings"
 																															, "Pitstop.Delta", 30))

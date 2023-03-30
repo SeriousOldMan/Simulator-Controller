@@ -580,12 +580,12 @@ class SpeechRecognizer {
 			if bestMatch {
 				callback := bestMatch.Callback
 
-				%callback%(bestMatch.Name, words)
+				callback.Call(bestMatch.Name, words)
 			}
 			else if this._grammars.Has("?") {
 				callback := this._grammars["?"].Callback
 
-				%callback%("?", words)
+				callback.Call("?", words)
 			}
 		}
 		else {
@@ -593,7 +593,7 @@ class SpeechRecognizer {
 				if grammar.Grammar.match(words) {
 					callback := grammar.Callback
 
-					%callback%(name, words)
+					callback.Call(name, words)
 
 					return
 				}
@@ -601,7 +601,7 @@ class SpeechRecognizer {
 			if this._grammars.Has("?") {
 				callback := this._grammars["?"].Callback
 
-				%callback%("?", words)
+				callback.Call("?", words)
 			}
 		}
 	}

@@ -593,7 +593,10 @@ else {
 
 		weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)
 
-Any: [?Peter.grandchild], [?Peter.son], {Prove: grandFather(?A, ?Peter.grandchild)}} => (Call: celebrate())
+		{Any: [?Peter.grandchild], [?Peter.son], {Prove: grandFather(?A, ?Peter.grandchild)}} => (Call: celebrate())
+
+		reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
+													 Call(messageBox, ?delta)
 	)"
 
 	productions := false
@@ -607,7 +610,7 @@ Any: [?Peter.grandchild], [?Peter.son], {Prove: grandFather(?A, ?Peter.grandchil
 
 	kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
 	; eng.setTraceLevel(kTraceFull)
-	g := rc.compileGoal("any?(?r, [1, 2, 3])")
+	g := rc.compileGoal("reportAnalysis(0, 0, 0)")
 
 	rs := kb.prove(g)
 

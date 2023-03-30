@@ -404,7 +404,7 @@ class SystemPlugin extends ControllerPlugin {
 
 		if this.iStartupSongIsPlaying {
 			if callback
-				%callback%()
+				callback.Call()
 
 			fadeIn(masterVolume)
 		}
@@ -524,7 +524,7 @@ unmuteSimulator() {
 
 		SetTimer(unmuteSimulator, 0)
 
-		plugin.stopStartupSong("restoreSimulatorVolume")
+		plugin.stopStartupSong(restoreSimulatorVolume)
 	}
 }
 

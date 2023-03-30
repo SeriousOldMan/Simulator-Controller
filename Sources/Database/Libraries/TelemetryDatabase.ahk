@@ -137,7 +137,7 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getElectronicsCount(drivers := "__Undefined__") {
-		local result := this.combineResults("Electronics", {Group: [["Lap.Time", "count", "Count"]]
+		local result := this.combineResults("Electronics", {Group: [["Lap.Time", count, "Count"]]
 														  , Transform: removeInvalidLaps
 														  , Where: {}}, drivers)
 
@@ -145,7 +145,7 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getTyresCount(drivers := "__Undefined__") {
-		local result := this.combineResults("Tyres", {Group: [["Lap.Time", "count", "Count"]]
+		local result := this.combineResults("Tyres", {Group: [["Lap.Time", count, "Count"]]
 													, Transform: removeInvalidLaps
 													, Where: {}}, drivers)
 
@@ -165,21 +165,21 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getMapsCount(weather, drivers := "__Undefined__") {
-		return this.combineResults("Electronics", {Group: [["Map", "count", "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
+		return this.combineResults("Electronics", {Group: [["Map", count, "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
 												 , Transform: removeInvalidLaps
 												 , Where: {Weather: weather}}
 												, drivers)
 	}
 
 	getMapData(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Electronics", {Group: [["Lap.Time", "average", "Lap.Time"], ["Fuel.Consumption", "average", "Fuel.Consumption"]]
+		return this.combineResults("Electronics", {Group: [["Lap.Time", average, "Lap.Time"], ["Fuel.Consumption", average, "Fuel.Consumption"]]
 												 , By: "Map", Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 												, drivers)
 	}
 
 	getTyreData(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
+		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
@@ -193,38 +193,38 @@ class TelemetryDatabase extends SessionDatabase {
 	}
 
 	getMapLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Electronics", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
+		return this.combineResults("Electronics", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
 												 , Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 												, drivers)
 	}
 
 	getTyreLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Tyre.Laps"
+		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
 
 	getFuelLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Group: [["Lap.Time", "minimum", "Lap.Time"]], By: "Fuel.Remaining"
+		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Fuel.Remaining"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
 
 	getPressuresCount(weather, drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Group: [["Tyre.Pressure", "count", "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
+		return this.combineResults("Tyres", {Group: [["Tyre.Pressure", count, "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
 										   , Transform: compose(removeInvalidLaps, computePressures)
 										   , Where: {Weather: weather}}
 										  , drivers)
 	}
 
 	getLapTimePressures(weather, compound, compoundColor, drivers := "__Undefined__") {
-		return this.combineResults("Tyres", {Group: [["Tyre.Pressure.Front.Left", "average", "Tyre.Pressure.Front.Left"]
-												   , ["Tyre.Pressure.Front.Right", "average", "Tyre.Pressure.Front.Right"]
-												   , ["Tyre.Pressure.Rear.Left", "average", "Tyre.Pressure.Rear.Left"]
-												   , ["Tyre.Pressure.Rear.Right", "average", "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
+		return this.combineResults("Tyres", {Group: [["Tyre.Pressure.Front.Left", average, "Tyre.Pressure.Front.Left"]
+												   , ["Tyre.Pressure.Front.Right", average, "Tyre.Pressure.Front.Right"]
+												   , ["Tyre.Pressure.Rear.Left", average, "Tyre.Pressure.Rear.Left"]
+												   , ["Tyre.Pressure.Rear.Right", average, "Tyre.Pressure.Rear.Right"]], By: "Lap.Time"
 										   , Transform: compose(removeInvalidLaps, computePressures)
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)

@@ -135,7 +135,7 @@ class Database {
 
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		if (schemas is Map) {
+		if isInstance(schemas, Map) {
 			for name, fields in schemas
 				this.iSchemas[name] := fields
 		}
@@ -292,7 +292,7 @@ class Database {
 		local tries := 10
 		local row, directory, fileName, ignore, column, value, newValues, file
 
-		if !(values is Database.Row) {
+		if !isInstance(values, Database.Row) {
 			newValues := Database.Row()
 
 			for column, value in values.OwnProps()
@@ -495,7 +495,7 @@ always(value, ignore*) {
 constraintColumns(constraints, row) {
 	local column, value
 
-	if (constraints is Map) {
+	if isInstance(constraints, Map) {
 		for column, value in constraints
 			if (row.Has(column) && (row[column] != value))
 				return false
@@ -550,7 +550,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 			for ignore, row in groupedRows
 				columnValues.Push(row[valueColumn])
 
-			resultRow[resultColumn] := %function%(columnValues)
+			resultRow[resultColumn] := function(columnValues)
 		}
 
 		result.Push(resultRow)

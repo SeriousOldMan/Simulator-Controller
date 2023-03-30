@@ -334,7 +334,7 @@ class RaceEngineer extends RaceAssistant {
 			if (fuel == 0)
 				speaker.speakPhrase("Later")
 			else
-				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel))), unit: fragments[getUnit("Volume")]})
+				speaker.speakPhrase("Fuel", {fuel: floor(speaker.number2Speech(convertUnit("Volume", fuel))), unit: speaker.Fragments[getUnit("Volume")]})
 		}
 	}
 
@@ -1082,7 +1082,7 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	readSettings(&settings) {
-		return combine(base.readSettings(&settings)
+		return combine(super.readSettings(&settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																					   , getDeprecatedValue(settings, "Session Settings", "Race Settings", "Pitstop.Delta", 30))
 									, "Session.Settings.Damage.Suspension.Repair", getDeprecatedValue(settings, "Session Settings", "Race Settings"

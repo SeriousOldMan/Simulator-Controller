@@ -107,12 +107,12 @@ removeDuplicates(list) {
 	return result
 }
 
-combine(map, collections*) {
-	local result := map.Clone()
+combine(initialMap, collections*) {
+	local result := initialMap.Clone()
 	local ignore, collection, key, value
 
 	for ignore, collection in collections
-		if (collection is Map) {
+		if isInstance(collection, Map) {
 			for key, value in collection
 				result[key] := value
 		}
@@ -127,7 +127,7 @@ getKeys(collection) {
 	local result := []
 	local ignore, key
 
-	if (collection is Map) {
+	if isInstance(collection, Map) {
 		for key, ignore in collection
 			result.Push(key)
 	}
@@ -142,7 +142,7 @@ getValues(collection) {
 	local result := []
 	local ignore, value
 
-	if (collection is Map) {
+	if isInstance(collection, Map) {
 		for ignore, value in collection
 			result.Push(value)
 	}

@@ -351,7 +351,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				dataLap := getMultiMapValue(this.Data, "Stint Data", "Laps", false)
 
 				if (!dataLap || !stateLap || Abs(dataLap - stateLap) <= 5) {
-					if isDebug()
+					if (isDebug() && isLogLevel(kLogDebug))
 						showMessage("Restoring session state for " . raceAssistant.Plugin)
 
 					raceAssistant.Simulator.restoreSessionState(&sessionSettings, &sessionState)
@@ -1628,7 +1628,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		local stateName
 
 		if (teamServer && this.TeamSessionActive) {
-			if isDebug()
+			if (isDebug() && isLogLevel(kLogDebug))
 				showMessage("Saving lap state for " . this.Plugin)
 
 			if state {
@@ -1669,7 +1669,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		this.Simulator.saveSessionState(&settings, &state)
 
 		if (teamServer && this.TeamSessionActive) {
-			if isDebug()
+			if (isDebug() && isLogLevel(kLogDebug))
 				showMessage("Saving session state for " . this.Plugin)
 
 			if settings

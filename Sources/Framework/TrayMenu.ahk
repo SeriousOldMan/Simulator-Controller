@@ -189,6 +189,6 @@ enableTrayMessages(duration := 1500) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-registerLocalizationCallback("installTrayMenu")
+registerLocalizationCallback(installTrayMenu)
 
 installTrayMenu()

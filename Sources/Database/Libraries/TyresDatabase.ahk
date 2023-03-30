@@ -279,7 +279,7 @@ class TyresDatabase extends SessionDatabase {
 
 		database := this.requireDatabase(simulator, car, track)
 
-		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+		for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", count, "Count"]]
 																		 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color", "Driver"]
 																		 , Where: where})
 			info.Push({Source: "User", Driver: row["Driver"]
@@ -289,7 +289,7 @@ class TyresDatabase extends SessionDatabase {
 		if this.UseCommunity {
 			database := this.getTyresDatabase(simulator, car, track, "Community")
 
-			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", "count", "Count"]]
+			for ignore, row in database.query("Tyres.Pressures.Distribution", {Group: [["Count", count, "Count"]]
 																			 , By: ["Weather", "Temperature.Air", "Temperature.Track", "Compound", "Compound.Color"]})
 				info.Push({Source: "Community", Driver: false
 						 , Weather: row["Weather"], AirTemperature: row["Temperature.Air"], TrackTemperature: row["Temperature.Track"]

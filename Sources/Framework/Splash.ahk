@@ -158,7 +158,7 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 		showSplash(video, true)
 
 		if song
-			%songHandler%(song)
+			songHandler(song)
 
 		return
 	}
@@ -183,7 +183,7 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 	if song {
 		vSongIsPlaying := true
 
-		%songHandler%(song)
+		songHandler(song)
 	}
 }
 

@@ -400,9 +400,12 @@ updateEngineRepair(?lap) <= lapDamage(?lap, Engine, ?damage), Set(Damage.Engine,
 ;;; regards to collected damage.                                            ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, {Any: [?Damage.Suspension = 0], {None: [?Damage.Suspension]}} => (Clear: Damage.Suspension.Lap.Delta)
-priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} => (Clear: Damage.Bodywork.Lap.Delta)
-priority: 5, {Any: [?Damage.Engine = 0], {None: [?Damage.Engine]}} => (Clear: Damage.Engine.Lap.Delta)
+priority: 5, {Any: [?Damage.Suspension = 0], {None: [?Damage.Suspension]}} =>
+		(Clear: Damage.Suspension.Lap.Delta), (Clear: Damage.Repair.Suspension.Target)
+priority: 5, {Any: [?Damage.Bodywork = 0], {None: [?Damage.Bodywork]}} =>
+		(Clear: Damage.Bodywork.Lap.Delta), (Clear: Damage.Repair.Bodywork.Target)
+priority: 5, {Any: [?Damage.Engine = 0], {None: [?Damage.Engine]}} =>
+		(Clear: Damage.Engine.Lap.Delta), (Clear: Damage.Repair.Engine.Target)
 
 {All: [?Lap], [?Damage.Suspension > 0]} => (Prove: lapTimeDamageImpact(?Lap, Suspension, !Damage.Supsension))
 {All: [?Lap], [?Damage.Bodywork > 0]} => (Prove: lapTimeDamageImpact(?Lap, Bodywork, !Damage.Bodywork))
@@ -475,9 +478,9 @@ reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?bDelta), reportAnalysis(?
 reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= unbound?(?eDelta), reportAnalysis(?sDelta, ?bDelta, 0), !
 
 reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= ?temp = !Damage.Reported + !Session.Settings.Damage.Analysis.Laps, !Lap > ?temp,
-											  max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
-											  remainingStintLaps(!Lap, ?stintLaps), ?lostTime = ?stintLaps * ?delta,
-											  reportDamageAnalysis(?lostTime, ?stintLaps, ?delta)
+											 max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
+											 remainingStintLaps(!Lap, ?stintLaps), ?lostTime = ?stintLaps * ?delta,
+											 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta)
 
 reportDamageAnalysis(?lostTime, ?stintLaps, ?delta) <= >=(?lostTime, !Session.Settings.Pitstop.Delta),
 													   Call(reportDamageAnalysis, true, ?stintLaps, ?delta),

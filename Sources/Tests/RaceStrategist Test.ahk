@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - RaceStrategist Test             ;;;
 ;;;                                         (Race Strategist Rules)         ;;;
 ;;;                                                                         ;;;
@@ -11,27 +11,23 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
+SendMode("Input")					; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
-; SetBatchLines -1				; Maximize CPU utilization
-; ListLines Off					; Disable execution history
-
-global vBuildConfiguration := "Development"
+global kBuildConfiguration := "Development"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Startup.ahk
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\RaceStrategist.ahk
-#Include AHKUnit\AHKUnit.ahk
+#Include "..\Framework\Startup.ahk"
+#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Assistants\Libraries\RaceStrategist.ahk"
+#Include "AHKUnit\AHKUnit.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -39,7 +35,8 @@ global vBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceStrategist extends RaceStrategist {
-	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
+	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__"
+		, service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
 		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
@@ -61,7 +58,7 @@ class BasicReporting extends Assert {
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
 				strategist.addLap(A_Index, data)
@@ -103,7 +100,7 @@ class BasicReporting extends Assert {
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
 				strategist.addLap(A_Index, data)
@@ -162,7 +159,7 @@ class GapReporting extends Assert {
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
 				strategist.addLap(A_Index, data)
@@ -195,7 +192,7 @@ class GapReporting extends Assert {
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
 				strategist.addLap(A_Index, data)
@@ -230,7 +227,7 @@ class PositionProjection extends Assert {
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
 				strategist.addLap(A_Index, data)
@@ -273,7 +270,7 @@ class PitstopRecommendation extends Assert {
 		loop {
 			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
 				strategist.addLap(A_Index, data)
@@ -317,12 +314,12 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
+	MsgBox("Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
 	raceNr := 17
 	strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-									   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
+								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
 
 	strategist.VoiceManager.setDebug(kDebugGrammars, false)
 
@@ -335,7 +332,7 @@ else {
 			loop {
 				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
-				if (data.Count() == 0) {
+				if (data.Count == 0) {
 					if (A_Index == 1)
 						done := true
 
@@ -358,14 +355,14 @@ else {
 			if (A_Index = 19) {
 				strategist.performPitstop()
 
-				MsgBox Pitstop...
+				MsgBox("Pitstop...")
 			}
 		} until done
 
 		strategist.finishSession()
 
 		while strategist.KnowledgeBase
-			Sleep 1000
+			Sleep(1000)
 	}
 	else if (raceNr == 16) {
 		done := false
@@ -376,7 +373,7 @@ else {
 			loop {
 				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
-				if (data.Count() == 0) {
+				if (data.Count == 0) {
 					if (A_Index == 1)
 						done := true
 
@@ -400,7 +397,7 @@ else {
 		strategist.finishSession()
 
 		while strategist.KnowledgeBase
-			Sleep 1000
+			Sleep(1000)
 	}
 	else if (raceNr == 17) {
 		done := false
@@ -414,7 +411,7 @@ else {
 				if (lap == 1 && A_Index == 1)
 					strategist.prepareSession(false, data)
 
-				if (data.Count() == 0) {
+				if (data.Count == 0) {
 					if (lap == 82)
 						done := true
 
@@ -435,13 +432,13 @@ else {
 		strategist.finishSession()
 
 		while strategist.KnowledgeBase
-			Sleep 1000
+			Sleep(1000)
 	}
 
 	if isDebug()
-		MsgBox Done...
+		MsgBox("Done...")
 
-	ExitApp
+	ExitApp()
 }
 
 show(context, args*) {

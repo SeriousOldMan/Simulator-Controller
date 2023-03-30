@@ -232,7 +232,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Muted[]  {
+	Muted {
 		Get {
 			return this.VoiceManager.Muted
 		}
@@ -576,11 +576,11 @@ class RaceAssistant extends ConfigurationItem {
 				this.clearContinuation()
 
 				if isInstance(continuation, VoiceManager.VoiceContinuation)
-					continuation.continue()
+					continuation.next()
 				else if continuation {
 					this.getSpeaker().speakPhrase("Confirm")
 
-					%continuation%()
+					continuation.Call()
 				}
 			case "No":
 				continuation := this.Continuation
@@ -614,7 +614,7 @@ class RaceAssistant extends ConfigurationItem {
 			case "?":
 				this.getSpeaker().speakPhrase("Repeat")
 			default:
-				throw "Unknown grammar """ . grammar . """ detected in RaceAssistant.handleVoiceCommand...."
+				throw "Unknown grammar `"" . grammar . "`" detected in RaceAssistant.handleVoiceCommand...."
 		}
 	}
 
@@ -632,7 +632,7 @@ class RaceAssistant extends ConfigurationItem {
 		local announcements := []
 		local key, value, announcement, score, ignore, fragment, fragmentScore
 
-		if (this.Announcements is Map) {
+		if isInstance(this.Announcements, Map) {
 			for key, value in this.Announcements
 				announcements.Push(key)
 		}
@@ -858,7 +858,7 @@ class RaceAssistant extends ConfigurationItem {
 		productions := false
 		reductions := false
 
-		compiler.compileRules(rules, productions, reductions)
+		compiler.compileRules(rules, &productions, &reductions)
 
 		engine := RuleEngine(productions, reductions, facts)
 
@@ -888,7 +888,7 @@ class RaceAssistant extends ConfigurationItem {
 		else if (this.Debug[option] == option)
 			this.iDebug := (this.iDebug - option)
 
-		switch option, false {
+		switch option {
 			case kDebugKnowledgeBase:
 				label := translate("Debug Knowledgebase")
 
@@ -1089,7 +1089,7 @@ class RaceAssistant extends ConfigurationItem {
 									  , "Session.Time.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionTimeRemaining", 0)
 									  , "Session.Lap.Remaining", getDeprecatedValue(data, "Session Data", "Stint Data", "SessionLapsRemaining", 0)
 									  , "Session.Settings.Lap.Time.Adjust", this.AdjustLapTime
-									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)})
+									  , "Session.Settings.Fuel.Max", getMultiMapValue(data, "Session Data", "FuelAmount", 0)))
 
 		this.initializeSessionFormat(facts, settings, data, lapTime)
 
@@ -1202,7 +1202,7 @@ class RaceAssistant extends ConfigurationItem {
 		else
 			enoughData := (lapNumber > (baseLap + (this.LearningLaps - 1)))
 
-		this.LastLap := lapNumber
+		this.iLastLap := lapNumber
 
 		this.updateDynamicValues({EnoughData: enoughData})
 
@@ -1372,10 +1372,12 @@ class RaceAssistant extends ConfigurationItem {
 
 		brakeTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperature", ""))
 
-		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FL", Round(brakeTemperatures[1] / 10) * 10)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FR", Round(brakeTemperatures[2] / 10) * 10)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RL", Round(brakeTemperatures[3] / 10) * 10)
-		knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RR", Round(brakeTemperatures[4] / 10) * 10)
+		if (brakeTemperatures.Length > 0) {
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FL", Round(brakeTemperatures[1] / 10) * 10)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.FR", Round(brakeTemperatures[2] / 10) * 10)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RL", Round(brakeTemperatures[3] / 10) * 10)
+			knowledgeBase.addFact("Lap." . lapNumber . ".Brake.Temperature.RR", Round(brakeTemperatures[4] / 10) * 10)
+		}
 
 		brakeWear := getMultiMapValue(data, "Car Data", "BrakeWear", "")
 

@@ -23,9 +23,9 @@ substituteVariables(text, values := false) {
 			if endPos {
 				variable := Trim(SubStr(result, startPos, endPos - startPos))
 
-				if (values is Map)
+				if isInstance(values, Map)
 					value := (values && values.Has(variable)) ? values[variable] : %variable%
-				else if (values is Object)
+				else if isInstance(values, Object)
 					value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
 				else
 					value := %variable%

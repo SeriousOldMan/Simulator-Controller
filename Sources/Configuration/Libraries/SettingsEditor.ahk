@@ -202,7 +202,7 @@ editModes(&settingsOrCommand, arguments*) {
 
 		result := kCancel
 	}
-	else if IsObject(settingsOrCommand) {
+	else if isObject(settingsOrCommand) {
 		result := false
 		newSettings := newMultiMap()
 

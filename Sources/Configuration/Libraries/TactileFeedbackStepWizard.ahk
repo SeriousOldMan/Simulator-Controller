@@ -50,7 +50,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 			for ignore, action in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", "")) {
 				function := wizard.getModuleActionFunction("Tactile Feedback", false, action)
 
-				if !IsObject(function)
+				if !isObject(function)
 					function := ((function != "") ? Array(function) : [])
 
 				if (function.Length() > 0) {
@@ -67,7 +67,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 				for ignore, action in this.getActions(mode) {
 					function := wizard.getModuleActionFunction("Tactile Feedback", mode, action)
 
-					if !IsObject(function)
+					if !isObject(function)
 						function := ((function != "") ? Array(function) : [])
 
 					if (function.Length() > 0) {
@@ -306,7 +306,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 						function := wizard.getModuleActionFunction("Tactile Feedback", mode, action)
 
 						if (function && (function != ""))
-							this.setActionFunction(mode, action, (IsObject(function) ? function : Array(function)))
+							this.setActionFunction(mode, action, (isObject(function) ? function : Array(function)))
 					}
 
 					label := getMultiMapValue(pluginLabels, "Tactile Feedback", action . (mode ? ".Dial" : ".Toggle"), kUndefined)

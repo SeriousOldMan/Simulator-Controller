@@ -97,7 +97,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					if wizard.assistantActionAvailable(assistant, action) {
 						function := wizard.getAssistantActionFunction(assistant, action)
 
-						if !IsObject(function)
+						if !isObject(function)
 							function := ((function != "") ? Array(function) : [])
 
 						if (function.Length() > 0) {
@@ -120,7 +120,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					if wizard.assistantActionAvailable(assistant, action) {
 						function := wizard.getAssistantActionFunction(assistant, action)
 
-						if !IsObject(function)
+						if !isObject(function)
 							function := ((function != "") ? Array(function) : [])
 
 						if (function.Length() > 0)
@@ -426,7 +426,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					function := wizard.getAssistantActionFunction(assistant, action)
 
 					if (function != "")
-						this.setActionFunction(false, action, (IsObject(function) ? function : Array(function)))
+						this.setActionFunction(false, action, (isObject(function) ? function : Array(function)))
 				}
 
 				subAction := ConfigurationItem.splitDescriptor(action)

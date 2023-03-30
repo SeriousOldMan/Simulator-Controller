@@ -78,7 +78,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 						if wizard.simulatorActionAvailable(simulator, mode, action) {
 							function := wizard.getSimulatorActionFunction(simulator, mode, action)
 
-							if !IsObject(function)
+							if !isObject(function)
 								function := ((function != "") ? Array(function) : [])
 
 							if (function.Length() > 0) {
@@ -352,7 +352,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 						function := wizard.getSimulatorActionFunction(simulator, mode, action)
 
 						if (function != "")
-							this.setActionFunction(mode, action, (IsObject(function) ? function : Array(function)))
+							this.setActionFunction(mode, action, (isObject(function) ? function : Array(function)))
 					}
 
 					subAction := ConfigurationItem.splitDescriptor(action)
@@ -510,7 +510,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 							function := this.getActionFunction(mode, action)
 
 							if (function && (function != "")) {
-								if !IsObject(function)
+								if !isObject(function)
 									function := Array(function)
 
 								for ignore, partFunction in function

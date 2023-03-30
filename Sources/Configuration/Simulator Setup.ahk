@@ -1464,7 +1464,7 @@ class SetupWizard extends ConfigurationItem {
 		}
 
 		for ignore, function in functions {
-			function := IsObject(function) ? function.Clone() : Array(function)
+			function := isObject(function) ? function.Clone() : Array(function)
 
 			name := function.RemoveAt(1)
 
@@ -1499,8 +1499,8 @@ class SetupWizard extends ConfigurationItem {
 		}
 
 		for action, function in functions {
-			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
-				if !IsObject(function)
+			if (function && ((isObject(function) && (function.Length() > 0)) || (function != ""))) {
+				if !isObject(function)
 					function := Array(function)
 
 				count += 1
@@ -1586,8 +1586,8 @@ class SetupWizard extends ConfigurationItem {
 		}
 
 		for action, function in functions {
-			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
-				if !IsObject(function)
+			if (function && ((isObject(function) && (function.Length() > 0)) || (function != ""))) {
+				if !isObject(function)
 					function := Array(function)
 
 				count += 1
@@ -1710,8 +1710,8 @@ class SetupWizard extends ConfigurationItem {
 		}
 
 		for action, function in functions {
-			if (function && ((IsObject(function) && (function.Length() > 0)) || (function != ""))) {
-				if !IsObject(function)
+			if (function && ((isObject(function) && (function.Length() > 0)) || (function != ""))) {
+				if !isObject(function)
 					function := Array(function)
 
 				knowledgeBase.addFact("Module." . module . modeClause . ".Action." . action . ".Function", values2String("|", function*))
@@ -2723,7 +2723,7 @@ findSoftware(definition, software) {
 								folders := folders["LibraryFolders"]
 
 								for ignore, folder in folders {
-									if IsObject(folder)
+									if isObject(folder)
 										folder := folder["path"]
 
 									fileName := folder . "\steamapps\common\" . locator . "\" . descriptor[3]

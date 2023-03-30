@@ -536,7 +536,7 @@ class SetupAdvisor extends ConfigurationItem {
 		if !content
 			content := [translate("Please describe your car handling problems.")]
 
-		isChart := !IsObject(content)
+		isChart := !isObject(content)
 
 		if this.SettingsViewer {
 			window := this.Window

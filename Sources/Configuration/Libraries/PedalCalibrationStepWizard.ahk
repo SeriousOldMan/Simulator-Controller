@@ -47,7 +47,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 			function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
 
 			if (function && (function != ""))
-				calibrations.Push("""" . action . """ " . (IsObject(function) ? function[1] : function))
+				calibrations.Push("""" . action . """ " . (isObject(function) ? function[1] : function))
 		}
 
 		if (calibrations.Length() > 0) {
@@ -241,7 +241,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 					function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
 
 					if (function && (function != ""))
-						this.setActionFunction("Pedal Calibration", action, (IsObject(function) ? function : Array(function)))
+						this.setActionFunction("Pedal Calibration", action, (isObject(function) ? function : Array(function)))
 				}
 
 				subAction := ConfigurationItem.splitDescriptor(action)
@@ -253,7 +253,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				function := this.getActionFunction("Pedal Calibration", action)
 
 				if (function && (function != ""))
-					function := (IsObject(function) ? function[1] : function)
+					function := (isObject(function) ? function[1] : function)
 				else
 					function := ""
 

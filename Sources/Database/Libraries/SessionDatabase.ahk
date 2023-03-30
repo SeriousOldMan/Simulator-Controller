@@ -213,7 +213,7 @@ class SessionDatabase extends ConfigurationItem {
 						catch Any as exception {
 							logMessage(kLogCritical, translate("Cannot connect to the Team Server (URL: ") . SessionDatabase.ServerURL[identifier]
 												   . translate(", Token: ") . SessionDatabase.ServerToken[identifier]
-												   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+												   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 							connector := false
 						}
@@ -798,7 +798,7 @@ class SessionDatabase extends ConfigurationItem {
 		local result := []
 		local id, actions
 
-		if !IsObject(data)
+		if !isObject(data)
 			data := readMultiMap(data)
 
 		loop getMultiMapValue(data, "Automations", "Count", 0) {
@@ -1813,7 +1813,7 @@ class SessionDatabase extends ConfigurationItem {
 
 			setMultiMapValue(configuration, "Database Synchronizer", "Information"
 						   , translate("Error: ") . translate("Synchronization failed (Exception: ")
-						   . (IsObject(exception) ? exception.Message : exception) . translate(")"))
+						   . (isObject(exception) ? exception.Message : exception) . translate(")"))
 
 			setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Failed")
 		}

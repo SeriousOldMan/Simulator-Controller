@@ -156,7 +156,7 @@ class RaceAssistant extends ConfigurationItem {
 			variables := super.getPhraseVariables(variables)
 
 			if variables
-				if (variables is Map)
+				if isInstance(variables, Map)
 					variables["Driver"] := variables["User"]
 				else
 					variables.Driver := variables.User
@@ -933,10 +933,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callPrepareSession(settings, data) {
-		if (settings && !IsObject(settings))
+		if (settings && !isObject(settings))
 			settings := readMultiMap(settings)
 
-		if (data && !IsObject(data))
+		if (data && !isObject(data))
 			data := readMultiMap(data)
 		else if !data
 			data := newMultiMap()
@@ -1015,7 +1015,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	readSettings(&settings) {
-		if !IsObject(settings)
+		if !isObject(settings)
 			settings := readMultiMap(settings)
 
 		return CaseInsenseMap("Session.Settings.Lap.Formation", getDeprecatedValue(settings, "Session Settings", "Race Settings", "Lap.Formation", true)
@@ -1039,10 +1039,10 @@ class RaceAssistant extends ConfigurationItem {
 		local configuration, simulator, simulatorName, session, driverForname, driverSurname, driverNickname
 		local lapTime, settingsLapTime, facts
 
-		if (settings && !IsObject(settings))
+		if (settings && !isObject(settings))
 			settings := readMultiMap(settings)
 
-		if (data && !IsObject(data))
+		if (data && !isObject(data))
 			data := readMultiMap(data)
 
 		if settings
@@ -1097,10 +1097,10 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callStartSession(settings, data) {
-		if (settings && !IsObject(settings))
+		if (settings && !isObject(settings))
 			settings := readMultiMap(settings)
 
-		if (data && !IsObject(data))
+		if (data && !isObject(data))
 			data := readMultiMap(data)
 
 		this.startSession(settings, data)
@@ -1170,7 +1170,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callAddLap(lapNumber, data) {
-		if !IsObject(data)
+		if !isObject(data)
 			data := readMultiMap(data)
 
 		this.addLap(lapNumber, data)
@@ -1404,7 +1404,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callUpdateLap(lapNumber, data) {
-		if !IsObject(data)
+		if !isObject(data)
 			data := readMultiMap(data)
 
 		this.updateLap(lapNumber, &data)

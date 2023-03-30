@@ -290,10 +290,10 @@ class Predicate extends Condition {
 		local left := this.iLeftPrimary
 		local right := this.iRightPrimary
 
-		if ((left != kNotInitialized) && (left is Variable))
+		if ((left != kNotInitialized) && isInstance(left, Variable))
 			facts.Push(left.Variable[true])
 
-		if ((right != kNotInitialized) && (right is Variable))
+		if ((right != kNotInitialized) && isInstance(right, Variable))
 			facts.Push(right.Variable[true])
 	}
 
@@ -338,7 +338,7 @@ class Predicate extends Condition {
 					case kGreaterOrEqual:
 						result := (leftPrimary >= rightPrimary)
 					case kContains:
-						if IsObject(leftPrimary)
+						if isObject(leftPrimary)
 							result := inList(leftPrimary, rightPrimary)
 						else
 							try {
@@ -413,9 +413,9 @@ class Goal extends Condition {
 		local ignore, term
 
 		for ignore, term in this.Goal.Arguments
-			if (term is Variable)
+			if isInstance(term, Variable)
 				facts.Push(term.Variable[true])
-			else if (term is Fact)
+			else if isInstance(term, Fact)
 				facts.Push(term.Fact)
 	}
 
@@ -527,9 +527,9 @@ class Variable extends Primary {
 		if (variablesFactsOrResultSet = kNotInitialized)
 			return this
 		else {
-			value := variablesFactsOrResultSet.getValue(((variablesFactsOrResultSet is Facts) || ((variablesFactsOrResultSet is Variables))) ? this : this.RootVariable)
+			value := variablesFactsOrResultSet.getValue((isInstance(variablesFactsOrResultSet, Facts) || (isInstance(variablesFactsOrResultSet, Variables))) ? this : this.RootVariable)
 
-			if (IsObject(value) && ((value is Variable) || (value is Literal) || (value is Fact)))
+			if (isObject(value) && (isInstance(value, Variable) || isInstance(value, Literal) || isInstance(value, Fact)))
 				value := value.getValue(variablesFactsOrResultSet, value)
 
 			if (value != kNotInitialized)
@@ -581,12 +581,12 @@ class Variable extends Primary {
 			return ("?" . name . ((property != "") ? ("." . property) : ""))
 		else {
 			root := this.RootVariable
-			value := ((variablesFactsOrResultSet is Variables) ? this.getValue(variablesFactsOrResultSet) : root.getValue(variablesFactsOrResultSet))
+			value := (isInstance(variablesFactsOrResultSet, Variables) ? this.getValue(variablesFactsOrResultSet) : root.getValue(variablesFactsOrResultSet))
 
 			if (value = kNotInitialized)
 				return "?" . name . ((property != "") ? ("." . property) : "") ; . " (" . &root . ")"
 			else if isInstance(value, Term)
-				return value.toString((variablesFactsOrResultSet is Variables) ? kNotInitialized : variablesFactsOrResultSet) . ((property != "") ? ("." . property) : "")
+				return value.toString(isInstance(variablesFactsOrResultSet, Variables) ? kNotInitialized : variablesFactsOrResultSet) . ((property != "") ? ("." . property) : "")
 			else
 				return value
 		}
@@ -629,16 +629,16 @@ class Fact extends Primary {
 	}
 
 	getValue(factsOrResultSet, default := "__NotInitialized__") {
-		if (factsOrResultSet is Facts)
+		if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact, default)
 		else
 			return this
 	}
 
 	isUnbound(factsOrResultSet) {
-		if (factsOrResultSet is Facts)
+		if isInstance(factsOrResultSet, Facts)
 			return (this.getValue(factsOrResultSet) = kNotInitialized)
-		else if (factsOrResultSet is ResultSet)
+		else if isInstance(factsOrResultSet, ResultSet)
 			return (factsOrResultSet.KnowledgeBase.Facts.getValue(this.Fact, kNotInitialized) = kNotInitialized)
 		else
 			return false
@@ -647,9 +647,9 @@ class Fact extends Primary {
 	toString(factsOrResultSet := "__NotInitialized__") {
 		if (factsOrResultSet = kNotInitialized)
 			return false
-		else if (factsOrResultSet is Facts)
+		else if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact)
-		else if (factsOrResultSet is ResultSet)
+		else if isInstance(factsOrResultSet, ResultSet)
 			return factsOrResultSet.KnowledgeBase.Facts.getValue(this.Fact)
 		else
 			return false
@@ -658,7 +658,7 @@ class Fact extends Primary {
 	unify(choicePoint, term) {
 		local facts
 
-		if (term is Literal)
+		if isInstance(term, Literal)
 			return (term.Literal = choicePoint.ResultSet.KnowledgeBase.Facts.getValue(this.Fact))
 		else if isInstance(term, Fact) {
 			facts := choicePoint.ResultSet.KnowledgeBase.Facts
@@ -691,7 +691,7 @@ class Literal extends Primary {
 	}
 
 	getValue(factsOrResultSet := "__NotInitialized__", *) {
-		if (factsOrResultSet && (factsOrResultSet != kNotInitialized) && (factsOrResultSet is Facts))
+		if (factsOrResultSet && (factsOrResultSet != kNotInitialized) && isInstance(factsOrResultSet, Facts))
 			return this.Literal
 		else
 			return this
@@ -707,9 +707,9 @@ class Literal extends Primary {
 	}
 
 	unify(choicePoint, term) {
-		if (term is Literal)
+		if isInstance(term, Literal)
 			return (this.Literal = term.Literal)
-		else if (term is Fact)
+		else if isInstance(term, Fact)
 			return (this.Literal = choicePoint.ResultSet.KnowledgeBase.Facts.getValue(term.Fact))
 		else
 			return false
@@ -1424,12 +1424,12 @@ class Pair extends Term {
 			left := next.LeftTerm.toString(resultSet)
 			right := next.RightTerm.getValue(resultSet, next.RightTerm)
 
-			separator := (!(right is Nil) ? ((right is Pair) ? ", " : " | ") : "")
+			separator := (!isInstance(right, Nil) ? (isInstance(right, Pair) ? ", " : " | ") : "")
 
 			result := result . left . separator
 
 			if !isInstance(right, Pair) {
-				if !(right is Nil)
+				if !isInstance(right, Nil)
 					result := result . next.RightTerm.toString(resultSet)
 
 				break
@@ -1527,7 +1527,7 @@ class Nil extends Term {
 	}
 
 	unify(choicePoint, term) {
-		return (term is Nil)
+		return isInstance(term, Nil)
 	}
 }
 
@@ -1851,10 +1851,10 @@ class ResultSet {
 	}
 
 	unify(choicePoint, termA, termB) {
-		if (termA is Variable)
+		if isInstance(termA, Variable)
 			termA := termA.RootVariable
 
-		if (termB is Variable)
+		if isInstance(termB, Variable)
 			termB := termB.RootVariable
 
 		termA := termA.getValue(this, termA)
@@ -1968,7 +1968,7 @@ class ResultSet {
 			}
 			else {
 				if (ruleEngine.TraceLevel <= kTraceFull)
-					ruleEngine.trace(kTraceFull, var.toString() . " is unbound - return " . (IsObject(last) ? last.toString() : last))
+					ruleEngine.trace(kTraceFull, var.toString() . " is unbound - return " . (isObject(last) ? last.toString() : last))
 
 				return last
 			}
@@ -2922,9 +2922,9 @@ class Facts {
 	getValue(fact, default := "__NotInitialized__") {
 		local facts := this.Facts
 
-		if (fact is Variable)
+		if isInstance(fact, Variable)
 			fact := fact.Variable[true]
-		else if (fact is Literal)
+		else if isInstance(fact, Literal)
 			fact := fact.Literal
 
 		return (facts.Has(fact) ? facts[fact] : default)
@@ -3493,10 +3493,10 @@ class RuleCompiler {
 			includes := []
 
 		if !path {
-			if !IsObject(productions)
+			if !isObject(productions)
 				productions := false
 
-			if !IsObject(reductions)
+			if !isObject(reductions)
 				reductions := false
 		}
 
@@ -3513,10 +3513,10 @@ class RuleCompiler {
 			includes := []
 
 		if !path {
-			if !IsObject(productions)
+			if !isObject(productions)
 				productions := []
 
-			if !IsObject(reductions)
+			if !isObject(reductions)
 				reductions := []
 		}
 
@@ -4052,7 +4052,7 @@ class RuleCompiler {
 	}
 
 	createTermParser(term, variables := "__NotInitialized__", forArguments := true) {
-		local complex := IsObject(term)
+		local complex := isObject(term)
 
 		if ((term == "!") && !forArguments)
 			return CutParser(this, variables)

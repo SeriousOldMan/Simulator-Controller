@@ -2875,7 +2875,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iSelectedPlanStint := false
 
-			if IsObject(minutesOrStint) {
+			if isObject(minutesOrStint) {
 				if (LV_GetCount() > 0) {
 					time := this.computeStartTime(minutesOrStint)
 
@@ -4253,13 +4253,13 @@ class RaceCenter extends ConfigurationItem {
 		local name := nameOrConfiguration
 		local theStrategy
 
-		if !IsObject(nameOrConfiguration)
+		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
 		theStrategy := ((simulation && this.UseTraffic) ? this.SessionTrafficStrategy(this, nameOrConfiguration, driver)
 														: this.SessionStrategy(this, nameOrConfiguration, driver))
 
-		if (name && !IsObject(name))
+		if (name && !isObject(name))
 			theStrategy.setName(name)
 
 		theStrategy.setVersion(A_Now)
@@ -7033,7 +7033,7 @@ class RaceCenter extends ConfigurationItem {
 				this.updateState()
 			}
 			catch Any as exception {
-				message := (IsObject(exception) ? exception.Message : exception)
+				message := (isObject(exception) ? exception.Message : exception)
 
 				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: ") . message)
 
@@ -7695,7 +7695,7 @@ class RaceCenter extends ConfigurationItem {
 				airTemperatures.Push(lap.AirTemperature)
 				trackTemperatures.Push(lap.TrackTemperature)
 
-				if IsObject(lap.Stint)
+				if isObject(lap.Stint)
 					newStint.Lap := (stintLap + 1)
 				else
 					if (lap.Stint != stintNr)

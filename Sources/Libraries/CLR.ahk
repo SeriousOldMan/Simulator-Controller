@@ -149,8 +149,8 @@ CLR_CompileAssembly(Code, References, ProviderAssembly, ProviderType, AppDomain 
 ; Usage 2: GUID := CLR_GUID("{...}"), pGUID := GUID.Ptr
 CLR_GUID(a, b:=unset) {
 	DllCall("ole32\IIDFromString"
-		  , "wstr", sGUID := IsSet(b) ? b : a
+		  , "wstr", sGUID := isSet(b) ? b : a
 		  , "ptr", GUID := Buffer(16, 0), "hresult")
 
-	return IsSet(b) ? GUID.Ptr : GUID
+	return isSet(b) ? GUID.Ptr : GUID
 }

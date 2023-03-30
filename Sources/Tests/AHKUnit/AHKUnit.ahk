@@ -390,7 +390,7 @@ class AhkUnit_Assert {
 
 	class AssertObject extends AhkUnit_Assert.Arg1_ {
 		Evaluate() {
-			return IsObject(this.actual)
+			return isObject(this.actual)
 		}
 
 		GetMesssage() {
@@ -458,11 +458,11 @@ class AhkUnit_Runner {
 				method.Call(testInstance)
 				/*
 			} catch Any as e {
-				thrownClass := (!IsObject(e) || (e.__Class == "")) ? "Exception" : e.__Class
+				thrownClass := (!isObject(e) || (e.__Class == "")) ? "Exception" : e.__Class
 				expectedClass := testInstance[key . "_throws"]
 				if (expectedClass != "") {
 					assertion := AhkUnit.Assert.Equals("throw " . expectedClass, "throw " . thrownClass)
-					caller := IsObject(e) ? e : Object()
+					caller := isObject(e) ? e : Object()
 					testInstance.Assert_(assertion, "", caller)
 				} else {
 					this._AddFailure("Exception thrown in " . key)
@@ -562,7 +562,7 @@ class Assert extends AhkUnit.FrameworkCore {
 	}
 
 	Assert_(assertion, message, caller) {
-		if (IsObject(assertion)) {
+		if (isObject(assertion)) {
 			if (assertion.Evaluate()) {
 				this.AuSuccess()
 				return ""
@@ -570,7 +570,7 @@ class Assert extends AhkUnit.FrameworkCore {
 		} else {
 			assertion := AhkUnit.Assert.Message("Bad assertion object.")
 		}
-		caller := IsObject(caller) ? caller : Error("", -caller - 1)
+		caller := isObject(caller) ? caller : Error("", -caller - 1)
 		file := caller.file
 		line := caller.line
 		pos := ""

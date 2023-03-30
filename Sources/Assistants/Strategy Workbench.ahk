@@ -1777,7 +1777,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 							pitstopFuelServiceEdit := strategy.PitstopFuelService
 
-							if IsObject(pitstopFuelServiceEdit) {
+							if isObject(pitstopFuelServiceEdit) {
 								pitstopFuelServiceRuleDropDown := (1 + (pitstopFuelServiceEdit[1] != "Fixed"))
 								GuiControl Choose, pitstopFuelServiceRuleDropDown, % pitstopFuelServiceRuleDropDown
 
@@ -1804,7 +1804,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 								pitstopWindowEdit := ""
 							}
-							else if IsObject(pitstopRule) {
+							else if isObject(pitstopRule) {
 								GuiControl Choose, pitstopRequirementsDropDown, 3
 
 								pitstopWindowEdit := values2String("-", pitstopRule*)
@@ -2535,12 +2535,12 @@ class StrategyWorkbench extends ConfigurationItem {
 		local name := nameOrConfiguration
 		local theStrategy, name
 
-		if !IsObject(nameOrConfiguration)
+		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
 		theStrategy := Strategy(this, nameOrConfiguration, driver)
 
-		if (name && !IsObject(name))
+		if (name && !isObject(name))
 			theStrategy.setName(name)
 
 		return theStrategy

@@ -92,7 +92,7 @@ class AhkUnit_Assert {
 		; message
 		
 		Evaluate() {
-			if (!IsObject(this.expected) || !IsObject(this.actual)) {
+			if (!isObject(this.expected) || !isObject(this.actual)) {
 				this.message := "Not an object"
 				return false
 			}
@@ -201,7 +201,7 @@ class AhkUnit_Assert {
 	
 	class Object extends AhkUnit_Assert.Arg1_ {
 		Evaluate() {
-			return IsObject(this.actual)
+			return isObject(this.actual)
 		}
 		
 		GetMesssage() {

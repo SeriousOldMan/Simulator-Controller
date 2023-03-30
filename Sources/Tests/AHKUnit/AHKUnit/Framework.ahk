@@ -20,7 +20,7 @@ class AhkUnit_Framework extends AhkUnit.FrameworkCore {
 	}
 	
 	Assert_(assertion, message, caller) {
-		if (IsObject(assertion)) {
+		if (isObject(assertion)) {
 			if (assertion.Evaluate()) {
 				this.AuSuccess()
 				return ""
@@ -28,7 +28,7 @@ class AhkUnit_Framework extends AhkUnit.FrameworkCore {
 		} else {
 			assertion := AhkUnit.Assert.Message("Bad assertion object.")
 		}
-		caller := IsObject(caller) ? caller : Exception("", -caller - 1)
+		caller := isObject(caller) ? caller : Exception("", -caller - 1)
 		file := caller.file
 		line := caller.line
 		pos := ""

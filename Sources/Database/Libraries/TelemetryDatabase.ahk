@@ -126,7 +126,7 @@ class TelemetryDatabase extends SessionDatabase {
 			else {
 				if (drivers == true)
 					drivers := [this.ID]
-				else if !IsObject(drivers)
+				else if !isObject(drivers)
 					drivers := [drivers]
 
 				return this.Database.combine(table, query, "Driver", drivers)
@@ -266,7 +266,7 @@ class TelemetryDatabase extends SessionDatabase {
 					if this.Shared
 						for ignore, connector in this.Connectors
 							try {
-								if IsObject(identifiers)
+								if isObject(identifiers)
 									identifiers := values2String(";", identifiers*)
 
 								connector.DeleteData("Electronics", identifiers)
@@ -309,7 +309,7 @@ class TelemetryDatabase extends SessionDatabase {
 					if this.Shared
 						for ignore, connector in this.Connectors
 							try {
-								if IsObject(identifiers)
+								if isObject(identifiers)
 									identifiers := values2String(";", identifiers*)
 
 								connector.DeleteData("Tyres", identifiers)
@@ -516,7 +516,7 @@ invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
 	local driver := row["Driver"]
 
 	if ((drivers = kUndefined)
-	 || (IsObject(drivers) && inList(drivers, driver))
+	 || (isObject(drivers) && inList(drivers, driver))
 	 || ((drivers == true) && (driver = SessionDatabase.ID))
 	 || (drivers = driver))
 		return !validLap(ltAvg, ltStdDev, cAvg, cStdDev, row)

@@ -239,7 +239,7 @@ class Database {
 
 			selection := []
 
-			if !(predicate is Func)
+			if !isInstance(predicate, Func)
 				predicate := constraintColumns.Bind(predicate)
 
 			for ignore, row in rows
@@ -349,7 +349,7 @@ class Database {
 		query := query.Clone()
 		where := query.Where
 
-		if (where is Map)
+		if isInstance(where, Map)
 			where := where.Clone()
 		else {
 			where := CaseInsenseMap()
@@ -374,7 +374,7 @@ class Database {
 		local rows := []
 		local ignore, row
 
-		if (where && !(where is Func))
+		if (where && !isInstance(where, Func))
 			where := constraintColumns.Bind(where)
 
 		for ignore, row in this.Tables[name]
@@ -513,7 +513,7 @@ groupRows(groupedByColumns, groupedColumns, rows) {
 	local function, ignore, row, column, key, result, group, groupedRows, columnValues
 	local resultRow, valueColumn, resultColumn, columnDescriptor
 
-	if !IsObject(groupedByColumns)
+	if !isObject(groupedByColumns)
 		groupedByColumns := Array(groupedByColumns)
 
 	for ignore, row in rows {

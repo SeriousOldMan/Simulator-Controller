@@ -314,7 +314,7 @@ class Application extends ConfigurationItem {
 			}
 		}
 		catch Any as exception {
-			message := (IsObject(exception) ? exception.Message : exception)
+			message := (isObject(exception) ? exception.Message : exception)
 
 			logMessage(kLogCritical, translate("Error while starting application ") . application . translate(" (") . exePath . translate("): ") . message . " - please check the configuration")
 

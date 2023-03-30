@@ -698,7 +698,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -727,7 +727,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			catch Any as exception {
 				if !ignore {
 					this.LastMessage := (translate("Error while fetching driver names (Driver: ") . this.Driver
-									   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+									   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 					logMessage(kLogCritical, this.LastMessage)
 
@@ -780,7 +780,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				this.LastMessage := (translate("Error while starting session (Session: ") . this.Session . translate(", Car: ") . car
 								   . translate(", Track: ") . track . translate("), Exception: ")
-								   . (IsObject(exception) ? exception.Message : exception))
+								   . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 
@@ -804,7 +804,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while finishing session (Session: ") . this.Session
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 
@@ -876,7 +876,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while requesting current driver session (Session: ") . this.Session
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 
@@ -904,7 +904,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching session data (Session: ") . this.Session . translate(", Name: ") . name
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -934,7 +934,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while storing session data (Session: ") . this.Session . translate(", Name: ") . name
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -964,7 +964,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
-								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1000,7 +1000,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while storing stint data (Session: ") . session . translate(", Stint: ") . stint
-								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1020,7 +1020,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching stint data (Session: ") . session . translate(", Stint: ") . stint
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1051,7 +1051,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1073,7 +1073,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1105,7 +1105,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while fetching lap data (Session: ") . session . translate(", Lap: ") . lap
-								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1144,7 +1144,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while storing lap data (Session: ") . session . translate(", Lap: ") . lap
-								   . translate(", Name: ") . name . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate(", Name: ") . name . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1176,7 +1176,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while starting stint (Session: ") . this.Session . translate(", Driver: ") . this.Driver
-								   . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (IsObject(exception) ? exception.Message :  exception))
+								   . translate(", Lap: ") . lapNumber . translate("), Exception: ") . (isObject(exception) ? exception.Message :  exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 
@@ -1243,7 +1243,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			}
 			catch Any as exception {
 				this.LastMessage := (translate("Error while updating a lap (Session: ") . this.Session . translate(", Lap: ") . lapNumber
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 			}
@@ -1347,7 +1347,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				this.LastMessage := (translate("Cannot connect to the Team Server (URL: ") . this.ServerURL
 								   . translate(", Token: ") . this.ServerToken
-								   . translate("), Exception: ") . (IsObject(exception) ? exception.Message : exception))
+								   . translate("), Exception: ") . (isObject(exception) ? exception.Message : exception))
 
 				logMessage(kLogCritical, this.LastMessage)
 

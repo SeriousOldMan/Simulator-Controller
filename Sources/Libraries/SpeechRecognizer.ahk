@@ -465,11 +465,11 @@ class SpeechRecognizer {
 		if this.Instance {
 			switch this.iEngine, false {
 				case "Desktop":
-					return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
+					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
 				case "Azure":
-					return Grammar.Choices(!IsObject(choices) ? string2Values(",", choices) : choices)
+					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
-					return this.Instance.NewServerChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
+					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
 			}
 		}
 		else
@@ -857,7 +857,7 @@ class Grammar {
 			local index, choice
 
 			for index, choice in choices
-				if !IsObject(choice)
+				if !isObject(choice)
 					choices[index] := Grammar.Words(choice)
 
 			this.iChoices := choices
@@ -897,7 +897,7 @@ class Grammar {
 		__New(string) {
 			local index, literal
 
-			if !IsObject(string)
+			if !isObject(string)
 				string := string2Values(A_Space, string)
 
 			for index, literal in string {

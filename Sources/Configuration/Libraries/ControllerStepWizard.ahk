@@ -1092,7 +1092,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		if (oldFunction && (oldFunction != "")) {
 			changed := []
 
-			if (IsObject(oldfunction) && IsObject(functionDescriptor)) {
+			if (isObject(oldfunction) && isObject(functionDescriptor)) {
 				loop % oldFunction.Length()
 					if (oldFunction[A_Index] != functionDescriptor[A_Index])
 						changed.Push(oldFunction[A_Index])
@@ -1201,7 +1201,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 								function := this.getActionFunction(mode, action)
 
 								if (function && (function != "")) {
-									if !IsObject(function)
+									if !isObject(function)
 										function := Array(function)
 
 									for ignore, partFunction in function
@@ -1245,7 +1245,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		if (function && (function != "")) {
 			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
 
-			if IsObject(function) {
+			if isObject(function) {
 				for ignore, function in function
 					this.clearActionFunction(mode, action, function)
 			}
@@ -1312,7 +1312,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		function := this.getActionFunction(this.getActionMode(row), this.getAction(row))
 		count := 0
 
-		if IsObject(function) {
+		if isObject(function) {
 			if ((function.Length() > 1) && (function[1] != "") && (function[2] != ""))
 				count := 2
 			else if (function[1] != "")

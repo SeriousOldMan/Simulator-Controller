@@ -345,7 +345,7 @@ class Window extends Gui {
 		else
 			this.Opt("-SysMenu -Border -Caption +0x800000")
 
-		if !IsObject(options)
+		if !isObject(options)
 			this.Opt(options)
 
 		this.BackColor := backColor

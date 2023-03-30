@@ -131,7 +131,7 @@ class JSON {
 	}
 
 	static print(obj, indent:="", lvl:=1) {
-		if IsObject(obj) {
+		if isObject(obj) {
 			If !(obj is Array || obj is Map || obj is String || obj is Number)
 				throw Error("Object type not supported.", -1, Format("<Object at 0x{:p}>", ObjPtr(obj)))
 
@@ -153,7 +153,7 @@ class JSON {
 
 			lvl += 1, out := "" ; Make #Warn happy
 			for k, v in obj {
-				if IsObject(k) || (k == "")
+				if isObject(k) || (k == "")
 					throw Error("Invalid object key.", -1, k ? Format("<Object at 0x{:p}>", ObjPtr(obj)) : "<blank>")
 
 				if !is_array ;// key ; ObjGetCapacity([k], 1)

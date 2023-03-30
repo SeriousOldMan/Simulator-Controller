@@ -1200,7 +1200,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			type := this.getSettingType(setting["Section"], setting["Key"], &ignore)
 
 			if type {
-				if IsObject(type)
+				if isObject(type)
 					value := translate(setting["Value"])
 				else if (type = "Boolean")
 					value := (setting["Value"] ? "x" : "")
@@ -2790,7 +2790,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			type := this.getSettingType(section, key, &ignore)
 
-			if IsObject(type)
+			if isObject(type)
 				display := translate(value)
 			else if (type = "Boolean")
 				display := (value ? "x" : "")
@@ -2863,7 +2863,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			type := this.getSettingType(section, key, &ignore)
 
-			if IsObject(type)
+			if isObject(type)
 				display := translate(value)
 			else if (type = "Boolean")
 				display := (value ? "x" : "")
@@ -4434,7 +4434,7 @@ WM_MOUSEMOVE(*) {
 			if (currentAction && (currentAction != previousAction)) {
 				ToolTip()
 
-				if IsObject(currentAction) {
+				if isObject(currentAction) {
 					actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
 																												: "Hotkey: ")
 																			: "Command: ")
@@ -4589,7 +4589,7 @@ chooseSettingAsync() {
 
 	type := editor.getSettingType(section, key, &ignore)
 
-	if IsObject(type) {
+	if isObject(type) {
 		window["settingValueEdit"].Visible := false
 		window["settingValueText"].Visible := false
 		window["settingValueCheck"].Visible := false
@@ -4660,7 +4660,7 @@ addSetting(*) {
 
 	type := editor.getSettingType(settings[1][1], settings[1][2], &default)
 
-	if IsObject(type) {
+	if isObject(type) {
 		window["settingValueEdit"].Visible := false
 		window["settingValueText"].Visible := false
 		window["settingValueCheck"].Visible := false
@@ -4772,7 +4772,7 @@ selectSettingAsync() {
 
 	type := editor.getSettingType(section, key, &default)
 
-	if IsObject(type) {
+	if isObject(type) {
 		window["settingValueEdit"].Visible := false
 		window["settingValueText"].Visible := false
 		window["settingValueCheck"].Visible := false
@@ -4861,7 +4861,7 @@ changeSettingAsync() {
 
 		type := editor.getSettingType(section, key, &ignore)
 
-		if IsObject(type)
+		if isObject(type)
 			value := type[inList(collect(type, translate), window["settingValueDropDown"].Text)]
 		else if (type = "Boolean")
 			value := window["settingValueCheck"].Value

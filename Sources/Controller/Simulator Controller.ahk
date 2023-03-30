@@ -623,7 +623,7 @@ class SimulatorController extends ConfigurationItem {
 	findMode(plugin, name) {
 		local ignore, mode
 
-		if !IsObject(plugin)
+		if !isObject(plugin)
 			plugin := this.findPlugin(plugin)
 
 		for ignore, mode in this.Modes

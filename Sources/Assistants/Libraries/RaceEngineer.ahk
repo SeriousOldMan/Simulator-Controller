@@ -1668,7 +1668,7 @@ class RaceEngineer extends RaceAssistant {
 				if (optionsOrLap != false)
 					plannedLap := Max(optionsOrLap, knowledgeBase.getValue("Lap") + 1)
 			}
-			else if (IsObject(optionsOrLap) && optionsOrLap.HasProp("Confirm"))
+			else if (isObject(optionsOrLap) && optionsOrLap.HasProp("Confirm"))
 				confirm := optionsOrLap.Confirm
 		}
 

@@ -181,7 +181,7 @@ logMessage(logLevel, message) {
 logError(exception, unhandled := false, report := true) {
 	local message
 
-	if IsObject(exception) {
+	if isObject(exception) {
 		message := exception.Message
 
 		if !isNumber(message)
@@ -194,7 +194,7 @@ logError(exception, unhandled := false, report := true) {
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
 	if (report && !unhandled && isDevelopment() && isDebug())
-		if IsObject(exception)
+		if isObject(exception)
 			MsgBox(translate("Handled exception encountered in ") . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
 		else
 			MsgBox(translate("Handled exception encountered: ") . exception)

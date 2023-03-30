@@ -306,7 +306,7 @@ class StreamDeck extends FunctionController {
 	}
 
 	hasFunction(function) {
-		if IsObject(function)
+		if isObject(function)
 			function := function.Descriptor
 
 		return (inList(this.Functions, function) != false)
@@ -341,7 +341,7 @@ class StreamDeck extends FunctionController {
 	setControlLabel(function, text, color := "Black", overlay := false) {
 		local actions, icon, ignore, theAction, displayMode, labelMode
 
-		if !IsObject(function)
+		if !isObject(function)
 			function := this.Controller.findFunction(function)
 
 		if (this.isRunning() && this.hasFunction(function)) {
@@ -378,7 +378,7 @@ class StreamDeck extends FunctionController {
 		local controller := this.Controller
 		local enabled, displayMode, iconMode, ignore, theAction
 
-		if !IsObject(function)
+		if !isObject(function)
 			function := controller.findFunction(function)
 
 		if (this.isRunning() && this.hasFunction(function)) {

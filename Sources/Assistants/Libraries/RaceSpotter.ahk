@@ -2994,7 +2994,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 		update := false
 
-		if !IsObject(data)
+		if !isObject(data)
 			data := readMultiMap(data)
 
 		sector := getMultiMapValue(data, "Stint Data", "Sector", 0)

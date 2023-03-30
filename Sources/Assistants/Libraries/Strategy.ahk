@@ -123,7 +123,7 @@ class StrategySimulation {
 				compiler.compileRules(rules, productions, reductions)
 		}
 		catch Any as exception {
-			message := (IsObject(exception) ? exception.Message : exception)
+			message := (isObject(exception) ? exception.Message : exception)
 
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
@@ -136,7 +136,7 @@ class StrategySimulation {
 		local knowledgeBase, rules, rule, resultSet, refuelRule, valid, ignore, pitstop, tyreChangeRule
 		local number, pitstop, tyreCompound, tyreCompoundColor, productions, reductions
 
-		if IsObject(reqPitstops)
+		if isObject(reqPitstops)
 			reqPitstops := 1
 
 		if (strategy.Pitstops.Length < reqPitstops)
@@ -481,7 +481,7 @@ class StrategySimulation {
 
 				reqPitstops := strategy.PitstopRule
 
-				if IsObject(reqPitstops) {
+				if isObject(reqPitstops) {
 					avgLapTime := strategy.AvgLapTime
 					openingLap := (reqPitstops[1] * 60 / avgLapTime)
 					closingLap := (reqPitstops[2] * 60 / avgLapTime)
@@ -1543,7 +1543,7 @@ class Strategy extends ConfigurationItem {
 			local nr := this.Nr
 			local lap := this.Lap
 			local pitstopRule := strategy.PitstopRule
-			local numPitstops := (IsObject(pitstopRule) ? 1 : pitstopRule)
+			local numPitstops := (isObject(pitstopRule) ? 1 : pitstopRule)
 			local refuelRule := strategy.RefuelRule
 			local tyreChangeRule := strategy.TyreChangeRule
 			local remainingFuel := strategy.RemainingFuel[true]
@@ -1562,7 +1562,7 @@ class Strategy extends ConfigurationItem {
 				stintLaps := Floor(Min(remainingSessionLaps - lastStintLaps, strategy.StintLaps
 									 , strategy.getMaxFuelLaps(strategy.FuelCapacity, fuelConsumption)))
 
-			if IsObject(pitstopRule) {
+			if isObject(pitstopRule) {
 				avgLapTime := strategy.AvgLapTime[true]
 				openingLap := (pitstopRule[1] * 60 / avgLapTime)
 				closingLap := (pitstopRule[2] * 60 / avgLapTime)
@@ -2494,7 +2494,7 @@ class Strategy extends ConfigurationItem {
 
 		setMultiMapValue(configuration, "Settings", "PitstopDelta", this.PitstopDelta)
 
-		if IsObject(this.PitstopFuelService)
+		if isObject(this.PitstopFuelService)
 			setMultiMapValue(configuration, "Settings", "PitstopFuelService", values2String(":", this.PitstopFuelService*))
 		else
 			setMultiMapValue(configuration, "Settings", "PitstopFuelService", this.PitstopFuelService)
@@ -2506,7 +2506,7 @@ class Strategy extends ConfigurationItem {
 
 		pitstopRule := this.PitstopRule
 
-		if IsObject(pitstopRule)
+		if isObject(pitstopRule)
 			pitstopRule := values2String("-", pitstopRule*)
 
 		setMultiMapValue(configuration, "Settings", "PitstopRule", pitstopRule)
@@ -2818,7 +2818,7 @@ class Strategy extends ConfigurationItem {
 
 		if ((pitstopNr = 1) && ((targetLap >= remainingSessionLaps) && pitstopRule) && (pitstopRule == true))
 			targetLap := remainingSessionLaps - 2
-		else if IsObject(pitstopRule) {
+		else if isObject(pitstopRule) {
 			openingLap := (pitstopRule[1] * 60 / avgLapTime)
 			closingLap := (pitstopRule[2] * 60 / avgLapTime)
 
@@ -2966,7 +2966,7 @@ class Strategy extends ConfigurationItem {
 					this.iStintLaps := Min(stintLaps, canonicalStintLaps)
 			}
 		}
-		else if IsObject(numPitstops) {
+		else if isObject(numPitstops) {
 			valid := false
 
 			numPitstops := 1
@@ -2979,7 +2979,7 @@ class Strategy extends ConfigurationItem {
 				break
 
 			if !valid
-				if IsObject(pitstopRule)
+				if isObject(pitstopRule)
 					valid := ((pitstopLap >= (pitstopRule[1] * 60 / avgLapTime)) && (pitstopLap <= (pitstopRule[2] * 60 / avgLapTime)))
 				else
 					valid := (pitstopNr >= numPitstops)

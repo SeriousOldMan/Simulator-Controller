@@ -72,7 +72,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			else
 				actionArguments := Array("On", 50)
 
-			if !IsObject(function)
+			if !isObject(function)
 				function := ((function != "") ? Array(function) : [])
 
 			if (function.Length() > 0) {
@@ -110,7 +110,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					else
 						actionArguments := Array("On", 1.0)
 
-					if !IsObject(function)
+					if !isObject(function)
 						function := ((function != "") ? Array(function) : [])
 
 					if (function.Length() > 0) {
@@ -555,7 +555,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						function := wizard.getModuleActionFunction("Motion Feedback", mode, action)
 
 						if (function && (function != ""))
-							this.setActionFunction(mode, action, (IsObject(function) ? function : Array(function)))
+							this.setActionFunction(mode, action, (isObject(function) ? function : Array(function)))
 
 						arguments := wizard.getModuleActionArgument("Motion Feedback", mode, action)
 

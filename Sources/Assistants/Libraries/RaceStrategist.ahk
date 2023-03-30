@@ -1616,7 +1616,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		static lastSector := 1
 
-		if !IsObject(data)
+		if !isObject(data)
 			data := readMultiMap(data)
 
 		sector := getMultiMapValue(data, "Stint Data", "Sector", 0)
@@ -1831,7 +1831,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		if strategy {
 			if (this.Session == kSessionRace) {
-				if !IsObject(strategy)
+				if !isObject(strategy)
 					strategy := Strategy(this, readMultiMap(strategy))
 
 				this.clearStrategy()
@@ -1857,7 +1857,7 @@ class RaceStrategist extends GridRaceAssistant {
 	runSimulation(pitstopHistory) {
 		local data
 
-		if !IsObject(pitstopHistory) {
+		if !isObject(pitstopHistory) {
 			data := readMultiMap(pitstopHistory)
 
 			if !isDebug()
@@ -1871,12 +1871,12 @@ class RaceStrategist extends GridRaceAssistant {
 		local name := nameOrConfiguration
 		local theStrategy
 
-		if !IsObject(nameOrConfiguration)
+		if !isObject(nameOrConfiguration)
 			nameOrConfiguration := false
 
 		theStrategy := RaceStrategist.RaceStrategy(this, nameOrConfiguration, driver)
 
-		if (name && !IsObject(name))
+		if (name && !isObject(name))
 			theStrategy.setName(name)
 
 		return theStrategy

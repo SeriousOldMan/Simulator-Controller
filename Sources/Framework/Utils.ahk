@@ -97,10 +97,10 @@ isInstance(object, root) {
 	/*
 	local candidate, classVar, outerClassVar
 
-	if IsObject(object) {
+	if isObject(object) {
 		candidate := object.base
 
-		while IsObject(candidate)
+		while isObject(candidate)
 			if (candidate == root)
 				return true
 			else {

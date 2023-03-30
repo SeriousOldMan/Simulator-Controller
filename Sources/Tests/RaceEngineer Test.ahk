@@ -64,6 +64,10 @@ class TestRaceEngineer extends RaceEngineer {
 		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
+
+		setDebug(false)
+
+		this.setDebug(kDebugKnowledgeBase, false)
 	}
 
 	createKnowledgeBase(facts) {
@@ -239,7 +243,8 @@ class FuelReporting extends Assert {
 			else
 				engineer.addLap(A_Index, &data)
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(false, vFuelWarnings.Has(1), "Unexpected fuel warning in lap 1...")
@@ -266,7 +271,8 @@ class FuelReporting extends Assert {
 			else
 				engineer.addLap(A_Index, &data)
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(3, vFuelWarnings[3], "Unexpected remaining fuel reported in lap 3...")
@@ -308,7 +314,8 @@ class DamageReporting extends Assert {
 				this.AssertEqual(kNotInitialized, vBodyworkDamage, "Expected no bodywork damage to be reported...")
 			}
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		engineer.finishSession(false)
@@ -348,7 +355,8 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, &data)
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 0.0	->	1.1		Report Bodywork
@@ -418,7 +426,8 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, &data)
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 3.1	->	3.2		Report Bodywork
@@ -499,7 +508,8 @@ class DamageAnalysis extends Assert {
 					else
 						engineer.updateLap(lap, &data)
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 				}
 
 				; 0.0	->	1.1		Report Bodywork
@@ -580,7 +590,8 @@ class PitstopHandling extends Assert {
 					engineer.planPitstop()
 			}
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.Has("pitstopPlanned"), "No pitstop planned...")
@@ -629,7 +640,8 @@ class PitstopHandling extends Assert {
 					engineer.planPitstop()
 			}
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.Has("pitstopPlanned"), "No pitstop planned...")
@@ -681,7 +693,8 @@ class PitstopHandling extends Assert {
 					Break
 			}
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		this.AssertEqual(true, vCompletedActions.Has("pitstopPlanned"), "No pitstop planned...")
@@ -743,7 +756,8 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		if vCompletedActions.Has("pitstopPlanned")
@@ -809,7 +823,8 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		if vCompletedActions.Has("pitstopPlanned")
@@ -868,7 +883,8 @@ class PitstopHandling extends Assert {
 				if (A_Index = 5) {
 					engineer.performPitstop()
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if vCompletedActions.Has("pitstopFinished")
 						this.AssertEqual(1, vCompletedActions["pitstopFinished"], "Pitstop not prepared as number 1...")
@@ -904,7 +920,8 @@ class PitstopHandling extends Assert {
 
 					engineer.planPitstop()
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr"), "Pitstop number increment failed...")
 					this.AssertEqual(false, engineer.tKnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
@@ -976,7 +993,8 @@ class PitstopHandling extends Assert {
 				}
 			}
 
-			engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+			if engineer.Debug[kDebugKnowledgeBase]
+				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 		}
 
 		engineer.finishSession(false)
@@ -1028,7 +1046,8 @@ else {
 					engineer.performPitstop()
 				}
 
-				engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+				if engineer.Debug[kDebugKnowledgeBase]
+					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 				if isDebug()
 					MsgBox("Lap " . A_Index . " loaded - Continue?")
@@ -1066,7 +1085,8 @@ else {
 					else
 						engineer.updateLap(lap, &data)
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1100,7 +1120,8 @@ else {
 					else
 						engineer.updateLap(lap, &data)
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1140,7 +1161,8 @@ else {
 						engineer.preparePitstop()
 					}
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -1172,7 +1194,8 @@ else {
 					if (lap = 8)
 						engineer.planPitstop()
 
-					engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+					if engineer.Debug[kDebugKnowledgeBase]
+						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					if (lap = 8)
 						MsgBox("Pitstop")
@@ -1207,7 +1230,8 @@ else {
 					if (lap = 17) {
 						engineer.planPitstop()
 
-						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
+						if engineer.Debug[kDebugKnowledgeBase]
+							engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 						MsgBox("Pitstop")
 					}

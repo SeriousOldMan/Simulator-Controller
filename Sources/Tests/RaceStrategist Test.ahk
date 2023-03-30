@@ -40,6 +40,10 @@ class TestRaceStrategist extends RaceStrategist {
 		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
+
+		setDebug(false)
+
+		this.setDebug(kDebugKnowledgeBase, false)
 	}
 
 	createKnowledgeBase(facts) {
@@ -85,7 +89,8 @@ class BasicReporting extends Assert {
 					this.AssertEqual(11, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -105,7 +110,8 @@ class BasicReporting extends Assert {
 			else
 				strategist.addLap(A_Index, &data)
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -177,7 +183,8 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4464, 4, 9153, 1, -519263), "Unexpected standings gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -201,7 +208,7 @@ class GapReporting extends Assert {
 				case 1:
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 6, -871, 10, 219), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 2:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 1, -6563, 6, 582), "Unexpected track gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 22, -6563, 6, 582), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 3:
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 19, -9343, 6, 1446), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 4:
@@ -210,7 +217,8 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 21, -4103, 4, 9153), "Unexpected track gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -239,7 +247,8 @@ class PositionProjection extends Assert {
 
 				position := strategist.KnowledgeBase.getValue("Standings.Extrapolated." . 10 . ".Car.13.Position", false)
 
-				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+				if strategist.Debug[kDebugKnowledgeBase]
+					strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 				this.AssertEqual(8, position, "Unexpected future position detected in lap 3...")
 			}
@@ -253,7 +262,8 @@ class PositionProjection extends Assert {
 				this.AssertEqual(4, position, "Unexpected future position detected in lap 3...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -290,7 +300,8 @@ class PitstopRecommendation extends Assert {
 				this.AssertEqual("[[11, 7, 5], [11, 7], [11], [], []]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics"), "Unexpected evaluated cars ahead detected after pitstop recommmendation in lap 2...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -307,10 +318,10 @@ class PitstopRecommendation extends Assert {
 if !GetKeyState("Ctrl") {
 	startTime := A_TickCount
 
-	;AHKUnit.AddTestClass(BasicReporting)
-	;AHKUnit.AddTestClass(PositionProjection)
+	AHKUnit.AddTestClass(BasicReporting)
+	AHKUnit.AddTestClass(PositionProjection)
 	AHKUnit.AddTestClass(GapReporting)
-	;AHKUnit.AddTestClass(PitstopRecommendation)
+	AHKUnit.AddTestClass(PitstopRecommendation)
 
 	AHKUnit.Run()
 

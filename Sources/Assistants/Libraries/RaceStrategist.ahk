@@ -2860,19 +2860,8 @@ class RaceStrategist extends GridRaceAssistant {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getTime() {
+getTime(*) {
 	return A_Now
-}
-
-comparePositions(c1, c2) {
-	return (c1[2] < c2[2])
-}
-
-compareSequences(c1, c2) {
-	c1 := c1[2]
-	c2 := c2[2]
-
-	return ((c1 - Floor(c1)) < (c2 - Floor(c2)))
 }
 
 updatePositions(context, futureLap) {
@@ -2880,6 +2869,13 @@ updatePositions(context, futureLap) {
 	local cars := []
 	local count := 0
 	local laps
+
+	compareSequences(c1, c2) {
+		c1 := c1[2]
+		c2 := c2[2]
+
+		return ((c1 - Floor(c1)) < (c2 - Floor(c2)))
+	}
 
 	loop knowledgeBase.getValue("Car.Count", 0) {
 		laps := knowledgeBase.getValue("Standings.Extrapolated." . futureLap . ".Car." . A_Index . ".Laps", kUndefined)
@@ -2891,7 +2887,7 @@ updatePositions(context, futureLap) {
 		}
 	}
 
-	bubbleSort(&cars, comparePositions)
+	bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
 
 	loop {
 		if (A_Index > count)

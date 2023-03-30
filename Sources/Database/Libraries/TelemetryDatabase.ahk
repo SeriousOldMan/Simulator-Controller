@@ -363,26 +363,26 @@ class TelemetryDatabase extends SessionDatabase {
 
 		if (!this.Shared || db.lock("Tyres", false))
 			try {
-				this.db.add("Tyres", Database.Row("Driver: driver, Weather: weather"
-												, "Temperature.Air", valueOrNull(airTemperature)
-												, "Temperature.Track", valueOrNull(trackTemperature)
-												, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
-												, "Fuel.Remaining", valueOrNull(fuelRemaining)
-												, "Fuel.Consumption", valueOrNull(fuelConsumption)
-												, "Lap.Time", valueOrNull(lapTime), "Tyre.Laps", valueOrNull(tyreLaps)
-												, "Tyre.Pressure.Front.Left", valueOrNull(pressureFL)
-												, "Tyre.Pressure.Front.Right", valueOrNull(pressureFR)
-												, "Tyre.Pressure.Rear.Left", valueOrNull(pressureRL)
-												, "Tyre.Pressure.Rear.Right", valueOrNull(pressureRR)
-												, "Tyre.Temperature.Front.Left", valueOrNull(temperatureFL)
-												, "Tyre.Temperature.Front.Right", valueOrNull(temperatureFR)
-												, "Tyre.Temperature.Rear.Left", valueOrNull(temperatureRL)
-												, "Tyre.Temperature.Rear.Right", valueOrNull(temperatureRR)
-												, "Tyre.Wear.Front.Left", valueOrNull(wearFL)
-												, "Tyre.Wear.Front.Right", valueOrNull(wearFR)
-												, "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
-												, "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
-												, "Identifier", identifier ? identifier : kNull)
+				db.add("Tyres", Database.Row("Driver", driver, "Weather", weather
+										   , "Temperature.Air", valueOrNull(airTemperature)
+										   , "Temperature.Track", valueOrNull(trackTemperature)
+										   , "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor
+										   , "Fuel.Remaining", valueOrNull(fuelRemaining)
+										   , "Fuel.Consumption", valueOrNull(fuelConsumption)
+										   , "Lap.Time", valueOrNull(lapTime), "Tyre.Laps", valueOrNull(tyreLaps)
+										   , "Tyre.Pressure.Front.Left", valueOrNull(pressureFL)
+										   , "Tyre.Pressure.Front.Right", valueOrNull(pressureFR)
+										   , "Tyre.Pressure.Rear.Left", valueOrNull(pressureRL)
+										   , "Tyre.Pressure.Rear.Right", valueOrNull(pressureRR)
+										   , "Tyre.Temperature.Front.Left", valueOrNull(temperatureFL)
+										   , "Tyre.Temperature.Front.Right", valueOrNull(temperatureFR)
+										   , "Tyre.Temperature.Rear.Left", valueOrNull(temperatureRL)
+										   , "Tyre.Temperature.Rear.Right", valueOrNull(temperatureRR)
+										   , "Tyre.Wear.Front.Left", valueOrNull(wearFL)
+										   , "Tyre.Wear.Front.Right", valueOrNull(wearFR)
+										   , "Tyre.Wear.Rear.Left", valueOrNull(wearRL)
+										   , "Tyre.Wear.Rear.Right", valueOrNull(wearRR)
+										   , "Identifier", identifier ? identifier : kNull)
 								, true)
 			}
 			finally {

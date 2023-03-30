@@ -398,7 +398,7 @@ class StrategySimulation {
 		Sleep(200)
 
 		if verbose
-			progress := += 5
+			progress += 5
 	}
 
 	createScenarios(electronicsData, tyresData, verbose, &progress) {
@@ -500,11 +500,11 @@ class StrategySimulation {
 				strategy.adjustLastPitstopRefuelAmount()
 
 				if verbose
-					progress := += 1
+					progress += 1
 			}
 
 		if verbose
-			progress := := Floor(progress + 10)
+			progress := Floor(progress + 10)
 
 		return scenarios
 	}
@@ -594,12 +594,12 @@ class StrategySimulation {
 					candidate := this.compareScenarios(strategy, candidate)
 
 				if verbose
-					progress := += 1
+					progress += 1
 			}
 		}
 
 		if verbose
-			progress := := Floor(progress + 10)
+			progress := Floor(progress + 10)
 
 		return candidate
 	}
@@ -833,7 +833,7 @@ class VariationSimulation extends StrategySimulation {
 							}
 
 							if verbose
-								progress := += 1
+								progress += 1
 						}
 
 						if useTelemetryData {
@@ -869,7 +869,7 @@ class VariationSimulation extends StrategySimulation {
 																 , weather, tyreCompound, tyreCompoundColor)
 
 								if verbose
-									progress := += 1
+									progress += 1
 							}
 						}
 
@@ -893,7 +893,7 @@ class VariationSimulation extends StrategySimulation {
 				break
 		}
 
-		progress := := Floor(progress + 10)
+		progress := Floor(progress + 10)
 
 		return scenarios
 	}
@@ -1200,7 +1200,7 @@ class TrafficSimulation extends StrategySimulation {
 								}
 
 								if verbose
-									progress := += 1
+									progress += 1
 							}
 
 							if useTelemetryData {
@@ -1240,7 +1240,7 @@ class TrafficSimulation extends StrategySimulation {
 																	 , weather, tyreCompound, tyreCompoundColor)
 
 									if verbose
-										progress := += 1
+										progress += 1
 								}
 							}
 
@@ -1264,7 +1264,7 @@ class TrafficSimulation extends StrategySimulation {
 				break
 		}
 
-		progress := := Floor(progress + 10)
+		progress := Floor(progress + 10)
 
 		return scenarios
 	}
@@ -1381,37 +1381,37 @@ class Strategy extends ConfigurationItem {
 		iRemainingTyreLaps := 0
 		iRemainingFuel := 0
 
-		Strategy[]  {
+		Strategy {
 			Get {
 				return this.iStrategy
 			}
 		}
 
-		Nr[]  {
+		Nr {
 			Get {
 				return this.iNr
 			}
 		}
 
-		Lap[]  {
+		Lap {
 			Get {
 				return this.iLap
 			}
 		}
 
-		Driver[]  {
+		Driver {
 			Get {
 				return this.iDriver
 			}
 		}
 
-		DriverName[]  {
+		DriverName {
 			Get {
 				return this.iDriverName
 			}
 		}
 
-		Time[]  {
+		Time {
 			Get {
 				return this.iTime
 			}
@@ -1668,7 +1668,7 @@ class Strategy extends ConfigurationItem {
 			airTemperature := false
 			trackTemperature := false
 
-			strategy.getWeather(this.Time / 60, weather, airTemperature, trackTemperature)
+			strategy.getWeather(this.Time / 60, &weather, &airTemperature, &trackTemperature)
 
 			this.iWeather := weather
 			this.iAirTemperature := airTemperature
@@ -2619,7 +2619,7 @@ class Strategy extends ConfigurationItem {
 	}
 
 	createPitstop(nr, lap, driver, tyreCompound, tyreCompoundColor, configuration := false, adjustments := false) {
-		return this.Pitstop(this, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration, adjustments)
+		return Strategy.Pitstop(this, nr, lap, driver, tyreCompound, tyreCompoundColor, configuration, adjustments)
 	}
 
 	setName(name) {
@@ -2801,7 +2801,7 @@ class Strategy extends ConfigurationItem {
 			else {
 				time := (this.Time[true] + ((A_Index - 1) * avgLapTime))
 
-				this.getWeather(time / 60, weather, airTemperature, trackTemperature)
+				this.getWeather(time / 60, &weather, &airTemperature, &trackTemperature)
 
 				if (!telemetryDB.suitableTyreCompound(simulator, car, track, weather, qualifiedCompound)
 				 && telemetryDB.optimalTyreCompound(simulator, car, track
@@ -3036,7 +3036,7 @@ class Strategy extends ConfigurationItem {
 			else {
 				telemetryDB := this.StrategyManager.TelemetryDatabase
 
-				this.getWeather((this.Time[true] + (pitstopLap - currentLap) * avgLapTime) / 60, weather, airTemperature, trackTemperature)
+				this.getWeather((this.Time[true] + (pitstopLap - currentLap) * avgLapTime) / 60, &weather, &airTemperature, &trackTemperature)
 
 				candidate := telemetryDB.optimalTyreCompound(this.Simulator, this.Car, this.Track
 														   , weather, airTemperature, trackTemperature

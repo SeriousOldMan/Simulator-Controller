@@ -684,7 +684,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	futurePositionRecognized(words) {
-		local knowledgeBase = this.KnowledgeBase
+		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments, lapPosition, lapDelta, currentLap, lap, car, position
 
 		if !this.hasEnoughData()
@@ -1200,7 +1200,7 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	readSettings(&settings) {
-		return combine(super.readSettings(settings)
+		return combine(super.readSettings(&settings)
 					 , CaseInsenseMap("Session.Settings.Pitstop.Delta", getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta"
 																								 , getMultiMapValue(settings, "Session Settings"
 																															, "Pitstop.Delta", 30))
@@ -1332,7 +1332,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		telemetryDB.Database.clear("Electronics")
 		telemetryDB.Database.clear("Tyres")
-		telemetryDB.flush()
+		telemetryDB.Database.flush()
 
 		this.updateSessionValues({TelemetryDatabase: telemetryDB})
 

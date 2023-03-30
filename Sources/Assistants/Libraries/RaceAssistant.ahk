@@ -1548,7 +1548,7 @@ class GridRaceAssistant extends RaceAssistant {
 			if (!knowledgeBase || (knowledgeBase != this.KnowledgeBase)) {
 				knowledgaBase := this.KnowledgeBase
 
-				multiClass := (this.getClasses(data).Length() > 1)
+				multiClass := (this.getClasses(data).Length > 1)
 			}
 
 			return multiClass

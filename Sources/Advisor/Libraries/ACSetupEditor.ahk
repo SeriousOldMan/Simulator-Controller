@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Setup Editor for AC             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,7 +9,7 @@
 ;;;                           Local Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -124,26 +124,24 @@ class ACSetupEditor extends FileSetupEditor {
 		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
-		local title, fileName, theSetup
+		local fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
 
 		if (track && (track != true))
-			loop Files, %directory%\*.*, D
+			loop Files, directory "\*.*", "D"
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 
 					break
 				}
 
-		title := translate("Load AC Setup File...")
+		this.Window.Opt("+OwnDialogs")
 
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.ini)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := FileSelect(1, directory, translate("Load AC Setup File..."), "Setup (*.ini)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
 			theSetup := ACSetup(this, fileName)
@@ -159,20 +157,18 @@ class ACSetupEditor extends FileSetupEditor {
 
 	saveSetup() {
 		local fileName := this.Setup.FileName
-		local directory, title, text
+		local directory, text
 
-		if fileName = this.Setup.FileName[true]
-			SplitPath fileName, , directory
+		if (fileName = "this.Setup.FileName[true]")
+			SplitPath(fileName, , &directory)
 		else
 			directory := fileName
 
-		title := translate("Save AC Setup File...")
+		this.Window.Opt("+OwnDialogs")
 
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-		FileSelectFile fileName, S17, %directory%, %title%, Setup (*.ini)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateSaveCancelButtons)
+		fileName := FileSelect("S17", directory, translate("Save AC Setup File..."), "Setup (*.ini)")
+		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
 			if !InStr(fileName, ".ini")
@@ -182,7 +178,7 @@ class ACSetupEditor extends FileSetupEditor {
 
 			text := this.Setup.Setup
 
-			FileAppend %text%, %fileName%
+			FileAppend(text, fileName)
 
 			this.Setup.FileName := fileName
 		}
@@ -199,26 +195,24 @@ class ACSetupComparator extends FileSetupComparator {
 		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
-		local title, fileName, theSetup
+		local fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
 
 		if (track && (track != true))
-			loop Files, %directory%\*.*, D
+			loop Files, directory "\*.*", "D"
 				if (InStr(track, A_LoopFileName) == 1) {
 					directory .= ("\" . A_LoopFileName)
 
 					break
 				}
 
-		title := (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" AC Setup File..."))
+		this.Window.Opt("+OwnDialogs")
 
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.ini)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := FileSelect(1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" AC Setup File...")), "Setup (*.ini)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
 			theSetup := ACSetup(this, fileName)

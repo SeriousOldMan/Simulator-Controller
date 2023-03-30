@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Generic Telemetry Analyzer      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Math.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\..\Libraries\Task.ahk"
+#Include "..\..\Libraries\Math.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -224,9 +224,9 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iTrackWidth := getMultiMapValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
 
 		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Advisor"
-																					   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
+													   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
 		this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Advisor"
-																					  , prefix . "OversteerThresholds", defaultOversteerThresholds))
+													  , prefix . "OversteerThresholds", defaultOversteerThresholds))
 		this.iLowspeedThreshold := getMultiMapValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
 		super.__New(advisor, simulator)
@@ -246,7 +246,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			advisor := this.Advisor
 			characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
 			severities := {Light: 33, Medium: 50, Heavy: 66}
-			characteristics := {}
+			characteristics := CaseInsenseMap()
 			count := 0
 			maxValue := 0
 
@@ -271,7 +271,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 							if value {
 								characteristic := (type . ".Corner." . key . "." . speed)
 
-								if !characteristics.HasKey(characteristic)
+								if !characteristics.Has(characteristic)
 									characteristics[characteristic] := [Round(value / maxValue * 66), severities[severity]]
 								else {
 									characteristic := characteristics[characteristic]
@@ -282,7 +282,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 							}
 						}
 
-			Sleep 500
+			Sleep(500)
 
 			for characteristic, value in characteristics {
 				if (A_Index > kMaxCharacteristics)
@@ -299,7 +299,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 			showProgress({progress: 100, message: translate("Finished...")})
 
-			Sleep 500
+			Sleep(500)
 
 			hideProgress()
 		}
@@ -345,11 +345,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 				code := SessionDatabase().getSimulatorCode(this.Simulator)
 
-				Run %kBinariesDirectory%%code% SHM Spotter.exe %options%, %kBinariesDirectory%, UserErrorLevel Hide, pid
+				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
 			}
 			catch Any as exception {
-				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")
-													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
+				message := substituteVariables(translate("Cannot start %simulator% %protocol% Spotter (%exePath%) - please check the configuration...")													   , {simulator: code, protocol: "SHM", exePath: kBinariesDirectory . code . " SHM Spotter.exe"})
 
 				logMessage(kLogCritical, message)
 
@@ -370,12 +369,10 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 			tries := 5
 
 			while (tries-- > 0) {
-				Process Exist, %pid%
+				if ProcessExist(pid) {
+					ProcessClose(pid)
 
-				if ErrorLevel {
-					Process Close, %pid%
-
-					Sleep 500
+					Sleep(500)
 				}
 				else
 					break
@@ -405,9 +402,11 @@ setAnalyzerSetting(analyzer, key, value) {
 }
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
-	local window, aWindow, x, y, ignore, widget, advisor, row, include
+	local x, y, ignore, widget, advisor, row, include
 	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
-	local calibration
+	local calibration, theListView
+
+	static analyzerGui
 
 	static activateButton
 	static calibrateButton
@@ -446,6 +445,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 	static updateTask := false
 
+	noSelect(listView, *) {
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
+	}
+
 	if (commandOrAnalyzer == kCancel) {
 		if updateTask
 			updateTask.stop()
@@ -455,113 +459,96 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		result := kCancel
 	}
 	else if (commandOrAnalyzer == "UpdateSlider") {
-		Gui TAN:Default
-
-		fromEdit := ((arguments.Length() > 0) && arguments[1])
+		fromEdit := ((arguments.Length > 0) && arguments[1])
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, severity in ["Light", "Medium", "Heavy"] {
 				if fromEdit {
-					GuiControlGet value, , %severity%%type%ThresholdEdit
+					value := %"severity" . type . "ThresholdEdit"%.Text
 
 					newValue := Min(Max(value, kMinThreshold), kMaxThreshold)
 
-					GuiControl, , %severity%%type%ThresholdSlider, %newValue%
+					%"severity" . type . "ThresholdSlider"%.Value := newValue
 
 					if (newValue != value)
-						GuiControl, , %severity%%type%ThresholdEdit, %newValue%
+						%"severity" . type . "ThresholdEdit"%.Text := newValue
 				}
 				else {
-					GuiControlGet value, , %severity%%type%ThresholdSlider
+					value := %"severity" . type . "ThresholdSlider"%.Value
 
-					GuiControl, , %severity%%type%ThresholdEdit, %value%
+					%"severity" . type . "ThresholdEdit"%.Text := value
 				}
 			}
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
-		Gui TAN:+Disabled
-		Gui CAN:+OwnerTAN
+		analyzerGui.Opt("+Disabled")
 
 		try {
-			calibration := runCalibrator(analyzer)
+			calibration := runCalibrator(analyzer, analyzerGui)
 
 			if calibration {
 				analyzer.UnderSteerThresholds := calibration[1]
 				analyzer.OverSteerThresholds := calibration[2]
 
-				Gui TAN:Default
-
-				GuiControl, , heavyOversteerThresholdSlider, % analyzer.OversteerThresholds[3]
-				GuiControl, , heavyOversteerThresholdEdit, % analyzer.OversteerThresholds[3]
-				GuiControl, , mediumOversteerThresholdSlider, % analyzer.OversteerThresholds[2]
-				GuiControl, , mediumOversteerThresholdEdit, % analyzer.OversteerThresholds[2]
-				GuiControl, , lightOversteerThresholdSlider, % analyzer.OversteerThresholds[1]
-				GuiControl, , lightOversteerThresholdEdit, % analyzer.OversteerThresholds[1]
-				GuiControl, , lightUndersteerThresholdSlider, % analyzer.UndersteerThresholds[1]
-				GuiControl, , lightUndersteerThresholdEdit, % analyzer.UndersteerThresholds[1]
-				GuiControl, , mediumUndersteerThresholdSlider, % analyzer.UndersteerThresholds[2]
-				GuiControl, , mediumUndersteerThresholdEdit, % analyzer.UndersteerThresholds[2]
-				GuiControl, , heavyUndersteerThresholdSlider, % analyzer.UndersteerThresholds[3]
-				GuiControl, , heavyUndersteerThresholdEdit, % analyzer.UndersteerThresholds[3]
+				heavyOversteerThresholdSlider.Value := analyzer.OversteerThresholds[3]
+				heavyOversteerThresholdEdit.Text := analyzer.OversteerThresholds[3]
+				mediumOversteerThresholdSlider.Value := analyzer.OversteerThresholds[2]
+				mediumOversteerThresholdEdit.Text := analyzer.OversteerThresholds[2]
+				lightOversteerThresholdSlider.Value := analyzer.OversteerThresholds[1]
+				lightOversteerThresholdEdit.Text := analyzer.OversteerThresholds[1]
+				lightUndersteerThresholdSlider.Value := analyzer.UndersteerThresholds[1]
+				lightUndersteerThresholdEdit.Text := analyzer.UndersteerThresholds[1]
+				mediumUndersteerThresholdSlider.Value := analyzer.UndersteerThresholds[2]
+				mediumUndersteerThresholdEdit.Text := analyzer.UndersteerThresholds[2]
+				heavyUndersteerThresholdSlider.Value := analyzer.UndersteerThresholds[3]
+				heavyUndersteerThresholdEdit.Text := analyzer.UndersteerThresholds[3]
 			}
 		}
 		finally {
-			Gui TAN:-Disabled
+			analyzerGui.Opt("-Disabled")
 		}
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Prepare")) {
-		GuiControlGet steerLockEdit
-		GuiControlGet steerRatioEdit
-		GuiControlGet wheelbaseEdit
-		GuiControlGet trackWidthEdit
-		GuiControlGet lowspeedThresholdEdit
-		GuiControlGet heavyOversteerThresholdSlider
-		GuiControlGet mediumOversteerThresholdSlider
-		GuiControlGet lightOversteerThresholdSlider
-		GuiControlGet heavyUndersteerThresholdSlider
-		GuiControlGet mediumUndersteerThresholdSlider
-		GuiControlGet lightUndersteerThresholdSlider
-
-		GuiControl Disable, calibrateButton
+		calibrateButton.Enabled := false
 
 		if analyzer.settingAvailable("SteerLock")
-			analyzer.SteerLock := steerLockEdit
+			analyzer.SteerLock := steerLockEdit.Text
 
 		if analyzer.settingAvailable("SteerRatio")
-			analyzer.SteerRatio := steerRatioEdit
+			analyzer.SteerRatio := steerRatioEdit.Text
 
 		if analyzer.settingAvailable("Wheelbase")
-			analyzer.Wheelbase := wheelbaseEdit
+			analyzer.Wheelbase := wheelbaseEdit.Text
 
 		if analyzer.settingAvailable("TrackWidth")
-			analyzer.TrackWidth := trackWidthEdit
+			analyzer.TrackWidth := trackWidthEdit.Text
 
 		if analyzer.settingAvailable("LowspeedThreshold")
-			analyzer.LowspeedThreshold := lowspeedThresholdEdit
+			analyzer.LowspeedThreshold := lowspeedThresholdEdit.Text
 
 		if analyzer.settingAvailable("OversteerThresholds")
-			analyzer.OversteerThresholds := [lightOversteerThresholdSlider, mediumOversteerThresholdSlider, heavyOversteerThresholdSlider]
+			analyzer.OversteerThresholds := [lightOversteerThresholdSlider.Value, mediumOversteerThresholdSlider.Value, heavyOversteerThresholdSlider.Value]
 
 		if analyzer.settingAvailable("UndersteerThresholds")
-			analyzer.UndersteerThresholds := [lightUndersteerThresholdSlider, mediumUndersteerThresholdSlider, heavyUndersteerThresholdSlider]
+			analyzer.UndersteerThresholds := [lightUndersteerThresholdSlider.Value, mediumUndersteerThresholdSlider.Value, heavyUndersteerThresholdSlider.Value]
 
 		dataFile := temporaryFileName("Analyzer", "data")
 
 		for ignore, widget in prepareWidgets {
-			GuiControl Disable, %widget%
-			GuiControl Hide, %widget%
+			ogc%widget%.Enabled := false
+			ogc%widget%.Visible := false
 		}
 
 		for ignore, widget in runWidgets
-			GuiControl Show, %widget%
+			ogc%widget%.Visible := true
 
-		GuiControl, , activateButton, % translate("Stop")
+		ogcactivateButton.Value := translate("Stop")
 
 		state := "Run"
 
 		analyzer.startTelemetryAnalyzer(dataFile)
 
-		updateTask := PeriodicTask(Func("runAnalyzer").Bind("UpdateIssues"), 5000)
+		updateTask := PeriodicTask(runAnalyzer.Bind("UpdateIssues"), 5000)
 
 		updateTask.start()
 	}
@@ -573,14 +560,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		analyzer.stopTelemetryAnalyzer()
 
 		for ignore, widget in runWidgets {
-			GuiControl Disable, %widget%
-			GuiControl Hide, %widget%
+			widget.Enabled := false
+			widget.Visible := false
 		}
 
 		for ignore, widget in analyzeWidgets
-			GuiControl Show, %widget%
+			widget.Visible := true
 
-		GuiControl, , activateButton, % translate("Apply")
+		activateButton.Text := translate("Apply")
 
 		state := "Analyze"
 
@@ -594,25 +581,19 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		while (tries-- > 0) {
 			data := readMultiMap(dataFile)
 
-			if (data.Count() > 0) {
+			if (data.Count > 0) {
 				runAnalyzer("UpdateTelemetry", data)
 
 				break
 			}
 			else
-				Sleep 20
+				Sleep(20)
 		}
 	}
 	else if (commandOrAnalyzer == "FilterTelemetry") {
 		advisor := analyzer.Advisor
 		characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
-		final := ((arguments.Length() > 0) && arguments[1])
-
-		Gui TAN:Default
-
-		Gui ListView, % resultListView
-
-		GuiControlGet applyThresholdSlider
+		final := ((arguments.Length > 0) && arguments[1])
 
 		data := readMultiMap(dataFile)
 
@@ -622,17 +603,17 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					for ignore, key in ["Entry", "Apex", "Exit"] {
 						value := getMultiMapValue(data, type . "." . speed . "." . severity, key, kUndefined)
 
-						include := ((value != kUndefined) && (value >= applyThresholdSlider))
+						include := ((value != kUndefined) && (value >= applyThresholdSlider.Value))
 
 						if (include && final) {
 							include := false
 
 							characteristic := characteristicLabels[type . ".Corner." . key . "." . speed]
 
-							row := LV_GetNext(0, "C")
+							row := resultListView.GetNext(0, "C")
 
 							while row {
-								LV_GetText(value, row)
+								value := resultListView.GetText(row)
 
 								if (value = characteristic) {
 									include := true
@@ -640,7 +621,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 									break
 								}
 								else
-									row := LV_GetNext(row, "C")
+									row := resultListView.GetNext(row, "C")
 							}
 						}
 
@@ -655,11 +636,9 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
 		data := arguments[1]
 
-		Gui TAN:Default
+		theListView := ((state = "Run") ? issuesListView : resultListView)
 
-		Gui ListView, % ((state = "Run") ? issuesListView : resultListView)
-
-		LV_Delete()
+		theListView.Delete()
 
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, speed in ["Slow", "Fast"]
@@ -670,14 +649,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						if value {
 							characteristic := (type . ".Corner." . key . "." . speed)
 
-							LV_Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic], translate(severity), value)
+							theListView.Add((state = "Analyze") ? "Check" : "", characteristicLabels[characteristic], translate(severity), value)
 						}
 					}
 
-		LV_ModifyCol()
+		theListView.ModifyCol()
 
 		loop 3
-			LV_ModifyCol(A_Index, "AutoHdr")
+			theListView.ModifyCol(A_Index, "AutoHdr")
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Analyze"))
 		result := runAnalyzer("FilterTelemetry", true)
@@ -693,174 +672,199 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		runWidgets := []
 		analyzeWidgets := []
 
-		aWindow := SetupAdvisor.Instance.Window
-		window := "TAN"
+		analyzerGui := Window()
 
-		Gui %window%:New
+		analyzerGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Default
+		analyzerGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(analyzerGui, "Setup Advisor.Analyzer"))
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		analyzerGui.SetFont("s9 Norm", "Arial")
+		analyzerGui.SetFont("Italic Underline", "Arial")
 
-		Gui %window%:Font, s10 Bold, Arial
+		analyzerGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(analyzerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer"))
 
-		Gui %window%:Add, Text, w324 Center gmoveAnalyzer, % translate("Modular Simulator Controller System")
+		analyzerGui.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+		analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200", translate("Simulator"))
+		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", analyzer.Simulator)
 
-		Gui %window%:Add, Text, x78 YP+20 w184 cBlue Center gopenAnalyzerDocumentation, % translate("Telemetry Analyzer")
-
-		Gui %window%:Font, s8 Norm, Arial
-
-		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200, % translate("Simulator")
-		Gui %window%:Add, Text, x158 yp w180 h23 +0x200, % analyzer.Simulator
-
-		Gui %window%:Add, Text, x16 yp+24 w130 h23 +0x200, % translate("Car")
-		Gui %window%:Add, Text, x158 yp w180 h23 +0x200, % (analyzer.Car ? analyzer.Car : translate("Unknown"))
+		analyzerGui.Add("Text", "x16 yp+24 w130 h23 +0x200", translate("Car"))
+		analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", (analyzer.Car ? analyzer.Car : translate("Unknown")))
 
 		if analyzer.Track {
-			Gui %window%:Add, Text, x16 yp+24 w130 h23 +0x200, % translate("Track")
-			Gui %window%:Add, Text, x158 yp w180 h23 +0x200, % new SessionDatabase().getTrackName(analyzer.Simulator, analyzer.Track)
+			analyzerGui.Add("Text", "x16 yp+24 w130 h23 +0x200", translate("Track"))
+			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", new SessionDatabase().getTrackName(analyzer.Simulator, analyzer.Track))
 		}
 
-		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 Section HWNDwidget1, % translate("Steering Lock / Ratio")
-		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget2 vsteerLockEdit, % analyzer.SteerLock
-		Gui %window%:Add, Edit, x208 yp w45 h23 Limit2 Number HWNDwidget3 vsteerRatioEdit, % analyzer.SteerRatio
-		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-99 HWNDwidget4, % analyzer.SteerRatio
+		widget1 := analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200 Section", translate("Steering Lock / Ratio"))
+		steerLockEdit := analyzerGui.Add("Edit", "x158 yp w45 h23 +0x200", analyzer.SteerLock)
+		widget2 := steerLockEdit
+		steerRatioEdit := analyzerGui.Add("Edit", "x208 yp w45 h23 Limit2 Number", analyzer.SteerRatio)
+		widget3 := steerRatioEdit
+		widget4 := analyzerGui.Add("UpDown", "x238 yp w18 h23 Range1-99", analyzer.SteerRatio)
 
-		Gui %window%:Add, Text, x16 yp+30 w130 h23 +0x200 HWNDwidget27, % translate("Wheelbase / Track Width")
-		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 HWNDwidget28 Number Limit3 vwheelbaseEdit, % analyzer.Wheelbase
-		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget29, % analyzer.Wheelbase
-		Gui %window%:Add, Edit, x208 yp w45 h23 +0x200 HWNDwidget30 Number Limit3 vtrackWidthEdit, % analyzer.TrackWidth
-		Gui %window%:Add, UpDown, x238 yp w18 h23 Range1-999 HWNDwidget31, % analyzer.TrackWidth
-		Gui %window%:Add, Text, x257 yp w50 h23 +0x200 HWNDwidget32, % translate("cm")
+		widget27 := analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200", translate("Wheelbase / Track Width"))
+		wheelbaseEdit := analyzerGui.Add("Edit", "x158 yp w45 h23 +0x200 Number Limit3", analyzer.Wheelbase)
+		widget29 := analyzerGui.Add("UpDown", "x188 yp w18 h23 Range1-999", analyzer.Wheelbase)
+		trackWidthEdit := analyzerGui.Add("Edit", "x208 yp w45 h23 +0x200 Number Limit3", analyzer.TrackWidth)
+		widget30 := trackWidthEdit
+		widget31 := analyzerGui.Add("UpDown", "x238 yp w18 h23 Range1-999", analyzer.TrackWidth)
+		widget32 := analyzerGui.Add("Text", "x257 yp w50 h23 +0x200", translate("cm"))
 
 		if !analyzer.settingAvailable("SteerLock") {
-			GuiControl Disable, steerLockEdit
-			GuiControl, , steerLockEdit, % ""
+			steerLockEdit.Enabled := false
+			steerLockEdit.Text := ""
 		}
 
 		if !analyzer.settingAvailable("SteerRatio") {
-			GuiControl Disable, steerRatioEdit
-			GuiControl, , steerRatioEdit, % ""
+			steerRatioEdit.Enabled := false
+			steerRatioEdit.Text := ""
 		}
 
 		if !analyzer.settingAvailable("Wheelbase") {
-			GuiControl Disable, wheelbaseEdit
-			GuiControl, , wheelbaseEdit, % ""
+			wheelbaseEdit.Enabled := false
+			wheelbaseEdit.Text := ""
 		}
 
 		if !analyzer.settingAvailable("TrackWidth") {
-			GuiControl Disable, trackWidthEdit
-			GuiControl, , trackWidthEdit, % ""
+			trackWidthEdit.Enabled := false
+			trackWidthEdit.Text := ""
 		}
 
-		Gui %window%:Font, Italic, Arial
+		analyzerGui.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, GroupBox, -Theme x16 yp+34 w320 h215 HWNDwidget5, % translate("Thresholds")
+		widget5 := analyzerGui.Add("GroupBox", "-Theme x16 yp+34 w320 h215", translate("Thresholds"))
 
-		Gui %window%:Font, Norm, Arial
+		analyzerGui.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Text, x24 yp+21 w130 h23 +0x200 HWNDwidget6, % translate("Consider less than")
-		Gui %window%:Add, Edit, x158 yp w45 h23 +0x200 Number Limit3 HWNDwidget7 vlowspeedThresholdEdit, % analyzer.LowspeedThreshold
-		Gui %window%:Add, UpDown, x188 yp w18 h23 Range1-999 HWNDwidget33, % analyzer.LowspeedThreshold
-		Gui %window%:Add, Text, x207 yp w120 h23 +0x200 HWNDwidget8, % translate("km/h as low speed")
+		widget6 := analyzerGui.Add("Text", "x24 yp+21 w130 h23 +0x200", translate("Consider less than"))
+		lowspeedThresholdEdit := analyzerGui.Add("Edit", "x158 yp w45 h23 +0x200 Number Limit3", analyzer.LowspeedThreshold)
+		widget7 := lowspeedThresholdEdit
+		widget33 := analyzerGui.Add("UpDown", "x188 yp w18 h23 Range1-999", analyzer.LowspeedThreshold)
+		widget8 := analyzerGui.Add("Text", "x207 yp w120 h23 +0x200", translate("km/h as low speed"))
 
 		if !analyzer.settingAvailable("LowspeedThreshold") {
-			GuiControl Disable, lowspeedThresholdEdit
-			GuiControl, , lowspeedThresholdEdit, % ""
+			lowspeedThresholdEdit.Enabled := false
+			lowspeedThresholdEdit.Text := ""
 		}
 
-		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget9, % translate("Heavy Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget10 vheavyOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[3]
-		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget21 vheavyOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[3]
+		widget9 := analyzerGui.Add("Text", "x24 yp+30 w130 h20 +0x200", translate("Heavy Oversteer"))
+		heavyOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[3])
+		heavyOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		widget10 := heavyOversteerThresholdSlider
+		heavyOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[3])
+		heavyOversteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		widget21 := heavyOversteerThresholdEdit
 
-		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget11, % translate("Medium Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget12 vmediumOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[2]
-		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget22 vmediumOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[2]
+		widget11 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Oversteer"))
+		mediumOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[2])
+		mediumOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		widget12 := mediumOversteerThresholdSlider
+		mediumOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[2])
+		mediumOversteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		widget22 := mediumOversteerThresholdEdit
 
-		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget13, % translate("Light Oversteer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget14 vlightOversteerThresholdSlider gupdateThresholdSlider, % analyzer.OversteerThresholds[1]
-		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget23 vlightOversteerThresholdEdit gupdateThresholdEdit, % analyzer.OversteerThresholds[1]
+		widget13 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Light Oversteer"))
+		lightOversteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.OversteerThresholds[1])
+		lightOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		widget14 := lightOversteerThresholdSlider
+		lightOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[1])
+		lightOversteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		widget23 := lightOversteerThresholdEdit
 
-		Gui %window%:Add, Text, x24 yp+30 w130 h20 +0x200 HWNDwidget15, % translate("Light Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget16 vlightUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[1]
-		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget24 vlightUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[1]
+		widget15 := analyzerGui.Add("Text", "x24 yp+30 w130 h20 +0x200", translate("Light Understeer"))
+		lightUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[1])
+		lightUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		widget16 := lightUndersteerThresholdSlider
+		lightUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[1])
+		lightUndersteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		widget24 := lightUndersteerThresholdEdit
 
-		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget17, % translate("Medium Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget18 vmediumUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[2]
-		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget25 vmediumUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[2]
+		widget17 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Understeer"))
+		mediumUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[2])
+		mediumUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		widget18 := mediumUndersteerThresholdSlider
+		mediumUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[2])
+		mediumUndersteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		widget25 := mediumUndersteerThresholdEdit
 
-		Gui %window%:Add, Text, x24 yp+22 w130 h20 +0x200 HWNDwidget19, % translate("Heavy Understeer")
-		Gui %window%:Add, Slider, Center Thick15 x158 yp+2 w132 0x10 Range%kMinThreshold%-%kMaxThreshold% ToolTip HWNDwidget20 vheavyUndersteerThresholdSlider gupdateThresholdSlider, % analyzer.UndersteerThresholds[3]
-		Gui %window%:Add, Edit, x293 yp w35 +0x200 HWNDwidget26 vheavyUndersteerThresholdEdit gupdateThresholdEdit, % analyzer.UndersteerThresholds[3]
+		widget19 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Heavy Understeer"))
+		heavyUndersteerThresholdSlider := analyzerGui.Add("Slider", "Center Thick15 x158 yp+2 w132 0x10 Range" . kMinThreshold . "-" . kMaxThreshold . " ToolTip", analyzer.UndersteerThresholds[3])
+		heavyUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
+		widget20 := heavyUndersteerThresholdSlider
+		heavyUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[3])
+		heavyUndersteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		widget26 := heavyUndersteerThresholdEdit
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
-			GuiControl Disable, heavyOversteerThresholdSlider
-			GuiControl, , heavyOversteerThresholdSlider, 0
-			GuiControl Disable, mediumOversteerThresholdSlider
-			GuiControl, , mediumOversteerThresholdSlider, 0
-			GuiControl Disable, lightOversteerThresholdSlider
-			GuiControl, , lightOversteerThresholdSlider, 0
+			heavyOversteerThresholdSlider.Enabled := false
+			heavyOversteerThresholdSlider.Value := 0
+			mediumOversteerThresholdSlider.Enabled := false
+			mediumOversteerThresholdSlider.Value := 0
+			lightOversteerThresholdSlider.Enabled := false
+			lightOversteerThresholdSlider.Value := 0
 		}
 
 		if !analyzer.settingAvailable("UndersteerThresholds") {
-			GuiControl Disable, heavyUndersteerThresholdSlider
-			GuiControl, , heavyUndersteerThresholdSlider, 0
-			GuiControl Disable, mediumUndersteerThresholdSlider
-			GuiControl, , mediumUndersteerThresholdSlider, 0
-			GuiControl Disable, lightUndersteerThresholdSlider
-			GuiControl, , lightUndersteerThresholdSlider, 0
+			heavyUndersteerThresholdSlider.Enabled := false
+			heavyUndersteerThresholdSlider.Value := 0
+			mediumUndersteerThresholdSlider.Enabled := false
+			mediumUndersteerThresholdSlider.Value := 0
+			lightUndersteerThresholdSlider.Enabled := false
+			lightUndersteerThresholdSlider.Value := 0
 		}
 
 		loop 33
-			prepareWidgets.Push(widget%A_Index%)
+			prepareWidgets.Push(%"widget" . A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", collect(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
+		widget1 := analyzerGui.Add("ListView", "x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
+		widget1.OnEvent("Click", noSelect)
+		widget1.OnEvent("DoubleClick", noSelect)
 
 		issuesListView := widget1
 
-		Gui %window%:Font, s14, Arial
+		analyzerGui.SetFont("s14", "Arial")
 
-		Gui %window%:Add, Text, x16 ys+200 w320 h200 HWNDwidget2 Wrap Hidden, % translate("Go to the track and run some decent laps. Then click on ""Stop"" to analyze the telemetry data.")
+		widget2 := analyzerGui.Add("Text", "x16 ys+200 w320 h200 Wrap Hidden", translate("Go to the track and run some decent laps. Then click on `"Stop`" to analyze the telemetry data."))
 
-		Gui %window%:Font, Norm s8, Arial
+		analyzerGui.SetFont("Norm s8", "Arial")
 
 		loop 2
-			runWidgets.Push(widget%A_Index%)
+			runWidgets.Push(%"widget" . A_Index%)
 
-		Gui %window%:Add, ListView, x16 ys w320 h230 -Multi -LV0x10 Checked NoSort NoSortHdr HWNDwidget1 gnoSelect Hidden, % values2String("|", collect(["Characteristic", "Intensity", "Frequency (%)"], "translate")*)
+		widget1 := analyzerGui.Add("ListView", "x16 ys w320 h230 -Multi -LV0x10 Checked NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
+		widget1.OnEvent("Click", noSelect)
+		widget1.OnEvent("DoubleClick", noSelect)
 
 		resultListView := widget1
 
-		Gui %window%:Add, Text, x16 yp+238 w130 h23 +0x200 HWNDwidget2 Hidden, % translate("Threshold")
-		Gui %window%:Add, Slider, x158 yp w60 0x10 Range0-25 ToolTip HWNDwidget3 vapplyThresholdSlider gupdateThreshold Hidden, 0
-		Gui %window%:Add, Text, x220 yp+3 HWNDwidget4 Hidden, % translate("%")
+		widget2 := analyzerGui.Add("Text", "x16 yp+238 w130 h23 +0x200 Hidden", translate("Threshold"))
+		applyThresholdSlider := analyzerGui.Add("Slider", "x158 yp w60 0x10 Range0-25 ToolTip Hidden", 0)
+		applyThresholdSlider.OnEvent("Change", runAnalyzer.Bind("Threshold"))
+		widget3 := applyThresholdSlider
+		widget4 := analyzerGui.Add("Text", "x220 yp+3 Hidden", translate("%"))
 
 		loop 4
-			analyzeWidgets.Push(widget%A_Index%)
+			analyzeWidgets.Push(%"widget" . A_Index%)
 
-		Gui %window%:Add, Button, x16 ys+290 w80 h23 vcalibrateButton gcalibrateAnalyzer, % translate("Calibrate...")
-		Gui %window%:Add, Button, x158 yp w80 h23 Default vactivateButton gactivateAnalyzer, % translate("Start")
-		Gui %window%:Add, Button, xp+98 yp w80 h23 gcancelAnalyzer, % translate("Cancel")
+		calibrateButton := analyzerGui.Add("Button", "x16 ys+290 w80 h23 ", translate("Calibrate..."))
+		calibrateButton.OnEvent("Click", runAnalyzer.Bind("Calibrate"))
+		activateButton := analyzerGui.Add("Button", "x158 yp w80 h23 Default", translate("Start"))
+		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
+		analyzerGui.Add("Button", "xp+98 yp w80 h23", translate("Cancel")).OnEvent("Click", runAnalyzer.Bind(kCancel))
 
-		Gui %window%:+Owner%aWindow%
-		Gui %aWindow%:+Disabled
+		analyzerGui.Opt("+Owner" . SetupAdvisor.Instance.Window)
 
 		try {
-			if getWindowPosition("Setup Advisor.Analyzer", x, y)
-				Gui %window%:Show, AutoSize x%x% y%y%
+			if getWindowPosition("Setup Advisor.Analyzer", &x, &y)
+				analyzerGui.Show("AutoSize x" . x . " y" . y)
 			else
-				Gui %window%:Show, AutoSize Center
+				analyzerGui.Show("AutoSize Center")
 
 			while !result
-				Sleep 100
+				Sleep(100)
 		}
 		finally {
-			Gui %aWindow%:-Disabled
-
 			if dataFile
 				deleteFile(dataFile)
 
@@ -872,7 +876,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzer.stopTelemetryAnalyzer()
 		}
 
-		Gui %window%:Destroy
+		analyzerGui.Destroy()
 
 		return ((result == kCancel) ? false : result)
 	}
@@ -886,6 +890,7 @@ runCalibrator(commandOrAnalyzer) {
 	local mediumOversteerThreshold, mediumUndersteerThreshold
 	local window, x, y, ignore, type, speed, key, value, variable
 
+	static calibratorGui
 	static activateButton
 	static infoText
 
@@ -894,8 +899,8 @@ runCalibrator(commandOrAnalyzer) {
 	static state := "Start"
 	static dataFile := false
 
-	static cleanValues := {}
-	static overValues := {}
+	static cleanValues := CaseInsenseMap()
+	static overValues := CaseInsenseMap()
 
 	if (commandOrAnalyzer == kCancel) {
 		analyzer.stopTelemetryAnalyzer()
@@ -903,8 +908,8 @@ runCalibrator(commandOrAnalyzer) {
 		result := kCancel
 	}
 	else if ((commandOrAnalyzer == "Activate") && (state = "Start")) {
-		GuiControl, , infoText, % translate("Drive at least two consecutive clean laps without under- or oversteering the car. Then press ""Next"".")
-		GuiControl, , activateButton, % translate("Next")
+		infoText.Text := translate("Drive at least two consecutive clean laps without under- or oversteering the car. Then press `"Next`".")
+		activateButton.Text := translate("Next")
 
 		dataFile := temporaryFileName("Calibrator", "data")
 
@@ -917,8 +922,8 @@ runCalibrator(commandOrAnalyzer) {
 
 		cleanValues := readMultiMap(dataFile)
 
-		GuiControl, , infoText, % translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press ""Finish"".")
-		GuiControl, , activateButton, % translate("Finish")
+		infoText.Text := translate("Drive at least two consecutive hard laps and provoke under- and oversteering to the max but stay on the track. Then press `"Finish`".")
+		activateButton.Text := translate("Finish")
 
 		state := "Push"
 
@@ -940,43 +945,38 @@ runCalibrator(commandOrAnalyzer) {
 		dataFile := false
 		result := false
 
-		cleanValues := {}
-		overValues := {}
-		window := "CAN"
+		cleanValues := CaseInsenseMap()
+		overValues := CaseInsenseMap()
 
-		Gui %window%:New
+		calibratorGui := Window()
 
-		Gui %window%:Default
+		calibratorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		calibratorGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(calibratorGui, "Setup Advisor.Calibrator"))
 
-		Gui %window%:Font, s10 Bold, Arial
+		calibratorGui.SetFont("s9 Norm", "Arial")
+		calibratorGui.SetFont("Italic Underline", "Arial")
 
-		Gui %window%:Add, Text, w324 Center gmoveCalibrator, % translate("Modular Simulator Controller System")
+		calibratorGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(analyzerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer"))
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+		calibratorGui.SetFont("Norm s14", "Arial")
 
-		Gui %window%:Add, Text, x78 YP+20 w184 cBlue Center gopenAnalyzerDocumentation, % translate("Telemetry Analyzer")
+		infoText := calibratorGui.Add("Text", "x16 yp+30 w320 h140 Wrap", translate("Start a practice session and prepare for a run. Then press `"Start`"."))
 
-		Gui %window%:Font, Norm s14, Arial
+		calibratorGui.SetFont("Norm s8", "Arial")
 
-		Gui %window%:Add, Text, x16 yp+30 w320 h140 Wrap vinfoText, % translate("Start a practice session and prepare for a run. Then press ""Start"".")
-
-		Gui %window%:Font, Norm s8, Arial
-
-		Gui %window%:Add, Button, x92 yp+145 w80 h23 Default vactivateButton gactivateCalibrator, % translate("Start")
-		Gui %window%:Add, Button, xp+100 yp w80 h23 gcancelCalibrator, % translate("Cancel")
+		activateButton := calibratorGui.Add("Button", "x92 yp+145 w80 h23 Default", translate("Start"))
+		activateButton.OnEvent("Click", runCalibrator.Bind("Activate"))
+		calibratorGui.Add("Button", "xp+100 yp w80 h23", translate("Cancel")).OnEvent("Click", runCalibrator.Bind(kCancel))
 
 		try {
-			if getWindowPosition("Setup Advisor.Calibrator", x, y)
-				Gui %window%:Show, AutoSize x%x% y%y%
+			if getWindowPosition("Setup Advisor.Calibrator", &x, &y)
+				calibratorGui.Show("AutoSize x" . x . " y" . y)
 			else
-				Gui %window%:Show, AutoSize Center
+				calibratorGui.Show("AutoSize Center")
 
 			while !result
-				Sleep 100
+				Sleep(100)
 		}
 		finally {
 			; if dataFile
@@ -985,7 +985,7 @@ runCalibrator(commandOrAnalyzer) {
 			analyzer.stopTelemetryAnalyzer()
 		}
 
-		Gui %window%:Destroy
+		calibratorGui.Destroy()
 
 		if (result != kCancel) {
 			for ignore, type in ["Oversteer", "Understeer"] {
@@ -1037,53 +1037,4 @@ runCalibrator(commandOrAnalyzer) {
 		else
 			return false
 	}
-}
-
-noSelect() {
-	loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
-}
-
-updateThresholdSlider() {
-	runAnalyzer("UpdateSlider")
-}
-
-updateThresholdEdit() {
-	runAnalyzer("UpdateSlider", true)
-}
-
-activateAnalyzer() {
-	runAnalyzer("Activate")
-}
-
-calibrateAnalyzer() {
-	runAnalyzer("Calibrate")
-}
-
-cancelAnalyzer() {
-	runAnalyzer(kCancel)
-}
-
-updateThreshold() {
-	runAnalyzer("Threshold")
-}
-
-moveAnalyzer() {
-	moveByMouse("TAN", "Setup Advisor.Analyzer")
-}
-
-openAnalyzerDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer
-}
-
-moveCalibrator() {
-	moveByMouse("CAN", "Setup Advisor.Calibrator")
-}
-
-activateCalibrator() {
-	runCalibrator("Activate")
-}
-
-cancelCalibrator() {
-	runCalibrator(kCancel)
 }

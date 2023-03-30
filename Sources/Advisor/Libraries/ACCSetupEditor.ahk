@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Setup Editor for ACC            ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,8 @@
 ;;;                           Local Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\JSON.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\..\Libraries\JSON.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -46,10 +46,10 @@ class ACCSetup extends FileSetup {
 			if InStr(path, "[") {
 				path := string2Values("[", SubStr(path, 1, StrLen(path) - 1))
 
-				if data.HasKey(path[1]) {
+				if data.Has(path[1]) {
 					data := data[path[1]]
 
-					if data.HasKey(path[2])
+					if data.Has(path[2])
 						data := data[path[2]]
 					else
 						return default
@@ -57,7 +57,7 @@ class ACCSetup extends FileSetup {
 				else
 					return default
 			}
-			else if data.HasKey(path)
+			else if data.Has(path)
 				data := data[path]
 			else
 				return default
@@ -69,7 +69,7 @@ class ACCSetup extends FileSetup {
 	setValue(setting, value, display := false) {
 		local data := (display ? display : this.Data)
 		local elements := string2Values(".", getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting))
-		local length := elements.Length()
+		local length := elements.Length
 		local index, path, last
 
 		try {
@@ -79,10 +79,10 @@ class ACCSetup extends FileSetup {
 				if InStr(path, "[") {
 					path := string2Values("[", SubStr(path, 1, StrLen(path) - 1))
 
-					if data.HasKey(path[1]) {
+					if data.Has(path[1]) {
 						data := data[path[1]]
 
-						if data.HasKey(path[2]) {
+						if data.Has(path[2]) {
 							if last
 								return (data[path[2]] := value)
 							else
@@ -94,7 +94,7 @@ class ACCSetup extends FileSetup {
 					else
 						return value
 				}
-				else if data.HasKey(path) {
+				else if data.Has(path) {
 					if last
 						return (data[path] := value)
 					else
@@ -159,7 +159,7 @@ class ACCSetupEditor extends FileSetupEditor {
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
-		local title, fileName, theSetup
+		local fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
@@ -167,13 +167,11 @@ class ACCSetupEditor extends FileSetupEditor {
 		if (track && (track != true))
 			directory .= ("\" . track)
 
-		title := translate("Load ACC Setup File...")
+		this.Window.Opt("+OwnDialogs")
 
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.json)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := FileSelect(1, directory, translate("Load ACC Setup File..."), "Setup (*.json)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
 			theSetup := ACCSetup(this, fileName)
@@ -191,18 +189,16 @@ class ACCSetupEditor extends FileSetupEditor {
 		local fileName := this.Setup.FileName
 		local directory, title, fileName, text
 
-		if fileName = this.Setup.FileName[true]
-			SplitPath fileName, , directory
+		if (fileName = "this.Setup.FileName[true]")
+			SplitPath(fileName, , &directory)
 		else
 			directory := fileName
 
-		title := translate("Save ACC Setup File...")
+		this.Window.Opt("+OwnDialogs")
 
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-		FileSelectFile fileName, S17, %directory%, %title%, Setup (*.json)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateSaveCancelButtons)
+		fileName := FileSelect("S17", directory, translate("Save ACC Setup File..."), "Setup (*.json)")
+		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
 			if !InStr(fileName, ".json")
@@ -212,7 +208,7 @@ class ACCSetupEditor extends FileSetupEditor {
 
 			text := this.Setup.Setup
 
-			FileAppend %text%, %fileName%
+			FileAppend(text, fileName)
 
 			this.Setup.FileName := fileName
 		}
@@ -229,7 +225,7 @@ class ACCSetupComparator extends FileSetupComparator {
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
-		local title, fileName, theSetup
+		local fileName, theSetup
 
 		if (car && (car != true))
 			directory .= ("\" . car)
@@ -237,13 +233,11 @@ class ACCSetupComparator extends FileSetupComparator {
 		if (track && (track != true))
 			directory .= ("\" . track)
 
-		title := (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File..."))
+		this.Window.Opt("+OwnDialogs")
 
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-		FileSelectFile fileName, 1, %directory%, %title%, Setup (*.json)
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateLoadCancelButtons)
+		fileName := FileSelect(1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File...")), "Setup (*.json)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
 			theSetup := ACCSetup(this, fileName)

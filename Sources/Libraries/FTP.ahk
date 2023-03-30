@@ -212,10 +212,12 @@ class FTP {
 		catch Any
 			result["FileName"]      := ""
 
-		try
+		try {
 			result["AlternateFileName"] := StrGet(WIN32_FIND_DATA.Ptr + 44 + MAX_PATH, MAX_PATH, "utf-16")
-		catch Any
+		}
+		catch Any {
 			result["AlternateFileName"] := ""
+		}
 
 		return result
 	}

@@ -678,7 +678,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 				driver := getMultiMapValue(raceData, "Cars", "Driver", 0)
 				laps := getMultiMapValue(raceData, "Laps", "Count", 0)
 
-				if (reader.getClasses(raceData).Length() > 1) {
+				if (reader.getClasses(raceData).Length > 1) {
 					class := getMultiMapValue(raceData, "Cars", "Car." . driver . ".Class", false)
 
 					if class {

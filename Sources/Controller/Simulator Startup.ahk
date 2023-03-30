@@ -154,7 +154,7 @@ class SimulatorStartup extends ConfigurationItem {
 
 				return false
 			}
-			else if (noConfiguration && (readMultiMap(kSimulatorConfigurationFile).Count() == 0)) {
+			else if (noConfiguration && (readMultiMap(kSimulatorConfigurationFile).Count == 0)) {
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("Cannot initiate startup sequence, please check the configuration..."), translate("Error"), 262160)
 				OnMessage(0x44, translateOkButton, 0)

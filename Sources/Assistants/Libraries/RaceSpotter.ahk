@@ -214,7 +214,7 @@ class CarInfo {
 			local numDeltas, ignore, sDeltas
 
 			if sector {
-				numDeltas := this.Deltas[sector].Length()
+				numDeltas := this.Deltas[sector].Length
 
 				loop Min(count, numDeltas)
 					deltas.Push(this.Deltas[sector][numDeltas - A_Index + 1])
@@ -351,9 +351,9 @@ class CarInfo {
 
 	hasDelta(sector := false) {
 		if sector
-			return (this.Deltas[sector].Count() > 0)
+			return (this.Deltas[sector].Count > 0)
 		else
-			return (this.Deltas.Count() > 0)
+			return (this.Deltas.Count > 0)
 	}
 
 	hasProblem() {
@@ -959,7 +959,7 @@ class RaceSpotter extends GridRaceAssistant {
 					SupportMenu.Uncheck(label)
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, false, false)
 		}
 	}
 
@@ -1196,7 +1196,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local talking := false
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (this.getPosition(false, "Class") = this.getCars("Class").Length())
+		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker := this.getSpeaker()
@@ -1342,9 +1342,9 @@ class RaceSpotter extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 		else {
 			if this.MultiClass
-				this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length(), classCars: this.getCars("Class").Length()})
+				this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length, classCars: this.getCars("Class").Length})
 			else
-				this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length()})
+				this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length})
 		}
 	}
 

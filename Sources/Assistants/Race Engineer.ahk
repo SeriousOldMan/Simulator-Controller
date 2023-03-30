@@ -112,7 +112,7 @@ startRaceEngineer() {
 
 	index := 1
 
-	while (index < A_Args.Length()) {
+	while (index < A_Args.Length) {
 		switch A_Args[index] {
 			case "-Remote":
 				remotePID := A_Args[index + 1]

@@ -24,10 +24,12 @@ CLR_LoadLibrary(AssemblyName, AppDomain := 0) {
 
 	typeofAssembly := AppDomain.GetType().Assembly.GetType()
 
-	try
+	try {
 		return typeofAssembly.InvokeMember_3("LoadWithPartialName", 0x158, null, null, args)
-	catch
+	}
+	catch Any {
 		return typeofAssembly.InvokeMember_3("LoadFrom", 0x158, null, null, args)
+	}
 }
 
 CLR_CreateObject(Assembly, TypeName, Args*) {

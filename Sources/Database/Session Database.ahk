@@ -3753,7 +3753,7 @@ editSettings(editorOrCommand, arguments*) {
 			groups[connection[1]] := values2String(",", connection[4]*)
 		}
 
-		if ((groups.Count() != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length)) {
+		if ((groups.Count != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length)) {
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)

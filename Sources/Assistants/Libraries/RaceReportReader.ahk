@@ -231,7 +231,7 @@ class RaceReportReader {
 						driverNicknames.Push(nickName)
 				}
 
-			if (classes.Count() > 1) {
+			if (classes.Count > 1) {
 				classPositions := overallPositions.Clone()
 
 				for ignore, carClass in classes {

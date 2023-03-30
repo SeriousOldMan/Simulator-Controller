@@ -861,7 +861,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local speaker := this.getSpeaker()
 		local delta, car, speaker, driver, inPit, lap, lapped
 
-		if (this.getPosition(false, "Class") = this.getCars("Class").Length())
+		if (this.getPosition(false, "Class") = this.getCars("Class").Length)
 			speaker.speakPhrase("NoGapToBehind")
 		else {
 			speaker.beginTalk()
@@ -993,9 +993,9 @@ class RaceStrategist extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Later")
 		else {
 			if this.MultiClass
-				this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length(), classCars: this.getCars("Class").Length()})
+				this.getSpeaker().speakPhrase("ActiveCarsClass", {overallCars: this.getCars().Length, classCars: this.getCars("Class").Length})
 			else
-				this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length()})
+				this.getSpeaker().speakPhrase("ActiveCars", {cars: this.getCars().Length})
 		}
 	}
 
@@ -2320,7 +2320,7 @@ class RaceStrategist extends GridRaceAssistant {
 			speaker.beginTalk()
 
 			try {
-				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length, first: laps[1], last: laps[laps.Length()]})
+				speaker.speakPhrase("EvaluatedLaps", {laps: laps.Length, first: laps[1], last: laps[laps.Length]})
 
 				if (position = Min(positions*))
 					speaker.speakPhrase("EvaluatedSimilarPosition", {position: position})

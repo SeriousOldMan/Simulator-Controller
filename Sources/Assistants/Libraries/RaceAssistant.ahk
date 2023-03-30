@@ -909,7 +909,7 @@ class RaceAssistant extends ConfigurationItem {
 					SupportMenu.Uncheck(label)
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, false, false)
 		}
 	}
 

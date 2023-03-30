@@ -2122,7 +2122,7 @@ pushButton(buttonNumber) {
 	local descriptor := ConfigurationItem.descriptor(kButtonType, buttonNumber)
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
-	if ((function != false) && (SimulatorController.Instance.getActions(function, "Push").Length() > 0))
+	if ((function != false) && (SimulatorController.Instance.getActions(function, "Push").Length > 0))
 		fireControllerActions(function, "Push")
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action pushButton - please check the configuration"))
@@ -2144,7 +2144,7 @@ rotateDial(dialNumber, direction) {
 	descriptor := ConfigurationItem.descriptor(kDialType, dialNumber)
 	function := SimulatorController.Instance.findFunction(descriptor)
 
-	if ((function != false) && (SimulatorController.Instance.getActions(function, direction).Length() > 0))
+	if ((function != false) && (SimulatorController.Instance.getActions(function, direction).Length > 0))
 		fireControllerActions(function, direction)
 	else
 		logMessage(kLogWarn, translate("Controller function ") . descriptor . translate(" not found in custom controller action rotateDial - please check the configuration"))
@@ -2155,9 +2155,9 @@ switchToggle(toggleType, toggleNumber, mode := "activate") {
 	local function := SimulatorController.Instance.findFunction(descriptor)
 
 	if (function != false) {
-		if (((mode = "activate") || (mode = "on")) && (SimulatorController.Instance.getActions(function, "On").Length() > 0))
+		if (((mode = "activate") || (mode = "on")) && (SimulatorController.Instance.getActions(function, "On").Length > 0))
 			fireControllerActions(function, "On")
-		else if (((mode = "deactivate") || (mode = "off")) && (SimulatorController.Instance.getActions(function, "Off").Length() > 0))
+		else if (((mode = "deactivate") || (mode = "off")) && (SimulatorController.Instance.getActions(function, "Off").Length > 0))
 			fireControllerActions(function, "Off")
 		else {
 			logMessage(kLogWarn, translate("Unsupported argument (") . mode . translate(") detected in switchToggle - please check the configuration"))

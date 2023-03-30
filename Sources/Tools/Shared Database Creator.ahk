@@ -246,8 +246,9 @@ downloadUserDatabases(directory) {
 
 				break
 			}
-			catch Any
+			catch Any {
 				Sleep(100)
+			}
 		}
 	}
 

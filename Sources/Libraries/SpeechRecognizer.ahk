@@ -918,7 +918,7 @@ class Grammar {
 			local ignore, word
 
 			for ignore, word in this.Words
-				if (words.Length() < running)
+				if (words.Length < running)
 					return false
 				else if !this.matchWord(words[running++], word)
 					return false
@@ -957,11 +957,11 @@ class Grammar {
 	}
 
 	AppendString(string) {
-		this.iParts.Push(this.Words(string))
+		this.iParts.Push(Grammar.Words(string))
 	}
 
 	AppendGrammars(grammars*) {
-		this.AppendChoices(this.Choices(grammars))
+		this.AppendChoices(Grammar.Choices(grammars))
 	}
 
 	match(words) {
@@ -973,7 +973,7 @@ class Grammar {
 	matchWords(words, &index) {
 		local alternatives, running, ignore, part
 
-		if (words.Length() < index)
+		if (words.Length < index)
 			return true
 		else {
 			alternatives := false

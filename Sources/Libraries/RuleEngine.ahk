@@ -350,8 +350,8 @@ class Predicate extends Condition {
 						unknown := true
 				}
 			}
-			catch Any {
-				MsgBox "Oops"
+			catch Any as exception {
+				logError(exception)
 			}
 
 			if unknown

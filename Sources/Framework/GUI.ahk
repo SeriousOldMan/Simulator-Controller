@@ -190,7 +190,7 @@ class Window extends Gui {
 					case "Grow":
 						%variable% += (horizontal ? deltaWidth : deltaHeight)
 					case "Grow/2":
-						%variable% += (horizontal ? deltaWidth : deltaHeight)
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 2)
 					case "Grow/3":
 						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3)
 					case "Grow\3":

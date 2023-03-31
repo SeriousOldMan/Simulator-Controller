@@ -31,8 +31,8 @@ class ACCSetup extends FileSetup {
 		}
 	}
 
-	__New(editor, originalFileName := false) {
-		super.__New(editor, originalFileName)
+	__New(editor, originalFileName := false, modifiedFileName := false) {
+		super.__New(editor, originalFileName, modifiedFileName)
 
 		this.iOriginalData := JSON.parse(this.Setup[true])
 		this.iModifiedData := JSON.parse(this.Setup[false])

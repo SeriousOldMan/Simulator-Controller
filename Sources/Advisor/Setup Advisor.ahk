@@ -183,11 +183,11 @@ class SetupAdvisor extends ConfigurationItem {
 
 	SelectedCharacteristicsWidgets[key := false] {
 		Get {
-			return (key ? this.iCharacteristicsWidgets[key] : this.iCharacteristicsWidgets)
+			return (key ? this.iSelectedCharacteristicsWidgets[key] : this.iSelectedCharacteristicsWidgets)
 		}
 
 		Set {
-			return (key ? (this.iCharacteristicsWidgets[key] := value) : (this.iCharacteristicsWidgets := value))
+			return (key ? (this.iSelectedCharacteristicsWidgets[key] := value) : (this.iSelectedCharacteristicsWidgets := value))
 		}
 	}
 
@@ -263,6 +263,10 @@ class SetupAdvisor extends ConfigurationItem {
 	Setup {
 		Get {
 			return this.iSetup
+		}
+
+		Set {
+			return (this.iSetup := value)
 		}
 	}
 
@@ -381,14 +385,14 @@ class SetupAdvisor extends ConfigurationItem {
 
 		advisorGui.SetFont("s10 Bold", "Arial")
 
-		advisorGui.Add("Text", "w1184 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(advisorGui, "Setup Advisor"))
+		advisorGui.Add("Text", "w1184 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(advisorGui, "Setup Advisor"))
 
 		advisorGui.SetFont("s9 Norm", "Arial")
 		advisorGui.SetFont("Italic Underline", "Arial")
 
-		advisorGui.Add("Text", "x508 YP+20 w184 cBlue Center", translate("Setup Advisor")).OnEvent("Click", openDocumentation.Bind(advisorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor"))
+		advisorGui.Add("Text", "x508 YP+20 w184 cBlue Center H:Center", translate("Setup Advisor")).OnEvent("Click", openDocumentation.Bind(advisorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor"))
 
-		advisorGui.Add("Text", "x8 yp+30 w1200 0x10 Section")
+		advisorGui.Add("Text", "x8 yp+30 w1200 0x10 W:Grow Section")
 
 		advisorGui.SetFont("Norm")
 		advisorGui.SetFont("s10 Bold", "Arial")
@@ -452,7 +456,7 @@ class SetupAdvisor extends ConfigurationItem {
 		advisorGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
 
 		advisorGui.SetFont("s8 Norm")
-		advisorGui.Add("GroupBox", "x16 yp+30 w382 h469 -Theme")
+		advisorGui.Add("GroupBox", "x16 yp+30 w382 h469 -Theme H:Grow")
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
@@ -466,19 +470,19 @@ class SetupAdvisor extends ConfigurationItem {
 
 		advisorGui.SetFont("s8 Norm", "Arial")
 
-		this.iSettingsViewer := advisorGui.Add("ActiveX", "x420 yp+30 w775 h621 Border vsettingsViewer", "shell.explorer").Value
+		this.iSettingsViewer := advisorGui.Add("ActiveX", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer", "shell.explorer").Value
 		this.SettingsViewer.Navigate("about:blank")
 
 		this.showSettingsChart(false)
 
 		advisorGui.SetFont("Norm", "Arial")
 
-		advisorGui.Add("Text", "x8 y730 w1200 0x10")
+		advisorGui.Add("Text", "x8 y730 w1200 0x10 Y:Move W:Grow")
 
-		advisorGui.Add("Button", "x16 y738 w77 h23", translate("&Load...")).OnEvent("Click", loadSetup)
-		advisorGui.Add("Button", "x98 y738 w77 h23", translate("&Save...")).OnEvent("Click", saveSetup)
+		advisorGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadSetup)
+		advisorGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
 
-		advisorGui.Add("Button", "x574 y738 w80 h23", translate("Close")).OnEvent("Click", closeSetupAdvisor)
+		advisorGui.Add("Button", "x574 y738 w80 h23 H:Center Y:Move", translate("Close")).OnEvent("Click", closeSetupAdvisor)
 	}
 
 	saveState(fileName := false) {
@@ -1277,7 +1281,7 @@ class SetupAdvisor extends ConfigurationItem {
 	loadWeather(weather, force := false) {
 	}
 
-	startTelemetryAnalyzer() {
+	startTelemetryAnalyzer(*) {
 		local analyzerClass := getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
 		if analyzerClass
@@ -1291,7 +1295,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.showSettingsChart(false)
 	}
 
-	addCharacteristic(characteristic, weight := 50, value := 33, draw := true) {
+	addCharacteristic(characteristic, weight := 50, value := 33, draw := true, *) {
 		local advisor := this
 		local window := this.Window
 		local numCharacteristics := this.SelectedCharacteristics.Length
@@ -1330,8 +1334,6 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
-			this.Window
-
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
@@ -1342,7 +1344,7 @@ class SetupAdvisor extends ConfigurationItem {
 			window.SetFont("s10 Italic", "Arial")
 
 			deleteButton := window.Add("Button", "x" . X . " y" . Y . " w20 h20")
-			deleteButton.OnEvent("Click", ObjBindMethod(this, "deleteCharacteristic", characteristic))
+			deleteButton.OnEvent("Click", ObjBindMethod(this, "deleteCharacteristic", characteristic, true))
 			setButtonIcon(deleteButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 			x := x + 25
@@ -1383,7 +1385,7 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 
-	deleteCharacteristic(characteristic, draw := true) {
+	deleteCharacteristic(characteristic, draw := true, *) {
 		local numCharacteristics := this.SelectedCharacteristics.Length
 		local index := inList(this.SelectedCharacteristics, characteristic)
 		local ignore, widget, row, y, widgets, pos, poxX, posY
@@ -1456,7 +1458,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 						if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
 							dynamicMenus[optionMenu].Add(characteristicLabels[option]
-													   , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33))
+													   , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33, true))
 
 							optionEmpty := false
 						}
@@ -1473,7 +1475,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 					if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
 						dynamicMenus[groupMenu].Add(characteristicLabels[groupOption]
-												  , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33))
+												  , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33, true))
 
 						groupEmpty := false
 					}
@@ -1560,7 +1562,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local editorClass := getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false)
 
 		if editorClass
-			this.iSetup := %editorClass%(this).editSetup(this.Setup)
+			%editorClass%(this).editSetup(this.Setup)
 	}
 }
 
@@ -1955,7 +1957,7 @@ class SetupEditor extends ConfigurationItem {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Resizeable: true, Closeable: true})
+			super.__New({Resizeable: true, Closeable: true}, "Setup Editor")
 		}
 
 		Close(*) {
@@ -2092,40 +2094,40 @@ class SetupEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Text", "w784 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Setup Advisor.Setup Editor"))
+		editorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Setup Advisor.Setup Editor"))
 
 		editorGui.SetFont("s9 Norm", "Arial")
 		editorGui.SetFont("Italic Underline", "Arial")
 
-		editorGui.Add("Text", "x308 YP+20 w184 cBlue Center", translate("Setup Editor")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups"))
+		editorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Editor")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Text", "x8 yp+30 w800 0x10 Section")
+		editorGui.Add("Text", "x8 yp+30 w800 0x10 W:Grow Section")
 
 		editorGui.Add("Button", "x16 ys+10 w60", translate("Setup:")).OnEvent("Click", chooseSetupFile)
 		editorGui.Add("Text", "x85 ys+14 w193 vsetupNameViewer")
-		editorGui.Add("Button", "x280 ys+10 w80  vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
+		editorGui.Add("Button", "x280 ys+10 w80 X:Move/2 vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow/2 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectSetting)
 
-		editorGui.Add("Button", "x16 yp+324 w80 Disabled vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
-		editorGui.Add("Button", "x280 yp w80 Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
+		editorGui.Add("Button", "x16 yp+324 w80 Disabled Y:Move vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
+		editorGui.Add("Button", "x280 yp w80 Y:Move X:Move/2 Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
 
-		editorGui.Add("Button", "x280 yp+29 w80", translate("Compare...")).OnEvent("Click", compareSetup)
+		editorGui.Add("Button", "x280 yp+29 w80 Y:Move X:Move/2", translate("Compare...")).OnEvent("Click", compareSetup)
 
-		editorGui.Add("Button", "x16 ys+420 w80", translate("&Apply")).OnEvent("Click", applyRecommendations)
-		editorGui.Add("Slider", "x100 ys+422 w60 0x10 Range20-100 ToolTip vapplyStrengthSlider", 100)
-		editorGui.Add("Text", "x162 ys+425", translate("%"))
+		editorGui.Add("Button", "x16 ys+420 w80 Y:Move", translate("&Apply")).OnEvent("Click", applyRecommendations)
+		editorGui.Add("Slider", "x100 ys+422 w60 0x10 Y:Move Range20-100 ToolTip vapplyStrengthSlider", 100)
+		editorGui.Add("Text", "x162 ys+425 Y:Move", translate("%"))
 
-		editorGui.Add("Button", "x280 ys+420 w80", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
+		editorGui.Add("Button", "x280 ys+420 w80 Y:Move X:Move/2", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
 
-		editorGui.Add("Edit", "x374 ys+10 w423 h433 T8 ReadOnly -Wrap HScroll vsetupViewer")
+		editorGui.Add("Edit", "x374 ys+10 w423 h433 T8 X:Move/2 W:Grow/2 H:Grow ReadOnly -Wrap HScroll vsetupViewer")
 
-		editorGui.Add("Text", "x8 y506 w800 0x10")
+		editorGui.Add("Text", "x8 y506 w800 0x10 Y:Move W:Grow")
 
-		editorGui.Add("Button", "x374 y514 w80 h23", translate("Close")).OnEvent("Click", closeEditor)
+		editorGui.Add("Button", "x374 y514 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeEditor)
 	}
 
 	show() {
@@ -2141,6 +2143,14 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	close() {
+		this.destroy()
+
+		if this.Setup {
+			this.Advisor.Setup := this.Setup
+
+			this.Setup.Editor := false
+		}
+
 		this.iClosed := true
 	}
 
@@ -2156,18 +2166,6 @@ class SetupEditor extends ConfigurationItem {
 		this.createGui(this.Configuration)
 
 		this.show()
-
-		try {
-			while !this.iClosed
-				Sleep(200)
-		}
-		finally {
-			this.destroy()
-		}
-
-		this.Setup.Editor := false
-
-		return this.Setup
 	}
 
 	updateState() {
@@ -2246,7 +2244,7 @@ class SetupEditor extends ConfigurationItem {
 		else
 			this.Setup := setup
 
-		this.Control["TextsetupNameViewer"].Text := (setup ? setup.Name : "")
+		this.Control["setupNameViewer"].Text := (setup ? setup.Name : "")
 		this.Control["setupViewer"].Text := (setup ? setup.Setup : "")
 
 		categories := getMultiMapValues(this.Advisor.Definition, "Setup.Categories")
@@ -2442,9 +2440,11 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	resetSetup() {
+		local setup := this.Setup
+
 		this.Setup.reset()
 
-		this.loadSetup(this.Setup)
+		this.loadSetup(&setup)
 	}
 
 	updateSetting(setting, newValue) {
@@ -2696,7 +2696,9 @@ class SetupComparator extends ConfigurationItem {
 		}
 
 		mixSetups(*) {
-			comparator.loadSetups(false, false, comparatorGui["applyMixSlider"].Value)
+			local ignore := false
+
+			comparator.loadSetups(&ignore, &ignore, comparatorGui["applyMixSlider"].Value)
 		}
 
 		comparatorGui := SetupComparator.ComparatorWindow(this)
@@ -2705,36 +2707,36 @@ class SetupComparator extends ConfigurationItem {
 
 		comparatorGui.SetFont("s10 Bold", "Arial")
 
-		comparatorGui.Add("Text", "w784 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(comparatorGui, "Setup Advisor.Setup Comparator"))
+		comparatorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(comparatorGui, "Setup Advisor.Setup Comparator"))
 
 		comparatorGui.SetFont("s9 Norm", "Arial")
 		comparatorGui.SetFont("Italic Underline", "Arial")
 
-		comparatorGui.Add("Text", "x308 YP+20 w184 cBlue Center", translate("Setup Comparator")).OnEvent("Click", openDocumentation.Bind(comparatorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups"))
+		comparatorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Comparator")).OnEvent("Click", openDocumentation.Bind(comparatorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups"))
 
 		comparatorGui.SetFont("s8 Norm", "Arial")
 
-		comparatorGui.Add("Text", "x8 yp+30 w800 0x10 Section")
+		comparatorGui.Add("Text", "x8 yp+30 w800 0x10 W:Grow Section")
 
 		comparatorGui.Add("Button", "x16 ys+10 w60", translate("Setup A:")).OnEvent("Click", chooseSetupAFile)
 		comparatorGui.Add("Text", "x85 ys+14 w193 vsetupNameAViewer")
 		comparatorGui.Add("Button", "x16 ys+34 w60", translate("Setup B:")).OnEvent("Click", chooseSetupBFile)
 		comparatorGui.Add("Text", "x85 ys+38 w193 vsetupNameBViewer")
 
-		this.iSettingsListView := comparatorGui.Add("ListView", "x16 ys+64 w784 h350 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], translate))
+		this.iSettingsListView := comparatorGui.Add("ListView", "x16 ys+64 w784 h350 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectABSetting)
 
-		comparatorGui.Add("Button", "x16 yp+354 w80 Disabled vdecreaseABSettingButton", translate("Decrease")).OnEvent("Click", decreaseABSetting)
-		comparatorGui.Add("Button", "x720 yp w80 Disabled vincreaseABSettingButton", translate("Increase")).OnEvent("Click", increaseABSetting)
+		comparatorGui.Add("Button", "x16 yp+354 w80 Disabled Y:Move vdecreaseABSettingButton", translate("Decrease")).OnEvent("Click", decreaseABSetting)
+		comparatorGui.Add("Button", "x720 yp w80 Disabled X:Move Y:Move vincreaseABSettingButton", translate("Increase")).OnEvent("Click", increaseABSetting)
 
-		comparatorGui.Add("Slider", "x316 yp w200 0x10 Range-100-100 ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
-		comparatorGui.Add("Text", "x251 yp+3 w50", translate("Setup A"))
-		comparatorGui.Add("Text", "x529 yp w50", translate("Setup B"))
+		comparatorGui.Add("Slider", "x316 yp w200 0x10 Range-100-100 Y:Move X:Move/2 ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
+		comparatorGui.Add("Text", "x251 yp+3 w50 Y:Move X:Move/2 ", translate("Setup A"))
+		comparatorGui.Add("Text", "x529 yp w50 X:Move/2 Y:Move", translate("Setup B"))
 
-		comparatorGui.Add("Text", "x8 y506 w800 0x10")
+		comparatorGui.Add("Text", "x8 y506 w800 0x10 Y:Move W:Grow")
 
-		comparatorGui.Add("Button", "x322 y514 w80 h23", translate("&Apply")).OnEvent("Click", applyComparator)
-		comparatorGui.Add("Button", "x426 y514 w80 h23 Default", translate("Close")).OnEvent("Click", closeComparator)
+		comparatorGui.Add("Button", "x322 y514 w80 h23 Y:Move X:Move/2", translate("&Apply")).OnEvent("Click", applyComparator)
+		comparatorGui.Add("Button", "x426 y514 w80 h23 Default Y:Move X:Move/2", translate("Close")).OnEvent("Click", closeComparator)
 	}
 
 	show() {
@@ -3074,7 +3076,7 @@ class FileSetupComparator extends SetupComparator {
 	}
 
 	loadSetups(&setupA := false, &setupB := false, mix := 0) {
-		super.loadSetups(setupA, setupB, mix)
+		super.loadSetups(&setupA, &setupB, mix)
 
 		if this.SetupAB
 			this.SetupAB.FileName[false] := setupA.FileName[false]

@@ -49,10 +49,10 @@ class ACSetup extends FileSetup {
 		}
 	}
 
-	__New(editor, originalFileName := false) {
+	__New(editor, originalFileName := false, modifiedFileName := false) {
 		iEditor := editor
 
-		super.__New(editor, originalFileName)
+		super.__New(editor, originalFileName, modifiedFileName)
 
 		this.iOriginalData := parseMultiMap(this.Setup[true])
 		this.iModifiedData := parseMultiMap(this.Setup[false])

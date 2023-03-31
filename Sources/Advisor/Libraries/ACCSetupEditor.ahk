@@ -167,7 +167,8 @@ class ACCSetupEditor extends FileSetupEditor {
 		if (track && (track != true))
 			directory .= ("\" . track)
 
-		this.Window.Opt("+OwnDialogs")
+		if this.Window
+			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := FileSelect(1, directory, translate("Load ACC Setup File..."), "Setup (*.json)")
@@ -194,7 +195,8 @@ class ACCSetupEditor extends FileSetupEditor {
 		else
 			directory := fileName
 
-		this.Window.Opt("+OwnDialogs")
+		if this.Window
+			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSaveCancelButtons)
 		fileName := FileSelect("S17", directory, translate("Save ACC Setup File..."), "Setup (*.json)")
@@ -233,7 +235,8 @@ class ACCSetupComparator extends FileSetupComparator {
 		if (track && (track != true))
 			directory .= ("\" . track)
 
-		this.Window.Opt("+OwnDialogs")
+		if this.Window
+			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := FileSelect(1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File...")), "Setup (*.json)")

@@ -199,7 +199,7 @@ startRaceStrategist() {
 	if (debug && strategistSpeaker) {
 		strategist.getSpeaker()
 
-		strategist.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase({})})
+		strategist.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase()})
 	}
 
 	if (strategistLogo && !kSilentMode)

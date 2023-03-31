@@ -82,7 +82,7 @@ initializeDebugging() {
 logUnhandledError(error, *) {
 	logError(error, true)
 
-	return -1
+	return ((isDevelopment() && isDebug()) ? 0: -1)
 }
 
 

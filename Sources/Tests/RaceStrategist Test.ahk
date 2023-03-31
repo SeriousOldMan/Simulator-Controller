@@ -46,7 +46,7 @@ class TestRaceStrategist extends RaceStrategist {
 		this.setDebug(kDebugKnowledgeBase, false)
 	}
 
-	createKnowledgeBase(facts) {
+	createKnowledgeBase(facts := false) {
 		local knowledgeBase := super.createKnowledgeBase(facts)
 
 		knowledgeBase.addRule(RuleCompiler().compileRule("carNumber(?car, ?car)"))

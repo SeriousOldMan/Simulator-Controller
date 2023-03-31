@@ -351,6 +351,13 @@ class Window extends Gui {
 		this.BackColor := backColor
 	}
 
+	Opt(options) {
+		super.Opt(options)
+
+		if InStr(options, "-Disabled")
+			this.Show("NA")
+	}
+
 	Add(type, options := "", arguments*) {
 		local rules := false
 		local newOptions, ignore, option, control

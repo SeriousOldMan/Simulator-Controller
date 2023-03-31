@@ -45,7 +45,7 @@ class ACSetup extends FileSetup {
 
 			value := printMultiMap(setup)
 
-			return (base.Setup[original] := StrReplace(StrReplace(value, "=true", "=1"), "=false", "=0"))
+			return (super.Setup[original] := StrReplace(StrReplace(value, "=true", "=1"), "=false", "=0"))
 		}
 	}
 
@@ -137,7 +137,8 @@ class ACSetupEditor extends FileSetupEditor {
 					break
 				}
 
-		this.Window.Opt("+OwnDialogs")
+		if this.Window
+			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := FileSelect(1, directory, translate("Load AC Setup File..."), "Setup (*.ini)")
@@ -164,7 +165,8 @@ class ACSetupEditor extends FileSetupEditor {
 		else
 			directory := fileName
 
-		this.Window.Opt("+OwnDialogs")
+		if this.Window
+			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateSaveCancelButtons)
 		fileName := FileSelect("S17", directory, translate("Save AC Setup File..."), "Setup (*.ini)")
@@ -208,7 +210,8 @@ class ACSetupComparator extends FileSetupComparator {
 					break
 				}
 
-		this.Window.Opt("+OwnDialogs")
+		if this.Window
+			this.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := FileSelect(1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" AC Setup File...")), "Setup (*.ini)")

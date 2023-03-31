@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,17 +25,17 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Application.ahk
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Math.ahk
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Math.ahk"
+#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -62,22 +62,13 @@ global kDebugRules := 2
 ;;;                         Public Classes Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global simulatorDropDown
-global carDropDown
-global trackDropDown
-global weatherDropDown
-
-global editSetupButton
-
-global settingsViewer
-
-global characteristicsButton
-
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SetupAdvisor                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SetupAdvisor extends ConfigurationItem {
+	iWindow := false
+
 	iDebug := kDebugOff
 
 	iProgressCount := 0
@@ -98,16 +89,43 @@ class SetupAdvisor extends ConfigurationItem {
 	iSettings := []
 
 	iSelectedCharacteristics := []
-	iSelectedCharacteristicsWidgets := {}
+	iSelectedCharacteristicsWidgets := CaseInsenseMap()
 
-	iEditor := false
+	iSettingsViewer := false
+
 	iSetup := false
 
 	iKnowledgeBase := false
 
+	class AdvisorWindow extends Window {
+		iAdvisor := false
+
+		Advisor {
+			Get {
+				return this.iAdvisor
+			}
+		}
+
+		__New(advisor) {
+			this.iAdvisor := advisor
+
+			super.__New({Resizeable: true, Closeable: true})
+		}
+
+		Close(*) {
+			closeSetupAdvisor()
+		}
+	}
+
 	Window {
 		Get {
-			return "Advisor"
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
 		}
 	}
 
@@ -118,12 +136,6 @@ class SetupAdvisor extends ConfigurationItem {
 
 		Set {
 			return (this.iProgressCount := value)
-		}
-	}
-
-	SettingsViewer {
-		Get {
-			return settingsViewer
 		}
 	}
 
@@ -242,9 +254,9 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 
-	Editor {
+	SettingsViewer {
 		Get {
-			return this.iEditor
+			return this.iSettingsViewer
 		}
 	}
 
@@ -297,39 +309,101 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local window := this.Window
-		local simulators, simulator, weather, choices, chosen, index, name
+		local advisor := this
+		local simulators, simulator, weather, choices, chosen, index, name, advisorGui
 
-		Gui %window%:Default
+		chooseSimulator(*) {
+			advisor.loadSimulator((advisorGui["simulatorDropDown"].Text = translate("Generic")) ? true : advisorGui["simulatorDropDown"].Text)
+		}
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		chooseCar(*) {
+			advisor.loadCar((advisorGui["carDropDown"].Text = translate("All")) ? true : advisorGui["carDropDown"].Text)
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		chooseTrack(*) {
+			local simulator, tracks, trackNames
 
-		Gui %window%:Add, Text, w1184 Center gmoveAdvisor, % translate("Modular Simulator Controller System")
+			if (advisorGui["trackDropDown"].Text = translate("All"))
+				advisor.loadTrack(true)
+			else {
+				simulator := advisor.SelectedSimulator
+				tracks := advisor.getTracks(simulator, advisor.SelectedCar)
+				trackNames := collect(tracks, ObjBindMethod(advisor, "getTrackName", simulator))
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+				advisor.loadTrack(tracks[inList(trackNames, advisorGui["trackDropDown"].Text)])
+			}
+		}
 
-		Gui %window%:Add, Text, x508 YP+20 w184 cBlue Center gopenAdvisorDocumentation, % translate("Setup Advisor")
+		chooseWeather(*) {
+		}
 
-		Gui %window%:Add, Text, x8 yp+30 w1200 0x10 Section
+		chooseCharacteristic(*) {
+			advisor.chooseCharacteristic()
+		}
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold, Arial
+		editSetup(*) {
+			advisor.editSetup()
+		}
 
-		Gui %window%:Add, Picture, x16 yp+12 w30 h30, %kIconsDirectory%Road.ico
-		Gui %window%:Add, Text, x50 yp+5 w120 h26, % translate("Selection")
+		loadSetup(*) {
+			local fileName
 
-		Gui %window%:Font, s8 Norm, Arial
+			advisorGui.Opt("+OwnDialogs")
 
-		Gui %window%:Add, Text, x16 yp+32 w80 h23 +0x200, % translate("Simulator")
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := FileSelect(1, "", translate("Load Problems..."), "Problems (*.setup)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+
+			if (fileName != "")
+				advisor.restoreState(fileName)
+		}
+
+		saveSetup(*) {
+			local fileName
+
+			advisorGui.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateSaveCancelButtons)
+			fileName := FileSelect("S17", "", translate("Save Problems..."), "Problems (*.setup)")
+			OnMessage(0x44, translateSaveCancelButtons, 0)
+
+			if (fileName != "") {
+				if !InStr(fileName, ".setup")
+					fileName := (fileName . ".setup")
+
+				advisor.saveState(fileName)
+			}
+		}
+
+		advisorGui := SetupAdvisor.AdvisorWindow(this)
+
+		this.iWindow := advisorGui
+
+		advisorGui.SetFont("s10 Bold", "Arial")
+
+		advisorGui.Add("Text", "w1184 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(advisorGui, "Setup Advisor"))
+
+		advisorGui.SetFont("s9 Norm", "Arial")
+		advisorGui.SetFont("Italic Underline", "Arial")
+
+		advisorGui.Add("Text", "x508 YP+20 w184 cBlue Center", translate("Setup Advisor")).OnEvent("Click", openDocumentation.Bind(advisorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor"))
+
+		advisorGui.Add("Text", "x8 yp+30 w1200 0x10 Section")
+
+		advisorGui.SetFont("Norm")
+		advisorGui.SetFont("s10 Bold", "Arial")
+
+		advisorGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Road.ico")
+		advisorGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
+
+		advisorGui.SetFont("s8 Norm", "Arial")
+
+		advisorGui.Add("Text", "x16 yp+32 w80 h23 +0x200", translate("Simulator"))
 
 		simulators := this.getSimulators()
 		simulator := 0
 
-		if (simulators.Length() > 0) {
+		if (simulators.Length > 0) {
 			if this.SelectedSimulator
 				simulator := inList(simulators, this.SelectedSimulator)
 
@@ -341,75 +415,74 @@ class SetupAdvisor extends ConfigurationItem {
 			if (name == true)
 				simulators[index] := translate("Generic")
 
-		Gui %window%:Add, DropDownList, x100 yp w196 Choose%simulator% vsimulatorDropDown gchooseSimulator, % values2String("|", simulators*)
+		advisorGui.Add("DropDownList", "x100 yp w196 Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
 		else
 			simulator := false
 
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Car")
-		Gui %window%:Add, DropDownList, x100 yp w196 Choose1 vcarDropDown gchooseCar, % translate("All")
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Track")
-		Gui %window%:Add, DropDownList, x100 yp w196 Choose1 vtrackDropDown gchooseTrack, % translate("All")
+		advisorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Car"))
+		advisorGui.Add("DropDownList", "x100 yp w196 Choose1 vcarDropDown", [translate("All")]).OnEvent("Change", chooseCar)
+		advisorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Track"))
+		advisorGui.Add("DropDownList", "x100 yp w196 Choose1 vtrackDropDown", [translate("All")]).OnEvent("Change", chooseTrack)
 
-		Gui %window%:Add, Text, x16 yp+24 w80 h23 +0x200, % translate("Conditions")
+		advisorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Conditions"))
 
 		weather := this.SelectedWeather
-		choices := collect(kWeatherConditions, "translate")
+		choices := collect(kWeatherConditions, translate)
 		chosen := inList(kWeatherConditions, weather)
 
-		if (!chosen && (choices.Length() > 0)) {
+		if (!chosen && (choices.Length > 0)) {
 			weather := choices[1]
 			chosen := 1
 		}
 
-		Gui %window%:Add, DropDownList, x100 yp w196 AltSubmit Disabled Choose%chosen% gchooseWeather vweatherDropDown, % values2String("|", choices*)
+		advisorGui.Add("DropDownList", "x100 yp w196 AltSubmit Disabled Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
 
-		Gui %window%:Add, Button, x305 ys+49 w94 h94 Disabled HWNDsetupButton veditSetupButton geditSetup
-		setButtonIcon(setupButton, kIconsDirectory . "Car Setup.ico", 1, "W64 H64")
+		advisorGui.Add("Button", "x305 ys+49 w94 h94 Disabled veditSetupButton").OnEvent("Click", editSetup)
+		setButtonIcon(advisorGui["editSetupButton"], kIconsDirectory . "Car Setup.ico", 1, "W64 H64")
 
-		Gui %window%:Add, Text, x8 yp+103 w400 0x10
+		advisorGui.Add("Text", "x8 yp+103 w400 0x10")
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold, Arial
+		advisorGui.SetFont("Norm")
+		advisorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Picture, x16 yp+12 w30 h30, %kIconsDirectory%Report.ico
-		Gui %window%:Add, Text, x50 yp+5 w180 h26, % translate("Characteristics")
+		advisorGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Report.ico")
+		advisorGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
 
-		Gui %window%:Font, s8 Norm
-		Gui %window%:Add, GroupBox, x16 yp+30 w382 h469 -Theme
+		advisorGui.SetFont("s8 Norm")
+		advisorGui.Add("GroupBox", "x16 yp+30 w382 h469 -Theme")
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
-		Gui %window%:Add, Button, x328 yp-24 w70 h23 vcharacteristicsButton gchooseCharacteristic, % translate("Problem...")
+		advisorGui.Add("Button", "x328 yp-24 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
 
-		Gui %window%:Font, Norm
-		Gui %window%:Font, s10 Bold, Arial
+		advisorGui.SetFont("Norm")
+		advisorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Picture, x420 ys+12 w30 h30, %kIconsDirectory%Assistant.ico
-		Gui %window%:Add, Text, x454 yp+5 w150 h26, % translate("Recommendations")
+		advisorGui.Add("Picture", "x420 ys+12 w30 h30", kIconsDirectory . "Assistant.ico")
+		advisorGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
-		Gui %window%:Font, s8 Norm, Arial
+		advisorGui.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, ActiveX, x420 yp+30 w775 h621 Border vsettingsViewer, shell.explorer
-
-		settingsViewer.Navigate("about:blank")
+		this.iSettingsViewer := advisorGui.Add("ActiveX", "x420 yp+30 w775 h621 Border vsettingsViewer", "shell.explorer").Value
+		this.SettingsViewer.Navigate("about:blank")
 
 		this.showSettingsChart(false)
 
-		Gui %window%:Font, Norm, Arial
+		advisorGui.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Text, x8 y730 w1200 0x10
+		advisorGui.Add("Text", "x8 y730 w1200 0x10")
 
-		Gui %window%:Add, Button, x16 y738 w77 h23 gloadSetup, % translate("&Load...")
-		Gui %window%:Add, Button, x98 y738 w77 h23 gsaveSetup, % translate("&Save...")
+		advisorGui.Add("Button", "x16 y738 w77 h23", translate("&Load...")).OnEvent("Click", loadSetup)
+		advisorGui.Add("Button", "x98 y738 w77 h23", translate("&Save...")).OnEvent("Click", saveSetup)
 
-		Gui %window%:Add, Button, x574 y738 w80 h23 GcloseAdvisor, % translate("Close")
+		advisorGui.Add("Button", "x574 y738 w80 h23", translate("Close")).OnEvent("Click", closeSetupAdvisor)
 	}
 
 	saveState(fileName := false) {
-		local state, window, ignore, characteristic, widgets, value1, value2
+		local state, ignore, characteristic, widgets, value1, value2
 
 		if !fileName
 			fileName := (kUserConfigDirectory . "Advisor.setup")
@@ -426,15 +499,11 @@ class SetupAdvisor extends ConfigurationItem {
 
 		setMultiMapValue(state, "Characteristics", "Characteristics", values2String(",", this.SelectedCharacteristics*))
 
-		window := this.Window
-
-		Gui %window%:Default
-
 		for ignore, characteristic in this.SelectedCharacteristics {
 			widgets := this.SelectedCharacteristicsWidgets[characteristic]
 
-			GuiControlGet value1, , % widgets[1]
-			GuiControlGet value2, , % widgets[2]
+			value1 := widgets[1].Text
+			value2 := widgets[2].Text
 
 			setMultiMapValue(state, "Characteristics", characteristic . ".Weight", value1)
 			setMultiMapValue(state, "Characteristics", characteristic . ".Value", value2)
@@ -446,7 +515,7 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	restoreState(fileName := false) {
-		local state, simulator, car, track, weather, characteristicLabels, characteristics, window
+		local state, simulator, car, track, weather, characteristicLabels, characteristics
 		local ignore, characteristic
 
 		if !fileName
@@ -478,18 +547,15 @@ class SetupAdvisor extends ConfigurationItem {
 
 			characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
 
-			if (characteristics.Length() > 0) {
-				window := this.Window
-
-				Gui %window%:Default
-				Gui %window%:+Disabled
+			if (characteristics.Length > 0) {
+				this.Window.Opt("+Disabled")
 
 				try {
 					this.ProgressCount := 0
 
 					showProgress({color: "Green", width: 350, title: translate("Loading Problems"), message: translate("Preparing Characteristics...")})
 
-					Sleep 200
+					Sleep(200)
 
 					for ignore, characteristic in characteristics {
 						showProgress({progress: (this.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
@@ -505,12 +571,12 @@ class SetupAdvisor extends ConfigurationItem {
 
 					showProgress({progress: 100, message: translate("Finished...")})
 
-					Sleep 500
+					Sleep(500)
 
 					hideProgress()
 				}
 				finally {
-					Gui %window%:-Disabled
+					this.Window.Opt("-Disabled")
 				}
 			}
 		}
@@ -524,14 +590,14 @@ class SetupAdvisor extends ConfigurationItem {
 		local window := this.Window
 		local x, y
 
-		if getWindowPosition("Setup Advisor", x, y)
-			Gui %window%:Show, x%x% y%y%
+		if getWindowPosition("Setup Advisor", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui %window%:Show
+			window.Show()
 	}
 
 	showSettingsChart(content) {
-		local isChart, window, before, after, width, height, info, html, index, message, iWidth, iHeight
+		local isChart, before, after, width, height, info, html, index, message, iWidth, iHeight, document
 
 		if !content
 			content := [translate("Please describe your car handling problems.")]
@@ -539,15 +605,11 @@ class SetupAdvisor extends ConfigurationItem {
 		isChart := !isObject(content)
 
 		if this.SettingsViewer {
-			window := this.Window
-
-			Gui %window%:Default
-
 			this.SettingsViewer.Document.open()
 
 			if (content && (content != "")) {
 				if isChart {
-					before =
+					before := "
 					(
 					<html>
 						<meta charset='utf-8'>
@@ -560,7 +622,7 @@ class SetupAdvisor extends ConfigurationItem {
 							<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 							<script type="text/javascript">
 								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
-					)
+					)"
 
 					width := this.SettingsViewer.Width
 					height := (this.SettingsViewer.Height - 110 - 1)
@@ -570,7 +632,7 @@ class SetupAdvisor extends ConfigurationItem {
 					iWidth := width - 10
 					iHeight := 90
 
-					after =
+					after := "
 					(
 							</script>
 						</head>
@@ -585,7 +647,9 @@ class SetupAdvisor extends ConfigurationItem {
 							</div>
 						</body>
 					</html>
-					)
+					)"
+
+					after := substituteVariables(after, {width: width, height: height, iWidth: iWidth, iHeight: iHeight, info: info})
 
 					this.SettingsViewer.Document.write(before . content . after)
 				}
@@ -602,8 +666,7 @@ class SetupAdvisor extends ConfigurationItem {
 						html .= message
 					}
 
-
-					html =
+					document := "
 					(
 					<html>
 						<meta charset='utf-8'>
@@ -621,9 +684,9 @@ class SetupAdvisor extends ConfigurationItem {
 							</div>
 						</body>
 					</html>
-					)
+					)"
 
-					this.SettingsViewer.Document.write(html)
+					this.SettingsViewer.Document.write(substituteVariables(document, {width: width, height: height, html: html}))
 				}
 			}
 			else {
@@ -637,12 +700,12 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	showSettingsDeltas(settings) {
-		local drawChartFunction, names, values, ignore, setting, max, index, value
+		local drawChartFunction, names, values, ignore, setting, theMax, index, value
 
 		this.showSettingsChart(false)
 
 		if settings {
-			if (settings.Length() > 0) {
+			if (settings.Length > 0) {
 				drawChartFunction := "function drawChart() {"
 				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 
@@ -660,15 +723,15 @@ class SetupAdvisor extends ConfigurationItem {
 					values.Push(setting[2])
 				}
 
-				max := Max(Abs(maximum(values)), Abs(minimum(values)))
+				theMax := Max(Abs(maximum(values)), Abs(minimum(values)))
 
 				for index, value in values
-					values[index] := (value / max)
+					values[index] := (value / theMax)
 
 				if false {
 					drawChartFunction .= "`n['" . translate("Setting") . "', '" . translate("Value") . "',  { role: 'annotation' }]"
 
-					loop % names.Length()
+					loop names.Length
 						drawChartFunction .= ",`n['" . names[A_Index] . "', " . values[A_Index] . ", '" . names[A_Index] . "']"
 
 					drawChartFunction .= "`n]);"
@@ -682,7 +745,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 					drawChartFunction .= "`n]);"
 
-					drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length() * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, hAxis: {maxValue: 1, minValue: -1}, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
+					drawChartFunction := drawChartFunction . "`nvar options = { bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none' }, hAxis: {maxValue: 1, minValue: -1}, bars: 'horizontal', backgroundColor: 'D8D8D8', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };"
 				}
 
 				drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
@@ -717,9 +780,9 @@ class SetupAdvisor extends ConfigurationItem {
 
 		if label
 			if enabled
-				Menu SupportMenu, Check, %label%
+				SupportMenu.Check(label)
 			else
-				Menu SupportMenu, Uncheck, %label%
+				SupportMenu.Uncheck(label)
 	}
 
 	toggleDebug(option) {
@@ -731,9 +794,8 @@ class SetupAdvisor extends ConfigurationItem {
 		local hasGeneric := false
 		local simulator
 
-		loop Files, %kResourcesDirectory%Advisor\Definitions\*.ini, F
-		{
-			SplitPath A_LoopFileName, , , , simulator
+		loop Files, kResourcesDirectory "Advisor\Definitions\*.ini", "F" {
+			SplitPath(A_LoopFileName, , , , &simulator)
 
 			if (simulator = "Generic")
 				hasGeneric := true
@@ -741,9 +803,8 @@ class SetupAdvisor extends ConfigurationItem {
 				simulators.Push(simulator)
 		}
 
-		loop Files, %kUserHomeDirectory%Advisor\Definitions\*.ini, F
-		{
-			SplitPath A_LoopFileName, , , , simulator
+		loop Files, kUserHomeDirectory "Advisor\Definitions\*.ini", "F" {
+			SplitPath(A_LoopFileName, , , , &simulator)
 
 			if (simulator = "Generic")
 				hasGeneric := true
@@ -759,12 +820,11 @@ class SetupAdvisor extends ConfigurationItem {
 
 	getCars(simulator) {
 		local cars := []
-		local sessionDB, ignore, car, descriptor
+		local ignore, car, descriptor
 
 		if ((simulator != true) && (simulator != "*")) {
-			loop Files, %kResourcesDirectory%Advisor\Definitions\Cars\%simulator%.*.ini, F
-			{
-				SplitPath A_LoopFileName, , , , descriptor
+			loop Files, kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".*.ini", "F" {
+				SplitPath(A_LoopFileName, , , , &descriptor)
 
 				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
 
@@ -772,9 +832,8 @@ class SetupAdvisor extends ConfigurationItem {
 					cars.Push(car)
 			}
 
-			loop Files, %kUserHomeDirectory%Advisor\Definitions\Cars\*.ini, F
-			{
-				SplitPath A_LoopFileName, , , , descriptor
+			loop Files, kUserHomeDirectory . "Advisor\Definitions\Cars\*.ini", "F" {
+				SplitPath(A_LoopFileName, , , , &descriptor)
 
 				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
 
@@ -783,10 +842,8 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 
 			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
-				sessionDB := SessionDatabase()
-
-				for ignore, car in sessionDB.getCars(simulator) {
-					car := sessionDB.getCarName(simulator, car)
+				for ignore, car in SessionDatabase().getCars(simulator) {
+					car := SessionDatabase.getCarName(simulator, car)
 
 					if !inList(cars, car)
 						cars.Push(car)
@@ -814,7 +871,7 @@ class SetupAdvisor extends ConfigurationItem {
 		if ((track = "*") || (track == true))
 			return translate("All")
 		else
-			return SessionDatabase().getTrackName(simulator, track)
+			return SessionDatabase.getTrackName(simulator, track)
 	}
 
 	dumpKnowledgeBase(knowledgeBase) {
@@ -826,52 +883,39 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	updateState() {
-		local window := this.Window
-
-		Gui %window%:Default
-
-		if (this.SelectedCharacteristics.Length() < kMaxCharacteristics)
-			GuiControl Enable, characteristicsButton
+		if (this.SelectedCharacteristics.Length < kMaxCharacteristics)
+			this.Control["characteristicsButton"].Enabled := true
 		else
-			GuiControl Disable, characteristicsButton
+			this.Control["characteristicsButton"].Enabled := false
 
 		if (this.SimulatorDefinition && getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false))
-			GuiControl Enable, editSetupButton
+			this.Control["editSetupButton"].Enabled := true
 		else
-			GuiControl Disable, editSetupButton
+			this.Control["editSetupButton"].Enabled := false
 
 	}
 
-	compileRules(fileName, ByRef productions, ByRef reductions) {
-		local rules
-
-		if (fileName && (fileName != "") && FileExist(fileName)) {
-			FileRead rules, %fileName%
-
-			new RuleCompiler().compileRules(rules, productions, reductions)
-		}
+	compileRules(fileName, &productions, &reductions) {
+		if (fileName && (fileName != "") && FileExist(fileName))
+			RuleCompiler().compileRules(FileRead(fileName), &productions, &reductions)
 	}
 
-	loadRules(ByRef productions, ByRef reductions) {
-		local rules, compiler, simulator, car
-
-		FileRead rules, % kResourcesDirectory . "Advisor\Rules\Setup Advisor.rules"
+	loadRules(&productions, &reductions) {
+		local simulator, car
 
 		productions := false
 		reductions := false
 
-		compiler := RuleCompiler()
-
-		compiler.compileRules(rules, productions, reductions)
+		RuleCompiler().compileRules(FileRead(kResourcesDirectory . "Advisor\Rules\Setup Advisor.rules"), &productions, &reductions)
 
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar[false]
 
-		this.compileRules(getFileName("Advisor\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
-		this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
+		this.compileRules(getFileName("Advisor\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
+		this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
 
 		if (car != true)
-			this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), productions, reductions)
+			this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
 	}
 
 	loadCharacteristics(definition, simulator := false, car := false, track := false, fast := false) {
@@ -904,7 +948,7 @@ class SetupAdvisor extends ConfigurationItem {
 							this.Characteristics.Push(characteristic)
 
 							if (!fast && !isDebug())
-								Sleep 25
+								Sleep(25)
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																	   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -927,7 +971,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Characteristics.Push(characteristic)
 
 						if (!fast && !isDebug())
-							Sleep 25
+							Sleep(25)
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("characteristicActive("
 																   . StrReplace(values2String(",", simulator, car, track, characteristic), A_Space, "\ ")
@@ -961,16 +1005,14 @@ class SetupAdvisor extends ConfigurationItem {
 						setting := factPath(group, groupOption[1], option)
 
 						if !simulator {
-							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ")
-																				 . settingsLabels[setting]
-																				 . translate("...")})
+							showProgress({progress: ++this.ProgressCount, message: translate("Initializing Setting ")																				 . settingsLabels[setting]																				 . translate("...")})
 
 							knowledgeBase.prove(compiler.compileGoal("addSetting(" . setting . ")")).dispose()
 
 							this.Settings.Push(setting)
 
 							if (!fast && !isDebug())
-								Sleep 25
+								Sleep(25)
 						}
 						else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																	   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
@@ -994,7 +1036,7 @@ class SetupAdvisor extends ConfigurationItem {
 						this.Settings.Push(setting)
 
 						if (!fast && !isDebug())
-							Sleep 25
+							Sleep(25)
 					}
 					else if knowledgeBase.prove(compiler.compileGoal("settingAvailable("
 																   . StrReplace(values2String(",", simulator, car, setting), A_Space, "\ ")
@@ -1007,7 +1049,7 @@ class SetupAdvisor extends ConfigurationItem {
 			}
 	}
 
-	createKnowledgeBase(facts, productions, reductions) {
+	createKnowledgeBase(productions, reductions, facts := false) {
 		local engine := RuleEngine(productions, reductions, facts)
 
 		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
@@ -1040,20 +1082,20 @@ class SetupAdvisor extends ConfigurationItem {
 
 		showProgress({color: "Blue", width: 350, title: translate(phase1), message: translate("Clearing Problems...")})
 
-		Sleep 200
+		Sleep(200)
 
 		this.clearCharacteristics()
 
 		showProgress({progress: this.ProgressCount++, message: translate("Preparing Knowledgebase...")})
 
-		Sleep 200
+		Sleep(200)
 
 		productions := false
 		reductions := false
 
-		this.loadRules(productions, reductions)
+		this.loadRules(&productions, &reductions)
 
-		knowledgeBase := this.createKnowledgeBase({}, productions, reductions)
+		knowledgeBase := this.createKnowledgeBase(productions, reductions)
 
 		this.iKnowledgeBase := knowledgeBase
 
@@ -1069,17 +1111,17 @@ class SetupAdvisor extends ConfigurationItem {
 
 		knowledgeBase.produce()
 
-		Sleep 200
+		Sleep(200)
 
 		showProgress({progress: this.ProgressCount++, color: "Green", title: translate(phase3), message: translate("Loading Car Settings...")})
 
 		this.loadCharacteristics(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], this.SelectedTrack["*"], fast)
 
-		Sleep 200
+		Sleep(200)
 
 		this.loadSettings(this.Definition, this.SelectedSimulator["*"], this.SelectedCar["*"], fast)
 
-		Sleep 200
+		Sleep(200)
 
 		knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
 		knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
@@ -1094,7 +1136,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		showProgress({progress: this.ProgressCount++, message: translate("Initializing Car Setup...")})
 
-		Sleep 200
+		Sleep(200)
 
 		this.updateRecommendations(false, false)
 
@@ -1102,7 +1144,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		showProgress({message: translate("Finished...")})
 
-		Sleep 500
+		Sleep(500)
 
 		this.iSetup := false
 
@@ -1112,13 +1154,10 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local window, simulators, settings
+		local simulators, settings
 
 		if (force || (simulator != this.SelectedSimulator)) {
-			window := this.Window
-
-			Gui %window%:Default
-			Gui %window%:+Disabled
+			this.Window.Opt("+Disabled")
 
 			try {
 				this.iSelectedSimulator := simulator
@@ -1136,15 +1175,15 @@ class SetupAdvisor extends ConfigurationItem {
 
 				simulators := this.getSimulators()
 
-				if (simulators.Length() > 0)
-					GuiControl Choose, simulatorDropDown, % inList(this.getSimulators(), simulator)
+				if (simulators.Length > 0)
+					this.Control["simulatorDropDown"].Choose(inList(this.getSimulators(), simulator))
 
-				this.loadCars(this.AvailableCars[true], false)
+				this.loadCars(this.AvailableCars[true])
 
 				this.initializeAdvisor()
 			}
 			finally {
-				Gui %window%:-Disabled
+				this.Window.Opt("-Disabled")
 			}
 		}
 	}
@@ -1152,27 +1191,26 @@ class SetupAdvisor extends ConfigurationItem {
 	loadCars(cars) {
 		local tracks, trackNames
 
-		GuiControl, , carDropDown, % "|" . values2String("|", cars*)
+		this.Control["carDropDown"].Delete()
+		this.Control["carDropDown"].Add(cars)
 
-		GuiControl Choose, carDropDown, 1
+		this.Control["carDropDown"].Choose(1)
 
 		this.iSelectedCar := ((cars[1] = translate("All")) ? true : cars[1])
 
 		tracks := this.getTracks(this.SelectedSimulator, this.SelectedCar).Clone()
 		trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 
-		GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
-		GuiControl Choose, trackDropDown, 1
+		this.Control["trackDropDown"].Delete()
+		this.Control["trackDropDown"].Add(trackNames)
+		this.Control["trackDropDown"].Choose(1)
 	}
 
 	loadCar(car, force := false) {
-		local window, tracks, trackNames, settings
+		local tracks, trackNames, settings
 
 		if (force || (car != this.SelectedCar[false])) {
-			window := this.Window
-
-			Gui %window%:Default
-			Gui %window%:+Disabled
+			this.Window.Opt("+Disabled")
 
 			try {
 				this.iSelectedCar := car
@@ -1186,30 +1224,28 @@ class SetupAdvisor extends ConfigurationItem {
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-				GuiControl Choose, carDropDown, % inList(this.AvailableCars, this.SelectedCar)
+				this.Control["carDropDown"].Choose(inList(this.AvailableCars, this.SelectedCar))
 
 				tracks := this.getTracks(this.SelectedSimulator, car).Clone()
 				trackNames := collect(tracks, ObjBindMethod(this, "getTrackName", this.SelectedSimulator))
 
-				GuiControl, , trackDropDown, % "|" . values2String("|", trackNames*)
-				GuiControl Choose, trackDropDown, 1
+				this.Control["trackDropDown"].Delete()
+				this.Control["trackDropDown"].Add(trackNames)
+				this.Control["trackDropDown"].Choose(1)
 
 				this.initializeAdvisor("Loading Car", "Loading Car", "Loading Car", true)
 			}
 			finally {
-				Gui %window%:-Disabled
+				this.Window.Opt("-Disabled")
 			}
 		}
 	}
 
 	loadTrack(track, force := false) {
-		local window, settings
+		local settings
 
 		if (force || (track != this.SelectedTrack[false])) {
-			window := this.Window
-
-			Gui %window%:Default
-			Gui %window%:+Disabled
+			this.Window.Opt("+Disabled")
 
 			try {
 				this.iSelectedTrack := track
@@ -1230,10 +1266,10 @@ class SetupAdvisor extends ConfigurationItem {
 						track := 1
 				}
 
-				GuiControl Choose, trackDropDown, %track%
+				this.Control["trackDropDown"].Choose(track)
 			}
 			finally {
-				Gui %window%:-Disabled
+				this.Window.Opt("-Disabled")
 			}
 		}
 	}
@@ -1245,26 +1281,56 @@ class SetupAdvisor extends ConfigurationItem {
 		local analyzerClass := getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
 		if analyzerClass
-			new %analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
+			%analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
 	}
 
 	clearCharacteristics() {
-		while (this.SelectedCharacteristics.Length() > 0)
-			this.deleteCharacteristic(this.SelectedCharacteristics[this.SelectedCharacteristics.Length()], false)
+		while (this.SelectedCharacteristics.Length > 0)
+			this.deleteCharacteristic(this.SelectedCharacteristics[this.SelectedCharacteristics.Length], false)
 
 		this.showSettingsChart(false)
 	}
 
 	addCharacteristic(characteristic, weight := 50, value := 33, draw := true) {
-		local numCharacteristics := this.SelectedCharacteristics.Length()
-		local window, x, y, characteristicLabels, callback
-		local label1, label2, slider1, slider2
+		local advisor := this
+		local window := this.Window
+		local numCharacteristics := this.SelectedCharacteristics.Length
+		local x, y, characteristicLabels, callback
+		local label1, label2, slider1, slider2, deleteButton
+
+		updateSlider(characteristic, slider1, slider2, *) {
+			advisor.updateCharacteristic(characteristic, slider1.Value, slider2.Value)
+		}
+
+		initializeSlider(slider1, value1, slider2, value2) {
+			/*
+			local window := SetupAdvisor.Instance.Window
+			local y, pos, posX, posY
+
+			window.BackColor := "D0D0D0"
+
+			ControlClick(slider1, , , , , "x0 y0")
+			ControlClick(slider2, , , , , "x0 y0")
+
+			Sleep(10)
+
+			slider1.GetPos(&posX, &posY, &posW, &posH)
+			y := (posY - 1)
+			slider1.Move(posX, Y)
+			slider1.Move(posX, posY)
+
+			slider2.GetPos(&posX, &posY, &posW, &posH)
+			y := (posY - 1)
+			slider2.Move(posX, Y)
+			slider2.Move(posX, posY)
+			*/
+
+			slider1.Value := value1
+			slider2.Value := value2
+		}
 
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
-			window := this.Window
-
-			Gui %window%:Default
-			Gui %window%:Color, D0D0D0, D8D8D8
+			this.Window
 
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
@@ -1273,40 +1339,37 @@ class SetupAdvisor extends ConfigurationItem {
 
 			this.SelectedCharacteristics.Push(characteristic)
 
-			Gui %window%:Font, s10 Italic, Arial
+			window.SetFont("s10 Italic", "Arial")
 
-			Gui %window%:Add, Button, x%X% y%Y% w20 h20 HWNDdeleteButton
+			deleteButton := window.Add("Button", "x" . X . " y" . Y . " w20 h20")
+			deleteButton.OnEvent("Click", ObjBindMethod(this, "deleteCharacteristic", characteristic))
 			setButtonIcon(deleteButton, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
-
-			callback := ObjBindMethod(this, "deleteCharacteristic", characteristic)
-
-			GuiControl +g, %deleteButton%, %callback%
 
 			x := x + 25
 
-			Gui %window%:Add, Text, x%X% y%Y% w300 h26 HWNDlabel1, % characteristicLabels[characteristic]
+			label1 := window.Add("Text", "x" . X . " y" . Y . " w300 h26", characteristicLabels[characteristic])
 
 			x := x - 25
 
-			Gui %window%:Font, s8 Norm, Arial
+			window.SetFont("s8 Norm", "Arial")
 
 			x := x + 8
 			y := y + 26
 
-			Gui %window%:Add, Text, x%X% y%Y% w115 HWNDlabel2, % translate("Importance / Severity")
+			label2 := window.Add("Text", "x" . X . " y" . Y . " w115", translate("Importance / Severity"))
 
 			x := x + 120
 
-			Gui %window%:Add, Slider, Center Thick15 x%x% yp-2 w118 0x10 Range0-100 ToolTip HWNDslider1, 0
+			slider1 := window.Add("Slider", "Center Thick15 x" . x . " yp-2 w118 0x10 Range0-100 ToolTip", "0")
 
 			x := x + 123
 
-			Gui %window%:Add, Slider, Center Thick15 x%x% yp w118 0x10 Range0-100 ToolTip HWNDslider2, 0
+			slider2 := window.Add("Slider", "Center Thick15 x" . x . " yp w118 0x10 Range0-100 ToolTip", "0")
 
-			callback := Func("updateSlider").Bind(characteristic, slider1, slider2)
+			callback := updateSlider.Bind(characteristic, slider1, slider2)
 
-			GuiControl +g, %slider1%, %callback%
-			GuiControl +g, %slider2%, %callback%
+			slider1.OnEvent("Change", callback)
+			slider2.OnEvent("Change", callback)
 
 			this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
 
@@ -1321,24 +1384,24 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	deleteCharacteristic(characteristic, draw := true) {
-		local numCharacteristics := this.SelectedCharacteristics.Length()
+		local numCharacteristics := this.SelectedCharacteristics.Length
 		local index := inList(this.SelectedCharacteristics, characteristic)
 		local ignore, widget, row, y, widgets, pos, poxX, posY
 
 		if index {
 			for ignore, widget in this.SelectedCharacteristicsWidgets[characteristic]
-				GuiControl Hide, %widget%
+				widget.Visible := false
 
-			loop % (numCharacteristics - index)
-			{
+			loop (numCharacteristics - index) {
 				row := (A_Index + index)
 
 				for ignore, widget in this.SelectedCharacteristicsWidgets[this.SelectedCharacteristics[row]] {
-					GuiControlGet pos, Pos, %widget%
+					widget.GetPos(&posX, &posY, &posW, &posH)
 
 					y := (posY - kCharacteristicHeight)
 
-					GuiControl MoveDraw, %widget%, y%Y%
+					widget.Move(posX, Y)
+					widget.Redraw()
 				}
 			}
 
@@ -1355,25 +1418,19 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	chooseCharacteristic() {
-		local window := this.Window
+		local dynamicMenus := CaseInsenseMap()
 		local characteristicLabels, menuIndex, groups, translatedGroups, ignore, group, definition, option
-		local groupMenu, groupEmpty, groupOption, optionMenu, optionEmpty, handler, label, characteristic
+		local groupMenu, groupEmpty, groupOption, optionMenu, optionEmpty, label, characteristic
+		local characteristicsMenu, groupMenu
 
-		Gui %window%:Default
-
-		try {
-			Menu CharacteristicsMenu, DeleteAll
-		}
-		catch Any as exception {
-			logError(exception)
-		}
+		characteristicsMenu := Menu()
 
 		characteristicLabels := getMultiMapValues(this.Definition, "Setup.Characteristics.Labels")
 
 		menuIndex := 1
 
 		groups := getMultiMapValues(this.Definition, "Setup.Characteristics")
-		translatedGroups := {}
+		translatedGroups := CaseInsenseMap()
 
 		for group, definition in groups
 			translatedGroups[characteristicLabels[group]] := group
@@ -1384,12 +1441,7 @@ class SetupAdvisor extends ConfigurationItem {
 			groupMenu := ("SubMenu" . menuIndex++)
 			groupEmpty := true
 
-			try {
-				Menu %groupMenu%, DeleteAll
-			}
-			catch Any as exception {
-				logError(exception)
-			}
+			dynamicMenus[groupMenu] := Menu()
 
 			for ignore, groupOption in string2Values(";", definition) {
 				if InStr(groupOption, ":") {
@@ -1397,31 +1449,21 @@ class SetupAdvisor extends ConfigurationItem {
 					optionMenu := ("SubMenu" . menuIndex++)
 					optionEmpty := true
 
-					try {
-						Menu %optionMenu%, DeleteAll
-					}
-					catch Any as exception {
-						logError(exception)
-					}
+					dynamicMenus[optionMenu] := Menu()
 
 					for ignore, option in string2Values(",", groupOption[2]) {
 						characteristic := factPath(group, groupOption[1], option)
 
 						if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-							handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33)
-
-							label := characteristicLabels[option]
-
-							Menu, %optionMenu%, Add, %label%, %handler%
+							dynamicMenus[optionMenu].Add(characteristicLabels[option]
+													   , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33))
 
 							optionEmpty := false
 						}
 					}
 
 					if !optionEmpty {
-						label := characteristicLabels[groupOption[1]]
-
-						Menu %groupMenu%, Add, %label%, :%optionMenu%
+						dynamicMenus[groupMenu].Add(characteristicLabels[groupOption[1]], dynamicMenus[optionMenu])
 
 						groupEmpty := false
 					}
@@ -1430,35 +1472,29 @@ class SetupAdvisor extends ConfigurationItem {
 					characteristic := factPath(group, groupOption)
 
 					if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-						handler := ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33)
-						label := characteristicLabels[groupOption]
-
-						Menu %groupMenu%, Add, %label%, %handler%
+						dynamicMenus[groupMenu].Add(characteristicLabels[groupOption]
+												  , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33))
 
 						groupEmpty := false
 					}
 				}
 			}
 
-			if !groupEmpty {
-				label := characteristicLabels[group]
-
-				Menu CharacteristicsMenu, Add, %label%, :%groupMenu%
-			}
+			if !groupEmpty
+				characteristicsMenu.Add(characteristicLabels[group], dynamicMenus[groupMenu])
 		}
 
-		Menu CharacteristicsMenu, Add
+		characteristicsMenu.Add()
 
 		label := translate("Analyzer...")
-		handler := ObjBindMethod(this, "startTelemetryAnalyzer")
 
-		Menu CharacteristicsMenu, Add, %label%, %handler%
+		characteristicsMenu.Add(label, ObjBindMethod(this, "startTelemetryAnalyzer"))
 
 		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
-			Menu CharacteristicsMenu, Disable, %label%
+			characteristicsMenu.Disable(label)
 
-		Menu CharacteristicsMenu, Show
+		characteristicsMenu.Show()
 	}
 
 	updateCharacteristic(characteristic, value1, value2) {
@@ -1467,13 +1503,10 @@ class SetupAdvisor extends ConfigurationItem {
 
 	updateRecommendations(draw := true, update := true) {
 		local knowledgeBase := this.KnowledgeBase
-		local window, noProblem, ignore, characteristic, widgets, value1, value2, settingsLabels, settings
+		local noProblem, ignore, characteristic, widgets, value1, value2, settingsLabels, settings
 		local setting, delta
 
-		window := this.Window
-
-		Gui %window%:Default
-		Gui %window%:+Disabled
+		this.Window.Opt("+Disabled")
 
 		try {
 			noProblem := true
@@ -1483,8 +1516,8 @@ class SetupAdvisor extends ConfigurationItem {
 
 				widgets := this.SelectedCharacteristicsWidgets[characteristic]
 
-				GuiControlGet value1, , % widgets[1]
-				GuiControlGet value2, , % widgets[2]
+				value1 := widgets[1].Text
+				value2 := widgets[2].Text
 
 				knowledgeBase.setFact(characteristic . ".Weight", value1, true)
 				knowledgeBase.setFact(characteristic . ".Value", value2, true)
@@ -1505,9 +1538,8 @@ class SetupAdvisor extends ConfigurationItem {
 				for ignore, setting in this.Settings {
 					delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
 
-					if delta is Number
-						if (delta != 0)
-							settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
+					if (isNumber(delta) && (delta != 0))
+						settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
 				}
 
 				if noProblem
@@ -1520,36 +1552,15 @@ class SetupAdvisor extends ConfigurationItem {
 				this.updateState()
 		}
 		finally {
-			Gui %window%:-Disabled
+			this.Window.Opt("-Disabled")
 		}
 	}
 
 	editSetup() {
 		local editorClass := getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false)
-		local editor, aWindow, eWindow
 
-		if editorClass {
-			editor := %editorClass%(this)
-
-			this.iEditor := editor
-
-			aWindow := this.Window
-			eWindow := editor.Window
-
-			Gui %eWindow%:+Owner%aWindow%
-			Gui %aWindow%:+Disabled
-
-			try {
-				editor.createGui(editor.Configuration)
-
-				this.iSetup := editor.editSetup(this.Setup)
-			}
-			finally {
-				this.iEditor := false
-
-				Gui %aWindow%:-Disabled
-			}
-		}
+		if editorClass
+			this.iSetup := %editorClass%(this).editSetup(this.Setup)
 	}
 }
 
@@ -1594,11 +1605,15 @@ class Setup {
 	iOriginalSetup := ""
 	iModifiedSetup := ""
 
-	iEnabledSettings := {}
+	iEnabledSettings := CaseInsenseMap()
 
 	Editor {
 		Get {
 			return this.iEditor
+		}
+
+		Set {
+			return (this.iEditor := value)
 		}
 	}
 
@@ -1610,7 +1625,7 @@ class Setup {
 
 	Enabled[setting] {
 		Get {
-			return this.iEnabledSettings.HasKey(setting)
+			return this.iEnabledSettings.Has(setting)
 		}
 	}
 
@@ -1652,7 +1667,7 @@ class Setup {
 		if setting
 			this.iEnabledSettings.Delete(setting)
 		else
-			this.iEnabledSettings := {}
+			this.iEnabledSettings := CaseInsenseMap()
 	}
 }
 
@@ -1668,7 +1683,7 @@ class FileSetup extends Setup {
 		Get {
 			local fileName := this.FileName[true]
 
-			SplitPath fileName, , , , fileName
+			SplitPath(fileName, , , , &fileName)
 
 			return fileName
 		}
@@ -1693,13 +1708,13 @@ class FileSetup extends Setup {
 		this.iModifiedFileName := modifiedFileName
 
 		if (originalFileName && FileExist(originalFileName)) {
-			FileRead setup, %originalFileName%
+			setup := FileRead(originalFileName)
 
 			this.iOriginalSetup := setup
 		}
 
 		if (modifiedFileName && FileExist(modifiedFileName)) {
-			FileRead setup, %modifiedFileName%
+			setup := FileRead(modifiedFileName)
 
 			this.iModifiedSetup := setup
 		}
@@ -1856,7 +1871,7 @@ class IntegerHandler extends DiscreteValuesHandler {
 	validValue(displayValue) {
 		local rawValue := this.convertToRawValue(displayValue)
 
-		return (base.validValue(displayValue) && (Round(rawValue) = rawValue))
+		return (super.validValue(displayValue) && (Round(rawValue) = rawValue))
 	}
 
 	formatValue(value) {
@@ -1886,7 +1901,7 @@ class DecimalHandler extends DiscreteValuesHandler {
 	validValue(displayValue) {
 		local rawValue := this.convertToRawValue(displayValue)
 
-		return (base.validValue(displayValue) && (Round(rawValue) = rawValue))
+		return (super.validValue(displayValue) && (Round(rawValue) = rawValue))
 	}
 
 	formatValue(value) {
@@ -1915,26 +1930,50 @@ class ClicksHandler extends IntegerHandler {
 ;;; SetupEditor                                                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global setupViewer
-global setupNameViewer
-
-global decreaseSettingButton
-global increaseSettingButton
-
-global resetSetupButton
-
-global applyStrengthSlider := 100
-
 class SetupEditor extends ConfigurationItem {
+	iWindow := false
+
 	iAdvisor := false
 	iSetup := false
 
 	iComparator := false
 
-	iSettings := {}
+	iSettings := CaseInsenseMap()
 	iSettingsListView := false
 
 	iClosed := false
+
+	class EditorWindow extends Window {
+		iEditor := false
+
+		Editor {
+			Get {
+				return this.iEditor
+			}
+		}
+
+		__New(editor) {
+			this.iEditor := editor
+
+			super.__New({Resizeable: true, Closeable: true})
+		}
+
+		Close(*) {
+			this.Editor.close()
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
 
 	Advisor {
 		Get {
@@ -1980,12 +2019,6 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
-	Window {
-		Get {
-			return "Editor"
-		}
-	}
-
 	__New(advisor, configuration := false) {
 		local simulator, car, section, values, key, value, fileName
 
@@ -2014,61 +2047,95 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local window := this.Window
-		local settingsListView
+		local editor := this
+		local settingsListView, editorGui
 
-		Gui %window%:Default
+		closeEditor(*) {
+			editor.close()
+		}
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		chooseSetupFile(*) {
+			editor.chooseSetup()
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		resetSetup(*) {
+			editor.resetSetup()
+		}
 
-		Gui %window%:Add, Text, w784 Center gmoveEditor, % translate("Modular Simulator Controller System")
+		selectSetting(*) {
+			editor.updateState()
+		}
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+		increaseSetting(*) {
+			editor.increaseSetting()
+		}
 
-		Gui %window%:Add, Text, x308 YP+20 w184 cBlue Center gopenEditorDocumentation, % translate("Setup Editor")
+		decreaseSetting(*) {
+			editor.decreaseSetting()
+		}
 
-		Gui %window%:Font, s8 Norm, Arial
+		compareSetup(*) {
+			editor.compareSetup()
+		}
 
-		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
+		applyRecommendations(*) {
+			editor.applyRecommendations(editorGui["applyStrengthSlider"].Value)
+		}
 
-		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupFile, % translate("Setup:")
-		Gui %window%:Add, Text, x85 ys+14 w193 vsetupNameViewer
-		Gui %window%:Add, Button, x280 ys+10 w80 gresetSetup vresetSetupButton, % translate("&Reset")
+		saveModifiedSetup(*) {
+			editor.saveSetup()
+		}
 
-		Gui %window%:Add, ListView, x16 ys+40 w344 h320 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectSetting, % values2String("|", collect(["Category", "Setting", "Value", "Unit"], "translate")*)
+		editorGui := SetupEditor.EditorWindow(this)
 
-		this.iSettingsListView := settingsListView
+		this.iWindow := editorGui
 
-		Gui %window%:Add, Button, x16 yp+324 w80 Disabled gdecreaseSetting vdecreaseSettingButton, % translate("Decrease")
-		Gui %window%:Add, Button, x280 yp w80 Disabled gincreaseSetting vincreaseSettingButton, % translate("Increase")
+		editorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Button, x280 yp+29 w80 gcompareSetup, % translate("Compare...")
+		editorGui.Add("Text", "w784 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Setup Advisor.Setup Editor"))
 
-		Gui %window%:Add, Button, x16 ys+420 w80 gapplyRecommendations, % translate("&Apply")
-		Gui %window%:Add, Slider, x100 ys+422 w60 0x10 Range20-100 ToolTip vapplyStrengthSlider, %applyStrengthSlider%
-		Gui %window%:Add, Text, x162 ys+425, % translate("%")
+		editorGui.SetFont("s9 Norm", "Arial")
+		editorGui.SetFont("Italic Underline", "Arial")
 
-		Gui %window%:Add, Button, x280 ys+420 w80 gsaveModifiedSetup, % translate("&Save...")
+		editorGui.Add("Text", "x308 YP+20 w184 cBlue Center", translate("Setup Editor")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups"))
 
-		Gui %window%:Add, Edit, x374 ys+10 w423 h433 T8 ReadOnly -Wrap HScroll vsetupViewer
+		editorGui.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, Text, x8 y506 w800 0x10
+		editorGui.Add("Text", "x8 yp+30 w800 0x10 Section")
 
-		Gui %window%:Add, Button, x374 y514 w80 h23 GcloseEditor, % translate("Close")
+		editorGui.Add("Button", "x16 ys+10 w60", translate("Setup:")).OnEvent("Click", chooseSetupFile)
+		editorGui.Add("Text", "x85 ys+14 w193 vsetupNameViewer")
+		editorGui.Add("Button", "x280 ys+10 w80  vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
+
+		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
+		this.iSettingsListView.OnEvent("Click", selectSetting)
+
+		editorGui.Add("Button", "x16 yp+324 w80 Disabled vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
+		editorGui.Add("Button", "x280 yp w80 Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
+
+		editorGui.Add("Button", "x280 yp+29 w80", translate("Compare...")).OnEvent("Click", compareSetup)
+
+		editorGui.Add("Button", "x16 ys+420 w80", translate("&Apply")).OnEvent("Click", applyRecommendations)
+		editorGui.Add("Slider", "x100 ys+422 w60 0x10 Range20-100 ToolTip vapplyStrengthSlider", 100)
+		editorGui.Add("Text", "x162 ys+425", translate("%"))
+
+		editorGui.Add("Button", "x280 ys+420 w80", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
+
+		editorGui.Add("Edit", "x374 ys+10 w423 h433 T8 ReadOnly -Wrap HScroll vsetupViewer")
+
+		editorGui.Add("Text", "x8 y506 w800 0x10")
+
+		editorGui.Add("Button", "x374 y514 w80 h23", translate("Close")).OnEvent("Click", closeEditor)
 	}
 
 	show() {
 		local window := this.Window
 		local x, y
 
-		if getWindowPosition("Setup Advisor.Setup Editor", x, y)
-			Gui %window%:Show, x%x% y%y%
+		if getWindowPosition("Setup Advisor.Setup Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui %window%:Show
+			window.Show()
 
 		this.loadSetup()
 	}
@@ -2078,56 +2145,55 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	destroy() {
-		local window := this.Window
-
-		Gui %window%:Destroy
+		if this.Window
+			this.Window.Destroy()
 	}
 
 	editSetup(setup := false) {
-		this.Setup := (setup ? setup : Setup())
+		this.Setup := (setup ? setup.Clone() : Setup())
+		this.Setup.Editor := this
+
+		this.createGui(this.Configuration)
 
 		this.show()
 
 		try {
 			while !this.iClosed
-				Sleep 200
+				Sleep(200)
 		}
 		finally {
 			this.destroy()
 		}
 
+		this.Setup.Editor := false
+
 		return this.Setup
 	}
 
 	updateState() {
-		local window := this.Window
 		local setup := this.Setup
 		local enabled := []
 		local changed := false
 		local row, label, sIndex, sEnabled, ignore, setting
 
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
-
-		if LV_GetNext(0) {
-			GuiControl Enable, increaseSettingButton
-			GuiControl Enable, decreaseSettingButton
+		if this.SettingsListView.GetNext(0) {
+			this.Control["increaseSettingButton"].Enabled := true
+			this.Control["decreaseSettingButton"].Enabled := true
 		}
 		else {
-			GuiControl Disable, increaseSettingButton
-			GuiControl Disable, decreaseSettingButton
+			this.Control["increaseSettingButton"].Enabled := false
+			this.Control["decreaseSettingButton"].Enabled := false
 		}
 
 		if setup {
-			row := LV_GetNext(0, "C")
+			row := this.SettingsListView.GetNext(0, "C")
 
 			while row {
-				LV_GetText(label, row, 2)
+				label := this.SettingsListView.GetText(row, 2)
 
 				enabled.Push(this.Settings[label])
 
-				row := LV_GetNext(row, "C")
+				row := this.SettingsListView.GetNext(row, "C")
 			}
 
 			for ignore, setting in this.Advisor.Settings {
@@ -2147,7 +2213,7 @@ class SetupEditor extends ConfigurationItem {
 			}
 
 			if changed
-				GuiControl Text, setupViewer, % this.Setup.Setup
+				this.Control["setupViewer"].Text := this.Setup.Setup
 		}
 	}
 
@@ -2170,8 +2236,8 @@ class SetupEditor extends ConfigurationItem {
 		throw "Virtual method SetupEditor.chooseSetup must be implemented in a subclass..."
 	}
 
-	loadSetup(ByRef setup := false) {
-		local window, categories, categoriesLabels, settingsLabels, settingsUnits
+	loadSetup(&setup := false) {
+		local categories, categoriesLabels, settingsLabels, settingsUnits
 		local ignore, setting, handler, modifiedValue, originalValue, value, category, candidate, settings
 		local cSetting, label, lastCategory
 
@@ -2180,18 +2246,8 @@ class SetupEditor extends ConfigurationItem {
 		else
 			this.Setup := setup
 
-		window := this.Window
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
-
-		LV_Delete()
-
-		this.Settings := {}
-
-		GuiControl Text, setupNameViewer, % (setup ? setup.Name : "")
-		GuiControl Text, setupViewer, % (setup ? setup.Setup : "")
+		this.Control["TextsetupNameViewer"].Text := (setup ? setup.Name : "")
+		this.Control["setupViewer"].Text := (setup ? setup.Setup : "")
 
 		categories := getMultiMapValues(this.Advisor.Definition, "Setup.Categories")
 
@@ -2201,18 +2257,12 @@ class SetupEditor extends ConfigurationItem {
 
 		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
 
-		if (settingsUnits.Count() = 0)
+		if (settingsUnits.Count = 0)
 			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
-		window := this.Window
+		this.SettingsListView.Delete()
 
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
-
-		LV_Delete()
-
-		this.Settings := {}
+		this.Settings := CaseInsenseMap()
 
 		setup.disable(false)
 
@@ -2226,12 +2276,14 @@ class SetupEditor extends ConfigurationItem {
 				if (originalValue = modifiedValue)
 					value := displayValue("Float", handler.formatValue(originalValue))
 				else if (modifiedValue > originalValue) {
-					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+							. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 					setup.enable(setting)
 				}
 				else {
-					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+					value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+							. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 					setup.enable(setting)
 				}
@@ -2252,28 +2304,27 @@ class SetupEditor extends ConfigurationItem {
 
 				label := settingsLabels[setting]
 
-				LV_Add((originalValue = modifiedValue) ? "" : "Check", categoriesLabels[category], label, value, settingsUnits[setting])
+				this.SettingsListView.Add((originalValue = modifiedValue) ? "" : "Check", categoriesLabels[category], label, value, settingsUnits[setting])
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting
 			}
 		}
 
-		LV_ModifyCol()
+		this.SettingsListView.ModifyCol()
 
-		LV_ModifyCol(1, "AutoHdr Sort 80")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr")
+		this.SettingsListView.ModifyCol(1, "AutoHdr Sort 80")
+		this.SettingsListView.ModifyCol(2, "AutoHdr")
+		this.SettingsListView.ModifyCol(3, "AutoHdr")
+		this.SettingsListView.ModifyCol(4, "AutoHdr")
 
 		lastCategory := ""
 
-		loop % LV_getCount()
-		{
-			LV_GetText(category, A_Index)
+		loop this.SettingsListView.GetCount() {
+			category := this.SettingsListView.GetText(A_Index)
 
 			if (category = lastCategory)
-				LV_Modify(A_Index, "", "")
+				this.SettingsListView.Modify(A_Index, "", "")
 
 			lastCategory := category
 		}
@@ -2286,19 +2337,14 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	increaseSetting(setting := false) {
-		local window := this.Window
 		local handler, label, row, candidate
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
 
 		if setting {
 			label := this.Settings[setting]
 			row := false
 
 			loop {
-				LV_GetText(candidate, A_Index, 2)
+				candidate := this.SettingsListView.GetText(A_Index, 2)
 
 				if (label = candidate) {
 					row := A_Index
@@ -2308,36 +2354,31 @@ class SetupEditor extends ConfigurationItem {
 			}
 		}
 		else
-			row := LV_GetNext(0)
+			row := this.SettingsListView.GetNext(0)
 
 		if row {
-			LV_GetText(label, row, 2)
+			label := this.SettingsListView.GetText(row, 2)
 
 			setting := this.Settings[label]
 			handler := this.createSettingHandler(setting)
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.increaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
 
-			GuiControl Text, setupViewer, % (this.Setup ? this.Setup.Setup : "")
+			this.Control["setupViewer"].Text := (this.Setup ? this.Setup.Setup : "")
 		}
 
 		this.updateState()
 	}
 
 	decreaseSetting(setting := false) {
-		local window := this.Window
 		local label, row, candidate, handler
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
 
 		if setting {
 			label := this.Settings[setting]
 			row := false
 
 			loop {
-				LV_GetText(candidate, A_Index, 2)
+				candidate := this.SettingsListView.GetText(A_Index, 2)
 
 				if (label = candidate) {
 					row := A_Index
@@ -2347,17 +2388,17 @@ class SetupEditor extends ConfigurationItem {
 			}
 		}
 		else
-			row := LV_GetNext(0)
+			row := this.SettingsListView.GetNext(0)
 
 		if row {
-			LV_GetText(label, row, 2)
+			label := this.SettingsListView.GetText(row, 2)
 
 			setting := this.Settings[label]
 			handler := this.createSettingHandler(setting)
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.decreaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
 
-			GuiControl Text, setupViewer, % (this.Setup ? this.Setup.Setup : "")
+			this.Control["setupViewer"].Text := (this.Setup ? this.Setup.Setup : "")
 		}
 
 		this.updateState()
@@ -2365,7 +2406,7 @@ class SetupEditor extends ConfigurationItem {
 
 	applyRecommendations(percentage) {
 		local knowledgeBase := this.Advisor.KnowledgeBase
-		local settings := {}
+		local settings := CaseInsenseMap()
 		local min := 1
 		local ignore, setting, delta, increment
 
@@ -2390,11 +2431,11 @@ class SetupEditor extends ConfigurationItem {
 					increment *= -1
 
 				if (increment < 0) {
-					loop % Abs(increment)
+					loop Abs(increment)
 						this.decreaseSetting(setting)
 				}
 				else
-					loop % Abs(increment)
+					loop Abs(increment)
 						this.increaseSetting(setting)
 			}
 		}
@@ -2410,12 +2451,12 @@ class SetupEditor extends ConfigurationItem {
 		local setup := this.Setup
 		local label := this.Settings[setting]
 		local row := false
-		local candidate, window, handler, originalValue, modifiedValue, value
+		local candidate, handler, originalValue, modifiedValue, value
 
 		setup.setValue(setting, newValue)
 
 		loop {
-			LV_GetText(candidate, A_Index, 2)
+			candidate := this.SettingsListView.GetText(A_Index, 2)
 
 			if (label = candidate) {
 				row := A_Index
@@ -2423,12 +2464,6 @@ class SetupEditor extends ConfigurationItem {
 				break
 			}
 		}
-
-		window := this.Window
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
 
 		handler := this.createSettingHandler(setting)
 		originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
@@ -2440,39 +2475,35 @@ class SetupEditor extends ConfigurationItem {
 			setup.disable(setting)
 		}
 		else if (modifiedValue > originalValue) {
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 			setup.enable(setting)
 		}
 		else {
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
 			setup.enable(setting)
 		}
 
-		LV_Modify(row, "Vis Col3", value)
-		LV_Modify(row, (originalValue = modifiedValue) ? "-Check" : "Check")
-		LV_ModifyCol(3, "AutoHdr")
+		this.SettingsListView.Modify(row, "Vis Col3", value)
+		this.SettingsListView.Modify(row, (originalValue = modifiedValue) ? "-Check" : "Check")
+		this.SettingsListView.ModifyCol(3, "AutoHdr")
 	}
 
 	compareSetup() {
 		local comparatorClass := getMultiMapValue(this.Configuration, "Setup", "Comparator", false)
-		local comparator, aWindow, cWindow, newSetup
+		local comparator, newSetup
 
 		if comparatorClass {
 			comparator := %comparatorClass%(this)
 
 			this.iComparator := comparator
 
-			aWindow := this.Window
-			cWindow := comparator.Window
-
-			Gui %cWindow%:+Owner%aWindow%
-			Gui %aWindow%:+Disabled
+			this.Window.Opt("+Disabled")
 
 			try {
-				comparator.createGui(comparator.Configuration)
-
 				newSetup := comparator.compareSetup()
 
 				if newSetup
@@ -2481,7 +2512,7 @@ class SetupEditor extends ConfigurationItem {
 			finally {
 				this.iComparator := false
 
-				Gui %aWindow%:-Disabled
+				this.Window.Opt("-Disabled")
 			}
 		}
 	}
@@ -2491,15 +2522,9 @@ class SetupEditor extends ConfigurationItem {
 ;;; SetupComparator                                                         ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global decreaseABSettingButton
-global increaseABSettingButton
-
-global setupNameAViewer
-global setupNameBViewer
-
-global applyMixSlider := 0
-
 class SetupComparator extends ConfigurationItem {
+	iWindow := false
+
 	iEditor := false
 
 	iSetupA := false
@@ -2508,9 +2533,41 @@ class SetupComparator extends ConfigurationItem {
 
 	iSettingsListView := false
 
-	iSettings := {}
+	iSettings := CaseInsenseMap()
 
 	iClosed := false
+
+	class ComparatorWindow extends Window {
+		iComparator := false
+
+		Comparator {
+			Get {
+				return this.iComparator
+			}
+		}
+
+		__New(comparator) {
+			this.iComparator := comparator
+
+			super.__New({Resizeable: true, Closeable: true, Options: "ToolWindow"}, "")
+		}
+
+		Close(*) {
+			this.Comparator.close()
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
 
 	Advisor {
 		Get {
@@ -2576,12 +2633,6 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	Window {
-		Get {
-			return "Comparator"
-		}
-	}
-
 	__New(editor, configuration := false) {
 		local advisor, simulator, car, section, values, key, value, fileName
 
@@ -2613,57 +2664,87 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local window := this.Window
-		local settingsListView
+		local comparator := this
+		local settingsListView, comparatorGui
 
-		Gui %window%:Default
+		applyComparator(*) {
+			comparator.close(true)
+		}
 
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
+		closeComparator(*) {
+			comparator.close()
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		chooseSetupAFile(*) {
+			comparator.chooseSetup("A")
+		}
 
-		Gui %window%:Add, Text, w784 Center gmoveComparator, % translate("Modular Simulator Controller System")
+		chooseSetupBFile(*) {
+			comparator.chooseSetup("B")
+		}
 
-		Gui %window%:Font, s9 Norm, Arial
-		Gui %window%:Font, Italic Underline, Arial
+		selectABSetting(*) {
+			comparator.updateState()
+		}
 
-		Gui %window%:Add, Text, x308 YP+20 w184 cBlue Center gopenComparatorDocumentation, % translate("Setup Comparator")
+		increaseABSetting(*) {
+			comparator.increaseSetting()
+		}
 
-		Gui %window%:Font, s8 Norm, Arial
+		decreaseABSetting(*) {
+			comparator.decreaseSetting()
+		}
 
-		Gui %window%:Add, Text, x8 yp+30 w800 0x10 Section
+		mixSetups(*) {
+			comparator.loadSetups(false, false, comparatorGui["applyMixSlider"].Value)
+		}
 
-		Gui %window%:Add, Button, x16 ys+10 w60 gchooseSetupAFile, % translate("Setup A:")
-		Gui %window%:Add, Text, x85 ys+14 w193 vsetupNameAViewer
-		Gui %window%:Add, Button, x16 ys+34 w60 gchooseSetupBFile, % translate("Setup B:")
-		Gui %window%:Add, Text, x85 ys+38 w193 vsetupNameBViewer
+		comparatorGui := SetupComparator.ComparatorWindow(this)
 
-		Gui %window%:Add, ListView, x16 ys+64 w784 h350 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDsettingsListView gselectABSetting, % values2String("|", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], "translate")*)
+		this.iWindow := comparatorGui
 
-		Gui %window%:Add, Button, x16 yp+354 w80 Disabled vdecreaseABSettingButton gdecreaseABSetting, % translate("Decrease")
-		Gui %window%:Add, Button, x720 yp w80 Disabled vincreaseABSettingButton gincreaseABSetting, % translate("Increase")
+		comparatorGui.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Slider, x316 yp w200 0x10 Range-100-100 ToolTip vapplyMixSlider gmixSetups, 0
-		Gui %window%:Add, Text, x251 yp+3 w50, % translate("Setup A")
-		Gui %window%:Add, Text, x529 yp w50, % translate("Setup B")
+		comparatorGui.Add("Text", "w784 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(comparatorGui, "Setup Advisor.Setup Comparator"))
 
-		this.iSettingsListView := settingsListView
+		comparatorGui.SetFont("s9 Norm", "Arial")
+		comparatorGui.SetFont("Italic Underline", "Arial")
 
-		Gui %window%:Add, Text, x8 y506 w800 0x10
+		comparatorGui.Add("Text", "x308 YP+20 w184 cBlue Center", translate("Setup Comparator")).OnEvent("Click", openDocumentation.Bind(comparatorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups"))
 
-		Gui %window%:Add, Button, x322 y514 w80 h23 GapplyComparator, % translate("&Apply")
-		Gui %window%:Add, Button, x426 y514 w80 h23 Default GcloseComparator, % translate("Close")
+		comparatorGui.SetFont("s8 Norm", "Arial")
+
+		comparatorGui.Add("Text", "x8 yp+30 w800 0x10 Section")
+
+		comparatorGui.Add("Button", "x16 ys+10 w60", translate("Setup A:")).OnEvent("Click", chooseSetupAFile)
+		comparatorGui.Add("Text", "x85 ys+14 w193 vsetupNameAViewer")
+		comparatorGui.Add("Button", "x16 ys+34 w60", translate("Setup B:")).OnEvent("Click", chooseSetupBFile)
+		comparatorGui.Add("Text", "x85 ys+38 w193 vsetupNameBViewer")
+
+		this.iSettingsListView := comparatorGui.Add("ListView", "x16 ys+64 w784 h350 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], translate))
+		this.iSettingsListView.OnEvent("Click", selectABSetting)
+
+		comparatorGui.Add("Button", "x16 yp+354 w80 Disabled vdecreaseABSettingButton", translate("Decrease")).OnEvent("Click", decreaseABSetting)
+		comparatorGui.Add("Button", "x720 yp w80 Disabled vincreaseABSettingButton", translate("Increase")).OnEvent("Click", increaseABSetting)
+
+		comparatorGui.Add("Slider", "x316 yp w200 0x10 Range-100-100 ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
+		comparatorGui.Add("Text", "x251 yp+3 w50", translate("Setup A"))
+		comparatorGui.Add("Text", "x529 yp w50", translate("Setup B"))
+
+		comparatorGui.Add("Text", "x8 y506 w800 0x10")
+
+		comparatorGui.Add("Button", "x322 y514 w80 h23", translate("&Apply")).OnEvent("Click", applyComparator)
+		comparatorGui.Add("Button", "x426 y514 w80 h23 Default", translate("Close")).OnEvent("Click", closeComparator)
 	}
 
 	show() {
 		local window := this.Window
 		local x, y
 
-		if getWindowPosition("Setup Advisor.Setup Comparator", x, y)
-			Gui %window%:Show, x%x% y%y%
+		if getWindowPosition("Setup Advisor.Setup Comparator", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui %window%:Show
+			window.Show()
 
 		this.loadSetups()
 	}
@@ -2673,13 +2754,12 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	destroy() {
-		local window := this.Window
-
-		Gui %window%:Destroy
+		if this.Window
+			this.Window.Destroy()
 	}
 
-	loadSetups(ByRef setupA := false, ByRef setupB := false, mix := 0) {
-		local window, setupClass, setupAB, categories, categoriesLabels, settingsLabels, settingsUnits
+	loadSetups(&setupA := false, &setupB := false, mix := 0) {
+		local setupClass, setupAB, categories, categoriesLabels, settingsLabels, settingsUnits
 		local ignore, setting, handler, valueA, valueB, category, candidate, settings, cSetting
 		local targetAB, valueAB, lastValueAB, delta, label, lastCategory
 
@@ -2693,18 +2773,8 @@ class SetupComparator extends ConfigurationItem {
 		else
 			this.SetupB := setupB
 
-		window := this.Window
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
-
-		LV_Delete()
-
-		this.Settings := {}
-
-		GuiControl Text, setupNameAViewer, % (setupA ? setupA.Name : "")
-		GuiControl Text, setupNameBViewer, % (setupB ? setupB.Name : "")
+		this.Control["setupNameAViewer"].Text := (setupA ? setupA.Name : "")
+		this.Control["setupNameBViewer"].Text := (setupB ? setupB.Name : "")
 
 		setupClass := this.SetupClass
 
@@ -2722,12 +2792,12 @@ class SetupComparator extends ConfigurationItem {
 
 		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units")
 
-		if (settingsUnits.Count() = 0)
+		if (settingsUnits.Count = 0)
 			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")
 
-		LV_Delete()
+		this.SettingsListView.Delete()
 
-		this.Settings := {}
+		this.Settings := CaseInsenseMap()
 
 		for ignore, setting in this.Advisor.Settings {
 			handler := this.Editor.createSettingHandler(setting)
@@ -2780,44 +2850,47 @@ class SetupComparator extends ConfigurationItem {
 				valueAB := handler.formatValue(valueAB)
 
 				if (valueB > valueA)
-					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
+					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "+"
+							 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
 				else if (valueB < valueA)
-					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
+					valueB := (displayValue("Float", valueB) . A_Space . translate("(") . "-"
+							 . displayValue("Float", handler.formatValue(Abs(valueA - valueB))) . translate(")"))
 				else
 					valueB := displayValue("Float", valueB)
 
 				if (valueAB > valueA)
-					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
+					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "+"
+							  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
 				else if (valueAB < valueA)
-					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
+					valueAB := (displayValue("Float", valueAB) . A_Space . translate("(") . "-"
+							  . displayValue("Float", handler.formatValue(Abs(valueA - valueAB))) . translate(")"))
 				else
 					valueAB := displayValue("Float", valueAB)
 
 				label := settingsLabels[setting]
 
-				LV_Add("", categoriesLabels[category], settingsLabels[setting], displayValue("Float", valueA), valueB, valueAB, settingsUnits[setting])
+				this.SettingsListView.Add("", categoriesLabels[category], settingsLabels[setting], displayValue("Float", valueA), valueB, valueAB, settingsUnits[setting])
 
 				this.Settings[setting] := label
 				this.Settings[label] := setting
 			}
 		}
 
-		LV_ModifyCol()
+		this.SettingsListView.ModifyCol()
 
-		LV_ModifyCol(1, "AutoHdr Sort")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr")
-		LV_ModifyCol(5, "AutoHdr")
+		this.SettingsListView.ModifyCol(1, "AutoHdr Sort")
+		this.SettingsListView.ModifyCol(2, "AutoHdr")
+		this.SettingsListView.ModifyCol(3, "AutoHdr")
+		this.SettingsListView.ModifyCol(4, "AutoHdr")
+		this.SettingsListView.ModifyCol(5, "AutoHdr")
 
 		lastCategory := ""
 
-		loop % LV_getCount()
-		{
-			LV_GetText(category, A_Index)
+		loop this.SettingsListView.GetCount() {
+			category := this.SettingsListView.GetText(A_Index)
 
 			if (category = lastCategory)
-				LV_Modify(A_Index, "", "")
+				this.SettingsListView.Modify(A_Index, "", "")
 
 			lastCategory := category
 		}
@@ -2828,11 +2901,13 @@ class SetupComparator extends ConfigurationItem {
 	compareSetup(setup := false) {
 		this.SetupB := (setup ? setup : Setup())
 
+		this.createGui(this.Configuration)
+
 		this.show()
 
 		try {
 			while !this.iClosed
-				Sleep 200
+				Sleep(200)
 		}
 		finally {
 			this.destroy()
@@ -2843,7 +2918,7 @@ class SetupComparator extends ConfigurationItem {
 
 	updateSetting(setting, newValue) {
 		local setup := this.SetupAB
-		local label, row, candidate, window, handler, originalValue, modifiedValue, value
+		local label, row, candidate, handler, originalValue, modifiedValue, value
 
 		setup.setValue(setting, newValue)
 
@@ -2851,7 +2926,7 @@ class SetupComparator extends ConfigurationItem {
 		row := false
 
 		loop {
-			LV_GetText(candidate, A_Index, 2)
+			candidate := this.SettingsListView.GetText(A_Index, 2)
 
 			if (label = candidate) {
 				row := A_Index
@@ -2860,12 +2935,6 @@ class SetupComparator extends ConfigurationItem {
 			}
 		}
 
-		window := this.Window
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
-
 		handler := this.Editor.createSettingHandler(setting)
 		originalValue := handler.convertToDisplayValue(this.SetupA.getValue(setting, false))
 		modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
@@ -2873,28 +2942,25 @@ class SetupComparator extends ConfigurationItem {
 		if (originalValue = modifiedValue)
 			value := displayValue("Float", handler.formatValue(originalValue))
 		else if (modifiedValue > originalValue)
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 		else
-			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-" . displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
+			value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+					. displayValue("Float", handler.formatValue(Abs(originalValue - modifiedValue))) . translate(")"))
 
-		LV_Modify(row, "Vis Col5", value)
-		LV_ModifyCol(5, "AutoHdr")
+		this.SettingsListView.Modify(row, "Vis Col5", value)
+		this.SettingsListView.ModifyCol(5, "AutoHdr")
 	}
 
 	increaseSetting(setting := false) {
-		local window := this.Window
 		local row, candidate, label, handler
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
 
 		if setting {
 			label := this.Settings[setting]
 			row := false
 
 			loop {
-				LV_GetText(candidate, A_Index, 2)
+				candidate := this.SettingsListView.GetText(A_Index, 2)
 
 				if (label = candidate) {
 					row := A_Index
@@ -2904,10 +2970,10 @@ class SetupComparator extends ConfigurationItem {
 			}
 		}
 		else
-			row := LV_GetNext(0)
+			row := this.SettingsListView.GetNext(0)
 
 		if row {
-			LV_GetText(label, row, 2)
+			label := this.SettingsListView.GetText(row, 2)
 
 			setting := this.Settings[label]
 			handler := this.Editor.createSettingHandler(setting)
@@ -2919,19 +2985,14 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	decreaseSetting(setting := false) {
-		local window := this.Window
 		local label, row, candidate, handler
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
 
 		if setting {
 			label := this.Settings[setting]
 			row := false
 
 			loop {
-				LV_GetText(candidate, A_Index, 2)
+				candidate := this.SettingsListView.GetText(A_Index, 2)
 
 				if (label = candidate) {
 					row := A_Index
@@ -2941,10 +3002,10 @@ class SetupComparator extends ConfigurationItem {
 			}
 		}
 		else
-			row := LV_GetNext(0)
+			row := this.SettingsListView.GetNext(0)
 
 		if row {
-			LV_GetText(label, row, 2)
+			label := this.SettingsListView.GetText(row, 2)
 
 			setting := this.Settings[label]
 			handler := this.Editor.createSettingHandler(setting)
@@ -2956,19 +3017,13 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	updateState() {
-		local window := this.Window
-
-		Gui %window%:Default
-
-		Gui ListView, % this.SettingsListView
-
-		if LV_GetNext(0) {
-			GuiControl Enable, increaseABSettingButton
-			GuiControl Enable, decreaseABSettingButton
+		if this.SettingsListView.GetNext(0) {
+			this.Control["increaseABSettingButton"].Enabled := true
+			this.Control["decreaseABSettingButton"].Enabled := true
 		}
 		else {
-			GuiControl Disable, increaseABSettingButton
-			GuiControl Disable, decreaseABSettingButton
+			this.Control["increaseABSettingButton"].Enabled := false
+			this.Control["decreaseABSettingButton"].Enabled := false
 		}
 	}
 }
@@ -3018,7 +3073,7 @@ class FileSetupComparator extends SetupComparator {
 		}
 	}
 
-	loadSetups(ByRef setupA := false, ByRef setupB := false, mix := 0) {
+	loadSetups(&setupA := false, &setupB := false, mix := 0) {
 		super.loadSetups(setupA, setupB, mix)
 
 		if this.SetupAB
@@ -3031,246 +3086,20 @@ class FileSetupComparator extends SetupComparator {
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeSlider(slider1, value1, slider2, value2) {
-	local window := SetupAdvisor.Instance.Window
-	local y, pos, posX, posY
+closeSetupAdvisor(*) {
+	if GetKeyState("Ctrl", "P")
+		SetupAdvisor.Instance.saveState()
 
-	Gui %window%:Default
-	Gui %window%:Color, D0D0D0, D8D8D8
-
-	ControlClick, , ahk_id %slider1%, , , , x0 y0
-	ControlClick, , ahk_id %slider2%, , , , x0 y0
-
-	Sleep 10
-
-	GuiControlGet pos, Pos, %slider1%
-	y := (posY - 1)
-	GuiControl MoveDraw, %slider1%, y%Y%
-	GuiControl MoveDraw, %slider1%, y%posY%
-
-	GuiControlGet pos, Pos, %slider2%
-	y := (posY - 1)
-	GuiControl MoveDraw, %slider2%, y%Y%
-	GuiControl MoveDraw, %slider2%, y%posY%
-
-	GuiControl, , %slider1%, %value1%
-	GuiControl, , %slider2%, %value2%
-}
-
-updateSlider(characteristic, slider1, slider2) {
-	local value1, value2
-
-	GuiControlGet value1, , %slider1%
-	GuiControlGet value2, , %slider2%
-
-	SetupAdvisor.Instance.updateCharacteristic(characteristic, value1, value2)
+	ExitApp(0)
 }
 
 factPath(path*) {
 	local result := ""
 
-	loop % path.Length()
+	loop path.Length
 		result .= ((StrLen(result) > 0) ? ("." . path[A_Index]) : path[A_Index])
 
 	return result
-}
-
-loadSetup() {
-	local title := translate("Load Problems...")
-	local fileName
-
-	Gui +OwnDialogs
-
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-	FileSelectFile fileName, 1, , %title%, Problems (*.setup)
-	OnMessage(0x44, "")
-
-	if (fileName != "")
-		SetupAdvisor.Instance.restoreState(fileName)
-}
-
-saveSetup() {
-	local title := translate("Save Problems...")
-	local fileName
-
-	Gui +OwnDialogs
-
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-	FileSelectFile fileName, S17, , %title%, Problems (*.setup)
-	OnMessage(0x44, "")
-
-	if (fileName != "") {
-		if !InStr(fileName, ".setup")
-			fileName := (fileName . ".setup")
-
-		SetupAdvisor.Instance.saveState(fileName)
-	}
-}
-
-editSetup() {
-	SetupAdvisor.Instance.editSetup()
-}
-
-compareSetup() {
-	SetupAdvisor.Instance.Editor.compareSetup()
-}
-
-closeAdvisor() {
-	if GetKeyState("Ctrl", "P")
-		SetupAdvisor.Instance.saveState()
-
-	ExitApp 0
-}
-
-moveAdvisor() {
-	moveByMouse(SetupAdvisor.Instance.Window, "Setup Advisor")
-}
-
-openAdvisorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor
-}
-
-closeEditor() {
-	SetupAdvisor.Instance.Editor.close()
-}
-
-moveEditor() {
-	moveByMouse(SetupAdvisor.Instance.Editor.Window, "Setup Advisor.Setup Editor")
-}
-
-openEditorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups
-}
-
-applyComparator() {
-	SetupAdvisor.Instance.Editor.Comparator.close(true)
-}
-
-closeComparator() {
-	SetupAdvisor.Instance.Editor.Comparator.close()
-}
-
-moveComparator() {
-	moveByMouse(SetupAdvisor.Instance.Editor.Comparator.Window, "Setup Advisor.Setup Comparator")
-}
-
-openComparatorDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups
-}
-
-chooseSetupAFile() {
-	SetupAdvisor.Instance.Editor.Comparator.chooseSetup("A")
-}
-
-chooseSetupBFile() {
-	SetupAdvisor.Instance.Editor.Comparator.chooseSetup("B")
-}
-
-selectABSetting() {
-	SetupAdvisor.Instance.Editor.Comparator.updateState()
-}
-
-increaseABSetting() {
-	SetupAdvisor.Instance.Editor.Comparator.increaseSetting()
-}
-
-decreaseABSetting() {
-	SetupAdvisor.Instance.Editor.Comparator.decreaseSetting()
-}
-
-mixSetups() {
-	GuiControlGet applyMixSlider
-
-	SetupAdvisor.Instance.Editor.Comparator.loadSetups(false, false, applyMixSlider)
-}
-
-chooseSetupFile() {
-	SetupAdvisor.Instance.Editor.chooseSetup()
-}
-
-selectSetting() {
-	SetupAdvisor.Instance.Editor.updateState()
-}
-
-increaseSetting() {
-	SetupAdvisor.Instance.Editor.increaseSetting()
-}
-
-decreaseSetting() {
-	SetupAdvisor.Instance.Editor.decreaseSetting()
-}
-
-applyRecommendations() {
-	GuiControlGet applyStrengthSlider
-
-	SetupAdvisor.Instance.Editor.applyRecommendations(applyStrengthSlider)
-}
-
-resetSetup() {
-	SetupAdvisor.Instance.Editor.resetSetup()
-}
-
-saveModifiedSetup() {
-	SetupAdvisor.Instance.Editor.saveSetup()
-}
-
-chooseSimulator() {
-	local advisor := SetupAdvisor.Instance
-	local window := advisor.Window
-
-	Gui %window%:Default
-
-	GuiControlGet simulatorDropDown
-
-	advisor.loadSimulator((simulatorDropDown = translate("Generic")) ? true : simulatorDropDown)
-}
-
-chooseCar() {
-	local advisor := SetupAdvisor.Instance
-	local window := advisor.Window
-
-	Gui %window%:Default
-
-	GuiControlGet carDropDown
-
-	advisor.loadCar((carDropDown = translate("All")) ? true : carDropDown)
-}
-
-chooseTrack() {
-	local advisor := SetupAdvisor.Instance
-	local window := advisor.Window
-	local simulator, tracks, trackNames
-
-	Gui %window%:Default
-
-	GuiControlGet trackDropDown
-
-	if (trackDropDown = translate("All"))
-		advisor.loadTrack(true)
-	else {
-		simulator := advisor.SelectedSimulator
-		tracks := advisor.getTracks(simulator, advisor.SelectedCar)
-		trackNames := collect(tracks, ObjBindMethod(advisor, "getTrackName", simulator))
-
-		advisor.loadTrack(tracks[inList(trackNames, trackDropDown)])
-	}
-}
-
-chooseWeather() {
-	/*
-	advisor := SetupAdvisor.Instance
-	window := advisor.Window
-
-	Gui %window%:Default
-
-	GuiControlGet weatherDropDown
-
-	advisor.loadWeather(kWeatherConditions[weatherDropDown])
-	*/
-}
-
-chooseCharacteristic() {
-	SetupAdvisor.Instance.chooseCharacteristic()
 }
 
 runSetupAdvisor() {
@@ -3281,13 +3110,13 @@ runSetupAdvisor() {
 	local track := getMultiMapValue(settings, "Setup Advisor", "Track", false)
 	local weather := false
 	local index := 1
-	local advisor, label, callback
+	local advisor, label
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Setup Advisor
+	TraySetIcon(icon, "1")
+	A_IconTip := "Setup Advisor"
 
-	while (index < A_Args.Length()) {
-		switch A_Args[index] {
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
 			case "-Simulator":
 				simulator := A_Args[index + 1]
 				index += 2
@@ -3308,27 +3137,25 @@ runSetupAdvisor() {
 	fixIE(11)
 
 	if car
-		car := SessionDatabase().getCarName(simulator, car)
+		car := SessionDatabase.getCarName(simulator, car)
 
 	advisor := SetupAdvisor(simulator, car, track, weather)
 
-	Menu SupportMenu, Insert, 1&
+	SupportMenu.Insert("1&")
 
 	label := translate("Debug Rule System")
-	callback := ObjBindMethod(advisor, "toggleDebug", kDebugRules)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(advisor, "toggleDebug", kDebugRules))
 
 	if advisor.Debug[kDebugRules]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	label := translate("Debug Knowledgebase")
-	callback := ObjBindMethod(advisor, "toggleDebug", kDebugKnowledgeBase)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(advisor, "toggleDebug", kDebugKnowledgeBase))
 
 	if advisor.Debug[kDebugKnowledgebase]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	advisor.createGui(advisor.Configuration)
 
@@ -3360,11 +3187,11 @@ runSetupAdvisor() {
 ;;;                          Editor Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\GenericTelemetryAnalyzer.ahk
-#Include Libraries\IRCTelemetryAnalyzer.ahk
-#Include Libraries\R3ETelemetryAnalyzer.ahk
-#Include Libraries\ACCSetupEditor.ahk
-#Include Libraries\ACSetupEditor.ahk
+#Include "Libraries\GenericTelemetryAnalyzer.ahk"
+#Include "Libraries\IRCTelemetryAnalyzer.ahk"
+#Include "Libraries\R3ETelemetryAnalyzer.ahk"
+#Include "Libraries\ACCSetupEditor.ahk"
+#Include "Libraries\ACSetupEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

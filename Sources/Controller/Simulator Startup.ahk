@@ -54,6 +54,16 @@ global kClose := "Close"
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class StartupWindow extends Window {
+	__New() {
+		super.__New({Options: "+Caption +Border +SysMenu", Closeable: true})
+	}
+
+	Close(*) {
+		closeLaunchPad()
+	}
+}
+
 class SimulatorStartup extends ConfigurationItem {
 	static Instance := false
 
@@ -260,6 +270,11 @@ class SimulatorStartup extends ConfigurationItem {
 	startup() {
 		local startSimulator, runningIndex, hidden, hasSplashTheme
 
+		playSong(songFile) {
+			if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
+				messageSend(kFileMessage, "Startup", "playStartupSong:" . songFile, SimulatorStartup.Instance.ControllerPID)
+		}
+
 		if this.prepareConfiguration() {
 			startSimulator := ((this.iStartupOption != false) || GetKeyState("Ctrl") || GetKeyState("MButton"))
 
@@ -379,6 +394,81 @@ launchPad(command := false, arguments*) {
 
 	static closeCheckBox
 
+	closeAll(*) {
+		local msgResult
+
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to close all currently running applications? Unsaved data might be lost."), translate("Modular Simulator Controller System"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes")
+			launchPad("Close All", GetKeyState("Ctrl", "P"))
+	}
+
+	closeOnStartup(*) {
+		launchPad("CloseOnStartup")
+	}
+
+	launchStartup(*) {
+		launchPad("Startup")
+	}
+
+	launchApplication(application, *) {
+		local executable := launchPad("Executable", application)
+
+		if executable
+			launchPad("Launch", executable)
+	}
+
+	modifySettings(launchPadGui, *) {
+		local settings := readMultiMap(kSimulatorSettingsFile)
+
+		launchPadGui.Opt("+Disabled")
+
+		try {
+			if (editSettings(&settings) == kSave)
+				writeMultiMap(kSimulatorSettingsFile, settings)
+		}
+		finally {
+			launchPadGui.Opt("-Disabled")
+		}
+	}
+
+	launchSimulatorDownload() {
+		local msgResult
+
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to download and install the latest version? You must close all applications before running the update."), translate("Update"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes")
+			launchPad("Launch", "Simulator Download.exe", true)
+	}
+
+	WM_MOUSEMOVE(wParam, lParam, msg, Hwnd) {
+		local Text, CurrControl
+
+		static PrevHwnd := 0
+
+		if (Hwnd != PrevHwnd) {
+			Text := "", ToolTip()
+
+			CurrControl := GuiCtrlFromHwnd(Hwnd)
+
+			if CurrControl {
+				Text := launchPad("ToolTip", CurrControl)
+
+				if !text
+					return
+
+				SetTimer () => ToolTip(Text), -1000
+				SetTimer () => ToolTip(), -4000
+			}
+
+			PrevHwnd := Hwnd
+		}
+	}
+
 	if (command = kClose) {
 		if ((arguments.Length > 0) && arguments[1])
 			launchPad("Close All")
@@ -482,7 +572,7 @@ launchPad(command := false, arguments*) {
 		icons["SetupAdvisor"] := kIconsDirectory . "Setup.ico"
 		icons["SystemMonitor"] := kIconsDirectory . "Monitoring.ico"
 
-		launchPadGui := Window()
+		launchPadGui := StartupWindow()
 
 		launchPadGui.SetFont("s10 Bold", "Arial")
 
@@ -585,147 +675,27 @@ closeLaunchPad(*) {
 		launchPad(kClose)
 }
 
-closeAll(*) {
-	local msgResult
-
-	OnMessage(0x44, translateYesNoButtons)
-	msgResult := MsgBox(translate("Do you really want to close all currently running applications? Unsaved data might be lost."), translate("Modular Simulator Controller System"), 262436)
-	OnMessage(0x44, translateYesNoButtons, 0)
-
-	if (msgResult = "Yes")
-		launchPad("Close All", GetKeyState("Ctrl", "P"))
-}
-
-closeOnStartup(*) {
-	launchPad("CloseOnStartup")
-}
-
-launchStartup(*) {
-	launchPad("Startup")
-}
-
-launchApplication(application, *) {
-	local executable := launchPad("Executable", application)
-
-	if executable
-		launchPad("Launch", executable)
-}
-
-modifySettings(launchPadGui, *) {
-	local settings := readMultiMap(kSimulatorSettingsFile)
-
-	launchPadGui.Opt("+Disabled")
-
-	try {
-		if (editSettings(&settings) == kSave)
-			writeMultiMap(kSimulatorSettingsFile, settings)
-	}
-	finally {
-		launchPadGui.Opt("-Disabled")
-		launchPadGui.Show("NA")
-	}
-}
-
-launchSimulatorDownload() {
-	local msgResult
-
-	OnMessage(0x44, translateYesNoButtons)
-	msgResult := MsgBox(translate("Do you really want to download and install the latest version? You must close all applications before running the update."), translate("Update"), 262436)
-	OnMessage(0x44, translateYesNoButtons, 0)
-
-	if (msgResult = "Yes")
-		launchPad("Launch", "Simulator Download.exe", true)
-}
-
-WM_MOUSEMOVE(wParam, lParam, msg, Hwnd) {
-	local Text, CurrControl
-
-    static PrevHwnd := 0
-
-	if (Hwnd != PrevHwnd) {
-        Text := "", ToolTip()
-
-        CurrControl := GuiCtrlFromHwnd(Hwnd)
-
-		if CurrControl {
-            Text := launchPad("ToolTip", CurrControl)
-
-			if !text
-				return
-
-            SetTimer () => ToolTip(Text), -1000
-            SetTimer () => ToolTip(), -4000
-        }
-
-        PrevHwnd := Hwnd
-    }
-}
-
-/*
-WM_MOUSEMOVE(*) {
-	local text
-
-    static CurrControl := false
-	static PrevControl := false
-
-	; CurrControl := A_GuiControl
-
-	if ((CurrControl != PrevControl) && !InStr(CurrControl, " ")) {
-		ToolTip()
-
-		SetTimer(RemoveToolTip, 0)
-        SetTimer(DisplayToolTip, 1000)
-
-        PrevControl := CurrControl
-    }
-
-	return
-
-    DisplayToolTip() {
-		SetTimer(DisplayToolTip,0)
-
-		text := launchPad("ToolTip", CurrControl)
-
-		if text {
-			ToolTip(text)
-
-			SetTimer(RemoveToolTip,10000)
-		}
-
-		return
-	}
-
-    RemoveToolTip() {
-		SetTimer(RemoveToolTip,0)
-
-		ToolTip()
-
-		return
-	}
-}
-*/
-
-watchStartupSemaphore() {
-	if !FileExist(kTempDirectory . "Startup.semaphore")
-		if !SimulatorStartup.StayOpen
-			exitStartup()
-		else
-			try {
-				hideSplashTheme()
-			}
-			catch Any as exception {
-				logError(exception)
-			}
-}
-
-clearStartupSemaphore(*) {
-	deleteFile(kTempDirectory . "Startup.semaphore")
-
-	return false
-}
-
 startupSimulator() {
 	local fileName
+
+	watchStartupSemaphore() {
+		if !FileExist(kTempDirectory . "Startup.semaphore")
+			if !SimulatorStartup.StayOpen
+				exitStartup()
+			else
+				try {
+					hideSplashTheme()
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+	}
+
+	clearStartupSemaphore(*) {
+		deleteFile(kTempDirectory . "Startup.semaphore")
+
+		return false
+	}
 
 	Hotkey("Escape", cancelStartup, "On")
 
@@ -769,11 +739,6 @@ startSimulator() {
 		ExitApp(0)
 
 	return
-}
-
-playSong(songFile) {
-	if (songFile && FileExist(getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)))
-		messageSend(kFileMessage, "Startup", "playStartupSong:" . songFile, SimulatorStartup.Instance.ControllerPID)
 }
 
 cancelStartup(*) {

@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,17 +25,17 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Process.ahk
+#Include "..\Framework\Process.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\RaceStrategist.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Assistants\Libraries\RaceStrategist.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -43,6 +43,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
+	/*
 	local info := kVersion . " - 2023, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local image := "1:" . logo
@@ -50,17 +51,18 @@ showLogo(name) {
 
 	static videoPlayer
 
-	SysGet mainScreen, MonitorWorkArea
+	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
 	x := mainScreenLeft
 	y := mainScreenBottom - 234
 
 	title1 := translate("Modular Simulator Controller System")
 	title2 := substituteVariables(translate("%name% - The Virtual Race Strategist"), {name: name})
-	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
+	SplashImageGui := Gui("ToolWindow -Sysmenu Disabled"), SplashImageGui.SetFont("bold"), SplashImageGui.AddText("w200 Center", title1 "`n" title2), SplashImageGui.AddPicture("w200 h-1", image), SplashImageGui.SetFont("norm"), SplashImageGui.AddText("w200 Center", info), SplashImageGui.Show()
 
-	Gui Logo:-Border -Caption
-	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
+	Logo := Gui()
+	Logo.Opt("-Border -Caption")
+	Logo.Add("ActiveX", "x0 y0 w279 h155 VvideoPlayer", "shell explorer")
 
 	videoPlayer.Navigate("about:blank")
 
@@ -71,21 +73,15 @@ showLogo(name) {
 	x += 10
 	y += 40
 
-	Gui Logo:Margin, 0, 0
-	Gui Logo:+AlwaysOnTop
-	Gui Logo:Show, AutoSize x%x% y%y%
-}
-
-hideLogo() {
-	Gui Logo:Destroy
-	SplashImage 1:Off
+	Logo.MarginX := "0", Logo.MarginY := "0"
+	Logo.Opt("+AlwaysOnTop")
+	Logo.Show("AutoSize x" . x . " y" . y)
+	*/
 }
 
 checkRemoteProcessAlive(pid) {
-	Process Exist, %pid%
-
-	if !ErrorLevel
-		ExitApp 0
+	if !ProcessExist(pid)
+		ExitApp(0)
 }
 
 startRaceStrategist() {
@@ -101,19 +97,17 @@ startRaceStrategist() {
 	local strategistListener := false
 	local strategistMuted := false
 	local debug := false
-	local voiceServer, index, strategist, label, callback
+	local voiceServer, index, strategist, label
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Race Strategist
+	TraySetIcon(icon, "1")
+	A_IconTip := "Race Strategist"
 
-	Process Exist, Voice Server.exe
-
-	voiceServer := ErrorLevel
+	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
 
-	while (index < A_Args.Length()) {
-		switch A_Args[index] {
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
 			case "-Remote":
 				remotePID := A_Args[index + 1]
 				index += 2
@@ -168,7 +162,7 @@ startRaceStrategist() {
 	if debug
 		setDebug(true)
 
-	strategist := RaceStrategist(kSimulatorConfiguration
+	strategist := new RaceStrategist(kSimulatorConfiguration
 								   , remotePID ? RaceStrategist.RaceStrategistRemoteHandler(remotePID) : false
 								   , strategistName, strategistLanguage
 								   , strategistSynthesizer, strategistSpeaker, strategistSpeakerVocalics
@@ -176,37 +170,35 @@ startRaceStrategist() {
 
 	RaceStrategist.Instance := strategist
 
-	Menu SupportMenu, Insert, 1&
+	SupportMenu.Insert("1&")
 
 	label := translate("Debug Rule System")
-	callback := ObjBindMethod(strategist, "toggleDebug", kDebugRules)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(strategist, "toggleDebug", kDebugRules))
 
 	if strategist.Debug[kDebugRules]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	label := translate("Debug Knowledgebase")
-	callback := ObjBindMethod(strategist, "toggleDebug", kDebugKnowledgeBase)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(strategist, "toggleDebug", kDebugKnowledgeBase))
 
 	if strategist.Debug[kDebugKnowledgebase]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
-	registerMessageHandler("Race Strategist", "handleStrategistMessage")
+	registerMessageHandler("Race Strategist", handleStrategistMessage)
 
 	if (debug && strategistSpeaker) {
 		strategist.getSpeaker()
 
-		strategist.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase()})
+		strategist.updateDynamicValues({KnowledgeBase: RaceStrategist.Instance.createKnowledgeBase({})})
 	}
 
 	if (strategistLogo && !kSilentMode)
 		showLogo(strategistName)
 
 	if remotePID
-		Task.startTask(PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(new PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
 
 	return
 }
@@ -218,12 +210,12 @@ startRaceStrategist() {
 
 shutdownRaceStrategist(shutdown := false) {
 	if shutdown
-		ExitApp 0
+		ExitApp(0)
 
 	if (RaceStrategist.Instance.Session == kSessionFinished)
-		Task.startTask(Func("shutdownRaceStrategist").Bind(true), 10000, kLowPriority)
+		Task.startTask(shutdownRaceStrategist.Bind(true), 10000, kLowPriority)
 	else
-		Task.startTask("shutdownRaceStrategist", 1000, kLowPriority)
+		Task.startTask(shutdownRaceStrategist, 1000, kLowPriority)
 
 	return false
 }
@@ -233,7 +225,7 @@ handleStrategistMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Task.startTask("shutdownRaceStrategist", 20000, kLowPriority)
+			Task.startTask(shutdownRaceStrategist, 20000, kLowPriority)
 
 			return true
 		}
@@ -241,7 +233,7 @@ handleStrategistMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceStrategist.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.startTask("shutdownRaceStrategist", 20000, kLowPriority)
+		Task.startTask(shutdownRaceStrategist, 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceStrategist.Instance, data))
 }

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Track Mapper                    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,15 +25,15 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Process.ahk
+#Include "..\Framework\Process.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Database\Libraries\SessionDatabase.ahk
-#Include ..\Libraries\GDIP.ahk
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Libraries\GDIP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -73,8 +73,7 @@ createTrackImage(trackMap) {
 	lastX := 0
 	lastY := 0
 
-	loop % getMultiMapValue(trackMap, "Map", "Points")
-	{
+	loop getMultiMapValue(trackMap, "Map", "Points") {
 		x := Round((marginX + offsetX + getMultiMapValue(trackMap, "Points", A_Index . ".X")) * scale)
 		y := Round((marginY + offsetY + getMultiMapValue(trackMap, "Points", A_Index . ".Y")) * scale)
 
@@ -88,7 +87,7 @@ createTrackImage(trackMap) {
 		lastX := x
 		lastY := y
 
-		Sleep 1
+		Sleep(1)
 	}
 
 	Gdip_DrawLine(graphics, pen, lastX, lastY, firstX, firstY)
@@ -126,11 +125,10 @@ createTrackMap(simulator, track, fileName) {
 
 	writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
-	loop Read, %fileName%
-	{
+	loop Read, fileName {
 		coordinates.Push(string2Values(",", A_LoopReadLine))
 
-		Sleep 1
+		Sleep(1)
 
 		if (Mod(A_Index, 100) = 0) {
 			setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
@@ -142,7 +140,7 @@ createTrackMap(simulator, track, fileName) {
 	setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Analyzing")
 	setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
-	if (coordinates.Length() > 0) {
+	if (coordinates.Length > 0) {
 		if (coordinates[1].Length() = 2) {
 			exact := true
 
@@ -171,7 +169,7 @@ createTrackMap(simulator, track, fileName) {
 
 			points += 1
 
-			Sleep 1
+			Sleep(1)
 
 			if (Mod(A_Index, 100) = 0) {
 				setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
@@ -210,7 +208,7 @@ createTrackMap(simulator, track, fileName) {
 			for ignore, coordinate in coordinates {
 				normalized[Round(coordinate[1] * 1000)] := [coordinate[2], coordinate[3]]
 
-				Sleep 1
+				Sleep(1)
 
 				if (Mod(A_Index, 100) = 0) {
 					setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
@@ -238,7 +236,7 @@ createTrackMap(simulator, track, fileName) {
 
 				trackData .= (coordinate[1] . A_Space . coordinate[2])
 
-				Sleep 1
+				Sleep(1)
 
 				if (Mod(A_Index, 100) = 0) {
 					setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
@@ -259,11 +257,11 @@ createTrackMap(simulator, track, fileName) {
 		setMultiMapValue(trackMap, "Map", "Precision", exact ? "Exact" : "Estimated")
 		setMultiMapValue(trackMap, "Map", "Points", points)
 
-		loop %points% {
+		loop points {
 			setMultiMapValue(trackMap, "Points", A_Index . ".X", coordinates[A_Index][1])
 			setMultiMapValue(trackMap, "Points", A_Index . ".Y", coordinates[A_Index][2])
 
-			Sleep 1
+			Sleep(1)
 
 			if (Mod(A_Index, 100) = 0) {
 				setMultiMapValue(trackMapperState, "Track Mapper", "Points", A_Index)
@@ -275,7 +273,7 @@ createTrackMap(simulator, track, fileName) {
 		if trackData {
 			deleteFile(kTempDirectory . track . ".data")
 
-			FileAppend %trackData%, %kTempDirectory%%track%.data
+			FileAppend(trackData, kTempDirectory . track . ".data")
 
 			trackData := (kTempDirectory . track . ".data")
 		}
@@ -296,12 +294,12 @@ createTrackMap(simulator, track, fileName) {
 		if trackData
 			deleteFile(fileName)
 
-		Sleep 10000
+		Sleep(10000)
 
 		setMultiMapValue(trackMapperState, "Track Mapper", "Action", "Finished")
 		writeMultiMap(kTempDirectory . "Track Mapper.state", trackMapperState)
 
-		Sleep 10000
+		Sleep(10000)
 
 		deleteFile(kTempDirectory . "Track Mapper.state")
 	}
@@ -320,15 +318,13 @@ recreateTrackMaps() {
 	local directory := sessionDB.DatabasePath
 	local code, simulator, track
 
-	loop Files, %directory%User\Tracks\*.*, D		; Simulator
-	{
+	loop Files, directory . "User\Tracks\*.*", "D" {
 		code := A_LoopFileName
 
 		simulator := sessionDB.getSimulatorName(code)
 
-		loop Files, %directory%User\Tracks\%code%\*.map, F		; Track
-		{
-			SplitPath A_LoopFileName, , , , track
+		loop Files, directory . "User\Tracks\" . code . "\*.map", "F" {
+			SplitPath(A_LoopFileName, , , , &track)
 
 			recreateTrackMap(simulator, track)
 		}
@@ -343,13 +339,13 @@ startTrackMapper() {
 	local recreate := false
 	local index
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Track Mapper
+	TraySetIcon(icon, "1")
+	A_IconTip := "Track Mapper"
 
 	index := 1
 
-	while (index < A_Args.Length()) {
-		switch A_Args[index] {
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
 			case "-Simulator":
 				simulator := A_Args[index + 1]
 				index += 2
@@ -376,7 +372,7 @@ startTrackMapper() {
 	if recreate
 		recreateTrackMaps()
 
-	ExitApp 0
+	ExitApp(0)
 }
 
 ;;;-------------------------------------------------------------------------;;;

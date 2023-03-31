@@ -197,7 +197,7 @@ class ACSetupComparator extends FileSetupComparator {
 		local directory := (A_MyDocuments . "\Assetto Corsa\setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
-		local fileName, theSetup
+		local fileName, theSetup, ignore
 
 		if (car && (car != true))
 			directory .= ("\" . car)
@@ -222,9 +222,9 @@ class ACSetupComparator extends FileSetupComparator {
 
 			if load {
 				if (type = "A")
-					this.loadSetups(theSetup)
+					this.loadSetups(&theSetup)
 				else
-					this.loadSetups(false, theSetup)
+					this.loadSetups(&ignore := false, &theSetup)
 			}
 			else
 				return theSetup

@@ -160,7 +160,7 @@ class JSON {
 					out .= (ObjGetCapacity([k]) ? JSON.print(k) : escape_str(k)) (indent ? ": " : ":") ; token + padding
 
 				out .= JSON.print(v, indent, lvl) ; value
-					.  ( indent ? ",`n" . indt : "," ) ; token + indent
+					.  ( (indent != "") ? ",`n" . indt : "," ) ; token + indent
 			}
 
 			if (out != "") {

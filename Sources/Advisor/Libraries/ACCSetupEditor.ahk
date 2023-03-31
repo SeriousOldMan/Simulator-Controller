@@ -178,7 +178,7 @@ class ACCSetupEditor extends FileSetupEditor {
 			theSetup := ACCSetup(this, fileName)
 
 			if load
-				this.loadSetup(theSetup)
+				this.loadSetup(&theSetup)
 			else
 				return theSetup
 		}
@@ -227,7 +227,7 @@ class ACCSetupComparator extends FileSetupComparator {
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
 		local car := sessionDB.getCarCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedCar[false])
 		local track := sessionDB.getTrackCode(this.Advisor.SelectedSimulator[false], this.Advisor.SelectedTrack[false])
-		local fileName, theSetup
+		local fileName, theSetup, ignore
 
 		if (car && (car != true))
 			directory .= ("\" . car)
@@ -247,9 +247,9 @@ class ACCSetupComparator extends FileSetupComparator {
 
 			if load {
 				if (type = "A")
-					this.loadSetups(theSetup)
+					this.loadSetups(&theSetup)
 				else
-					this.loadSetups(false, theSetup)
+					this.loadSetups(&ignore := false, &theSetup)
 			}
 			else
 				return theSetup

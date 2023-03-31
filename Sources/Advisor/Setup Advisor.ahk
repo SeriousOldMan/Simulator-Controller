@@ -117,6 +117,30 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 
+	class AdivisorResizer extends Window.Resizer {
+		iRedraw := false
+
+		__New(arguments*) {
+			super.__New(arguments*)
+
+			Task.startTask(ObjBindMethod(this, "redrawRecommendations"), 500, kLowPriority)
+		}
+
+		Redraw() {
+			this.iRedraw := (A_TickCount + 2000)
+		}
+
+		redrawRecommendations() {
+			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+				this.iRedraw := false
+
+				SetupAdvisor.Instance.updateRecommendations(true, false)
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
 	Window {
 		Get {
 			return this.iWindow
@@ -483,6 +507,8 @@ class SetupAdvisor extends ConfigurationItem {
 		advisorGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
 
 		advisorGui.Add("Button", "x574 y738 w80 h23 H:Center Y:Move", translate("Close")).OnEvent("Click", closeSetupAdvisor)
+
+		advisorGui.Add(SetupAdvisor.AdivisorResizer(advisorGui))
 	}
 
 	saveState(fileName := false) {
@@ -506,8 +532,8 @@ class SetupAdvisor extends ConfigurationItem {
 		for ignore, characteristic in this.SelectedCharacteristics {
 			widgets := this.SelectedCharacteristicsWidgets[characteristic]
 
-			value1 := widgets[1].Text
-			value2 := widgets[2].Text
+			value1 := widgets[1].Value
+			value2 := widgets[2].Value
 
 			setMultiMapValue(state, "Characteristics", characteristic . ".Weight", value1)
 			setMultiMapValue(state, "Characteristics", characteristic . ".Value", value2)
@@ -542,7 +568,10 @@ class SetupAdvisor extends ConfigurationItem {
 			if (track = "*")
 				track := true
 
-			this.loadSimulator(simulator, true)
+			if !GetKeyState("Ctrl", "P")
+				this.clearCharacteristics()
+
+			this.loadSimulator(simulator)
 			this.loadCar(car)
 			this.loadTrack(track)
 			this.loadWeather(weather)
@@ -564,9 +593,10 @@ class SetupAdvisor extends ConfigurationItem {
 					for ignore, characteristic in characteristics {
 						showProgress({progress: (this.ProgressCount += 10), message: translate("Load ") . characteristicLabels[characteristic] . translate("...")})
 
-						this.addCharacteristic(characteristic, getMultiMapValue(state, "Characteristics", characteristic . ".Weight")
-															 , getMultiMapValue(state, "Characteristics", characteristic . ".Value")
-															 , false)
+						if (this.SelectedCharacteristics.Length < kMaxCharacteristics)
+							this.addCharacteristic(characteristic, getMultiMapValue(state, "Characteristics", characteristic . ".Weight")
+																 , getMultiMapValue(state, "Characteristics", characteristic . ".Value")
+																 , false)
 					}
 
 					this.updateRecommendations()
@@ -1306,33 +1336,6 @@ class SetupAdvisor extends ConfigurationItem {
 			advisor.updateCharacteristic(characteristic, slider1.Value, slider2.Value)
 		}
 
-		initializeSlider(slider1, value1, slider2, value2) {
-			/*
-			local window := SetupAdvisor.Instance.Window
-			local y, pos, posX, posY
-
-			window.BackColor := "D0D0D0"
-
-			ControlClick(slider1, , , , , "x0 y0")
-			ControlClick(slider2, , , , , "x0 y0")
-
-			Sleep(10)
-
-			slider1.GetPos(&posX, &posY, &posW, &posH)
-			y := (posY - 1)
-			slider1.Move(posX, Y)
-			slider1.Move(posX, posY)
-
-			slider2.GetPos(&posX, &posY, &posW, &posH)
-			y := (posY - 1)
-			slider2.Move(posX, Y)
-			slider2.Move(posX, posY)
-			*/
-
-			slider1.Value := value1
-			slider2.Value := value2
-		}
-
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
@@ -1362,20 +1365,21 @@ class SetupAdvisor extends ConfigurationItem {
 
 			x := x + 120
 
-			slider1 := window.Add("Slider", "Center Thick15 x" . x . " yp-2 w118 0x10 Range0-100 ToolTip", "0")
+			slider1 := window.Add("Slider", "Center Thick15 x" . x . " yp-2 w118 0x10 Range0-100 ToolTip", 0)
 
 			x := x + 123
 
-			slider2 := window.Add("Slider", "Center Thick15 x" . x . " yp w118 0x10 Range0-100 ToolTip", "0")
+			slider2 := window.Add("Slider", "Center Thick15 x" . x . " yp w118 0x10 Range0-100 ToolTip", 0)
 
 			callback := updateSlider.Bind(characteristic, slider1, slider2)
 
 			slider1.OnEvent("Change", callback)
 			slider2.OnEvent("Change", callback)
 
-			this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
+			slider1.Value := weight
+			slider2.Value := value
 
-			initializeSlider(slider1, weight, slider2, value)
+			this.SelectedCharacteristicsWidgets[characteristic] := [slider1, slider2, label1, label2, deleteButton]
 
 			if draw {
 				this.updateRecommendations()
@@ -1413,7 +1417,9 @@ class SetupAdvisor extends ConfigurationItem {
 			this.KnowledgeBase.clearFact(characteristic . ".Value")
 
 			this.SelectedCharacteristics.RemoveAt(index)
-			this.SelectedCharacteristicsWidgets.Delete(characteristic)
+
+			if this.SelectedCharacteristicsWidgets.Has(characteristic)
+				this.SelectedCharacteristicsWidgets.Delete(characteristic)
 
 			this.updateRecommendations(draw)
 		}
@@ -1518,8 +1524,8 @@ class SetupAdvisor extends ConfigurationItem {
 
 				widgets := this.SelectedCharacteristicsWidgets[characteristic]
 
-				value1 := widgets[1].Text
-				value2 := widgets[2].Text
+				value1 := widgets[1].Value
+				value2 := widgets[2].Value
 
 				knowledgeBase.setFact(characteristic . ".Weight", value1, true)
 				knowledgeBase.setFact(characteristic . ".Value", value2, true)
@@ -1666,8 +1672,10 @@ class Setup {
 	}
 
 	disable(setting) {
-		if setting
-			this.iEnabledSettings.Delete(setting)
+		if setting {
+			if this.iEnabledSettings.Has(setting)
+				this.iEnabledSettings.Delete(setting)
+		}
 		else
 			this.iEnabledSettings := CaseInsenseMap()
 	}
@@ -2211,7 +2219,7 @@ class SetupEditor extends ConfigurationItem {
 			}
 
 			if changed
-				this.Control["setupViewer"].Text := this.Setup.Setup
+				this.Control["setupViewer"].Value := this.Setup.Setup
 		}
 	}
 
@@ -2245,7 +2253,7 @@ class SetupEditor extends ConfigurationItem {
 			this.Setup := setup
 
 		this.Control["setupNameViewer"].Text := (setup ? setup.Name : "")
-		this.Control["setupViewer"].Text := (setup ? setup.Setup : "")
+		this.Control["setupViewer"].Value := (setup ? setup.Setup : "")
 
 		categories := getMultiMapValues(this.Advisor.Definition, "Setup.Categories")
 
@@ -2362,7 +2370,7 @@ class SetupEditor extends ConfigurationItem {
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.increaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
 
-			this.Control["setupViewer"].Text := (this.Setup ? this.Setup.Setup : "")
+			this.Control["setupViewer"].Value := (this.Setup ? this.Setup.Setup : "")
 		}
 
 		this.updateState()
@@ -2396,7 +2404,7 @@ class SetupEditor extends ConfigurationItem {
 
 			this.updateSetting(setting, handler.convertToRawValue(handler.decreaseValue(handler.convertToDisplayValue(this.Setup.getValue(setting)))))
 
-			this.Control["setupViewer"].Text := (this.Setup ? this.Setup.Setup : "")
+			this.Control["setupViewer"].Value := (this.Setup ? this.Setup.Setup : "")
 		}
 
 		this.updateState()
@@ -2405,7 +2413,7 @@ class SetupEditor extends ConfigurationItem {
 	applyRecommendations(percentage) {
 		local knowledgeBase := this.Advisor.KnowledgeBase
 		local settings := CaseInsenseMap()
-		local min := 1
+		local theMin := 1
 		local ignore, setting, delta, increment
 
 		this.resetSetup()
@@ -2415,14 +2423,14 @@ class SetupEditor extends ConfigurationItem {
 
 			if (delta != kUndefined)
 				if (delta != 0) {
-					min := Min(Abs(delta), min)
+					theMin := Min(Abs(delta), theMin)
 
 					settings[setting] := delta
 				}
 		}
 
 		for setting, delta in settings {
-			increment := Round((delta / min) * (percentage / 100))
+			increment := Round((delta / theMin) * (percentage / 100))
 
 			if (increment != 0) {
 				if getMultiMapValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
@@ -2507,7 +2515,7 @@ class SetupEditor extends ConfigurationItem {
 				newSetup := comparator.compareSetup()
 
 				if newSetup
-					this.loadSetup(newSetup)
+					this.loadSetup(&newSetup)
 			}
 			finally {
 				this.iComparator := false
@@ -2696,9 +2704,10 @@ class SetupComparator extends ConfigurationItem {
 		}
 
 		mixSetups(*) {
-			local ignore := false
+			local ignore1 := false
+			local ignore2 := false
 
-			comparator.loadSetups(&ignore, &ignore, comparatorGui["applyMixSlider"].Value)
+			comparator.loadSetups(&ignore1, &ignore2, comparatorGui["applyMixSlider"].Value)
 		}
 
 		comparatorGui := SetupComparator.ComparatorWindow(this)

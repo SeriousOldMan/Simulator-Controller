@@ -18,7 +18,7 @@ After starting the tool, you first select the simulation and, if necessary, the 
 
 Please note, that it is possible to describe and edit several issues at once. "Setup Advisor" will try to find the best possible compromise, especially when there are conflicting requirements. Of course, this has its limitations and it is therefore always advisable to tackle one or two issues at a time, even if "Setup Advisor" searches for solutions for up to eight issues at a time.
 
-Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Advisor". This state can be retrieved again, when you hold down the Control key, while starting "Setup Advisor".
+Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Advisor". This state can be retrieved again, when you hold down the Control key, while starting "Setup Advisor". Last, but not least, when you load a set of saved issues, you suppress the deletion of all present issues by holding down the Control key as well. But be aware, that there is a restriction for the overall number of issues.
 
 ### Real-time telemetry analyzer
 

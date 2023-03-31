@@ -68,12 +68,8 @@ class RaceReports extends ConfigurationItem {
 	iReportViewer := false
 
 	class ReportResizer extends Window.Resizer {
-		Resize(*) {
-			RaceReports.Instance.loadReport(RaceReports.Instance.SelectedReport, true)
-		}
-
 		Redraw() {
-			RaceReports.Instance.Field["chartViewer"].Redraw()
+			RaceReports.Instance.loadReport(RaceReports.Instance.SelectedReport, true)
 		}
 	}
 

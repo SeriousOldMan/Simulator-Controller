@@ -420,7 +420,7 @@ class Window extends Gui {
 	Resize(minMax, width, height) {
 		local descriptor := this.Descriptor
 		local restricted := false
-		local x, y, w, h, settings
+		local x, y, w, h, settings, ignore, resizer
 
 		if (minMax = "Initialize") {
 			WinGetPos(&x, &y, &w, &h, this)
@@ -483,6 +483,9 @@ class Window extends Gui {
 				WinMove(x, y, width, height, this)
 
 			WinRedraw(this)
+
+			for ignore, resizer in this.Resizers
+				resizer.Redraw()
 		}
 	}
 

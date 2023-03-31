@@ -100,7 +100,7 @@ class StrategySimulation {
 		this.iTelemetryDatabase := telemetryDatabase
 	}
 
-	createKnowledgeBase(facts, productions, reductions) {
+	createKnowledgeBase(productions, reductions, facts := false) {
 		local engine := RuleEngine(productions, reductions, facts)
 
 		return KnowledgeBase(engine, engine.createFacts(), engine.createRules())
@@ -226,7 +226,7 @@ class StrategySimulation {
 
 				this.loadRules(compiler, validator, &productions, &reductions)
 
-				knowledgeBase := this.createKnowledgeBase(CaseInsenseMap(), productions, reductions)
+				knowledgeBase := this.createKnowledgeBase(productions, reductions)
 			}
 
 			rules := knowledgeBase.Rules

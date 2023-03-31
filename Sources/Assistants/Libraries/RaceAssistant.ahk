@@ -849,7 +849,7 @@ class RaceAssistant extends ConfigurationItem {
 		this.VoiceManager.clearContinuation()
 	}
 
-	createKnowledgeBase(facts) {
+	createKnowledgeBase(facts := false) {
 		local compiler := RuleCompiler()
 		local rules, productions, reductions, engine, knowledgeBase, ignore, compound, compoundColor
 

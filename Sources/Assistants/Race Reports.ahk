@@ -79,7 +79,7 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 
-	Field[name] {
+	Control[name] {
 		Get {
 			return this.iWindow[name]
 		}
@@ -170,19 +170,21 @@ class RaceReports extends ConfigurationItem {
 		super.__New(configuration)
 
 		RaceReports.Instance := this
+
+		this.createGui(this.Configuration)
 	}
 
 	createGui(configuration) {
+		local reports := this
 		local stepWizard, simulators, simulator
 
 		static raceReportsGui
 
 		chooseSimulator(*) {
-			RaceReports.Instance.loadSimulator(raceReportsGui["simulatorDropDown"].Text)
+			reports.loadSimulator(raceReportsGui["simulatorDropDown"].Text)
 		}
 
 		chooseCar(*) {
-			local reports := RaceReports.Instance
 			local sessionDB := reports.SessionDatabase
 			local simulator := reports.SelectedSimulator
 			local index, car
@@ -193,7 +195,6 @@ class RaceReports extends ConfigurationItem {
 		}
 
 		chooseTrack(*) {
-			local reports := RaceReports.Instance
 			local simulator := reports.SelectedSimulator
 			local tracks := reports.getTracks(simulator, reports.SelectedCar)
 			local trackNames := collect(tracks, ObjBindMethod(reports.SessionDatabase, "getTrackName", simulator))
@@ -202,23 +203,23 @@ class RaceReports extends ConfigurationItem {
 		}
 
 		chooseRace(listView, line, *) {
-			RaceReports.Instance.loadRace(line)
+			reports.loadRace(line)
 		}
 
 		chooseReport(*) {
-			RaceReports.Instance.loadReport(kRaceReports[raceReportsGui["reportsDropDown"].Value])
+			reports.loadReport(kRaceReports[raceReportsGui["reportsDropDown"].Value])
 		}
 
 		reportSettings(*) {
-			RaceReports.Instance.reportSettings(kRaceReports[raceReportsGui["reportsDropDown"].Value])
+			reports.reportSettings(kRaceReports[raceReportsGui["reportsDropDown"].Value])
 		}
 
 		reloadRaceReports(*) {
-			RaceReports.Instance.loadTrack(RaceReports.Instance.SelectedTrack, true)
+			reports.loadTrack(reports.SelectedTrack, true)
 		}
 
 		deleteRaceReport(*) {
-			RaceReports.Instance.deleteRace()
+			reports.deleteRace()
 		}
 
 		closeReports(*) {
@@ -309,12 +310,12 @@ class RaceReports extends ConfigurationItem {
 
 	showOverviewReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Overview"))
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Overview"))
 
 			this.iSelectedReport := "Overview"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -325,12 +326,12 @@ class RaceReports extends ConfigurationItem {
 
 	showCarReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Car"))
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Car"))
 
 			this.iSelectedReport := "Car"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -341,13 +342,13 @@ class RaceReports extends ConfigurationItem {
 
 	showDriverReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportSettingsButton"].Enabled := true
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Drivers"))
+			this.Control["reportSettingsButton"].Enabled := true
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Drivers"))
 
 			this.iSelectedReport := "Drivers"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -364,13 +365,13 @@ class RaceReports extends ConfigurationItem {
 
 	showPositionsReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportSettingsButton"].Enabled := true
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Positions"))
+			this.Control["reportSettingsButton"].Enabled := true
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Positions"))
 
 			this.iSelectedReport := "Positions"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -387,13 +388,13 @@ class RaceReports extends ConfigurationItem {
 
 	showLapTimesReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportSettingsButton"].Enabled := true
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Lap Times"))
+			this.Control["reportSettingsButton"].Enabled := true
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Lap Times"))
 
 			this.iSelectedReport := "Lap Times"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -410,13 +411,13 @@ class RaceReports extends ConfigurationItem {
 
 	showConsistencyReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportSettingsButton"].Enabled := true
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Consistency"))
+			this.Control["reportSettingsButton"].Enabled := true
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Consistency"))
 
 			this.iSelectedReport := "Consistency"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -433,13 +434,13 @@ class RaceReports extends ConfigurationItem {
 
 	showPaceReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportSettingsButton"].Enabled := true
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Pace"))
+			this.Control["reportSettingsButton"].Enabled := true
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Pace"))
 
 			this.iSelectedReport := "Pace"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -456,13 +457,13 @@ class RaceReports extends ConfigurationItem {
 
 	showPerformanceReport(reportDirectory) {
 		if reportDirectory {
-			this.Field["reportSettingsButton"].Enabled := true
-			this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Performance"))
+			this.Control["reportSettingsButton"].Enabled := true
+			this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Performance"))
 
 			this.iSelectedReport := "Performance"
 		}
 		else {
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["reportsDropDown"].Choose(0)
 
 			this.iSelectedReport := false
 		}
@@ -554,10 +555,10 @@ class RaceReports extends ConfigurationItem {
 			for index, car in cars
 				carNames[index] := sessionDB.getCarName(simulator, car)
 
-			this.Field["simulatorDropDown"].Choose(inList(this.getSimulators(), simulator))
+			this.Control["simulatorDropDown"].Choose(inList(this.getSimulators(), simulator))
 
-			this.Field["carDropDown"].Delete()
-			this.Field["carDropDown"].Add(carNames)
+			this.Control["carDropDown"].Delete()
+			this.Control["carDropDown"].Add(carNames)
 
 			this.loadCar((cars.Length > 0) ? cars[1] : false, true)
 		}
@@ -571,10 +572,10 @@ class RaceReports extends ConfigurationItem {
 
 			tracks := this.getTracks(this.SelectedSimulator, car)
 
-			this.Field["carDropDown"].Choose(inList(this.getCars(this.SelectedSimulator), car))
+			this.Control["carDropDown"].Choose(inList(this.getCars(this.SelectedSimulator), car))
 
-			this.Field["trackDropDown"].Delete()
-			this.Field["trackDropDown"].Add(collect(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator)))
+			this.Control["trackDropDown"].Delete()
+			this.Control["trackDropDown"].Add(collect(tracks, ObjBindMethod(this.SessionDatabase, "getTrackName", this.SelectedSimulator)))
 
 			this.loadTrack((tracks.Length > 0) ? tracks[1] : false, true)
 		}
@@ -591,17 +592,17 @@ class RaceReports extends ConfigurationItem {
 			this.iSelectedRace := false
 			this.iSelectedReport := false
 
-			this.Field["trackDropDown"].Choose(inList(this.getTracks(simulator, this.SelectedCar), track))
-			this.Field["reportsDropDown"].Enabled := false
-			this.Field["reportSettingsButton"].Enabled := false
-			this.Field["reportsDropDown"].Choose(0)
+			this.Control["trackDropDown"].Choose(inList(this.getTracks(simulator, this.SelectedCar), track))
+			this.Control["reportsDropDown"].Enabled := false
+			this.Control["reportSettingsButton"].Enabled := false
+			this.Control["reportsDropDown"].Choose(0)
 
-			this.Field["deleteReportButton"].Enabled := false
+			this.Control["deleteReportButton"].Enabled := false
 
 			if track
-				this.Field["reloadReportsButton"].Enabled := true
+				this.Control["reloadReportsButton"].Enabled := true
 			else
-				this.Field["reloadReportsButton"].Enabled := false
+				this.Control["reloadReportsButton"].Enabled := false
 
 			this.ReportViewer.showReportChart(false)
 			this.ReportViewer.showReportInfo(false)
@@ -637,9 +638,9 @@ class RaceReports extends ConfigurationItem {
 			this.Settings := CaseInsenseMap()
 
 			if raceNr {
-				this.Field["reportsDropDown"].Enabled := true
-				this.Field["reportsDropDown"].Choose(inList(kRaceReports, "Overview"))
-				this.Field["deleteReportButton"].Enabled := true
+				this.Control["reportsDropDown"].Enabled := true
+				this.Control["reportsDropDown"].Choose(inList(kRaceReports, "Overview"))
+				this.Control["deleteReportButton"].Enabled := true
 
 				this.iSelectedRace := raceNr
 				this.iSelectedReport := false
@@ -647,10 +648,10 @@ class RaceReports extends ConfigurationItem {
 				this.loadReport("Overview")
 			}
 			else {
-				this.Field["reportsDropDown"].Enabled := false
-				this.Field["reportSettingsButton"].Enabled := false
-				this.Field["reportsDropDown"].Choose(0)
-				this.Field["deleteReportButton"].Enabled := false
+				this.Control["reportsDropDown"].Enabled := false
+				this.Control["reportSettingsButton"].Enabled := false
+				this.Control["reportsDropDown"].Choose(0)
+				this.Control["deleteReportButton"].Enabled := false
 
 				this.iSelectedRace := false
 
@@ -689,13 +690,13 @@ class RaceReports extends ConfigurationItem {
 					if inList(simulators, this.SelectedSimulator)
 						this.loadSimulator(this.SelectedSimulator, true)
 					else {
-						this.Field["simulatorDropDown"].Delete()
-						this.Field["simulatorDropDown"].Add(simulators)
+						this.Control["simulatorDropDown"].Delete()
+						this.Control["simulatorDropDown"].Add(simulators)
 
 						if (simulators.Length > 0)
 							this.loadSimulator(simulators[1], true)
 						else
-							this.Field["simulatorDropDown"].Choose(0)
+							this.Control["simulatorDropDown"].Choose(0)
 					}
 				}
 			}
@@ -709,8 +710,8 @@ class RaceReports extends ConfigurationItem {
 			if report {
 				this.iSelectedReport := report
 
-				this.Field["reportsDropDown"].Choose(inList(kRaceReports, report))
-				this.Field["reportSettingsButton"].Enabled := false
+				this.Control["reportsDropDown"].Choose(inList(kRaceReports, report))
+				this.Control["reportSettingsButton"].Enabled := false
 
 				simulator := this.SessionDatabase.getSimulatorCode(this.SelectedSimulator)
 				car := this.SessionDatabase.getCarCode(this.SelectedSimulator, this.SelectedCar)
@@ -766,7 +767,7 @@ class RaceReports extends ConfigurationItem {
 				}
 			}
 			else {
-				this.Field["reportsDropDown"].Choose(0)
+				this.Control["reportsDropDown"].Choose(0)
 
 				this.iSelectedReport := false
 
@@ -833,7 +834,6 @@ runRaceReports() {
 
 	reports := RaceReports(reportsDirectory, kSimulatorConfiguration)
 
-	reports.createGui(reports.Configuration)
 	reports.show()
 
 	simulators := reports.getSimulators()

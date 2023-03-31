@@ -170,7 +170,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		local defaultLowspeedThreshold := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
 
-		simulator := SessionDatabase().getSimulatorName(simulator)
+		simulator := SessionDatabase.getSimulatorName(simulator)
 
 		if (selectedCar == true)
 			selectedCar := false
@@ -318,7 +318,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		if !this.iAnalyzerPID {
 			try {
-				options := ((calibrate ? "-Calibrate """ : "-Analyze """) . dataFile . """")
+				options := ((calibrate ? "-Calibrate `"" : "-Analyze `"") . dataFile . "`"")
 
 				if !calibrate {
 					if this.settingAvailable("UndersteerThresholds")
@@ -343,7 +343,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if this.settingAvailable("TrackWidth")
 					options .= (A_Space . this.TrackWidth)
 
-				code := SessionDatabase().getSimulatorCode(this.Simulator)
+				code := SessionDatabase.getSimulatorCode(this.Simulator)
 
 				Run(kBinariesDirectory . code . " SHM Spotter.exe " . options, kBinariesDirectory, "Hide", &pid)
 			}
@@ -535,14 +535,14 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		dataFile := temporaryFileName("Analyzer", "data")
 
 		for ignore, widget in prepareWidgets {
-			ogc%widget%.Enabled := false
-			ogc%widget%.Visible := false
+			widget.Enabled := false
+			widget.Visible := false
 		}
 
 		for ignore, widget in runWidgets
-			ogc%widget%.Visible := true
+			widget.Visible := true
 
-		ogcactivateButton.Value := translate("Stop")
+		activateButton.Text := translate("Stop")
 
 		state := "Run"
 
@@ -693,7 +693,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		if analyzer.Track {
 			analyzerGui.Add("Text", "x16 yp+24 w130 h23 +0x200", translate("Track"))
-			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", new SessionDatabase().getTrackName(analyzer.Simulator, analyzer.Track))
+			analyzerGui.Add("Text", "x158 yp w180 h23 +0x200", SessionDatabase.getTrackName(analyzer.Simulator, analyzer.Track))
 		}
 
 		widget1 := analyzerGui.Add("Text", "x16 yp+30 w130 h23 +0x200 Section", translate("Steering Lock / Ratio"))
@@ -882,13 +882,13 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	}
 }
 
-runCalibrator(commandOrAnalyzer) {
+runCalibrator(commandOrAnalyzer, *) {
 	local lightOversteerThreshold := 0
 	local heavyOversteerThreshold := 0
 	local lightUndersteerThreshold := 0
 	local heavyUndersteerThreshold := 0
 	local mediumOversteerThreshold, mediumUndersteerThreshold
-	local window, x, y, ignore, type, speed, key, value, variable
+	local x, y, ignore, type, speed, key, value, variable
 
 	static calibratorGui
 	static activateButton
@@ -957,7 +957,7 @@ runCalibrator(commandOrAnalyzer) {
 		calibratorGui.SetFont("s9 Norm", "Arial")
 		calibratorGui.SetFont("Italic Underline", "Arial")
 
-		calibratorGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(analyzerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer"))
+		calibratorGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(calibratorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer"))
 
 		calibratorGui.SetFont("Norm s14", "Arial")
 

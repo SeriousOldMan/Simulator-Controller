@@ -199,7 +199,7 @@ startRaceEngineer() {
 	if (debug && engineerSpeaker) {
 		engineer.getSpeaker()
 
-		engineer.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
+		engineer.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase()})
 	}
 
 	if (engineerLogo && !kSilentMode)

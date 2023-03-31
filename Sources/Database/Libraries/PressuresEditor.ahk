@@ -53,7 +53,7 @@ class PressuresEditor {
 		}
 	}
 
-	Field[name] {
+	Control[name] {
 		Get {
 			return this.iWindow[name]
 		}
@@ -299,19 +299,19 @@ class PressuresEditor {
 		if index {
 			count := this.PressuresListView.GetText(index, 3)
 
-			this.Field["upPressureButton"].Enabled := true
+			this.Control["upPressureButton"].Enabled := true
 
 			if (count > 1)
-				this.Field["downPressureButton"].Enabled := true
+				this.Control["downPressureButton"].Enabled := true
 			else
-				this.Field["downPressureButton"].Enabled := false
+				this.Control["downPressureButton"].Enabled := false
 
-			this.Field["clearPressureButton"].Enabled := true
+			this.Control["clearPressureButton"].Enabled := true
 		}
 		else {
-			this.Field["upPressureButton"].Enabled := false
-			this.Field["downPressureButton"].Enabled := false
-			this.Field["clearPressureButton"].Enabled := false
+			this.Control["upPressureButton"].Enabled := false
+			this.Control["downPressureButton"].Enabled := false
+			this.Control["clearPressureButton"].Enabled := false
 		}
 	}
 
@@ -322,7 +322,7 @@ class PressuresEditor {
 		if (force || (compound != this.SelectedCompound)) {
 			this.iSelectedCompound := compound
 
-			this.Field["compoundDropDown"].Choose(inList(this.Compounds, compound))
+			this.Control["compoundDropDown"].Choose(inList(this.Compounds, compound))
 
 			splitCompound(compound, &compound, &compoundColor)
 
@@ -350,8 +350,8 @@ class PressuresEditor {
 				temperatures[A_Index] := (Round(convertUnit("Temperature", temperature[1])) . translate(" / ") . Round(convertUnit("Temperature", temperature[2])))
 			}
 
-			this.Field["temperaturesDropDown"].Delete()
-			this.Field["temperaturesDropDown"].Add(temperatures)
+			this.Control["temperaturesDropDown"].Delete()
+			this.Control["temperaturesDropDown"].Add(temperatures)
 
 			if (temperatures.Length > 0)
 				this.loadTemperatures(this.Temperatures[1][1], this.Temperatures[1][2], true)
@@ -392,7 +392,7 @@ class PressuresEditor {
 				this.loadPressures(false, false)
 			}
 
-			this.Field["temperaturesDropDown"].Choose(chosen)
+			this.Control["temperaturesDropDown"].Choose(chosen)
 		}
 	}
 

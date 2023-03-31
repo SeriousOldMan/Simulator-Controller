@@ -70,7 +70,7 @@ class TestRaceEngineer extends RaceEngineer {
 		this.setDebug(kDebugKnowledgeBase, false)
 	}
 
-	createKnowledgeBase(facts) {
+	createKnowledgeBase(facts := false) {
 		local knowledgeBase := super.createKnowledgeBase(facts)
 
 		knowledgeBase.setFact("Session.Settings.Tyre.Pressure.Correction.Pressure", true)

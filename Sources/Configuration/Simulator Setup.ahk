@@ -291,7 +291,7 @@ class SetupWizard extends ConfigurationItem {
 		SetupWizard.Instance := this
 	}
 
-	createKnowledgeBase(facts) {
+	createKnowledgeBase(facts := false) {
 		local rules, productions, reductions, engine
 
 		FileRead rules, % kResourcesDirectory . "Setup\Simulator Setup.rules"
@@ -317,7 +317,7 @@ class SetupWizard extends ConfigurationItem {
 		if !definition
 			definition := this.Definition
 
-		this.iKnowledgeBase := this.createKnowledgeBase({})
+		this.iKnowledgeBase := this.createKnowledgeBase()
 
 		this.iSteps := {}
 		this.iStep := 0

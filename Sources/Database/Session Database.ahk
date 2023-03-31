@@ -115,7 +115,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	Field[name] {
+	Control[name] {
 		Get {
 			return this.iWindow[name]
 		}
@@ -1653,7 +1653,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				   . action.Action)
 		}
 
-		this.Field["trackAutomationInfoEdit"].Value := info
+		this.Control["trackAutomationInfoEdit"].Value := info
 	}
 
 	loadTrackMap(trackMap, trackImage) {
@@ -4494,13 +4494,13 @@ showSettings(*) {
 chooseSimulator(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.loadSimulator(editor.Field["simulatorDropDown"].Text)
+	editor.loadSimulator(editor.Control["simulatorDropDown"].Text)
 }
 
 chooseCar(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local simulator := editor.SelectedSimulator
-	local carDropDown := editor.Field["carDropDown"].Text
+	local carDropDown := editor.Control["carDropDown"].Text
 	local index, car
 
 	if (carDropDown = translate("All"))
@@ -4516,7 +4516,7 @@ chooseCar(*) {
 
 chooseTrack(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local trackDropDown := editor.Field["trackDropDown"].Text
+	local trackDropDown := editor.Control["trackDropDown"].Text
 	local simulator, tracks, trackNames
 
 	if (trackDropDown = translate("All"))
@@ -4532,7 +4532,7 @@ chooseTrack(*) {
 
 chooseWeather(*) {
 	local editor := SessionDatabaseEditor.Instance
-	local weatherDropDown := editor.Field["weatherDropDown"].Value
+	local weatherDropDown := editor.Control["weatherDropDown"].Value
 
 	editor.loadWeather((weatherDropDown == 1) ? true : kWeatherConditions[weatherDropDown - 1])
 }
@@ -4540,7 +4540,7 @@ chooseWeather(*) {
 updateNotes(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.updateNotes(editor.Field["notesEdit"].Text)
+	editor.updateNotes(editor.Control["notesEdit"].Text)
 }
 
 chooseSetting(*) {
@@ -4922,8 +4922,8 @@ updateStrategyAccess(*) {
 		info := sessionDB.readStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
 
 		setMultiMapValue(info, "Strategy", "Synchronized", false)
-		setMultiMapValue(info, "Access", "Share", editor.Field["shareStrategyWithCommunityCheck"].Value)
-		setMultiMapValue(info, "Access", "Synchronize", editor.Field["shareStrategyWithTeamServerCheck"].Value)
+		setMultiMapValue(info, "Access", "Share", editor.Control["shareStrategyWithCommunityCheck"].Value)
+		setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareStrategyWithTeamServerCheck"].Value)
 
 		sessionDB.writeStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
 	}
@@ -4964,7 +4964,7 @@ updateSetupAccess(*) {
 	local sessionDB := editor.SessionDatabase
 	local selected, type, name
 
-	type := kSetupTypes[editor.Field["setupTypeDropDown"].Value]
+	type := kSetupTypes[editor.Control["setupTypeDropDown"].Value]
 
 	selected := editor.SetupListView.GetNext(0)
 
@@ -4974,8 +4974,8 @@ updateSetupAccess(*) {
 		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
 
 		setMultiMapValue(info, "Setup", "Synchronized", false)
-		setMultiMapValue(info, "Access", "Share", editor.Field["shareSetupWithCommunityCheck"].Value)
-		setMultiMapValue(info, "Access", "Synchronize", editor.Field["shareSetupWithTeamServerCheck"].Value)
+		setMultiMapValue(info, "Access", "Share", editor.Control["shareSetupWithCommunityCheck"].Value)
+		setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareSetupWithTeamServerCheck"].Value)
 
 		sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
 	}
@@ -4984,25 +4984,25 @@ updateSetupAccess(*) {
 uploadSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.uploadSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value])
+	editor.uploadSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value])
 }
 
 downloadSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.downloadSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
+	editor.downloadSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
 }
 
 renameSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.renameSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
+	editor.renameSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
 }
 
 deleteSetup(*) {
 	local editor := SessionDatabaseEditor.Instance
 
-	editor.deleteSetup(kSetupTypes[editor.Field["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
+	editor.deleteSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
 }
 
 loadPressures(*) {
@@ -5171,12 +5171,12 @@ selectData(*) {
 selectAllData(*) {
 	local editor := SessionDatabaseEditor.Instance
 	local listView := editor.AdministrationListView
-	local dataSelectCheck := editor.Field["dataSelectCheck"].Value
+	local dataSelectCheck := editor.Control["dataSelectCheck"].Value
 
 	if (dataSelectCheck == -1) {
 		dataSelectCheck := 0
 
-		editor.Field["dataSelectCheck"].Value := 0
+		editor.Control["dataSelectCheck"].Value := 0
 	}
 
 	loop listView.GetCount()
@@ -5273,8 +5273,8 @@ chooseDatabaseScope(*) {
 			persistent := true
 	}
 
-	if (persistent || ((editor.Field["databaseScopeDropDown"].Value == 2) != editor.UseCommunity)) {
-		editor.UseCommunity[persistent] := (editor.Field["databaseScopeDropDown"].Value == 2)
+	if (persistent || ((editor.Control["databaseScopeDropDown"].Value == 2) != editor.UseCommunity)) {
+		editor.UseCommunity[persistent] := (editor.Control["databaseScopeDropDown"].Value == 2)
 
 		editor.loadSimulator(editor.SelectedSimulator, true)
 	}

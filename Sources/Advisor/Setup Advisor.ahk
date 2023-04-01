@@ -109,7 +109,7 @@ class SetupAdvisor extends ConfigurationItem {
 		__New(advisor) {
 			this.iAdvisor := advisor
 
-			super.__New({Resizeable: true, Closeable: true})
+			super.__New({Descriptor: "Setup Advisor", Resizeable: true, Closeable: true})
 		}
 
 		Close(*) {
@@ -127,7 +127,7 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 
 		Redraw() {
-			this.iRedraw := (A_TickCount + 2000)
+			this.iRedraw := (A_TickCount + 500)
 		}
 
 		redrawRecommendations() {
@@ -622,12 +622,15 @@ class SetupAdvisor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-		local x, y
+		local x, y, w, h
 
 		if getWindowPosition("Setup Advisor", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
+
+		if getWindowSize("Setup Advisor", &w, &h)
+			window.Resize("Initialize", w, h)
 	}
 
 	showSettingsChart(content) {
@@ -1965,7 +1968,7 @@ class SetupEditor extends ConfigurationItem {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Resizeable: true, Closeable: true}, "Setup Editor")
+			super.__New({Descriptor: "Setup Advisor.Setup Editor", Resizeable: true, Closeable: true}, "Setup Editor")
 		}
 
 		Close(*) {
@@ -2140,12 +2143,15 @@ class SetupEditor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-		local x, y
+		local x, y, w, h
 
 		if getWindowPosition("Setup Advisor.Setup Editor", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
+
+		if getWindowSize("Setup Advisor.Setup Editor", &w, &h)
+			window.Resize("Initialize", w, h)
 
 		this.loadSetup()
 	}
@@ -2557,7 +2563,7 @@ class SetupComparator extends ConfigurationItem {
 		__New(comparator) {
 			this.iComparator := comparator
 
-			super.__New({Resizeable: true, Closeable: true, Options: "ToolWindow"}, "")
+			super.__New({Descriptor: "Setup Advisor.Setup Comparator", Resizeable: true, Closeable: true, Options: "ToolWindow"}, "")
 		}
 
 		Close(*) {
@@ -2750,12 +2756,15 @@ class SetupComparator extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-		local x, y
+		local x, y, w, h
 
 		if getWindowPosition("Setup Advisor.Setup Comparator", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
+
+		if getWindowSize("Setup Advisor.Setup Comparator", &w, &h)
+			window.Resize("Initialize", w, h)
 
 		this.loadSetups()
 	}

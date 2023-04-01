@@ -1108,7 +1108,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	showLogo(show := "__Undefined__") {
-		local info, x, y, html
+		local info, x, y, html, videoPlayer
 		local mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 		local logoGui
 

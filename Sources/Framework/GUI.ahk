@@ -58,6 +58,9 @@ class Window extends Gui {
 
 	iDescriptor := false
 
+	iLastX := false
+	iLastY := false
+
 	class Resizer {
 		iWindow := false
 
@@ -327,6 +330,9 @@ class Window extends Gui {
 					this.iResizeable := argument
 				case "Descriptor":
 					this.iDescriptor := argument
+
+					if argument
+						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 2000, kLowPriority)
 				case "Options":
 					options := argument
 				case "BackColor":
@@ -415,6 +421,32 @@ class Window extends Gui {
 
 	DefineResizeRule(control, rule) {
 		this.AddResizer(Window.ControlResizer(this, control, rule))
+	}
+
+	UpdatePosition(descriptor) {
+		local x, y, w, h, settings
+
+		try {
+			WinGetPos(&x, &y, &w, &h, this)
+
+			if (x && y) {
+				if (this.iLastX && ((this.iLastX != x) || (this.iLastY != y))) {
+					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+					setMultiMapValue(settings, "Window Positions", descriptor . ".X", x)
+					setMultiMapValue(settings, "Window Positions", descriptor . ".Y", y)
+
+					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				}
+
+				this.iLastX := x
+				this.iLastY := y
+
+				return Task.CurrentTask
+			}
+		}
+		catch Any {
+		}
 	}
 
 	Close(*) {

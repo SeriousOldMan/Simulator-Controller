@@ -43,12 +43,12 @@
 
 global kClose := "Close"
 
-global kStateIcons := Map("DISABLED", kIconsDirectory . "Black.ico"
-						, "PASSIVE", kIconsDirectory . "Gray.ico"
-						, "ACTIVE", kIconsDirectory . "Green.ico"
-						, "WARNING", kIconsDirectory . "Yellow.ico"
-						, "CRITICAL", kIconsDirectory . "Red.ico"
-						, "UNKNOWN", kIconsDirectory . "Empty.png")
+global kStateIcons := CaseInsenseMap("Disabled", kIconsDirectory . "Black.ico"
+								   , "Passive", kIconsDirectory . "Gray.ico"
+								   , "Active", kIconsDirectory . "Green.ico"
+								   , "Warning", kIconsDirectory . "Yellow.ico"
+								   , "Critical", kIconsDirectory . "Red.ico"
+								   , "Unknown", kIconsDirectory . "Empty.png")
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -336,8 +336,8 @@ systemMonitor(command := false, arguments*) {
 			controllerState := getControllerState(false)
 
 			if (controllerState.Count > 0) {
-				state := StrUpper(getMultiMapValue(controllerState, "Team Server", "State", "Unknown"))
-
+				state := getMultiMapValue(controllerState, "Team Server", "State", "Unknown")
+				
 				if kStateIcons.Has(state)
 					icon := kStateIcons[state]
 				else
@@ -654,7 +654,7 @@ chooseLogLevel(*) {
 }
 
 updateSimulationState(controllerState) {
-	local state := StrUpper(getMultiMapValue(controllerState, "Simulation", "State", "Disabled"))
+	local state := getMultiMapValue(controllerState, "Simulation", "State", "Disabled")
 	local html, icon, displayState
 
 	if kStateIcons.Has(state)
@@ -728,7 +728,7 @@ updateAssistantsState(controllerState) {
 
 	html .= info
 
-	assistantsState.Value := kStateIcons[StrUpper(overallState)]
+	assistantsState.Value := kStateIcons[overallState]
 
 	if (overallState = "Disabled")
 		html := ""
@@ -739,7 +739,7 @@ updateAssistantsState(controllerState) {
 }
 
 updateSessionState(controllerState) {
-	local state := StrUpper(getMultiMapValue(controllerState, "Team Server", "State", "Disabled"))
+	local state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
 	local html, icon, ignore, property, key, value
 
 	if kStateIcons.Has(state)
@@ -779,7 +779,7 @@ updateSessionState(controllerState) {
 }
 
 updateDataState(databaseState) {
-	local state := StrUpper(getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled"))
+	local state := getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled")
 	local html, icon, serverURL, serverToken, action, counter, identifier
 
 	if kStateIcons.Has(state)
@@ -853,7 +853,7 @@ updateDataState(databaseState) {
 }
 
 updateAutomationState(controllerState) {
-	local state := StrUpper(getMultiMapValue(controllerState, "Track Automation", "State", "Disabled"))
+	local state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
 	local html, icon, automation
 
 	if kStateIcons.Has(state)
@@ -890,7 +890,7 @@ updateAutomationState(controllerState) {
 }
 
 updateMapperState(trackMapperState) {
-	local state := StrUpper(getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled"))
+	local state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
 	local html, icon, simulator, track, action, points
 
 	if kStateIcons.Has(state)

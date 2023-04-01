@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,17 +25,17 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Process.ahk
+#Include "..\Framework\Process.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\RaceSpotter.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Assistants\Libraries\RaceSpotter.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -43,6 +43,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
+	/*
 	local info := kVersion . " - 2023, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
 	local image := "1:" . logo
@@ -50,17 +51,18 @@ showLogo(name) {
 
 	static videoPlayer
 
-	SysGet mainScreen, MonitorWorkArea
+	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
 	x := mainScreenRight - 299
 	y := mainScreenBottom - 234
 
 	title1 := translate("Modular Simulator Controller System")
 	title2 := substituteVariables(translate("%name% - The Virtual Race Spotter"), {name: name})
-	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
+	SplashImageGui := Gui("ToolWindow -Sysmenu Disabled"), SplashImageGui.SetFont("bold"), SplashImageGui.AddText("w200 Center", title1 "`n" title2), SplashImageGui.AddPicture("w200 h-1", image), SplashImageGui.SetFont("norm"), SplashImageGui.AddText("w200 Center", info), SplashImageGui.Show()
 
-	Gui Logo:-Border -Caption
-	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
+	Logo := Gui()
+	Logo.Opt("-Border -Caption")
+	Logo.Add("ActiveX", "x0 y0 w279 h155 VvideoPlayer", "shell explorer")
 
 	videoPlayer.Navigate("about:blank")
 
@@ -71,21 +73,15 @@ showLogo(name) {
 	x += 10
 	y += 40
 
-	Gui Logo:Margin, 0, 0
-	Gui Logo:+AlwaysOnTop
-	Gui Logo:Show, AutoSize x%x% y%y%
-}
-
-hideLogo() {
-	Gui Logo:Destroy
-	SplashImage 1:Off
+	Logo.MarginX := "0", Logo.MarginY := "0"
+	Logo.Opt("+AlwaysOnTop")
+	Logo.Show("AutoSize x" . x . " y" . y
+	*/
 }
 
 checkRemoteProcessAlive(pid) {
-	Process Exist, %pid%
-
-	if !ErrorLevel
-		ExitApp 0
+	if !ProcessExist(pid)
+		ExitApp(0)
 }
 
 startRaceSpotter() {
@@ -101,19 +97,17 @@ startRaceSpotter() {
 	local spotterListener := false
 	local spotterMuted := false
 	local debug := false
-	local voiceServer, index, spotter, label, callback
+	local voiceServer, index, spotter, label
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Race Spotter
+	TraySetIcon(icon, "1")
+	A_IconTip := "Race Spotter"
 
-	Process Exist, Voice Server.exe
-
-	voiceServer := ErrorLevel
+	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
 
 	while (index < A_Args.Length) {
-		switch A_Args[index] {
+		switch A_Args[index], false {
 			case "-Remote":
 				remotePID := A_Args[index + 1]
 				index += 2
@@ -168,53 +162,50 @@ startRaceSpotter() {
 	if debug
 		setDebug(true)
 
-	spotter := RaceSpotter(kSimulatorConfiguration
-										  , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
-										  , spotterName, spotterLanguage
-										  , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
-										  , spotterRecognizer, spotterListener, spotterMuted, voiceServer)
+	spotter := new RaceSpotter(kSimulatorConfiguration
+							 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
+							 , spotterName, spotterLanguage
+							 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
+							 , spotterRecognizer, spotterListener, spotterMuted, voiceServer)
 
 	RaceSpotter.Instance := spotter
 
-	Menu SupportMenu, Insert, 1&
+	SupportMenu.Insert("1&")
 
 	label := translate("Debug Positions")
-	callback := ObjBindMethod(spotter, "toggleDebug", kDebugPositions)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(spotter, "toggleDebug", kDebugPositions))
 
 	if spotter.Debug[kDebugPositions]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	label := translate("Debug Rule System")
-	callback := ObjBindMethod(spotter, "toggleDebug", kDebugRules)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(spotter, "toggleDebug", kDebugRules))
 
 	if spotter.Debug[kDebugRules]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	label := translate("Debug Knowledgebase")
-	callback := ObjBindMethod(spotter, "toggleDebug", kDebugKnowledgeBase)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(spotter, "toggleDebug", kDebugKnowledgeBase))
 
 	if spotter.Debug[kDebugKnowledgebase]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	registerMessageHandler("Race Spotter", handleSpotterMessage)
 
 	if (debug && spotterSpeaker) {
 		RaceSpotter.Instance.getSpeaker()
 
-		RaceSpotter.Instance.updateDynamicValues({KnowledgeBase: RaceSpotter.Instance.createKnowledgeBase()})
+		RaceSpotter.Instance.updateDynamicValues({KnowledgeBase: RaceSpotter.Instance.createKnowledgeBase({})})
 	}
 
 	if (spotterLogo && !kSilentMode)
 		showLogo(spotterName)
 
 	if remotePID
-		Task.startTask(PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(new PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
 
 	return
 }
@@ -226,12 +217,12 @@ startRaceSpotter() {
 
 shutdownRaceSpotter(shutdown := false) {
 	if shutdown
-		ExitApp 0
+		ExitApp(0)
 
 	if (RaceSpotter.Instance.Session == kSessionFinished)
-		Task.startTask(Func("shutdownRaceSpotter").Bind(true), 10000, kLowPriority)
+		Task.startTask(shutdownRaceSpotter.Bind(true), 10000, kLowPriority)
 	else
-		Task.startTask("shutdownRaceSpotter", 1000, kLowPriority)
+		Task.startTask(shutdownRaceSpotter, 1000, kLowPriority)
 
 	return false
 }
@@ -241,7 +232,7 @@ handleSpotterMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Task.startTask("shutdownRaceSpotter", 20000, kLowPriority)
+			Task.startTask(shutdownRaceSpotter, 20000, kLowPriority)
 
 			return true
 		}
@@ -249,7 +240,7 @@ handleSpotterMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceSpotter.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.startTask("shutdownRaceSpotter", 20000, kLowPriority)
+		Task.startTask(shutdownRaceSpotter, 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceSpotter.Instance, data))
 }

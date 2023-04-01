@@ -97,6 +97,8 @@ class Window extends Gui {
 		iOriginalWidth := 0
 		iOriginalHeight := 0
 
+		iCompiledRules := false
+
 		Control {
 			Get {
 				return this.iControl
@@ -151,6 +153,10 @@ class Window extends Gui {
 			this.iOriginalHeight := h
 		}
 
+		Reset() {
+			this.iCompiledRules := false
+		}
+
 		CanResize(deltaWidth, deltaHeight) {
 			return !!this.Rule
 		}
@@ -160,57 +166,89 @@ class Window extends Gui {
 			local y := this.OriginalY
 			local w := this.OriginalWidth
 			local h := this.OriginalHeight
-			local ignore, part, variable, horizontal, rule, div, mul
+			local ignore, part, variable, horizontal, rule, div, mul, rules
 
-			for ignore, part in string2Values(";", this.Rule) {
-				part := string2Values(":", part)
-				variable := part[1]
+			callRules(rules, &x, &y, &w, &h) {
+				local ignore, rule
 
-				if (variable = "Width")
-					variable := "w"
-				else if (variable = "Height")
-					variable := "h"
-				else if (variable = "Horizontal")
-					variable := "h"
-				else if (variable = "Vertical")
-					variable := "h"
+				for ignore, rule in rules
+					rule(&x, &y, &w, &h, deltaWidth, deltaHeight)
+			}
 
-				horizontal := ((variable = "x") || (variable = "w"))
+			fastMover(horizontal, var, d, m) {
+				return (&x, &y, &w, &h, dw, dh) => (%var% += Round((horizontal ? dw : dh) / d * m))
+			}
 
-				rule := part[2]
+			fastGrower(horizontal, var, d, m) {
+				return (&x, &y, &w, &h, dw, dh) => (%var% += Round((horizontal ? dw : dh) / d * m))
+			}
 
-				if Instr(rule, "/") {
-					rule := string2Values("/", rule)
+			fastCenter(horizontal, var, d, m) {
+				if (var = "h")
+					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (w / 2)))
+				else
+					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (h / 2)))
+			}
 
-					part := rule[2]
-					rule := rule[1]
+			rules := this.iCompiledRules
 
-					if InStr(part, "\") {
-						part := string2Values("\", part)
+			if !rules {
+				rules := []
 
-						div := part[1]
-						mul := part[2]
+				for ignore, part in string2Values(";", this.Rule) {
+					part := string2Values(":", part)
+					variable := part[1]
+
+					if (variable = "Width")
+						variable := "w"
+					else if (variable = "Height")
+						variable := "h"
+					else if (variable = "Horizontal")
+						variable := "h"
+					else if (variable = "Vertical")
+						variable := "h"
+
+					horizontal := ((variable = "x") || (variable = "w"))
+
+					rule := part[2]
+
+					if Instr(rule, "/") {
+						rule := string2Values("/", rule)
+
+						part := rule[2]
+						rule := rule[1]
+
+						if InStr(part, "\") {
+							part := string2Values("\", part)
+
+							div := part[1]
+							mul := part[2]
+						}
+						else {
+							div := part
+							mul := 1
+						}
 					}
 					else {
-						div := part
+						div := 1
 						mul := 1
 					}
-				}
-				else {
-					div := 1
-					mul := 1
+
+					switch rule, false {
+						case "Move":
+							rules.Push(fastMover(horizontal, variable, div, mul))
+						case "Grow":
+							rules.Push(fastGrower(horizontal, variable, div, mul))
+						case "Center":
+							rules.Push(fastCenter(horizontal, variable, div, mul))
+					}
 				}
 
-				switch rule, false {
-					case "Move", "Grow":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / div * mul)
-					case "Center":
-						if (variable = "h")
-							x := Round((this.Window.Width / 2) - (w / 2))
-						else
-							y := Round((this.Window.Height / 2) - (h / 2))
-				}
+				this.iCompiledRules := rules
 			}
+
+			for ignore, rule in rules
+				rule(&x, &y, &w, &h, deltaWidth, deltaHeight)
 
 			ControlMove(x, y, w, h, this.Control)
 		}
@@ -463,7 +501,7 @@ class Window extends Gui {
 		local restricted := false
 		local x, y, w, h, settings, ignore, resizer
 
-		if (minMax = "Initialize") {
+		if InStr(minMax, "Init") {
 			WinGetPos(&x, &y, &w, &h, this)
 
 			this.iWidth := width
@@ -471,7 +509,8 @@ class Window extends Gui {
 
 			WinMove(x, y, width, height, this)
 
-			WinRedraw(this)
+			for ignore, resizer in this.Resizers
+				resizer.Redraw()
 		}
 		else {
 			if !this.Width

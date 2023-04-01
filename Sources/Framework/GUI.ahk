@@ -160,7 +160,7 @@ class Window extends Gui {
 			local y := this.OriginalY
 			local w := this.OriginalWidth
 			local h := this.OriginalHeight
-			local ignore, part, variable, horizontal
+			local ignore, part, variable, horizontal, rule, div, mul
 
 			for ignore, part in string2Values(";", this.Rule) {
 				part := string2Values(":", part)
@@ -177,31 +177,33 @@ class Window extends Gui {
 
 				horizontal := ((variable = "x") || (variable = "w"))
 
-				switch part[2], false {
-					case "Move":
-						%variable% += (horizontal ? deltaWidth : deltaHeight)
-					case "Move/2":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 2)
-					case "Move/3":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3)
-					case "Move/4":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4)
-					case "Move\3":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3 * 2)
-					case "Move\4":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4 * 3)
-					case "Grow":
-						%variable% += (horizontal ? deltaWidth : deltaHeight)
-					case "Grow/2":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 2)
-					case "Grow/3":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3)
-					case "Grow\3":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 3 * 2)
-					case "Grow/4":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4)
-					case "Grow\4":
-						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / 4 * 3)
+				rule := part[2]
+
+				if Instr(rule, "/") {
+					rule := string2Values("/", rule)
+
+					part := rule[2]
+					rule := rule[1]
+
+					if InStr(part, "\") {
+						part := string2Values("\", part)
+
+						div := part[1]
+						mul := part[2]
+					}
+					else {
+						div := part
+						mul := 1
+					}
+				}
+				else {
+					div := 1
+					mul := 1
+				}
+
+				switch rule, false {
+					case "Move", "Grow":
+						%variable% += Round((horizontal ? deltaWidth : deltaHeight) / div * mul)
 					case "Center":
 						if (variable = "h")
 							x := Round((this.Window.Width / 2) - (w / 2))

@@ -282,7 +282,7 @@ class RaceReports extends ConfigurationItem {
 		raceReportsGui.Add("Button", "x1177 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)
 
-		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 X:Move/4 W:Grow\4 H:Grow Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
+		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 X:Move/4 W:Grow/4\3 H:Grow Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
 
 		this.iReportViewer := RaceReportViewer(raceReportsGui, raceReportsGui["chartViewer"].Value, raceReportsGui["infoViewer"].Value)
 

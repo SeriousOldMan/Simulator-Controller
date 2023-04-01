@@ -1238,31 +1238,29 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getTyreCompoundCode(simulator, car, track, compound, default)
 	}
 
-	suitableTyreCompound(simulator, car, track, weather, compound) {
-		local compoundColor := compoundColor(compound)
-
-		compound := compound(compound)
+	suitableTyreCompound(simulator, car, track, weather, tyreCompound) {
+		tyreCompound := compound(tyreCompound)
 
 		if (weather = "Dry") {
-			if (compound = "Dry")
+			if (tyreCompound = "Dry")
 				return true
 		}
 		else if (weather = "Drizzle") {
-			if inList(["Dry", "Intermediate"], compound)
+			if inList(["Dry", "Intermediate"], tyreCompound)
 				return true
 		}
 		else if (weather = "LightRain") {
-			if inList(["Intermediate", "Wet"], compound)
+			if inList(["Intermediate", "Wet"], tyreCompound)
 				return true
 		}
-		else if (compound = "Wet")
+		else if (tyreCompound = "Wet")
 			return true
 
 		return false
 	}
 
 	optimalTyreCompound(simulator, car, track, weather, airTemeperature, trackTemperature, availableTyreCompounds := false) {
-		local compounds, compound, index
+		local compounds, tyreCompound, index
 
 		if !availableTyreCompounds
 			availableTyreCompounds := this.getTyreCompounds(simulator, car, track)
@@ -1271,24 +1269,24 @@ class SessionDatabase extends ConfigurationItem {
 
 		switch weather {
 			case "Dry":
-				compound := "Dry"
+				tyreCompound := "Dry"
 			case "Drizzle", "LightRain":
-				compound := "Intermediate"
+				tyreCompound := "Intermediate"
 			default:
-				compound := "Wet"
+				tyreCompound := "Wet"
 		}
 
-		index := inList(compounds, normalizeCompound(compound))
+		index := inList(compounds, normalizeCompound(tyreCompound))
 
 		if index
 			return availableTyreCompounds[index]
-		else if ((compound = "Intermediate") && (weather = "Drizzle")) {
+		else if ((tyreCompound = "Intermediate") && (weather = "Drizzle")) {
 			index := inList(compounds, normalizeCompound("Dry"))
 
 			if index
 				return availableTyreCompounds[index]
 		}
-		else if ((compound = "Intermediate") && (weather = "LightRain")) {
+		else if ((tyreCompound = "Intermediate") && (weather = "LightRain")) {
 			index := inList(compounds, normalizeCompound("Wet"))
 
 			if index

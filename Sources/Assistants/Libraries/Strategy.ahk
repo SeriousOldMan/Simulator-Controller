@@ -292,7 +292,7 @@ class StrategySimulation {
 	}
 
 	getSessionWeather(minute, &weather, &airTemperature, &trackTemperature) {
-		return this.StrategyManager.getSessionWeather(minute, weather, &airTemperature, &trackTemperature)
+		return this.StrategyManager.getSessionWeather(minute, &weather, &airTemperature, &trackTemperature)
 	}
 
 	getStartConditions(&initialStint, &initialLap, &initialStintTime, &initialSessionTime
@@ -363,14 +363,12 @@ class StrategySimulation {
 		local tyreCompound := false
 		local tyreCompoundColor := false
 		local tyrePressures := false
-		local message, compound, candidate
+		local message, candidate
 
 		this.getStrategySettings(&simulator, &car, &track, &weather, &airTemperature, &trackTemperature
 							   , &sessionType, &sessionLength, &maxTyreLaps, &tyreCompound, &tyreCompoundColor, &tyrePressures)
 
-		compound := compound(tyreCompound, tyreCompoundColor)
-
-		if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound) {
+		if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor)) {
 			candidate := telemetryDB.optimalTyreCompound(simulator, car, track, weather, airTemperature, trackTemperature)
 
 			if candidate
@@ -415,7 +413,7 @@ class StrategySimulation {
 		local driverName := false
 		local strategy, currentConsumption, rnd, startFuel, startFuelAmount, fuelAmount, lapTime
 
-		this.getStintDriver(initialStint, driverID, driverName)
+		this.getStintDriver(initialStint, &driverID, &driverName)
 
 		this.setStintDriver(initialStint, driverID)
 
@@ -627,7 +625,7 @@ class StrategySimulation {
 		try {
 			Sleep(200)
 
-			this.acquireTelemetryData(&electronicsData, &tyresData, verbose, progress)
+			this.acquireTelemetryData(&electronicsData, &tyresData, verbose, &progress)
 
 			if verbose {
 				message := translate("Creating Scenarios...")
@@ -647,7 +645,7 @@ class StrategySimulation {
 
 			Sleep(200)
 
-			scenarios := this.optimizeScenarios(scenarios, verbose, progress)
+			scenarios := this.optimizeScenarios(scenarios, verbose, &progress)
 
 			if verbose {
 				message := translate("Evaluating Scenarios...")
@@ -657,7 +655,7 @@ class StrategySimulation {
 
 			Sleep(200)
 
-			scenario := this.evaluateScenarios(scenarios, verbose, progress)
+			scenario := this.evaluateScenarios(scenarios, verbose, &progress)
 
 			if scenario {
 				if verbose {
@@ -840,7 +838,7 @@ class VariationSimulation extends StrategySimulation {
 							driverID := false
 							driverName := false
 
-							this.getStintDriver(initialStint, driverID, driverName)
+							this.getStintDriver(initialStint, &driverID, &driverName)
 
 							this.setStintDriver(initialStint, driverID)
 
@@ -1207,12 +1205,12 @@ class TrafficSimulation extends StrategySimulation {
 								driverID := false
 								driverName := false
 
-								this.getStintDriver(initialStint, driverID, driverName)
+								this.getStintDriver(initialStint, &driverID, &driverName)
 
 								this.setStintDriver(initialStint, driverID)
 
 								for ignore, mapData in this.acquireElectronicsData(weather, targetTyreCompound, targetTyreCompoundColor) {
-									this.getStintDriver(initialStint, driverID, driverName)
+									this.getStintDriver(initialStint, &driverID, &driverName)
 
 									this.setStintDriver(initialStint, driverID)
 
@@ -2289,7 +2287,7 @@ class Strategy extends ConfigurationItem {
 			tyreChangeRule := false
 			tyreSets := false
 
-			this.StrategyManager.getPitstopRules(validator, pitstopRule, refuelRule, tyreChangeRule, tyreSets)
+			this.StrategyManager.getPitstopRules(&validator, &pitstopRule, &refuelRule, &tyreChangeRule, &tyreSets)
 
 			this.iValidator := validator
 			this.iPitstopRule := pitstopRule
@@ -2333,7 +2331,7 @@ class Strategy extends ConfigurationItem {
 				if (minute > duration)
 					break
 				else {
-					this.StrategyManager.getSessionWeather(minute, weather, &airTemperature, &trackTemperature)
+					this.StrategyManager.getSessionWeather(minute, &weather, &airTemperature, &trackTemperature)
 
 					if ((weather != lastWeather) || (airTemperature != lastAirTemperature) || (trackTemperature != lastTrackTemperature)) {
 						lastWeather := weather
@@ -3058,7 +3056,7 @@ class Strategy extends ConfigurationItem {
 			driverID := false
 			driverName := false
 
-			this.StrategyManager.getStintDriver(pitstopNr + 1, driverID, driverName)
+			this.StrategyManager.getStintDriver(pitstopNr + 1, &driverID, &driverName)
 
 			this.StrategyManager.setStintDriver(pitstopNr + 1, driverID)
 
@@ -3307,7 +3305,7 @@ lookupLapTime(lapTimes, ecuMap, remainingFuel) {
 	local ignore, candidate
 
 	for ignore, candidate in lapTimes
-		if ((candidate.Map = ecuMap) && (!selected || (Abs(candidate["Fuel.Remaining"] - remainingFuel) < Abs(selected["Fuel.Remaining"] - remainingFuel))))
+		if ((candidate["Map"] = ecuMap) && (!selected || (Abs(candidate["Fuel.Remaining"] - remainingFuel) < Abs(selected["Fuel.Remaining"] - remainingFuel))))
 			selected := candidate
 
 	return (selected ? selected["Lap.Time"] : false)

@@ -43,40 +43,37 @@
 ;;;-------------------------------------------------------------------------;;;
 
 showLogo(name) {
-	/*
 	local info := kVersion . " - 2023, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
-	local image := "1:" . logo
-	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html
-
-	static videoPlayer
+	local title1 := translate("Modular Simulator Controller System")
+	local title2 := substituteVariables(translate("%name% - The Virtual Race Spotter"), {name: name})
+	local mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, html
+	local logoGui, videoPlayer
 
 	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
-	x := mainScreenRight - 299
+	x := mainScreenLeft
 	y := mainScreenBottom - 234
 
-	title1 := translate("Modular Simulator Controller System")
-	title2 := substituteVariables(translate("%name% - The Virtual Race Spotter"), {name: name})
-	SplashImageGui := Gui("ToolWindow -Sysmenu Disabled"), SplashImageGui.SetFont("bold"), SplashImageGui.AddText("w200 Center", title1 "`n" title2), SplashImageGui.AddPicture("w200 h-1", image), SplashImageGui.SetFont("norm"), SplashImageGui.AddText("w200 Center", info), SplashImageGui.Show()
+	logoGui := Window()
 
-	Logo := Gui()
-	Logo.Opt("-Border -Caption")
-	Logo.Add("ActiveX", "x0 y0 w279 h155 VvideoPlayer", "shell explorer")
+	logoGui.SetFont("Bold")
+	logoGui.AddText("w279 Center", title1 . "`n" . title2)
+
+	videoPlayer := logoGui.Add("ActiveX", "x10 y40 w279 h155", "shell explorer").Value
+
+	logoGui.SetFont("Norm")
+	logoGui.AddText("w279 Center", info)
 
 	videoPlayer.Navigate("about:blank")
 
 	html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . logo . "' width=279 height=155 border=0 padding=0></body></html>"
 
-	videoPlayer.document.write(html)
+	videoPlayer.Document.Write(html)
 
-	x += 10
-	y += 40
+	logoGui.Show("X" . x . " Y" . y)
 
-	Logo.MarginX := "0", Logo.MarginY := "0"
-	Logo.Opt("+AlwaysOnTop")
-	Logo.Show("AutoSize x" . x . " y" . y
-	*/
+	WinSetTransparent(255, , translate("Creative Commons - BY-NC-SA"))
 }
 
 checkRemoteProcessAlive(pid) {
@@ -162,11 +159,11 @@ startRaceSpotter() {
 	if debug
 		setDebug(true)
 
-	spotter := new RaceSpotter(kSimulatorConfiguration
-							 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
-							 , spotterName, spotterLanguage
-							 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
-							 , spotterRecognizer, spotterListener, spotterMuted, voiceServer)
+	spotter := RaceSpotter(kSimulatorConfiguration
+						 , remotePID ? RaceSpotter.RaceSpotterRemoteHandler(remotePID) : false
+						 , spotterName, spotterLanguage
+						 , spotterSynthesizer, spotterSpeaker, spotterSpeakerVocalics
+						 , spotterRecognizer, spotterListener, spotterMuted, voiceServer)
 
 	RaceSpotter.Instance := spotter
 
@@ -205,7 +202,7 @@ startRaceSpotter() {
 		showLogo(spotterName)
 
 	if remotePID
-		Task.startTask(new PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
 
 	return
 }

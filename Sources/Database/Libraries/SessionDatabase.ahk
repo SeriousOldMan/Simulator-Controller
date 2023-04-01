@@ -665,6 +665,47 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getDriverName(simulator, id)
 	}
 
+	static mapTrack(simulator, track, dataFile, callback := false) {
+		local pid
+
+		simulator := SessionDatabase.getSimulatorName(simulator)
+
+		finalizeTrackMap() {
+			if ProcessExist(pid)
+				Task.startTask(Task.CurrentTask, 10000)
+			else {
+				deleteFile(kTempDirectory . "Track Mapper.state")
+
+				if callback
+					callback.Call()
+			}
+		}
+
+		try {
+			Run(A_ComSpec . " /c `"`"" . kBinariesDirectory . "Track Mapper.exe`" -Simulator `"" . simulator . "`" -Track `"" . track . "`" -Data `"" . datafile . "`"`""
+			  , kBinariesDirectory, "Hide", &pid)
+		}
+		catch Any as exception {
+			logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
+
+			showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			deleteFile(kTempDirectory . "Track Mapper.state")
+
+			pid := false
+		}
+
+		if pid
+			Task.startTask(finalizeTrackMap, 120000, kLowPriority)
+
+		return pid
+	}
+
+	mapTrack(simulator, track, dataFile, callback := false) {
+		return SessionDatabase.mapTrack(simulator, track, dataFile, callback)
+	}
+
 	hasTrackMap(simulator, track) {
 		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
 

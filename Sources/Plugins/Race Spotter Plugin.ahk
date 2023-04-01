@@ -502,25 +502,11 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 			if ProcessExist(pid)
 				Task.startTask(Task.CurrentTask, 10000)
 			else {
-				try {
-					this.iMapperPhase := "Map"
-
-					Run(A_ComSpec . " /c `"`"" . kBinariesDirectory . "Track Mapper.exe`" -Simulator `"" . simulator . "`" -Track `"" . track . "`" -Data `"" . datafile . "`"`""
-					  , kBinariesDirectory, "Hide", &pid)
-				}
-				catch Any as exception {
-					logMessage(kLogCritical, translate("Cannot start Track Mapper - please rebuild the applications..."))
-
-					showMessage(translate("Cannot start Track Mapper - please rebuild the applications...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
-					pid := false
-				}
+				pid := SessionDatabase.mapTrack(simulator, track, dataFile, ObjBindMethod(this, "finalizeTrackMap"))
 
 				if pid {
 					this.iMapperPID := pid
-
-					Task.startTask(ObjBindMethod(this, "finalizeTrackMap"), 120000, kLowPriority)
+					this.iMapperPhase := "Map"
 				}
 				else {
 					this.iMapperPhase := false
@@ -531,18 +517,8 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	finalizeTrackMap() {
-		local pid := this.iMapperPID
-
-		if pid {
-			if ProcessExist(pid)
-				Task.startTask(Task.CurrentTask, 10000)
-			else {
-				this.iMapperPID := false
-				this.iMapperPhase := false
-
-				deleteFile(kTempDirectory . "Track Mapper.state")
-			}
-		}
+		this.iMapperPID := false
+		this.iMapperPhase := false
 	}
 
 	shutdownTrackMapper(force := false, *) {

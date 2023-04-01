@@ -3307,7 +3307,7 @@ class RaceCenter extends ConfigurationItem {
 			yValues.Push(setup["Tyre.Pressure." . tyreType])
 		}
 
-		linRegression(xValues, yValues, a, b)
+		linRegression(xValues, yValues, &a, &b)
 	}
 
 	driverReferencePressure(driver, weather, airTemperature, trackTemperature, compound, compoundColor
@@ -4752,7 +4752,7 @@ class RaceCenter extends ConfigurationItem {
 				yValues.Push(entry["Lap.Time"])
 			}
 
-			linRegression(xValues, yValues, a, b)
+			linRegression(xValues, yValues, &a, &b)
 		}
 
 		baseLapTime := ((a && b) ? (a + (tyreLaps * b)) : false)

@@ -2129,7 +2129,7 @@ class RaceStrategist extends GridRaceAssistant {
 				yValues.Push(entry["Lap.Time"])
 			}
 
-			linRegression(xValues, yValues, a, b)
+			linRegression(xValues, yValues, &a, &b)
 		}
 
 		baseLapTime := ((a && b) ? (a + (tyreLaps * b)) : false)

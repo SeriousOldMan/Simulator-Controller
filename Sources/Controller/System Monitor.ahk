@@ -66,7 +66,7 @@ getTableCSS() {
 	local script
 
 	script := "
-(
+	(
 		.table-std, .th-std, .td-std {
 			border-collapse: collapse;
 			padding: .3em .5em;
@@ -108,7 +108,7 @@ getTableCSS() {
 		.table-std tbody tr:nth-child(odd) {
 			background-color: #D0D0D0;
 		}
-)"
+	)"
 
 	return script
 }
@@ -197,6 +197,19 @@ systemMonitor(command := false, arguments*) {
 
 	static logMessageListView
 	static logBufferEdit
+
+	closeSystemMonitor(*) {
+		ExitApp(0)
+	}
+
+	noSelect(listView, *) {
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
+	}
+
+	chooseLogLevel(*) {
+		broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "System Monitor")), "setLogLevel", logLevelDropDown.Value)
+	}
 
 	if !stateIcons
 		stateIcons := CaseInsenseMap()
@@ -337,7 +350,7 @@ systemMonitor(command := false, arguments*) {
 
 			if (controllerState.Count > 0) {
 				state := getMultiMapValue(controllerState, "Team Server", "State", "Unknown")
-				
+
 				if kStateIcons.Has(state)
 					icon := kStateIcons[state]
 				else
@@ -438,7 +451,7 @@ systemMonitor(command := false, arguments*) {
 
 				logMessageListView.ModifyCol()
 
-				Loop 4
+				loop 4
 					logMessageListView.ModifyCol(A_Index, "AutoHdr")
 			}
 			else
@@ -630,7 +643,7 @@ systemMonitor(command := false, arguments*) {
 
 		vStartupFinished := true
 
-		Loop
+		loop
 			Sleep(100)
 		until result
 
@@ -638,19 +651,6 @@ systemMonitor(command := false, arguments*) {
 
 		return ((result = kClose) ? false : true)
 	}
-}
-
-closeSystemMonitor(*) {
-	ExitApp(0)
-}
-
-noSelect(listView, *) {
-	Loop listView.GetCount()
-		listView.Modify(A_Index, "-Select")
-}
-
-chooseLogLevel(*) {
-	broadcastMessage(concatenate(kBackgroundApps, remove(kForegroundApps, "System Monitor")), "setLogLevel", logLevelDropDown.Value)
 }
 
 updateSimulationState(controllerState) {

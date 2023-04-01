@@ -85,7 +85,7 @@ startRaceEngineer() {
 	local icon := kIconsDirectory . "Artificial Intelligence.ico"
 	local remotePID := false
 	local engineerName := "Jona"
-	local engineerLogo := true
+	local engineerLogo := false
 	local engineerLanguage := false
 	local engineerSynthesizer := true
 	local engineerSpeaker := false
@@ -104,7 +104,7 @@ startRaceEngineer() {
 	index := 1
 
 	while (index < A_Args.Length) {
-		switch A_Args[index] {
+		switch A_Args[index], false {
 			case "-Remote":
 				remotePID := A_Args[index + 1]
 				index += 2

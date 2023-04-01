@@ -99,7 +99,7 @@ class StrategyViewer {
 
 	createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries) {
 		local startStint := strategy.StartStint
-		local html := "<table class=""table-std"">"
+		local html := "<table class=`"table-std`">"
 		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopLaps, refuels, tyreChanges, weathers
 		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopLap
 		local lastWeather, lastTyreChange, lastTyreLaps, ignore, pitstop, pitstopLap
@@ -110,12 +110,12 @@ class StrategyViewer {
 		tyreSeries := [strategy.RemainingTyreLaps]
 
 		if !strategy.LastPitstop {
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">" . startStint . "</th></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th><td class=""td-std"">" . strategy.DriverName . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th><td class=""td-std"">" . strategy.RemainingLaps . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th><td class=""td-std"">" . this.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th><td class=""td-std"">" . displayValue("Float", convertUnit("Volume", strategy.FuelConsumption)) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Stint") . "</th><th class=`"th-std`">" . startStint . "</th></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-std`">" . strategy.DriverName . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Map") . "</th><td class=`"td-std`">" . strategy.Map . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td class=`"td-std`">" . strategy.RemainingLaps . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time") . "</th><td class=`"td-std`">" . this.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption") . "</th><td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", strategy.FuelConsumption)) . "</td></tr>")
 			html .= "</table>"
 
 			timeSeries.Push(strategy.getSessionDuration() / 60)
@@ -150,16 +150,16 @@ class StrategyViewer {
 			for ignore, pitstop in strategy.Pitstops {
 				pitstopLap := (pitstop.Lap - lastLap)
 
-				stints.Push("<th class=""th-std"">" . (startStint + A_Index - 1) . "</th>")
-				drivers.Push("<td class=""td-std"">" . lastDriver . "</td>")
-				maps.Push("<td class=""td-std"">" . lastMap . "</td>")
-				laps.Push("<td class=""td-std"">" . Max(pitstopLap, 0) . "</td>")
-				lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
-				fuelConsumptions.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
-				pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
-				weathers.Push("<td class=""td-std"">" . lastWeather . "</td>")
-				refuels.Push("<td class=""td-std"">" . ((pitstop.Nr > 1) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
-				tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
+				stints.Push("<th class=`"th-std`">" . (startStint + A_Index - 1) . "</th>")
+				drivers.Push("<td class=`"td-std`">" . lastDriver . "</td>")
+				maps.Push("<td class=`"td-std`">" . lastMap . "</td>")
+				laps.Push("<td class=`"td-std`">" . Max(pitstopLap, 0) . "</td>")
+				lapTimes.Push("<td class=`"td-std`">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
+				fuelConsumptions.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
+				pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
+				weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
+				refuels.Push("<td class=`"td-std`">" . ((pitstop.Nr > 1) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
+				tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
 
 				timeSeries.Push(pitstop.Time / 60)
 				lapSeries.Push(pitstop.Lap)
@@ -183,34 +183,34 @@ class StrategyViewer {
 				tyreSeries.Push(lastTyreLaps)
 			}
 
-			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length + startStint) . "</th>")
-			drivers.Push("<td class=""td-std"">" . lastDriver . "</td>")
-			maps.Push("<td class=""td-std"">" . lastMap . "</td>")
-			laps.Push("<td class=""td-std"">" . strategy.LastPitstop.StintLaps . "</td>")
-			lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
-			fuelConsumptions.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
-			pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
-			weathers.Push("<td class=""td-std"">" . lastWeather . "</td>")
-			refuels.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", lastRefuel)) . "</td>")
-			tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
+			stints.Push("<th class=`"th-std`">" . (strategy.Pitstops.Length + startStint) . "</th>")
+			drivers.Push("<td class=`"td-std`">" . lastDriver . "</td>")
+			maps.Push("<td class=`"td-std`">" . lastMap . "</td>")
+			laps.Push("<td class=`"td-std`">" . strategy.LastPitstop.StintLaps . "</td>")
+			lapTimes.Push("<td class=`"td-std`">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
+			fuelConsumptions.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
+			pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
+			weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
+			refuels.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastRefuel)) . "</td>")
+			tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
 
 			timeSeries.Push((strategy.LastPitstop.Time + (strategy.LastPitstop.StintLaps * lastLapTime)) / 60)
 			lapSeries.Push(lastLap + strategy.LastPitstop.StintLaps)
 			fuelSeries.Push(strategy.LastPitstop.RemainingFuel - (strategy.LastPitstop.StintLaps * strategy.LastPitstop.FuelConsumption))
 			tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
 
-			html .= "<table class=""table-std"">"
+			html .= "<table class=`"table-std`">"
 
-			html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
-					   . "<th class=""th-std"">" . translate("Driver") . "</th>"
-					   . "<th class=""th-std"">" . translate("Weather") . "</th>"
-					   . "<th class=""th-std"">" . translate("Laps") . "</th>"
-					   . "<th class=""th-std"">" . translate("Map") . "</th>"
-					   . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
-					   . "<th class=""th-std"">" . translate("Consumption") . "</th>"
-					   . "<th class=""th-std"">" . translate("Pitstop Lap") . "</th>"
-					   . "<th class=""th-std"">" . translate("Refuel Amount") . "</th>"
-					   . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
+			html .= ("<tr><th class=`"th-std`">" . translate("Stint") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Driver") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Weather") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Laps") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Map") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Lap Time") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Consumption") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Pitstop Lap") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Refuel Amount") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Tyre Change") . "</th>"
 				   . "</tr>")
 
 			loop stints.Length
@@ -276,33 +276,33 @@ class StrategyViewer {
 			strategy := false
 
 		if strategy {
-			html := ("<div id=""header""><b>" . translate("Strategy: ") . strategy.Name . "</b></div>")
+			html := ("<div id=`"header`"><b>" . translate("Strategy: ") . strategy.Name . "</b></div>")
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Session") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Session") . "</i></div>")
 
 			html .= ("<br><br>" . this.createStrategyInfo(strategy))
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Setup") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Setup") . "</i></div>")
 
 			html .= ("<br><br>" . this.createSetupInfo(strategy))
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Stints") . "</i></div>")
 
 			timeSeries := []
 			lapSeries := []
 			fuelSeries := []
 			tyreSeries := []
 
-			html .= ("<br><br>" . this.createStintsInfo(strategy, timeSeries, lapSeries, fuelSeries, tyreSeries))
+			html .= ("<br><br>" . this.createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries))
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Consumables") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Consumables") . "</i></div>")
 
 			drawChartFunction := false
 			chartID := false
 
 			width := (this.StrategyViewer.Width - 10)
 
-			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, &chartID)
+			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
 
 			before := "
 			(
@@ -323,6 +323,8 @@ class StrategyViewer {
 					</script>
 				</head>
 			)"
+
+			before := substituteVariables(before, {chartID: chartID})
 		}
 		else {
 			before := ""

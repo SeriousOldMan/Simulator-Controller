@@ -823,7 +823,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				simulator := 1
 		}
 
-		workbenchGui.Add("DropDownList", "x90 yp w290 W:Grow/10 Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
+		workbenchGui.Add("DropDownList", "x90 yp w290 W:Grow(0.1) Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
@@ -831,10 +831,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			simulator := false
 
 		workbenchGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Car"))
-		workbenchGui.Add("DropDownList", "AltSubmit x90 yp w290 W:Grow/10 vcarDropDown").OnEvent("Change", chooseCar)
+		workbenchGui.Add("DropDownList", "AltSubmit x90 yp w290 W:Grow(0.1) vcarDropDown").OnEvent("Change", chooseCar)
 
 		workbenchGui.Add("Text", "x16 yp24 w70 h23 +0x200", translate("Track"))
-		workbenchGui.Add("DropDownList", "x90 yp w290 W:Grow/10 vtrackDropDown").OnEvent("Change", chooseTrack)
+		workbenchGui.Add("DropDownList", "x90 yp w290 W:Grow(0.1) vtrackDropDown").OnEvent("Change", chooseTrack)
 
 		workbenchGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Conditions"))
 
@@ -847,31 +847,31 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		workbenchGui.Add("DropDownList", "x90 yp w120 W:Grow/10 AltSubmit Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
+		workbenchGui.Add("DropDownList", "x90 yp w120 W:Grow(0.1) AltSubmit Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
 
-		workbenchGui.Add("Edit", "x215 yp w40 X:Move/10 Number Limit2 vairTemperatureEdit", this.AirTemperature).OnEvent("Change", updateTemperatures)
-		workbenchGui.Add("UpDown", "x242 yp-2 w18 h20 X:Move/10 Range0-99", this.AirTemperature)
-		workbenchGui.Add("Edit", "x262 yp w40 X:Move/10 Number Limit2 vtrackTemperatureEdit", this.TrackTemperature).OnEvent("Change", updateTemperatures)
-		workbenchGui.Add("UpDown", "x289 yp w18 h20 X:Move/10 Range0-99", this.TrackTemperature)
-		workbenchGui.Add("Text", "x304 yp w90 h23 X:Move/10 +0x200", translate("Air / Track"))
+		workbenchGui.Add("Edit", "x215 yp w40 X:Move(0.1) Number Limit2 vairTemperatureEdit", this.AirTemperature).OnEvent("Change", updateTemperatures)
+		workbenchGui.Add("UpDown", "x242 yp-2 w18 h20 X:Move(0.1) Range0-99", this.AirTemperature)
+		workbenchGui.Add("Edit", "x262 yp w40 X:Move(0.1) Number Limit2 vtrackTemperatureEdit", this.TrackTemperature).OnEvent("Change", updateTemperatures)
+		workbenchGui.Add("UpDown", "x289 yp w18 h20 X:Move(0.1) Range0-99", this.TrackTemperature)
+		workbenchGui.Add("Text", "x304 yp w90 h23 X:Move(0.1) +0x200", translate("Air / Track"))
 
-		workbenchGui.Add("Text", "x16 yp+32 w364 0x10 W:Grow/10")
+		workbenchGui.Add("Text", "x16 yp+32 w364 0x10 W:Grow(0.1)")
 
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("Text", "x16 yp+10 w364 h23 W:Grow/10 Center +0x200", translate("Chart"))
+		workbenchGui.Add("Text", "x16 yp+10 w364 h23 W:Grow(0.1) Center +0x200", translate("Chart"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("DropDownList", "x12 yp+28 w76 AltSubmit Choose1 vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
 
-		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h263 W:Grow/10 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
+		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h263 W:Grow(0.1) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
-		workbenchGui.Add("Text", "x195 yp w70 h23 X:Move/10 +0x200", translate("Driver"))
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move/10 AltSubmit vdriverDropDown").OnEvent("Change", chooseDriver)
+		workbenchGui.Add("Text", "x195 yp w70 h23 X:Move(0.1) +0x200", translate("Driver"))
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit vdriverDropDown").OnEvent("Change", chooseDriver)
 
 		compound := this.SelectedCompound[true]
 		choices := collect([normalizeCompound("Dry")], translate)
@@ -882,33 +882,33 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move/10 +0x200", translate("Compound"))
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move/10 AltSubmit Choose" . chosen . "  vcompoundDropDown", choices).OnEvent("Change", chooseCompound)
+		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move(0.1) +0x200", translate("Compound"))
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit Choose" . chosen . "  vcompoundDropDown", choices).OnEvent("Change", chooseCompound)
 
-		workbenchGui.Add("Text", "x195 yp+28 w70 h23 X:Move/10 +0x200", translate("X-Axis"))
+		workbenchGui.Add("Text", "x195 yp+28 w70 h23 X:Move(0.1) +0x200", translate("X-Axis"))
 
 		schema := filterSchema(TelemetryDatabase().getSchema("Electronics", true))
 
 		chosen := inList(schema, "Map")
 
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move/10 AltSubmit Choose" . chosen . " vdataXDropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit Choose" . chosen . " vdataXDropDown", schema).OnEvent("Change", chooseAxis)
 
-		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move/10 +0x200", translate("Series"))
+		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move(0.1) +0x200", translate("Series"))
 
 		chosen := inList(schema, "Fuel.Consumption")
 
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move/10 AltSubmit Choose" . chosen . " vdataY1DropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit Choose" . chosen . " vdataY1DropDown", schema).OnEvent("Change", chooseAxis)
 
 		schema := concatenate([translate("None")], schema)
 
-		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move/10 AltSubmit Choose1 vdataY2DropDown", schema).OnEvent("Change", chooseAxis)
-		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move/10 AltSubmit Choose1 vdataY3DropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) AltSubmit Choose1 vdataY2DropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) AltSubmit Choose1 vdataY3DropDown", schema).OnEvent("Change", chooseAxis)
 
-		workbenchGui.Add("Text", "x400 ys w40 h23 X:Move/10 +0x200", translate("Chart"))
-		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move/10 AltSubmit Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
-		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move/10 AltSubmit Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+		workbenchGui.Add("Text", "x400 ys w40 h23 X:Move(0.1) +0x200", translate("Chart"))
+		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move(0.1) AltSubmit Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
+		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) AltSubmit Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
-		this.iChartViewer := workbenchGui.Add("ActiveX", "x400 yp+24 w950 h442 Border vchartViewer X:Move/10 W:Grow/10\9", "shell.explorer").Value
+		this.iChartViewer := workbenchGui.Add("ActiveX", "x400 yp+24 w950 h442 Border vchartViewer X:Move(0.1) W:Grow(0.9)", "shell.explorer").Value
 		this.iChartViewer.Navigate("about:blank")
 
 		workbenchGui.Add("Text", "x8 yp+450 w1350 0x10 W:Grow")
@@ -945,7 +945,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeWorkbench)
 
-		workbenchTab := workbenchGui.Add("Tab", "x16 ys+39 w593 h216 -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Drivers", "Weather", "Simulation", "Strategy"], translate))
+		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h216 H:Grow -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Drivers", "Weather", "Simulation", "Strategy"], translate))
 
 		workbenchTab.UseTab(1)
 
@@ -1083,7 +1083,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
-		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
+		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
 		this.iDriversListView.OnEvent("DoubleClick", chooseSimDriver)
 
 		workbenchGui.Add("Text", "x" . x2 . " ys+34 w90 h23 +0x200", translate("Driver"))
@@ -1107,7 +1107,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x7 := x6 + 47
 		x8 := x7 + 52
 
-		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
+		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
 		this.iWeatherListView.OnEvent("Click", chooseSimWeather)
 
 		workbenchGui.Add("Text", "x" . x2 . " ys+34 w70 h23 +0x200", translate("Time"))

@@ -55,7 +55,7 @@ global kStateIcons := CaseInsenseMap("Disabled", kIconsDirectory . "Black.ico"
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vStartupFinished := false
+global gStartupFinished := false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -141,27 +141,8 @@ updateDashboard(viewer, html := "") {
 	viewer.Document.Close()
 }
 
-global simulationDashboard
-global assistantsDashboard
-global sessionDashboard
-global dataDashboard
-global automationDashboard
-global mapperDashboard
-
-global simulationState
-global assistantsState
-global sessionState
-global dataState
-global automationState
-global mapperState
-
-global logLevelDropDown
-
 systemMonitor(command := false, arguments*) {
-	global vStartupFinished
-
-	global simulationDashboard, assistantsDashboard, sessionDashboard, dataDashboard, automationDashboard, mapperDashboard
-	global simulationState, assistantsState, sessionState, dataState, automationState, mapperState, logLevelDropDown
+	global gStartupFinished
 
 	local x, y, time, logLevel
 	local controllerState, databaseState, trackMapperState, ignore, plugin, icons, modules, key, value
@@ -197,6 +178,310 @@ systemMonitor(command := false, arguments*) {
 
 	static logMessageListView
 	static logBufferEdit
+
+	static simulationDashboard
+	static assistantsDashboard
+	static sessionDashboard
+	static dataDashboard
+	static automationDashboard
+	static mapperDashboard
+
+	static simulationState
+	static assistantsState
+	static sessionState
+	static dataState
+	static automationState
+	static mapperState
+
+	static logLevelDropDown
+
+	updateSimulationState(controllerState) {
+		local state := getMultiMapValue(controllerState, "Simulation", "State", "Disabled")
+		local html, icon, displayState
+
+		if kStateIcons.Has(state)
+			icon := kStateIcons[state]
+		else
+			icon := kStateIcons["Unknown"]
+
+		simulationState.Value := icon
+
+		displayState := getMultiMapValue(controllerState, "Simulation", "Session")
+
+		if (displayState = "Qualification")
+			displayState := "Qualifying"
+
+		if (state = "Active") {
+			html := "<table>"
+			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Car") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Track") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(displayState) . "</td></tr>")
+			html .= "</table>"
+		}
+		else if (state = "Passive") {
+			html := "<table>"
+			html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . translate("Waiting for session...") . "</td></tr>")
+			html .= "</table>"
+		}
+		else
+			html := ""
+
+		updateDashboard(simulationDashboard, html)
+	}
+
+	updateAssistantsState(controllerState) {
+		local overallState := "Disabled"
+		local html := "<table>"
+		local info := ""
+		local assistant, state, configuration
+
+		for key, state in getMultiMapValues(controllerState, "Race Assistants") {
+			if ((key = "Mode") || (key = "Session"))
+				info .= ("<tr><td><b>" . translate(key . ":") . "</b></td><td>" . translate(state) . "</td></tr>")
+			else {
+				if (state = "Active") {
+					overallState := "Active"
+
+					state := translate("Active")
+
+					if getMultiMapValue(controllerState, key, "Muted", false)
+						state .= translate(" (Muted)")
+					else {
+						configuration := readMultiMap(kTempDirectory . key . ".state")
+
+						if (getMultiMapValue(configuration, "Voice", "Muted", false)
+						 || !getMultiMapValue(configuration, "Voice", "Speaker", true))
+							state .= translate(" (Muted)")
+					}
+				}
+				else if (state = "Waiting") {
+					if (overallState = "Disabled")
+						overallState := "Passive"
+
+					state := translate("Waiting...")
+				}
+				else
+					state := translate("Inactive")
+
+				html .= ("<tr><td><b>" . translate(key) . translate(":") . "</b></td><td>" . state . "</td></tr>")
+			}
+		}
+
+		html .= info
+
+		assistantsState.Value := kStateIcons[overallState]
+
+		if (overallState = "Disabled")
+			html := ""
+		else
+			html .= "</table>"
+
+		updateDashboard(assistantsDashboard, html)
+	}
+
+	updateSessionState(controllerState) {
+		local state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
+		local html, icon, ignore, property, key, value
+
+		if kStateIcons.Has(state)
+			icon := kStateIcons[state]
+		else
+			icon := kStateIcons["Unknown"]
+
+		sessionState.Value := icon
+
+		if ((state != "Unknown") && (state != "Disabled")) {
+			state := CaseInsenseMap()
+
+			for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
+				property := StrSplit(property, ":", " `t", 2)
+
+				state[property[1]] := property[2]
+			}
+
+			for key, value in state
+				if (value = "Invalid")
+					state[key] := translate("Not valid")
+				else if (value = "Mismatch")
+					state[key] := translate("No match")
+
+			html := "<table>"
+			html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . state["ServerURL"] . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . state["SessionToken"] . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Team:") . "</b></td><td>" . state["Team"] . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Driver:") . "</b></td><td>" . state["Driver"] . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . state["Session"] . "</td></tr>")
+			html .= "</table>"
+		}
+		else
+			html := ""
+
+		updateDashboard(sessionDashboard, html)
+	}
+
+	updateDataState(databaseState) {
+		local state := getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled")
+		local html, icon, serverURL, serverToken, action, counter, identifier
+
+		if kStateIcons.Has(state)
+			icon := kStateIcons[state]
+		else
+			icon := kStateIcons["Unknown"]
+
+		dataState.Value := icon
+
+		if ((state != "Unknown") && (state != "Disabled")) {
+			serverURL := getMultiMapValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
+			serverToken := getMultiMapValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined)
+
+			if !getMultiMapValue(databaseState, "Database Synchronizer", "Connected", true)
+				action := "Disconnected"
+			else
+				action := getMultiMapValue(databaseState, "Database Synchronizer", "Synchronization", false)
+
+			html := "<table>"
+
+			/*
+			identifier := getMultiMapValue(databaseState, "Database Synchronizer", "Identifier", false)
+
+			if identifier
+				html .= ("<tr><td><b>" . translate("Name:") . "</b></td><td>" . identifier . "</td></tr>")
+			*/
+
+			if (serverURL != kUndefined)
+				html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . serverURL . "</td></tr>")
+
+			if (serverToken != kUndefined)
+				html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
+
+			html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>" . getMultiMapValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Database:") . "</b></td><td>" . getMultiMapValue(databaseState, "Database Synchronizer", "DatabaseID") . "</td></tr>")
+
+			if action {
+				switch action, false {
+					case "Running":
+						counter := getMultiMapValue(databaseState, "Database Synchronizer", "Counter", false)
+
+						if counter
+							action := substituteVariables(translate("Synchronizing (%counter% objects transferred)..."), {counter: counter})
+						else
+							action := translate("Synchronizing...")
+					case "Finished":
+						action := translate("Finished synchronization")
+					case "Waiting":
+						action := translate("Waiting for next synchronization...")
+					case "Failed":
+						action := translate("Synchronization failed")
+					case "Uploading":
+						action := translate("Uploading community database...")
+					case "Downloading":
+						action := translate("Downloading community database...")
+					case "Disconnected":
+						action := (translate("Lost connection to the Team Server (URL: ") . serverURL . translate(")"))
+					default:
+						throw "Unknown action detected in updateDataState..."
+				}
+
+				html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
+			}
+
+			html .= "</table>"
+		}
+		else
+			html := ""
+
+		updateDashboard(dataDashboard, html)
+	}
+
+	updateAutomationState(controllerState) {
+		local state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
+		local html, icon, automation
+
+		if kStateIcons.Has(state)
+			icon := kStateIcons[state]
+		else
+			icon := kStateIcons["Unknown"]
+
+		automationState.Value := icon
+
+		if ((state != "Unknown") && (state != "Disabled")) {
+			if (state = "Passive") {
+				html := "<table>"
+				html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . translate("Waiting for session...") . "</td></tr>")
+				html .= "</table>"
+			}
+			else {
+				automation := getMultiMapValue(controllerState, "Track Automation", "Automation", false)
+
+				if !automation
+					automation := translate("Not available")
+
+				html := "<table>"
+				html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Simulator") . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Car") . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Track") . "</td></tr>")
+				html .= ("<tr><td><b>" . translate("Automation:") . "</b></td><td>" . automation . "</td></tr>")
+				html .= "</table>"
+			}
+		}
+		else
+			html := ""
+
+		updateDashboard(automationDashboard, html)
+	}
+
+	updateMapperState(trackMapperState) {
+		local state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
+		local html, icon, simulator, track, action, points
+
+		if kStateIcons.Has(state)
+			icon := kStateIcons[state]
+		else
+			icon := kStateIcons["Unknown"]
+
+		mapperState.Value := icon
+
+		if ((state != "Unknown") && (state != "Disabled")) {
+			action := getMultiMapValue(trackMapperState, "Track Mapper", "Action", "Waiting")
+
+			html := "<table>"
+			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(trackMapperState, "Track Mapper", "Simulator") . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(trackMapperState, "Track Mapper", "Track") . "</td></tr>")
+
+			switch action, false {
+				case "Waiting":
+					action := translate("Waiting for track scanner...")
+				case "Scanning":
+					action := translate("Scanning track...")
+				case "Reading":
+					action := translate("Reading track coordinates (%points%)...")
+				case "Analyzing":
+					action := translate("Analyzing track coordinates (%points%)...")
+				case "Normalizing":
+					action := translate("Normalizing track coordinates (%points%)...")
+				case "Tranforming":
+					action := translate("Transforming track coordinates (%points%)...")
+				case "Processing":
+					action := translate("Processing track spline (%points%)...")
+				case "Image":
+					action := translate("Creating track map...")
+				case "Metadata":
+					action := translate("Creating track meta data...")
+				default:
+					throw "Unknown action detected in updateDataState..."
+			}
+
+			action := substituteVariables(action, {points: getMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)})
+
+			html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
+			html .= "</table>"
+		}
+		else
+			html := ""
+
+		updateDashboard(mapperDashboard, html)
+	}
 
 	closeSystemMonitor(*) {
 		ExitApp(0)
@@ -641,7 +926,7 @@ systemMonitor(command := false, arguments*) {
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateServer"), 5000, kLowPriority).start()
 
-		vStartupFinished := true
+		gStartupFinished := true
 
 		loop
 			Sleep(100)
@@ -651,294 +936,6 @@ systemMonitor(command := false, arguments*) {
 
 		return ((result = kClose) ? false : true)
 	}
-}
-
-updateSimulationState(controllerState) {
-	local state := getMultiMapValue(controllerState, "Simulation", "State", "Disabled")
-	local html, icon, displayState
-
-	if kStateIcons.Has(state)
-		icon := kStateIcons[state]
-	else
-		icon := kStateIcons["Unknown"]
-
-	simulationState.Value := icon
-
-	displayState := getMultiMapValue(controllerState, "Simulation", "Session")
-
-	if (displayState = "Qualification")
-		displayState := "Qualifying"
-
-	if (state = "Active") {
-		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Simulator") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Car") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Track") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(displayState) . "</td></tr>")
-		html .= "</table>"
-	}
-	else if (state = "Passive") {
-		html := "<table>"
-		html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . translate("Waiting for session...") . "</td></tr>")
-		html .= "</table>"
-	}
-	else
-		html := ""
-
-	updateDashboard(simulationDashboard, html)
-}
-
-updateAssistantsState(controllerState) {
-	local overallState := "Disabled"
-	local html := "<table>"
-	local info := ""
-	local assistant, state, configuration
-
-	for key, state in getMultiMapValues(controllerState, "Race Assistants") {
-		if ((key = "Mode") || (key = "Session"))
-			info .= ("<tr><td><b>" . translate(key . ":") . "</b></td><td>" . translate(state) . "</td></tr>")
-		else {
-			if (state = "Active") {
-				overallState := "Active"
-
-				state := translate("Active")
-
-				if getMultiMapValue(controllerState, key, "Muted", false)
-					state .= translate(" (Muted)")
-				else {
-					configuration := readMultiMap(kTempDirectory . key . ".state")
-
-					if (getMultiMapValue(configuration, "Voice", "Muted", false)
-					 || !getMultiMapValue(configuration, "Voice", "Speaker", true))
-						state .= translate(" (Muted)")
-				}
-			}
-			else if (state = "Waiting") {
-				if (overallState = "Disabled")
-					overallState := "Passive"
-
-				state := translate("Waiting...")
-			}
-			else
-				state := translate("Inactive")
-
-			html .= ("<tr><td><b>" . translate(key) . translate(":") . "</b></td><td>" . state . "</td></tr>")
-		}
-	}
-
-	html .= info
-
-	assistantsState.Value := kStateIcons[overallState]
-
-	if (overallState = "Disabled")
-		html := ""
-	else
-		html .= "</table>"
-
-	updateDashboard(assistantsDashboard, html)
-}
-
-updateSessionState(controllerState) {
-	local state := getMultiMapValue(controllerState, "Team Server", "State", "Disabled")
-	local html, icon, ignore, property, key, value
-
-	if kStateIcons.Has(state)
-		icon := kStateIcons[state]
-	else
-		icon := kStateIcons["Unknown"]
-
-	sessionState.Value := icon
-
-	if ((state != "Unknown") && (state != "Disabled")) {
-		state := CaseInsenseMap()
-
-		for ignore, property in string2Values(";", getMultiMapValue(controllerState, "Team Server", "Properties")) {
-			property := StrSplit(property, ":", " `t", 2)
-
-			state[property[1]] := property[2]
-		}
-
-		for key, value in state
-			if (value = "Invalid")
-				state[key] := translate("Not valid")
-			else if (value = "Mismatch")
-				state[key] := translate("No match")
-
-		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . state["ServerURL"] . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . state["SessionToken"] . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Team:") . "</b></td><td>" . state["Team"] . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Driver:") . "</b></td><td>" . state["Driver"] . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . state["Session"] . "</td></tr>")
-		html .= "</table>"
-	}
-	else
-		html := ""
-
-	updateDashboard(sessionDashboard, html)
-}
-
-updateDataState(databaseState) {
-	local state := getMultiMapValue(databaseState, "Database Synchronizer", "State", "Disabled")
-	local html, icon, serverURL, serverToken, action, counter, identifier
-
-	if kStateIcons.Has(state)
-		icon := kStateIcons[state]
-	else
-		icon := kStateIcons["Unknown"]
-
-	dataState.Value := icon
-
-	if ((state != "Unknown") && (state != "Disabled")) {
-		serverURL := getMultiMapValue(databaseState, "Database Synchronizer", "ServerURL", kUndefined)
-		serverToken := getMultiMapValue(databaseState, "Database Synchronizer", "ServerToken", kUndefined)
-
-		if !getMultiMapValue(databaseState, "Database Synchronizer", "Connected", true)
-			action := "Disconnected"
-		else
-			action := getMultiMapValue(databaseState, "Database Synchronizer", "Synchronization", false)
-
-		html := "<table>"
-
-		/*
-		identifier := getMultiMapValue(databaseState, "Database Synchronizer", "Identifier", false)
-
-		if identifier
-			html .= ("<tr><td><b>" . translate("Name:") . "</b></td><td>" . identifier . "</td></tr>")
-		*/
-
-		if (serverURL != kUndefined)
-			html .= ("<tr><td><b>" . translate("Server:") . "</b></td><td>" . serverURL . "</td></tr>")
-
-		if (serverToken != kUndefined)
-			html .= ("<tr><td><b>" . translate("Token:") . "</b></td><td>" . serverToken . "</td></tr>")
-
-		html .= ("<tr><td><b>" . translate("User:") . "</b></td><td>" . getMultiMapValue(databaseState, "Database Synchronizer", "UserID") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Database:") . "</b></td><td>" . getMultiMapValue(databaseState, "Database Synchronizer", "DatabaseID") . "</td></tr>")
-
-		if action {
-			switch action, false {
-				case "Running":
-					counter := getMultiMapValue(databaseState, "Database Synchronizer", "Counter", false)
-
-					if counter
-						action := substituteVariables(translate("Synchronizing (%counter% objects transferred)..."), {counter: counter})
-					else
-						action := translate("Synchronizing...")
-				case "Finished":
-					action := translate("Finished synchronization")
-				case "Waiting":
-					action := translate("Waiting for next synchronization...")
-				case "Failed":
-					action := translate("Synchronization failed")
-				case "Uploading":
-					action := translate("Uploading community database...")
-				case "Downloading":
-					action := translate("Downloading community database...")
-				case "Disconnected":
-					action := (translate("Lost connection to the Team Server (URL: ") . serverURL . translate(")"))
-				default:
-					throw "Unknown action detected in updateDataState..."
-			}
-
-			html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
-		}
-
-		html .= "</table>"
-	}
-	else
-		html := ""
-
-	updateDashboard(dataDashboard, html)
-}
-
-updateAutomationState(controllerState) {
-	local state := getMultiMapValue(controllerState, "Track Automation", "State", "Disabled")
-	local html, icon, automation
-
-	if kStateIcons.Has(state)
-		icon := kStateIcons[state]
-	else
-		icon := kStateIcons["Unknown"]
-
-	automationState.Value := icon
-
-	if ((state != "Unknown") && (state != "Disabled")) {
-		if (state = "Passive") {
-			html := "<table>"
-			html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . translate("Waiting for session...") . "</td></tr>")
-			html .= "</table>"
-		}
-		else {
-			automation := getMultiMapValue(controllerState, "Track Automation", "Automation", false)
-
-			if !automation
-				automation := translate("Not available")
-
-			html := "<table>"
-			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Simulator") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Car") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Track Automation", "Track") . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Automation:") . "</b></td><td>" . automation . "</td></tr>")
-			html .= "</table>"
-		}
-	}
-	else
-		html := ""
-
-	updateDashboard(automationDashboard, html)
-}
-
-updateMapperState(trackMapperState) {
-	local state := getMultiMapValue(trackMapperState, "Track Mapper", "State", "Disabled")
-	local html, icon, simulator, track, action, points
-
-	if kStateIcons.Has(state)
-		icon := kStateIcons[state]
-	else
-		icon := kStateIcons["Unknown"]
-
-	mapperState.Value := icon
-
-	if ((state != "Unknown") && (state != "Disabled")) {
-		action := getMultiMapValue(trackMapperState, "Track Mapper", "Action", "Waiting")
-
-		html := "<table>"
-		html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . getMultiMapValue(trackMapperState, "Track Mapper", "Simulator") . "</td></tr>")
-		html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(trackMapperState, "Track Mapper", "Track") . "</td></tr>")
-
-		switch action, false {
-			case "Waiting":
-				action := translate("Waiting for track scanner...")
-			case "Scanning":
-				action := translate("Scanning track...")
-			case "Reading":
-				action := translate("Reading track coordinates (%points%)...")
-			case "Analyzing":
-				action := translate("Analyzing track coordinates (%points%)...")
-			case "Normalizing":
-				action := translate("Normalizing track coordinates (%points%)...")
-			case "Tranforming":
-				action := translate("Transforming track coordinates (%points%)...")
-			case "Processing":
-				action := translate("Processing track spline (%points%)...")
-			case "Image":
-				action := translate("Creating track map...")
-			case "Metadata":
-				action := translate("Creating track meta data...")
-			default:
-				throw "Unknown action detected in updateDataState..."
-		}
-
-		action := substituteVariables(action, {points: getMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)})
-
-		html .= ("<tr><td><b>" . translate("Action:") . "</b></td><td>" . action . "</td></tr>")
-		html .= "</table>"
-	}
-	else
-		html := ""
-
-	updateDashboard(mapperDashboard, html)
 }
 
 clearOrphaneStateFiles() {
@@ -989,9 +986,9 @@ startSystemMonitor() {
 ;;;-------------------------------------------------------------------------;;;
 
 monitoringMessageHandler(category, data) {
-	global vStartupFinished
+	global gStartupFinished
 
-	if vStartupFinished
+	if gStartupFinished
 		if (InStr(data, "logMessage") = 1) {
 			data := StrSplit(StrSplit(data, ":", , 2)[2], ";", " `t", 5)
 

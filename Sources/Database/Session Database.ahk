@@ -3162,7 +3162,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	renameStrategy(strategyName) {
 		local window := this.Window
-		local locale := ((getLanguage() = "en") ? "" : "Locale")
 		local result, newName, curExtension, curName
 
 		window.Opt("+OwnDialogs")
@@ -3257,7 +3256,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	renameSetup(setupType, setupName) {
 		local window := this.Window
-		local locale := ((getLanguage() = "en") ? "" : "Locale")
 		local result, newName, curExtension, curName
 
 		window.Opt("+OwnDialogs")

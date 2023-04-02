@@ -2118,23 +2118,23 @@ class SetupEditor extends ConfigurationItem {
 
 		editorGui.Add("Button", "x16 ys+10 w60", translate("Setup:")).OnEvent("Click", chooseSetupFile)
 		editorGui.Add("Text", "x85 ys+14 w193 vsetupNameViewer")
-		editorGui.Add("Button", "x280 ys+10 w80 X:Move/2 vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
+		editorGui.Add("Button", "x280 ys+10 w80 X:Move(0.5) vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow/2 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow(0.5) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectSetting)
 
 		editorGui.Add("Button", "x16 yp+324 w80 Disabled Y:Move vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
-		editorGui.Add("Button", "x280 yp w80 Y:Move X:Move/2 Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
+		editorGui.Add("Button", "x280 yp w80 Y:Move X:Move(0.5) Disabled vincreaseSettingButton", translate("Increase")).OnEvent("Click", increaseSetting)
 
-		editorGui.Add("Button", "x280 yp+29 w80 Y:Move X:Move/2", translate("Compare...")).OnEvent("Click", compareSetup)
+		editorGui.Add("Button", "x280 yp+29 w80 Y:Move X:Move(0.5)", translate("Compare...")).OnEvent("Click", compareSetup)
 
 		editorGui.Add("Button", "x16 ys+420 w80 Y:Move", translate("&Apply")).OnEvent("Click", applyRecommendations)
 		editorGui.Add("Slider", "x100 ys+422 w60 0x10 Y:Move Range20-100 ToolTip vapplyStrengthSlider", 100)
 		editorGui.Add("Text", "x162 ys+425 Y:Move", translate("%"))
 
-		editorGui.Add("Button", "x280 ys+420 w80 Y:Move X:Move/2", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
+		editorGui.Add("Button", "x280 ys+420 w80 Y:Move X:Move(0.5)", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
 
-		editorGui.Add("Edit", "x374 ys+10 w423 h433 T8 X:Move/2 W:Grow/2 H:Grow ReadOnly -Wrap HScroll vsetupViewer")
+		editorGui.Add("Edit", "x374 ys+10 w423 h433 T8 X:Move(0.5) W:Grow(0.5) H:Grow ReadOnly -Wrap HScroll vsetupViewer")
 
 		editorGui.Add("Text", "x8 y506 w800 0x10 Y:Move W:Grow")
 
@@ -2744,14 +2744,14 @@ class SetupComparator extends ConfigurationItem {
 		comparatorGui.Add("Button", "x16 yp+354 w80 Disabled Y:Move vdecreaseABSettingButton", translate("Decrease")).OnEvent("Click", decreaseABSetting)
 		comparatorGui.Add("Button", "x720 yp w80 Disabled X:Move Y:Move vincreaseABSettingButton", translate("Increase")).OnEvent("Click", increaseABSetting)
 
-		comparatorGui.Add("Slider", "x316 yp w200 0x10 Range-100-100 Y:Move X:Move/2 ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
-		comparatorGui.Add("Text", "x251 yp+3 w50 Y:Move X:Move/2 ", translate("Setup A"))
-		comparatorGui.Add("Text", "x529 yp w50 X:Move/2 Y:Move", translate("Setup B"))
+		comparatorGui.Add("Slider", "x316 yp w200 0x10 Range-100-100 Y:Move X:Move(0.5) ToolTip vapplyMixSlider", 0).OnEvent("Change", mixSetups)
+		comparatorGui.Add("Text", "x251 yp+3 w50 Y:Move X:Move(0.5) ", translate("Setup A"))
+		comparatorGui.Add("Text", "x529 yp w50 X:Move(0.5) Y:Move", translate("Setup B"))
 
 		comparatorGui.Add("Text", "x8 y506 w800 0x10 Y:Move W:Grow")
 
-		comparatorGui.Add("Button", "x322 y514 w80 h23 Y:Move X:Move/2", translate("&Apply")).OnEvent("Click", applyComparator)
-		comparatorGui.Add("Button", "x426 y514 w80 h23 Default Y:Move X:Move/2", translate("Close")).OnEvent("Click", closeComparator)
+		comparatorGui.Add("Button", "x322 y514 w80 h23 Y:Move X:Move(0.5)", translate("&Apply")).OnEvent("Click", applyComparator)
+		comparatorGui.Add("Button", "x426 y514 w80 h23 Default Y:Move X:Move(0.5)", translate("Close")).OnEvent("Click", closeComparator)
 	}
 
 	show() {

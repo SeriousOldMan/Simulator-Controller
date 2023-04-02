@@ -249,7 +249,7 @@ class RaceReports extends ConfigurationItem {
 
 		simulator := ((simulators.Length > 0) ? 1 : 0)
 
-		raceReportsGui.Add("DropDownList", "x90 yp w180 W:Grow/4 Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
+		raceReportsGui.Add("DropDownList", "x90 yp w180 W:Grow(0.25) Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
@@ -257,14 +257,14 @@ class RaceReports extends ConfigurationItem {
 			simulator := false
 
 		raceReportsGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Car"))
-		raceReportsGui.Add("DropDownList", "x90 yp w180 W:Grow/4 vcarDropDown").OnEvent("Change", chooseCar)
+		raceReportsGui.Add("DropDownList", "x90 yp w180 W:Grow(0.25) vcarDropDown").OnEvent("Change", chooseCar)
 
 		raceReportsGui.Add("Text", "x16 yp24 w70 h23 +0x200", translate("Track"))
-		raceReportsGui.Add("DropDownList", "x90 yp w180 W:Grow/4 vtrackDropDown").OnEvent("Change", chooseTrack)
+		raceReportsGui.Add("DropDownList", "x90 yp w180 W:Grow(0.25) vtrackDropDown").OnEvent("Change", chooseTrack)
 
 		raceReportsGui.Add("Text", "x16 yp+26 w70 h23 +0x200", translate("Races"))
 
-		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 W:Grow/4 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
+		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 W:Grow(0.25) H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
 		this.iRacesListView.OnEvent("Click", chooseRace)
 
 		raceReportsGui.Add("Button", "x62 yp+205 w23 h23 Y:Move vreloadReportsButton").OnEvent("Click", reloadRaceReports)
@@ -274,15 +274,15 @@ class RaceReports extends ConfigurationItem {
 		setButtonIcon(raceReportsGui["deleteReportButton"], kIconsDirectory . "Minus.ico", 1)
 
 		raceReportsGui.Add("Text", "x16 yp+30 w70 h23 Y:Move +0x200", translate("Info"))
-		raceReportsGui.Add("ActiveX", "x90 yp-2 w180 h170 Y:Move W:Grow/4 Border vinfoViewer", "shell.explorer").Value.Navigate("about:blank")
+		raceReportsGui.Add("ActiveX", "x90 yp-2 w180 h170 Y:Move W:Grow(0.25) Border vinfoViewer", "shell.explorer").Value.Navigate("about:blank")
 
-		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200 X:Move/4", translate("Report"))
-		raceReportsGui.Add("DropDownList", "x334 yp w120 X:Move/4 Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
+		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200 X:Move(0.25)", translate("Report"))
+		raceReportsGui.Add("DropDownList", "x334 yp w120 X:Move(0.25) Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
 
 		raceReportsGui.Add("Button", "x1177 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)
 
-		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 X:Move/4 W:Grow/4\3 H:Grow Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
+		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 X:Move(0.25) W:Grow(0.75) H:Grow Border vchartViewer", "shell.explorer").Value.Navigate("about:blank")
 
 		this.iReportViewer := RaceReportViewer(raceReportsGui, raceReportsGui["chartViewer"].Value, raceReportsGui["infoViewer"].Value)
 

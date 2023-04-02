@@ -398,9 +398,9 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				connection := this.iCachedObjects[connection]
 
-				if (connection.Name && (connection.Name != "") && (connection.Type = "Driver")
-									&& !inList(connectedDrivers, connection.Name))
-					connectedDrivers.Push(connection.Name)
+				if (connection["Name"] && (connection["Name"] != "") && (connection["Type"] = "Driver")
+									   && !inList(connectedDrivers, connection["Name"]))
+					connectedDrivers.Push(connection["Name"])
 			}
 
 			state.Push("Drivers: " . values2String("|", connectedDrivers*))
@@ -431,12 +431,12 @@ class TeamServerPlugin extends ControllerPlugin {
 					if !this.iCachedObjects.Has(driver)
 						this.iCachedObjects[driver] := this.parseObject(this.Connector.GetDriver(driver))
 
-					state.Push("StintNr: " . this.iCachedObjects[stint].Nr)
-					state.Push("StintLap: " . this.iCachedObjects[lap].Nr)
+					state.Push("StintNr: " . this.iCachedObjects[stint]["Nr"])
+					state.Push("StintLap: " . this.iCachedObjects[lap]["Nr"])
 
 					driver := this.iCachedObjects[driver]
 
-					state.Push("StintDriver: " . computeDriverName(driver.ForName, driver.SurName, driver.NickName))
+					state.Push("StintDriver: " . computeDriverName(driver["ForName"], driver["SurName"], driver["NickName"]))
 				}
 			}
 			catch Any as exception {
@@ -717,12 +717,12 @@ class TeamServerPlugin extends ControllerPlugin {
 
 				driver := this.iCachedObjects[this.Driver]
 
-				this.iDriverForName := driver.ForName
-				this.iDriverSurName := driver.SurName
-				this.iDriverNickName := driver.NickName
+				this.iDriverForName := driver["ForName"]
+				this.iDriverSurName := driver["SurName"]
+				this.iDriverNickName := driver["NickName"]
 
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver.ForName . A_Space . driver.SurName . translate(")"))
+					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["ForName"]. A_Space . driver["SurName"] . translate(")"))
 			}
 			catch Any as exception {
 				if !ignore {
@@ -1042,7 +1042,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				if !this.iCachedObjects.Has(lap)
 					this.iCachedObjects[lap] := this.parseObject(this.Connector.GetLap(lap))
 
-				lapNr := this.iCachedObjects[lap].Nr
+				lapNr := this.iCachedObjects[lap]["Nr"]
 
 				if (getLogLevel() <= kLogInfo)
 					logMessage(kLogInfo, translate("Fetching lap number (Session: ") . this.Session . translate(", Lap: ") . lap . translate(", Number: ") . lapNr . translate(")"))
@@ -1286,7 +1286,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							if !this.iCachedObjects.Has(this.Team)
 								this.iCachedObjects[this.Team] := this.parseObject(this.Connector.GetTeam(this.Team))
 
-							this.iTeamName := this.iCachedObjects[this.Team].Name
+							this.iTeamName := this.iCachedObjects[this.Team]["Name"]
 
 							this.State["Team"] := this.Team[true]
 						}
@@ -1301,7 +1301,7 @@ class TeamServerPlugin extends ControllerPlugin {
 								this.iCachedObjects[this.Driver] := this.parseObject(this.Connector.GetDriver(this.Driver))
 
 							driverObject := this.iCachedObjects[this.Driver]
-							this.iDriverName := (driverObject.ForName . A_Space . driverObject.SurName)
+							this.iDriverName := (driverObject["ForName"] . A_Space . driverObject["SurName"])
 
 							this.State["Driver"] := this.Driver[true]
 						}
@@ -1315,7 +1315,7 @@ class TeamServerPlugin extends ControllerPlugin {
 							if !this.iCachedObjects.Has(this.Session)
 								this.iCachedObjects[this.Session] := this.parseObject(this.Connector.GetSession(this.Session))
 
-							this.iSessionName := this.iCachedObjects[this.Session].Name
+							this.iSessionName := this.iCachedObjects[this.Session]["Name"]
 
 							this.State["Session"] := this.Session[true]
 						}

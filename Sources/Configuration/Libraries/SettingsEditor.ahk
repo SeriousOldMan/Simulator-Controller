@@ -17,92 +17,8 @@ global kEditModes := "Edit"
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Constant Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global trayTipCheck
-global trayTipDurationInput
-global trayTipSimulationCheck
-global trayTipSimulationDurationInput
-global buttonBoxCheck
-global buttonBoxDurationInput
-global buttonBoxSimulationCheck
-global buttonBoxSimulationDurationInput
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-startConfiguration(*) {
-	local restart := "Restart"
-
-	try {
-		RunWait(kBinariesDirectory . "Simulator Configuration.exe")
-
-		editSettings(&restart)
-	}
-	catch Any as exception {
-		OnMessage(0x44, translateOkButton)
-		MsgBox(translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
-		OnMessage(0x44, translateOkButton, 0)
-	}
-}
-
-setInputState(input, enabler) {
-	if enabler.Value
-		input.Enabled := true
-	else {
-		input.Enabled := false
-		input.Text := 0
-	}
-}
-
-checkTrayTipDuration(*) {
-	setInputState(trayTipDurationInput, trayTipCheck)
-}
-
-checkTrayTipSimulationDuration(*) {
-	setInputState(trayTipSimulationDurationInput, trayTipSimulationCheck)
-}
-
-checkButtonBoxDuration(*) {
-	setInputState(buttonBoxDurationInput, buttonBoxCheck)
-}
-
-checkButtonBoxSimulationDuration(*) {
-	setInputState(buttonBoxSimulationDurationInput, buttonBoxSimulationCheck)
-}
-
-computeStartupSongs() {
-	local files := concatenate(getFileNames("*.wav", kUserSplashMediaDirectory, kSplashMediaDirectory)
-							 , getFileNames("*.mp3", kUserSplashMediaDirectory, kSplashMediaDirectory))
-	local index, fileName, soundFile
-
-	for index, fileName in files {
-		SplitPath(fileName, &soundFile)
-
-		files[index] := soundFile
-	}
-
-	return files
-}
-
-getSelectedModes(modesListView) {
-	local rowNumber := 0
-	local modes := []
-
-	loop {
-		rowNumber := modesListView.GetNext(rowNumber, "C")
-
-		if !rowNumber
-			break
-
-		modes.Push(ConfigurationItem.descriptor(modesListView.GetText(rowNumber, 1), modesListView.GetText(rowNumber, 2)))
-	}
-
-	return modes
-}
 
 editModes(&settingsOrCommand, arguments*) {
 	global kSave, kCancel, kUpdate
@@ -125,6 +41,22 @@ editModes(&settingsOrCommand, arguments*) {
 	static modeSimulatorDropDown
 	static modeSessionDropDown
 	static modesListView
+
+	getSelectedModes(modesListView) {
+		local rowNumber := 0
+		local modes := []
+
+		loop {
+			rowNumber := modesListView.GetNext(rowNumber, "C")
+
+			if !rowNumber
+				break
+
+			modes.Push(ConfigurationItem.descriptor(modesListView.GetText(rowNumber, 1), modesListView.GetText(rowNumber, 2)))
+		}
+
+		return modes
+	}
 
 	if ((settingsOrCommand = kSave) || (settingsOrCommand = kUpdate)) {
 		modes := getSelectedModes(modesListView)
@@ -208,10 +140,7 @@ editModes(&settingsOrCommand, arguments*) {
 
 		setMultiMapValues(newSettings, "Modes", getMultiMapValues(settingsOrCommand, "Modes"))
 
-		modesEditorGui := Gui()
-
-		modesEditorGui.Opt("-Border -Caption +0x800000")
-		modesEditorGui.BackColor := "D0D0D0"
+		modesEditorGui := Window()
 
 		modesEditorGui.SetFont("Bold", "Arial")
 
@@ -297,10 +226,7 @@ editModes(&settingsOrCommand, arguments*) {
 ;;;-------------------------------------------------------------------------;;;
 
 editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
-	global kSave, kCancel, kContinue, kEditModes
-
-	global trayTipCheck, trayTipDurationInput, trayTipSimulationCheck, trayTipSimulationDurationInput
-	global buttonBoxCheck, buttonBoxDurationInput, buttonBoxSimulationCheck, buttonBoxSimulationDurationInput
+	global kSave, kCancel, kContinue, kUpdate, kEditModes
 
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
 	local descriptor, value, simulators, margin, choices, chosen, themes
@@ -351,6 +277,46 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 	static feedbackVariable6
 	static feedbackVariable7
 	static feedbackVariable8
+
+	setInputState(input, enabler) {
+		if enabler.Value
+			input.Enabled := true
+		else {
+			input.Enabled := false
+			input.Text := 0
+		}
+	}
+
+	checkTrayTipDuration(*) {
+		setInputState(trayTipDurationInput, trayTipCheck)
+	}
+
+	checkTrayTipSimulationDuration(*) {
+		setInputState(trayTipSimulationDurationInput, trayTipSimulationCheck)
+	}
+
+	checkButtonBoxDuration(*) {
+		setInputState(buttonBoxDurationInput, buttonBoxCheck)
+	}
+
+	checkButtonBoxSimulationDuration(*) {
+		setInputState(buttonBoxSimulationDurationInput, buttonBoxSimulationCheck)
+	}
+
+	startConfiguration(*) {
+		local restart := "Restart"
+
+		try {
+			RunWait(kBinariesDirectory . "Simulator Configuration.exe")
+
+			editSettings(&restart)
+		}
+		catch Any as exception {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Cannot start the configuration tool - please check the installation..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+	}
 
 	if (settingsOrCommand == kSave) {
 		newSettings := newMultiMap()
@@ -425,10 +391,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 		result := false
 		restart := false
 
-		settingsEditorGui := Gui()
-
-		settingsEditorGui.Opt("-Border -Caption +0x800000")
-		settingsEditorGui.BackColor := "D0D0D0"
+		settingsEditorGui := Window()
 
 		settingsEditorGui.SetFont("Bold", "Arial")
 

@@ -77,8 +77,8 @@ class Window extends Gui {
 		Initialize() {
 		}
 
-		CanResize(deltaWidth, deltaHeight) {
-			return true
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			return false
 		}
 
 		Resize(deltaWidth, deltaHeight) {
@@ -90,6 +90,8 @@ class Window extends Gui {
 
 	class ControlResizer extends Window.Resizer {
 		iRule := false
+		iCompiledRule := false
+
 		iControl := false
 
 		iOriginalX := 0
@@ -97,17 +99,15 @@ class Window extends Gui {
 		iOriginalWidth := 0
 		iOriginalHeight := 0
 
-		iCompiledRules := false
-
 		Control {
 			Get {
 				return this.iControl
 			}
 		}
 
-		Rule {
+		Rule[optimized := false] {
 			Get {
-				return this.iRule
+				return (optimized ? this.iCompiledRule : this.iRule)
 			}
 		}
 
@@ -140,6 +140,8 @@ class Window extends Gui {
 			this.iRule := rule
 
 			super.__New(window)
+
+			this.Optimize()
 		}
 
 		Initialize() {
@@ -154,11 +156,77 @@ class Window extends Gui {
 		}
 
 		Reset() {
-			this.iCompiledRules := false
+			this.Optimize()
 		}
 
-		CanResize(deltaWidth, deltaHeight) {
-			return !!this.Rule
+		Optimize() {
+			local ignore, part, variable, horizontal, rule, factor, rules
+
+			callRules(rules, &x, &y, &w, &h, dw, dh) {
+				local ignore, rule
+
+				for ignore, rule in rules
+					rule(&x, &y, &w, &h, dw, dh)
+			}
+
+			fastMover(horizontal, variable, factor) {
+				return (&x, &y, &w, &h, dw, dh) => (%variable% += Round((horizontal ? dw : dh) * factor))
+			}
+
+			fastGrower(horizontal, variable, factor) {
+				return (&x, &y, &w, &h, dw, dh) => (%variable% += Round((horizontal ? dw : dh) * factor))
+			}
+
+			fastCenter(horizontal, variable, factor) {
+				if (variable = "h")
+					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (w / 2)))
+				else
+					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (h / 2)))
+			}
+
+			rules := []
+
+			for ignore, part in string2Values(";", this.Rule) {
+				part := StrSplit(part, ":", , 2)
+				variable := part[1]
+
+				if (variable = "Width")
+					variable := "w"
+				else if (variable = "Height")
+					variable := "h"
+				else if (variable = "Horizontal")
+					variable := "h"
+				else if (variable = "Vertical")
+					variable := "h"
+
+				horizontal := ((variable = "x") || (variable = "w"))
+
+				rule := part[2]
+
+				if Instr(rule, "(") {
+					rule := StrSplit(rule, "(", " `t)", 2)
+
+					factor := rule[2]
+					rule := rule[1]
+				}
+				else
+					factor := 1
+
+				switch rule, false {
+					case "Move":
+						rules.Push(fastMover(horizontal, variable, factor))
+					case "Grow":
+						rules.Push(fastGrower(horizontal, variable, factor))
+					case "Center":
+						rules.Push(fastCenter(horizontal, variable, factor))
+				}
+			}
+
+			this.iCompiledRule := callRules.Bind(rules)
+		}
+
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			return false
 		}
 
 		Resize(deltaWidth, deltaHeight) {
@@ -166,89 +234,8 @@ class Window extends Gui {
 			local y := this.OriginalY
 			local w := this.OriginalWidth
 			local h := this.OriginalHeight
-			local ignore, part, variable, horizontal, rule, div, mul, rules
 
-			callRules(rules, &x, &y, &w, &h) {
-				local ignore, rule
-
-				for ignore, rule in rules
-					rule(&x, &y, &w, &h, deltaWidth, deltaHeight)
-			}
-
-			fastMover(horizontal, var, d, m) {
-				return (&x, &y, &w, &h, dw, dh) => (%var% += Round((horizontal ? dw : dh) / d * m))
-			}
-
-			fastGrower(horizontal, var, d, m) {
-				return (&x, &y, &w, &h, dw, dh) => (%var% += Round((horizontal ? dw : dh) / d * m))
-			}
-
-			fastCenter(horizontal, var, d, m) {
-				if (var = "h")
-					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (w / 2)))
-				else
-					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (h / 2)))
-			}
-
-			rules := this.iCompiledRules
-
-			if !rules {
-				rules := []
-
-				for ignore, part in string2Values(";", this.Rule) {
-					part := string2Values(":", part)
-					variable := part[1]
-
-					if (variable = "Width")
-						variable := "w"
-					else if (variable = "Height")
-						variable := "h"
-					else if (variable = "Horizontal")
-						variable := "h"
-					else if (variable = "Vertical")
-						variable := "h"
-
-					horizontal := ((variable = "x") || (variable = "w"))
-
-					rule := part[2]
-
-					if Instr(rule, "/") {
-						rule := string2Values("/", rule)
-
-						part := rule[2]
-						rule := rule[1]
-
-						if InStr(part, "\") {
-							part := string2Values("\", part)
-
-							div := part[1]
-							mul := part[2]
-						}
-						else {
-							div := part
-							mul := 1
-						}
-					}
-					else {
-						div := 1
-						mul := 1
-					}
-
-					switch rule, false {
-						case "Move":
-							rules.Push(fastMover(horizontal, variable, div, mul))
-						case "Grow":
-							rules.Push(fastGrower(horizontal, variable, div, mul))
-						case "Center":
-							rules.Push(fastCenter(horizontal, variable, div, mul))
-					}
-				}
-
-				this.iCompiledRules := rules
-			}
-
-			for ignore, rule in rules
-				rule(&x, &y, &w, &h, deltaWidth, deltaHeight)
+			this.Rule[true](&x, &y, &w, &h, deltaWidth, deltaHeight)
 
 			ControlMove(x, y, w, h, this.Control)
 		}
@@ -539,11 +526,8 @@ class Window extends Gui {
 				restricted := true
 			}
 
-			if (!restricted && (this.Resizers.Length > 0) && !this.ControlsCanResize(width, height)) {
-				width := this.Width
-				height := this.Height
+			if this.ControlsRestrictResize(&width, &height)
 				restricted := true
-			}
 
 			if descriptor {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -569,14 +553,22 @@ class Window extends Gui {
 		}
 	}
 
-	ControlsCanResize(width, height) {
+	ControlsRestrictResize(&width, &height) {
+		local deltaWidth := (width - this.MinWidth)
+		local deltaHeight := (height - this.MinHeight)
+		local restricted := false
 		local ignore, resizer
 
 		for ignore, resizer in this.Resizers
-			if !resizer.CanResize(width - this.MinWidth, height - this.MinHeight)
-				return false
+			if resizer.RestrictResize(&deltaWidth, &deltaHeight)
+				restricted := true
 
-		return true
+		if restricted {
+			width := (this.MinWidth + deltaWidth)
+			height := (this.MinHeight + deltaHeight)
+		}
+
+		return restricted
 	}
 
 	ControlsResize(width, height) {

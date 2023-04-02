@@ -410,7 +410,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 			options := values2String(A_Space, options*)
 
-			Run("`"" exePath "`" " . options, kBinariesDirectory, , &pid)
+			Run("`"" . exePath . "`" " . options, kBinariesDirectory, , &pid)
 		}
 		catch Any as exception {
 			logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -441,7 +441,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		data := readSimulatorData(prefix)
 
-		if (getMultiMapValues(data, "Setup Data").Count() > 0) {
+		if (getMultiMapValues(data, "Setup Data").Count > 0) {
 			readTyreSetup(readMultiMap(kRaceSettingsFile))
 
 			pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
@@ -560,10 +560,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 	}
 
 	validateNumber(field, *) {
-		field := settingsGui["field"]
+		field := settingsGui[field]
 
 		if !isNumber(internalValue("Float", field.Text))
 			field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+		else
+			field.ValidText := field.Text
 	}
 
 	if (settingsOrCommand == kLoad) {
@@ -1197,8 +1199,11 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Button", "x292 " . option . " w90 h23", translate("Setups...")).OnEvent("Click", openSessionDatabase)
 
-		if import
-			settingsGui.Add("Button", "x292 yp+25 w90 h23", translate("Import")).OnEvent("Click", editRaceSettings.Bind("Import"))
+		if import {
+			local message := "Import"
+
+			settingsGui.Add("Button", "x292 yp+25 w90 h23", translate("Import")).OnEvent("Click", editRaceSettings.Bind(&message))
+		}
 
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
@@ -1399,7 +1404,7 @@ readSimulatorData(simulator) {
 	deleteFile(dataFile)
 
 	try {
-		RunWait(A_ComSpec " /c `"`"" exePath "`" -Setup > `"" dataFile "`"`", , Hide")
+		RunWait(A_ComSpec " /c `"`"" . exePath . "`" -Setup > `"" . dataFile . "`"`"", , "Hide")
 	}
 	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1436,6 +1441,7 @@ showRaceSettingsEditor() {
 	global gSimulator, gCar, gTrack, gWeather, gAirTemperature, gTrackTemperature
 	global gTyreCompound, gTyreCompoundColor, gTyreCompounds, gSilentMode, gTeamMode, gTestMode
 
+	local message := "Export"
 	local icon := kIconsDirectory . "Race Settings.ico"
 	local index, fileName, settings
 
@@ -1517,7 +1523,7 @@ showRaceSettingsEditor() {
 	index := inList(A_Args, "-Import")
 
 	if index {
-		if editRaceSettings("Export", A_Args[index + 1], A_Args[index + 2], settings)
+		if editRaceSettings(&message, A_Args[index + 1], A_Args[index + 2], settings)
 			writeMultiMap(fileName, settings)
 	}
 	else {
@@ -1538,7 +1544,9 @@ showRaceSettingsEditor() {
 ;;;-------------------------------------------------------------------------;;;
 
 setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
-	editRaceSettings("TyrePressures", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure)
+	local message := "TyrePressures"
+
+	editRaceSettings(&message, tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure)
 }
 
 

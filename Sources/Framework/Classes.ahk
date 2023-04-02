@@ -207,13 +207,20 @@ class Application extends ConfigurationItem {
 		logMessage(kLogInfo, "Starting application " . this.Application)
 
 		if (special && (specialStartup && specialStartup != "")) {
-			if IsLabel(specialStartup) {
-				%specialStartup%()
+			try {
+				if IsLabel(specialStartup) {
+					%specialStartup%()
 
-				return this.CurrentPID
+					return this.CurrentPID
+				}
+				else
+					return (this.iRunningPID := %specialStartup%())
 			}
-			else
-				return (this.iRunningPID := %specialStartup%())
+			catch Any as exception {
+				logError(exception)
+
+				return (this.iRunningPID := Application.run(this.Application, this.ExePath, this.WorkingDirectory, options, wait))
+			}
 		}
 		else
 			return (this.iRunningPID := Application.run(this.Application, this.ExePath, this.WorkingDirectory, options, wait))
@@ -225,10 +232,20 @@ class Application extends ConfigurationItem {
 		logMessage(kLogInfo, "Stopping application " . this.Application)
 
 		if (special && specialShutdown && (specialShutdown != "")) {
-			if IsLabel(specialShutdown)
+			try {
 				%specialShutdown%()
-			else
-				%specialShutdown%()
+			}
+			catch Any as exception {
+				logError(exception)
+
+				try {
+					WinClose("ahk_pid " . this.iRunningPID)
+					ProcessClose(this.iRunningPID)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
 
 			this.iRunningPID := 0
 		}
@@ -256,12 +273,17 @@ class Application extends ConfigurationItem {
 		local specialIsRunning := this.iSpecialIsRunning
 
 		if (special && specialIsRunning && (specialIsRunning != ""))
-			if %specialIsRunning%()
-				return true
-			else if (this.getProcessID() != 0)
-				return true
-			else
-				return false
+			try {
+				if %specialIsRunning%()
+					return true
+				else if (this.getProcessID() != 0)
+					return true
+				else
+					return false
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 
 		return (this.getProcessID() != 0)
 	}

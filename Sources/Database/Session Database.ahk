@@ -452,7 +452,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		setButtonIcon(editorGui["addSettingButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteSettingButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Button", "x440 yp+30 w80 h23", translate("Test...")).OnEvent("Click", testSettings.Bind("Normal"))
+		editorGui.Add("Button", "x440 yp+30 w80 h23", translate("Test...")).OnEvent("Click", testSettings)
 
 		editorGui["settingsTab"].UseTab(2)
 
@@ -4328,9 +4328,12 @@ editSettings(editorOrCommand, arguments*) {
 loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false, *) {
 	local loginGui
 
+	static name := ""
+	static password := ""
+
 	static result := false
-	static nameEdit := ""
-	static passwordEdit := ""
+	static nameEdit
+	static passwordEdit
 
 	if (connectorOrCommand == kOk)
 		result := kOk
@@ -4347,10 +4350,10 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 		loginGui.Add("Text", "x110 yp w160 h23 +0x200", teamServerURL)
 
 		loginGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Name"))
-		nameEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21", nameEdit)
+		nameEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21", name)
 
 		loginGui.Add("Text", "x16 yp+23 w90 h23 +0x200", translate("Password"))
-		passwordEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21 Password", passwordEdit)
+		passwordEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21 Password", password)
 
 		loginGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", loginDialog.Bind(kOk))
 		loginGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", loginDialog.Bind(kCancel))
@@ -4366,13 +4369,13 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 			if (result == kCancel)
 				return false
 			else if (result == kOk) {
-				nameEdit := loginGui["nameEdit"]
-				passwordEdit := loginGui["passwordEdit"]
+				name := loginGui["nameEdit"]
+				password := loginGui["passwordEdit"]
 
 				try {
 					connectorOrCommand.Initialize(teamServerURL)
 
-					connectorOrCommand.Login(nameEdit, passwordEdit)
+					connectorOrCommand.Login(name, password)
 
 					return connectorOrCommand.GetDataToken()
 				}

@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,16 +25,16 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Process.ahk
+#Include "..\Framework\Process.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Messages.ahk
-#Include ..\Libraries\CLR.ahk
-#Include ..\Database\Libraries\SessionDatabase.ahk
+#Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\CLR.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -55,188 +55,26 @@ global kRaceSettingsFile := getFileName("Race.settings", kUserConfigDirectory)
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vSilentMode := kSilentMode
-global vTeamMode := true
-global vTestMode := false
+global gSimulator := false
+global gCar := false
+global gTrack := false
+global gWeather := "Dry"
+global gAirTemperature := 23
+global gTrackTemperature := 27
 
-global vSimulator := false
-global vCar := false
-global vTrack := false
-global vWeather := "Dry"
-global vAirTemperature := 23
-global vTrackTemperature := 27
+global gTyreCompounds := kTyreCompounds
 
-global vTyreCompounds := kTyreCompounds
+global gTyreCompound := false
+global gTyreCompoundColor := false
 
-global vCompound := false
-global vCompoundColor := false
-
-global repairSuspensionDropDown
-global repairSuspensionThresholdEdit
-global repairSuspensionGreaterLabel
-global repairSuspensionThresholdLabel
-
-global repairBodyworkDropDown
-global repairBodyworkThresholdEdit
-global repairBodyworkGreaterLabel
-global repairBodyworkThresholdLabel
-
-global repairEngineDropDown
-global repairEngineThresholdEdit
-global repairEngineGreaterLabel
-global repairEngineThresholdLabel
-
-global changeTyreDropDown
-global changeTyreThresholdEdit
-global changeTyreGreaterLabel
-global changeTyreThresholdLabel
-
-global spSetupTyreCompoundDropDown
-global spSetupTyreSetEdit
-global spPitstopTyreSetEdit
-
-global fuelConsumptionEdit
-global tyrePressureDeviationEdit
-global pitstopRefuelServiceRuleDropDown
-global pitstopRefuelServiceEdit
-global pitstopRefuelServiceLabel
-
-global tpDryFrontLeftEdit
-global tpDryFrontRightEdit
-global tpDryRearLeftEdit
-global tpDryRearRightEdit
-global tpWetFrontLeftEdit
-global tpWetFrontRightEdit
-global tpWetRearLeftEdit
-global tpWetRearRightEdit
-
-global spDryFrontLeftEdit
-global spDryFrontRightEdit
-global spDryRearLeftEdit
-global spDryRearRightEdit
-global spWetFrontLeftEdit
-global spWetFrontRightEdit
-global spWetRearLeftEdit
-global spWetRearRightEdit
+global gSilentMode := kSilentMode
+global gTeamMode := true
+global gTestMode := false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-loginDialog(connectorOrCommand := false, teamServerURL := false) {
-	local window := "TSL"
-	local title
-
-	static result := false
-	static nameEdit := ""
-	static passwordEdit := ""
-
-	if (connectorOrCommand == kOk)
-		result := kOk
-	else if (connectorOrCommand == kCancel)
-		result := kCancel
-	else {
-		result := false
-
-		Gui %window%:New
-
-		Gui %window%:Default
-
-		Gui %window%:-Border ; -Caption
-		Gui %window%:Color, D0D0D0, D8D8D8
-
-		Gui %window%:Font, Norm, Arial
-
-		Gui %window%:Add, Text, x16 y16 w90 h23 +0x200, % translate("Server URL")
-		Gui %window%:Add, Text, x110 yp w160 h23 +0x200, %teamServerURL%
-
-		Gui %window%:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, x110 yp+1 w160 h21 VnameEdit, %nameEdit%
-		Gui %window%:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Password")
-		Gui %window%:Add, Edit, x110 yp+1 w160 h21 Password VpasswordEdit, %passwordEdit%
-
-		Gui %window%:Add, Button, x60 yp+35 w80 h23 Default gacceptLogin, % translate("Ok")
-		Gui %window%:Add, Button, x146 yp w80 h23 gcancelLogin, % translate("&Cancel")
-
-		Gui %window%:Show, AutoSize Center
-
-		while !result
-			Sleep 100
-
-		Gui %window%:Submit
-		Gui %window%:Destroy
-
-		if (result == kCancel)
-			return false
-		else if (result == kOk) {
-			try {
-				connectorOrCommand.Initialize(teamServerURL)
-
-				connectorOrCommand.Login(nameEdit, passwordEdit)
-
-				return connectorOrCommand.GetSessionToken()
-			}
-			catch Any as exception {
-				title := translate("Error")
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
-				OnMessage(0x44, "")
-
-				return false
-			}
-		}
-	}
-}
-
-acceptLogin() {
-	loginDialog(kOk)
-}
-
-cancelLogin() {
-	loginDialog(kCancel)
-}
-
-moveRaceSettingsEditor() {
-	moveByMouse("RES", "Race Settings")
-}
-
-loadRaceSettings() {
-	editRaceSettings(kLoad)
-}
-
-saveRaceSettings() {
-	editRaceSettings(kSave)
-}
-
-acceptRaceSettings() {
-	editRaceSettings(kOk)
-}
-
-cancelRaceSettings() {
-	editRaceSettings(kCancel)
-}
-
-connectServer() {
-	editRaceSettings(kConnect)
-}
-
-chooseTeam() {
-	editRaceSettings(kUpdate, "Team")
-}
-
-chooseDriver() {
-	editRaceSettings(kUpdate, "Driver")
-}
-
-chooseSession() {
-	editRaceSettings(kUpdate, "Session")
-}
-
-openSettingsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings
-}
 
 isPositiveFloat(numbers*) {
 	local ignore, value
@@ -244,7 +82,7 @@ isPositiveFloat(numbers*) {
 	for ignore, value in numbers {
 		value := internalValue("Float", value)
 
-		if value is not Float
+		if !isFloat(value)
 			return false
 		else if (value < 0)
 			return false
@@ -257,11 +95,10 @@ isPositiveNumber(numbers*) {
 	local ignore, value
 
 	for ignore, value in numbers
-		if value is not Number
-		{
+		if !isNumber(value) {
 			value := internalValue("Float", value)
 
-			if value is not Number
+			if !isNumber(value)
 				return false
 			else if (value < 0)
 				return false
@@ -272,134 +109,7 @@ isPositiveNumber(numbers*) {
 	return true
 }
 
-updateRepairSuspensionState() {
-	GuiControlGet repairSuspensionDropDown
-
-	if ((repairSuspensionDropDown == 1) || (repairSuspensionDropDown == 2)) {
-		GuiControl Hide, repairSuspensionGreaterLabel
-		GuiControl Hide, repairSuspensionThresholdEdit
-		GuiControl Hide, repairSuspensionThresholdLabel
-
-		repairSuspensionThresholdEdit := 0
-
-		GuiControl, , repairSuspensionThresholdEdit, 0
-	}
-	else if (repairSuspensionDropDown == 3) {
-		GuiControl Show, repairSuspensionGreaterLabel
-		GuiControl Show, repairSuspensionThresholdEdit
-		GuiControl Hide, repairSuspensionThresholdLabel
-	}
-	else if (repairSuspensionDropDown == 4) {
-		GuiControl Show, repairSuspensionGreaterLabel
-		GuiControl Show, repairSuspensionThresholdEdit
-		GuiControl Show, repairSuspensionThresholdLabel
-	}
-}
-
-updateRepairBodyworkState() {
-	GuiControlGet repairBodyworkDropDown
-
-	if ((repairBodyworkDropDown == 1) || (repairBodyworkDropDown == 2)) {
-		GuiControl Hide, repairBodyworkGreaterLabel
-		GuiControl Hide, repairBodyworkThresholdEdit
-		GuiControl Hide, repairBodyworkThresholdLabel
-
-		repairBodyworkThresholdEdit := 0
-
-		GuiControl, , repairBodyworkThresholdEdit, 0
-	}
-	else if (repairBodyworkDropDown == 3) {
-		GuiControl Show, repairBodyworkGreaterLabel
-		GuiControl Show, repairBodyworkThresholdEdit
-		GuiControl Hide, repairBodyworkThresholdLabel
-	}
-	else if (repairBodyworkDropDown == 4) {
-		GuiControl Show, repairBodyworkGreaterLabel
-		GuiControl Show, repairBodyworkThresholdEdit
-		GuiControl Show, repairBodyworkThresholdLabel
-	}
-}
-
-updateRepairEngineState() {
-	GuiControlGet repairEngineDropDown
-
-	if ((repairEngineDropDown == 1) || (repairEngineDropDown == 2)) {
-		GuiControl Hide, repairEngineGreaterLabel
-		GuiControl Hide, repairEngineThresholdEdit
-		GuiControl Hide, repairEngineThresholdLabel
-
-		repairEngineThresholdEdit := 0
-
-		GuiControl, , repairEngineThresholdEdit, 0
-	}
-	else if (repairEngineDropDown == 3) {
-		GuiControl Show, repairEngineGreaterLabel
-		GuiControl Show, repairEngineThresholdEdit
-		GuiControl Hide, repairEngineThresholdLabel
-	}
-	else if (repairEngineDropDown == 4) {
-		GuiControl Show, repairEngineGreaterLabel
-		GuiControl Show, repairEngineThresholdEdit
-		GuiControl Show, repairEngineThresholdLabel
-	}
-}
-
-updateChangeTyreState() {
-	GuiControlGet changeTyreDropDown
-
-	if ((changeTyreDropDown == 1) || (changeTyreDropDown == 3)) {
-		GuiControl Hide, changeTyreGreaterLabel
-		GuiControl Hide, changeTyreThresholdEdit
-		GuiControl Hide, changeTyreThresholdLabel
-
-		changeTyreThresholdEdit := 0
-
-		GuiControl, , changeTyreThresholdEdit, 0
-	}
-	else if (changeTyreDropDown == 2) {
-		GuiControl Show, changeTyreGreaterLabel
-		GuiControl Show, changeTyreThresholdEdit
-		GuiControl Show, changeTyreThresholdLabel
-
-		GuiControl Text, changeTyreThresholdLabel, % translate("Degrees")
-	}
-	else if (changeTyreDropDown == 4) {
-		GuiControl Show, changeTyreGreaterLabel
-		GuiControl Show, changeTyreThresholdEdit
-		GuiControl Show, changeTyreThresholdLabel
-
-		GuiControl Text, changeTyreThresholdLabel, % translate("Sec. p. Lap")
-	}
-}
-
-readTyreSetup(settings) {
-	local color
-
-	if (vCompound && vCompoundColor) {
-		spSetupTyreCompoundDropDown := vCompound
-		color := vCompoundColor
-	}
-	else {
-		spSetupTyreCompoundDropDown := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
-		color := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
-	}
-
-	spSetupTyreCompoundDropDown := compound(spSetupTyreCompoundDropDown, color)
-
-	spSetupTyreSetEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 1)
-	spPitstopTyreSetEdit := getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", 2)
-
-	spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)))
-	spDryFrontRightEdit:= displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)))
-	spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)))
-	spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)))
-	spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)))
-	spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)))
-	spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)))
-	spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)))
-}
-
-getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := false) {
+getDeprecatedValue(data, newSection, oldSection, key, default := false) {
 	local value := getMultiMapValue(data, newSection, key, kUndefined)
 
 	if (value != kUndefined)
@@ -408,150 +118,509 @@ getDeprecatedConfigurationValue(data, newSection, oldSection, key, default := fa
 		return getMultiMapValue(data, oldSection, key, default)
 }
 
-parseObject(properties) {
-	local result := {}
-	local property
+loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false, *) {
+	local loginGui
 
-	properties := StrReplace(properties, "`r", "")
+	static name := ""
+	static password := ""
 
-	loop Parse, properties, `n
-	{
-		property := string2Values("=", A_LoopField)
+	static result := false
+	static nameEdit
+	static passwordEdit
 
-		result[property[1]] := property[2]
-	}
+	if (connectorOrCommand == kOk)
+		result := kOk
+	else if (connectorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
 
-	return result
-}
+		loginGui := Window()
 
-loadTeams(connector) {
-	local teams := {}
-	local identifiers, ignore, identifier, team
+		loginGui.SetFont("Norm", "Arial")
 
-	try {
-		identifiers := string2Values(";", connector.GetAllTeams())
-	}
-	catch Any as exception {
-		identifiers := []
-	}
+		loginGui.Add("Text", "x16 y16 w90 h23 +0x200", translate("Server URL"))
+		loginGui.Add("Text", "x110 yp w160 h23 +0x200", teamServerURL)
 
-	for ignore, identifier in identifiers {
-		team := parseObject(connector.GetTeam(identifier))
+		loginGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Name"))
+		nameEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21", name)
 
-		teams[team.Name] := team.Identifier
-	}
+		loginGui.Add("Text", "x16 yp+23 w90 h23 +0x200", translate("Password"))
+		passwordEdit := loginGui.Add("Edit", "x110 yp+1 w160 h21 Password", password)
 
-	return teams
-}
+		loginGui.Add("Button", "x60 yp+35 w80 h23 Default", translate("Ok")).OnEvent("Click", loginDialog.Bind(kOk))
+		loginGui.Add("Button", "x146 yp w80 h23", translate("&Cancel")).OnEvent("Click", loginDialog.Bind(kCancel))
 
-loadDrivers(connector, team) {
-	local drivers := {}
-	local identifiers, ignore, identifier, driver, name
+		loginGui.Opt("+Owner" . owner.Hwnd)
 
-	if team {
+		loginGui.Show("AutoSize Center")
+
+		while !result
+			Sleep(100)
+
 		try {
-			identifiers := string2Values(";", connector.GetTeamDrivers(team))
-		}
-		catch Any as exception {
-			identifiers := []
-		}
+			if (result == kCancel)
+				return false
+			else if (result == kOk) {
+				name := loginGui["nameEdit"]
+				password := loginGui["passwordEdit"]
 
-		for ignore, identifier in identifiers {
-			driver := parseObject(connector.GetDriver(identifier))
+				try {
+					connectorOrCommand.Initialize(teamServerURL)
 
-			name := computeDriverName(driver.ForName, driver.SurName, driver.NickName)
+					connectorOrCommand.Login(name, password)
 
-			drivers[name] := driver.Identifier
-		}
-	}
+					return connectorOrCommand.GetSessionToken()
+				}
+				catch Any as exception {
+					OnMessage(0x44, translateOkButton)
+					MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
 
-	return drivers
-}
-
-loadSessions(connector, team) {
-	local sessions := {}
-	local identifiers, ignore, identifier, session
-
-	if team {
-		try {
-			identifiers := string2Values(";", connector.GetTeamSessions(team))
-		}
-		catch Any as exception {
-			identifiers := []
-		}
-
-		for ignore, identifier in identifiers {
-			try {
-				session := parseObject(connector.GetSession(identifier))
-
-				sessions[session.Name] := session.Identifier
-			}
-			catch Any as exception {
-				logError(exception)
+					return false
+				}
 			}
 		}
+		finally {
+			loginGui.Destroy()
+		}
 	}
-
-	return sessions
 }
 
-editRaceSettings(ByRef settingsOrCommand, arguments*) {
-	local dllFile, dllName, names, exception, chosen, choices, tabs, import, simulator, ignore, option
-	local dirName, simulatorCode, title, file, compound, compoundColor, fileName, token
-	local x, y, e, sessionDB, directory, connection, settings, serverURLs
+editRaceSettings(&settingsOrCommand, arguments*) {
+	global kLoad, kSave, kOk, kCancel, kConnect, kUpdate
+
+	local dllFile, dllName, names, exception, value, chosen, choices, tabs, import, simulator, ignore, option
+	local dirName, simulatorCode, file, tyreCompound, tyreCompoundColor, fileName, token
+	local x, y, e, directory, connection, settings, serverURLs, settingsTab
+
+	local setupTyreCompound := "Dry"
+	local setupTyreCompoundColor := "Black"
+	local setupTyreSet := 1
+	local pitstopTyreSet := 2
+	local dryFrontLeft := 26.1, dryFrontRight := 26.1, dryRearLeft := 26.1, dryRearRight := 26.1
+	local wetFrontLeft := 28.5, wetFrontRight := 28.5, wetRearLeft := 28.5, wetRearRight := 28.5
+
+	static settingsGui
 
 	static result
 	static newSettings
-
-	static pitstopWarningEdit
-	static extrapolationLapsEdit
-	static overtakeDeltaEdit
-	static trafficConsideredEdit
-	static pitstopStrategyWindowEdit
-
-	static temperatureCorrectionCheck
-	static setupPressureCompareCheck
-	static pressureLossCorrectionCheck
-
-	static avgLaptimeEdit
-	static formationLapCheck
-	static postRaceLapCheck
-	static pitstopDeltaEdit
-	static pitstopTyreServiceEdit
-	static pitstopServiceDropDown
-	static safetyFuelEdit
-
-	static serverURLEdit
-	static serverTokenEdit
-	static teamDropDownMenu
-	static teamName
-	static teamIdentifier
-	static driverDropDownMenu
-	static driverName
-	static driverIdentifier
-	static sessionDropDownMenu
-	static sessionName
-	static sessionIdentifier
 
 	static connector
 	static connected
 	static keepAliveTask := false
 
-	static teams := {}
-	static drivers := {}
-	static sessions := {}
+	static serverURL, serverToken, teamName, driverName, sessionName, teamIdentifier, driverIdentifier, sessionIdentifier
 
-restart:
-	if (settingsOrCommand == kLoad)
-		result := kLoad
+	static teams := CaseInsenseMap()
+	static drivers := CaseInsenseMap()
+	static sessions := CaseInsenseMap()
+
+	parseObject(properties) {
+		local result := CaseInsenseMap()
+		local property
+
+		properties := StrReplace(properties, "`r", "")
+
+		loop Parse, properties, "`n" {
+			property := string2Values("=", A_LoopField)
+
+			result[property[1]] := property[2]
+		}
+
+		return result
+	}
+
+	loadTeams(connector) {
+		local teams := CaseInsenseMap()
+		local identifiers, ignore, identifier, team
+
+		try {
+			identifiers := string2Values(";", connector.GetAllTeams())
+		}
+		catch Any as exception {
+			identifiers := []
+		}
+
+		for ignore, identifier in identifiers {
+			team := parseObject(connector.GetTeam(identifier))
+
+			teams[team["Name"]] := team["Identifier"]
+		}
+
+		return teams
+	}
+
+	loadDrivers(connector, team) {
+		local drivers := CaseInsenseMap()
+		local identifiers, ignore, identifier, driver, name
+
+		if team {
+			try {
+				identifiers := string2Values(";", connector.GetTeamDrivers(team))
+			}
+			catch Any as exception {
+				identifiers := []
+			}
+
+			for ignore, identifier in identifiers {
+				driver := parseObject(connector.GetDriver(identifier))
+
+				name := computeDriverName(driver["ForName"], driver["SurName"], driver["NickName"])
+
+				drivers[name] := driver["Identifier"]
+			}
+		}
+
+		return drivers
+	}
+
+	loadSessions(connector, team) {
+		local sessions := CaseInsenseMap()
+		local identifiers, ignore, identifier, session
+
+		if team {
+			try {
+				identifiers := string2Values(";", connector.GetTeamSessions(team))
+			}
+			catch Any as exception {
+				identifiers := []
+			}
+
+			for ignore, identifier in identifiers {
+				try {
+					session := parseObject(connector.GetSession(identifier))
+
+					sessions[session["Name"]] := session["Identifier"]
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+		}
+
+		return sessions
+	}
+
+	updateRepairSuspensionState(*) {
+		local repairSuspensionDropDown := settingsGui["repairSuspensionDropDown"].Value
+
+		if ((repairSuspensionDropDown == 1) || (repairSuspensionDropDown == 2)) {
+			settingsGui["repairSuspensionGreaterLabel"].Visible := false
+			settingsGui["repairSuspensionThresholdEdit"].Visible := false
+			settingsGui["repairSuspensionThresholdLabel"].Visible := false
+
+			settingsGui["repairSuspensionThresholdEdit"].Text := 0
+		}
+		else if (repairSuspensionDropDown == 3) {
+			settingsGui["repairSuspensionGreaterLabel"].Visible := true
+			settingsGui["repairSuspensionThresholdEdit"].Visible := true
+			settingsGui["repairSuspensionThresholdLabel"].Visible := false
+		}
+		else if (repairSuspensionDropDown == 4) {
+			settingsGui["repairSuspensionGreaterLabel"].Visible := true
+			settingsGui["repairSuspensionThresholdEdit"].Visible := true
+			settingsGui["repairSuspensionThresholdLabel"].Visible := true
+		}
+	}
+
+	updateRepairBodyworkState(*) {
+		local repairBodyworkDropDown := settingsGui["repairBodyworkDropDown"].Value
+
+		if ((repairBodyworkDropDown == 1) || (repairBodyworkDropDown == 2)) {
+			settingsGui["repairBodyworkGreaterLabel"].Visible := false
+			settingsGui["repairBodyworkThresholdEdit"].Visible := false
+			settingsGui["repairBodyworkThresholdLabel"].Visible := false
+
+			settingsGui["repairBodyworkThresholdEdit"].Text := 0
+		}
+		else if (repairBodyworkDropDown == 3) {
+			settingsGui["repairBodyworkGreaterLabel"].Visible := true
+			settingsGui["repairBodyworkThresholdEdit"].Visible := true
+			settingsGui["repairBodyworkThresholdLabel"].Visible := false
+		}
+		else if (repairBodyworkDropDown == 4) {
+			settingsGui["repairBodyworkGreaterLabel"].Visible := true
+			settingsGui["repairBodyworkThresholdEdit"].Visible := true
+			settingsGui["repairBodyworkThresholdLabel"].Visible := true
+		}
+	}
+
+	updateRepairEngineState(*) {
+		local repairEngineDropDown := settingsGui["repairEngineDropDown"].Value
+
+		if ((repairEngineDropDown == 1) || (repairEngineDropDown == 2)) {
+			settingsGui["repairEngineGreaterLabel"].Visible := false
+			settingsGui["repairEngineThresholdEdit"].Visible := false
+			settingsGui["repairEngineThresholdLabel"].Visible := false
+
+			settingsGui["repairEngineThresholdEdit"].Text := 0
+		}
+		else if (repairEngineDropDown == 3) {
+			settingsGui["repairEngineGreaterLabel"].Visible := true
+			settingsGui["repairEngineThresholdEdit"].Visible := true
+			settingsGui["repairEngineThresholdLabel"].Visible := false
+		}
+		else if (repairEngineDropDown == 4) {
+			settingsGui["repairEngineGreaterLabel"].Visible := true
+			settingsGui["repairEngineThresholdEdit"].Visible := true
+			settingsGui["repairEngineThresholdLabel"].Visible := true
+		}
+	}
+
+	updateChangeTyreState(*) {
+		local changeTyreDropDown := settingsGui["changeTyreDropDown"].Value
+
+		if ((changeTyreDropDown == 1) || (changeTyreDropDown == 3)) {
+			settingsGui["changeTyreGreaterLabel"].Visible := false
+			settingsGui["changeTyreThresholdEdit"].Visible := false
+			settingsGui["changeTyreThresholdLabel"].Visible := false
+
+			settingsGui["changeTyreThresholdEdit"].Text := 0
+		}
+		else if (changeTyreDropDown == 2) {
+			settingsGui["changeTyreGreaterLabel"].Visible := true
+			settingsGui["changeTyreThresholdEdit"].Visible := true
+			settingsGui["changeTyreThresholdLabel"].Visible := true
+
+			settingsGui["changeTyreThresholdLabel"].Text := translate("Degrees")
+		}
+		else if (changeTyreDropDown == 4) {
+			settingsGui["changeTyreGreaterLabel"].Visible := true
+			settingsGui["changeTyreThresholdEdit"].Visible := true
+			settingsGui["changeTyreThresholdLabel"].Visible := true
+
+			settingsGui["changeTyreThresholdLabel"].Text := translate("Sec. p. Lap")
+		}
+	}
+
+	openSessionDatabase(*) {
+		local exePath := kBinariesDirectory . "Session Database.exe"
+		local pid, options, ignore, arg
+
+		try {
+			options := []
+
+			for ignore, arg in A_Args
+				options.Push("`"" . arg . "`"")
+
+			options.Push("-Setup")
+
+			options.Push(ProcessExist())
+
+			options := values2String(A_Space, options*)
+
+			Run("`"" exePath "`" " . options, kBinariesDirectory, , &pid)
+		}
+		catch Any as exception {
+			logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+
+			showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+		}
+	}
+
+	importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {
+		local result := false
+		local candidate, ignore, data, tyreCompound, tyreCompoundColor
+
+		if (message != "Import") {
+			settings := false
+
+			simulator := false
+
+			for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
+				if Application(candidate, kSimulatorConfiguration).isRunning() {
+					simulator := candidate
+
+					break
+				}
+
+			prefix := SessionDatabase.getSimulatorCode(simulator)
+		}
+
+		data := readSimulatorData(prefix)
+
+		if (getMultiMapValues(data, "Setup Data").Count() > 0) {
+			readTyreSetup(readMultiMap(kRaceSettingsFile))
+
+			pitstopTyreSet := getMultiMapValue(data, "Setup Data", "TyreSet", pitstopTyreSet)
+			setupTyreSet := Max(1, pitstopTyreSet - 1)
+
+			if settings {
+				setMultiMapValue(settings, "Session Setup", "Tyre.Set", setupTyreSet)
+				setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", pitstopTyreSet)
+			}
+
+			tyreCompound := getMultiMapValue(data, "Setup Data", "TyreCompound", setupTyreCompound)
+			tyreCompoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", setupTyreCompoundColor)
+
+			if (tyreCompound = "Dry") {
+				dryFrontLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", dryFrontLeft)))
+				dryFrontRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", dryFrontRight)))
+				dryRearLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", dryRearLeft)))
+				dryRearRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", dryRearRight)))
+
+				if settings {
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
+
+					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", dryFrontLeft), false))
+					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", dryFrontRight), false))
+					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", dryRearLeft), false))
+					setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", dryRearRight), false))
+
+					if (!gSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
+						message := (translate("Tyre setup imported: ") . translate(compound(tyreCompound, tyreCompoundColor)))
+
+						showMessage(message . translate(", Set ") . setupTyreSet . translate("; ")
+										    . dryFrontLeft . translate(", ") . dryFrontRight . translate(", ")
+											. dryRearLeft . translate(", ") . dryRearRight, false, "Information.png", 5000)
+					}
+				}
+
+				result := tyreCompound
+			}
+			else if ((tyreCompound = "Wet") || (tyreCompound = "Intermediate")) {
+				wetFrontLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", wetFrontLeft)))
+				wetFrontRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", wetFrontRight)))
+				wetRearLeft := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", wetRearLeft)))
+				wetRearRight := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", wetRearRight)))
+
+				if settings {
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound", tyreCompound)
+					setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
+
+					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", wetFrontLeft), false))
+					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", wetFrontRight), false))
+					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", wetRearLeft), false))
+					setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", wetRearRight), false))
+
+					if (!gSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
+						message := (translate("Tyre setup imported: ") . compound(tyreCompound, tyreCompoundColor))
+
+						showMessage(message . translate("; ")
+											. wetFrontLeft . translate(", ") . wetFrontRight . translate(", ")
+											. wetRearLeft . translate(", ") . wetRearRight, false, "Information.png", 5000)
+					}
+				}
+
+				result := tyreCompound
+			}
+
+			setupTyreCompound := tyreCompound
+			setupTyreCompoundColor := tyreCompoundColor
+		}
+
+		return result
+	}
+
+	chooseRefuelService(*) {
+		settingsGui["pitstopRefuelServiceLabel"].Text := translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopRefuelServiceRuleDropdown"].Value])
+	}
+
+	setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
+		if (tyreCompound = "Wet") {
+			settingsGui["spWetFrontLeftEdit"].Text := displayValue("Float", convertUnit("Pressure", flPressure))
+			settingsGui["spWetFrontRightEdit"].Text := displayValue("Float", convertUnit("Pressure", frPressure))
+			settingsGui["spWetRearLeftEdit"].Text := displayValue("Float", convertUnit("Pressure", rlPressure))
+			settingsGui["spWetRearRightEdit"].Text := displayValue("Float", convertUnit("Pressure", rrPressure))
+		}
+		else {
+			settingsGui["spDryFrontLeftEdit"].Text := displayValue("Float", convertUnit("Pressure", flPressure))
+			settingsGui["spDryFrontRightEdit"].Text := displayValue("Float", convertUnit("Pressure", frPressure))
+			settingsGui["spDryRearLeftEdit"].Text := displayValue("Float", convertUnit("Pressure", rlPressure))
+			settingsGui["spDryRearRightEdit"].Text := displayValue("Float", convertUnit("Pressure", rrPressure))
+		}
+
+		return false
+	}
+
+	readTyreSetup(settings) {
+		if (gTyreCompound && gTyreCompoundColor) {
+			setupTyreCompound := gTyreCompound
+			setupTyreCompoundColor := gTyreCompoundColor
+		}
+		else {
+			setupTyreCompound := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound", "Dry")
+			setupTyreCompoundColor := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Compound.Color", "Black")
+		}
+
+		setupTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set", 1)
+		pitstopTyreSet := getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Set.Fresh", 2)
+
+		dryFrontLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FL", 26.1)))
+		dryFrontRight:= displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.FR", 26.1)))
+		dryRearLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RL", 26.1)))
+		dryRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Dry.Pressure.RR", 26.1)))
+		wetFrontLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FL", 28.5)))
+		wetFrontRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.FR", 28.5)))
+		wetRearLeft := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RL", 28.5)))
+		wetRearRight := displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settings, "Session Setup", "Race Setup", "Tyre.Wet.Pressure.RR", 28.5)))
+	}
+
+	validateNumber(field, *) {
+		field := settingsGui["field"]
+
+		if !isNumber(internalValue("Float", field.Text))
+			field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+	}
+
+	if (settingsOrCommand == kLoad) {
+		if (gSimulator && gCar && gTrack) {
+			directory := SessionDatabase.DatabasePath
+			simulatorCode := SessionDatabase.getSimulatorCode(gSimulator)
+
+			dirName := (directory . "User\" . simulatorCode . "\" . gCar . "\" . gTrack . "\Race Settings")
+
+			DirCreate(dirName)
+		}
+		else
+			dirName := kRaceSettingsFile
+
+		settingsGui.Opt("+OwnDialogs")
+
+		OnMessage(0x44, translateLoadCancelButtons)
+		file := FileSelect(1, dirName, translate("Load Race Settings..."), "Settings (*.settings)")
+		OnMessage(0x44, translateLoadCancelButtons, 0)
+
+		if (file != "") {
+			newSettings := readMultiMap(file)
+
+			result := "Restart"
+		}
+	}
 	else if (settingsOrCommand == kCancel)
 		result := kCancel
+	else if (settingsOrCommand == "Export")
+		return importFromSimulation("Import", arguments*)
+	else if (settingsOrCommand == "Import") {
+		value := importFromSimulation("Editor")
+
+		if value {
+			settingsGui["spSetupTyreSetEdit"].Text := setupTyreSet
+			settingsGui["spPitstopTyreSetEdit"].Text := pitstopTyreSet
+
+			settingsGui["spSetupTyreCompoundDropDown"].Choose(inList(gTyreCompounds, compound(setupTyreCompound, setupTyreCompoundColor)))
+		}
+
+		if (value = "Dry") {
+			settingsGui["spDryFrontLeftEdit"].Text := dryFrontLeft
+			settingsGui["spDryFrontRightEdit"].Text := dryFrontRight
+			settingsGui["spDryRearLeftEdit"].Text := dryRearLeft
+			settingsGui["spDryRearRightEdit"].Text := dryRearRight
+		}
+		else if ((value = "Wet") || (value = "Intermediate")) {
+			settingsGui["spWetFrontLeftEdit"].Text := wetFrontLeft
+			settingsGui["spWetFrontRightEdit"].Text := wetFrontRight
+			settingsGui["spWetRearLeftEdit"].Text := wetRearLeft
+			settingsGui["spWetRearRightEdit"].Text := wetRearRight
+		}
+	}
 	else if (settingsOrCommand == kUpdate) {
 		if connected
 			if (arguments[1] == "Team") {
-				GuiControlGet teamDropDownMenu
-
-				teamName := getKeys(teams)[teamDropDownMenu]
+				teamName := getKeys(teams)[settingsGui["teamDropDownMenu"].Value]
 				teamIdentifier := teams[teamName]
 
 				exception := false
@@ -559,8 +628,8 @@ restart:
 				try {
 					drivers := loadDrivers(connector, teamIdentifier)
 				}
-				catch e {
-					drivers := {}
+				catch Any as e {
+					drivers := CaseInsenseMap()
 
 					exception := e
 				}
@@ -568,7 +637,7 @@ restart:
 				names := getKeys(drivers)
 				chosen := inList(getValues(drivers), driverIdentifier)
 
-				if ((chosen == 0) && (names.Length() > 0))
+				if ((chosen == 0) && (names.Length > 0))
 					chosen := 1
 
 				if (chosen == 0) {
@@ -580,14 +649,15 @@ restart:
 					driverIdentifier := drivers[driverName]
 				}
 
-				GuiControl, , driverDropDownMenu, % ("|" . values2String("|", names*))
-				GuiControl Choose, driverDropDownMenu, % chosen
+				settingsGui["driverDropDownMenu"].Delete()
+				settingsGui["driverDropDownMenu"].Add(names)
+				settingsGui["driverDropDownMenu"].Choose(chosen)
 
 				try {
 					sessions := loadSessions(connector, teamIdentifier)
 				}
-				catch e {
-					sessions := {}
+				catch Any as e {
+					sessions := CaseInsenseMap()
 
 					exception := e
 				}
@@ -595,7 +665,7 @@ restart:
 				names := getKeys(sessions)
 				chosen := inList(getValues(sessions), sessionIdentifier)
 
-				if ((chosen == 0) && (names.Length() > 0))
+				if ((chosen == 0) && (names.Length > 0))
 					chosen := 1
 
 				if (chosen == 0) {
@@ -607,59 +677,51 @@ restart:
 					sessionIdentifier := sessions[sessionName]
 				}
 
-				GuiControl, , sessionDropDownMenu, % ("|" . values2String("|", names*))
-				GuiControl Choose, sessionDropDownMenu, % chosen
+				settingsGui["sessionDropDownMenu"].Delete()
+				settingsGui["sessionDropDownMenu"].Add(names)
+				settingsGui["sessionDropDownMenu"].Choose(chosen)
 
 				if exception
 					throw exception
 			}
 			else if (arguments[1] == "Driver") {
-				GuiControlGet driverDropDownMenu
-
-				driverName := getKeys(drivers)[driverDropDownMenu]
+				driverName := getKeys(drivers)[settingsGui["driverDropDownMenu"].Value]
 				driverIdentifier := drivers[driverName]
 			}
 			else if (arguments[1] == "Session") {
-				GuiControlGet sessionDropDownMenu
-
-				sessionName := getKeys(sessions)[sessionDropDownMenu]
+				sessionName := getKeys(sessions)[settingsGui["sessionDropDownMenu"].Value]
 				sessionIdentifier := sessions[sessionName]
 			}
 	}
 	else if (settingsOrCommand == kConnect) {
-		GuiControlGet serverURLEdit
-		GuiControlGet serverTokenEdit
+		serverURL := settingsGui["serverURLEdit"].Text
+		serverToken := settingsGui["serverTokenEdit"].Text
 
 		if connector {
 			if GetKeyState("Ctrl", "P") {
-				Gui TSL:+OwnerRES
-				Gui RES:+Disabled
+				settingsGui.Opt("+Disabled")
 
 				try {
-					token := loginDialog(connector, serverURLEdit)
+					token := loginDialog(connector, serverURL, settingsGui)
 
 					if token {
-						serverTokenEdit := token
+						serverToken := token
 
-						Gui RES:Default
-
-						GuiControl Text, serverTokenEdit, %serverTokenEdit%
+						settingsGui["serverTokenEdit"].Text := token
 					}
 					else
 						return
 				}
 				finally {
-					Gui RES:-Disabled
+					settingsGui.Opt("-Disabled")
 				}
 			}
 
 			try {
-				connector.Initialize(serverURLEdit, serverTokenEdit)
+				connector.Initialize(serverURL, serverToken)
 
-				sessionDB := SessionDatabase()
-
-				connection := connector.Connect(serverTokenEdit, sessionDB.ID
-											  , vSimulator ? sessionDB.getDriverName(vSimulator, sessionDB.ID) : sessionDB.getUserName()
+				connection := connector.Connect(serverToken, SessionDatabase.ID
+											  , gSimulator ? SessionDatabase.getDriverName(gSimulator, SessionDatabase.ID) : SessionDatabase.getUserName()
 											  , "Driver")
 
 				if (connection && (connection != "")) {
@@ -667,15 +729,16 @@ restart:
 
 					serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
 
-					if !inList(serverURLs, serverURLEdit) {
-						serverURLs.Push(serverURLEdit)
+					if !inList(serverURLs, serverURL) {
+						serverURLs.Push(serverURL)
 
 						setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
 
 						writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
-						GuiControl, , serverURLEdit, % ("|" . values2String("|", serverURLs*))
-						GuiControl Choose, serverURLEdit, % inList(serverURLs, serverURLEdit)
+						settingsGui["serverURLEdit"].Delete()
+						settingsGui["serverURLEdit"].Add(serverURLs)
+						settingsGui["serverURLEdit"].Choose(inList(serverURLs, serverURL))
 					}
 
 					connector.ValidateSessionToken()
@@ -692,7 +755,7 @@ restart:
 					names := getKeys(teams)
 					chosen := inList(getValues(teams), teamIdentifier)
 
-					if ((chosen == 0) && (names.Length() > 0))
+					if ((chosen == 0) && (names.Length > 0))
 						chosen := 1
 
 					if (chosen == 0) {
@@ -704,12 +767,13 @@ restart:
 						teamIdentifier := teams[teamName]
 					}
 
-					GuiControl, , teamDropDownMenu, % ("|" . values2String("|", names*))
-					GuiControl Choose, teamDropDownMenu, % chosen
+					settingsGui["teamDropDownMenu"].Delete()
+					settingsGui["teamDropDownMenu"].Add(names)
+					settingsGui["teamDropDownMenu"].Choose(chosen)
 
 					connected := true
 
-					editRaceSettings(kUpdate, "Team")
+					editRaceSettings(&kUpdate, "Team")
 
 					showMessage(translate("Successfully connected to the Team Server."))
 				}
@@ -717,104 +781,113 @@ restart:
 					throw "Invalid or missing token..."
 			}
 			catch Any as exception {
-				title := translate("Error")
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
-				OnMessage(0x44, "")
+				OnMessage(0x44, translateOkButton)
+				MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
 			}
 		}
 	}
+	else if (settingsOrCommand = "TyrePressures")
+		setTyrePressures(arguments*)
 	else if ((settingsOrCommand == kSave) || (settingsOrCommand == kOk)) {
-		Gui RES:Submit, NoHide
-
 		newSettings := newMultiMap()
 
-		if (!isPositiveFloat(tyrePressureDeviationEdit
-						   , tpDryFrontLeftEdit, tpDryFrontRightEdit, tpDryRearLeftEdit, tpDryRearRightEdit
-						   , tpWetFrontLeftEdit, tpWetFrontRightEdit, tpWetRearLeftEdit, tpWetRearRightEdit
-						   , spDryFrontLeftEdit, spDryFrontRightEdit, spDryRearLeftEdit, spDryRearRightEdit
-						   , spWetFrontLeftEdit, spWetFrontRightEdit, spWetRearLeftEdit, spWetRearRightEdit)
-		 || !isPositiveNumber(fuelConsumptionEdit, repairSuspensionThresholdEdit, pitstopRefuelServiceEdit
-							, repairBodyworkThresholdEdit, repairEngineThresholdEdit)
-		 || (trafficConsideredEdit < 1) || (trafficConsideredEdit > 100)) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+		if (!isPositiveFloat(settingsGui["tyrePressureDeviationEdit"].Text
+						   , settingsGui["tpDryFrontLeftEdit"].Text, settingsGui["tpDryFrontRightEdit"].Text
+						   , settingsGui["tpDryRearLeftEdit"].Text, settingsGui["tpDryRearRightEdit"].Text
+						   , settingsGui["tpWetFrontLeftEdit"].Text, settingsGui["tpWetFrontRightEdit"].Text
+						   , settingsGui["tpWetRearLeftEdit"].Text, settingsGui["tpWetRearRightEdit"].Text
+						   , settingsGui["spDryFrontLeftEdit"].Text, settingsGui["spDryFrontRightEdit"].Text
+						   , settingsGui["spDryRearLeftEdit"].Text, settingsGui["spDryRearRightEdit"].Text
+						   , settingsGui["spWetFrontLeftEdit"].Text, settingsGui["spWetFrontRightEdit"].Text
+						   , settingsGui["spWetRearLeftEdit"].Text, settingsGui["spWetRearRightEdit"].Text)
+		 || !isPositiveNumber(settingsGui["fuelConsumptionEdit"].Text, settingsGui["pitstopRefuelServiceEdit"].Text
+							, settingsGui["repairSuspensionThresholdEdit"].Text, settingsGui["repairBodyworkThresholdEdit"].Text, settingsGui["repairEngineThresholdEdit"].Text)
+		 || (!isInteger(settingsGui["trafficConsideredEdit"].Text) || (settingsGui["trafficConsideredEdit"].Text < 1) || (settingsGui["trafficConsideredEdit"].Text > 100))) {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
 
-		setMultiMapValue(newSettings, "Session Settings", "Lap.PitstopWarning", pitstopWarningEdit)
+		setMultiMapValue(newSettings, "Session Settings", "Lap.PitstopWarning", settingsGui["pitstopWarningEdit"].Text)
 
 		setMultiMapValue(newSettings, "Session Settings", "Damage.Suspension.Repair"
-							, ["Never", "Always", "Threshold", "Impact"][repairSuspensionDropDown])
-		setMultiMapValue(newSettings, "Session Settings", "Damage.Suspension.Repair.Threshold", internalValue("Float", repairSuspensionThresholdEdit, 1))
+									, ["Never", "Always", "Threshold", "Impact"][settingsGui["repairSuspensionDropDown"].Value])
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Suspension.Repair.Threshold", internalValue("Float", settingsGui["repairSuspensionThresholdEdit"].Text, 1))
 
 		setMultiMapValue(newSettings, "Session Settings", "Damage.Bodywork.Repair"
-							, ["Never", "Always", "Threshold", "Impact"][repairBodyworkDropDown])
-		setMultiMapValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", internalValue("Float", repairBodyworkThresholdEdit, 1))
+									, ["Never", "Always", "Threshold", "Impact"][settingsGui["repairBodyworkDropDown"].Value])
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Bodywork.Repair.Threshold", internalValue("Float", settingsGui["repairBodyworkThresholdEdit"].Text, 1))
 
 		setMultiMapValue(newSettings, "Session Settings", "Damage.Engine.Repair"
-							, ["Never", "Always", "Threshold", "Impact"][repairEngineDropDown])
-		setMultiMapValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", internalValue("Float", repairEngineThresholdEdit, 1))
+									, ["Never", "Always", "Threshold", "Impact"][settingsGui["repairEngineDropDown"].Value])
+		setMultiMapValue(newSettings, "Session Settings", "Damage.Engine.Repair.Threshold", internalValue("Float", settingsGui["repairEngineThresholdEdit"].Text, 1))
 
 		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change"
-							, ["Never", "Temperature", "Weather"][changeTyreDropDown])
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", internalValue("Float", changeTyreThresholdEdit, 1))
+									, ["Never", "Temperature", "Weather"][settingsGui["changeTyreDropDown"].Value])
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Compound.Change.Threshold", internalValue("Float", settingsGui["changeTyreThresholdEdit"].Text, 1))
 
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", internalValue("Float", tyrePressureDeviationEdit, 1))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", temperatureCorrectionCheck)
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", setupPressureCompareCheck)
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Pressure", pressureLossCorrectionCheck)
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Deviation", internalValue("Float", settingsGui["tyrePressureDeviationEdit"].Text, 1))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Temperature", settingsGui["temperatureCorrectionCheck"].Value)
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Setup", settingsGui["setupPressureCompareCheck"].Value)
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Pressure.Correction.Pressure", settingsGui["pressureLossCorrectionCheck"].Value)
 
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", convertUnit("Pressure", internalValue("Float", tpDryFrontLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", convertUnit("Pressure", internalValue("Float", tpDryFrontRightEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", convertUnit("Pressure", internalValue("Float", tpDryRearLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", convertUnit("Pressure", internalValue("Float", tpDryRearRightEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FL", convertUnit("Pressure", internalValue("Float", tpWetFrontLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FR", convertUnit("Pressure", internalValue("Float", tpWetFrontRightEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RL", convertUnit("Pressure", internalValue("Float", tpWetRearLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR", convertUnit("Pressure", internalValue("Float", tpWetRearRightEdit), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FL"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpDryFrontLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.FR"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpDryFrontRightEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RL"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpDryRearLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Dry.Pressure.Target.RR"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpDryRearRightEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FL"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpWetFrontLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.FR"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpWetFrontRightEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RL"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpWetRearLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Tyre.Wet.Pressure.Target.RR"
+									, convertUnit("Pressure", internalValue("Float", settingsGui["tpWetRearRightEdit"].Text), false))
 
-		setMultiMapValue(newSettings, "Session Settings", "Lap.AvgTime", avgLaptimeEdit)
-		setMultiMapValue(newSettings, "Session Settings", "Fuel.AvgConsumption", convertUnit("Volume", internalValue("Float", fuelConsumptionEdit), false))
-		setMultiMapValue(newSettings, "Session Settings", "Fuel.SafetyMargin", Round(convertUnit("Volume", internalValue("Float", safetyFuelEdit), false)))
+		setMultiMapValue(newSettings, "Session Settings", "Lap.AvgTime", settingsGui["avgLaptimeEdit"].Text)
+		setMultiMapValue(newSettings, "Session Settings", "Fuel.AvgConsumption", convertUnit("Volume", internalValue("Float", settingsGui["fuelConsumptionEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Settings", "Fuel.SafetyMargin", Round(convertUnit("Volume", internalValue("Float", settingsGui["safetyFuelEdit"].Text), false)))
 
-		setMultiMapValue(newSettings, "Session Settings", "Lap.Formation", formationLapCheck)
-		setMultiMapValue(newSettings, "Session Settings", "Lap.PostRace", postRaceLapCheck)
+		setMultiMapValue(newSettings, "Session Settings", "Lap.Formation", settingsGui["formationLapCheck"].Value)
+		setMultiMapValue(newSettings, "Session Settings", "Lap.PostRace", settingsGui["postRaceLapCheck"].Value)
 
-		splitCompound(vTyreCompounds[spSetupTyreCompoundDropDown], &compound, &compoundColor)
+		splitCompound(gTyreCompounds[settingsGui["spSetupTyreCompoundDropDown"].Value], &tyreCompound, &tyreCompoundColor)
 
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound", compound)
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color", compoundColor)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound", tyreCompound)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Compound.Color", tyreCompoundColor)
 
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set", settingsGui["spSetupTyreSetEdit"].Text)
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Set.Fresh", settingsGui["spPitstopTyreSetEdit"].Text)
 
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false))
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false))
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false))
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false))
-		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", settingsGui["spDryFrontLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", settingsGui["spDryFrontRightEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", settingsGui["spDryRearLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", settingsGui["spDryRearRightEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", settingsGui["spWetFrontLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", settingsGui["spWetFrontRightEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", settingsGui["spWetRearLeftEdit"].Text), false))
+		setMultiMapValue(newSettings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", settingsGui["spWetRearRightEdit"].Text), false))
 
-		setMultiMapValue(newSettings, "Strategy Settings", "Pitstop.Delta", pitstopDeltaEdit)
-		setMultiMapValue(newSettings, "Strategy Settings", "Service.Tyres", pitstopTyreServiceEdit)
-		setMultiMapValue(newSettings, "Strategy Settings", "Service.Refuel.Rule", ["Fixed", "Dynamic"][pitstopRefuelServiceRuleDropDown])
-		setMultiMapValue(newSettings, "Strategy Settings", "Service.Refuel", internalValue("Float", pitstopRefuelServiceEdit, 1))
-		setMultiMapValue(newSettings, "Strategy Settings", "Service.Order", (pitstopServiceDropDown == 1) ? "Simultaneous" : "Sequential")
-		setMultiMapValue(newSettings, "Strategy Settings", "Extrapolation.Laps", extrapolationLapsEdit)
-		setMultiMapValue(newSettings, "Strategy Settings", "Overtake.Delta", overtakeDeltaEdit)
-		setMultiMapValue(newSettings, "Strategy Settings", "Traffic.Considered", trafficConsideredEdit)
-		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Window.Considered", pitstopStrategyWindowEdit)
+		setMultiMapValue(newSettings, "Strategy Settings", "Pitstop.Delta", settingsGui["pitstopDeltaEdit"].Text)
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Tyres", settingsGui["pitstopTyreServiceEdit"].Text)
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Refuel.Rule", ["Fixed", "Dynamic"][settingsGui["pitstopRefuelServiceRuleDropDown"].Value])
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Refuel", internalValue("Float", settingsGui["pitstopRefuelServiceEdit"].Text, 1))
+		setMultiMapValue(newSettings, "Strategy Settings", "Service.Order", (settingsGui["pitstopServiceDropDown"].Value == 1) ? "Simultaneous" : "Sequential")
+		setMultiMapValue(newSettings, "Strategy Settings", "Extrapolation.Laps", settingsGui["extrapolationLapsEdit"].Text)
+		setMultiMapValue(newSettings, "Strategy Settings", "Overtake.Delta", settingsGui["overtakeDeltaEdit"].Text)
+		setMultiMapValue(newSettings, "Strategy Settings", "Traffic.Considered", settingsGui["trafficConsideredEdit"].Text)
+		setMultiMapValue(newSettings, "Strategy Settings", "Strategy.Window.Considered", settingsGui["pitstopStrategyWindowEdit"].Text)
 
-		if vTeamMode {
-			setMultiMapValue(newSettings, "Team Settings", "Server.URL", serverURLEdit)
-			setMultiMapValue(newSettings, "Team Settings", "Server.Token", serverTokenEdit)
+		if gTeamMode {
+			setMultiMapValue(newSettings, "Team Settings", "Server.URL", settingsGui["serverURLEdit"].Text)
+			setMultiMapValue(newSettings, "Team Settings", "Server.Token", settingsGui["serverTokenEdit"].Text)
 			setMultiMapValue(newSettings, "Team Settings", "Team.Name", teamName)
 			setMultiMapValue(newSettings, "Team Settings", "Driver.Name", driverName)
 			setMultiMapValue(newSettings, "Team Settings", "Session.Name", sessionName)
@@ -824,15 +897,40 @@ restart:
 		}
 
 		if (settingsOrCommand == kOk)
-			Gui RES:Destroy
+			result := settingsOrCommand
+		else {
+			if (gSimulator && gCar && gTrack) {
+				directory := SessionDatabase.DatabasePath
+				simulatorCode := SessionDatabase.getSimulatorCode(gSimulator)
 
-		result := settingsOrCommand
+				dirName := (directory . "User\" . simulatorCode . "\" . gCar . "\" . gTrack . "\Race Settings")
+
+				DirCreate(dirName)
+
+				fileName := (dirName . "\Race.settings")
+			}
+			else
+				fileName := kRaceSettingsFile
+
+			settingsGui.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateSaveCancelButtons)
+			file := FileSelect("S17", fileName, translate("Save Race Settings..."), "Settings (*.settings)")
+			OnMessage(0x44, translateSaveCancelButtons, 0)
+
+			if (file != "") {
+				if !InStr(file, ".")
+					file := (file . ".settings")
+
+				writeMultiMap(file, newSettings)
+			}
+		}
 	}
 	else {
 		connector := false
 		connected := false
 
-		if vTeamMode {
+		if gTeamMode {
 			dllName := "Team Server Connector.dll"
 			dllFile := kBinariesDirectory . dllName
 
@@ -855,56 +953,371 @@ restart:
 
 		result := false
 
-		pitstopWarningEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3)
+		settingsGui := Window()
 
-		repairSuspensionDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always")
-		repairSuspensionThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)
+		settingsGui.SetFont("Bold", "Arial")
 
-		repairBodyworkDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact")
-		repairBodyworkThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)
+		settingsGui.Add("Text", "w388 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(settingsGui, "Race Settings"))
 
-		repairEngineDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact")
-		repairEngineThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Italic Underline", "Arial")
 
-		changeTyreDropDown := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never")
-		changeTyreThresholdEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0), 1)
+		settingsGui.Add("Text", "x118 YP+20 w168 cBlue Center", translate("Race Settings")).OnEvent("Click", openDocumentation.Bind(settingsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#race-settings"))
 
-		tyrePressureDeviationEdit := displayValue("Float", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1)
-		temperatureCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
-		setupPressureCompareCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", false)
-		pressureLossCorrectionCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", false)
+		settingsGui.SetFont("Norm", "Arial")
 
-		tpDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)))
-		tpDryFrontRightEdit:= displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)))
-		tpDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)))
-		tpDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)))
-		tpWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)))
-		tpWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)))
-		tpWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)))
-		tpWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)))
+		if !gTestMode {
+			settingsGui.Add("Button", "x228 y499 w80 h23 Default", translate("Ok")).OnEvent("Click", editRaceSettings.Bind(&kOk))
+			settingsGui.Add("Button", "x316 y499 w80 h23", translate("&Cancel")).OnEvent("Click", editRaceSettings.Bind(&kCancel))
+		}
+		else
+			settingsGui.Add("Button", "x316 y499 w80 h23 Default", translate("Close")).OnEvent("Click", editRaceSettings.Bind(&kCancel))
 
-		avgLaptimeEdit := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
-		fuelConsumptionEdit := displayValue("Float", convertUnit("Volume", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))
-		safetyFuelEdit := displayValue("Float", convertUnit("Volume", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)), 0)
+		settingsGui.Add("Button", "x8 y499 w77 h23", translate("&Load...")).OnEvent("Click", editRaceSettings.Bind(&kLoad))
+		settingsGui.Add("Button", "x90 y499 w77 h23", translate("&Save...")).OnEvent("Click", editRaceSettings.Bind(&kSave))
 
-		formationLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
-		postRaceLapCheck := getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
+		if gTeamMode
+			tabs := collect(["Race", "Pitstop", "Strategy", "Team"], translate)
+		else
+			tabs := collect(["Race", "Pitstop", "Strategy"], translate)
 
-		pitstopDeltaEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedConfigurationValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
-		pitstopTyreServiceEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
-		pitstopRefuelServiceRuleDropDown := inList(["Fixed", "Dynamic"], getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
-		pitstopRefuelServiceEdit := displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)
-		pitstopServiceDropDown := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
-		extrapolationLapsEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
-		overtakeDeltaEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
-		trafficConsideredEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
-		pitstopStrategyWindowEdit := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 2)
+		settingsTab := settingsGui.Add("Tab3", "x8 y48 w388 h444 -Wrap", tabs)
+
+		settingsTab.UseTab(2)
+
+		settingsGui.Add("Text", "x16 y82 w105 h20 Section", translate("Pitstop Warning"))
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VpitstopWarningEdit"
+							  , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3))
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9"
+								, getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PitstopWarning", 3))
+		settingsGui.Add("Text", "x184 yp+2 w70 h20", translate("Laps"))
+
+		settingsGui.Add("Text", "x16 yp+30 w105 h23 +0x200", translate("Repair Suspension"))
+
+		choices := collect(["Never", "Always", "Threshold", "Impact"], translate)
+		chosen := inList(["Never", "Always", "Threshold", "Impact"]
+					   , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always"))
+
+		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VrepairSuspensionDropDown", choices).OnEvent("Change", updateRepairSuspensionState)
+		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairSuspensionGreaterLabel", translate(">"))
+		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit"
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)).OnEvent("Change", validateNumber.Bind("repairSuspensionThresholdEdit"))
+		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairSuspensionThresholdLabel", translate("Sec. p. Lap"))
+
+		updateRepairSuspensionState()
+
+		settingsGui.Add("Text", "x16 yp+24 w105 h23 +0x200", translate("Repair Bodywork"))
+
+		choices := collect(["Never", "Always", "Threshold", "Impact"], translate)
+		chosen := inList(["Never", "Always", "Threshold", "Impact"]
+					   , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact"))
+
+		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VrepairBodyworkDropDown", choices).OnEvent("Change", updateRepairBodyworkState)
+		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairBodyworkGreaterLabel", translate(">"))
+		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit"
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairBodyworkThresholdEdit"))
+		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel", translate("Sec. p. Lap"))
+
+		updateRepairBodyworkState()
+
+		settingsGui.Add("Text", "x16 yp+24 w105 h23 +0x200", translate("Repair Engine"))
+
+		choices := collect(["Never", "Always", "Threshold", "Impact"], translate)
+		chosen := inList(["Never", "Always", "Threshold", "Impact"], getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact"))
+
+		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VrepairEngineDropDown", choices).OnEvent("Change", updateRepairEngineState)
+		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairEngineGreaterLabel", translate(">"))
+		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairEngineThresholdEdit"
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairEngineThresholdEdit"))
+		settingsGui.Add("Text", "x318 yp+2 w90 h20 VrepairEngineThresholdLabel", translate("Sec. p. Lap"))
+
+		updateRepairEngineState()
+
+		settingsGui.Add("Text", "x16 yp+24 w105 h23 +0x200", translate("Change Compound"))
+
+		choices := collect(["Never", "Tyre Temperature", "Weather"], translate)
+		chosen := inList(["Never", "Temperature", "Weather"], getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never"))
+
+		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VchangeTyreDropDown", choices).OnEvent("Change", updateChangeTyreState)
+		settingsGui.Add("Text", "x245 yp+2 w20 h20 VchangeTyreGreaterLabel", translate(">"))
+		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VchangeTyreThresholdEdit"
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0), 1))
+		settingsGui.Add("Text", "x318 yp+2 w90 h20 VchangeTyreThresholdLabel", translate("Degrees"))
+
+		updateChangeTyreState()
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Bold Italic", "Arial")
+
+		settingsGui.Add("Text", "x66 yp+30 w270 0x10")
+		settingsGui.Add("Text", "x16 yp+10 w370 h20 Center BackgroundTrans", translate("Target Pressures"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x16 yp+30 w105 h20 Section", translate("Deviation Threshold"))
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 VtyrePressureDeviationEdit"
+							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Deviation", 0.2), 1)).OnEvent("Change", validateNumber.Bind("tyrePressureDeviationEdit"))
+		settingsGui.Add("Text", "x184 yp+2 w70 h20", getUnit("Pressure"))
+
+		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Temperature", true)
+
+		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VtemperatureCorrectionCheck", chosen)
+		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on temperature trend"))
+
+		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Setup", false)
+
+		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VsetupPressureCompareCheck", chosen)
+		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on database values"))
+
+		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Pressure.Correction.Pressure", false)
+
+		settingsGui.Add("Text", "x16 yp+24 w105 h20 Section", translate("Correction"))
+		settingsGui.Add("CheckBox", "x126 yp-4 w17 h23 Checked" . chosen . " VpressureLossCorrectionCheck", chosen)
+		settingsGui.Add("Text", "x147 yp+4 w200 h20", translate("based on pressure loss"))
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Italic", "Arial")
+
+		settingsGui.Add("GroupBox", "-Theme x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Left"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryFrontLeftEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Right"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryFrontRightEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Left"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryRearLeftEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Right"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryRearRightEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Italic", "Arial")
+
+		settingsGui.Add("GroupBox", "-Theme x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Left"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FL", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetFrontLeftEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Right"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.FR", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetFrontRightEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Left"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RL", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetRearLeftEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Right"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit"
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Wet.Pressure.Target.RR", 30.0)))).OnEvent("Change", validateNumber.Bind("tpWetRearRightEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsTab.UseTab(1)
+
+		value := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.AvgTime", 120)
+
+		settingsGui.Add("Text", "x16 y82 w85 h23 +0x200 Section", translate("Avg. Lap Time"))
+		settingsGui.Add("Edit", "x106 yp w50 h20 Limit3 Number VavgLaptimeEdit", value)
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range1-999 0x80", value)
+		settingsGui.Add("Text", "x164 yp+4 w90 h20", translate("Sec."))
+
+		settingsGui.Add("Text", "x16 yp+22 w85 h20 +0x200", translate("Fuel Consumption"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 VfuelConsumptionEdit", displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.AvgConsumption", 3.0)))).OnEvent("Change", validateNumber.Bind("fuelConsumptionEdit"))
+		settingsGui.Add("Text", "x164 yp+4 w90 h20", getUnit("Volume", true))
+
+		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.Formation", true)
+
+		settingsGui.Add("Text", "x212 ys w85 h23 +0x200", translate("Formation"))
+		settingsGui.Add("CheckBox", "x292 yp-1 w17 h23 Checked" . chosen . " VformationLapCheck", chosen)
+		settingsGui.Add("Text", "x310 yp+4 w90 h20", translate("Lap"))
+
+		chosen := getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Lap.PostRace", true)
+
+		settingsGui.Add("Text", "x212 yp+22 w85 h23 +0x200", translate("Post Race"))
+		settingsGui.Add("CheckBox", "x292 yp-1 w17 h23 Checked" . chosen . " VpostRaceLapCheck", chosen)
+		settingsGui.Add("Text", "x310 yp+4 w90 h20", translate("Lap"))
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Bold Italic", "Arial")
+
+		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
+		settingsGui.Add("Text", "x16 yp+10 w370 h20 Center BackgroundTrans", translate("Initial Setup"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x16 yp+30 w85 h23 +0x200", translate("Tyre Compound"))
 
 		readTyreSetup(settingsOrCommand)
 
-		if vTeamMode {
-			serverURLEdit := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.URL", "")
-			serverTokenEdit := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.Token", "")
+		choices := collect(gTyreCompounds, translate)
+		chosen := inList(gTyreCompounds, compound(setupTyreCompound, setupTyreCompoundColor))
+
+		if ((chosen == 0) && (choices.Length > 0))
+			chosen := 1
+
+		settingsGui.Add("DropDownList", "x106 yp w110 AltSubmit Choose" . chosen . " VspSetupTyreCompoundDropDown", choices)
+
+		settingsGui.Add("Text", "x16 yp+26 w90 h20", translate("Start Tyre Set"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit", setupTyreSet)
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99", setupTyreSet)
+
+		settingsGui.Add("Text", "x16 yp+24 w95 h20", translate("Pitstop Tyre Set"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit", pitstopTyreSet)
+		settingsGui.Add("UpDown", "x138 yp-2 w18 h20 Range0-99", pitstopTyreSet)
+
+		import := false
+
+		for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
+			if Application(simulator, kSimulatorConfiguration).isRunning() {
+				import := true
+
+				break
+			}
+
+		option := (import ? "yp-25" : "yp")
+
+		settingsGui.Add("Button", "x292 " . option . " w90 h23", translate("Setups...")).OnEvent("Click", openSessionDatabase)
+
+		if import
+			settingsGui.Add("Button", "x292 yp+25 w90 h23", translate("Import")).OnEvent("Click", editRaceSettings.Bind("Import"))
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Italic", "Arial")
+
+		settingsGui.Add("GroupBox", "-Theme x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Left"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit", dryFrontLeft).OnEvent("Change", validateNumber.Bind("spDryFrontLeftEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Right"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit", dryFrontRight).OnEvent("Change", validateNumber.Bind("spDryFrontRightEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Left"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit", dryRearLeft).OnEvent("Change", validateNumber.Bind("spDryRearLeftEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Right"))
+		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit", dryRearRight).OnEvent("Change", validateNumber.Bind("spDryRearRightEdit"))
+		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.SetFont("Norm", "Arial")
+		settingsGui.SetFont("Italic", "Arial")
+
+		settingsGui.Add("GroupBox", "-Theme x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
+
+		settingsGui.SetFont("Norm", "Arial")
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Left"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit", wetFrontLeft).OnEvent("Change", validateNumber.Bind("spWetFrontLeftEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Front Right"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit", wetFrontRight).OnEvent("Change", validateNumber.Bind("spWetFrontRightEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Left"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit", wetRearLeft).OnEvent("Change", validateNumber.Bind("spWetRearLeftEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsGui.Add("Text", "x212 yp+24 w75 h20", translate("Rear Right"))
+		settingsGui.Add("Edit", "x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit", wetRearRight).OnEvent("Change", validateNumber.Bind("spWetRearRightEdit"))
+		settingsGui.Add("Text", "x350 yp+2 w30 h20", getUnit("Pressure"))
+
+		settingsTab.UseTab(3)
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Extrapolation.Laps", 3)
+
+		settingsGui.Add("Text", "x16 y82 w105 h20 Section", translate("Race positions"))
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9", value)
+		settingsGui.Add("Text", "x184 yp+2 w290 h20", translate("simulated future laps"))
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Overtake.Delta", 1)
+
+		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Overtake"))
+		settingsGui.Add("Text", "x100 yp w28 h23 +0x200", translate("Abs("))
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-99 0x80", value)
+		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("/ laptime difference) Seconds"))
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Traffic.Considered", 5)
+
+		settingsGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Traffic"))
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-100 0x80", value)
+		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("% track length"))
+
+		settingsGui.Add("Text", "x66 yp+28 w270 0x10")
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Strategy.Window.Considered", 2)
+
+		settingsGui.Add("Text", "x16 yp+15 w105 h23 +0x200", translate("Pitstop Window"))
+		settingsGui.Add("Edit", "x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range1-9 0x80", value)
+		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("Laps +/- around optimal lap"))
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Pitstop.Delta", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Pitstop.Delta", 60))
+
+		settingsGui.Add("Text", "x16 yp+22 w105 h20 +0x200", translate("Pitlane Delta"))
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 0x80 Range0-99", value)
+		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("Seconds (Drive through - Drive by)"))
+
+		value := getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Tyres", 30)
+
+		settingsGui.Add("Text", "x16 yp+22 w85 h20 +0x200", translate("Tyre Service"))
+		settingsGui.Add("Edit", "x126 yp-2 w50 h20 Limit2 Number VpitstopTyreServiceEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 0x80 Range0-99", value)
+		settingsGui.Add("Text", "x184 yp+4 w290 h20", translate("Seconds (Change four tyres)"))
+
+		chosen := inList(["Fixed", "Dynamic"], getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
+
+		settingsGui.Add("DropDownList", "x12 yp+21 w110 AltSubmit Choose" . chosen . " VpitstopRefuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
+
+		settingsGui.Add("Edit", "x126 yp w50 h20 VpitstopRefuelServiceEdit"
+							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
+		settingsGui.Add("Text", "x184 yp+4 w290 h20 VpitstopRefuelServiceLabel", translate(["Seconds", "Seconds (Refuel of 10 liters)"][settingsGui["pitstopRefuelServiceRuleDropdown"].Value]))
+
+		chosen := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
+
+		settingsGui.Add("Text", "x16 yp+24 w85 h23", translate("Service"))
+		settingsGui.Add("DropDownList", "x126 yp-3 w100 AltSubmit Choose" . chosen . " vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
+
+		value := displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)), 0)
+
+		settingsGui.Add("Text", "x16 yp+27 w85 h23 +0x200", translate("Safety Fuel"))
+		settingsGui.Add("Edit", "x126 yp w50 h20 Number Limit2 VsafetyFuelEdit", value)
+		settingsGui.Add("UpDown", "x158 yp-2 w18 h20 Range0-99", value)
+		settingsGui.Add("Text", "x184 yp+2 w90 h20", getUnit("Volume", true))
+
+		if gTeamMode {
+			settingsTab.UseTab(4)
+
+			serverURL := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.URL", "")
+			serverToken := getMultiMapValue(settingsOrCommand, "Team Settings", "Server.Token", "")
 			teamName := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Name", "")
 			teamIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Team.Identifier", false)
 			driverName := getMultiMapValue(settingsOrCommand, "Team Settings", "Driver.Name", "")
@@ -915,575 +1328,78 @@ restart:
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 			serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
-		}
 
-		Gui RES:Default
+			settingsGui.Add("Text", "x16 y82 w90 h23 +0x200", translate("Server URL"))
 
-		Gui RES:-Border ; -Caption
-		Gui RES:Color, D0D0D0, D8D8D8
+			if (!inList(serverURLs, serverURL) && StrLen(serverURL) > 0)
+				serverURLs.Push(serverURL)
 
-		Gui RES:Font, Bold, Arial
-
-		Gui RES:Add, Text, w388 Center gmoveRaceSettingsEditor, % translate("Modular Simulator Controller System")
-
-		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Italic Underline, Arial
-
-		Gui RES:Add, Text, x118 YP+20 w168 cBlue Center gopenSettingsDocumentation, % translate("Race Settings")
-
-		Gui RES:Font, Norm, Arial
-
-		if !vTestMode {
-			Gui RES:Add, Button, x228 y499 w80 h23 Default gacceptRaceSettings, % translate("Ok")
-			Gui RES:Add, Button, x316 y499 w80 h23 gcancelRaceSettings, % translate("&Cancel")
-		}
-		else
-			Gui RES:Add, Button, x316 y499 w80 h23 Default gcancelRaceSettings, % translate("Close")
-
-		Gui RES:Add, Button, x8 y499 w77 h23 gloadRaceSettings, % translate("&Load...")
-		Gui RES:Add, Button, x90 y499 w77 h23 gsaveRaceSettings, % translate("&Save...")
-
-		if vTeamMode
-			tabs := collect(["Race", "Pitstop", "Strategy", "Team"], "translate")
-		else
-			tabs := collect(["Race", "Pitstop", "Strategy"], "translate")
-
-		Gui RES:Add, Tab3, x8 y48 w388 h444 -Wrap, % values2String("|", tabs*)
-
-		Gui Tab, 2
-
-		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Pitstop Warning")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number VpitstopWarningEdit, %pitstopWarningEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9, %pitstopWarningEdit%
-		Gui RES:Add, Text, x184 yp+2 w70 h20, % translate("Laps")
-
-		Gui RES:Add, Text, x16 yp+30 w105 h23 +0x200, % translate("Repair Suspension")
-
-		choices := collect(["Never", "Always", "Threshold", "Impact"], "translate")
-
-		repairSuspensionDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairSuspensionDropDown)
-
-		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairSuspensionDropDown% VrepairSuspensionDropDown gupdateRepairSuspensionState, % values2String("|", choices*)
-		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairSuspensionGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit gvalidateRepairSuspensionThreshold, %repairSuspensionThresholdEdit%
-		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairSuspensionThresholdLabel, % translate("Sec. p. Lap")
-
-		updateRepairSuspensionState()
-
-		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Repair Bodywork")
-
-		choices := collect(["Never", "Always", "Threshold", "Impact"], "translate")
-
-		repairBodyworkDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairBodyworkDropDown)
-
-		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairBodyworkDropDown% VrepairBodyworkDropDown gupdateRepairBodyworkState, % values2String("|", choices*)
-		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairBodyworkGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit gvalidateRepairBodyworkThreshold, %repairBodyworkThresholdEdit%
-		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairBodyworkThresholdLabel, % translate("Sec. p. Lap")
-
-		updateRepairBodyworkState()
-
-		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Repair Engine")
-
-		choices := collect(["Never", "Always", "Threshold", "Impact"], "translate")
-
-		repairEngineDropDown := inList(["Never", "Always", "Threshold", "Impact"], repairEngineDropDown)
-
-		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%repairEngineDropDown% VrepairEngineDropDown gupdateRepairEngineState, % values2String("|", choices*)
-		Gui RES:Add, Text, x245 yp+2 w20 h20 VrepairEngineGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x260 yp-2 w50 h20 VrepairEngineThresholdEdit gvalidateRepairEngineThreshold, %repairEngineThresholdEdit%
-		Gui RES:Add, Text, x318 yp+2 w90 h20 VrepairEngineThresholdLabel, % translate("Sec. p. Lap")
-
-		updateRepairEngineState()
-
-		Gui RES:Add, Text, x16 yp+24 w105 h23 +0x200, % translate("Change Compound")
-
-		choices := collect(["Never", "Tyre Temperature", "Weather"], "translate")
-
-		changeTyreDropDown := inList(["Never", "Temperature", "Weather"], changeTyreDropDown)
-
-		Gui RES:Add, DropDownList, x126 yp w110 AltSubmit Choose%changeTyreDropDown% VchangeTyreDropDown gupdateChangeTyreState, % values2String("|", choices*)
-		Gui RES:Add, Text, x245 yp+2 w20 h20 VchangeTyreGreaterLabel, % translate(">")
-		Gui RES:Add, Edit, x260 yp-2 w50 h20 VchangeTyreThresholdEdit, %changeTyreThresholdEdit%
-		Gui RES:Add, Text, x318 yp+2 w90 h20 VchangeTyreThresholdLabel, % translate("Degrees")
-
-		updateChangeTyreState()
-
-		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Bold Italic, Arial
-
-		Gui RES:Add, Text, x66 yp+30 w270 0x10
-		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Target Pressures")
-
-		Gui RES:Font, Norm, Arial
-
-		Gui RES:Add, Text, x16 yp+30 w105 h20 Section, % translate("Deviation Threshold")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 VtyrePressureDeviationEdit gvalidateTyrePressureDeviation, %tyrePressureDeviationEdit%
-		Gui RES:Add, Text, x184 yp+2 w70 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
-		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%temperatureCorrectionCheck% VtemperatureCorrectionCheck, %temperatureCorrectionCheck%
-		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on temperature trend")
-
-		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
-		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%setupPressureCompareCheck% VsetupPressureCompareCheck, %setupPressureCompareCheck%
-		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on database values")
-
-		Gui RES:Add, Text, x16 yp+24 w105 h20 Section, % translate("Correction")
-		Gui RES:Add, CheckBox, x126 yp-4 w17 h23 Checked%pressureLossCorrectionCheck% VpressureLossCorrectionCheck, %pressureLossCorrectionCheck%
-		Gui RES:Add, Text, x147 yp+4 w200 h20, % translate("based on pressure loss")
-
-		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Italic, Arial
-
-		Gui RES:Add, GroupBox, -Theme x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
-
-		Gui RES:Font, Norm, Arial
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit gvalidateTPDryFrontLeft, %tpDryFrontLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit gvalidateTPDryFrontRight, %tpDryFrontRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit gvalidateTPDryRearLeft, %tpDryRearLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Rear Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit gvalidateTPDryRearRight, %tpDryRearRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Italic, Arial
-
-		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120, % translate("Wet / Intermediate Tyres")
-
-		Gui RES:Font, Norm, Arial
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontLeftEdit gvalidateTPWetFrontLeft, %tpWetFrontLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetFrontRightEdit gvalidateTPWetFrontRight, %tpWetFrontRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearLeftEdit gvalidateTPWetRearLeft, %tpWetRearLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VtpWetRearRightEdit gvalidateTPWetRearRight, %tpWetRearRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui Tab, 1
-
-		Gui RES:Add, Text, x16 y82 w85 h23 +0x200 Section, % translate("Avg. Lap Time")
-		Gui RES:Add, Edit, x106 yp w50 h20 Limit3 Number VavgLaptimeEdit, %avgLaptimeEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range1-999 0x80, %avgLaptimeEdit%
-		Gui RES:Add, Text, x164 yp+4 w90 h20, % translate("Sec.")
-
-		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Fuel Consumption")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 VfuelConsumptionEdit gvalidateFuelConsumption, %fuelConsumptionEdit%
-		Gui RES:Add, Text, x164 yp+4 w90 h20, % getUnit("Volume", true)
-
-		Gui RES:Add, Text, x212 ys w85 h23 +0x200, % translate("Formation")
-		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%formationLapCheck% VformationLapCheck, %formationLapCheck%
-		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
-
-		Gui RES:Add, Text, x212 yp+22 w85 h23 +0x200, % translate("Post Race")
-		Gui RES:Add, CheckBox, x292 yp-1 w17 h23 Checked%postRaceLapCheck% VpostRaceLapCheck, %postRaceLapCheck%
-		Gui RES:Add, Text, x310 yp+4 w90 h20, % translate("Lap")
-
-		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Bold Italic, Arial
-
-		Gui RES:Add, Text, x66 yp+28 w270 0x10
-		Gui RES:Add, Text, x16 yp+10 w370 h20 Center BackgroundTrans, % translate("Initial Setup")
-
-		Gui RES:Font, Norm, Arial
-
-		Gui RES:Add, Text, x16 yp+30 w85 h23 +0x200, % translate("Tyre Compound")
-
-		choices := collect(vTyreCompounds, "translate")
-
-		spSetupTyreCompoundDropDown := inList(vTyreCompounds, spSetupTyreCompoundDropDown)
-
-		if ((spSetupTyreCompoundDropDown == 0) && (choices.Length() > 0))
-			spSetupTyreCompoundDropDown := 1
-
-		Gui RES:Add, DropDownList, x106 yp w110 AltSubmit Choose%spSetupTyreCompoundDropDown% VspSetupTyreCompoundDropDown, % values2String("|", choices*)
-
-		Gui RES:Add, Text, x16 yp+26 w90 h20, % translate("Start Tyre Set")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit, %spSetupTyreSetEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range0-99, %spSetupTyreSetEdit%
-
-		Gui RES:Add, Text, x16 yp+24 w95 h20, % translate("Pitstop Tyre Set")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit2 Number VspPitstopTyreSetEdit, %spPitstopTyreSetEdit%
-		Gui RES:Add, UpDown, x138 yp-2 w18 h20 Range0-99, %spPitstopTyreSetEdit%
-
-		import := false
-
-		for simulator, ignore in getMultiMapValues(getControllerState(), "Simulators")
-			if new Application(simulator, kSimulatorConfiguration).isRunning() {
-				import := true
-
-				break
-			}
-
-		option := (import ? "yp-25" : "yp")
-
-		Gui RES:Add, Button, x292 %option% w90 h23 gopenSessionDatabase, % translate("Setups...")
-
-		if import
-			Gui RES:Add, Button, x292 yp+25 w90 h23 gimportFromSimulation, % translate("Import")
-
-		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Italic, Arial
-
-		Gui RES:Add, GroupBox, -Theme x16 yp+30 w180 h120 Section, % translate("Dry Tyres")
-
-		Gui RES:Font, Norm, Arial
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontLeftEdit gvalidateSPDryFrontLeft, %spDryFrontLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryFrontRightEdit gvalidateSPDryFrontRight, %spDryFrontRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Left")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearLeftEdit gvalidateSPDryRearLeft, %spDryRearLeftEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x26 yp+24 w75 h20 , % translate("Rear Right")
-		Gui RES:Add, Edit, x106 yp-2 w50 h20 Limit4 VspDryRearRightEdit gvalidateSPDryRearRight, %spDryRearRightEdit%
-		Gui RES:Add, Text, x164 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Font, Norm, Arial
-		Gui RES:Font, Italic, Arial
-
-		Gui RES:Add, GroupBox, -Theme x202 ys w180 h120 , % translate("Wet / Intermediate Tyres")
-
-		Gui RES:Font, Norm, Arial
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontLeftEdit gvalidateSPWetFrontLeft, %spWetFrontLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Front Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetFrontRightEdit gvalidateSPWetFrontRight, %spWetFrontRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Left")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearLeftEdit gvalidateSPWetRearLeft, %spWetRearLeftEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui RES:Add, Text, x212 yp+24 w75 h20, % translate("Rear Right")
-		Gui RES:Add, Edit, x292 yp-2 w50 h20 Limit4 VspWetRearRightEdit gvalidateSPWetRearRight, %spWetRearRightEdit%
-		Gui RES:Add, Text, x350 yp+2 w30 h20, % getUnit("Pressure")
-
-		Gui Tab, 3
-
-		Gui RES:Add, Text, x16 y82 w105 h20 Section, % translate("Race positions")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit1 Number VextrapolationLapsEdit, %extrapolationLapsEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9, %extrapolationLapsEdit%
-		Gui RES:Add, Text, x184 yp+2 w290 h20, % translate("simulated future laps")
-
-		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Overtake")
-		Gui RES:Add, Text, x100 yp w28 h23 +0x200, % translate("Abs(")
-		Gui RES:Add, Edit, x126 yp w50 h20 Limit2 Number VovertakeDeltaEdit, %overtakeDeltaEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-99 0x80, %overtakeDeltaEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("/ laptime difference) Seconds")
-
-		Gui RES:Add, Text, x16 yp+20 w85 h23 +0x200, % translate("Traffic")
-		Gui RES:Add, Edit, x126 yp w50 h20 Limit3 Number VtrafficConsideredEdit, %trafficConsideredEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-100 0x80, %trafficConsideredEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("% track length")
-
-		Gui RES:Add, Text, x66 yp+28 w270 0x10
-
-		Gui RES:Add, Text, x16 yp+15 w105 h23 +0x200, % translate("Pitstop Window")
-		Gui RES:Add, Edit, x126 yp w50 h20 Limit1 Number VpitstopStrategyWindowEdit, %pitstopStrategyWindowEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range1-9 0x80, %pitstopStrategyWindowEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Laps +/- around optimal lap")
-
-		Gui RES:Add, Text, x16 yp+22 w105 h20 +0x200, % translate("Pitlane Delta")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopDeltaEdit, %pitstopDeltaEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80 Range0-99, %pitstopDeltaEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Drive through - Drive by)")
-
-		Gui RES:Add, Text, x16 yp+22 w85 h20 +0x200, % translate("Tyre Service")
-		Gui RES:Add, Edit, x126 yp-2 w50 h20 Limit2 Number VpitstopTyreServiceEdit, %pitstopTyreServiceEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 0x80 Range0-99, %pitstopTyreServiceEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20, % translate("Seconds (Change four tyres)")
-
-		Gui RES:Add, DropDownList, x12 yp+21 w110 AltSubmit Choose%pitstopRefuelServiceRuleDropdown% VpitstopRefuelServiceRuleDropdown gchooseRefuelService, % values2String("|", collect(["Refuel Fixed", "Refuel Dynamic"], "translate")*)
-
-		Gui RES:Add, Edit, x126 yp w50 h20 VpitstopRefuelServiceEdit gvalidatePitstopRefuelService, %pitstopRefuelServiceEdit%
-		Gui RES:Add, Text, x184 yp+4 w290 h20 VpitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopRefuelServiceRuleDropdown])
-
-
-		Gui RES:Add, Text, x16 yp+24 w85 h23, % translate("Service")
-		Gui RES:Add, DropDownList, x126 yp-3 w100 AltSubmit Choose%pitstopServiceDropDown% vpitstopServiceDropDown, % values2String("|", collect(["Simultaneous", "Sequential"], "translate")*)
-
-		Gui RES:Add, Text, x16 yp+27 w85 h23 +0x200, % translate("Safety Fuel")
-		Gui RES:Add, Edit, x126 yp w50 h20 Number Limit2 VsafetyFuelEdit, %safetyFuelEdit%
-		Gui RES:Add, UpDown, x158 yp-2 w18 h20 Range0-99, %safetyFuelEdit%
-		Gui RES:Add, Text, x184 yp+2 w90 h20, % getUnit("Volume", true)
-
-		if vTeamMode {
-			Gui RES:Tab, 4
-
-			Gui RES:Add, Text, x16 y82 w90 h23 +0x200, % translate("Server URL")
-
-			if (!inList(serverURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
-				serverURLs.Push(serverURLEdit)
-
-			chosen := inList(serverURLs, serverURLEdit)
-			if (!chosen && (serverURLs.Length() > 0))
+			chosen := inList(serverURLs, serverURL)
+			if (!chosen && (serverURLs.Length > 0))
 				chosen := 1
 
-			Gui RES:Add, ComboBox, x126 yp+1 w256 Choose%chosen% vserverURLEdit, % values2String("|", serverURLs*)
+			settingsGui.Add("ComboBox", "x126 yp+1 w256 Choose" . chosen . " vserverURLEdit", serverURLs)
 
-			Gui RES:Add, Text, x16 yp+23 w90 h23 +0x200, % translate("Session Token")
-			Gui RES:Add, Edit, x126 yp w256 h21 vserverTokenEdit, %serverTokenEdit%
-			Gui RES:Add, Button, x102 yp-1 w23 h23 Center +0x200 HWNDtokenButtonHandle gconnectServer
-			setButtonIcon(tokenButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+			settingsGui.Add("Text", "x16 yp+23 w90 h23 +0x200", translate("Session Token"))
+			settingsGui.Add("Edit", "x126 yp w256 h21 vserverTokenEdit", serverToken)
+			button := settingsGui.Add("Button", "x102 yp-1 w23 h23 Center +0x200")
+			button.OnEvent("Click", editRaceSettings.Bind(&kConnect))
+			setButtonIcon(button, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
 
-			Gui RES:Add, Text, x16 yp+30 w90 h23 +0x200, % translate("Team / Driver")
+			settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Team / Driver"))
 
 			if teamIdentifier
-				Gui RES:Add, DropDownList, x126 yp w126 AltSubmit Choose1 vteamDropDownMenu gchooseTeam, % teamName
+				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit Choose1 vteamDropDownMenu", [teamName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
 			else
-				Gui RES:Add, DropDownList, x126 yp w126 AltSubmit vteamDropDownMenu gchooseTeam
+				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit vteamDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
 
 			if driverIdentifier
-				Gui RES:Add, DropDownList, x256 yp w126 AltSubmit Choose1 vdriverDropDownMenu gchooseDriver, % driverName
+				settingsGui.Add("DropDownList", "x256 yp w126 AltSubmit Choose1 vdriverDropDownMenu", [driverName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 			else
-				Gui RES:Add, DropDownList, x256 yp w126 AltSubmit vdriverDropDownMenu gchooseDriver
+				settingsGui.Add("DropDownList", "x256 yp w126 AltSubmit vdriverDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 
-			Gui RES:Add, Text, x16 yp+24 w90 h23 +0x200, % translate("Session")
+			settingsGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Session"))
 
 			if sessionIdentifier
-				Gui RES:Add, DropDownList, x126 yp w126 AltSubmit Choose1 vsessionDropDownMenu gchooseSession, % sessionName
+				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit Choose1 vsessionDropDownMenu", [sessionName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Session"))
 			else
-				Gui RES:Add, DropDownList, x126 yp w126 AltSubmit vsessionDropDownMenu gchooseSession
+				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit vsessionDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Session"))
 
-			Gui RES:Add, Text, x126 yp+30 r6 w256, % translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions.")
+			settingsGui.Add("Text", "x126 yp+30 r6 w256", translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions."))
 		}
 
-		if getWindowPosition("Race Settings", x, y)
-			Gui RES:Show, x%x% y%y%
+		if getWindowPosition("Race Settings", &x, &y)
+			settingsGui.Show("x" . x . " y" . y)
 		else
-			Gui RES:Show
+			settingsGui.Show()
 
-		loop {
-			loop
-				Sleep 1000
-			until result
+		loop
+			Sleep(1000)
+		until result
 
-			if (result == kLoad) {
-				result := false
+		settingsGui.Destroy()
 
-				title := translate("Load Race Settings...")
-
-				if (vSimulator && vCar && vTrack) {
-					sessionDB := SessionDatabase()
-
-					directory := sessionDB.DatabasePath
-					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
-
-					dirName = %directory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
-
-					FileCreateDir %dirName%
-				}
-				else
-					dirName := kRaceSettingsFile
-
-				Gui +OwnDialogs
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Load", "Cancel"]))
-				FileSelectFile file, 1, %dirName%, %title%, Settings (*.settings)
-				OnMessage(0x44, "")
-
-				if (file != "") {
-					settingsOrCommand := readMultiMap(file)
-
-					Gui RES:Destroy
-
-					Goto restart
-				}
-			}
-			else if (result == kSave) {
-				result := false
-
-				if (vSimulator && vCar && vTrack) {
-					sessionDB := SessionDatabase()
-
-					directory := sessionDB.DatabasePath
-					simulatorCode := sessionDB.getSimulatorCode(vSimulator)
-
-					dirName = %directory%User\%simulatorCode%\%vCar%\%vTrack%\Race Settings
-
-					FileCreateDir %dirName%
-
-					fileName := (dirName . "\Race.settings")
-				}
-				else
-					fileName := kRaceSettingsFile
-
-				title := translate("Save Race Settings...")
-
-				Gui +OwnDialogs
-
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Save", "Cancel"]))
-				FileSelectFile file, S17, %fileName%, %title%, Settings (*.settings)
-				OnMessage(0x44, "")
-
-				if (file != "") {
-					if !InStr(file, ".")
-						file := (file . ".settings")
-
-					writeMultiMap(file, newSettings)
-				}
-			}
-			else if (result == kOk) {
+		if (result == kOk)
+			settingsOrCommand := newSettings
+		else if (result = "Restart")
+			if (editRaceSettings(&newSettings) == kOk)
 				settingsOrCommand := newSettings
-
-				break
-			}
-			else if (result == kCancel)
-				break
-		}
 
 		return result
 	}
 }
 
-chooseRefuelService() {
-	GuiControlGet pitstopRefuelServiceRuleDropdown
-
-	GuiControl, , pitstopRefuelServiceLabel, % translate(["Seconds", "Seconds (Refuel of 10 liters)"][pitstopRefuelServiceRuleDropdown])
-}
-
-validateNumber(field) {
-	local oldValue := %field%
-	local value
-
-	GuiControlGet %field%
-
-	value := internalValue("Float", %field%)
-
-	if value is not Number
-	{
-		%field% := oldValue
-
-		GuiControl, , %field%, %oldValue%
-	}
-}
-
-validateRepairSuspensionThreshold() {
-	validateNumber("repairSuspensionThresholdEdit")
-}
-
-validateRepairBodyworkThreshold() {
-	validateNumber("repairBodyworkThresholdEdit")
-}
-
-validateRepairEngineThreshold() {
-	validateNumber("repairEngineThresholdEdit")
-}
-
-validateTPDryFrontLeft() {
-	validateNumber("tpDryFrontLeftEdit")
-}
-
-validateTPDryFrontRight() {
-	validateNumber("tpDryFrontRightEdit")
-}
-
-validateTPDryRearLeft() {
-	validateNumber("tpDryRearLeftEdit")
-}
-
-validateTPDryRearRight() {
-	validateNumber("tpDryRearRightEdit")
-}
-
-validateTPWetFrontLeft() {
-	validateNumber("tpWetFrontLeftEdit")
-}
-
-validateTPWetFrontRight() {
-	validateNumber("tpWetFrontRightEdit")
-}
-
-validateTPWetRearLeft() {
-	validateNumber("tpWetRearLeftEdit")
-}
-
-validateTPWetRearRight() {
-	validateNumber("tpWetRearRightEdit")
-}
-
-validateSPDryFrontLeft() {
-	validateNumber("spDryFrontLeftEdit")
-}
-
-validateSPDryFrontRight() {
-	validateNumber("spDryFrontRightEdit")
-}
-
-validateSPDryRearLeft() {
-	validateNumber("spDryRearLeftEdit")
-}
-
-validateSPDryRearRight() {
-	validateNumber("spDryRearRightEdit")
-}
-
-validateSPWetFrontLeft() {
-	validateNumber("spWetFrontLeftEdit")
-}
-
-validateSPWetFrontRight() {
-	validateNumber("spWetFrontRightEdit")
-}
-
-validateSPWetRearLeft() {
-	validateNumber("spWetRearLeftEdit")
-}
-
-validateSPWetRearRight() {
-	validateNumber("spWetRearRightEdit")
-}
-
-validateTyrePressureDeviation() {
-	validateNumber("tyrePressureDeviationEdit")
-}
-
-validateFuelConsumption() {
-	validateNumber("fuelConsumptionEdit")
-}
-
-validatePitstopRefuelService() {
-	validateNumber("pitstopRefuelServiceEdit")
-}
-
 readSimulatorData(simulator) {
 	local dataFile := kTempDirectory . simulator . " Data\Setup.data"
 	local exePath := kBinariesDirectory . simulator . " SHM Provider.exe"
-	local data, compound, compoundColor
+	local data, tyreCompound, tyreCompoundColor
 
-	FileCreateDir %kTempDirectory%%simulator% Data
+	DirCreate(kTempDirectory "" simulator " Data")
+
+	deleteFile(dataFile)
 
 	try {
-		RunWait %ComSpec% /c ""%exePath%" -Setup > "%dataFile%"", , Hide
+		RunWait(A_ComSpec " /c `"`"" exePath "`" -Setup > `"" dataFile "`"`", , Hide")
 	}
 	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: "SHM"}) . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
@@ -1497,18 +1413,18 @@ readSimulatorData(simulator) {
 	deleteFile(dataFile)
 
 	if (getMultiMapValue(data, "Car Data", "TyreCompound", kUndefined) = kUndefined) {
-		compound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
+		tyreCompound := getMultiMapValue(data, "Car Data", "TyreCompoundRaw", kUndefined)
 
-		if (compound && (compound != kUndefined)) {
-			compound := SessionDatabase().getTyreCompoundName(simulator, vCar, vTrack, compound, false)
+		if (tyreCompound && (tyreCompound != kUndefined)) {
+			tyreCompound := SessionDatabase.getTyreCompoundName(simulator, gCar, gTrack, tyreCompound, false)
 
-			if compound {
-				compoundColor := false
+			if tyreCompound {
+				tyreCompoundColor := false
 
-				splitCompound(compound, &compound, &compoundColor)
+				splitCompound(tyreCompound, &tyreCompound, &tyreCompoundColor)
 
-				setMultiMapValue(data, "Car Data", "TyreCompound", compound)
-				setMultiMapValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+				setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+				setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
 			}
 		}
 	}
@@ -1516,189 +1432,52 @@ readSimulatorData(simulator) {
 	return data
 }
 
-openSessionDatabase() {
-	local exePath := kBinariesDirectory . "Session Database.exe"
-	local pid, options, ignore, arg
-
-	try {
-		options := []
-
-		for ignore, arg in A_Args
-			options.Push("""" . arg . """")
-
-		options.Push("-Setup")
-
-		Process Exist
-
-		options.Push(ErrorLevel)
-
-		options := values2String(A_Space, options*)
-
-		Run "%exePath%" %options%, %kBinariesDirectory%, , pid
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, translate("Cannot start the Session Database tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-
-		showMessage(substituteVariables(translate("Cannot start the Session Database tool (%exePath%) - please check the configuration..."), {exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-}
-
-importFromSimulation(message := false, simulator := false, prefix := false, settings := false) {
-	local candidate, ignore, data, compound, compoundColor
-
-	if (message != "Import") {
-		settings := false
-
-		simulator := false
-
-		for candidate, ignore in getMultiMapValues(getControllerState(), "Simulators")
-			if new Application(candidate, kSimulatorConfiguration).isRunning() {
-				simulator := candidate
-
-				break
-			}
-
-		prefix := SessionDatabase().getSimulatorCode(simulator)
-	}
-
-	data := readSimulatorData(prefix)
-
-	if (getMultiMapValues(data, "Setup Data").Count() > 0) {
-		readTyreSetup(readMultiMap(kRaceSettingsFile))
-
-		spPitstopTyreSetEdit := getMultiMapValue(data, "Setup Data", "TyreSet", spPitstopTyreSetEdit)
-		spSetupTyreSetEdit := Max(1, spPitstopTyreSetEdit - 1)
-
-		if settings {
-			setMultiMapValue(settings, "Session Setup", "Tyre.Set", spSetupTyreSetEdit)
-			setMultiMapValue(settings, "Session Setup", "Tyre.Set.Fresh", spPitstopTyreSetEdit)
-		}
-		else {
-			GuiControl Text, spSetupTyreSetEdit, %spSetupTyreSetEdit%
-			GuiControl Text, spPitstopTyreSetEdit, %spPitstopTyreSetEdit%
-		}
-
-		compound := getMultiMapValue(data, "Setup Data", "TyreCompound", spSetupTyreCompoundDropDown)
-
-		if (compound = "Dry") {
-			spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", spDryFrontLeftEdit)))
-			spDryFrontRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", spDryFrontRightEdit)))
-			spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", spDryRearLeftEdit)))
-			spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", spDryRearRightEdit)))
-
-			if settings {
-				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
-
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
-
-				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FL", convertUnit("Pressure", internalValue("Float", spDryFrontLeftEdit), false))
-				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.FR", convertUnit("Pressure", internalValue("Float", spDryFrontRightEdit), false))
-				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RL", convertUnit("Pressure", internalValue("Float", spDryRearLeftEdit), false))
-				setMultiMapValue(settings, "Session Setup", "Tyre.Dry.Pressure.RR", convertUnit("Pressure", internalValue("Float", spDryRearRightEdit), false))
-
-				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
-					message := (translate("Tyre setup imported: ") . translate(compound(compound, compoundColor)))
-
-					showMessage(message . translate(", Set ") . spSetupTyreSetEdit . translate("; ")
-							  . spDryFrontLeftEdit . translate(", ") . spDryFrontRightEdit . translate(", ")
-							  . spDryRearLeftEdit . translate(", ") . spDryRearRightEdit, false, "Information.png", 5000)
-				}
-			}
-			else {
-				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
-
-				GuiControl Choose, spSetupTyreCompoundDropDown, % inList(vTyreCompounds, compound(compound, compoundColor))
-
-				GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
-				GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
-				GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
-				GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
-			}
-		}
-		else if ((compound = "Wet") || (compound = "Intermediate")) {
-			spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFL", spWetFrontLeftEdit)))
-			spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureFR", spWetFrontRightEdit)))
-			spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRL", spWetRearLeftEdit)))
-			spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", getMultiMapValue(data, "Setup Data", "TyrePressureRR", spWetRearRightEdit)))
-
-			if settings {
-				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
-
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound", compound)
-				setMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", compoundColor)
-
-				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FL", convertUnit("Pressure", internalValue("Float", spWetFrontLeftEdit), false))
-				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.FR", convertUnit("Pressure", internalValue("Float", spWetFrontRightEdit), false))
-				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RL", convertUnit("Pressure", internalValue("Float", spWetRearLeftEdit), false))
-				setMultiMapValue(settings, "Session Setup", "Tyre.Wet.Pressure.RR", convertUnit("Pressure", internalValue("Float", spWetRearRightEdit), false))
-
-				if (!vSilentMode && !inList(["rFactor 2", "Automobilista 2", "Project CARS 2"], simulator)) {
-					message := (translate("Tyre setup imported: ") . compound(compound, compoundColor))
-
-					showMessage(message . translate("; ")
-							  . spWetFrontLeftEdit . translate(", ") . spWetFrontRightEdit . translate(", ")
-							  . spWetRearLeftEdit . translate(", ") . spWetRearRightEdit, false, "Information.png", 5000)
-				}
-			}
-			else {
-				compoundColor := getMultiMapValue(data, "Setup Data", "TyreCompoundColor", "Black")
-
-				GuiControl Choose, spSetupTyreCompoundDropDown, % inList(vTyreCompounds, compound(compound, compoundColor))
-
-				GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
-				GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
-				GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
-				GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
-			}
-		}
-	}
-}
-
 showRaceSettingsEditor() {
+	global gSimulator, gCar, gTrack, gWeather, gAirTemperature, gTrackTemperature
+	global gTyreCompound, gTyreCompoundColor, gTyreCompounds, gSilentMode, gTeamMode, gTestMode
+
 	local icon := kIconsDirectory . "Race Settings.ico"
 	local index, fileName, settings
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Race Settings
+	TraySetIcon(icon, "1")
+	A_IconTip := "Race Settings"
 
-	vSimulator := false
-	vCar := false
-	vTrack := false
-	vWeather := "Dry"
-	vAirTemperature := 23
-	vTrackTemperature:= 27
-	vCompound := false
-	vCompoundColor := false
+	gSimulator := false
+	gCar := false
+	gTrack := false
+	gWeather := "Dry"
+	gAirTemperature := 23
+	gTrackTemperature := 27
+	gTyreCompound := false
+	gTyreCompoundColor := false
 
 	index := 1
 
-	while (index < A_Args.Length()) {
-		switch A_Args[index] {
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
 			case "-Simulator":
-				vSimulator := A_Args[index + 1]
+				gSimulator := A_Args[index + 1]
 				index += 2
 			case "-Car":
-				vCar := A_Args[index + 1]
+				gCar := A_Args[index + 1]
 				index += 2
 			case "-Track":
-				vTrack := A_Args[index + 1]
+				gTrack := A_Args[index + 1]
 				index += 2
 			case "-Weather":
-				vWeather := A_Args[index + 1]
+				gWeather := A_Args[index + 1]
 				index += 2
 			case "-AirTemperature":
-				vAirTemperature := A_Args[index + 1]
+				gAirTemperature := A_Args[index + 1]
 				index += 2
 			case "-TrackTemperature":
-				vTrackTemperature := A_Args[index + 1]
+				gTrackTemperature := A_Args[index + 1]
 				index += 2
 			case "-Compound":
-				vCompound := A_Args[index + 1]
+				gTyreCompound := A_Args[index + 1]
 				index += 2
 			case "-CompoundColor":
-				vCompoundColor := A_Args[index + 1]
+				gTyreCompoundColor := A_Args[index + 1]
 				index += 2
 			case "-Setup":
 				vRequestorPID := A_Args[index + 1]
@@ -1708,14 +1487,14 @@ showRaceSettingsEditor() {
 		}
 	}
 
-	if (vSimulator && vCar)
-		vTyreCompounds := SessionDatabase().getTyreCompounds(vSimulator, vCar, vTrack ? vTrack : "*")
+	if (gSimulator && gCar)
+		gTyreCompounds := SessionDatabase.getTyreCompounds(gSimulator, gCar, gTrack ? gTrack : "*")
 
-	if (vAirTemperature <= 0)
-		vAirTemperature := 23
+	if (gAirTemperature <= 0)
+		gAirTemperature := 23
 
-	if (vTrackTemperature <= 0)
-		vTrackTemperature := 27
+	if (gTrackTemperature <= 0)
+		gTrackTemperature := 27
 
 	fileName := kRaceSettingsFile
 
@@ -1727,32 +1506,30 @@ showRaceSettingsEditor() {
 	settings := readMultiMap(fileName)
 
 	if inList(A_Args, "-Silent")
-		vSilentMode := true
+		gSilentMode := true
 
 	if inList(A_Args, "-NoTeam")
-		vTeamMode := false
+		gTeamMode := false
 
 	if inList(A_Args, "-Test")
-		vTestMode := true
+		gTestMode := true
 
 	index := inList(A_Args, "-Import")
 
 	if index {
-		importFromSimulation("Import", A_Args[index + 1], A_Args[index + 2], settings)
-
-		writeMultiMap(fileName, settings)
+		if editRaceSettings("Export", A_Args[index + 1], A_Args[index + 2], settings)
+			writeMultiMap(fileName, settings)
 	}
 	else {
 		registerMessageHandler("Setup", functionMessageHandler)
 
-		if (editRaceSettings(settings) = kOk) {
-			writeMultiMap(fileName, settings)
+		result := editRaceSettings(&settings)
 
-			ExitApp 0
-		}
+		if (result = kOk)
+			writeMultiMap(fileName, settings)
 	}
 
-	ExitApp 0
+	ExitApp(0)
 }
 
 
@@ -1760,33 +1537,8 @@ showRaceSettingsEditor() {
 ;;;                         Message Handler Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setTyrePressures(compound, compoundColor, flPressure, frPressure, rlPressure, rrPressure) {
-	Gui RES:Default
-
-	if (compound = "Wet") {
-		spWetFrontLeftEdit := displayValue("Float", convertUnit("Pressure", flPressure))
-		spWetFrontRightEdit := displayValue("Float", convertUnit("Pressure", frPressure))
-		spWetRearLeftEdit := displayValue("Float", convertUnit("Pressure", rlPressure))
-		spWetRearRightEdit := displayValue("Float", convertUnit("Pressure", rrPressure))
-
-		GuiControl Text, spWetFrontLeftEdit, %spWetFrontLeftEdit%
-		GuiControl Text, spWetFrontRightEdit, %spWetFrontRightEdit%
-		GuiControl Text, spWetRearLeftEdit, %spWetRearLeftEdit%
-		GuiControl Text, spWetRearRightEdit, %spWetRearRightEdit%
-	}
-	else {
-		spDryFrontLeftEdit := displayValue("Float", convertUnit("Pressure", flPressure))
-		spDryFrontRightEdit := displayValue("Float", convertUnit("Pressure", frPressure))
-		spDryRearLeftEdit := displayValue("Float", convertUnit("Pressure", rlPressure))
-		spDryRearRightEdit := displayValue("Float", convertUnit("Pressure", rrPressure))
-
-		GuiControl Text, spDryFrontLeftEdit, %spDryFrontLeftEdit%
-		GuiControl Text, spDryFrontRightEdit, %spDryFrontRightEdit%
-		GuiControl Text, spDryRearLeftEdit, %spDryRearLeftEdit%
-		GuiControl Text, spDryRearRightEdit, %spDryRearRightEdit%
-	}
-
-	return false
+setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
+	editRaceSettings("TyrePressures", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure)
 }
 
 

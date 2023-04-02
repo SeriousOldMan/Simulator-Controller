@@ -17,6 +17,7 @@
   4. Controller action and voice command to enable/disable data collection
   5. Multi-category awareness (Pro, Pro-AM, ...)
   6. Graphical Editor for Vocalics Settings inkl. Test-Modus...
+  7. Better answers by the Strategist, when a pitstop cannot be recommend
 
 #### Race Center
   1. Multi-category awareness (Pro, Pro-AM, ...)

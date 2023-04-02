@@ -193,7 +193,7 @@ class PressuresEditor {
 
 		pressuresEditorGui.Add("Button", "x338 yp+162 w23 h23 vupPressureButton").OnEvent("Click", upPressure)
 		pressuresEditorGui.Add("Button", "xp+24 yp w23 h23 vdownPressureButton").OnEvent("Click", downPressure)
-		pressuresEditorGui.Add("Button", "xp+24 yp w23 h23 vclearPressureButton").OnEvent("Click", clearPressure.Bind("Normal"))
+		pressuresEditorGui.Add("Button", "xp+24 yp w23 h23 vclearPressureButton").OnEvent("Click", clearPressure)
 
 		setButtonIcon(pressuresEditorGui["upPressureButton"], kIconsDirectory . "Up Arrow.ico", 1, "W12 H12 L6 T6 R6 B6")
 		setButtonIcon(pressuresEditorGui["downPressureButton"], kIconsDirectory . "Down Arrow.ico", 1, "W12 H12 L4 T4 R4 B4")

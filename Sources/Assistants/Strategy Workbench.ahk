@@ -99,18 +99,41 @@ class StrategyWorkbench extends ConfigurationItem {
 	iTelemetryDatabase := false
 
 	class WorkbenchResizer extends Window.Resizer {
+		iRedraw := false
+
+		__New(arguments*) {
+			super.__New(arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+		}
+
 		Redraw() {
-			local workbench := StrategyWorkbench.Instance
+			this.iRedraw := (A_TickCount + 500)
+		}
 
-			workbench.showStrategyInfo(workbench.SelectedStrategy)
+		RedrawHTMLViwer() {
+			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+				local workbench := StrategyWorkbench.Instance
+				local ignore, button
 
-			if (workbench.Control["chartSourceDropDown"].Value = 1)
-				workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
-			else {
-				workbench.ChartViewer.Document.open()
-				workbench.ChartViewer.Document.write(workbench.iTelemetryChartHTML)
-				workbench.ChartViewer.Document.close()
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				workbench.showStrategyInfo(workbench.SelectedStrategy)
+
+				if (workbench.Control["chartSourceDropDown"].Value = 1)
+					workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
+				else {
+					workbench.ChartViewer.Document.open()
+					workbench.ChartViewer.Document.write(workbench.iTelemetryChartHTML)
+					workbench.ChartViewer.Document.close()
+				}
 			}
+
+			return Task.CurrentTask
 		}
 	}
 
@@ -444,13 +467,15 @@ class StrategyWorkbench extends ConfigurationItem {
 			local compound := listView.GetText(line, 1)
 			local count := listView.GetText(line, 2)
 
-			if compound
-				compound := normalizeCompound(compound)
+			if line {
+				if compound
+					compound := normalizeCompound(compound)
 
-			workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.TyreCompounds, translate), compound))
-			workbenchGui["tyreSetCountEdit"].Text := count
+				workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.TyreCompounds, translate), compound))
+				workbenchGui["tyreSetCountEdit"].Text := count
 
-			workbench.updateState()
+				workbench.updateState()
+			}
 		}
 
 		updateTyreSet(*) {

@@ -253,7 +253,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 	}
 
 	chooseAccount(listView, line, *) {
-		administrationEditor.Bind(kEvent, "AccountLoad", line)
+		if line
+			administrationEditor.Bind(kEvent, "AccountLoad", line)
 	}
 
 	deleteAccount(*) {

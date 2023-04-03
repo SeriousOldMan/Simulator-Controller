@@ -157,7 +157,7 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 			}
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, false, (tries = 1))
 
 			if (tries-- <= 0)
 				break

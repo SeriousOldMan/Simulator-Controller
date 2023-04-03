@@ -32,6 +32,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\Task.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 
@@ -68,8 +69,32 @@ class RaceReports extends ConfigurationItem {
 	iReportViewer := false
 
 	class ReportResizer extends Window.Resizer {
+		iRedraw := false
+
+		__New(arguments*) {
+			super.__New(arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+		}
+
 		Redraw() {
-			RaceReports.Instance.loadReport(RaceReports.Instance.SelectedReport, true)
+			this.iRedraw := (A_TickCount + 500)
+		}
+
+		RedrawHTMLViwer() {
+			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+				local ignore, button
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				RaceReports.Instance.loadReport(RaceReports.Instance.SelectedReport, true)
+			}
+
+			return Task.CurrentTask
 		}
 	}
 
@@ -203,7 +228,8 @@ class RaceReports extends ConfigurationItem {
 		}
 
 		chooseRace(listView, line, *) {
-			reports.loadRace(line)
+			if line
+				reports.loadRace(line)
 		}
 
 		chooseReport(*) {

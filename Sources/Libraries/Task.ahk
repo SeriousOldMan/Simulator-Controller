@@ -332,24 +332,26 @@ class Task {
 
 	static schedule(priority := 2) {
 		local next, worked, oldScheduling, visited, schedule
+		local unprotect := true
 
 		static scheduling := false
 
 		protectionOn(true)
 
 		try {
-			if ((scheduling >= priority) || (Task.CurrentTask && (Task.CurrentTask.Priority >= priority)) || (Task.Blocked >= priority)) {
-				protectionOff(true)
-
+			if ((scheduling >= priority) || (Task.CurrentTask && (Task.CurrentTask.Priority >= priority)) || (Task.Blocked >= priority))
 				return
-			}
+
 			else {
 				oldScheduling := scheduling
 				scheduling := priority
 
 				try {
-					if (priority < kInterruptPriority)
+					if (priority < kInterruptPriority) {
 						protectionOff(true)
+
+						unprotect := false
+					}
 
 					visited := Map()
 
@@ -380,7 +382,7 @@ class Task {
 
 			SetTimer(schedule, ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow))))
 
-			if (priority == kInterruptPriority)
+			if unprotect
 				protectionOff(true)
 		}
 	}

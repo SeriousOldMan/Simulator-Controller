@@ -109,6 +109,48 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
+	class EditorResizer extends Window.Resizer {
+		iRedraw := false
+
+		__New(arguments*) {
+			super.__New(arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawTrackViwer"), 500, kLowPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := (A_TickCount + 500)
+		}
+
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			if (deltaWidth > 200) {
+				deltaWidth := (this.Window.Width - this.Window.MinWidth)
+
+				return true
+			}
+			else
+				return false
+		}
+
+		RedrawTrackViwer() {
+			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+				local editor := SessionDatabaseEditor.Instance
+				local ignore, button
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				if (editor.SelectedModule = "Automation")
+					editor.updateTrackMap()
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
 	Window {
 		Get {
 			return this.iWindow
@@ -295,20 +337,20 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	createGui(configuration) {
 		local x, y, car, track, weather, simulators, simulator, choices, chosen, tabs, button, editorGui
 
-		editorGui := Window()
+		editorGui := Window({Descriptor: "Session Database", Closeable: true, Resizeable: true})
 
 		this.iWindow := editorGui
 
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Text", "w664 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Session Database"))
+		editorGui.Add("Text", "w664 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Session Database"))
 
 		editorGui.SetFont("s9 Norm", "Arial")
 		editorGui.SetFont("Italic Underline", "Arial")
 
-		editorGui.Add("Text", "x258 YP+20 w164 cBlue Center", translate("Session Database")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
+		editorGui.Add("Text", "x258 YP+20 w164 H:Center cBlue Center", translate("Session Database")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
 
-		editorGui.Add("Text", "x8 yp+30 w670 0x10")
+		editorGui.Add("Text", "x8 yp+30 w670 W:Grow 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
@@ -365,17 +407,17 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x280 ys w30 h30 Section", kIconsDirectory . "Report.ico")
-		editorGui.Add("Text", "xp+34 yp+5 w120 h26", translate("Notes"))
+		editorGui.Add("Text", "xp+34 yp+5 w120 h26 W:Grow", translate("Notes"))
 
-		button := editorGui.Add("Button", "x647 yp w23 h23")
+		button := editorGui.Add("Button", "x647 yp w23 h23 X:Move")
 		button.OnEvent("Click", showSettings)
 		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
-		editorGui.Add("Edit", "x280 yp+32 w390 h94 -Background vnotesEdit").OnEvent("Change", updateNotes)
+		editorGui.Add("Edit", "x280 yp+32 w390 h94 W:Grow -Background vnotesEdit").OnEvent("Change", updateNotes)
 
-		editorGui.Add("Text", "x16 yp+104 w654 0x10")
+		editorGui.Add("Text", "x16 yp+104 w654 W:Grow 0x10")
 
 		editorGui.SetFont("Norm")
 		editorGui.SetFont("s10 Bold", "Arial")
@@ -427,7 +469,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm cBlack", "Arial")
 
-		editorGui.Add("GroupBox", "x280 ys-8 w390 h476")
+		editorGui.Add("GroupBox", "x280 ys-8 w390 h476 W:Grow H:Grow")
 
 		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
@@ -435,66 +477,66 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(1)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h326 -Multi -LV0x10 BackgroundD8D8D8 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 BackgroundD8D8D8 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
 		this.iSettingsListView.OnEvent("Click", chooseSetting)
 
-		editorGui.Add("Text", "x296 yp+332 w80 h23 +0x200", translate("Setting"))
-		editorGui.Add("DropDownList", "xp+90 yp w270 vsettingDropDown").OnEvent("Change", selectSetting)
+		editorGui.Add("Text", "x296 yp+332 w80 h23 Y:Move +0x200", translate("Setting"))
+		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move W:Grow vsettingDropDown").OnEvent("Change", selectSetting)
 
-		editorGui.Add("Text", "x296 yp+24 w80 h23 +0x200", translate("Value"))
-		editorGui.Add("DropDownList", "xp+90 yp w180 vsettingValueDropDown").OnEvent("Change", changeSetting)
-		editorGui.Add("Edit", "xp yp w50 vsettingValueEdit").OnEvent("Change", changeSetting)
-		editorGui.Add("Edit", "xp yp w210 h57 vsettingValueText").OnEvent("Change", changeSetting)
-		editorGui.Add("CheckBox", "xp yp+4 vsettingValueCheck").OnEvent("Click", changeSetting)
+		editorGui.Add("Text", "x296 yp+24 w80 h23 Y:Move +0x200", translate("Value"))
+		editorGui.Add("DropDownList", "xp+90 yp w180 Y:Move W:Grow vsettingValueDropDown").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w50 Y:Move vsettingValueEdit").OnEvent("Change", changeSetting)
+		editorGui.Add("Edit", "xp yp w210 h57 Y:Move W:Grow vsettingValueText").OnEvent("Change", changeSetting)
+		editorGui.Add("CheckBox", "xp yp+4 Y:Move vsettingValueCheck").OnEvent("Click", changeSetting)
 
-		editorGui.Add("Button", "x606 yp+30 w23 h23 vaddSettingButton").OnEvent("Click", addSetting)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteSettingButton").OnEvent("Click", deleteSetting)
+		editorGui.Add("Button", "x606 yp+30 w23 h23 X:Move Y:Move vaddSettingButton").OnEvent("Click", addSetting)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteSettingButton").OnEvent("Click", deleteSetting)
 		setButtonIcon(editorGui["addSettingButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteSettingButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Button", "x440 yp+30 w80 h23", translate("Test...")).OnEvent("Click", testSettings)
+		editorGui.Add("Button", "x440 yp+30 w80 h23 Y:Move X:Move(0.5)", translate("Test...")).OnEvent("Click", testSettings)
 
 		editorGui["settingsTab"].UseTab(2)
 
-		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h326 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
 
-		editorGui.Add("Button", "xp+260 yp+328 w23 h23 vuploadStrategyButton").OnEvent("Click", uploadStrategy)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vdownloadStrategyButton").OnEvent("Click", downloadStrategy)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vrenameStrategyButton").OnEvent("Click", renameStrategy)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteStrategyButton").OnEvent("Click", deleteStrategy)
+		editorGui.Add("Button", "xp+260 yp+328 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdownloadStrategyButton").OnEvent("Click", downloadStrategy)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vrenameStrategyButton").OnEvent("Click", renameStrategy)
+		editorGui.Add("Button", "xp+25 yp w23 h23 X:Move Y:Move vdeleteStrategyButton").OnEvent("Click", deleteStrategy)
 		setButtonIcon(editorGui["uploadStrategyButton"], kIconsDirectory . "Upload.ico", 1)
 		setButtonIcon(editorGui["downloadStrategyButton"], kIconsDirectory . "Download.ico", 1)
 		setButtonIcon(editorGui["renameStrategyButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteStrategyButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Text", "x296 yp w80 h23 +0x200", translate("Share"))
-		editorGui.Add("CheckBox", "xp+90 yp+4 w140 vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
-		editorGui.Add("CheckBox", "xp yp+24 w140 vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
+		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareStrategyWithCommunityCheck", translate("with Community")).OnEvent("Click", updateStrategyAccess)
+		editorGui.Add("CheckBox", "xp yp+24 w140 Y:Move vshareStrategyWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateStrategyAccess)
 
 		editorGui["settingsTab"].UseTab(3)
 
 		editorGui.Add("Text", "x296 ys w80 h23 +0x200", translate("Purpose"))
-		editorGui.Add("DropDownList", "xp+90 yp w270 Choose2 vsetupTypeDropDown"
+		editorGui.Add("DropDownList", "xp+90 yp w270 W:Grow Choose2 vsetupTypeDropDown"
 					, collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], translate)).OnEvent("Change", chooseSetupType)
 
-		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h302 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h302 H:Grow W:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iSetupListView.OnEvent("Click", chooseSetup)
 
 		this.iSelectedSetupType := kDryRaceSetup
 
-		editorGui.Add("Button", "xp+260 yp+304 w23 h23 vuploadSetupButton").OnEvent("Click", uploadSetup)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vdownloadSetupButton").OnEvent("Click", downloadSetup)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vrenameSetupButton").OnEvent("Click", renameSetup)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteSetupButton").OnEvent("Click", deleteSetup)
+		editorGui.Add("Button", "xp+260 yp+304 w23 h23 Y:Move X:Move vuploadSetupButton").OnEvent("Click", uploadSetup)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdownloadSetupButton").OnEvent("Click", downloadSetup)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vrenameSetupButton").OnEvent("Click", renameSetup)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdeleteSetupButton").OnEvent("Click", deleteSetup)
 		setButtonIcon(editorGui["uploadSetupButton"], kIconsDirectory . "Upload.ico", 1)
 		setButtonIcon(editorGui["downloadSetupButton"], kIconsDirectory . "Download.ico", 1)
 		setButtonIcon(editorGui["renameSetupButton"], kIconsDirectory . "Pencil.ico", 1)
 		setButtonIcon(editorGui["deleteSetupButton"], kIconsDirectory . "Minus.ico", 1)
 
-		editorGui.Add("Text", "x296 yp w80 h23 +0x200", translate("Share"))
-		editorGui.Add("CheckBox", "xp+90 yp+4 w140 vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
-		editorGui.Add("CheckBox", "xp yp+24 w140 vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
+		editorGui.Add("Text", "x296 yp w80 h23 Y:Move +0x200", translate("Share"))
+		editorGui.Add("CheckBox", "xp+90 yp+4 w140 Y:Move vshareSetupWithCommunityCheck", translate("with Community")).OnEvent("Click", updateSetupAccess)
+		editorGui.Add("CheckBox", "xp yp+24 w140 Y:Move vshareSetupWithTeamServerCheck", translate("on Team Server")).OnEvent("Click", updateSetupAccess)
 
 		editorGui["settingsTab"].UseTab(4)
 
@@ -558,41 +600,41 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(5)
 
-		this.iTrackDisplayArea := [297, 239, 358, 350, 0, 0]
+		this.iTrackDisplayArea := [297, 239, 358, 350]
 
-		editorGui.Add("Picture", "x296 y238 w360 h352 Border")
-		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 w358 h350 vtrackDisplay")
+		editorGui.Add("Picture", "x296 y238 w360 h352 W:Grow H:Grow Border vtrackDisplayArea")
+		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
-		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 Y:Move W:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 
-		editorGui.Add("Text", "x415 yp w60 h23 +0x200", translate("Name"))
-		editorGui.Add("Edit", "xp+60 yp w109 vtrackAutomationNameEdit")
+		editorGui.Add("Text", "x415 yp w60 h23 Y:Move X:Move +0x200", translate("Name"))
+		editorGui.Add("Edit", "xp+60 yp w109 Y:Move X:Move vtrackAutomationNameEdit")
 
-		editorGui.Add("Button", "x584 yp w23 h23 vaddTrackAutomationButton").OnEvent("Click", addTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 vdeleteTrackAutomationButton").OnEvent("Click", deleteTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 Center +0x200 vsaveTrackAutomationButton").OnEvent("Click", saveTrackAutomation)
+		editorGui.Add("Button", "x584 yp w23 h23 Y:Move X:Move vaddTrackAutomationButton").OnEvent("Click", addTrackAutomation)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdeleteTrackAutomationButton").OnEvent("Click", deleteTrackAutomation)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move Center +0x200 vsaveTrackAutomationButton").OnEvent("Click", saveTrackAutomation)
 		setButtonIcon(editorGui["addTrackAutomationButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteTrackAutomationButton"], kIconsDirectory . "Minus.ico", 1)
 		setButtonIcon(editorGui["saveTrackAutomationButton"], kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		editorGui.Add("Text", "x415 yp+24 w60 h23 +0x200", translate("Actions"))
-		editorGui.Add("Edit", "xp+60 yp w181 h61 ReadOnly -Wrap vtrackAutomationInfoEdit")
+		editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move X:Move +0x200", translate("Actions"))
+		editorGui.Add("Edit", "xp+60 yp w181 h61 Y:Move X:Move ReadOnly -Wrap vtrackAutomationInfoEdit")
 
 		editorGui["settingsTab"].UseTab(6)
 
 		editorGui.Add("CheckBox", "-Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
 
-		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
 		this.iAdministrationListView.OnEvent("Click", noSelect)
 		this.iAdministrationListView.OnEvent("DoubleClick", noSelect)
 
-		editorGui.Add("Button", "x314 yp+419 w90 h23 vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
-		editorGui.Add("Button", "xp+95 yp w90 h23 vimportDataButton", translate("Import...")).OnEvent("Click", importData)
+		editorGui.Add("Button", "x314 yp+419 w90 h23 Y:Move vexportDataButton", translate("Export...")).OnEvent("Click", exportData)
+		editorGui.Add("Button", "xp+95 yp w90 h23 Y:Move vimportDataButton", translate("Import...")).OnEvent("Click", importData)
 
-		editorGui.Add("Button", "x566 yp w90 h23 vdeleteDataButton", translate("Delete...")).OnEvent("Click", deleteData)
+		editorGui.Add("Button", "x566 yp w90 h23 Y:Move X:Move vdeleteDataButton", translate("Delete...")).OnEvent("Click", deleteData)
 
 		editorGui["settingsTab"].UseTab()
 
@@ -603,12 +645,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("DropDownList", "x120 yp w140 AltSubmit Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
-		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
+		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
-		editorGui.Add("Text", "x8 y700 w670 0x10")
 
-		editorGui.Add("Button", "x304 y708 w80 h23", translate("Close")).OnEvent("Click", closeSessionDatabaseEditor)
+		editorGui.Add("Text", "x8 y700 w670 0x10 Y:Move W:Grow")
+
+		editorGui.Add("Button", "x304 y708 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSessionDatabaseEditor)
+
+		editorGui.Add(SessionDatabaseEditor.EditorResizer(editorGui))
 
 		this.loadSimulator(simulator, true)
 		this.loadCar(car, true)
@@ -625,12 +670,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-		local x, y
+		local x, y, w, h
 
 		if getWindowPosition("Session Database", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
+
+		if getWindowSize("Session Database", &w, &h)
+			window.Resize("Initialize", w, h)
 	}
 
 	getSimulators() {
@@ -764,23 +812,21 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			window["settingsTab6"].SetFont("s10 Bold cSilver", "Arial")
 		}
 
-		window.SetFont("s10 Bold cBlack", "Arial")
-
 		switch this.SelectedModule, false {
 			case "Settings":
-				window["settingsTab1"].SetFont()
+				window["settingsTab1"].SetFont("s10 Bold cBlack", "Arial")
 
 				window["settingsTab"].Choose(1)
 			case "Strategies":
-				window["settingsTab2"].SetFont()
+				window["settingsTab2"].SetFont("s10 Bold cBlack", "Arial")
 
 				window["settingsTab"].Choose(2)
 			case "Setups":
-				window["settingsTab3"].SetFont()
+				window["settingsTab3"].SetFont("s10 Bold cBlack", "Arial")
 
 				window["settingsTab"].Choose(3)
 			case "Pressures":
-				window["settingsTab4"].SetFont()
+				window["settingsTab4"].SetFont("s10 Bold cBlack", "Arial")
 
 				window["settingsTab"].Choose(4)
 
@@ -795,11 +841,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							break
 						}
 			case "Automation":
-				window["settingsTab5"].SetFont()
+				window["settingsTab5"].SetFont("s10 Bold cBlack", "Arial")
 
 				window["settingsTab"].Choose(5)
 			case "Data":
-				window["settingsTab6"].SetFont()
+				window["settingsTab6"].SetFont("s10 Bold cBlack", "Arial")
 
 				window["settingsTab"].Choose(6)
 		}
@@ -1564,17 +1610,23 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local trackMap := this.TrackMap
 		local trackImage := this.TrackImage
 		local scale := getMultiMapValue(trackMap, "Map", "Scale")
-		local width := this.iTrackDisplayArea[3]
-		local height := this.iTrackDisplayArea[4]
 		local offsetX := getMultiMapValue(trackMap, "Map", "Offset.X")
 		local offsetY := getMultiMapValue(trackMap, "Map", "Offset.Y")
 		local marginX := getMultiMapValue(trackMap, "Map", "Margin.X")
 		local marginY := getMultiMapValue(trackMap, "Map", "Margin.Y")
 		local imgWidth := ((getMultiMapValue(trackMap, "Map", "Width") + (2 * marginX)) * scale)
 		local imgHeight := ((getMultiMapValue(trackMap, "Map", "Height") + (2 * marginY)) * scale)
-		local imgScale := Min(width / imgWidth, height / imgHeight)
-		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, x, y, trackImage, trackDisplay
-		local pictureX, pictureY, pictureW, pictureH, deltaX, deltaY, window
+		local x, y, w, h, imgScale, deltaX, deltaY
+		local token, bitmap, graphics, brushHotkey, brushCommand, r, ignore, action, imgX, imgY, trackImage
+
+		ControlGetPos(&x, &y, &w, &h, this.Control["trackDisplayArea"])
+
+		x += 2
+		y += 2
+		w -= 4
+		h -= 4
+
+		imgScale := Min(w / imgWidth, h / imgHeight)
 
 		if actions {
 			token := Gdip_Startup()
@@ -1591,10 +1643,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			r := Round(15 / (imgScale * 3))
 
 			for ignore, action in actions {
-				x := Round((marginX + offsetX + action.X) * scale)
-				y := Round((marginX + offsetY + action.Y) * scale)
+				imgX := Round((marginX + offsetX + action.X) * scale)
+				imgY := Round((marginX + offsetY + action.Y) * scale)
 
-				Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, x - r, y - r, r * 2, r * 2)
+				Gdip_FillEllipse(graphics, (action.Type = "Hotkey") ? brushHotkey : brushCommand, imgX - r, imgY - r, r * 2, r * 2)
 			}
 
 			Gdip_DeleteBrush(brushHotkey)
@@ -1614,46 +1666,39 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		imgWidth *= imgScale
 		imgHeight *= imgScale
 
-		trackDisplay := this.iTrackDisplay
+		deltaX := ((w - imgWidth) / 2)
+		deltaY := ((h - imgHeight) / 2)
 
-		window := this.Window
+		x := Round(x + deltaX)
+		y := Round(y + deltaY)
 
-		pictureX := this.iTrackDisplayArea[1]
-		pictureY := this.iTrackDisplayArea[2]
-		pictureW := this.iTrackDisplayArea[3]
-		pictureH := this.iTrackDisplayArea[4]
+		this.iTrackDisplayArea := [x, y, w, h, deltaX, deltaY]
 
-		deltaX := ((this.iTrackDisplayArea[3] - imgWidth) / 2)
-		deltaY := ((this.iTrackDisplayArea[4] - imgHeight) / 2)
+		ControlMove(x, y, w, h, this.iTrackDisplay)
 
-		pictureX := Round(pictureX + deltaX)
-		pictureY := Round(pictureY + deltaY)
-
-		this.iTrackDisplayArea[5] := deltaX
-		this.iTrackDisplayArea[6] := deltaY
-
-		window["trackDisplay"].Move(pictureX, pictureY)
-		window["trackDisplay"].Value := "*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage
+		this.iTrackDisplay.Value := "*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage
 	}
 
 	updateTrackMap() {
-		this.createTrackMap(this.SelectedTrackAutomation.Actions)
+		this.createTrackMap(this.SelectedTrackAutomation ? this.SelectedTrackAutomation.Actions : false)
 	}
 
 	updateTrackAutomationInfo() {
 		local info := ""
 		local index, action
 
-		for index, action in this.SelectedTrackAutomation.Actions {
-			if (index > 1)
-				info .= "`n"
+		if this.SelectedTrackAutomation {
+			for index, action in this.SelectedTrackAutomation.Actions {
+				if (index > 1)
+					info .= "`n"
 
-			info .= (index . translate(" -> ")
-				   . translate((action.Type = "Hotkey") ? (InStr(action.Action, "|") ? "Hotkey(s): " : "Hotkey: ") : "Command: ")
-				   . action.Action)
+				info .= (index . translate(" -> ")
+					   . translate((action.Type = "Hotkey") ? (InStr(action.Action, "|") ? "Hotkey(s): " : "Hotkey: ") : "Command: ")
+					   . action.Action)
+			}
+
+			this.Control["trackAutomationInfoEdit"].Value := info
 		}
-
-		this.Control["trackAutomationInfoEdit"].Value := info
 	}
 
 	loadTrackMap(trackMap, trackImage) {
@@ -2244,7 +2289,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local progressWindow := showProgress({color: "Green", title: translate("Analyzing Data")})
 		local selectedSimulator, selectedCar, selectedTrack, drivers, simulator, progress, tracks, track
-		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, count, strategies
+		local car, carName, found, targetDirectory, telemetryDB, ignore, driver, tyresDB, result, number, strategies
 		local automations, trackName, setups, ignore, type, extension
 
 		progressWindow.Opt("+Owner" . window.Hwnd)
@@ -2299,10 +2344,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 									telemetryDB := TelemetryDatabase(simulator, car, track)
 
 									for ignore, driver in drivers {
-										count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+										number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
-										if (count > 0)
-											this.AdministrationListView.Add("", translate("Telemetry"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), count)
+										if (number > 0)
+											this.AdministrationListView.Add("", translate("Telemetry"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
 									}
 
 									tyresDB := TyresDatabase().getTyresDatabase(simulator, car, track)
@@ -2311,15 +2356,15 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", count, "Count"]]
 																				  , Where: {Driver: driver}})
 
-										count := ((result.Length > 0) ? result[1].Count : 0)
+										number := ((result.Length > 0) ? result[1].Count : 0)
 
 										result := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", count, "Count"]]
 																							   , Where: {Driver: driver}})
 
-										count += ((result.Length > 0) ? result[1].Count : 0)
+										number += ((result.Length > 0) ? result[1].Count : 0)
 
-										if (count > 0)
-											this.AdministrationListView.Add("", translate("Pressures"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), count)
+										if (number > 0)
+											this.AdministrationListView.Add("", translate("Pressures"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
 									}
 
 									strategies := 0
@@ -2369,7 +2414,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	selectData(load := true) {
 		local ignore, column, selectedSimulator, selectedCar, selectedTrack, drivers, cars, telemetry
-		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory, count
+		local pressures, strategies, automations, tracks, simulator, track, car, found, targetDirectory, number
 		local ignore, type, extension, setups
 
 		this.DataListView.Delete()
@@ -2448,10 +2493,10 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										}
 									}
 
-								count := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length
+								number := this.SessionDatabase.getTrackAutomations(simulator, car, track).Length
 
-								if (count > 0) {
-									automations += count
+								if (number > 0) {
+									automations += number
 
 									found := true
 								}
@@ -3282,7 +3327,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-
 copyDirectory(source, destination, progressStep, &count) {
 	local files := []
 	local ignore, fileName, file, subDirectory
@@ -3442,7 +3486,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
 	local x, y, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
-	local strategies, automations, row, selection, data, type, count
+	local strategies, automations, row, selection, data, type, number
 
 	static importDataGui
 	static importSelectCheck
@@ -3569,10 +3613,10 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 					telemetryDB.setDatabase(Database(sourceDirectory . "\", kTelemetrySchemas))
 
 					for driver, driverName in drivers {
-						count := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
+						number := (telemetryDB.getElectronicsCount(driver) + telemetryDB.getTyresCount(driver))
 
-						if (count > 0)
-							importListView.Add("Check", translate("Telemetry"), (carName . " / " . trackName), driverName, count)
+						if (number > 0)
+							importListView.Add("Check", translate("Telemetry"), (carName . " / " . trackName), driverName, number)
 					}
 
 					tyresDB := Database(sourceDirectory . "\", kTyresSchemas)
@@ -3581,15 +3625,15 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 						rows := tyresDB.query("Tyres.Pressures", {Group: [["Driver", count, "Count"]]
 																, Where: {Driver: driver}})
 
-						count := ((rows.Length > 0) ? rows[1].Count : 0)
+						number := ((rows.Length > 0) ? rows[1].Count : 0)
 
 						rows := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", count, "Count"]]
 																			 , Where: {Driver: driver}})
 
-						count += ((rows.Length > 0) ? rows[1].Count : 0)
+						number += ((rows.Length > 0) ? rows[1].Count : 0)
 
-						if (count > 0)
-							importListView.Add("Check", translate("Pressures"), (carName . " / " . trackName), driverName, count)
+						if (number > 0)
+							importListView.Add("Check", translate("Pressures"), (carName . " / " . trackName), driverName, number)
 					}
 
 					strategies := 0
@@ -4424,9 +4468,7 @@ WM_MOUSEMOVE(*) {
 		coordinateX := false
 		coordinateY := false
 
-		if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
-									, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
-									, &coordinateX, &coordinateY) {
+		if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 			currentAction := editor.findTrackAction(coordinateX, coordinateY)
 
 			if !currentAction
@@ -4907,7 +4949,8 @@ changeSettingAsync() {
 }
 
 chooseStrategy(listView, line, *) {
-	SessionDatabaseEditor.Instance.selectStrategy(line)
+	if line
+		SessionDatabaseEditor.Instance.selectStrategy(line)
 }
 
 updateStrategyAccess(*) {
@@ -4957,7 +5000,8 @@ chooseSetupType(dropDown, *) {
 }
 
 chooseSetup(listView, line, *) {
-	SessionDatabaseEditor.Instance.selectSetup(line)
+	if line
+		SessionDatabaseEditor.Instance.selectSetup(line)
 }
 
 updateSetupAccess(*) {
@@ -5021,7 +5065,8 @@ editPressures(*) {
 }
 
 noSelect(listView, line, *) {
-	listView.Modify(line, "-Select")
+	if line
+		listView.Modify(line, "-Select")
 }
 
 selectTrackAction(*) {
@@ -5033,9 +5078,7 @@ selectTrackAction(*) {
 
 	MouseGetPos(&x, &y)
 
-	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
-								, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
-								, &coordinateX, &coordinateY) {
+	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 		action := editor.findTrackAction(coordinateX, coordinateY)
 
 		if action {
@@ -5054,9 +5097,7 @@ selectTrackAction(*) {
 				while (GetKeyState("LButton", "P")) {
 					MouseGetPos(&x, &y)
 
-					if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1] - editor.iTrackDisplayArea[5]
-												, y - editor.iTrackDisplayArea[2] - editor.iTrackDisplayArea[6]
-												, &coordinateX, &coordinateY) {
+					if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 						action.X := coordinateX
 						action.Y := coordinateY
 
@@ -5091,58 +5132,60 @@ selectTrackAutomation(listView, line, *) {
 	local window := editor.Window
 	local index, trackAutomation, checkedRows, checked, changed, ignore, row
 
-	trackAutomation := editor.TrackAutomations[line].Clone()
-	trackAutomation.Actions := trackAutomation.Actions.Clone()
-	trackAutomation.Origin := editor.TrackAutomations[line]
+	if line {
+		trackAutomation := editor.TrackAutomations[line].Clone()
+		trackAutomation.Actions := trackAutomation.Actions.Clone()
+		trackAutomation.Origin := editor.TrackAutomations[line]
 
-	editor.iSelectedTrackAutomation := trackAutomation
+		editor.iSelectedTrackAutomation := trackAutomation
 
-	window["trackAutomationNameEdit"].Value := trackAutomation.Name
+		window["trackAutomationNameEdit"].Value := trackAutomation.Name
 
-	editor.updateTrackAutomationInfo()
+		editor.updateTrackAutomationInfo()
 
-	editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
+		editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
 
-	editor.updateState()
+		editor.updateState()
 
-	checkedRows := []
-	checked := editor.TrackAutomationsListView.GetNext(0, "C")
+		checkedRows := []
+		checked := editor.TrackAutomationsListView.GetNext(0, "C")
 
-	while checked {
-		checkedRows.Push(checked)
+		while checked {
+			checkedRows.Push(checked)
 
-		checked := editor.TrackAutomationsListView.GetNext(checked, "C")
-	}
+			checked := editor.TrackAutomationsListView.GetNext(checked, "C")
+		}
 
-	changed := false
+		changed := false
 
-	for index, trackAutomation in editor.TrackAutomations
-		if !inList(checkedRows, index)
-			if trackAutomation.Active {
-				trackAutomation.Active := false
+		for index, trackAutomation in editor.TrackAutomations
+			if !inList(checkedRows, index)
+				if trackAutomation.Active {
+					trackAutomation.Active := false
+
+					changed := true
+				}
+
+		for index, row in checkedRows
+			if !editor.TrackAutomations[row].Active {
+				editor.TrackAutomations[row].Active := true
+
+				checkedRows.RemoveAt(index)
 
 				changed := true
+
+				break
 			}
 
-	for index, row in checkedRows
-		if !editor.TrackAutomations[row].Active {
-			editor.TrackAutomations[row].Active := true
+		if changed {
+			for ignore, row in checkedRows {
+				editor.TrackAutomations[row].Active := false
 
-			checkedRows.RemoveAt(index)
+				editor.TrackAutomationsListView.Modify(row, "-Check")
+			}
 
-			changed := true
-
-			break
+			editor.writeTrackAutomations(false)
 		}
-
-	if changed {
-		for ignore, row in checkedRows {
-			editor.TrackAutomations[row].Active := false
-
-			editor.TrackAutomationsListView.Modify(row, "-Check")
-		}
-
-		editor.writeTrackAutomations(false)
 	}
 }
 

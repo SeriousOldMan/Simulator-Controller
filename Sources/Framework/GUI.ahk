@@ -147,12 +147,17 @@ class Window extends Gui {
 		Initialize() {
 			local x, y, w, h
 
-			ControlGetPos(&x, &y, &w, &h, this.Control)
+			try {
+				ControlGetPos(&x, &y, &w, &h, this.Control)
 
-			this.iOriginalX := x
-			this.iOriginalY := y
-			this.iOriginalWidth := w
-			this.iOriginalHeight := h
+				this.iOriginalX := x
+				this.iOriginalY := y
+				this.iOriginalWidth := w
+				this.iOriginalHeight := h
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 		}
 
 		Reset() {
@@ -170,18 +175,31 @@ class Window extends Gui {
 			}
 
 			fastMover(horizontal, variable, factor) {
-				return (&x, &y, &w, &h, dw, dh) => (%variable% += Round((horizontal ? dw : dh) * factor))
+				move(&x, &y, &w, &h, dw, dh) {
+					switch variable, false {
+						case "x":
+							x += Round((horizontal ? dw : dh) * factor)
+						case "y":
+							y += Round((horizontal ? dw : dh) * factor)
+						case "w":
+							w += Round((horizontal ? dw : dh) * factor)
+						case "h":
+							h += Round((horizontal ? dw : dh) * factor)
+						default:
+							logError("Unknown variable detected in Resizre.Optimize...")
+					}
+				}
+
+				return move
 			}
 
-			fastGrower(horizontal, variable, factor) {
-				return (&x, &y, &w, &h, dw, dh) => (%variable% += Round((horizontal ? dw : dh) * factor))
-			}
+			fastGrower := fastMover
 
 			fastCenter(horizontal, variable, factor) {
 				if (variable = "h")
 					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (w / 2)))
 				else
-					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (h / 2)))
+					return (&x, &y, &w, &h, dw, dh) => (y := Round((this.Window.Height / 2) - (h / 2)))
 			}
 
 			rules := []
@@ -197,7 +215,7 @@ class Window extends Gui {
 				else if (variable = "Horizontal")
 					variable := "h"
 				else if (variable = "Vertical")
-					variable := "h"
+					variable := "v"
 
 				horizontal := ((variable = "x") || (variable = "w"))
 
@@ -425,19 +443,18 @@ class Window extends Gui {
 
 		super.Show(arguments*)
 
-		WinGetPos(&x, &y, &width, &height, this)
+		if !this.MinWidth {
+			WinGetPos(&x, &y, &width, &height, this)
 
-		if !this.MinWidth
 			this.iMinWidth := width
-
-		if !this.MinHeight
 			this.iMinHeight := height
 
-		this.iWidth := width
-		this.iHeight := height
+			this.iWidth := width
+			this.iHeight := height
 
-		for ignore, resizer in this.Resizers
-			resizer.Initialize()
+			for ignore, resizer in this.Resizers
+				resizer.Initialize()
+		}
 	}
 
 	AddResizer(resizer) {
@@ -451,10 +468,10 @@ class Window extends Gui {
 	}
 
 	UpdatePosition(descriptor) {
-		local x, y, w, h, settings
+		local x, y, settings
 
 		try {
-			WinGetPos(&x, &y, &w, &h, this)
+			WinGetPos(&x, &y, , , this)
 
 			if (x && y) {
 				if (this.iLastX && ((this.iLastX != x) || (this.iLastY != y))) {
@@ -468,12 +485,12 @@ class Window extends Gui {
 
 				this.iLastX := x
 				this.iLastY := y
-
-				return Task.CurrentTask
 			}
 		}
 		catch Any {
 		}
+
+		return Task.CurrentTask
 	}
 
 	Close(*) {
@@ -484,72 +501,81 @@ class Window extends Gui {
 	}
 
 	Resize(minMax, width, height) {
-		local descriptor := this.Descriptor
 		local restricted := false
-		local x, y, w, h, settings, ignore, resizer
+		local curPriority := Task.block(kInterruptPriority)
+		local x, y, w, h, ignore, resizer
 
-		if InStr(minMax, "Init") {
-			WinGetPos(&x, &y, &w, &h, this)
+		try {
+			if InStr(minMax, "Init")
+				WinMove( , , width, height, this)
+			else {
+				if !this.Width
+					return
 
-			this.iWidth := width
-			this.iHeight := height
+				if true {
+					WinGetPos( , , &w, &h, this)
 
-			WinMove(x, y, width, height, this)
+					width := w
+					height := h
+				}
 
-			for ignore, resizer in this.Resizers
-				resizer.Redraw()
+				if (width < this.MinWidth) {
+					width := this.MinWidth
+					restricted := true
+				}
+				else if (this.MaxWidth && (width > this.MaxWidth)) {
+					width := this.MaxWidth
+					restricted := true
+				}
+
+				if (height < this.MinHeight) {
+					height := this.MinHeight
+					restricted := true
+				}
+				else if (this.MaxHeight && (height > this.MaxHeight)) {
+					height := this.MaxHeight
+					restricted := true
+				}
+
+				if this.ControlsRestrictResize(&width, &height)
+					restricted := true
+
+				this.iWidth := width
+				this.iHeight := height
+
+				this.ControlsResize(width, height)
+
+				if restricted {
+					WinMove( , , width, height, this)
+
+					return
+				}
+				else {
+					for ignore, resizer in this.Resizers
+						resizer.Redraw()
+
+					WinRedraw(this)
+
+					if this.Descriptor {
+						updateSettings(width, height) {
+							local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+							setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
+							setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
+
+							writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+						}
+
+						Task.startTask(updateSettings.Bind(width, height), 1000, kLowPriority)
+					}
+				}
+			}
 		}
-		else {
-			if !this.Width
-				return
-
-			WinGetPos(&x, &y, &w, &h, this)
-
-			width := w
-			height := h
-
-			if (width < this.MinWidth) {
-				width := this.MinWidth
-				restricted := true
-			}
-			else if (this.MaxWidth && (width > this.MaxWidth)) {
-				width := this.MaxWidth
-				restricted := true
-			}
-
-			if (height < this.MinHeight) {
-				height := this.MinHeight
-				restricted := true
-			}
-			else if (this.MaxHeight && (height > this.MaxHeight)) {
-				height := this.MaxHeight
-				restricted := true
-			}
-
-			if this.ControlsRestrictResize(&width, &height)
-				restricted := true
-
-			if descriptor {
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Window Positions", descriptor . ".Width", width)
-				setMultiMapValue(settings, "Window Positions", descriptor . ".Height", height)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-			}
-
-			this.iWidth := width
-			this.iHeight := height
-
-			this.ControlsResize(width, height)
-
-			if restricted
-				WinMove(x, y, width, height, this)
-
-			WinRedraw(this)
-
-			for ignore, resizer in this.Resizers
-				resizer.Redraw()
+		catch Any as exception {
+			Task.startTask(logError.Bind(exception), 100, kLowPriority)
+		}
+		finally {
+			Task.unblock(curPriority)
 		}
 	}
 
@@ -572,10 +598,12 @@ class Window extends Gui {
 	}
 
 	ControlsResize(width, height) {
+		local deltaWidth := (width - this.MinWidth)
+		local deltaHeight := (height - this.MinHeight)
 		local ignore, resizer
 
 		for ignore, resizer in this.Resizers
-			resizer.Resize(width - this.MinWidth, height - this.MinHeight)
+			resizer.Resize(deltaWidth, deltaHeight)
 	}
 }
 

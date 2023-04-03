@@ -123,18 +123,24 @@ class SetupAdvisor extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "redrawRecommendations"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
 		}
 
 		Redraw() {
 			this.iRedraw := (A_TickCount + 500)
 		}
 
-		redrawRecommendations() {
+		RedrawHTMLViwer() {
 			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+				local ignore, button
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
 				this.iRedraw := false
 
-				SetupAdvisor.Instance.updateRecommendations(true, false)
+				try this.Window.Advisor.updateRecommendations(true, false)
 			}
 
 			return Task.CurrentTask
@@ -383,7 +389,7 @@ class SetupAdvisor extends ConfigurationItem {
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
-				advisor.restoreState(fileName)
+				advisor.restoreState(fileName, false)
 		}
 
 		saveSetup(*) {
@@ -416,7 +422,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		advisorGui.Add("Text", "x508 YP+20 w184 cBlue Center H:Center", translate("Setup Advisor")).OnEvent("Click", openDocumentation.Bind(advisorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor"))
 
-		advisorGui.Add("Text", "x8 yp+30 w1200 0x10 W:Grow Section")
+		advisorGui.Add("Text", "x8 yp+30 w1200 W:Grow 0x10 Section")
 
 		advisorGui.SetFont("Norm")
 		advisorGui.SetFont("s10 Bold", "Arial")
@@ -480,7 +486,7 @@ class SetupAdvisor extends ConfigurationItem {
 		advisorGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
 
 		advisorGui.SetFont("s8 Norm")
-		advisorGui.Add("GroupBox", "x16 yp+30 w382 h469 -Theme H:Grow")
+		advisorGui.Add("GroupBox", "x16 yp+30 w382 h469 H:Grow -Theme")
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
@@ -501,14 +507,27 @@ class SetupAdvisor extends ConfigurationItem {
 
 		advisorGui.SetFont("Norm", "Arial")
 
-		advisorGui.Add("Text", "x8 y730 w1200 0x10 Y:Move W:Grow")
+		advisorGui.Add("Text", "x8 y730 w1200 Y:Move W:Grow 0x10")
 
 		advisorGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadSetup)
 		advisorGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
 
-		advisorGui.Add("Button", "x574 y738 w80 h23 H:Center Y:Move", translate("Close")).OnEvent("Click", closeSetupAdvisor)
+		advisorGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupAdvisor)
 
 		advisorGui.Add(SetupAdvisor.AdivisorResizer(advisorGui))
+	}
+
+	show() {
+		local window := this.Window
+		local x, y, w, h
+
+		if getWindowPosition("Setup Advisor", &x, &y)
+			window.Show("x" . x . " y" . y)
+		else
+			window.Show()
+
+		if getWindowSize("Setup Advisor", &w, &h)
+			window.Resize("Initialize", w, h)
 	}
 
 	saveState(fileName := false) {
@@ -544,7 +563,7 @@ class SetupAdvisor extends ConfigurationItem {
 		writeMultiMap(fileName, state)
 	}
 
-	restoreState(fileName := false) {
+	restoreState(fileName := false, reset := true) {
 		local state, simulator, car, track, weather, characteristicLabels, characteristics
 		local ignore, characteristic
 
@@ -571,7 +590,7 @@ class SetupAdvisor extends ConfigurationItem {
 			if !GetKeyState("Ctrl", "P")
 				this.clearCharacteristics()
 
-			this.loadSimulator(simulator)
+			this.loadSimulator(simulator, reset)
 			this.loadCar(car)
 			this.loadTrack(track)
 			this.loadWeather(weather)
@@ -618,19 +637,6 @@ class SetupAdvisor extends ConfigurationItem {
 			this.loadSimulator(true, true)
 
 		return false
-	}
-
-	show() {
-		local window := this.Window
-		local x, y, w, h
-
-		if getWindowPosition("Setup Advisor", &x, &y)
-			window.Show("x" . x . " y" . y)
-		else
-			window.Show()
-
-		if getWindowSize("Setup Advisor", &w, &h)
-			window.Resize("Initialize", w, h)
 	}
 
 	showSettingsChart(content) {
@@ -1522,35 +1528,39 @@ class SetupAdvisor extends ConfigurationItem {
 		try {
 			noProblem := true
 
-			for ignore, characteristic in this.SelectedCharacteristics {
-				noProblem := false
+			if knowledgeBase {
+				for ignore, characteristic in this.SelectedCharacteristics {
+					noProblem := false
 
-				widgets := this.SelectedCharacteristicsWidgets[characteristic]
+					widgets := this.SelectedCharacteristicsWidgets[characteristic]
 
-				value1 := widgets[1].Value
-				value2 := widgets[2].Value
+					value1 := widgets[1].Value
+					value2 := widgets[2].Value
 
-				knowledgeBase.setFact(characteristic . ".Weight", value1, true)
-				knowledgeBase.setFact(characteristic . ".Value", value2, true)
+					knowledgeBase.setFact(characteristic . ".Weight", value1, true)
+					knowledgeBase.setFact(characteristic . ".Value", value2, true)
+				}
+
+				knowledgeBase.addFact("Calculate", true)
+
+				this.KnowledgeBase.produce()
+
+				if this.Debug[kDebugKnowledgeBase]
+					this.dumpKnowledgeBase(this.KnowledgeBase)
 			}
 
-			knowledgeBase.addFact("Calculate", true)
-
-			this.KnowledgeBase.produce()
-
-			if this.Debug[kDebugKnowledgeBase]
-				this.dumpKnowledgeBase(this.KnowledgeBase)
-
 			if draw {
-				settingsLabels := getMultiMapValues(this.Definition, "Setup.Settings.Labels")
+				if knowledgeBase {
+					settingsLabels := getMultiMapValues(this.Definition, "Setup.Settings.Labels")
 
-				settings := []
+					settings := []
 
-				for ignore, setting in this.Settings {
-					delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
+					for ignore, setting in this.Settings {
+						delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
 
-					if (isNumber(delta) && (delta != 0))
-						settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
+						if (isNumber(delta) && (delta != 0))
+							settings.Push(Array(settingsLabels[setting], Round(delta, 2)))
+					}
 				}
 
 				if noProblem
@@ -2120,7 +2130,7 @@ class SetupEditor extends ConfigurationItem {
 		editorGui.Add("Text", "x85 ys+14 w193 vsetupNameViewer")
 		editorGui.Add("Button", "x280 ys+10 w80 X:Move(0.5) vresetSetupButton", translate("&Reset")).OnEvent("Click", resetSetup)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow(0.5) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x16 ys+40 w344 h320 H:Grow W:Grow(0.5) BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectSetting)
 
 		editorGui.Add("Button", "x16 yp+324 w80 Disabled Y:Move vdecreaseSettingButton", translate("Decrease")).OnEvent("Click", decreaseSetting)
@@ -2738,7 +2748,7 @@ class SetupComparator extends ConfigurationItem {
 		comparatorGui.Add("Button", "x16 ys+34 w60", translate("Setup B:")).OnEvent("Click", chooseSetupBFile)
 		comparatorGui.Add("Text", "x85 ys+38 w193 vsetupNameBViewer")
 
-		this.iSettingsListView := comparatorGui.Add("ListView", "x16 ys+64 w784 h350 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], translate))
+		this.iSettingsListView := comparatorGui.Add("ListView", "x16 ys+64 w784 h350 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Category", "Setting", "Value (A)", "Value (B)", "Value (A/B)", "Unit"], translate))
 		this.iSettingsListView.OnEvent("Click", selectABSetting)
 
 		comparatorGui.Add("Button", "x16 yp+354 w80 Disabled Y:Move vdecreaseABSettingButton", translate("Decrease")).OnEvent("Click", decreaseABSetting)

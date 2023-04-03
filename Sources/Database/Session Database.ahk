@@ -1674,9 +1674,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iTrackDisplayArea := [x, y, w, h, deltaX, deltaY]
 
+		this.iTrackDisplay.Opt("-Redraw")
+
 		ControlMove(x, y, w, h, this.iTrackDisplay)
 
 		this.iTrackDisplay.Value := "*w" . imgWidth . " *h" . imgHeight . A_Space . trackImage
+
+		this.iTrackDisplay.Opt("+Redraw")
 	}
 
 	updateTrackMap() {

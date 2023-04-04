@@ -18,6 +18,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\Libraries\Task.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -45,6 +52,7 @@ getControllerActionDefinitions(type) {
 class Window extends Gui {
 	iCloseable := false
 	iResizeable := false
+	iAsynchronous := false
 
 	iMinWidth := 0
 	iMinHeight := 0
@@ -60,6 +68,8 @@ class Window extends Gui {
 
 	iLastX := false
 	iLastY := false
+
+	iRules := []
 
 	class Resizer {
 		iWindow := false
@@ -204,7 +214,7 @@ class Window extends Gui {
 
 			rules := []
 
-			for ignore, part in string2Values(";", this.Rule) {
+			for ignore, part in string2Values(A_Space, this.Rule) {
 				part := StrSplit(part, ":", , 2)
 				variable := part[1]
 
@@ -253,11 +263,7 @@ class Window extends Gui {
 			local w := this.OriginalWidth
 			local h := this.OriginalHeight
 
-			logMessage(kLogOff, this.Control.Name . " => " . values2String("; ", x, y, w, h))
-
 			this.Rule[true](&x, &y, &w, &h, deltaWidth, deltaHeight)
-
-			logMessage(kLogOff, this.Control.Name . " <= " . values2String("; ", x, y, w, h))
 
 			ControlMove(x, y, w, h, this.Control)
 		}
@@ -285,7 +291,7 @@ class Window extends Gui {
 
 	Resizeable {
 		Get {
-			return this.iResizeable
+			return (this.iResizeable ? (this.iAsynchronous || true) : false)
 		}
 	}
 
@@ -367,6 +373,18 @@ class Window extends Gui {
 		}
 	}
 
+	Rules[asText := true] {
+		Get {
+			return (asText ? values2String(A_Space, this.iRules*) : this.iRules)
+		}
+
+		Set {
+			this.iRules := (isObject(value) ? value : ((Trim(value) = "") ? [] : string2Values(A_Space, value)))
+
+			return this.Rules[asText]
+		}
+	}
+
 	__New(options := {}, name := Strsplit(A_ScriptName, ".")[1], arguments*) {
 		local backColor := "D0D0D0"
 		local ignore, argument
@@ -376,7 +394,10 @@ class Window extends Gui {
 				case "Closeable":
 					this.iCloseable := argument
 				case "Resizeable":
-					this.iResizeable := argument
+					if InStr(argument, "Async")
+						this.iAsynchronous := argument
+
+					this.iResizeable := (argument != false)
 				case "Descriptor":
 					this.iDescriptor := argument
 
@@ -435,8 +456,12 @@ class Window extends Gui {
 
 			control := super.Add(type, options, arguments*)
 
-			if rules
-				this.DefineResizeRule(control, values2String(";", rules*))
+			if (rules || this.Rules[false].Length > 0) {
+				if !rules
+					rules := []
+
+				this.DefineResizeRule(control, values2String(" ", concatenate(this.Rules[false], rules)*))
+			}
 
 			return control
 		}
@@ -506,22 +531,38 @@ class Window extends Gui {
 
 	Resize(minMax, width, height) {
 		local restricted := false
-		local curPriority := Task.block(kInterruptPriority)
 		local x, y, w, h, ignore, resizer
 
-		try {
-			if InStr(minMax, "Init")
-				WinMove( , , width, height, this)
-			else {
-				if !this.Width
+		static lastWidth, lastHeight
+		static resizeTask := false
+		static nextResize := false
+
+		resizeAsync(synchronous := false) {
+			local curPriority := Task.block(kInterruptPriority)
+
+			try {
+				if !synchronous {
+					if (A_TickCount < nextResize)
+						for ignore, button in ["LButton", "MButton", "RButton"]
+							if GetKeyState(button, "P")
+								return Task.CurrentTask
+
+					if !this.Width
+						return Task.CurrentTask
+
+					resizeTask.stop()
+					resizeTask := false
+
+					width := lastWidth
+					height := lastHeight
+				}
+				else if !this.Width
 					return
 
-				if true {
-					WinGetPos( , , &w, &h, this)
+				WinGetPos( , , &w, &h, this)
 
-					width := w
-					height := h
-				}
+				width := w
+				height := h
 
 				if (width < this.MinWidth) {
 					width := this.MinWidth
@@ -574,13 +615,30 @@ class Window extends Gui {
 					}
 				}
 			}
+			catch Any as exception {
+				Task.startTask(logError.Bind(exception), 100, kLowPriority)
+			}
+			finally {
+				Task.unblock(curPriority)
+			}
 		}
-		catch Any as exception {
-			Task.startTask(logError.Bind(exception), 100, kLowPriority)
+
+		if InStr(minMax, "Init")
+			WinMove( , , width, height, this)
+		else if (this.Resizeable != true) {
+			lastWidth := width
+			lastHeight := height
+
+			if !resizeTask {
+				nextResize := (A_TickCount + 1000)
+
+				resizeTask := Task(resizeAsync, 100, kHighPriority)
+
+				resizeTask.start()
+			}
 		}
-		finally {
-			Task.unblock(curPriority)
-		}
+		else
+			resizeAsync(true)
 	}
 
 	ControlsRestrictResize(&width, &height) {

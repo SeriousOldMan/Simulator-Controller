@@ -1803,7 +1803,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: true})
+		centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Asynchronous"})
 
 		this.iWindow := centerGui
 
@@ -1902,8 +1902,10 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
-		this.iChartViewer := centerGui.Add("ActiveX", "x400 yp+24 w950 h343 W:Grow Border vchartViewer", "shell.explorer").Value
+		this.iChartViewer := centerGui.Add("ActiveX", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer", "shell.explorer").Value
 		this.iChartViewer.Navigate("about:blank")
+
+		centerGui.Rules := "Y:Move(0.2)"
 
 		centerGui.Add("Text", "x8 yp+351 w1350 W:Grow 0x10")
 
@@ -1932,10 +1934,12 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("GroupBox", "-Theme x619 ys+39 w732 h9 W:Grow", translate("Output"))
 
-		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+21 w732 h293 W:Grow H:Grow Border vdetailsViewer", "shell.explorer").Value
+		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+21 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer", "shell.explorer").Value
 		this.iDetailsViewer.Navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(window, this.iDetailsViewer)
+
+		centerGui.Rules := ""
 
 		centerGui.SetFont("Norm", "Arial")
 
@@ -1945,7 +1949,9 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeRaceCenter)
 
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
+		centerGui.Rules := "Y:Move(0.2)"
+
+		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
 
 		centerTab.UseTab(1)
 
@@ -1953,7 +1959,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("DateTime", "x106 yp w80 h23 vsessionDateCal").OnEvent("Change", updateDate)
 		centerGui.Add("DateTime", "x190 yp w50 h23  vsessionTimeEdit  1", "HH:mm").OnEvent("Change", updateTime)
 
-		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
+		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
 		this.iPlanListView.OnEvent("Click", choosePlan)
 
 		centerGui.Add("Text", "x378 ys+68 w90 h23 +0x200", translate("Driver"))
@@ -1989,12 +1995,12 @@ class RaceCenter extends ConfigurationItem {
 
 		centerTab.UseTab(2)
 
-		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iStintsListView.OnEvent("Click", chooseStint)
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident", "Penalty"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident", "Penalty"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerTab.UseTab(4)
@@ -2072,7 +2078,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerTab.UseTab(5)
 
-		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
+		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
 		this.iSetupsListView.OnEvent("Click", chooseSetup)
 
 		centerGui.Add("Text", "x378 ys+38 w90 h23 +0x200", translate("Driver"))
@@ -2174,8 +2180,10 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Button", "x66 ys+279 w160", translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
-		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
+		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop)
+
+		centerGui.Rules := ""
 
 		this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
 

@@ -277,7 +277,8 @@ class Database {
 		if flush
 			this.flush(name, backup)
 
-		this.iTables.Delete(name)
+		if this.iTables.Has(name)
+			this.iTables.Delete(name)
 	}
 
 	add(name, values, flush := false) {

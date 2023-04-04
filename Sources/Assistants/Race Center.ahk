@@ -185,8 +185,6 @@ class RaceCenter extends ConfigurationItem {
 	iWorking := 0
 	iSyncTask := false
 
-	iClosed := false
-
 	iSessionDirectory := false
 	iRaceSettings := false
 
@@ -280,12 +278,44 @@ class RaceCenter extends ConfigurationItem {
 	iSelectedDrivers := false
 
 	iSelectedDetailReport := false
+	iSelectedDetailHTML := false
 
 	iStrategyViewer := false
 
 	iTasks := []
 
 	iPressuresRequest := false
+
+	class RaceCenterResizer extends Window.Resizer {
+		iRedraw := false
+
+		__New(arguments*) {
+			super.__New(arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := (A_TickCount + 500)
+		}
+
+		RedrawHTMLViwer() {
+			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+				local rCenter := RaceCenter.Instance
+				local ignore, button
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				rCenter.pushTask(ObjBindMethod(rCenter, "updateReports", true))
+			}
+
+			return Task.CurrentTask
+		}
+	}
 
 	class RaceCenterTelemetryDatabase extends TelemetryDatabase {
 		iRaceCenter := false
@@ -1176,7 +1206,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	createGui(configuration) {
-		local raceCenter := this
+		local center := this
 		local centerGui, centerTab, x, y, width, ignore, report, choices, serverURLs, settings, button, control
 
 		validateNumber(field, *) {
@@ -1189,24 +1219,24 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		closeRaceCenter(*) {
-			raceCenter.close()
+			ExitApp(0)
 		}
 
 		connectServer(*) {
-			raceCenter.iServerURL := centerGui["serverURLEdit"].Text
-			raceCenter.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? "__INVALID__" : centerGui["serverTokenEdit"].Text)
+			center.iServerURL := centerGui["serverURLEdit"].Text
+			center.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? "__INVALID__" : centerGui["serverTokenEdit"].Text)
 
-			raceCenter.connect()
+			center.connect()
 		}
 
 		chooseTeam(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "selectTeam")
-										  , getValues(raceCenter.Teams)[centerGui["teamDropDownMenu"].Value])
+			center.withExceptionhandler(ObjBindMethod(center, "selectTeam")
+									  , getValues(center.Teams)[centerGui["teamDropDownMenu"].Value])
 		}
 
 		chooseSession(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "selectSession")
-										  , getValues(raceCenter.Sessions)[centerGui["sessionDropDownMenu"].Value])
+			center.withExceptionhandler(ObjBindMethod(center, "selectSession")
+									  , getValues(center.Sessions)[centerGui["sessionDropDownMenu"].Value])
 		}
 
 		connectSession(*) {
@@ -1214,12 +1244,12 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		chooseReport(listView, line, *) {
-			if raceCenter.HasData {
-				if raceCenter.isWorking()
+			if center.HasData {
+				if center.isWorking()
 					return
 
 				if line
-					raceCenter.showReport(kSessionReports[line])
+					center.showReport(kSessionReports[line])
 			}
 			else
 				loop listView.GetCount()
@@ -1227,75 +1257,75 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		reportSettings(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "reportSettings", raceCenter.SelectedReport))
+			center.withExceptionhandler(ObjBindMethod(center, "reportSettings", center.SelectedReport))
 		}
 
 		chooseDriver(*) {
-			raceCenter.withExceptionHandler(ObjBindMethod(raceCenter, "selectDriver"
-										  , (centerGui["driverDropDown"].Value = 1) ? true : raceCenter.AvailableDrivers[centerGui["driverDropDown"].Value - 1]))
+			center.withExceptionHandler(ObjBindMethod(center, "selectDriver"
+									  , (centerGui["driverDropDown"].Value = 1) ? true : center.AvailableDrivers[centerGui["driverDropDown"].Value - 1]))
 		}
 
 		chooseAxis(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "showTelemetryReport"))
+			center.withExceptionhandler(ObjBindMethod(center, "showTelemetryReport"))
 		}
 
 		chooseChartType(*) {
-			raceCenter.selectChartType(["Scatter", "Bar", "Bubble", "Line"][centerGui["chartTypeDropDown"].Value])
+			center.selectChartType(["Scatter", "Bar", "Bubble", "Line"][centerGui["chartTypeDropDown"].Value])
 		}
 
 		sessionMenu(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "chooseSessionMenu", centerGui["sessionMenuDropDown"].Value))
+			center.withExceptionhandler(ObjBindMethod(center, "chooseSessionMenu", centerGui["sessionMenuDropDown"].Value))
 		}
 
 		planMenu(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "choosePlanMenu", centerGui["planMenuDropDown"].Value))
+			center.withExceptionhandler(ObjBindMethod(center, "choosePlanMenu", centerGui["planMenuDropDown"].Value))
 		}
 
 		strategyMenu(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "chooseStrategyMenu", centerGui["strategyMenuDropDown"].Value))
+			center.withExceptionhandler(ObjBindMethod(center, "chooseStrategyMenu", centerGui["strategyMenuDropDown"].Value))
 		}
 
 		pitstopMenu(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "choosePitstopMenu", centerGui["pitstopMenuDropDown"].Value))
+			center.withExceptionhandler(ObjBindMethod(center, "choosePitstopMenu", centerGui["pitstopMenuDropDown"].Value))
 		}
 
 		updateDate(*) {
-			raceCenter.iDate := centerGui["sessionDateCal"].Value
+			center.iDate := centerGui["sessionDateCal"].Value
 		}
 
 		updateTime(*) {
-			local time := raceCenter.Time
+			local time := center.Time
 
-			raceCenter.iTime := centerGui["sessionTimeEdit"].Value
+			center.iTime := centerGui["sessionTimeEdit"].Value
 
-			time := DateDiff(time, raceCenter.iTime, "Minutes")
+			time := DateDiff(time, center.iTime, "Minutes")
 
-			raceCenter.updatePlan(-time)
+			center.updatePlan(-time)
 
-			loop raceCenter.PlanListView.GetCount()
-				raceCenter.PlanListView.Modify(A_Index, "-Select")
+			loop center.PlanListView.GetCount()
+				center.PlanListView.Modify(A_Index, "-Select")
 
-			raceCenter.iSelectedPlanStint := false
+			center.iSelectedPlanStint := false
 
-			raceCenter.updateState()
+			center.updateState()
 		}
 
 		choosePlan(listView, line, *) {
 			local stint, driver, timePlanned, timeActual, lapPlanned, lapActual, refuelAmount, tyreChange, time, currentTime
 
 			if line {
-				raceCenter.PlanListView.Modify(line, "Select")
+				center.PlanListView.Modify(line, "Select")
 
-				raceCenter.iSelectedPlanStint := line
+				center.iSelectedPlanStint := line
 
-				stint := raceCenter.PlanListView.GetText(line, 1)
-				driver := raceCenter.PlanListView.GetText(line, 2)
-				timePlanned := raceCenter.PlanListView.GetText(line, 3)
-				timeActual := raceCenter.PlanListView.GetText(line, 4)
-				lapPlanned := raceCenter.PlanListView.GetText(line, 5)
-				lapActual := raceCenter.PlanListView.GetText(line, 6)
-				refuelAmount := raceCenter.PlanListView.GetText(line, 7)
-				tyreChange := raceCenter.PlanListView.GetText(line, 8)
+				stint := center.PlanListView.GetText(line, 1)
+				driver := center.PlanListView.GetText(line, 2)
+				timePlanned := center.PlanListView.GetText(line, 3)
+				timeActual := center.PlanListView.GetText(line, 4)
+				lapPlanned := center.PlanListView.GetText(line, 5)
+				lapActual := center.PlanListView.GetText(line, 6)
+				refuelAmount := center.PlanListView.GetText(line, 7)
+				tyreChange := center.PlanListView.GetText(line, 8)
 
 				time := string2Values(":", timePlanned)
 
@@ -1319,7 +1349,7 @@ class RaceCenter extends ConfigurationItem {
 
 				timeActual := currentTime
 
-				centerGui["planDriverDropDownMenu"].Choose(inList(getKeys(raceCenter.SessionDrivers), driver) + 1)
+				centerGui["planDriverDropDownMenu"].Choose(inList(getKeys(center.SessionDrivers), driver) + 1)
 				centerGui["planTimeEdit"].Value := timePlanned
 				centerGui["actTimeEdit"].Value := timeActual
 				centerGui["planLapEdit"].Text := lapPlanned
@@ -1327,7 +1357,7 @@ class RaceCenter extends ConfigurationItem {
 				centerGui["planRefuelEdit"].Text := refuelAmount
 				centerGui["planTyreCompoundDropDown"].Choose((tyreChange = "x") ? 1 : 2)
 
-				raceCenter.updateState()
+				center.updateState()
 			}
 		}
 
@@ -1335,53 +1365,53 @@ class RaceCenter extends ConfigurationItem {
 			updatePlanAsync() {
 				local row, stint, time
 
-				row := raceCenter.PlanListView.GetNext(0)
+				row := center.PlanListView.GetNext(0)
 
-				if (row && (row != raceCenter.SelectedPlanStint)) {
-					raceCenter.PlanListView.Modify(row, "-Select")
+				if (row && (row != center.SelectedPlanStint)) {
+					center.PlanListView.Modify(row, "-Select")
 
 					row := false
-					raceCenter.iSelectedPlanStint := false
+					center.iSelectedPlanStint := false
 				}
 
 				if (row > 0) {
 					if (centerGui["planDriverDropDownMenu"].Value = 1)
-						raceCenter.PlanListView.Modify(row, "Col2", "")
+						center.PlanListView.Modify(row, "Col2", "")
 					else
-						raceCenter.PlanListView.Modify(row, "Col2", getKeys(raceCenter.SessionDrivers)[centerGui["planDriverDropDownMenu"].Value - 1])
+						center.PlanListView.Modify(row, "Col2", getKeys(center.SessionDrivers)[centerGui["planDriverDropDownMenu"].Value - 1])
 
 					time := FormatTime(centerGui["planTimeEdit"].Value, "HH:mm")
 
-					raceCenter.PlanListView.Modify(row, "Col3", ((time = "00:00") ? "" : time))
+					center.PlanListView.Modify(row, "Col3", ((time = "00:00") ? "" : time))
 
 					time := FormatTime(centerGui["actTimeEdit"].Value, "HH:mm")
 
-					raceCenter.PlanListView.Modify(row, "Col4", ((time = "00:00") ? "" : time))
+					center.PlanListView.Modify(row, "Col4", ((time = "00:00") ? "" : time))
 
-					stint := raceCenter.PlanListView.GetText(row, 1)
+					stint := center.PlanListView.GetText(row, 1)
 
 					if (stint > 1)
-						raceCenter.PlanListView.Modify(row, "Col5", centerGui["planLapEdit"].Text, centerGui["actLapEdit"].Text, centerGui["planRefuelEdit"].Text
-																  , (centerGui["planTyreCompoundDropDown"].Value = 2) ? "" : "x")
+						center.PlanListView.Modify(row, "Col5", centerGui["planLapEdit"].Text, centerGui["actLapEdit"].Text, centerGui["planRefuelEdit"].Text
+															  , (centerGui["planTyreCompoundDropDown"].Value = 2) ? "" : "x")
 
-					if (raceCenter.SelectedDetailReport = "Plan")
-						raceCenter.showPlanDetails()
+					if (center.SelectedDetailReport = "Plan")
+						center.showPlanDetails()
 				}
 			}
 
-			raceCenter.pushTask(updatePlanAsync)
+			center.pushTask(updatePlanAsync)
 		}
 
 		addPlan(*) {
 			local row, translator, msgResult
 
-			row := raceCenter.PlanListView.GetNext(0)
+			row := center.PlanListView.GetNext(0)
 
-			if (row && (row != raceCenter.SelectedPlanStint)) {
-				raceCenter.PlanListView.Modify(row, "-Select")
+			if (row && (row != center.SelectedPlanStint)) {
+				center.PlanListView.Modify(row, "-Select")
 
 				row := false
-				raceCenter.iSelectedPlanStint := false
+				center.iSelectedPlanStint := false
 			}
 
 			if row {
@@ -1395,25 +1425,25 @@ class RaceCenter extends ConfigurationItem {
 					return
 
 				if (msgResult = "Yes")
-					raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "addPlan", "Before"))
+					center.withExceptionhandler(ObjBindMethod(center, "addPlan", "Before"))
 
 				if (msgResult = "No")
-					raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "addPlan", "After"))
+					center.withExceptionhandler(ObjBindMethod(center, "addPlan", "After"))
 			}
 			else
-				raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "addPlan"))
+				center.withExceptionhandler(ObjBindMethod(center, "addPlan"))
 		}
 
 		deletePlan(*) {
 			local row, msgResult
 
-			row := raceCenter.PlanListView.GetNext(0)
+			row := center.PlanListView.GetNext(0)
 
-			if (row && (row != raceCenter.SelectedPlanStint)) {
-				raceCenter.PlanListView.Modify(row, "-Select")
+			if (row && (row != center.SelectedPlanStint)) {
+				center.PlanListView.Modify(row, "-Select")
 
 				row := false
-				raceCenter.iSelectedPlanStint := false
+				center.iSelectedPlanStint := false
 			}
 
 			if row {
@@ -1422,42 +1452,42 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
-					raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "deletePlan"))
+					center.withExceptionhandler(ObjBindMethod(center, "deletePlan"))
 			}
 		}
 
 		releasePlan(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "releasePlan"))
+			center.withExceptionhandler(ObjBindMethod(center, "releasePlan"))
 		}
 
 		chooseStint(listView, line, *) {
 			if line
-				raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "showStintDetails", raceCenter.Stints[listView.GetText(line, 1)]))
+				center.withExceptionhandler(ObjBindMethod(center, "showStintDetails", center.Stints[listView.GetText(line, 1)]))
 		}
 
 		chooseLap(listView, line, *) {
 			if line
-				raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "showLapDetails", raceCenter.Laps[listView.GetText(line, 1)]))
+				center.withExceptionhandler(ObjBindMethod(center, "showLapDetails", center.Laps[listView.GetText(line, 1)]))
 		}
 
 		chooseSimulationSettings(*) {
-			raceCenter.iUseSessionData := (centerGui["useSessionDataDropDown"].Value == 1)
-			raceCenter.iUseTelemetryDatabase := (centerGui["useTelemetryDataDropDown"].Value == 1)
-			raceCenter.iUseCurrentMap := (centerGui["keepMapDropDown"].Value == 1)
-			raceCenter.iUseTraffic := (centerGui["considerTrafficDropDown"].Value == 1)
+			center.iUseSessionData := (centerGui["useSessionDataDropDown"].Value == 1)
+			center.iUseTelemetryDatabase := (centerGui["useTelemetryDataDropDown"].Value == 1)
+			center.iUseCurrentMap := (centerGui["keepMapDropDown"].Value == 1)
+			center.iUseTraffic := (centerGui["considerTrafficDropDown"].Value == 1)
 
-			raceCenter.updateState()
+			center.updateState()
 		}
 
 		updateSetup(*) {
 			updateSetupAsync() {
-				local row := raceCenter.SetupsListView.GetNext(0)
+				local row := center.SetupsListView.GetNext(0)
 
-				if (row && (row != raceCenter.SelectedSetup)) {
-					raceCenter.SetupsListView.Modify(row, "-Select")
+				if (row && (row != center.SelectedSetup)) {
+					center.SetupsListView.Modify(row, "-Select")
 
 					row := false
-					raceCenter.iSelectedSetup := false
+					center.iSelectedSetup := false
 				}
 
 				if row {
@@ -1466,28 +1496,28 @@ class RaceCenter extends ConfigurationItem {
 					validateNumber("setupBasePressureRLEdit")
 					validateNumber("setupBasePressureRREdit")
 
-					raceCenter.SetupsListView.Modify(row, "", getKeys(raceCenter.SessionDrivers)[centerGui["setupDriverDropDownMenu"].Value]
-															, translate(kWeatherConditions[centerGui["setupWeatherDropDownMenu"].Value]) . A_Space
-															. translate("(") . centerGui["setupAirTemperatureEdit"].Text . ", "
-																			 . centerGui["setupTrackTemperatureEdit"].Text . translate(")")
-															, translate(raceCenter.TyreCompounds[centerGui["setupCompoundDropDownMenu"].Value])
-															, values2String(", ", centerGui["setupBasePressureFLEdit"].Text
-																				, centerGui["setupBasePressureFREdit"].Text
-																				, centerGui["setupBasePressureRLEdit"].Text
-																				, centerGui["setupBasePressureRREdit"].Text)
-															, centerGui["setupNotesEdit"].Text)
+					center.SetupsListView.Modify(row, "", getKeys(center.SessionDrivers)[centerGui["setupDriverDropDownMenu"].Value]
+														, translate(kWeatherConditions[centerGui["setupWeatherDropDownMenu"].Value]) . A_Space
+														. translate("(") . centerGui["setupAirTemperatureEdit"].Text . ", "
+																		 . centerGui["setupTrackTemperatureEdit"].Text . translate(")")
+														, translate(center.TyreCompounds[centerGui["setupCompoundDropDownMenu"].Value])
+														, values2String(", ", centerGui["setupBasePressureFLEdit"].Text
+																			, centerGui["setupBasePressureFREdit"].Text
+																			, centerGui["setupBasePressureRLEdit"].Text
+																			, centerGui["setupBasePressureRREdit"].Text)
+														, centerGui["setupNotesEdit"].Text)
 				}
 
-				if (raceCenter.SelectedDetailReport = "Setups")
-					raceCenter.showSetupsDetails()
+				if (center.SelectedDetailReport = "Setups")
+					center.showSetupsDetails()
 			}
 
-			raceCenter.pushTask(updateSetupAsync)
+			center.pushTask(updateSetupAsync)
 		}
 
 		addSetup(*) {
-			if (raceCenter.SessionDrivers.Count > 0)
-				raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "addSetup"))
+			if (center.SessionDrivers.Count > 0)
+				center.withExceptionhandler(ObjBindMethod(center, "addSetup"))
 			else {
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("There are no drivers available. Please select a valid session first."), translate("Information"), 262192)
@@ -1496,28 +1526,28 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		copySetup(*) {
-			local row := raceCenter.SetupsListView.GetNext(0)
+			local row := center.SetupsListView.GetNext(0)
 
-			if (row && (row != raceCenter.SelectedSetup)) {
-				raceCenter.SetupsListView.Modify(row, "-Select")
+			if (row && (row != center.SelectedSetup)) {
+				center.SetupsListView.Modify(row, "-Select")
 
 				row := false
-				raceCenter.iSelectedSetup := false
+				center.iSelectedSetup := false
 			}
 
 			if row
-				raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "copySetup"))
+				center.withExceptionhandler(ObjBindMethod(center, "copySetup"))
 		}
 
 		deleteSetup(*) {
-			local row := raceCenter.SetupsListView.GetNext(0)
+			local row := center.SetupsListView.GetNext(0)
 			local msgResult
 
-			if (row && (row != raceCenter.SelectedSetup)) {
-				raceCenter.SetupsListView.Modify(row, "-Select")
+			if (row && (row != center.SelectedSetup)) {
+				center.SetupsListView.Modify(row, "-Select")
 
 				row := false
-				raceCenter.iSelectedSetup := false
+				center.iSelectedSetup := false
 			}
 
 			if row {
@@ -1526,7 +1556,7 @@ class RaceCenter extends ConfigurationItem {
 				OnMessage(0x44, translateYesNoButtons, 0)
 
 				if (msgResult = "Yes")
-					raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "deleteSetup"))
+					center.withExceptionhandler(ObjBindMethod(center, "deleteSetup"))
 			}
 		}
 
@@ -1534,21 +1564,21 @@ class RaceCenter extends ConfigurationItem {
 			local exePath := kBinariesDirectory . "Session Database.exe"
 			local options, row
 
-			row := raceCenter.SetupsListView.GetNext(0)
+			row := center.SetupsListView.GetNext(0)
 
-			if (row = raceCenter.SelectedSetup) {
-				raceCenter.iPressuresRequest := row
+			if (row = center.SelectedSetup) {
+				center.iPressuresRequest := row
 
 				try {
 					options := ["-Setup", ProcessExist()]
 
-					if (raceCenter.Simulator && raceCenter.Car && raceCenter.Track) {
-						tyreCompound := raceCenter.TyreCompounds[centerGui["setupCompoundDropDownMenu"].Value]
+					if (center.Simulator && center.Car && center.Track) {
+						tyreCompound := center.TyreCompounds[centerGui["setupCompoundDropDownMenu"].Value]
 
-						options := concatenate(options, ["-Simulator", "`"" . SessionDatabase.getSimulatorName(raceCenter.Simulator) . "`""
-													   , "-Car", "`"" . raceCenter.Car . "`""
-													   , "-Track", "`"" . raceCenter.Track . "`""
-													   , "-Weather", raceCenter.Weather
+						options := concatenate(options, ["-Simulator", "`"" . SessionDatabase.getSimulatorName(center.Simulator) . "`""
+													   , "-Car", "`"" . center.Car . "`""
+													   , "-Track", "`"" . center.Track . "`""
+													   , "-Weather", center.Weather
 													   , "-AirTemperature", Round(convertUnit("Temperature", internalValue("Float", centerGui["setupAirTemperatureEdit"].Text), false))
 													   , "-TrackTemperature", Round(convertUnit("Temperature", internalValue("Float", centerGui["setupTrackTemperatureEdit"].Text), false))
 													   , "-Compound", compound(tyreCompound), "-CompoundColor", compoundColor(tyreCompound)])
@@ -1571,19 +1601,19 @@ class RaceCenter extends ConfigurationItem {
 			local driver, conditions, tyreCompound, pressures, temperatures
 
 			if line {
-				raceCenter.SetupsListView.iSelectedSetup := line
+				center.SetupsListView.iSelectedSetup := line
 
-				driver := raceCenter.SetupsListView.GetText(line, 1)
-				conditions := raceCenter.SetupsListView.GetText(line, 2)
-				tyreCompound := raceCenter.SetupsListView.GetText(line, 3)
-				pressures := raceCenter.SetupsListView.GetText(line, 4)
+				driver := center.SetupsListView.GetText(line, 1)
+				conditions := center.SetupsListView.GetText(line, 2)
+				tyreCompound := center.SetupsListView.GetText(line, 3)
+				pressures := center.SetupsListView.GetText(line, 4)
 
 				conditions := string2Values(translate("("), conditions)
 
-				centerGui["setupDriverDropDownMenu"].Choose(inList(getKeys(raceCenter.SessionDrivers), driver))
+				centerGui["setupDriverDropDownMenu"].Choose(inList(getKeys(center.SessionDrivers), driver))
 
 				centerGui["setupWeatherDropDownMenu"].Choose(inList(collect(kWeatherConditions, translate), conditions[1]))
-				centerGui["setupCompoundDropDownMenu"].Choose(inList(collect(raceCenter.TyreCompounds, translate), normalizeCompound(tyreCompound)))
+				centerGui["setupCompoundDropDownMenu"].Choose(inList(collect(center.TyreCompounds, translate), normalizeCompound(tyreCompound)))
 
 				temperatures := string2Values(", ", StrReplace(conditions[2], translate(")"), ""))
 
@@ -1597,15 +1627,15 @@ class RaceCenter extends ConfigurationItem {
 				centerGui["setupBasePressureRLEdit"].Text := pressures[3]
 				centerGui["setupBasePressureRREdit"].Text := pressures[4]
 
-				centerGui["setupNotesEdit"].Text := raceCenter.SetupsListView.GetText(line, 5)
+				centerGui["setupNotesEdit"].Text := center.SetupsListView.GetText(line, 5)
 
-				raceCenter.updateState()
+				center.updateState()
 			}
 		}
 
 		releaseSetups(*) {
-			if raceCenter.SessionActive
-				raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "releaseSetups"))
+			if center.SessionActive
+				center.withExceptionhandler(ObjBindMethod(center, "releaseSetups"))
 			else {
 				OnMessage(0x44, translateOkButton)
 				MsgBox(translate("You are not connected to an active session."), translate("Information"), 262192)
@@ -1623,7 +1653,7 @@ class RaceCenter extends ConfigurationItem {
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
-				if (raceCenter.SessionStore.Tables["Setups.Data"].Length > 0) {
+				if (center.SessionStore.Tables["Setups.Data"].Length > 0) {
 					translator := translateMsgBoxButtons.Bind(["Insert", "Replace", "Cancel"])
 
 					OnMessage(0x44, translator)
@@ -1634,13 +1664,13 @@ class RaceCenter extends ConfigurationItem {
 						return
 
 					if (msgResult = "Yes")
-						raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "importSetups", fileName, false))
+						center.withExceptionhandler(ObjBindMethod(center, "importSetups", fileName, false))
 
 					if (msgResult = "No")
-						raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "importSetups", fileName, true))
+						center.withExceptionhandler(ObjBindMethod(center, "importSetups", fileName, true))
 				}
 				else
-					raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "importSetups", fileName, false))
+					center.withExceptionhandler(ObjBindMethod(center, "importSetups", fileName, false))
 		}
 
 		downloadSetups(*) {
@@ -1656,9 +1686,9 @@ class RaceCenter extends ConfigurationItem {
 				if !InStr(fileName, ".")
 					fileName := (fileName . ".setups")
 
-				raceCenter.saveSetups(true)
+				center.saveSetups(true)
 
-				setups := (raceCenter.SessionDirectory . "Setups.Data.CSV")
+				setups := (center.SessionDirectory . "Setups.Data.CSV")
 
 				try {
 					FileCopy(setups, fileName, 1)
@@ -1670,7 +1700,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		updateState(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "updateState"))
+			center.withExceptionhandler(ObjBindMethod(center, "updateState"))
 		}
 
 		copyPressures(*) {
@@ -1679,7 +1709,7 @@ class RaceCenter extends ConfigurationItem {
 			local pressuresMenu, label
 
 			copyPressure(driver, compound, pressures, *) {
-				local chosen := inList(collect(concatenate(["No Tyre Change"], raceCenter.TyreCompounds), translate), compound)
+				local chosen := inList(collect(concatenate(["No Tyre Change"], center.TyreCompounds), translate), compound)
 
 				pressures := string2Values(", ", pressures)
 
@@ -1690,26 +1720,26 @@ class RaceCenter extends ConfigurationItem {
 				centerGui["pitstopPressureRREdit"].Text := pressures[4]
 
 				if driver {
-					driver := inList(raceCenter.TeamDrivers, driver)
+					driver := inList(center.TeamDrivers, driver)
 
 					if driver
 						centerGui["pitstopDriverDropDownMenu"].Choose(driver + 1)
 				}
 
-				raceCenter.updateState()
+				center.updateState()
 			}
 
 			pressuresMenu := Menu()
 
-			loop raceCenter.PitstopsListView.GetCount() {
-				lap := raceCenter.PitstopsListView.GetText(A_Index, 2)
+			loop center.PitstopsListView.GetCount() {
+				lap := center.PitstopsListView.GetText(A_Index, 2)
 
-				if raceCenter.Laps.Has(lap) {
-					driver := raceCenter.PitstopsListView.GetText(A_Index, 3)
-					tyreCompound := raceCenter.PitstopsListView.GetText(A_Index, 5)
-					pressures := raceCenter.PitstopsListView.GetText(A_Index, 7)
+				if center.Laps.Has(lap) {
+					driver := center.PitstopsListView.GetText(A_Index, 3)
+					tyreCompound := center.PitstopsListView.GetText(A_Index, 5)
+					pressures := center.PitstopsListView.GetText(A_Index, 7)
 
-					lap := raceCenter.Laps[lap]
+					lap := center.Laps[lap]
 
 					conditions := (translate(lap.Weather) . A_Space . translate("(")
 								 . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", "
@@ -1728,14 +1758,14 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 
-			loop raceCenter.SetupsListView.GetCount() {
+			loop center.SetupsListView.GetCount() {
 				if ((A_Index = 1) && hasPitstops)
 					pressuresMenu.Add()
 
-				driver := raceCenter.SetupsListView.GetText(A_Index, 1)
-				conditions := raceCenter.SetupsListView.GetText(A_Index, 2)
-				tyreCompound := raceCenter.SetupsListView.GetText(A_Index, 3)
-				pressures := raceCenter.SetupsListView.GetText(A_Index, 4)
+				driver := center.SetupsListView.GetText(A_Index, 1)
+				conditions := center.SetupsListView.GetText(A_Index, 2)
+				tyreCompound := center.SetupsListView.GetText(A_Index, 3)
+				pressures := center.SetupsListView.GetText(A_Index, 4)
 
 				pressuresMenu.Add((driver . translate(" - ") . conditions . translate(" - ") . tyreCompound . translate(": ") . pressures)
 								, copyPressure.Bind(driver, compound, pressures))
@@ -1748,27 +1778,27 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		planPitstop(*) {
-			raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "planPitstop"))
+			center.withExceptionhandler(ObjBindMethod(center, "planPitstop"))
 		}
 
 		choosePitstop(listView, line, *) {
-			local sessionStore := raceCenter.SessionStore
+			local sessionStore := center.SessionStore
 			local pitstops := sessionStore.Tables["Pitstop.Data"]
 			local pitstop
 
 			if line {
-				pitstop := raceCenter.PitstopsListViewsettingsListView.GetText(line, 1)
+				pitstop := center.PitstopsListViewsettingsListView.GetText(line, 1)
 
 				if (pitstops.Has(pitstop) && (pitstops[pitstop]["Status"] = "Planned")) {
-					raceCenter.PitstopsListViewsettingsListView.Modify(line, "-Check")
+					center.PitstopsListViewsettingsListView.Modify(line, "-Check")
 
-					loop raceCenter.PitstopsListViewsettingsListView.GetCount()
-						raceCenter.PitstopsListViewsettingsListView.Modify(line, "-Select")
+					loop center.PitstopsListViewsettingsListView.GetCount()
+						center.PitstopsListViewsettingsListView.Modify(line, "-Select")
 				}
 				else {
-					raceCenter.PitstopsListViewsettingsListView.Modify(line, "Check")
+					center.PitstopsListViewsettingsListView.Modify(line, "Check")
 
-					raceCenter.withExceptionhandler(ObjBindMethod(raceCenter, "showPitstopDetails", pitstop))
+					center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop))
 				}
 			}
 		}
@@ -1779,14 +1809,14 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.SetFont("s10 Bold", "Arial")
 
-		centerGui.Add("Text", "w1334 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center"))
+		centerGui.Add("Text", "w1334 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(centerGui, "Race Center"))
 
 		centerGui.SetFont("s9 Norm", "Arial")
 		centerGui.SetFont("Italic Underline", "Arial")
 
-		centerGui.Add("Text", "x608 YP+20 w134 cBlue Center", translate("Race Center")).OnEvent("Click", openDocumentation.Bind(centerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center"))
+		centerGui.Add("Text", "x608 YP+20 w134 H:Center cBlue Center", translate("Race Center")).OnEvent("Click", openDocumentation.Bind(centerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center"))
 
-		centerGui.Add("Text", "x8 yp+30 w1350 0x10")
+		centerGui.Add("Text", "x8 yp+30 w1350 W:Grow 0x10")
 
 		centerGui.SetFont("Norm")
 		centerGui.SetFont("s10 Bold", "Arial")
@@ -1869,23 +1899,21 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x400 ys w40 h23 +0x200", translate("Plot"))
 		centerGui.Add("DropDownList", "x444 yp w80 AltSubmit Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
-		centerGui.Add("Button", "x1327 yp w23 h23 vreportSettingsButton").OnEvent("Click", reportSettings)
+		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
-		this.iChartViewer := centerGui.Add("ActiveX", "x400 yp+24 w950 h343 Border vchartViewer", "shell.explorer").Value
+		this.iChartViewer := centerGui.Add("ActiveX", "x400 yp+24 w950 h343 W:Grow Border vchartViewer", "shell.explorer").Value
 		this.iChartViewer.Navigate("about:blank")
 
-		centerGui.Add("Text", "x8 yp+351 w1350 0x10")
+		centerGui.Add("Text", "x8 yp+351 w1350 W:Grow 0x10")
 
 		centerGui.SetFont("s10 Bold", "Arial")
 
 		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", kIconsDirectory . "Tools BW.ico")
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
 
-		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp w30 h30 vwaitViewer", "shell.explorer").Value
+		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp w30 h30 X:Move vwaitViewer", "shell.explorer").Value
 		this.iWaitViewer.Navigate("about:blank")
-
-		this.startWorking(false)
 
 		centerGui.SetFont("s8 Norm cBlack", "Arial")
 
@@ -1902,25 +1930,22 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "-Theme x619 ys+39 w732 h9", translate("Output"))
+		centerGui.Add("GroupBox", "-Theme x619 ys+39 w732 h9 W:Grow", translate("Output"))
 
-		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+21 w732 h293 Border vdetailsViewer", "shell.explorer").Value
+		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+21 w732 h293 W:Grow H:Grow Border vdetailsViewer", "shell.explorer").Value
 		this.iDetailsViewer.Navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(window, this.iDetailsViewer)
 
-		this.showDetails(false, false)
-		this.showChart(false)
-
 		centerGui.SetFont("Norm", "Arial")
 
-		centerGui.Add("Text", "x8 y815 w1350 0x10")
+		centerGui.Add("Text", "x8 y815 w1350 0x10 Y:Move W:Grow")
 
-		centerGui.Add("Text", "x16 y827 w554 vmessageField")
+		centerGui.Add("Text", "x16 y827 w554 Y:Move vmessageField")
 
-		centerGui.Add("Button", "x649 y824 w80 h23 ", translate("Close")).OnEvent("Click", closeRaceCenter)
+		centerGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeRaceCenter)
 
-		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
+		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
 
 		centerTab.UseTab(1)
 
@@ -1928,7 +1953,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("DateTime", "x106 yp w80 h23 vsessionDateCal").OnEvent("Change", updateDate)
 		centerGui.Add("DateTime", "x190 yp w50 h23  vsessionTimeEdit  1", "HH:mm").OnEvent("Change", updateTime)
 
-		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
+		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
 		this.iPlanListView.OnEvent("Click", choosePlan)
 
 		centerGui.Add("Text", "x378 ys+68 w90 h23 +0x200", translate("Driver"))
@@ -1964,12 +1989,12 @@ class RaceCenter extends ConfigurationItem {
 
 		centerTab.UseTab(2)
 
-		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iStintsListView.OnEvent("Click", chooseStint)
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident", "Penalty"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident", "Penalty"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerTab.UseTab(4)
@@ -2047,7 +2072,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerTab.UseTab(5)
 
-		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
+		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
 		this.iSetupsListView.OnEvent("Click", chooseSetup)
 
 		centerGui.Add("Text", "x378 ys+38 w90 h23 +0x200", translate("Driver"))
@@ -2149,10 +2174,30 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Button", "x66 ys+279 w160", translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
-		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
-		this.iPitstopsListView.OnEvent("DoubleClick", choosePitstop)
+		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
+		this.iPitstopsListView.OnEvent("Click", choosePitstop)
 
 		this.iReportViewer := RaceReportViewer(centerGui, this.ChartViewer)
+
+		centerGui.Add(RaceCenter.RaceCenterResizer(centerGui))
+	}
+
+	show() {
+		local window := this.Window
+		local x, y, w, h
+
+		if getWindowPosition("Race Center", &x, &y)
+			window.Show("AutoSize x" . x . " y" . y)
+		else
+			window.Show("AutoSize")
+
+		if getWindowSize("Race Center", &w, &h)
+			window.Resize("Initialize", w, h)
+
+		this.startWorking(false)
+
+		this.showDetails(false, false)
+		this.showChart(false)
 
 		this.initializeSession()
 
@@ -7204,14 +7249,31 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	updateReports() {
-		if !this.SelectedReport
-			this.iSelectedReport := "Overview"
+	updateReports(redraw := false) {
+		if this.HasData {
+			if !this.SelectedReport
+				this.iSelectedReport := "Overview"
 
-		this.showReport(this.SelectedReport, true)
+			this.showReport(this.SelectedReport, true)
+		}
+		else if redraw
+			this.showChart(false)
 
 		if (!this.SelectedDetailReport && this.Strategy)
 			this.StrategyViewer.showStrategyInfo(this.Strategy)
+		else if redraw {
+			if (this.SelectedDetailReport = "Plan")
+				this.showPlanDetails()
+			else if (this.SelectedDetailReport = "Setups")
+				this.showSetupsDetails()
+			else if ((this.SelectedDetailReport = "Strategy") && this.Strategy)
+				this.StrategyViewer.showStrategyInfo(this.Strategy)
+			else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
+				this.DetailsViewer.Document.open()
+				this.DetailsViewer.Document.write(this.iSelectedDetailHTML)
+				this.DetailsViewer.Document.close()
+			}
+		}
 	}
 
 	getCar(lap, carID, &car, &carNumber, &carName, &driverForname, &driverSurname, &driverNickname) {
@@ -7937,16 +7999,16 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		for ignore, setup in this.SessionStore.Tables["Setups.Data"] {
-			conditions := (translate(setup.Weather) . A_Space
+			conditions := (translate(setup["Weather"]) . A_Space
 						 . translate("(") . displayValue("Float", convertUnit("Temperature", setup["Temperature.Air"]), 0) . ", "
 										  . displayValue("Float", convertUnit("Temperature", setup["Temperature.Track"]), 0) . translate(")"))
 
-			this.SetupsListView.Add("", setup.Driver, conditions, translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
+			this.SetupsListView.Add("", setup["Driver"], conditions, translate(compound(setup["Tyre.Compound"], setup["Tyre.Compound.Color"]))
 									  , values2String(", ", displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Left"]))
 														  , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Front.Right"]))
 														  , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Left"]))
 														  , displayValue("Float", convertUnit("Pressure", setup["Tyre.Pressure.Rear.Right"])))
-									  , displayNullValue(setup.Notes, ""))
+									  , displayNullValue(setup["Notes"], ""))
 		}
 
 		this.SetupsListView.ModifyCol()
@@ -7987,7 +8049,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		for ignore, plan in this.SessionStore.Tables["Plan.Data"] {
-			refuel := displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0)
+			refuel := (isNumber(plan["Fuel.Amount"]) ? displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0) : plan["Fuel.Amount"])
 
 			timeActual := ""
 			lapActual := ""
@@ -8181,28 +8243,6 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		this.pushTask(loadSessionAsync)
-	}
-
-	show() {
-		local window := this.Window
-		local x, y, w, h
-
-		if getWindowPosition("Race Center", &x, &y)
-			window.Show("x" . x . " y" . y)
-		else
-			window.Show()
-
-		if getWindowSize("Race Center", &w, &h)
-			window.Resize("Initial", w, h)
-
-		while !this.iClosed
-			Sleep(1000)
-
-		this.iSyncTask.pause()
-	}
-
-	close() {
-		this.iClosed := true
 	}
 
 	showChart(drawChartFunction) {
@@ -8420,6 +8460,8 @@ class RaceCenter extends ConfigurationItem {
 			script := ""
 
 		html := ("<html>" . script . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+
+		this.iSelectedDetailHTML := html
 
 		this.DetailsViewer.Document.open()
 		this.DetailsViewer.Document.write(html)
@@ -11663,7 +11705,7 @@ startupRaceCenter() {
 	local icon := kIconsDirectory . "Console.ico"
 	local rCenter
 
-	TraySetIcon(icon,"1")
+	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
 
 	fixIE(11)
@@ -11677,8 +11719,6 @@ startupRaceCenter() {
 	registerMessageHandler("Setup", functionMessageHandler)
 
 	rCenter.show()
-
-	ExitApp(0)
 }
 
 

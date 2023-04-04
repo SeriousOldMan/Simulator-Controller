@@ -336,79 +336,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local editor := this
 		local x, y, car, track, weather, simulators, simulator, choices, chosen, tabs, button, editorGui
 
-		showActionInfo(*) {
-			local x, y, coordinateX, coordinateY, window
-
-			static currentAction := false
-			static previousAction := false
-			static actionInfo := ""
-
-			displayToolTip() {
-				SetTimer(displayToolTip, 0)
-
-				ToolTip(actionInfo)
-
-				SetTimer(removeToolTip, 10000)
-			}
-
-			removeToolTip() {
-				SetTimer(removeToolTip, 0)
-
-				ToolTip()
-			}
-
-			if (editor.SelectedModule = "Automation") {
-				window := editor.Window
-
-				MouseGetPos(&x, &y)
-
-				coordinateX := false
-				coordinateY := false
-
-				if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-					currentAction := editor.findTrackAction(coordinateX, coordinateY)
-
-					if !currentAction
-						currentAction := (coordinateX . ";" . coordinateY)
-
-					if (currentAction && (currentAction != previousAction)) {
-						ToolTip()
-
-						if isObject(currentAction) {
-							actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
-																														: "Hotkey: ")
-																					: "Command: ")
-							actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
-										 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
-										 . translate(" -> ")
-										 . actionInfo . currentAction.Action)
-						}
-						else
-							actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
-
-						SetTimer(removeToolTip, 0)
-						SetTimer(displayToolTip, 1000)
-
-						previousAction := currentAction
-					}
-					else if !currentAction {
-						ToolTip()
-
-						SetTimer(removeToolTip, 0)
-
-						previousAction := false
-					}
-				}
-				else {
-					ToolTip()
-
-					SetTimer(removeToolTip, 0)
-
-					previousAction := false
-				}
-			}
-		}
-
 		closeSessionDatabaseEditor(*) {
 			ExitApp(0)
 		}
@@ -1549,20 +1476,82 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.loadCar(car, true)
 		this.loadTrack(track, true)
 		this.loadWeather(weather, true)
-
-		this.updateState()
-
-		if (this.RequestorPID && this.moduleAvailable("Pressures"))
-			this.selectModule("Pressures")
-		else
-			this.selectModule("Settings")
-
-		OnMessage(0x0200, showActionInfo)
 	}
 
 	show() {
 		local window := this.Window
 		local x, y, w, h
+
+		showActionInfo(*) {
+			local x, y, coordinateX, coordinateY, window
+
+			static currentAction := false
+			static previousAction := false
+			static actionInfo := ""
+
+			displayToolTip() {
+				SetTimer(displayToolTip, 0)
+
+				ToolTip(actionInfo)
+
+				SetTimer(removeToolTip, 10000)
+			}
+
+			removeToolTip() {
+				SetTimer(removeToolTip, 0)
+
+				ToolTip()
+			}
+
+			if (this.SelectedModule = "Automation") {
+				MouseGetPos(&x, &y)
+
+				coordinateX := false
+				coordinateY := false
+
+				if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+					currentAction := this.findTrackAction(coordinateX, coordinateY)
+
+					if !currentAction
+						currentAction := (coordinateX . ";" . coordinateY)
+
+					if (currentAction && (currentAction != previousAction)) {
+						ToolTip()
+
+						if isObject(currentAction) {
+							actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
+																														: "Hotkey: ")
+																					: "Command: ")
+							actionInfo := (inList(this.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
+										 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
+										 . translate(" -> ")
+										 . actionInfo . currentAction.Action)
+						}
+						else
+							actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
+
+						SetTimer(removeToolTip, 0)
+						SetTimer(displayToolTip, 1000)
+
+						previousAction := currentAction
+					}
+					else if !currentAction {
+						ToolTip()
+
+						SetTimer(removeToolTip, 0)
+
+						previousAction := false
+					}
+				}
+				else {
+					ToolTip()
+
+					SetTimer(removeToolTip, 0)
+
+					previousAction := false
+				}
+			}
+		}
 
 		if getWindowPosition("Session Database", &x, &y)
 			window.Show("x" . x . " y" . y)
@@ -1571,6 +1560,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if getWindowSize("Session Database", &w, &h)
 			window.Resize("Initialize", w, h)
+		this.updateState()
+
+		if (this.RequestorPID && this.moduleAvailable("Pressures"))
+			this.selectModule("Pressures")
+		else
+			this.selectModule("Settings")
+
+		OnMessage(0x0200, showActionInfo)
 	}
 
 	getSimulators() {
@@ -5411,8 +5408,6 @@ showSessionDatabaseEditor() {
 	finally {
 		protectionOff()
 	}
-
-	return
 }
 
 

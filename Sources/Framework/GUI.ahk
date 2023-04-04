@@ -253,7 +253,11 @@ class Window extends Gui {
 			local w := this.OriginalWidth
 			local h := this.OriginalHeight
 
+			logMessage(kLogOff, this.Control.Name . " => " . values2String("; ", x, y, w, h))
+
 			this.Rule[true](&x, &y, &w, &h, deltaWidth, deltaHeight)
+
+			logMessage(kLogOff, this.Control.Name . " <= " . values2String("; ", x, y, w, h))
 
 			ControlMove(x, y, w, h, this.Control)
 		}

@@ -123,7 +123,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		RestrictResize(&deltaWidth, &deltaHeight) {
-			if (deltaWidth > 200) {
+			if (deltaWidth > 300) {
 				deltaWidth := (this.Window.Width - this.Window.MinWidth)
 
 				return true
@@ -330,14 +330,831 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		super.__New(kSimulatorConfiguration)
 
 		SessionDatabaseEditor.Instance := this
-
-		OnMessage(0x0200, WM_MOUSEMOVE)
 	}
 
 	createGui(configuration) {
+		local editor := this
 		local x, y, car, track, weather, simulators, simulator, choices, chosen, tabs, button, editorGui
 
-		editorGui := Window({Descriptor: "Session Database", Closeable: true, Resizeable: true})
+		closeSessionDatabaseEditor(*) {
+			ExitApp(0)
+		}
+
+		showSettings(*) {
+			editorGui.Opt("+Disabled")
+
+			try {
+				editSettings(editor, window)
+			}
+			finally {
+				editorGui.Opt("-Disabled")
+			}
+		}
+
+		chooseSimulator(*) {
+			editor.loadSimulator(editor.Control["simulatorDropDown"].Text)
+		}
+
+		chooseCar(*) {
+			local simulator := editor.SelectedSimulator
+			local carDropDown := editor.Control["carDropDown"].Text
+			local index, car
+
+			if (carDropDown = translate("All"))
+				editor.loadCar(true)
+			else
+				for index, car in editor.getCars(simulator)
+					if (carDropDown = editor.getCarName(simulator, car)) {
+						editor.loadCar(car)
+
+						break
+					}
+		}
+
+		chooseTrack(*) {
+			local trackDropDown := editor.Control["trackDropDown"].Text
+			local simulator, tracks, trackNames
+
+			if (trackDropDown = translate("All"))
+				editor.loadTrack(true)
+			else {
+				simulator := editor.SelectedSimulator
+				tracks := editor.getTracks(simulator, editor.SelectedCar)
+				trackNames := collect(tracks, ObjBindMethod(editor, "getTrackName", simulator))
+
+				editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
+			}
+		}
+
+		chooseWeather(*) {
+			local weatherDropDown := editor.Control["weatherDropDown"].Value
+
+			editor.loadWeather((weatherDropDown == 1) ? true : kWeatherConditions[weatherDropDown - 1])
+		}
+
+		updateNotes(*) {
+			editor.updateNotes(editor.Control["notesEdit"].Text)
+		}
+
+		chooseSetting(*) {
+			Task.startTask(chooseSettingAsync)
+		}
+
+		chooseSettingAsync() {
+			local selected, setting, value, settings, section, key, ignore, candidate
+			local labels, descriptor, type
+
+			selected := editor.SettingsListView.GetNext(0)
+
+			if !selected
+				return
+
+			setting := editor.SettingsListView.GetText(selected, 1)
+			value := editor.SettingsListView.GetText(selected, 2)
+
+			settings := editor.getAvailableSettings(selected)
+
+			section := false
+			key := false
+
+			for ignore, candidate in settings
+				if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
+					section := candidate[1]
+					key := candidate[2]
+
+					break
+				}
+
+			labels := []
+
+			for ignore, descriptor in settings
+				labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
+
+			bubbleSort(&labels)
+
+			editorGui["settingDropDown"].Delete()
+			editorGui["settingDropDown"].Add(labels)
+			editorGui["settingDropDown"].Choose(inList(labels, setting))
+
+			ignore := false
+
+			type := editor.getSettingType(section, key, &ignore)
+
+			if isObject(type) {
+				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueCheck"].Visible := false
+				editorGui["settingValueDropDown"].Visible := true
+				editorGui["settingValueDropDown"].Enabled := true
+
+				labels := collect(type, translate)
+
+				editorGui["settingValueDropDown"].Delete()
+				editorGui["settingValueDropDown"].Add(labels)
+				editorGui["settingValueDropDown"].Choose(inList(labels, value))
+			}
+			else if (type = "Boolean") {
+				editorGui["settingValueDropDown"].Visible := false
+				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueCheck"].Visible := true
+				editorGui["settingValueCheck"].Enabled := true
+
+				if (editorGui["settingValueCheck"].Value != value)
+					editorGui["settingValueCheck"].Value := (value = "x") ? true : false
+			}
+			else if (type = "Text") {
+				editorGui["settingValueDropDown"].Visible := false
+				editorGui["settingValueCheck"].Visible := false
+				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueText"].Visible := true
+				editorGui["settingValueText"].Enabled := true
+
+				if (editorGui["settingValueText"].Text != value)
+					editorGui["settingValueText"].Text := value
+			}
+			else {
+				editorGui["settingValueDropDown"].Visible := false
+				editorGui["settingValueCheck"].Visible := false
+				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueEdit"].Visible := true
+				editorGui["settingValueEdit"].Enabled := true
+
+				editor.iSelectedValue := value
+
+				if (editorGui["settingValueEdit"].Text != value)
+					editorGui["settingValueEdit"].Text := value
+			}
+
+			editor.updateState()
+		}
+
+		addSetting(*) {
+			local settings, labels, ignore, setting, type, value, default
+
+			settings := editor.getAvailableSettings(false)
+
+			labels := []
+
+			for ignore, setting in settings
+				labels.Push(editor.getSettingLabel(setting[1], setting[2]))
+
+			editorGui["settingDropDown"].Enabled := true
+
+			editorGui["settingDropDown"].Delete()
+			editorGui["settingDropDown"].Add(labels)
+			editorGui["settingDropDown"].Choose(1)
+
+			default := false
+
+			type := editor.getSettingType(settings[1][1], settings[1][2], &default)
+
+			if isObject(type) {
+				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueCheck"].Visible := false
+				editorGui["settingValueDropDown"].Visible := true
+				editorGui["settingValueDropDown"].Enabled := true
+
+				labels := collect(type, translate)
+
+				editorGui["settingValueDropDown"].Delete()
+				editorGui["settingValueDropDown"].Add(labels)
+				editorGui["settingValueDropDown"].Choose(inList(type, default))
+
+				value := default
+			}
+			else if (type = "Boolean") {
+				editorGui["settingValueDropDown"].Visible := false
+				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueCheck"].Visible := true
+				editorGui["settingValueCheck"].Enabled := true
+
+				editorGui["settingValueCheck"].Value := default
+
+				value := default
+			}
+			else if (type = "Text") {
+				editorGui["settingValueDropDown"].Visible := false
+				editorGui["settingValueCheck"].Visible := false
+				editorGui["settingValueEdit"].Visible := false
+				editorGui["settingValueText"].Visible := true
+				editorGui["settingValueText"].Enabled := true
+
+				editorGui["settingValueText"].Text := default
+
+				value := default
+			}
+			else {
+				editorGui["settingValueDropDown"].Visible := false
+				editorGui["settingValueCheck"].Visible := false
+				editorGui["settingValueText"].Visible := false
+				editorGui["settingValueEdit"].Visible := true
+				editorGui["settingValueEdit"].Enabled := true
+
+				value := default
+
+				editor.iSelectedValue := displayValue("Float", value)
+				editorGui["settingValueEdit"].Text := editor.iSelectedValue
+			}
+
+			editor.addSetting(settings[1][1], settings[1][2], value)
+		}
+
+		deleteSetting(*) {
+			local settingDropDown := window["settingDropDown"].Text
+			local selected, settings, section, key, ignore, setting
+
+			selected := editor.SettingsListView.GetNext(0)
+
+			if !selected
+				return
+
+			settings := editor.getAvailableSettings(selected)
+
+			section := false
+			key := false
+
+			for ignore, setting in settings
+				if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+					section := setting[1]
+					key := setting[2]
+
+					break
+				}
+
+			SessionDatabaseEditor.Instance.deleteSetting(section, key)
+		}
+
+		selectSetting(*) {
+			selectSettingAsync() {
+				local settingDropDown := editorGui["settingDropDown"].Text
+				local selected, settings, section, key, ignore, setting, type, value, default, labels
+
+				selected := editor.SettingsListView.GetNext(0)
+
+				if !selected
+					return
+
+				settings := editor.getAvailableSettings(selected)
+
+				section := false
+				key := false
+
+				for ignore, setting in settings
+					if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+						section := setting[1]
+						key := setting[2]
+
+						break
+					}
+
+				default := false
+
+				type := editor.getSettingType(section, key, &default)
+
+				if isObject(type) {
+					editorGui["settingValueEdit"].Visible := false
+					editorGui["settingValueText"].Visible := false
+					editorGui["settingValueCheck"].Visible := false
+					editorGui["settingValueDropDown"].Visible := true
+					editorGui["settingValueDropDown"].Enabled := true
+
+					labels := collect(type, translate)
+
+					editorGui["settingValueDropDown"].Delete()
+					editorGui["settingValueDropDown"].Add(labels)
+					editorGui["settingValueDropDown"].Choose(inList(type, default))
+
+					value := default
+				}
+				else if (type = "Boolean") {
+					editorGui["settingValueDropDown"].Visible := false
+					editorGui["settingValueEdit"].Visible := false
+					editorGui["settingValueText"].Visible := false
+					editorGui["settingValueCheck"].Visible := true
+					editorGui["settingValueCheck"].Enabled := true
+
+					editorGui["settingValueCheck"].Value := default
+
+					value := default
+				}
+				else if (type = "Text") {
+					editorGui["settingValueDropDown"].Visible := false
+					editorGui["settingValueEdit"].Visible := false
+					editorGui["settingValueCheck"].Visible := false
+					editorGui["settingValueText"].Visible := true
+					editorGui["settingValueText"].Enabled := true
+
+					editorGui["settingValueText"].Text := default
+
+					value := default
+				}
+				else {
+					editorGui["settingValueDropDown"].Visible := false
+					editorGui["settingValueCheck"].Visible := false
+					editorGui["settingValueText"].Visible := false
+					editorGui["settingValueEdit"].Visible := true
+					editorGui["settingValueEdit"].Enabled := true
+
+					value := default
+
+					editor.iSelectedValue := displayValue("Float", value)
+					editorGui["settingValueEdit"].Text := editor.iSelectedValue
+				}
+
+				editor.updateSetting(section, key, value)
+			}
+
+			Task.startTask(selectSettingAsync)
+		}
+
+		changeSetting(*) {
+			changeSettingAsync() {
+				local selected, settings, section, key, ignore, setting
+				local type, value, oldValue, settingDropDown, settingValue
+
+				if (editor.SelectedModule = "Settings") {
+					selected := editor.SettingsListView.GetNext(0)
+
+					if !selected
+						return
+
+					settingDropDown := editorGui["settingDropDown"].Text
+
+					settings := editor.getAvailableSettings(selected)
+
+					section := false
+					key := false
+
+					for ignore, setting in settings
+						if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
+							section := setting[1]
+							key := setting[2]
+
+							break
+						}
+
+					ignore := false
+
+					type := editor.getSettingType(section, key, &ignore)
+
+					if isObject(type)
+						value := type[inList(collect(type, translate), editorGui["settingValueDropDown"].Text)]
+					else if (type = "Boolean")
+						value := editorGui["settingValueCheck"].Value
+					else if (type = "Text") {
+						settingValue := editorGui["settingValueText"].Value
+
+						if InStr(settingValue, "`n") {
+							settingValue := StrReplace(settingValue, "`n", A_Space)
+
+							editorGui["settingValueText"].Value := settingValue
+						}
+
+						value := settingValue
+					}
+					else {
+						oldValue := editor.iSelectedValue
+
+						settingValue := editorGui["settingValueEdit"].Text
+
+						if (type = "Integer") {
+							if !isInteger(settingValue) {
+								settingValue := oldValue
+
+								editorGui["settingValueEdit"].Text := oldValue
+							}
+
+							value := settingValue
+						}
+						else if (type = "Float") {
+							value := internalValue("Float", editorGui["settingValueEdit"])
+
+							if !isNumber(value) {
+								editorGui["settingValueEdit"].Text := oldValue
+
+								value := internalValue("Float", oldValue)
+							}
+						}
+					}
+
+					editor.updateSetting(section, key, value)
+				}
+			}
+
+			Task.startTask(changeSettingAsync)
+		}
+
+		chooseStrategy(listView, line, *) {
+			if line
+				SessionDatabaseEditor.Instance.selectStrategy(line)
+		}
+
+		updateStrategyAccess(*) {
+			local sessionDB := editor.SessionDatabase
+			local selected, type, name
+
+			selected := editor.StrategyListView.GetNext(0)
+
+			if selected {
+				name := editor.StrategyListView.GetText(selected, 2)
+
+				info := sessionDB.readStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
+
+				setMultiMapValue(info, "Strategy", "Synchronized", false)
+				setMultiMapValue(info, "Access", "Share", editor.Control["shareStrategyWithCommunityCheck"].Value)
+				setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareStrategyWithTeamServerCheck"].Value)
+
+				sessionDB.writeStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
+			}
+		}
+
+		uploadStrategy(*) {
+			editor.uploadStrategy()
+		}
+
+		downloadStrategy(*) {
+			editor.downloadStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
+		}
+
+		renameStrategy(*) {
+			editor.renameStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
+		}
+
+		deleteStrategy(*) {
+			editor.deleteStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
+		}
+
+		chooseSetupType(dropDown, *) {
+			editor.loadSetups(kSetupTypes[dropDown.Value])
+		}
+
+		chooseSetup(listView, line, *) {
+			if line
+				editor.selectSetup(line)
+		}
+
+		updateSetupAccess(*) {
+			local sessionDB := editor.SessionDatabase
+			local selected, type, name
+
+			type := kSetupTypes[editor.Control["setupTypeDropDown"].Value]
+
+			selected := editor.SetupListView.GetNext(0)
+
+			if selected {
+				name := editor.SetupListView.GetText(selected, 2)
+
+				info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
+
+				setMultiMapValue(info, "Setup", "Synchronized", false)
+				setMultiMapValue(info, "Access", "Share", editor.Control["shareSetupWithCommunityCheck"].Value)
+				setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareSetupWithTeamServerCheck"].Value)
+
+				sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
+			}
+		}
+
+		uploadSetup(*) {
+			editor.uploadSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value])
+		}
+
+		downloadSetup(*) {
+			editor.downloadSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
+		}
+
+		renameSetup(*) {
+			editor.renameSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
+		}
+
+		deleteSetup(*) {
+			editor.deleteSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
+		}
+
+		loadPressures(*) {
+			if (editor.SelectedModule = "Pressures")
+				WindowTask(editor.Window, ObjBindMethod(editor, "loadPressures"), 100).start()
+		}
+
+		editPressures(*) {
+			if (editor.SelectedModule = "Pressures")
+				WindowTask(editor.Window, ObjBindMethod(editor, "openPressuresEditor"), 100).start()
+		}
+
+		selectTrackAction(*) {
+			local coordinateX := false
+			local coordinateY := false
+			local action := false
+			local x, y, originalX, originalY, currentX, currentY, msgResult
+
+			MouseGetPos(&x, &y)
+
+			if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+				action := editor.findTrackAction(coordinateX, coordinateY)
+
+				if action {
+					if GetKeyState("Ctrl", "P") {
+						OnMessage(0x44, translateYesNoButtons)
+						msgResult := MsgBox(translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
+						OnMessage(0x44, translateYesNoButtons, 0)
+
+						if (msgResult = "Yes")
+							editor.deleteTrackAction(action)
+					}
+					else {
+						originalX := action.X
+						originalY := action.Y
+
+						while (GetKeyState("LButton", "P")) {
+							MouseGetPos(&x, &y)
+
+							if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+								action.X := coordinateX
+								action.Y := coordinateY
+
+								editor.updateTrackMap()
+							}
+						}
+
+						currentX := action.X
+						currentY := action.Y
+
+						action.X := originalX
+						action.Y := originalY
+
+						if (editor.findTrackAction(currentX, currentY) == action) {
+							editor.updateTrackMap()
+
+							editor.actionClicked(originalX, originalY, action)
+						}
+						else {
+							action.X := currentX
+							action.Y := currentY
+						}
+					}
+				}
+				else
+					editor.trackClicked(coordinateX, coordinateY)
+			}
+		}
+
+		selectTrackAutomation(listView, line, *) {
+			local index, trackAutomation, checkedRows, checked, changed, ignore, row
+
+			if line {
+				trackAutomation := editor.TrackAutomations[line].Clone()
+				trackAutomation.Actions := trackAutomation.Actions.Clone()
+				trackAutomation.Origin := editor.TrackAutomations[line]
+
+				editor.iSelectedTrackAutomation := trackAutomation
+
+				editorGui["trackAutomationNameEdit"].Value := trackAutomation.Name
+
+				editor.updateTrackAutomationInfo()
+
+				editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
+
+				editor.updateState()
+
+				checkedRows := []
+				checked := editor.TrackAutomationsListView.GetNext(0, "C")
+
+				while checked {
+					checkedRows.Push(checked)
+
+					checked := editor.TrackAutomationsListView.GetNext(checked, "C")
+				}
+
+				changed := false
+
+				for index, trackAutomation in editor.TrackAutomations
+					if !inList(checkedRows, index)
+						if trackAutomation.Active {
+							trackAutomation.Active := false
+
+							changed := true
+						}
+
+				for index, row in checkedRows
+					if !editor.TrackAutomations[row].Active {
+						editor.TrackAutomations[row].Active := true
+
+						checkedRows.RemoveAt(index)
+
+						changed := true
+
+						break
+					}
+
+				if changed {
+					for ignore, row in checkedRows {
+						editor.TrackAutomations[row].Active := false
+
+						editor.TrackAutomationsListView.Modify(row, "-Check")
+					}
+
+					editor.writeTrackAutomations(false)
+				}
+			}
+		}
+
+		addTrackAutomation(*) {
+			editor.addTrackAutomation()
+		}
+
+		deleteTrackAutomation(*) {
+			local msgResult
+
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Do you really want to delete the selected automation?"), translate("Delete"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
+
+			if (msgResult = "Yes")
+				editor.deleteTrackAutomation()
+		}
+
+		saveTrackAutomation(*) {
+			editor.saveTrackAutomation()
+		}
+
+		selectData(*) {
+			editor.updateState()
+		}
+
+		selectAllData(*) {
+			local listView := editor.AdministrationListView
+			local dataSelectCheck := editor.Control["dataSelectCheck"].Value
+
+			if (dataSelectCheck == -1) {
+				dataSelectCheck := 0
+
+				editor.Control["dataSelectCheck"].Value := 0
+			}
+
+			loop listView.GetCount()
+				listView.Modify(A_Index, dataSelectCheck ? "Check" : "-Check")
+
+			editor.updateState()
+		}
+
+		exportData(*) {
+			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			local folder
+
+			editor.Window.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translator)
+			folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select target folder..."))
+			OnMessage(0x44, translator, 0)
+
+			if (folder != "")
+				editor.exportData(folder . "\Export_" . A_Now)
+		}
+
+		importData(*) {
+			local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+			local folder, info, selection
+
+			editorGui.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translator)
+			folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select export folder..."))
+			OnMessage(0x44, translator, 0)
+
+			if (folder != "")
+				if FileExist(folder . "\Export.info") {
+					info := readMultiMap(folder . "\Export.info")
+
+					if (getMultiMapValue(info, "General", "Simulator") = editor.SelectedSimulator) {
+						editorGui.Opt("+Disabled")
+
+						try {
+							selection := selectImportData(editor, folder, window)
+
+							if selection
+								editor.importData(folder, selection)
+						}
+						finally {
+							editorGui.Opt("-Disabled")
+						}
+					}
+					else {
+						OnMessage(0x44, translateOkButton)
+						MsgBox(translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
+						OnMessage(0x44, translateOkButton, 0)
+					}
+				}
+				else {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("This is not a valid folder with exported data."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+				}
+		}
+
+		deleteData(*) {
+			local msgResult
+
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
+
+			if (msgResult = "Yes")
+				editor.deleteData()
+		}
+
+		chooseTab(module, *) {
+			if editor.moduleAvailable(module)
+				editor.selectModule(module)
+		}
+
+		chooseDatabaseScope(*) {
+			local persistent, msgResult
+
+			persistent := false
+
+			if GetKeyState("Ctrl", "P") {
+				OnMessage(0x44, translateYesNoButtons)
+				msgResult := MsgBox(translate("Do you really want to change the scope for all applications?"), translate("Modular Simulator Controller System"), 262436)
+				OnMessage(0x44, translateYesNoButtons, 0)
+
+				if (msgResult = "Yes")
+					persistent := true
+			}
+
+			if (persistent || ((editor.Control["databaseScopeDropDown"].Value == 2) != editor.UseCommunity)) {
+				editor.UseCommunity[persistent] := (editor.Control["databaseScopeDropDown"].Value == 2)
+
+				editor.loadSimulator(editor.SelectedSimulator, true)
+			}
+		}
+
+		transferPressures(*) {
+			local sessionDB := editor.SessionDatabase
+			local tyrePressures, compounds, compound, compoundColor, ignore, pressureInfo, driver
+
+			if (editorGui["driverDropDown"].Text = translate("All"))
+				driver := [true]
+			else
+				driver := [sessionDB.getDriverID(editor.SelectedSimulator, editorGui["driverDropDown"].Text)]
+
+			tyrePressures := []
+
+			compounds := sessionDB.getTyreCompounds(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack)
+
+			compound := false
+			compoundColor := false
+
+			splitCompound(compounds[editorGui["tyreCompoundDropDown"].Value], &compound, &compoundColor)
+
+			for ignore, pressureInfo in SessionDatabaseEditor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
+																							   , editor.SelectedTrack, editor.SelectedWeather
+																							   , convertUnit("Temperature", editorGui["airTemperatureEdit"].Value, false)
+																							   , convertUnit("Temperature", editorGui["trackTemperatureEdit"].Value, false)
+																							   , compound, compoundColor, driver*)
+				tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
+
+			messageSend(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)
+		}
+
+		testSettings(*) {
+			local exePath := kBinariesDirectory . "Race Settings.exe"
+			local fileName := kTempDirectory . "Temp.settings"
+			local settings, section, values, key, value, options
+
+			try {
+				settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
+
+				for section, values in SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
+																	 , editor.SelectedTrack["*"], editor.SelectedWeather["*"], false)
+					for key, value in values
+						setMultiMapValue(settings, section, key, value)
+
+				writeMultiMap(fileName, settings)
+
+				options := "-NoTeam -Test -File `"" . fileName . "`""
+
+				if (editor.SelectedSimulator)
+					options .= (" -Simulator `"" . editor.SelectedSimulator . "`"")
+
+				if (editor.SelectedCar)
+					options .= (" -Car `"" . editor.SelectedCar . "`"")
+
+				if (editor.SelectedTrack)
+					options .= (" -Track `"" . editor.SelectedTrack . "`"")
+
+				Run("`"" . exePath . "`" " . options, kBinariesDirectory)
+			}
+			catch Any as exception {
+				logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+
+				showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
+
+		editorGui := Window({Descriptor: "Session Database", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 
 		this.iWindow := editorGui
 
@@ -484,7 +1301,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("DropDownList", "xp+90 yp w270 Y:Move W:Grow vsettingDropDown").OnEvent("Change", selectSetting)
 
 		editorGui.Add("Text", "x296 yp+24 w80 h23 Y:Move +0x200", translate("Value"))
-		editorGui.Add("DropDownList", "xp+90 yp w180 Y:Move W:Grow vsettingValueDropDown").OnEvent("Change", changeSetting)
+		editorGui.Add("DropDownList", "xp+90 yp w180 Y:Move vsettingValueDropDown").OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w50 Y:Move vsettingValueEdit").OnEvent("Change", changeSetting)
 		editorGui.Add("Edit", "xp yp w210 h57 Y:Move W:Grow vsettingValueText").OnEvent("Change", changeSetting)
 		editorGui.Add("CheckBox", "xp yp+4 Y:Move vsettingValueCheck").OnEvent("Click", changeSetting)
@@ -602,25 +1419,25 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.iTrackDisplayArea := [297, 239, 358, 350]
 
-		editorGui.Add("Picture", "x296 y238 w360 h352 W:Grow H:Grow Border vtrackDisplayArea")
+		editorGui.Add("Picture", "x296 y238 w360 h352 W:Grow H:Grow(0.9) Border vtrackDisplayArea")
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
-		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 Y:Move W:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 
-		editorGui.Add("Text", "x415 yp w60 h23 Y:Move X:Move +0x200", translate("Name"))
-		editorGui.Add("Edit", "xp+60 yp w109 Y:Move X:Move vtrackAutomationNameEdit")
+		editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.9) +0x200", translate("Name"))
+		editorGui.Add("Edit", "xp+60 yp w109 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) vtrackAutomationNameEdit")
 
-		editorGui.Add("Button", "x584 yp w23 h23 Y:Move X:Move vaddTrackAutomationButton").OnEvent("Click", addTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move vdeleteTrackAutomationButton").OnEvent("Click", deleteTrackAutomation)
-		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move X:Move Center +0x200 vsaveTrackAutomationButton").OnEvent("Click", saveTrackAutomation)
+		editorGui.Add("Button", "x584 yp w23 h23 Y:Move(0.9) X:Move vaddTrackAutomationButton").OnEvent("Click", addTrackAutomation)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move vdeleteTrackAutomationButton").OnEvent("Click", deleteTrackAutomation)
+		editorGui.Add("Button", "xp+25 yp w23 h23 Y:Move(0.9) X:Move Center +0x200 vsaveTrackAutomationButton").OnEvent("Click", saveTrackAutomation)
 		setButtonIcon(editorGui["addTrackAutomationButton"], kIconsDirectory . "Plus.ico", 1)
 		setButtonIcon(editorGui["deleteTrackAutomationButton"], kIconsDirectory . "Minus.ico", 1)
 		setButtonIcon(editorGui["saveTrackAutomationButton"], kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move X:Move +0x200", translate("Actions"))
-		editorGui.Add("Edit", "xp+60 yp w181 h61 Y:Move X:Move ReadOnly -Wrap vtrackAutomationInfoEdit")
+		editorGui.Add("Text", "x415 yp+24 w60 h23 Y:Move(0.9) X:Move(0.8) +0x200", translate("Actions"))
+		editorGui.Add("Edit", "xp+60 yp w181 h61 Y:Move(0.9) X:Move(0.8) W:Grow(0.2) H:Grow(0.1) ReadOnly -Wrap vtrackAutomationInfoEdit")
 
 		editorGui["settingsTab"].UseTab(6)
 
@@ -659,18 +1476,82 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.loadCar(car, true)
 		this.loadTrack(track, true)
 		this.loadWeather(weather, true)
-
-		this.updateState()
-
-		if (this.RequestorPID && this.moduleAvailable("Pressures"))
-			this.selectModule("Pressures")
-		else
-			this.selectModule("Settings")
 	}
 
 	show() {
 		local window := this.Window
 		local x, y, w, h
+
+		showActionInfo(*) {
+			local x, y, coordinateX, coordinateY, window
+
+			static currentAction := false
+			static previousAction := false
+			static actionInfo := ""
+
+			displayToolTip() {
+				SetTimer(displayToolTip, 0)
+
+				ToolTip(actionInfo)
+
+				SetTimer(removeToolTip, 10000)
+			}
+
+			removeToolTip() {
+				SetTimer(removeToolTip, 0)
+
+				ToolTip()
+			}
+
+			if (this.SelectedModule = "Automation") {
+				MouseGetPos(&x, &y)
+
+				coordinateX := false
+				coordinateY := false
+
+				if this.findTrackCoordinate(x - this.iTrackDisplayArea[1], y - this.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
+					currentAction := this.findTrackAction(coordinateX, coordinateY)
+
+					if !currentAction
+						currentAction := (coordinateX . ";" . coordinateY)
+
+					if (currentAction && (currentAction != previousAction)) {
+						ToolTip()
+
+						if isObject(currentAction) {
+							actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
+																														: "Hotkey: ")
+																					: "Command: ")
+							actionInfo := (inList(this.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
+										 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
+										 . translate(" -> ")
+										 . actionInfo . currentAction.Action)
+						}
+						else
+							actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
+
+						SetTimer(removeToolTip, 0)
+						SetTimer(displayToolTip, 1000)
+
+						previousAction := currentAction
+					}
+					else if !currentAction {
+						ToolTip()
+
+						SetTimer(removeToolTip, 0)
+
+						previousAction := false
+					}
+				}
+				else {
+					ToolTip()
+
+					SetTimer(removeToolTip, 0)
+
+					previousAction := false
+				}
+			}
+		}
 
 		if getWindowPosition("Session Database", &x, &y)
 			window.Show("x" . x . " y" . y)
@@ -679,6 +1560,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if getWindowSize("Session Database", &w, &h)
 			window.Resize("Initialize", w, h)
+		this.updateState()
+
+		if (this.RequestorPID && this.moduleAvailable("Pressures"))
+			this.selectModule("Pressures")
+		else
+			this.selectModule("Settings")
+
+		OnMessage(0x0200, showActionInfo)
 	}
 
 	getSimulators() {
@@ -2745,10 +3634,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		type := getMultiMapValue(this.SettingDescriptors, section . ".Types", key, false)
 
 		if type {
-			type := string2Values(";", type)
+			if InStr(type, ";") {
+				type := string2Values(";", type)
 
-			default := type[2]
-			type := type[1]
+				default := type[2]
+				type := type[1]
+			}
+			else
+				default := ""
 
 			if InStr(type, "Choices:")
 				type := string2Values(",", string2Values(":", type)[2])
@@ -3330,6 +4223,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+noSelect(listView, line, *) {
+	if line
+		listView.Modify(line, "-Select")
+}
 
 copyDirectory(source, destination, progressStep, &count) {
 	local files := []
@@ -4442,959 +5340,6 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	}
 }
 
-WM_MOUSEMOVE(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local x, y, coordinateX, coordinateY, window
-
-	static currentAction := false
-	static previousAction := false
-	static actionInfo := ""
-
-    displayToolTip() {
-		SetTimer(displayToolTip, 0)
-
-		ToolTip(actionInfo)
-
-		SetTimer(removeToolTip, 10000)
-	}
-
-    removeToolTip() {
-		SetTimer(removeToolTip, 0)
-
-		ToolTip()
-	}
-
-	if (editor.SelectedModule = "Automation") {
-		window := editor.Window
-
-		MouseGetPos(&x, &y)
-
-		coordinateX := false
-		coordinateY := false
-
-		if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-			currentAction := editor.findTrackAction(coordinateX, coordinateY)
-
-			if !currentAction
-				currentAction := (coordinateX . ";" . coordinateY)
-
-			if (currentAction && (currentAction != previousAction)) {
-				ToolTip()
-
-				if isObject(currentAction) {
-					actionInfo := translate((currentAction.Type = "Hotkey") ? (InStr(currentAction.Action, "|") ? "Hotkey(s): "
-																												: "Hotkey: ")
-																			: "Command: ")
-					actionInfo := (inList(editor.SelectedTrackAutomation.Actions, currentAction) . translate(": ")
-								 . (Round(currentAction.X, 3) . translate(", ") . Round(currentAction.Y, 3))
-								 . translate(" -> ")
-								 . actionInfo . currentAction.Action)
-				}
-				else
-					actionInfo := (Round(string2Values(";", currentAction)[1], 3) . translate(", ") . Round(string2Values(";", currentAction)[2], 3))
-
-				SetTimer(removeToolTip, 0)
-				SetTimer(displayToolTip, 1000)
-
-				previousAction := currentAction
-			}
-			else if !currentAction {
-				ToolTip()
-
-				SetTimer(removeToolTip, 0)
-
-				previousAction := false
-			}
-		}
-		else {
-			ToolTip()
-
-			SetTimer(removeToolTip, 0)
-
-			previousAction := false
-		}
-	}
-}
-
-closeSessionDatabaseEditor(*) {
-	ExitApp(0)
-}
-
-showSettings(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-
-	protectionOn()
-
-	window.Opt("+Disabled")
-
-	try {
-		editSettings(editor, window)
-	}
-	finally {
-		window.Opt("-Disabled")
-
-		protectionOff()
-	}
-}
-
-chooseSimulator(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.loadSimulator(editor.Control["simulatorDropDown"].Text)
-}
-
-chooseCar(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local simulator := editor.SelectedSimulator
-	local carDropDown := editor.Control["carDropDown"].Text
-	local index, car
-
-	if (carDropDown = translate("All"))
-		editor.loadCar(true)
-	else
-		for index, car in editor.getCars(simulator)
-			if (carDropDown = editor.getCarName(simulator, car)) {
-				editor.loadCar(car)
-
-				break
-			}
-}
-
-chooseTrack(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local trackDropDown := editor.Control["trackDropDown"].Text
-	local simulator, tracks, trackNames
-
-	if (trackDropDown = translate("All"))
-		editor.loadTrack(true)
-	else {
-		simulator := editor.SelectedSimulator
-		tracks := editor.getTracks(simulator, editor.SelectedCar)
-		trackNames := collect(tracks, ObjBindMethod(editor, "getTrackName", simulator))
-
-		editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
-	}
-}
-
-chooseWeather(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local weatherDropDown := editor.Control["weatherDropDown"].Value
-
-	editor.loadWeather((weatherDropDown == 1) ? true : kWeatherConditions[weatherDropDown - 1])
-}
-
-updateNotes(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.updateNotes(editor.Control["notesEdit"].Text)
-}
-
-chooseSetting(*) {
-	Task.startTask(chooseSettingAsync)
-}
-
-chooseSettingAsync() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local selected, setting, value, settings, section, key, ignore, candidate
-	local labels, descriptor, type
-
-	selected := editor.SettingsListView.GetNext(0)
-
-	if !selected
-		return
-
-	setting := editor.SettingsListView.GetText(selected, 1)
-	value := editor.SettingsListView.GetText(selected, 2)
-
-	settings := editor.getAvailableSettings(selected)
-
-	section := false
-	key := false
-
-	for ignore, candidate in settings
-		if (setting = editor.getSettingLabel(candidate[1], candidate[2])) {
-			section := candidate[1]
-			key := candidate[2]
-
-			break
-		}
-
-	labels := []
-
-	for ignore, descriptor in settings
-		labels.Push(editor.getSettingLabel(descriptor[1], descriptor[2]))
-
-	bubbleSort(&labels)
-
-	window["settingDropDown"].Delete()
-	window["settingDropDown"].Add(labels)
-	window["settingDropDown"].Choose(inList(labels, setting))
-
-	ignore := false
-
-	type := editor.getSettingType(section, key, &ignore)
-
-	if isObject(type) {
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueDropDown"].Visible := true
-		window["settingValueDropDown"].Enabled := true
-
-		labels := collect(type, translate)
-
-		window["settingValueDropDown"].Delete()
-		window["settingValueDropDown"].Add(labels)
-		window["settingValueDropDown"].Choose(inList(labels, value))
-	}
-	else if (type = "Boolean") {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueCheck"].Visible := true
-		window["settingValueCheck"].Enabled := true
-
-		if (window["settingValueCheck"].Value != value)
-			window["settingValueCheck"].Value := (value = "x") ? true : false
-	}
-	else if (type = "Text") {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := true
-		window["settingValueText"].Enabled := true
-
-		if (window["settingValueText"].Text != value)
-			window["settingValueText"].Text := value
-	}
-	else {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueEdit"].Visible := true
-		window["settingValueEdit"].Enabled := true
-
-		editor.iSelectedValue := value
-
-		if (window["settingValueEdit"].Text != value)
-			window["settingValueEdit"].Text := value
-	}
-
-	editor.updateState()
-}
-
-addSetting(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local settings, labels, ignore, setting, type, value, default
-
-	settings := editor.getAvailableSettings(false)
-
-	labels := []
-
-	for ignore, setting in settings
-		labels.Push(editor.getSettingLabel(setting[1], setting[2]))
-
-	window["settingDropDown"].Enabled := true
-
-	window["settingDropDown"].Delete()
-	window["settingDropDown"].Add(labels)
-	window["settingDropDown"].Choose(1)
-
-	default := false
-
-	type := editor.getSettingType(settings[1][1], settings[1][2], &default)
-
-	if isObject(type) {
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueDropDown"].Visible := true
-		window["settingValueDropDown"].Enabled := true
-
-		labels := collect(type, translate)
-
-		window["settingValueDropDown"].Delete()
-		window["settingValueDropDown"].Add(labels)
-		window["settingValueDropDown"].Choose(inList(type, default))
-
-		value := default
-	}
-	else if (type = "Boolean") {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueCheck"].Visible := true
-		window["settingValueCheck"].Enabled := true
-
-		window["settingValueCheck"].Value := default
-
-		value := default
-	}
-	else if (type = "Text") {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := true
-		window["settingValueText"].Enabled := true
-
-		window["settingValueText"].Text := default
-
-		value := default
-	}
-	else {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueEdit"].Visible := true
-		window["settingValueEdit"].Enabled := true
-
-		value := default
-
-		editor.iSelectedValue := displayValue("Float", value)
-		window["settingValueEdit"].Text := editor.iSelectedValue
-	}
-
-	editor.addSetting(settings[1][1], settings[1][2], value)
-}
-
-deleteSetting(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local settingDropDown := window["settingDropDown"].Text
-	local selected, settings, section, key, ignore, setting
-
-	selected := editor.SettingsListView.GetNext(0)
-
-	if !selected
-		return
-
-	settings := editor.getAvailableSettings(selected)
-
-	section := false
-	key := false
-
-	for ignore, setting in settings
-		if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-			section := setting[1]
-			key := setting[2]
-
-			break
-		}
-
-	SessionDatabaseEditor.Instance.deleteSetting(section, key)
-}
-
-selectSetting(*) {
-	Task.startTask(selectSettingAsync)
-}
-
-selectSettingAsync() {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local settingDropDown := window["settingDropDown"].Text
-	local selected, settings, section, key, ignore, setting, type, value, default, labels
-
-	selected := editor.SettingsListView.GetNext(0)
-
-	if !selected
-		return
-
-	settings := editor.getAvailableSettings(selected)
-
-	section := false
-	key := false
-
-	for ignore, setting in settings
-		if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-			section := setting[1]
-			key := setting[2]
-
-			break
-		}
-
-	default := false
-
-	type := editor.getSettingType(section, key, &default)
-
-	if isObject(type) {
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueDropDown"].Visible := true
-		window["settingValueDropDown"].Enabled := true
-
-		labels := collect(type, translate)
-
-		window["settingValueDropDown"].Delete()
-		window["settingValueDropDown"].Add(labels)
-		window["settingValueDropDown"].Choose(inList(type, default))
-
-		value := default
-	}
-	else if (type = "Boolean") {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueEdit"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueCheck"].Visible := true
-		window["settingValueCheck"].Enabled := true
-
-		window["settingValueCheck"].Value := default
-
-		value := default
-	}
-	else if (type = "Text") {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueEdit"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueText"].Visible := true
-		window["settingValueText"].Enabled := true
-
-		window["settingValueText"].Text := default
-
-		value := default
-	}
-	else {
-		window["settingValueDropDown"].Visible := false
-		window["settingValueCheck"].Visible := false
-		window["settingValueText"].Visible := false
-		window["settingValueEdit"].Visible := true
-		window["settingValueEdit"].Enabled := true
-
-		value := default
-
-		editor.iSelectedValue := displayValue("Float", value)
-		window["settingValueEdit"].Text := editor.iSelectedValue
-	}
-
-	editor.updateSetting(section, key, value)
-}
-
-changeSetting(*) {
-	Task.startTask(changeSettingAsync)
-}
-
-changeSettingAsync() {
-	local editor := SessionDatabaseEditor.Instance
-	local window, selected, settings, section, key, ignore, setting
-	local type, value, oldValue, settingDropDown, settingValue
-
-	if (editor.SelectedModule = "Settings") {
-		window := editor.Window
-
-		selected := editor.SettingsListView.GetNext(0)
-
-		if !selected
-			return
-
-		settingDropDown := window["settingDropDown"].Text
-
-		settings := editor.getAvailableSettings(selected)
-
-		section := false
-		key := false
-
-		for ignore, setting in settings
-			if (settingDropDown = editor.getSettingLabel(setting[1], setting[2])) {
-				section := setting[1]
-				key := setting[2]
-
-				break
-			}
-
-		ignore := false
-
-		type := editor.getSettingType(section, key, &ignore)
-
-		if isObject(type)
-			value := type[inList(collect(type, translate), window["settingValueDropDown"].Text)]
-		else if (type = "Boolean")
-			value := window["settingValueCheck"].Value
-		else if (type = "Text") {
-			settingValue := window["settingValueText"].Value
-
-			if InStr(settingValue, "`n") {
-				settingValue := StrReplace(settingValue, "`n", A_Space)
-
-				window["settingValueText"].Value := settingValue
-			}
-
-			value := settingValue
-		}
-		else {
-			oldValue := editor.iSelectedValue
-
-			settingValue := window["settingValueEdit"].Text
-
-			if (type = "Integer") {
-				if !isInteger(settingValue) {
-					settingValue := oldValue
-
-					window["settingValueEdit"].Text := oldValue
-				}
-
-				value := settingValue
-			}
-			else if (type = "Float") {
-				value := internalValue("Float", window["settingValueEdit"])
-
-				if !isNumber(value) {
-					window["settingValueEdit"].Text := oldValue
-
-					value := internalValue("Float", oldValue)
-				}
-			}
-		}
-
-		editor.updateSetting(section, key, value)
-	}
-}
-
-chooseStrategy(listView, line, *) {
-	if line
-		SessionDatabaseEditor.Instance.selectStrategy(line)
-}
-
-updateStrategyAccess(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local sessionDB := editor.SessionDatabase
-	local selected, type, name
-
-	selected := editor.StrategyListView.GetNext(0)
-
-	if selected {
-		name := editor.StrategyListView.GetText(selected, 2)
-
-		info := sessionDB.readStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name)
-
-		setMultiMapValue(info, "Strategy", "Synchronized", false)
-		setMultiMapValue(info, "Access", "Share", editor.Control["shareStrategyWithCommunityCheck"].Value)
-		setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareStrategyWithTeamServerCheck"].Value)
-
-		sessionDB.writeStrategyInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, name, info)
-	}
-}
-
-uploadStrategy(*) {
-	SessionDatabaseEditor.Instance.uploadStrategy()
-}
-
-downloadStrategy(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.downloadStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
-}
-
-renameStrategy(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.renameStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
-}
-
-deleteStrategy(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.deleteStrategy(editor.StrategyListView.GetText(editor.StrategyListView.GetNext(0), 2))
-}
-
-chooseSetupType(dropDown, *) {
-	SessionDatabaseEditor.Instance.loadSetups(kSetupTypes[dropDown.Value])
-}
-
-chooseSetup(listView, line, *) {
-	if line
-		SessionDatabaseEditor.Instance.selectSetup(line)
-}
-
-updateSetupAccess(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local sessionDB := editor.SessionDatabase
-	local selected, type, name
-
-	type := kSetupTypes[editor.Control["setupTypeDropDown"].Value]
-
-	selected := editor.SetupListView.GetNext(0)
-
-	if selected {
-		name := editor.SetupListView.GetText(selected, 2)
-
-		info := sessionDB.readSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name)
-
-		setMultiMapValue(info, "Setup", "Synchronized", false)
-		setMultiMapValue(info, "Access", "Share", editor.Control["shareSetupWithCommunityCheck"].Value)
-		setMultiMapValue(info, "Access", "Synchronize", editor.Control["shareSetupWithTeamServerCheck"].Value)
-
-		sessionDB.writeSetupInfo(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack, type, name, info)
-	}
-}
-
-uploadSetup(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.uploadSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value])
-}
-
-downloadSetup(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.downloadSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
-}
-
-renameSetup(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.renameSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
-}
-
-deleteSetup(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	editor.deleteSetup(kSetupTypes[editor.Control["setupTypeDropDown"].Value], editor.SetupListView.GetText(editor.SetupListView.GetNext(0), 2))
-}
-
-loadPressures(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	if (editor.SelectedModule = "Pressures")
-		WindowTask(editor.Window, ObjBindMethod(editor, "loadPressures"), 100).start()
-}
-
-editPressures(*) {
-	local editor := SessionDatabaseEditor.Instance
-
-	if (editor.SelectedModule = "Pressures")
-		WindowTask(editor.Window, ObjBindMethod(editor, "openPressuresEditor"), 100).start()
-}
-
-noSelect(listView, line, *) {
-	if line
-		listView.Modify(line, "-Select")
-}
-
-selectTrackAction(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local coordinateX := false
-	local coordinateY := false
-	local action := false
-	local x, y, originalX, originalY, currentX, currentY, msgResult
-
-	MouseGetPos(&x, &y)
-
-	if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-		action := editor.findTrackAction(coordinateX, coordinateY)
-
-		if action {
-			if GetKeyState("Ctrl", "P") {
-				OnMessage(0x44, translateYesNoButtons)
-				msgResult := MsgBox(translate("Do you really want to delete the selected action?"), translate("Delete"), 262436)
-				OnMessage(0x44, translateYesNoButtons, 0)
-
-				if (msgResult = "Yes")
-					editor.deleteTrackAction(action)
-			}
-			else {
-				originalX := action.X
-				originalY := action.Y
-
-				while (GetKeyState("LButton", "P")) {
-					MouseGetPos(&x, &y)
-
-					if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
-						action.X := coordinateX
-						action.Y := coordinateY
-
-						editor.updateTrackMap()
-					}
-				}
-
-				currentX := action.X
-				currentY := action.Y
-
-				action.X := originalX
-				action.Y := originalY
-
-				if (editor.findTrackAction(currentX, currentY) == action) {
-					editor.updateTrackMap()
-
-					editor.actionClicked(originalX, originalY, action)
-				}
-				else {
-					action.X := currentX
-					action.Y := currentY
-				}
-			}
-		}
-		else
-			editor.trackClicked(coordinateX, coordinateY)
-	}
-}
-
-selectTrackAutomation(listView, line, *) {
-	local editor := SessionDatabaseEditor.Instance
-	local window := editor.Window
-	local index, trackAutomation, checkedRows, checked, changed, ignore, row
-
-	if line {
-		trackAutomation := editor.TrackAutomations[line].Clone()
-		trackAutomation.Actions := trackAutomation.Actions.Clone()
-		trackAutomation.Origin := editor.TrackAutomations[line]
-
-		editor.iSelectedTrackAutomation := trackAutomation
-
-		window["trackAutomationNameEdit"].Value := trackAutomation.Name
-
-		editor.updateTrackAutomationInfo()
-
-		editor.createTrackMap(editor.SelectedTrackAutomation.Actions)
-
-		editor.updateState()
-
-		checkedRows := []
-		checked := editor.TrackAutomationsListView.GetNext(0, "C")
-
-		while checked {
-			checkedRows.Push(checked)
-
-			checked := editor.TrackAutomationsListView.GetNext(checked, "C")
-		}
-
-		changed := false
-
-		for index, trackAutomation in editor.TrackAutomations
-			if !inList(checkedRows, index)
-				if trackAutomation.Active {
-					trackAutomation.Active := false
-
-					changed := true
-				}
-
-		for index, row in checkedRows
-			if !editor.TrackAutomations[row].Active {
-				editor.TrackAutomations[row].Active := true
-
-				checkedRows.RemoveAt(index)
-
-				changed := true
-
-				break
-			}
-
-		if changed {
-			for ignore, row in checkedRows {
-				editor.TrackAutomations[row].Active := false
-
-				editor.TrackAutomationsListView.Modify(row, "-Check")
-			}
-
-			editor.writeTrackAutomations(false)
-		}
-	}
-}
-
-addTrackAutomation(*) {
-	SessionDatabaseEditor.Instance.addTrackAutomation()
-}
-
-deleteTrackAutomation(*) {
-	local msgResult
-
-	OnMessage(0x44, translateYesNoButtons)
-	msgResult := MsgBox(translate("Do you really want to delete the selected automation?"), translate("Delete"), 262436)
-	OnMessage(0x44, translateYesNoButtons, 0)
-
-	if (msgResult = "Yes")
-		SessionDatabaseEditor.Instance.deleteTrackAutomation()
-}
-
-saveTrackAutomation(*) {
-	SessionDatabaseEditor.Instance.saveTrackAutomation()
-}
-
-selectData(*) {
-	SessionDatabaseEditor.Instance.updateState()
-}
-
-selectAllData(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local listView := editor.AdministrationListView
-	local dataSelectCheck := editor.Control["dataSelectCheck"].Value
-
-	if (dataSelectCheck == -1) {
-		dataSelectCheck := 0
-
-		editor.Control["dataSelectCheck"].Value := 0
-	}
-
-	loop listView.GetCount()
-		listView.Modify(A_Index, dataSelectCheck ? "Check" : "-Check")
-
-	editor.updateState()
-}
-
-exportData(*) {
-	local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-	local folder
-
-	SessionDatabaseEditor.Instance.Window.Opt("+OwnDialogs")
-
-	OnMessage(0x44, translator)
-	folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select target folder..."))
-	OnMessage(0x44, translator, 0)
-
-	if (folder != "")
-		SessionDatabaseEditor.Instance.exportData(folder . "\Export_" . A_Now)
-}
-
-importData(*) {
-	local window := SessionDatabaseEditor.Instance.Window
-	local translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
-	local folder, info, selection
-
-	window.Opt("+OwnDialogs")
-
-	OnMessage(0x44, translator)
-	folder := DirSelect("*" . kDatabaseDirectory, 0, translate("Select export folder..."))
-	OnMessage(0x44, translator, 0)
-
-	if (folder != "")
-		if FileExist(folder . "\Export.info") {
-			info := readMultiMap(folder . "\Export.info")
-
-			if (getMultiMapValue(info, "General", "Simulator") = SessionDatabaseEditor.Instance.SelectedSimulator) {
-				window.Opt("+Disabled")
-
-				try {
-					selection := selectImportData(SessionDatabaseEditor.Instance, folder, window)
-
-					if selection
-						SessionDatabaseEditor.Instance.importData(folder, selection)
-				}
-				finally {
-					window.Opt("-Disabled")
-				}
-			}
-			else {
-				OnMessage(0x44, translateOkButton)
-				MsgBox(translate("The data has not been exported for the currently selected simulator."), translate("Error"), 262160)
-				OnMessage(0x44, translateOkButton, 0)
-			}
-		}
-		else {
-			OnMessage(0x44, translateOkButton)
-			MsgBox(translate("This is not a valid folder with exported data."), translate("Error"), 262160)
-			OnMessage(0x44, translateOkButton, 0)
-		}
-}
-
-deleteData(*) {
-	local msgResult
-
-	OnMessage(0x44, translateYesNoButtons)
-	msgResult := MsgBox(translate("Do you really want to delete the selected data?"), translate("Delete"), 262436)
-	OnMessage(0x44, translateYesNoButtons, 0)
-
-	if (msgResult = "Yes")
-		SessionDatabaseEditor.Instance.deleteData()
-}
-
-chooseTab(module, *) {
-	local editor := SessionDatabaseEditor.Instance
-
-	if editor.moduleAvailable(module)
-		editor.selectModule(module)
-}
-
-chooseDatabaseScope(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local persistent, msgResult
-
-	persistent := false
-
-	if GetKeyState("Ctrl", "P") {
-		OnMessage(0x44, translateYesNoButtons)
-		msgResult := MsgBox(translate("Do you really want to change the scope for all applications?"), translate("Modular Simulator Controller System"), 262436)
-		OnMessage(0x44, translateYesNoButtons, 0)
-
-		if (msgResult = "Yes")
-			persistent := true
-	}
-
-	if (persistent || ((editor.Control["databaseScopeDropDown"].Value == 2) != editor.UseCommunity)) {
-		editor.UseCommunity[persistent] := (editor.Control["databaseScopeDropDown"].Value == 2)
-
-		editor.loadSimulator(editor.SelectedSimulator, true)
-	}
-}
-
-transferPressures(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local sessionDB := editor.SessionDatabase
-	local window := editor.Window
-	local tyrePressures, compounds, compound, compoundColor, ignore, pressureInfo, driver
-
-	if (window["driverDropDown"].Text = translate("All"))
-		driver := [true]
-	else
-		driver := [sessionDB.getDriverID(editor.SelectedSimulator, window["driverDropDown"].Text)]
-
-	tyrePressures := []
-
-	compounds := sessionDB.getTyreCompounds(editor.SelectedSimulator, editor.SelectedCar, editor.SelectedTrack)
-
-	compound := false
-	compoundColor := false
-
-	splitCompound(compounds[window["tyreCompoundDropDown"].Value], &compound, &compoundColor)
-
-	for ignore, pressureInfo in SessionDatabaseEditor.EditorTyresDatabase().getPressures(editor.SelectedSimulator, editor.SelectedCar
-																					   , editor.SelectedTrack, editor.SelectedWeather
-																					   , convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
-																					   , convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
-																					   , compound, compoundColor, driver*)
-		tyrePressures.Push(pressureInfo["Pressure"] + ((pressureInfo["Delta Air"] + Round(pressureInfo["Delta Track"] * 0.49)) * 0.1))
-
-	messageSend(kFileMessage, "Setup", "setTyrePressures:" . values2String(";", compound, compoundColor, tyrePressures*), editor.RequestorPID)
-}
-
-testSettings(*) {
-	local editor := SessionDatabaseEditor.Instance
-	local exePath := kBinariesDirectory . "Race Settings.exe"
-	local fileName := kTempDirectory . "Temp.settings"
-	local settings, section, values, key, value, options
-
-	try {
-		settings := readMultiMap(getFileName("Race.settings", kUserConfigDirectory, kConfigDirectory))
-
-		for section, values in SettingsDatabase().loadSettings(editor.SelectedSimulator, editor.SelectedCar["*"]
-															 , editor.SelectedTrack["*"], editor.SelectedWeather["*"], false)
-			for key, value in values
-				setMultiMapValue(settings, section, key, value)
-
-		writeMultiMap(fileName, settings)
-
-		options := "-NoTeam -Test -File `"" . fileName . "`""
-
-		if (editor.SelectedSimulator)
-			options .= (" -Simulator `"" . editor.SelectedSimulator . "`"")
-
-		if (editor.SelectedCar)
-			options .= (" -Car `"" . editor.SelectedCar . "`"")
-
-		if (editor.SelectedTrack)
-			options .= (" -Track `"" . editor.SelectedTrack . "`"")
-
-		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
-	}
-	catch Any as exception {
-		logMessage(kLogCritical, translate("Cannot start the Race Settings tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
-
-		showMessage(substituteVariables(translate("Cannot start the Race Settings tool (%exePath%) - please check the configuration..."), {exePath: exePath})
-				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-	}
-}
-
 showSessionDatabaseEditor() {
 	local icon := kIconsDirectory . "Session Database.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -5467,8 +5412,6 @@ showSessionDatabaseEditor() {
 	finally {
 		protectionOff()
 	}
-
-	return
 }
 
 

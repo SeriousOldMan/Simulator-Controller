@@ -749,7 +749,7 @@ systemMonitor(command := false, arguments*) {
 	else {
 		result := false
 
-		systemMonitorGui := Window()
+		systemMonitorGui := Window({Descriptor: "System Monitor", Closeable: true, Options: "+SysMenu +Caption"})
 
 		systemMonitorGui.SetFont("s10 Bold", "Arial")
 

@@ -131,17 +131,9 @@ class Database {
 	}
 
 	__New(directory, schemas) {
-		local name, fields
-
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		if isInstance(schemas, Map) {
-			for name, fields in schemas
-				this.iSchemas[name] := fields
-		}
-		else
-			for name, fields in schemas.OwnProps()
-				this.iSchemas[name] := fields
+		this.iSchemas := toMap(schemas)
 	}
 
 	lock(name := false, wait := true) {
@@ -285,7 +277,8 @@ class Database {
 		if flush
 			this.flush(name, backup)
 
-		this.iTables.Delete(name)
+		if this.iTables.Has(name)
+			this.iTables.Delete(name)
 	}
 
 	add(name, values, flush := false) {

@@ -2870,17 +2870,7 @@ class Facts {
 		}
 
 		Set {
-			if !isInstance(value, CaseInsenseMap) {
-				local facts := CaseInsenseMap()
-				local key, theValue
-
-				for key, theValue in value
-					facts[key] := theValue
-
-				value := facts
-			}
-
-			return (this.iFacts := value)
+			return (this.iFacts := toMap(value))
 		}
 	}
 

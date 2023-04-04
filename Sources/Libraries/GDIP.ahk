@@ -2768,6 +2768,8 @@ Gdip_GetLockBitPixel(Scan0, x, y, Stride)
 
 Gdip_PixelateBitmap(pBitmap, &pBitmapOut, BlockSize)
 {
+	local null
+
 	static PixelateBitmap
 
 	Ptr := "Ptr"

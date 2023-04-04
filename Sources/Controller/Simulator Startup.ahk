@@ -445,7 +445,7 @@ launchPad(command := false, arguments*) {
 			launchPad("Launch", "Simulator Download.exe", true)
 	}
 
-	WM_MOUSEMOVE(wParam, lParam, msg, Hwnd) {
+	showApplicationInfo(wParam, lParam, msg, Hwnd) {
 		local Text, CurrControl
 
 		static PrevHwnd := 0
@@ -640,7 +640,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Button", "x267 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)
 		launchPadGui.Add("Button", "x482 yp w100 h23", translate("Close All...")).OnEvent("Click", closeAll)
 
-		OnMessage(0x0200, WM_MOUSEMOVE)
+		OnMessage(0x0200, showApplicationInfo)
 
 		x := false
 		y := false

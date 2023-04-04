@@ -131,17 +131,9 @@ class Database {
 	}
 
 	__New(directory, schemas) {
-		local name, fields
-
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		if isInstance(schemas, Map) {
-			for name, fields in schemas
-				this.iSchemas[name] := fields
-		}
-		else
-			for name, fields in schemas.OwnProps()
-				this.iSchemas[name] := fields
+		this.iSchemas := toMap(schemas)
 	}
 
 	lock(name := false, wait := true) {

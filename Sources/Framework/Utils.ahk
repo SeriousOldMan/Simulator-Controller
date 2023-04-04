@@ -93,36 +93,42 @@ isNull(value) {
 	return ((value = kNull) || (value == "__Null__"))
 }
 
-isInstance(object, root) {
-	/*
-	local candidate, classVar, outerClassVar
+toObject(candidate) {
+	local key, value
 
-	if isObject(object) {
-		candidate := object.base
+	if isInstance(candidate, Map) {
+		local result := Object()
 
-		while isObject(candidate)
-			if (candidate == root)
-				return true
-			else {
-				classVar := (candidate.base ? candidate.base.__Class : false)
+		for key, value in candidate
+			result.%key% := value
 
-				if (classVar && (classVar != "")) {
-					if InStr(classVar, ".") {
-						classVar := StrSplit(classVar, ".")
-						outerClassVar := classVar[1]
-
-						candidate := %outerClassVar%[classVar[2]]
-					}
-					else
-						candidate := %classVar%
-				}
-				else
-					return false
-			}
+		return result
 	}
+	else
+		return candidate
+}
 
-	return false
-	*/
+toMap(candidate, class := CaseInsenseMap) {
+	local key, value
 
+	if !isInstance(candidate, class) {
+		local result := %class%()
+
+		if !isInstance(candidate, Map) {
+			for key, value in candidate.OwnProps()
+				result[key] := value
+		}
+		else {
+			for key, value in candidate
+				result[key] := value
+		}
+
+		return result
+	}
+	else
+		return candidate
+}
+
+isInstance(object, root) {
 	return (object is root)
 }

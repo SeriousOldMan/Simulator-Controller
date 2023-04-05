@@ -314,9 +314,11 @@ class RaceReports extends ConfigurationItem {
 
 		this.loadSimulator(simulator, true)
 
+		/*
 		raceReportsGui.Add("Text", "x8 y574 w1200 0x10 Y:Move W:Grow")
 
 		raceReportsGui.Add("Button", "x574 y580 w80 h23 H:Center Y:Move", translate("Close")).OnEvent("Click", closeReports)
+		*/
 
 		raceReportsGui.Add(RaceReports.ReportResizer(raceReportsGui))
 	}

@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global vDebug := (kBuildConfiguration = "Development")
-global vLogLevel := kLogWarn
+global vLogLevel := ((kBuildConfiguration = "Development") ? kLogDebug : kLogWarn)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -193,12 +193,15 @@ logError(exception, unhandled := false, report := true) {
 		logMessage(unhandled ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
-	if (report && isDevelopment() && isDebug())
+	if (report && isDevelopment() && isDebug()) {
 		if isObject(exception)
 			MsgBox(translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
 				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
 		else
 			MsgBox(translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
+
+		Sleep 100
+	}
 
 	return ((isDevelopment() || isDebug()) ? false : true)
 }

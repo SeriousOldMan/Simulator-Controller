@@ -901,7 +901,7 @@ class SessionDatabase extends ConfigurationItem {
 		return result
 	}
 
-	getSimulatorName(simulatorCode) {
+	static getSimulatorName(simulatorCode) {
 		local name, description, code
 
 		if (simulatorCode = "Unknown")
@@ -919,6 +919,10 @@ class SessionDatabase extends ConfigurationItem {
 
 			return false
 		}
+	}
+
+	getSimulatorName(simulatorCode) {
+		return SessionDatabase.getSimulatorName(simulatorCode)
 	}
 
 	static getSimulatorCode(simulatorName) {

@@ -114,7 +114,8 @@ loadSimulatorConfiguration() {
 	if (!A_IsCompiled || getMultiMapValue(kSimulatorConfiguration, "Configuration", "Debug", false))
 		setDebug(true)
 
-	setLogLevel(inList(kLogLevelNames, getMultiMapValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn")))
+	if !isDevelopment()
+		setLogLevel(inList(kLogLevelNames, getMultiMapValue(kSimulatorConfiguration, "Configuration", "Log Level", "Warn")))
 }
 
 initializeEnvironment() {

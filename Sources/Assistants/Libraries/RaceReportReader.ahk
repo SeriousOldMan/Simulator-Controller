@@ -103,9 +103,8 @@ class RaceReportReader {
 					carNumber := getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr", "-")
 					carName := getMultiMapValue(raceData, "Cars", "Car." . car . ".Car", translate("Unknown"))
 
-					if (drivers.Length > 0) {
+					if ((drivers.Length > 0) && drivers[1].Has(car))
 						parseDriverName(drivers[1][car], &driverForname, &driverSurname, &driverNickname)
-					}
 					else {
 						driverForname := "John"
 						driverSurname := "Doe"
@@ -190,46 +189,47 @@ class RaceReportReader {
 
 		if (cars && (tPositions.Length > 0) && (drivers.Length > 0)) {
 			loop getMultiMapValue(raceData, "Cars", "Count", 0)
-				if (!extendedIsNull(tPositions[tPositions.Length][A_Index]) && !extendedIsNull(tTimes[tTimes.Length][A_Index])) {
-					if cars
-						cars.Push(A_Index)
+				if (tPositions[tPositions.Length].Has(A_Index) && tTimes[tTimes.Length].Has(A_Index))
+					if (!extendedIsNull(tPositions[tPositions.Length][A_Index]) && !extendedIsNull(tTimes[tTimes.Length][A_Index])) {
+						if cars
+							cars.Push(A_Index)
 
-					if ids
-						ids.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"))
+						if ids
+							ids.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".ID"))
 
-					position := tPositions[1][A_Index]
+						position := tPositions[1][A_Index]
 
-					if overallPositions
-						overallPositions.Push(position)
+						if overallPositions
+							overallPositions.Push(position)
 
-					carClass := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
+						carClass := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
 
-					if !classes.Has(carClass)
-						classes[carClass] := [Array(A_Index, position)]
-					else
-						classes[carClass].Push(Array(A_Index, position))
+						if !classes.Has(carClass)
+							classes[carClass] := [Array(A_Index, position)]
+						else
+							classes[carClass].Push(Array(A_Index, position))
 
-					if carNumbers
-						carNumbers.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
+						if carNumbers
+							carNumbers.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr"))
 
-					if carNames
-						carNames.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+						if carNames
+							carNames.Push(getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
-					forName := false
-					surName := false
-					nickName := false
+						forName := false
+						surName := false
+						nickName := false
 
-					parseDriverName(drivers[1][A_Index], &forName, &surName, &nickName)
+						parseDriverName(drivers[1][A_Index], &forName, &surName, &nickName)
 
-					if driverFornames
-						driverFornames.Push(forName)
+						if driverFornames
+							driverFornames.Push(forName)
 
-					if driverSurnames
-						driverSurnames.Push(surName)
+						if driverSurnames
+							driverSurnames.Push(surName)
 
-					if driverNicknames
-						driverNicknames.Push(nickName)
-				}
+						if driverNicknames
+							driverNicknames.Push(nickName)
+					}
 
 			if (classes.Count > 1) {
 				classPositions := overallPositions.Clone()
@@ -345,7 +345,7 @@ class RaceReportReader {
 
 		positions := this.getDriverPositions(raceData, positions, car)
 
-		return Max(0, cars - positions[1]) + Max(0, cars - positions[positions.Length])
+		return Max(0, cars - numberValue(positions[1])) + Max(0, cars - numberValue(positions[positions.Length]))
 	}
 
 	getDriverRaceCraft(raceData, positions, car) {
@@ -359,9 +359,9 @@ class RaceReportReader {
 		loop positions.Length {
 			position := positions[A_Index]
 
-			if ((position = kNull) && (A_Index = positions.Length))
+			if (extendedIsNull(position) && (A_Index = positions.Length))
 				return 0
-			else if (position != kNull) {
+			else if !extendedIsNull(position) {
 				result += (Max(0, 11 - position) / 10)
 
 				if lastPosition
@@ -414,7 +414,7 @@ class RaceReportReader {
 			for ignore, lap in this.getLaps(raceData)
 				if times.Has(lap) {
 					time := (times[lap].Has(car) ? times[lap][car] : 0)
-					time := (isNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+					time := (extendedIsNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
 
 					if (time > 0)
 						if (time > threshold)
@@ -428,7 +428,8 @@ class RaceReportReader {
 	}
 
 	normalizeValues(values, target) {
-		local factor := (target / maximum(values))
+		local max := maximum(values)
+		local factor := ((max != 0) ? (target / max) : 1)
 		local index, value
 
 		for index, value in values
@@ -536,6 +537,10 @@ class RaceReportReader {
 
 extendedIsNull(value, allowZero := true) {
 	return (isNull(value) || (!allowZero && !value) || (value = "-") || (value = ""))
+}
+
+numberValue(value) {
+	return (isNumber(value) ? value : (extendedIsNull(value) ? 0 : value))
 }
 
 correctEmptyValues(table, default := "__Undefined__") {

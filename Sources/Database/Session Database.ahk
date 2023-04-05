@@ -1466,9 +1466,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
+		/*
 		editorGui.Add("Text", "x8 y700 w670 0x10 Y:Move W:Grow")
 
 		editorGui.Add("Button", "x304 y708 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSessionDatabaseEditor)
+		*/
 
 		editorGui.Add(SessionDatabaseEditor.EditorResizer(editorGui))
 

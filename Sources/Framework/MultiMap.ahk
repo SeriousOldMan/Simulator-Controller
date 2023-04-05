@@ -16,15 +16,23 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Public Classes Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class MultiMap extends CaseInsenseFusionMap {
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 newMultiMap() {
-	return CaseInsenseMap()
+	return MultiMap()
 }
 
 newSectionMap() {
-	return CaseInsenseMap()
+	return MultiMap()
 }
 
 readMultiMap(multiMapFile) {

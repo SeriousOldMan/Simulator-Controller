@@ -112,7 +112,7 @@ toMap(candidate, class := CaseInsenseMap) {
 	local key, value
 
 	if !isInstance(candidate, class) {
-		local result := %class%()
+		local result := class()
 
 		if !isInstance(candidate, Map) {
 			for key, value in candidate.OwnProps()

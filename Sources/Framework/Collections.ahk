@@ -9,10 +9,67 @@
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class CaseSenseMap extends Map {
+class FusionMap extends Map {
+	__New(arguments*) {
+		this.Default := false
+
+		super.__New(arguments*)
+	}
+
+	__Item[key] {
+		Get {
+			return super.__Item[isInteger(key) ? String(key) : key]
+		}
+
+		Set {
+			return (super.__Item[isInteger(key) ? String(key) : key] := value)
+		}
+	}
+
+	Get(key, default := unset) {
+		return super.Get(isInteger(key) ? String(key) : key, default?)
+	}
+
+	Set(keyValues*) {
+		local index, key
+
+		loop (keyValues.Length / 2) {
+			index := ((A_Index * 2) - 1)
+			key := keyValues[index]
+
+			if isInteger(key)
+				keyValues[index] := String(key)
+		}
+
+		super.Set(keyValues*)
+	}
+
+	Has(key) {
+		return super.Has(isInteger(key) ? String(key) : key)
+	}
+
+	Delete(key) {
+		try {
+			super.Delete(key)
+		}
+		catch UnsetItemError {
+		}
+	}
 }
 
+global CaseSenseMap := Map
+
 class CaseInsenseMap extends Map {
+	__New(arguments*) {
+		this.CaseSense := false
+
+		super.__New(arguments*)
+	}
+}
+
+global CaseSenseFusionMap := FusionMap
+
+class CaseInsenseFusionMap extends FusionMap {
 	__New(arguments*) {
 		this.CaseSense := false
 

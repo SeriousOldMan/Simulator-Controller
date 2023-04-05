@@ -410,15 +410,15 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		}
 	}
 
-	static Assistants[key := false] {
+	static Assistants[key?] {
 		Get {
-			return (key ? RaceAssistantPlugin.sAssistants[key] : RaceAssistantPlugin.sAssistants)
+			return (isSet(key) ? RaceAssistantPlugin.sAssistants[key] : RaceAssistantPlugin.sAssistants)
 		}
 	}
 
-	Assistants[key := false] {
+	Assistants[key?] {
 		Get {
-			return RaceAssistantPlugin.Assistants[key]
+			return RaceAssistantPlugin.Assistants[key?]
 		}
 	}
 

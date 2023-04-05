@@ -217,9 +217,9 @@ class ConfigurationEditor extends ConfigurationItem {
 	iDevelopment := false
 	iSaveMode := false
 
-	Configurators[key := false] {
+	Configurators[key?] {
 		Get {
-			return (key ? this.iConfigurators[key] : this.iConfigurators)
+			return (isSet(key) ? this.iConfigurators[key] : this.iConfigurators)
 		}
 	}
 

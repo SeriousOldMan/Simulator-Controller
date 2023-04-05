@@ -1503,13 +1503,13 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	ControllerPreviews[key := false] {
+	ControllerPreviews[key?] {
 		Get {
-			return (key ? ControllerPreview.sControllerPreviews[key] : ControllerPreview.sControllerPreviews)
+			return (isSet(key) ? ControllerPreview.sControllerPreviews[key] : ControllerPreview.sControllerPreviews)
 		}
 
 		Set {
-			return (key ? (ControllerPreview.sControllerPreviews[key] := value) : (ControllerPreview.sControllerPreviews := value))
+			return (isSet(key) ? (ControllerPreview.sControllerPreviews[key] := value) : (ControllerPreview.sControllerPreviews := value))
 		}
 	}
 
@@ -1665,12 +1665,9 @@ class DisplayRulesEditor extends ConfigurationItem {
 		}
 	}
 
-	Buttons[index := false] {
+	Buttons[index?] {
 		Get {
-			if index
-				return this.iButtons[index]
-			else
-				return this.iButtons
+			return (isSet(index) ? this.iButtons[index] : this.iButtons)
 		}
 	}
 

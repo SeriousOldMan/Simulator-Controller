@@ -71,15 +71,15 @@ class PressuresEditor {
 		}
 	}
 
-	Compounds[key := false] {
+	Compounds[key?] {
 		Get {
-			return (key ? this.iCompounds[key] : this.iCompounds)
+			return (isSet(key) ? this.iCompounds[key] : this.iCompounds)
 		}
 	}
 
-	Temperatures[key := false] {
+	Temperatures[key?] {
 		Get {
-			return (key ? this.iTemperatures[key] : this.iTemperatures)
+			return (isSet(key) ? this.iTemperatures[key] : this.iTemperatures)
 		}
 	}
 
@@ -95,9 +95,9 @@ class PressuresEditor {
 		}
 	}
 
-	SelectedTemperatures[key := false] {
+	SelectedTemperatures[key?] {
 		Get {
-			return (key ? this.iSelectedTemperatures[key] : this.iSelectedTemperatures)
+			return (isSet(key) ? this.iSelectedTemperatures[key] : this.iSelectedTemperatures)
 		}
 	}
 

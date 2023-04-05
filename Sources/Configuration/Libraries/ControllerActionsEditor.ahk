@@ -46,9 +46,9 @@ class ControllerActionsEditor extends ConfigurationItem {
 	iActionLabels := {}
 	iActionIcons := {}
 
-	Plugins[index := false] {
+	Plugins[index?] {
 		Get {
-			return (index ? this.iPlugins[index] : this.iPlugins)
+			return (isSet(index) ? this.iPlugins[index] : this.iPlugins)
 		}
 	}
 

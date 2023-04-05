@@ -113,15 +113,15 @@ class StrategyViewer {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Stint") . "</th><th class=`"th-std`">" . startStint . "</th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-std`">" . strategy.DriverName . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Map") . "</th><td class=`"td-std`">" . strategy.Map . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td class=`"td-std`">" . strategy.RemainingLaps . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td class=`"td-std`">" . strategy.RemainingSessionLaps . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time") . "</th><td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption") . "</th><td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", strategy.FuelConsumption)) . "</td></tr>")
 			html .= "</table>"
 
 			timeSeries.Push(strategy.getSessionDuration() / 60)
 			lapSeries.Push(strategy.getSessionLaps())
-			fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingLaps))
-			tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingLaps)
+			fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingSessionLaps))
+			tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingSessionLaps)
 		}
 		else {
 			stints := []

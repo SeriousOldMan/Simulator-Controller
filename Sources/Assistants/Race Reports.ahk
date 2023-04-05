@@ -146,12 +146,9 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 
-	AvailableRaces[index := false] {
+	AvailableRaces[index?] {
 		Get {
-			if index
-				return this.iAvailableRaces[index]
-			else
-				return this.iAvailableRaces
+			return (isSet(index) ? this.iAvailableRaces[index] : this.iAvailableRaces)
 		}
 	}
 
@@ -173,12 +170,9 @@ class RaceReports extends ConfigurationItem {
 		}
 	}
 
-	Settings[key := false] {
+	Settings[key?] {
 		Get {
-			if key
-				return this.ReportViewer.Settings[key]
-			else
-				return this.ReportViewer.Settings
+			return (isSet(key) ? this.ReportViewer.Settings[key] : this.ReportViewer.Settings)
 		}
 
 		Set {

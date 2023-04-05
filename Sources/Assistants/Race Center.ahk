@@ -2559,7 +2559,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getPosition(data, type := "Overall", car := false) {
-		local knowledgebase := this.Knowledgebase
 		local position, candidate
 
 		if !car

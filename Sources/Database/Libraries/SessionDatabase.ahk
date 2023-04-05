@@ -275,12 +275,12 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	static ServerURLs[identifier := false] {
+	static ServerURLs[identifier?] {
 		Get {
-			if !SessionDatabase.sServerURLs.Has(identifier)
+			if (isSet(identifier) && !SessionDatabase.sServerURLs.Has(identifier))
 				SessionDatabase.sServerURLs := stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
-			return (identifier ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
+			return (isSet(identifier) ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
 		}
 	}
 
@@ -290,15 +290,15 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
-	static ServerURL[identifier] {
+	static ServerURL[identifier?] {
 		Get {
-			return SessionDatabase.ServerURLs[identifier]
+			return SessionDatabase.ServerURLs[identifier?]
 		}
 	}
 
-	ServerURL[identifier := false] {
+	ServerURL[identifier?] {
 		Get {
-			return SessionDatabase.ServerURL[identifier]
+			return SessionDatabase.ServerURL[identifier?]
 		}
 	}
 

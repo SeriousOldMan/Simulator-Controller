@@ -91,9 +91,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	Teams[key := false] {
+	Teams[key?] {
 		Get {
-			return (key ? this.iTeams[key] : this.iTeams)
+			return (isSet(key) ? this.iTeams[key] : this.iTeams)
 		}
 	}
 
@@ -103,9 +103,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	Drivers[key := false] {
+	Drivers[key?] {
 		Get {
-			return (key ? this.iDrivers[key] : this.iDrivers)
+			return (isSet(key) ? this.iDrivers[key] : this.iDrivers)
 		}
 	}
 
@@ -115,9 +115,9 @@ class TeamServerConfigurator extends ConfigurationItem {
 		}
 	}
 
-	Sessions[key := false] {
+	Sessions[key?] {
 		Get {
-			return (key ? this.iSessions[key] : this.iSessions)
+			return (isSet(key) ? this.iSessions[key] : this.iSessions)
 		}
 	}
 

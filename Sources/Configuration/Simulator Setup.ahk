@@ -233,18 +233,18 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 
-	Steps[step := false] {
+	Steps[step?] {
 		Get {
-			if step
+			if isSet(step)
 				return (this.iSteps.HasKey(step) ? this.iSteps[step] : false)
 			else
 				return this.iSteps
 		}
 	}
 
-	StepWizards[descriptor := false] {
+	StepWizards[descriptor?] {
 		Get {
-			if descriptor
+			if isSet(descriptor)
 				return (this.iStepWizards.HasKey(descriptor) ? this.iStepWizards[descriptor] : false)
 			else
 				return this.iStepWizards
@@ -273,12 +273,12 @@ class SetupWizard extends ConfigurationItem {
 		}
 	}
 
-	Presets[index := false] {
+	Presets[index?] {
 		Get {
 			if !this.iPresets
 				this.iPresets := this.loadPresets()
 
-			return (index ? this.iPresets[index] : this.iPresets)
+			return (isSet(index) ? this.iPresets[index] : this.iPresets)
 		}
 	}
 
@@ -1903,12 +1903,9 @@ class StepWizard extends ConfigurationItem {
 		}
 	}
 
-	Definition[key := false] {
+	Definition[key?] {
 		Get {
-			if key
-				return this.iDefinition[key]
-			else
-				return this.iDefinition
+			return (isSet(key) ? this.iDefinition[key] : this.iDefinition)
 		}
 	}
 

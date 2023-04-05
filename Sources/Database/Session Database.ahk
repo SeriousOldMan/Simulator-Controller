@@ -277,13 +277,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	TrackAutomations[key := false] {
+	TrackAutomations[key?] {
 		Get {
-			return (key ? this.iTrackAutomations[key] : this.iTrackAutomations)
+			return (isSet(key) ? this.iTrackAutomations[key] : this.iTrackAutomations)
 		}
 
 		Set {
-			return (key ? (this.iTrackAutomations[key] := value) : (this.iTrackAutomations := value))
+			return (isSet(key) ? (this.iTrackAutomations[key] := value) : (this.iTrackAutomations := value))
 		}
 	}
 

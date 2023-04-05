@@ -60,13 +60,13 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	UndersteerThresholds[key := false] {
+	UndersteerThresholds[key?] {
 		Get {
-			return (key ? this.iUndersteerThresholds[key] : this.iUndersteerThresholds)
+			return (isSet(key) ? this.iUndersteerThresholds[key] : this.iUndersteerThresholds)
 		}
 
 		Set {
-			if key {
+			if isSet(key) {
 				this.iUndersteerThresholds[key] := value
 
 				setAnalyzerSetting(this, "UndersteerThresholds", values2String(",", this.iUndersteerThresholds*))
@@ -81,13 +81,13 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	OversteerThresholds[key := false] {
+	OversteerThresholds[key?] {
 		Get {
 			return (key ? this.iOversteerThresholds[key] : this.iOversteerThresholds)
 		}
 
 		Set {
-			if key {
+			if isSet(key) {
 				this.iOversteerThresholds[key] := value
 
 				setAnalyzerSetting(this, "OversteerThresholds", values2String(",", this.iOversteerThresholds*))

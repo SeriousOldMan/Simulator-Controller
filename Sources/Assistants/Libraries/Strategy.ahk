@@ -114,13 +114,13 @@ class StrategySimulation {
 		productions := false
 		reductions := false
 
-		compiler.compileRules(rules, productions, reductions)
+		compiler.compileRules(rules, &productions, &reductions)
 
 		try {
 			rules := FileRead(getFileName(validator . ".rules", kUserHomeDirectory . "Validators\", kResourcesDirectory . "Strategy\Validators\"))
 
 			if (rules != "")
-				compiler.compileRules(rules, productions, reductions)
+				compiler.compileRules(rules, &productions, &reductions)
 		}
 		catch Any as exception {
 			message := (isObject(exception) ? exception.Message : exception)
@@ -129,6 +129,14 @@ class StrategySimulation {
 			MsgBox(translate("Cannot load the custom validation rules.") . "`n`n" . message, translate("Error"), 262192)
 			OnMessage(0x44, translateOkButton, 0)
 		}
+	}
+
+	dumpKnowledgeBase(knowledgeBase) {
+		knowledgeBase.dumpFacts()
+	}
+
+	dumpRules(knowledgeBase) {
+		knowledgeBase.dumpRules()
 	}
 
 	scenarioValid(strategy, validator) {
@@ -1816,9 +1824,9 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	WeatherForecast[key := false] {
+	WeatherForecast[key?] {
 		Get {
-			return (key ? this.iWeatherForecast[key] : this.iWeatherForecast)
+			return (isSet(key) ? this.iWeatherForecast[key] : this.iWeatherForecast)
 		}
 	}
 
@@ -1873,13 +1881,13 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	AvailableTyreSets[key := false] {
+	AvailableTyreSets[key?] {
 		Get {
-			return (key ? this.iAvailableTyreSets[key] : this.iAvailableTyreSets)
+			return (isSet(key) ? this.iAvailableTyreSets[key] : this.iAvailableTyreSets)
 		}
 
 		Set {
-			return (key ? (this.iAvailableTyreSets[key] := value) : (this.iAvailableTyreSets := value))
+			return (isSet(key) ? (this.iAvailableTyreSets[key] := value) : (this.iAvailableTyreSets := value))
 		}
 	}
 
@@ -2143,9 +2151,9 @@ class Strategy extends ConfigurationItem {
 		}
 	}
 
-	Pitstops[index := false] {
+	Pitstops[index?] {
 		Get {
-			return (index ? this.iPitstops[index] : this.iPitstops)
+			return (isSet(index) ? this.iPitstops[index] : this.iPitstops)
 		}
 	}
 

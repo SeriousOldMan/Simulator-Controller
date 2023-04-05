@@ -205,15 +205,15 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 
-	SelectedCharacteristics[key := false] {
+	SelectedCharacteristics[key?] {
 		Get {
-			return (key ? this.iSelectedCharacteristics[key] : this.iSelectedCharacteristics)
+			return (isSet(key) ? this.iSelectedCharacteristics[key] : this.iSelectedCharacteristics)
 		}
 	}
 
-	SelectedCharacteristicsWidgets[key := false] {
+	SelectedCharacteristicsWidgets[key?] {
 		Get {
-			return (key ? this.iSelectedCharacteristicsWidgets[key] : this.iSelectedCharacteristicsWidgets)
+			return (isSet(key) ? this.iSelectedCharacteristicsWidgets[key] : this.iSelectedCharacteristicsWidgets)
 		}
 
 		Set {
@@ -2034,13 +2034,13 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
-	Setings[key := false] {
+	Setings[key?] {
 		Get {
-			return (key ? this.iSettings[key] : this.iSettings)
+			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}
 
 		Set {
-			return (key ? (this.iSettings[key] := value) : (this.iSettings := value))
+			return (isSet(key) ? (this.iSettings[key] := value) : (this.iSettings := value))
 		}
 	}
 
@@ -2649,13 +2649,13 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	Setings[key := false] {
+	Setings[key?] {
 		Get {
-			return (key ? this.iSettings[key] : this.iSettings)
+			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}
 
 		Set {
-			return (key ? (this.iSettings[key] := value) : (this.iSettings := value))
+			return (isSet(key) ? (this.iSettings[key] := value) : (this.iSettings := value))
 		}
 	}
 

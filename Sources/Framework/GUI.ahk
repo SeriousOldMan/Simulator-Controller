@@ -334,6 +334,11 @@ class Window extends Gui {
 				return (this.iMaxWidth := value)
 			}
 			finally {
+				if this.MaxWidth
+					this.Opt("+MaxSize" . this.MaxWidth . "x")
+				else
+					this.Opt("-MaxSize")
+
 				this.Resize("Auto", this.Width, this.Height)
 			}
 		}
@@ -349,6 +354,11 @@ class Window extends Gui {
 				return (this.iMaxHeight := value)
 			}
 			finally {
+				if this.MaxHeight
+					this.Opt("+MaxSize" . "x" . this.MaxHeight)
+				else
+					this.Opt("-MaxSize")
+
 				this.Resize("Auto", this.Width, this.Height)
 			}
 		}
@@ -473,6 +483,8 @@ class Window extends Gui {
 
 			this.iMinWidth := width
 			this.iMinHeight := height
+
+			this.Opt("MinSize" . width . "x" . height)
 
 			this.iWidth := width
 			this.iHeight := height

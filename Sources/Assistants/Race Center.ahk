@@ -239,8 +239,8 @@ class RaceCenter extends ConfigurationItem {
 	iUseTraffic := false
 
 	iDrivers := []
-	iStints := CaseInsenseFusionMap()
-	iLaps := CaseInsenseFusionMap()
+	iStints := CaseInsenseSafeMap()
+	iLaps := CaseInsenseSafeMap()
 
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
@@ -3082,7 +3082,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getPlanDrivers() {
-		local drivers := CaseInsenseFusionMap()
+		local drivers := CaseInsenseSafeMap()
 		local stint, driver
 
 		loop this.PlanListView.GetCount() {
@@ -3106,7 +3106,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iSelectedPlanStint := false
 
-			pitstops := CaseInsenseFusionMap()
+			pitstops := CaseInsenseSafeMap()
 			numStints := 1
 
 			for ignore, pitstop in this.Strategy.Pitstops {
@@ -5048,7 +5048,7 @@ class RaceCenter extends ConfigurationItem {
 									+ getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Lap.Running", 0))
 				}
 
-				laps := CaseInsenseFusionMap()
+				laps := CaseInsenseSafeMap()
 
 				consideredLaps := []
 
@@ -5280,8 +5280,8 @@ class RaceCenter extends ConfigurationItem {
 		this.iTeamDriversVersion := false
 
 		this.iDrivers := []
-		this.iStints := CaseInsenseFusionMap()
-		this.iLaps := CaseInsenseFusionMap()
+		this.iStints := CaseInsenseSafeMap()
+		this.iLaps := CaseInsenseSafeMap()
 
 		this.iPitstops := CaseInsenseMap()
 		this.iLastPitstopUpdate := false
@@ -7801,7 +7801,7 @@ class RaceCenter extends ConfigurationItem {
 	loadLaps() {
 		local ignore, lap, newLap, engineDamage
 
-		this.iLaps := CaseInsenseFusionMap()
+		this.iLaps := CaseInsenseSafeMap()
 
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
 			newLap := {Nr: lap["Nr"], Stint: lap["Stint"], Laptime: lap["Lap.Time"], Position: lap["Position"], Grip: lap["Grip"]
@@ -7859,7 +7859,7 @@ class RaceCenter extends ConfigurationItem {
 		local ignore, stint, newStint, driver, laps, lap, stintNr, stintLap, airTemperatures, trackTemperatures
 		local currentStint, lastLap, remainingFuel, fuelConsumption, penalty
 
-		this.iStints := CaseInsenseFusionMap()
+		this.iStints := CaseInsenseSafeMap()
 
 		for ignore, stint in this.SessionStore.Tables["Stint.Data"] {
 			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint["Driver.ID"]})
@@ -8347,7 +8347,7 @@ class RaceCenter extends ConfigurationItem {
 		laps := false
 
 		if (settingsLaps && (settingsLaps.Length > 0)) {
-			laps := CaseInsenseFusionMap()
+			laps := CaseInsenseSafeMap()
 
 			for ignore, lap in settingsLaps
 				laps[lap] := lap
@@ -8658,7 +8658,7 @@ class RaceCenter extends ConfigurationItem {
 						brushCar := Gdip_BrushCreateSolid(0xff000000)
 						brushGray := Gdip_BrushCreateSolid(0xffBBBBBB)
 
-						carIndices := CaseInsenseFusionMap()
+						carIndices := CaseInsenseSafeMap()
 
 						if positions {
 							loop getMultiMapValue(positions, "Position Data", "Car.Count")
@@ -9418,7 +9418,7 @@ class RaceCenter extends ConfigurationItem {
 						if (positions && (positions != "")) {
 							positions := parseMultiMap(positions)
 
-							carIDs := CaseInsenseFusionMap()
+							carIDs := CaseInsenseSafeMap()
 
 							loop getMultiMapValue(positions, "Position Data", "Car.Count")
 								carIDs[A_Index] := getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID")
@@ -10392,7 +10392,7 @@ class RaceCenter extends ConfigurationItem {
 		local hasGrain := false
 		local hasBlister := false
 		local hasFlatSpot := false
-		local tyres := CaseInsenseFusionMap()
+		local tyres := CaseInsenseSafeMap()
 		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})

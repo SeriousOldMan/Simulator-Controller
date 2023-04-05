@@ -143,8 +143,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				if (editor.SelectedModule = "Automation")
+				if (editor.SelectedModule = "Automation") {
 					editor.updateTrackMap()
+
+					WinRedraw(this.Window)
+				}
 			}
 
 			return Task.CurrentTask

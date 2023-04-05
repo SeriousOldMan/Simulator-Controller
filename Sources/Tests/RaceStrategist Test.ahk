@@ -14,10 +14,10 @@
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
-SendMode("Input")					; Recommended for new scripts due to its superior speed and reliability.
+SendMode("Input")				; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
-global kBuildConfiguration := "Development"
+global kBuildConfiguration := "Production"
 
 
 ;;;-------------------------------------------------------------------------;;;

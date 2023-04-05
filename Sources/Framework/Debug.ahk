@@ -9,8 +9,8 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vDebug := (kBuildConfiguration = "Development")
-global vLogLevel := ((kBuildConfiguration = "Development") ? kLogDebug : kLogWarn)
+global gDebug := (kBuildConfiguration = "Development")
+global gLogLevel := ((kBuildConfiguration = "Development") ? kLogDebug : kLogWarn)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -91,13 +91,13 @@ logUnhandledError(error, *) {
 ;;;-------------------------------------------------------------------------;;;
 
 isDebug() {
-	global vDebug
+	global gDebug
 
-	return vDebug
+	return gDebug
 }
 
 isLogLevel(logLevel) {
-	return (logLevel >= vLogLevel)
+	return (logLevel >= gLogLevel)
 }
 
 isDevelopment() {
@@ -107,13 +107,13 @@ isDevelopment() {
 }
 
 getLogLevel() {
-	global vLogLevel
+	global gLogLevel
 
-	return vLogLevel
+	return gLogLevel
 }
 
 logMessage(logLevel, message) {
-	global vLogLevel
+	global gLogLevel
 
 	local script := StrSplit(A_ScriptName, ".")[1]
 	local time := A_Now
@@ -216,7 +216,7 @@ toggleDebug(*) {
 }
 
 setDebug(debug, *) {
-	global vDebug
+	global gDebug
 	local title, state
 
 	if hasTrayMenu()
@@ -225,18 +225,18 @@ setDebug(debug, *) {
 		else
 			SupportMenu.Uncheck(translate("Debug"))
 
-	if (vDebug || debug) {
+	if (gDebug || debug) {
 		title := translate("Modular Simulator Controller System")
 		state := (debug ? translate("Enabled") : translate("Disabled"))
 
 		TrayTip(title, "Debug: " . state)
 	}
 
-	vDebug := debug
+	gDebug := debug
 }
 
 setLogLevel(level, *) {
-	global vLogLevel
+	global gLogLevel
 
 	local ignore, title, state
 
@@ -277,8 +277,8 @@ setLogLevel(level, *) {
 			state := translate("Off")
 	}
 
-	if (vLogLevel != level) {
-		vLogLevel := level
+	if (gLogLevel != level) {
+		gLogLevel := level
 
 		title := translate("Modular Simulator Controller System")
 

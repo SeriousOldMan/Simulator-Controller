@@ -27,9 +27,9 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vTrayMessageDuration := false
+global gTrayMessageDuration := false
 
-global vHasTrayMenu := false
+global gHasTrayMenu := false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -54,11 +54,11 @@ exitApplication(*) {
 ;;;-------------------------------------------------------------------------;;;
 
 hasTrayMenu() {
-	return vHasTrayMenu
+	return gHasTrayMenu
 }
 
 installTrayMenu(update := false) {
-	global vHasTrayMenu
+	global gHasTrayMenu
 	local icon := kIconsDirectory . "Pause.ico"
 	local label := translate("Exit")
 	local levels, level, ignore, oldLabel
@@ -69,8 +69,8 @@ installTrayMenu(update := false) {
 		Sleep(50)
 	}
 
-	if (update && vHasTrayMenu) {
-		oldLabel := translate("Exit", vHasTrayMenu)
+	if (update && gHasTrayMenu) {
+		oldLabel := translate("Exit", gHasTrayMenu)
 
 		A_TrayMenu.Rename(oldLabel, label)
 	}
@@ -123,8 +123,8 @@ installTrayMenu(update := false) {
 
 	label := translate("Support")
 
-	if (update && vHasTrayMenu) {
-		oldLabel := translate("Support", vHasTrayMenu)
+	if (update && gHasTrayMenu) {
+		oldLabel := translate("Support", gHasTrayMenu)
 
 		A_TrayMenu.Delete(oldLabel)
 		A_TrayMenu.Insert("1&", label, SupportMenu)
@@ -134,20 +134,20 @@ installTrayMenu(update := false) {
 		A_TrayMenu.Insert("1&", label, SupportMenu)
 	}
 
-	vHasTrayMenu := getLanguage()
+	gHasTrayMenu := getLanguage()
 }
 
 trayMessage(title, message, duration := false, async := true) {
-	global vTrayMessageDuration
+	global gTrayMessageDuration
 
-	if (async && (duration || vTrayMessageDuration))
+	if (async && (duration || gTrayMessageDuration))
 		Task.startTask(trayMessage.Bind(title, message, duration, false), 0, kLowPriority)
 	else {
 		title := StrReplace(title, "`n", A_Space)
 		message := StrReplace(message, "`n", A_Space)
 
 		if !duration
-			duration := vTrayMessageDuration
+			duration := gTrayMessageDuration
 
 		if duration {
 			protectionOn()
@@ -173,15 +173,15 @@ trayMessage(title, message, duration := false, async := true) {
 }
 
 disableTrayMessages() {
-	global vTrayMessageDuration
+	global gTrayMessageDuration
 
-	vTrayMessageDuration := false
+	gTrayMessageDuration := false
 }
 
 enableTrayMessages(duration := 1500) {
-	global vTrayMessageDuration
+	global gTrayMessageDuration
 
-	vTrayMessageDuration := duration
+	gTrayMessageDuration := duration
 }
 
 

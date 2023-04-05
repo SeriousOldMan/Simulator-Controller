@@ -9,7 +9,7 @@
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class FusionMap extends Map {
+class SafeMap extends Map {
 	__New(arguments*) {
 		this.Default := false
 
@@ -26,7 +26,7 @@ class FusionMap extends Map {
 		}
 	}
 
-	Get(key, default := unset) {
+	Get(key, default?) {
 		return super.Get(isInteger(key) ? String(key) : key, default?)
 	}
 
@@ -50,7 +50,7 @@ class FusionMap extends Map {
 
 	Delete(key) {
 		try {
-			super.Delete(key)
+			super.Delete(isInteger(key) ? String(key) : key)
 		}
 		catch UnsetItemError {
 		}
@@ -67,9 +67,9 @@ class CaseInsenseMap extends Map {
 	}
 }
 
-global CaseSenseFusionMap := FusionMap
+global CaseSenseSafeMap := SafeMap
 
-class CaseInsenseFusionMap extends FusionMap {
+class CaseInsenseSafeMap extends SafeMap {
 	__New(arguments*) {
 		this.CaseSense := false
 

@@ -1790,7 +1790,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Deffered"})
+		centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Deferred"})
 
 		this.iWindow := centerGui
 

@@ -2828,7 +2828,7 @@ class SetupComparator extends ConfigurationItem {
 
 		settingsLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Settings.Labels")
 
-		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units")
+		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
 
 		if (settingsUnits.Count = 0)
 			settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units.EN")

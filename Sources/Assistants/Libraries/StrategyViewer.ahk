@@ -44,7 +44,7 @@ class StrategyViewer {
 		this.iStrategyViewer := strategyViewer
 	}
 
-	lapTimeDisplayValue(lapTime) {
+	static lapTimeDisplayValue(lapTime) {
 		local seconds, fraction, minutes
 
 		if isNumber(lapTime)
@@ -113,15 +113,15 @@ class StrategyViewer {
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Stint") . "</th><th class=`"th-std`">" . startStint . "</th></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-std`">" . strategy.DriverName . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Map") . "</th><td class=`"td-std`">" . strategy.Map . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td class=`"td-std`">" . strategy.RemainingLaps . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time") . "</th><td class=`"td-std`">" . this.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td class=`"td-std`">" . strategy.RemainingSessionLaps . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time") . "</th><td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption") . "</th><td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", strategy.FuelConsumption)) . "</td></tr>")
 			html .= "</table>"
 
 			timeSeries.Push(strategy.getSessionDuration() / 60)
 			lapSeries.Push(strategy.getSessionLaps())
-			fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingLaps))
-			tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingLaps)
+			fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingSessionLaps))
+			tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingSessionLaps)
 		}
 		else {
 			stints := []
@@ -154,11 +154,11 @@ class StrategyViewer {
 				drivers.Push("<td class=`"td-std`">" . lastDriver . "</td>")
 				maps.Push("<td class=`"td-std`">" . lastMap . "</td>")
 				laps.Push("<td class=`"td-std`">" . Max(pitstopLap, 0) . "</td>")
-				lapTimes.Push("<td class=`"td-std`">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
-				fuelConsumptions.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
+				lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
+				fuelConsumptions.Push("<td class=`"td-std`">" . (isNumber(lastFuelConsumption) ? displayValue("Float", convertUnit("Volume", lastFuelConsumption)) : "") . "</td>")
 				pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
 				weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
-				refuels.Push("<td class=`"td-std`">" . ((pitstop.Nr > 1) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
+				refuels.Push("<td class=`"td-std`">" . (isNumber(lastRefuel) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
 				tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
 
 				timeSeries.Push(pitstop.Time / 60)
@@ -187,7 +187,7 @@ class StrategyViewer {
 			drivers.Push("<td class=`"td-std`">" . lastDriver . "</td>")
 			maps.Push("<td class=`"td-std`">" . lastMap . "</td>")
 			laps.Push("<td class=`"td-std`">" . strategy.LastPitstop.StintLaps . "</td>")
-			lapTimes.Push("<td class=`"td-std`">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
+			lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
 			fuelConsumptions.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
 			pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
 			weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")

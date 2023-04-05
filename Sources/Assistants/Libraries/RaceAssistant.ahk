@@ -260,13 +260,13 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	Announcements[key := false] {
+	Announcements[key?] {
 		Get {
-			return (key ? this.iAnnouncements[key] : this.iAnnouncements)
+			return (isSet(key) ? this.iAnnouncements[key] : this.iAnnouncements)
 		}
 
 		Set {
-			return (key ? (this.iAnnouncements[key] := value) : (this.iAnnouncements := value))
+			return (isSet(key) ? (this.iAnnouncements[key] := value) : (this.iAnnouncements := value))
 		}
 	}
 

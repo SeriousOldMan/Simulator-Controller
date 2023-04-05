@@ -899,6 +899,7 @@ systemMonitor(command := false, arguments*) {
 		logLevelDropDown := systemMonitorGui.Add("DropDownList", "x689 yp-1 w91 AltSubmit Choose" . chosen, collect(choices, translate))
 		logLevelDropDown.OnEvent("Change", chooseLogLevel)
 
+		/*
 		monitorTabView.UseTab()
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
@@ -906,7 +907,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.Add("Text", "x8 ys+385 w790 0x10")
 
 		systemMonitorGui.Add("Button", "x367 yp+10 w80 h23 Default", translate("Close")).OnEvent("Click", closeSystemMonitor)
-
+		*/
 		x := false
 		y := false
 

@@ -205,15 +205,15 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 	}
 
-	SelectedCharacteristics[key := false] {
+	SelectedCharacteristics[key?] {
 		Get {
-			return (key ? this.iSelectedCharacteristics[key] : this.iSelectedCharacteristics)
+			return (isSet(key) ? this.iSelectedCharacteristics[key] : this.iSelectedCharacteristics)
 		}
 	}
 
-	SelectedCharacteristicsWidgets[key := false] {
+	SelectedCharacteristicsWidgets[key?] {
 		Get {
-			return (key ? this.iSelectedCharacteristicsWidgets[key] : this.iSelectedCharacteristicsWidgets)
+			return (isSet(key) ? this.iSelectedCharacteristicsWidgets[key] : this.iSelectedCharacteristicsWidgets)
 		}
 
 		Set {
@@ -344,7 +344,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 	createGui(configuration) {
 		local advisor := this
-		local simulators, simulator, weather, choices, chosen, index, name, advisorGui
+		local simulators, simulator, weather, choices, chosen, index, name, advisorGui, button
 
 		chooseSimulator(*) {
 			advisor.loadSimulator((advisorGui["simulatorDropDown"].Text = translate("Generic")) ? true : advisorGui["simulatorDropDown"].Text)
@@ -490,7 +490,13 @@ class SetupAdvisor extends ConfigurationItem {
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
-		advisorGui.Add("Button", "x328 yp-24 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
+		advisorGui.Add("Button", "x280 yp-24 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
+		button := advisorGui.Add("Button", "x352 yp w23 h23")
+		button.OnEvent("Click", loadSetup)
+		setButtonIcon(button, kIconsDirectory . "Load.ico", 1, "L2 T2 R2 B2")
+		button := advisorGui.Add("Button", "x376 yp w23 h23")
+		button.OnEvent("Click", saveSetup)
+		setButtonIcon(button, kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
 		advisorGui.SetFont("Norm")
 		advisorGui.SetFont("s10 Bold", "Arial")
@@ -505,6 +511,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 		this.showSettingsChart(false)
 
+		/*
 		advisorGui.SetFont("Norm", "Arial")
 
 		advisorGui.Add("Text", "x8 y730 w1200 Y:Move W:Grow 0x10")
@@ -513,6 +520,7 @@ class SetupAdvisor extends ConfigurationItem {
 		advisorGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
 
 		advisorGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupAdvisor)
+		*/
 
 		advisorGui.Add(SetupAdvisor.AdivisorResizer(advisorGui))
 	}
@@ -2026,13 +2034,13 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
-	Setings[key := false] {
+	Setings[key?] {
 		Get {
-			return (key ? this.iSettings[key] : this.iSettings)
+			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}
 
 		Set {
-			return (key ? (this.iSettings[key] := value) : (this.iSettings := value))
+			return (isSet(key) ? (this.iSettings[key] := value) : (this.iSettings := value))
 		}
 	}
 
@@ -2641,13 +2649,13 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	Setings[key := false] {
+	Setings[key?] {
 		Get {
-			return (key ? this.iSettings[key] : this.iSettings)
+			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}
 
 		Set {
-			return (key ? (this.iSettings[key] := value) : (this.iSettings := value))
+			return (isSet(key) ? (this.iSettings[key] := value) : (this.iSettings := value))
 		}
 	}
 

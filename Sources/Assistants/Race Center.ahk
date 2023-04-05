@@ -239,8 +239,8 @@ class RaceCenter extends ConfigurationItem {
 	iUseTraffic := false
 
 	iDrivers := []
-	iStints := CaseInsenseMap()
-	iLaps := CaseInsenseMap()
+	iStints := CaseInsenseSafeMap()
+	iLaps := CaseInsenseSafeMap()
 
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
@@ -301,7 +301,6 @@ class RaceCenter extends ConfigurationItem {
 
 		RedrawHTMLViwer() {
 			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
-				local rCenter := RaceCenter.Instance
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -310,7 +309,7 @@ class RaceCenter extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				rCenter.pushTask(ObjBindMethod(rCenter, "updateReports", true))
+				RaceCenter.Instance.pushTask(ObjBindMethod(RaceCenter.Instance, "updateReports", true))
 			}
 
 			return Task.CurrentTask
@@ -723,39 +722,27 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	Teams[key := false] {
+	Teams[key?] {
 		Get {
-			if key
-				return this.iTeams[key]
-			else
-				return this.iTeams
+			return (isSet(key) ? this.iTeams[key] : this.iTeams)
 		}
 	}
 
-	Sessions[key := false] {
+	Sessions[key?] {
 		Get {
-			if key
-				return this.iSessions[key]
-			else
-				return this.iSessions
+			return (isSet(key) ? this.iSessions[key] : this.iSessions)
 		}
 	}
 
-	SessionDrivers[key := false] {
+	SessionDrivers[key?] {
 		Get {
-			if key
-				return this.iSessionDrivers[key]
-			else
-				return this.iSessionDrivers
+			return (isSet(key) ? this.iSessionDrivers[key] : this.iSessionDrivers)
 		}
 	}
 
-	TeamDrivers[key := false] {
+	TeamDrivers[key?] {
 		Get {
-			if key
-				return this.iTeamDrivers[key]
-			else
-				return this.iTeamDrivers
+			return (isSet(key) ? this.iTeamDrivers[key] : this.iTeamDrivers)
 		}
 	}
 
@@ -879,9 +866,9 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	TyreCompounds[key := false] {
+	TyreCompounds[key?] {
 		Get {
-			return (key ? this.iTyreCompounds[key] : this.iTyreCompounds)
+			return (isSet(key) ? this.iTyreCompounds[key] : this.iTyreCompounds)
 		}
 	}
 
@@ -939,13 +926,13 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	Stints[key := false] {
+	Stints[key?] {
 		Get {
-			return (key ? this.iStints[key] : this.iStints)
+			return (isSet(key) ? this.iStints[key] : this.iStints)
 		}
 
 		Set {
-			return (key ? (this.iStints[key] := value) : (this.iStints := value))
+			return (isSet(key) ? (this.iStints[key] := value) : (this.iStints := value))
 		}
 	}
 
@@ -958,13 +945,13 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	Laps[key := false] {
+	Laps[key?] {
 		Get {
-			return (key ? this.iLaps[key] : this.iLaps)
+			return (isSet(key) ? this.iLaps[key] : this.iLaps)
 		}
 
 		Set {
-			return (key ? (this.iLaps[key] := value) : (this.iLaps := value))
+			return (isSet(key) ? (this.iLaps[key] := value) : (this.iLaps := value))
 		}
 	}
 
@@ -977,9 +964,9 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	Pitstops[id := false] {
+	Pitstops[id?] {
 		Get {
-			if id {
+			if isSet(id) {
 				if !this.iPitstops.Has(id)
 					this.iPitstops[id] := []
 
@@ -1125,9 +1112,9 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	AvailableDrivers[index := false] {
+	AvailableDrivers[index?] {
 		Get {
-			return (index ? this.iAvailableDrivers[index] : this.iAvailableDrivers)
+			return (isSet(index) ? this.iAvailableDrivers[index] : this.iAvailableDrivers)
 		}
 	}
 
@@ -1601,7 +1588,7 @@ class RaceCenter extends ConfigurationItem {
 			local driver, conditions, tyreCompound, pressures, temperatures
 
 			if line {
-				center.SetupsListView.iSelectedSetup := line
+				center.iSelectedSetup := line
 
 				driver := center.SetupsListView.GetText(line, 1)
 				conditions := center.SetupsListView.GetText(line, 2)
@@ -1768,7 +1755,7 @@ class RaceCenter extends ConfigurationItem {
 				pressures := center.SetupsListView.GetText(A_Index, 4)
 
 				pressuresMenu.Add((driver . translate(" - ") . conditions . translate(" - ") . tyreCompound . translate(": ") . pressures)
-								, copyPressure.Bind(driver, compound, pressures))
+								, copyPressure.Bind(driver, tyreCompound, pressures))
 
 				hasPitstops := true
 			}
@@ -1787,23 +1774,23 @@ class RaceCenter extends ConfigurationItem {
 			local pitstop
 
 			if line {
-				pitstop := center.PitstopsListViewsettingsListView.GetText(line, 1)
+				pitstop := center.PitstopsListView.GetText(line, 1)
 
 				if (pitstops.Has(pitstop) && (pitstops[pitstop]["Status"] = "Planned")) {
-					center.PitstopsListViewsettingsListView.Modify(line, "-Check")
+					center.PitstopsListView.Modify(line, "-Check")
 
-					loop center.PitstopsListViewsettingsListView.GetCount()
-						center.PitstopsListViewsettingsListView.Modify(line, "-Select")
+					loop center.PitstopsListView.GetCount()
+						center.PitstopsListView.Modify(line, "-Select")
 				}
 				else {
-					center.PitstopsListViewsettingsListView.Modify(line, "Check")
+					center.PitstopsListView.Modify(line, "Check")
 
 					center.withExceptionhandler(ObjBindMethod(center, "showPitstopDetails", pitstop))
 				}
 			}
 		}
 
-		centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Asynchronous"})
+		centerGui := Window({Descriptor: "Race Center", Closeable: true, Resizeable: "Deffered"})
 
 		this.iWindow := centerGui
 
@@ -1869,7 +1856,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+31 w356 0x10")
 
-		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h230 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
+		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h230 H:Grow(0.2) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
 
 		for ignore, report in kSessionReports
@@ -1909,12 +1896,14 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x8 yp+351 w1350 W:Grow 0x10")
 
-		centerGui.SetFont("s10 Bold", "Arial")
+		centerGui.SetFont("s8 Norm cBlack", "Arial")
 
 		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", kIconsDirectory . "Tools BW.ico")
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
 
-		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp w30 h30 X:Move vwaitViewer", "shell.explorer").Value
+		centerGui.Add("Text", "x760 yp+8 w556 0x2 X:Move vmessageField")
+
+		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp-8 w30 h30 X:Move vwaitViewer", "shell.explorer").Value
 		this.iWaitViewer.Navigate("about:blank")
 
 		centerGui.SetFont("s8 Norm cBlack", "Arial")
@@ -1939,17 +1928,19 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iStrategyViewer := StrategyViewer(window, this.iDetailsViewer)
 
-		centerGui.Rules := ""
-
 		centerGui.SetFont("Norm", "Arial")
+
+		/*
+		centerGui.Rules := ""
 
 		centerGui.Add("Text", "x8 y815 w1350 0x10 Y:Move W:Grow")
 
-		centerGui.Add("Text", "x16 y827 w554 Y:Move vmessageField")
+		centerGui.Add("Text", "x16 y827 w554 Y:Move Border vmessageField")
 
 		centerGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeRaceCenter)
 
 		centerGui.Rules := "Y:Move(0.2)"
+		*/
 
 		centerTab := centerGui.Add("Tab3", "x16 ys+39 w593 h316 H:Grow(0.8) AltSubmit -Wrap Section vraceCenterTabView", collect(["Plan", "Stints", "Laps", "Strategy", "Setups", "Pitstops"], translate))
 
@@ -2568,7 +2559,6 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getPosition(data, type := "Overall", car := false) {
-		local knowledgebase := this.Knowledgebase
 		local position, candidate
 
 		if !car
@@ -2765,8 +2755,8 @@ class RaceCenter extends ConfigurationItem {
 
 		if selected {
 			window["planDriverDropDownMenu"].Enabled := true
-			window["DateTimeplanTimeEdit"].Enabled := true
-			window["DateTimeactTimeEdit"].Enabled := true
+			window["planTimeEdit"].Enabled := true
+			window["actTimeEdit"].Enabled := true
 			window["deletePlanButton"].Enabled := true
 
 			stint := this.PlanListView.GetText(selected, 1)
@@ -3092,7 +3082,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getPlanDrivers() {
-		local drivers := CaseInsenseMap()
+		local drivers := CaseInsenseSafeMap()
 		local stint, driver
 
 		loop this.PlanListView.GetCount() {
@@ -3116,7 +3106,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iSelectedPlanStint := false
 
-			pitstops := CaseInsenseMap()
+			pitstops := CaseInsenseSafeMap()
 			numStints := 1
 
 			for ignore, pitstop in this.Strategy.Pitstops {
@@ -3380,8 +3370,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		this.Control["planDriverDropDownMenu"].Choose(1)
-		this.Control["DateTimeplanTimeEdit"].Value := "20200101000000"
-		this.Control["DateTimeactTimeEdit"].Value := "20200101000000"
+		this.Control["planTimeEdit"].Value := "20200101000000"
+		this.Control["actTimeEdit"].Value := "20200101000000"
 		this.Control["planLapEdit"].Text := ""
 		this.Control["actLapEdit"].Text := ""
 		this.Control["planRefuelEdit"].Text := 0
@@ -5058,7 +5048,7 @@ class RaceCenter extends ConfigurationItem {
 									+ getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Lap.Running", 0))
 				}
 
-				laps := CaseInsenseMap()
+				laps := CaseInsenseSafeMap()
 
 				consideredLaps := []
 
@@ -5290,8 +5280,8 @@ class RaceCenter extends ConfigurationItem {
 		this.iTeamDriversVersion := false
 
 		this.iDrivers := []
-		this.iStints := CaseInsenseMap()
-		this.iLaps := CaseInsenseMap()
+		this.iStints := CaseInsenseSafeMap()
+		this.iLaps := CaseInsenseSafeMap()
 
 		this.iPitstops := CaseInsenseMap()
 		this.iLastPitstopUpdate := false
@@ -5494,7 +5484,7 @@ class RaceCenter extends ConfigurationItem {
 		local newLaps := []
 		local newTelemetry := false
 		local ignore, identifier, newLap, count, lap, tries, rawData, data, damage, ignore, value
-		local fuelConsumption, compound, compoundColor, car, pLap
+		local fuelConsumption, car, pLap
 
 		for ignore, identifier in stintLaps
 			if !this.Laps.Has(identifier) {
@@ -5612,10 +5602,8 @@ class RaceCenter extends ConfigurationItem {
 			lap.TrackTemperature := Round(getMultiMapValue(data, "Track Data", "Temperature"), 1)
 			lap.Grip := getMultiMapValue(data, "Track Data", "Grip")
 
-			compound := getMultiMapValue(data, "Car Data", "TyreCompound")
-			compoundColor := getMultiMapValue(data, "Car Data", "TyreCompoundColor")
-
-			lap.Compound := compound(compound, compoundColor)
+			lap.Compound := compound(getMultiMapValue(data, "Car Data", "TyreCompound")
+								   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 
 			try {
 				tries := ((A_Index == count) ? 30 : 1)
@@ -5654,6 +5642,9 @@ class RaceCenter extends ConfigurationItem {
 					throw "No data..."
 			}
 			catch Any as exception {
+				if (exception != "No data...")
+					logError(exception)
+
 				if (lap.Nr > 1) {
 					pLap := this.getPreviousLap(lap)
 
@@ -5700,8 +5691,8 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	updatePitstopSettings(pitstopSettings) {
-		pitstopSettings("Update", pitstopSettings)
+	updatePitstopSettings(settings) {
+		pitstopSettings("Update", settings)
 	}
 
 	updatePitstopState(lap, data) {
@@ -5929,7 +5920,7 @@ class RaceCenter extends ConfigurationItem {
 					this.iAirTemperature := lastLap.AirTemperature
 					this.iTrackTemperature := lastLap.TrackTemperature
 
-					if lastLap.Has("Weather10Min") {
+					if lastLap.HasOwnProp("Weather10Min") {
 						this.iWeather10Min := lastLap.Weather10Min
 						this.iWeather30Min := lastLap.Weather30Min
 					}
@@ -6213,6 +6204,9 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 				catch Any as exception {
+					if (exception != "No data...")
+						logError(exception)
+
 					try {
 						state := this.Connector.GetSessionValue(session, "Race Engineer State")
 					}
@@ -6257,6 +6251,15 @@ class RaceCenter extends ConfigurationItem {
 
 				telemetryData := string2Values(";", telemetryData)
 
+				if (telemetryData.Length = 15)
+					telemetryData.Push(",,,")
+
+				if (telemetryData.Length = 16)
+					telemetryData.Push(",,,")
+
+				if (telemetryData.Length = 17)
+					telemetryData.Push("null,null,null,null")
+
 				if !pitstop {
 					pitstop := telemetryData[10]
 
@@ -6290,16 +6293,8 @@ class RaceCenter extends ConfigurationItem {
 
 				lapPressures := this.LapsListView.GetText(lap, 10)
 
-				if (lapPressures = "-, -, -, -") {
-					loop 4 {
-						pressure := pressures[A_Index]
-
-						if isNumber(pressure)
-							pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressure))
-					}
-
-					this.LapsListView.Modify(this.Laps[lap].Row, "Col10", values2String(", ", collect(pressures, "displayValue")*))
-				}
+				if (lapPressures = "-, -, -, -")
+					this.LapsListView.Modify(this.Laps[lap].Row, "Col10", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : p)*))
 
 				newData := true
 				lap += 1
@@ -6427,12 +6422,16 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 				catch Any as exception {
-					logError(exception)
+					if (exception != "No data...")
+						logError(exception)
 
 					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-", "-,-,-,-")
 				}
 
 				lapPressures := string2Values(";", lapPressures)
+
+				while (lapPressures.Length < 11)
+					lapPressures.Push("-,-,-,-")
 
 				if (lapPressures[1] != "-")
 					this.initializeSimulator(lapPressures[1], lapPressures[2], lapPressures[3])
@@ -6441,9 +6440,9 @@ class RaceCenter extends ConfigurationItem {
 				hotPressures := string2Values(",", lapPressures[10])
 				pressuresLosses := string2Values(",", lapPressures[11])
 
-				coldPressures := collect(coldPressures, kNull)
-				hotPressures := collect(hotPressures, kNull)
-				pressuresLosses := collect(pressuresLosses, kNull)
+				coldPressures := collect(coldPressures, null)
+				hotPressures := collect(hotPressures, null)
+				pressuresLosses := collect(pressuresLosses, null)
 
 				pressuresDB.updatePressures(lapPressures[4], lapPressures[5], lapPressures[6]
 										  , lapPressures[7], lapPressures[8], coldPressures, hotPressures, pressuresLosses, driverID, flush)
@@ -6661,7 +6660,8 @@ class RaceCenter extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
-				logError(exception)
+				if (exception != "No data...")
+					logError(exception)
 			}
 
 			if (state && (state != "")) {
@@ -6803,7 +6803,7 @@ class RaceCenter extends ConfigurationItem {
 				hasTyreData := (sessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: nextPitstop}}).Length > 0)
 
 				if (!hasServiceData || !hasTyreData) {
-					pitstopLap := sessionStore.Tables["Pitstop.Data"][nextPitstop].Lap
+					pitstopLap := sessionStore.Tables["Pitstop.Data"][nextPitstop]["Lap"]
 
 					if (pitstopLap != "-") {
 						nextLap := (full ? startLap : Max(startLap, pitstopLap - 1))
@@ -7230,6 +7230,7 @@ class RaceCenter extends ConfigurationItem {
 				this.updateState()
 			}
 			catch Any as exception {
+				msgbox 0
 				message := (isObject(exception) ? exception.Message : exception)
 
 				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: ") . message)
@@ -7258,6 +7259,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	updateReports(redraw := false) {
+		local selectedLap, selectedStint
+
 		if this.HasData {
 			if !this.SelectedReport
 				this.iSelectedReport := "Overview"
@@ -7270,16 +7273,35 @@ class RaceCenter extends ConfigurationItem {
 		if (!this.SelectedDetailReport && this.Strategy)
 			this.StrategyViewer.showStrategyInfo(this.Strategy)
 		else if redraw {
-			if (this.SelectedDetailReport = "Plan")
-				this.showPlanDetails()
-			else if (this.SelectedDetailReport = "Setups")
-				this.showSetupsDetails()
-			else if ((this.SelectedDetailReport = "Strategy") && this.Strategy)
-				this.StrategyViewer.showStrategyInfo(this.Strategy)
-			else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
-				this.DetailsViewer.Document.open()
-				this.DetailsViewer.Document.write(this.iSelectedDetailHTML)
-				this.DetailsViewer.Document.close()
+			switch this.SelectedDetailReport, false {
+				case "Plan":
+					this.showPlanDetails()
+				case "Setups":
+					this.showSetupsDetails()
+				case "Session":
+					this.showSessionSummary()
+				case "Drivers":
+					this.showDriverStatistics()
+				case "Pitstops":
+					this.showPitstopsDetails()
+				default:
+					selectedLap := this.LapsListView.GetNext(0)
+
+					if (selectedLap && (this.SelectedDetailReport = "Lap"))
+						this.showLapDetails(this.Laps[selectedLap])
+					else {
+						selectedStint := this.StintsListView.GetNext(0)
+
+						if (selectedStint && (this.SelectedDetailReport = "Stint"))
+							this.showStintDetails(this.Stints[selectedStint])
+						else if ((this.SelectedDetailReport = "Strategy") && this.Strategy)
+							this.StrategyViewer.showStrategyInfo(this.Strategy)
+						else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
+							this.DetailsViewer.Document.open()
+							this.DetailsViewer.Document.write(this.iSelectedDetailHTML)
+							this.DetailsViewer.Document.close()
+						}
+					}
 			}
 		}
 	}
@@ -7335,32 +7357,34 @@ class RaceCenter extends ConfigurationItem {
 			loop tOPositions.Length {
 				index := inList(tOPositions, A_Index)
 
-				if cars
-					cars.Push(tCars[index])
+				if index {
+					if cars
+						cars.Push(tCars[index])
 
-				if ids
-					ids.Push(tIDs[index])
+					if ids
+						ids.Push(tIDs[index])
 
-				if overallPositions
-					overallPositions.Push(tOPositions[index])
+					if overallPositions
+						overallPositions.Push(tOPositions[index])
 
-				if classPositions
-					classPositions.Push(tCPositions[index])
+					if classPositions
+						classPositions.Push(tCPositions[index])
 
-				if carNumbers
-					carNumbers.Push(tCarNumbers[index])
+					if carNumbers
+						carNumbers.Push(tCarNumbers[index])
 
-				if carNames
-					carNames.Push(tCarNames[index])
+					if carNames
+						carNames.Push(tCarNames[index])
 
-				if driverFornames
-					driverFornames.Push(tDriverFornames[index])
+					if driverFornames
+						driverFornames.Push(tDriverFornames[index])
 
-				if driverSurnames
-					driverSurnames.Push(tDriverSurnames[index])
+					if driverSurnames
+						driverSurnames.Push(tDriverSurnames[index])
 
-				if driverNicknames
-					driverNicknames.Push(tDriverNicknames[index])
+					if driverNicknames
+						driverNicknames.Push(tDriverNicknames[index])
+				}
 			}
 
 		return multiClass
@@ -7384,7 +7408,7 @@ class RaceCenter extends ConfigurationItem {
 	computeDuration(stint) {
 		local duration, duration, ignore, lap
 
-		if stint.Duration
+		if stint.HasOwnProp("Duration")
 			return stint.Duration
 		else {
 			duration := 0
@@ -7402,7 +7426,7 @@ class RaceCenter extends ConfigurationItem {
 	computeEndTime(stint, update := false) {
 		local time, duration
 
-		if stint.EndTime
+		if stint.HasOwnProp("EndTime")
 			return stint.EndTime
 		else {
 			time := this.computeStartTime(stint)
@@ -7420,7 +7444,7 @@ class RaceCenter extends ConfigurationItem {
 	computeStartTime(stint) {
 		local time
 
-		if stint.StartTime
+		if stint.HasOwnProp("StartTime")
 			return stint.StartTime
 		else {
 			if (stint.Nr = 1) {
@@ -7777,7 +7801,7 @@ class RaceCenter extends ConfigurationItem {
 	loadLaps() {
 		local ignore, lap, newLap, engineDamage
 
-		this.iLaps := []
+		this.iLaps := CaseInsenseSafeMap()
 
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
 			newLap := {Nr: lap["Nr"], Stint: lap["Stint"], Laptime: lap["Lap.Time"], Position: lap["Position"], Grip: lap["Grip"]
@@ -7787,7 +7811,8 @@ class RaceCenter extends ConfigurationItem {
 					 , Damage: lap["Damage"], EngineDamage: lap["EngineDamage"]
 					 , Accident: lap["Accident"], Penalty: ((lap["Penalty"] != kNull) ? lap["Penalty"] : false)
 					 , Compound: compound(lap["Tyre.Compound"], lap["Tyre.Compound.Color"])
-					 , RemainingDriverTime: lap["Time.Driver.Remaining"], RemainingStintTime: lap["Time.Stint.Remaining"]}
+					 , RemainingDriverTime: lap["Time.Driver.Remaining"], RemainingStintTime: lap["Time.Stint.Remaining"]
+					 , Telemetry: false}
 
 			if (isNull(newLap.Map))
 				newLap.Map := "n/a"
@@ -7834,10 +7859,10 @@ class RaceCenter extends ConfigurationItem {
 		local ignore, stint, newStint, driver, laps, lap, stintNr, stintLap, airTemperatures, trackTemperatures
 		local currentStint, lastLap, remainingFuel, fuelConsumption, penalty
 
-		this.iStints := []
+		this.iStints := CaseInsenseSafeMap()
 
 		for ignore, stint in this.SessionStore.Tables["Stint.Data"] {
-			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint["ID"]})
+			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint["Driver.ID"]})
 
 			newStint := {Nr: stint["Nr"], Lap: stint["Lap"], Driver: driver
 					   , Weather: stint["Weather"], Compound: normalizeCompound(stint["Compound"])
@@ -7927,7 +7952,8 @@ class RaceCenter extends ConfigurationItem {
 
 					this.StintsListView.Add("", stint.Nr, stint.Driver.FullName, values2String(", ", collect(string2Values(",", stint.Weather), translate)*)
 											  , translate(stint.Compound), stint.Laps.Length, stint.StartPosition, stint.EndPosition
-											  , lapTimeDisplayValue(stint.AvgLaptime), displayValue("Float", convertUnit("Volume", stint.FuelConsumption))
+											  , lapTimeDisplayValue(stint.AvgLaptime)
+											  , isNumber(stint.FuelConsumption) ? displayValue("Float", convertUnit("Volume", stint.FuelConsumption)) : stint.FuelConsumption
 											  , stint.Accidents, stint.Penalties, stint.Potential, stint.RaceCraft, stint.Speed, stint.Consistency, stint.CarControl)
 				}
 
@@ -8223,7 +8249,7 @@ class RaceCenter extends ConfigurationItem {
 							this.iAirTemperature := lastLap.AirTemperature
 							this.iTrackTemperature := lastLap.TrackTemperature
 
-							if lastLap.Has("Weather10Min") {
+							if lastLap.HasOwnProp("Weather10Min") {
 								this.iWeather10Min := lastLap.Weather10Min
 								this.iWeather30Min := lastLap.Weather30Min
 							}
@@ -8317,11 +8343,11 @@ class RaceCenter extends ConfigurationItem {
 			drawChartFunction .= ("`ndata.addColumn('number', '" . yAxis . "');")
 		}
 
-		settingsLaps := this.ReportViewer.Settings["Laps"]
+		settingsLaps := (this.ReportViewer.Settings.Has("Laps") ? this.ReportViewer.Settings["Laps"] : false)
 		laps := false
 
 		if (settingsLaps && (settingsLaps.Length > 0)) {
-			laps := CaseInsenseMap()
+			laps := CaseInsenseSafeMap()
 
 			for ignore, lap in settingsLaps
 				laps[lap] := lap
@@ -8334,15 +8360,11 @@ class RaceCenter extends ConfigurationItem {
 			if (laps && !laps.Has(A_Index))
 				continue
 
-			if this.SelectedDrivers
-				if !inList(this.SelectedDrivers, this.Stints[values.Stint].Driver.ID)
-					continue
-
 			if !first
 				drawChartFunction .= ",`n"
 
 			first := false
-			value := values[xAxis]
+			value := ((this.SelectedDrivers && !inList(this.SelectedDrivers, this.Stints[values["Stint"]].Driver.ID)) ? kNull : values[xAxis])
 
 			if ((value = "n/a") || (isNull(value)))
 				value := kNull
@@ -8591,7 +8613,7 @@ class RaceCenter extends ConfigurationItem {
 		local r, coordinates, carID, carIndex, carPosition, carClass, x, y, brush
 		local imageAreaWidth, script
 
-		this.initializeReport()
+		this.initializeReports()
 
 		if this.Simulator {
 			sessionDB := SessionDatabase()
@@ -8636,7 +8658,7 @@ class RaceCenter extends ConfigurationItem {
 						brushCar := Gdip_BrushCreateSolid(0xff000000)
 						brushGray := Gdip_BrushCreateSolid(0xffBBBBBB)
 
-						carIndices := CaseInsenseMap()
+						carIndices := CaseInsenseSafeMap()
 
 						if positions {
 							loop getMultiMapValue(positions, "Position Data", "Car.Count")
@@ -9281,7 +9303,7 @@ class RaceCenter extends ConfigurationItem {
 				if (telemetry.Count > 0) {
 					brakeTemperatures := string2Values(",", getMultiMapValue(telemetry, "Car Data", "BrakeTemperature", ""))
 
-					if (brakeTemperatures.Count = 4) {
+					if (brakeTemperatures.Length = 4) {
 						temperatureFL := brakeTemperatures[1]
 						temperatureFR := brakeTemperatures[2]
 						temperatureRL := brakeTemperatures[3]
@@ -9302,7 +9324,7 @@ class RaceCenter extends ConfigurationItem {
 
 					brakeWears := string2Values(",", getMultiMapValue(telemetry, "Car Data", "BrakeWear", ""))
 
-					if (brakeWears.Count = 4) {
+					if (brakeWears.Length = 4) {
 						wearFL := brakeWears[1]
 						wearFR := brakeWears[2]
 						wearRL := brakeWears[3]
@@ -9347,7 +9369,7 @@ class RaceCenter extends ConfigurationItem {
 				lap := 0
 
 				for ignore, entry in sessionStore.Tables["Delta.Data"]
-					lap := Max(lap, entry.Lap)
+					lap := Max(lap, entry["Lap"])
 
 				lap += 1
 
@@ -9384,7 +9406,8 @@ class RaceCenter extends ConfigurationItem {
 						standingsData := parseMultiMap(standingsData)
 					}
 					catch Any as exception {
-						logError(exception)
+						if (exception != "No data...")
+							logError(exception)
 
 						standingsData := newMultiMap()
 					}
@@ -9395,7 +9418,7 @@ class RaceCenter extends ConfigurationItem {
 						if (positions && (positions != "")) {
 							positions := parseMultiMap(positions)
 
-							carIDs := CaseInsenseMap()
+							carIDs := CaseInsenseSafeMap()
 
 							loop getMultiMapValue(positions, "Position Data", "Car.Count")
 								carIDs[A_Index] := getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID")
@@ -9495,7 +9518,7 @@ class RaceCenter extends ConfigurationItem {
 												, "Lap.Time.Average", null(stint.AvgLaptime), "Lap.Time.Best", null(stint.BestLapTime)
 												, "Fuel.Consumption", null(stint.FuelConsumption), "Accidents", stint.Accidents, "Penalties", stint.Penalties
 												, "Position.Start", null(stint.StartPosition), "Position.End", null(stint.EndPosition)
-												, "Time.Start", stint.StartTime, "Time.End", stint.EndTime, "Driver.ID", stint.ID)
+												, "Time.Start", this.computeStartTime(stint), "Time.End", this.computeEndTime(stint), "Driver.ID", stint.ID)
 
 						sessionStore.add("Stint.Data", stintData)
 					}
@@ -10369,13 +10392,13 @@ class RaceCenter extends ConfigurationItem {
 		local hasGrain := false
 		local hasBlister := false
 		local hasFlatSpot := false
-		local tyres := CaseInsenseMap()
+		local tyres := CaseInsenseSafeMap()
 		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData["Tyre"]] := tyreData
 
-		for tyre, key in {FL: "Front.Left", FR: "Front.Right", RL: "Rear.Left", RR: "Rear.Right"} {
+		for tyre, key in {FL: "Front.Left", FR: "Front.Right", RL: "Rear.Left", RR: "Rear.Right"}.OwnProps() {
 			if !driver
 				driver := tyres[key]["Driver"]
 
@@ -10391,7 +10414,7 @@ class RaceCenter extends ConfigurationItem {
 			tyreNames.Push("<th class=`"th-std`">" . translate(tyre) . "</th>")
 
 			wear := tyres[key]["Wear"]
-			wearData.Push("<td class=`"td-std`" " . this.computeTyreWearColor(tyres[key].Wear) . ">" . wear . "</td>")
+			wearData.Push("<td class=`"td-std`" " . this.computeTyreWearColor(tyres[key]["Wear"]) . ">" . wear . "</td>")
 
 			if (wear != "-")
 				hasWear := true
@@ -10506,13 +10529,13 @@ class RaceCenter extends ConfigurationItem {
 		local tyreSetData := []
 		local tyrePressuresData := []
 		local repairsData := []
-		local tyreCompound, tyreSet, ignore, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs
+		local tyreCompound, tyreSet, index, pitstopData, serviceData, pressures, repairBodywork, repairSuspension, repairs
 		local name, key, tyrePressures, header, repairEngine
 
-		for ignore, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
-			pitstopNRs.Push("<th class=`"th-std`">" . A_Index . "</th>")
+		for index, pitstopData in this.SessionStore.Tables["Pitstop.Data"] {
+			pitstopNRs.Push("<th class=`"th-std`">" . index . "</th>")
 
-			serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: A_Index}})
+			serviceData := this.SessionStore.query("Pitstop.Service.Data", {Where: {Pitstop: index}})
 
 			if (serviceData.Length = 0) {
 				timeData.Push("<td class=`"td-std`">" . "-" . "</td>")
@@ -10539,8 +10562,8 @@ class RaceCenter extends ConfigurationItem {
 
 				repairsData.Push("<td class=`"td-std`">" . repairs . "</td>")
 
-				lapData.Push("<td class=`"td-std`">" . ((pitstopData["Lap"] = "-") ? "-" : (pitstopData["Lap"] + 1)) . "</td>")
-				refuelData.Push("<td class=`"td-std`">" . ((pitstopData["Fuel"] != 0) ? displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) : "-") . "</td>")
+				lapData.Push("<td class=`"td-std`">" . (!isNumber(pitstopData["Lap"]) ? "-" : (pitstopData["Lap"] + 1)) . "</td>")
+				refuelData.Push("<td class=`"td-std`">" . (isNumber(pitstopData["Fuel"]) ? ((pitstopData["Fuel"] != 0) ? displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) : "-") : "-") . "</td>")
 
 				tyreCompound := translate(compound(pitstopData["Tyre.Compound"], pitstopData["Tyre.Compound.Color"]))
 
@@ -10569,7 +10592,7 @@ class RaceCenter extends ConfigurationItem {
 				timeData.Push("<td class=`"td-std`">" . (serviceData["Time"] ? displayValue("Float", serviceData["Time"], 1) : "-") . "</td>")
 				previousDriverData.Push("<td class=`"td-std`">" . (serviceData["Driver.Previous"] ? serviceData["Driver.Previous"] : "-") . "</td>")
 				nextDriverData.Push("<td class=`"td-std`">" . (serviceData["Driver.Next"] ? serviceData["Driver.Next"] : "-") . "</td>")
-				refuelData.Push("<td class=`"td-std`">" . (serviceData["Fuel"] ? ((pitstopData.Fuel != 0) ? displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) : "-") : "-") . "</td>")
+				refuelData.Push("<td class=`"td-std`">" . (serviceData["Fuel"] ? ((isInteger(pitstopData["Fuel"]) && (pitstopData["Fuel"] != 0)) ? displayValue("Float", convertUnit("Volume", pitstopData["Fuel"])) : "-") : "-") . "</td>")
 
 				tyreCompound := translate(compound(serviceData["Tyre.Compound"], serviceData["Tyre.Compound.Color"]))
 
@@ -11374,7 +11397,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		availableDriversListView.ModifyCol(2, "AutoHdr Center")
 
 		selectedDriversListView := teamGui.Add("ListView", "x230 ys w160 h184 BackgroundD8D8D8 AltSubmit -Multi -LV0x10 NoSort NoSortHdr", collect(["Selected Driver", "Online"], translate))
-		selectedDriversListView.OnEvent("´Click", manageTeam.Bind("UpdateState"))
+		selectedDriversListView.OnEvent("Click", manageTeam.Bind("UpdateState"))
 
 		for ignore, name in teamDrivers
 			selectedDriversListView.Add("", name, inList(connectedDrivers, name) ? translate("x") : "")

@@ -45,7 +45,7 @@ class ACSetup extends FileSetup {
 
 			value := printMultiMap(setup)
 
-			return (super.Setup[original] := StrReplace(StrReplace(value, "=true", "=1"), "=false", "=0"))
+			return (super.Setup[original?] := StrReplace(StrReplace(value, "=true", "=1"), "=false", "=0"))
 		}
 	}
 

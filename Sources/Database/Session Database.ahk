@@ -143,8 +143,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				if (editor.SelectedModule = "Automation")
+				if (editor.SelectedModule = "Automation") {
 					editor.updateTrackMap()
+
+					WinRedraw(this.Window)
+				}
 			}
 
 			return Task.CurrentTask
@@ -277,13 +280,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 	}
 
-	TrackAutomations[key := false] {
+	TrackAutomations[key?] {
 		Get {
-			return (key ? this.iTrackAutomations[key] : this.iTrackAutomations)
+			return (isSet(key) ? this.iTrackAutomations[key] : this.iTrackAutomations)
 		}
 
 		Set {
-			return (key ? (this.iTrackAutomations[key] := value) : (this.iTrackAutomations := value))
+			return (isSet(key) ? (this.iTrackAutomations[key] := value) : (this.iTrackAutomations := value))
 		}
 	}
 
@@ -1468,9 +1471,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
+		/*
 		editorGui.Add("Text", "x8 y700 w670 0x10 Y:Move W:Grow")
 
 		editorGui.Add("Button", "x304 y708 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSessionDatabaseEditor)
+		*/
 
 		editorGui.Add(SessionDatabaseEditor.EditorResizer(editorGui))
 

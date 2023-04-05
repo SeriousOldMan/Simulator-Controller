@@ -115,11 +115,11 @@ class CarInfo {
 		}
 	}
 
-	Pitstops[key := false] {
+	Pitstops[key?] {
 		Get {
 			local pitstops := this.Spotter.Pitstops[this.Nr]
 
-			return (key ? pitstops[key] : pitstops)
+			return (isSet(key) ? pitstops[key] : pitstops)
 		}
 	}
 
@@ -138,13 +138,13 @@ class CarInfo {
 		}
 	}
 
-	LapTimes[key := false] {
+	LapTimes[key?] {
 		Get {
-			return (key ? this.iLapTimes[key] : this.iLapTimes)
+			return (isSet(key) ? this.iLapTimes[key] : this.iLapTimes)
 		}
 
 		Set {
-			return (key ? (this.iLapTimes[key] := value) : (this.iLapTimes := value))
+			return (isSet(key) ? (this.iLapTimes[key] := value) : (this.iLapTimes := value))
 		}
 	}
 
@@ -177,11 +177,11 @@ class CarInfo {
 		}
 	}
 
-	Deltas[sector := false, key := false] {
+	Deltas[sector := false, key?] {
 		Get {
 			if sector {
 				if this.iDeltas.Has(sector)
-					return (key ? this.iDeltas[sector][key] : this.iDeltas[sector])
+					return (isSet(key) ? this.iDeltas[sector][key] : this.iDeltas[sector])
 				else
 					return []
 			}
@@ -865,35 +865,35 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	OtherCars[key := false] {
+	OtherCars[key?] {
 		Get {
-			return (key ? this.iOtherCars[key] : this.iOtherCars)
+			return (isSet(key) ? this.iOtherCars[key] : this.iOtherCars)
 		}
 
 		Set {
-			return (key ? (this.iOtherCars[key] := value) : (this.iOtherCars := value))
+			return (isSet(key) ? (this.iOtherCars[key] := value) : (this.iOtherCars := value))
 		}
 	}
 
-	Positions[key := false] {
+	Positions[key?] {
 		Get {
-			return (key ? this.iPositions[key] : this.iPositions)
+			return (isSet(key) ? this.iPositions[key] : this.iPositions)
 		}
 	}
 
-	PositionInfos[key := false] {
+	PositionInfos[key?] {
 		Get {
-			return (key ? this.iPositionInfos[key] : this.iPositionInfos)
+			return (isSet(key) ? this.iPositionInfos[key] : this.iPositionInfos)
 		}
 
 		Set {
-			return (key ? (this.iPositionInfos[key] := value) : (this.iPositionInfos := value))
+			return (isSet(key) ? (this.iPositionInfos[key] := value) : (this.iPositionInfos := value))
 		}
 	}
 
-	Pitstops[nr := false] {
+	Pitstops[nr?] {
 		Get {
-			if nr {
+			if isSet(nr) {
 				if !this.iPitstops.Has(nr)
 					this.iPitstops[nr] := []
 
@@ -904,23 +904,23 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	TacticalAdvices[key := false] {
+	TacticalAdvices[key?] {
 		Get {
-			return (key ? this.iTacticalAdvices[key] : this.iTacticalAdvices)
+			return (isSet(key) ? this.iTacticalAdvices[key] : this.iTacticalAdvices)
 		}
 
 		Set {
-			return (key ? (this.iTacticalAdvices[key] := value) : (this.iTacticalAdvices := value))
+			return (isSet(key) ? (this.iTacticalAdvices[key] := value) : (this.iTacticalAdvices := value))
 		}
 	}
 
-	SessionInfos[key := false] {
+	SessionInfos[key?] {
 		Get {
-			return (key ? this.iSessionInfos[key] : this.iSessionInfos)
+			return (isSet(key) ? this.iSessionInfos[key] : this.iSessionInfos)
 		}
 
 		Set {
-			return (key ? (this.iSessionInfos[key] := value) : (this.iSessionInfos := value))
+			return (isSet(key) ? (this.iSessionInfos[key] := value) : (this.iSessionInfos := value))
 		}
 	}
 

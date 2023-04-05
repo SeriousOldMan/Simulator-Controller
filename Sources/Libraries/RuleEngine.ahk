@@ -1833,7 +1833,7 @@ class ResultSet {
 	setVariable(choicePoint, var, value) {
 		local bindings := this.iBindings
 
-		var := var.RootVariable
+		var := ObjPtr(var.RootVariable)
 
 		choicePoint.saveVariable(var, (bindings.Has(var) ? bindings[var] : kNotInitialized))
 
@@ -1947,8 +1947,8 @@ class ResultSet {
 			if (ruleEngine.TraceLevel <= kTraceFull)
 				ruleEngine.trace(kTraceFull, "Look for value of " . var.toString()) ; . "(" . &var . ")")
 
-			if (bindings && bindings.Has(var)) {
-				value := bindings[var]
+			if (bindings && bindings.Has(ObjPtr(var))) {
+				value := bindings[ObjPtr(var)]
 
 				if isInstance(value, Variable) {
 					root := value.RootVariable
@@ -2014,7 +2014,7 @@ class ChoicePoint {
 	iNextChoicePoint := false
 
 	iEnvironment := false
-	iSavedVariables := CaseInsenseMap()
+	iSavedVariables := Map()
 
 	iResultSet := false
 	iGoal := false
@@ -2087,7 +2087,7 @@ class ChoicePoint {
 		for var, value in this.iSavedVariables
 			resultSet.resetVariable(this, var, value)
 
-		this.iSavedVariables := CaseInsenseMap()
+		this.iSavedVariables := Map()
 	}
 
 	append(afterChoicePoint) {
@@ -2185,7 +2185,7 @@ class ChoicePoint {
 
 class RulesChoicePoint extends ChoicePoint {
 	iReductions := []
-	iSubstitutedReductions := CaseInsenseMap()
+	iSubstitutedReductions := Map()
 	iNextRuleIndex := 1
 
 	iSubChoicePoints := []
@@ -2223,7 +2223,7 @@ class RulesChoicePoint extends ChoicePoint {
 	}
 
 	dispose() {
-		this.iSubstitutedReductions := CaseInsenseMap()
+		this.iSubstitutedReductions := Map()
 		this.iReductions := []
 
 		super.dispose()
@@ -2250,10 +2250,10 @@ class RulesChoicePoint extends ChoicePoint {
 
 				rule := reductions[index]
 
-				if !this.iSubstitutedReductions.Has(rule)
-					this.iSubstitutedReductions[rule] := rule.substituteVariables()
+				if !this.iSubstitutedReductions.Has(ObjPtr(rule))
+					this.iSubstitutedReductions[ObjPtr(rule)] := rule.substituteVariables()
 
-				rule := this.iSubstitutedReductions[rule]
+				rule := this.iSubstitutedReductions[ObjPtr(rule)]
 
 				if (resultSet.RuleEngine.TraceLevel <= kTraceLight)
 					resultSet.RuleEngine.trace(kTraceLight, "Trying rule " . rule.toString())

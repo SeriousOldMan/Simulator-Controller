@@ -58,19 +58,13 @@ class RaceReportViewer extends RaceReportReader {
 		}
 	}
 
-	Settings[key := false] {
+	Settings[key?] {
 		Get {
-			if key
-				return this.iSettings[key]
-			else
-				return this.iSettings
+			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}
 
 		Set {
-			if key
-				return this.iSettings[key] := value
-			else
-				return this.iSettings := value
+			return (isSet(key) ? (this.iSettings[key] := value) : (this.iSettings := value))
 		}
 	}
 
@@ -82,7 +76,7 @@ class RaceReportViewer extends RaceReportReader {
 		this.iInfoViewer := infoViewer
 	}
 
-	lapTimeDisplayValue(lapTime) {
+	static lapTimeDisplayValue(lapTime) {
 		local seconds, fraction, minutes
 
 		if isNumber(lapTime)
@@ -213,12 +207,13 @@ class RaceReportViewer extends RaceReportReader {
 	getReportDrivers(raceData, drivers := false) {
 		local result
 
-		if drivers {
+		if (drivers && (drivers.Length > 0)) {
 			result := []
 
 			loop getMultiMapValue(raceData, "Cars", "Count")
 				if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
-					result.Push(drivers[1][A_Index])
+					if drivers[1].Has(A_Index)
+						result.Push(drivers[1][A_Index])
 
 			return result
 		}
@@ -307,9 +302,14 @@ class RaceReportViewer extends RaceReportReader {
 				else
 					for ignore, lap in this.getReportLaps(raceData, true) {
 						if (drivers.Length >= lap) {
-							drivers[lap].RemoveAt(car)
-							positions[lap].RemoveAt(car)
-							times[lap].RemoveAt(car)
+							if drivers[lap].Has(car)
+								drivers[lap].RemoveAt(car)
+
+							if positions[lap].Has(car)
+								positions[lap].RemoveAt(car)
+
+							if times[lap].Has(car)
+								times[lap].RemoveAt(car)
 						}
 					}
 			}
@@ -368,8 +368,8 @@ class RaceReportViewer extends RaceReportReader {
 
 					rows.Push(Array("'" . class . "'", "'" . nr . "'"
 								  , "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
-								  , "'" . this.lapTimeDisplayValue(min) . "'"
-								  , "'" . this.lapTimeDisplayValue(avg) . "'", result, result))
+								  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
+								  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
 				}
 				else
 					invalids += 1
@@ -483,7 +483,7 @@ class RaceReportViewer extends RaceReportReader {
 										 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
 										 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
 										 , "'" . consumption . "'"
-										 , "'" . this.lapTimeDisplayValue(lapTime) . "'"
+										 , "'" . RaceReportViewer.lapTimeDisplayValue(lapTime) . "'"
 										 , "'" . (pitstop ? translate("x") : "") . "'")
 
 				rows.Push("[" . row	. "]")
@@ -745,7 +745,7 @@ class RaceReportViewer extends RaceReportReader {
 							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
 
 							if (time > 0)
-								lapTimes.Push("'" . this.lapTimeDisplayValue(time) . "'")
+								lapTimes.Push("'" . RaceReportViewer.lapTimeDisplayValue(time) . "'")
 							else
 								lapTimes.Push(kNull)
 						}

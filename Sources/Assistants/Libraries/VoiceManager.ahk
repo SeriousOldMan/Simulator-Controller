@@ -101,21 +101,15 @@ class VoiceManager {
 			}
 		}
 
-		Phrases[key := false] {
+		Phrases[key?] {
 			Get {
-				if key
-					return this.iPhrases[key]
-				else
-					return this.iPhrases
+				return (isSet(key) ? this.iPhrases[key] : this.iPhrases)
 			}
 		}
 
-		Fragments[key := false] {
+		Fragments[key?] {
 			Get {
-				if key
-					return this.iFragments[key]
-				else
-					return this.iFragments
+				return (isSet(key) ? this.iFragments[key] : this.iFragments)
 			}
 		}
 
@@ -229,21 +223,15 @@ class VoiceManager {
 			}
 		}
 
-		Phrases[key := false] {
+		Phrases[key?] {
 			Get {
-				if key
-					return this.iPhrases[key]
-				else
-					return this.iPhrases
+				return (isSet(key) ? this.iPhrases[key] : this.iPhrases)
 			}
 		}
 
-		Fragments[key := false] {
+		Fragments[key?] {
 			Get {
-				if key
-					return this.iFragments[key]
-				else
-					return this.iFragments
+				return (isSet(key) ? this.iFragments[key] : this.iFragments)
 			}
 		}
 

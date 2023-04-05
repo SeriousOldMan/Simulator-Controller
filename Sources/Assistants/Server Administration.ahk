@@ -636,11 +636,13 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		administrationGui.Add("Text", "x118 YP+20 w168 cBlue Center H:Center", translate("Server Administration")).OnEvent("Click", openDocumentation.Bind(administrationGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration"))
 
-		administrationGui.Add("Text", "x24 yp+30 w356 0x10")
-
 		administrationGui.SetFont("Norm", "Arial")
 
+		/*
+		administrationGui.Add("Text", "x24 yp+30 w356 0x10")
+
 		administrationGui.Add("Button", "x164 y474 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", administrationEditor.Bind(kClose))
+		*/
 
 		x := 8
 		y := 68

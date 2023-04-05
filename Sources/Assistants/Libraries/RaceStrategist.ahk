@@ -330,15 +330,15 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		Pitstops[key := false] {
+		Pitstops[key?] {
 			Get {
-				return (key ? this.iPitstops[key] : this.iPitstops)
+				return (isSet(key) ? this.iPitstops[key] : this.iPitstops)
 			}
 		}
 
-		UsedTyreSets[key := false] {
+		UsedTyreSets[key?] {
 			Get {
-				return (key ? this.iUsedTyreSets[key] : this.iUsedTyreSets)
+				return (isSet(key) ? this.iUsedTyreSets[key] : this.iUsedTyreSets)
 			}
 		}
 
@@ -400,9 +400,9 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	RaceInfo[key := false] {
+	RaceInfo[key?] {
 		Get {
-			return (key ? this.iRaceInfo[key] : this.iRaceInfo)
+			return (isSet(key) ? this.iRaceInfo[key] : this.iRaceInfo)
 		}
 	}
 

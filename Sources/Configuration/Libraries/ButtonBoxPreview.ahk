@@ -72,12 +72,9 @@ class ButtonBoxPreview extends ControllerPreview {
 		}
 	}
 
-	RowDefinitions[row := false] {
+	RowDefinitions[row?] {
 		Get {
-			if row
-				return this.iRowDefinitions[row]
-			else
-				return this.iRowDefinitions
+			return (isSet(row) ? this.iRowDefinitions[row] : this.iRowDefinitions)
 		}
 	}
 

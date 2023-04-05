@@ -88,13 +88,13 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	CarMetaData[key := false] {
+	CarMetaData[key?] {
 		Get {
-			return (key ? this.iCarMetaData[key] : this.iCarMetaData)
+			return (isSet(key) ? this.iCarMetaData[key] : this.iCarMetaData)
 		}
 
 		Set {
-			return (key ? (this.iCarMetaData[key] := value) : (this.iCarMetaData := value))
+			return (isSet(key) ? (this.iCarMetaData[key] := value) : (this.iCarMetaData := value))
 		}
 	}
 

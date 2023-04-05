@@ -200,13 +200,13 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 	}
 
-	State[key := false] {
+	State[key?] {
 		Get {
-			return (key ? this.iState[key] : this.iState)
+			return (isSet(key) ? this.iState[key] : this.iState)
 		}
 
 		Set {
-			return (key ? (this.iState[key] := value) : (this.iState := value))
+			return (isSet(key) ? (this.iState[key] := value) : (this.iState := value))
 		}
 	}
 

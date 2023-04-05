@@ -185,30 +185,27 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	TyreCompounds[key := false] {
+	TyreCompounds[key?] {
 		Get {
-			return (key ? this.iTyreCompounds[key] : this.iTyreCompounds)
+			return (isSet(key) ? this.iTyreCompounds[key] : this.iTyreCompounds)
 		}
 	}
 
-	AvailableDrivers[index := false] {
+	AvailableDrivers[index?] {
 		Get {
-			return (index ? this.iAvailableDrivers[index] : this.iAvailableDrivers)
+			return (isSet(index) ? this.iAvailableDrivers[index] : this.iAvailableDrivers)
 		}
 	}
 
-	AvailableCompounds[index := false] {
+	AvailableCompounds[index?] {
 		Get {
-			return (index ? this.iAvailableCompounds[index] : this.iAvailableCompounds)
+			return (isSet(index) ? this.iAvailableCompounds[index] : this.iAvailableCompounds)
 		}
 	}
 
-	SelectedCompound[colored := false] {
+	SelectedCompound[colored?] {
 		Get {
-			if colored
-				return compound(this.iSelectedCompound, this.iSelectedCompoundColor)
-			else
-				return this.iSelectedCompound
+			return (isSet(colored) ? compound(this.iSelectedCompound, this.iSelectedCompoundColor) : this.iSelectedCompound)
 		}
 	}
 
@@ -230,19 +227,19 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 	}
 
-	SelectedDrivers[index := false] {
+	SelectedDrivers[index?] {
 		Get {
-			return (index ? this.iSelectedDrivers[index] : this.iSelectedDrivers)
+			return (isSet(index) ? this.iSelectedDrivers[index] : this.iSelectedDrivers)
 		}
 	}
 
-	StintDrivers[index := false] {
+	StintDrivers[index?] {
 		Get {
-			return (index ? this.iStintDrivers[index] : this.iStintDrivers)
+			return (isSet(index) ? this.iStintDrivers[index] : this.iStintDrivers)
 		}
 
 		Set {
-			return (index ? (this.iStintDrivers[index] := value) : (this.iStintDrivers := value))
+			return (isSet(index) ? (this.iStintDrivers[index] := value) : (this.iStintDrivers := value))
 		}
 	}
 
@@ -964,11 +961,13 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		this.showStrategyInfo(false)
 
+		/*
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x8 y816 w1350 0x10 Y:Move W:Grow")
 
 		workbenchGui.Add("Button", "x649 y824 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeWorkbench)
+		*/
 
 		workbenchTab := workbenchGui.Add("Tab3", "x16 ys+39 w593 h216 H:Grow -Wrap Section", collect(["Rules && Settings", "Pitstop && Service", "Drivers", "Weather", "Simulation", "Strategy"], translate))
 
@@ -1946,8 +1945,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadDriver(driver, force := false) {
-		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers != false))
-				  || !inList(this.SelectedDrivers, driver)) {
+		if (force || (((driver == true) || (driver == false)) && (this.SelectedDrivers && !inList(this.SelectedDrivers, driver)))) {
 			if driver {
 				this.Control["driverDropDown"].Choose(((driver = true) ? 1 : (inList(this.AvailableDrivers, driver) + 1)))
 

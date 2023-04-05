@@ -16,15 +16,66 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                    Public Classes Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class MultiMap extends CaseInsenseSafeMap {
+	static read(multiMapFile) {
+		return readMultiMap(multiMapFile)
+	}
+
+	static parse(text) {
+		return parseMultiMap(text)
+	}
+
+	write(multiMapFile, symbolic := true) {
+		writeMultiMap(multiMapFile, this, symbolic := true)
+	}
+
+	print(symbolic := true) {
+		return printMultiMap(this, symbolic := true)
+	}
+
+	getValue(section, key, default?) {
+		return getMultiMapValue(this, section, key, default?)
+	}
+
+	getValues(multiMap, section, default?) {
+		return getMultiMapValues(this, section, default?)
+	}
+
+	setValue(section, key, value) {
+		return setMultiMapValue(this, section, key, value)
+	}
+
+	setValues(section, values) {
+		return setMultiMapValues(this, section, values)
+	}
+
+	addValues(otherMultiMap) {
+		return addMultiMapValues(this, otherMultiMap)
+	}
+
+	removeValue(section, key) {
+		return removeMultiMapValue(this, section, key)
+	}
+
+	removeValues(multiMap, section) {
+		return removeMultiMapValues(this, section)
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 newMultiMap() {
-	return CaseInsenseMap()
+	return MultiMap()
 }
 
 newSectionMap() {
-	return CaseInsenseMap()
+	return MultiMap()
 }
 
 readMultiMap(multiMapFile) {
@@ -195,7 +246,7 @@ getMultiMapValue(multiMap, section, key, default := false) {
 	return default
 }
 
-getMultiMapValues(multiMap, section, default := unset) {
+getMultiMapValues(multiMap, section, default?) {
 	return multiMap.Has(section) ? multiMap[section].Clone() : (isSet(default) ? default : newSectionMap())
 }
 

@@ -512,13 +512,13 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	VoiceClients[key := false] {
+	VoiceClients[key?] {
 		Get {
-			return (key ? this.iVoiceClients[key] : this.iVoiceClients)
+			return (isSet(key) ? this.iVoiceClients[key] : this.iVoiceClients)
 		}
 
 		Set {
-			return (key ? (this.iVoiceClients[key] := value) : (this.iVoiceClients := value))
+			return (isSet(key) ? (this.iVoiceClients[key] := value) : (this.iVoiceClients := value))
 		}
 	}
 

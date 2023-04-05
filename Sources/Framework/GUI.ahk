@@ -52,7 +52,6 @@ getControllerActionDefinitions(type) {
 class Window extends Gui {
 	iCloseable := false
 	iResizeable := false
-	iAsynchronous := false
 
 	iMinWidth := 0
 	iMinHeight := 0
@@ -291,7 +290,7 @@ class Window extends Gui {
 
 	Resizeable {
 		Get {
-			return (this.iResizeable ? (this.iAsynchronous || true) : false)
+			return this.iResizeable
 		}
 	}
 
@@ -335,6 +334,11 @@ class Window extends Gui {
 				return (this.iMaxWidth := value)
 			}
 			finally {
+				if this.MaxWidth
+					this.Opt("+MaxSize" . this.MaxWidth . "x")
+				else
+					this.Opt("-MaxSize")
+
 				this.Resize("Auto", this.Width, this.Height)
 			}
 		}
@@ -350,6 +354,11 @@ class Window extends Gui {
 				return (this.iMaxHeight := value)
 			}
 			finally {
+				if this.MaxHeight
+					this.Opt("+MaxSize" . "x" . this.MaxHeight)
+				else
+					this.Opt("-MaxSize")
+
 				this.Resize("Auto", this.Width, this.Height)
 			}
 		}
@@ -394,10 +403,7 @@ class Window extends Gui {
 				case "Closeable":
 					this.iCloseable := argument
 				case "Resizeable":
-					if InStr(argument, "Async")
-						this.iAsynchronous := argument
-
-					this.iResizeable := (argument != false)
+					this.iResizeable := argument
 				case "Descriptor":
 					this.iDescriptor := argument
 
@@ -478,6 +484,8 @@ class Window extends Gui {
 			this.iMinWidth := width
 			this.iMinHeight := height
 
+			this.Opt("MinSize" . width . "x" . height)
+
 			this.iWidth := width
 			this.iHeight := height
 
@@ -533,112 +541,99 @@ class Window extends Gui {
 		local restricted := false
 		local x, y, w, h, ignore, resizer
 
-		static lastWidth, lastHeight
+		static needResize := false
 		static resizeTask := false
-		static nextResize := false
 
-		resizeAsync(synchronous := false) {
-			local curPriority := Task.block(kInterruptPriority)
+		runResizers() {
+			local width, height
 
-			try {
-				if !synchronous {
-					if (A_TickCount < nextResize)
-						for ignore, button in ["LButton", "MButton", "RButton"]
-							if GetKeyState(button, "P")
-								return Task.CurrentTask
+			if needResize {
+				local curPriority := Task.block(kInterruptPriority)
 
-					if !this.Width
-						return Task.CurrentTask
+				needResize := false
 
-					resizeTask.stop()
-					resizeTask := false
+				try {
+					WinGetPos( , , &w, &h, this)
 
-					width := lastWidth
-					height := lastHeight
-				}
-				else if !this.Width
-					return
+					width := w
+					height := h
 
-				WinGetPos( , , &w, &h, this)
+					if (width < this.MinWidth) {
+						width := this.MinWidth
+						restricted := true
+					}
+					else if (this.MaxWidth && (width > this.MaxWidth)) {
+						width := this.MaxWidth
+						restricted := true
+					}
 
-				width := w
-				height := h
+					if (height < this.MinHeight) {
+						height := this.MinHeight
+						restricted := true
+					}
+					else if (this.MaxHeight && (height > this.MaxHeight)) {
+						height := this.MaxHeight
+						restricted := true
+					}
 
-				if (width < this.MinWidth) {
-					width := this.MinWidth
-					restricted := true
-				}
-				else if (this.MaxWidth && (width > this.MaxWidth)) {
-					width := this.MaxWidth
-					restricted := true
-				}
+					if this.ControlsRestrictResize(&width, &height)
+						restricted := true
 
-				if (height < this.MinHeight) {
-					height := this.MinHeight
-					restricted := true
-				}
-				else if (this.MaxHeight && (height > this.MaxHeight)) {
-					height := this.MaxHeight
-					restricted := true
-				}
+					this.iWidth := width
+					this.iHeight := height
 
-				if this.ControlsRestrictResize(&width, &height)
-					restricted := true
+					this.ControlsResize(width, height)
 
-				this.iWidth := width
-				this.iHeight := height
+					if restricted {
+						WinMove( , , width, height, this)
 
-				this.ControlsResize(width, height)
+						return
+					}
+					else {
+						for ignore, resizer in this.Resizers
+							resizer.Redraw()
 
-				if restricted {
-					WinMove( , , width, height, this)
+						WinRedraw(this)
 
-					return
-				}
-				else {
-					for ignore, resizer in this.Resizers
-						resizer.Redraw()
+						if this.Descriptor {
+							updateSettings(width, height) {
+								local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-					WinRedraw(this)
+								setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
+								setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
 
-					if this.Descriptor {
-						updateSettings(width, height) {
-							local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+								writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+							}
 
-							setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
-							setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
-
-							writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+							Task.startTask(updateSettings.Bind(width, height), 1000, kLowPriority)
 						}
-
-						Task.startTask(updateSettings.Bind(width, height), 1000, kLowPriority)
 					}
 				}
-			}
-			catch Any as exception {
-				Task.startTask(logError.Bind(exception), 100, kLowPriority)
-			}
-			finally {
-				Task.unblock(curPriority)
-			}
-		}
-
-		if InStr(minMax, "Init")
-			WinMove( , , width, height, this)
-		else if (this.Resizeable != true) {
-			lastWidth := width
-			lastHeight := height
-
-			if !resizeTask {
-				nextResize := (A_TickCount + 1000)
-
-				resizeTask := Task(resizeAsync, 100, kHighPriority)
-
-				resizeTask.start()
+				catch Any as exception {
+					Task.startTask(logError.Bind(exception), 100, kLowPriority)
+				}
+				finally {
+					Task.unblock(curPriority)
+				}
 			}
 		}
-		else
-			resizeAsync(true)
+
+		if this.Width
+			if InStr(minMax, "Init")
+				WinMove( , , width, height, this)
+			else {
+				needResize := true
+
+				if (this.Resizeable = "Deferred") {
+					if !resizeTask {
+						resizeTask := PeriodicTask(runResizers, 100)
+
+						resizeTask.start()
+					}
+				}
+				else
+					runResizers()
+			}
 	}
 
 	ControlsRestrictResize(&width, &height) {

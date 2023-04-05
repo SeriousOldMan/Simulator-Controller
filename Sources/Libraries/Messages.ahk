@@ -135,11 +135,11 @@ class MessageManager extends PeriodicTask {
 		}
 	}
 
-	static MessageHandlers[key := false] {
+	static MessageHandlers[key?] {
 		Get {
 			MessageManager.initializeMessageHandlers()
 
-			return (key ? MessageManager.sMessageHandlers[key] : MessageManager.sMessageHandlers)
+			return (isSet(key) ? MessageManager.sMessageHandlers[key] : MessageManager.sMessageHandlers)
 		}
 
 		Set {
@@ -149,13 +149,13 @@ class MessageManager extends PeriodicTask {
 		}
 	}
 
-	OutgoingMessages[key := false] {
+	OutgoingMessages[key?] {
 		Get {
-			return (key ? MessageManager.sOutgoingMessages[key] : MessageManager.sOutgoingMessages)
+			return (isSet(key) ? MessageManager.sOutgoingMessages[key] : MessageManager.sOutgoingMessages)
 		}
 
 		Set {
-			return (key ? (MessageManager.sOutgoingMessages[key] := value) : (MessageManager.sOutgoingMessages := value))
+			return (isSet(key) ? (MessageManager.sOutgoingMessages[key] := value) : (MessageManager.sOutgoingMessages := value))
 		}
 	}
 

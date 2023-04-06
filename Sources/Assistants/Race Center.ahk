@@ -11720,18 +11720,6 @@ loadDrivers(connector, team) {
 	return drivers
 }
 
-setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
-	local rCenter := RaceCenter.Instance
-
-	if (rCenter.iPressuresRequest = "Pitstop")
-		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure))
-	else
-		if (rCenter.SetupsListView.GetNext(0) = rCenter.iPressuresRequest)
-			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
-
-	return false
-}
-
 startupRaceCenter() {
 	local icon := kIconsDirectory . "Console.ico"
 	local rCenter
@@ -11750,6 +11738,23 @@ startupRaceCenter() {
 	registerMessageHandler("Setup", functionMessageHandler)
 
 	rCenter.show()
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Message Handler Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+setTyrePressures(tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure) {
+	local rCenter := RaceCenter.Instance
+
+	if (rCenter.iPressuresRequest = "Pitstop")
+		rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializePitstopTyreSetup", &tyreCompound, &tyreCompoundColor, &flPressure, &frPressure, &rlPressure, &rrPressure))
+	else
+		if (rCenter.SetupsListView.GetNext(0) = rCenter.iPressuresRequest)
+			rCenter.withExceptionhandler(ObjBindMethod(rCenter, "initializeSetup", tyreCompound, tyreCompoundColor, flPressure, frPressure, rlPressure, rrPressure))
+
+	return false
 }
 
 

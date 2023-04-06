@@ -17,7 +17,7 @@
 SendMode("Input")				; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
-global kBuildConfiguration := "Development"
+global kBuildConfiguration := "Production"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -310,7 +310,7 @@ class Unification extends Assert {
 	Simple_Test() {
 		tests := [["empty()", ["empty()"]]]
 
-		this.executeTests(tests, kTraceFull)
+		this.executeTests(tests, isDebug() ? kTraceFull : kTraceOff)
 	}
 
 	Concat_Test() {

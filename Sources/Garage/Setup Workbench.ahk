@@ -1,5 +1,5 @@
 ﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Setup Advisor                   ;;;
+;;;   Modular Simulator Controller System - Setup Workbench                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -18,7 +18,7 @@
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Setup.ico
-;@Ahk2Exe-ExeName Setup Advisor.exe
+;@Ahk2Exe-ExeName Setup Workbench.exe
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -63,10 +63,10 @@ global kDebugRules := 2
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; SetupAdvisor                                                            ;;;
+;;; SetupWorkbench                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SetupAdvisor extends ConfigurationItem {
+class SetupWorkbench extends ConfigurationItem {
 	iWindow := false
 
 	iDebug := kDebugOff
@@ -97,23 +97,23 @@ class SetupAdvisor extends ConfigurationItem {
 
 	iKnowledgeBase := false
 
-	class AdvisorWindow extends Window {
-		iAdvisor := false
+	class WorkbenchWindow extends Window {
+		iWorkbench := false
 
-		Advisor {
+		Workbench {
 			Get {
-				return this.iAdvisor
+				return this.iWorkbench
 			}
 		}
 
-		__New(advisor) {
-			this.iAdvisor := advisor
+		__New(Workbench) {
+			this.iWorkbench := workbench
 
-			super.__New({Descriptor: "Setup Advisor", Resizeable: true, Closeable: true})
+			super.__New({Descriptor: "Setup Workbench", Resizeable: true, Closeable: true})
 		}
 
 		Close(*) {
-			closeSetupAdvisor()
+			closeSetupWorkbench()
 		}
 	}
 
@@ -140,7 +140,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				try this.Window.Advisor.updateRecommendations(true, false)
+				try this.Window.Workbench.updateRecommendations(true, false)
 			}
 
 			return Task.CurrentTask
@@ -319,19 +319,19 @@ class SetupAdvisor extends ConfigurationItem {
 			this.iSelectedWeather := weather
 		}
 
-		definition := readMultiMap(kResourcesDirectory . "Advisor\Setup Advisor.ini")
+		definition := readMultiMap(kResourcesDirectory . "Garage\Setup Workbench.ini")
 
 		for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
-			if FileExist(rootDirectory . "Setup Advisor." . getLanguage()) {
+			if FileExist(rootDirectory . "Setup Workbench." . getLanguage()) {
 				found := true
 
-				for section, values in readMultiMap(rootDirectory . "Setup Advisor." . getLanguage())
+				for section, values in readMultiMap(rootDirectory . "Setup Workbench." . getLanguage())
 					for key, value in values
 						setMultiMapValue(definition, section, key, value)
 			}
 
 		if !found
-			for section, values in readMultiMap(kTranslationsDirectory . "Setup Advisor.en")
+			for section, values in readMultiMap(kTranslationsDirectory . "Setup Workbench.en")
 				for key, value in values
 					setMultiMapValue(definition, section, key, value)
 
@@ -339,32 +339,32 @@ class SetupAdvisor extends ConfigurationItem {
 
 		super.__New(kSimulatorConfiguration)
 
-		SetupAdvisor.Instance := this
+		SetupWorkbench.Instance := this
 	}
 
 	createGui(configuration) {
-		local advisor := this
-		local simulators, simulator, weather, choices, chosen, index, name, advisorGui, button
+		local workbench := this
+		local simulators, simulator, weather, choices, chosen, index, name, workbenchGui, button
 
 		chooseSimulator(*) {
-			advisor.loadSimulator((advisorGui["simulatorDropDown"].Text = translate("Generic")) ? true : advisorGui["simulatorDropDown"].Text)
+			workbench.loadSimulator((workbenchGui["simulatorDropDown"].Text = translate("Generic")) ? true : workbenchGui["simulatorDropDown"].Text)
 		}
 
 		chooseCar(*) {
-			advisor.loadCar((advisorGui["carDropDown"].Text = translate("All")) ? true : advisorGui["carDropDown"].Text)
+			workbench.loadCar((workbenchGui["carDropDown"].Text = translate("All")) ? true : workbenchGui["carDropDown"].Text)
 		}
 
 		chooseTrack(*) {
 			local simulator, tracks, trackNames
 
-			if (advisorGui["trackDropDown"].Text = translate("All"))
-				advisor.loadTrack(true)
+			if (workbenchGui["trackDropDown"].Text = translate("All"))
+				workbench.loadTrack(true)
 			else {
-				simulator := advisor.SelectedSimulator
-				tracks := advisor.getTracks(simulator, advisor.SelectedCar)
-				trackNames := collect(tracks, ObjBindMethod(advisor, "getTrackName", simulator))
+				simulator := workbench.SelectedSimulator
+				tracks := workbench.getTracks(simulator, workbench.SelectedCar)
+				trackNames := collect(tracks, ObjBindMethod(workbench, "getTrackName", simulator))
 
-				advisor.loadTrack(tracks[inList(trackNames, advisorGui["trackDropDown"].Text)])
+				workbench.loadTrack(tracks[inList(trackNames, workbenchGui["trackDropDown"].Text)])
 			}
 		}
 
@@ -372,30 +372,30 @@ class SetupAdvisor extends ConfigurationItem {
 		}
 
 		chooseCharacteristic(*) {
-			advisor.chooseCharacteristic()
+			workbench.chooseCharacteristic()
 		}
 
 		editSetup(*) {
-			advisor.editSetup()
+			workbench.editSetup()
 		}
 
 		loadSetup(*) {
 			local fileName
 
-			advisorGui.Opt("+OwnDialogs")
+			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateLoadCancelButtons)
 			fileName := FileSelect(1, "", translate("Load Problems..."), "Problems (*.setup)")
 			OnMessage(0x44, translateLoadCancelButtons, 0)
 
 			if (fileName != "")
-				advisor.restoreState(fileName, false)
+				workbench.restoreState(fileName, false)
 		}
 
 		saveSetup(*) {
 			local fileName
 
-			advisorGui.Opt("+OwnDialogs")
+			workbenchGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSaveCancelButtons)
 			fileName := FileSelect("S17", "", translate("Save Problems..."), "Problems (*.setup)")
@@ -405,34 +405,34 @@ class SetupAdvisor extends ConfigurationItem {
 				if !InStr(fileName, ".setup")
 					fileName := (fileName . ".setup")
 
-				advisor.saveState(fileName)
+				workbench.saveState(fileName)
 			}
 		}
 
-		advisorGui := SetupAdvisor.AdvisorWindow(this)
+		workbenchGui := SetupWorkbench.WorkbenchWindow(this)
 
-		this.iWindow := advisorGui
+		this.iWindow := workbenchGui
 
-		advisorGui.SetFont("s10 Bold", "Arial")
+		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		advisorGui.Add("Text", "w1184 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(advisorGui, "Setup Advisor"))
+		workbenchGui.Add("Text", "w1184 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(workbenchGui, "Setup Workbench"))
 
-		advisorGui.SetFont("s9 Norm", "Arial")
-		advisorGui.SetFont("Italic Underline", "Arial")
+		workbenchGui.SetFont("s9 Norm", "Arial")
+		workbenchGui.SetFont("Italic Underline", "Arial")
 
-		advisorGui.Add("Text", "x508 YP+20 w184 cBlue Center H:Center", translate("Setup Advisor")).OnEvent("Click", openDocumentation.Bind(advisorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor"))
+		workbenchGui.Add("Text", "x508 YP+20 w184 cBlue Center H:Center", translate("Setup Workbench")).OnEvent("Click", openDocumentation.Bind(workbenchGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench"))
 
-		advisorGui.Add("Text", "x8 yp+30 w1200 W:Grow 0x10 Section")
+		workbenchGui.Add("Text", "x8 yp+30 w1200 W:Grow 0x10 Section")
 
-		advisorGui.SetFont("Norm")
-		advisorGui.SetFont("s10 Bold", "Arial")
+		workbenchGui.SetFont("Norm")
+		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		advisorGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Road.ico")
-		advisorGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Road.ico")
+		workbenchGui.Add("Text", "x50 yp+5 w120 h26", translate("Selection"))
 
-		advisorGui.SetFont("s8 Norm", "Arial")
+		workbenchGui.SetFont("s8 Norm", "Arial")
 
-		advisorGui.Add("Text", "x16 yp+32 w80 h23 +0x200", translate("Simulator"))
+		workbenchGui.Add("Text", "x16 yp+32 w80 h23 +0x200", translate("Simulator"))
 
 		simulators := this.getSimulators()
 		simulator := 0
@@ -449,19 +449,19 @@ class SetupAdvisor extends ConfigurationItem {
 			if (name == true)
 				simulators[index] := translate("Generic")
 
-		advisorGui.Add("DropDownList", "x100 yp w196 Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
+		workbenchGui.Add("DropDownList", "x100 yp w196 Choose" . simulator . " vsimulatorDropDown", simulators).OnEvent("Change", chooseSimulator)
 
 		if (simulator > 0)
 			simulator := simulators[simulator]
 		else
 			simulator := false
 
-		advisorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Car"))
-		advisorGui.Add("DropDownList", "x100 yp w196 Choose1 vcarDropDown", [translate("All")]).OnEvent("Change", chooseCar)
-		advisorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Track"))
-		advisorGui.Add("DropDownList", "x100 yp w196 Choose1 vtrackDropDown", [translate("All")]).OnEvent("Change", chooseTrack)
+		workbenchGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Car"))
+		workbenchGui.Add("DropDownList", "x100 yp w196 Choose1 vcarDropDown", [translate("All")]).OnEvent("Change", chooseCar)
+		workbenchGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Track"))
+		workbenchGui.Add("DropDownList", "x100 yp w196 Choose1 vtrackDropDown", [translate("All")]).OnEvent("Change", chooseTrack)
 
-		advisorGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Conditions"))
+		workbenchGui.Add("Text", "x16 yp+24 w80 h23 +0x200", translate("Conditions"))
 
 		weather := this.SelectedWeather
 		choices := collect(kWeatherConditions, translate)
@@ -472,69 +472,69 @@ class SetupAdvisor extends ConfigurationItem {
 			chosen := 1
 		}
 
-		advisorGui.Add("DropDownList", "x100 yp w196 AltSubmit Disabled Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
+		workbenchGui.Add("DropDownList", "x100 yp w196 AltSubmit Disabled Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
 
-		advisorGui.Add("Button", "x305 ys+49 w94 h94 Disabled veditSetupButton").OnEvent("Click", editSetup)
-		setButtonIcon(advisorGui["editSetupButton"], kIconsDirectory . "Car Setup.ico", 1, "W64 H64")
+		workbenchGui.Add("Button", "x305 ys+49 w94 h94 Disabled veditSetupButton").OnEvent("Click", editSetup)
+		setButtonIcon(workbenchGui["editSetupButton"], kIconsDirectory . "Car Setup.ico", 1, "W64 H64")
 
-		advisorGui.Add("Text", "x8 yp+103 w400 0x10")
+		workbenchGui.Add("Text", "x8 yp+103 w400 0x10")
 
-		advisorGui.SetFont("Norm")
-		advisorGui.SetFont("s10 Bold", "Arial")
+		workbenchGui.SetFont("Norm")
+		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		advisorGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Report.ico")
-		advisorGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
+		workbenchGui.Add("Picture", "x16 yp+12 w30 h30", kIconsDirectory . "Report.ico")
+		workbenchGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
 
-		advisorGui.SetFont("s8 Norm")
-		advisorGui.Add("GroupBox", "x16 yp+30 w382 h469 H:Grow -Theme")
+		workbenchGui.SetFont("s8 Norm")
+		workbenchGui.Add("GroupBox", "x16 yp+30 w382 h469 H:Grow -Theme")
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
-		advisorGui.Add("Button", "x280 yp-24 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
-		button := advisorGui.Add("Button", "x352 yp w23 h23")
+		workbenchGui.Add("Button", "x280 yp-24 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
+		button := workbenchGui.Add("Button", "x352 yp w23 h23")
 		button.OnEvent("Click", loadSetup)
 		setButtonIcon(button, kIconsDirectory . "Load.ico", 1, "L2 T2 R2 B2")
-		button := advisorGui.Add("Button", "x376 yp w23 h23")
+		button := workbenchGui.Add("Button", "x376 yp w23 h23")
 		button.OnEvent("Click", saveSetup)
 		setButtonIcon(button, kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
-		advisorGui.SetFont("Norm")
-		advisorGui.SetFont("s10 Bold", "Arial")
+		workbenchGui.SetFont("Norm")
+		workbenchGui.SetFont("s10 Bold", "Arial")
 
-		advisorGui.Add("Picture", "x420 ys+12 w30 h30", kIconsDirectory . "Assistant.ico")
-		advisorGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
+		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", kIconsDirectory . "Assistant.ico")
+		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
-		advisorGui.SetFont("s8 Norm", "Arial")
+		workbenchGui.SetFont("s8 Norm", "Arial")
 
-		this.iSettingsViewer := advisorGui.Add("ActiveX", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer", "shell.explorer").Value
+		this.iSettingsViewer := workbenchGui.Add("ActiveX", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer", "shell.explorer").Value
 		this.SettingsViewer.Navigate("about:blank")
 
 		this.showSettingsChart(false)
 
 		/*
-		advisorGui.SetFont("Norm", "Arial")
+		workbenchGui.SetFont("Norm", "Arial")
 
-		advisorGui.Add("Text", "x8 y730 w1200 Y:Move W:Grow 0x10")
+		workbenchGui.Add("Text", "x8 y730 w1200 Y:Move W:Grow 0x10")
 
-		advisorGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadSetup)
-		advisorGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
+		workbenchGui.Add("Button", "x16 y738 w77 h23 Y:Move", translate("&Load...")).OnEvent("Click", loadSetup)
+		workbenchGui.Add("Button", "x98 y738 w77 h23 Y:Move", translate("&Save...")).OnEvent("Click", saveSetup)
 
-		advisorGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupAdvisor)
+		workbenchGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupWorkbench)
 		*/
 
-		advisorGui.Add(SetupAdvisor.AdivisorResizer(advisorGui))
+		workbenchGui.Add(SetupWorkbench.AdivisorResizer(workbenchGui))
 	}
 
 	show() {
 		local window := this.Window
 		local x, y, w, h
 
-		if getWindowPosition("Setup Advisor", &x, &y)
+		if getWindowPosition("Setup Workbench", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
 
-		if getWindowSize("Setup Advisor", &w, &h)
+		if getWindowSize("Setup Workbench", &w, &h)
 			window.Resize("Initialize", w, h)
 	}
 
@@ -542,7 +542,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local state, ignore, characteristic, widgets, value1, value2
 
 		if !fileName
-			fileName := (kUserConfigDirectory . "Advisor.setup")
+			fileName := (kUserConfigDirectory . "Setup Workbench.setup")
 
 		state := this.SimulatorDefinition.Clone()
 
@@ -576,7 +576,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local ignore, characteristic
 
 		if !fileName
-			fileName := (kUserConfigDirectory . "Advisor.setup")
+			fileName := (kUserConfigDirectory . "Setup Workbench.setup")
 
 		if FileExist(fileName) {
 			state := readMultiMap(fileName)
@@ -845,7 +845,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local hasGeneric := false
 		local simulator
 
-		loop Files, kResourcesDirectory "Advisor\Definitions\*.ini", "F" {
+		loop Files, kResourcesDirectory "Garager\Definitions\*.ini", "F" {
 			SplitPath(A_LoopFileName, , , , &simulator)
 
 			if (simulator = "Generic")
@@ -854,7 +854,7 @@ class SetupAdvisor extends ConfigurationItem {
 				simulators.Push(simulator)
 		}
 
-		loop Files, kUserHomeDirectory "Advisor\Definitions\*.ini", "F" {
+		loop Files, kUserHomeDirectory "Garage\Definitions\*.ini", "F" {
 			SplitPath(A_LoopFileName, , , , &simulator)
 
 			if (simulator = "Generic")
@@ -874,7 +874,7 @@ class SetupAdvisor extends ConfigurationItem {
 		local ignore, car, descriptor
 
 		if ((simulator != true) && (simulator != "*")) {
-			loop Files, kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".*.ini", "F" {
+			loop Files, kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".*.ini", "F" {
 				SplitPath(A_LoopFileName, , , , &descriptor)
 
 				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
@@ -883,7 +883,7 @@ class SetupAdvisor extends ConfigurationItem {
 					cars.Push(car)
 			}
 
-			loop Files, kUserHomeDirectory . "Advisor\Definitions\Cars\*.ini", "F" {
+			loop Files, kUserHomeDirectory . "Garage\Definitions\Cars\*.ini", "F" {
 				SplitPath(A_LoopFileName, , , , &descriptor)
 
 				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")
@@ -957,16 +957,16 @@ class SetupAdvisor extends ConfigurationItem {
 		productions := false
 		reductions := false
 
-		RuleCompiler().compileRules(FileRead(kResourcesDirectory . "Advisor\Rules\Setup Advisor.rules"), &productions, &reductions)
+		RuleCompiler().compileRules(FileRead(kResourcesDirectory . "Garage\Rules\Setup Workbench.rules"), &productions, &reductions)
 
 		simulator := this.SelectedSimulator
 		car := this.SelectedCar[false]
 
-		this.compileRules(getFileName("Advisor\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
-		this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
+		this.compileRules(getFileName("Garage\Rules\" . simulator . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
+		this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . ".Generic.rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
 
 		if (car != true)
-			this.compileRules(getFileName("Advisor\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
+			this.compileRules(getFileName("Garage\Rules\Cars\" . simulator . "." . car . ".rules", kResourcesDirectory, kUserHomeDirectory), &productions, &reductions)
 	}
 
 	loadCharacteristics(definition, simulator := false, car := false, track := false, fast := false) {
@@ -1107,7 +1107,7 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	initializeSimulator(name) {
-		local definition := readMultiMap(kResourcesDirectory . "Advisor\Definitions\" . name . ".ini")
+		local definition := readMultiMap(kResourcesDirectory . "Garage\Definitions\" . name . ".ini")
 		local simulator := getMultiMapValue(definition, "Simulator", "Simulator")
 		local cars, tracks
 
@@ -1124,7 +1124,7 @@ class SetupAdvisor extends ConfigurationItem {
 		this.iSelectedTrack := ((tracks[1] = "*") ? true : tracks[1])
 	}
 
-	initializeAdvisor(phase1 := "Initializing Setup Advisor", phase2 := "Starting Setup Advisor", phase3 := "Loading Car", fast := false) {
+	initializeWorkbench(phase1 := "Initializing Setup Workbench", phase2 := "Starting Setup Workbench", phase3 := "Loading Car", fast := false) {
 		local knowledgeBase, simulator, x, y, productions, reductions
 
 		simulator := this.SelectedSimulator
@@ -1174,9 +1174,9 @@ class SetupAdvisor extends ConfigurationItem {
 
 		Sleep(200)
 
-		knowledgeBase.setFact("Advisor.Simulator", this.SelectedSimulator["*"])
-		knowledgeBase.setFact("Advisor.Car", this.SelectedCar["*"])
-		knowledgeBase.setFact("Advisor.Track", this.SelectedTrack["*"])
+		knowledgeBase.setFact("Workbench.Simulator", this.SelectedSimulator["*"])
+		knowledgeBase.setFact("Workbench.Car", this.SelectedCar["*"])
+		knowledgeBase.setFact("Workbench.Track", this.SelectedTrack["*"])
 
 		knowledgeBase.addFact("Calculate", true)
 
@@ -1216,9 +1216,9 @@ class SetupAdvisor extends ConfigurationItem {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 				if (simulator == true)
-					removeMultiMapValue(settings, "Setup Advisor", "Simulator")
+					removeMultiMapValue(settings, "Setup Workbench", "Simulator")
 				else
-					setMultiMapValue(settings, "Setup Advisor", "Simulator", simulator)
+					setMultiMapValue(settings, "Setup Workbench", "Simulator", simulator)
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -1231,7 +1231,7 @@ class SetupAdvisor extends ConfigurationItem {
 
 				this.loadCars(this.AvailableCars[true])
 
-				this.initializeAdvisor()
+				this.initializeWorkbench()
 			}
 			finally {
 				this.Window.Opt("-Disabled")
@@ -1269,9 +1269,9 @@ class SetupAdvisor extends ConfigurationItem {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 				if (car == true)
-					removeMultiMapValue(settings, "Setup Advisor", "Car")
+					removeMultiMapValue(settings, "Setup Workbench", "Car")
 				else
-					setMultiMapValue(settings, "Setup Advisor", "Car", car)
+					setMultiMapValue(settings, "Setup Workbench", "Car", car)
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -1284,7 +1284,7 @@ class SetupAdvisor extends ConfigurationItem {
 				this.Control["trackDropDown"].Add(trackNames)
 				this.Control["trackDropDown"].Choose(1)
 
-				this.initializeAdvisor("Loading Car", "Loading Car", "Loading Car", true)
+				this.initializeWorkbench("Loading Car", "Loading Car", "Loading Car", true)
 			}
 			finally {
 				this.Window.Opt("-Disabled")
@@ -1304,9 +1304,9 @@ class SetupAdvisor extends ConfigurationItem {
 				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 				if (track == true)
-					removeMultiMapValue(settings, "Setup Advisor", "Track")
+					removeMultiMapValue(settings, "Setup Workbench", "Track")
 				else
-					setMultiMapValue(settings, "Setup Advisor", "Track", track)
+					setMultiMapValue(settings, "Setup Workbench", "Track", track)
 
 				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 
@@ -1343,14 +1343,14 @@ class SetupAdvisor extends ConfigurationItem {
 	}
 
 	addCharacteristic(characteristic, weight := 50, value := 33, draw := true, *) {
-		local advisor := this
+		local workbench := this
 		local window := this.Window
 		local numCharacteristics := this.SelectedCharacteristics.Length
 		local x, y, characteristicLabels, callback
 		local label1, label2, slider1, slider2, deleteButton
 
 		updateSlider(characteristic, slider1, slider2, *) {
-			advisor.updateCharacteristic(characteristic, slider1.Value, slider2.Value)
+			workbench.updateCharacteristic(characteristic, slider1.Value, slider2.Value)
 		}
 
 		if (!inList(this.SelectedCharacteristics, characteristic) && (numCharacteristics <= kMaxCharacteristics)) {
@@ -1599,12 +1599,12 @@ class SetupAdvisor extends ConfigurationItem {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class TelemetryAnalyzer {
-	iAdvisor := false
+	iWorkbench := false
 	iSimulator := false
 
-	Advisor {
+	Workbench {
 		Get {
-			return this.iAdvisor
+			return this.iWorkbench
 		}
 	}
 
@@ -1614,8 +1614,8 @@ class TelemetryAnalyzer {
 		}
 	}
 
-	__New(advisor, simulator) {
-		this.iAdvisor := advisor
+	__New(workbench, simulator) {
+		this.iWorkbench := workbench
 		this.iSimulator := simulator
 	}
 
@@ -1964,7 +1964,7 @@ class ClicksHandler extends IntegerHandler {
 class SetupEditor extends ConfigurationItem {
 	iWindow := false
 
-	iAdvisor := false
+	iWorkbench := false
 	iSetup := false
 
 	iComparator := false
@@ -1986,7 +1986,7 @@ class SetupEditor extends ConfigurationItem {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Setup Advisor.Setup Editor", Resizeable: true, Closeable: true}, "Setup Editor")
+			super.__New({Descriptor: "Setup Workbench.Setup Editor", Resizeable: true, Closeable: true}, "Setup Editor")
 		}
 
 		Close(*) {
@@ -2006,9 +2006,9 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
-	Advisor {
+	Workbench {
 		Get {
-			return this.iAdvisor
+			return this.iWorkbench
 		}
 	}
 
@@ -2050,23 +2050,23 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
-	__New(advisor, configuration := false) {
+	__New(workbench, configuration := false) {
 		local simulator, car, section, values, key, value, fileName
 
-		this.iAdvisor := advisor
+		this.iWorkbench := workbench
 
 		if !configuration {
-			simulator := advisor.SelectedSimulator
-			car := advisor.SelectedCar[false]
+			simulator := workbench.SelectedSimulator
+			car := workbench.SelectedCar[false]
 
-			configuration := readMultiMap(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
+			configuration := readMultiMap(kResourcesDirectory . "Garage\Definitions\" . simulator . ".ini")
 
-			for section, values in readMultiMap(kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".Generic.ini")
+			for section, values in readMultiMap(kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".Generic.ini")
 				for key, value in values
 					setMultiMapValue(configuration, section, key, value)
 
 			if (car != true) {
-				fileName := ("Advisor\Definitions\Cars\" . simulator . "." . car . ".ini")
+				fileName := ("Garage\Definitions\Cars\" . simulator . "." . car . ".ini")
 
 				for section, values in readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
 					for key, value in values
@@ -2123,12 +2123,12 @@ class SetupEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s10 Bold", "Arial")
 
-		editorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Setup Advisor.Setup Editor"))
+		editorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Setup Workbench.Setup Editor"))
 
 		editorGui.SetFont("s9 Norm", "Arial")
 		editorGui.SetFont("Italic Underline", "Arial")
 
-		editorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Editor")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups"))
+		editorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Editor")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups"))
 
 		editorGui.SetFont("s8 Norm", "Arial")
 
@@ -2163,12 +2163,12 @@ class SetupEditor extends ConfigurationItem {
 		local window := this.Window
 		local x, y, w, h
 
-		if getWindowPosition("Setup Advisor.Setup Editor", &x, &y)
+		if getWindowPosition("Setup Workbench.Setup Editor", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
 
-		if getWindowSize("Setup Advisor.Setup Editor", &w, &h)
+		if getWindowSize("Setup Workbench.Setup Editor", &w, &h)
 			window.Resize("Initialize", w, h)
 
 		this.loadSetup()
@@ -2178,7 +2178,7 @@ class SetupEditor extends ConfigurationItem {
 		this.destroy()
 
 		if this.Setup {
-			this.Advisor.Setup := this.Setup
+			this.Workbench.Setup := this.Setup
 
 			this.Setup.Editor := false
 		}
@@ -2226,7 +2226,7 @@ class SetupEditor extends ConfigurationItem {
 				row := this.SettingsListView.GetNext(row, "C")
 			}
 
-			for ignore, setting in this.Advisor.Settings {
+			for ignore, setting in this.Workbench.Settings {
 				sIndex := inList(enabled, setting)
 				sEnabled := setup.Enabled[setting]
 
@@ -2279,11 +2279,11 @@ class SetupEditor extends ConfigurationItem {
 		this.Control["setupNameViewer"].Text := (setup ? setup.Name : "")
 		this.Control["setupViewer"].Value := (setup ? setup.Setup : "")
 
-		categories := getMultiMapValues(this.Advisor.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
 
-		settingsLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Settings.Labels")
+		settingsLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Settings.Labels")
 
 		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units." . getLanguage())
 
@@ -2296,7 +2296,7 @@ class SetupEditor extends ConfigurationItem {
 
 		setup.disable(false)
 
-		for ignore, setting in this.Advisor.Settings {
+		for ignore, setting in this.Workbench.Settings {
 			handler := this.createSettingHandler(setting)
 
 			if handler {
@@ -2435,14 +2435,14 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	applyRecommendations(percentage) {
-		local knowledgeBase := this.Advisor.KnowledgeBase
+		local knowledgeBase := this.Workbench.KnowledgeBase
 		local settings := CaseInsenseMap()
 		local theMin := 1
 		local ignore, setting, delta, increment
 
 		this.resetSetup()
 
-		for ignore, setting in this.Advisor.Settings {
+		for ignore, setting in this.Workbench.Settings {
 			delta := knowledgeBase.getValue(setting . ".Delta", kUndefined)
 
 			if (delta != kUndefined)
@@ -2581,7 +2581,7 @@ class SetupComparator extends ConfigurationItem {
 		__New(comparator) {
 			this.iComparator := comparator
 
-			super.__New({Descriptor: "Setup Advisor.Setup Comparator", Resizeable: true, Closeable: true, Options: "ToolWindow"}, "")
+			super.__New({Descriptor: "Setup Workbench.Setup Comparator", Resizeable: true, Closeable: true, Options: "ToolWindow"}, "")
 		}
 
 		Close(*) {
@@ -2601,9 +2601,9 @@ class SetupComparator extends ConfigurationItem {
 		}
 	}
 
-	Advisor {
+	Workbench {
 		Get {
-			return this.Editor.Advisor
+			return this.Editor.Workbench
 		}
 	}
 
@@ -2666,25 +2666,25 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	__New(editor, configuration := false) {
-		local advisor, simulator, car, section, values, key, value, fileName
+		local workbench, simulator, car, section, values, key, value, fileName
 
 		this.iEditor := editor
 		this.iSetupA := editor.Setup
 
 		if !configuration {
-			advisor := this.Advisor
+			workbench := this.Workbench
 
-			simulator := advisor.SelectedSimulator
-			car := advisor.SelectedCar[false]
+			simulator := workbench.SelectedSimulator
+			car := workbench.SelectedCar[false]
 
-			configuration := readMultiMap(kResourcesDirectory . "Advisor\Definitions\" . simulator . ".ini")
+			configuration := readMultiMap(kResourcesDirectory . "Garage\Definitions\" . simulator . ".ini")
 
-			for section, values in readMultiMap(kResourcesDirectory . "Advisor\Definitions\Cars\" . simulator . ".Generic.ini")
+			for section, values in readMultiMap(kResourcesDirectory . "Garage\Definitions\Cars\" . simulator . ".Generic.ini")
 				for key, value in values
 					setMultiMapValue(configuration, section, key, value)
 
 			if (car != true) {
-				fileName := ("Advisor\Definitions\Cars\" . simulator . "." . car . ".ini")
+				fileName := ("Garage\Definitions\Cars\" . simulator . "." . car . ".ini")
 
 				for section, values in readMultiMap(getFileName(fileName, kResourcesDirectory, kUserHomeDirectory))
 					for key, value in values
@@ -2740,12 +2740,12 @@ class SetupComparator extends ConfigurationItem {
 
 		comparatorGui.SetFont("s10 Bold", "Arial")
 
-		comparatorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(comparatorGui, "Setup Advisor.Setup Comparator"))
+		comparatorGui.Add("Text", "w784 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(comparatorGui, "Setup Workbench.Setup Comparator"))
 
 		comparatorGui.SetFont("s9 Norm", "Arial")
 		comparatorGui.SetFont("Italic Underline", "Arial")
 
-		comparatorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Comparator")).OnEvent("Click", openDocumentation.Bind(comparatorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#comparing-car-setups"))
+		comparatorGui.Add("Text", "x308 YP+20 w184 cBlue Center H:Center", translate("Setup Comparator")).OnEvent("Click", openDocumentation.Bind(comparatorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#comparing-car-setups"))
 
 		comparatorGui.SetFont("s8 Norm", "Arial")
 
@@ -2776,12 +2776,12 @@ class SetupComparator extends ConfigurationItem {
 		local window := this.Window
 		local x, y, w, h
 
-		if getWindowPosition("Setup Advisor.Setup Comparator", &x, &y)
+		if getWindowPosition("Setup Workbench.Setup Comparator", &x, &y)
 			window.Show("x" . x . " y" . y)
 		else
 			window.Show()
 
-		if getWindowSize("Setup Advisor.Setup Comparator", &w, &h)
+		if getWindowSize("Setup Workbench.Setup Comparator", &w, &h)
 			window.Resize("Initialize", w, h)
 
 		this.loadSetups()
@@ -2822,11 +2822,11 @@ class SetupComparator extends ConfigurationItem {
 
 		this.SetupAB := setupAB
 
-		categories := getMultiMapValues(this.Advisor.Definition, "Setup.Categories")
+		categories := getMultiMapValues(this.Workbench.Definition, "Setup.Categories")
 
-		categoriesLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Categories.Labels")
+		categoriesLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Categories.Labels")
 
-		settingsLabels := getMultiMapValues(this.Advisor.Definition, "Setup.Settings.Labels")
+		settingsLabels := getMultiMapValues(this.Workbench.Definition, "Setup.Settings.Labels")
 
 		settingsUnits := getMultiMapValues(this.Configuration, "Setup.Settings.Units")
 
@@ -2837,7 +2837,7 @@ class SetupComparator extends ConfigurationItem {
 
 		this.Settings := CaseInsenseMap()
 
-		for ignore, setting in this.Advisor.Settings {
+		for ignore, setting in this.Workbench.Settings {
 			handler := this.Editor.createSettingHandler(setting)
 
 			if handler {
@@ -3124,9 +3124,9 @@ class FileSetupComparator extends SetupComparator {
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-closeSetupAdvisor(*) {
+closeSetupWorkbench(*) {
 	if GetKeyState("Ctrl", "P")
-		SetupAdvisor.Instance.saveState()
+		SetupWorkbench.Instance.saveState()
 
 	ExitApp(0)
 }
@@ -3140,18 +3140,18 @@ factPath(path*) {
 	return result
 }
 
-runSetupAdvisor() {
+runSetupWorkbench() {
 	local icon := kIconsDirectory . "Setup.ico"
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Setup Advisor", "Simulator", false)
-	local car := getMultiMapValue(settings, "Setup Advisor", "Car", false)
-	local track := getMultiMapValue(settings, "Setup Advisor", "Track", false)
+	local simulator := getMultiMapValue(settings, "Setup Workbench", "Simulator", false)
+	local car := getMultiMapValue(settings, "Setup Workbench", "Car", false)
+	local track := getMultiMapValue(settings, "Setup Workbench", "Track", false)
 	local weather := false
 	local index := 1
-	local advisor, label
+	local workbench, label
 
 	TraySetIcon(icon, "1")
-	A_IconTip := "Setup Advisor"
+	A_IconTip := "Setup Workbench"
 
 	while (index < A_Args.Length) {
 		switch A_Args[index], false {
@@ -3177,45 +3177,45 @@ runSetupAdvisor() {
 	if car
 		car := SessionDatabase.getCarName(simulator, car)
 
-	advisor := SetupAdvisor(simulator, car, track, weather)
+	workbench := SetupWorkbench(simulator, car, track, weather)
 
 	SupportMenu.Insert("1&")
 
 	label := translate("Debug Rule System")
 
-	SupportMenu.Insert("1&", label, ObjBindMethod(advisor, "toggleDebug", kDebugRules))
+	SupportMenu.Insert("1&", label, ObjBindMethod(workbench, "toggleDebug", kDebugRules))
 
-	if advisor.Debug[kDebugRules]
+	if workbench.Debug[kDebugRules]
 		SupportMenu.Check(label)
 
 	label := translate("Debug Knowledgebase")
 
-	SupportMenu.Insert("1&", label, ObjBindMethod(advisor, "toggleDebug", kDebugKnowledgeBase))
+	SupportMenu.Insert("1&", label, ObjBindMethod(workbench, "toggleDebug", kDebugKnowledgeBase))
 
-	if advisor.Debug[kDebugKnowledgebase]
+	if workbench.Debug[kDebugKnowledgebase]
 		SupportMenu.Check(label)
 
-	advisor.createGui(advisor.Configuration)
+	workbench.createGui(workbench.Configuration)
 
-	advisor.show()
+	workbench.show()
 
 	if !GetKeyState("Ctrl", "P")
 		if simulator {
-			advisor.loadSimulator(simulator, true)
+			workbench.loadSimulator(simulator, true)
 
-			if inList(advisor.AvailableCars, car)
-				advisor.loadCar(car)
+			if inList(workbench.AvailableCars, car)
+				workbench.loadCar(car)
 
 			if track
-				advisor.loadTrack(track)
+				workbench.loadTrack(track)
 
 			if weather
-				advisor.loadWeather(weather)
+				workbench.loadWeather(weather)
 		}
 		else
-			advisor.loadSimulator(true, true)
+			workbench.loadSimulator(true, true)
 	else
-		Task.startTask(ObjBindMethod(advisor, "restoreState"), 100)
+		Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)
 
 	return
 }
@@ -3236,4 +3236,4 @@ runSetupAdvisor() {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-runSetupAdvisor()
+runSetupWorkbench()

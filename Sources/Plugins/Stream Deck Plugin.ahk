@@ -617,7 +617,7 @@ initializeStreamDeckPlugin() {
 		StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
 	}
 
-	registerMessageHandler("Stream Deck", handleStreamDeckMessage´)
+	registerMessageHandler("Stream Deck", handleStreamDeckMessage)
 
 	PeriodicTask(refreshStreamDecks, 5000, kLowPriority).start()
 }

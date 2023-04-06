@@ -2642,7 +2642,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					for ignore, fileName in files
 						strategies.Push(this.createStrategy(readMultiMap(fileName)))
 
-					if (strategies.Count() > 1)
+					if (strategies.Count > 1)
 						this.compareStrategies(strategies*)
 				}
 			case 9: ; "Export Strategy..."

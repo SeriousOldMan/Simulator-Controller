@@ -116,7 +116,7 @@ class ACCSetup extends FileSetup {
 		local display := JSON.parse(this.Setup[true])
 		local ignore, setting
 
-		for ignore, setting in this.Editor.Workbenh.Settings
+		for ignore, setting in this.Editor.Workbench.Settings
 			this.setValue(setting, this.getValue(setting, !this.Enabled[setting]), display)
 
 		return JSON.print(display, "  ")
@@ -157,8 +157,8 @@ class ACCSetupEditor extends FileSetupEditor {
 	chooseSetup(load := true) {
 		local sessionDB := SessionDatabase()
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		local car := sessionDB.getCarCode(this.Workbenh.SelectedSimulator[false], this.Workbenh.SelectedCar[false])
-		local track := sessionDB.getTrackCode(this.Workbenh.SelectedSimulator[false], this.Workbenh.SelectedTrack[false])
+		local car := sessionDB.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local fileName, theSetup
 
 		if (car && (car != true))
@@ -225,8 +225,8 @@ class ACCSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
 		local sessionDB := SessionDatabase()
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		local car := sessionDB.getCarCode(this.Workbenh.SelectedSimulator[false], this.Workbenh.SelectedCar[false])
-		local track := sessionDB.getTrackCode(this.Workbenh.SelectedSimulator[false], this.Workbenh.SelectedTrack[false])
+		local car := sessionDB.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
+		local track := sessionDB.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local fileName, theSetup, ignore
 
 		if (car && (car != true))

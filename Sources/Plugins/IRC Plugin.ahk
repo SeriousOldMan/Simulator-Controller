@@ -223,13 +223,13 @@ class IRCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		super.startPitstopSetup()
+		super.startPitstopSetup(pitstopNumber)
 
 		openPitstopMFD()
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		super.finishPitstopSetup()
+		super.finishPitstopSetup(pitstopNumber)
 
 		closePitstopMFD()
 	}

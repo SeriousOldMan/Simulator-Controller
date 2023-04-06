@@ -748,16 +748,15 @@ openDocumentation(dialog, url, *) {
 	Run(url)
 }
 
-moveByMouse(dialog, descriptor := false, *) {
+moveByMouse(window, descriptor := false, *) {
 	local curCoordMode := A_CoordModeMouse
-	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
-	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
+	local anchorX, anchorY, winX, winY, x, y, newX, newY, settings
 
 	CoordMode("Mouse", "Screen")
 
 	try {
 		MouseGetPos(&anchorX, &anchorY)
-		WinGetPos(&winX, &winY, &w, &h, "A")
+		WinGetPos(&winX, &winY, , , window)
 
 		newX := winX
 		newY := winY
@@ -768,14 +767,16 @@ moveByMouse(dialog, descriptor := false, *) {
 			newX := winX + (x - anchorX)
 			newY := winY + (y - anchorY)
 
-			dialog.Move(newX, newY)
+			window.Move(newX, newY)
 		}
+
+		WinGetPos(&winX, &winY, , , window)
 
 		if descriptor {
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setMultiMapValue(settings, "Window Positions", descriptor . ".X", newX)
-			setMultiMapValue(settings, "Window Positions", descriptor . ".Y", newY)
+			setMultiMapValue(settings, "Window Positions", descriptor . ".X", winX)
+			setMultiMapValue(settings, "Window Positions", descriptor . ".Y", winY)
 
 			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
@@ -797,7 +798,7 @@ getWindowPosition(descriptor, &x, &y) {
 		loop MonitorGetCount() {
 			MonitorGetWorkArea(A_Index, &screenLeft, &screenTop, &screenRight, &screenBottom)
 
-			if ((posX >= screenLeft) && (posX <= screenRight) && (posY >= screenTop) && (posY <= screenBottom)) {
+			if ((posX >= (screenLeft - 50)) && (posX <= (screenRight + 50)) && (posY >= (screenTop - 50)) && (posY <= (screenBottom + 50))) {
 				x := posX
 				y := posY
 

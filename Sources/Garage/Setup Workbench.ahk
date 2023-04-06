@@ -310,8 +310,6 @@ class SetupWorkbench extends ConfigurationItem {
 		local found := false
 		local definition, section, values, key, value, ignore, rootDirectory
 
-		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
-
 		if simulator {
 			this.iSelectedSimulator := simulator
 			this.iSelectedCar := car
@@ -808,7 +806,7 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	setDebug(option, enabled) {
+	setDebug(option, enabled, *) {
 		local label := false
 
 		if enabled
@@ -836,7 +834,7 @@ class SetupWorkbench extends ConfigurationItem {
 				SupportMenu.Uncheck(label)
 	}
 
-	toggleDebug(option) {
+	toggleDebug(option, *) {
 		this.setDebug(option, !this.Debug[option])
 	}
 

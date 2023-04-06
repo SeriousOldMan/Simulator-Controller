@@ -190,12 +190,8 @@ showSplashTheme(theme := unset, songHandler := false, alwaysOnTop := true) {
 hideSplashTheme() {
 	SetTimer(showSplashTheme, 0)
 
-	try {
+	try
 		SoundPlay("NonExistent.avi")
-	}
-	catch Any as exception {
-		logError(exception)
-	}
 
 	hideSplash()
 }

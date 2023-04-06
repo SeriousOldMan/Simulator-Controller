@@ -4715,7 +4715,7 @@ multiply(choicePoint, operand1, operand2, operand3) {
 			if !isNumber(value1)
 				return false
 
-			if !isNumber(value3)
+			if (!isNumber(value3) || (value3 = 0))
 				return false
 
 			return resultSet.unify(choicePoint, operand2, Literal(value1 / value3))
@@ -4731,7 +4731,7 @@ multiply(choicePoint, operand1, operand2, operand3) {
 			if !isNumber(value1)
 				return false
 
-			if !isNumber(value2)
+			if (!isNumber(value2) || (value2 = 0))
 				return false
 
 			return resultSet.unify(choicePoint, operand3, Literal(value1 / value2))
@@ -4775,7 +4775,7 @@ divide(choicePoint, operand1, operand2, operand3) {
 			if !isNumber(value2)
 				return false
 
-			if !isNumber(value3)
+			if (!isNumber(value3) || (value3 = 0))
 				return false
 
 			return resultSet.unify(choicePoint, operand1, Literal(value2 / value3))
@@ -4826,7 +4826,7 @@ divide(choicePoint, operand1, operand2, operand3) {
 		if !isNumber(value2)
 			return false
 
-		if !isNumber(value3)
+		if (!isNumber(value3) || (value3 = 0))
 			return false
 
 		return (value1 = (value2 / value3))

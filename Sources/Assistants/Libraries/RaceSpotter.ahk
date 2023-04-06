@@ -351,7 +351,7 @@ class CarInfo {
 
 	hasDelta(sector := false) {
 		if sector
-			return (this.Deltas[sector].Count > 0)
+			return (this.Deltas[sector].Length > 0)
 		else
 			return (this.Deltas.Count > 0)
 	}
@@ -715,7 +715,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iDriverCar := false
 	iOtherCars := CaseInsenseMap()
-	iPositions := CaseInsenseMap()
+	iPositions := CaseInsenseSafeMap()
 
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
@@ -928,11 +928,6 @@ class RaceSpotter extends GridRaceAssistant {
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
-		if isDebug() {
-			this.setDebug(kDebugKnowledgeBase, true)
-			this.setDebug(kDebugPositions, true)
-		}
-
 		this.updateConfigurationValues({Announcements: {DeltaInformation: 2, TacticalAdvices: true
 									  , SideProximity: true, RearProximity: true
 									  , YellowFlags: true, BlueFlags: true, PitWindow: true
@@ -941,7 +936,7 @@ class RaceSpotter extends GridRaceAssistant {
 		OnExit(ObjBindMethod(this, "shutdownSpotter", true))
 	}
 
-	setDebug(option, enabled) {
+	setDebug(option, enabled, *) {
 		local label := false
 
 		super.setDebug(option, enabled)
@@ -2207,7 +2202,7 @@ class RaceSpotter extends GridRaceAssistant {
 													, lost: speaker.number2Speech(deltaDifference, 1)
 													, lapTime: speaker.number2Speech(lapTimeDifference, 1)})
 
-					car := standingsAhead.Car
+					car := standingsBehind.Car
 					unsafe := true
 
 					if (car.Incidents > 0)
@@ -2295,7 +2290,7 @@ class RaceSpotter extends GridRaceAssistant {
 			if (lastLap > 1)
 				this.updatePositionInfos(lastLap, sector, positions)
 
-			if (!this.SpotterSpeaking && !this.DriverCar.InPit) {
+			if (!this.SpotterSpeaking && this.DriverCar && !this.DriverCar.InPit) {
 				this.SpotterSpeaking := true
 
 				try {
@@ -2522,7 +2517,7 @@ class RaceSpotter extends GridRaceAssistant {
 			this.SpotterSpeaking := true
 
 			try {
-				if positions.Has("StandingsBehind") {
+				if (positions.Has("StandingsBehind") && positions.Has(positions["StandingsBehind"])) {
 					delta := Abs(positions[positions["StandingsBehind"]][10])
 
 					if (delta && (delta < 2000))
@@ -3098,7 +3093,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local notAlone := (count > 1)
 		local carPositions := []
-		local positions := CaseInsenseMap()
+		local positions := CaseInsenseSafeMap()
 		local trackAhead := false
 		local trackBehind := false
 		local standingsAhead := false

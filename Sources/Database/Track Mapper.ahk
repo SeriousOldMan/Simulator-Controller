@@ -60,7 +60,7 @@ createTrackImage(trackMap) {
 
 	token := Gdip_Startup()
 
-	bitmap := Gdip_CreateBitcollect(Round(width * scale), Round(height * scale))
+	bitmap := Gdip_CreateBitMap(Round(width * scale), Round(height * scale))
 
 	graphics := Gdip_GraphicsFromImage(bitmap)
 
@@ -141,7 +141,7 @@ createTrackMap(simulator, track, fileName) {
 	setMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)
 
 	if (coordinates.Length > 0) {
-		if (coordinates[1].Length() = 2) {
+		if (coordinates[1].Length = 2) {
 			exact := true
 
 			xIndex := 1

@@ -322,7 +322,7 @@ class AMS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		super.finishPitstopSetup()
+		super.finishPitstopSetup(pitstopNumber)
 
 		this.requirePitstopMFD()
 

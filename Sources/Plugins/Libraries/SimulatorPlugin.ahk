@@ -211,15 +211,27 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	iTrackAutomation := kUndefined
 
-	ActiveSimulator {
+	static ActiveSimulator {
 		Get {
 			return SimulatorPlugin.sActiveSimulator
 		}
 	}
 
-	ActiveSimulation {
+	ActiveSimulator {
+		Get {
+			return SimulatorPlugin.ActiveSimulator
+		}
+	}
+
+	static ActiveSimulation {
 		Get {
 			return SimulatorPlugin.sActiveSimulation
+		}
+	}
+
+	ActiveSimulation {
+		Get {
+			return SimulatorPlugin.ActiveSimulation
 		}
 	}
 
@@ -914,13 +926,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	startSession(settings, data) {
-		local compound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-		local compoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
 		this.Car := getMultiMapValue(data, "Session Data", "Car")
 		this.Track := getMultiMapValue(data, "Session Data", "Track")
 
-		this.CurrentTyreCompound := compound(compound, compoundColor)
+		this.CurrentTyreCompound := compound(tyreCompound, tyreCompoundColor)
 
 		this.updateTyreCompound(data)
 
@@ -980,18 +992,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	tyreCompoundIndex(compound, compoundColor := false) {
+	tyreCompoundIndex(tyreCompound, tyreCompoundColor := false) {
 		local compounds, index, candidate
 
-		if compound {
+		if tyreCompound {
 			compounds := SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
-			index := inList(compounds, compound(compound, compoundColor))
+			index := inList(compounds, compound(tyreCompound, tyreCompoundColor))
 
 			if index
 				return index
 			else
 				for index, candidate in compounds
-					if (InStr(candidate, compound) == 1)
+					if (InStr(candidate, tyreCompound) == 1)
 						return index
 
 			return false
@@ -1000,11 +1012,11 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			return false
 	}
 
-	tyreCompoundCode(compound, compoundColor := false) {
+	tyreCompoundCode(tyreCompound, tyreCompoundColor := false) {
 		local index
 
-		if compound {
-			index := this.tyreCompoundIndex(compound, compoundColor)
+		if tyreCompound {
+			index := this.tyreCompoundIndex(tyreCompound, tyreCompoundColor)
 
 			return (index ? SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
 		}
@@ -1045,9 +1057,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		if compound
-			this.RequestedTyreCompound := compound(compound, compoundColor)
+	setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
+		if tyreCompound
+			this.RequestedTyreCompound := compound(tyreCompound, tyreCompoundColor)
 		else
 			this.RequestedTyreCompound := false
 	}
@@ -1062,18 +1074,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateTyreCompound(data) {
-		local compound, compoundColor
+		local tyreCompound, tyreCompoundColor
 
 		if (!getMultiMapValue(data, "Car Data", "TyreCompound", false)
 		 && !getMultiMapValue(data, "Car Data", "TyreCompoundRaw", false))
 			if this.CurrentTyreCompound {
-				compound := "Dry"
-				compoundColor := "Black"
+				tyreCompound := "Dry"
+				tyreCompoundColor := "Black"
 
-				splitCompound(this.CurrentTyreCompound, &compound, &compoundColor)
+				splitCompound(this.CurrentTyreCompound, &tyreCompound, &tyreCompoundColor)
 
-				setMultiMapValue(data, "Car Data", "TyreCompound", compound)
-				setMultiMapValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+				setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+				setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
 			}
 	}
 
@@ -1093,50 +1105,50 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	saveSessionState(&sessionSettings, &sessionState) {
-		local compound, compoundColor
+		local tyreCompound, tyreCompoundColor
 
 		if !sessionSettings
 			sessionSettings := newMultiMap()
 
 		if this.CurrentTyreCompound {
-			compound := "Dry"
-			compoundColor := "Black"
+			tyreCompound := "Dry"
+			tyreCompoundColor := "Black"
 
-			splitCompound(this.CurrentTyreCompound, &compound, &compoundColor)
+			splitCompound(this.CurrentTyreCompound, &tyreCompound, &tyreCompoundColor)
 
-			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", compound)
-			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound.Color", compoundColor)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", tyreCompound)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound.Color", tyreCompoundColor)
 		}
 
 		if this.RequestedTyreCompound {
-			compound := "Dry"
-			compoundColor := "Black"
+			tyreCompound := "Dry"
+			tyreCompoundColor := "Black"
 
-			splitCompound(this.RequestedTyreCompound, &compound, &compoundColor)
+			splitCompound(this.RequestedTyreCompound, &tyreCompound, &tyreCompoundColor)
 
-			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", compound)
-			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound.Color", compoundColor)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", tyreCompound)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound.Color", tyreCompoundColor)
 		}
 	}
 
 	restoreSessionState(&sessionSettings, &sessionState) {
-		local compound
+		local tyreCompound
 
 		this.CurrentTyreCompound := false
 		this.RequestedTyreCompound := false
 
 		if sessionSettings {
-			compound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", false)
+			tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", false)
 
-			if compound
-				this.CurrentTyreCompound := compound(compound, getMultiMapValue(sessionSettings
-																			  , "Simulator Settings", "Tyre.Current.Compound.Color"))
+			if tyreCompound
+				this.CurrentTyreCompound := compound(tyreCompound, getMultiMapValue(sessionSettings
+																				  , "Simulator Settings", "Tyre.Current.Compound.Color"))
 
-			compound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", false)
+			tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", false)
 
-			if compound
-				this.RequestedTyreCompound := compound(compound, getMultiMapValue(sessionSettings
-																				, "Simulator Settings", "Tyre.Requested.Compound.Color"))
+			if tyreCompound
+				this.RequestedTyreCompound := compound(tyreCompound, getMultiMapValue(sessionSettings
+																					, "Simulator Settings", "Tyre.Requested.Compound.Color"))
 		}
 	}
 
@@ -1227,7 +1239,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
 
 	try {
-		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" .dataFile . "`"`"", , "Hide")
+		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
 	}
 	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")

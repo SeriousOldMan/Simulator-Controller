@@ -395,12 +395,8 @@ class SystemPlugin extends ControllerPlugin {
 		if this.iStartupSongIsPlaying
 			masterVolume := fadeOut()
 
-		try {
+		try
 			SoundPlay("NonExistent.avi")
-		}
-		catch Any as exception {
-			logError(exception)
-		}
 
 		if this.iStartupSongIsPlaying {
 			if callback

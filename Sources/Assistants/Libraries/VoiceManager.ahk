@@ -542,8 +542,6 @@ class VoiceManager {
 	}
 
 	__New(name, options) {
-		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugRecognitions) : kDebugOff)
-
 		this.iName := name
 
 		this.initialize(options)
@@ -623,7 +621,7 @@ class VoiceManager {
 			this.stopListening()
 	}
 
-	setDebug(option, enabled) {
+	setDebug(option, enabled, *) {
 		if enabled
 			this.iDebug := (this.iDebug | option)
 		else if (this.Debug[option] == option)

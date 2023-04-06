@@ -665,12 +665,8 @@ class SpeechSynthesizer {
 			return true
 		}
 		else if (this.iPlaysCacheFile || (this.Synthesizer = "dotNET") || (this.Synthesizer = "Azure")) {
-			try {
+			try
 				SoundPlay("NonExistent.avi")
-			}
-			catch Any as exception {
-				logError(exception)
-			}
 
 			if this.iPlaysCacheFile {
 				this.iPlaysCacheFile := false

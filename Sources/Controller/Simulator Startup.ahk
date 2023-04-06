@@ -56,7 +56,7 @@ global kClose := "Close"
 
 class StartupWindow extends Window {
 	__New() {
-		super.__New({Options: "+Caption +Border +SysMenu", Closeable: true})
+		super.__New({Descriptor: "Simulator Startup", Options: "+Caption +Border +SysMenu", Closeable: true})
 	}
 
 	Close(*) {

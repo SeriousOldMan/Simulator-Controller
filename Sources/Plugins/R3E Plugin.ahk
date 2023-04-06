@@ -538,7 +538,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		super.startPitstopSetup()
+		super.startPitstopSetup(pitstopNumber)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -549,7 +549,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		super.finishPitstopSetup()
+		super.finishPitstopSetup(pitstopNumber)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.activateWindow()

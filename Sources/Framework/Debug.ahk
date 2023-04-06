@@ -80,9 +80,7 @@ initializeDebugging() {
 }
 
 logUnhandledError(error, *) {
-	logError(error, true)
-
-	return ((isDevelopment() && isDebug()) ? 0: -1)
+	return logError(error, true)
 }
 
 
@@ -179,7 +177,8 @@ logMessage(logLevel, message) {
 }
 
 logError(exception, unhandled := false, report := true) {
-	local message
+	local debug := (isDevelopment() && isDebug())
+	local handle, message
 
 	if isObject(exception) {
 		message := exception.Message
@@ -193,17 +192,18 @@ logError(exception, unhandled := false, report := true) {
 		logMessage(unhandled ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
-	if (report && isDevelopment() && isDebug()) {
+	if ((unhandled || report) && debug && (true || !A_IsCompiled))
 		if isObject(exception)
 			MsgBox(translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
-				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message)
+				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message
+				 . (exception.HasProp("Stack") ? ("`n`nStack:`n`n" . exception.Stack) : ""))
 		else
 			MsgBox(translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
-		Sleep 100
-	}
-
-	return ((isDevelopment() || isDebug()) ? false : true)
+	if debug
+		return (A_IsCompiled ? -1 : false)
+	else
+		return -1
 }
 
 

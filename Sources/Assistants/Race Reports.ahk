@@ -176,7 +176,7 @@ class RaceReports extends ConfigurationItem {
 		}
 
 		Set {
-			if key
+			if isSet(key)
 				return this.ReportViewer.Settings[key] := value
 			else
 				return this.ReportViewer.Settings := value
@@ -382,7 +382,14 @@ class RaceReports extends ConfigurationItem {
 	editDriverReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showPositionsReport(reportDirectory) {
@@ -405,7 +412,14 @@ class RaceReports extends ConfigurationItem {
 	editPositionsReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showLapTimesReport(reportDirectory) {
@@ -428,7 +442,14 @@ class RaceReports extends ConfigurationItem {
 	editLapTimesReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showConsistencyReport(reportDirectory) {
@@ -451,7 +472,14 @@ class RaceReports extends ConfigurationItem {
 	editConsistencyReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showPaceReport(reportDirectory) {
@@ -474,7 +502,14 @@ class RaceReports extends ConfigurationItem {
 	editPaceReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showPerformanceReport(reportDirectory) {
@@ -497,7 +532,14 @@ class RaceReports extends ConfigurationItem {
 	editPerformanceReportSettings(reportDirectory) {
 		this.ReportViewer.setReport(reportDirectory)
 
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	getSimulators() {

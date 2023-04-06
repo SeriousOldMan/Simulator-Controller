@@ -460,7 +460,7 @@ systemMonitor(command := false, arguments*) {
 					action := translate("Analyzing track coordinates (%points%)...")
 				case "Normalizing":
 					action := translate("Normalizing track coordinates (%points%)...")
-				case "Tranforming":
+				case "Transforming":
 					action := translate("Transforming track coordinates (%points%)...")
 				case "Processing":
 					action := translate("Processing track spline (%points%)...")
@@ -469,7 +469,7 @@ systemMonitor(command := false, arguments*) {
 				case "Metadata":
 					action := translate("Creating track meta data...")
 				default:
-					throw "Unknown action detected in updateDataState..."
+					throw "Unknown action detected in updateMapperState..."
 			}
 
 			action := substituteVariables(action, {points: getMultiMapValue(trackMapperState, "Track Mapper", "Points", 0)})

@@ -1170,6 +1170,47 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.updatePositionsData(data)
 	}
 
+	static getSession(data := false) {
+		local ignore
+
+		if RaceAssistantPlugin.Simulator {
+			if !data
+				data := readSimulatorData(RaceAssistantPlugin.Simulator.Code)
+
+			return getDataSession(data, &ignore)
+		}
+		else
+			return kSessionFinished
+	}
+
+	static runningSession(data) {
+		return getMultiMapValue(data, "Session Data", "Active", false)
+	}
+
+	static activeSession(data) {
+		local ignore
+
+		return (getDataSession(data, &ignore) >= kSessionPractice)
+	}
+
+	static driverActive(data) {
+		local teamServer := RaceAssistantPlugin.TeamServer
+
+		if RaceAssistantPlugin.TeamSessionActive
+			return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
+		else
+			return true
+	}
+
+	static currentLap(data) {
+		if (RaceAssistantPlugin.Session == kSessionRace)
+			loop getMultiMapValue(data, "Position Data", "Car.Count")
+				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
+					return getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap")
+
+		return getMultiMapValue(data, "Stint Data", "Laps", 0)
+	}
+
 	activate() {
 		super.activate()
 
@@ -1576,33 +1617,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			this.RaceAssistant.unmute()
 	}
 
-	getSession(data := false) {
-		local ignore
-
-		if RaceAssistantPlugin.Simulator {
-			if !data
-				data := readSimulatorData(RaceAssistantPlugin.Simulator.Code)
-
-			return getDataSession(data, &ignore)
-		}
-		else
-			return kSessionFinished
-	}
-
 	updateTelemetryData(data) {
 	}
 
 	updatePositionsData(data) {
-	}
-
-	runningSession(data) {
-		return getMultiMapValue(data, "Session Data", "Active", false)
-	}
-
-	activeSession(data) {
-		local ignore
-
-		return (getDataSession(data, &ignore) >= kSessionPractice)
 	}
 
 	updateSession(session) {
@@ -1685,24 +1703,6 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
 	}
 
-	driverActive(data) {
-		local teamServer := RaceAssistantPlugin.TeamServer
-
-		if RaceAssistantPlugin.TeamSessionActive
-			return RaceAssistantPlugin.Simulator.driverActive(data, teamServer.DriverForName, teamServer.DriverSurName)
-		else
-			return true
-	}
-
-	currentLap(data) {
-		if (this.Session == kSessionRace)
-			loop getMultiMapValue(data, "Position Data", "Car.Count")
-				if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Position") = 1)
-					return getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Lap")
-
-		return getMultiMapValue(data, "Stint Data", "Laps", 0)
-	}
-
 	static collectSessionData() {
 		local finished := false
 		local joinedSession := false
@@ -1726,7 +1726,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				hasAssistant := (hasAssistant || (assistant.RaceAssistant != false))
 			}
 
-			if (!hasAssistant && (this.Session == kSessionFinished))
+			if (!hasAssistant && (RaceAssistantPlugin.Session == kSessionFinished))
 				RaceAssistantPlugin.initializeAssistantsState()
 		}
 
@@ -1759,14 +1759,14 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			try {
 				session := getDataSession(data, &finished)
 
-				if (finished && (this.Session == kSessionRace)) {
+				if (finished && (RaceAssistantPlugin.Session == kSessionRace)) {
 					session := kSessionRace
 
 					setMultiMapValue(data, "Session Data", "Session", "Race")
 
 					if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
 						if !RaceAssistantPlugin.Finished
-							RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
+							RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 1)
 
 						finished := false
 					}
@@ -1882,7 +1882,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 							RaceAssistantPlugin.sLapRunning := 0
 
 							if RaceAssistantPlugin.Finished {
-								if (this.currentLap(data) >= RaceAssistantPlugin.Finished) {
+								if (RaceAssistantPlugin.currentLap(data) >= RaceAssistantPlugin.Finished) {
 									; Session has endedd
 
 									finished := true
@@ -1894,9 +1894,9 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 								if (getMultiMapValue(data, "Session Data", "SessionFormat") = "Time") {
 									if (sessionTimeRemaining <= 0)
-										RaceAssistantPlugin.sFinished := (this.currentLap(data) + 1)
+										RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 1)
 									else if (sessionLapsRemaining < 1)
-										RaceAssistantPlugin.sFinished := (this.currentLap(data) + 2)
+										RaceAssistantPlugin.sFinished := (RaceAssistantPlugin.currentLap(data) + 2)
 								}
 								else if (sessionLapsRemaining == 0)
 									RaceAssistantPlugin.sFinished := dataLastLap

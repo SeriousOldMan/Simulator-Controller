@@ -155,7 +155,8 @@ class Database {
 						file := FileOpen(directory . name . ".CSV", "rw-rwd")
 					}
 					catch Any as exception {
-						logError(exception)
+						if !wait
+							logError(exception)
 
 						file := false
 					}

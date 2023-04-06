@@ -242,17 +242,19 @@ class MessageManager extends PeriodicTask {
 				if (StrLen(line) == 0)
 					break
 
-				data := StrSplit(line, ":", , 2)
-				category := data[1]
+				if InStr(line, ":") {
+					data := StrSplit(line, ":", , 2)
+					category := data[1]
 
-				messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
+					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
 
-				if (!messageHandler)
-					messageHandler := messageHandlers["*"]
+					if (!messageHandler)
+						messageHandler := messageHandlers["*"]
 
-				logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
+					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
-				result.Push(Array(messageHandler, category, data[2]))
+					result.Push(Array(messageHandler, category, data[2]))
+				}
 			}
 
 			file.Length := 0
@@ -398,7 +400,7 @@ class MessageManager extends PeriodicTask {
 ;;;-------------------------------------------------------------------------;;;
 
 createMessageReceiver() {
-	local messageReceiverGui := Gui(, A_ScriptName)
+	local messageReceiverGui := Gui("ToolWindow", A_ScriptName)
 
 	messageReceiverGui.BackColor := "D0D0D0"
 
@@ -408,7 +410,8 @@ createMessageReceiver() {
 	messageReceiverGui.MarginX := "10"
 	messageReceiverGui.MarginY := "10"
 
-	messageReceiverGui.Show("X0 Y0 Hide AutoSize")
+	messageReceiverGui.Show("X-10000 Y-10000 NA")
+	; messageReceiverGui.Minimize()
 }
 
 unknownMessageHandler(category, data) {
@@ -431,12 +434,14 @@ encodeDWORD(string) {
 
 decodeDWORD(data) {
 	local result := ""
+	local char
 
     loop 4 {
-        result := (Chr(data & 0xFF) . result)
+		result := (Chr(data & 0xFF) . result)
 
         data >>= 8
     }
+	until !data
 
     return result
 }

@@ -1830,13 +1830,13 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		super.startPitstopSetup()
+		super.startPitstopSetup(pitstopNumber)
 
 		withProtection(ObjBindMethod(this, "requirePitstopMFD", this.iNoImageSearch))
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		super.finishPitstopSetup()
+		super.finishPitstopSetup(pitstopNumber)
 
 		closePitstopMFD()
 	}

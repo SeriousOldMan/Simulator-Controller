@@ -722,7 +722,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.iDriverNickName := driver["NickName"]
 
 				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["ForName"]. A_Space . driver["SurName"] . translate(")"))
+					logMessage(kLogInfo, translate("Fetching Driver (Driver: ") . this.Driver . translate(", Name: ") . driver["ForName"] . A_Space . driver["SurName"] . translate(")"))
 			}
 			catch Any as exception {
 				if !ignore {

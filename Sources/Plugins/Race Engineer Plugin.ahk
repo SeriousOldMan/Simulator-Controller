@@ -129,7 +129,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 		fireAction(function, trigger) {
 			if (this.Plugin.RaceEngineer && (this.Action = "PitstopPlan"))
 				this.Plugin.planPitstop()
-			if (this.Plugin.RaceEngineer && (this.Action = "DriverSwapPlan"))
+			else if (this.Plugin.RaceEngineer && (this.Action = "DriverSwapPlan"))
 				this.Plugin.planDriverSwap()
 			else if (this.Plugin.RaceEngineer && (this.Action = "PitstopPrepare"))
 				this.Plugin.preparePitstop()
@@ -147,7 +147,7 @@ class RaceEngineerPlugin extends RaceAssistantPlugin  {
 	LapDatabase {
 		Get {
 			if !this.iLapDatabase
-				this.iLapDatabase := Database(false, this.kLapDataSchemas)
+				this.iLapDatabase := Database(false, RaceEngineerPlugin.kLapDataSchemas)
 
 			return this.iLapDatabase
 		}

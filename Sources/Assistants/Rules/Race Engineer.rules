@@ -604,12 +604,12 @@ priority: 20, {All: {Any: [?Lap.Remaining.Fuel < ?Lap.Remaining.Stint], [?Lap.Re
 lowFuelWarning(?lap, ?remainingLaps) <= recentPitstopLap(?lap), !, fail
 lowFuelWarning(?lap, ?remainingLaps) <= Call(lowFuelWarning, ?remainingLaps)
 
-priority: -10, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
-					 [?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
-priority: -10, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],
-					 [?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
-priority: -10, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
-					 [?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
+priority: 20, {All: [?Lap.Remaining.Stint <= ?Lap.Remaining.Fuel],
+					[?Lap.Remaining.Stint <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Stint)
+priority: 20, {All: [?Lap.Remaining.Session <= ?Lap.Remaining.Fuel],
+					[?Lap.Remaining.Session <= ?Lap.Remaining.Stint]} => (Set: Lap.Remaining, ?Lap.Remaining.Session)
+priority: 20, {All: [?Lap.Remaining.Fuel <= ?Lap.Remaining.Stint],
+					[?Lap.Remaining.Fuel <= ?Lap.Remaining.Session]} => (Set: Lap.Remaining, ?Lap.Remaining.Fuel)
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -608,17 +608,18 @@ class Function extends ConfigurationItem {
 		if (action != false) {
 			function := action[1]
 
-			try {
-				function := %function%
-			}
-			catch Any as exception {
-				logError(exception)
+			if !isInstance(function, Func)
+				try {
+					function := %function%
+				}
+				catch Any as exception {
+					logError(exception, false, false)
 
-				function := false
-			}
+					function := false
+				}
 		}
 
-		return (function != false) ? function.Bind(action[2]*) : false
+		return (function ? function.Bind(action[2]*) : false)
 	}
 
 	fireAction(trigger) {

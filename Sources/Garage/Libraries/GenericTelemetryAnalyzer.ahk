@@ -83,7 +83,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 	OversteerThresholds[key?] {
 		Get {
-			return (key ? this.iOversteerThresholds[key] : this.iOversteerThresholds)
+			return (isSet(key) ? this.iOversteerThresholds[key] : this.iOversteerThresholds)
 		}
 
 		Set {
@@ -245,7 +245,7 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		if telemetry {
 			workbench := this.Workbench
 			characteristicLabels := getMultiMapValues(workbench.Definition, "Setup.Characteristics.Labels")
-			severities := {Light: 33, Medium: 50, Heavy: 66}
+			severities := CaseInsenseMap("Light", 33, "Medium", 50, "Heavy", 66)
 			characteristics := CaseInsenseMap()
 			count := 0
 			maxValue := 0
@@ -464,20 +464,17 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		for ignore, type in ["Oversteer", "Understeer"]
 			for ignore, severity in ["Light", "Medium", "Heavy"] {
 				if fromEdit {
-					value := %"severity" . type . "ThresholdEdit"%.Text
+					value := %severity . type . "ThresholdEdit"%.Text
 
 					newValue := Min(Max(value, kMinThreshold), kMaxThreshold)
 
-					%"severity" . type . "ThresholdSlider"%.Value := newValue
+					%severity . type . "ThresholdSlider"%.Value := newValue
 
 					if (newValue != value)
-						%"severity" . type . "ThresholdEdit"%.Text := newValue
+						%severity . type . "ThresholdEdit"%.Text := newValue
 				}
-				else {
-					value := %"severity" . type . "ThresholdSlider"%.Value
-
-					%"severity" . type . "ThresholdEdit"%.Text := value
-				}
+				else
+					%severity . type . "ThresholdEdit"%.Text := %severity . type . "ThresholdSlider"%.Value
 			}
 	}
 	else if (commandOrAnalyzer == "Calibrate") {
@@ -753,7 +750,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		heavyOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
 		widget10 := heavyOversteerThresholdSlider
 		heavyOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[3])
-		heavyOversteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		heavyOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget21 := heavyOversteerThresholdEdit
 
 		widget11 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Oversteer"))
@@ -761,7 +758,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		mediumOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
 		widget12 := mediumOversteerThresholdSlider
 		mediumOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[2])
-		mediumOversteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		mediumOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget22 := mediumOversteerThresholdEdit
 
 		widget13 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Light Oversteer"))
@@ -769,7 +766,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		lightOversteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
 		widget14 := lightOversteerThresholdSlider
 		lightOversteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.OversteerThresholds[1])
-		lightOversteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		lightOversteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget23 := lightOversteerThresholdEdit
 
 		widget15 := analyzerGui.Add("Text", "x24 yp+30 w130 h20 +0x200", translate("Light Understeer"))
@@ -777,7 +774,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		lightUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
 		widget16 := lightUndersteerThresholdSlider
 		lightUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[1])
-		lightUndersteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		lightUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget24 := lightUndersteerThresholdEdit
 
 		widget17 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Medium Understeer"))
@@ -785,7 +782,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		mediumUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
 		widget18 := mediumUndersteerThresholdSlider
 		mediumUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[2])
-		mediumUndersteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		mediumUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget25 := mediumUndersteerThresholdEdit
 
 		widget19 := analyzerGui.Add("Text", "x24 yp+22 w130 h20 +0x200", translate("Heavy Understeer"))
@@ -793,7 +790,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		heavyUndersteerThresholdSlider.OnEvent("Change", runAnalyzer.Bind("UpdateSlider"))
 		widget20 := heavyUndersteerThresholdSlider
 		heavyUndersteerThresholdEdit := analyzerGui.Add("Edit", "x293 yp w35 +0x200", analyzer.UndersteerThresholds[3])
-		heavyUndersteerThresholdEdit.OnEvent("Change", runAnalyzer("UpdateSlider", true))
+		heavyUndersteerThresholdEdit.OnEvent("Change", runAnalyzer.Bind("UpdateSlider", true))
 		widget26 := heavyUndersteerThresholdEdit
 
 		if !analyzer.settingAvailable("OversteerThresholds") {
@@ -815,7 +812,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 
 		loop 33
-			prepareWidgets.Push(%"widget" . A_Index%)
+			if (A_Index != 28)
+				prepareWidgets.Push(%"widget" . A_Index%)
 
 		widget1 := analyzerGui.Add("ListView", "x16 ys w320 h190 -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Characteristic", "Intensity", "Frequency (%)"], translate))
 		widget1.OnEvent("Click", noSelect)
@@ -853,7 +851,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
 		analyzerGui.Add("Button", "xp+98 yp w80 h23", translate("Cancel")).OnEvent("Click", runAnalyzer.Bind(kCancel))
 
-		analyzerGui.Opt("+Owner" . workbench.Window.Hwnd)
+		analyzerGui.Opt("+Owner" . analyzer.Workbench.Window.Hwnd)
 
 		try {
 			if getWindowPosition("Setup Workbench.Analyzer", &x, &y)

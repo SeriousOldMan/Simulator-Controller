@@ -685,7 +685,8 @@ class RaceEngineer extends RaceAssistant {
 		}
 		else {
 			if !tyreTypeFragments
-				tyreTypeFragments := {FL: fragments["FrontLeft"], FR: fragments["FrontRight"], RL: fragments["RearLeft"], RR: fragments["RearRight"]}
+				tyreTypeFragments := CaseInsenseMap("FL", fragments["FrontLeft"], "FR", fragments["FrontRight"]
+												  , "RL", fragments["RearLeft"], "RR", fragments["RearRight"])
 
 			tyreType := false
 
@@ -1798,7 +1799,7 @@ class RaceEngineer extends RaceAssistant {
 							speaker.speakPhrase(!tyreSet ? "WetTyresNoSet" : "WetTyres", {compound: fragments[compound . "Tyre"], color: color, set: tyreSet})
 					}
 					else {
-						if (knowledgeBase.getValue("Lap.Remaining.Stint") > 5)
+						if (knowledgeBase.getValue("Lap.Remaining.Stint", 0) > 5)
 							speaker.speakPhrase("NoTyreChange")
 						else
 							speaker.speakPhrase("NoTyreChangeLap")
@@ -1849,7 +1850,7 @@ class RaceEngineer extends RaceAssistant {
 
 					deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 
-					for tyre, tyreType in {FrontLeft: "FL", FrontRight: "FR", RearLeft: "RL", RearRight: "RR"} {
+					for tyre, tyreType in {FrontLeft: "FL", FrontRight: "FR", RearLeft: "RL", RearRight: "RR"}.OwnProps() {
 						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
 
 						if (lostPressure && (lostPressure >= deviationThreshold))
@@ -2354,7 +2355,7 @@ class RaceEngineer extends RaceAssistant {
 			try {
 				speaker.speakPhrase(phrase)
 
-				if (knowledgeBase.getValue("Lap.Remaining") > 4)
+				if (knowledgeBase.getValue("Lap.Remaining", 0) > 4)
 					speaker.speakPhrase("DamageAnalysis")
 				else
 					speaker.speakPhrase("NoDamageAnalysis")
@@ -2369,7 +2370,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
-		if (knowledgeBase.getValue("Lap.Remaining") > 3)
+		if (knowledgeBase.getValue("Lap.Remaining", 0) > 3)
 			if (this.Speaker[false] && this.Announcements["DamageAnalysis"]) {
 				speaker := this.getSpeaker()
 
@@ -2400,12 +2401,14 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
+		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
+
 		if (this.Session == kSessionRace)
 			if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
-				speaker.speakPhrase("PressureLoss", {tyre: fragments[{FL: "FrontLeft", FR: "FrontRight", RL: "RearLeft", RR: "RearRight"}[tyre]]
+				speaker.speakPhrase("PressureLoss", {tyre: fragments[tyreLookup[tyre]]
 												   , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
 												   , unit: fragments[getUnit("Pressure")]})
 			}
@@ -2427,7 +2430,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining") > 3))
+		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining", 0) > 3))
 			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments

@@ -105,7 +105,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 	LapDatabase {
 		Get {
 			if !this.iLapDatabase
-				this.iLapDatabase := Database(false, this.kLapDataSchemas)
+				this.iLapDatabase := Database(false, RaceStrategistPlugin.kLapDataSchemas)
 
 			return this.iLapDatabase
 		}
@@ -255,7 +255,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 														 , "Weather", weather, "Temperature.Air", airTemperature, "Temperature.Track", trackTemperature
 														 , "Fuel.Consumption", fuelConsumption, "Fuel.Remaining", fuelRemaining, "LapTime", lapTime
 														 , "Pitstop", pitstop, "Map", map, "TC", tc, "ABS", abs
-														 , "Compound", compound, "Compound.Color" compoundColor
+														 , "Compound", compound, "Compound.Color", compoundColor
 														 , "Pressures", pressures, "Temperatures", temperatures, "Wear", wear))
 	}
 
@@ -690,7 +690,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 								classCars += 1
 
 								if laps
-									position := (positions[laps].HasKey(A_Index) ? positions[laps][A_Index] : cars)
+									position := (positions[laps].Has(A_Index) ? positions[laps][A_Index] : cars)
 								else
 									position := cars
 

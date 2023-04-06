@@ -624,8 +624,6 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	__New(configuration := false) {
-		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
-
 		super.__New(configuration)
 
 		VoiceServer.Instance := this
@@ -775,7 +773,7 @@ class VoiceServer extends ConfigurationItem {
 			this.listen(toggle, false)
 	}
 
-	setDebug(option, enabled) {
+	setDebug(option, enabled, *) {
 		local label := false
 
 		if enabled
@@ -797,7 +795,7 @@ class VoiceServer extends ConfigurationItem {
 				SupportMenu.Uncheck(label)
 	}
 
-	toggleDebug(option) {
+	toggleDebug(option, *) {
 		this.setDebug(option, !this.Debug[option])
 	}
 

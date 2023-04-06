@@ -8537,7 +8537,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editDriverReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Drivers", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showPositionsReport() {
@@ -8549,7 +8556,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPositionsReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showLapTimesReport() {
@@ -8561,7 +8575,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editLapTimesReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showConsistencyReport() {
@@ -8573,7 +8594,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editConsistencyReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showPaceReport() {
@@ -8585,7 +8613,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPaceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showPerformanceReport() {
@@ -8597,7 +8632,14 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPerformanceReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		this.Window.Opt("+Disabled")
+
+		try {
+			return this.ReportViewer.editReportSettings("Laps", "Cars", "Classes")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showTrackMap() {
@@ -8916,7 +8958,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPressuresReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps")
+		try {
+			return this.ReportViewer.editReportSettings("Laps")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showBrakesReport() {
@@ -8928,7 +8975,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editBrakesReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps")
+		try {
+			return this.ReportViewer.editReportSettings("Laps")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showTemperaturesReport() {
@@ -8940,7 +8992,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editTemperaturesReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps")
+		try {
+			return this.ReportViewer.editReportSettings("Laps")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	showCustomReport() {
@@ -8952,7 +9009,12 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editCustomReportSettings() {
-		return this.ReportViewer.editReportSettings("Laps")
+		try {
+			return this.ReportViewer.editReportSettings("Laps")
+		}
+		finally {
+			this.Window.Opt("-Disabled")
+		}
 	}
 
 	updateSeriesSelector(report, force := false) {

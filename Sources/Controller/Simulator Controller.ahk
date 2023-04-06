@@ -233,16 +233,24 @@ class GuiFunctionController extends FunctionController {
 
 	setControlLabel(function, text, color := "Black", overlay := false) {
 		local window := this.iWindow
-		local label
+		local label, font
 
 		if (window != false) {
 			label := this.getControlLabel(function.Descriptor)
 
 			if (label != false) {
-				label.SetFont("s8 c" . color, "Arial")
-				label.Value := text
+				font := ("s8 c" . color)
 
-				this.show()
+				if !label.HasOwnProp("Font")
+					label.Font := false
+
+				if ((label.Font != font) || (label.Text != text)) {
+					label.SetFont("s8 c" . color, "Arial")
+					label.Text := text
+					label.Font := font
+
+					this.show()
+				}
 			}
 		}
 	}

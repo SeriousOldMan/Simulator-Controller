@@ -483,7 +483,7 @@ class SpeechRecognizer {
 		this._grammarCallbacks[name] := callback
 
 		if (this.iEngine = "Azure") {
-			grammar := Map("Name", name, "Grammar", grammar, "Callback", callback)
+			grammar := {Name: name, Grammar: grammar, Callback: callback}
 
 			this._grammars[name] := grammar
 
@@ -776,7 +776,7 @@ class GrammarCompiler {
 		loop {
 			character := SubStr(text, nextCharIndex, 1)
 
-			if (InStr(delimiters, character) || (nextCharIndex > length)) {
+			if ((nextCharIndex > length) || InStr(delimiters, character)) {
 				if (beginCharIndex == nextCharIndex)
 					return false
 				else

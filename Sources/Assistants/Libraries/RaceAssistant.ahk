@@ -57,7 +57,7 @@ class RaceAssistant extends ConfigurationItem {
 	iSettings := false
 	iVoiceManager := false
 
-	iAnnouncements := false
+	iAnnouncements := CaseInsenseMap()
 
 	iRemoteHandler := false
 
@@ -262,7 +262,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	Announcements[key?] {
 		Get {
-			return (isSet(key) ? this.iAnnouncements[key] : this.iAnnouncements)
+			return (isSet(key) ? this.iAnnouncements.Get(key, false) : this.iAnnouncements)
 		}
 
 		Set {
@@ -422,7 +422,6 @@ class RaceAssistant extends ConfigurationItem {
 		if !kUnknown
 			kUnknown := translate("Unknown")
 
-		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
 		this.iAssistantType := assistantType
 		this.iRemoteHandler := remoteHandler
 
@@ -498,7 +497,7 @@ class RaceAssistant extends ConfigurationItem {
 			this.iLearningLaps := values.LearningLaps
 
 		if values.HasProp("Announcements")
-			this.iAnnouncements := values.Announcements
+			this.iAnnouncements := toMap(values.Announcements)
 	}
 
 	updateSessionValues(values) {
@@ -880,7 +879,7 @@ class RaceAssistant extends ConfigurationItem {
 		return knowledgeBase
 	}
 
-	setDebug(option, enabled) {
+	setDebug(option, enabled, *) {
 		local label := false
 
 		if enabled
@@ -913,7 +912,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	toggleDebug(option) {
+	toggleDebug(option, *) {
 		this.setDebug(option, !this.Debug[option])
 	}
 
@@ -1170,10 +1169,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callAddLap(lapNumber, data) {
-		if !isObject(data)
-			data := readMultiMap(data)
+		if this.KnowledgeBase {
+			if !isObject(data)
+				data := readMultiMap(data)
 
-		this.addLap(lapNumber, data)
+			this.addLap(lapNumber, &data)
+		}
 	}
 
 	addLap(lapNumber, &data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
@@ -1277,7 +1278,7 @@ class RaceAssistant extends ConfigurationItem {
 				this.initializeSessionFormat(knowledgeBase, this.Settings, data, lapTime)
 		}
 
-		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Time.End"))
+		overallTime := ((lapNumber = 1) ? 0 : knowledgeBase.getValue("Lap." . (lapNumber - 1) . ".Time.End", 0))
 
 		if (lapValid = kUndefined)
 			lapValid := getMultiMapValue(data, "Stint Data", "LapValid", true)
@@ -1404,10 +1405,12 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	callUpdateLap(lapNumber, data) {
-		if !isObject(data)
-			data := readMultiMap(data)
+		if this.KnowledgeBase {
+			if !isObject(data)
+				data := readMultiMap(data)
 
-		this.updateLap(lapNumber, &data)
+			this.updateLap(lapNumber, &data)
+		}
 	}
 
 	updateLap(lapNumber, &data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {

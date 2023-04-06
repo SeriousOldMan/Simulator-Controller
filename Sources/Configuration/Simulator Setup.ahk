@@ -283,7 +283,6 @@ class SetupWizard extends ConfigurationItem {
 	}
 
 	__New(configuration, definition) {
-		this.iDebug := (isDebug() ? (kDebugKnowledgeBase + kDebugRules) : kDebugOff)
 		this.iDefinition := definition
 
 		super.__New(configuration)
@@ -553,7 +552,7 @@ class SetupWizard extends ConfigurationItem {
 				this.Steps[A_Index].reset()
 	}
 
-	setDebug(option, enabled) {
+	setDebug(option, enabled, *) {
 		local label := false
 
 		if enabled
@@ -581,7 +580,7 @@ class SetupWizard extends ConfigurationItem {
 				Menu SupportMenu, Uncheck, %label%
 	}
 
-	toggleDebug(option) {
+	toggleDebug(option, *) {
 		this.setDebug(option, !this.Debug[option])
 	}
 

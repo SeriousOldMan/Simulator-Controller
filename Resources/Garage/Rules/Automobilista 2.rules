@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Assetto Corsa Setup Rules       ;;;
+;;;   Modular Simulator Controller System - Automobilista 2 Setup Rules     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -9,16 +9,15 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator("Assetto Corsa")),
-				 (Prove: addCharacteristics("Assetto Corsa", *, *, *)),
-				 (Prove: addSettings("Assetto Corsa", *, *)),
-				 (Prove: removeSettings("Assetto Corsa", *, [Aero.Splitter.Front, Brake.Duct.Front, Brake.Duct.Rear,
-															 Electronics.Map,
-															 Geometry.Caster.Left, Geometry.Caster.Right]))
+[?Initialize] => (Prove: addSimulator("Automobilista 2")),
+				 (Prove: addCharacteristics("Automobilista 2", *, *, *)),
+				 (Prove: addSettings("Automobilista 2", *, *)),
+				 (Prove: removeSettings("Automobilista 2", *, [Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
+															   Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right]))
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Setup Recommendations                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include %kResourcesDirectory%Advisor\Rules\Generic Recommendations.rules
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

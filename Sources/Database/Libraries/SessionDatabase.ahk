@@ -277,16 +277,16 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ServerURLs[identifier?] {
 		Get {
-			if (isSet(identifier) && !SessionDatabase.sServerURLs.Has(identifier))
+			if (SessionDatabase.sServerURLs.Count = 0) ; isSet(identifier) && !SessionDatabase.sServerURLs.Has(identifier))
 				SessionDatabase.sServerURLs := stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
 			return (isSet(identifier) ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
 		}
 	}
 
-	ServerURLs[identifier := false] {
+	ServerURLs[identifier?] {
 		Get {
-			return SessionDatabase.ServerURLs[identifier]
+			return SessionDatabase.ServerURLs[identifier?]
 		}
 	}
 

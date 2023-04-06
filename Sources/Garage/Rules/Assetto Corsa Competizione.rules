@@ -1,5 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Generic Setup Rules             ;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competitizione    ;;;
+;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -9,14 +10,15 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSimulator(*)),
-				 (Prove: addCharacteristics(*, *, *, *)),
-				 (Prove: addSettings(*, *, *)),
-				 (Prove: removeSetting(*, *, Aero.Splitter.Front))
+[?Initialize] => (Prove: addSimulator("Assetto Corsa Competizione")),
+				 (Prove: addCharacteristics("Assetto Corsa Competizione", *, *, *))
+
+[?Initialize] => (Prove: addSettings("Assetto Corsa Competizione", *, *)),
+				 (Prove: removeSetting("Assetto Corsa Competizione", *, Aero.Wing.Front))
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Setup Recommendations                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include %kResourcesDirectory%Advisor\Rules\Generic Recommendations.rules
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

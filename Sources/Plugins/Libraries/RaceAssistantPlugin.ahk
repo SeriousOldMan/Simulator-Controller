@@ -245,8 +245,8 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				openRaceCenter(this.Plugin)
 			else if (this.Action = "SessionDatabaseOpen")
 				openSessionDatabase(this.Plugin)
-			else if (this.Action = "SetupAdvisorOpen")
-				openSetupAdvisor(this.Plugin)
+			else if (this.Action = "SetupWorkbenchOpen")
+				openSetupWorkbench(this.Plugin)
 			else if (this.Action = "StrategyWorkbenchOpen")
 				openStrategyWorkbench(this.Plugin)
 		}
@@ -652,7 +652,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 	__New(controller, name, configuration := false, register := true) {
 		local teamServer, raceAssistantToggle, teamServerToggle, arguments, ignore, theAction
-		local openRaceSettings, openSessionDatabase, openSetupAdvisor, openRaceCenter, openStrategyWorkbench, importSetup
+		local openRaceSettings, openSessionDatabase, openSetupWorkbench, openRaceCenter, openStrategyWorkbench, importSetup
 		local assistantSpeaker, assistantListener, first
 
 		super.__New(controller, name, configuration, register)
@@ -731,10 +731,10 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if openSessionDatabase
 				this.createRaceAssistantAction(controller, "SessionDatabaseOpen", openSessionDatabase)
 
-			openSetupAdvisor := this.getArgumentValue("openSetupAdvisor", false)
+			openSetupWorkbench := this.getArgumentValue("openSetupWorkbench", false)
 
-			if openSetupAdvisor
-				this.createRaceAssistantAction(controller, "SetupAdvisorOpen", openSetupAdvisor)
+			if openSetupWorkbench
+				this.createRaceAssistantAction(controller, "SetupWorkbenchOpen", openSetupWorkbench)
 
 			openStrategyWorkbench := this.getArgumentValue("openStrategyWorkbench", false)
 
@@ -820,7 +820,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				this.registerAction(RaceAssistantPlugin.TeamServerToggleAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor)))
 			}
 			else if ((action = "RaceSettingsOpen") || (action = "SetupImport")
-				  || (action = "SessionDatabaseOpen") || (action = "SetupAdvisorOpen")
+				  || (action = "SessionDatabaseOpen") || (action = "SetupWorkbenchOpen")
 				  || (action = "StrategyWorkbenchOpen") || (action = "RaceCenterOpen")) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
@@ -1202,7 +1202,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			}
 			else if isInstance(theAction, RaceAssistantPlugin.RaceSettingsAction) {
 				if ((theAction.Action = "RaceSettingsOpen") || (theAction.Action = "SessionDatabaseOpen")
-				 || (theAction.Action = "SetupAdvisorOpen")
+				 || (theAction.Action = "SetupWorkbenchOpen")
 				 || (theAction.Action = "StrategyWorkbenchOpen")|| (theAction.Action = "RaceCenterOpen")) {
 					theAction.Function.enable(kAllTrigger, theAction)
 					theAction.Function.setLabel(theAction.Label)
@@ -2124,8 +2124,8 @@ openSessionDatabase(plugin := false) {
 	}
 }
 
-openSetupAdvisor(plugin := false) {
-	local exePath := kBinariesDirectory . "Setup Advisor.exe"
+openSetupWorkbench(plugin := false) {
+	local exePath := kBinariesDirectory . "Setup Workbench.exe"
 	local options
 
 	try {
@@ -2134,9 +2134,9 @@ openSetupAdvisor(plugin := false) {
 		Run("`"" . exePath . "`" " . options, kBinariesDirectory)
 	}
 	catch Any as exception {
-		logMessage(kLogCritical, translate("Cannot start the Setup Advisor tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
+		logMessage(kLogCritical, translate("Cannot start the Setup Workbench tool (") . exePath . translate(") - please rebuild the applications in the binaries folder (") . kBinariesDirectory . translate(")"))
 
-		showMessage(substituteVariables(translate("Cannot start the Setup Advisor tool (%exePath%) - please check the configuration..."), {exePath: exePath})
+		showMessage(substituteVariables(translate("Cannot start the Setup Workbench tool (%exePath%) - please check the configuration..."), {exePath: exePath})
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 }

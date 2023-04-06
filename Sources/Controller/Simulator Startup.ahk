@@ -376,20 +376,6 @@ launchPad(command := false, arguments*) {
 	static executables
 	static icons
 
-	static Startup
-	static RaceReports
-	static StrategyWorkbench
-	static RaceCenter
-	static ServerAdministration
-	static SimulatorSetup
-	static SimulatorConfiguration
-	static SimulatorDownload
-	static SimulatorSettings
-	static RaceSettings
-	static SessionDatabase
-	static SetupAdvisor
-	static SystemMonitor
-
 	static launchPadGui
 
 	static closeCheckBox
@@ -542,7 +528,7 @@ launchPad(command := false, arguments*) {
 		toolTips["SimulatorSettings"] := "Settings: Change the behaviour of Simulator Controller during startup and in a running simulation."
 		toolTips["RaceSettings"] := "Race Settings: Manage the settings for the Virtual Race Assistants and also the connection to the Team Server for team races."
 		toolTips["SessionDatabase"] := "Session Database: Manage simulator, car and track specific settings and gives access to various areas of the data collected by Simulator Controller during the sessions."
-		toolTips["SetupAdvisor"] := "Setup Advisor: Develop car setups using an interview-based approach, where you describe your handling problems."
+		toolTips["SetupWorkbench"] := "Setup Workbench: Develop car setups using an interview-based approach, where you describe your handling problems."
 		toolTips["SystemMonitor"] := "System Monitor: Monitor all system activities on a dashboard and investigate log files of all system components."
 
 		executables["RaceReports"] := "Race Reports.exe"
@@ -555,7 +541,7 @@ launchPad(command := false, arguments*) {
 		executables["SimulatorSettings"] := "Simulator Settings.exe"
 		executables["RaceSettings"] := "Race Settings.exe"
 		executables["SessionDatabase"] := "Session Database.exe"
-		executables["SetupAdvisor"] := "Setup Advisor.exe"
+		executables["SetupWorkbench"] := "Setup Workbench.exe"
 		executables["SystemMonitor"] := "System Monitor.exe"
 
 		icons["Startup"] := kIconsDirectory . "Startup.ico"
@@ -569,7 +555,7 @@ launchPad(command := false, arguments*) {
 		icons["SimulatorSettings"] := kIconsDirectory . "Settings.ico"
 		icons["RaceSettings"] := kIconsDirectory . "Race Settings.ico"
 		icons["SessionDatabase"] := kIconsDirectory . "Session Database.ico"
-		icons["SetupAdvisor"] := kIconsDirectory . "Setup.ico"
+		icons["SetupWorkbench"] := kIconsDirectory . "Setup.ico"
 		icons["SystemMonitor"] := kIconsDirectory . "Monitoring.ico"
 
 		launchPadGui := StartupWindow()
@@ -613,7 +599,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Server Administration")
 		launchPadGui.Add("Text", "xp+150 yp w60 h40 Center", "System Monitor")
 
-		launchPadGui.Add("Picture", "x16 ys+104 w60 h60 vSetupAdvisor", kIconsDirectory . "Setup.ico").OnEvent("Click", launchApplication.Bind("SetupAdvisor"))
+		launchPadGui.Add("Picture", "x16 ys+104 w60 h60 vSetupWorkbench", kIconsDirectory . "Setup.ico").OnEvent("Click", launchApplication.Bind("SetupWorkbench"))
 		launchPadGui.Add("Picture", "xp+90 yp w60 h60 vRaceSettings", kIconsDirectory . "Race Settings.ico").OnEvent("Click", launchApplication.Bind("RaceSettings"))
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSessionDatabase", kIconsDirectory . "Session Database.ico").OnEvent("Click", launchApplication.Bind("SessionDatabase"))
 
@@ -621,7 +607,7 @@ launchPad(command := false, arguments*) {
 		launchPadGui.Add("Picture", "xp+74 yp w60 h60 vSimulatorConfiguration", kIconsDirectory . "Configuration.ico").OnEvent("Click", launchApplication.Bind("SimulatorConfiguration"))
 		launchPadGui.Add("Picture", "xp+150 yp w60 h60 vSimulatorDownload", kIconsDirectory . "Installer.ico").OnEvent("Click", launchSimulatorDownload.Bind("SimulatorDownload"))
 
-		launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "Setup Advisor")
+		launchPadGui.Add("Text", "x16 yp+64 w60 h40 Center", "Setup Workbench")
 		launchPadGui.Add("Text", "xp+90 yp w60 h40 Center", "Race Settings")
 		launchPadGui.Add("Text", "xp+74 yp w60 h40 Center", "Session Database")
 		launchPadGui.Add("Text", "xp+110 yp w60 h40 Center", "Simulator Setup")

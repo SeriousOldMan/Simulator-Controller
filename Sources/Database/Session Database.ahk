@@ -347,7 +347,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			editorGui.Opt("+Disabled")
 
 			try {
-				editSettings(editor, window)
+				editSettings(editor, editorGui)
 			}
 			finally {
 				editorGui.Opt("-Disabled")
@@ -1036,7 +1036,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						editorGui.Opt("+Disabled")
 
 						try {
-							selection := selectImportData(editor, folder, window)
+							selection := selectImportData(editor, folder, editorGui)
 
 							if selection
 								editor.importData(folder, selection)
@@ -4393,7 +4393,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 }
 
 selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := false, *) {
-	local x, y, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
+	local x, y, w, h, editor, simulator, code, info, drivers, id, name, progressWindow, tracks, progress
 	local car, carName, track, trackName, sourceDirectory, found, telemetryDB, tyresDB, driver, driverName, rows
 	local strategies, automations, row, selection, data, type, number
 
@@ -4441,25 +4441,25 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 	else {
 		result := false
 
-		importDataGui := Window()
+		importDataGui := Window({Descriptor: "Session Database.Import", Resizeable: true, Options: "ToolWindow -SysMenu"}, translate("Import"))
 
 		importDataGui.SetFont("s10 Bold", "Arial")
 
-		importDataGui.Add("Text", "w394 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(importDataGui, "Session Database.Import"))
+		importDataGui.Add("Text", "w394 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(importDataGui, "Session Database.Import"))
 
 		importDataGui.SetFont("s9 Norm", "Arial")
 		importDataGui.SetFont("Italic Underline", "Arial")
 
-		importDataGui.Add("Text", "x153 YP+20 w104 cBlue Center", translate("Database Location")).OnEvent("Click", openDocumentation.Bind(importDataGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
+		importDataGui.Add("Text", "x153 YP+20 w104 H:Center cBlue Center", translate("Import")).OnEvent("Click", openDocumentation.Bind(importDataGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer#managing-the-session-database"))
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
-		importDataGui.Add("Text", "x8 yp+30 w410 0x10")
+		importDataGui.Add("Text", "x8 yp+30 w410 W:Grow 0x10")
 
 		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)
@@ -4575,10 +4575,10 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 
 		importDataGui.SetFont("s8 Norm", "Arial")
 
-		importDataGui.Add("Text", "x8 yp+410 w410 0x10")
+		importDataGui.Add("Text", "x8 yp+410 w410 W:Grow Y:Move 0x10")
 
-		importDataGui.Add("Button", "x123 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
-		importDataGui.Add("Button", "x226 yp w80 h23", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))
+		importDataGui.Add("Button", "x123 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Ok")).OnEvent("Click", selectImportData.Bind(kOk))
+		importDataGui.Add("Button", "x226 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", selectImportData.Bind(kCancel))
 
 		importDataGui.Opt("+Owner" . owner.Hwnd)
 
@@ -4586,6 +4586,9 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 			importDataGui.Show("x" . x . " y" . y)
 		else
 			importDataGui.Show()
+
+		if getWindowSize("Session Database.Import", &w, &h)
+			importDataGui.Resize("Initialize", w, h)
 
 		loop
 			Sleep(100)

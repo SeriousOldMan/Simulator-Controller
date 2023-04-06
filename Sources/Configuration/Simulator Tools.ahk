@@ -652,7 +652,7 @@ checkInstallation() {
 				}
 
 				fixIE(11, "Session Database.exe")
-				fixIE(11, "Setup Advisor.exe")
+				fixIE(11, "Setup Workbench.exe")
 				fixIE(11, "Race Reports.exe")
 				fixIE(11, "Strategy Workbench.exe")
 				fixIE(11, "Race Center.exe")
@@ -903,7 +903,7 @@ createShortcuts(location, installLocation) {
 		FileCreateShortcut %installLocation%\Binaries\Simulator Tools.exe, %location%\Uninstall.lnk, %installLocation%\Binaries, -Uninstall
 
 		for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
-						   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
+						   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Workbench"]
 			FileCreateShortCut %installLocation%\Binaries\%name%.exe, %location%\%name%.lnk, %installLocation%\Binaries
 	}
 	else
@@ -926,7 +926,7 @@ deleteShortcuts(location) {
 	}
 
 	for ignore, name in ["Simulator Startup", "Simulator Settings", "Simulator Setup", "Simulator Configuration", "Race Settings", "Session Database"
-					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Advisor"]
+					   , "Race Reports", "Strategy Workbench", "Race Center", "Server Administration", "Setup Workbench"]
 		deleteFile(location . "\" . name . ".lnk")
 
 	deleteFile(location . "\Documentation.lnk")
@@ -947,7 +947,7 @@ writeAppPaths(installLocation) {
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe, , %installLocation%\Binaries\Strategy Workbench.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
 	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe, , %installLocation%\Binaries\Server Administration.exe
-	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe, , %installLocation%\Binaries\SetupAdvisor.exe
+	RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe, , %installLocation%\Binaries\SetupWorkbench.exe
 }
 
 deleteAppPaths() {
@@ -962,7 +962,7 @@ deleteAppPaths() {
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe
 	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe
-	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe
+	RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe
 }
 
 writeUninstallerInfo(installLocation) {
@@ -1640,7 +1640,7 @@ updateInstallationForV398() {
 			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe, , %installLocation%\Binaries\Session Database.exe
 			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe, , %installLocation%\Binaries\Race Center.exe
 			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe, , %installLocation%\Binaries\Server Administration.exe
-			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe, , %installLocation%\Binaries\Setup Advisor.exe
+			RegWrite REG_SZ, HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe, , %installLocation%\Binaries\Setup Workbench.exe
 
 			RegDelete HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupDatabase.exe
 		}
@@ -1657,7 +1657,7 @@ updateInstallationForV392() {
 	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
 		installLocation := getMultiMapValue(installOptions, "Install", "Location")
 
-		FileCreateShortCut %installLocation%\Binaries\Setup Advisor.exe, %A_StartMenu%\Simulator Controller\Setup Advisor.lnk, %installLocation%\Binaries
+		FileCreateShortCut %installLocation%\Binaries\Setup Workbench.exe, %A_StartMenu%\Simulator Controller\Setup Workbench.lnk, %installLocation%\Binaries
 	}
 }
 
@@ -1715,7 +1715,7 @@ updateConfigurationForV452() {
 
 	settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-	for key, value in getMultiMapValues(settings, "Setup Advisor")
+	for key, value in getMultiMapValues(settings, "Setup Workbench")
 		tempValues[StrReplace(key, ".Unknown", ".*")] := value
 
 	for key, value in tempValues {
@@ -1735,7 +1735,7 @@ updateConfigurationForV452() {
 			newValues[key] := value
 	}
 
-	setMultiMapValues(settings, "Setup Advisor", newValues)
+	setMultiMapValues(settings, "Setup Workbench", newValues)
 
 	writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 }

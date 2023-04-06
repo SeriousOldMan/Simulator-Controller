@@ -162,12 +162,12 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		}
 	}
 
-	__New(advisor, simulator) {
-		local selectedCar := advisor.SelectedCar[false]
-		local selectedTrack := advisor.SelectedTrack[false]
-		local defaultUndersteerThresholds := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
-		local defaultOversteerThresholds := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
-		local defaultLowspeedThreshold := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
+	__New(workbench, simulator) {
+		local selectedCar := workbench.SelectedCar[false]
+		local selectedTrack := workbench.SelectedTrack[false]
+		local defaultUndersteerThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "UndersteerThresholds", "40,70,100")
+		local defaultOversteerThresholds := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "OversteerThresholds", "-40,-70,-100")
+		local defaultLowspeedThreshold := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "LowspeedThreshold", 120)
 		local fileName, configuration, settings, prefix
 
 		simulator := SessionDatabase.getSimulatorName(simulator)
@@ -181,13 +181,13 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 		this.iCar := selectedCar
 		this.iTrack := selectedTrack
 
-		this.iSteerLock := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "SteerLock", 900)
-		this.iSteerRatio := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "SteerRatio", 12)
-		this.iWheelbase := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "Wheelbase", 270)
-		this.iTrackWidth := getMultiMapValue(advisor.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
+		this.iSteerLock := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "SteerLock", 900)
+		this.iSteerRatio := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "SteerRatio", 12)
+		this.iWheelbase := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "Wheelbase", 270)
+		this.iTrackWidth := getMultiMapValue(workbench.SimulatorDefinition, "Analyzer", "TrackWidth", 150)
 
 		if selectedCar {
-			fileName := getFileName("Advisor\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
+			fileName := getFileName("Workbench\Definitions\Cars\" . simulator . "." . selectedCar . ".ini", kResourcesDirectory, kUserHomeDirectory)
 
 			if FileExist(fileName) {
 				configuration := readMultiMap(fileName)
@@ -207,29 +207,29 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . ".*.")
 
-		this.iSteerLock := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
-		this.iSteerRatio := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
-		this.iWheelbase := getMultiMapValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
-		this.iTrackWidth := getMultiMapValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+		this.iSteerLock := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
 
-		defaultUndersteerThresholds := getMultiMapValue(settings, "Setup Advisor", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
-		defaultOversteerThresholds := getMultiMapValue(settings, "Setup Advisor", prefix . "OversteerThresholds", defaultOversteerThresholds)
-		defaultLowspeedThreshold := getMultiMapValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+		defaultUndersteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "UndersteerThresholds", defaultUndersteerThresholds)
+		defaultOversteerThresholds := getMultiMapValue(settings, "Setup Workbench", prefix . "OversteerThresholds", defaultOversteerThresholds)
+		defaultLowspeedThreshold := getMultiMapValue(settings, "Setup Workbench", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
 		prefix := (simulator . "." . (selectedCar ? selectedCar : "*") . "." . (selectedTrack ? selectedTrack : "*") . ".")
 
-		this.iSteerLock := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerLock", this.SteerLock)
-		this.iSteerRatio := getMultiMapValue(settings, "Setup Advisor", prefix . "SteerRatio", this.SteerRatio)
-		this.iWheelbase := getMultiMapValue(settings, "Setup Advisor", prefix . "Wheelbase", this.Wheelbase)
-		this.iTrackWidth := getMultiMapValue(settings, "Setup Advisor", prefix . "TrackWidth", this.TrackWidth)
+		this.iSteerLock := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerLock", this.SteerLock)
+		this.iSteerRatio := getMultiMapValue(settings, "Setup Workbench", prefix . "SteerRatio", this.SteerRatio)
+		this.iWheelbase := getMultiMapValue(settings, "Setup Workbench", prefix . "Wheelbase", this.Wheelbase)
+		this.iTrackWidth := getMultiMapValue(settings, "Setup Workbench", prefix . "TrackWidth", this.TrackWidth)
 
-		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Advisor"
+		this.iUndersteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
 													   , prefix . "UndersteerThresholds", defaultUndersteerThresholds))
-		this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Advisor"
+		this.iOversteerThresholds := string2Values(",", getMultiMapValue(settings, "Setup Workbench"
 													  , prefix . "OversteerThresholds", defaultOversteerThresholds))
-		this.iLowspeedThreshold := getMultiMapValue(settings, "Setup Advisor", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
+		this.iLowspeedThreshold := getMultiMapValue(settings, "Setup Workbench", prefix . "LowspeedThreshold", defaultLowspeedThreshold)
 
-		super.__New(advisor, simulator)
+		super.__New(workbench, simulator)
 
 		OnExit(ObjBindMethod(this, "stopTelemetryAnalyzer", true))
 	}
@@ -239,20 +239,20 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 	}
 
 	createCharacteristics(telemetry := false) {
-		local advisor, severities, count, maxValue
+		local workbench, severities, count, maxValue
 		local characteristicLabels, characteristic, characteristics, ignore, type, severity, speed, key, value
 
 		if telemetry {
-			advisor := this.Advisor
-			characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
+			workbench := this.Workbench
+			characteristicLabels := getMultiMapValues(workbench.Definition, "Setup.Characteristics.Labels")
 			severities := {Light: 33, Medium: 50, Heavy: 66}
 			characteristics := CaseInsenseMap()
 			count := 0
 			maxValue := 0
 
-			advisor.clearCharacteristics()
+			workbench.clearCharacteristics()
 
-			advisor.ProgressCount := 0
+			workbench.ProgressCount := 0
 
 			showProgress({color: "Green", width: 350, title: translate("Creating Problems"), message: translate("Preparing Characteristics...")})
 
@@ -288,14 +288,14 @@ class GenericTelemetryAnalyzer extends TelemetryAnalyzer {
 				if (A_Index > kMaxCharacteristics)
 					break
 
-				showProgress({progress: (advisor.ProgressCount += 10), message: translate("Create ") . characteristicLabels[characteristic] . translate("...")})
+				showProgress({progress: (workbench.ProgressCount += 10), message: translate("Create ") . characteristicLabels[characteristic] . translate("...")})
 
-				advisor.addCharacteristic(characteristic, value[1], value[2], false)
+				workbench.addCharacteristic(characteristic, value[1], value[2], false)
 			}
 
-			advisor.updateRecommendations()
+			workbench.updateRecommendations()
 
-			advisor.updateState()
+			workbench.updateState()
 
 			showProgress({progress: 100, message: translate("Finished...")})
 
@@ -396,13 +396,13 @@ setAnalyzerSetting(analyzer, key, value) {
 	local prefix := (analyzer.Simulator . "." . (car ? car : "*") . "." . (track ? track : "*") . ".")
 	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-	setMultiMapValue(settings, "Setup Advisor", prefix . key, value)
+	setMultiMapValue(settings, "Setup Workbench", prefix . key, value)
 
 	writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 }
 
 runAnalyzer(commandOrAnalyzer := false, arguments*) {
-	local x, y, ignore, widget, advisor, row, include
+	local x, y, ignore, widget, workbench, row, include
 	local tries, data, type, speed, severity, key, value, newValue, characteristic, characteristicLabels, fromEdit
 	local calibration, theListView
 
@@ -591,8 +591,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		}
 	}
 	else if (commandOrAnalyzer == "FilterTelemetry") {
-		advisor := analyzer.Advisor
-		characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
+		workbench := analyzer.Workbench
+		characteristicLabels := getMultiMapValues(workbench.Definition, "Setup.Characteristics.Labels")
 		final := ((arguments.Length > 0) && arguments[1])
 
 		data := readMultiMap(dataFile)
@@ -632,8 +632,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		return data
 	}
 	else if (commandOrAnalyzer == "UpdateTelemetry") {
-		advisor := analyzer.Advisor
-		characteristicLabels := getMultiMapValues(advisor.Definition, "Setup.Characteristics.Labels")
+		workbench := analyzer.Workbench
+		characteristicLabels := getMultiMapValues(workbench.Definition, "Setup.Characteristics.Labels")
 		data := arguments[1]
 
 		theListView := ((state = "Run") ? issuesListView : resultListView)
@@ -676,12 +676,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("s10 Bold", "Arial")
 
-		analyzerGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(analyzerGui, "Setup Advisor.Analyzer"))
+		analyzerGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(analyzerGui, "Setup Workbench.Analyzer"))
 
 		analyzerGui.SetFont("s9 Norm", "Arial")
 		analyzerGui.SetFont("Italic Underline", "Arial")
 
-		analyzerGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(analyzerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer"))
+		analyzerGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(analyzerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer"))
 
 		analyzerGui.SetFont("s8 Norm", "Arial")
 
@@ -853,10 +853,10 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		activateButton.OnEvent("Click", runAnalyzer.Bind("Activate"))
 		analyzerGui.Add("Button", "xp+98 yp w80 h23", translate("Cancel")).OnEvent("Click", runAnalyzer.Bind(kCancel))
 
-		analyzerGui.Opt("+Owner" . SetupAdvisor.Instance.Window)
+		analyzerGui.Opt("+Owner" . workbench.Window.Hwnd)
 
 		try {
-			if getWindowPosition("Setup Advisor.Analyzer", &x, &y)
+			if getWindowPosition("Setup Workbench.Analyzer", &x, &y)
 				analyzerGui.Show("AutoSize x" . x . " y" . y)
 			else
 				analyzerGui.Show("AutoSize Center")
@@ -952,12 +952,12 @@ runCalibrator(commandOrAnalyzer, *) {
 
 		calibratorGui.SetFont("s10 Bold", "Arial")
 
-		calibratorGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(calibratorGui, "Setup Advisor.Calibrator"))
+		calibratorGui.Add("Text", "w324 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(calibratorGui, "Setup Workbench.Calibrator"))
 
 		calibratorGui.SetFont("s9 Norm", "Arial")
 		calibratorGui.SetFont("Italic Underline", "Arial")
 
-		calibratorGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(calibratorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer"))
+		calibratorGui.Add("Text", "x78 YP+20 w184 cBlue Center", translate("Telemetry Analyzer")).OnEvent("Click", openDocumentation.Bind(calibratorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer"))
 
 		calibratorGui.SetFont("Norm s14", "Arial")
 
@@ -970,7 +970,7 @@ runCalibrator(commandOrAnalyzer, *) {
 		calibratorGui.Add("Button", "xp+100 yp w80 h23", translate("Cancel")).OnEvent("Click", runCalibrator.Bind(kCancel))
 
 		try {
-			if getWindowPosition("Setup Advisor.Calibrator", &x, &y)
+			if getWindowPosition("Setup Workbench.Calibrator", &x, &y)
 				calibratorGui.Show("AutoSize x" . x . " y" . y)
 			else
 				calibratorGui.Show("AutoSize Center")

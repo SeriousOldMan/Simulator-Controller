@@ -845,7 +845,7 @@ class SetupWorkbench extends ConfigurationItem {
 		local hasGeneric := false
 		local simulator
 
-		loop Files, kResourcesDirectory "Garager\Definitions\*.ini", "F" {
+		loop Files, kResourcesDirectory "Garage\Definitions\*.ini", "F" {
 			SplitPath(A_LoopFileName, , , , &simulator)
 
 			if (simulator = "Generic")

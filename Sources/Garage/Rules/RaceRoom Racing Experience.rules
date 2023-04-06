@@ -24,4 +24,4 @@
 ;;;                         Setup Recommendations                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include %kResourcesDirectory%Advisor\Rules\Generic Recommendations.rules
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

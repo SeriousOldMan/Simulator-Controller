@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Setup Advisor Rules             ;;;
+;;;   Modular Simulator Controller System - Setup Workbench Rules             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
@@ -75,7 +75,7 @@ allSettings([?setting | ?settings], ?index) <= Get(Setting, ?index, ?setting), ?
 ;;;                         Simulator Configuration                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-priority: 5, [?Initialize] => (Set: Simulator.Count, 0), (Set: Advisor.Simulator, *), (Set: Advisor.Car, *), (Set: Advisor.Track, *)
+priority: 5, [?Initialize] => (Set: Simulator.Count, 0), (Set: Workbench.Simulator, *), (Set: Workbench.Car, *), (Set: Workbench.Track, *)
 
 addSimulator(?simulator) <= addSimulator(?simulator, !Simulator.Count)
 
@@ -163,7 +163,7 @@ resetCharacteristics(0) <= !
 resetCharacteristics(?index) <= Get(Characteristic, ?index, ?characteristic), Set(?characteristic, Correction, 0),
 									?nIndex = ?index - 1, resetCharacteristics(?nIndex)
 
-updateCharacteristics() <= updateCharacteristics(!Advisor.Simulator, !Advisor.Car, !Advisor.Track, !Characteristics.Count)
+updateCharacteristics() <= updateCharacteristics(!Workbench.Simulator, !Workbench.Car, !Workbench.Track, !Characteristics.Count)
 
 updateCharacteristics(?, ?, ?, 0) <= !
 updateCharacteristics(?simulator, ?car, ?track, ?index) <=

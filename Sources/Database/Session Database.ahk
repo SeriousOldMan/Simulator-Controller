@@ -960,6 +960,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					editor.writeTrackAutomations(false)
 				}
+
+				editor.TrackAutomationsListView.Modify(line, "Select Vis")
 			}
 		}
 
@@ -2396,7 +2398,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		this.readTrackAutomations()
 
-		this.iSelectedTrackAutomation := CaseInsenseMap("Name", "...", "Actions", [])
+		this.iSelectedTrackAutomation := {Name: "...", Actions: [], Active: false}
 
 		this.updateState()
 
@@ -2406,7 +2408,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteTrackAutomation() {
-		if this.SelectedTrackAutomation.Has("Origin") {
+		if this.SelectedTrackAutomation.HasOwnProp("Origin") {
 			this.TrackAutomations.RemoveAt(inList(this.TrackAutomations, this.SelectedTrackAutomation.Origin))
 
 			this.writeTrackAutomations()

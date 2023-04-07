@@ -1850,7 +1850,7 @@ class RaceEngineer extends RaceAssistant {
 
 					deviationThreshold := knowledgeBase.getValue("Session.Settings.Tyre.Pressure.Deviation")
 
-					for tyre, tyreType in {FrontLeft: "FL", FrontRight: "FR", RearLeft: "RL", RearRight: "RR"}.OwnProps() {
+					for tyre, tyreType in Map("FrontLeft", "FL", "FrontRight", "FR", "RearLeft", "RL", "RearRight", "RR") {
 						lostPressure := knowledgeBase.getValue("Pitstop.Planned.Tyre.Pressure.Lost." . tyreType, false)
 
 						if (lostPressure && (lostPressure >= deviationThreshold))

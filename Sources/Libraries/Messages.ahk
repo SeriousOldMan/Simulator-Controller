@@ -128,7 +128,7 @@ class MessageManager extends PeriodicTask {
 					withProtection(ObjBindMethod(message[1], "call", message[2], message[3]))
 				}
 				catch Any as exception {
-					logError(exception)
+					logError(exception, true)
 				}
 
 			return false

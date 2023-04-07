@@ -10460,7 +10460,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})
 			tyres[tyreData["Tyre"]] := tyreData
 
-		for tyre, key in {FL: "Front.Left", FR: "Front.Right", RL: "Rear.Left", RR: "Rear.Right"}.OwnProps() {
+		for tyre, key in Map("FL", "Front.Left", "FR", "Front.Right", "RL", "Rear.Left", "RR", "Rear.Right") {
 			if !driver
 				driver := tyres[key]["Driver"]
 

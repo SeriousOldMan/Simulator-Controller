@@ -401,7 +401,7 @@ class Task {
 			next := theTask.execute()
 		}
 		catch Any as exception {
-			logError(exception, true, true)
+			logError(exception, true)
 
 			next := false
 		}

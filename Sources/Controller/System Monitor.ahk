@@ -682,14 +682,14 @@ systemMonitor(command := false, arguments*) {
 				}
 			}
 
-			serverURL.Value := serverURL
-			serverToken.Value := serverToken
-			serverDriver.Value := serverDriver
-			serverTeam.Value := serverTeam
-			serverSession.Value := serverSession
-			stintNr.Value := stintNr
-			stintLap.Value := stintLap
-			stintDriver.Value := stintDriver
+			serverURL.Value := serverURLValue
+			serverToken.Value := serverTokenValue
+			serverDriver.Value := serverDriverValue
+			serverTeam.Value := serverTeamValue
+			serverSession.Value := serverSessionValue
+			stintNr.Value := stintNrValue
+			stintLap.Value := stintLapValue
+			stintDriver.Value := stintDriverValue
 
 			driversListView.Delete()
 

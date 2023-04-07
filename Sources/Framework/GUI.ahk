@@ -585,29 +585,26 @@ class Window extends Gui {
 
 				this.ControlsResize(width, height)
 
-				if restricted {
+				if restricted
 					WinMove( , , width, height, this)
-
-					return
-				}
 				else {
 					for ignore, resizer in this.Resizers
 						resizer.Redraw()
 
 					WinRedraw(this)
+				}
 
-					if this.Descriptor {
-						updateSettings(width, height) {
-							local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+				if this.Descriptor {
+					updateSettings(width, height) {
+						local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-							setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
-							setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
+						setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
+						setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
 
-							writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-						}
-
-						Task.startTask(updateSettings.Bind(width, height), 1000, kLowPriority)
+						writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 					}
+
+					Task.startTask(updateSettings.Bind(width, height), 1000, kLowPriority)
 				}
 			}
 			catch Any as exception {

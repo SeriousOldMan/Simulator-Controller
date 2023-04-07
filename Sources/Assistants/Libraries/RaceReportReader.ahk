@@ -328,7 +328,7 @@ class RaceReportReader {
 			for ignore, time in invalidTimes
 				validTimes.RemoveAt(inList(validTimes, time))
 
-			if (validTimes.Length > 1) {
+			if (validTimes.Length > 0) {
 				max := Round(maximum(validTimes) / 1000, 1)
 				avg := Round(average(validTimes) / 1000, 1)
 				stdDev := (stdDeviation(validTimes) / 1000)

@@ -1901,7 +1901,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Picture", "x16 yp+10 w30 h30 Section", kIconsDirectory . "Tools BW.ico")
 		centerGui.Add("Text", "x50 yp+5 w80 h26", translate("Session"))
 
-		centerGui.Add("Text", "x760 yp+8 w556 0x2 X:Move vmessageField")
+		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
 
 		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp-8 w30 h30 X:Move vwaitViewer", "shell.explorer").Value
 		this.iWaitViewer.Navigate("about:blank")
@@ -3179,7 +3179,7 @@ class RaceCenter extends ConfigurationItem {
 			loop this.PlanListView.GetCount() {
 				if ((A_Index > 1) && !pitstops.Has(A_Index - 1))
 					continue
-				else if ((A_Index = 1) && (pitstops.Count > 0) && !pitstops.HasKey(1))
+				else if ((A_Index = 1) && (pitstops.Count > 0) && !pitstops.Has(1))
 					continue
 
 				driver := ((A_Index = 1) ? this.Strategy.DriverName : pitstops[A_Index - 1].DriverName)
@@ -5098,7 +5098,10 @@ class RaceCenter extends ConfigurationItem {
 								lapTime += (pitstopDelta + (pitstopFuelService[2] * fuelCapacity) + pitstopTyreService)
 						}
 
-						delta := (((avgLapTime + lapTime) / lapTime) - 1)
+						if lapTime
+							delta := (((avgLapTime + lapTime) / lapTime) - 1)
+						else
+							delta := 0
 
 						running := (lastRunnings[A_Index] + delta)
 
@@ -5109,7 +5112,7 @@ class RaceCenter extends ConfigurationItem {
 					bubbleSort(&carPositions, (a, b) => a[3] < b[3])
 
 					for nr, position in carPositions
-						position[3] += ((lastPositions[position[1]] - nr) * (overTakeDelta / position[2]))
+						position[3] += ((lastPositions[position[1]] - nr) * (overTakeDelta / (position[2] ? position[2] : 0.01)))
 
 					bubbleSort(&carPositions, (a, b) => a[3] < b[3])
 
@@ -5505,7 +5508,7 @@ class RaceCenter extends ConfigurationItem {
 
 			lap.Stint := stint
 
-			tries := ((A_Index == count) ? 30 : 1)
+			tries := ((A_Index == count) ? 30 : 5)
 
 			while (tries > 0) {
 				rawData := this.Connector.GetLapValue(identifier, "Telemetry Data")
@@ -5518,7 +5521,7 @@ class RaceCenter extends ConfigurationItem {
 					if (tries <= 0) {
 						this.showMessage(translate("Give up - use default values"))
 
-						newLaps.RemoveAt(A_Index, newLaps.Length - A_Index + 1)
+						newLaps.RemoveAt(lap.Nr, newLaps.Length - lap.Nr + 1)
 
 						return newLaps
 					}
@@ -5606,7 +5609,7 @@ class RaceCenter extends ConfigurationItem {
 								   , getMultiMapValue(data, "Car Data", "TyreCompoundColor"))
 
 			try {
-				tries := ((A_Index == count) ? 30 : 1)
+				tries := ((A_Index == count) ? 30 : 5)
 
 				while (tries > 0) {
 					rawData := this.Connector.GetLapValue(identifier, "Positions Data")
@@ -5862,6 +5865,8 @@ class RaceCenter extends ConfigurationItem {
 
 				for ignore, stint in updatedStints {
 					for ignore, lap in this.loadNewLaps(stint) {
+						newData := true
+
 						remainingFuel := lap.FuelRemaining
 
 						if isNumber(remainingFuel)
@@ -5898,6 +5903,9 @@ class RaceCenter extends ConfigurationItem {
 					}
 				}
 
+				if !newData
+					return false
+
 				if first {
 					this.LapsListView.ModifyCol()
 
@@ -5907,8 +5915,6 @@ class RaceCenter extends ConfigurationItem {
 
 				for ignore, stint in updatedStints
 					this.updateStint(stint)
-
-				newData := true
 
 				this.iLastLap := this.Laps[lastLap.Nr]
 				this.iCurrentStint := currentStint
@@ -6175,7 +6181,7 @@ class RaceCenter extends ConfigurationItem {
 				pitstop := false
 
 				try {
-					tries := ((lap == lastLap) ? 10 : 1)
+					tries := ((lap == lastLap) ? 10 : 5)
 
 					while (tries > 0) {
 						telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
@@ -6393,7 +6399,7 @@ class RaceCenter extends ConfigurationItem {
 				driverID := this.Laps[lap].Stint.ID
 
 				try {
-					tries := ((lap == lastLap) ? 10 : 1)
+					tries := ((lap == lastLap) ? 10 : 5)
 
 					while (tries > 0) {
 						lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
@@ -9443,7 +9449,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					try {
-						tries := ((lap == lastLap) ? 10 : 1)
+						tries := ((lap == lastLap) ? 10 : 5)
 
 						while (tries > 0) {
 							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")
@@ -9817,7 +9823,7 @@ class RaceCenter extends ConfigurationItem {
 		for ignore, time in validTimes
 			consistency += (100 - Abs(avg - time))
 
-		consistency := Round(consistency / validTimes.Length, 2)
+		consistency := Round(consistency / ((validTimes.Length = 0) ? 0.01 : validTimes.Length), 2)
 
 		title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
 
@@ -10133,7 +10139,7 @@ class RaceCenter extends ConfigurationItem {
 				driverFullname := "-"
 				delta := "-"
 
-				if (entry["Car"] || (entry["ID"] != kNull)) {
+				if ((entry["Car"] && (entry["Car"] != kNull)) || (entry["ID"] && (entry["ID"] != kNull))) {
 					driverForname := false
 					driverSurname := false
 					driverNickname := false
@@ -11264,7 +11270,7 @@ class RaceCenter extends ConfigurationItem {
 			cars.Push(A_Index)
 
 		loop laps.Length
-			if times[A_Index].HasKey(car) {
+			if times[A_Index].Has(car) {
 				lapTime += times[A_Index][car]
 				count += 1
 			}
@@ -11552,29 +11558,29 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 
 				settingsListView.Delete()
 
-				if arguments[1].HasKey("FuelAmount")
+				if arguments[1].Has("FuelAmount")
 					settingsListView.Add("", translate("Refuel"), displayValue("Float", convertUnit("Volume", arguments[1]["FuelAmount"])))
 
-				if arguments[1].HasKey("TyreCompound")
+				if arguments[1].Has("TyreCompound")
 					if arguments[1]["TyreCompound"]
 						settingsListView.Add("", translate("Tyre Compound"), compound(arguments[1]["TyreCompound"], arguments[1]["TyreCompoundColor"])
 											   . (inList(["ACC", "Assetto Corsa Competizione"], rCenter.Simulator) ? translate(" (probably)") : ""))
 
-				if arguments[1].HasKey("TyreSet")
-					if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
+				if arguments[1].Has("TyreSet")
+					if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
 						settingsListView.Add("", translate("Tyre Set"), arguments[1]["TyreSet"] ? arguments[1]["TyreSet"] : "-")
 
-				if arguments[1].HasKey("TyrePressureFL")
-					if (arguments[1].HasKey("TyreCompound") && arguments[1]["TyreCompound"])
+				if arguments[1].Has("TyrePressureFL")
+					if (arguments[1].Has("TyreCompound") && arguments[1]["TyreCompound"])
 						settingsListView.Add("", translate("Tyre Pressures"), values2String(", ", displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFL"]))
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureFR"]))
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRL"]))
 																								, displayValue("Float", convertUnit("Pressure", arguments[1]["TyrePressureRR"]))))
 
-				if (arguments[1].HasKey("RepairBodywork") || arguments[1].HasKey("RepairSuspension") || arguments[1].HasKey("RepairEngine"))
-					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].HasKey("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
-																						, arguments[1].HasKey("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
-																						, arguments[1].HasKey("RepairEngine") ? arguments[1]["RepairEngine"] : false))
+				if (arguments[1].Has("RepairBodywork") || arguments[1].Has("RepairSuspension") || arguments[1].Has("RepairEngine"))
+					settingsListView.Add("", translate("Repairs"), rCenter.computeRepairs(arguments[1].Has("RepairBodywork") ? arguments[1]["RepairBodywork"] : false
+																						, arguments[1].Has("RepairSuspension") ? arguments[1]["RepairSuspension"] : false
+																						, arguments[1].Has("RepairEngine") ? arguments[1]["RepairEngine"] : false))
 
 				settingsListView.ModifyCol()
 

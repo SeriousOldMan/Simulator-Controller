@@ -720,7 +720,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 
 				if !multiClass {
 					if laps
-						position := (positions[laps].HasKey(driver) ? positions[laps][driver] : cars)
+						position := (positions[laps].Has(driver) ? positions[laps][driver] : cars)
 					else
 						position := cars
 

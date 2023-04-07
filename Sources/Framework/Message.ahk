@@ -41,7 +41,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		title := translate("Modular Simulator Controller System")
 
 	messageGui := Window()
-	
+
 	messageGui.SetFont("s10 Bold")
 	messageGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
 	messageGui.SetFont()
@@ -82,7 +82,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		}
 
 	messageGui.Opt("+AlwaysOnTop")
-	messageGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
+	messageGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NA")
 
 	Sleep(duration)
 

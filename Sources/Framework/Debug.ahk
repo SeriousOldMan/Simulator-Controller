@@ -166,7 +166,7 @@ logMessage(logLevel, message) {
 			if pid {
 				sending := true
 
-				message := StrReplace(message, "`n", A_Space)
+				message := StrReplace(StrReplace(message, "`n", A_Space), "`r", A_Space)
 
 				try {
 					messageSend(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), pid)

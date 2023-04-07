@@ -251,7 +251,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					FileAppend("Exit`n", kTempDirectory . "ACCUDP.cmd")
 				}
 				catch Any as exception {
-					logError(exception)
+					if (A_Index = 5)
+						logError(exception)
 				}
 
 				Sleep(250)
@@ -338,12 +339,18 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			fileName := (kTempDirectory . "ACCUDP.cmd")
 
-			try {
-				FileAppend("Read`n", fileName)
-			}
-			catch Any as exception {
-				logError(exception)
-			}
+			loop 5
+				try {
+					FileAppend("Read`n", fileName)
+
+					break
+				}
+				catch Any as exception {
+					if (A_Index = 5)
+						logError(exception)
+					else
+						Sleep(10)
+				}
 
 			tries := 10
 

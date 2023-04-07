@@ -2,27 +2,27 @@
 
 When it comes to race cars, the vast amount of available settings when developing a setup for a specific track and the personal driving style can be overwhelming - and this not only for the beginners. Most of us know some thump rules, for example: "Increase the rear wing angle to increase the rear stabiliity in fast corners and under heavy braking". But only a few of us know all the little tricks to create the best possible compromise for a given driver / car / track combination. And it will always be a compromise, since many requirements are contradictory. Creating loads of downforce for fast corners makes you slow on the straights, right?
 
-Welcome to "Setup Advisor", a new member in the growing collection of tools of the Simulator Controller suite.
+Welcome to "Setup Workbench", a new member in the growing collection of tools of the Simulator Controller suite.
 
-Important: "Setup Advisor" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Advisor" once using administrator privileges.
+Important: "Setup Workbench" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Workbench" once using administrator privileges.
 
 ## Describing Setup Issues
 
 The real world approach, when developing a setup for a race car, is to drive a few laps and make mental notes of all the flaws and drawbacks of the current car handling. You then describe all these issues to your suspension engineer, who then adjusts the settings on the car accordingly. Another test on the track will hopefully confirm the improvements that have been made, but usually also reveal new issues that arise as a result of the changes. After you have gone through this cycle a few times, you usually have found the best possible compromise for the current track.
 
-"Setup Advisor" supports exactly this approach by allowing you to describe the issues with the current setup on the left-hand side of the window. You can determine how badly the issue affects the driving characteristics and how important an improvement is for the overall performance.
+"Setup Workbench" supports exactly this approach by allowing you to describe the issues with the current setup on the left-hand side of the window. You can determine how badly the issue affects the driving characteristics and how important an improvement is for the overall performance.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Advisor.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Workbench.JPG)
 
 After starting the tool, you first select the simulation and, if necessary, the car and track, as well as the weather conditions for which a setup is to be developed. Different simulators and also different cars might support different sets of setup options. You can choose "Generic" or "All", if the specific simulator and car is not availabe. Then you can click on the "Problem..." button to select an issue for which you want to explore a possible change to the car setup. With the sliders "Importance" and "Severity" you determine the above-mentioned weighting and the severity of the issue. After a few moments, one or more recommendations for useful changes to the setup will appear on the right side of the window. For many issues, tiered recommendations are available based on the selected severity level.
 
-Please note, that it is possible to describe and edit several issues at once. "Setup Advisor" will try to find the best possible compromise, especially when there are conflicting requirements. Of course, this has its limitations and it is therefore always advisable to tackle one or two issues at a time, even if "Setup Advisor" searches for solutions for up to eight issues at a time.
+Please note, that it is possible to describe and edit several issues at once. "Setup Workbench" will try to find the best possible compromise, especially when there are conflicting requirements. Of course, this has its limitations and it is therefore always advisable to tackle one or two issues at a time, even if "Setup Workbench" searches for solutions for up to eight issues at a time.
 
-Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Advisor". This state can be retrieved again, when you hold down the Control key, while starting "Setup Advisor". Last, but not least, when you load a set of saved issues, you suppress the deletion of all present issues by holding down the Control key as well. But be aware, that there is a restriction for the overall number of issues.
+Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Workbench". This state can be retrieved again, when you hold down the Control key, while starting "Setup Workbench". Last, but not least, when you load a set of saved issues, you suppress the deletion of all present issues by holding down the Control key as well. But be aware, that there is a restriction for the overall number of issues.
 
 ### Real-time telemetry analyzer
 
-"Setup Advisor" provides a special tool, which analyzes the telemetry data while you are driving to detect over- or understeering corner by corner. Handling issues can then be autmatically generated from this information. To start the analyzer, choose the "Analyzer..." item from the "Problem..." menu. The following window appears:
+"Setup Workbench" provides a special tool, which analyzes the telemetry data while you are driving to detect over- or understeering corner by corner. Handling issues can then be autmatically generated from this information. To start the analyzer, choose the "Analyzer..." item from the "Problem..." menu. The following window appears:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Telemetry%20Analyzer%201.JPG)
 
@@ -42,7 +42,7 @@ In this dialog you can initialize the analyzer for your car and you targeted dri
 
   2. The second line of entry fields allow you to enter the wheel base and the track width of the car you want to analyze. Although the underlying computation using the Ackermann steering equations require those values to get a precise result, it will be absolutely okay to use the defaults of 270 cm wheelbase and 150 cm track width for GT-like cars. You might not get the exact slip angles, but you can compensate for that using the threshold sliders anyway.
 
-  3. Since the "Setup Advisor" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field.
+  3. Since the "Setup Workbench" differentiates between slow and fast corners, you can enter the speed which splits the two categories in the next field.
 
   4. Last but not least, you can define thresholds for the detection of low, medium and high over- or understeering. The thresholds are also **very** specific for a given simulator and a given car and also for your preferred driving style. Therefore you have to experiment a little bit to find the best settings here. But some general rules apply:
 
@@ -67,7 +67,7 @@ Go to the track and drive acouple of laps. Always the last 2 laps will be consid
 
 For each individual handling issue category, for example *low speed corner entry understeering*, the "Frequency" shows how often this happens related to the overall track length and the "Intensity" shows the category (*Light*, *Medium* or *Heavy*) according to your initial settings. You can use the threshold slider here to *filter* unimportant issues, which you don't want to be considered. Moving the slider to the right will remove all issues, whose frequency percentage is below the set threshold. If you want to include all issues, set the slider completely to the left. You can additionally remove those issues, which resulted from a driver error, by unchecking the check box in the issue list, before proceeding.
 
-When you are satiesfied with the displayed handling issues, click on "Apply". The analyzer will clear all current handling issues from the left pane of the "Setup Advisor" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
+When you are satiesfied with the displayed handling issues, click on "Apply". The analyzer will clear all current handling issues from the left pane of the "Setup Workbench" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
 
 Please be aware that not every handling issue is related to problems with the car setup. Equally often they arise when you are not used to specific characteristics of the car and you are kind of *overdriving* it. The analyzer can help you here as well. Try to drive clean laps as without too much detected over- or understeering events. You will see, that this will feel slower most of the time, but in the end you will be faster.
 
@@ -93,7 +93,7 @@ Please, note that all of this also applies to the Virtual Race Assistants, but y
 
 ## Understanding the Recommendations
 
-Since "Setup Advisor" has no knowledge about the concrete settings in the current car setup, all recommendations are of reltive nature. When you get the recommendation for a reduction of "Camber Rear Left" by -1, this does not mean that you have to reduce the rear left camber by exactly 1 click or by 0.1 degree. It rather means, that a reduction of the camber will have a large, when not the largest impact in the set of recommendations. To be precise, a recommendation with a value of 1.0 or -1.0 is four times as important than a recommendation with a value of 0.25. This is a hint for you where to start with your incremental tests when applying the recommended setup changes to your car.
+Since "Setup Workbench" has no knowledge about the concrete settings in the current car setup, all recommendations are of reltive nature. When you get the recommendation for a reduction of "Camber Rear Left" by -1, this does not mean that you have to reduce the rear left camber by exactly 1 click or by 0.1 degree. It rather means, that a reduction of the camber will have a large, when not the largest impact in the set of recommendations. To be precise, a recommendation with a value of 1.0 or -1.0 is four times as important than a recommendation with a value of 0.25. This is a hint for you where to start with your incremental tests when applying the recommended setup changes to your car.
 
 ### Meaning of the setup values
 
@@ -119,7 +119,7 @@ Please be aware, that a long list of change recommendations does not mean that y
 
 ### Handling of contradictions
 
-If you're working on more than one issue at a time, it's likely that you'll have conflicting recommendations to address. Depending on the "Importance" and "Severity" settings, "Setup Advisor" attempts to balance these contradictions. Example: If both a high top speed and equally high cornering speeds are required in fast corners, it depends on the product of the respective "Importance" and "Severity" whether an increase or decrease in the downforce value of the rear wing is recommended at the end.
+If you're working on more than one issue at a time, it's likely that you'll have conflicting recommendations to address. Depending on the "Importance" and "Severity" settings, "Setup Workbench" attempts to balance these contradictions. Example: If both a high top speed and equally high cornering speeds are required in fast corners, it depends on the product of the respective "Importance" and "Severity" whether an increase or decrease in the downforce value of the rear wing is recommended at the end.
 
 ### Disclaimer
 
@@ -127,7 +127,7 @@ The rules for the recommendations have been compiled from different sources, abo
 
 ## How it works
 
-"Setup Advisor" uses the same rule engine, that is used by the Virtual Race Assistants. A generic set of rules handle the overall computation and the analysis of the problem descriptions given by the driver. Each problem is identified by a descriptor, for example "Understeer.Corner.Exit.Fast" for understeering while accelerating out of fast corners. For each setup option, a descriptor exists as well, for example "Bumpstop.Range.Front.Left" for the length of the bumpstop rubber in the front left spring damper.
+"Setup Workbench" uses the same rule engine, that is used by the Virtual Race Assistants. A generic set of rules handle the overall computation and the analysis of the problem descriptions given by the driver. Each problem is identified by a descriptor, for example "Understeer.Corner.Exit.Fast" for understeering while accelerating out of fast corners. For each setup option, a descriptor exists as well, for example "Bumpstop.Range.Front.Left" for the length of the bumpstop rubber in the front left spring damper.
 
 During the first phase, the rule engine analyses all given problems and their "Importance" and "Severity" settings. A resulting correction value is derived, while handling contradictory requirements. The a long list of rules are evaluated that look like this:
 
@@ -146,25 +146,25 @@ During the first phase, the rule engine analyses all given problems and their "I
 			(Prove: changeSetting(Bumpstop.Range, [Rear.Left, Rear.Right], -0.5, ?Understeer.Corner.Exit.Fast.Correction)),
 			(Prove: changeSetting(Bumpstop.Rate, [Rear.Left, Rear.Right], 0.5, ?Understeer.Corner.Exit.Fast.Correction))
 
-As you can see, these rules define the changes to be applied to the setup settings to compensate for a specific problem, fast corner exit understeer in this example. It is self-explanatory, that a lot of settings might be influenced by many applicable rules at the same time. The generic rule set of "Setup Advisor" will handle this by computing the resulting setting as the best possible compromise for all resulting changes.
+As you can see, these rules define the changes to be applied to the setup settings to compensate for a specific problem, fast corner exit understeer in this example. It is self-explanatory, that a lot of settings might be influenced by many applicable rules at the same time. The generic rule set of "Setup Workbench" will handle this by computing the resulting setting as the best possible compromise for all resulting changes.
 
 ## Managing Car Setups
 
-After you have described your problems and reviewed the recommendations of "Setup Advisor", you may either change the settings directly in your simulator, or you can load the respective setup file for the given car and let "Setup Advisor" handle the modifications. To do this, click on the button with the little car on the right side of the *Selection* area. This will open a second window which allows you to work with setup files. If you do this for the first time, you first have to find and load the respective setup file, which will be used as the base setup for all modifications. Once you have loaded this file, the following window opens:
+After you have described your problems and reviewed the recommendations of "Setup Workbench", you may either change the settings directly in your simulator, or you can load the respective setup file for the given car and let "Setup Workbench" handle the modifications. To do this, click on the button with the little car on the right side of the *Selection* area. This will open a second window which allows you to work with setup files. If you do this for the first time, you first have to find and load the respective setup file, which will be used as the base setup for all modifications. Once you have loaded this file, the following window opens:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Editor%201.JPG)
 
-On the right side, you will see the simulator specific content of the setup file, in this case a setup for *Assetto Corsa Competizione* in a JSON format. In the list on the right, all settings known to "Setup Advisor", which are valid for the currently selected simulator and car will be listed together with their values from the currently loaded setup file. You can select a setting in this list and change its value using the "Increase" or "Decrease" button. Much more interesting is the "Apply" button below. When you click this button, all recommendations of the "Setup Advisor" will be applied as balanced changes to the currently loaded setup. You can specify with the small slider to the right of the button the amount of the applied changes, thereby filtering small and possibly unneccessary changes. You will then see a list like this:
+On the right side, you will see the simulator specific content of the setup file, in this case a setup for *Assetto Corsa Competizione* in a JSON format. In the list on the right, all settings known to "Setup Workbench", which are valid for the currently selected simulator and car will be listed together with their values from the currently loaded setup file. You can select a setting in this list and change its value using the "Increase" or "Decrease" button. Much more interesting is the "Apply" button below. When you click this button, all recommendations of the "Setup Workbench" will be applied as balanced changes to the currently loaded setup. You can specify with the small slider to the right of the button the amount of the applied changes, thereby filtering small and possibly unneccessary changes. You will then see a list like this:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Editor%202.JPG)
 
 Using the checkboxes on the left side of each setting, you can control which modifications will be included in the modified setup and which are not. The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed, chosen and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The *Setup Editor* is currently only available for *Assetto Corsa* and *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#notes) down below.
+Note: The *Setup Editor* is currently only available for *Assetto Corsa* and *Assetto Corsa Competizione*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
 
 ## Comparing Car Setups
 
-Beside applying selected recommendations for handling problems to a given setup, "Setup Advisor" is also able to compare two given setups and can also *merge* setups, for example a setup for dry conditions with a setup for wet conditions to create some kind of hybrid setup for endurance races. To do this, first load one setup into the *Setup Editor* as described above, and then click the "Compare..." button. You will be asked to load a second setup, which then will be compared to the first one. The differences will be shown in the following window.
+Beside applying selected recommendations for handling problems to a given setup, "Setup Workbench" is also able to compare two given setups and can also *merge* setups, for example a setup for dry conditions with a setup for wet conditions to create some kind of hybrid setup for endurance races. To do this, first load one setup into the *Setup Editor* as described above, and then click the "Compare..." button. You will be asked to load a second setup, which then will be compared to the first one. The differences will be shown in the following window.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Editor%203.JPG)
 
@@ -172,9 +172,9 @@ The orginal setup will be named "Setup A" and the second will be named "Setup B"
 
 When you want the merged setup to be taken over to the *Setup Editor*, when you are finished, click on the "Apply" button, otherwise close the window using the "Close" button.
 
-## Extending and cutomizing "Setup Advisor"
+## Extending and cutomizing "Setup Workbench"
 
-As you might have noticed, the "Setup Advisor" implements a quite generic, but also to a large extent general approach to car handling problems. But it is also possible to introduce simulator specific or even car specific rules for the AI processing and you can also describe the car specific settings, their ranges and rules for reading and modifying setup files. All builtin definitions and rules can be found in the *Resources\Advisor\Definitions* and in the *Resources\Advisor\Rules* folder in the program directory. But you can introduce their own versions of these files or even new ones in the *Simulator Controller\Advisor* folder in your user *Documents* folder. You can use the definition and rule files which are located in the programm directory as a template when creating your own files.
+As you might have noticed, the "Setup Workbench" implements a quite generic, but also to a large extent general approach to car handling problems. But it is also possible to introduce simulator specific or even car specific rules for the AI processing and you can also describe the car specific settings, their ranges and rules for reading and modifying setup files. All builtin definitions and rules can be found in the *Resources\Garage\Definitions* and in the *Resources\Garage\Rules* folder in the program directory. But you can introduce their own versions of these files or even new ones in the *Simulator Controller\Garage* folder in your user *Documents* folder. You can use the definition and rule files which are located in the programm directory as a template when creating your own files.
 
 Although it is possible to introduce support for a completely new simulator, much more common is the addition of a new car. Every simulator will support a so called generic car, with all setup settings supported by this simulator. Also, the Setup Editor will handle this generic car, but almost all settings will be handled as simple "clicks" without restricting the changes to a known range. This information is provided by the so called car definition files and the car specific rules.
 
@@ -186,13 +186,13 @@ Each simulator comes with a set of default settings which will be available for 
 
 This rule removes the front splitter setting from the set of available settings in *Assetto Corsa Competizione* for the "McLaren 720s GT3" upon initialization of the rule set, since this car does not have an adjustable front splitter.
 
-Car specific rules are either located in the *Resources\Advisor\Rules\Cars* folder in the program directory or in the *Simulator Controller\Advisor\Rules\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
+Car specific rules are either located in the *Resources\Garage\Rules\Cars* folder in the program directory or in the *Simulator Controller\Garage\Rules\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
 
 	[Simulator].[Car].rules
 
 with [Simulator] and [Car] substituted by the specific names.
 
-These rules are loaded and activated, when you select a specific car in "Setup Advisor". In most cases, the car specific rules will alter the set of available car settings, but it is also possible to modify, add or remove rules for the problem analysis as described above.
+These rules are loaded and activated, when you select a specific car in "Setup Workbench". In most cases, the car specific rules will alter the set of available car settings, but it is also possible to modify, add or remove rules for the problem analysis as described above.
 
 Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very minimalistic approach, when it comes to car setup capabilities:
 
@@ -214,7 +214,7 @@ Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very
 				 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
 				 Differential.Preload, AntiRollBar.Rear]))
 
-Beside the rules, which influence the way, the "Setup Advisor" analyses your handling problems, a so called definition file describe the car settings, their units and value ranges in more detail for the Setup Editor. These files are located in the *Resources\Advisor\Definitions\Cars* folder in the program directory or in the *Simulator Controller\Advisor\Definitions\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
+Beside the rules, which influence the way, the "Setup Workbench" analyses your handling problems, a so called definition file describe the car settings, their units and value ranges in more detail for the Setup Editor. These files are located in the *Resources\Garage\Definitions\Cars* folder in the program directory or in the *Simulator Controller\Garage\Definitions\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
 
 	[Simulator].[Car].ini
 
@@ -283,9 +283,9 @@ The sections "[Setup.Settings.Units.DE]" and "[Setup.Settings.Units.EN]" and so 
 
 Most of the stuff we talked about so far is independent of a specific simulator, since all of them store the setups more or less in the same way - as numbers. The file format, though, is very different. As you have seen above, the setups are stored as a JSON file in *Assetto Corsa Competizione*. INI files are supported for *assetto Corsa*. Therefore, let's take a look into the simulator specific configuration.
 
-Similar to cars, each simulator has a definition file which is located in the *Resources\Advisor\Definitions* folder in the program directory. You can add your own, as mentioned above, by adding them to *Simulator Controller\Advisor\Definitions* folder in your local *Documents* folder. A rule file for a given simulator is also available, which is located (I think you can guess it) in the *Resources\Advisor\Rules* folder in the program directory. You can also add your own here by adding them to *Simulator Controller\Advisor\Rules* folder in your local *Documents* folder.
+Similar to cars, each simulator has a definition file which is located in the *Resources\Garage\Definitions* folder in the program directory. You can add your own, as mentioned above, by adding them to *Simulator Controller\Garage\Definitions* folder in your local *Documents* folder. A rule file for a given simulator is also available, which is located (I think you can guess it) in the *Resources\Garage\Rules* folder in the program directory. You can also add your own here by adding them to *Simulator Controller\Garage\Rules* folder in your local *Documents* folder.
 
-"Setup Advisor" scans both directories at startup and compiles the list of available simulators. Let's now take a look at the simulator specific configuration.
+"Setup Workbench" scans both directories at startup and compiles the list of available simulators. Let's now take a look at the simulator specific configuration.
 
 ### Assetto Corsa Competizione
 
@@ -306,11 +306,11 @@ The access paths for the JSON-based setup files of *Assetto Corsa Competizione* 
 	Brake.Duct.Rear=advancedSetup.aeroBalance.brakeDuct[2]
 	...
 
-As you can see, the approach is quite simple, since the structure of the JSON-based setup file is very similar to the internal storage format, which is used by "Setup Advisor".
+As you can see, the approach is quite simple, since the structure of the JSON-based setup file is very similar to the internal storage format, which is used by "Setup Workbench".
 
 ## Notes
 
   1. Only *Assetto Corsa* and *Assetto Corsa Competizione* are supported at the moment, when it comes to editing, comparing and saving setup files. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
   2. The implementation for *Assetto Corsa Competizione* provides a generic car model and detailed car specifications for all currently available cars. More cars will be added when additional DLCs become availabble.
   3. The implementation for *Assetto Corsa* currently provides a generic car model and a couple of detailed car models at the moment. More detailed car models will be added over time. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
-  4. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Advisor". 
+  4. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 

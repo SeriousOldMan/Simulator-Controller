@@ -446,7 +446,7 @@ Selects the driver to take the car during the next pitstop. *selection* must be 
 #### *openRaceSettings(import :: Boolean := false)*
 Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration. If you supply *true* for the *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened.
 
-#### *openSetupAdvisor()*
+#### *openSetupWorkbench()*
 Opens the tool which helps you creating a suspension setup for a car. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.
 
 #### *openSessionDatabase()*

@@ -33,15 +33,15 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.6.3.0-release]() (Changes: Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center", Fixed potential race condition in session database, Fixed update procedure for SilentAssistant, New voice command for requesting the number of active cars in a session, New information request action "ActiveCars" for Race Strategist and Race Spotter, New Stream Deck icon for the "ActiveCars" information request action, New car models for "Setup Advisor", Support for input audio routing, New voice test script in *Utilities* folder.)
+[4.6.3.0-release]() (Changes: Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center", Fixed potential race condition in session database, Fixed update procedure for SilentAssistant, New voice command for requesting the number of active cars in a session, New information request action "ActiveCars" for Race Strategist and Race Spotter, New Stream Deck icon for the "ActiveCars" information request action, New car models for "Setup Workbench", Support for input audio routing, New voice test script in *Utilities* folder.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-463) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[4.6.2.0-release](https://cutt.ly/g8Qpqzw) (Changes: Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC, "Race Center" provides detailed information about the pitstops of all cars, New *hotkey* controller action function, "Copy" button in "Race Center" to transfer one of the predefined tyre pressure setups or one of the recent pitstop setups to the "Pitstop" tab, New information window for Pitstop MFD information in "Race Center", Updated tyre compound meta data for *rFactor 2*, Increased reliability of repair setting choices in *Assetto Corsa Competizione*, New car models for "Setup Advisor", Reduced frequency of blue flag alerts by Spotter, Reduced frequency of behind alerts by Spotter.)
+[4.6.2.0-release](https://cutt.ly/g8Qpqzw) (Changes: Better session end detection for practice sessions when your standing in the pitlane for a long time, General better last lap and session end detection in ACC, "Race Center" provides detailed information about the pitstops of all cars, New *hotkey* controller action function, "Copy" button in "Race Center" to transfer one of the predefined tyre pressure setups or one of the recent pitstop setups to the "Pitstop" tab, New information window for Pitstop MFD information in "Race Center", Updated tyre compound meta data for *rFactor 2*, Increased reliability of repair setting choices in *Assetto Corsa Competizione*, New car models for "Setup Workbench", Reduced frequency of blue flag alerts by Spotter, Reduced frequency of behind alerts by Spotter.)
 
-[4.6.1.0-release](https://cutt.ly/n8tardr) (Changes: Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center", New pressures cleaning tool in "Session Database", New car models for "Setup Advisor", Fixed critical bug in "Race Reports" for team races.)
+[4.6.1.0-release](https://cutt.ly/n8tardr) (Changes: Changed default for pressure calculation in "Race Center", Changed default for repairs to *Everything* in "Race Center", New pressures cleaning tool in "Session Database", New car models for "Setup Workbench", Fixed critical bug in "Race Reports" for team races.)
 
 #### Latest development build
 
@@ -73,7 +73,7 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 8. [More about the Race Assistants](https://youtu.be/AWJe7mZC2UI) - After learning a little bit here and there about the Race Assistants in the last videos, this one is completely dedicated to the Race Assistants.
 
-9. [Working with the Setup Advisor](https://youtu.be/TqkMvOB0UWI) - The Setup Advisor is a tool which helps you with your car setup work. It takes your handling problems and comes up with recommendations how to fix those. For a couple of simulators, setup files can loaded, modified and written back after automatically having applied the recommendations.
+9. [Working with the Setup Workbench](https://youtu.be/TqkMvOB0UWI) - The Setup Workbench is a tool which helps you with your car setup work. It takes your handling problems and comes up with recommendations how to fix those. For a couple of simulators, setup files can loaded, modified and written back after automatically having applied the recommendations.
 
 10. [Working with data from multiple Drivers](https://youtu.be/TK-TMtd1W9o) - This time you will learn how to work with data from multiple drivers in your telemetry database and how to create team strategies from this data. You will also see, how you can export and import data from and to your telemetry database.
 
@@ -83,7 +83,7 @@ Beside the quite extensive documentation (I know, nobody reads documentation the
 
 13. [Team Data Replication](https://youtu.be/KgZ86YIBMOQ) - This video shows you how to share telemetry and other data in your team using the Team Server. This data can then be used to create team strategies or lookup tyre pressures for an unplanned pitstop in a team race and so on.
 
-14. [Analyzing Driving Style and Handling Issues](https://youtu.be/UmXMKMpGOkk) - This video shows you how to use the all new telemetry analyzer, which will automatically detect handling issues of your setup (or your driving style) while you are driving. The handling issues can then be transferred to the Setup Advisor to create a modification of the car setup.
+14. [Analyzing Driving Style and Handling Issues](https://youtu.be/UmXMKMpGOkk) - This video shows you how to use the all new telemetry analyzer, which will automatically detect handling issues of your setup (or your driving style) while you are driving. The handling issues can then be transferred to the Setup Workbench to create a modification of the car setup.
 
 15. [Expert guide to race settings](https://youtu.be/UeD397KFEhg) - This video will give you a complete overview over all the settings used by the Race Assistants, for example all the stuff needed by the Race Engineer to handle a successful pitstop in even the worst conditions.
 
@@ -147,11 +147,11 @@ Beside the typical duties of a Spotter, this Assistant is also able to automate 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 
-#### Setup Advisor
+#### Setup Workbench
 
-Another very useful tool of the Simulator Controller suite is the Setup Advisor. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
+Another very useful tool of the Simulator Controller suite is the Setup Workbench. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Advisor.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench.JPG)
 
 ### Additional features
 

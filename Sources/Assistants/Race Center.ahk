@@ -7885,7 +7885,7 @@ class RaceCenter extends ConfigurationItem {
 
 	loadPlan(info := false, plan := false) {
 		local window := this.Window
-		local currentListView, fileName, ignore, refuel
+		local currentListView, fileName, ignore, refuel, lapActual, timeActual
 
 		Gui %window%:Default
 
@@ -7924,8 +7924,11 @@ class RaceCenter extends ConfigurationItem {
 
 				refuel := displayValue("Float", convertUnit("Volume", plan["Fuel.Amount"]), 0)
 
-				LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], plan["Time.Actual"]
-						 , plan["Lap.Planned"], plan["Lap.Actual"]
+				timeActual := "" ; plan["Time.Actual"]
+				lapActual := "" ; plan["Lap.Actual"]
+
+				LV_Add("", plan.Stint, plan.Driver, plan["Time.Planned"], timeActual
+						 , plan["Lap.Planned"], lapActual
 						 , (refuel = 0) ? "-" : refuel, plan["Tyre.Change"])
 			}
 

@@ -278,7 +278,7 @@ class SpeechSynthesizer {
 				if !FileExist(kTempDirectory . player) {
 					copied := false
 
-					while (!copied)
+					while !copied
 						try {
 							FileCopy %kSox%, %kTempDirectory%%player%, 1
 

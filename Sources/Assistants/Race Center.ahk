@@ -6199,8 +6199,11 @@ class RaceCenter extends ConfigurationItem {
 				catch Any as exception {
 					if (exception != "No data...")
 						logError(exception)
-					else if (fails++ < 3)
+
+					if (fails++ < 3)
 						return false
+					else
+						fails := 0
 
 					try {
 						state := this.Connector.GetSessionValue(session, "Race Engineer State")
@@ -6406,8 +6409,11 @@ class RaceCenter extends ConfigurationItem {
 				catch Any as exception {
 					if (exception != "No data...")
 						logError(exception)
-					else if (fails++ < 3)
+
+					if (fails++ < 3)
 						return false
+					else
+						fails := 0
 
 					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-", "-,-,-,-")
 				}

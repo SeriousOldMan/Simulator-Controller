@@ -2438,7 +2438,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		if (knowledgeBase.getValue("Lap.Remaining") > 3)
+		if (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
 			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments

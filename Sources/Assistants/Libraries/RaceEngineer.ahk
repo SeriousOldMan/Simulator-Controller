@@ -2358,7 +2358,7 @@ class RaceEngineer extends RaceAssistant {
 				try {
 					speaker.speakPhrase(phrase)
 
-					if (knowledgeBase.getValue("Lap.Remaining", 0) > 4)
+					if (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 4)
 						speaker.speakPhrase("DamageAnalysis")
 					else
 						speaker.speakPhrase("NoDamageAnalysis")
@@ -2373,7 +2373,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
-		if (knowledgeBase.getValue("Lap.Remaining", 0) > 3)
+		if (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
 			if (this.Speaker[false] && this.Announcements["DamageAnalysis"])
 				if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
@@ -2435,7 +2435,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, fragments
 
-		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining", 0) > 3))
+		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3))
 			if (this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments

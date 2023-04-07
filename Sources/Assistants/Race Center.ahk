@@ -6886,12 +6886,12 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.GetSessionValue(session, "Race Strategy Version")
 
 			if (version && (version != "")) {
-				this.showMessage(translate("Syncing session strategy"))
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
-
 				if (!this.Strategy || !this.Strategy.Version || (version > this.Strategy.Version)) {
+					this.showMessage(translate("Syncing session strategy"))
+
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Syncing session strategy (Version: ") . version . translate(")"))
+
 					strategy := this.Connector.GetSessionValue(session, "Race Strategy")
 
 					this.showMessage(translate("Updating session strategy"))
@@ -6927,12 +6927,12 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.GetSessionValue(session, "Setups Version")
 
 			if (version && (version != "")) {
-				this.showMessage(translate("Syncing setups"))
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Syncing setups (Version: ") . version . translate(")"))
-
 				if (!this.SetupsVersion || (this.SetupsVersion < version)) {
+					this.showMessage(translate("Syncing setups"))
+
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Syncing setups (Version: ") . version . translate(")"))
+
 					info := this.Connector.GetSessionValue(session, "Setups Info")
 					setups := this.Connector.GetSessionValue(session, "Setups")
 
@@ -6975,12 +6975,12 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.GetSessionValue(session, "Team Drivers Version")
 
 			if (version && (version != "")) {
-				this.showMessage(translate("Syncing team drivers"))
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Syncing team drivers (Version: ") . version . translate(")"))
-
 				if (!this.TeamDriversVersion || (this.TeamDriversVersion < version)) {
+					this.showMessage(translate("Syncing team drivers"))
+
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Syncing team drivers (Version: ") . version . translate(")"))
+
 					this.iTeamDriversVersion := version
 
 					try {
@@ -7017,12 +7017,12 @@ class RaceCenter extends ConfigurationItem {
 			version := this.Connector.GetSessionValue(session, "Stint Plan Version")
 
 			if (version && (version != "")) {
-				this.showMessage(translate("Syncing stint plan"))
-
-				if (getLogLevel() <= kLogInfo)
-					logMessage(kLogInfo, translate("Syncing stint plan (Version: ") . version . translate(")"))
-
 				if (!this.PlanVersion || (this.PlanVersion < version)) {
+					this.showMessage(translate("Syncing stint plan"))
+
+					if (getLogLevel() <= kLogInfo)
+						logMessage(kLogInfo, translate("Syncing stint plan (Version: ") . version . translate(")"))
+
 					info := this.Connector.GetSessionValue(session, "Stint Plan Info")
 					plan := this.Connector.GetSessionValue(session, "Stint Plan")
 

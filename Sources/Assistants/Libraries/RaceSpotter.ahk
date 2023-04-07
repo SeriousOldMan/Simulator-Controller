@@ -1105,7 +1105,7 @@ class RaceSpotter extends GridRaceAssistant {
 				delta := Abs(knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta", 0) / 1000)
 				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 
-				if (delta = 0) {
+				if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
 					if standard {
 						speaker.speakPhrase(inPit ? "AheadCarInPit" : "NoTrackGap")
 
@@ -1203,7 +1203,7 @@ class RaceSpotter extends GridRaceAssistant {
 				inPit := (knowledgeBase.getValue("Car." . car . ".InPitLane", false) || knowledgeBase.getValue("Car." . car . ".InPit", false))
 				lapped := false
 
-				if (delta = 0) {
+				if ((delta = 0) || (inPit && (Abs(delta) < 30))) {
 					if standard {
 						speaker.speakPhrase(inPit ? "BehindCarInPit" : "NoTrackGap")
 

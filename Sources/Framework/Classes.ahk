@@ -602,24 +602,24 @@ class Function extends ConfigurationItem {
 		}
 	}
 
-	actionCallable(trigger, action) {
-		local function := false
+	actionCallable(__trigger__, __action__) {
+		local __function__ := false
 
-		if (action != false) {
-			function := action[1]
+		if (__action__ != false) {
+			__function__ := __action__[1]
 
-			if !isInstance(function, Func)
+			if !isInstance(__function__, Func)
 				try {
-					function := %function%
+					__function__ := %__function__%
 				}
 				catch Any as exception {
 					logError(exception, false, false)
 
-					function := false
+					__function__ := false
 				}
 		}
 
-		return (function ? function.Bind(action[2]*) : false)
+		return (__function__ ? __function__.Bind(__action__[2]*) : false)
 	}
 
 	fireAction(trigger) {

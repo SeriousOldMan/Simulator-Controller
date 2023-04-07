@@ -1,3 +1,9 @@
+## 4.6.3.2-release 04/07/23
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Stint plans are now reset in the Race Center, when a session is cleared.
+  4. A couple of performance improvements in the session database.
+
 ## 4.6.3.1-release 03/17/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always

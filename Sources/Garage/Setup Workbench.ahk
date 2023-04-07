@@ -2152,9 +2152,11 @@ class SetupEditor extends ConfigurationItem {
 
 		editorGui.Add("Edit", "x374 ys+10 w423 h433 T8 X:Move(0.5) W:Grow(0.5) H:Grow ReadOnly -Wrap HScroll vsetupViewer")
 
+		/*
 		editorGui.Add("Text", "x8 y506 w800 0x10 Y:Move W:Grow")
 
 		editorGui.Add("Button", "x374 y514 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeEditor)
+		*/
 	}
 
 	show() {

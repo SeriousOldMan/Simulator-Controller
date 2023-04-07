@@ -3492,7 +3492,7 @@ class RaceCenter extends ConfigurationItem {
 
 			if this.Strategy
 				for index, pitstop in this.Strategy.Pitstops
-					if (pitstop.ID = currentStint.Nr) {
+					if (pitstop.Nr = currentStint.Nr) {
 						lap := pitstop.Lap
 						refuel := pitstop.RefuelAmount
 
@@ -3654,7 +3654,7 @@ class RaceCenter extends ConfigurationItem {
 		local setups, index, tyreType, a, b
 		local settings, correctionAir, correctionTrack, delta
 
-		pressureCurve(&a, &b) {
+		pressureCurve(setups, tyreType, &a, &b) {
 			local xValues := []
 			local yValues := []
 			local ignore, setup
@@ -3675,7 +3675,7 @@ class RaceCenter extends ConfigurationItem {
 					a := false
 					b := false
 
-					pressureCurve(&a, &b)
+					pressureCurve(setups, tyreType, &a, &b)
 
 					%["pressureFL", "pressureFR", "pressureRL", "pressureRR"][index]% := (a + (b * airTemperature))
 				}
@@ -6200,7 +6200,7 @@ class RaceCenter extends ConfigurationItem {
 					if (exception != "No data...")
 						logError(exception)
 
-					if (fails++ < 3)
+					if ((lap = lastLap) && (fails++ < 3))
 						return false
 					else
 						fails := 0
@@ -6410,7 +6410,7 @@ class RaceCenter extends ConfigurationItem {
 					if (exception != "No data...")
 						logError(exception)
 
-					if (fails++ < 3)
+					if ((lap = lastLap) && (fails++ < 3))
 						return false
 					else
 						fails := 0

@@ -6137,13 +6137,15 @@ class RaceCenter extends ConfigurationItem {
 
 	syncTelemetry(load := false) {
 		local lastLap := this.LastLap
-		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID, pitstop, tries
+		local newData, message, session, telemetryDB, tyresTable, lap, runningLap, driverID, pitstop
 		local telemetryData, state, pressures, temperatures, wear, lapPressures, pressure
 
 		if lastLap
 			lastLap := lastLap.Nr
 		else
 			return false
+
+		static fails := 0
 
 		newData := false
 
@@ -6181,37 +6183,24 @@ class RaceCenter extends ConfigurationItem {
 				pitstop := false
 
 				try {
-					tries := ((lap == lastLap) ? 10 : 5)
+					telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
 
-					while (tries > 0) {
-						telemetryData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Telemetry")
+					if (!telemetryData || (telemetryData == ""))
+						throw "No data..."
+					else {
+						this.showMessage(translate("Updating telemetry data (Lap: ") . lap . translate(")"))
 
-						if (!telemetryData || (telemetryData == "")) {
-							tries -= 1
-
-							this.showMessage(translate("Waiting for data"))
-
-							if (tries <= 0) {
-								this.showMessage(translate("Give up - use default values"))
-
-								throw "No data..."
-							}
-							else
-								Sleep(400)
-						}
-						else {
-							this.showMessage(translate("Updating telemetry data (Lap: ") . lap . translate(")"))
-
-							if (getLogLevel() <= kLogInfo)
-								logMessage(kLogInfo, translate("Updating telemetry data (Lap: ") . lap . translate("), Data: `n`n") . telemetryData . "`n")
-
-							break
-						}
+						if (getLogLevel() <= kLogInfo)
+							logMessage(kLogInfo, translate("Updating telemetry data (Lap: ") . lap . translate("), Data: `n`n") . telemetryData . "`n")
 					}
+
+					fails := 0
 				}
 				catch Any as exception {
 					if (exception != "No data...")
 						logError(exception)
+					else if (fails++ < 3)
+						return false
 
 					try {
 						state := this.Connector.GetSessionValue(session, "Race Engineer State")
@@ -6312,8 +6301,10 @@ class RaceCenter extends ConfigurationItem {
 
 	syncTyrePressures(load := false) {
 		local lastLap, tyresTable, ignore, pressureData, pressureFL, pressureFR, pressureRL, pressureRR, tyres
-		local row, session, pressuresDB, message, newData, lap, flush, driverID, tries
+		local row, session, pressuresDB, message, newData, lap, flush, driverID
 		local lapPressures, coldPressures, hotPressures, pressuresLosses, pressuresTable, pressures, pressure
+
+		static fails := 0
 
 		if load {
 			lastLap := this.LastLap
@@ -6399,37 +6390,24 @@ class RaceCenter extends ConfigurationItem {
 				driverID := this.Laps[lap].Stint.ID
 
 				try {
-					tries := ((lap == lastLap) ? 10 : 5)
+					lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
 
-					while (tries > 0) {
-						lapPressures := this.Connector.GetSessionLapValue(session, lap, "Race Engineer Pressures")
+					if (!lapPressures || (lapPressures == ""))
+						throw "No data..."
+					else {
+						this.showMessage(translate("Updating tyre pressures (Lap: ") . lap . translate(")"))
 
-						if (!lapPressures || (lapPressures == "")) {
-							tries -= 1
+						if (getLogLevel() <= kLogInfo)
+							logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
 
-							this.showMessage(translate("Waiting for data"))
-
-							if (tries <= 0) {
-								this.showMessage(translate("Give up - use default values"))
-
-								throw "No data..."
-							}
-							else
-								Sleep(400)
-						}
-						else {
-							this.showMessage(translate("Updating tyre pressures (Lap: ") . lap . translate(")"))
-
-							if (getLogLevel() <= kLogInfo)
-								logMessage(kLogInfo, translate("Updating tyre pressures (Lap: ") . lap . translate("), Data: `n`n") . lapPressures . "`n")
-
-							break
-						}
+						fails := 0
 					}
 				}
 				catch Any as exception {
 					if (exception != "No data...")
 						logError(exception)
+					else if (fails++ < 3)
+						return false
 
 					lapPressures := values2String(";", "-", "-", "-", "-", "-", "-", "-", "-", "-,-,-,-", "-,-,-,-", "-,-,-,-")
 				}
@@ -6475,7 +6453,7 @@ class RaceCenter extends ConfigurationItem {
 		}
 	}
 
-	syncPitstops(state := false) {
+	syncPitstops(newLaps := false) {
 		local sessionStore := this.SessionStore
 		local session := this.SelectedSession[true]
 		local nextStop := (this.PitstopsListView.GetCount() + 1)
@@ -6495,7 +6473,7 @@ class RaceCenter extends ConfigurationItem {
 
 		this.showMessage(translate("Updating pitstops"))
 
-		if !state
+		if newLaps {
 			try {
 				state := this.Connector.GetSessionValue(session, "Race Engineer State")
 			}
@@ -6503,264 +6481,245 @@ class RaceCenter extends ConfigurationItem {
 				logError(exception)
 			}
 
-		if (state && (state != "")) {
-			if (getLogLevel() <= kLogInfo)
-				logMessage(kLogInfo, translate("Updating pitstops, State: `n`n") . state . "`n")
+			if (state && (state != "")) {
+				if (getLogLevel() <= kLogInfo)
+					logMessage(kLogInfo, translate("Updating pitstops, State: `n`n") . state . "`n")
 
-			state := parseMultiMap(state)
+				state := parseMultiMap(state)
 
-			loop {
-				lap := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
+				loop {
+					lap := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Lap", false)
 
-				if lap {
-					fuel := Round(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
-					tyreCompound := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
-					tyreCompoundColor := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color", false)
-					tyreSet := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
-					pressureFL := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-")
-					pressureFR := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-")
-					pressureRL := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-")
-					pressureRR := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-")
-					repairBodywork := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
-					repairSuspension := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
-					repairEngine := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Engine", false)
-					driverRequest := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Driver.Request", false)
+					if lap {
+						fuel := Round(getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Fuel", 0))
+						tyreCompound := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound", false)
+						tyreCompoundColor := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Compound.Color", false)
+						tyreSet := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Set", "-")
+						pressureFL := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FL", "-")
+						pressureFR := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.FR", "-")
+						pressureRL := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RL", "-")
+						pressureRR := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Tyre.Pressure.RR", "-")
+						repairBodywork := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Bodywork", false)
+						repairSuspension := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Suspension", false)
+						repairEngine := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Repair.Engine", false)
+						driverRequest := getMultiMapValue(state, "Session State", "Pitstop." . nextStop . ".Driver.Request", false)
 
-					if (tyreCompound && (tyreCompound != "-")) {
-						pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
-													   , Round(pressureRL, 1), Round(pressureRR, 1))
+						if (tyreCompound && (tyreCompound != "-")) {
+							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
+														   , Round(pressureRL, 1), Round(pressureRR, 1))
 
-						displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
-															  , displayValue("Float", convertUnit("Pressure", pressureFR))
-															  , displayValue("Float", convertUnit("Pressure", pressureRL))
-															  , displayValue("Float", convertUnit("Pressure", pressureRR)))
-					}
-					else {
-						tyreCompound := "-"
-						tyreCompoundColor := false
-
-						tyreSet := "-"
-						pressures := "-, -, -, -"
-						displayPressures := pressures
-					}
-
-					if isNumber(fuel) {
-						if (fuel = 0)
-							displayFuel := "-"
-						else
-							displayFuel := displayValue("Float", convertUnit("Volume", fuel))
-					}
-					else
-						displayFuel := fuel
-
-					if driverRequest {
-						driverRequest := string2Values("|", driverRequest)
-
-						currentDriver := string2Values(":", driverRequest[1])[1]
-						nextDriver := string2Values(":", driverRequest[2])[1]
-					}
-					else {
-						if (lap > 1) {
-							currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
-
-							if this.Laps.Has(lap + 1)
-								nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
-							else if this.CurrentStint
-								nextDriver := this.CurrentStint.Driver.FullName
-							else
-								nextDriver := false
+							displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
+																  , displayValue("Float", convertUnit("Pressure", pressureFR))
+																  , displayValue("Float", convertUnit("Pressure", pressureRL))
+																  , displayValue("Float", convertUnit("Pressure", pressureRR)))
 						}
 						else {
-							currentDriver := this.Laps[1].Stint.Driver.FullName
+							tyreCompound := "-"
+							tyreCompoundColor := false
 
-							if this.Laps.Has(2)
-								nextDriver := this.Laps[2].Stint.Driver.FullName
-							else if this.CurrentStint
-								nextDriver := this.CurrentStint.Driver.FullName
+							tyreSet := "-"
+							pressures := "-, -, -, -"
+							displayPressures := pressures
+						}
+
+						if isNumber(fuel) {
+							if (fuel = 0)
+								displayFuel := "-"
 							else
-								nextDriver := false
+								displayFuel := displayValue("Float", convertUnit("Volume", fuel))
+						}
+						else
+							displayFuel := fuel
+
+						if driverRequest {
+							driverRequest := string2Values("|", driverRequest)
+
+							currentDriver := string2Values(":", driverRequest[1])[1]
+							nextDriver := string2Values(":", driverRequest[2])[1]
+						}
+						else {
+							if (lap > 1) {
+								currentDriver := this.Laps[lap - 1].Stint.Driver.FullName
+
+								if this.Laps.Has(lap + 1)
+									nextDriver := this.Laps[lap + 1].Stint.Driver.FullName
+								else if this.CurrentStint
+									nextDriver := this.CurrentStint.Driver.FullName
+								else
+									nextDriver := false
+							}
+							else {
+								currentDriver := this.Laps[1].Stint.Driver.FullName
+
+								if this.Laps.Has(2)
+									nextDriver := this.Laps[2].Stint.Driver.FullName
+								else if this.CurrentStint
+									nextDriver := this.CurrentStint.Driver.FullName
+								else
+									nextDriver := false
+							}
+
+							if !currentDriver
+								currentDriver := kNull
+
+							if !nextDriver
+								nextDriver := currentDriver
 						}
 
-						if !currentDriver
-							currentDriver := kNull
+						loop this.PitstopsListView.GetCount()
+							if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
+								this.PitstopsListView.Delete(A_Index)
 
-						if !nextDriver
-							nextDriver := currentDriver
+								break
+							}
+
+						this.PitstopsListView.Add("Check", nextStop, lap + 1, displayNullValue(nextDriver), displayFuel
+														 , (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor))
+														 , ((tyreSet = 0) ? "-" : tyreSet), displayPressures
+														 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+
+						pressures := string2Values(",", pressures)
+
+						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
+
+						stint := this.Laps[lap].Stint
+
+						sessionStore.add("Pitstop.Data"
+									   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
+													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
+													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
+													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
+													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Performed"
+													, "Stint", stint.Nr + 1))
+
+						newData := true
+
+						nextStop += 1
 					}
+					else if (nextStop >= getMultiMapValue(state, "Session State", "Pitstop.Last", 0))
+						break
+					else {
+						this.PitstopsListView.Add("Check", nextStop, "-", "-", "-", "-", "-", "-, -, -, -", this.computeRepairs(false, false, false))
 
-					loop this.PitstopsListView.GetCount()
-						if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
-							this.PitstopsListView.Delete(A_Index)
+						sessionStore.add("Pitstop.Data"
+									   , Database.Row("Lap", "-", "Fuel", "-", "Tyre.Compound", "-", "Tyre.Compound.Color", false, "Tyre.Set", "-"
+													, "Tyre.Pressure.Cold.Front.Left", "-", "Tyre.Pressure.Cold.Front.Right", "-"
+													, "Tyre.Pressure.Cold.Rear.Left", "-", "Tyre.Pressure.Cold.Rear.Right", "-"
+													, "Repair.Bodywork", false, "Repair.Suspension", false, "Repair.Engine", false
+													, "Driver.Current", kNull, "Driver.Next", kNull, "Status", "Performed"
+													, "Stint", "-"))
 
-							break
-						}
+						newData := true
 
-					this.PitstopsListView.Add("Check", nextStop, lap + 1, displayNullValue(nextDriver), displayFuel
-													 , (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor))
-													 , ((tyreSet = 0) ? "-" : tyreSet), displayPressures
-													 , this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
-
-					pressures := string2Values(",", pressures)
-
-					sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
-
-					stint := this.Laps[lap].Stint
-
-					sessionStore.add("Pitstop.Data"
-								   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
-												, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
-												, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
-												, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
-												, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Performed"
-												, "Stint", stint.Nr + 1))
-
-					newData := true
-
-					nextStop += 1
-				}
-				else if (nextStop >= getMultiMapValue(state, "Session State", "Pitstop.Last", 0))
-					break
-				else {
-					this.PitstopsListView.Add("Check", nextStop, "-", "-", "-", "-", "-", "-, -, -, -", this.computeRepairs(false, false, false))
-
-					sessionStore.add("Pitstop.Data"
-								   , Database.Row("Lap", "-", "Fuel", "-", "Tyre.Compound", "-", "Tyre.Compound.Color", false, "Tyre.Set", "-"
-												, "Tyre.Pressure.Cold.Front.Left", "-", "Tyre.Pressure.Cold.Front.Right", "-"
-												, "Tyre.Pressure.Cold.Rear.Left", "-", "Tyre.Pressure.Cold.Rear.Right", "-"
-												, "Repair.Bodywork", false, "Repair.Suspension", false, "Repair.Engine", false
-												, "Driver.Current", kNull, "Driver.Next", kNull, "Status", "Performed"
-												, "Stint", "-"))
-
-					newData := true
-
-					nextStop += 1
+						nextStop += 1
+					}
 				}
 			}
 		}
 
 		if (!newData && this.LastLap) {
 			try {
-				tries := 10
+				state := this.Connector.GetLapValue(this.LastLap.Identifier, "Race Engineer Pitstop Pending")
 
-				while (tries > 0) {
-					state := this.Connector.GetLapValue(this.LastLap.Identifier, "Race Engineer Pitstop Pending")
+				if ((!state || (state == "")) && (this.LastLap.Nr > 1))
+					state := this.Connector.GetLapValue(this.Laps[this.LastLap.Nr - 1].Identifier, "Race Engineer Pitstop Pending")
 
-					if ((!state || (state == "")) && (this.LastLap.Nr > 1))
-						state := this.Connector.GetLapValue(this.Laps[this.LastLap.Nr - 1].Identifier, "Race Engineer Pitstop Pending")
+				if (state && (state != "")) {
+					state := parseMultiMap(state)
 
-					if (!state || (state == "")) {
-						tries -= 1
+					pitstopNr := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
 
-						this.showMessage(translate("Waiting for data"))
+					if (pitstopNr && (pitstopNr > this.PitstopsListView.GetCount())) {
+						newData := true
 
-						if (tries <= 0) {
-							this.showMessage(translate("Give up - use default values"))
+						lap := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Lap", "-")
 
-							throw "No data..."
+						if !lap
+							lap := "-"
+
+						fuel := Round(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Fuel", 0))
+						tyreCompound := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
+						tyreCompoundColor := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
+						tyreSet := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
+						pressureFL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FL", "-")
+						pressureFR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FR", "-")
+						pressureRL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RL", "-")
+						pressureRR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RR", "-")
+						repairBodywork := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
+						repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
+						repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
+						driverRequest := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Driver.Request", false)
+
+						if (tyreCompound && (tyreCompound != "-")) {
+							pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
+														   , Round(pressureRL, 1), Round(pressureRR, 1))
+
+							displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
+																  , displayValue("Float", convertUnit("Pressure", pressureFR))
+																  , displayValue("Float", convertUnit("Pressure", pressureRL))
+																  , displayValue("Float", convertUnit("Pressure", pressureRR)))
+						}
+						else {
+							tyreCompound := "-"
+							tyreCompoundColor := false
+
+							tyreSet := "-"
+							pressures := "-, -, -, -"
+							displayPressures := pressures
+						}
+
+						if driverRequest {
+							driverRequest := string2Values("|", driverRequest)
+
+							currentDriver := string2Values(":", driverRequest[1])[1]
+							nextDriver := string2Values(":", driverRequest[2])[1]
+						}
+						else {
+							currentDriver := this.Laps[this.LastLap.Nr].Stint.Driver.FullName
+
+							if !currentDriver
+								currentDriver := kNull
+
+							nextDriver := currentDriver
+						}
+
+						if isNumber(fuel) {
+							if (fuel = 0)
+								displayFuel := "-"
+							else
+								displayFuel := displayValue("Float", convertUnit("Volume", fuel))
 						}
 						else
-							Sleep(400)
+							displayFuel := fuel
+
+						loop this.PitstopsListView.GetCount()
+							if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
+								this.PitstopsListView.Delete(A_Index)
+
+								break
+							}
+
+						this.PitstopsListView.Add("", this.PitstopsListView.GetCount() + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
+													, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), ((tyreSet = 0) ? "-" : tyreSet)
+													, displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
+
+						pressures := string2Values(",", pressures)
+
+						sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
+
+						sessionStore.add("Pitstop.Data"
+									   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
+													, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
+													, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
+													, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
+													, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Planned"
+													, "Stint", this.CurrentStint.Nr + 1))
 					}
-					else
-						break
 				}
 			}
 			catch Any as exception {
 				if (exception != "No data...")
 					logError(exception)
-			}
-
-			if (state && (state != "")) {
-				state := parseMultiMap(state)
-
-				pitstopNr := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Nr", false)
-
-				if (pitstopNr && (pitstopNr > this.PitstopsListView.GetCount())) {
-					newData := true
-
-					lap := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Lap", "-")
-
-					if !lap
-						lap := "-"
-
-					fuel := Round(getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Fuel", 0))
-					tyreCompound := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound", false)
-					tyreCompoundColor := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Compound.Color", false)
-					tyreSet := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Set", "-")
-					pressureFL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FL", "-")
-					pressureFR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.FR", "-")
-					pressureRL := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RL", "-")
-					pressureRR := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Tyre.Pressure.RR", "-")
-					repairBodywork := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Bodywork", false)
-					repairSuspension := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Suspension", false)
-					repairEngine := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Repair.Engine", false)
-					driverRequest := getMultiMapValue(state, "Pitstop Pending", "Pitstop.Planned.Driver.Request", false)
-
-					if (tyreCompound && (tyreCompound != "-")) {
-						pressures := values2String(", ", Round(pressureFL, 1), Round(pressureFR, 1)
-													   , Round(pressureRL, 1), Round(pressureRR, 1))
-
-						displayPressures := values2String(", ", displayValue("Float", convertUnit("Pressure", pressureFL))
-															  , displayValue("Float", convertUnit("Pressure", pressureFR))
-															  , displayValue("Float", convertUnit("Pressure", pressureRL))
-															  , displayValue("Float", convertUnit("Pressure", pressureRR)))
-					}
-					else {
-						tyreCompound := "-"
-						tyreCompoundColor := false
-
-						tyreSet := "-"
-						pressures := "-, -, -, -"
-						displayPressures := pressures
-					}
-
-					if driverRequest {
-						driverRequest := string2Values("|", driverRequest)
-
-						currentDriver := string2Values(":", driverRequest[1])[1]
-						nextDriver := string2Values(":", driverRequest[2])[1]
-					}
-					else {
-						currentDriver := this.Laps[this.LastLap.Nr].Stint.Driver.FullName
-
-						if !currentDriver
-							currentDriver := kNull
-
-						nextDriver := currentDriver
-					}
-
-					if isNumber(fuel) {
-						if (fuel = 0)
-							displayFuel := "-"
-						else
-							displayFuel := displayValue("Float", convertUnit("Volume", fuel))
-					}
-					else
-						displayFuel := fuel
-
-					loop this.PitstopsListView.GetCount()
-						if (this.PitstopsListView.GetNext(A_Index - 1, "C") != A_Index) {
-							this.PitstopsListView.Delete(A_Index)
-
-							break
-						}
-
-					this.PitstopsListView.Add("", this.PitstopsListView.GetCount() + 1, (lap = "-") ? "-" : (lap + 1), displayNullValue(nextDriver), displayFuel
-												, (tyreCompound = "-") ? tyreCompound : translate(compound(tyreCompound, tyreCompoundColor)), ((tyreSet = 0) ? "-" : tyreSet)
-												, displayPressures, this.computeRepairs(repairBodywork, repairSuspension, repairEngine))
-
-					pressures := string2Values(",", pressures)
-
-					sessionStore.remove("Pitstop.Data", {Status: "Planned"}, always.Bind(true))
-
-					sessionStore.add("Pitstop.Data"
-								   , Database.Row("Lap", lap, "Fuel", fuel, "Tyre.Compound", tyreCompound, "Tyre.Compound.Color", tyreCompoundColor, "Tyre.Set", tyreSet
-												, "Tyre.Pressure.Cold.Front.Left", pressures[1], "Tyre.Pressure.Cold.Front.Right", pressures[2]
-												, "Tyre.Pressure.Cold.Rear.Left", pressures[3], "Tyre.Pressure.Cold.Rear.Right", pressures[4]
-												, "Repair.Bodywork", repairBodywork, "Repair.Suspension", repairSuspension, "Repair.Engine", repairEngine
-												, "Driver.Current", currentDriver, "Driver.Next", nextDriver, "Status", "Planned"
-												, "Stint", this.CurrentStint.Nr + 1))
-				}
 			}
 		}
 
@@ -7173,15 +7132,13 @@ class RaceCenter extends ConfigurationItem {
 				if this.syncTyrePressures()
 					newData := true
 
-				if newLaps {
-					if this.syncPitstops() {
-						newData := true
+				if this.syncPitstops(newLaps) {
+					newData := true
 
-						nextPitstopUpdate := (this.LastLap.Nr + 2)
-					}
+					nextPitstopUpdate := (this.LastLap.Nr + 2)
 				}
-				else
-					this.updatePitstops()
+
+				this.updatePitstops()
 
 				forcePitstopUpdate := (this.LastLap && (this.LastLap.Nr = nextPitstopUpdate))
 
@@ -9449,7 +9406,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					try {
-						tries := ((lap == lastLap) ? 10 : 5)
+						tries := ((lap == lastLap) ? 10 : 1)
 
 						while (tries > 0) {
 							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")

@@ -220,6 +220,9 @@ class TestPitstopHandler {
 
 	savePressureData(*) {
 	}
+
+	saveLapState(*) {
+	}
 }
 
 
@@ -924,7 +927,7 @@ class PitstopHandling extends Assert {
 						engineer.dumpKnowledgeBase(engineer.KnowledgeBase)
 
 					this.AssertEqual(2, engineer.KnowledgeBase.getValue("Pitstop.Planned.Nr"), "Pitstop number increment failed...")
-					this.AssertEqual(false, engineer.tKnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
+					this.AssertEqual(false, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Suspension"), "Expected no suspension repair...")
 					this.AssertEqual(true, engineer.KnowledgeBase.getValue("Pitstop.Planned.Repair.Bodywork"), "Expected bodywork repair...")
 					this.AssertEqual(0, vFuelWarnings.Count, "Warning suppression not working...")
 					this.AssertEqual(kNotInitialized, vSuspensionDamage, "Warning suppression not working...")

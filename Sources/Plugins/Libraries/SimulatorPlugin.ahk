@@ -1205,7 +1205,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 	acquireSessionData(&telemetryData, &positionsData) {
 		local data := newMultiMap()
-		local section, values
+		local section, values, driver
 
 		setMultiMapValue(data, "System", "Time", A_TickCount)
 
@@ -1220,6 +1220,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		for section, values in positionsData
 			setMultiMapValues(data, section, values)
+
+		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+
+		if driver {
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
+				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
+				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+		}
 
 		return data
 	}

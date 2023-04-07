@@ -2298,72 +2298,75 @@ class RaceEngineer extends RaceAssistant {
 	}
 
 	lowFuelWarning(remainingLaps) {
+		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
-		if (this.Speaker[false] && this.Announcements["FuelWarning"]) {
-			speaker := this.getSpeaker()
+		if (this.Speaker[false] && this.Announcements["FuelWarning"])
+			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+				speaker := this.getSpeaker()
 
-			speaker.beginTalk()
+				speaker.beginTalk()
 
-			try {
-				speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
+				try {
+					speaker.speakPhrase((remainingLaps <= 2) ? "VeryLowFuel" : "LowFuel", {laps: remainingLaps})
 
-				if this.supportsPitstop() {
-					if this.hasPreparedPitstop()
-						speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
-					else if !this.hasPlannedPitstop() {
-						speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+					if this.supportsPitstop() {
+						if this.hasPreparedPitstop()
+							speaker.speakPhrase((remainingLaps <= 2) ? "LowComeIn" : "ComeIn")
+						else if !this.hasPlannedPitstop() {
+							speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-						this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
-					}
-					else {
-						speaker.speakPhrase("ConfirmPrepare", false, true)
+							this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+						}
+						else {
+							speaker.speakPhrase("ConfirmPrepare", false, true)
 
-						this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+							this.setContinuation(VoiceManager.ReplyContinuation(this, ObjBindMethod(this, "preparePitstop"), false, "Okay"))
+						}
 					}
 				}
+				finally {
+					speaker.endTalk()
+				}
 			}
-			finally {
-				speaker.endTalk()
-			}
-		}
 	}
 
 	damageWarning(newSuspensionDamage, newBodyworkDamage, newEngineDamage) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, phrase
 
-		if (this.Speaker[false] && this.Announcements["DamageReporting"]) {
-			speaker := this.getSpeaker()
-			phrase := false
+		if (this.Speaker[false] && this.Announcements["DamageReporting"])
+			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+				speaker := this.getSpeaker()
+				phrase := false
 
-			if newEngineDamage {
-				if (newSuspensionDamage || newBodyworkDamage)
-					phrase := "AllDamage"
-				else
-					phrase := "EngineDamage"
+				if newEngineDamage {
+					if (newSuspensionDamage || newBodyworkDamage)
+						phrase := "AllDamage"
+					else
+						phrase := "EngineDamage"
+				}
+				else if (newSuspensionDamage && newBodyworkDamage)
+					phrase := "BothDamage"
+				else if newSuspensionDamage
+					phrase := "SuspensionDamage"
+				else if newBodyworkDamage
+					phrase := "BodyworkDamage"
+
+				speaker.beginTalk()
+
+				try {
+					speaker.speakPhrase(phrase)
+
+					if (knowledgeBase.getValue("Lap.Remaining", 0) > 4)
+						speaker.speakPhrase("DamageAnalysis")
+					else
+						speaker.speakPhrase("NoDamageAnalysis")
+				}
+				finally {
+					speaker.endTalk()
+				}
 			}
-			else if (newSuspensionDamage && newBodyworkDamage)
-				phrase := "BothDamage"
-			else if newSuspensionDamage
-				phrase := "SuspensionDamage"
-			else if newBodyworkDamage
-				phrase := "BodyworkDamage"
-
-			speaker.beginTalk()
-
-			try {
-				speaker.speakPhrase(phrase)
-
-				if (knowledgeBase.getValue("Lap.Remaining", 0) > 4)
-					speaker.speakPhrase("DamageAnalysis")
-				else
-					speaker.speakPhrase("NoDamageAnalysis")
-			}
-			finally {
-				speaker.endTalk()
-			}
-		}
 	}
 
 	reportDamageAnalysis(repair, stintLaps, delta) {
@@ -2371,30 +2374,31 @@ class RaceEngineer extends RaceAssistant {
 		local speaker
 
 		if (knowledgeBase.getValue("Lap.Remaining", 0) > 3)
-			if (this.Speaker[false] && this.Announcements["DamageAnalysis"]) {
-				speaker := this.getSpeaker()
+			if (this.Speaker[false] && this.Announcements["DamageAnalysis"])
+				if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
+					speaker := this.getSpeaker()
 
-				stintLaps := Round(stintLaps)
+					stintLaps := Round(stintLaps)
 
-				if repair {
-					speaker.beginTalk()
+					if repair {
+						speaker.beginTalk()
 
-					try {
-						speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
+						try {
+							speaker.speakPhrase("RepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
 
-						if this.supportsPitstop() {
-							speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
+							if this.supportsPitstop() {
+								speaker.speakPhrase("ConfirmPlan", {forYou: ""}, true)
 
-							this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+								this.setContinuation(ObjBindMethod(this, "planPitstop", "Now"))
+							}
+						}
+						finally {
+							speaker.endTalk()
 						}
 					}
-					finally {
-						speaker.endTalk()
-					}
+					else if (repair == false)
+						speaker.speakPhrase((Abs(delta) < 0.2) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
 				}
-				else if (repair == false)
-					speaker.speakPhrase((Abs(delta) < 0.2) ? "NoTimeLost" : "NoRepairPitstop", {laps: stintLaps, delta: speaker.number2Speech(delta, 1)})
-			}
 	}
 
 	pressureLossWarning(tyre, lostPressure) {
@@ -2404,14 +2408,15 @@ class RaceEngineer extends RaceAssistant {
 		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
 
 		if (this.Session == kSessionRace)
-			if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
-				speaker := this.getSpeaker()
-				fragments := speaker.Fragments
+			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false))
+				if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
+					speaker := this.getSpeaker()
+					fragments := speaker.Fragments
 
-				speaker.speakPhrase("PressureLoss", {tyre: fragments[tyreLookup[tyre]]
-												   , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
-												   , unit: fragments[getUnit("Pressure")]})
-			}
+					speaker.speakPhrase("PressureLoss", {tyre: fragments[tyreLookup[tyre]]
+													   , lost: speaker.number2Speech(convertUnit("Pressure", lostPressure))
+													   , unit: fragments[getUnit("Pressure")]})
+				}
 	}
 
 	weatherChangeNotification(change, minutes) {

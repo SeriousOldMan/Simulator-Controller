@@ -1251,6 +1251,9 @@ class RaceAssistant extends ConfigurationItem {
 		if (trackTemperature = 0)
 			trackTemperature := Round(getMultiMapValue(data, "Car Data", "RoadTemperature", 0))
 
+		knowledgeBase.setFact("InPitlane", getMultiMapValue(data, "Stint Data", "InPitlane", false))
+		knowledgeBase.setFact("InPit", getMultiMapValue(data, "Stint Data", "InPit", false))
+
 		weatherNow := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 		weather10Min := getMultiMapValue(data, "Weather Data", "Weather10Min", "Dry")
 		weather30Min := getMultiMapValue(data, "Weather Data", "Weather30Min", "Dry")

@@ -32,6 +32,7 @@ global LogMenu := Menu()
 #Include "..\Framework\Localization.ahk"
 #Include "..\Framework\TrayMenu.ahk"
 #Include "..\Framework\Message.ahk"
+#Include "..\Framework\MultiMap.ahk"
 #Include "..\Libraries\Messages.ahk"
 
 
@@ -165,6 +166,8 @@ logMessage(logLevel, message) {
 			if pid {
 				sending := true
 
+				message := StrReplace(message, "`n", A_Space)
+
 				try {
 					messageSend(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), pid)
 				}
@@ -178,21 +181,22 @@ logMessage(logLevel, message) {
 
 logError(exception, unhandled := false, report := true) {
 	local debug := (isDevelopment() && isDebug())
-	local handle, message
+	local handle, message, settings
+
+	static verbose := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Debug.ini"), "Debug", "Verbose", debug && !A_IsCompiled)
 
 	if isObject(exception) {
 		message := exception.Message
 
-		if !isNumber(message)
-			logMessage(unhandled ? kLogCritical : kLogDebug
-					 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
-					 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+		logMessage(unhandled ? kLogCritical : kLogDebug
+				 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
+				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
 	}
-	else if !isNumber(exception)
+	else
 		logMessage(unhandled ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
-	if ((unhandled || report) && debug && (true || !A_IsCompiled))
+	if (verbose && (unhandled || report))
 		if isObject(exception)
 			MsgBox(translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
 				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message

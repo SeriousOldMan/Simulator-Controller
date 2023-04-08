@@ -14,7 +14,7 @@
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Framework\Production.ahk
+;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
 ; REMOVED: #MaxMem 128

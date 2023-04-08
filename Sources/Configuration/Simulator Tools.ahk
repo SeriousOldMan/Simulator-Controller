@@ -14,7 +14,7 @@
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Framework\Production.ahk
+;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Tools.ico
@@ -2806,9 +2806,9 @@ runBuildTargets(ByRef buildProgress) {
 
 					FileRead sourceCode, %targetSource%
 
-					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include ..\Framework\Development.ahk`r`n;@SC-EndIF", "")
+					sourceCode := StrReplace(sourceCode, ";@SC-IF %configuration% == Development`r`n#Include `"..\Framework\Development.ahk`"`r`n;@SC-EndIF", "")
 
-					sourceCode := StrReplace(sourceCode, ";@SC #Include ..\Framework\Production.ahk", "#Include ..\Framework\Production.ahk")
+					sourceCode := StrReplace(sourceCode, ";@SC #Include `"..\Framework\Production.ahk`"", "#Include `"..\Framework\Production.ahk`"")
 
 					deleteFile(sourceDirectory . "\compile.ahk")
 

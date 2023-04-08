@@ -443,17 +443,25 @@ class Function extends ConfigurationItem {
 				}
 				else {
 					if (actions.Length > 0) {
-						for ignore, action in actions
-							callables.Push(this.actionCallable(trigger, action))
+						for ignore, action in actions {
+							action := this.actionCallable(trigger, action)
+
+							if action
+								callables.Push(action)
+							else
+								return false
+						}
 					}
 					else {
 						action := this.actionCallable(trigger, false)
 
 						if action
 							callables.Push(action)
+						else
+							return false
 					}
 
-					return ((callables.Length > 0) ? callActions.Bind(callables.Clone()) : false)
+					return ((callables.Length > 0) ? ((callables.Length = 1) ? callables[1] : callActions.Bind(callables)) : false)
 				}
 			}
 			else {
@@ -479,8 +487,17 @@ class Function extends ConfigurationItem {
 							if action
 								callables.Push((action && (action.Length == 2)) ? (action[1] . "(" . values2String(", ", arguments*) . ")") : "")
 						}
-						else
-							callables.Push(this.actionCallable(trigger, action))
+						else {
+							action := this.actionCallable(trigger, action)
+
+							if action
+								callables.Push(action)
+							else {
+								callables := []
+
+								continue 2
+							}
+						}
 
 					if (!asText && (callables.Length = 0)) {
 						action := this.actionCallable(trigger, false)
@@ -489,7 +506,8 @@ class Function extends ConfigurationItem {
 							callables.Push(action)
 					}
 
-					result[trigger] := (asText ? values2String(" | ", callables*) : ((callables.Length > 0) ? callActions.Bind(callables.Clone()) : false))
+					result[trigger] := (asText ? values2String(" | ", callables*)
+											   : ((callables.Length > 0) ? ((callables.Length = 1) ? callables[1] : callActions.Bind(callables)) : false))
 				}
 
 				return result

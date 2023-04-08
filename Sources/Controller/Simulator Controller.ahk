@@ -1360,27 +1360,31 @@ class ControllerFunction {
 			handler := this.Actions[trigger]
 
 			for ignore, theHotkey in this.Hotkeys[trigger] {
-				if (SubStr(theHotkey, 1, 1) = "?") {
-					command := SubStr(theHotkey, 2)
+				try {
+					if (SubStr(theHotkey, 1, 1) = "?") {
+						if !handler
+							throw "Action " . this.Actions[trigger, true] . " cannot be found..."
 
-					controller.enableVoiceCommand(command, handler)
+						command := SubStr(theHotkey, 2)
 
-					logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
-				}
-				else
-					try {
+						controller.enableVoiceCommand(command, handler)
+
+						logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
+					}
+					else {
 						Hotkey(theHotkey, handler, "On")
 
 						logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction")
 																																						   : this.Function.Actions[trigger, true]))
 					}
-					catch Any as exception {
-						logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
+				}
+				catch Any as exception {
+					logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
 
-						showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
-								  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+					showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 
-					}
+				}
 			}
 		}
 	}

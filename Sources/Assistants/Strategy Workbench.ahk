@@ -603,14 +603,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		addSimDriver(*) {
 			local row := workbench.DriversListView.GetNext(0)
-			local msgResult, numRows, driver, handler
+			local msgResult, numRows, driver, translator
 
 			if row {
-				handler := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
+				translator := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
 
-				OnMessage(0x44, handler)
+				OnMessage(0x44, translator)
 				msgResult := MsgBox(translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
-				OnMessage(0x44, handler, 0)
+				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
 					return

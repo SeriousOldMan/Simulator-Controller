@@ -1086,8 +1086,7 @@ class RaceStrategist extends GridRaceAssistant {
 					only := ""
 
 					if (driverAvgLapTime < (leaderAvgLapTime * 1.01))
-						if speaker.Fragments.Has("Only")
-							only := speaker.Fragments["Only"]
+						only := speaker.Fragments["Only"]
 
 					speaker.speakPhrase("Compare2Leader", {relative: only, seconds: speaker.number2Speech(Abs(driverAvgLapTime - leaderAvgLapTime), 1)})
 

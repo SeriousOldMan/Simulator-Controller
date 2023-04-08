@@ -1,9 +1,9 @@
 [Development]
-Version=4.6.3.1-dev
-Target=4.6.3.1-release
-Date=03/15/2023
+Version=4.6.3.3-dev
+Target=4.6.3.3-release
+Date=04/04/2023
 Download=
-Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC
+Changes=Car meta data update for R3E
 [Release]
 Version=4.6.3.0-release
 Date=03/10/2023

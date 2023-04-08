@@ -1372,6 +1372,8 @@ class ControllerFunction {
 						logMessage(kLogInfo, translate("Binding voice command ") . command . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction") : this.Function.Actions[trigger, true]))
 					}
 					else {
+						if theHotkey = ""
+							MsgBox ("Oops")
 						Hotkey(theHotkey, handler, "On")
 
 						logMessage(kLogInfo, translate("Binding hotkey ") . theHotkey . translate(" for trigger ") . trigger . translate(" to ") . (action ? (action.base.__Class . ".fireAction")
@@ -1383,7 +1385,6 @@ class ControllerFunction {
 
 					showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-
 				}
 			}
 		}
@@ -1403,7 +1404,12 @@ class ControllerFunction {
 				if (SubStr(theHotkey, 1, 1) = "?")
 					controller.disableVoiceCommand(SubStr(theHotkey, 2), handler)
 				else
-					Hotkey(theHotkey, "Off")
+					try {
+						Hotkey(theHotkey, "Off")
+					}
+					catch Any as exception {
+						logError(exception, false, false)
+					}
 			}
 		}
 	}
@@ -1500,7 +1506,9 @@ class ControllerCustomFunction extends ControllerFunction {
 		}
 
 		actionCallable(trigger, action) {
-			return functionActionCallable(this.iOuterFunction, trigger, super.actionCallable(trigger, action))
+			local callable := super.actionCallable(trigger, action)
+
+			return (callable ? functionActionCallable(this.iOuterFunction, trigger, callable) : false)
 		}
 	}
 
@@ -1854,7 +1862,16 @@ setHotkeyEnabled(function, trigger, enabled) {
 				controller.disableVoiceCommand(SubStr(theHotkey, 2), function.Actions[trigger])
 		}
 		else
-			Hotkey(theHotkey, state)
+			try {
+				Hotkey(theHotkey, state)
+			}
+			catch Any as exception {
+				logMessage(kLogCritical, translate("Error while registering hotkey ") . theHotkey . translate(" - please check the configuration"))
+
+				showMessage(substituteVariables(translate("Cannot register hotkey %hotkey% - please check the configuration..."), {hotKey: theHotKey})
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			}
 }
 
 functionActionCallable(function, trigger, action) {
@@ -1864,7 +1881,7 @@ functionActionCallable(function, trigger, action) {
 		handler.Call()
 	}
 
-	return actionCallable
+	return (handler ? actionCallable : false)
 }
 
 fireControllerActions(function, trigger, fromTask := false) {

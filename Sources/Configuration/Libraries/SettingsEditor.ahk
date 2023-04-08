@@ -84,8 +84,8 @@ editModes(&settingsOrCommand, arguments*) {
 			modeSessionDropDown.Choose(1)
 		}
 		else {
-			if (selectedSimulator != simulators[modeSimulatorDropDown - 1]) {
-				selectedSimulator := simulators[modeSimulatorDropDown - 1]
+			if (selectedSimulator != simulators[modeSimulatorDropDown.Value - 1]) {
+				selectedSimulator := simulators[modeSimulatorDropDown.Value - 1]
 				modeSessionDropDown.Choose(1)
 				selectedSession := false
 

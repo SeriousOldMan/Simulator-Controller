@@ -3985,7 +3985,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		if (pitstopTyreCompound > 1) {
+		if pitstopTyreCompound {
 			setMultiMapValue(pitstopPlan, "Pitstop", "Tyre.Change", true)
 
 			if ((pitstopTyreSet = "") || (pitstopTyreSet = "-"))

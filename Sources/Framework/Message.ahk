@@ -82,7 +82,7 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 		}
 
 	messageGui.Opt("+AlwaysOnTop")
-	messageGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NA")
+	messageGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
 
 	Sleep(duration)
 

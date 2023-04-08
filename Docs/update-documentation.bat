@@ -18,7 +18,7 @@ copy "Virtual Race Engineer.md" ..\..\Controller.Wiki\Virtual-Race-Engineer.md
 copy "Virtual Race Strategist.md" ..\..\Controller.Wiki\Virtual-Race-Strategist.md
 copy "Virtual Race Spotter.md" ..\..\Controller.Wiki\Virtual-Race-Spotter.md
 copy "Team Server.md" ..\..\Controller.Wiki\Team-Server.md
-copy "Setup Advisor.md" ..\..\Controller.Wiki\Setup-Advisor.md
+copy "Setup Workbench.md" ..\..\Controller.Wiki\Setup-Workbench.md
 copy "Race Engineer Commands (EN).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(EN).md
 copy "Race Strategist Commands (EN).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(EN).md
 copy "Race Spotter Commands (EN).md" ..\..\Controller.Wiki\Race-Spotter-Commands-(EN).md

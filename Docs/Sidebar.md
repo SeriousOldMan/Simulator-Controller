@@ -89,15 +89,15 @@
   - [Compound Rules](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#compound-rules)
   - [Using Tyre Compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#using-tyre-compounds)
   
-[Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
+[Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench)
 ------
-  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#introduction)
-  - [Describing Setup Issues](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#describing-setup-issues)
-    - [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#real-time-telemetry-analyzer)
-  - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#understanding-the-recommendations)
-  - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#how-it-works)
-  - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#managing-car-setups)
-  - [Extending and Customizing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor#extending-and-cutomizing-setup-advisor)
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introduction)
+  - [Describing Setup Issues](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#describing-setup-issues)
+    - [Telemetry Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-telemetry-analyzer)
+  - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#understanding-the-recommendations)
+  - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works)
+  - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups)
+  - [Extending and Customizing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench)
 
 [Virtual Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Engineer)
 ------

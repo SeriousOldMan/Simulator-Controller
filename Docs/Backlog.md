@@ -25,7 +25,7 @@
 #### Race Reports
   1. Multi-category awareness (Pro, Pro-AM, ...)
 
-#### Setup Advisor
+#### Setup Workbench
   1. General detection of counter steering in the telemetry analyzer
   2. Collect telemetry data from multiple drivers and generate combined setup recommendations
 

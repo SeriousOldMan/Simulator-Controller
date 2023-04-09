@@ -93,11 +93,11 @@ isNull(value) {
 	return ((value = kNull) || (value == "__Null__"))
 }
 
-toObject(candidate) {
+toObject(candidate, class := Object) {
 	local key, value
 
-	if isInstance(candidate, Map) {
-		local result := Object()
+	if !isInstance(candidate, class) {
+		local result := class()
 
 		for key, value in candidate
 			result.%key% := value
@@ -108,7 +108,7 @@ toObject(candidate) {
 		return candidate
 }
 
-toMap(candidate, class := CaseInsenseMap) {
+toMap(candidate, class := Map) {
 	local key, value
 
 	if !isInstance(candidate, class) {

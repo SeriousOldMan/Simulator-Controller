@@ -133,7 +133,7 @@ class Database {
 	__New(directory, schemas) {
 		this.iDirectory := (normalizeDirectoryPath(directory) . "\")
 
-		this.iSchemas := toMap(schemas, DaseInsenseMap)
+		this.iSchemas := toMap(schemas, CaseInsenseMap)
 	}
 
 	lock(name := false, wait := true) {

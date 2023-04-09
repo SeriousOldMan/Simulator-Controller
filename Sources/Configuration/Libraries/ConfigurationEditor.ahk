@@ -247,18 +247,6 @@ class ConfigurationEditor extends ConfigurationItem {
 	iDevelopment := false
 	iSaveMode := false
 
-	class EditorResizer extends Window.Resizer {
-		RestrictResize(&deltaWidth, &deltaHeight) {
-			if (deltaWidth > 150) {
-				deltaWidth := (this.Window.Width - this.Window.MinWidth)
-
-				return true
-			}
-			else
-				return false
-		}
-	}
-
 	Window {
 		Get {
 			return this.iWindow
@@ -351,7 +339,7 @@ class ConfigurationEditor extends ConfigurationItem {
 				configurator.activate()
 		}
 
-		editorGui := Window({Descriptor: "Simulator Configuration", Options: "+SysMenu +Caption -MaximizeBox", Closeable: true, Resizeable: true})
+		editorGui := Window({Descriptor: "Simulator Configuration", Options: "+SysMenu +Caption -MaximizeBox", Closeable: true, Resizeable: "Deferred"})
 
 		this.iWindow := editorGui
 
@@ -390,8 +378,6 @@ class ConfigurationEditor extends ConfigurationItem {
 
 			configurator[2].createGui(this, 16, 80, 458, 425)
 		}
-
-		editorGui.Add(ConfigurationEditor.EditorResizer(editorGui))
 	}
 
 	registerWidget(plugin, widget) {

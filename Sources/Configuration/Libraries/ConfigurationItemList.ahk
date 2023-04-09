@@ -55,8 +55,12 @@ class ConfigurationItemList extends ConfigurationPanel {
 
 	ItemList[index := "__Undefined__"] {
 		Get {
-			if (index != kUndefined)
+			if (index != kUndefined) {
+				if !this.iItemList.Has(index)
+					MsgBox 1
+
 				return this.iItemList[index]
+			}
 			else
 				return this.iItemList
 		}
@@ -80,7 +84,7 @@ class ConfigurationItemList extends ConfigurationPanel {
 	}
 
 	initializeList(editor, listView, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
-		this.setEditor(editor)
+		this.Editor := editor
 
 		this.iListView := listView
 		this.iAddButton := addButton

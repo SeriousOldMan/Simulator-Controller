@@ -9,7 +9,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,141 +20,148 @@
 ;;; FormatsEditor                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global massUnitDropDown
-global temperatureUnitDropDown
-global pressureUnitDropDown
-global volumeUnitDropDown
-global lengthUnitDropDown
-global speedUnitDropDown
-global numberFormatDropDown
-global timeFormatDropDown
-
-class FormatsEditor extends ConfigurationItem {
+class FormatsEditor extends ConfigurationPanel {
 	iClosed := false
 
 	__New(configuration) {
 		super.__New(configuration)
 
 		FormatsEditor.Instance := this
-
-		this.createGui(configuration)
 	}
 
 	createGui(configuration) {
 		local chosen
 
-		Gui FE:Default
+		static formatsGui
 
-		Gui FE:-Border ; -Caption
-		Gui FE:Color, D0D0D0, D8D8D8
+		saveFormatsEditor(*) {
+			protectionOn()
 
-		Gui FE:Font, Bold, Arial
+			try {
+				this.closeEditor(true)
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui FE:Add, Text, w238 Center gmoveFormatsEditor, % translate("Modular Simulator Controller System")
+		cancelFormatsEditor(*) {
+			protectionOn()
 
-		Gui FE:Font, Norm, Arial
-		Gui FE:Font, Italic Underline, Arial
+			try {
+				this.closeEditor(false)
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui FE:Add, Text, x63 YP+20 w128 cBlue Center gopenFormatsDocumentation, % translate("Units && Formats")
+		formatsGui := Window()
 
-		Gui FE:Font, Norm, Arial
+		this.Window := formatsGui
 
-		chosen := inList(kTemperatureUnits, temperatureUnitDropDown)
+		formatsGui.Add("Text", "w238 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(formatsGui, "Formats Editor"))
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Temperature")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vtemperatureUnitDropDown, % values2String("|", kTemperatureUnits*)
+		formatsGui.SetFont("Norm", "Arial")
+		formatsGui.SetFont("Italic Underline", "Arial")
 
-		chosen := inList(kMassUnits, massUnitDropDown)
+		formatsGui.Add("Text", "x63 YP+20 w128 cBlue Center", translate("Units && Formats")).OnEvent("Click", openDocumentation.Bind(formatsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats"))
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Mass")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vmassUnitDropDown, % values2String("|", kMassUnits*)
+		formatsGui.SetFont("Norm", "Arial")
 
-		chosen := inList(kPressureUnits, pressureUnitDropDown)
+		chosen := inList(kTemperatureUnits, this.Value["temperatureUnit"])
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Pressure")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vpressureUnitDropDown, % values2String("|", kPressureUnits*)
+		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Temperature"))
+		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vtemperatureUnitDropDown", kTemperatureUnits)
 
-		chosen := inList(kVolumeUnits, volumeUnitDropDown)
+		chosen := inList(kMassUnits, this.Value["massUnit"])
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Volume")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vvolumeUnitDropDown, % values2String("|", kVolumeUnits*)
+		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Mass"))
+		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vmassUnitDropDown", kMassUnits)
 
-		chosen := inList(kLengthUnits, lengthUnitDropDown)
+		chosen := inList(kPressureUnits, this.Value["pressureUnit"])
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Length")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vlengthUnitDropDown, % values2String("|", kLengthUnits*)
+		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Pressure"))
+		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vpressureUnitDropDown", kPressureUnits)
 
-		chosen := inList(kSpeedUnits, speedUnitDropDown)
+		chosen := inList(kVolumeUnits, this.Value["volumeUnit"])
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Speed")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vspeedUnitDropDown, % values2String("|", kSpeedUnits*)
+		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Volume"))
+		ogcvolumeUnitDropDown := formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vvolumeUnitDropDown", kVolumeUnits)
 
-		chosen := inList(kNumberFormats, numberFormatDropDown)
+		chosen := inList(kLengthUnits, this.Value["lengthUnit"])
 
-		Gui FE:Add, Text, x16 yp+30 w100 h23 +0x200, % translate("Float")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vnumberFormatDropDown, % values2String("|", kNumberFormats*)
+		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Length"))
+		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vlengthUnitDropDown", kLengthUnits)
 
-		chosen := inList(kTimeFormats, timeFormatDropDown)
+		chosen := inList(kSpeedUnits, this.Value["speedUnit"])
 
-		Gui FE:Add, Text, x16 yp+24 w100 h23 +0x200, % translate("Time")
-		Gui FE:Add, DropDownList, x120 yp w125 AltSubmit Choose%chosen% vtimeFormatDropDown, % values2String("|", kTimeFormats*)
+		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Speed"))
+		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vspeedUnitDropDown", kSpeedUnits)
 
-		Gui FE:Add, Text, x24 y+10 w213 0x10
+		chosen := inList(kNumberFormats, this.Value["numberFormat"])
 
-		Gui FE:Add, Button, x36 yp+10 w80 h23 Default GsaveFormatsEditor, % translate("Save")
-		Gui FE:Add, Button, x139 yp w80 h23 GcancelFormatsEditor, % translate("&Cancel")
+		formatsGui.Add("Text", "x16 yp+30 w100 h23 +0x200", translate("Float"))
+		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vnumberFormatDropDown", kNumberFormats)
+
+		chosen := inList(kTimeFormats, this.Value["timeFormat"])
+
+		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Time"))
+		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vtimeFormatDropDown", kTimeFormats)
+
+		formatsGui.Add("Text", "x24 y+10 w213 0x10")
+
+		formatsGui.Add("Button", "x36 yp+10 w80 h23 Default", translate("Save")).OnEvent("Click", saveFormatsEditor)
+		formatsGui.Add("Button", "x139 yp w80 h23", translate("&Cancel")).OnEvent("Click", cancelFormatsEditor)
 	}
 
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
-		massUnitDropDown := getMultiMapValue(configuration, "Localization", "MassUnit", "Kilogram")
-		temperatureUnitDropDown := getMultiMapValue(configuration, "Localization", "TemperatureUnit", "Celsius")
-		pressureUnitDropDown := getMultiMapValue(configuration, "Localization", "PressureUnit", "PSI")
-		volumeUnitDropDown := getMultiMapValue(configuration, "Localization", "VolumeUnit", "Liter")
-		lengthUnitDropDown := getMultiMapValue(configuration, "Localization", "LengthUnit", "Meter")
-		speedUnitDropDown := getMultiMapValue(configuration, "Localization", "SpeedUnit", "km/h")
+		this.Value["massUnit"] := getMultiMapValue(configuration, "Localization", "MassUnit", "Kilogram")
+		this.Value["temperatureUnit"] := getMultiMapValue(configuration, "Localization", "TemperatureUnit", "Celsius")
+		this.Value["pressureUnit"] := getMultiMapValue(configuration, "Localization", "PressureUnit", "PSI")
+		this.Value["volumeUnit"] := getMultiMapValue(configuration, "Localization", "VolumeUnit", "Liter")
+		this.Value["lengthUnit"] := getMultiMapValue(configuration, "Localization", "LengthUnit", "Meter")
+		this.Value["speedUnit"] := getMultiMapValue(configuration, "Localization", "SpeedUnit", "km/h")
 
-		numberFormatDropDown := getMultiMapValue(configuration, "Localization", "NumberFormat", "#.##")
-		timeFormatDropDown := getMultiMapValue(configuration, "Localization", "TimeFormat", "[H:]M:S.##")
+		this.Value["numberFormat"] := getMultiMapValue(configuration, "Localization", "NumberFormat", "#.##")
+		this.Value["timeFormat"] := getMultiMapValue(configuration, "Localization", "TimeFormat", "[H:]M:S.##")
 
-		if (volumeUnitDropDown = "Gallon")
-			volumeUnitDropDown := "Gallon (GB)"
+		if (this.Value["volumeUnit"] = "Gallon")
+			this.Value["volumeUnit"] := "Gallon (GB)"
 	}
 
 	saveToConfiguration(configuration) {
 		super.saveToConfiguration(configuration)
 
-		GuiControlGet temperatureUnitDropDown
-		GuiControlGet massUnitDropDown
-		GuiControlGet pressureUnitDropDown
-		GuiControlGet volumeUnitDropDown
-		GuiControlGet lengthUnitDropDown
-		GuiControlGet speedUnitDropDown
-		GuiControlGet numberFormatDropDown
-		GuiControlGet timeFormatDropDown
+		setMultiMapValue(configuration, "Localization", "TemperatureUnit", kTemperatureUnits[this.Control["temperatureUnitDropDown"].Value])
+		setMultiMapValue(configuration, "Localization", "MassUnit", kMassUnits[this.Control["massUnitDropDown"].Value])
+		setMultiMapValue(configuration, "Localization", "PressureUnit", kPressureUnits[this.Control["pressureUnitDropDown"].Value])
+		setMultiMapValue(configuration, "Localization", "VolumeUnit", kVolumeUnits[this.Control["volumeUnitDropDown"].Value])
+		setMultiMapValue(configuration, "Localization", "LengthUnit", kLengthUnits[this.Control["lengthUnitDropDown"].Value])
+		setMultiMapValue(configuration, "Localization", "SpeedUnit", kSpeedUnits[this.Control["speedUnitDropDown"].Value])
 
-		setMultiMapValue(configuration, "Localization", "TemperatureUnit", kTemperatureUnits[temperatureUnitDropDown])
-		setMultiMapValue(configuration, "Localization", "MassUnit", kMassUnits[massUnitDropDown])
-		setMultiMapValue(configuration, "Localization", "PressureUnit", kPressureUnits[pressureUnitDropDown])
-		setMultiMapValue(configuration, "Localization", "VolumeUnit", kVolumeUnits[volumeUnitDropDown])
-		setMultiMapValue(configuration, "Localization", "LengthUnit", kLengthUnits[lengthUnitDropDown])
-		setMultiMapValue(configuration, "Localization", "SpeedUnit", kSpeedUnits[speedUnitDropDown])
-
-		setMultiMapValue(configuration, "Localization", "NumberFormat", kNumberFormats[numberFormatDropDown])
-		setMultiMapValue(configuration, "Localization", "TimeFormat", kTimeFormats[timeFormatDropDown])
+		setMultiMapValue(configuration, "Localization", "NumberFormat", kNumberFormats[this.Control["numberFormatDropDown"].Value])
+		setMultiMapValue(configuration, "Localization", "TimeFormat", kTimeFormats[this.Control["timeFormatDropDown"].Value])
 	}
 
-	editFormats() {
-		local x, y, configuration
+	editFormats(owner) {
+		local window, x, y, configuration
 
-		if getWindowPosition("Formats Editor", x, y)
-			Gui FE:Show, x%x% y%y%
+		this.createGui(this.Configuration)
+
+		window := this.Window
+
+		window.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Formats Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui FE:Show
+			window.Show()
 
 		loop
-			Sleep 200
+			Sleep(200)
 		until this.iClosed
 
 		try {
@@ -169,49 +176,11 @@ class FormatsEditor extends ConfigurationItem {
 				return false
 		}
 		finally {
-			Gui FE:Destroy
+			window.Destroy()
 		}
 	}
 
 	closeEditor(save) {
-		if save
-			Gui FE:Submit
-
 		this.iClosed := (save ? kOk : kCancel)
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-saveFormatsEditor() {
-	protectionOn()
-
-	try {
-		FormatsEditor.Instance.closeEditor(true)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-cancelFormatsEditor() {
-	protectionOn()
-
-	try {
-		FormatsEditor.Instance.closeEditor(false)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-moveFormatsEditor() {
-	moveByMouse("FE", "Formats Editor")
-}
-
-openFormatsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats
 }

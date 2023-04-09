@@ -179,6 +179,7 @@ class TriggerDetectorContinuation extends Continuation {
 
 class ConfigurationPanel extends ConfigurationItem {
 	iEditor := false
+	iWindow := false
 
 	iValues := CaseInsenseMap()
 
@@ -186,17 +187,25 @@ class ConfigurationPanel extends ConfigurationItem {
 		Get {
 			return this.iEditor
 		}
+
+		Set {
+			return (this.iEditor := value)
+		}
 	}
 
 	Window {
 		Get {
-			return this.Editor.Window
+			return (this.iWindow ? this.iWindow : ((this.Editor != this) ? this.Editor.Window : false))
+		}
+
+		Set {
+			return (this.iWindow := value)
 		}
 	}
 
 	Control[name] {
 		Get {
-			return this.Editor.Control[name]
+			return this.Window[name]
 		}
 	}
 
@@ -210,8 +219,10 @@ class ConfigurationPanel extends ConfigurationItem {
 		}
 	}
 
-	setEditor(editor) {
-		this.iEditor := editor
+	__New(arguments*) {
+		this.iEditor := this
+
+		super.__New(arguments*)
 	}
 }
 
@@ -235,6 +246,18 @@ class ConfigurationEditor extends ConfigurationItem {
 
 	iDevelopment := false
 	iSaveMode := false
+
+	class EditorResizer extends Window.Resizer {
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			if (deltaWidth > 150) {
+				deltaWidth := (this.Window.Width - this.Window.MinWidth)
+
+				return true
+			}
+			else
+				return false
+		}
+	}
 
 	Window {
 		Get {
@@ -328,37 +351,37 @@ class ConfigurationEditor extends ConfigurationItem {
 				configurator.activate()
 		}
 
-		editorGui := Window({Descriptor: "Simulator Configuration", Options: "+SysMenu +Caption"})
+		editorGui := Window({Descriptor: "Simulator Configuration", Options: "+SysMenu +Caption -MaximizeBox", Closeable: true, Resizeable: true})
 
 		this.iWindow := editorGui
 
 		editorGui.SetFont("Bold", "Arial")
 
-		editorGui.Add("Text", "w478 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Simulator Configuration"))
+		editorGui.Add("Text", "w478 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(editorGui, "Simulator Configuration"))
 
 		editorGui.SetFont("Norm", "Arial")
 		editorGui.SetFont("Italic Underline", "Arial")
 
-		editorGui.Add("Text", "x178 YP+20 w138 cBlue Center", translate("Configuration")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration"))
+		editorGui.Add("Text", "x178 YP+20 w138 H:Center cBlue Center", translate("Configuration")).OnEvent("Click", openDocumentation.Bind(editorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration"))
 
 		editorGui.SetFont("Norm", "Arial")
 
-		editorGui.Add("Button", "x232 y528 w80 h23 Default", translate("Save")).OnEvent("Click", saveAndExit)
-		editorGui.Add("Button", "x320 y528 w80 h23", translate("&Cancel")).OnEvent("Click", cancelAndExit)
-		editorGui.Add("Button", "x408 y528 w77 h23", translate("&Apply")).OnEvent("Click", saveAndStay)
+		editorGui.Add("Button", "x232 y528 w80 h23 Y:Move X:Move Default", translate("Save")).OnEvent("Click", saveAndExit)
+		editorGui.Add("Button", "x320 y528 w80 h23 Y:Move X:Move", translate("&Cancel")).OnEvent("Click", cancelAndExit)
+		editorGui.Add("Button", "x408 y528 w77 h23 Y:Move X:Move", translate("&Apply")).OnEvent("Click", saveAndStay)
 
 		choices := ["Auto", "Manual"]
 		chosen := inList(choices, this.iSaveMode)
 
-		editorGui.Add("Text", "x8 y528 w55 h23 +0x200", translate("Save"))
-		editorGui.Add("DropDownList", "x63 y528 w75 AltSubmit Choose" . chosen . "  vsaveModeDropDown", collect(choices, translate)).OnEvent("Change", updateSaveMode)
+		editorGui.Add("Text", "x8 y528 w55 h23 Y:Move +0x200", translate("Save"))
+		editorGui.Add("DropDownList", "x63 y528 w75 Y:Move AltSubmit Choose" . chosen . "  vsaveModeDropDown", collect(choices, translate)).OnEvent("Change", updateSaveMode)
 
 		labels := []
 
 		for ignore, configurator in this.Configurators
 			labels.Push(configurator[1])
 
-		editorGui.Add("Tab3", "x8 y48 w478 h472 AltSubmit -Wrap vconfiguratorTabView", labels).OnEvent("Change", selectTab)
+		editorGui.Add("Tab3", "x8 y48 w478 h472 W:Grow H:Grow AltSubmit -Wrap vconfiguratorTabView", labels).OnEvent("Change", selectTab)
 
 		tab := 1
 
@@ -367,6 +390,8 @@ class ConfigurationEditor extends ConfigurationItem {
 
 			configurator[2].createGui(this, 16, 80, 458, 425)
 		}
+
+		editorGui.Add(ConfigurationEditor.EditorResizer(editorGui))
 	}
 
 	registerWidget(plugin, widget) {
@@ -394,12 +419,15 @@ class ConfigurationEditor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-		local x, y
+		local x, y, w, h
 
 		if getWindowPosition("Simulator Configuration", &x, &y)
-			window.Show("x" . x . " y" . y)
+			window.Show("x" . x . " y" . y . " AutoSize")
 		else
 			window.Show()
+
+		if getWindowSize("Simulator Configuration", &w, &h)
+			window.Resize("Initialize", w, h)
 	}
 
 	hide() {

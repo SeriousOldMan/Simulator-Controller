@@ -35,8 +35,8 @@
 #Include "Libraries\ConfigurationItemList.ahk"
 #Include "Libraries\ConfigurationEditor.ahk"
 ; #Include "Libraries\ThemesEditor.ahk"
-; #Include "Libraries\FormatsEditor.ahk"
-; #Include "Libraries\TranslationsEditor.ahk"
+#Include "Libraries\FormatsEditor.ahk"
+#Include "Libraries\TranslationsEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -169,12 +169,12 @@ class GeneralTab extends ConfigurationItemPanel {
 			this.openThemesEditor()
 		}
 
-		this.setEditor(editor)
+		this.Editor := editor
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y80 w458 h70", translate("Installation"))
+		window.Add("GroupBox", "-Theme x16 y80 w458 h70 W:Grow", translate("Installation"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -189,7 +189,7 @@ class GeneralTab extends ConfigurationItemPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y160 w458 h95", translate("Settings"))
+		window.Add("GroupBox", "-Theme x16 y160 w458 h95 W:Grow", translate("Settings"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -207,7 +207,7 @@ class GeneralTab extends ConfigurationItemPanel {
 			chosen := enIndex
 
 		window.Add("Text", "x24 y176 w86 h23 +0x200", translate("Localization"))
-		window.Add("DropDownList", "x250 y176 w188 Choose" . chosen . " vlanguageDropDown", choices)
+		window.Add("DropDownList", "x250 y176 w188  Choose" . chosen . " vlanguageDropDown", choices)
 		window.Add("Button", "x440 y175 w23 h23", translate("...")).OnEvent("Click", openTranslationsEditor)
 		button := window.Add("Button", "x224 y175 w23 h23")
 		button.OnEvent("Click", openFormatsEditor)
@@ -221,7 +221,7 @@ class GeneralTab extends ConfigurationItemPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y265 w458 h115", translate("Simulators"))
+		window.Add("GroupBox", "-Theme x16 y265 w458 h115 W:Grow", translate("Simulators"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -231,7 +231,7 @@ class GeneralTab extends ConfigurationItemPanel {
 			window.SetFont("Norm", "Arial")
 			window.SetFont("Italic", "Arial")
 
-			window.Add("GroupBox", "-Theme x16 y388 w458 h119", translate("Development"))
+			window.Add("GroupBox", "-Theme x16 y388 w458 h119 W:Grow", translate("Development"))
 
 			window.SetFont("Norm", "Arial")
 
@@ -317,7 +317,7 @@ class GeneralTab extends ConfigurationItemPanel {
 
 			choices := ["Info", "Warn", "Critical", "Off"]
 
-			setMultiMapValue(configuration, "Configuration", "Log Level", choices[inList(collect(choices, "translate"), this.Control["logLevelDropDown"].Value)])
+			setMultiMapValue(configuration, "Configuration", "Log Level", choices[inList(collect(choices, translate), this.Control["logLevelDropDown"].Text)])
 		}
 
 		this.iSimulatorsList.saveToConfiguration(configuration)
@@ -334,14 +334,13 @@ class GeneralTab extends ConfigurationItemPanel {
 	}
 
 	openTranslationsEditor() {
-		/*
 		local window := this.Window
 		local choices, chosen, enIndex, code, language
 
 		window.Opt("+Disabled")
 
 		try {
-			if (TranslationsEditor(this.Configuration, window)).editTranslations() {
+			if (TranslationsEditor(this.Configuration)).editTranslations(window) {
 				window.Opt("-Disabled")
 
 				choices := []
@@ -371,7 +370,6 @@ class GeneralTab extends ConfigurationItemPanel {
 		finally {
 			window.Opt("-Disabled")
 		}
-		*/
 	}
 
 	openThemesEditor() {
@@ -382,7 +380,7 @@ class GeneralTab extends ConfigurationItemPanel {
 		window.Opt("+Disabled")
 
 		try {
-			configuration := (ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
+			configuration := (ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes(window)
 
 			if configuration
 				this.iSplashThemesConfiguration := configuration
@@ -394,14 +392,13 @@ class GeneralTab extends ConfigurationItemPanel {
 	}
 
 	openFormatsEditor() {
-		/*
 		local window := this.Window
 		local configuration
 
 		window.Opt("+Disabled")
 
 		try {
-			configuration := FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats()
+			configuration := FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats(window)
 
 			if configuration
 				this.iFormatsConfiguration := configuration
@@ -409,7 +406,6 @@ class GeneralTab extends ConfigurationItemPanel {
 		finally {
 			window.Opt("-Disabled")
 		}
-		*/
 	}
 }
 
@@ -428,7 +424,7 @@ class SimulatorsList extends ConfigurationItemList {
 		local window := editor.Window
 		local control
 
-		control := window.Add("ListBox", "x24 y284 w194 h96 vsimulatorsListBox")
+		control := window.Add("ListBox", "x24 y284 w194 h96 BackGroundD8D8D8 vsimulatorsListBox")
 		control.OnEvent("Change", listEvent.Bind("Click"))
 		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
 

@@ -70,12 +70,12 @@ class MultiMap extends CaseInsenseSafeMap {
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-newMultiMap() {
-	return MultiMap()
+newMultiMap(arguments*) {
+	return MultiMap(arguments*)
 }
 
-newSectionMap() {
-	return MultiMap()
+newSectionMap(arguments*) {
+	return MultiMap(arguments*)
 }
 
 readMultiMap(multiMapFile) {

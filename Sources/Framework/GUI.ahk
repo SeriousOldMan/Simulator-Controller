@@ -474,17 +474,18 @@ class Window extends Gui {
 	}
 
 	Show(arguments*) {
-		local x, y, width, height
+		local x, y, cWidth, cHeight, width, height
 
 		super.Show(arguments*)
 
 		if !this.MinWidth {
+			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
 			WinGetPos(&x, &y, &width, &height, this)
 
 			this.iMinWidth := width
 			this.iMinHeight := height
 
-			this.Opt("MinSize" . width . "x" . height)
+			this.Opt("MinSize" . cWidth . "x" . cHeight)
 
 			this.iWidth := width
 			this.iHeight := height
@@ -543,8 +544,17 @@ class Window extends Gui {
 
 		static resizeTask := false
 
+		updateSettings(width, height) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
+			setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
 		runResizers(synchronous := false) {
-			local curPriority, width, height, ignore, button
+			local curPriority, width, height, ignore, button, fullWidth, fullHeight, deltaWidth, deltaHeight
 
 			if !synchronous {
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -594,18 +604,8 @@ class Window extends Gui {
 					WinRedraw(this)
 				}
 
-				if this.Descriptor {
-					updateSettings(width, height) {
-						local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-						setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
-						setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
-
-						writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-					}
-
+				if this.Descriptor
 					Task.startTask(updateSettings.Bind(width, height), 1000, kLowPriority)
-				}
 			}
 			catch Any as exception {
 				Task.startTask(logError.Bind(exception), 100, kLowPriority)
@@ -615,10 +615,10 @@ class Window extends Gui {
 			}
 		}
 
-		if this.Width
-			if InStr(minMax, "Init")
-				WinMove( , , width, height, this)
-			else if (this.Resizeable = "Deferred") {
+		if InStr(minMax, "Init")
+			WinMove( , , width, height, this)
+		else if this.Width {
+			if (this.Resizeable = "Deferred") {
 				if !resizeTask {
 					resizeTask := Task(runResizers, 100)
 
@@ -627,6 +627,7 @@ class Window extends Gui {
 			}
 			else
 				runResizers(true)
+		}
 	}
 
 	ControlsRestrictResize(&width, &height) {

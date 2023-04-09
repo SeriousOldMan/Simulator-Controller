@@ -69,7 +69,7 @@ class VoiceManager {
 
 	class RemoteSpeaker {
 		iVoiceManager := false
-		iFragments := CaseInsenseMap()
+		iFragments := CaseInsenseSafeMap()
 		iPhrases := CaseInsenseMap()
 
 		iSpeaker := false
@@ -115,7 +115,8 @@ class VoiceManager {
 
 		__New(voiceManager, synthesizer, speaker, language, fragments, phrases) {
 			this.iVoiceManager := voiceManager
-			this.iFragments := fragments
+			this.iFragments := toMap(fragments, CaseInsenseSafeMap)
+			this.iFragments.Default := ""
 			this.iPhrases := phrases
 
 			this.iSpeaker := speaker
@@ -769,7 +770,7 @@ class VoiceManager {
 	}
 
 	buildFragments(language) {
-		local fragments := CaseInsenseMap()
+		local fragments := CaseInsenseSafeMap()
 		local grammars := this.getGrammars(language)
 		local fragment, word
 

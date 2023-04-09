@@ -377,7 +377,7 @@ initializeLocalization() {
 ;;;-------------------------------------------------------------------------;;;
 
 availableLanguages() {
-	local translations := collect("en", "English")
+	local translations := CaseInsenseMap("en", "English")
 	local ignore, fileName, languageCode
 
 	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {
@@ -389,7 +389,7 @@ availableLanguages() {
 	return translations
 }
 
-readTranslations(targetLanguageCode, withUserTranslations := true) {
+readTranslations(targetLanguageCode, withUserTranslations := true, fromEditor := false) {
 	local fileNames := []
 	local fileName := (kTranslationsDirectory . "Translations." . targetLanguageCode)
 	local translations, translation, ignore, enString
@@ -417,15 +417,15 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 			translation := StrSplit(translation, "=>")
 			enString := translation[1]
 
-			if ((SubStr(enString, 1, 1) != "[") && (targetLanguageCode != "en"))
-				if ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2]))) {
+			if ((SubStr(enString, 1, 1) != "[") && (fromEditor || (targetLanguageCode != "en")))
+				if (!fromEditor && ((translation.Length < 2) || (translations.Has(enString) && (translations[enString] != translation[2])))) {
 					if isDebug()
 						throw "Inconsistent translation encountered for `"" . enString . "`" in readTranslations..."
 					else
 						logError("Inconsistent translation encountered for `"" . enString . "`" in readTranslations...")
 				}
 				else
-					translations[enString] := translation[2]
+					translations[enString] := ((translation.Length < 2) ? "" : translation[2])
 		}
 
 	return translations
@@ -433,7 +433,7 @@ readTranslations(targetLanguageCode, withUserTranslations := true) {
 
 writeTranslations(languageCode, languageName, translations) {
 	local fileName := kUserTranslationsDirectory . "Translations." . languageCode
-	local stdTranslations := readTranslations(languageCode, false)
+	local stdTranslations := readTranslations(languageCode, false, false)
 	local hasValues := false
 	local ignore, key, value, temp, curEncoding, original, translation
 
@@ -444,7 +444,7 @@ writeTranslations(languageCode, languageName, translations) {
 	}
 
 	if hasValues {
-		temp := {}
+		temp := CaseInsenseMap()
 
 		for key, value in translations
 			if (!stdTranslations.Has(key) || (stdTranslations[key] != value))

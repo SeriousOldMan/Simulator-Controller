@@ -2870,7 +2870,7 @@ class Facts {
 		}
 
 		Set {
-			return (this.iFacts := toMap(value))
+			return (this.iFacts := toMap(value, CaseInsenseMap))
 		}
 	}
 

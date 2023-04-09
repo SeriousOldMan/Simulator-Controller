@@ -377,7 +377,7 @@ initializeLocalization() {
 ;;;-------------------------------------------------------------------------;;;
 
 availableLanguages() {
-	local translations := collect("en", "English")
+	local translations := CaseInsenseMap("en", "English")
 	local ignore, fileName, languageCode
 
 	for ignore, fileName in getFileNames("Translations.*", kUserTranslationsDirectory, kTranslationsDirectory) {

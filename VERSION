@@ -1,9 +1,9 @@
 [Development]
-Version=4.6.3.1-dev
-Target=4.6.3.1-release
-Date=03/15/2023
+Version=4.7.0.0-dev
+Target=4.7.0.0-release
+Date=04/08/2023
 Download=
-Changes=Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC
+Changes=Full rework of all applications to support the new AutoHotkey 2.0 language, Support for window reszing in allmost all applications, Renamed controller action function "hotkey" to "trigger" to avoid conflict with new builtin function, Renamed "Setup Advisor" to "Setup Workbench", Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor", Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins, Renamed configuration map functions to multi map functions, Big performance improvements
 [Release]
 Version=4.6.3.0-release
 Date=03/10/2023
@@ -13,4 +13,4 @@ Changes=Allow multiple actions for a custom voice command, Allow multiple action
 Type=Development
 [Version]
 Release=4.6.3.0-release
-Development=4.6.3.1-dev
+Development=4.7.0.0-dev

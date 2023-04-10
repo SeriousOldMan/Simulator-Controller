@@ -41,7 +41,7 @@ class TranslationsEditor extends ConfigurationPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Translations Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
+			super.__New({Descriptor: "Translations Editor", Closeable: true, Resizeable: true, Options: "ToolWindow -MaximizeBox"}, "")
 		}
 
 		Close(*) {
@@ -154,14 +154,15 @@ class TranslationsEditor extends ConfigurationPanel {
 		this.iTranslationsList.createGui(this, configuration)
 	}
 
-	editTranslations(owner) {
+	editTranslations(owner := false) {
 		local window, x, y, w, h
 
 		this.createGui(this.Configuration)
 
 		window := this.Window
 
-		window.Opt("+Owner" . owner.Hwnd)
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
 
 		if getWindowPosition("Translations Editor", &x, &y)
 			window.Show("x" . x . " y" . y)
@@ -349,7 +350,6 @@ class TranslationsList extends ConfigurationItemList {
 		control := window.Add("ListView", "x16 y+10 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VtranslationsListView", collect(["Original", "Translation"], translate))
 		control.OnEvent("Click", listEvent.Bind("Click"))
 		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
-		control.OnEvent("ItemSelect", listEvent.Bind("Select"))
 
 		window.Add("Text", "x16 w86 h23 Y:Move +0x200", translate("Original"))
 		window.Add("Edit", "x110 yp w283 h80 Y:Move W:Grow Disabled voriginalTextEdit")
@@ -371,6 +371,9 @@ class TranslationsList extends ConfigurationItemList {
 
 		static first := true
 
+		if (first != this.Control["translationsListView"])
+			first := true
+
 		count := this.Control["translationsListView"].GetCount()
 
 		for index, translation in this.ItemList
@@ -383,12 +386,12 @@ class TranslationsList extends ConfigurationItemList {
 			loop count - items.Length
 				this.Control["translationsListView"].Delete(count - A_Index + 1)
 
-		if (first || (this.iLanguageCode = "en")) {
+		if ((first == true) || (this.iLanguageCode = "en")) {
 			this.Control["translationsListView"].ModifyCol()
 			this.Control["translationsListView"].ModifyCol(1, 150)
 			this.Control["translationsListView"].ModifyCol(2, 300)
 
-			first := false
+			first := this.Control["translationsListView"]
 		}
 	}
 

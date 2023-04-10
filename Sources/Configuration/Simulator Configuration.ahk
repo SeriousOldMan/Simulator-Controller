@@ -34,7 +34,7 @@
 
 #Include "Libraries\ConfigurationItemList.ahk"
 #Include "Libraries\ConfigurationEditor.ahk"
-; #Include "Libraries\ThemesEditor.ahk"
+#Include "Libraries\ThemesEditor.ahk"
 #Include "Libraries\FormatsEditor.ahk"
 #Include "Libraries\TranslationsEditor.ahk"
 
@@ -373,7 +373,6 @@ class GeneralTab extends ConfigurationItemPanel {
 	}
 
 	openThemesEditor() {
-		/*
 		local window := this.Window
 		local configuration
 
@@ -388,7 +387,6 @@ class GeneralTab extends ConfigurationItemPanel {
 		finally {
 			window.Opt("-Disabled")
 		}
-		*/
 	}
 
 	openFormatsEditor() {
@@ -606,8 +604,8 @@ initializeSimulatorConfiguration()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-; #Include "..\Plugins\Configuration Plugins.ahk"
-; #Include "%A_MyDocuments%\Simulator Controller\Plugins\Configuration Plugins.ahk"
+#Include "..\Plugins\Configuration Plugins.ahk"
+#Include "%A_MyDocuments%\Simulator Controller\Plugins\Configuration Plugins.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

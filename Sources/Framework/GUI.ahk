@@ -847,6 +847,7 @@ translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
 translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
 translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
 translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
+translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
 getControllerActionLabels() {
 	return getControllerActionDefinitions("Labels")

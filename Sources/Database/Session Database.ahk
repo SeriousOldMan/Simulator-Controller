@@ -3256,12 +3256,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 										result := tyresDB.query("Tyres.Pressures", {Group: [["Driver", count, "Count"]]
 																				  , Where: {Driver: driver}})
 
-										number := ((result.Length > 0) ? result[1].Count : 0)
+										number := ((result.Length > 0) ? result[1]["Count"] : 0)
 
 										result := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", count, "Count"]]
 																							   , Where: {Driver: driver}})
 
-										number += ((result.Length > 0) ? result[1].Count : 0)
+										number += ((result.Length > 0) ? result[1]["Count"] : 0)
 
 										if (number > 0)
 											this.AdministrationListView.Add("", translate("Pressures"), (carName . " / " . trackName), this.SessionDatabase.getDriverName(selectedSimulator, driver), number)
@@ -4534,12 +4534,12 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 						rows := tyresDB.query("Tyres.Pressures", {Group: [["Driver", count, "Count"]]
 																, Where: {Driver: driver}})
 
-						number := ((rows.Length > 0) ? rows[1].Count : 0)
+						number := ((rows.Length > 0) ? rows[1]["Count"] : 0)
 
 						rows := tyresDB.query("Tyres.Pressures.Distribution", {Group: [["Driver", count, "Count"]]
 																			 , Where: {Driver: driver}})
 
-						number += ((rows.Length > 0) ? rows[1].Count : 0)
+						number += ((rows.Length > 0) ? rows[1]["Count"] : 0)
 
 						if (number > 0)
 							importListView.Add("Check", translate("Pressures"), (carName . " / " . trackName), driverName, number)

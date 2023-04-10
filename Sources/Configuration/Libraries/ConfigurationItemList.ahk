@@ -6,6 +6,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                         Local Include Section                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "ConfigurationEditor.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -13,38 +20,29 @@
 ;;; ConfigurationItemList                                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ConfigurationItemList extends ConfigurationItem {
-	static sListControls := {}
+class ConfigurationItemList extends ConfigurationPanel {
+	static sListControls := Map()
 
-	iListHandle := false
-	iAddButton := ""
-	iDeleteButton := ""
-	iUpdateButton := ""
+	iListView := false
+	iAddButton := false
+	iDeleteButton := false
+	iUpdateButton := false
 	iUpButton := false
 	iDownButton := false
 
 	iItemList := []
 	iCurrentItem := 0
 
-	iWindow := false
-
-	Window {
+	ListView {
 		Get {
-			return this.iWindow
-		}
-	}
-
-	ListHandle {
-		Get {
-			return this.iListHandle
+			return this.iListView
 		}
 	}
 
 	AutoSave {
 		Get {
-; #Warn UseUnsetLocal, Off
 			try {
-				if (ConfigurationEditor && ConfigurationEditor.Instance)
+				if (isSet(ConfigurationEditor) && ConfigurationEditor.Instance)
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false
@@ -57,8 +55,12 @@ class ConfigurationItemList extends ConfigurationItem {
 
 	ItemList[index := "__Undefined__"] {
 		Get {
-			if (index != kUndefined)
+			if (index != kUndefined) {
+				if !this.iItemList.Has(index)
+					MsgBox 1
+
 				return this.iItemList[index]
+			}
 			else
 				return this.iItemList
 		}
@@ -81,50 +83,50 @@ class ConfigurationItemList extends ConfigurationItem {
 		}
 	}
 
-	initializeList(listHandle, listVariable, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
-		this.iWindow := (A_DefaultGui ? A_DefaultGui : (A_Gui ? A_Gui : false))
+	initializeList(editor, listView, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
+		this.Editor := editor
 
-		this.iListHandle := listHandle
+		this.iListView := listView
 		this.iAddButton := addButton
 		this.iDeleteButton := deleteButton
 		this.iUpdateButton := updateButton
 		this.iUpButton := upButton
 		this.iDownButton := downButton
 
-		ConfigurationItemList.associateList(listVariable, this)
+		associateControl(control) {
+			ConfigurationItemList.sListControls[control] := this
+		}
+
+		associateControl(listView)
 
 		if addButton
-			ConfigurationItemList.associateList(addButton, this)
+			associateControl(addButton)
 
 		if deleteButton
-			ConfigurationItemList.associateList(deleteButton, this)
+			associateControl(deleteButton)
 
 		if updateButton
-			ConfigurationItemList.associateList(updateButton, this)
+			associateControl(updateButton)
 
 		if upButton
-			ConfigurationItemList.associateList(upButton, this)
+			associateControl(upButton)
 
 		if downButton
-			ConfigurationItemList.associateList(downButton, this)
+			associateControl(downButton)
 
 		this.loadList(this.ItemList)
+
 		this.updateState()
 	}
 
 	saveToConfiguration(configuration) {
-		if this.AutoSave {
+		if this.AutoSave
 			if (this.CurrentItem != 0)
 				this.updateItem()
-		}
 	}
 
-	associateList(variable, itemList) {
-		ConfigurationItemList.sListControls[variable] := itemList
-	}
-
-	getList(variable) {
-		return ConfigurationItemList.sListControls[variable]
+	static getList(control) {
+		return ConfigurationItemList.sListControls[control]
 	}
 
 	clickEvent(line, count) {
@@ -138,46 +140,20 @@ class ConfigurationItemList extends ConfigurationItem {
 	}
 
 	processListEvent() {
-		local event := (A_GuiEvent . A_Space . A_GuiControl . A_Space . A_EventInfo)
-		local editor
-
-		static lastEvent := false
-		static lastEditor := false
-
-		if (event = lastEvent)
-			return false
-		else {
-			lastEvent := event
-
-			return true
-		}
-
-		editor := (A_GuiControl . "." . A_EventInfo)
-
-		if (editor = lastEditor)
-			return false
-		else {
-			lastEditor := editor
-
-			return true
-		}
+		return true
 	}
 
-	listEvent() {
-		local info := ErrorLevel
-
+	listEvent(type, line) {
 		protectionOn(true, true)
 
 		try {
 			if this.processListEvent() {
-				if (A_GuiEvent == "DoubleClick")
-					this.clickEvent(A_EventInfo, 2)
-				else if (A_GuiEvent == "Normal")
-					this.clickEvent(A_EventInfo, 1)
-				else if (A_GuiEvent == "I") {
-					if InStr(info, "S", true)
-						this.selectEvent(A_EventInfo)
-				}
+				if (type == "DoubleClick")
+					this.clickEvent(line, 2)
+				else if (type == "Click")
+					this.clickEvent(line, 1)
+				else if (type == "Select")
+					this.selectEvent(line)
 			}
 		}
 		finally {
@@ -192,40 +168,37 @@ class ConfigurationItemList extends ConfigurationItem {
 	updateState() {
 		local window := this.Window
 
-		if window
-			window .= ":"
-		else
-			window := ""
-
 		if (this.CurrentItem != 0) {
 			if (this.iDeleteButton != false)
-				GuiControl %window%Enable, % this.iDeleteButton
+				this.iDeleteButton.Enabled := true
+
 			if (this.iUpdateButton != false)
-				GuiControl %window%Enable, % this.iUpdateButton
+				this.iUpdateButton.Enabled := true
 
 			if (this.iUpButton != false)
 				if (this.CurrentItem > 1)
-					GuiControl %window%Enable, % this.iUpButton
+					this.iUpButton.Enabled := true
 				else
-					GuiControl %window%Disable, % this.iUpButton
+					this.iUpButton.Enabled := false
 
 			if (this.iDownButton != false)
-				if (this.CurrentItem < this.ItemList.Length())
-					GuiControl %window%Enable, % this.iDownButton
+				if (this.CurrentItem < this.ItemList.Length)
+					this.iDownButton.Enabled := true
 				else
-					GuiControl %window%Disable, % this.iDownButton
+					this.iDownButton.Enabled := false
 		}
 		else {
 			if (this.iUpButton != false)
-				GuiControl %window%Disable, % this.iUpButton
+				this.iUpButton.Enabled := false
 
 			if (this.iDownButton != false)
-				GuiControl %window%Disable, % this.iDownButton
+				this.iDownButton.Enabled := false
 
 			if (this.iDeleteButton != false)
-				GuiControl %window%Disable, % this.iDeleteButton
+				this.iDeleteButton.Enabled := false
+
 			if (this.iUpdateButton != false)
-				GuiControl %window%Disable, % this.iUpdateButton
+				this.iUpdateButton.Enabled := false
 		}
 	}
 
@@ -261,10 +234,8 @@ class ConfigurationItemList extends ConfigurationItem {
 	selectItem(itemNumber) {
 		this.CurrentItem := itemNumber
 
-		Gui ListView, % this.ListHandle
-
 		if itemNumber
-			LV_Modify(itemNumber, "Vis +Select +Focus")
+			this.ListView.Modify(itemNumber, "Vis +Select +Focus")
 
 		this.updateState()
 	}
@@ -351,69 +322,69 @@ class ConfigurationItemList extends ConfigurationItem {
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
+;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-listEvent() {
+listEvent(type, control, line, *) {
 	protectionOn()
 
 	try {
-		ConfigurationItemList.getList(A_GuiControl).listEvent()
+		ConfigurationItemList.getList(control).listEvent(type, line)
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-addItem() {
+addItem(control, *) {
 	protectionOn()
 
 	try{
-		ConfigurationItemList.getList(A_GuiControl).addItem()
+		ConfigurationItemList.getList(control).addItem()
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-deleteItem() {
+deleteItem(control, *) {
 	protectionOn()
 
 	try{
-		ConfigurationItemList.getList(A_GuiControl).deleteItem()
+		ConfigurationItemList.getList(control).deleteItem()
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-updateItem() {
+updateItem(control, *) {
 	protectionOn()
 
 	try{
-		ConfigurationItemList.getList(A_GuiControl).updateItem()
+		ConfigurationItemList.getList(control).updateItem()
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-upItem() {
+upItem(control, *) {
 	protectionOn()
 
 	try{
-		ConfigurationItemList.getList(A_GuiControl).upItem()
+		ConfigurationItemList.getList(control).upItem()
 	}
 	finally {
 		protectionOff()
 	}
 }
 
-downItem() {
+downItem(control, *) {
 	protectionOn()
 
 	try{
-		ConfigurationItemList.getList(A_GuiControl).downItem()
+		ConfigurationItemList.getList(control).downItem()
 	}
 	finally {
 		protectionOff()

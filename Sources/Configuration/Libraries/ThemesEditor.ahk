@@ -9,15 +9,15 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ConfigurationItemList.ahk
-#Include Libraries\ConfigurationEditor.ahk
+#Include "ConfigurationItemList.ahk"
+#Include "ConfigurationEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,12 +28,23 @@
 ;;; ThemesEditor                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global windowTitleEdit := ""
-global windowSubtitleEdit := ""
-
-class ThemesEditor extends ConfigurationItem {
+class ThemesEditor extends ConfigurationPanel {
 	iClosed := false
 	iThemesList := false
+
+	class ThemesWindow extends Window {
+		iEditor := false
+
+		__New(editor) {
+			this.iEditor := editor
+
+			super.__New({Descriptor: "Themes Editor", Closeable: true, Resizeable: true, Options: "ToolWindow -MaximizeBox"}, "")
+		}
+
+		Close(*) {
+			this.iEditor.closeEditor(false)
+		}
+	}
 
 	__New(configuration) {
 		this.iThemesList := ThemesList(configuration)
@@ -41,71 +52,102 @@ class ThemesEditor extends ConfigurationItem {
 		super.__New(configuration)
 
 		ThemesEditor.Instance := this
-
-		this.createGui(configuration)
 	}
 
 	createGui(configuration) {
-		Gui TE:Default
+		local themesGui
 
-		Gui TE:-Border ; -Caption
-		Gui TE:Color, D0D0D0, D8D8D8
+		saveThemesEditor(*) {
+			protectionOn()
 
-		Gui TE:Font, Bold, Arial
+			try {
+				this.closeEditor(true)
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui TE:Add, Text, w388 Center gmoveThemesEditor, % translate("Modular Simulator Controller System")
+		cancelThemesEditor(*) {
+			protectionOn()
 
-		Gui TE:Font, Norm, Arial
-		Gui TE:Font, Italic Underline, Arial
+			try {
+				this.closeEditor(false)
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui TE:Add, Text, x158 YP+20 w88 cBlue Center gopenThemesDocumentation, % translate("Themes")
+		themesGui := ThemesEditor.ThemesWindow(this)
 
-		Gui TE:Font, Norm, Arial
+		this.Window := themesGui
 
-		Gui TE:Add, Text, x16 y48 w160 h23 +0x200, % translate("Upper Title")
-		Gui TE:Add, Edit, x110 y48 w284 h21 VwindowTitleEdit, %windowTitleEdit%
+		themesGui.SetFont("Bold", "Arial")
 
-		Gui TE:Add, Text, x16 y72 w160 h23 +0x200, % translate("Lower Title")
-		Gui TE:Add, Edit, x110 y72 w284 h21 VwindowSubtitleEdit, %windowSubtitleEdit%
+		themesGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(themesGui, "Themes Editor"))
 
-		Gui TE:Add, Text, x50 y106 w310 0x10
+		themesGui.SetFont("Norm", "Arial")
+		themesGui.SetFont("Italic Underline", "Arial")
 
-		this.iThemesList.createGui(configuration)
+		themesGui.Add("Text", "x158 YP+20 w88 H:Center cBlue Center", translate("Themes")).OnEvent("Click", openDocumentation.Bind(themesGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor"))
 
-		Gui TE:Add, Text, x50 y+10 w310 0x10
+		themesGui.SetFont("Norm", "Arial")
 
-		Gui TE:Add, Button, x126 yp+10 w80 h23 Default GsaveThemesEditor, % translate("Save")
-		Gui TE:Add, Button, x214 yp w80 h23 GcancelThemesEditor, % translate("&Cancel")
+		themesGui.Add("Text", "x16 y48 w160 h23 +0x200", translate("Upper Title"))
+		themesGui.Add("Edit", "x110 y48 w284 h21 W:Grow VwindowTitleEdit", this.Value["windowTitle"])
+
+		themesGui.Add("Text", "x16 y72 w160 h23 +0x200", translate("Lower Title"))
+		themesGui.Add("Edit", "x110 y72 w284 h21 W:Grow VwindowSubtitleEdit", this.Value["windowSubtitle"])
+
+		themesGui.Add("Text", "x50 y106 w310 W:Grow 0x10")
+
+		this.iThemesList.createGui(this, configuration)
+
+		themesGui.Add("Text", "x50 y+10 w310 Y:Move W:Grow 0x10")
+
+		themesGui.Add("Button", "x126 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Save")).OnEvent("Click", saveThemesEditor)
+		themesGui.Add("Button", "x214 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", cancelThemesEditor)
 	}
 
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
-		windowTitleEdit := getMultiMapValue(configuration, "Splash Window", "Title", "")
-		windowSubtitleEdit := getMultiMapValue(configuration, "Splash Window", "Subtitle", "")
+		this.Value["windowTitle"] := getMultiMapValue(configuration, "Splash Window", "Title", "")
+		this.Value["windowSubtitle"] := getMultiMapValue(configuration, "Splash Window", "Subtitle", "")
 	}
 
 	saveToConfiguration(configuration) {
 		super.saveToConfiguration(configuration)
 
-		setMultiMapValue(configuration, "Splash Window", "Title", windowTitleEdit)
-		setMultiMapValue(configuration, "Splash Window", "Subtitle", windowSubtitleEdit)
+		setMultiMapValue(configuration, "Splash Window", "Title", this.Control["windowTitleEdit"].Text)
+		setMultiMapValue(configuration, "Splash Window", "Subtitle", this.Control["windowSubtitleEdit"].Text)
 
 		this.iThemesList.saveToConfiguration(configuration)
 	}
 
-	editThemes() {
-		local x, y, configuration
+	editThemes(owner := false) {
+		local x, y, configuration, window
+
+		this.createGui(this.Configuration)
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
 
 		this.iThemesList.clearEditor()
 
-		if getWindowPosition("Themes Editor", x, y)
-			Gui TE:Show, x%x% y%y%
+		if getWindowPosition("Themes Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui TE:Show
+			window.Show()
+
+		if getWindowSize("Themes Editor", &w, &h)
+			window.Resize("Initialize", w, h)
 
 		loop
-			Sleep 200
+			Sleep(200)
 		until this.iClosed
 
 		try {
@@ -120,14 +162,11 @@ class ThemesEditor extends ConfigurationItem {
 				return false
 		}
 		finally {
-			Gui TE:Destroy
+			window.Destroy()
 		}
 	}
 
 	closeEditor(save) {
-		if save
-			Gui TE:Submit
-
 		this.iThemesList.togglePlaySoundFile(true)
 
 		this.iClosed := (save ? kOk : kCancel)
@@ -138,32 +177,15 @@ class ThemesEditor extends ConfigurationItem {
 ;;; ThemesList                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global themesListView := false
-global themeNameEdit := ""
-global themeTypeDropDown := 0
-
-global playSoundButtonHandle
-global soundFilePathEdit := ""
-
-global videoFilePathLabel
-global videoFilePathEdit := ""
-global videoFilePathButton
-
-global picturesListLabel
-global addPictureButton
-global picturesListView
-global picturesListViewHandle
-global picturesListViewImages
-global picturesDurationLabel
-global picturesDurationEdit := 3000
-global picturesDurationPostfix
-
-global themeAddButton
-global themeDeleteButton
-global themeUpdateButton
-
 class ThemesList extends ConfigurationItemList {
 	iSoundIsPlaying := false
+	iPicturesList := false
+
+	PicturesList {
+		Get {
+			return this.iPicturesList
+		}
+	}
 
 	__New(configuration) {
 		super.__New(configuration)
@@ -171,48 +193,156 @@ class ThemesList extends ConfigurationItemList {
 		ThemesList.Instance := this
 	}
 
-	createGui(configuration) {
-		Gui TE:Add, ListView, x16 y120 w377 h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndthemesListViewHandle VthemesListView glistEvent
-							, % values2String("|", collect(["Theme", "Media", "Sound File"], "translate")*)
+	createGui(editor, configuration) {
+		local window := editor.Window
+		local control
 
-		Gui TE:Add, Text, x16 y270 w86 h23 +0x200, % translate("Theme")
-		Gui TE:Add, Edit, x110 y270 w140 h21 VthemeNameEdit, %themeNameEdit%
+		updateThemesEditorState(*) {
+			protectionOn()
 
-		Gui TE:Add, Text, x16 y294 w86 h23 +0x200, % translate("Type")
-		Gui TE:Add, DropDownList, x110 y294 w140 AltSubmit VthemeTypeDropDown gupdateThemesEditorState, % translate("Picture Carousel") . "|" . translate("Video")
+			try {
+				this.updateState()
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui TE:Add, Text, x16 y318 w160 h23 +0x200, % translate("Sound File")
-		Gui TE:Add, Button, x85 y317 w23 h23 HwndplaySoundButtonHandle gtogglePlaySoundFile
-		setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
-		Gui TE:Add, Edit, x110 y318 w259 h21 VsoundFilePathEdit, %soundFilePathEdit%
-		Gui TE:Add, Button, x371 y317 w23 h23 gchooseSoundFilePath, % translate("...")
+		togglePlaySoundFile(*) {
+			protectionOn()
 
-		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VvideoFilePathLabel, % translate("Video")
-		Gui TE:Add, Edit, x110 y342 w259 h21 VvideoFilePathEdit, %videoFilePathEdit%
-		Gui TE:Add, Button, x371 y341 w23 h23 VvideoFilePathButton gchooseVideoFilePath, % translate("...")
+			try {
+				this.togglePlaySoundFile()
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui TE:Add, Text, x16 y342 w80 h23 +0x200 VpicturesListLabel, % translate("Pictures")
-		Gui TE:Add, Button, x85 y342 w23 h23 HwndaddPictureButtonHandle VaddPictureButton gaddThemePicture
-		setButtonIcon(addPictureButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		Gui TE:Add, ListView, x110 y342 w284 h112 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr HwndpicturesListViewHandle VpicturesListView, % translate("Picture")
+		addThemePicture(*) {
+			local pictureFile
 
-		Gui TE:Add, Text, x16 y456 w80 h23 +0x200 VpicturesDurationLabel, % translate("Display Duration")
-		Gui TE:Add, Edit, x110 y456 w40 h21 Limit5 Number VpicturesDurationEdit, %picturesDurationEdit%
+			protectionOn()
 
-		Gui TE:Font, Norm, Arial
+			try {
+				this.Window.Opt("+OwnDialogs")
 
-		Gui TE:Add, Text, x154 y459 w40 h23 VpicturesDurationPostfix, % translate("ms")
+				OnMessage(0x44, translateSaveCancelButtons)
+				pictureFile := FileSelect(1, "", translate("Select Image..."), "Image (*.jpg; *.gif)")
+				OnMessage(0x44, translateSaveCancelButtons, 0)
 
-		Gui TE:Add, Button, x184 y490 w46 h23 VthemeAddButton gaddItem, % translate("Add")
-		Gui TE:Add, Button, x232 y490 w50 h23 Disabled VthemeDeleteButton gdeleteItem, % translate("Delete")
-		Gui TE:Add, Button, x340 y490 w55 h23 Disabled VthemeUpdateButton gupdateItem, % translate("&Save")
+				if (pictureFile != "") {
+					IL_Add(this.PicturesList, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
 
-		this.initializeList(themesListViewHandle, "themesListView", "themeAddButton", "themeDeleteButton", "themeUpdateButton")
+					this.Control["picturesListView"].Add("Check Icon" . (this.Control["picturesListView"].GetCount() + 1)
+													   , StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
+
+					this.Control["picturesListView"].ModifyCol()
+					this.Control["picturesListView"].Modify(this.Control["picturesListView"].GetCount(), "Vis")
+				}
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		chooseSoundFilePath(*) {
+			local path, soundFile
+
+			protectionOn()
+
+			try {
+				path := this.Control["soundFilePathEdit"].Text
+
+				if (path && (path != ""))
+					path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+				else
+					path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+
+				this.Window.Opt("+OwnDialogs")
+
+				OnMessage(0x44, translateSelectCancelButtons)
+				soundFile := FileSelect(1, "*" . path, translate("Select Sound File..."), "Audio (*.wav; *.mp3)")
+				OnMessage(0x44, translateSelectCancelButtons, 0)
+
+				if (soundFile != "")
+					this.Control["soundFilePathEdit"].Text := soundFile
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		chooseVideoFilePath(*) {
+			local path, videoFile
+
+			protectionOn()
+
+			try {
+				path := this.Control["videoFilePathEdit"].Text
+
+				if (path && (path != ""))
+					path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
+				else
+					path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
+
+				this.Window.Opt("+OwnDialogs")
+
+				OnMessage(0x44, translateSelectCancelButtons)
+				videoFile := FileSelect(1, "*" . path, translate("Select Video (GIF) File..."), "Video (*.gif)")
+				OnMessage(0x44, translateSelectCancelButtons, 0)
+
+				if (videoFile != "")
+					this.Control["videoFilePathEdit"].Text := videoFile
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		control := window.Add("ListView", "x16 y120 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VthemesListView", collect(["Theme", "Media", "Sound File"], translate))
+		control.OnEvent("Click", listEvent.Bind("Click"))
+		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
+
+		window.Add("Text", "x16 y270 w86 h23 +0x200 Y:Move", translate("Theme"))
+		window.Add("Edit", "x110 y270 w140 h21 Y:Move W:Grow(0.5) VthemeNameEdit")
+
+		window.Add("Text", "x16 y294 w86 h23 +0x200 Y:Move", translate("Type"))
+		window.Add("DropDownList", "x110 y294 w140 Y:Move W:Grow(0.5) AltSubmit VthemeTypeDropDown", [translate("Picture Carousel"), translate("Video")]).OnEvent("Change", updateThemesEditorState)
+
+		window.Add("Text", "x16 y318 w160 h23 Y:Move +0x200", translate("Sound File"))
+		window.Add("Button", "x85 y317 w23 h23 Y:Move vplaySoundFileButton").OnEvent("Click", togglePlaySoundFile)
+		setButtonIcon(window["playSoundFileButton"], kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
+		window.Add("Edit", "x110 y318 w259 h21 Y:Move W:Grow VsoundFilePathEdit")
+		window.Add("Button", "x371 y317 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseSoundFilePath)
+
+		window.Add("Text", "x16 y342 w80 h23 +0x200 Y:Move VvideoFilePathLabel", translate("Video"))
+		window.Add("Edit", "x110 y342 w259 h21 Y:Move W:Grow VvideoFilePathEdit")
+		window.Add("Button", "x371 y341 w23 h23 Y:Move X:Move VvideoFilePathButton", translate("...")).OnEvent("Click", chooseVideoFilePath)
+
+		window.Add("Text", "x16 y342 w80 h23 +0x200 Y:Move VpicturesListLabel", translate("Pictures"))
+		window.Add("Button", "x85 y342 w23 h23 Y:Move VaddPictureButton").OnEvent("Click", addThemePicture)
+		setButtonIcon(window["addPictureButton"], kIconsDirectory . "Plus.ico", 1)
+
+		window.Add("ListView", "x110 y342 w284 h112 Y:Move W:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr VpicturesListView", [translate("Picture")])
+
+		window.Add("Text", "x16 y456 w80 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
+		window.Add("Edit", "x110 y456 w40 h21 Y:Move Limit5 Number VpicturesDurationEdit")
+
+		window.SetFont("Norm", "Arial")
+
+		window.Add("Text", "x154 y459 w40 h23 Y:Move VpicturesDurationPostfix", translate("ms"))
+
+		window.Add("Button", "x184 y490 w46 h23 Y:Move X:Move VthemeAddButton", translate("Add")).OnEvent("Click", addItem)
+		window.Add("Button", "x232 y490 w50 h23 Y:Move X:Move Disabled VthemeDeleteButton", translate("Delete")).OnEvent("Click", deleteItem)
+		window.Add("Button", "x340 y490 w55 h23 Y:Move X:Move Disabled VthemeUpdateButton", translate("&Save")).OnEvent("Click", updateItem)
+
+		this.initializeList(editor, window["themesListView"], window["themeAddButton"], window["themeDeleteButton"], window["themeUpdateButton"])
 	}
 
 	loadFromConfiguration(configuration) {
 		local splashThemes := getMultiMapValues(configuration, "Splash Themes")
-		local themes := {}
+		local themes := CaseInsenseMap()
 		local descriptor, value, theme, type, media, duration, songFile
 
 		super.loadFromConfiguration(configuration)
@@ -220,18 +350,18 @@ class ThemesList extends ConfigurationItemList {
 		for descriptor, value in splashThemes {
 			theme := StrSplit(descriptor, ".")[1]
 
-			if !themes.HasKey(theme) {
+			if !themes.Has(theme) {
 				type := splashThemes[theme . ".Type"]
 				media := ((type == ("Picture Carousel")) ? splashThemes[theme . ".Images"] : splashThemes[theme . ".Video"])
 				duration := ((type == ("Picture Carousel")) ? splashThemes[theme . ".Duration"] : false)
-				songFile := (splashThemes.HasKey(theme . ".Song") ? splashThemes[theme . ".Song"] : false)
+				songFile := (splashThemes.Has(theme . ".Song") ? splashThemes[theme . ".Song"] : false)
 
 				if !songFile
 					songFile := ""
 
 				themes[theme] := theme
 
-				this.ItemList.Push(Array(type, theme, media, songFile, duration))
+				this.ItemList.Push([type, theme, media, songFile, duration])
 			}
 		}
 	}
@@ -265,15 +395,16 @@ class ThemesList extends ConfigurationItemList {
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
+		if (first != this.Control["themesListView"])
+			first := true
 
-		LV_Delete()
+		this.Control["themesListView"].Delete()
 
 		for ignore, theme in items {
 			songFile := theme[4]
 
 			if (songFile != "") {
-				SplitPath songFile, , , , nameNoExt
+				SplitPath(songFile, , , , &nameNoExt)
 
 				songFile := nameNoExt
 			}
@@ -281,177 +412,145 @@ class ThemesList extends ConfigurationItemList {
 			mediaFiles := []
 
 			for ignore, mediaFile in string2Values(",", theme[3]) {
-				SplitPath mediaFile, , , , nameNoExt
+				SplitPath(mediaFile, , , , &nameNoExt)
 
 				mediaFiles.Push(nameNoExt)
 			}
 
-			LV_Add("", theme[2], values2String(", ", mediaFiles*), songFile)
+			this.Control["themesListView"].Add("", theme[2], values2String(", ", mediaFiles*), songFile)
 		}
 
 		if first {
-			LV_ModifyCol(1, 100)
-			LV_ModifyCol(2, 180)
-			LV_ModifyCol(3, 100)
+			this.Control["themesListView"].ModifyCol(1, 100)
+			this.Control["themesListView"].ModifyCol(2, 180)
+			this.Control["themesListView"].ModifyCol(3, 100)
 
-			first := false
+			first := this.Control["themesListView"]
 		}
 	}
 
 	updateState() {
 		super.updateState()
 
-		GuiControlGet themeTypeDropDown
-
-		if (themeTypeDropDown == 1) {
-			GuiControl Show, picturesListLabel
-			GuiControl Show, addPictureButton
-			GuiControl Show, picturesListView
-			GuiControl Show, picturesDurationLabel
-			GuiControl Show, picturesDurationEdit
-			GuiControl Show, picturesDurationPostfix
+		if (this.Control["themeTypeDropDown"].Value == 1) {
+			this.Control["picturesListLabel"].Visible := true
+			this.Control["addPictureButton"].Visible := true
+			this.Control["picturesListView"].Visible := true
+			this.Control["picturesDurationLabel"].Visible := true
+			this.Control["picturesDurationEdit"].Visible := true
+			this.Control["picturesDurationPostfix"].Visible := true
 		}
 		else {
-			GuiControl Hide, picturesListLabel
-			GuiControl Hide, addPictureButton
-			GuiControl Hide, picturesListView
-			GuiControl Hide, picturesDurationLabel
-			GuiControl Hide, picturesDurationEdit
-			GuiControl Hide, picturesDurationPostfix
+			this.Control["picturesListLabel"].Visible := false
+			this.Control["addPictureButton"].Visible := false
+			this.Control["picturesListView"].Visible := false
+			this.Control["picturesDurationLabel"].Visible := false
+			this.Control["picturesDurationEdit"].Visible := false
+			this.Control["picturesDurationPostfix"].Visible := false
 		}
 
-		if (themeTypeDropDown == 2) {
-			GuiControl Show, videoFilePathLabel
-			GuiControl Show, videoFilePathEdit
-			GuiControl Show, videoFilePathButton
+		if (this.Control["themeTypeDropDown"].Value == 2) {
+			this.Control["videoFilePathLabel"].Visible := true
+			this.Control["videoFilePathEdit"].Visible := true
+			this.Control["videoFilePathButton"].Visible := true
 		}
 		else {
-			GuiControl Hide, videoFilePathLabel
-			GuiControl Hide, videoFilePathEdit
-			GuiControl Hide, videoFilePathButton
+			this.Control["videoFilePathLabel"].Visible := false
+			this.Control["videoFilePathEdit"].Visible := false
+			this.Control["videoFilePathButton"].Visible := false
 		}
 	}
 
 	initializePicturesList(pictures := "") {
 		local ignore, picture
 
-		Gui ListView, % picturesListViewHandle
-
-		LV_Delete()
+		this.Control["picturesListView"].Delete()
 
 		pictures := string2Values(",", pictures)
 
-		picturesListViewImages := IL_Create(pictures.Length())
+		picturesListViewImages := IL_Create(pictures.Length)
 
 		for ignore, picture in pictures
 			IL_Add(picturesListViewImages, getFileName(picture, kUserSplashMediaDirectory, kSplashMediaDirectory))
 
-		LV_SetImageList(picturesListViewImages)
+		this.Control["picturesListView"].SetImageList(picturesListViewImages)
 
-		loop % pictures.Length()
-			LV_Add("Check Icon" . A_Index, pictures[A_Index])
+		loop pictures.Length
+			this.Control["picturesListView"].Add("Check Icon" . A_Index, pictures[A_Index])
 
-		LV_ModifyCol()
+		this.Control["picturesListView"].ModifyCol()
 	}
 
 	loadEditor(item) {
-		themeTypeDropDown := (item[1] == "Picture Carousel") ? 1 : 2
-		themeNameEdit := item[2]
-		soundFilePathEdit := item[4]
+		local chosen := ((item[1] == "Picture Carousel") ? 1 : 2)
 
-		GuiControl Choose, themeTypeDropDown, %themeTypeDropDown%
-		GuiControl Text, themeNameEdit, %themeNameEdit%
-		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
+		this.Control["themeTypeDropDown"].Choose(chosen)
+		this.Control["themeNameEdit"].Text := item[2]
+		this.Control["soundFilePathEdit"].Text := item[4]
 
-		if (themeTypeDropDown == 2)
-			videoFilePathEdit := item[3]
+		if (chosen == 2)
+			this.Control["videoFilePathEdit"].Text := item[3]
 		else
-			videoFilePathEdit := ""
+			this.Control["videoFilePathEdit"].Text := ""
 
-		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
-
-		if (themeTypeDropDown == 1) {
+		if (chosen == 1) {
 			this.initializePicturesList(item[3])
 
-			picturesDurationEdit := item[5]
-
-			GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
+			this.Control["picturesDurationEdit"].Text := item[5]
 		}
 		else
 			this.initializePicturesList("")
 
-		this.updateEditor()
+		this.updateState()
 	}
 
 	clearEditor() {
-		themeTypeDropDown := 0
-		themeNameEdit := ""
-		soundFilePathEdit := ""
-		videoFilePathEdit := ""
-		picturesDurationEdit := 3000
-
-		GuiControl Choose, themeTypeDropDown, %themeTypeDropDown%
-		GuiControl Text, themeNameEdit, %themeNameEdit%
-		GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
-		GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
-		GuiControl Text, picturesDurationEdit, %picturesDurationEdit%
+		this.Control["themeTypeDropDown"].Choose(0)
+		this.Control["themeNameEdit"].Text := ""
+		this.Control["soundFilePathEdit"].Text := ""
+		this.Control["videoFilePathEdit"].Text := ""
+		this.Control["picturesDurationEdit"].Text := 3000
 
 		this.initializePicturesList("")
 
-		this.updateEditor()
+		this.updateState()
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local type, media, pictures, rowNumber, title, fileName
+		local type, media, pictures, rowNumber, fileName
 
-		GuiControlGet themeNameEdit
-		GuiControlGet themeTypeDropDown
-		GuiControlGet soundFilePathEdit
-		GuiControlGet picturesDurationEdit
-
-		type := ""
-		media := ""
-
-		if (themeTypeDropDown == 1) {
+		if (this.Control["themeTypeDropDown"].Value == 1) {
 			type := "Picture Carousel"
 			pictures := []
-
-			Gui ListView, % picturesListViewHandle
 
 			rowNumber := 0
 
 			loop {
-				rowNumber := LV_GetNext(rowNumber, "C")
+				rowNumber := this.Control["picturesListView"].GetNext(rowNumber, "C")
 
 				if !rowNumber
 					break
 
-				LV_GetText(fileName, rowNumber)
+				fileName := this.Control["picturesListView"].GetText(rowNumber, 1)
 
 				pictures.Push(StrReplace(StrReplace(fileName, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
 			}
 
 			media := values2String(", ", pictures*)
 		}
-		else if (themeTypeDropDown == 2) {
+		else if (this.Control["themeTypeDropDown"].Value == 2) {
 			type := "Video"
-
-			GuiControlGet videoFilePathEdit
-
-			media := videoFilePathEdit
+			media := this.Control["videoFilePathEdit"].Text
 		}
-		else
-			Goto error
+		else {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
-		return Array(type, themeNameEdit, media, soundFilePathEdit, picturesDurationEdit)
+			return false
+		}
 
-error:
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		title := translate("Error")
-		MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-		OnMessage(0x44, "")
-
-		return false
+		return Array(type, this.Control["themeNameEdit"].Text, media, this.Control["soundFilePathEdit"].Text, this.Control["picturesDurationEdit"].Text)
 	}
 
 	togglePlaySoundFile(stop := false) {
@@ -459,24 +558,23 @@ error:
 
 		if (stop || this.iSoundIsPlaying) {
 			try {
-				SoundPlay NonExistent.avi
+				SoundPlay("NonExistent.avi")
 			}
 			catch Any as exception {
-				logError(exception)
 			}
 
-			setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
+			setButtonIcon(this.Control["playSoundFileButton"], kIconsDirectory . "Start.ico", 1, "L2 T2 R2 B2")
 
 			this.iSoundIsPlaying := false
 		}
 		else if !this.iSoundIsPlaying {
 			try {
-				songFile := getFileName(soundFilePathEdit, kUserSplashMediaDirectory, kSplashMediaDirectory)
+				songFile := getFileName(this.Control["soundFilePathEdit"].Text, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
 				if FileExist(songFile) {
-					SoundPlay %songFile%
+					SoundPlay(songFile)
 
-					setButtonIcon(playSoundButtonHandle, kIconsDirectory . "Pause.ico", 1, "L2 T2 R2 B2")
+					setButtonIcon(this.Control["playSoundFileButton"], kIconsDirectory . "Pause.ico", 1, "L2 T2 R2 B2")
 
 					this.iSoundIsPlaying := true
 				}
@@ -485,160 +583,5 @@ error:
 				logError(exception)
 			}
 		}
-	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-saveThemesEditor() {
-	protectionOn()
-
-	try {
-		ThemesEditor.Instance.closeEditor(true)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-cancelThemesEditor() {
-	protectionOn()
-
-	try {
-		ThemesEditor.Instance.closeEditor(false)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-moveThemesEditor() {
-	moveByMouse("TE", "Themes Editor")
-}
-
-openThemesDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor
-}
-
-updateThemesEditorState() {
-	protectionOn()
-
-	try {
-		ConfigurationItemList.getList("themesListView").updateState()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-togglePlaySoundFile() {
-	protectionOn()
-
-	try {
-		ThemesList.Instance.togglePlaySoundFile()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-addThemePicture() {
-	local pictureFile, title
-
-	protectionOn()
-
-	try {
-		title := translate("Select Image...")
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-		FileSelectFile pictureFile, 1, , %title%, Image (*.jpg; *.gif)
-		OnMessage(0x44, "")
-
-		if (pictureFile != "") {
-			Gui ListView, % picturesListViewHandle
-
-			IL_Add(picturesListViewImages, LoadPicture(pictureFile, "W32 H32"), 0xFFFFFF, false)
-
-			LV_Add("Check Icon" . (LV_GetCount() + 1), StrReplace(StrReplace(pictureFile, kUserSplashMediaDirectory, ""), kSplashMediaDirectory, ""))
-
-			LV_ModifyCol()
-			LV_Modify(LV_GetCount(), "Vis")
-		}
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseSoundFilePath() {
-	local path, soundFile, title
-
-	protectionOn()
-
-	try {
-		GuiControlGet soundFilePathEdit
-
-		path := soundFilePathEdit
-
-		if (path && (path != ""))
-			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
-		else
-			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
-
-		title := translate("Select Sound File...")
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-		FileSelectFile soundFile, 1, *%path%, %title%, Audio (*.wav; *.mp3)
-		OnMessage(0x44, "")
-
-		if (soundFile != "") {
-			soundFilePathEdit := soundFile
-
-			GuiControl Text, soundFilePathEdit, %soundFilePathEdit%
-		}
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseVideoFilePath() {
-	local path, videoFile, title
-
-	protectionOn()
-
-	try {
-		GuiControlGet videoFilePathEdit
-
-		path := videoFilePathEdit
-
-		if (path && (path != ""))
-			path := getFileName(path, kUserSplashMediaDirectory, kSplashMediaDirectory)
-		else
-			path := SubStr(kUserSplashMediaDirectory, 1, StrLen(kUserSplashMediaDirectory) - 1)
-
-		title := translate("Select Video (GIF) File...")
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-		FileSelectFile videoFile, 1, *%path%, %title%, Video (*.gif)
-		OnMessage(0x44, "")
-
-		if (videoFile != "") {
-			videoFilePathEdit := videoFile
-
-			GuiControl Text, videoFilePathEdit, %videoFilePathEdit%
-		}
-	}
-	finally {
-		protectionOff()
 	}
 }

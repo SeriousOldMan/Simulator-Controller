@@ -497,7 +497,7 @@ class RaceAssistant extends ConfigurationItem {
 			this.iLearningLaps := values.LearningLaps
 
 		if values.HasProp("Announcements")
-			this.iAnnouncements := toMap(values.Announcements)
+			this.iAnnouncements := toMap(values.Announcements, CaseInsenseMap)
 	}
 
 	updateSessionValues(values) {

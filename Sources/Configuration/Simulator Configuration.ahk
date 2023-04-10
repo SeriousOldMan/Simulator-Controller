@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
@@ -25,18 +25,18 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Application.ahk
+#Include "..\Framework\Application.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ConfigurationItemList.ahk
-#Include Libraries\ConfigurationEditor.ahk
-#Include Libraries\ThemesEditor.ahk
-#Include Libraries\FormatsEditor.ahk
-#Include Libraries\TranslationsEditor.ahk
+#Include "Libraries\ConfigurationItemList.ahk"
+#Include "Libraries\ConfigurationEditor.ahk"
+#Include "Libraries\ThemesEditor.ahk"
+#Include "Libraries\FormatsEditor.ahk"
+#Include "Libraries\TranslationsEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -47,19 +47,7 @@
 ;;; GeneralTab                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global nirCmdPathEdit
-global homePathEdit
-
-global languageDropDown
-global startWithWindowsCheck
-global silentModeCheck
-
-global ahkPathEdit
-global msBuildPathEdit
-global debugEnabledCheck
-global logLevelDropDown
-
-class GeneralTab extends ConfigurationItem {
+class GeneralTab extends ConfigurationItemPanel {
 	iSimulatorsList := false
 	iDevelopment := false
 	iSplashThemesConfiguration := false
@@ -79,34 +67,136 @@ class GeneralTab extends ConfigurationItem {
 		local choices := []
 		local chosen := 0
 		local enIndex := 0
-		local code, language
+		local code, language, translator, button
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		chooseHomePath(*) {
+			local directory, translator
 
-		Gui %window%:Add, GroupBox, -Theme x16 y80 w458 h70, % translate("Installation")
+			protectionOn()
 
-		Gui %window%:Font, Norm, Arial
+			try {
+				window.Opt("+OwnDialogs")
 
-		Gui %window%:Add, Text, x24 y97 w160 h23 +0x200, % translate("Installation Folder (optional)")
-		Gui %window%:Add, Edit, x224 y97 w214 h21 VhomePathEdit, %homePathEdit%
-		Gui %window%:Add, Button, x440 y96 w23 h23 gchooseHomePath, % translate("...")
+				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
-		Gui %window%:Add, Text, x24 y121 w160 h23 +0x200, % translate("NirCmd Folder (optional)")
-		Gui %window%:Add, Edit, x224 y121 w214 h21 VnirCmdPathEdit, %nirCmdPathEdit%
-		Gui %window%:Add, Button, x440 y120 w23 h23 gchooseNirCmdPath, % translate("...")
+				OnMessage(0x44, translator)
+				directory := DirSelect("*" . window["homePathEdit"].Text, 0, translate("Select Installation folder..."))
+				OnMessage(0x44, translator, 0)
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+				if (directory != "")
+					window["homePathEdit"].Text := directory
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui %window%:Add, GroupBox, -Theme x16 y160 w458 h95, % translate("Settings")
+		chooseNirCmdPath(*) {
+			local directory, translator
 
-		Gui %window%:Font, Norm, Arial
+			protectionOn()
+
+			try {
+				window.Opt("+OwnDialogs")
+
+				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+
+				OnMessage(0x44, translator)
+				directory := DirSelect("*" . window["nirCmdPathEdit"].Text, 0, translate("Select NirCmd folder..."))
+				OnMessage(0x44, translator, 0)
+
+				if (directory != "")
+					window["nirCmdPathEdit"].Text := directory
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		chooseAHKPath(*) {
+			local directory, translator
+
+			protectionOn()
+
+			try {
+				window.Opt("+OwnDialogs")
+
+				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+
+				OnMessage(0x44, translator)
+				directory := DirSelect("*" . window["ahkPathEdit"].Text, 0, translate("Select AutoHotkey folder..."))
+				OnMessage(0x44, translator, 0)
+
+				if (directory != "")
+					window["ahkPathEdit"].Text := directory
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		chooseMSBuildPath(*) {
+			local directory, translator
+
+			protectionOn()
+
+			try {
+				window.Opt("+OwnDialogs")
+
+				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
+
+				OnMessage(0x44, translator)
+				directory := DirSelect("*" . window["msBuildPathEdit"].Text, 0, translate("Select MSBuild Bin folder..."))
+				OnMessage(0x44, translator, 0)
+
+				if (directory != "")
+					window["msBuildPathEdit"].Text := directory
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		openTranslationsEditor(*) {
+			this.openTranslationsEditor()
+		}
+
+		openFormatsEditor(*) {
+			this.openFormatsEditor()
+		}
+
+		openThemesEditor(*) {
+			this.openThemesEditor()
+		}
+
+		this.Editor := editor
+
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
+
+		window.Add("GroupBox", "-Theme x16 y80 w458 h70 W:Grow", translate("Installation"))
+
+		window.SetFont("Norm", "Arial")
+
+		window.Add("Text", "x24 y97 w160 h23 +0x200", translate("Installation Folder (optional)"))
+		window.Add("Edit", "x224 y97 w214 h21 W:Grow vhomePathEdit", this.Value["homePath"])
+		window.Add("Button", "x440 y96 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseHomePath)
+
+		window.Add("Text", "x24 y121 w160 h23 +0x200", translate("NirCmd Folder (optional)"))
+		window.Add("Edit", "x224 y121 w214 h21 W:Grow VnirCmdPathEdit", this.Value["nirCmdPath"])
+		window.Add("Button", "x440 y120 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseNirCmdPath)
+
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
+
+		window.Add("GroupBox", "-Theme x16 y160 w458 h95 W:Grow", translate("Settings"))
+
+		window.SetFont("Norm", "Arial")
 
 		for code, language in availableLanguages() {
 			choices.Push(language)
 
-			if (language == languageDropDown)
+			if (language == this.Value["language"])
 				chosen := A_Index
 
 			if (code = "en")
@@ -116,102 +206,97 @@ class GeneralTab extends ConfigurationItem {
 		if (chosen == 0)
 			chosen := enIndex
 
-		Gui %window%:Add, Text, x24 y176 w86 h23 +0x200, % translate("Localization")
-		Gui %window%:Add, DropDownList, x250 y176 w188 Choose%chosen% VlanguageDropDown, % values2String("|", choices*)
-		Gui %window%:Add, Button, x440 y175 w23 h23 gopenTranslationsEditor, % translate("...")
-		Gui %window%:Add, Button, x224 y175 w23 h23 HWNDbuttonHandle gopenFormatsEditor
-		setButtonIcon(buttonHandle, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
+		window.Add("Text", "x24 y176 w86 h23 +0x200", translate("Localization"))
+		window.Add("DropDownList", "x250 y176 w188 W:Grow Choose" . chosen . " vlanguageDropDown", choices)
+		window.Add("Button", "x440 y175 w23 h23 X:Move", translate("...")).OnEvent("Click", openTranslationsEditor)
+		button := window.Add("Button", "x224 y175 w23 h23")
+		button.OnEvent("Click", openFormatsEditor)
+		setButtonIcon(button, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Add, CheckBox, x24 y200 w242 h23 Checked%startWithWindowsCheck% VstartWithWindowsCheck, % translate("Start with Windows")
-		Gui %window%:Add, CheckBox, x24 y224 w242 h23 Checked%silentModeCheck% VsilentModeCheck, % translate("Silent mode (no splash screen, no sound)")
+		window.Add("CheckBox", "x24 y200 w242 h23 Checked" . this.Value["startWithWindows"] . " VstartWithWindowsCheck", translate("Start with Windows"))
+		window.Add("CheckBox", "x24 y224 w242 h23 Checked" . this.Value["silentMode"] . " VsilentModeCheck", translate("Silent mode (no splash screen, no sound)"))
 
-		Gui %window%:Add, Button, x363 y224 w100 h23 GopenThemesEditor, % translate("Themes Editor...")
+		window.Add("Button", "x363 y224 w100 h23 X:Move", translate("Themes Editor...")).OnEvent("Click", openThemesEditor)
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, GroupBox, -Theme x16 y265 w458 h115, % translate("Simulators")
+		window.Add("GroupBox", "-Theme x16 y265 w458 h115 W:Grow", translate("Simulators"))
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
 		this.iSimulatorsList.createGui(editor, x, y, width, height)
 
 		if this.iDevelopment {
-			Gui %window%:Font, Norm, Arial
-			Gui %window%:Font, Italic, Arial
+			window.SetFont("Norm", "Arial")
+			window.SetFont("Italic", "Arial")
 
-			Gui %window%:Add, GroupBox, -Theme x16 y388 w458 h119, % translate("Development")
+			window.Add("GroupBox", "-Theme x16 y388 w458 h119 W:Grow", translate("Development"))
 
-			Gui %window%:Font, Norm, Arial
+			window.SetFont("Norm", "Arial")
 
-			Gui %window%:Add, Text, x24 y405 w160 h23 +0x200, % translate("AutoHotkey Folder")
-			Gui %window%:Add, Edit, x224 y406 w214 h21 VahkPathEdit, %ahkPathEdit%
-			Gui %window%:Add, Button, x440 y404 w23 h23 gchooseAHKPath, % translate("...")
+			window.Add("Text", "x24 y405 w160 h23 +0x200", translate("AutoHotkey Folder"))
+			window.Add("Edit", "x224 y406 w214 h21 W:Grow VahkPathEdit", this.Value["ahkPath"])
+			window.Add("Button", "x440 y404 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseAHKPath)
 
-			Gui %window%:Add, Text, x24 y429 w160 h23 +0x200, % translate("MSBuild Bin Folder")
-			Gui %window%:Add, Edit, x224 y429 w214 h21 VmsBuildPathEdit, %msBuildPathEdit%
-			Gui %window%:Add, Button, x440 y428 w23 h23 gchooseMSBuildPath, % translate("...")
+			window.Add("Text", "x24 y429 w160 h23 +0x200", translate("MSBuild Bin Folder"))
+			window.Add("Edit", "x224 y429 w214 h21 W:Grow VmsBuildPathEdit", this.Value["msBuildPath"])
+			window.Add("Button", "x440 y428 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseMSBuildPath)
 
-			Gui %window%:Add, Text, x24 y453 w160 h23 +0x200, % translate("Debug")
-			Gui %window%:Add, CheckBox, x226 y451 w242 h23 Checked%debugEnabledCheck% VdebugEnabledCheck, % translate("Enabled?")
+			window.Add("Text", "x24 y453 w160 h23 +0x200", translate("Debug"))
+			window.Add("CheckBox", "x226 y451 w242 h23 Checked" . this.Value["debugEnabled"] . " vdebugEnabledCheck", translate("Enabled?"))
 
-			Gui %window%:Add, Text, x24 y477 w160 h23 +0x200, % translate("Log Level")
+			window.Add("Text", "x24 y477 w160 h23 +0x200", translate("Log Level"))
 
 			choices := ["Info", "Warn", "Critical", "Off"]
 
-			chosen := inList(choices, logLevelDropDown)
+			chosen := inList(choices, this.Value["logLevel"])
 
 			if !chosen
 				chosen := 2
 
-			Gui %window%:Add, DropDownList, x224 y477 w91 Choose%chosen% VlogLevelDropDown, % values2String("|", collect(choices, "translate")*)
+			window.Add("DropDownList", "x224 y477 w91 Choose" . chosen . " vlogLevelDropDown", collect(choices, translate))
 		}
 	}
 
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
-		nirCmdPathEdit := getMultiMapValue(configuration, "Configuration", "NirCmd Path", "")
-		homePathEdit := getMultiMapValue(configuration, "Configuration", "Home Path", "")
+		this.Value["nirCmdPath"] := getMultiMapValue(configuration, "Configuration", "NirCmd Path", "")
+		this.Value["homePath"] := getMultiMapValue(configuration, "Configuration", "Home Path", "")
 
-		languageDropDown := availableLanguages()[getMultiMapValue(configuration, "Configuration", "Language", getLanguage())]
-		startWithWindowsCheck := getMultiMapValue(configuration, "Configuration", "Start With Windows", true)
-		silentModeCheck := getMultiMapValue(configuration, "Configuration", "Silent Mode", false)
+		this.Value["language"] := availableLanguages()[getMultiMapValue(configuration, "Configuration", "Language", getLanguage())]
+		this.Value["startWithWindows"] := getMultiMapValue(configuration, "Configuration", "Start With Windows", true)
+		this.Value["silentMode"] := getMultiMapValue(configuration, "Configuration", "Silent Mode", false)
 
 		if this.iDevelopment {
-			ahkPathEdit := getMultiMapValue(configuration, "Configuration", "AHK Path", "")
-			msBuildPathEdit := getMultiMapValue(configuration, "Configuration", "MSBuild Path", "")
-			debugEnabledCheck := getMultiMapValue(configuration, "Configuration", "Debug", false)
-			logLevelDropDown := getMultiMapValue(configuration, "Configuration", "Log Level", "Warn")
+			this.Value["ahkPath"] := getMultiMapValue(configuration, "Configuration", "AHK Path", "")
+			this.Value["msBuildPath"] := getMultiMapValue(configuration, "Configuration", "MSBuild Path", "")
+			this.Value["debugEnabled"] := getMultiMapValue(configuration, "Configuration", "Debug", false)
+			this.Value["logLevel"] := getMultiMapValue(configuration, "Configuration", "Log Level", "Warn")
 		}
 	}
 
 	saveToConfiguration(configuration) {
+		local window := this.Window
 		local languageCode := "en"
 		local code, language, choices
 
 		super.saveToConfiguration(configuration)
 
-		GuiControlGet nirCmdPathEdit
-		GuiControlGet homePathEdit
-
-		GuiControlGet languageDropDown
-		GuiControlGet startWithWindowsCheck
-		GuiControlGet silentModeCheck
-
-		setMultiMapValue(configuration, "Configuration", "NirCmd Path", nirCmdPathEdit)
-		setMultiMapValue(configuration, "Configuration", "Home Path", homePathEdit)
+		setMultiMapValue(configuration, "Configuration", "NirCmd Path", this.Control["nirCmdPathEdit"].Text)
+		setMultiMapValue(configuration, "Configuration", "Home Path", this.Control["homePathEdit"].Text)
 
 		for code, language in availableLanguages()
-			if (language = languageDropDown) {
+			if (language = this.Control["languageDropDown"].Text) {
 				languageCode := code
 
 				break
 			}
 
 		setMultiMapValue(configuration, "Configuration", "Language", languageCode)
-		setMultiMapValue(configuration, "Configuration", "Start With Windows", startWithWindowsCheck)
-		setMultiMapValue(configuration, "Configuration", "Silent Mode", silentModeCheck)
+		setMultiMapValue(configuration, "Configuration", "Start With Windows", this.Control["startWithWindowsCheck"].Value)
+		setMultiMapValue(configuration, "Configuration", "Silent Mode", this.Control["silentModeCheck"].Value)
 
 		if this.iSplashThemesConfiguration
 			addMultiMapValues(configuration, this.iSplashThemesConfiguration)
@@ -226,18 +311,13 @@ class GeneralTab extends ConfigurationItem {
 			setMultiMapValues(configuration, "Localization", getMultiMapValues(this.Configuration, "Localization"))
 
 		if this.iDevelopment {
-			GuiControlGet ahkPathEdit
-			GuiControlGet msBuildPathEdit
-			GuiControlGet debugEnabledCheck
-			GuiControlGet logLevelDropDown
-
-			setMultiMapValue(configuration, "Configuration", "AHK Path", ahkPathEdit)
-			setMultiMapValue(configuration, "Configuration", "MSBuild Path", msBuildPathEdit)
-			setMultiMapValue(configuration, "Configuration", "Debug", debugEnabledCheck)
+			setMultiMapValue(configuration, "Configuration", "AHK Path", this.Control["ahkPathEdit"].Text)
+			setMultiMapValue(configuration, "Configuration", "MSBuild Path", this.Control["msBuildPathEdit"].Text)
+			setMultiMapValue(configuration, "Configuration", "Debug", this.Control["debugEnabledCheck"].Value)
 
 			choices := ["Info", "Warn", "Critical", "Off"]
 
-			setMultiMapValue(configuration, "Configuration", "Log Level", choices[inList(collect(choices, "translate"), logLevelDropDown)])
+			setMultiMapValue(configuration, "Configuration", "Log Level", choices[inList(collect(choices, translate), this.Control["logLevelDropDown"].Text)])
 		}
 
 		this.iSimulatorsList.saveToConfiguration(configuration)
@@ -254,92 +334,82 @@ class GeneralTab extends ConfigurationItem {
 	}
 
 	openTranslationsEditor() {
-		local window := ConfigurationEditor.Instance.Window
+		local window := this.Window
 		local choices, chosen, enIndex, code, language
 
-		GuiControlGet languageDropDown
+		window.Opt("+Disabled")
 
-		Gui TE:+Owner%window%
-		Gui %window%:+Disabled
+		try {
+			if (TranslationsEditor(this.Configuration)).editTranslations(window) {
+				window.Opt("-Disabled")
 
-		if (TranslationsEditor(this.Configuration)).editTranslations() {
-			Gui %window%:-Disabled
+				choices := []
+				chosen := 0
+				enIndex := 1
 
-			window := ConfigurationEditor.Instance.Window
+				for code, language in availableLanguages() {
+					choices.Push(language)
 
-			Gui %window%:Default
+					if (language == window["languageDropDown"].Text)
+						chosen := A_Index
 
-			choices := []
-			chosen := 0
-			enIndex := 1
+					if (code = "en")
+						enIndex := A_Index
+				}
 
-			for code, language in availableLanguages() {
-				choices.Push(language)
+				if (chosen == 0) {
+					chosen := enIndex
+					languageDropDown := "English"
+				}
 
-				if (language == languageDropDown)
-					chosen := A_Index
-
-				if (code = "en")
-					enIndex := A_Index
+				window["languageDropDown"].Delete()
+				window["languageDropDown"].Add(choices)
+				window["languageDropDown"].Choose(chosen)
 			}
-
-			if (chosen == 0) {
-				chosen := enIndex
-				languageDropDown := "English"
-			}
-
-			GuiControl, , languageDropDown, % "|" . values2String("|", choices*)
-			GuiControl Choose, languageDropDown, %chosen%
 		}
-		else
-			Gui %window%:-Disabled
+		finally {
+			window.Opt("-Disabled")
+		}
 	}
 
 	openThemesEditor() {
-		local window := ConfigurationEditor.Instance.Window
+		local window := this.Window
 		local configuration
 
-		Gui TE:+Owner%window%
-		Gui %window%:+Disabled
+		window.Opt("+Disabled")
 
-		configuration := (ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes()
+		try {
+			configuration := (ThemesEditor(this.iSplashThemesConfiguration ? this.iSplashThemesConfiguration : this.Configuration)).editThemes(window)
 
-		if configuration
-			this.iSplashThemesConfiguration := configuration
-
-		Gui %window%:-Disabled
+			if configuration
+				this.iSplashThemesConfiguration := configuration
+		}
+		finally {
+			window.Opt("-Disabled")
+		}
 	}
 
 	openFormatsEditor() {
-		local window := ConfigurationEditor.Instance.Window
+		local window := this.Window
 		local configuration
 
-		Gui FE:+Owner%window%
-		Gui %window%:+Disabled
+		window.Opt("+Disabled")
 
-		configuration := FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats()
+		try {
+			configuration := FormatsEditor(this.iFormatsConfiguration ? this.iFormatsConfiguration : this.Configuration).editFormats(window)
 
-		if configuration
-			this.iFormatsConfiguration := configuration
-
-		Gui %window%:-Disabled
+			if configuration
+				this.iFormatsConfiguration := configuration
+		}
+		finally {
+			window.Opt("-Disabled")
+		}
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SimulatorsList                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-global simulatorsListBox := "|"
-
-global simulatorEdit := ""
-
-global simulatorUpButton
-global simulatorDownButton
-
-global simulatorAddButton
-global simulatorDeleteButton
-global simulatorUpdateButton
 
 class SimulatorsList extends ConfigurationItemList {
 	__New(configuration) {
@@ -350,20 +420,23 @@ class SimulatorsList extends ConfigurationItemList {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
+		local control
 
-		Gui %window%:Add, ListBox, x24 y284 w194 h96 HwndsimulatorsListBoxHandle VsimulatorsListBox glistEvent, %simulatorsListBox%
+		control := window.Add("ListBox", "x24 y284 w194 h96 BackGroundD8D8D8 vsimulatorsListBox")
+		control.OnEvent("Change", listEvent.Bind("Click"))
+		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
 
-		Gui %window%:Add, Edit, x224 y284 w239 h21 VsimulatorEdit, %simulatorEdit%
+		window.Add("Edit", "x224 y284 w239 h21 W:Grow VsimulatorEdit")
 
-		Gui %window%:Add, Button, x385 y309 w38 h23 Disabled VsimulatorUpButton gupItem, % translate("Up")
-		Gui %window%:Add, Button, x425 y309 w38 h23 Disabled VsimulatorDownButton gdownItem, % translate("Down")
+		window.Add("Button", "x385 y309 w38 h23 X:Move Disabled VsimulatorUpButton", translate("Up")).OnEvent("Click", upItem)
+		window.Add("Button", "x425 y309 w38 h23 X:Move Disabled VsimulatorDownButton", translate("Down")).OnEvent("Click", downItem)
 
-		Gui %window%:Add, Button, x264 y349 w46 h23 VsimulatorAddButton gaddItem, % translate("Add")
-		Gui %window%:Add, Button, x312 y349 w50 h23 Disabled VsimulatorDeleteButton gdeleteItem, % translate("Delete")
-		Gui %window%:Add, Button, x408 y349 w55 h23 Disabled VsimulatorUpdateButton gupdateItem, % translate("&Save")
+		window.Add("Button", "x264 y349 w46 h23 X:Move VsimulatorAddButton", translate("Add")).OnEvent("Click", addItem)
+		window.Add("Button", "x312 y349 w50 h23 X:Move Disabled VsimulatorDeleteButton", translate("Delete")).OnEvent("Click", deleteItem)
+		window.Add("Button", "x408 y349 w55 h23 X:Move Disabled VsimulatorUpdateButton", translate("&Save")).OnEvent("Click", updateItem)
 
-		this.initializeList(simulatorsListBoxHandle, "simulatorsListBox", "simulatorAddButton", "simulatorDeleteButton", "simulatorUpdateButton"
-						  , "simulatorUpButton", "simulatorDownButton")
+		this.initializeList(editor, window["simulatorsListBox"], window["simulatorAddButton"], window["simulatorDeleteButton"], window["simulatorUpdateButton"]
+								  , window["simulatorUpButton"], window["simulatorDownButton"])
 	}
 
 	loadFromConfiguration(configuration) {
@@ -379,34 +452,25 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 
 	clickEvent(line, count) {
-		GuiControlGet simulatorsListBox
-
-		this.openEditor(inList(this.ItemList, simulatorsListBox))
-	}
-
-	processListEvent() {
-		return true
+		this.openEditor(inList(this.ItemList, this.Control["simulatorsListBox"].Text))
 	}
 
 	loadList(items) {
-		simulatorsListBox := values2String("|", this.ItemList*)
-
-		GuiControl, , simulatorsListBox, % "|" . simulatorsListBox
+		this.Control["simulatorsListBox"].Delete()
+		this.Control["simulatorsListBox"].Add(this.ItemList)
 	}
 
 	selectItem(itemNumber) {
 		this.CurrentItem := itemNumber
 
 		if itemNumber
-			GuiControl Choose, simulatorsListBox, %itemNumber%
+			this.Control["simulatorsListBox"].Choose(itemNumber)
 
 		this.updateState()
 	}
 
 	loadEditor(item) {
-		simulatorEdit := item
-
-		GuiControl Text, simulatorEdit, %simulatorEdit%
+		this.Control["simulatorEdit"].Text := item
 	}
 
 	clearEditor() {
@@ -414,9 +478,7 @@ class SimulatorsList extends ConfigurationItemList {
 	}
 
 	buildItemFromEditor(isNew := false) {
-		GuiControlGet simulatorEdit
-
-		return simulatorEdit
+		return this.Control["simulatorEdit"].Text
 	}
 }
 
@@ -425,147 +487,25 @@ class SimulatorsList extends ConfigurationItemList {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-chooseHomePath() {
-	local directory
-
-	protectionOn()
-
-	try {
-		GuiControlGet homePathEdit
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%homePathEdit%, 0, % translate("Select Installation folder...")
-		OnMessage(0x44, "")
-
-		if (directory != "")
-			GuiControl Text, homePathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseNirCmdPath() {
-	local directory
-
-	protectionOn()
-
-	try {
-		GuiControlGet nirCmdPathEdit
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%nirCmdPathEdit%, 0, % translate("Select NirCmd folder...")
-		OnMessage(0x44, "")
-
-		if (directory != "")
-			GuiControl Text, nirCmdPathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseAHKPath() {
-	local directory
-
-	protectionOn()
-
-	try {
-		GuiControlGet ahkPathEdit
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%ahkPathEdit%, 0, % translate("Select AutoHotkey folder...")
-		OnMessage(0x44, "")
-
-		if (directory != "")
-			GuiControl Text, ahkPathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseMSBuildPath() {
-	local directory
-
-	protectionOn()
-
-	try {
-		GuiControlGet msBuildPathEdit
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%msBuildPathEdit%, 0, % translate("Select MSBuild Bin folder...")
-		OnMessage(0x44, "")
-
-		if (directory != "")
-			GuiControl Text, msBuildPathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-openTranslationsEditor() {
-	GeneralTab.Instance.openTranslationsEditor()
-}
-
-openFormatsEditor() {
-	GeneralTab.Instance.openFormatsEditor()
-}
-
-openThemesEditor() {
-	GeneralTab.Instance.openThemesEditor()
-}
-
-saveConfiguration(configurationFile, editor) {
-	local configuration := newMultiMap()
-	local startupLink, startupExe
-
-	editor.saveToConfiguration(configuration)
-
-	writeMultiMap(configurationFile, configuration)
-
-	deleteFile(kTempDirectory . "Simulator Controller.state")
-
-	startupLink := A_Startup . "\Simulator Startup.lnk"
-
-	if getMultiMapValue(configuration, "Configuration", "Start With Windows", false) {
-		startupExe := kBinariesDirectory . "Simulator Startup.exe"
-
-		FileCreateShortCut %startupExe%, %startupLink%, %kBinariesDirectory%
-	}
-	else
-		deleteFile(startupLink)
-
-	deleteDirectory(kTempDirectory, false)
-}
-
 initializeSimulatorConfiguration() {
-	local icon := kIconsDirectory . "Configuration.ico"
-	local title, initialize
+	global kConfigurationEditor
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Simulator Configuration
+	local icon := kIconsDirectory . "Configuration.ico"
+	local msgResult, initialize
+
+	TraySetIcon(icon, "1")
+	A_IconTip := "Simulator Configuration"
 
 	kConfigurationEditor := true
 
 	protectionOn()
 
 	if (GetKeyState("Ctrl") && GetKeyState("Shift")) {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Configuration")
-		MsgBox 262436, %title%, % translate("Do you really want to start with a fresh configuration?")
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to start with a fresh configuration?"), translate("Configuration"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
 
-		IfMsgBox Yes
+		if (msgResult = "Yes")
 			initialize := true
 		else
 			initialize := false
@@ -574,9 +514,9 @@ initializeSimulatorConfiguration() {
 		initialize := false
 
 	try {
-		new ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Ctrl")
-							 || (getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
-							 , initialize ? newMultiMap() : kSimulatorConfiguration)
+		ConfigurationEditor(FileExist("C:\Program Files\AutoHotkey") || GetKeyState("Ctrl")
+						 || (getMultiMapValue(kSimulatorConfiguration, "Configuration", "AHK Path", "") != "")
+						  , initialize ? newMultiMap() : kSimulatorConfiguration)
 	}
 	finally {
 		protectionOff()
@@ -589,6 +529,29 @@ startupSimulatorConfiguration() {
 	local editor := ConfigurationEditor.Instance
 	local done, saved, result
 
+	saveConfiguration(configurationFile, editor) {
+		local configuration := newMultiMap()
+		local startupLink, startupExe
+
+		editor.saveToConfiguration(configuration)
+
+		writeMultiMap(configurationFile, configuration)
+
+		deleteFile(kTempDirectory . "Simulator Controller.state")
+
+		startupLink := A_Startup . "\Simulator Startup.lnk"
+
+		if getMultiMapValue(configuration, "Configuration", "Start With Windows", false) {
+			startupExe := kBinariesDirectory . "Simulator Startup.exe"
+
+			FileCreateShortcut(startupExe, startupLink, kBinariesDirectory)
+		}
+		else
+			deleteFile(startupLink)
+
+		deleteDirectory(kTempDirectory, false)
+	}
+
 	editor.createGui(editor.Configuration)
 
 	done := false
@@ -598,14 +561,14 @@ startupSimulatorConfiguration() {
 
 	try {
 		loop {
-			Sleep 200
+			Sleep(200)
 
-			result := ConfigurationEditor.Instance.Result
+			result := editor.Result
 
 			if (result == kApply) {
 				saved := true
 
-				ConfigurationEditor.Instance.Result := false
+				editor.Result := false
 
 				saveConfiguration(kSimulatorConfigurationFile, editor)
 			}
@@ -624,9 +587,9 @@ startupSimulatorConfiguration() {
 	}
 
 	if saved
-		ExitApp 1
+		ExitApp(1)
 	else
-		ExitApp 0
+		ExitApp(0)
 }
 
 
@@ -641,8 +604,8 @@ initializeSimulatorConfiguration()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Configuration Plugins.ahk
-#Include %A_MyDocuments%\Simulator Controller\Plugins\Configuration Plugins.ahk
+#Include "..\Plugins\Configuration Plugins.ahk"
+#Include "%A_MyDocuments%\Simulator Controller\Plugins\Configuration Plugins.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

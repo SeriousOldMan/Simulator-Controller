@@ -20,7 +20,7 @@
 ;;; ConfigurationItemList                                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ConfigurationItemList extends ConfigurationPanel {
+class ConfigurationItemList extends ConfiguratorPanel {
 	static sListControls := Map()
 
 	iListView := false

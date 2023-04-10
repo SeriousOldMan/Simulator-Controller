@@ -28,7 +28,7 @@
 ;;; ThemesEditor                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ThemesEditor extends ConfigurationPanel {
+class ThemesEditor extends ConfiguratorPanel {
 	iClosed := false
 	iThemesList := false
 

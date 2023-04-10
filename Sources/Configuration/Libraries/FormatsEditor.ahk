@@ -20,7 +20,7 @@
 ;;; FormatsEditor                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class FormatsEditor extends ConfigurationPanel {
+class FormatsEditor extends ConfiguratorPanel {
 	iClosed := false
 
 	__New(configuration) {

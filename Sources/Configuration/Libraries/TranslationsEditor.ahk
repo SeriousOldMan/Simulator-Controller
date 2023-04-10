@@ -28,7 +28,7 @@
 ;;; TranslationsEditor                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class TranslationsEditor extends ConfigurationPanel {
+class TranslationsEditor extends ConfiguratorPanel {
 	iWindow := false
 
 	iLanguagesChanged := false

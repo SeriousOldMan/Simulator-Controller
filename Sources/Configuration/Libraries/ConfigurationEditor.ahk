@@ -174,10 +174,10 @@ class TriggerDetectorContinuation extends Continuation {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ConfigurationPanel                                                      ;;;
+;;; ConfiguratorPanel                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ConfigurationPanel extends ConfigurationItem {
+class ConfiguratorPanel extends ConfigurationItem {
 	iEditor := false
 	iWindow := false
 
@@ -220,17 +220,20 @@ class ConfigurationPanel extends ConfigurationItem {
 	}
 
 	__New(arguments*) {
-		this.iEditor := this
+		if !this.Editor
+			this.Editor := this
 
 		super.__New(arguments*)
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ConfigurationItemPanel                                                  ;;;
+;;; ConfiguratorPanel                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ConfigurationItemPanel extends ConfigurationPanel {
+class Configurator extends ConfiguratorPanel {
+	show() {
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -335,7 +338,7 @@ class ConfigurationEditor extends ConfigurationItem {
 		selectTab(*) {
 			local configurator := ConfigurationEditor.Instance.Configurators[editorGui["configuratorTabView"].Value][2]
 
-			if configurator.base.Has("activate")
+			if configurator.HasProp("activate")
 				configurator.activate()
 		}
 
@@ -405,12 +408,15 @@ class ConfigurationEditor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-		local x, y, w, h
+		local x, y, w, h, ignore, configurator
 
 		if getWindowPosition("Simulator Configuration", &x, &y)
 			window.Show("x" . x . " y" . y . " AutoSize")
 		else
 			window.Show()
+
+		for ignore, configurator in this.Configurators
+			configurator[2].show()
 
 		if getWindowSize("Simulator Configuration", &w, &h)
 			window.Resize("Initialize", w, h)

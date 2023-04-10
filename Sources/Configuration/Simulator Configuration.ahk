@@ -47,7 +47,7 @@
 ;;; GeneralTab                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class GeneralTab extends Configurator {
+class GeneralTab extends ConfiguratorPanel {
 	iSimulatorsList := false
 	iDevelopment := false
 	iSplashThemesConfiguration := false

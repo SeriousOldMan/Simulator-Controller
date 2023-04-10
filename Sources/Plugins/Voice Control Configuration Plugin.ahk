@@ -22,7 +22,7 @@
 ;;; VoiceControlConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class VoiceControlConfigurator extends Configurator {
+class VoiceControlConfigurator extends ConfiguratorPanel {
 	iLanguages := []
 	iRecognizers := []
 

@@ -225,13 +225,7 @@ class ConfiguratorPanel extends ConfigurationItem {
 
 		super.__New(arguments*)
 	}
-}
 
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ConfiguratorPanel                                                       ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class Configurator extends ConfiguratorPanel {
 	show() {
 	}
 }

@@ -20,18 +20,6 @@
 ;;; PluginsConfigurator                                                     ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global pluginsListView := false
-
-global pluginEdit := ""
-global pluginActivatedCheck := false
-global pluginActivatedCheckHandle
-global pluginSimulatorsEdit := ""
-global pluginArgumentsEdit := ""
-
-global pluginAddButton
-global pluginDeleteButton
-global pluginUpdateButton
-
 class PluginsConfigurator extends ConfigurationItemList {
 	iEditor := false
 

@@ -329,7 +329,7 @@ class TranslationsList extends ConfigurationItemList {
 
 	createGui(editor, configuration) {
 		local window := editor.Window
-		local option, control
+		local option
 
 		nextUntranslated(*) {
 			local untranslated
@@ -347,9 +347,7 @@ class TranslationsList extends ConfigurationItemList {
 			}
 		}
 
-		control := window.Add("ListView", "x16 y+10 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VtranslationsListView", collect(["Original", "Translation"], translate))
-		control.OnEvent("Click", listEvent.Bind("Click"))
-		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
+		window.Add("ListView", "x16 y+10 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VtranslationsListView", collect(["Original", "Translation"], translate))
 
 		window.Add("Text", "x16 w86 h23 Y:Move +0x200", translate("Original"))
 		window.Add("Edit", "x110 yp w283 h80 Y:Move W:Grow Disabled voriginalTextEdit")

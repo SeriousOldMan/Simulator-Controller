@@ -568,11 +568,13 @@ class FunctionsList extends ConfigurationItemList {
 				title := translate("Error")
 				MsgBox 262160, %title%, % translate("The type and number of an existing function may not be changed...")
 				OnMessage(0x44, "")
+				
+				return false
 			}
 			else {
 				this.iFunctions[function.Descriptor] := function
 
-				super.updateItem()
+				return super.updateItem()
 			}
 	}
 }

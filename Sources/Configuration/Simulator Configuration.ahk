@@ -420,20 +420,17 @@ class SimulatorsList extends ConfigurationItemList {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local control
 
-		control := window.Add("ListBox", "x24 y284 w194 h96 BackGroundD8D8D8 vsimulatorsListBox")
-		control.OnEvent("Change", listEvent.Bind("Click"))
-		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
+		window.Add("ListBox", "x24 y284 w194 h96 BackGroundD8D8D8 vsimulatorsListBox")
 
 		window.Add("Edit", "x224 y284 w239 h21 W:Grow VsimulatorEdit")
 
-		window.Add("Button", "x385 y309 w38 h23 X:Move Disabled VsimulatorUpButton", translate("Up")).OnEvent("Click", upItem)
-		window.Add("Button", "x425 y309 w38 h23 X:Move Disabled VsimulatorDownButton", translate("Down")).OnEvent("Click", downItem)
+		window.Add("Button", "x385 y309 w38 h23 X:Move Disabled VsimulatorUpButton", translate("Up"))
+		window.Add("Button", "x425 y309 w38 h23 X:Move Disabled VsimulatorDownButton", translate("Down"))
 
-		window.Add("Button", "x264 y349 w46 h23 X:Move VsimulatorAddButton", translate("Add")).OnEvent("Click", addItem)
-		window.Add("Button", "x312 y349 w50 h23 X:Move Disabled VsimulatorDeleteButton", translate("Delete")).OnEvent("Click", deleteItem)
-		window.Add("Button", "x408 y349 w55 h23 X:Move Disabled VsimulatorUpdateButton", translate("&Save")).OnEvent("Click", updateItem)
+		window.Add("Button", "x264 y349 w46 h23 X:Move VsimulatorAddButton", translate("Add"))
+		window.Add("Button", "x312 y349 w50 h23 X:Move Disabled VsimulatorDeleteButton", translate("Delete"))
+		window.Add("Button", "x408 y349 w55 h23 X:Move Disabled VsimulatorUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["simulatorsListBox"], window["simulatorAddButton"], window["simulatorDeleteButton"], window["simulatorUpdateButton"]
 								  , window["simulatorUpButton"], window["simulatorDownButton"])

@@ -195,7 +195,6 @@ class ThemesList extends ConfigurationItemList {
 
 	createGui(editor, configuration) {
 		local window := editor.Window
-		local control
 
 		updateThemesEditorState(*) {
 			protectionOn()
@@ -300,10 +299,7 @@ class ThemesList extends ConfigurationItemList {
 			}
 		}
 
-		control := window.Add("ListView", "x16 y120 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VthemesListView", collect(["Theme", "Media", "Sound File"], translate))
-		control.OnEvent("Click", listEvent.Bind("Click"))
-		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
-
+		window.Add("ListView", "x16 y120 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VthemesListView", collect(["Theme", "Media", "Sound File"], translate))
 		window.Add("Text", "x16 y270 w86 h23 +0x200 Y:Move", translate("Theme"))
 		window.Add("Edit", "x110 y270 w140 h21 Y:Move W:Grow(0.5) VthemeNameEdit")
 
@@ -333,9 +329,9 @@ class ThemesList extends ConfigurationItemList {
 
 		window.Add("Text", "x154 y459 w40 h23 Y:Move VpicturesDurationPostfix", translate("ms"))
 
-		window.Add("Button", "x184 y490 w46 h23 Y:Move X:Move VthemeAddButton", translate("Add")).OnEvent("Click", addItem)
-		window.Add("Button", "x232 y490 w50 h23 Y:Move X:Move Disabled VthemeDeleteButton", translate("Delete")).OnEvent("Click", deleteItem)
-		window.Add("Button", "x340 y490 w55 h23 Y:Move X:Move Disabled VthemeUpdateButton", translate("&Save")).OnEvent("Click", updateItem)
+		window.Add("Button", "x184 y490 w46 h23 Y:Move X:Move VthemeAddButton", translate("Add"))
+		window.Add("Button", "x232 y490 w50 h23 Y:Move X:Move Disabled VthemeDeleteButton", translate("Delete"))
+		window.Add("Button", "x340 y490 w55 h23 Y:Move X:Move Disabled VthemeUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["themesListView"], window["themeAddButton"], window["themeDeleteButton"], window["themeUpdateButton"])
 	}

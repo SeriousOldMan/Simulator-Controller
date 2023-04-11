@@ -9,15 +9,15 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ConfigurationItemList.ahk
-#Include Libraries\ConfigurationEditor.ahk
+#Include "ConfigurationEditor.ahk"
+#Include "ConfigurationItemList.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,23 +28,34 @@
 ;;; ControllerActionsEditor                                                 ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global caLanguageDropDown
-global caPluginDropDown
-
-class ControllerActionsEditor extends ConfigurationItem {
+class ControllerActionsEditor extends ConfiguratorPanel {
 	iClosed := false
-
-	iPluginActionsList := false
 
 	iPlugins := []
 
 	iSelectedLanguage := false
 	iSelectedPlugin := false
 
-	iChanged := {}
+	iActionsList := false
 
-	iActionLabels := {}
-	iActionIcons := {}
+	iChanged := CaseInsenseMap()
+
+	iActionLabels := CaseInsenseMap()
+	iActionIcons := CaseInsenseMap()
+
+	class ActionsWindow extends Window {
+		iEditor := false
+
+		__New(editor) {
+			this.iEditor := editor
+
+			super.__New({Descriptor: "Plugin Actions Editor", Closeable: true, Resizeable: true, Options: "ToolWindow -MaximizeBox"}, "")
+		}
+
+		Close(*) {
+			this.iEditor.closeEditor(false)
+		}
+	}
 
 	Plugins[index?] {
 		Get {
@@ -61,6 +72,12 @@ class ControllerActionsEditor extends ConfigurationItem {
 	SelectedPlugin {
 		Get {
 			return this.iSelectedPlugin
+		}
+	}
+
+	ActionsList {
+		Get {
+			return this.iActionsList
 		}
 	}
 
@@ -87,40 +104,60 @@ class ControllerActionsEditor extends ConfigurationItem {
 			if !language
 				language := this.SelectedLanguage
 
-			return (this.iChanged.HasKey(language) ? this.iChanged[language] : false)
+			return (this.iChanged.Has(language) ? this.iChanged[language] : false)
 		}
 	}
 
 	__New(configuration) {
-		this.iPluginActionsList := PluginActionsList(configuration)
-
 		super.__New(configuration)
 
 		ControllerActionsEditor.Instance := this
-
-		this.createGui(configuration)
 	}
 
 	createGui(configuration) {
 		local choices, chosen, code, language, ignore, thePlugin
 
-		Gui PAE:Default
+		static actionsGui
 
-		Gui PAE:-Border ; -Caption
-		Gui PAE:Color, D0D0D0, D8D8D8
+		saveControllerActionsEditor(*) {
+			this.closeEditor(true)
+		}
 
-		Gui PAE:Font, Bold, Arial
+		cancelControllerActionsEditor(*) {
+			this.closeEditor(false)
+		}
 
-		Gui PAE:Add, Text, w388 Center gmoveControllerActionsEditor, % translate("Modular Simulator Controller System")
+		chooseCALanguage(*) {
+			local code, language
 
-		Gui PAE:Font, Norm, Arial
-		Gui PAE:Font, Italic Underline, Arial
+			for code, language in availableLanguages()
+				if (language = actionsGui["caLanguageDropDown"]) {
+					this.selectLanguage(code)
 
-		Gui PAE:Add, Text, x128 YP+20 w148 cBlue Center gopenPluginActionsDocumentation, % translate("Labels && Icons")
+					break
+				}
+		}
 
-		Gui PAE:Font, Norm, Arial
+		chooseCAPlugin(*) {
+			this.selectPlugin(actionsGui["caPluginDropDown"].Text)
+		}
 
-		Gui PAE:Add, Text, x50 yp+30 w310 0x10
+		actionsGui := ControllerActionsEditor.ActionsWindow(this)
+
+		this.Window := actionsGui
+
+		actionsGui.SetFont("Bold", "Arial")
+
+		actionsGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(actionsGui, "Plugin Actions Editor"))
+
+		actionsGui.SetFont("Norm", "Arial")
+		actionsGui.SetFont("Italic Underline", "Arial")
+
+		actionsGui.Add("Text", "x128 YP+20 w148 H:Center cBlue Center", translate("Labels && Icons")).OnEvent("Click", openDocumentation.Bind(actionsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#plugin-actions-editor"))
+
+		actionsGui.SetFont("Norm", "Arial")
+
+		actionsGui.Add("Text", "x50 yp+30 w310 0x10 W:Grow")
 
 		choices := []
 		chosen := 1
@@ -132,24 +169,24 @@ class ControllerActionsEditor extends ConfigurationItem {
 			choices.Push(language)
 		}
 
-		Gui PAE:Add, Text, x16 yp+10 w86 h23 +0x200, % translate("Language")
-		Gui PAE:Add, DropDownList, x110 yp w120 Choose%chosen% VcaLanguageDropDown gchooseCALanguage, % values2String("|", choices*)
+		actionsGui.Add("Text", "x16 yp+10 w86 h23 +0x200", translate("Language"))
+		actionsGui.Add("DropDownList", "x110 yp w120 W:Grow Choose" . chosen . " VcaLanguageDropDown", choices).OnEvent("Change", chooseCALanguage)
 
 		choices := []
 
-		for ignore, thePlugin in this.Plugins {
+		for ignore, thePlugin in this.Plugins
 			choices.Push(thePlugin)
-		}
 
-		Gui PAE:Add, Text, x16 yp+24 w86 h23 +0x200, % translate("Plugin")
-		Gui PAE:Add, DropDownList, x110 yp w120 Choose1 VcaPluginDropDown gchooseCAPlugin, % values2String("|", choices*)
+		actionsGui.Add("Text", "x16 yp+24 w86 h23 +0x200", translate("Plugin"))
+		actionsGui.Add("DropDownList", "x110 yp w120 Choose1 VcaPluginDropDown", choices).OnEvent("Change", chooseCAPlugin)
 
-		this.iPluginActionsList.createGui(configuration)
+		this.iActionsList := PluginActionsList(this, configuration)
+		this.ActionsList.createGui(this, configuration)
 
-		Gui PAE:Add, Text, x50 yp+50 w310 0x10
+		actionsGui.Add("Text", "x50 yp+50 w310 0x10 Y:Move W:Grow")
 
-		Gui PAE:Add, Button, x106 yp+10 w80 h23 Default GsaveControllerActionsEditor, % translate("Save")
-		Gui PAE:Add, Button, x214 yp w80 h23 GcancelControllerActionsEditor, % translate("&Cancel")
+		actionsGui.Add("Button", "x106 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Save")).OnEvent("Click", saveControllerActionsEditor)
+		actionsGui.Add("Button", "x214 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", cancelControllerActionsEditor)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -242,10 +279,10 @@ class ControllerActionsEditor extends ConfigurationItem {
 	savePluginActions() {
 		local language, ignore
 
-		if !this.iPluginActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin)
+		if !this.ActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin)
 			return false
 
-		for language, ignore in availableLanguages() {
+		for language, ignore in availableLanguages()
 			if this.Changed[language] {
 				if this.ActionLabels[language]
 					this.saveModifiedPluginActions(this.ActionLabels[language], "Labels", language)
@@ -253,7 +290,6 @@ class ControllerActionsEditor extends ConfigurationItem {
 				if this.ActionIcons[language]
 					this.saveModifiedPluginActions(this.ActionIcons[language], "Icons", language)
 			}
-		}
 
 		return true
 	}
@@ -262,44 +298,48 @@ class ControllerActionsEditor extends ConfigurationItem {
 		this.iChanged[language] := changed
 	}
 
-	editPluginActions(plugin := false) {
-		local x, y
+	editPluginActions(plugin := false, owner := false) {
+		local window, x, y, w, h
+
+		this.createGui(this.Configuration)
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
 
 		this.selectLanguage(this.SelectedLanguage, true, plugin)
 
-		if getWindowPosition("Plugin Actions Editor", x, y)
-			Gui PAE:Show, x%x% y%y%
+		if getWindowPosition("Plugin Actions Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui PAE:Show
+			window.Show()
 
-restart:
-		loop
-			Sleep 200
-		until this.iClosed
+		if getWindowSize("Plugin Actions Editor", &w, &h)
+			window.Resize("Initialize", w, h)
 
 		try {
-			if (this.iClosed == kOk) {
-				if !this.saveToConfiguration(this.Configuration) {
-					this.iClosed := false
+			loop {
+				loop
+					Sleep(200)
+				until this.iClosed
 
-					Goto restart
+				if (this.iClosed == kOk) {
+					if this.saveToConfiguration(this.Configuration)
+						return true
+					else
+						this.iClosed := false
 				}
-
-
-				return true
+				else
+					return false
 			}
-			else
-				return false
 		}
 		finally {
-			Gui PAE:Destroy
+			window.Destroy()
 		}
 	}
 
 	closeEditor(save) {
-		if save
-			Gui PAE:Submit
-
 		this.iClosed := (save ? kOk : kCancel)
 	}
 
@@ -313,13 +353,13 @@ restart:
 				languages.Push(code)
 
 			if !force
-				if !this.iPluginActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin) {
-					GuiControl Choose, caLanguageDropDown, % inList(languages, this.SelectedLanguage)
+				if !this.ActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin) {
+					this.Control["caLanguageDropDown"].Choose(inList(languages, this.SelectedLanguage))
 
 					return
 				}
 
-			GuiControl Choose, caLanguageDropDown, % inList(languages, language)
+			this.Control["caLanguageDropDown"].Choose(inList(languages, language))
 
 			this.iSelectedLanguage := language
 
@@ -330,17 +370,17 @@ restart:
 	selectPlugin(plugin, force := false) {
 		if ((plugin != this.SelectedPlugin) || force) {
 			if !force
-				if !this.iPluginActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin) {
-					GuiControl Choose, caPluginDropDown, % inList(this.Plugins, this.SelectedPlugin)
+				if !this.ActionsList.savePluginActions(this.SelectedLanguage, this.SelectedPlugin) {
+					this.Control["caPluginDropDown"].Choose(inList(this.Plugins, this.SelectedPlugin))
 
 					return
 				}
 
-			GuiControl Choose, caPluginDropDown, % inList(this.Plugins, plugin)
+			this.Control["caPluginDropDown"].Choose(inList(this.Plugins, plugin))
 
 			this.iSelectedPlugin := plugin
 
-			this.iPluginActionsList.loadPluginActions(this.SelectedPlugin)
+			this.ActionsList.loadPluginActions(this.SelectedPlugin)
 		}
 	}
 }
@@ -348,10 +388,6 @@ restart:
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; PluginActionsList                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-global pluginActionsListView := false
-global labelEdit := ""
-global iconEdit
 
 class PluginActionsList extends ConfigurationItemList {
 	iCurrentIcon := false
@@ -362,53 +398,104 @@ class PluginActionsList extends ConfigurationItemList {
 		}
 	}
 
-	__New(configuration) {
+	CurrentIcon {
+		Get {
+			return this.iCurrentIcon
+		}
+
+		Set {
+			local icon := (value ? value : (kIconsDirectory . "Empty.png"))
+
+			try {
+				this.Control["iconEdit"].Value := ("*w43 *h43 " . icon)
+			}
+			catch Any as exception {
+				this.Control["iconEdit"].Value := ("*w43 *h43 " . kIconsDirectory . "Empty.png")
+			}
+
+			return (this.iCurrentIcon := value)
+		}
+	}
+
+	__New(editor, configuration) {
+		this.Editor := editor
+
 		super.__New(configuration)
 
 		PluginActionsList.Instance := this
 	}
 
-	createGui(configuration) {
-		Gui PAE:Add, ListView, x16 y120 w377 h240 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginActionsListViewHandle VpluginActionsListView glistEvent
-							 , % values2String("|", collect(["Action", "Trigger", "Label", "Icon"], "translate")*)
+	createGui(editor, configuration) {
+		local window := editor.Window
 
-		Gui PAE:Add, Text, x16 y370 w76, % translate("Label && Icon")
-		Gui PAE:Add, Edit, x100 yp w110 h45 VlabelEdit, %labelEdit%
-		Gui PAE:Add, Picture, Border x215 yp w45 h45 ViconEdit gclickIcon
+		deleteIcon(*) {
+			if this.CurrentItem {
+				this.CurrentIcon := false
 
-		Gui PAE:Font, c505050 s8
-		Gui PAE:Add, Text, x263 yp w120 r2, % translate("1. Click = Edit`n2. Ctrl-Click = Clear")
-		Gui PAE:Font
+				window["iconEdit"].Value := ("*w43 *h43 " . kIconsDirectory . "Empty.png")
+			}
+		}
 
-		this.initializeList(pluginActionsListViewHandle, "pluginActionsListView")
+		clickIcon(*) {
+			local pictureFile
+
+			if this.CurrentItem
+				if GetKeyState("Ctrl", "P")
+					deleteIcon()
+				else {
+					pictureFile := (this.CurrentIcon ? substituteVariables(this.CurrentIcon) : "")
+
+					window.Opt("+OwnDialogs")
+
+					OnMessage(0x44, translateSelectCancelButtons)
+					pictureFile := FileSelect(1, pictureFile, translate("Select Image..."), "Image (*.ico; *.png; *.jpg; *.gif)")
+					OnMessage(0x44, translateSelectCancelButtons, 0)
+
+					if (pictureFile != "")
+						this.CurrentIcon := pictureFile
+				}
+		}
+
+		window.Add("ListView", "x16 y120 w377 h240 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginActionsListView", collect(["Action", "Trigger", "Label", "Icon"], translate))
+
+		window.Add("Text", "x16 y370 w76 Y:Move", translate("Label && Icon"))
+		window.Add("Edit", "x100 yp w110 h45 Y:Move W:Grow(0.2) VlabelEdit")
+		window.Add("Picture", "Border x215 yp w45 h45 Y:Move X:Move(0.2) ViconEdit").OnEvent("Click", clickIcon)
+
+		window.SetFont("c505050 s8")
+
+		window.Add("Text", "x263 yp w120 r2 Y:Move X:Move(0.2)", translate("1. Click = Edit`n2. Ctrl-Click = Clear"))
+
+		window.SetFont()
+
+		this.initializeList(editor, window["pluginActionsListView"])
 	}
 
 	loadPluginActions(plugin) {
-		local editor := ControllerActionsEditor.Instance
-		local actions := {}
+		local actions := CaseInsenseMap()
 		local action, theAction, label, trigger, icon, items, ignore
 
-		for theAction, label in getMultiMapValues(editor.ActionLabels, plugin) {
+		for theAction, label in getMultiMapValues(this.Editor.ActionLabels, plugin) {
 			action := ConfigurationItem.splitDescriptor(theAction)
-			trigger := action[action.Length()]
+			trigger := action[action.Length]
 
-			action.RemoveAt(action.Length())
+			action.RemoveAt(action.Length)
 
-			action := ((action.Length() = 1) ? action[1]: ConfigurationItem.descriptor(action*))
+			action := ((action.Length = 1) ? action[1]: ConfigurationItem.descriptor(action*))
 
 			actions[theAction] := Array(false, action, trigger, label)
 		}
 
-		for theAction, icon in getMultiMapValues(editor.ActionIcons, plugin) {
+		for theAction, icon in getMultiMapValues(this.Editor.ActionIcons, plugin) {
 			action := ConfigurationItem.splitDescriptor(theAction)
-			trigger := action[action.Length()]
+			trigger := action[action.Length]
 
-			action.RemoveAt(action.Length())
+			action.RemoveAt(action.Length)
 
 			action := ConfigurationItem.descriptor(action*)
 
 			if (icon && (icon != ""))
-				if actions.HasKey(theAction)
+				if actions.Has(theAction)
 					actions[theAction][1] := icon
 				else
 					actions[theAction] := Array(icon, action, trigger, "")
@@ -425,7 +512,6 @@ class PluginActionsList extends ConfigurationItemList {
 	}
 
 	savePluginActions(language, plugin) {
-		local editor := ControllerActionsEditor.Instance
 		local actionLabels, actionIcons, changed, ignore, action, descriptor
 
 		this.selectEvent(false)
@@ -433,15 +519,15 @@ class PluginActionsList extends ConfigurationItemList {
 		this.clearEditor()
 		this.selectItem(false)
 
-		actionLabels := getMultiMapValues(editor.ActionLabels, plugin)
-		actionIcons := getMultiMapValues(editor.ActionIcons, plugin)
+		actionLabels := getMultiMapValues(this.Editor.ActionLabels, plugin)
+		actionIcons := getMultiMapValues(this.Editor.ActionIcons, plugin)
 
 		changed := false
 
 		for ignore, action in this.ItemList {
 			descriptor := ConfigurationItem.descriptor(action[2], action[3])
 
-			if actionLabels.HasKey(descriptor) {
+			if actionLabels.Has(descriptor) {
 				if (actionLabels[descriptor] != action[4]) {
 					actionLabels[descriptor] := action[4]
 
@@ -454,7 +540,7 @@ class PluginActionsList extends ConfigurationItemList {
 				changed := true
 			}
 
-			if actionIcons.HasKey(descriptor) {
+			if actionIcons.Has(descriptor) {
 				if (actionIcons[descriptor] != action[1]) {
 					actionIcons[descriptor] := action[1]
 
@@ -469,10 +555,10 @@ class PluginActionsList extends ConfigurationItemList {
 		}
 
 		if changed {
-			editor.setChanged(language, true)
+			this.Editor.setChanged(language, true)
 
-			setMultiMapValues(editor.ActionLabels, plugin, actionLabels)
-			setMultiMapValues(editor.ActionIcons, plugin, actionIcons)
+			setMultiMapValues(this.Editor.ActionLabels, plugin, actionLabels)
+			setMultiMapValues(this.Editor.ActionIcons, plugin, actionIcons)
 		}
 
 		return true
@@ -487,191 +573,82 @@ class PluginActionsList extends ConfigurationItemList {
 			if action {
 				this.ItemList[this.CurrentItem] := action
 
-				Gui ListView, % this.ListHandle
-
-				LV_Modify(this.CurrentItem, "", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
+				this.Control["pluginActionsListView"].Modify(this.CurrentItem, "", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
 			}
 		}
 
-		if (line)
+		if line
 			super.selectEvent(line)
 	}
 
 	loadList(items) {
 		local action, length, picturesListViewImages, ignore, item, picture
 
-		Gui PAE:Default
-		Gui ListView, % this.ListHandle
-
-		LV_Delete()
+		this.Control["pluginActionsListView"].Delete()
 
 		if false {
-			length := items.Length()
+			length := items.Length
 
 			picturesListViewImages := IL_Create(length)
 
 			for ignore, item in items {
-				picture := LoadPicture(item[1] ? item[1] : (kIconsDirectory . "Empty.png"), "W43 H43")
+				picture := LoadPicture(item[1] ? item[1] : (kIconsDirectory . "Empty.png"),"W43 H43")
 
 				IL_Add(picturesListViewImages, picture)
 			}
 
-			LV_SetImageList(picturesListViewImages)
+			this.Control["pluginActionsListView"].SetImageList(picturesListViewImages)
 		}
 
 		for ignore, action in items
-			LV_Add("", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
+			this.Control["pluginActionsListView"].Add("", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
 
-		LV_ModifyCol(1, 100)
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr")
+		this.Control["pluginActionsListView"].ModifyCol(1, 100)
+		this.Control["pluginActionsListView"].ModifyCol(2, "AutoHdr")
+		this.Control["pluginActionsListView"].ModifyCol(3, "AutoHdr")
+		this.Control["pluginActionsListView"].ModifyCol(4, "AutoHdr")
 	}
 
 	updateState() {
-		Gui PAE:Default
-
 		super.updateState()
 
 		if this.CurrentItem {
-			GuiControl Enable, labelEdit
+			this.Control["labelEdit"].Enabled := true
 
 			try
-				GuiControl Enable, íconEdit
+				this.Control["íconEdit"].Enabled := true
 		}
 		else {
-			GuiControl Disable, labelEdit
+			this.Control["labelEdit"].Enabled := false
 
 			try
-				GuiControl Disable, íconEdit
+				this.Control["íconEdit"].Enabled := false
 		}
 	}
 
 	loadEditor(item) {
 		local icon
 
-		GuiControl, , labelEdit, % item[4]
+		this.Control["labelEdit"].Value := item[4]
 
-		icon := (item[1] ? substituteVariables(item[1]) : (kIconsDirectory . "Empty.png"))
+		this.CurrentIcon := (item[1] ? substituteVariables(item[1]) : (kIconsDirectory . "Empty.png"))
 
-		try {
-			GuiControl, , iconEdit, % ("*w43 *h43 " . icon)
-		}
-		catch Any as exception {
-			item[1] := false
-
-			GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
-		}
-
-		this.iCurrentIcon := item[1]
-
-		this.updateEditor()
+		this.updateState()
 	}
 
 	clearEditor() {
-		GuiControl, , labelEdit, % ""
-		GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
+		this.Control["labelEdit"].Value := ""
+		this.Control["iconEdit"].Value := ("*w43 *h43 " . kIconsDirectory . "Empty.png")
 
-		this.updateEditor()
+		this.updateState()
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local action
+		local action := this.ItemList[this.CurrentItem].Clone()
 
-		GuiControlGet labelEdit
-
-		action := this.ItemList[this.CurrentItem].Clone()
-
-		action[4] := labelEdit
-		action[1] := this.iCurrentIcon
+		action[4] := this.Control["labelEdit"].Text
+		action[1] := this.CurrentIcon
 
 		return action
 	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-saveControllerActionsEditor() {
-	ControllerActionsEditor.Instance.closeEditor(true)
-}
-
-cancelControllerActionsEditor() {
-	ControllerActionsEditor.Instance.closeEditor(false)
-}
-
-moveControllerActionsEditor() {
-	moveByMouse("PAE", "Plugin Actions Editor")
-}
-
-openPluginActionsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#plugin-actions-editor
-}
-
-chooseCALanguage() {
-	local code, language
-
-	GuiControlGet caLanguageDropDown
-
-	for code, language in availableLanguages()
-		if (language = caLanguageDropDown) {
-			ControllerActionsEditor.Instance.selectLanguage(code)
-
-			break
-		}
-}
-
-chooseCAPlugin() {
-	GuiControlGet caPluginDropDown
-
-	ControllerActionsEditor.Instance.selectPlugin(caPluginDropDown)
-}
-
-deleteIcon() {
-	local actionsList := PluginActionsList.Instance
-
-	if actionsList.CurrentItem {
-		actionsList.iCurrentIcon := false
-
-		GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
-	}
-}
-
-clickIcon() {
-	local actionsList := PluginActionsList.Instance
-	local title, pictureFile, icon
-
-	if actionsList.CurrentItem
-		if GetKeyState("Ctrl", "P")
-			deleteIcon()
-		else {
-			title := translate("Select Image...")
-
-			pictureFile := (actionsList.iCurrentIcon ? substituteVariables(actionsList.iCurrentIcon) : "")
-
-			Gui +OwnDialogs
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-			FileSelectFile pictureFile, 1, %pictureFile%, %title%, Image (*.ico; *.png; *.jpg; *.gif)
-			OnMessage(0x44, "")
-
-			if (pictureFile != "") {
-				actionsList.iCurrentIcon := pictureFile
-
-				icon := (pictureFile ? pictureFile : (kIconsDirectory . "Empty.png"))
-
-				try {
-					GuiControl, , iconEdit, % ("*w43 *h43 " . icon)
-				}
-				catch Any as exception {
-					pictureFile := false
-
-					GuiControl, , iconEdit, % ("*w43 *h43 " . kIconsDirectory . "Empty.png")
-				}
-
-				actionsList.iCurrentIcon := pictureFile
-			}
-		}
 }

@@ -24,11 +24,8 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local control
 
-		control := window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlaunchpadListView", collect(["#", "Label", "Application"], translate))
-		control.OnEvent("Click", listEvent.Bind("Click"))
-		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
+		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlaunchpadListView", collect(["#", "Label", "Application"], translate))
 
 		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Button"))
 		window.Add("Text", "x95 y295 w23 h23 Y:Move +0x200", translate("#"))
@@ -41,9 +38,9 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		window.Add("Text", "x16 y343 w86 h23 Y:Move +0x200", translate("Application"))
 		window.Add("DropDownList", "x110 y343 w363 h21 R10 Y:Move W:Grow VlaunchpadApplicationDropDown")
 
-		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VlaunchpadAddButton", translate("Add")).OnEvent("Click", addItem)
-		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VlaunchpadDeleteButton", translate("Delete")).OnEvent("Click", deleteItem)
-		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VlaunchpadUpdateButton", translate("&Save")).OnEvent("Click", updateItem)
+		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VlaunchpadAddButton", translate("Add"))
+		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VlaunchpadDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VlaunchpadUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["launchpadListView"], window["launchpadAddButton"], window["launchpadDeleteButton"], window["launchpadUpdateButton"])
 
@@ -99,9 +96,10 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		local currentApplication := (this.CurrentItem ? this.ItemList[this.CurrentItem][3] : false)
 		local ignore, launchpadApplication
 
-		if (isSet(ApplicationsConfigurator) && ApplicationsConfigurator.Instance)
-			for ignore, launchpadApplication in ApplicationsConfigurator.Instance.Applications[[translate("Other")]]
-				launchpadApplicationsList.Push(launchpadApplication.Application)
+		try
+			if (isSet(ApplicationsConfigurator) && ApplicationsConfigurator.Instance)
+				for ignore, launchpadApplication in ApplicationsConfigurator.Instance.Applications[[translate("Other")]]
+					launchpadApplicationsList.Push(launchpadApplication.Application)
 
 		this.Control["launchpadApplicationDropDown"].Delete()
 		this.Control["launchpadApplicationDropDown"].Add(launchpadApplicationsList)
@@ -156,9 +154,11 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("The button number of an existing application launcher may not be changed..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
+			
+			return false
 		}
 		else
-			super.updateItem()
+			return super.updateItem()
 	}
 }
 

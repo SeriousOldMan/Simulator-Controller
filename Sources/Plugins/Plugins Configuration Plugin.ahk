@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Plugins Configuration Plugin    ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Configuration\Libraries\ControllerActionsEditor.ahk
+#Include "..\Configuration\Libraries\ControllerActionsEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -21,14 +21,6 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class PluginsConfigurator extends ConfigurationItemList {
-	iEditor := false
-
-	Editor {
-		Get {
-			return this.iEditor
-		}
-	}
-
 	Plugins {
 		Get {
 			local result := []
@@ -42,7 +34,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 	}
 
 	__New(editor, configuration) {
-		this.iEditor := editor
+		this.Editor := editor
 
 		super.__New(configuration)
 
@@ -52,32 +44,79 @@ class PluginsConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndpluginsListViewHandle VpluginsListView glistEvent
-						, % values2String("|", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], "translate")*)
+		openActionsEditor(*) {
+			window.Opt("+Disabled")
 
-		Gui %window%:Add, Text, x16 y295 w86 h23 +0x200, % translate("Plugin")
-		Gui %window%:Add, Edit, x110 y295 w154 h21 VpluginEdit, %pluginEdit%
+			try {
+				ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(window["pluginEdit"].Text, window)
+			}
+			finally {
+				window.Opt("-Disabled")
+			}
+		}
 
-		Gui %window%:Add, CheckBox, x110 y319 w120 h23 VpluginActivatedCheck HwndpluginActivatedCheckHandle, % translate("Activated?")
+		openPluginsModesDocumentation(*) {
+			switch window["pluginEdit"].Text, false {
+				case "System":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration")
+				case "Tactile Feedback":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-1")
+				case "Motion Feedback":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2")
+				case "Pedal Calibration":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-3")
+				case "Race Engineer":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer")
+				case "Race Strategist":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist")
+				case "Race Spotter":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter")
+				case "Team Server":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server")
+				case "ACC":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4")
+				case "AC":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-5")
+				case "IRC":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-6")
+				case "RF2":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-7")
+				case "R3E":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8")
+				case "AMS2":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9")
+				case "PCARS2":
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-10")
+				default:
+					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes")
+			}
+		}
 
-		Gui %window%:Add, Text, x16 y343 w89 h23 +0x200, % translate("Simulator(s)")
-		Gui %window%:Add, Edit, x110 y343 w363 h21 VpluginSimulatorsEdit, %pluginSimulatorsEdit%
+		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginsListView", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], translate))
 
-		Gui %window%:Font, Underline, Arial
+		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Plugin"))
+		window.Add("Edit", "x110 y295 w154 h21 Y:Move W:Grow(0.2) VpluginEdit")
 
-		Gui %window%:Add, Text, x16 y368 w86 h23 +0x200 cBlue gopenPluginsModesDocumentation, % translate("Arguments")
+		window.Add("CheckBox", "x110 y319 w120 h23 Y:Move VpluginActivatedCheck", translate("Activated?"))
 
-		Gui %window%:Font, Norm, Arial
+		window.Add("Text", "x16 y343 w89 h23 Y:Move +0x200", translate("Simulator(s)"))
+		window.Add("Edit", "x110 y343 w363 h21 Y:Move W:Grow(0.2) VpluginSimulatorsEdit")
 
-		Gui %window%:Add, Edit, x110 y368 w363 h113 VpluginArgumentsEdit, %pluginArgumentsEdit%
+		window.SetFont("Underline", "Arial")
 
-		Gui %window%:Add, Button, x16 y490 w140 h23 gopenActionsEditor, % translate("Edit Labels && Icons...")
+		window.Add("Text", "x16 y368 w86 h23 +0x200 Y:Move cBlue", translate("Arguments")).OnEvent("Click", openPluginsModesDocumentation)
 
-		Gui %window%:Add, Button, x264 y490 w46 h23 VpluginAddButton gaddItem, % translate("Add")
-		Gui %window%:Add, Button, x312 y490 w50 h23 Disabled VpluginDeleteButton gdeleteItem, % translate("Delete")
-		Gui %window%:Add, Button, x418 y490 w55 h23 Disabled VpluginUpdateButton gupdateItem, % translate("&Save")
+		window.SetFont("Norm", "Arial")
 
-		this.initializeList(pluginsListViewHandle, "pluginsListView", "pluginAddButton", "pluginDeleteButton", "pluginUpdateButton")
+		window.Add("Edit", "x110 y368 w363 h113 Y:Move W:Grow VpluginArgumentsEdit")
+
+		window.Add("Button", "x16 y490 w140 h23 Y:Move ", translate("Edit Labels && Icons...")).OnEvent("Click", openActionsEditor)
+
+		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VpluginAddButton", translate("Add"))
+		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VpluginDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VpluginUpdateButton", translate("&Save"))
+
+		this.initializeList(editor, window["pluginsListView"], window["pluginAddButton"], window["pluginDeleteButton"], window["pluginUpdateButton"])
 	}
 
 	loadFromConfiguration(configuration) {
@@ -102,27 +141,25 @@ class PluginsConfigurator extends ConfigurationItemList {
 		super.updateState()
 
 		if (this.CurrentItem != 0) {
-			GuiControlGet pluginEdit
+			if (this.Control["pluginEdit"].Text = "System") {
+				this.Control["pluginEdit"].Enabled := false
+				this.Control["pluginActivatedCheck"].Enabled := false
+				this.Control["pluginSimulatorsEdit"].Enabled := false
 
-			if (pluginEdit = "System") {
-				GuiControl Disable, pluginEdit
-				GuiControl Disable, pluginActivatedCheck
-				GuiControl Disable, pluginSimulatorsEdit
-
-				GuiControl Disable, pluginDeleteButton
+				this.Control["pluginDeleteButton"].Enabled := false
 			}
 			else {
-				GuiControl Enable, pluginEdit
-				GuiControl Enable, pluginActivatedCheck
-				GuiControl Enable, pluginSimulatorsEdit
+				this.Control["pluginEdit"].Enabled := true
+				this.Control["pluginActivatedCheck"].Enabled := true
+				this.Control["pluginSimulatorsEdit"].Enabled := true
 
-				GuiControl Enable, pluginDeleteButton
+				this.Control["pluginDeleteButton"].Enabled := true
 			}
 		}
 		else {
-			GuiControl Enable, pluginEdit
-			GuiControl Enable, pluginActivatedCheck
-			GuiControl Enable, pluginSimulatorsEdit
+			this.Control["pluginEdit"].Enabled := true
+			this.Control["pluginActivatedCheck"].Enabled := true
+			this.Control["pluginSimulatorsEdit"].Enabled := true
 		}
 	}
 
@@ -131,79 +168,73 @@ class PluginsConfigurator extends ConfigurationItemList {
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
+		comparePlugins(p1, p2) {
+			if (p1.Plugin = translate("System"))
+				return false
+			else if (p2.Plugin = translate("System"))
+				return true
+			else
+				return (p1.Plugin >= p2.Plugin)
+		}
 
 		bubbleSort(&items, comparePlugins)
 
 		this.ItemList := items
 
-		count := LV_GetCount()
+		count := this.Control["pluginsListView"].GetCount()
 
 		for index, thePlugin in items {
 			name := thePlugin.Plugin
 			active := thePlugin.Active
 
 			if (index <= count)
-				LV_Modify(index, "", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")
-						, name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
+				this.Control["pluginsListView"].Modify(index, "", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")
+																, name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
 			else
-				LV_Add("", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")
-					 , name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
+				this.Control["pluginsListView"].Add("", thePlugin.Active ? ((name = translate("System")) ? translate("Always") : translate("Yes")) : translate("No")
+													  , name, values2String(", ", thePlugin.Simulators*), thePlugin.Arguments[true])
 		}
 
-		if (items.Length() < count)
-			loop % count - items.Length()
-				LV_Delete(count - A_Index - 1)
+		if (items.Length < count)
+			Loop count - items.Length
+				this.Control["pluginsListView"].Delete(count - A_Index - 1)
 
 		if first {
-			LV_ModifyCol()
-			LV_ModifyCol(1, "Center AutoHdr")
-			LV_ModifyCol(2, 100)
-			LV_ModifyCol(3, 120)
+			this.Control["pluginsListView"].ModifyCol()
+			this.Control["pluginsListView"].ModifyCol(1, "Center AutoHdr")
+			this.Control["pluginsListView"].ModifyCol(2, 100)
+			this.Control["pluginsListView"].ModifyCol(3, 120)
 
 			first := false
 		}
 	}
 
-	selectItem(itemNumber) {
-		Gui ListView, % this.ListHandle
-
-		if (itemNumber && (itemNumber != this.CurrentItem))
-			LV_Modify(itemNumber, "Vis +Select +Focus")
-
-		this.CurrentItem := itemNumber
-
-		this.updateState()
-	}
-
 	loadEditor(item) {
-		GuiControl Text, pluginEdit, % item.Plugin
-
-		if item.Active
-			Control Check, , , ahk_id %pluginActivatedCheckHandle%
-		else
-			Control Uncheck, , , ahk_id %pluginActivatedCheckHandle%
-
-		GuiControl, , pluginActivatedCheck, % item.Active
-
-		GuiControl Text, pluginSimulatorsEdit, % values2String(", ", item.Simulators*)
-		GuiControl Text, pluginArgumentsEdit, % item.Arguments[true]
+		this.Control["pluginEdit"].Text := item.Plugin
+		this.Control["pluginActivatedCheck"].Value := !!item.Active
+		this.Control["pluginSimulatorsEdit"].Text := values2String(", ", item.Simulators*)
+		this.Control["pluginArgumentsEdit"].Text := item.Arguments[true]
 	}
 
 	clearEditor() {
-		Control Uncheck, , , ahk_id %pluginActivatedCheckHandle%
-		GuiControl Text, pluginEdit, % ""
-		GuiControl Text, pluginSimulatorsEdit, % ""
-		GuiControl Text, pluginArgumentsEdit, % ""
+		this.Control["pluginActivatedCheck"].Value := 0
+		this.Control["pluginEdit"].Text := ""
+		this.Control["pluginSimulatorsEdit"].Text := ""
+		this.Control["pluginArgumentsEdit"].Text := ""
 	}
 
 	buildItemFromEditor(isNew := false) {
-		GuiControlGet pluginEdit
-		GuiControlGet pluginSimulatorsEdit
-		GuiControlGet pluginArgumentsEdit
-		GuiControlGet pluginActivatedCheck
+		try {
+			return Plugin(this.Control["pluginEdit"].Text, false, this.Control["pluginActivatedCheck"].Value
+						, this.Control["pluginSimulatorsEdit"].Text, this.Control["pluginArgumentsEdit"].Text)
+		}
+		catch Any as exception {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
-		return Plugin(pluginEdit, false, pluginActivatedCheck != 0, pluginSimulatorsEdit, pluginArgumentsEdit)
+			return false
+		}
 	}
 }
 
@@ -211,70 +242,6 @@ class PluginsConfigurator extends ConfigurationItemList {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-comparePlugins(p1, p2) {
-	if (p1.Plugin = translate("System"))
-		return false
-	else if (p2.Plugin = translate("System"))
-		return true
-	else
-		return (p1.Plugin >= p2.Plugin)
-}
-
-openActionsEditor() {
-	local owner := PluginsConfigurator.Instance.Editor.Window
-
-	GuiControlGet pluginEdit
-
-	Gui %owner%:+Disabled
-	Gui PAE:+Owner%owner%
-
-	try {
-		new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(pluginEdit)
-	}
-	finally {
-		Gui %owner%:-Disabled
-	}
-}
-
-openPluginsModesDocumentation() {
-	GuiControlGet pluginEdit
-
-	switch pluginEdit {
-		case "System":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration
-		case "Tactile Feedback":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-1
-		case "Motion Feedback":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-2
-		case "Pedal Calibration":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-3
-		case "Race Engineer":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer
-		case "Race Strategist":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist
-		case "Race Spotter":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-spotter
-		case "Team Server":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server
-		case "ACC":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4
-		case "AC":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-5
-		case "IRC":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-6
-		case "RF2":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-7
-		case "R3E":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-8
-		case "AMS2":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-9
-		case "PCARS2":
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-10
-		default:
-			Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes
-	}
-}
 
 initializePluginsConfigurator() {
 	local editor
@@ -292,3 +259,8 @@ initializePluginsConfigurator() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializePluginsConfigurator()
+
+
+
+
+

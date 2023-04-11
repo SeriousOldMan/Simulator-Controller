@@ -41,28 +41,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 	iSoundProcessingSettings := false
 
-	class VoiceResizer extends Window.Resizer {
-		iPanel := false
-		iStart := false
-
-		__New(window, panel, start) {
-			this.iPanel := panel
-			this.iStart := start
-
-			super.__New(window)
-		}
-		/*
-		Resize(arguments*) {
-			if this.iStart
-				this.iPanel.hideWidgets()
-			else
-				this.iPanel.showWidgets()
-
-			super.Resize(arguments*)
-		}
-		*/
-	}
-
 	__New(editor, configuration := false) {
 		super.__New(configuration)
 
@@ -246,8 +224,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		w4 := width - (x4 - x)
 		x5 := x3 + 24
 
-		window.Add(VoiceControlConfigurator.VoiceResizer(window, this, true))
-
 		widget1 := window.Add("Text", "x" . x . " y" . y . " w110 h23 +0x200 Hidden", translate("Language"))
 		widget2 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . " VvoiceLanguageDropDown Hidden", choices)
 		widget2.OnEvent("Change", updateLanguage)
@@ -345,8 +321,6 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		widget30 := window.Add("Text", "x" . x . " yp+24 w110 h23 +0x200 VazureSpeakerLabel Hidden", translate("Voice"))
 		widget31 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow VazureSpeakerDropDown Hidden", voices)
-
-		; window.Add(VoiceControlConfigurator.VoiceResizer(window, this, false))
 
 		this.iAzureSynthesizerWidgets := [[window["azureSubscriptionKeyLabel"], window["azureSubscriptionKeyEdit"]]
 										, [window["azureTokenIssuerLabel"], window["azureTokenIssuerEdit"]]

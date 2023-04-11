@@ -219,6 +219,12 @@ class ConfiguratorPanel extends ConfigurationItem {
 		}
 	}
 
+	AutoSave {
+		Get {
+			return false
+		}
+	}
+
 	__New(arguments*) {
 		if !this.Editor
 			this.Editor := this

@@ -195,7 +195,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			this.Control["applicationUpdateButton"].Enabled := false
 		}
 
-		if (isSet(LaunchpadConfigurator) && LaunchpadConfigurator.Instance)
+		if (isSet(LaunchpadConfigurator) && LaunchpadConfigurator.hasOwnProp("Instance"))
 			try
 				LaunchpadConfigurator.Instance.loadApplicationChoices(true)
 	}

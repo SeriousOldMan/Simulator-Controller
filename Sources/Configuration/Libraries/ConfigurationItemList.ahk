@@ -42,7 +42,7 @@ class ConfigurationItemList extends ConfiguratorPanel {
 	AutoSave {
 		Get {
 			try {
-				if (isSet(ConfigurationEditor) && ConfigurationEditor.Instance)
+				if (isSet(ConfigurationEditor) && ConfigurationEditor.hasOwnProp("Instance"))
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false

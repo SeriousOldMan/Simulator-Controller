@@ -20,7 +20,7 @@
 ;;; FormatsEditor                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class FormatsEditor extends ConfigurationPanel {
+class FormatsEditor extends ConfiguratorPanel {
 	iClosed := false
 
 	__New(configuration) {
@@ -146,14 +146,15 @@ class FormatsEditor extends ConfigurationPanel {
 		setMultiMapValue(configuration, "Localization", "TimeFormat", kTimeFormats[this.Control["timeFormatDropDown"].Value])
 	}
 
-	editFormats(owner) {
+	editFormats(owner := false) {
 		local window, x, y, configuration
 
 		this.createGui(this.Configuration)
 
 		window := this.Window
 
-		window.Opt("+Owner" . owner.Hwnd)
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
 
 		if getWindowPosition("Formats Editor", &x, &y)
 			window.Show("x" . x . " y" . y)

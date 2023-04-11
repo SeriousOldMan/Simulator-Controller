@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Chat Messages                   ;;;
 ;;;                                         Configuration Plugin            ;;;
 ;;;                                                                         ;;;
@@ -14,25 +14,9 @@
 ;;; ChatMessagesConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global chatMessagesListView := false
-global chatMessageNumberEdit := 1
-global chatMessageLabelEdit := ""
-global chatMessageMessageEdit := ""
-global chatMessageAddButton
-global chatMessageDeleteButton
-global chatMessageUpdateButton
-
 class ChatMessagesConfigurator extends ConfigurationItemList {
-	iEditor := false
-
-	Editor {
-		Get {
-			return this.iEditor
-		}
-	}
-
 	__New(editor, configuration) {
-		this.iEditor := editor
+		this.Editor := editor
 
 		super.__New(configuration)
 
@@ -41,28 +25,25 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local configuration := editor.Configuration
 
-		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndchatMessagesListViewHandle VchatMessagesListView glistEvent
-						, % values2String("|", collect(["#", "Label", "Text"], "translate")*)
+		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
 
-		Gui %window%:Add, Text, x16 y295 w86 h23 +0x200, % translate("Button")
-		Gui %window%:Add, Text, x95 y295 w23 h23 +0x200, % translate("#")
-		Gui %window%:Add, Edit, x110 y295 w40 h21 Number Limit3 VchatMessageNumberEdit, %chatMessageNumberEdit%
-		Gui %window%:Add, UpDown, x150 y295 w17 h21 Range1-999, 1
+		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Button"))
+		window.Add("Text", "x95 y295 w23 h23 Y:Move +0x200", translate("#"))
+		window.Add("Edit", "x110 y295 w40 h21 Y:Move Number Limit3 VchatMessageNumberEdit")
+		window.Add("UpDown", "x150 y295 w17 h21 Y:Move Range1-999")
 
-		Gui %window%:Add, Text, x16 y319 w86 h23 +0x200, % translate("Label")
-		Gui %window%:Add, Edit, x110 y319 w80 h21 VchatMessageLabelEdit, %chatMessageLabelEdit%
+		window.Add("Text", "x16 y319 w86 h23 Y:Move +0x200", translate("Label"))
+		window.Add("Edit", "x110 y319 w80 h21 Y:Move W:Grow(0.2) VchatMessageLabelEdit")
 
-		Gui %window%:Add, Text, x16 y343 w86 h23 +0x200, % translate("Message")
-		Gui %window%:Add, Edit, x110 y343 w363 h21 VchatMessageMessageEdit, %chatMessageMessageEdit%
+		window.Add("Text", "x16 y343 w86 h23 Y:Move +0x200", translate("Message"))
+		window.Add("Edit", "x110 y343 w363 h21 Y:Move W:Grow VchatMessageMessageEdit")
 
-		Gui %window%:Add, Button, x264 y490 w46 h23 VchatMessageAddButton gaddItem, % translate("Add")
-		Gui %window%:Add, Button, x312 y490 w50 h23 Disabled VchatMessageDeleteButton gdeleteItem, % translate("Delete")
-		Gui %window%:Add, Button, x418 y490 w55 h23 Disabled VchatMessageUpdateButton gupdateItem, % translate("&Save")
+		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VchatMessageAddButton", translate("Add"))
+		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VchatMessageDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VchatMessageUpdateButton", translate("&Save"))
 
-		this.initializeList(configuration, chatMessagesListViewHandle, "chatMessagesListView"
-						  , "chatMessageAddButton", "chatMessageDeleteButton", "chatMessageUpdateButton")
+		this.initializeList(editor, window["chatMessagesListView"], window["chatMessageAddButton"], window["chatMessageDeleteButton"], window["chatMessageUpdateButton"])
 	}
 
 	loadFromConfiguration(configuration) {
@@ -92,78 +73,70 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
+		this.Control["chatMessagesListView"].Delete()
 
-		LV_Delete()
-
-		bubbleSort(&items, compareChatMessages)
+		bubbleSort(&items, (c1, c2) => (c1[1] >= c2[1]))
 
 		this.ItemList := items
 
 		for ignore, chatMessage in items
-			LV_Add("", chatMessage[1], chatMessage[2], chatMessage[3])
+			this.Control["chatMessagesListView"].Add("", chatMessage[1], chatMessage[2], chatMessage[3])
 
 		if first {
-			LV_ModifyCol()
-			LV_ModifyCol(2, "AutoHdr")
+			this.Control["chatMessagesListView"].ModifyCol()
+			this.Control["chatMessagesListView"].ModifyCol(2, "AutoHdr")
 
 			first := false
 		}
 	}
 
 	loadEditor(item) {
-		GuiControl Text, chatMessageNumberEdit, % item[1]
-		GuiControl Text, chatMessageLabelEdit, % item[2]
-		GuiControl Text, chatMessageMessageEdit, % item[3]
+		this.Control["chatMessageNumberEdit"].Text := item[1]
+		this.Control["chatMessageLabelEdit"].Text := item[2]
+		this.Control["chatMessageMessageEdit"].Text := item[3]
 	}
 
 	clearEditor() {
-		GuiControl Text, chatMessageNumberEdit, 1
-		GuiControl Text, chatMessageLabelEdit, % ""
-		GuiControl Text, chatMessageMessageEdit, % ""
+		this.Control["chatMessageNumberEdit"].Text := 1
+		this.Control["chatMessageLabelEdit"].Text := ""
+		this.Control["chatMessageMessageEdit"].Text := ""
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local title, ignore, item
+		local ignore, item
 
-		GuiControlGet chatMessageNumberEdit
-		GuiControlGet chatMessageLabelEdit
-		GuiControlGet chatMessageMessageEdit
-
-		if ((chatMessageLabelEdit = "") || (chatMessageMessageEdit = "")) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+		if ((Trim(this.Control["chatMessageLabelEdit"].Text) = "") || (Trim(this.Control["chatMessageMessageEdit"].Text) = "")) {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
 		else if isNew
 			for ignore, item in this.ItemList
-				if (item[1] = chatMessageNumberEdit) {
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					title := translate("Error")
-					MsgBox 262160, %title%, % translate("A chat message for this button already exists - please use different values...")
-					OnMessage(0x44, "")
+				if (item[1] = this.Control["chatMessageNumberEdit"].Text) {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("A chat message for this button already exists - please use different values..."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
 
 					return false
 				}
 
-		return Array(chatMessageNumberEdit, chatMessageLabelEdit, chatMessageMessageEdit)
+		return Array(this.Control["chatMessageNumberEdit"].Text, this.Control["chatMessageLabelEdit"].Text, this.Control["chatMessageMessageEdit"].Text)
 	}
 
 	updateItem() {
 		local chatMessage := this.buildItemFromEditor()
-		local title
 
 		if (chatMessage && (chatMessage[1] != this.ItemList[this.CurrentItem][1])) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("The button number of an existing chat message may not be changed...")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("The button number of an existing chat message may not be changed..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+
+			return false
 		}
 		else
-			super.updateItem()
+			return super.updateItem()
 	}
 }
 
@@ -171,10 +144,6 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-compareChatMessages(c1, c2) {
-	return (c1[1] >= c2[1])
-}
 
 initializeChatMessagesConfigurator() {
 	local editor

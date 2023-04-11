@@ -174,10 +174,10 @@ class TriggerDetectorContinuation extends Continuation {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ConfigurationPanel                                                      ;;;
+;;; ConfiguratorPanel                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ConfigurationPanel extends ConfigurationItem {
+class ConfiguratorPanel extends ConfigurationItem {
 	iEditor := false
 	iWindow := false
 
@@ -219,18 +219,21 @@ class ConfigurationPanel extends ConfigurationItem {
 		}
 	}
 
+	AutoSave {
+		Get {
+			return false
+		}
+	}
+
 	__New(arguments*) {
-		this.iEditor := this
+		if !this.Editor
+			this.Editor := this
 
 		super.__New(arguments*)
 	}
-}
 
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ConfigurationItemPanel                                                  ;;;
-;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-
-class ConfigurationItemPanel extends ConfigurationPanel {
+	show() {
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -246,18 +249,6 @@ class ConfigurationEditor extends ConfigurationItem {
 
 	iDevelopment := false
 	iSaveMode := false
-
-	class EditorResizer extends Window.Resizer {
-		RestrictResize(&deltaWidth, &deltaHeight) {
-			if (deltaWidth > 150) {
-				deltaWidth := (this.Window.Width - this.Window.MinWidth)
-
-				return true
-			}
-			else
-				return false
-		}
-	}
 
 	Window {
 		Get {
@@ -347,11 +338,11 @@ class ConfigurationEditor extends ConfigurationItem {
 		selectTab(*) {
 			local configurator := ConfigurationEditor.Instance.Configurators[editorGui["configuratorTabView"].Value][2]
 
-			if configurator.base.Has("activate")
+			if configurator.HasProp("activate")
 				configurator.activate()
 		}
 
-		editorGui := Window({Descriptor: "Simulator Configuration", Options: "+SysMenu +Caption -MaximizeBox", Closeable: true, Resizeable: true})
+		editorGui := Window({Descriptor: "Simulator Configuration", Options: "+SysMenu +Caption -MaximizeBox", Closeable: true, Resizeable: "Deferred"})
 
 		this.iWindow := editorGui
 
@@ -390,8 +381,6 @@ class ConfigurationEditor extends ConfigurationItem {
 
 			configurator[2].createGui(this, 16, 80, 458, 425)
 		}
-
-		editorGui.Add(ConfigurationEditor.EditorResizer(editorGui))
 	}
 
 	registerWidget(plugin, widget) {
@@ -419,12 +408,15 @@ class ConfigurationEditor extends ConfigurationItem {
 
 	show() {
 		local window := this.Window
-		local x, y, w, h
+		local x, y, w, h, ignore, configurator
 
 		if getWindowPosition("Simulator Configuration", &x, &y)
 			window.Show("x" . x . " y" . y . " AutoSize")
 		else
 			window.Show()
+
+		for ignore, configurator in this.Configurators
+			configurator[2].show()
 
 		if getWindowSize("Simulator Configuration", &w, &h)
 			window.Resize("Initialize", w, h)

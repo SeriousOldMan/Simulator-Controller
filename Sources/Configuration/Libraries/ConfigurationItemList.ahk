@@ -20,7 +20,7 @@
 ;;; ConfigurationItemList                                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ConfigurationItemList extends ConfigurationPanel {
+class ConfigurationItemList extends ConfiguratorPanel {
 	static sListControls := Map()
 
 	iListView := false
@@ -42,7 +42,7 @@ class ConfigurationItemList extends ConfigurationPanel {
 	AutoSave {
 		Get {
 			try {
-				if (isSet(ConfigurationEditor) && ConfigurationEditor.Instance)
+				if (isSet(ConfigurationEditor) && ConfigurationEditor.hasOwnProp("Instance"))
 					return ConfigurationEditor.Instance.AutoSave
 				else
 					return false
@@ -84,6 +84,75 @@ class ConfigurationItemList extends ConfigurationPanel {
 	}
 
 	initializeList(editor, listView, addButton := false, deleteButton := false, updateButton := false, upButton := false, downButton := false) {
+		listEvent(type, control, line, *) {
+			protectionOn()
+
+			try {
+				if isInstance(listView, Gui.ListBox)
+					line := listView.Value
+
+				this.listEvent(type, line)
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		addItem(control, *) {
+			protectionOn()
+
+			try{
+				this.addItem()
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		deleteItem(control, *) {
+			protectionOn()
+
+			try{
+				this.deleteItem()
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		updateItem(control, *) {
+			protectionOn()
+
+			try{
+				this.updateItem()
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		upItem(control, *) {
+			protectionOn()
+
+			try{
+				this.upItem()
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		downItem(control, *) {
+			protectionOn()
+
+			try{
+				this.downItem()
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
 		this.Editor := editor
 
 		this.iListView := listView
@@ -99,20 +168,45 @@ class ConfigurationItemList extends ConfigurationPanel {
 
 		associateControl(listView)
 
-		if addButton
+		if isInstance(listView, Gui.ListView) {
+			listView.OnEvent("Click", listEvent.Bind("Click"))
+			listView.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
+			listView.OnEvent("ItemSelect", listEvent.Bind("Select"))
+		}
+		else if isInstance(listView, Gui.ListBox) {
+			listView.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
+			listView.OnEvent("Change", listEvent.Bind("Select"))
+		}
+
+		if addButton {
 			associateControl(addButton)
 
-		if deleteButton
+			addButton.OnEvent("Click", addItem)
+		}
+
+		if deleteButton {
 			associateControl(deleteButton)
 
-		if updateButton
+			deleteButton.OnEvent("Click", deleteItem)
+		}
+
+		if updateButton {
 			associateControl(updateButton)
 
-		if upButton
+			updateButton.OnEvent("Click", updateItem)
+		}
+
+		if upButton {
 			associateControl(upButton)
 
-		if downButton
+			upButton.OnEvent("Click", upItem)
+		}
+
+		if downButton {
 			associateControl(downButton)
+
+			downButton.OnEvent("Click", downItem)
+		}
 
 		this.loadList(this.ItemList)
 
@@ -122,7 +216,9 @@ class ConfigurationItemList extends ConfigurationPanel {
 	saveToConfiguration(configuration) {
 		if this.AutoSave
 			if (this.CurrentItem != 0)
-				this.updateItem()
+				return this.updateItem()
+
+		return true
 	}
 
 	static getList(control) {
@@ -130,13 +226,40 @@ class ConfigurationItemList extends ConfigurationPanel {
 	}
 
 	clickEvent(line, count) {
+		/*
 		if (line != 0)
 			this.openEditor(line)
+		*/
 	}
 
 	selectEvent(line) {
-		if (line != 0)
-			this.openEditor(line)
+		if this.AutoSave {
+			if ((this.CurrentItem != 0) && (line != this.CurrentItem))
+				if !this.updateItem() {
+					this.selectItem(this.CurrentItem)
+
+					return
+				}
+		}
+
+		if (line != this.CurrentItem)
+			if (line != 0) {
+				this.openEditor(line)
+
+				this.selectItem(line)
+			}
+			else {
+				if isInstance(this.ListView, Gui.ListView) {
+					loop this.ListView.GetCount(0)
+						this.ListView.Modify(A_Index, "-Select")
+				}
+				else
+					this.ListView.Choose(0)
+
+				this.clearEditor()
+			}
+
+		this.updateState()
 	}
 
 	processListEvent() {
@@ -152,7 +275,7 @@ class ConfigurationItemList extends ConfigurationPanel {
 					this.clickEvent(line, 2)
 				else if (type == "Click")
 					this.clickEvent(line, 1)
-				else if (type == "Select")
+				else if ((type == "Select") && line && (line = (isInstance(this.ListView, Gui.ListView) ? this.ListView.GetNext(0) : this.ListView.Value)))
 					this.selectEvent(line)
 			}
 		}
@@ -216,13 +339,6 @@ class ConfigurationItemList extends ConfigurationPanel {
 
 	openEditor(itemNumber) {
 		if (itemNumber != this.CurrentItem) {
-			if this.AutoSave {
-				if (this.CurrentItem != 0)
-					this.updateItem()
-
-				this.selectItem(itemNumber)
-			}
-
 			this.CurrentItem := itemNumber
 
 			this.loadEditor(this.ItemList[this.CurrentItem])
@@ -235,7 +351,10 @@ class ConfigurationItemList extends ConfigurationPanel {
 		this.CurrentItem := itemNumber
 
 		if itemNumber
-			this.ListView.Modify(itemNumber, "Vis +Select +Focus")
+			if isInstance(this.ListView, Gui.ListView)
+				this.ListView.Modify(itemNumber, "Vis +Select +Focus")
+			else
+				this.ListView.Choose(itemNumber)
 
 		this.updateState()
 	}
@@ -285,7 +404,11 @@ class ConfigurationItemList extends ConfigurationPanel {
 					this.loadList(this.ItemList)
 
 					this.selectItem(this.CurrentItem)
+
+					return true
 				}
+				else
+					return false
 			}
 			finally {
 				recurse := false
@@ -317,76 +440,5 @@ class ConfigurationItemList extends ConfigurationPanel {
 		this.selectItem(this.CurrentItem + 1)
 
 		this.updateState()
-	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-listEvent(type, control, line, *) {
-	protectionOn()
-
-	try {
-		ConfigurationItemList.getList(control).listEvent(type, line)
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-addItem(control, *) {
-	protectionOn()
-
-	try{
-		ConfigurationItemList.getList(control).addItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-deleteItem(control, *) {
-	protectionOn()
-
-	try{
-		ConfigurationItemList.getList(control).deleteItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-updateItem(control, *) {
-	protectionOn()
-
-	try{
-		ConfigurationItemList.getList(control).updateItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-upItem(control, *) {
-	protectionOn()
-
-	try{
-		ConfigurationItemList.getList(control).upItem()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-downItem(control, *) {
-	protectionOn()
-
-	try{
-		ConfigurationItemList.getList(control).downItem()
-	}
-	finally {
-		protectionOff()
 	}
 }

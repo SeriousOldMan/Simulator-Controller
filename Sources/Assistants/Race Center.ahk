@@ -7199,7 +7199,8 @@ class RaceCenter extends ConfigurationItem {
 				this.updateState()
 			}
 			catch Any as exception {
-				msgbox 0
+				logError(exception)
+
 				message := (isObject(exception) ? exception.Message : exception)
 
 				this.showMessage(translate("Cannot connect to the Team Server.") . A_Space . translate("Retry in 10 seconds."), translate("Error: ") . message)

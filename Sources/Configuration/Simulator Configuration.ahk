@@ -34,7 +34,7 @@
 
 #Include "Libraries\ConfigurationItemList.ahk"
 #Include "Libraries\ConfigurationEditor.ahk"
-; #Include "Libraries\ThemesEditor.ahk"
+#Include "Libraries\ThemesEditor.ahk"
 #Include "Libraries\FormatsEditor.ahk"
 #Include "Libraries\TranslationsEditor.ahk"
 
@@ -47,7 +47,7 @@
 ;;; GeneralTab                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class GeneralTab extends ConfigurationItemPanel {
+class GeneralTab extends ConfiguratorPanel {
 	iSimulatorsList := false
 	iDevelopment := false
 	iSplashThemesConfiguration := false
@@ -179,12 +179,12 @@ class GeneralTab extends ConfigurationItemPanel {
 		window.SetFont("Norm", "Arial")
 
 		window.Add("Text", "x24 y97 w160 h23 +0x200", translate("Installation Folder (optional)"))
-		window.Add("Edit", "x224 y97 w214 h21 vhomePathEdit", this.Value["homePath"])
-		window.Add("Button", "x440 y96 w23 h23", translate("...")).OnEvent("Click", chooseHomePath)
+		window.Add("Edit", "x224 y97 w214 h21 W:Grow vhomePathEdit", this.Value["homePath"])
+		window.Add("Button", "x440 y96 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseHomePath)
 
 		window.Add("Text", "x24 y121 w160 h23 +0x200", translate("NirCmd Folder (optional)"))
-		window.Add("Edit", "x224 y121 w214 h21 VnirCmdPathEdit", this.Value["nirCmdPath"])
-		window.Add("Button", "x440 y120 w23 h23", translate("...")).OnEvent("Click", chooseNirCmdPath)
+		window.Add("Edit", "x224 y121 w214 h21 W:Grow VnirCmdPathEdit", this.Value["nirCmdPath"])
+		window.Add("Button", "x440 y120 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseNirCmdPath)
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
@@ -207,8 +207,8 @@ class GeneralTab extends ConfigurationItemPanel {
 			chosen := enIndex
 
 		window.Add("Text", "x24 y176 w86 h23 +0x200", translate("Localization"))
-		window.Add("DropDownList", "x250 y176 w188  Choose" . chosen . " vlanguageDropDown", choices)
-		window.Add("Button", "x440 y175 w23 h23", translate("...")).OnEvent("Click", openTranslationsEditor)
+		window.Add("DropDownList", "x250 y176 w188 W:Grow Choose" . chosen . " vlanguageDropDown", choices)
+		window.Add("Button", "x440 y175 w23 h23 X:Move", translate("...")).OnEvent("Click", openTranslationsEditor)
 		button := window.Add("Button", "x224 y175 w23 h23")
 		button.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(button, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
@@ -216,7 +216,7 @@ class GeneralTab extends ConfigurationItemPanel {
 		window.Add("CheckBox", "x24 y200 w242 h23 Checked" . this.Value["startWithWindows"] . " VstartWithWindowsCheck", translate("Start with Windows"))
 		window.Add("CheckBox", "x24 y224 w242 h23 Checked" . this.Value["silentMode"] . " VsilentModeCheck", translate("Silent mode (no splash screen, no sound)"))
 
-		window.Add("Button", "x363 y224 w100 h23", translate("Themes Editor...")).OnEvent("Click", openThemesEditor)
+		window.Add("Button", "x363 y224 w100 h23 X:Move", translate("Themes Editor...")).OnEvent("Click", openThemesEditor)
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
@@ -236,12 +236,12 @@ class GeneralTab extends ConfigurationItemPanel {
 			window.SetFont("Norm", "Arial")
 
 			window.Add("Text", "x24 y405 w160 h23 +0x200", translate("AutoHotkey Folder"))
-			window.Add("Edit", "x224 y406 w214 h21 VahkPathEdit", this.Value["ahkPath"])
-			window.Add("Button", "x440 y404 w23 h23", translate("...")).OnEvent("Click", chooseAHKPath)
+			window.Add("Edit", "x224 y406 w214 h21 W:Grow VahkPathEdit", this.Value["ahkPath"])
+			window.Add("Button", "x440 y404 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseAHKPath)
 
 			window.Add("Text", "x24 y429 w160 h23 +0x200", translate("MSBuild Bin Folder"))
-			window.Add("Edit", "x224 y429 w214 h21 VmsBuildPathEdit", this.Value["msBuildPath"])
-			window.Add("Button", "x440 y428 w23 h23", translate("...")).OnEvent("Click", chooseMSBuildPath)
+			window.Add("Edit", "x224 y429 w214 h21 W:Grow VmsBuildPathEdit", this.Value["msBuildPath"])
+			window.Add("Button", "x440 y428 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseMSBuildPath)
 
 			window.Add("Text", "x24 y453 w160 h23 +0x200", translate("Debug"))
 			window.Add("CheckBox", "x226 y451 w242 h23 Checked" . this.Value["debugEnabled"] . " vdebugEnabledCheck", translate("Enabled?"))
@@ -373,7 +373,6 @@ class GeneralTab extends ConfigurationItemPanel {
 	}
 
 	openThemesEditor() {
-		/*
 		local window := this.Window
 		local configuration
 
@@ -388,7 +387,6 @@ class GeneralTab extends ConfigurationItemPanel {
 		finally {
 			window.Opt("-Disabled")
 		}
-		*/
 	}
 
 	openFormatsEditor() {
@@ -422,20 +420,17 @@ class SimulatorsList extends ConfigurationItemList {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
-		local control
 
-		control := window.Add("ListBox", "x24 y284 w194 h96 BackGroundD8D8D8 vsimulatorsListBox")
-		control.OnEvent("Change", listEvent.Bind("Click"))
-		control.OnEvent("DoubleClick", listEvent.Bind("DoubleClick"))
+		window.Add("ListBox", "x24 y284 w194 h96 BackGroundD8D8D8 vsimulatorsListBox")
 
-		window.Add("Edit", "x224 y284 w239 h21 VsimulatorEdit")
+		window.Add("Edit", "x224 y284 w239 h21 W:Grow VsimulatorEdit")
 
-		window.Add("Button", "x385 y309 w38 h23 Disabled VsimulatorUpButton", translate("Up")).OnEvent("Click", upItem)
-		window.Add("Button", "x425 y309 w38 h23 Disabled VsimulatorDownButton", translate("Down")).OnEvent("Click", downItem)
+		window.Add("Button", "x385 y309 w38 h23 X:Move Disabled VsimulatorUpButton", translate("Up"))
+		window.Add("Button", "x425 y309 w38 h23 X:Move Disabled VsimulatorDownButton", translate("Down"))
 
-		window.Add("Button", "x264 y349 w46 h23 VsimulatorAddButton", translate("Add")).OnEvent("Click", addItem)
-		window.Add("Button", "x312 y349 w50 h23 Disabled VsimulatorDeleteButton", translate("Delete")).OnEvent("Click", deleteItem)
-		window.Add("Button", "x408 y349 w55 h23 Disabled VsimulatorUpdateButton", translate("&Save")).OnEvent("Click", updateItem)
+		window.Add("Button", "x264 y349 w46 h23 X:Move VsimulatorAddButton", translate("Add"))
+		window.Add("Button", "x312 y349 w50 h23 X:Move Disabled VsimulatorDeleteButton", translate("Delete"))
+		window.Add("Button", "x408 y349 w55 h23 X:Move Disabled VsimulatorUpdateButton", translate("&Save"))
 
 		this.initializeList(editor, window["simulatorsListBox"], window["simulatorAddButton"], window["simulatorDeleteButton"], window["simulatorUpdateButton"]
 								  , window["simulatorUpButton"], window["simulatorDownButton"])
@@ -606,8 +601,8 @@ initializeSimulatorConfiguration()
 ;;;                          Plugin Include Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-; #Include "..\Plugins\Configuration Plugins.ahk"
-; #Include "%A_MyDocuments%\Simulator Controller\Plugins\Configuration Plugins.ahk"
+#Include "..\Plugins\Configuration Plugins.ahk"
+#Include "%A_MyDocuments%\Simulator Controller\Plugins\Configuration Plugins.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

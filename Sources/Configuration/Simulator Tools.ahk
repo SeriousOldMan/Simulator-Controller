@@ -2541,8 +2541,16 @@ runCopyTargets(&buildProgress) {
 			if InStr(FileExist(targetSource), "D")
 				copy := true
 			else {
-				srcLastModified := FileGetTime(targetSource, "M")
-				dstLastModified := FileGetTime(targetDestination, "M")
+				try {
+					srcLastModified := FileGetTime(targetSource, "M")
+					dstLastModified := FileGetTime(targetDestination, "M")
+				}
+				catch Any as exception {
+					logError(exception)
+
+					srcLastModified := false
+					dstLastModified := false
+				}
 
 				if srcLastModified {
 					if dstLastModified
@@ -2597,7 +2605,7 @@ runCopyTargets(&buildProgress) {
 
 runBuildTargets(&buildProgress) {
 	local title, ignore, target, targetName, build, targetSource, targetBinary, srcLastModified, binLastModified
-	local compiledFile, targetDirectory, sourceDirectory, sourceCode
+	local compiledFile, targetDirectory, sourceDirectory, sourceCode, result, options
 
 	if !kSilentMode
 		showProgress({progress: buildProgress, message: ""})
@@ -2612,8 +2620,16 @@ runBuildTargets(&buildProgress) {
 		targetSource := target[2]
 		targetBinary := target[3]
 
-		srcLastModified := FileGetTime(targetSource, "M")
-		binLastModified := FileGetTime(targetBinary, "M")
+		try {
+			srcLastModified := FileGetTime(targetSource, "M")
+			binLastModified := FileGetTime(targetBinary, "M")
+		}
+		catch Any as exception {
+			logError(exception)
+
+			srcLastModified := false
+			binLastModified := false
+		}
 
 		if gTargetConfigurationChanged
 			build := true
@@ -2635,6 +2651,8 @@ runBuildTargets(&buildProgress) {
 				if !FileExist(targetSource)
 					throw "Source file not found..."
 
+				options := " /base `"" . kAHKDirectory . "v2\AutoHotkey64.exe`""
+
 				if (gTargetConfiguration = "Production") {
 					SplitPath(targetSource, , &sourceDirectory)
 
@@ -2648,27 +2666,37 @@ runBuildTargets(&buildProgress) {
 
 					FileAppend(sourceCode, sourceDirectory . "\compile.ahk")
 
-					RunWait(kCompiler . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
+					result := RunWait(kCompiler . options . " /in `"" . sourceDirectory . "\compile.ahk" . "`"")
 
 					deleteFile(sourceDirectory . "\compile.ahk")
 				}
 				else
-					RunWait(kCompiler . " /in `"" . targetSource . "`"")
+					result := RunWait(kCompiler . options . " /in `"" . targetSource . "`"")
 			}
 			catch Any as exception {
 				logMessage(kLogCritical, translate("Cannot compile ") . targetSource . translate(" - source file or AHK Compiler (") . kCompiler . translate(") not found"))
 
 				showMessage(substituteVariables(translate("Cannot compile %targetSource%: Source file or AHK Compiler (%kCompiler%) not found..."), {targetSource: targetSource, kCompiler: kCompiler})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+				result := true
 			}
 
-			SplitPath(targetBinary, &compiledFile, &targetDirectory)
-			SplitPath(targetSource, , &sourceDirectory)
+			if !result {
+				SplitPath(targetBinary, &compiledFile, &targetDirectory)
+				SplitPath(targetSource, , &sourceDirectory)
 
-			compiledFile := sourceDirectory . "\" . compiledFile
+				compiledFile := sourceDirectory . "\" . compiledFile
 
-			DirCreate(targetDirectory)
-			FileMove(compiledFile, targetDirectory, 1)
+				DirCreate(targetDirectory)
+
+				try {
+					FileMove(compiledFile, targetDirectory, 1)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
 		}
 
 		buildProgress += (100 / (gTargetsCount + 1))
@@ -2826,7 +2854,7 @@ startSimulatorTools() {
 
 	buildProgress := 0
 
-	prepareTargets(buildProgress, updateOnly)
+	prepareTargets(&buildProgress, updateOnly)
 
 	gTargetsCount := (gUpdateTargets.Length + gCleanupTargets.Length + gCopyTargets.Length + gBuildTargets.Length
 					+ (((kMSBuildDirectory != "") && (gSpecialTargets.Length > 0)) ? getFileNames("*", kSourcesDirectory . "Special\").Length : 0))
@@ -2840,7 +2868,7 @@ startSimulatorTools() {
 		if exitProcesses
 			exitProcesses(true, true)
 
-		runCleanTargets(buildProgress)
+		runCleanTargets(&buildProgress)
 
 		if (gSpecialTargets.Length > 0)
 			runSpecialTargets(&buildProgress)
@@ -2902,8 +2930,8 @@ startSimulatorTools()
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; Escape::                   Cancel Build                                 ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-Escape::
-{
+
+Escape:: {
 	cancelBuild()
 
 	return

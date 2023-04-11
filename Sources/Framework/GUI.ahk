@@ -70,12 +70,20 @@ class Window extends Gui {
 
 	iRules := []
 
+	iTitleBarHeight := 0
+
 	class Resizer {
 		iWindow := false
 
 		Window {
 			Get {
 				return this.iWindow
+			}
+		}
+
+		Control {
+			Get {
+				return false
 			}
 		}
 
@@ -124,11 +132,19 @@ class Window extends Gui {
 			Get {
 				return this.iOriginalX
 			}
+
+			Set {
+				return (this.iOriginalX := value)
+			}
 		}
 
 		OriginalY {
 			Get {
 				return this.iOriginalY
+			}
+
+			Set {
+				return (this.iOriginalY := value)
 			}
 		}
 
@@ -136,11 +152,19 @@ class Window extends Gui {
 			Get {
 				return this.iOriginalWidth
 			}
+
+			Set {
+				return (this.iOriginalWidth := value)
+			}
 		}
 
 		OriginalHeight {
 			Get {
 				return this.iOriginalHeight
+			}
+
+			Set {
+				return (this.iOriginalHeight := value)
 			}
 		}
 
@@ -376,9 +400,26 @@ class Window extends Gui {
 		}
 	}
 
-	Resizers {
+	TitleBarHeight {
 		Get {
-			return this.iResizers
+			return this.iTitleBarHeight
+		}
+	}
+
+	Resizers[control?] {
+		Get {
+			if isSet(control) {
+				local resizers := []
+				local ignore, resizer
+
+				for ignore, resizer in this.Resizers
+					if (resizer.Control = control)
+						resizers.Push(resizer)
+
+				return resizers
+			}
+			else
+				return this.iResizers
 		}
 	}
 
@@ -475,12 +516,15 @@ class Window extends Gui {
 
 	Show(arguments*) {
 		local x, y, cWidth, cHeight, width, height
+		local fullHeight, clientHeight
 
 		super.Show(arguments*)
 
 		if !this.MinWidth {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
 			WinGetPos(&x, &y, &width, &height, this)
+
+			this.iTitleBarHeight := (height - cHeight)
 
 			this.iMinWidth := width
 			this.iMinHeight := height
@@ -847,6 +891,7 @@ translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
 translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
 translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
 translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
+translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
 getControllerActionLabels() {
 	return getControllerActionDefinitions("Labels")

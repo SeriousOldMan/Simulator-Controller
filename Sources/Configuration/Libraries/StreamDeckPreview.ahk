@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Stream Deck Preview             ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -74,20 +74,20 @@ class StreamDeckPreview extends ControllerPreview {
 		}
 
 		if (layout[1] = 2) {
-			this.Width := this.kMiniWidth
-			this.Height := this.kMiniHeight
+			this.Width := StreamDeckPreview.kMiniWidth
+			this.Height := StreamDeckPreview.kMiniHeight
 
 			this.iSize := "Mini"
 		}
 		else if (layout[1] = 3) {
-			this.Width := this.kStandardWidth
-			this.Height := this.kStandardHeight
+			this.Width := StreamDeckPreview.kStandardWidth
+			this.Height := StreamDeckPreview.kStandardHeight
 
 			this.iSize := "Standard"
 		}
 		else if (layout[1] = 4) {
-			this.Width := this.kXLWidth
-			this.Height := this.kXLHeight
+			this.Width := StreamDeckPreview.kXLWidth
+			this.Height := StreamDeckPreview.kXLHeight
 
 			this.iSize := "XL"
 		}
@@ -95,14 +95,12 @@ class StreamDeckPreview extends ControllerPreview {
 		this.Rows := layout[1]
 		this.Columns := layout[2]
 
-		loop % this.Rows
-		{
+		loop this.Rows {
 			row := A_Index
 
 			this.iButtons[row] := Object()
 
-			loop % this.Columns
-			{
+			loop this.Columns {
 				column := A_Index
 
 				button := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row))[column]
@@ -121,64 +119,67 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	createGui(configuration) {
-		local window := this.Window
 		local row := 0
 		local column := 0
 		local isEmpty := true
-		local y := this.kTopMargin
-		local x, column, posX, posY
+		local y := StreamDeckPreview.kTopMargin
+		local x, column, posX, posY, streamDeckGui
 
-		Gui %window%:Default
+		contextMenu(window, control, item, isRightClick, x, y) {
+			if (isRightClick && (window = streamDeckGui))
+				controlClick(window)
+		}
 
-		Gui %window%:-Border -Caption
+		streamDeckGui := Window()
 
-		Gui %window%:+LabelstreamDeck
+		this.Window := streamDeckGui
 
-		Gui %window%:Add, Picture, x0 y0, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
+		streamDeckGui.OnEvent("ContextMenu", contextMenu)
 
-		Gui %window%:Color, 0x000000
-		Gui %window%:Font, s8 Norm, Arial
+		streamDeckGui.Add("Picture", "x0 y0", (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg"))
 
-		Gui %window%:Font, cWhite
+		streamDeckGui.BackColor := "0x000000"
+		streamDeckGui.SetFont("s8 Norm", "Arial")
 
-		loop % this.Rows
-		{
-			this.iLabels[A_Index] := Object()
-			this.iIcons[A_Index] := Object()
+		streamDeckGui.SetFont("cWhite")
+
+		loop this.Rows {
+			this.iLabels[A_Index] := CaseInsenseMap()
+			this.iIcons[A_Index] := CaseInsenseMap()
 
 			row := A_Index
 
-			x := this.kLeftMargin[this.Size]
+			x := StreamDeckPreview.kLeftMargin[this.Size]
 
-			loop % this.Columns
-			{
+			loop this.Columns {
 				column := A_Index
 
 				posX := (x + 3)
 				posY := (y + 3)
 
-				Gui %window%:Add, Picture, x%posX% y%posY% w44 h44 BackgroundTrans hwndiconHandle
-				Gui %window%:Add, Text, x%posX% y%posY% w44 h44 Center BackgroundTrans hwndlabelHandle gcontrolClick
+				this.iIcons[row][column] := streamDeckGui.Add("Picture", "x" . posX . " y" . posY . " w44 h44 BackgroundTrans")
+				this.iLabels[row][column] := streamDeckGui.Add("Text", "x" . posX . " y" . posY . " w44 h44 Center BackgroundTrans").OnEvent("Click", controlClick.Bind(streamDeckGui))
 
-				this.iLabels[row][column] := labelHandle
-				this.iIcons[row][column] := iconHandle
-
-				x += (this.kColumnMargin + this.kButtonWidth)
+				x += (StreamDeckPreview.kColumnMargin + StreamDeckPreview.kButtonWidth)
 			}
 
-			y += (this.kRowMargin + this.kButtonHeight)
+			y += (StreamDeckPreview.kRowMargin + StreamDeckPreview.kButtonHeight)
 		}
 
 		this.updateButtons()
 	}
 
 	createBackground(configuration) {
-		local window := this.Window
+		local control := this.Window.Add("Picture", "x0 y0 " . previewMover . " 0x4000000", (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg"))
 		local previewMover := this.PreviewManager.getPreviewMover()
 
-		previewMover := (previewMover ? ("g" . previewMover) : "")
+		if previewMover {
+			move(*) {
+				previewMover.Call(this.Window)
+			}
 
-		Gui %window%:Add, Picture, x0 y0 %previewMover% 0x4000000, % (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg")
+			control.OnEvent("Click", move)
+		}
 	}
 
 	getButton(row, column) {
@@ -208,36 +209,31 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	updateButtons() {
-		local row, column, handle, button, label, handle, icon
+		local row, column, button, label, icon
 
-		loop % this.Rows
-		{
+		loop this.Rows {
 			row := A_Index
 
-			loop % this.Columns
-			{
+			loop this.Columns {
 				column := A_Index
-
-				handle := this.iLabels[row][column]
 
 				button := this.getButton(row, column)
 
 				if button {
 					label := this.getLabel(row, column)
 
-					GuiControl Text, %handle%, % button.Button . ((label && (label != true)) ? ("`n" . label) : "")
+					this.iLabels[row][column].Text := button.Button . ((label && (label != true)) ? ("`n" . label) : "")
 				}
 				else
-					GuiControl Text, %handle%, % ""
+					this.iLabels[row][column].Text := ""
 
-				handle := this.iIcons[row][column]
 				icon := this.getIcon(row, column)
 
 				if !icon
 					icon := (kIconsDirectory . "Empty.png")
 
 				try
-					GuiControl, , %handle%, % icon
+					this.iIcons[row][column].Value := icon
 			}
 		}
 	}
@@ -252,31 +248,29 @@ class StreamDeckPreview extends ControllerPreview {
 		local handle := this.iLabels[row][column]
 
 		if handle
-			GuiControl Text, %handle%, %text%
+			handle.Text := text
 	}
 
-	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
+	getControl(clickX, clickY, &row, &column, &isEmpty) {
 		local function
 		local descriptor := "Empty.0"
 		local name := "Empty"
 		local number := 0
-		local y := this.kTopMargin
+		local y := StreamDeckPreview.kTopMargin
 		local x, button, name, number, previewMover
 
 		row := 0
 		column := 0
 		isEmpty := true
 
-		loop % this.Rows
-		{
-			if ((clickY > y) && (clickY < (y + this.kButtonHeight))) {
+		loop this.Rows {
+			if ((clickY > y) && (clickY < (y + StreamDeckPreview.kButtonHeight))) {
 				row := A_Index
 
-				x := this.kLeftMargin[this.Size]
+				x := StreamDeckPreview.kLeftMargin[this.Size]
 
-				loop % this.Columns
-				{
-					if ((clickX > x) && (clickX < (x + this.kButtonWidth))) {
+				loop this.Columns {
+					if ((clickX > x) && (clickX < (x + StreamDeckPreview.kButtonWidth))) {
 						column := A_Index
 
 						button := this.getButton(row, column)
@@ -291,236 +285,152 @@ class StreamDeckPreview extends ControllerPreview {
 						return ["Control", ConfigurationItem.descriptor(name, number)]
 					}
 
-					x += (this.kColumnMargin + this.kButtonWidth)
+					x += (StreamDeckPreview.kColumnMargin + StreamDeckPreview.kButtonWidth)
 				}
 			}
 
-			y += (this.kRowMargin + this.kButtonHeight)
+			y += (StreamDeckPreview.kRowMargin + StreamDeckPreview.kButtonHeight)
 		}
 
 		previewMover := this.PreviewManager.getPreviewMover()
 
 		if previewMover
-			%previewMover%()
+			previewMover.Call(this.Window)
 
 		return false
 	}
 
 	controlClick(element, row, column, isEmpty) {
-		local handler := this.iControlClickHandler
-
-		return %handler%(this, element, element[2], row, column, isEmpty)
+		return this.iControlClickHandler.Call(this, element, element[2], row, column, isEmpty)
 	}
 
 	openControlMenu(preview, element, function, row, column, isEmpty) {
-		local count, menuItem, window, label, handler, count
-		local button, labelMode, iconMode, mode, menu
+		local count, mainMenu, controlMenu, numberMenu, subMenu, displayMenu, labelMenu, iconMenu, modeMenu, menuItem, window, label, count
+		local button, labelMode, iconMode, mode
 
 		if GetKeyState("Ctrl", "P")
-			LayoutsList.Instance.changeControl(row, column, "__Number__", false)
+			this.PreviewManager.changeControl(row, column, "__Number__", false)
 		else {
 			menuItem := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
 
-			try {
-				Menu MainMenu, DeleteAll
-			}
-			catch Any as exception {
-				logError(exception)
-			}
-
+			mainMenu := Menu()
 			window := this.Window
 
-			Gui %window%:Default
+			mainMenu.Add(menuItem, (*) => {})
+			mainMenu.Disable(menuItem)
+			mainMenu.Add()
 
-			Menu MainMenu, Add, %menuItem%, controlMenuIgnore
-			Menu MainMenu, Disable, %menuItem%
-			Menu MainMenu, Add
+			controlMenu := Menu()
 
-			try {
-				Menu ControlMenu, DeleteAll
-			}
-			catch Any as exception {
-				logError(exception)
-			}
+			controlMenu.Add(translate("Empty"), ObjBindMethod(this.PreviewManager, "changeControl", row, column, false))
+			controlMenu.Add()
 
-			label := translate("Empty")
-			handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, false)
+			numberMenu := Menu()
 
-			Menu ControlMenu, Add, %label%, %handler%
-
-			Menu ControlMenu, Add
-
-			try {
-				Menu NumberMenu, DeleteAll
-			}
-			catch Any as exception {
-				logError(exception)
-			}
-
-			label := translate("Input...")
-			handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", false)
-
-			Menu NumberMenu, Add, %label%, %handler%
-			Menu NumberMenu, Add
+			numberMenu.Add(translate("Input..."), ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Number__", false))
+			numberMenu.Add()
 
 			count := 1
 
 			loop 4 {
 				label := (count . " - " . (count + 9))
 
-				menu := ("NumSubMenu" . A_Index)
-
-				try {
-					Menu %menu%, DeleteAll
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+				subMenu := Menu()
 
 				loop 10 {
-					handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Number__", count)
-					Menu %menu%, Add, %count%, %handler%
+					subMenu.Add(count, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Number__", count))
 
 					if (count = ConfigurationItem.splitDescriptor(element[2])[2])
-						Menu %menu%, Check, %count%
+						subMenu.Check(count)
 
 					count += 1
 				}
 
-				Menu NumberMenu, Add, %label%, :%menu%
+				numberMenu.Add(label, subMenu)
 			}
 
-			label := translate("Number")
-			Menu ControlMenu, Add, %label%, :NumberMenu
+			controlMenu.Add(translate("Number"), numberMenu)
 
-			label := translate("Button")
-
-			Menu MainMenu, Add, %label%, :ControlMenu
+			mainMenu.Add(translate("Button"), controlMenu)
 
 			button := this.getButton(row, column)
 
 			if button {
-				try {
-					Menu DisplayMenu, DeleteAll
-				}
-				catch Any as exception {
-					logError(exception)
-				}
-
-				try {
-					Menu LabelMenu, DeleteAll
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+				displayMenu := Menu()
+				labelMenu := Menu()
 
 				labelMode := this.getLabel(row, column)
 
 				label := translate("Empty")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__No_Label__", false)
-				Menu LabelMenu, Add, %label%, %handler%
+				labelMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__No_Label__", false))
 				if (labelMode == false)
-					Menu LabelMenu, Check, %label%
+					labelMenu.Check(label)
 
 				label := translate("Action")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Action_Label__", false)
-				Menu LabelMenu, Add, %label%, %handler%
+				labelMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Action_Label__", false))
 				if (labelMode == true)
-					Menu LabelMenu, Check, %label%
+					labelMenu.Check(label)
 
 				label := translate("Text...")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Text_Label__", false)
-				Menu LabelMenu, Add, %label%, %handler%
+				labelMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Text_Label__", false))
 				if (labelMode && (labelMode != true))
-					Menu LabelMenu, Check, %label%
+					labelMenu.Check(label)
 
-				label := translate("Label")
+				displayMenu.Add(translate("Label"), labelMenu)
 
-				Menu DisplayMenu, Add, %label%, :LabelMenu
-
-				try {
-					Menu IconMenu, DeleteAll
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+				iconMenu := Menu()
 
 				iconMode := this.getIcon(row, column)
 
 				label := translate("Empty")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__No_Icon__", false)
-				Menu IconMenu, Add, %label%, %handler%
+				iconMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__No_Icon__", false))
 				if (iconMode == false)
-					Menu IconMenu, Check, %label%
+					iconMenu.Check(label)
 
 				label := translate("Action")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Action_Icon__", false)
-				Menu IconMenu, Add, %label%, %handler%
+				iconMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Action_Icon__", false))
 				if (iconMode == true)
-					Menu IconMenu, Check, %label%
+					iconMenu.Check(label)
 
 				label := translate("Image...")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Image_Icon__", false)
-				Menu IconMenu, Add, %label%, %handler%
+				iconMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Image_Icon__", false))
 				if (iconMode && (iconMode != true))
-					Menu IconMenu, Check, %label%
+					iconMenu.Check(label)
 
 				label := translate("Icon")
 
-				Menu DisplayMenu, Add, %label%, :IconMenu
+				displayMenu.Add(label, iconMenu)
 
-				try {
-					Menu ModeMenu, DeleteAll
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+				modeMenu := Menu()
 
 				mode := this.getMode(row, column)
 
 				label := translate("Icon or Label")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Mode__", kIconOrLabel)
-				Menu ModeMenu, Add, %label%, %handler%
+				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kIconOrLabel))
 				if (mode == kIconOrLabel)
-					Menu ModeMenu, Check, %label%
+					modeMenu.Check(label)
 
 				label := translate("Icon and Label")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Mode__", kIconAndLabel)
-				Menu ModeMenu, Add, %label%, %handler%
+				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kIconAndLabel))
 				if (mode == kIconAndLabel)
-					Menu ModeMenu, Check, %label%
+					modeMenu.Check(label)
 
 				label := translate("Only Icon")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Mode__", kIcon)
-				Menu ModeMenu, Add, %label%, %handler%
+				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kIcon))
 				if (mode == kIcon)
-					Menu ModeMenu, Check, %label%
+					modeMenu.Check(label)
 
 				label := translate("Only Label")
-				handler := ObjBindMethod(LayoutsList.Instance, "changeControl", row, column, "__Mode__", kLabel)
-				Menu ModeMenu, Add, %label%, %handler%
+				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kLabel))
 				if (mode == kLabel)
-					Menu ModeMenu, Check, %label%
+					modeMenu.Check(label)
 
-				label := translate("Rule")
+				displayMenu.Add(translate("Rule"), modeMenu)
 
-				Menu DisplayMenu, Add, %label%, :ModeMenu
-
-				label := translate("Display")
-
-				Menu MainMenu, Add, %label%, :DisplayMenu
+				mainMenu.Add(translate("Display"), displayMenu)
 			}
 
-			Menu MainMenu, Show
+			mainMenu.Show()
 		}
 	}
-}
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-streamDeckContextMenu(guiHwnd, ctrlHwnd, eventInfo, isRightClick, x, y) {
-	if (isRightClick && ControllerPreview.ControllerPreviews.HasKey(A_Gui))
-		controlClick()
 }

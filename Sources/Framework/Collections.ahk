@@ -9,9 +9,17 @@
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+class SafeArray extends Array {
+	__New(arguments*) {
+		this.Default := ""
+
+		super.__New(arguments*)
+	}
+}
+
 class SafeMap extends Map {
 	__New(arguments*) {
-		this.Default := false
+		this.Default := ""
 
 		super.__New(arguments*)
 	}

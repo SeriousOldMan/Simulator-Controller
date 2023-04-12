@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Race Engineer Configuration     ;;;
 ;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
@@ -14,32 +14,10 @@
 ;;; RaceEngineerConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global reSimulatorDropDown
-
-global reLoadSettingsDropDown
-global reLoadTyrePressuresDropDown
-global reSaveSettingsDropDown
-global reSaveTyrePressuresDropDown
-
-global reLearningLapsEdit
-global reLapsConsideredEdit
-global reDampingFactorEdit
-
-global reAdjustLapTimeCheck
-global reDamageAnalysisLapsEdit
-
-class RaceEngineerConfigurator extends ConfigurationItem {
-	iEditor := false
-
+class RaceEngineerConfigurator extends ConfiguratorPanel {
 	iSimulators := []
-	iSimulatorConfigurations := {}
+	iSimulatorConfigurations := CaseInsenseMap()
 	iCurrentSimulator := false
-
-	Editor {
-		Get {
-			return this.iEditor
-		}
-	}
 
 	Simulators {
 		Get {
@@ -48,7 +26,7 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	}
 
 	__New(editor, configuration := false) {
-		this.iEditor := editor
+		this.Editor := editor
 
 		super.__New(configuration)
 
@@ -59,7 +37,25 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		local window := editor.Window
 		local x0, x1, x2, x3, x4, w1, w2, w3, choices, chosen
 
-		Gui %window%:Font, Norm, Arial
+		replicateRESettings(*) {
+			this.replicateSettings()
+		}
+
+		validateREDampingFactor(*) {
+			local field := this.Control["reDampingFactorEdit"]
+
+			if !isNumber(internalValue("Float", field.Text))
+				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+			else
+				field.ValidText := field.Text
+		}
+
+		chooseRaceEngineerSimulator(*) {
+			this.saveSimulatorConfiguration()
+			this.loadSimulatorConfiguration()
+		}
+
+		window.SetFont("Norm", "Arial")
 
 		x0 := x + 8
 		x1 := x + 132
@@ -71,78 +67,81 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 		x4 := x1 + w2 + 1
 		w3 := width - (x3 - x + 16) + 10
 
-		Gui %window%:Add, Text, x%x0% y%y% w105 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
+		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w105 h23 +0x200 Hidden", translate("Simulator"))
 
-		if (this.Simulators.Length() = 0)
+		if (this.Simulators.Length = 0)
 			this.iSimulators := this.getSimulators()
 
  		choices := this.iSimulators
-		chosen := (choices.Length() > 0) ? 1 : 0
+		chosen := (choices.Length > 0) ? 1 : 0
 
-		Gui %window%:Add, DropDownList, x%x1% y%y% w%w2% Choose%chosen% gchooseRaceEngineerSimulator vreSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+		widget2 := window.Add("DropDownList", "x" . x1 . " y" . y . " w" . w2 . " W:Grow Choose" . chosen . " vreSimulatorDropDown Hidden", choices)
+		widget2.OnEvent("Change", chooseRaceEngineerSimulator)
 
-		Gui %window%:Add, Button, x%x4% yp w23 h23 Center +0x200 greplicateRESettings HWNDwidget31 Hidden
-		setButtonIcon(widget31, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
+		widget3 := window.Add("Button", "x" . x4 . " yp w23 h23 X:Move Center +0x200 Hidden")
+		widget3.OnEvent("Click", replicateRESettings)
+		setButtonIcon(widget3, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+40 w%width% h70 HWNDwidget3 Hidden, % translate("Settings (for all Race Assistants)")
+		widget4 := window.Add("GroupBox", "-Theme x" . x . " yp+40 w" . width . " h70 W:Grow Hidden", translate("Settings (for all Race Assistants)"))
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget4 Hidden, % translate("@ Session Begin")
-		choices := collect(["Load from previous Session", "Load from Database"], "translate")
-		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit vreLoadSettingsDropDown HWNDwidget5 Hidden, % values2String("|", choices*)
+		widget5 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("@ Session Begin"))
+		choices := collect(["Load from previous Session", "Load from Database"], translate)
+		widget6 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow AltSubmit vreLoadSettingsDropDown Hidden", choices)
 
-		choices := collect(["Ask", "Always save", "No action"], "translate")
-		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget6 Hidden, % translate("@ Session End")
-		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveSettingsDropDown HWNDwidget7 Hidden, % values2String("|", choices*)
+		widget7 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("@ Session End"))
+		choices := collect(["Ask", "Always save", "No action"], translate)
+		widget8 := window.Add("DropDownList", "x" . x1 . " yp w140 W:Grow(0.3) AltSubmit vreSaveSettingsDropDown Hidden", choices)
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h70 HWNDwidget8 Hidden, % translate("Tyre Pressures")
+		widget9 := window.Add("GroupBox", "-Theme x" . x . " yp+35 w" . width . " h70 W:Grow Hidden", translate("Tyre Pressures"))
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Text, x%x0% yp+17 w120 h23 +0x200 HWNDwidget9 Hidden, % translate("@ Session Begin")
-		choices := collect(["Load from Settings", "Load from Database", "Import from Simulator", "Use initial pressures"], "translate")
-		chosen := 1
-		Gui %window%:Add, DropDownList, x%x1% yp w%w1% AltSubmit Choose%chosen% vreLoadTyrePressuresDropDown HWNDwidget10 Hidden, % values2String("|", choices*)
+		widget10 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("@ Session Begin"))
+		choices := collect(["Load from Settings", "Load from Database", "Import from Simulator", "Use initial pressures"], translate)
+		widget11 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow AltSubmit Choose1 vreLoadTyrePressuresDropDown Hidden", choices)
 
-		choices := collect(["Ask", "Always save", "No action"], "translate")
-		Gui %window%:Add, Text, x%x0% yp+24 w120 h23 +0x200 HWNDwidget11 Hidden, % translate("@ Session End")
-		Gui %window%:Add, DropDownList, x%x1% yp w140 AltSubmit vreSaveTyrePressuresDropDown HWNDwidget12 Hidden, % values2String("|", choices*)
+		widget12 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("@ Session End"))
+		choices := collect(["Ask", "Always save", "No action"], translate)
+		widget13 := window.Add("DropDownList", "x" . x1 . " yp w140 W:Grow(0.3) AltSubmit vreSaveTyrePressuresDropDown Hidden", choices)
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h156 HWNDwidget13 Hidden, % translate("Data Analysis")
+		widget14 := window.Add("GroupBox", "-Theme x" . x . " yp+35 w" . width . " h156 W:Grow Hidden", translate("Data Analysis"))
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Text, x%x0% yp+17 w80 h23 +0x200 HWNDwidget14 Hidden, % translate("Learn for")
-		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number Limit1 vreLearningLapsEdit HWNDwidget15 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget16 Hidden, 1
-		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget17 Hidden, % translate("Laps after Start or Pitstop")
+		widget15 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Learn for"))
+		widget16 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vreLearningLapsEdit Hidden")
+		widget17 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget18 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
-		Gui %window%:Add, Text, x%x0% yp+26 w105 h20 Section HWNDwidget18 Hidden, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number Limit1 vreLapsConsideredEdit HWNDwidget19 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget20 Hidden, 1
-		Gui %window%:Add, Text, x%x3% yp+2 w%w3% h20 HWNDwidget21 Hidden, % translate("Laps")
+		widget19 := window.Add("Text", "x" . x0 . " yp+26 w105 h20 Section Hidden", translate("Statistical Window"))
+		widget20 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vreLapsConsideredEdit Hidden")
+		widget21 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget22 := window.Add("Text", "x" . x3 . " yp+2 w" . w3 . " h20 Hidden", translate("Laps"))
 
-		Gui %window%:Add, Text, x%x0% ys+24 w105 h20 Section HWNDwidget22 Hidden, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vreDampingFactorEdit gvalidateREDampingFactor HWNDwidget23 Hidden
-		Gui %window%:Add, Text, x%x3% yp+2 w%w3% h20 HWNDwidget24 Hidden, % translate("p. Lap")
+		widget23 := window.Add("Text", "x" . x0 . " ys+24 w105 h20 Section Hidden", translate("Damping Factor"))
+		widget24 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vreDampingFactorEdit  Hidden")
+		widget24.OnEvent("Change", validateREDampingFactor)
 
-		Gui %window%:Add, Text, x%x0% ys+30 w160 h23 +0x200 Section HWNDwidget25 Hidden, % translate("Adjust Lap Time")
-		Gui %window%:Add, CheckBox, x%x1% yp w%w1% h23 VreAdjustLapTimeCheck HWNDwidget26 Hidden, % translate("for Start, Pitstop or incomplete Laps (use from Settings)")
+		widget25 := window.Add("Text", "x" . x3 . " yp+2 w" . w3 . " h20 Hidden", translate("p. Lap"))
 
-		Gui %window%:Add, Text, x%x0% ys+30 w120 h23 +0x200 Section HWNDwidget27 Hidden, % translate("Damage Analysis for")
-		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number Limit1 VreDamageAnalysisLapsEdit HWNDwidget28 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget29 Hidden, 1
-		Gui %window%:Add, Text, x%x3% yp-2 w%w3% h23 +0x200 HWNDwidget30 Hidden, % translate("Laps after Incident")
+		widget26 := window.Add("Text", "x" . x0 . " ys+30 w160 h23 +0x200 Section Hidden", translate("Adjust Lap Time"))
+		widget27 := window.Add("CheckBox", "x" . x1 . " yp w" . w1 . " h23 VreAdjustLapTimeCheck Hidden", translate("for Start, Pitstop or incomplete Laps (use from Settings)"))
+
+		widget28 := window.Add("Text", "x" . x0 . " ys+30 w120 h23 +0x200 Section Hidden", translate("Damage Analysis for"))
+		widget29 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 VreDamageAnalysisLapsEdit Hidden")
+		widget30 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget31 := window.Add("Text", "x" . x3 . " yp-2 w" . w3 . " h23 +0x200 Hidden", translate("Laps after Incident"))
 
 		loop 31
 			editor.registerWidget(this, widget%A_Index%)
@@ -155,11 +154,11 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		if (this.Simulators.Length() = 0)
+		if (this.Simulators.Length = 0)
 			this.iSimulators := this.getSimulators()
 
 		for ignore, simulator in this.Simulators {
-			simulatorConfiguration := {}
+			simulatorConfiguration := CaseInsenseMap()
 
 			simulatorConfiguration["LoadSettings"] := getMultiMapValue(configuration, "Race Assistant Startup", simulator . ".LoadSettings", getMultiMapValue(configuration, "Race Engineer Startup", simulator . ".LoadSettings", "SettingsDatabase"))
 
@@ -204,101 +203,74 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 	}
 
 	loadSimulatorConfiguration(simulator := false) {
-		local window := this.Editor.Window
 		local configuration, value
 
-		Gui %window%:Default
+		if simulator
+			this.Control["reSimulatorDropDown"].Choose(inList(this.iSimulators, simulator))
 
-		if simulator {
-			reSimulatorDropDown := simulator
+		this.iCurrentSimulator := this.Control["reSimulatorDropDown"].Text
 
-			GuiControl Choose, reSimulatorDropDown, % inList(this.iSimulators, simulator)
-		}
-		else
-			GuiControlGet reSimulatorDropDown
-
-		this.iCurrentSimulator := reSimulatorDropDown
-
-		if this.iSimulatorConfigurations.HasKey(reSimulatorDropDown) {
-			configuration := this.iSimulatorConfigurations[reSimulatorDropDown]
+		if this.iSimulatorConfigurations.Has(this.iCurrentSimulator) {
+			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
 			value := configuration["LoadSettings"]
 
 			if (value = "SetupDatabase")
 				value := "SettingsDatabase"
 
-			GuiControl Choose, reLoadSettingsDropDown, % inList(["Default", "SettingsDatabase"], configuration["LoadSettings"])
+			this.Control["reLoadSettingsDropDown"].Choose(inList(["Default", "SettingsDatabase"], configuration["LoadSettings"]))
 
 			value := configuration["LoadTyrePressures"]
 
 			if (value = "SetupDatabase")
 				value := "TyresDatabase"
 
-			GuiControl Choose, reLoadTyrePressuresDropDown, % inList(["Default", "TyresDatabase", "Import", "Setup"], configuration["LoadTyrePressures"])
+			this.Control["reLoadTyrePressuresDropDown"].Choose(inList(["Default", "TyresDatabase", "Import", "Setup"], configuration["LoadTyrePressures"]))
 
-			GuiControl Choose, reSaveSettingsDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveSettings"])
-			GuiControl Choose, reSaveTyrePressuresDropDown, % inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"])
+			this.Control["reSaveSettingsDropDown"].Choose(inList(["Ask", "Always", "Never"], configuration["SaveSettings"]))
+			this.Control["reSaveTyrePressuresDropDown"].Choose(inList(["Ask", "Always", "Never"], configuration["SaveTyrePressures"]))
 
-			GuiControl Text, reLearningLapsEdit, % configuration["LearningLaps"]
-			GuiControl Text, reLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
+			this.Control["reLearningLapsEdit"].Text := configuration["LearningLaps"]
+			this.Control["reLapsConsideredEdit"].Text := configuration["ConsideredHistoryLaps"]
 
-			reDampingFactorEdit := displayValue("Float", configuration["HistoryLapsDamping"])
+			this.Control["reDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"])
+			this.Control["reDampingFactorEdit"].ValidText := this.Control["reDampingFactorEdit"].Text
 
-			GuiControl Text, reDampingFactorEdit, %reDampingFactorEdit%
+			this.Control["reAdjustLapTimeCheck"].Value := configuration["AdjustLapTime"]
 
-			GuiControl, , reAdjustLapTimeCheck, % configuration["AdjustLapTime"]
-
-			GuiControl Text, reDamageAnalysisLapsEdit, % configuration["DamageAnalysisLaps"]
+			this.Control["reDamageAnalysisLapsEdit"].Text := configuration["DamageAnalysisLaps"]
 		}
 	}
 
 	saveSimulatorConfiguration() {
-		local window := this.Editor.Window
 		local configuration
 
-		Gui %window%:Default
-
 		if this.iCurrentSimulator {
-			GuiControlGet reLoadSettingsDropDown
-			GuiControlGet reLoadTyrePressuresDropDown
-			GuiControlGet reSaveSettingsDropDown
-			GuiControlGet reSaveTyrePressuresDropDown
-
-			GuiControlGet reLearningLapsEdit
-			GuiControlGet reLapsConsideredEdit
-			GuiControlGet reDampingFactorEdit
-
-			GuiControlGet reAdjustLapTimeCheck
-			GuiControlGet reDamageAnalysisLapsEdit
-
 			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
-			configuration["LoadSettings"] := ["Default", "SettingsDatabase"][reLoadSettingsDropDown]
-			configuration["LoadTyrePressures"] := ["Default", "TyresDatabase", "Import", "Setup"][reLoadTyrePressuresDropDown]
+			configuration["LoadSettings"] := ["Default", "SettingsDatabase"][this.Control["reLoadSettingsDropDown"].Value]
+			configuration["LoadTyrePressures"] := ["Default", "TyresDatabase", "Import", "Setup"][this.Control["reLoadTyrePressuresDropDown"].Value]
 
-			configuration["SaveSettings"] := ["Ask", "Always", "Never"][reSaveSettingsDropDown]
-			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][reSaveTyrePressuresDropDown]
+			configuration["SaveSettings"] := ["Ask", "Always", "Never"][this.Control["reSaveSettingsDropDown"].Value]
+			configuration["SaveTyrePressures"] := ["Ask", "Always", "Never"][this.Control["reSaveTyrePressuresDropDown"].Value]
 
-			configuration["LearningLaps"] := reLearningLapsEdit
-			configuration["ConsideredHistoryLaps"] := reLapsConsideredEdit
-			configuration["HistoryLapsDamping"] := internalValue("Float", reDampingFactorEdit)
+			configuration["LearningLaps"] := this.Control["reLearningLapsEdit"].Text
+			configuration["ConsideredHistoryLaps"] := this.Control["reLapsConsideredEdit"].Text
+			configuration["HistoryLapsDamping"] := internalValue("Float", this.Control["reDampingFactorEdit"].Text)
 
-			configuration["AdjustLapTime"] := reAdjustLapTimeCheck
+			configuration["AdjustLapTime"] := this.Control["reAdjustLapTimeCheck"].Value
 
-			configuration["DamageAnalysisLaps"] := reDamageAnalysisLapsEdit
+			configuration["DamageAnalysisLaps"] := this.Control["reDamageAnalysisLapsEdit"].Text
 		}
 	}
 
 	setSimulators(simulators) {
-		local window := this.Editor.Window
-
-		Gui %window%:Default
-
 		this.iSimulators := simulators
 
-		GuiControl, , reSimulatorDropDown, % "|" . values2String("|", simulators*)
+		this.Control["reSimulatorDropDown"].Delete()
+		this.Control["reSimulatorDropDown"].Add(simulators)
 
-		if (simulators.Length() > 0) {
+		if (simulators.Length > 0) {
 			this.loadFromConfiguration(this.Configuration)
 
 			this.loadSimulatorConfiguration(simulators[1])
@@ -328,33 +300,6 @@ class RaceEngineerConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-replicateRESettings() {
-	RaceEngineerConfigurator.Instance.replicateSettings()
-}
-
-validateREDampingFactor() {
-	local oldValue := reDampingFactorEdit
-	local value
-
-	GuiControlGet reDampingFactorEdit
-
-	value := internalValue("Float", reDampingFactorEdit)
-
-	if value is not Number
-	{
-		reDampingFactorEdit := oldValue
-
-		GuiControl, , reDampingFactorEdit, %reDampingFactorEdit%
-	}
-}
-
-chooseRaceEngineerSimulator() {
-	local configurator := RaceEngineerConfigurator.Instance
-
-	configurator.saveSimulatorConfiguration()
-	configurator.loadSimulatorConfiguration()
-}
 
 initializeRaceEngineerConfigurator() {
 	local editor

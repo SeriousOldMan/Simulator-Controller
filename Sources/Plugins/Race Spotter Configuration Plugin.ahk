@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Race Spotter Configuration      ;;;
 ;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
@@ -14,36 +14,10 @@
 ;;; RaceSpotterConfigurator                                                 ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global rspSimulatorDropDown
-
-global rspLearningLapsEdit
-global rspLapsConsideredEdit
-global rspDampingFactorEdit
-
-global sideProximityDropDown
-global rearProximityDropDown
-global yellowFlagsDropDown
-global blueFlagsDropDown
-global sessionInformationDropDown
-global deltaInformationDropDown
-global cutWarningsDropDown
-global penaltyInformationDropDown
-global deltaInformationMethodDropDown
-global tacticalAdvicesDropDown
-global pitWindowDropDown
-
-class RaceSpotterConfigurator extends ConfigurationItem {
-	iEditor := false
-
+class RaceSpotterConfigurator extends ConfiguratorPanel {
 	iSimulators := []
-	iSimulatorConfigurations := {}
+	iSimulatorConfigurations := CaseInsenseMap()
 	iCurrentSimulator := false
-
-	Editor {
-		Get {
-			return this.iEditor
-		}
-	}
 
 	Simulators {
 		Get {
@@ -52,7 +26,7 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	__New(editor, configuration := false) {
-		this.iEditor := editor
+		this.Editor := editor
 
 		super.__New(configuration)
 
@@ -63,7 +37,25 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		local window := editor.Window
 		local x0, x1, x2, x3, x4, x5, x6, w1, w2, w3, w4, choices, chosen
 
-		Gui %window%:Font, Norm, Arial
+		replicateRSPSettings(*) {
+			this.replicateSettings()
+		}
+
+		validateRSPDampingFactor(*) {
+			local field := this.Control["rspDampingFactorEdit"]
+
+			if !isNumber(internalValue("Float", field.Text))
+				field.Text := (field.HasProp("ValidText") ? field.ValidText : "")
+			else
+				field.ValidText := field.Text
+		}
+
+		chooseRaceSpotterSimulator(*) {
+			this.saveSimulatorConfiguration()
+			this.loadSimulatorConfiguration()
+		}
+
+		window.SetFont("Norm", "Arial")
 
 		x0 := x + 8
 		x1 := x + 132
@@ -79,81 +71,84 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 		w4 := w1 - 24
 		x6 := x1 + w4 + 1
 
-		Gui %window%:Add, Text, x%x0% y%y% w120 h23 +0x200 HWNDwidget1 Hidden, % translate("Simulator")
+		widget1 := window.Add("Text", "x" . x0 . " y" . y . " w120 h23 +0x200 Hidden", translate("Simulator"))
 
-		if (this.Simulators.Length() = 0)
+		if (this.Simulators.Length = 0)
 			this.iSimulators := this.getSimulators()
 
  		choices := this.iSimulators
-		chosen := (choices.Length() > 0) ? 1 : 0
+		chosen := (choices.Length > 0) ? 1 : 0
 
-		Gui %window%:Add, DropDownList, x%x1% yp w%w4% Choose%chosen% gchooseRaceSpotterSimulator vrspSimulatorDropDown HWNDwidget2 Hidden, % values2String("|", choices*)
+		widget2 := window.Add("DropDownList", "x" . x1 . " yp w" . w4 . " Choose" . chosen . " W:Grow vrspSimulatorDropDown Hidden", choices)
+		widget2.OnEvent("Change", chooseRaceSpotterSimulator)
 
-		Gui %window%:Add, Button, x%x6% yp w23 h23 Center +0x200 greplicateRSPSettings HWNDwidget31 Hidden
-		setButtonIcon(widget31, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
+		widget3 := window.Add("Button", "x" . x6 . " yp w23 h23 X:Move Center +0x200  Hidden")
+		widget3.OnEvent("Click", replicateRSPSettings)
+		setButtonIcon(widget3, kIconsDirectory . "Renew.ico", 1, "L4 T4 R4 B4")
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+40 w%width% h96 HWNDwidget3 Hidden, % translate("Data Analysis")
+		widget4 := window.Add("GroupBox", "-Theme x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Data Analysis"))
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Text, x%x0% yp+17 w80 h23 +0x200 HWNDwidget4 Hidden, % translate("Learn for")
-		Gui %window%:Add, Edit, x%x1% yp w40 h21 Number Limit1 vrspLearningLapsEdit HWNDwidget5 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget6 Hidden, 1
-		Gui %window%:Add, Text, x%x3% yp w%w3% h23 +0x200 HWNDwidget7 Hidden, % translate("Laps after Start or Pitstop")
+		widget5 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Learn for"))
+		widget6 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vrspLearningLapsEdit Hidden")
+		widget7 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget8 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget8 Hidden, % translate("Statistical Window")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 Number Limit1 vrspLapsConsideredEdit HWNDwidget9 Hidden
-		Gui %window%:Add, UpDown, x%x2% yp w17 h21 Range1-9 HWNDwidget10 Hidden, 1
-		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget11 Hidden, % translate("Laps")
+		widget9 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Statistical Window"))
+		widget10 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vrspLapsConsideredEdit Hidden")
+		widget11 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget12 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("Laps"))
 
-		Gui %window%:Add, Text, x%x0% ys+24 w120 h20 Section HWNDwidget12 Hidden, % translate("Damping Factor")
-		Gui %window%:Add, Edit, x%x1% yp-2 w40 h21 vrspDampingFactorEdit gvalidateRSPDampingFactor HWNDwidget13 Hidden
-		Gui %window%:Add, Text, x%x3% yp+2 w80 h20 HWNDwidget14 Hidden, % translate("p. Lap")
+		widget13 := window.Add("Text", "x" . x0 . " ys+24 w120 h20 Section Hidden", translate("Damping Factor"))
+		widget14 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vrspDampingFactorEdit Hidden")
+		widget14.OnEvent("Change", validateRSPDampingFactor)
+		widget15 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("p. Lap"))
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, GroupBox, -Theme x%x% yp+35 w%width% h206 HWNDwidget15 Hidden, % translate("Announcements")
+		widget16 := window.Add("GroupBox", "-Theme x" . x . " yp+35 w" . width . " h206 W:Grow Hidden", translate("Announcements"))
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
 		x3 := x + 186
 		w3 := width - (x3 - x + 16) + 10
 		x5 := x1 + 72
 
-		Gui %window%:Add, Text, x%x0% yp+20 w120 h20 Section HWNDwidget16 Hidden, % translate("Side / Rear Proximity")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vsideProximityDropDown HWNDwidget17 Hidden, % values2String("|", translate("Off"), translate("On"))
-		Gui %window%:Add, DropDownList, x%x5% yp w70 AltSubmit Choose1 vrearProximityDropDown HWNDwidget18 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget17 := window.Add("Text", "x" . x0 . " yp+20 w120 h20 Section Hidden", translate("Side / Rear Proximity"))
+		widget18 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vsideProximityDropDown Hidden", [translate("Off"), translate("On")])
+		widget19 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) AltSubmit Choose1 vrearProximityDropDown Hidden", [translate("Off"), translate("On")])
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget19 Hidden, % translate("Yellow / Blue Flags")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vyellowFlagsDropDown HWNDwidget20 Hidden, % values2String("|", translate("Off"), translate("On"))
-		Gui %window%:Add, DropDownList, x%x5% yp w70 AltSubmit Choose1 vblueFlagsDropDown HWNDwidget21 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget20 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Yellow / Blue Flags"))
+		widget21 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vyellowFlagsDropDown Hidden", [translate("Off"), translate("On")])
+		widget22 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) AltSubmit Choose1 vblueFlagsDropDown Hidden", [translate("Off"), translate("On")])
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget22 Hidden, % translate("Pit Window")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vpitWindowDropDown HWNDwidget23 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget23 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Pit Window"))
+		widget24 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vpitWindowDropDown Hidden", [translate("Off"), translate("On")])
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget32 Hidden, % translate("Cut Warnings")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vcutWarningsDropDown HWNDwidget33 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget25 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Cut Warnings"))
+		widget26 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vcutWarningsDropDown Hidden", [translate("Off"), translate("On")])
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget24 Hidden, % translate("General Information")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vsessionInformationDropDown HWNDwidget25 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget27 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("General Information"))
+		widget28 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vsessionInformationDropDown Hidden", [translate("Off"), translate("On")])
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget34 Hidden, % translate("Penalty Information")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vpenaltyInformationDropDown HWNDwidget35 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget29 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Penalty Information"))
+		widget30 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vpenaltyInformationDropDown Hidden", [translate("Off"), translate("On")])
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget26 Hidden, % translate("Opponent Infos every")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose3 vdeltaInformationDropDown HWNDwidget27 Hidden, % values2String("|", translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps"))
-		Gui %window%:Add, DropDownList, x%x5% yp w70 AltSubmit Choose1 vdeltaInformationMethodDropDown HWNDwidget30 Hidden, % values2String("|", translate("Static"), translate("Dynamic"), translate("Both"))
+		widget31 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Opponent Infos every"))
+		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
+		widget33 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) AltSubmit Choose1 vdeltaInformationMethodDropDown Hidden", [translate("Static"), translate("Dynamic"), translate("Both")])
 
-		Gui %window%:Add, Text, x%x0% yp+26 w120 h20 Section HWNDwidget28 Hidden, % translate("Tactical Advices")
-		Gui %window%:Add, DropDownList, x%x1% yp-4 w70 AltSubmit Choose1 vtacticalAdvicesDropDown HWNDwidget29 Hidden, % values2String("|", translate("Off"), translate("On"))
+		widget34 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Tactical Advices"))
+		widget35 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vtacticalAdvicesDropDown Hidden", [translate("Off"), translate("On")])
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		loop 35
+		Loop 35
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()
@@ -164,11 +159,11 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 
 		super.loadFromConfiguration(configuration)
 
-		if (this.Simulators.Length() = 0)
+		if (this.Simulators.Length = 0)
 			this.iSimulators := this.getSimulators()
 
 		for ignore, simulator in this.Simulators {
-			simulatorConfiguration := {}
+			simulatorConfiguration := CaseInsenseMap()
 
 			simulatorConfiguration["LearningLaps"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".LearningLaps", 1)
 			simulatorConfiguration["ConsideredHistoryLaps"] := getMultiMapValue(configuration, "Race Spotter Analysis", simulator . ".ConsideredHistoryLaps", 5)
@@ -182,9 +177,9 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 			default := getMultiMapValue(configuration, "Race Spotter Announcements", simulator . ".DistanceInformation", default)
 
 			simulatorConfiguration["DeltaInformation"] := getMultiMapValue(configuration, "Race Spotter Announcements"
-																			  , simulator . ".DeltaInformation", default)
+																		 , simulator . ".DeltaInformation", default)
 			simulatorConfiguration["DeltaInformationMethod"] := getMultiMapValue(configuration, "Race Spotter Announcements"
-																					, simulator . ".DeltaInformationMethod", "Both")
+																			   , simulator . ".DeltaInformationMethod", "Both")
 
 			this.iSimulatorConfigurations[simulator] := simulatorConfiguration
 		}
@@ -215,113 +210,83 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 	}
 
 	loadSimulatorConfiguration(simulator := false) {
-		local window := this.Editor.Window
 		local configuration
 
-		Gui %window%:Default
+		if simulator
+			this.Control["rspSimulatorDropDown"].Choose(inList(this.iSimulators, simulator))
 
-		if simulator {
-			rspSimulatorDropDown := simulator
+		this.iCurrentSimulator := this.Control["rspSimulatorDropDown"].Text
 
-			GuiControl Choose, rspSimulatorDropDown, % inList(this.iSimulators, simulator)
-		}
-		else
-			GuiControlGet rspSimulatorDropDown
+		if this.iSimulatorConfigurations.Has(this.iCurrentSimulator) {
+			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
-		this.iCurrentSimulator := rspSimulatorDropDown
+			this.Control["rspLearningLapsEdit"].Text := configuration["LearningLaps"]
+			this.Control["rspLapsConsideredEdit"].Text := configuration["ConsideredHistoryLaps"]
 
-		if this.iSimulatorConfigurations.HasKey(rspSimulatorDropDown) {
-			configuration := this.iSimulatorConfigurations[rspSimulatorDropDown]
+			this.Control["rspDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"])
+			this.Control["rspDampingFactorEdit"].ValidText := this.Control["rspDampingFactorEdit"].Text
 
-			GuiControl Text, rspLearningLapsEdit, % configuration["LearningLaps"]
-			GuiControl Text, rspLapsConsideredEdit, % configuration["ConsideredHistoryLaps"]
+			this.Control["sideProximityDropDown"].Choose(configuration["SideProximity"] + 1)
+			this.Control["rearProximityDropDown"].Choose(configuration["RearProximity"] + 1)
+			this.Control["yellowFlagsDropDown"].Choose(configuration["YellowFlags"] + 1)
+			this.Control["blueFlagsDropDown"].Choose(configuration["BlueFlags"] + 1)
+			this.Control["sessionInformationDropDown"].Choose(configuration["SessionInformation"] + 1)
+			this.Control["cutWarningsDropDown"].Choose(configuration["CutWarnings"] + 1)
+			this.Control["penaltyInformationDropDown"].Choose(configuration["PenaltyInformation"] + 1)
 
-			rspDampingFactorEdit := displayValue("Float", configuration["HistoryLapsDamping"])
-			GuiControl Text, rspDampingFactorEdit, %rspDampingFactorEdit%
-
-			GuiControl Choose, sideProximityDropDown, % (configuration["SideProximity"] + 1)
-			GuiControl Choose, rearProximityDropDown, % (configuration["RearProximity"] + 1)
-			GuiControl Choose, yellowFlagsDropDown, % (configuration["YellowFlags"] + 1)
-			GuiControl Choose, blueFlagsDropDown, % (configuration["BlueFlags"] + 1)
-			GuiControl Choose, sessionInformationDropDown, % (configuration["SessionInformation"] + 1)
-			GuiControl Choose, cutWarningsDropDown, % (configuration["CutWarnings"] + 1)
-			GuiControl Choose, penaltyInformationDropDown, % (configuration["PenaltyInformation"] + 1)
-
-			if (!configuration["DeltaInformation"])
-				GuiControl Choose, deltaInformationDropDown, 1
+			if !configuration["DeltaInformation"]
+				this.Control["deltaInformationDropDown"].Choose(1)
 			else if (configuration["DeltaInformation"] = "S")
-				GuiControl Choose, deltaInformationDropDown, 2
+				this.Control["deltaInformationDropDown"].Choose(2)
 			else
-				GuiControl Choose, deltaInformationDropDown, % (configuration["DeltaInformation"] + 2)
+				this.Control["deltaInformationDropDown"].Choose(configuration["DeltaInformation"] + 2)
 
-			GuiControl Choose, deltaInformationMethodDropDown, % inList(["Static", "Dynamic", "Both"], configuration["DeltaInformationMethod"])
+			this.Control["deltaInformationMethodDropDown"].Choose(inList(["Static", "Dynamic", "Both"], configuration["DeltaInformationMethod"]))
 
-			GuiControl Choose, tacticalAdvicesDropDown, % (configuration["TacticalAdvices"] + 1)
-			GuiControl Choose, pitWindowDropDown, % (configuration["PitWindow"] + 1)
+			this.Control["tacticalAdvicesDropDown"].Choose(configuration["TacticalAdvices"] + 1)
+			this.Control["pitWindowDropDown"].Choose(configuration["PitWindow"] + 1)
 		}
 	}
 
 	saveSimulatorConfiguration() {
-		local window := this.Editor.Window
 		local configuration
 
-		Gui %window%:Default
-
 		if this.iCurrentSimulator {
-			GuiControlGet rspLearningLapsEdit
-			GuiControlGet rspLapsConsideredEdit
-			GuiControlGet rspDampingFactorEdit
-
-			GuiControlGet sideProximityDropDown
-			GuiControlGet rearProximityDropDown
-			GuiControlGet yellowFlagsDropDown
-			GuiControlGet blueFlagsDropDown
-			GuiControlGet sessionInformationDropDown
-			GuiControlGet cutWarningsDropDown
-			GuiControlGet penaltyInformationDropDown
-			GuiControlGet deltaInformationDropDown
-			GuiControlGet deltaInformationMethodDropDown
-			GuiControlGet tacticalAdvicesDropDown
-			GuiControlGet pitWindowDropDown
-
 			configuration := this.iSimulatorConfigurations[this.iCurrentSimulator]
 
-			configuration["LearningLaps"] := rspLearningLapsEdit
-			configuration["ConsideredHistoryLaps"] := rspLapsConsideredEdit
-			configuration["HistoryLapsDamping"] := internalValue("Float", rspDampingFactorEdit)
+			configuration["LearningLaps"] := this.Control["rspLearningLapsEdit"].Text
+			configuration["ConsideredHistoryLaps"] := this.Control["rspLapsConsideredEdit"].Text
+			configuration["HistoryLapsDamping"] := internalValue("Float", this.Control["rspDampingFactorEdit"].Text)
 
-			configuration["SideProximity"] := (sideProximityDropDown - 1)
-			configuration["RearProximity"] := (rearProximityDropDown - 1)
-			configuration["YellowFlags"] := (yellowFlagsDropDown - 1)
-			configuration["BlueFlags"] := (blueFlagsDropDown - 1)
-			configuration["SessionInformation"] := (sessionInformationDropDown - 1)
-			configuration["CutWarnings"] := (cutWarningsDropDown - 1)
-			configuration["PenaltyInformation"] := (penaltyInformationDropDown - 1)
+			configuration["SideProximity"] := (this.Control["sideProximityDropDown"].Value - 1)
+			configuration["RearProximity"] := (this.Control["rearProximityDropDown"].Value - 1)
+			configuration["YellowFlags"] := (this.Control["yellowFlagsDropDown"].Value - 1)
+			configuration["BlueFlags"] := (this.Control["blueFlagsDropDown"].Value - 1)
+			configuration["SessionInformation"] := (this.Control["sessionInformationDropDown"].Value - 1)
+			configuration["CutWarnings"] := (this.Control["cutWarningsDropDown"].Value - 1)
+			configuration["PenaltyInformation"] := (this.Control["penaltyInformationDropDown"].Value - 1)
 
-			if (deltaInformationDropDown == 1)
+			if (this.Control["deltaInformationDropDown"].Value == 1)
 				configuration["DeltaInformation"] := false
-			else if (deltaInformationDropDown == 2)
+			else if (this.Control["deltaInformationDropDown"].Value == 2)
 				configuration["DeltaInformation"] := "S"
 			else
-				configuration["DeltaInformation"] := (deltaInformationDropDown - 2)
+				configuration["DeltaInformation"] := (this.Control["deltaInformationDropDown"].Value - 2)
 
-			configuration["DeltaInformationMethod"] := ["Static", "Dynamic", "Both"][deltaInformationMethodDropDown]
+			configuration["DeltaInformationMethod"] := ["Static", "Dynamic", "Both"][this.Control["deltaInformationMethodDropDown"].Value]
 
-			configuration["TacticalAdvices"] := (tacticalAdvicesDropDown - 1)
-			configuration["PitWindow"] := (pitWindowDropDown - 1)
+			configuration["TacticalAdvices"] := (this.Control["tacticalAdvicesDropDown"].Value - 1)
+			configuration["PitWindow"] := (this.Control["pitWindowDropDown"].Value - 1)
 		}
 	}
 
 	setSimulators(simulators) {
-		local window := this.Editor.Window
-
-		Gui %window%:Default
-
 		this.iSimulators := simulators
 
-		GuiControl, , rspSimulatorDropDown, % "|" . values2String("|", simulators*)
+		this.Control["rspSimulatorDropDown"].Delete()
+		this.Control["rspSimulatorDropDown"].Add(simulators)
 
-		if (simulators.Length() > 0) {
+		if (simulators.Length > 0) {
 			this.loadFromConfiguration(this.Configuration)
 
 			this.loadSimulatorConfiguration(simulators[1])
@@ -353,33 +318,6 @@ class RaceSpotterConfigurator extends ConfigurationItem {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-replicateRSPSettings() {
-	RaceSpotterConfigurator.Instance.replicateSettings()
-}
-
-validateRSPDampingFactor() {
-	local oldValue := rspDampingFactorEdit
-	local value
-
-	GuiControlGet rspDampingFactorEdit
-
-	value := internalValue("Float", rspDampingFactorEdit)
-
-	if value is not Number
-	{
-		rspDampingFactorEdit := oldValue
-
-		GuiControl, , rspDampingFactorEdit, %rspDampingFactorEdit%
-	}
-}
-
-chooseRaceSpotterSimulator() {
-	local configurator := RaceSpotterConfigurator.Instance
-
-	configurator.saveSimulatorConfiguration()
-	configurator.loadSimulatorConfiguration()
-}
 
 initializeRaceSpotterConfigurator() {
 	local editor

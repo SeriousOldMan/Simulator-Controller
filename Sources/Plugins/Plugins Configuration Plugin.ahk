@@ -196,7 +196,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 		}
 
 		if (items.Length < count)
-			Loop count - items.Length
+			loop count - items.Length
 				this.Control["pluginsListView"].Delete(count - A_Index - 1)
 
 		if first {

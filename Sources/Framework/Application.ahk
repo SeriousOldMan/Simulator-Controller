@@ -116,7 +116,7 @@ consentDialog(id, consent := false, *) {
 	else
 		consentGui.Show()
 
-	Loop
+	loop
 		Sleep(100)
 	until closed
 

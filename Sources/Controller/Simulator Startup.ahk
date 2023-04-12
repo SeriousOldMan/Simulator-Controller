@@ -636,7 +636,7 @@ launchPad(command := false, arguments*) {
 		else
 			launchPadGui.Show()
 
-		Loop
+		loop
 			Sleep(100)
 		until result
 

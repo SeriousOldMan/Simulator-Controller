@@ -180,8 +180,8 @@ class RaceStrategist extends GridRaceAssistant {
 						found := false
 
 						for ignore, candidate in entries
-							if ((candidate.Map = entry.Map) && (candidate["Lap.Time"] = entry["Lap.Time"])
-															&& (candidate["Fuel.Consumption"] = entry["Fuel.Consumption"])) {
+							if ((candidate["Map"] = entry["Map"]) && (candidate["Lap.Time"] = entry["Lap.Time"])
+																  && (candidate["Fuel.Consumption"] = entry["Fuel.Consumption"])) {
 								found := true
 
 								break
@@ -1707,10 +1707,10 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.beginTalk()
 
 				try {
-					if ((options == true) || (options.Has("Strategy") && options.Strategy))
+					if ((options == true) || (options.HasOwnProp("Strategy") && options.Strategy))
 						speaker.speakPhrase("Strategy")
 
-					if ((options == true) || (options.Has("Pitstops") && options.Pitstops)) {
+					if ((options == true) || (options.HasOwnProp("Pitstops") && options.Pitstops)) {
 						speaker.speakPhrase("Pitstops", {pitstops: knowledgeBase.getValue("Strategy.Pitstop.Count")})
 
 						reported := true
@@ -1719,26 +1719,26 @@ class RaceStrategist extends GridRaceAssistant {
 					nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next", false)
 
 					if nextPitstop {
-						if ((options == true) || (options.Has("NextPitstop") && options.NextPitstop)) {
+						if ((options == true) || (options.HasOwnProp("NextPitstop") && options.NextPitstop)) {
 							lap := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Lap")
 							refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
 							tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 
 							speaker.speakPhrase("NextPitstop", {pitstopLap: lap})
 
-							if ((options == true) || (options.Has("Refuel") && options.Refuel))
+							if ((options == true) || (options.HasOwnProp("Refuel") && options.Refuel))
 								speaker.speakPhrase((refuel > 0) ? "Refuel" : "NoRefuel"
 												  , {fuel: displayValue("Float", convertUnit("Volume", refuel)), unit: speaker.Fragments[getUnit("Volume")]})
 
-							if ((options == true) || (options.Has("TyreChange") && options.TyreChange))
+							if ((options == true) || (options.HasOwnProp("TyreChange") && options.TyreChange))
 								speaker.speakPhrase(tyreChange ? "TyreChange" : "NoTyreChange")
 						}
 					}
-					else if ((options == true) || (options.Has("NextPitstop") && options.NextPitstop))
+					else if ((options == true) || (options.HasOwnProp("NextPitstop") && options.NextPitstop))
 						if !reported
 							speaker.speakPhrase("NoNextPitstop")
 
-					if ((options == true) || (options.Has("Map") && options.Map)) {
+					if ((options == true) || (options.HasOwnProp("Map") && options.Map)) {
 						map := knowledgeBase.getValue("Strategy.Map")
 
 						if ((map != "n/a") && (map != knowledgeBase.getValue("Lap." . knowledgeBase.getValue("Lap") . ".Map", "n/a")))
@@ -2034,7 +2034,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if !telemetryDB.suitableTyreCompound(strategy.Simulator, strategy.Car, strategy.Track
 											   , knowledgeBase.getValue("Weather.Weather.10Min", strategy.Weather)
 											   , compound(knowledgeBase.getValue("Tyre.Compound", "Dry")
-											   , knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
+														, knowledgeBase.getValue("Tyre.Compound.Color", "Black")))
 				initialTyreLaps := 999
 			else {
 				tyreSets := Task.CurrentTask.UsedTyreSets
@@ -2163,20 +2163,20 @@ class RaceStrategist extends GridRaceAssistant {
 	}
 
 	computeAvailableTyreSets(availableTyreSets, usedTyreSets) {
-		local compound, ignore, tyreSet, count
+		local tyreCompound, ignore, tyreSet, count
 
 		availableTyreSets := availableTyreSets.Clone()
 
 		for ignore, tyreSet in usedTyreSets {
-			compound := compound(tyreSet.Compound, tyreSet.CompoundColor)
+			tyreCompound := compound(tyreSet.Compound, tyreSet.CompoundColor)
 
-			if availableTyreSets.Has(compound) {
-				count := (availableTyreSets[compound] - 1)
+			if availableTyreSets.Has(tyreCompound) {
+				count := (availableTyreSets[tyreCompound] - 1)
 
 				if (count > 0)
-					availableTyreSets[compound] := count
+					availableTyreSets[tyreCompound] := count
 				else
-					availableTyreSets.Delete(compound)
+					availableTyreSets.Delete(tyreCompound)
 			}
 		}
 
@@ -2397,7 +2397,7 @@ class RaceStrategist extends GridRaceAssistant {
 		return result
 	}
 
-	callRecommendPitstop() {
+	callRecommendPitstop(lapNumber := false) {
 		this.clearContinuation()
 
 		this.getSpeaker().speakPhrase("Confirm")
@@ -2407,7 +2407,7 @@ class RaceStrategist extends GridRaceAssistant {
 		loop 10
 			Sleep(500)
 
-		this.recommendPitstop()
+		this.recommendPitstop(lapNumber)
 	}
 
 	callRecommendStrategy() {

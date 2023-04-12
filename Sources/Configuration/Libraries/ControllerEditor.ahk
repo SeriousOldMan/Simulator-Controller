@@ -58,7 +58,7 @@ class ControllerEditor extends ConfiguratorPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Controller Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"}, "")
+			super.__New({Descriptor: "Controller Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 		}
 
 		Close(*) {
@@ -1664,7 +1664,7 @@ class DisplayRulesEditor extends ConfiguratorPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Controller Editor.Display Rules", Closeable: true, Resizeable: true, Options: "ToolWindow -MaximizeBox"}, "")
+			super.__New({Descriptor: "Controller Editor.Display Rules", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 		}
 
 		Close(*) {

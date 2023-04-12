@@ -38,7 +38,7 @@ class ThemesEditor extends ConfiguratorPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Themes Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"}, "")
+			super.__New({Descriptor: "Themes Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 		}
 
 		Close(*) {

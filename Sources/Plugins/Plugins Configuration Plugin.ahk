@@ -174,7 +174,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 			else if (p2.Plugin = translate("System"))
 				return true
 			else
-				return (p1.Plugin >= p2.Plugin)
+				return ((StrCompare(p1.Plugin, p2.Plugin) <= 0) ? false : true)
 		}
 
 		bubbleSort(&items, comparePlugins)

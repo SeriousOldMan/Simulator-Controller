@@ -403,7 +403,7 @@ class RaceCenter extends ConfigurationItem {
 					result := []
 
 					for ignore, entry in entries
-						if (entry["Map"] = lastLap["Map"])
+						if (entry["Map"] = lastLap.Map)
 							result.Push(entry)
 
 					return result
@@ -488,7 +488,7 @@ class RaceCenter extends ConfigurationItem {
 					result := []
 
 					for ignore, entry in entries
-						if (entry["Map"] = lastLap["Map"])
+						if (entry["Map"] = lastLap.Map)
 							result.Push(entry)
 
 					return result
@@ -4534,8 +4534,20 @@ class RaceCenter extends ConfigurationItem {
 			driverName := driver.Fullname
 		}
 		else {
-			driverID := false
-			driverName := "John Doe (JD)"
+			if this.Strategy {
+				if (stintNumber = 1) {
+					driverID := this.Strategy.Driver
+					driverName := this.Strategy.DriverName
+				}
+				else if this.Strategy.Pitstops.Has(stintNumber - 1) {
+					driverID := this.Strategy.Pitstops[stintNumber - 1].Driver
+					driverName := this.Strategy.Pitstops[stintNumber - 1].DriverName
+				}
+			}
+			else {
+				driverID := false
+				driverName := "John Doe (JD)"
+			}
 		}
 
 		return true
@@ -4862,7 +4874,7 @@ class RaceCenter extends ConfigurationItem {
 				tyreCompoundColor := strategy.TyreCompoundColor
 			}
 
-			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, tyreCompound, tyreCompoundColor)
+			if !telemetryDB.suitableTyreCompound(simulator, car, track, weather, compound(tyreCompound, tyreCompoundColor))
 				initialTyreLaps := 999
 			else {
 				tyresTable := telemetryDB.Database.Tables["Tyres"]
@@ -7217,7 +7229,7 @@ class RaceCenter extends ConfigurationItem {
 				if (StrLen(driverSwapRequest) > 0) {
 					this.Connector.DeleteSessionValue(session, "Race Engineer Driver Swap Request")
 
-					this.pushTask(this.pushTask(ObjBindMethod(this, "planDriverSwap", string2Values(";", driverSwapRequest)*)))
+					this.pushTask(ObjBindMethod(this, "planDriverSwap", string2Values(";", driverSwapRequest)*))
 				}
 			}
 			catch Any as exception {

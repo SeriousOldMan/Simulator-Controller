@@ -2609,7 +2609,8 @@ restartSetup:
 			wizard.Working := false
 
 			Sleep 200
-		} until (wizard.Result == kLanguage)
+		}
+		until (wizard.Result == kLanguage)
 	}
 	finally {
 		wizard.hide()

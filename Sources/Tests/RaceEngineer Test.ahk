@@ -392,7 +392,8 @@ class DamageAnalysis extends Assert {
 				this.AssertEqual(kNotInitialized, vDamageLapDelta, "Unexpected damage analysis reported...")
 				this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
 			}
-		} until done
+		}
+		until done
 
 		engineer.finishSession(false)
 	}
@@ -474,7 +475,8 @@ class DamageAnalysis extends Assert {
 					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
 				}
 			}
-		} until done
+		}
+		until done
 
 		engineer.finishSession(false)
 	}
@@ -556,7 +558,8 @@ class DamageAnalysis extends Assert {
 					this.AssertEqual(kNotInitialized, vDamageStintLaps, "Unexpected damage analysis reported...")
 				}
 			}
-		} until done
+		}
+		until done
 
 		engineer.finishSession(false)
 	}
@@ -1095,7 +1098,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 	else if (raceNr == 3) {
 		; 3.1	->	3.2		Report Bodywork
@@ -1130,7 +1134,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 	else if (raceNr == 4) {
 		; 0.0	->	1.1		Report Bodywork
@@ -1171,7 +1176,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 	else if (raceNr == 5) {
 		done := false
@@ -1207,7 +1213,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 	else if (raceNr == 6) {
 		done := false
@@ -1243,7 +1250,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 	else if ((raceNr = 9) || (raceNr = 11) || (raceNr = 12)) {
 		done := false
@@ -1319,7 +1327,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 	else if (raceNr = 18) {
 		done := false
@@ -1346,7 +1355,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 	else if (raceNr > 6) {
 		done := false
@@ -1373,7 +1383,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 	}
 
 	if isDebug()

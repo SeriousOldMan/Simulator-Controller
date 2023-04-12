@@ -291,7 +291,8 @@ class GuiFunctionController extends FunctionController {
 
 			if (fnController == this)
 				return distance
-		} until (--index = 0)
+		}
+		until (--index = 0)
 
 		throw "Internal error detected in GuiFunctionController.distanceFromBottom..."
 	}
@@ -1086,7 +1087,8 @@ class SimulatorController extends ConfigurationItem {
 					targetMode := false
 				}
 			}
-		} until targetMode
+		}
+		until targetMode
 
 		this.setMode(targetMode)
 	}

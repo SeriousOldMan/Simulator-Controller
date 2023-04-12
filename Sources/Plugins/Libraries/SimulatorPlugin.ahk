@@ -1188,17 +1188,17 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		if isDebug() {
 			loop count {
-				if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position") != A_Index)
-					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index] . ": "
-										. getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position")
+				if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position") != A_Index)
+					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index][1] . ": "
+										. getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position")
 										. " -> " . A_Index)
 
-				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
+				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
 			}
 		}
 		else
 			loop count
-				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
+				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
 
 		return positionsData
 	}

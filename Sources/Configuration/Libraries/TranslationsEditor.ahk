@@ -41,7 +41,7 @@ class TranslationsEditor extends ConfiguratorPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Translations Editor", Closeable: true, Resizeable: true, Options: "ToolWindow -MaximizeBox"}, "")
+			super.__New({Descriptor: "Translations Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"}, "")
 		}
 
 		Close(*) {

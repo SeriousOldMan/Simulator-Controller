@@ -69,7 +69,7 @@ class ConfigurationItem {
 	}
 
 	static splitDescriptor(descriptor) {
-		return StrSplit(descriptor, ".")
+		return toArray(StrSplit(descriptor, "."), SafeArray)
 	}
 
 	splitDescriptor(descriptor) {
@@ -567,7 +567,7 @@ class Function extends ConfigurationItem {
 		}
 	}
 
-	createFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
+	static createFunction(descriptor, configuration := false, onHotkeys := false, onAction := false, offHotkeys := false, offAction := false) {
 		descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 		switch descriptor[1], false {
@@ -595,7 +595,7 @@ class Function extends ConfigurationItem {
 
 		action := Trim(action)
 
-		if (action == "")
+		if (!action || (action == ""))
 			return []
 		else {
 			actions := []

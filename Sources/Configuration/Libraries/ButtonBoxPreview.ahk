@@ -227,7 +227,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		local layout := string2Values(",", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
 		local rows := []
 		local columns
-
+sleep 2000
 		if (layout.Length > 1)
 			this.iRowMargin := layout[2]
 
@@ -245,14 +245,8 @@ class ButtonBoxPreview extends ControllerPreview {
 		this.Rows := layout[1]
 		this.Columns := layout[2]
 
-		loop this.Rows {
-			columns := string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), ""))
-
-			if ((columns.Length = 0) && (this.Columns = 1))
-				rows.Push([""])
-			else
-				rows.Push(columns)
-		}
+		loop this.Rows
+			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), ""), false, SafeArray))
 
 		this.iRowDefinitions := rows
 	}

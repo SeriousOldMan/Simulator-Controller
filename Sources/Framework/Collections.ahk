@@ -15,6 +15,15 @@ class SafeArray extends Array {
 
 		super.__New(arguments*)
 	}
+
+	__Item[index] {
+		Get {
+			if !this.Has(index)
+				return this.Default
+			else
+				return super.__Item[index]
+		}
+	}
 }
 
 class SafeMap extends Map {
@@ -88,6 +97,42 @@ class CaseInsenseSafeMap extends SafeMap {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+toMap(candidate, class := Map) {
+	local key, value
+
+	if !isInstance(candidate, class) {
+		local result := class()
+
+		if !isInstance(candidate, Map) {
+			for key, value in candidate.OwnProps()
+				result[key] := value
+		}
+		else {
+			for key, value in candidate
+				result[key] := value
+		}
+
+		return result
+	}
+	else
+		return candidate
+}
+
+toArray(candidate, class := Array) {
+	local key, value
+
+	if !isInstance(candidate, class) {
+		local result := class()
+
+		for ignore, value in candidate
+			result.Push(value)
+
+		return result
+	}
+	else
+		return candidate
+}
 
 inList(list, value) {
 	local index, candidate

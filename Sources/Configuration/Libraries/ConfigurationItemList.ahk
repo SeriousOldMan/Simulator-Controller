@@ -213,8 +213,8 @@ class ConfigurationItemList extends ConfiguratorPanel {
 		this.updateState()
 	}
 
-	saveToConfiguration(configuration) {
-		if this.AutoSave
+	saveToConfiguration(configuration, save := false) {
+		if (save || this.AutoSave)
 			if (this.CurrentItem != 0)
 				return this.updateItem()
 

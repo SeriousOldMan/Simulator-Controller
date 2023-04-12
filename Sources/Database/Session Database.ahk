@@ -4441,7 +4441,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 	else {
 		result := false
 
-		importDataGui := Window({Descriptor: "Session Database.Import", Resizeable: true, Options: "ToolWindow -SysMenu"}, translate("Import"))
+		importDataGui := Window({Descriptor: "Session Database.Import", Resizeable: true, Options: "-MaximizeBox"}, translate("Import"))
 
 		importDataGui.SetFont("s10 Bold", "Arial")
 

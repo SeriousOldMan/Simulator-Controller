@@ -32,7 +32,7 @@ class StreamDeckPreview extends ControllerPreview {
 	static kXLHeight := 330
 
 	static kTopMargin := 50
-	static kLeftMargin := {Mini: 38, Standard: 44, XL: 44}
+	static kLeftMargin := CaseInsenseMap("Mini", 38, "Standard", 44, "XL", 44)
 
 	static kButtonWidth := 50
 	static kButtonHeight := 50
@@ -42,9 +42,9 @@ class StreamDeckPreview extends ControllerPreview {
 
 	iSize := "Standard"
 
-	iButtons := {}
-	iLabels := {}
-	iIcons := {}
+	iButtons := CaseInsenseMap()
+	iLabels := CaseInsenseMap()
+	iIcons := CaseInsenseMap()
 
 	Type {
 		Get {
@@ -103,12 +103,7 @@ class StreamDeckPreview extends ControllerPreview {
 			loop this.Columns {
 				column := A_Index
 
-				columns := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row))
-
-				if ((columns.Length = 0) && (column = 1))
-					button := ""
-				else
-					button := columns[column]
+				button := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row), false, SafeArray)[column]
 
 				if (button && (button != "")) {
 					icon := getMultiMapValue(this.Configuration, "Buttons", this.Name . "." . button . ".Icon", true)
@@ -163,7 +158,8 @@ class StreamDeckPreview extends ControllerPreview {
 				posY := (y + 3)
 
 				this.iIcons[row][column] := streamDeckGui.Add("Picture", "x" . posX . " y" . posY . " w44 h44 BackgroundTrans")
-				this.iLabels[row][column] := streamDeckGui.Add("Text", "x" . posX . " y" . posY . " w44 h44 Center BackgroundTrans").OnEvent("Click", controlClick.Bind(streamDeckGui))
+				this.iLabels[row][column] := streamDeckGui.Add("Text", "x" . posX . " y" . posY . " w44 h44 Center BackgroundTrans")
+				this.iLabels[row][column].OnEvent("Click", controlClick.Bind(streamDeckGui))
 
 				x += (StreamDeckPreview.kColumnMargin + StreamDeckPreview.kButtonWidth)
 			}
@@ -175,7 +171,7 @@ class StreamDeckPreview extends ControllerPreview {
 	}
 
 	createBackground(configuration) {
-		local control := this.Window.Add("Picture", "x0 y0 " . previewMover . " 0x4000000", (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg"))
+		local control := this.Window.Add("Picture", "x0 y0 0x4000000", (kStreamDeckImagesDirectory . "Stream Deck " . this.Size . ".jpg"))
 		local previewMover := this.PreviewManager.getPreviewMover()
 
 		if previewMover {

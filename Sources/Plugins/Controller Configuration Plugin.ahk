@@ -386,6 +386,8 @@ class FunctionsList extends ConfigurationItemList {
 		if (functionType < 5) {
 			this.Control["functionOnActionEdit"].Enabled := false
 			this.Control["functionOffActionEdit"].Enabled := false
+			this.Control["functionOnActionEdit"].Text := ""
+			this.Control["functionOffActionEdit"].Text := ""
 		}
 		else {
 			this.Control["functionOnActionEdit"].Enabled := true
@@ -395,11 +397,10 @@ class FunctionsList extends ConfigurationItemList {
 		if ((functionType == 2) || (functionType == 4))
 			this.Control["functionOffHotkeysEdit"].Enabled := true
 		else {
-			this.Control["functionOffHotkeysEdit"].Text := ""
-			this.Control["functionOffActionEdit"].Text := ""
-
 			this.Control["functionOffHotkeysEdit"].Enabled := false
 			this.Control["functionOffActionEdit"].Enabled := false
+			this.Control["functionOffHotkeysEdit"].Text := ""
+			this.Control["functionOffActionEdit"].Text := ""
 		}
 	}
 
@@ -415,7 +416,7 @@ class FunctionsList extends ConfigurationItemList {
 	}
 
 	loadList(items) {
-		local qualifier, theFunction, hotkeysAndActions, index, trigger, nextHKA, hotkeys, action
+		local qualifier, theFunction, hotkeysAndActions, index, trigger, nextHKA, hotkeys, action, round
 
 		static first := true
 
@@ -423,12 +424,14 @@ class FunctionsList extends ConfigurationItemList {
 
 		this.Control["functionsListView"].Delete()
 
+		round := 0
+
 		loop {
-			if (A_Index > 2)
+			if (++round > 2)
 				break
 
 			for qualifier, theFunction in this.Functions
-				if (((A_Index == 1) && (theFunction.Type != kCustomType)) || ((A_Index == 2) && (theFunction.Type == kCustomType))) {
+				if (((round == 1) && (theFunction.Type != kCustomType)) || ((round == 2) && (theFunction.Type == kCustomType))) {
 					hotkeysAndActions := ""
 
 					for index, trigger in theFunction.Trigger {

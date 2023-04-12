@@ -58,7 +58,7 @@ class ControllerEditor extends ConfiguratorPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Controller Editor", Closeable: true, Resizeable: true, Options: "ToolWindow -MaximizeBox"}, "")
+			super.__New({Descriptor: "Controller Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"}, "")
 		}
 
 		Close(*) {
@@ -274,7 +274,8 @@ class ControllerEditor extends ConfiguratorPanel {
 			window.Resize("Initialize", w, h)
 
 		if this.Name
-			Task.startTask(ObjBindMethod(this, "selectLayout", this.Name), 1000)
+			this.selectLayout(this.Name)
+			; Task.startTask(ObjBindMethod(this, "selectLayout", this.Name), 1000)
 	}
 
 	close(save := true) {
@@ -462,7 +463,7 @@ class ControlsList extends ConfigurationItemList {
 		local ignore, control
 
 		if save
-			super.saveToConfiguration(configuration)
+			super.saveToConfiguration(configuration, true)
 
 		for ignore, control in this.ItemList
 			controls[control[1]] := values2String(";", control[2], control[3], control[4])
@@ -681,7 +682,7 @@ class LabelsList extends ConfigurationItemList {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class LayoutsList extends ConfigurationItemList {
-	iRowDefinitions := []
+	iRowDefinitions := SafeArray()
 	iSelectedRow := false
 
 	iStreamDeckConfiguration := false
@@ -803,7 +804,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 
 		sdWidget1 := window.Add("Text", "x8 ys w86 h23 +0x200", translate("Layout"))
-		sdWidget2 := window.Add("DropDownList", "x102 yp w110 W:Grow(0.2) AltSubmit Choose1 VlayoutDropDown", collect(["Mini", "Standard", "XL"], translate))
+		sdWidget2 := window.Add("DropDownList", "x102 yp w110 W:Grow(0.2) AltSubmit Choose2 VlayoutDropDown", collect(["Mini", "Standard", "XL"], translate))
 		sdWidget2.OnEvent("Change", chooseLayout)
 
 		sdWidget3 := window.Add("Button", "x102 yp+30 w230 h23 W:Grow(0.4) Center", translate("Edit Display Rules..."))
@@ -1024,7 +1025,7 @@ class LayoutsList extends ConfigurationItemList {
 		}
 
 		choices := []
-		rows := []
+		rows := SafeArray()
 
 		loop
 			if item[2].Has(A_Index) {
@@ -1054,6 +1055,8 @@ class LayoutsList extends ConfigurationItemList {
 
 			this.iSelectedRow := false
 		}
+
+		this.updateLayoutRowEditor(false)
 
 		preview := this.Editor.ControllerPreview
 
@@ -1117,15 +1120,14 @@ class LayoutsList extends ConfigurationItemList {
 		local grid, margins
 
 		if (this.Control["layoutTypeDropDown"].Value = 2) {
-			grid := "0x0"
+			this.chooseLayout(false)
 
 			margins := ["", "", "", ""]
 		}
-		else {
-			grid := (this.Control["layoutRowsEdit"].Text . "x" . this.Control["layoutColumnsEdit"].Text)
-
+		else
 			margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
-		}
+
+		grid := (this.Control["layoutRowsEdit"].Text . "x" . this.Control["layoutColumnsEdit"].Text)
 
 		this.loadEditor(Array(this.Control["layoutNameEdit"].Text
 					  , CaseInsenseMap("Type", ["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value]
@@ -1136,7 +1138,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.updateItem()
 	}
 
-	chooseLayout() {
+	chooseLayout(update := true) {
 		if (this.Control["layoutDropDown"].Value = 1) {
 			this.Control["layoutRowsEdit"].Text := 2
 			this.Control["layoutColumnsEdit"].Text := 3
@@ -1150,7 +1152,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.Control["layoutColumnsEdit"].Text := 8
 		}
 
-		if (this.CurrentItem != 0)
+		if (update && (this.CurrentItem != 0))
 			this.updateItem()
 	}
 
@@ -1311,7 +1313,7 @@ class LayoutsList extends ConfigurationItemList {
 
 			result := InputBox(translate("Please enter a button label:"), translate("Button Label"), "w200 h150", ((oldLabel && (oldLabel != true)) ? oldLabel : ""))
 
-			if (result = "Ok")
+			if (result.Result = "Ok")
 				oldButton.Label := result.Value
 			else
 				return
@@ -1795,7 +1797,7 @@ class DisplayRulesEditor extends ConfiguratorPanel {
 
 		this.Control["displayRuleButtonDropDown"].Delete()
 		this.Control["displayRuleButtonDropDown"].Add(buttons)
-		this.Control["displayRuleButtonDropDown"].Choose(this.SelectedLayout ? 1 : 0)
+		this.Control["displayRuleButtonDropDown"].Choose(1)
 
 		buttons.RemoveAt(1)
 
@@ -1899,7 +1901,7 @@ class DisplayRulesList extends ConfigurationItemList {
 	AutoSave {
 		Get {
 			if ControllerEditor.HasOwnProp("Instance")
-				return ControllerEditor.Intance.AutoSave
+				return ControllerEditor.Instance.AutoSave
 		}
 	}
 

@@ -108,27 +108,6 @@ toObject(candidate, class := Object) {
 		return candidate
 }
 
-toMap(candidate, class := Map) {
-	local key, value
-
-	if !isInstance(candidate, class) {
-		local result := class()
-
-		if !isInstance(candidate, Map) {
-			for key, value in candidate.OwnProps()
-				result[key] := value
-		}
-		else {
-			for key, value in candidate
-				result[key] := value
-		}
-
-		return result
-	}
-	else
-		return candidate
-}
-
 isInstance(object, root) {
 	return (object is root)
 }

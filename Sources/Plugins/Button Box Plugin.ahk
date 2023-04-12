@@ -138,7 +138,7 @@ class GridButtonBox extends ButtonBox {
 		rows := []
 
 		loop this.Rows
-			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), "")))
+			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""), false, SafeArray))
 
 		this.iRowDefinitions := rows
 	}

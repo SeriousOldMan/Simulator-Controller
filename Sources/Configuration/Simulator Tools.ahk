@@ -1116,7 +1116,7 @@ editTargets(command := "", *) {
 		if (gBuildSettings.Count > 24)
 			throw "Too many build targets detected in editTargets..."
 
-		targetsGui := Window({Descriptor: "Simulator Tools", Closeable: true, Options: "ToolWindow +SysMenu +Caption"})
+		targetsGui := Window({Descriptor: "Simulator Tools", Closeable: true, Options: "+SysMenu +Caption"})
 
 		targetsGui.SetFont("Bold", "Arial")
 

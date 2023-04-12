@@ -42,8 +42,11 @@ substituteVariables(text, values := false) {
 	return result
 }
 
-string2Values(delimiter, text, count := false) {
-	return (count ? StrSplit(Trim(text), delimiter, " `t", count) : StrSplit(Trim(text), delimiter, " `t"))
+string2Values(delimiter, text, count := false, class := Array) {
+	if (class == Array)
+		return (count ? StrSplit(Trim(text), delimiter, " `t", count) : StrSplit(Trim(text), delimiter, " `t"))
+	else
+		return toArray((count ? StrSplit(Trim(text), delimiter, " `t", count) : StrSplit(Trim(text), delimiter, " `t")), class)
 }
 
 values2String(delimiter, values*) {

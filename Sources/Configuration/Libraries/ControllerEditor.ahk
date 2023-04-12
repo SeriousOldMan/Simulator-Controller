@@ -248,7 +248,7 @@ class ControllerEditor extends ConfiguratorPanel {
 
 		for index, item in this.LayoutsList.ItemList
 			if (item[1] = name) {
-				; this.LayoutsList.openEditor(index)
+				this.LayoutsList.openEditor(index)
 				this.LayoutsList.selectItem(index)
 
 				break
@@ -273,7 +273,8 @@ class ControllerEditor extends ConfiguratorPanel {
 		if getWindowSize("Controller Editor", &w, &h)
 			window.Resize("Initialize", w, h)
 
-		this.selectLayout(this.Name)
+		if this.Name
+			Task.startTask(ObjBindMethod(this, "selectLayout", this.Name), 1000)
 	}
 
 	close(save := true) {
@@ -506,7 +507,7 @@ class ControlsList extends ConfigurationItemList {
 	}
 
 	clearEditor() {
-		this.loadEditor(Array("", "", "", "x"))
+		this.loadEditor(Array("", k1WayToggleType, "", "45x45"))
 	}
 
 	buildItemFromEditor(isNew := false) {
@@ -644,7 +645,7 @@ class LabelsList extends ConfigurationItemList {
 	}
 
 	clearEditor() {
-		this.loadEditor(Array("", "x"))
+		this.loadEditor(Array("", "50x30"))
 	}
 
 	buildItemFromEditor(isNew := false) {
@@ -830,8 +831,10 @@ class LayoutsList extends ConfigurationItemList {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			name := descriptor[1]
 
-			if !layouts.Has(name)
-				layouts[name] := CaseInsenseMap()
+			if !layouts.Has(name) {
+				layouts[name] := CaseInsenseSafeMap()
+				layouts[name].Default := ""
+			}
 
 			layouts[name]["Type"] := "Button Box"
 			layouts[name]["Visible"] := true
@@ -857,8 +860,10 @@ class LayoutsList extends ConfigurationItemList {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			name := descriptor[1]
 
-			if !layouts.Has(name)
-				layouts[name] := CaseInsenseMap()
+			if !layouts.Has(name) {
+				layouts[name] := CaseInsenseSafeMap()
+				layouts[name].Default := ""
+			}
 
 			layouts[name]["Type"] := "Stream Deck"
 			layouts[name]["Visible"] := false
@@ -1076,7 +1081,7 @@ class LayoutsList extends ConfigurationItemList {
 	clearEditor() {
 		local margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
 
-		this.loadEditor(Array("", CaseInsenseMap("Type", "Button Box", "Visible", true, "Grid", "0x0", "Margins", margins)))
+		this.loadEditor(Array("", CaseInsenseMap("Type", "Button Box", "Visible", true, "Grid", "1x1", "Margins", margins)))
 	}
 
 	buildItemFromEditor(isNew := false) {
@@ -1094,12 +1099,12 @@ class LayoutsList extends ConfigurationItemList {
 				this.iRowDefinitions[this.Control["layoutRowDropDown"].Value] := this.Control["layoutRowEdit"].Text
 
 			if (["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value] = "Button Box")
-				layout := CaseInsenseMap("Type", "Button Box", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text
-									   , "Visible", this.Control["layoutVisibleCheck"].Value
-									   , "Margins", Array(this.Control["layoutRowMarginEdit"].Text, this.Control["layoutColumnMarginEdit"].Text
-														, this.Control["layoutSidesMarginEdit"].Text, this.Control["layoutBottomMarginEdit"].Text))
+				layout := CaseInsenseSafeMap("Type", "Button Box", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text
+										   , "Visible", this.Control["layoutVisibleCheck"].Value
+										   , "Margins", Array(this.Control["layoutRowMarginEdit"].Text, this.Control["layoutColumnMarginEdit"].Text
+															, this.Control["layoutSidesMarginEdit"].Text, this.Control["layoutBottomMarginEdit"].Text))
 			else
-				layout := CaseInsenseMap("Type", "Stream Deck", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text, "Visible", false)
+				layout := CaseInsenseSafeMap("Type", "Stream Deck", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text, "Visible", false)
 
 			loop this.iRowDefinitions.Length
 				layout[A_Index] := this.iRowDefinitions[A_Index]
@@ -1122,9 +1127,10 @@ class LayoutsList extends ConfigurationItemList {
 			margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
 		}
 
-		this.loadEditor(Array(this.Control["layoutNameEdit"].Text, CaseInsenseMap("Type", ["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value]
-																				, "Visible", (this.Control["layoutTypeDropDown"].Value = 1) ? true : false
-																				, "Grid", grid, "Margins", margins)))
+		this.loadEditor(Array(this.Control["layoutNameEdit"].Text
+					  , CaseInsenseMap("Type", ["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value]
+									 , "Visible", (this.Control["layoutTypeDropDown"].Value = 1) ? true : false
+									 , "Grid", grid, "Margins", margins)))
 
 		if (this.CurrentItem != 0)
 			this.updateItem()
@@ -1355,7 +1361,7 @@ class LayoutsList extends ConfigurationItemList {
 				definition := (ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number) . "," . definition[2])
 		}
 		else if control {
-			if (definition.Length = 0) {
+			if ((definition.Length = 0) || ((definition.Length = 1) && (definition[1] = ""))) {
 				definition := ConfigurationItem.descriptor(control, 1)
 				number := 1
 			}

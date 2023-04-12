@@ -90,6 +90,7 @@ class ControllerList extends ConfigurationItemList {
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
+		local choices, chosen
 
 		openControllerEditor(*) {
 			this.openControllerEditor()
@@ -104,7 +105,11 @@ class ControllerList extends ConfigurationItemList {
 		window.Add("ListBox", "x24 y99 w194 h96 W:Grow(0.4) BackgroundD8D8D8 VcontrollerListBox")
 
 		window.Add("Edit", "x224 y99 w104 h21 X:Move(0.4) W:Grow(0.3) VcontrollerEdit")
-		window.Add("DropDownList", "x330 y99 w108 X:Move(0.7) W:Grow(0.3) Choose0 VcontrollerLayoutDropDown", this.computeLayoutChoices())
+
+		choices := this.computeLayoutChoices()
+		chosen := (choices.Length > 0)
+
+		window.Add("DropDownList", "x330 y99 w108 X:Move(0.7) W:Grow(0.3) Choose" . chosen . " VcontrollerLayoutDropDown", choices)
 		window.Add("Button", "x440 y98 w23 h23 X:Move VopenControllerEditorButton", translate("...")).OnEvent("Click", openControllerEditor)
 
 		window.Add("Button", "x385 y124 w38 h23 X:Move Disabled VcontrollerUpButton", translate("Up"))

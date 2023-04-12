@@ -60,7 +60,7 @@ class StreamDeckPreview extends ControllerPreview {
 
 	loadFromConfiguration(configuration) {
 		local layout := getMultiMapValue(configuration, "Layouts", this.Name . ".Layout", "Standard")
-		local row, column, button, icon, label, mode
+		local row, columns, column, button, icon, label, mode
 
 		switch layout {
 			case "Mini":
@@ -98,12 +98,17 @@ class StreamDeckPreview extends ControllerPreview {
 		loop this.Rows {
 			row := A_Index
 
-			this.iButtons[row] := Object()
+			this.iButtons[row] := CaseInsenseMap()
 
 			loop this.Columns {
 				column := A_Index
 
-				button := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row))[column]
+				columns := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row))
+
+				if ((columns.Length = 0) && (column = 1))
+					button := ""
+				else
+					button := columns[column]
 
 				if (button && (button != "")) {
 					icon := getMultiMapValue(this.Configuration, "Buttons", this.Name . "." . button . ".Icon", true)
@@ -308,6 +313,14 @@ class StreamDeckPreview extends ControllerPreview {
 		local count, mainMenu, controlMenu, numberMenu, subMenu, displayMenu, labelMenu, iconMenu, modeMenu, menuItem, window, label, count
 		local button, labelMode, iconMode, mode
 
+		changeControl(control, argument := false, *) {
+			this.PreviewManager.changeControl(row, column, control, argument)
+		}
+
+		changeLabel(label, *) {
+			this.PreviewManager.changeLabel(row, column, label)
+		}
+
 		if GetKeyState("Ctrl", "P")
 			this.PreviewManager.changeControl(row, column, "__Number__", false)
 		else {
@@ -322,12 +335,12 @@ class StreamDeckPreview extends ControllerPreview {
 
 			controlMenu := Menu()
 
-			controlMenu.Add(translate("Empty"), ObjBindMethod(this.PreviewManager, "changeControl", row, column, false))
+			controlMenu.Add(translate("Empty"), changeControl.Bind(false))
 			controlMenu.Add()
 
 			numberMenu := Menu()
 
-			numberMenu.Add(translate("Input..."), ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Number__", false))
+			numberMenu.Add(translate("Input..."), changeControl.Bind("__Number__", false))
 			numberMenu.Add()
 
 			count := 1
@@ -338,7 +351,7 @@ class StreamDeckPreview extends ControllerPreview {
 				subMenu := Menu()
 
 				loop 10 {
-					subMenu.Add(count, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Number__", count))
+					subMenu.Add(count, changeControl.Bind("__Number__", count))
 
 					if (count = ConfigurationItem.splitDescriptor(element[2])[2])
 						subMenu.Check(count)
@@ -362,17 +375,17 @@ class StreamDeckPreview extends ControllerPreview {
 				labelMode := this.getLabel(row, column)
 
 				label := translate("Empty")
-				labelMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__No_Label__", false))
+				labelMenu.Add(label, changeControl.Bind("__No_Label__", false))
 				if (labelMode == false)
 					labelMenu.Check(label)
 
 				label := translate("Action")
-				labelMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Action_Label__", false))
+				labelMenu.Add(label, changeControl.Bind("__Action_Label__", false))
 				if (labelMode == true)
 					labelMenu.Check(label)
 
 				label := translate("Text...")
-				labelMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Text_Label__", false))
+				labelMenu.Add(label, changeControl.Bind("__Text_Label__", false))
 				if (labelMode && (labelMode != true))
 					labelMenu.Check(label)
 
@@ -383,17 +396,17 @@ class StreamDeckPreview extends ControllerPreview {
 				iconMode := this.getIcon(row, column)
 
 				label := translate("Empty")
-				iconMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__No_Icon__", false))
+				iconMenu.Add(label, changeControl.Bind("__No_Icon__", false))
 				if (iconMode == false)
 					iconMenu.Check(label)
 
 				label := translate("Action")
-				iconMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Action_Icon__", false))
+				iconMenu.Add(label, changeControl.Bind("__Action_Icon__", false))
 				if (iconMode == true)
 					iconMenu.Check(label)
 
 				label := translate("Image...")
-				iconMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Image_Icon__", false))
+				iconMenu.Add(label, changeControl.Bind("__Image_Icon__", false))
 				if (iconMode && (iconMode != true))
 					iconMenu.Check(label)
 
@@ -406,22 +419,22 @@ class StreamDeckPreview extends ControllerPreview {
 				mode := this.getMode(row, column)
 
 				label := translate("Icon or Label")
-				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kIconOrLabel))
+				modeMenu.Add(label, changeControl.Bind("__Mode__", kIconOrLabel))
 				if (mode == kIconOrLabel)
 					modeMenu.Check(label)
 
 				label := translate("Icon and Label")
-				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kIconAndLabel))
+				modeMenu.Add(label, changeControl.Bind("__Mode__", kIconAndLabel))
 				if (mode == kIconAndLabel)
 					modeMenu.Check(label)
 
 				label := translate("Only Icon")
-				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kIcon))
+				modeMenu.Add(label, changeControl.Bind("__Mode__", kIcon))
 				if (mode == kIcon)
 					modeMenu.Check(label)
 
 				label := translate("Only Label")
-				modeMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Mode__", kLabel))
+				modeMenu.Add(label, changeControl.Bind("__Mode__", kLabel))
 				if (mode == kLabel)
 					modeMenu.Check(label)
 

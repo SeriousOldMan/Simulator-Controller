@@ -226,6 +226,7 @@ class ButtonBoxPreview extends ControllerPreview {
 	loadFromConfiguration(configuration) {
 		local layout := string2Values(",", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
 		local rows := []
+		local columns
 
 		if (layout.Length > 1)
 			this.iRowMargin := layout[2]
@@ -244,8 +245,14 @@ class ButtonBoxPreview extends ControllerPreview {
 		this.Rows := layout[1]
 		this.Columns := layout[2]
 
-		loop this.Rows
-			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), "")))
+		loop this.Rows {
+			columns := string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), ""))
+
+			if ((columns.Length = 0) && (this.Columns = 1))
+				rows.Push([""])
+			else
+				rows.Push(columns)
+		}
 
 		this.iRowDefinitions := rows
 	}
@@ -455,6 +462,14 @@ class ButtonBoxPreview extends ControllerPreview {
 	openControlMenu(preview, element, function, row, column, isEmpty) {
 		local count, mainMenu, controlMenu, numberMenu, subMenu, labelMenu, menuItem, window, label, control, definition
 
+		changeControl(control, argument := false, *) {
+			this.PreviewManager.changeControl(row, column, control, argument)
+		}
+
+		changeLabel(label, *) {
+			this.PreviewManager.changeLabel(row, column, label)
+		}
+
 		if (GetKeyState("Ctrl", "P") && !isEmpty)
 			this.PreviewManager.changeControl(row, column, "__Number__", false)
 		else {
@@ -470,11 +485,11 @@ class ButtonBoxPreview extends ControllerPreview {
 
 			controlMenu := Menu()
 
-			controlMenu.Add(translate("Empty"), ObjBindMethod(this.PreviewManager, "changeControl", row, column, false))
+			controlMenu.Add(translate("Empty"), changeControl.Bind(false))
 			controlMenu.Add()
 
 			for control, definition in ControlsList.Instance.getControls() {
-				controlMenu.Add(control, ObjBindMethod(this.PreviewManager, "changeControl", row, column, control))
+				controlMenu.Add(control, changeControl.Bind(control))
 
 				if (control = ConfigurationItem.splitDescriptor(element[2])[1])
 					controlMenu.Check(control)
@@ -485,7 +500,7 @@ class ButtonBoxPreview extends ControllerPreview {
 
 				numberMenu := Menu()
 
-				numberMenu.Add(translate("Input..."), ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Number__", false))
+				numberMenu.Add(translate("Input..."), changeControl.Bind("__Number__", false))
 				numberMenu.Add()
 
 				count := 1
@@ -496,7 +511,7 @@ class ButtonBoxPreview extends ControllerPreview {
 					subMenu := Menu()
 
 					loop 10 {
-						subMenu.Add(count, ObjBindMethod(this.PreviewManager, "changeControl", row, column, "__Number__", count))
+						subMenu.Add(count, changeControl.Bind("__Number__", count))
 
 						if (count = ConfigurationItem.splitDescriptor(element[2])[2])
 							subMenu.Check(count)
@@ -515,11 +530,11 @@ class ButtonBoxPreview extends ControllerPreview {
 			if !isEmpty {
 				labelMenu := Menu()
 
-				labelMenu.Add(translate("Empty"), ObjBindMethod(this.PreviewManager, "changeLabel", row, column, false))
+				labelMenu.Add(translate("Empty"), changeLabel.Bind(false))
 				labelMenu.Add()
 
 				for label, definition in LabelsList.Instance.getLabels()
-					labelMenu.Add(label, ObjBindMethod(this.PreviewManager, "changeLabel", row, column, label))
+					labelMenu.Add(label, changeLabel.Bind(label))
 
 				mainMenu.Add(translate("Label"), labelMenu)
 			}

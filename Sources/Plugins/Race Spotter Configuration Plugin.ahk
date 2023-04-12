@@ -95,16 +95,16 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 
 		widget5 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Learn for"))
 		widget6 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vrspLearningLapsEdit Hidden")
-		widget7 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget7 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
 		widget8 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
 		widget9 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Statistical Window"))
-		widget10 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vrspLapsConsideredEdit Hidden")
-		widget11 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget10 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vrspLapsConsideredEdit Hidden", 5)
+		widget11 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 5)
 		widget12 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("Laps"))
 
 		widget13 := window.Add("Text", "x" . x0 . " ys+24 w120 h20 Section Hidden", translate("Damping Factor"))
-		widget14 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vrspDampingFactorEdit Hidden")
+		widget14 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vrspDampingFactorEdit Hidden", displayValue("Float", 0.2, 1))
 		widget14.OnEvent("Change", validateRSPDampingFactor)
 		widget15 := window.Add("Text", "x" . x3 . " yp+2 w80 h20 Hidden", translate("p. Lap"))
 
@@ -209,6 +209,12 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		this.setSimulators(simulators)
 	}
 
+	show() {
+		super.show()
+
+		this.loadConfigurator(this.Configuration, this.getSimulators())
+	}
+
 	loadSimulatorConfiguration(simulator := false) {
 		local configuration
 
@@ -223,7 +229,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 			this.Control["rspLearningLapsEdit"].Text := configuration["LearningLaps"]
 			this.Control["rspLapsConsideredEdit"].Text := configuration["ConsideredHistoryLaps"]
 
-			this.Control["rspDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"])
+			this.Control["rspDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"], 1)
 			this.Control["rspDampingFactorEdit"].ValidText := this.Control["rspDampingFactorEdit"].Text
 
 			this.Control["sideProximityDropDown"].Choose(configuration["SideProximity"] + 1)

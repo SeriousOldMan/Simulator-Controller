@@ -121,16 +121,16 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 		widget15 := window.Add("Text", "x" . x0 . " yp+17 w80 h23 +0x200 Hidden", translate("Learn for"))
 		widget16 := window.Add("Edit", "x" . x1 . " yp w40 h21 Number Limit1 vreLearningLapsEdit Hidden")
-		widget17 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget17 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 2)
 		widget18 := window.Add("Text", "x" . x3 . " yp w" . w3 . " h23 +0x200 Hidden", translate("Laps after Start or Pitstop"))
 
 		widget19 := window.Add("Text", "x" . x0 . " yp+26 w105 h20 Section Hidden", translate("Statistical Window"))
-		widget20 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vreLapsConsideredEdit Hidden")
-		widget21 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", "1")
+		widget20 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 Number Limit1 vreLapsConsideredEdit Hidden", 5)
+		widget21 := window.Add("UpDown", "x" . x2 . " yp w17 h21 Range1-9 Hidden", 5)
 		widget22 := window.Add("Text", "x" . x3 . " yp+2 w" . w3 . " h20 Hidden", translate("Laps"))
 
 		widget23 := window.Add("Text", "x" . x0 . " ys+24 w105 h20 Section Hidden", translate("Damping Factor"))
-		widget24 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vreDampingFactorEdit  Hidden")
+		widget24 := window.Add("Edit", "x" . x1 . " yp-2 w40 h21 vreDampingFactorEdit  Hidden", displayValue("Float", 0.2, 1))
 		widget24.OnEvent("Change", validateREDampingFactor)
 
 		widget25 := window.Add("Text", "x" . x3 . " yp+2 w" . w3 . " h20 Hidden", translate("p. Lap"))
@@ -202,6 +202,12 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 		this.setSimulators(simulators)
 	}
 
+	show() {
+		super.show()
+
+		this.loadConfigurator(this.Configuration, this.getSimulators())
+	}
+
 	loadSimulatorConfiguration(simulator := false) {
 		local configuration, value
 
@@ -233,7 +239,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 			this.Control["reLearningLapsEdit"].Text := configuration["LearningLaps"]
 			this.Control["reLapsConsideredEdit"].Text := configuration["ConsideredHistoryLaps"]
 
-			this.Control["reDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"])
+			this.Control["reDampingFactorEdit"].Text := displayValue("Float", configuration["HistoryLapsDamping"], 1)
 			this.Control["reDampingFactorEdit"].ValidText := this.Control["reDampingFactorEdit"].Text
 
 			this.Control["reAdjustLapTimeCheck"].Value := configuration["AdjustLapTime"]

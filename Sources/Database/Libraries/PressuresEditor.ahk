@@ -129,7 +129,7 @@ class PressuresEditor {
 		local compounds := []
 		local weather, ignore, row, theCompound, pressuresEditorGui
 
-		pressuresEditorGui := Window()
+		pressuresEditorGui := Window({Descriptor: "Session Database.Pressures Editor", Options: "0x400000"}, "")
 
 		this.iWindow := pressuresEditorGui
 

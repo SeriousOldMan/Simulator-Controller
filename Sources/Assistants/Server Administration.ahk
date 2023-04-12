@@ -151,9 +151,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 				account := parseObject(connector.GetAccount(identifier))
 
 				accounts[A_Index] := account
-				accounts[account.Name] := account
+				accounts[account["Name"]] := account
 
-				index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
+				index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account["Contract"])
 
 				listView.Add("", account["Name"], account["EMail"]
 							   , (account["SessionAccess"] = "true") ? translate("Yes") : translate("No")
@@ -347,28 +347,28 @@ administrationEditor(configurationOrCommand, arguments*) {
 				for ignore, identifier in string2Values(";", connector.GetAllTasks()) {
 					task := parseObject(connector.GetTask(identifier))
 
-					if ((task.Which = "Account") && (task.What = "Renew"))
+					if ((task["Which"] = "Account") && (task["What"] = "Renew"))
 						type := "Quota"
 					else
-						type := task.Which
+						type := task["Which"]
 
-					tasks[type] := task.Identifier
+					tasks[type] := task["Identifier"]
 
 					if (type = "Token") {
-						administrationGui["taskTokenOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task.What))
-						administrationGui["taskTokenFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task.When))
+						administrationGui["taskTokenOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task["What"]))
+						administrationGui["taskTokenFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 					else if (type = "Session") {
-						administrationGui["taskSessionOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task.What))
-						administrationGui["taskSessionFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task.When))
+						administrationGui["taskSessionOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task["What"]))
+						administrationGui["taskSessionFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 					else if (type = "Quota") {
-						administrationGui["taskQuotaOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task.What) - 3)
-						administrationGui["taskQuotaFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task.When))
+						administrationGui["taskQuotaOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task["What"]) - 3)
+						administrationGui["taskQuotaFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 					else if (type = "Account") {
-						administrationGui["taskAccountOperationDropDown"].Choose(inList(["Delete"], task.What))
-						administrationGui["taskAccountFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task.When))
+						administrationGui["taskAccountOperationDropDown"].Choose(inList(["Delete"], task["What"]))
+						administrationGui["taskAccountFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 				}
 			}

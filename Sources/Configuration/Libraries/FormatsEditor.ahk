@@ -56,7 +56,7 @@ class FormatsEditor extends ConfiguratorPanel {
 			}
 		}
 
-		formatsGui := Window()
+		formatsGui := Window({Descriptor: "Formats Editor", Options: "0x400000"}, "")
 
 		this.Window := formatsGui
 

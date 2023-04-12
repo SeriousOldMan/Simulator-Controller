@@ -1291,7 +1291,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm cBlack", "Arial")
 
-		editorGui.Add("GroupBox", "x280 ys-8 w390 h476 W:Grow H:Grow")
+		editorGui.Add("GroupBox", "x280 ys-8 w390 h476 W:Grow H:Grow -Theme")
 
 		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
@@ -4333,7 +4333,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 	else {
 		result := false
 
-		actionDialogGui := Window()
+		actionDialogGui := Window({Options: "0x400000"})
 
 		actionDialogGui.SetFont("Norm", "Arial")
 
@@ -5020,7 +5020,7 @@ editSettings(editorOrCommand, arguments*) {
 			serverUpdateEdit := ""
 		}
 
-		settingsEditorGui := Window()
+		settingsEditorGui := Window({Descriptor: "Session Database.Settings", Options: "0x400000"}, "")
 
 		settingsEditorGui.SetFont("s10 Bold", "Arial")
 
@@ -5039,7 +5039,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		settingsEditorGui.SetFont("Italic", "Arial")
 
-		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section", translate("Team Data"))
+		settingsEditorGui.Add("GroupBox", "x16 yp+30 w388 h216 Section -Theme", translate("Team Data"))
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 
@@ -5298,7 +5298,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	else {
 		result := false
 
-		loginGui := Window()
+		loginGui := Window({Options: "0x400000"}, "")
 
 		loginGui.SetFont("Norm", "Arial")
 

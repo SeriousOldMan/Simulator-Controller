@@ -140,7 +140,7 @@ editModes(&settingsOrCommand, arguments*) {
 
 		setMultiMapValues(newSettings, "Modes", getMultiMapValues(settingsOrCommand, "Modes"))
 
-		modesEditorGui := Window()
+		modesEditorGui := Window({Descriptor: "Simulator Settings.Automation", Options: "0x400000"}, "")
 
 		modesEditorGui.SetFont("Bold", "Arial")
 
@@ -391,7 +391,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 		result := false
 		restart := false
 
-		settingsEditorGui := Window()
+		settingsEditorGui := Window({Descriptor: "Simulator Settings", Options: "0x400000"}, "")
 
 		settingsEditorGui.SetFont("Bold", "Arial")
 

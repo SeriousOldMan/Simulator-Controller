@@ -111,7 +111,7 @@ getLogLevel() {
 	return gLogLevel
 }
 
-logMessage(logLevel, message) {
+logMessage(logLevel, message, monitor := true) {
 	global gLogLevel
 
 	local script := StrSplit(A_ScriptName, ".")[1]
@@ -160,7 +160,7 @@ logMessage(logLevel, message) {
 				tries -= 1
 			}
 
-		if (!sending && (script != "System Monitor")) {
+		if (monitor && !sending && (script != "System Monitor")) {
 			pid := ProcessExist("System Monitor.exe")
 
 			if pid {
@@ -191,6 +191,10 @@ logError(exception, unhandled := false, report := true) {
 		logMessage(unhandled ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
 				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+
+
+		if exception.HasProp("Stack")
+			logMessage(unhandled ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
 	}
 	else
 		logMessage(unhandled ? kLogCritical : kLogDebug

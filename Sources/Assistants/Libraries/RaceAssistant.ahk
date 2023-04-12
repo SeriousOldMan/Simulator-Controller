@@ -1668,7 +1668,7 @@ class GridRaceAssistant extends RaceAssistant {
 				if data
 					return getMultiMapValue(data, "Position Data", "Car." . getMultiMapValue(data, "Position Data", "Driver.Car") . ".Position", false)
 				else
-					return knowledgeBase.getValue("Position")
+					return knowledgeBase.getValue("Position", 0)
 			}
 			else
 				car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car") : knowledgeBase.getValue("Driver.Car", false))
@@ -1753,7 +1753,7 @@ class GridRaceAssistant extends RaceAssistant {
 parseList(list) {
 	local compiler := RuleCompiler()
 	local nextCharIndex := 1
-	local term := compiler.readList(list, nextCharIndex)
+	local term := compiler.readList(&list, &nextCharIndex)
 
 	return compiler.createTermParser(term).parse(term).toObject()
 }

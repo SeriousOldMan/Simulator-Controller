@@ -176,6 +176,9 @@ class Task {
 	}
 
 	__New(callable := false, sleep := "__Undefined__", priority := "__Undefined__") {
+		if (callable && !isInstance(callable, Func))
+			throw "Non-function callable detected in Task.__New..."
+
 		this.iSleep := ((sleep = kUndefined) ? 0 : sleep)
 		this.iNextExecution := (A_TickCount + this.iSleep)
 

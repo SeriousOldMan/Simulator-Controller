@@ -227,7 +227,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		local layout := string2Values(",", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, "Layout"), ""))
 		local rows := []
 		local columns
-sleep 2000
+
 		if (layout.Length > 1)
 			this.iRowMargin := layout[2]
 

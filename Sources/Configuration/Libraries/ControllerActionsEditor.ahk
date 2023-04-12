@@ -49,7 +49,7 @@ class ControllerActionsEditor extends ConfiguratorPanel {
 		__New(editor) {
 			this.iEditor := editor
 
-			super.__New({Descriptor: "Plugin Actions Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"}, "")
+			super.__New({Descriptor: "Plugin Actions Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
 		}
 
 		Close(*) {

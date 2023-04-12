@@ -4333,7 +4333,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 	else {
 		result := false
 
-		actionDialogGui := Window({Options: "0x400000"})
+		actionDialogGui := Window({Options: "0x400000"}, "")
 
 		actionDialogGui.SetFont("Norm", "Arial")
 

@@ -669,7 +669,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 		runWidgets := []
 		analyzeWidgets := []
 
-		analyzerGui := Window({Descriptor: "Setup Workbench.Analyzer", Options: "0x400000"})
+		analyzerGui := Window({Descriptor: "Setup Workbench.Analyzer", Options: "0x400000"}, "")
 
 		analyzerGui.SetFont("s10 Bold", "Arial")
 
@@ -946,7 +946,7 @@ runCalibrator(commandOrAnalyzer, *) {
 		cleanValues := CaseInsenseMap()
 		overValues := CaseInsenseMap()
 
-		calibratorGui := Window({Descriptor: "Setup Workbench.Calibrator", Options: "0x400000"})
+		calibratorGui := Window({Descriptor: "Setup Workbench.Calibrator", Options: "0x400000"}, "")
 
 		calibratorGui.SetFont("s10 Bold", "Arial")
 

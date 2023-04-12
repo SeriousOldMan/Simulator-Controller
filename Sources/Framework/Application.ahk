@@ -73,7 +73,7 @@ consentDialog(id, consent := false, *) {
 	if !texts
 		texts := readMultiMap(kTranslationsDirectory . "Consent.en")
 
-	consentGui := Window({Descriptor: "Consent", Options: "0x400000"})
+	consentGui := Window({Descriptor: "Consent", Options: "0x400000"}, "")
 
 	consentGui.SetFont("s10 Bold")
 
@@ -408,7 +408,7 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 
 	innerWidth := width - 16
 
-	htmlGui := Window({Options: "0x400000"})
+	htmlGui := Window({Options: "0x400000"}, "")
 
 	htmlGui.SetFont("s10 Bold")
 

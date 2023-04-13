@@ -11401,7 +11401,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 	else {
 		result := false
 
-		teamGui := Window()
+		teamGui := Window({Descriptor: "Race Center.Team Manager", Options: "0x400000"}, "")
 
 		teamGui.Opt("+Owner" . raceCenterOrCommand.Window.Hwnd)
 
@@ -11565,7 +11565,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			}
 		}
 		else if (settingsListView && !isOpen) {
-			settingsGui.Show()
+			settingsGui.Show({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"}, "")
 
 			isOpen := true
 		}
@@ -11625,7 +11625,7 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 	else {
 		result := false
 
-		loginGui := Window()
+		loginGui := Window({Options: "0x400000"}, "")
 
 		loginGui.SetFont("Norm", "Arial")
 

@@ -456,7 +456,7 @@ class PluginActionsList extends ConfigurationItemList {
 				}
 		}
 
-		window.Add("ListView", "x16 y120 w377 h240 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginActionsListView", collect(["Action", "Trigger", "Label", "Icon"], translate))
+		window.Add("ListView", "x16 y120 w377 h240 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginActionsListView", collect(["Action", "Trigger", "Label", "Icon"], translate))
 
 		window.Add("Text", "x16 y370 w76 Y:Move", translate("Label && Icon"))
 		window.Add("Edit", "x100 yp w110 h45 Y:Move W:Grow(0.2) VlabelEdit")

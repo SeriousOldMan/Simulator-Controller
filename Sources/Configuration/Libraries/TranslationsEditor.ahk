@@ -347,7 +347,7 @@ class TranslationsList extends ConfigurationItemList {
 			}
 		}
 
-		window.Add("ListView", "x16 y+10 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VtranslationsListView", collect(["Original", "Translation"], translate))
+		window.Add("ListView", "x16 y+10 w377 h140 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VtranslationsListView", collect(["Original", "Translation"], translate))
 
 		window.Add("Text", "x16 w86 h23 Y:Move +0x200", translate("Original"))
 		window.Add("Edit", "x110 yp w283 h80 Y:Move W:Grow Disabled voriginalTextEdit")

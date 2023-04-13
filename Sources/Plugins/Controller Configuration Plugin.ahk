@@ -102,7 +102,7 @@ class ControllerList extends ConfigurationItemList {
 		window.Add("GroupBox", "-Theme x16 y80 w457 h115 W:Grow", translate("Controller"))
 
 		window.SetFont("Norm", "Arial")
-		window.Add("ListBox", "x24 y99 w194 h96 W:Grow(0.4) BackgroundD8D8D8 VcontrollerListBox")
+		window.Add("ListBox", "x24 y99 w194 h96 W:Grow(0.4) VcontrollerListBox")
 
 		window.Add("Edit", "x224 y99 w104 h21 X:Move(0.4) W:Grow(0.3) VcontrollerEdit")
 
@@ -306,7 +306,7 @@ class FunctionsList extends ConfigurationItemList {
 			Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions")
 		}
 
-		window.Add("ListView", "x16 y200 w457 h146 W:Grow H:Grow -Multi -LV0x10 BackgroundD8D8D8 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))
+		window.Add("ListView", "x16 y200 w457 h146 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))
 
 		window.Add("Text", "x16 y356 w86 h23 Y:Move +0x200", translate("Function"))
 		window.Add("DropDownList", "x124 y356 w91 Y:Move AltSubmit Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)

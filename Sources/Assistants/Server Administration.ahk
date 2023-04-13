@@ -689,7 +689,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		administrationTab.UseTab(1)
 
-		accountsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h146 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], translate))
+		accountsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h146 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], translate))
 		accountsListView.OnEvent("Click", chooseAccount)
 
 		administrationGui.Add("Text", "x" . x0 . " yp+150 w90 h23 Y:Move +0x200", translate("Name"))
@@ -747,7 +747,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 		administrationTab.UseTab(3)
 
-		connectionsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h270 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Role", "Name", "Since", "Session"], translate))
+		connectionsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h270 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Role", "Name", "Since", "Session"], translate))
 		connectionsListView.OnEvent("Click", noSelect)
 		connectionsListView.OnEvent("DoubleClick", noSelect)
 

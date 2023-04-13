@@ -299,7 +299,7 @@ class ThemesList extends ConfigurationItemList {
 			}
 		}
 
-		window.Add("ListView", "x16 y120 w377 h140 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VthemesListView", collect(["Theme", "Media", "Sound File"], translate))
+		window.Add("ListView", "x16 y120 w377 h140 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VthemesListView", collect(["Theme", "Media", "Sound File"], translate))
 		window.Add("Text", "x16 y270 w86 h23 +0x200 Y:Move", translate("Theme"))
 		window.Add("Edit", "x110 y270 w140 h21 Y:Move W:Grow(0.5) VthemeNameEdit")
 
@@ -320,7 +320,7 @@ class ThemesList extends ConfigurationItemList {
 		window.Add("Button", "x85 y342 w23 h23 Y:Move VaddPictureButton").OnEvent("Click", addThemePicture)
 		setButtonIcon(window["addPictureButton"], kIconsDirectory . "Plus.ico", 1)
 
-		window.Add("ListView", "x110 y342 w284 h112 Y:Move W:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr VpicturesListView", [translate("Picture")])
+		window.Add("ListView", "x110 y342 w284 h112 Y:Move W:Grow -Multi -LV0x10 Checked -Hdr NoSort NoSortHdr VpicturesListView", [translate("Picture")])
 
 		window.Add("Text", "x16 y456 w80 h23 +0x200 Y:Move VpicturesDurationLabel", translate("Display Duration"))
 		window.Add("Edit", "x110 y456 w40 h21 Y:Move Limit5 Number VpicturesDurationEdit")

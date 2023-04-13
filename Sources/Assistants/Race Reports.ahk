@@ -284,7 +284,7 @@ class RaceReports extends ConfigurationItem {
 
 		raceReportsGui.Add("Text", "x16 yp+26 w70 h23 +0x200", translate("Races"))
 
-		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 W:Grow(0.25) H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
+		this.iRacesListView := raceReportsGui.Add("ListView", "x90 yp-2 w180 h252 W:Grow(0.25) H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "Duration", "Starting Grid"], translate))
 		this.iRacesListView.OnEvent("Click", chooseRace)
 
 		raceReportsGui.Add("Button", "x62 yp+205 w23 h23 Y:Move vreloadReportsButton").OnEvent("Click", reloadRaceReports)

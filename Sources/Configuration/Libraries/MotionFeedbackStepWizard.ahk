@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ControllerStepWizard.ahk
+#Include "ControllerStepWizard.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,16 +20,8 @@
 ;;; MotionFeedbackStepWizard                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global motionIntensityField
-global effectSelectorField
-global effectIntensityField
-
 class MotionFeedbackStepWizard extends ActionsStepWizard {
 	iMotionEffectsList := false
-
-	iMotionIntensityDial := false
-	iEffectSelectorField := false
-	iEffectIntensityDial := false
 
 	iDisabledWidgets := []
 
@@ -75,7 +67,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			if !isObject(function)
 				function := ((function != "") ? Array(function) : [])
 
-			if (function.Length() > 0) {
+			if (function.Length > 0) {
 				if (arguments != "")
 					arguments .= "; "
 
@@ -113,7 +105,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 					if !isObject(function)
 						function := ((function != "") ? Array(function) : [])
 
-					if (function.Length() > 0) {
+					if (function.Length > 0) {
 						if (actions != "")
 							actions .= ", "
 
@@ -129,35 +121,17 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 			}
 
-			new Plugin("Motion Feedback", false, true, "", arguments).saveToConfiguration(configuration)
+			Plugin("Motion Feedback", false, true, "", arguments).saveToConfiguration(configuration)
 		}
 		else
-			new Plugin("Motion Feedback", false, false, "", "").saveToConfiguration(configuration)
+			Plugin("Motion Feedback", false, false, "", "").saveToConfiguration(configuration)
 	}
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
-		local motionFeedbackIconHandle := false
-		local motionFeedbackLabelHandle := false
-		local motionFeedbackListViewHandle := false
-		local motionFeedbackInfoTextHandle := false
-		local motionEffectsLabelHandle := false
-		local motionEffectsButtonHandle := false
-		local motionEffectsListHandle := false
-		local labelsEditorButtonHandle := false
-		local motionIntensityLabelHandle := false
-		local motionIntensityFieldHandle := false
-		local effectSelectorLabelHandle := false
-		local effectSelectorFieldHandle := false
-		local effectIntensityLabelHandle := false
-		local effectIntensityFieldHandle := false
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
-		local columnLabel1Handle := false
-		local columnLine1Handle := false
-		local columnLabel2Handle := false
-		local columnLine2Handle := false
 		local listX := x + 300
 		local listWidth := width - 300
 		local colWidth := width - listWidth - x
@@ -166,101 +140,102 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local secondWidth := colWidth - 155
 		local info, html
 
-		static motionFeedbackInfoText
+		changeMotionEffects(*) {
+			this.changeEffects("Motion")
+		}
 
-		Gui %window%:Default
+		motionFeedbackActionFunctionSelect(listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		motionFeedbackActionFunctionMenu(window, listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDmotionFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Motion 1.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDmotionFeedbackLabelHandle Hidden, % translate("Motion Feedback Configuration")
+		window.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Motion 1.ico")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Motion Feedback Configuration"))
 
-		Gui %window%:Font, Bold, Arial
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, Text, x%x% yp+30 w%colWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Setup ")
-		Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine1Handle Hidden
+		window.SetFont("Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget3 := window.Add("Text", "x" . x . " yp+30 w" . colWidth . " h23 +0x200 Hidden Section", translate("Setup "))
+		widget4 := window.Add("Text", "yp+20 x" . x . " w" . colWidth . " 0x10 Hidden")
 
-		Gui %window%:Add, Text, x%x% yp+10 w105 h23 +0x200 HWNDmotionEffectsLabelHandle Hidden, % translate("Motion Effects")
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDmotionEffectsButtonHandle gchangeMotionEffects Hidden
-		setButtonIcon(motionEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 Disabled ReadOnly HWNDmotionEffectsListHandle Hidden
+		widget5 := window.Add("Text", "x" . x . " yp+10 w105 h23 +0x200 Hidden", translate("Motion Effects"))
 
-		Gui %window%:Add, Text, x%x% yp+70 w105 h23 +0x200 HWNDmotionIntensityLabelHandle Hidden, % translate("Motion Intensity")
+		widget6 := window.Add("Button", "x" . buttonX . " yp w23 h23  Hidden")
+		widget6.OnEvent("Click", changeMotionEffects)
+		setButtonIcon(widget6, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
+		widget7 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 Disabled ReadOnly Hidden")
 
-		Gui %window%:Font, s8 Bold, Arial
+		widget8 := window.Add("Text", "x" . x . " yp+70 w105 h23 +0x200 Hidden", translate("Motion Intensity"))
 
-		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% h23 +0x200 HWNDmotionIntensityFieldHandle vmotionIntensityField Hidden
+		window.SetFont("s8 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget9 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 +0x200 vmotionIntensityField Hidden")
 
-		Gui %window%:Add, Text, x%x% yp+24 w105 h23 +0x200 HWNDeffectSelectorLabelHandle Hidden, % translate("Effect Selector")
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Font, s8 Bold, Arial
+		widget10 := window.Add("Text", "x" . x . " yp+24 w105 h23 +0x200 Hidden", translate("Effect Selector"))
 
-		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% h23 +0x200 HWNDeffectSelectorFieldHandle veffectSelectorField Hidden
+		window.SetFont("s8 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget11 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 +0x200 veffectSelectorField Hidden")
 
-		Gui %window%:Add, Text, x%x% yp+24 w105 h23 +0x200 HWNDeffectIntensityLabelHandle Hidden, % translate("Effect Intensity")
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Font, s8 Bold, Arial
+		widget12 := window.Add("Text", "x" . x . " yp+24 w105 h23 +0x200 Hidden", translate("Effect Intensity"))
 
-		Gui %window%:Add, Edit, x%secondX% yp w%secondWidth% h23 +0x200 HWNDeffectIntensityFieldHandle veffectIntensityField Hidden
+		window.SetFont("s8 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget13 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 +0x200 veffectIntensityField Hidden")
 
-		Gui %window%:Add, Button, x%x% yp+30 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsAndIconsEditor Hidden, % translate("Edit Labels && Icons...")
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Font, s8 Bold, Arial
+		widget14 := window.Add("Button", "x" . x . " yp+30 w" . colWidth . " h23  Hidden", translate("Edit Labels && Icons..."))
+		widget14.OnEvent("Click", openLabelsAndIconsEditor)
 
-		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden Section, % translate("Actions")
-		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
+		window.SetFont("s8 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget15 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions"))
+		widget16 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDmotionFeedbackListViewHandle gupdateMotionFeedbackActionFunction Hidden, % values2String("|", collect(["Mode", "Action", "Label", "State", "Intensity", "Function"], "translate")*)
+		window.SetFont("s8 Norm", "Arial")
+
+		widget17 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "State", "Intensity", "Function"], translate))
+		widget17.OnEvent("Click", motionFeedbackActionFunctionSelect)
+		widget17.OnEvent("DoubleClick", motionFeedbackActionFunctionSelect)
+		widget17.OnEvent("ContextMenu", motionFeedbackActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-		Sleep 200
-
-		Gui %window%:Add, ActiveX, x%x% yp+275 w%width% h135 HWNDmotionFeedbackInfoTextHandle VmotionFeedbackInfoText Hidden, shell.explorer
+		widget18 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 VmotionFeedbackInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		motionFeedbackInfoText.Navigate("about:blank")
-		motionFeedbackInfoText.Document.Write(html)
+		widget18.Value.Navigate("about:blank")
+		widget18.Value.Document.write(html)
 
-		this.setActionsListView(motionFeedbackListViewHandle)
+		this.setActionsListView(widget17)
 
-		this.iMotionEffectsList := motionEffectsListHandle
-		this.iMotionIntensityDial := motionIntensityFieldHandle
-		this.iEffectSelectorField := effectSelectorFieldHandle
-		this.iEffectIntensityDial := effectIntensityFieldHandle
+		this.iMotionEffectsList := widget7
 
-		; this.iDisabledWidgets := [motionEffectsListHandle, motionIntensityFieldHandle, effectSelectorFieldHandle, effectIntensityFieldHandle]
-		this.iDisabledWidgets := [motionIntensityFieldHandle, effectSelectorFieldHandle, effectIntensityFieldHandle]
+		this.iDisabledWidgets := [widget9, widget11, widget13]
 
-		this.registerWidgets(1, motionFeedbackIconHandle, motionFeedbackLabelHandle, motionFeedbackListViewHandle, motionFeedbackInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, motionEffectsLabelHandle, motionEffectsButtonHandle, motionEffectsListHandle, labelsEditorButtonHandle, motionIntensityLabelHandle, motionIntensityFieldHandle, effectSelectorLabelHandle, effectSelectorFieldHandle, effectIntensityLabelHandle, effectIntensityFieldHandle)
+		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget9, widget10
+							  , widget11, widget12, widget13, widget14, widget15, widget16, widget17, widget18)
 	}
 
 	reset() {
 		super.reset()
 
-		motionIntensityField := false
-		effectSelectorField := false
-		effectIntensityField := false
-
 		this.iMotionEffectsList := false
-		this.iMotionIntensityDial := false
-		this.iEffectSelectorField := false
-		this.iEffectIntensityDial := false
 		this.iDisabledWidgets := []
 		this.iCachedActions := {}
 	}
@@ -272,38 +247,34 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		super.showPage(page)
 
 		for ignore, widget in this.iDisabledWidgets
-			GuiControl Disable, %widget%
+			widget.Enabled := false
 
-		motionIntensityField := wizard.getModuleValue("Motion Feedback", "Motion Intensity")
-		effectSelectorField := wizard.getModuleValue("Motion Feedback", "Effect Selector")
-		effectIntensityField := wizard.getModuleValue("Motion Feedback", "Effect Intensity")
-
-		GuiControl Text, motionIntensityField, %motionIntensityField%
-		GuiControl Text, effectSelectorField, %effectSelectorField%
-		GuiControl Text, effectIntensityField, %effectIntensityField%
+		this.Control["motionIntensityField"].Text := wizard.getModuleValue("Motion Feedback", "Motion Intensity")
+		this.Control["effectSelectorField"].Text := wizard.getModuleValue("Motion Feedback", "Effect Selector")
+		this.Control["effectIntensityField"].Text := wizard.getModuleValue("Motion Feedback", "Effect Intensity")
 
 		row := false
 		column := false
 
-		if (motionIntensityField != "")
+		if (this.Control["motionIntensityField"].Text != "")
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(motionIntensityField, row, column) {
+				if preview.findFunction(this.Control["motionIntensityField"].Text, row, column) {
 					preview.setLabel(row, column, translate("Motion Intensity"))
 
 					break
 				}
 
-		if (effectSelectorField != "")
+		if (this.Control["effectSelectorField"].Text != "")
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(effectSelectorField, row, column) {
+				if preview.findFunction(this.Control["effectSelectorField"].Text, row, column) {
 					preview.setLabel(row, column, translate("Effect Selector"))
 
 					break
 				}
 
-		if (effectIntensityField != "")
+		if (this.Control["effectIntensityField"].Text != "")
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(effectIntensityField, row, column) {
+				if preview.findFunction(this.Control["effectIntensityField"].Text, row, column) {
 					preview.setLabel(row, column, translate("Effect Intensity"))
 
 					break
@@ -312,82 +283,44 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	hidePage(page) {
 		local wizard := this.SetupWizard
-		local function, action, title, ignore
+		local function, action, msgResult, ignore, motionIntensityField, effectSelectorField, effectIntensityField
 
 		if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Warning")
-			MsgBox 262436, %title%, % translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateMsgBoxButtons)
+			msgResult := MsgBox(translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
+							  , translate("Warning"), 262436)
+			OnMessage(0x44, translateMsgBoxButtons, 0)
 
-			IfMsgBox No
+			if (msgResult = "No")
 				return false
 		}
 
 		function := this.getActionFunction(false, "Motion")
 
 		if !function {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Warning")
-			MsgBox 262436, %title%, % translate("The function for the ""Motion"" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("The function for the ""Motion"" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-			IfMsgBox No
+			if (msgResult = "No")
 				return false
 		}
 
-		/*
-		valid := true
-
-		for ignore, mode in this.getModes() {
-			for ignore, action in this.getActions(mode) {
-				function := this.getActionFunction(mode, action)
-
-				if (function && (function != "")) {
-					arguments := this.getActionArgument(mode, action)
-
-					if ((!arguments || (arguments = "")) || (string2Values("|", arguments)[2] = ""))
-						valid := false
-				}
-
-				if !valid
-					break
-			}
-
-			if !valid
-				break
-		}
-
-		if !valid {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Warning")
-			MsgBox 262436, %title%, % translate("Not all configured effects have defined initial intensities. Do you really want to proceed? (Default is 50%)")
-			OnMessage(0x44, "")
-
-			IfMsgBox No
-				return false
-		}
-		*/
-
-		GuiControlGet effectSelectorField
-		GuiControlGet effectIntensityField
+		motionIntensityField := this.Control["motionIntensityField"].Text
+		effectSelectorField := this.Control["effectSelectorField"].Text
+		effectIntensityField := this.Control["effectIntensityField"].Text
 
 		if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Warning")
-			MsgBox 262436, %title%, % translate("You must specify both ""Effect Selector"" and ""Effect Intensity"" functions, if you want to control effect intensities. Do you really want to proceed?")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateYesNonButtons)
+			msgResult := MsgBox(translate("You must specify both ""Effect Selector"" and ""Effect Intensity"" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
+			OnMessage(0x44, translateYesNonButtons, 0)
 
-			IfMsgBox No
+			if (msgResult = "No")
 				return false
 		}
 
 		if super.hidePage(page) {
 			wizard := this.SetupWizard
-
-			GuiControlGet motionIntensityField
-			GuiControlGet effectSelectorField
-			GuiControlGet effectIntensityField
 
 			if (motionIntensityField != "")
 				wizard.setModuleValue("Motion Feedback", "Motion Intensity", motionIntensityField, false)
@@ -421,14 +354,14 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	getActions(mode := false) {
 		local wizard, actions
 
-		if this.iCachedActions.HasKey(mode)
+		if this.iCachedActions.Has(mode)
 			return this.iCachedActions[mode]
 		else {
 			wizard := this.SetupWizard
 
 			actions := wizard.moduleAvailableActions("Motion Feedback", mode)
 
-			if (actions.Length() == 0) {
+			if (actions.Length == 0) {
 				if mode
 					actions := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Motion Feedback", "Motion Feedback." . mode . ".Effects", ""))
 				else
@@ -467,16 +400,13 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	loadControllerLabels() {
-		local window := this.Window
-		local function, action, row, column, ignore, preview, mode
+		local function, action, row, column, ignore, preview, mode, motionIntensityField, effectSelectorField, effectIntensityField
 
 		super.loadControllerLabels()
 
-		Gui %window%:Default
-
-		GuiControlGet motionIntensityField
-		GuiControlGet effectSelectorField
-		GuiControlGet effectIntensityField
+		motionIntensityField := this.Control["motionIntensityField"].Text
+		effectSelectorField := this.Control["effectSelectorField"].Text
+		effectIntensityField := this.Control["effectIntensityField"].Text
 
 		row := false
 		column := false
@@ -516,12 +446,9 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	loadActions(load := false) {
-		local window := this.Window
 		local wizard := this.SetupWizard
 		local function, action, count, list, pluginLabels, lastMode, count
 		local ignore, mode, first, arguments, label, isBinary, state, intensity
-
-		Gui %window%:Default
 
 		if load {
 			this.iCachedActions := {}
@@ -529,18 +456,15 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			this.clearActionFunctions()
 			this.clearActionArguments()
 
-			list := this.iMotionEffectsList
-
-			GuiControl, , %list%, % "|" . values2String("|", this.getActions("Motion")*)
+			this.iMotionEffectsList.Delete()
+			this.iMotionEffectsList.Add(this.getActions("Motion"))
 		}
 
 		this.clearActions()
 
-		Gui ListView, % this.ActionsListView
-
 		pluginLabels := getControllerActionLabels()
 
-		LV_Delete()
+		this.ActionsListView.Delete()
 
 		lastMode := -1
 		count := 1
@@ -591,7 +515,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						intensity := (mode ? "1.0" : "50")
 					}
 
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, StrReplace(label, "`n" , A_Space), translate(state ? "On" : "Off"), intensity, function)
+					this.ActionsListView.Add("", (first ? translate(mode ? mode : "Independent") : ""), action, StrReplace(label, "`n", A_Space), translate(state ? "On" : "Off"), intensity, function)
 
 					count += 1
 				}
@@ -600,12 +524,12 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		this.loadControllerLabels()
 
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr")
-		LV_ModifyCol(5, "AutoHdr")
-		LV_ModifyCol(6, "AutoHdr")
+		this.ActionsListView.ModifyCol(1, "AutoHdr")
+		this.ActionsListView.ModifyCol(2, "AutoHdr")
+		this.ActionsListView.ModifyCol(3, "AutoHdr")
+		this.ActionsListView.ModifyCol(4, "AutoHdr")
+		this.ActionsListView.ModifyCol(5, "AutoHdr")
+		this.ActionsListView.ModifyCol(6, "AutoHdr")
 	}
 
 	saveActions() {
@@ -640,30 +564,23 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	changeEffects(mode) {
-		local actions := this.getActions(mode)
-		local title := translate("Modular Simulator Controller System")
-		local prompt := translate("Please input effect names (seperated by comma):")
-		local locale := ((getLanguage() = "en") ? "" : "Locale")
-		local actions := values2String(", ", actions*)
+		local actions := values2String(", ", this.getActions(mode)*)
+		local result
 
-		InputBox actions, %title%, %prompt%, , 450, 150, , , %locale%, , %actions%
+		result := InputBox(translate("Please input effect names (seperated by comma):"), translate("Modular Simulator Controller System"), "w450 h150", actions)
 
-		if !ErrorLevel {
+		if (result.Result = "Ok") {
 			this.saveActions()
 
-			this.SetupWizard.setModuleAvailableActions("Motion Feedback", mode, string2Values(",", actions))
+			this.SetupWizard.setModuleAvailableActions("Motion Feedback", mode, string2Values(",", result.Value))
 
 			this.loadActions(true)
 		}
 	}
 
 	setMotionIntensityDial(preview, function, control, row, column) {
-		local window := this.Window
+		local motionIntensityField := this.Control["motionIntensityField"].Text
 		local cRow, cColumn, ignore
-
-		Gui %window%:Default
-
-		GuiControlGet motionIntensityField
 
 		if (motionIntensityField != "") {
 			cRow := false
@@ -679,37 +596,25 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 		}
 
-		motionIntensityField := function
+		this.Control["motionIntensityField"].Text := function
 
-		GuiControl, , motionIntensityField, %motionIntensityField%
-
-		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		this.loadControllerLabels()
 	}
 
 	clearMotionIntensityDial(preview, function, control, row, column, sound := true) {
-		local window := this.Window
-
-		Gui %window%:Default
-
-		motionIntensityField := ""
-
-		GuiControl, , motionIntensityField, %motionIntensityField%
+		this.Control["motionIntensityField"].Value := ""
 
 		if sound
-			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		this.loadControllerLabels()
 	}
 
 	setEffectSelector(preview, function, control, row, column) {
-		local window := this.Window
+		local effectSelectorField := this.Control["effectSelectorField"].Text
 		local cRow, cColumn, ignore
-
-		Gui %window%:Default
-
-		GuiControlGet effectSelectorField
 
 		if (effectSelectorField != "") {
 			cRow := false
@@ -725,37 +630,25 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 		}
 
-		effectSelectorField := function
+		this.Control["effectSelectorField"].Text := function
 
-		GuiControl, , effectSelectorField, %effectSelectorField%
-
-		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		this.loadControllerLabels()
 	}
 
 	clearEffectSelector(preview, function, control, row, column, sound := true) {
-		local window := this.Window
-
-		Gui %window%:Default
-
-		effectSelectorField := ""
-
-		GuiControl, , effectSelectorField, %effectSelectorField%
+		this.Control["effectSelectorField"].Text := ""
 
 		if sound
-			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		this.loadControllerLabels()
 	}
 
 	setEffectIntensityDial(preview, function, control, row, column) {
-		local window := this.Window
+		local effectIntensityField := this.Control["effectIntensityField"].Text
 		local cRow, cColumn, ignore
-
-		Gui %window%:Default
-
-		GuiControlGet effectIntensityField
 
 		if (effectIntensityField != "") {
 			cRow := false
@@ -771,26 +664,18 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 		}
 
-		effectIntensityField := function
+		this.Control["effectIntensityField"].Text := function
 
-		GuiControl, , effectIntensityField, %effectIntensityField%
-
-		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		this.loadControllerLabels()
 	}
 
 	clearEffectIntensityDial(preview, function, control, row, column, sound := true) {
-		local window := this.Window
-
-		Gui %window%:Default
-
-		effectIntensityField := ""
-
-		GuiControl, , effectIntensityField, %effectIntensityField%
+		this.Control["effectIntensityField"].Text := ""
 
 		if sound
-			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		this.loadControllerLabels()
 	}
@@ -809,7 +694,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		this.setActionArgument(row, values2String("|", arguments*))
 
-		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		this.loadActions()
 	}
@@ -817,11 +702,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	inputIntensity(row) {
 		local action := this.getAction(row)
 		local mode := this.getActionMode(row)
-		local title := translate("Modular Simulator Controller System")
-		local prompt := translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity:")
-		local locale := ((getLanguage() = "en") ? "" : "Locale")
 		local arguments := this.getActionArgument(row)
-		local value, message, valid, title
+		local value, message, valid, result
 
 		if (arguments && (arguments != "")) {
 			arguments := string2Values("|", arguments)
@@ -834,16 +716,20 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			value := (mode ? "1.0" : "50")
 		}
 
-		InputBox value, %title%, %prompt%, , 300, 150, , , %locale%, , %value%
+		result := InputBox(translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity:"), translate("Modular Simulator Controller System"), "w300 h150", value)
 
-		if !ErrorLevel {
-			message := (mode ? "You must enter a valid number between 0.0 and 2.0..." : "You must enter a valid integer between 0 and 100...")
+		, value := IB.Value, ErrorLevel := IB.Result="OK" ? 0 : IB.Result="CANCEL" ? 1 : IB.Result="Timeout" ? 2 : "ERROR"
+
+		if (result.Result = "Ok") {
+			value := result.Value
+
+
 
 			valid := false
 
-			if value is Number
+			if isNumber(value)
 				if (!mode && (value >= 0) && (value <= 100)) {
-					if value is Integer
+					if isInteger(value)
 						valid := true
 				}
 				else if (mode && (value >= 0.0) && (value <= 2.0)) {
@@ -853,10 +739,11 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				}
 
 			if !valid {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				title := translate("Error")
-				MsgBox 262160, %title%, % translate(message)
-				OnMessage(0x44, "")
+				message := (mode ? "You must enter a valid number between 0.0 and 2.0..." : "You must enter a valid integer between 0 and 100...")
+
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate(message), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
 
 				return
 			}
@@ -865,7 +752,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 			this.setActionArgument(row, values2String("|", arguments*))
 
-			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 			this.loadActions()
 		}
@@ -873,19 +760,10 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	createActionsMenu(title, row) {
 		local contextMenu := super.createActionsMenu(title, row)
-		local menuItem, handler
 
-		Menu %contextMenu%, Add
+		contextMenu.Add(translate("Toggle Initial State"), (*) => this.toggleState(row))
 
-		menuItem := translate("Toggle Initial State")
-		handler := ObjBindMethod(this, "toggleState", row)
-
-		Menu %contextMenu%, Add, %menuItem%, %handler%
-
-		menuItem := translate("Set Initial Intensity...")
-		handler := ObjBindMethod(this, "inputIntensity", row)
-
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		contextMenu.Add(translate("Set Initial Intensity..."), (*) => this.inputIntensity(row))
 
 		return contextMenu
 	}
@@ -893,62 +771,52 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 	createControlMenu(title, preview, element, function, row, column) {
 		local contextMenu := super.createControlMenu(title, preview, element, function, row, column)
 		local functionType := ConfigurationItem.splitDescriptor(function)[1]
-		local menuItem, handler
+		local menuItem, motionIntensityField, effectSelectorField, effectIntensityField
 
-		GuiControlGet motionIntensityField
-		GuiControlGet effectSelectorField
-		GuiControlGet effectIntensityField
+		motionIntensityField := this.Control["motionIntensityField"].Text
+		effectSelectorField := this.Control["effectSelectorField"].Text
+		effectIntensityField := this.Control["effectIntensityField"].Text
 
-		Menu %contextMenu%, Add
+		contextMenu.Add()
 
 		menuItem := translate("Set Motion Intensity Dial")
-		handler := ObjBindMethod(this, "setMotionIntensityDial", preview, function, element[2], row, column)
 
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		contextMenu.Add(menuItem, (*) => this.setMotionIntensityDial(preview, function, element[2], row, column))
 
 		if ((functionType != k2WayToggleType) && (functionType != kDialType))
-			Menu %contextMenu%, Disable, %menuItem%
+			contextMenu.Disable(menuItem)
 
 		menuItem := translate("Clear Motion Intensity Dial")
-		handler := ObjBindMethod(this, "clearMotionIntensityDial", preview, function, element[2], row, column)
 
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		contextMenu.Add(menuItem, (*) => this.clearMotionIntensityDial(preview, function, element[2], row, column))
 
 		if ((motionIntensityField = "") || (motionIntensityField != function))
-			Menu %contextMenu%, Disable, %menuItem%
+			contextMenu.Disable(menuItem)
 
-		Menu %contextMenu%, Add
+		contextMenu.Add()
 
-		menuItem := translate("Set Effect Selector")
-		handler := ObjBindMethod(this, "setEffectSelector", preview, function, element[2], row, column)
-
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		contextMenu.Add(translate("Set Effect Selector"), (*) => this.setEffectSelector(preview, function, element[2], row, column))
 
 		menuItem := translate("Clear Effect Selector")
-		handler := ObjBindMethod(this, "clearEffectSelector", preview, function, element[2], row, column)
 
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		contextMenu.Add(menuItem, (*) => this.clearEffectSelector(preview, function, element[2], row, column))
 
 		if ((effectSelectorField = "") || (effectSelectorField != function))
-			Menu %contextMenu%, Disable, %menuItem%
+			contextMenu.Disable(menuItem)
 
-		Menu %contextMenu%, Add
+		contextMenu.Add()
 
-		menuItem := translate("Set Effect Intensity Dial")
-		handler := ObjBindMethod(this, "setEffectIntensityDial", preview, function, element[2], row, column)
-
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		contextMenu.Add(translate("Set Effect Intensity Dial"), (*) => this.setEffectIntensityDial(preview, function, element[2], row, column))
 
 		if ((functionType != k2WayToggleType) && (functionType != kDialType))
-			Menu %contextMenu%, Disable, %menuItem%
+			contextMenu.Disable(menuItem)
 
 		menuItem := translate("Clear Effect Intensity Dial")
-		handler := ObjBindMethod(this, "clearEffectIntensityDial", preview, function, element[2], row, column)
 
-		Menu %contextMenu%, Add, %menuItem%, %handler%
+		contextMenu.Add(menuItem, (*) => this.clearEffectIntensityDial(preview, function, element[2], row, column))
 
 		if ((effectIntensityField = "") || (effectIntensityField != function))
-			Menu %contextMenu%, Disable, %menuItem%
+			contextMenu.Disable(menuItem)
 
 		return contextMenu
 	}
@@ -958,14 +826,6 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-changeMotionEffects() {
-	SetupWizard.Instance.StepWizards["Motion Feedback"].changeEffects("Motion")
-}
-
-updateMotionFeedbackActionFunction() {
-	updateActionFunction(SetupWizard.Instance.StepWizards["Motion Feedback"])
-}
 
 initializeMotionFeedbackStepWizard() {
 	SetupWizard.Instance.registerStepWizard(MotionFeedbackStepWizard(SetupWizard.Instance, "Motion Feedback", kSimulatorConfiguration))

@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ControllerStepWizard.ahk
+#Include "ControllerStepWizard.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -22,7 +22,7 @@
 
 class PedalCalibrationStepWizard extends ActionsStepWizard {
 	iCachedActions := false
-	iPedalsCheck := {}
+	iPedalsCheck := CaseInsenseMap()
 
 	Pages {
 		Get {
@@ -50,7 +50,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				calibrations.Push("""" . action . """ " . (isObject(function) ? function[1] : function))
 		}
 
-		if (calibrations.Length() > 0) {
+		if (calibrations.Length > 0) {
 			if (arguments != "")
 				arguments .= "; "
 
@@ -62,45 +62,40 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
-		local pedalCalibrationIconHandle := false
-		local pedalCalibrationLabelHandle := false
-		local pedalCalibrationListViewHandle := false
-		local pedalCalibrationInfoTextHandle := false
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
-		local colummLabel1Handle := false
-		local colummLine1Handle := false
-		local colummLabel2Handle := false
-		local colummLine2Handle := false
 		local secondX := x + 80
 		local secondWidth := 40
 		local col1Width := (secondX - x) + secondWidth
 		local listX := x + 150
 		local listWidth := width - 150
-		local throttleLabelHandle := false
-		local throttleCheckHandle := false
-		local brakeLabelHandle := false
-		local brakeCheckHandle := false
-		local clutchLabelHandle := false
-		local clutchCheckHandle := false
-		local allPedals, pedals, index, pedal, yOption, checked, info, html
+		local pedalWidgets := []
+		local allPedals, pedals, index, pedal, yOption, checked, info, html, widget
 
-		static pedalCalibrationInfoText
+		updatePedals(*) {
+			this.updatePedals()
+		}
 
-		Gui %window%:Default
+		pedalCalibrationActionFunctionSelect(listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		pedalCalibrationActionFunctionMenu(window, listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDpedalCalibrationIconHandle Hidden, %kResourcesDirectory%Setup\Images\Brake.png
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDpedalCalibrationLabelHandle Hidden, % translate("Pedal Calibration Configuration")
+		window.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Font, s8 Bold, Arial
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Brake.png")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Pedal Calibration Configuration"))
 
-		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Pedals")
-		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine1Handle Hidden
+		window.SetFont("s8 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget3 := window.Add("Text", "x" . x . " yp+30 w" . col1Width . " h23 +0x200 Hidden Section", translate("Pedals"))
+		widget4 := window.Add("Text", "yp+20 x" . x . " w" . col1Width . " 0x10 Hidden")
+
+		window.SetFont("s8 Norm", "Arial")
 
 		allPedals := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals"))
 		pedals := wizard.getModuleValue("Pedal Calibration", "Pedals", kUndefined)
@@ -118,56 +113,60 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 			checked := (inList(pedals, pedal) ? "Checked" : "")
 
-			Gui %window%:Add, Text, x%x% %yOption% w105 h23 +0x200 HWND%pedal%LabelHandle Hidden, % translate(pedal)
-			Gui %window%:Add, CheckBox, x%secondX% yp w24 h23 +0x200 HWND%pedal%CheckHandle %checked% gupdatePedals Hidden
+			widget := window.Add("Text", "x" . x . " " . yOption . " w105 h23 +0x200 Hidden", translate(pedal))
 
-			this.iPedalsCheck[pedal] := %pedal%CheckHandle
+			pedalWidgets.Push(widget)
+
+			widget := window.Add("CheckBox", "x" . secondX . " yp w24 h23 +0x200 " . checked . " Hidden")
+			widget.OnEvent("Click", updatePedals)
+
+			pedalWidgets.Push(widget)
+
+			this.iPedalsCheck[pedal] := widget
 		}
 
-		Gui %window%:Font, Bold, Arial
+		window.SetFont("Bold", "Arial")
 
-		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden, % translate("Actions")
-		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
+		widget5 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden", translate("Actions"))
+		widget6 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
 
-		Gui %window%:Font, s8 Norm, Arial
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h260 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDpedalCalibrationListViewHandle gupdatePedalCalibrationActionFunction Hidden, % values2String("|", collect(["Mode", "Pedal", "Action", "Label", "Function"], "translate")*)
+		widget7 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h260 AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Mode", "Pedal", "Action", "Label", "Function"], translate))
+		widget7.OnEvent("Click", pedalCalibrationActionFunctionSelect)
+		widget7.OnEvent("DoubleClick", pedalCalibrationActionFunctionSelect)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-		Sleep 200
-
-		Gui %window%:Add, ActiveX, x%x% yp+265 w%width% h80 HWNDpedalCalibrationInfoTextHandle VpedalCalibrationInfoText Hidden, shell.explorer
+		widget8 := window.Add("ActiveX", "x" . x . " yp+265 w" . width . " h80 VpedalCalibrationInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		pedalCalibrationInfoText.Navigate("about:blank")
-		pedalCalibrationInfoText.Document.Write(html)
+		widget8.Value.Navigate("about:blank")
+		widget8.Value.Document.Write(html)
 
-		this.setActionsListView(pedalCalibrationListViewHandle)
+		this.setActionsListView(widget7)
 
-		this.registerWidgets(1, pedalCalibrationIconHandle, pedalCalibrationLabelHandle, pedalCalibrationListViewHandle, pedalCalibrationInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, throttleLabelHandle, throttleCheckHandle, brakeLabelHandle, brakeCheckHandle, clutchLabelHandle, clutchCheckHandle)
+		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, pedalWidgets*)
 	}
 
 	reset() {
 		super.reset()
 
 		this.iCachedActions := false
-		this.iPedalsCheck := {}
+		this.iPedalsCheck := CaseInsenseMap()
 	}
 
 	hidePage(page) {
-		local wizard := this.SetupWizard
-		local title
+		local msgResult
 
-		if !wizard.isSoftwareInstalled("SmartControl") {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Warning")
-			MsgBox 262436, %title%, % translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?")
-			OnMessage(0x44, "")
+		if !this.SetupWizard.isSoftwareInstalled("SmartControl") {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Heusinkveld SmartControl cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-			IfMsgBox No
+			if (msgResult = "No")
 				return false
 		}
 
@@ -192,7 +191,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 			actions := wizard.moduleAvailableActions("Pedal Calibration", "Pedal Calibration")
 
-			if (actions.Length() == 0) {
+			if (actions.Length == 0) {
 				actions := []
 
 				pedals := wizard.getModuleValue("Pedal Calibration", "Pedals", kUndefined)
@@ -214,7 +213,6 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 	}
 
 	loadActions(load := false) {
-		local window := this.Window
 		local wizard := this.SetupWizard
 		local function, action, count, lastPedal, ignore, subAction, label, pedal
 
@@ -226,11 +224,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		this.clearActions()
 
-		Gui %window%:Default
-
-		Gui ListView, % this.ActionsListView
-
-		LV_Delete()
+		this.ActionsListView.Delete()
 
 		count := 1
 		lastPedal := false
@@ -269,7 +263,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				else
 					pedal := ""
 
-				LV_Add("", ((count = 1) ? translate("Pedal Calibration") : ""), pedal, action, StrReplace(label, "`n" , A_Space), function)
+				this.ActionsListView.Add("", ((count = 1) ? translate("Pedal Calibration") : ""), pedal, action, StrReplace(label, "`n", A_Space), function)
 
 				count += 1
 			}
@@ -277,15 +271,15 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		this.loadControllerLabels()
 
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr")
+		this.ActionsListView.ModifyCol(1, "AutoHdr")
+		this.ActionsListView.ModifyCol(2, "AutoHdr")
+		this.ActionsListView.ModifyCol(3, "AutoHdr")
+		this.ActionsListView.ModifyCol(4, "AutoHdr")
 	}
 
 	saveActions() {
 		local wizard := this.SetupWizard
-		local modeFunctions := {}
+		local modeFunctions := CaseInsenseMap()
 		local function, ignore, action
 
 		for ignore, action in this.getActions() {
@@ -303,16 +297,14 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 	updatePedals() {
 		local wizard := this.SetupWizard
 		local pedals := []
-		local ignore, pedal, checked
+		local ignore, pedal
 
 		this.saveActions()
 
 		wizard.setModuleAvailableActions("Pedal Calibration", "Pedal Calibration", [])
 
 		for ignore, pedal in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Pedals")) {
-			GuiControlGet checked, , % this.iPedalsCheck[pedal]
-
-			if checked
+			if this.iPedalsCheck[pedal].Value
 				pedals.Push(pedal)
 		}
 
@@ -326,14 +318,6 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updatePedals() {
-	SetupWizard.Instance.StepWizards["Pedal Calibration"].updatePedals()
-}
-
-updatePedalCalibrationActionFunction() {
-	updateActionFunction(SetupWizard.Instance.StepWizards["Pedal Calibration"])
-}
 
 initializePedalCalibrationStepWizard() {
 	SetupWizard.Instance.registerStepWizard(PedalCalibrationStepWizard(SetupWizard.Instance, "Pedal Calibration", kSimulatorConfiguration))

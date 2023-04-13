@@ -1184,7 +1184,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
 								   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
 
-		bubbleSort(&cars, (c1, c2) => c1[2] > c2[2])
+		bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
 
 		if isDebug() {
 			loop count {

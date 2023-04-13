@@ -772,6 +772,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+28 w375 h9", translate("Simulation"))
+		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
@@ -780,6 +781,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+28 w375 h9", translate("Race Assistants"))
+		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
@@ -788,6 +790,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+138 w375 h9", translate("Team Session"))
+		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
@@ -796,6 +799,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+138 w375 h9", translate("Data Synchronization"))
+		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
@@ -804,6 +808,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+248 w375 h9", translate("Track Automation"))
+		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
@@ -812,6 +817,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+248 w375 h9", translate("Track Mapping"))
+		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")

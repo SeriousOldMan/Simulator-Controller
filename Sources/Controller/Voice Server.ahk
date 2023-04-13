@@ -1238,5 +1238,4 @@ handleVoiceMessage(category, data) {
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-setLogLevel(kLogDebug)
 startupVoiceServer()

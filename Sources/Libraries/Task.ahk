@@ -373,7 +373,8 @@ class Task {
 							}
 							else
 								Task.addTask(next)
-					} until !worked
+					}
+					until !worked
 				}
 				finally {
 					scheduling := oldScheduling

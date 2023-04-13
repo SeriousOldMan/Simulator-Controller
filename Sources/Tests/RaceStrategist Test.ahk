@@ -368,7 +368,8 @@ else {
 
 				MsgBox("Pitstop...")
 			}
-		} until done
+		}
+		until done
 
 		strategist.finishSession()
 
@@ -403,7 +404,8 @@ else {
 				if (A_Index = 1)
 					break
 			}
-		} until done
+		}
+		until done
 
 		strategist.finishSession()
 
@@ -438,7 +440,8 @@ else {
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 
 		strategist.finishSession()
 

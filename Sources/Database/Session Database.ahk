@@ -1291,7 +1291,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm cBlack", "Arial")
 
-		editorGui.Add("GroupBox", "x280 ys-8 w390 h476 W:Grow H:Grow -Theme")
+		editorGui.Add("Picture", "x280 ys-2 w390 h470 Border W:Grow H:Grow")
 
 		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 
@@ -3569,9 +3569,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if ((module != "Automation") && this.TrackMap)
 					this.unloadTrackMap()
 
-				if (module != "Pressures")
-					window.BackColor := "D0D0D0"
-
 				switch module, false {
 					case "Settings":
 						this.selectSettings()
@@ -3594,8 +3591,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	updateModules() {
 		local window := this.Window
-
-		window.BackColor := "D0D0D0"
 
 		window["notesEdit"].Value := this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 

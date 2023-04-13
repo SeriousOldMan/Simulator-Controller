@@ -577,7 +577,8 @@ startupSimulatorConfiguration() {
 
 				saveConfiguration(kSimulatorConfigurationFile, editor)
 			}
-		} until done
+		}
+		until done
 	}
 	finally {
 		editor.hide()

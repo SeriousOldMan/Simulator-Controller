@@ -493,7 +493,7 @@ class Window extends Gui {
 				case "Edit":
 					options .= " BackgroundWhite"
 				case "Button":
-					options .= " BackgroundD0D0D0"
+					options .= " BackgroundCCCCCC"
 			}
 		}
 

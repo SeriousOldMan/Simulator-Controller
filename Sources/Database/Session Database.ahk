@@ -3569,9 +3569,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				if ((module != "Automation") && this.TrackMap)
 					this.unloadTrackMap()
 
-				if (module != "Pressures")
-					window.BackColor := "D0D0D0"
-
 				switch module, false {
 					case "Settings":
 						this.selectSettings()
@@ -3594,8 +3591,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	updateModules() {
 		local window := this.Window
-
-		window.BackColor := "D0D0D0"
 
 		window["notesEdit"].Value := this.SessionDatabase.readNotes(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack)
 

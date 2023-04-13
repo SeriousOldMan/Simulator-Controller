@@ -881,7 +881,7 @@ class SetupWorkbench extends ConfigurationItem {
 					cars.Push(car)
 			}
 
-			loop Files, kUserHomeDirectory . "Garage\Definitions\Cars\*.ini", "F" {
+			loop Files, kUserHomeDirectory . "Garage\Definitions\Cars\" . simulator . ".*.ini", "F" {
 				SplitPath(A_LoopFileName, , , , &descriptor)
 
 				car := StrReplace(StrReplace(descriptor, simulator . ".", ""), ".ini", "")

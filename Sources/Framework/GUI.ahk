@@ -481,6 +481,31 @@ class Window extends Gui {
 			this.Show("NA")
 	}
 
+	ApplyThemeOptions(type, options) {
+		options := StrReplace(options, "-Theme", "")
+
+		if !InStr(options, "Background") {
+			switch type, false {
+				case "ListView", "ListBox":
+					options .= " BackgroundD8D8D8"
+				case "Edit":
+					options .= " BackgroundE0E0E0"
+				case "Edit":
+					options .= " BackgroundWhite"
+				case "Button":
+					options .= " BackgroundD0D0D0"
+			}
+		}
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		return options
+	}
+
+	ApplyThemeProperties(control) {
+	}
+
 	Add(type, options := "", arguments*) {
 		local rules := false
 		local newOptions, ignore, option, control
@@ -488,6 +513,8 @@ class Window extends Gui {
 		if type is Window.Resizer
 			return this.AddResizer(type)
 		else {
+			options := this.ApplyThemeOptions(type, options)
+
 			if RegExMatch(options, "i)[xywhv].*:") {
 				newOptions := []
 				rules := []
@@ -509,6 +536,8 @@ class Window extends Gui {
 
 				this.DefineResizeRule(control, values2String(" ", concatenate(this.Rules[false], rules)*))
 			}
+
+			this.ApplyThemeProperties(control)
 
 			return control
 		}

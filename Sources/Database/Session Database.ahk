@@ -1291,7 +1291,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.SetFont("s8 Norm cBlack", "Arial")
 
-		editorGui.Add("GroupBox", "x280 ys-8 w390 h476 W:Grow H:Grow -Theme")
+		editorGui.Add("Picture", "x280 ys-2 w390 h470 Border W:Grow H:Grow")
 
 		tabs := collect(["Settings", "Stratgies", "Setups", "Pressures", "Automation", "Data"], translate)
 

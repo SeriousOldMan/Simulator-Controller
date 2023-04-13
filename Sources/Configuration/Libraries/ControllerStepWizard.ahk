@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include Libraries\ControllerEditor.ahk
+#Include "..\..\Libraries\Task.ahk"
+#Include "ControllerEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -32,7 +32,7 @@ class ControllerStepWizard extends StepWizard {
 		configurationChanged(type, name) {
 			local bbConfiguration := newMultiMap()
 			local sdConfiguration := newMultiMap()
-			local oldGui, controllerWizard
+			local controllerWizard
 
 			super.configurationChanged(type, name)
 
@@ -41,19 +41,12 @@ class ControllerStepWizard extends StepWizard {
 			writeMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini", bbConfiguration)
 			writeMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", sdConfiguration)
 
-			oldGui := A_DefaultGui
+			controllerWizard := this.SetupWizard.StepWizards["Controller"]
 
-			try {
-				controllerWizard := SetupWizard.Instance.StepWizards["Controller"]
+			if controllerWizard.iFunctionTriggers {
+				this.SetupWizard.StepWizards["Controller"].saveFunctions(bbConfiguration, sdConfiguration)
 
-				if controllerWizard.iFunctionTriggers {
-					SetupWizard.Instance.StepWizards["Controller"].saveFunctions(bbConfiguration, sdConfiguration)
-
-					SetupWizard.Instance.StepWizards["Controller"].loadFunctions(bbConfiguration, sdConfiguration)
-				}
-			}
-			finally {
-				Gui %oldGui%:Default
+				this.SetupWizard.StepWizards["Controller"].loadFunctions(bbConfiguration, sdConfiguration)
 			}
 		}
 	}
@@ -92,7 +85,7 @@ class ControllerStepWizard extends StepWizard {
 				}
 			}
 
-			controls := {}
+			controls := CaseInsenseMap()
 			buttonBoxControllers := []
 
 			for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
@@ -108,15 +101,15 @@ class ControllerStepWizard extends StepWizard {
 						buttonBoxControllers.Push(controller)
 
 					for ignore, control in string2Values(";", definition) {
-						control := string2Values(",", control)[1]
+						Control:= string2Values(",", control)[1]()
 
 						if (control != "") {
-							control := ConfigurationItem.splitDescriptor(control)
+							Control:= ConfigurationItem.splitDescriptor(control)()
 							theFunction := ConfigurationItem.descriptor(controls[control[1]], control[2])
 
 							functionTriggers := wizard.getControllerFunctionTriggers(theFunction)
 
-							if (functionTriggers.Length() > 0)
+							if (functionTriggers.Length > 0)
 								theFunction := Function.createFunction(theFunction, false, functionTriggers[1], "", functionTriggers[2], "")
 							else
 								theFunction := Function.createFunction(theFunction, false, "", "", "", "")
@@ -127,20 +120,16 @@ class ControllerStepWizard extends StepWizard {
 				}
 			}
 
-			if (buttonBoxControllers.Length() > 0) {
-				loop % buttonBoxControllers.Length()
-				{
+			if (buttonBoxControllers.Length > 0) {
+				loop buttonBoxControllers.Length
 					buttonBoxControllers[A_Index] := (buttonBoxControllers[A_Index] . ":" . buttonBoxControllers[A_Index])
-				}
 
 				setMultiMapValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", buttonBoxControllers*))
 			}
 
-			if (streamDeckControllers.Length() > 0) {
-				loop % streamDeckControllers.Length()
-				{
+			if (streamDeckControllers.Length > 0) {
+				loop streamDeckControllers.Length
 					streamDeckControllers[A_Index] := (streamDeckControllers[A_Index] . ":" . streamDeckControllers[A_Index])
-				}
 
 				setMultiMapValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", streamDeckControllers*))
 			}
@@ -149,43 +138,97 @@ class ControllerStepWizard extends StepWizard {
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
-		local functionsIconHandle := false
-		local functionsIconLabelHandle := false
-		local functionsListViewHandle := false
-		local functionsInfoTextHandle := false
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
 		local info, html
 
-		static functionsInfoText
+		functionTriggersSelect(listView, line, *) {
+			local function, row, curCoordMode, control, number, trigger, menuItem
+			local multiple, menuItem, handler
 
-		Gui %window%:Default
+			loop this.iFunctionsListView.GetCount()
+				this.iFunctionsListView.Modify(A_Index, "-Select")
 
-		Gui %window%:Font, s10 Bold, Arial
+			if (line > 0)
+				this.updateFunctionTriggers(line)
+		}
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDfunctionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Controller.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDfunctionsLabelHandle Hidden, % translate("Controller Configuration")
+		functionTriggersMenu(window, listView, line, *) {
+			local window := this.Window
+			local function, row, curCoordMode, control, number, trigger, menuItem
+			local multiple, menuItem, handler, contextMenu
 
-		Gui %window%:Font, s8 Norm, Arial
+			loop this.iFunctionsListView.GetCount()
+				this.iFunctionsListView.Modify(A_Index, "-Select")
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDfunctionsListViewHandle gupdateFunctionTriggers Hidden, % values2String("|", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], "translate")*)
+			if (line > 0) {
+				row := line
+
+				curCoordMode := A_CoordModeMouse
+
+				control := this.iFunctionsListView.GetText(row, 2)
+				function := this.iFunctionsListView.GetText(row, 3)
+				number := this.iFunctionsListView.GetText(row, 4)
+				trigger := this.iFunctionsListView.GetText(row, 5)
+
+				menuItem := ConfigurationItem.descriptor(control, number)
+
+				contextMenu := Menu()
+
+				contextMenu.Add(menuItem, controlMenuIgnore)
+				contextMenu.Disable(menuItem)
+
+				if (trigger != translate("n/a")) {
+					contextMenu.Add()
+
+					multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+
+					contextMenu.Add(translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
+								  , ObjBindMethod(this, "updateFunctionTriggers", row))
+
+					multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
+
+					contextMenu.Add(translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
+								  , ObjBindMethod(this, "updateFunctionHotkeys", row))
+
+					contextMenu.Add()
+
+					contextMenu.Add(translate("Clear Trigger && Hotkey"), ObjBindMethod(this, "clearFunctionTriggerAndHotkey", row))
+				}
+
+				contextMenu.Show()
+			}
+
+			loop this.iFunctionsListView.GetCount()
+				this.iFunctionsListView.Modify(A_Index, "-Select")
+		}
+
+		window.SetFont("s10 Bold", "Arial")
+
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Controller.ico")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Controller Configuration"))
+
+		window.SetFont("s8 Norm", "Arial")
+
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], translate]))
+		widget3.OnEvent("Click", functionTriggersSelect)
+		widget3.OnEvent("DoubleClick", functionTriggersSelect)
+		widget3.OnEvent("ContextMenu", functionTriggersMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-		Sleep 200
-
-		Gui %window%:Add, ActiveX, x%x% yp+245 w%width% h195 HWNDfunctionsInfoTextHandle VfunctionsInfoText Hidden, shell.explorer
+		widget4 := window.Add("ActiveX", "x" . x . " yp+245 w" . width . " h195 VfunctionsInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		functionsInfoText.Navigate("about:blank")
-		functionsInfoText.Document.Write(html)
+		widget4.Value.Navigate("about:blank")
+		widget4.Value.Document.write(html)
 
-		this.iFunctionsListView := functionsListViewHandle
+		this.iFunctionsListView := widget3
 
-		this.registerWidgets(1, functionsIconHandle, functionsLabelHandle, functionsListViewHandle, functionsInfoTextHandle)
+		this.registerWidgets(1, widget1, widget2, widget3, widget4)
 	}
 
 	reset() {
@@ -217,8 +260,8 @@ class ControllerStepWizard extends StepWizard {
 		super.showPage(page)
 
 		this.iControllerEditor := this.StepControllerEditor("Default", this.SetupWizard.Configuration
-															  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
-															  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)
+														  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
+														  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)
 
 		this.iControllerEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450), "Center")
 
@@ -229,21 +272,15 @@ class ControllerStepWizard extends StepWizard {
 	hidePage(page) {
 		local buttonBoxConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 		local streamDeckConfiguration := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
-		local function, title, window, streamDeckFunctions, controller, definition, ignore
+		local function, streamDeckFunctions, controller, definition, ignore, msgResult
 
 		if (this.conflictingFunctions(buttonBoxConfiguration) || this.conflictingTriggers(buttonBoxConfiguration)) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("There are still duplicate functions or duplicate triggers - please correct...")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("There are still duplicate functions or duplicate triggers - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
-
-		window := this.Window
-
-		Gui %window%:Default
-		Gui ListView, % this.iFunctionsListView
 
 		streamDeckFunctions := 0
 
@@ -256,13 +293,12 @@ class ControllerStepWizard extends StepWizard {
 						streamDeckFunctions += 1
 		}
 
-		if ((LV_GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count()) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Warning")
-			MsgBox 262436, %title%, % translate("Not all functions have been assigned to physical controls. Do you really want to proceed?")
-			OnMessage(0x44, "")
+		if ((this.iFunctionsListView.GetCount() - streamDeckFunctions) != this.iFunctionTriggers.Count) {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Not all functions have been assigned to physical controls. Do you really want to proceed?"), translate("Warning"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-			IfMsgBox No
+			if (msgResult = "No")
 				return false
 		}
 
@@ -285,8 +321,8 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration) {
-		local controls := {}
-		local functions := {}
+		local controls := CaseInsenseMap()
+		local functions := CaseInsenseMap()
 		local function, control, descriptor, controller, definition, ignore
 
 		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
@@ -302,7 +338,7 @@ class ControllerStepWizard extends StepWizard {
 					function := ConfigurationItem.descriptor(controls[function[1]], function[2])
 
 					if (function != "")
-						if this.iFunctionTriggers.HasKey(function)
+						if this.iFunctionTriggers.Has(function)
 							functions.Push(Array(function, this.iFunctionTriggers[function]*))
 						else
 							functions.Push(function)
@@ -322,8 +358,8 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	conflictingFunctions(buttonBoxConfiguration) {
-		local controls := {}
-		local functions := {}
+		local controls := CaseInsenseMap()
+		local functions := CaseInsenseMap()
 		local conflict := false
 		local function, control, descriptor, controller, definition, ignore
 
@@ -343,7 +379,7 @@ class ControllerStepWizard extends StepWizard {
 						function := ConfigurationItem.splitDescriptor(function)
 						function := ConfigurationItem.descriptor(controls[function[1]], function[2])
 
-						if !functions.HasKey(function)
+						if !functions.Has(function)
 							functions[function] := [controller]
 						else {
 							functions[function].Push(controller)
@@ -359,13 +395,13 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	conflictingTriggers(buttonBoxConfiguration) {
-		local triggers := {}
+		local triggers := CaseInsenseMap()
 		local conflict := false
 		local function, functionTriggers, ignore, trigger
 
 		for function, functionTriggers in this.iFunctionTriggers
 			for ignore, trigger in functionTriggers
-				if !triggers.HasKey(trigger)
+				if !triggers.Has(trigger)
 					triggers[trigger] := [function]
 				else {
 					triggers[trigger].Push(function)
@@ -378,8 +414,7 @@ class ControllerStepWizard extends StepWizard {
 
 	loadFunctions(buttonBoxConfiguration, streamDeckConfiguration, load := false) {
 		local wizard := this.SetupWizard
-		local window := this.Window
-		local controls := {}
+		local controls := CaseInsenseMap()
 		local lastController := false
 		local function, ignore, control, descriptor, first, conflict, trigger, triggers
 		local functionConflicts, triggerConflicts, controller, definition, functionTriggers
@@ -387,14 +422,10 @@ class ControllerStepWizard extends StepWizard {
 		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
 			controls[control] := string2Values(";", descriptor)[1]
 
-		Gui %window%:Default
-
-		Gui ListView, % this.iFunctionsListView
-
 		if (load || !this.iFunctionTriggers)
-			this.iFunctionTriggers := {}
+			this.iFunctionTriggers := CaseInsenseMap()
 
-		LV_Delete()
+		this.iFunctionsListView.Delete()
 
 		functionConflicts := this.conflictingFunctions(buttonBoxConfiguration)
 		triggerConflicts := this.conflictingTriggers(buttonBoxConfiguration)
@@ -406,16 +437,16 @@ class ControllerStepWizard extends StepWizard {
 				controller := controller[1]
 
 				for ignore, control in string2Values(";", definition) {
-					control := string2Values(",", control)[1]
+					Control:= string2Values(",", control)[1]()
 
 					if (control != "") {
-						control := ConfigurationItem.splitDescriptor(control)
+						Control:= ConfigurationItem.splitDescriptor(control)()
 						function := ConfigurationItem.descriptor(controls[control[1]], control[2])
 
 						first := (controller != lastController)
 						lastController := controller
 
-						if this.iFunctionTriggers.HasKey(function)
+						if this.iFunctionTriggers.Has(function)
 							functionTriggers := this.iFunctionTriggers[function]
 						else
 							functionTriggers := wizard.getControllerFunctionTriggers(function)
@@ -442,7 +473,7 @@ class ControllerStepWizard extends StepWizard {
 						else
 							conflict := ""
 
-						if (functionTriggers.Length() > 0) {
+						if (functionTriggers.Length > 0) {
 							triggers := values2String(" `; ", functionTriggers*)
 
 							if load
@@ -451,7 +482,7 @@ class ControllerStepWizard extends StepWizard {
 						else
 							triggers := ""
 
-						LV_Add("", (first ? controller : ""), control[1], translate(controls[control[1]]), control[2], triggers, conflict)
+						this.iFunctionsListView.Add("", (first ? controller : ""), control[1], translate(controls[control[1]]), control[2], triggers, conflict)
 					}
 				}
 			}
@@ -468,36 +499,30 @@ class ControllerStepWizard extends StepWizard {
 						first := (controller != lastController)
 						lastController := controller
 
-						LV_Add("", (first ? controller : ""), translate("Key"), translate("Button"), ConfigurationItem.splitDescriptor(function)[2], translate("n/a"), "")
+						this.iFunctionsListView.Add("", (first ? controller : ""), translate("Key"), translate("Button"), ConfigurationItem.splitDescriptor(function)[2], translate("n/a"), "")
 					}
 			}
 		}
 
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr Integer")
-		LV_ModifyCol(4, "Center")
-		LV_ModifyCol(5, "AutoHdr")
-		LV_ModifyCol(6, "AutoHdr")
+		loop 6
+			this.iFunctionsListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.iFunctionsListView.ModifyCol(4, "Integer")
+		this.iFunctionsListView.ModifyCol(4, "Center")
 	}
 
 	updateFunctionTriggers(row) {
 		local wizard := this.SetupWizard
-		local window := this.Window
 		local function, trigger, type, number, callback
 
 		if triggerDetector("Active")
 			wizard.toggleTriggerDetector()
 
-		Gui %window%:Default
-		Gui ListView, % this.iFunctionsListView
-
-		LV_GetText(trigger, row, 5)
+		trigger := this.iFunctionsListView.GetText(row, 5)
 
 		if (trigger != translate("n/a")) {
-			LV_GetText(type, row, 3)
-			LV_GetText(number, row, 4)
+			type := this.iFunctionsListView.GetText(row, 4)
+			number := this.iFunctionsListView.GetText(row, 3)
 
 			switch type {
 				case translate(k2WayToggleType):
@@ -515,19 +540,14 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	updateFunctionHotkeys(row) {
-		local window := this.Window
-		local function, trigger, type, number, double, title, prompt, locale
+		local function, trigger, type, number, double, result
 		local key1, key2, buttonBoxConfiguration, streamDeckConfiguration
 
-		Gui %window%:Default
-
-		Gui ListView, % this.iFunctionsListView
-
-		LV_GetText(trigger, row, 5)
+		trigger := this.iFunctionsListView.GetText(row, 5)
 
 		if (trigger != translate("n/a")) {
-			LV_GetText(type, row, 3)
-			LV_GetText(number, row, 4)
+			type := this.iFunctionsListView.GetText(row, 3)
+			number := this.iFunctionsListView.GetText(row, 4)
 
 			double := false
 
@@ -546,34 +566,33 @@ class ControllerStepWizard extends StepWizard {
 
 			function := (type . "." . number)
 
-			trigger := (this.iFunctionTriggers.HasKey(function) ? this.iFunctionTriggers[function] : false)
-
-			title := translate("Modular Simulator Controller System")
-			prompt := translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
-			locale := ((getLanguage() = "en") ? "" : "Locale")
+			trigger := (this.iFunctionTriggers.Has(function) ? this.iFunctionTriggers[function] : false)
 
 			key1 := ""
 			key2 := ""
 
 			if trigger {
-				if (trigger.Length() > 0)
+				if (trigger.Length > 0)
 					key1 := trigger[1]
 
-				if (trigger.Length() > 1)
+				if (trigger.Length > 1)
 					key2 := trigger[2]
 			}
 
-			InputBox key1, %title%, %prompt%, , 200, 150, , , %locale%, , %key1%
+			result := InputBox(translate(double ? "Please enter the first Hotkey:" : "Please enter a Hotkey:")
+							 , translate("Modular Simulator Controller System"), "w200 h150", key1)
 
-			if ErrorLevel
+			if (result.Result = "Ok")
+				key1 := result.Value
+			else
 				return
 
 			if double {
-				prompt := translate("Please enter the second Hotkey:")
+				result := InputBox(translate("Please enter the second Hotkey:"), translate("Modular Simulator Controller System"), "w200 h150", key2)
 
-				InputBox key2, %title%, %prompt%, , 200, 150, , , %locale%, , %key2%
-
-				if ErrorLevel
+				if (result.Result = "Ok")
+					key2 := result.Value
+				else
 					return
 
 				if ((key1 = "") && (key2 = ""))
@@ -590,27 +609,18 @@ class ControllerStepWizard extends StepWizard {
 			this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 			this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
-			window := this.Window
-
-			Gui %window%:Default
-			Gui ListView, % this.iFunctionsListView
-
-			LV_Modify(row, "Vis")
+			this.iFunctionsListView.Modify(row, "Vis")
 		}
 	}
 
 	clearFunctionTriggerAndHotkey(row) {
-		local window := this.Window
 		local function, trigger, double, type, number
 
-		Gui %window%:Default
-		Gui ListView, % this.iFunctionsListView
-
-		LV_GetText(trigger, row, 5)
+		trigger := this.iFunctionsListView.GetText(row, 5)
 
 		if (trigger != translate("n/a")) {
-			LV_GetText(type, row, 3)
-			LV_GetText(number, row, 4)
+			type := this.iFunctionsListView.GetText(row, 3)
+			number := this.iFunctionsListView.GetText(row, 4)
 
 			double := false
 
@@ -631,7 +641,7 @@ class ControllerStepWizard extends StepWizard {
 
 			this.iFunctionTriggers.Delete(function)
 
-			LV_Modify(row, "Col5", "")
+			this.iFunctionTriggers.Modify(row, "Col5", "")
 
 			this.saveFunctions()
 		}
@@ -639,25 +649,23 @@ class ControllerStepWizard extends StepWizard {
 
 	registerHotKey(function, row, firstHotkey, hotkey) {
 		local wizard := this.SetupWizard
-		local controller, number, callback, buttonBoxConfiguration, streamDeckConfiguration, window
+		local controller, number, buttonBoxConfiguration, streamDeckConfiguration, window
 
-		SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+		SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 		if (firstHotkey == true) {
-			callback := ObjBindMethod(this, "registerHotkey", function, row, hotkey)
-
 			wizard.toggleTriggerDetector()
 
-			Sleep 2000
+			Sleep(2000)
 
-			wizard.toggleTriggerDetector(callback)
+			wizard.toggleTriggerDetector(ObjBindMethod(this, "registerHotkey", function, row, hotkey))
 
 			return
 		}
 		else if (firstHotkey != false) {
 			this.iFunctionTriggers[function] := [firstHotkey, hotkey]
 
-			hotkey := firstHotkey . " | " . hotkey
+			Hotkey(":= firstHotkey . `" | `" . hotkey")
 		}
 		else
 			this.iFunctionTriggers[function] := [hotkey]
@@ -670,12 +678,7 @@ class ControllerStepWizard extends StepWizard {
 		this.saveFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 		this.loadFunctions(buttonBoxConfiguration, streamDeckConfiguration)
 
-		window := this.Window
-
-		Gui %window%:Default
-		Gui ListView, % this.iFunctionsListView
-
-		LV_Modify(row, "Vis")
+		this.iFunctionsListView.Modify(row, "Vis")
 	}
 }
 
@@ -684,7 +687,7 @@ class ControllerStepWizard extends StepWizard {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ControllerPreviewStepWizard extends StepWizard {
-	static sControllerPreviewCenters := {}
+	static sControllerPreviewCenters := CaseInsenseMap()
 
 	iControllerPreviews := []
 	iControllerPreviewCenterY := 0
@@ -724,10 +727,10 @@ class ControllerPreviewStepWizard extends StepWizard {
 			ControllerPreviewStepWizard.sControllerPreviewCenters[descriptor] := [centerX, centerY]
 	}
 
-	getPreviewCenter(descriptor, ByRef centerX, ByRef centerY) {
+	getPreviewCenter(descriptor, &centerX, &centerY) {
 		local center
 
-		if (descriptor && ControllerPreviewStepWizard.sControllerPreviewCenters.HasKey(descriptor)) {
+		if (descriptor && ControllerPreviewStepWizard.sControllerPreviewCenters.Has(descriptor)) {
 			center := ControllerPreviewStepWizard.sControllerPreviewCenters[descriptor]
 
 			centerX := center[1]
@@ -740,7 +743,17 @@ class ControllerPreviewStepWizard extends StepWizard {
 	}
 
 	getPreviewMover() {
-		return "moveControllerPreview"
+		moveControllerPreview(window) {
+			local preview, x, y, width, height
+
+			moveByMouse(window)
+
+			WinGetPos(&x, &y, &width, &height, window)
+
+			this.setPreviewCenter(window, x + Round(width / 2), y + Round(height / 2))
+		}
+
+		return moveControllerPreview
 	}
 
 	createControllerPreview(type, controller, configuration) {
@@ -787,7 +800,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 				preview.setControlClickHandler(ObjBindMethod(this, "controlClick"))
 
 				if (index = 1) {
-					SysGet mainScreen, MonitorWorkArea
+					MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
 					this.iControllerPreviewCenterY := (mainScreenBottom - Round(preview.Height / 2))
 				}
@@ -847,15 +860,15 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 	iActionsListView := false
 
-	iModes := {}
-	iActions := {}
-	iDescriptors := {}
-	iLabels := {}
-	iFunctions := {}
-	iArguments := {}
+	iModes := CaseInsenseMap()
+	iActions := CaseInsenseMap()
+	iDescriptors := CaseInsenseMap()
+	iLabels := CaseInsenseMap()
+	iFunctions := CaseInsenseMap()
+	iArguments := CaseInsenseMap()
 
 	class ActionsButtonBoxPreview extends ButtonBoxPreview {
-		iModeDropDownHandle := false
+		iModeDropDown := false
 
 		iModes := []
 
@@ -863,7 +876,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			Get {
 				local mode, ignore, candidate
 
-				GuiControlGet mode, , % this.iModeDropDownHandle
+				mode := this.iModeDropDown.Text
 
 				if (mode == translate("All Modes"))
 					return true
@@ -890,6 +903,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			local modes := []
 			local ignore, mode
 
+			updateControllerLabels(*) {
+				this.loadControllerLabels()
+			}
+
 			super.createGui(configuration)
 
 			for ignore, mode in this.iModes
@@ -900,16 +917,15 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 			modes.InsertAt(1, translate("All Modes"))
 
-			Gui %window%:Font, s8 Norm Arial
+			window.SetFont("s8 Norm Arial")
 
-			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
-
-			this.iModeDropDownHandle := modeDropDownHandle
+			this.iModeDropDown := window.Add("DropDownList", "x8 y8 w82 Choose1", modes)
+			this.iModeDropDown.OnEvent("Change", updateControllerLabels)
 		}
 	}
 
 	class ActionsStreamDeckPreview extends StreamDeckPreview {
-		iModeDropDownHandle := false
+		iModeDropDown := false
 
 		iModes := []
 
@@ -917,7 +933,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			Get {
 				local mode, ignore, candidate
 
-				GuiControlGet mode, , % this.iModeDropDownHandle
+				mode := this.iModeDropDown.Text
 
 				if (mode == translate("All Modes"))
 					return true
@@ -944,6 +960,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			local modes := []
 			local ignore, mode
 
+			updateControllerLabels(*) {
+				this.loadControllerLabels()
+			}
+
 			super.createGui(configuration)
 
 			for ignore, mode in this.iModes
@@ -954,11 +974,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 			modes.InsertAt(1, translate("All Modes"))
 
-			Gui %window%:Font, s8 Norm Arial
+			window.SetFont("s8 Norm Arial")
 
-			Gui %window%:Add, DropDownList, x8 y8 w82 Choose1 HWNDmodeDropDownHandle gupdateControllerLabels, % values2String("|", modes*)
-
-			this.iModeDropDownHandle := modeDropDownHandle
+			this.iModeDropDown := window.Add("DropDownList", "x8 y8 w82 Choose1", modes)
+			this.iModeDropDown.OnEvent("Change", updateControllerLabels)
 		}
 	}
 
@@ -992,7 +1011,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		if this.SetupWizard.isModuleSelected("Controller")
 			this.loadActions(true)
 		else
-			GuiControl Hide, % this.ActionsListView
+			this.ActionsListView.Visible := false
 	}
 
 	hidePage(page) {
@@ -1072,17 +1091,17 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		if function {
 			key := (row . "." . function)
 
-			return this.iLabels[this.iLabels.HasKey(key) ? key : row]
+			return this.iLabels[this.iLabels.Has(key) ? key : row]
 		}
 		else
 			return this.iLabels[row]
 	}
 
 	clearActions() {
-		this.iModes := {}
-		this.iActions := {}
-		this.iDescriptors := {}
-		this.iLabels := {}
+		this.iModes := CaseInsenseMap()
+		this.iActions := CaseInsenseMap()
+		this.iDescriptors := CaseInsenseMap()
+		this.iLabels := CaseInsenseMap()
 	}
 
 	setActionFunction(mode, action, functionDescriptor) {
@@ -1093,7 +1112,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			changed := []
 
 			if (isObject(oldfunction) && isObject(functionDescriptor)) {
-				loop % oldFunction.Length()
+				loop oldFunction.Length
 					if (oldFunction[A_Index] != functionDescriptor[A_Index])
 						changed.Push(oldFunction[A_Index])
 			}
@@ -1105,8 +1124,8 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 					this.clearActionFunction(mode, action, oldValue)
 		}
 
-		if !this.iFunctions.HasKey(mode)
-			this.iFunctions[mode] := {}
+		if !this.iFunctions.Has(mode)
+			this.iFunctions[mode] := CaseInsenseMap()
 
 		this.iFunctions[mode][action] := functionDescriptor
 
@@ -1116,10 +1135,10 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	getActionFunction(mode, action) {
 		local functions
 
-		if this.iFunctions.HasKey(mode) {
+		if this.iFunctions.Has(mode) {
 			functions := this.iFunctions[mode]
 
-			return (functions.HasKey(action) ? functions[action] : false)
+			return (functions.Has(action) ? functions[action] : false)
 		}
 		else
 			return false
@@ -1128,17 +1147,17 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	clearActionFunction(mode, action, function) {
 		local functions, actionFunctions, index, candidate
 
-		if this.iFunctions.HasKey(mode) {
+		if this.iFunctions.Has(mode) {
 			functions := this.iFunctions[mode]
 
-			if functions.HasKey(action) {
+			if functions.Has(action) {
 				actionFunctions := functions[action]
 
 				for index, candidate in actionFunctions
 					if (candidate = function)
 						actionFunctions[index] := ""
 
-				if (actionFunctions.Length() == 1)
+				if (actionFunctions.Length == 1)
 					functions.Delete(action)
 				else if ((actionFunctions[1] = "") && (actionFunctions[2] = ""))
 					functions.Delete(action)
@@ -1147,7 +1166,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	clearActionFunctions() {
-		this.iFunctions := {}
+		this.iFunctions := CaseInsenseMap()
 	}
 
 	setActionArgument(row, argument) {
@@ -1158,11 +1177,11 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		if action
 			rowOrMode := this.getActionRow(rowOrMode, action)
 
-		return (this.iArguments.HasKey(rowOrMode) ? this.iArguments[rowOrMode] : false)
+		return (this.iArguments.Has(rowOrMode) ? this.iArguments[rowOrMode] : false)
 	}
 
 	clearActionArguments() {
-		this.iArguments := {}
+		this.iArguments := CaseInsenseMap()
 	}
 
 	createControllerPreview(type, controller, configuration) {
@@ -1223,16 +1242,16 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			this.iPendingActionRegistration := false
 			this.iPendingFunctionRegistration := row
 
-			SetTimer showSelectorHint, Off
+			SetTimer(showSelectorHint, 0)
 
-			ToolTip, , , 1
+			ToolTip( , , 1)
 
 			this.controlClick(arguments*)
 		}
 		else {
 			this.iPendingFunctionRegistration := row
 
-			SetTimer showSelectorHint, 100
+			SetTimer(showSelectorHint, 100)
 		}
 	}
 
@@ -1243,7 +1262,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		local ignore
 
 		if (function && (function != "")) {
-			SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+			SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 			if isObject(function) {
 				for ignore, function in function
@@ -1259,7 +1278,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	setFunctionAction(arguments) {
 		this.iPendingActionRegistration := arguments
 
-		SetTimer showSelectorHint, 100
+		SetTimer(showSelectorHint, 100)
 	}
 
 	clearFunctionAction(preview, function, control, row, column) {
@@ -1274,7 +1293,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				for action, functions in modeFunctions
 					for ignore, candidate in functions
 						if (candidate = function) {
-							SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+							SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
 							this.clearActionFunction(mode, action, function)
 
@@ -1288,32 +1307,21 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	createActionsMenu(title, row) {
-		local window := this.Window
-		local function, menuItem, handler, count
+		local function, menuItem, handler, count, contextMenu
 
-		Gui %window%:Default
+		contextMenu := Menu()
 
-		try {
-			Menu ContextMenu, DeleteAll
-		}
-		catch Any as exception {
-			logError(exception)
-		}
+		contextMenu.Add(title, (*) => {})
+		contextMenu.Disable(title)
+		contextMenu.Add()
 
-		Menu ContextMenu, Add, %title%, controlMenuIgnore
-		Menu ContextMenu, Disable, %title%
-		Menu ContextMenu, Add
-
-		menuItem := translate("Set Function")
-		handler := ObjBindMethod(this, "setFunction", row)
-
-		Menu ContextMenu, Add, %menuItem%, %handler%
+		contextMenu.Add(translate("Set Function"), ObjBindMethod(this, "setFunction", row))
 
 		function := this.getActionFunction(this.getActionMode(row), this.getAction(row))
 		count := 0
 
 		if isObject(function) {
-			if ((function.Length() > 1) && (function[1] != "") && (function[2] != ""))
+			if ((function.Length > 1) && (function[1] != "") && (function[2] != ""))
 				count := 2
 			else if (function[1] != "")
 				count := 1
@@ -1322,39 +1330,27 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			count := 1
 
 		menuItem := translate((count > 1) ? "Clear Function(s)" : "Clear Function")
-		handler := ObjBindMethod(this, "clearFunction", row)
 
-		Menu ContextMenu, Add, %menuItem%, %handler%
+		contextMenu.Add(menuItem, ObjBindMethod(this, "clearFunction", row))
 
-		function := this.getActionFunction(this.getActionMode(row), this.getAction(row))
+		this.getActionFunction(this.getActionMode(row), this.getAction(row))
 
 		if (count == 0)
-			Menu ContextMenu, Disable, %menuItem%
+			contextMenu.Disable(menuItem)
 
-		return "ContextMenu"
+		return contextMenu
 	}
 
 	createControlMenu(title, preview, element, function, row, column) {
-		local window := this.Window
-		local action, menuItem, handler, count, mode, modeFunctions, action, functions, ignore, candidate
+		local action, menuItem, handler, count, mode, modeFunctions, action, functions, ignore, candidate, contextMenu
 
-		Gui %window%:Default
+		contextMenu := Menu()
 
-		try {
-			Menu ContextMenu, DeleteAll
-		}
-		catch Any as exception {
-			logError(exception)
-		}
+		contextMenu.Add(title, (*) => {})
+		contextMenu.Disable(title)
+		contextMenu.Add()
 
-		Menu ContextMenu, Add, %title%, controlMenuIgnore
-		Menu ContextMenu, Disable, %title%
-		Menu ContextMenu, Add
-
-		menuItem := translate("Set Action")
-		handler := ObjBindMethod(this, "setFunctionAction", Array(preview, element, function, row, column, false, true))
-
-		Menu ContextMenu, Add, %menuItem%, %handler%
+		contextMenu.Add(translate("Set Action"), ObjBindMethod(this, "setFunctionAction", Array(preview, element, function, row, column, false, true)))
 
 		count := 0
 
@@ -1365,14 +1361,13 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 						count += 1
 
 		menuItem := translate((count > 1) ? "Clear Action(s)" : "Clear Action")
-		handler := ObjBindMethod(this, "clearFunctionAction", preview, function, element[2], row, column)
 
-		Menu ContextMenu, Add, %menuItem%, %handler%
+		contextMenu.Add(menuItem, ObjBindMethod(this, "clearFunctionAction", preview, function, element[2], row, column))
 
 		if (count = 0)
-			Menu ContextMenu, Disable, %menuItem%
+			contextMenu.Disable(menuItem)
 
-		return "ContextMenu"
+		return contextMenu
 	}
 
 	setControlFunction(row, function) {
@@ -1380,7 +1375,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		local action := this.getAction(row)
 		local actionDescriptor := this.getActionDescriptor(row)
 		local functionType := ConfigurationItem.splitDescriptor(function)[1]
-		local action, title, currentFunction
+		local action, msgResult, translator, currentFunction
 
 		if (((functionType == k2WayToggleType) || (functionType == kDialType)) && ((actionDescriptor[2] == "Toggle") || (actionDescriptor[2] == "Dial")))
 			function := [function]
@@ -1390,51 +1385,46 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			function := [function]
 		else {
 			if (actionDescriptor[2] == "Toggle")
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["On/Off", "Off", "Cancel"]))
+				translator := translateMsgBoxButtons.Bind(["On/Off", "Off", "Cancel"])
 			else
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Increase", "Decrease", "Cancel"]))
+				translator := translateMsgBoxButtons.Bind(["Increase", "Decrease", "Cancel"])
 
-			title := translate("Trigger")
-
-			MsgBox 262179, %title%, % translate("Trigger for ") . action . translate("?")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translator)
+			msgResult := MsgBox(translate("Trigger for ") . action . translate("?"), translate("Trigger"), 262179)
+			OnMessage(0x44, translator, 0)
 
 			currentFunction := this.getActionFunction(mode, action)
 
 			if currentFunction
 				currentFunction := currentFunction.Clone()
 
-			IfMsgBox Cancel
-				function := false
+			switch msgResult, false {
+				case "Cancel":
+					function := false
+				case "Yes":
+					if currentFunction {
+						if (currentFunction.Length == 1)
+							function := [function, ""]
+						else {
+							currentFunction[1] := function
 
-			IfMsgBox Yes
-			{
-				if currentFunction {
-					if (currentFunction.Length() == 1)
+							function := currentFunction
+						}
+					}
+					else
 						function := [function, ""]
-					else {
-						currentFunction[1] := function
+				case "No":
+					if currentFunction {
+						if (currentFunction.Length == 1)
+							function := ["", function]
+						else {
+							currentFunction[2] := function
 
-						function := currentFunction
+							function := currentFunction
+						}
 					}
-				}
-				else
-					function := [function, ""]
-			}
-
-			IfMsgBox No
-			{
-				if currentFunction {
-					if (currentFunction.Length() == 1)
+					else
 						function := ["", function]
-					else {
-						currentFunction[2] := function
-
-						function := currentFunction
-					}
-				}
-				else
-					function := ["", function]
 			}
 		}
 
@@ -1451,16 +1441,14 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			if (!this.iPendingFunctionRegistration && !actionRegistration) {
 				title := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
 
-				controlMenu := this.createControlMenu(title, preview, element, function, row, column)
-
-				Menu %controlMenu%, Show
+				this.createControlMenu(title, preview, element, function, row, column).Show()
 			}
 			else {
-				SoundPlay %kResourcesDirectory%Sounds\Activated.wav
+				SoundPlay(kResourcesDirectory . "Sounds\Activated.wav")
 
-				SetTimer showSelectorHint, Off
+				SetTimer(showSelectorHint, 0)
 
-				ToolTip, , , 1
+				ToolTip( , , 1)
 
 				actionRow := this.iPendingFunctionRegistration
 
@@ -1473,17 +1461,25 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 					this.loadActions()
 
-					window := this.Window
-
-					Gui %window%:Default
-					Gui ListView, % this.ActionsListView
-
-					LV_Modify(actionRow, "Vis")
+					this.ActionsListView.Modify(actionRow, "Vis")
 				}
 
 				this.iPendingFunctionRegistration := false
 			}
 		}
+	}
+
+	actionFunctionSelect(row) {
+		local action, row, label, contextMenu
+
+		loop this.ActionsListView.GetCount()
+			this.ActionsListView.Modify(A_Index, "-Select")
+
+		if (this.SetupWizard.isModuleSelected("Controller") && (row > 0))
+			if this.iPendingActionRegistration
+				this.setFunction(row)
+			else
+				this.createActionsMenu(this.getAction(row) . ": " . StrReplace(this.getActionLabel(row), "`n", A_Space), row).Show()
 	}
 }
 
@@ -1492,134 +1488,27 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-updateActionFunction(wizard) {
-	local action, row, label, contextMenu
-
-	loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
-
-	if wizard.SetupWizard.isModuleSelected("Controller") {
-		if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick")) {
-			if (A_EventInfo > 0) {
-				row := A_EventInfo
-
-				if wizard.iPendingActionRegistration
-					wizard.setFunction(row)
-				else {
-					action := wizard.getAction(row)
-					label := wizard.getActionLabel(row)
-
-					contextMenu := wizard.createActionsMenu(action . ": " . StrReplace(label, "`n", A_Space), row)
-
-					Menu %contextMenu%, Show
-				}
-			}
-		}
-	}
-}
-
 showSelectorHint() {
 	local hint
 
 	if (GetKeyState("Esc", "P") || !ActionsStepWizard.CurrentActionsStep) {
-		SetTimer showSelectorHint, Off
+		SetTimer(showSelectorHint, 0)
 
 		ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration := false
 		ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration := false
 
-		ToolTip, , , 1
+		ToolTip( , , 1)
 	}
-	else if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration {
-		hint := translate("Click on a controller function...")
-
-		ToolTip %hint%, , , 1
-	}
-	else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration {
-		hint := translate("Click on an action...")
-
-		ToolTip %hint%, , , 1
-	}
+	else if ActionsStepWizard.CurrentActionsStep.iPendingFunctionRegistration
+		ToolTip(translate("Click on a controller function..."), , , 1)
+	else if ActionsStepWizard.CurrentActionsStep.iPendingActionRegistration
+		ToolTip(translate("Click on an action..."), , , 1)
 }
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updateControllerLabels() {
-	SetupWizard.Instance.Step.loadControllerLabels()
-}
-
-updateFunctionTriggers() {
-	local function, row, curCoordMode, control, number, trigger, menuItem
-	local window, multiple, menuItem, handler
-
-	loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
-
-	if (A_GuiEvent = "Normal") {
-		if (A_EventInfo > 0)
-			SetupWizard.Instance.StepWizards["Controller"].updateFunctionTriggers(A_EventInfo)
-	}
-	else if (A_GuiEvent = "RightClick") {
-		if (A_EventInfo > 0) {
-			row := A_EventInfo
-
-			curCoordMode := A_CoordModeMouse
-
-			LV_GetText(control, row, 2)
-			LV_GetText(function, row, 3)
-			LV_GetText(number, row, 4)
-			LV_GetText(trigger, row, 5)
-
-			menuItem := ConfigurationItem.descriptor(control, number)
-
-			try {
-				Menu ContextMenu, DeleteAll
-			}
-			catch Any as exception {
-				logError(exception)
-			}
-
-			window := SetupWizard.Instance.WizardWindow
-
-			Gui %window%:Default
-
-			Menu ContextMenu, Add, %menuItem%, controlMenuIgnore
-			Menu ContextMenu, Disable, %menuItem%
-
-			if (trigger != translate("n/a")) {
-				Menu ContextMenu, Add
-
-				multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
-
-				menuItem := translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
-				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionTriggers", row)
-
-				Menu ContextMenu, Add, %menuItem%, %handler%
-
-				multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
-
-				menuItem := translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
-				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "updateFunctionHotkeys", row)
-
-				Menu ContextMenu, Add, %menuItem%, %handler%
-
-				Menu ContextMenu, Add
-
-				menuItem := translate("Clear Trigger && Hotkey")
-				handler := ObjBindMethod(SetupWizard.Instance.StepWizards["Controller"], "clearFunctionTriggerAndHotkey", row)
-
-				Menu ContextMenu, Add, %menuItem%, %handler%
-			}
-
-			Menu ContextMenu, Show
-		}
-	}
-
-	loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
-}
 
 initializeControllerStepWizard() {
 	SetupWizard.Instance.registerStepWizard(ControllerStepWizard(SetupWizard.Instance, "Controller", kSimulatorConfiguration))
@@ -1631,3 +1520,7 @@ initializeControllerStepWizard() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeControllerStepWizard()
+
+
+
+

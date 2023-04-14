@@ -200,7 +200,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			window.SetFont("Norm", "Arial")
 
-			widget := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Action", "Label", "Function"], translate))
+			widget := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h347 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Action", "Label", "Function"], translate))
 			widget.OnEvent("Click", assistantActionFunctionSelect)
 			widget.OnEvent("DoubleClick", assistantActionFunctionSelect)
 			widget.OnEvent("ContextMenu", noSelect)
@@ -212,7 +212,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-			widget := window.Add("ActiveX", "x" . x . " yp+352 w" . width . " h58 VactionsInfoText" . page . " Hidden", "shell.explorer")
+			widget := window.Add("ActiveX", "x" . x . " yp+352 w" . width . " h58 Y:Move(0.66) W:Grow H:Grow(0.33) VactionsInfoText" . page . " Hidden", "shell.explorer")
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

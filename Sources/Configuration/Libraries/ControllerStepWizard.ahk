@@ -933,7 +933,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 			modes.InsertAt(1, translate("All Modes"))
 
-			window.SetFont("s8 Norm Arial")
+			window.SetFont("s8 Norm", "Arial")
 
 			this.iModeDropDown := window.Add("DropDownList", "x8 y8 w82 Choose1", modes)
 			this.iModeDropDown.OnEvent("Change", updateControllerLabels)
@@ -991,7 +991,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 			modes.InsertAt(1, translate("All Modes"))
 
-			window.SetFont("s8 Norm Arial")
+			window.SetFont("s8 Norm", "Arial")
 
 			this.iModeDropDown := window.Add("DropDownList", "x8 y8 w82 Choose1", modes)
 			this.iModeDropDown.OnEvent("Change", updateControllerLabels)
@@ -1145,8 +1145,6 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			this.iFunctions[mode] := CaseInsenseMap()
 
 		this.iFunctions[mode][action] := functionDescriptor
-
-		this.saveFunctions()
 	}
 
 	getActionFunction(mode, action) {

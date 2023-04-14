@@ -1782,7 +1782,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	clearModuleValue(module, key, update := true) {
-		this.KnowledgeBase.removeFact("Module." . module . ".Key." . key, "")
+		this.KnowledgeBase.removeFact("Module." . module . ".Key." . key)
 
 		if update
 			this.updateState()
@@ -2257,8 +2257,8 @@ class StartStepWizard extends StepWizard {
 
 			window.SetFont("s10 Bold", "Arial")
 
-			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 H:Center Hidden", kResourcesDirectory . "Setup\Images\Security.ico")
-			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 H:Center Hidden", translate("Unblocking Applications and DLLs"))
+			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Security.ico")
+			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Unblocking Applications and DLLs"))
 
 			window.SetFont("s8 Norm", "Arial")
 
@@ -2385,7 +2385,7 @@ class FinishStepWizard extends StepWizard {
 		local window := this.Window
 		local image, text, html
 
-		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " H:Center Hidden", "shell.explorer")
+		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " W:Grow H:Grow Hidden", "shell.explorer")
 
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
@@ -2433,7 +2433,7 @@ class FinishStepWizard extends StepWizard {
 
 			this.SetupWizard.SettingsOpen := true
 
-			editSettings(settings, false, configuration
+			editSettings(&settings, false, configuration
 					   , Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 180, A_ScreenWidth - 360)
 					   , "Center")
 		}
@@ -2442,10 +2442,12 @@ class FinishStepWizard extends StepWizard {
 	}
 
 	closeSettingsEditor() {
+		global kSave
+
 		if !this.SetupWizard.SettingsOpen
 			Task.startTask(ObjBindMethod(this, "closeSettingsEditor"), 1000, kHighPriority)
 
-		writeMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini", editSettings(kSave, false, true))
+		writeMultiMap(kUserHomeDirectory . "Setup\Simulator Settings.ini", editSettings(&kSave, false, true))
 
 		this.SetupWizard.SettingsOpen := false
 

@@ -252,6 +252,15 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 	static popupPosition
 	static lastPositions
 
+	static trayTipCheck
+	static trayTipDurationInput
+	static trayTipSimulationCheck
+	static trayTipSimulationDurationInput
+	static buttonBoxCheck
+	static buttonBoxDurationInput
+	static buttonBoxSimulationCheck
+	static buttonBoxSimulationDurationInput
+
 	static startup
 	static startupOption
 

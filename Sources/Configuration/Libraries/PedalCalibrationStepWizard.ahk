@@ -132,14 +132,14 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget7 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h260 AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Mode", "Pedal", "Action", "Label", "Function"], translate))
+		widget7 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h260 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Mode", "Pedal", "Action", "Label", "Function"], translate))
 		widget7.OnEvent("Click", pedalCalibrationActionFunctionSelect)
 		widget7.OnEvent("DoubleClick", pedalCalibrationActionFunctionSelect)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget8 := window.Add("ActiveX", "x" . x . " yp+265 w" . width . " h80 VpedalCalibrationInfoText Hidden", "shell.explorer")
+		widget8 := window.Add("ActiveX", "x" . x . " yp+265 w" . width . " h80 Y:Move(0.66) W:Grow H:Grow(0.33) VpedalCalibrationInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -181,7 +181,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		return ["Pedal Calibration"]
 	}
 
-	getActions() {
+	getActions(mode := false) {
 		local wizard, actions, pedals, ignore, pedal, curve
 
 		if this.iCachedActions

@@ -25,7 +25,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 	iDisabledWidgets := []
 
-	iCachedActions := {}
+	iCachedActions := CaseInsenseMap()
 
 	Pages {
 		Get {
@@ -176,33 +176,33 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		widget6 := window.Add("Button", "x" . buttonX . " yp w23 h23  Hidden")
 		widget6.OnEvent("Click", changeMotionEffects)
 		setButtonIcon(widget6, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		widget7 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 Disabled ReadOnly Hidden")
+		widget7 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 H:Grow(0.33) Disabled ReadOnly Hidden")
 
-		widget8 := window.Add("Text", "x" . x . " yp+70 w105 h23 +0x200 Hidden", translate("Motion Intensity"))
-
-		window.SetFont("s8 Bold", "Arial")
-
-		widget9 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 +0x200 vmotionIntensityField Hidden")
-
-		window.SetFont("s8 Norm", "Arial")
-
-		widget10 := window.Add("Text", "x" . x . " yp+24 w105 h23 +0x200 Hidden", translate("Effect Selector"))
+		widget8 := window.Add("Text", "x" . x . " yp+70 w105 h23 +0x200 Y:Move(0.33) Hidden", translate("Motion Intensity"))
 
 		window.SetFont("s8 Bold", "Arial")
 
-		widget11 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 +0x200 veffectSelectorField Hidden")
+		widget9 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 Y:Move(0.33) +0x200 vmotionIntensityField Hidden")
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget12 := window.Add("Text", "x" . x . " yp+24 w105 h23 +0x200 Hidden", translate("Effect Intensity"))
+		widget10 := window.Add("Text", "x" . x . " yp+24 w105 h23 Y:Move(0.33) +0x200 Hidden", translate("Effect Selector"))
 
 		window.SetFont("s8 Bold", "Arial")
 
-		widget13 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 +0x200 veffectIntensityField Hidden")
+		widget11 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 Y:Move(0.33) +0x200 veffectSelectorField Hidden")
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget14 := window.Add("Button", "x" . x . " yp+30 w" . colWidth . " h23  Hidden", translate("Edit Labels && Icons..."))
+		widget12 := window.Add("Text", "x" . x . " yp+24 w105 h23 Y:Move(0.33) +0x200 Hidden", translate("Effect Intensity"))
+
+		window.SetFont("s8 Bold", "Arial")
+
+		widget13 := window.Add("Edit", "x" . secondX . " yp w" . secondWidth . " h23 Y:Move(0.33) +0x200 veffectIntensityField Hidden")
+
+		window.SetFont("s8 Norm", "Arial")
+
+		widget14 := window.Add("Button", "x" . x . " yp+30 w" . colWidth . " h23 Y:Move(0.33) Hidden", translate("Edit Labels && Icons..."))
 		widget14.OnEvent("Click", openLabelsAndIconsEditor)
 
 		window.SetFont("s8 Bold", "Arial")
@@ -212,7 +212,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget17 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "State", "Intensity", "Function"], translate))
+		widget17 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "State", "Intensity", "Function"], translate))
 		widget17.OnEvent("Click", motionFeedbackActionFunctionSelect)
 		widget17.OnEvent("DoubleClick", motionFeedbackActionFunctionSelect)
 		widget17.OnEvent("ContextMenu", noSelect)
@@ -220,7 +220,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget18 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 VmotionFeedbackInfoText Hidden", "shell.explorer")
+		widget18 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 Y:Move(0.66) W:Grow H:Grow(0.33) VmotionFeedbackInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -242,7 +242,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		this.iMotionEffectsList := false
 		this.iDisabledWidgets := []
-		this.iCachedActions := {}
+		this.iCachedActions := CaseInsenseMap()
 	}
 
 	showPage(page) {
@@ -291,10 +291,10 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local function, action, msgResult, ignore, motionIntensityField, effectSelectorField, effectIntensityField
 
 		if (!wizard.isSoftwareInstalled("SimFeedback") || !wizard.isSoftwareInstalled("StreamDeck Extension")) {
-			OnMessage(0x44, translateMsgBoxButtons)
+			OnMessage(0x44, translateYesNoButtons)
 			msgResult := MsgBox(translate("SimFeedback cannot be found or the StreamDeck Extension was not installed. Do you really want to proceed?")
 							  , translate("Warning"), 262436)
-			OnMessage(0x44, translateMsgBoxButtons, 0)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "No")
 				return false
@@ -456,7 +456,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local ignore, mode, first, arguments, label, isBinary, state, intensity
 
 		if load {
-			this.iCachedActions := {}
+			this.iCachedActions := CaseInsenseMap()
 
 			this.clearActionFunctions()
 			this.clearActionArguments()
@@ -542,7 +542,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		local function, action, ignore, mode, modeFunctions, modeArguments, arguments
 
 		for ignore, mode in this.getModes() {
-			modeFunctions := {}
+			modeFunctions := CaseInsenseMap()
 
 			for ignore, action in this.getActions(mode)
 				if wizard.moduleActionAvailable("Motion Feedback", mode, action) {
@@ -554,7 +554,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 			wizard.setModuleActionFunctions("Motion Feedback", mode, modeFunctions)
 
-			modeArguments := {}
+			modeArguments := CaseInsenseMap()
 
 			for ignore, action in this.getActions(mode)
 				if wizard.moduleActionAvailable("Motion Feedback", mode, action) {

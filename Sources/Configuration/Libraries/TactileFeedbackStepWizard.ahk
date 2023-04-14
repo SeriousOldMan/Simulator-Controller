@@ -152,9 +152,9 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		widget9 := window.Add("Button", "x" . buttonX . " yp w23 h23  Hidden")
 		widget9.OnEvent("Click", changeChassisEffects)
 		setButtonIcon(widget9, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		widget10 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 ReadOnly Disabled Hidden")
+		widget10 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 H:Grow(0.33) ReadOnly Disabled Hidden")
 
-		widget11 := window.Add("Button", "x" . x . " yp+70 w" . colWidth . " h23  Hidden", translate("Edit Labels && Icons..."))
+		widget11 := window.Add("Button", "x" . x . " yp+70 w" . colWidth . " h23 Y:Move(0.33) Hidden", translate("Edit Labels && Icons..."))
 		widget11.OnEvent("Click", openLabelsAndIconsEditor)
 
 		window.SetFont("s8 Bold", "Arial")
@@ -164,7 +164,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget14 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
+		widget14 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
 		widget14.OnEvent("Click", tactileFeedbackActionFunctionSelect)
 		widget14.OnEvent("DoubleClick", tactileFeedbackActionFunctionSelect)
 		widget14.OnEvent("ContextMenu", noSelect)
@@ -172,14 +172,14 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget15 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 VtactileFeedbackInfoText Hidden", "shell.explorer")
+		widget15 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 Y:Move(0.66) W:Grow H:Grow(0.33) VtactileFeedbackInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget15.Value.navigate("about:blank")
 		widget15.Value.document.write(html)
 
-		this.setActionsListView(widget15)
+		this.setActionsListView(widget14)
 
 		this.iPedalEffectsList := widget7
 		this.iChassisEffectsList := widget10

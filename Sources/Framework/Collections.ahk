@@ -9,7 +9,7 @@
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class SafeArray extends Array {
+class WeakArray extends Array {
 	__New(arguments*) {
 		this.Default := ""
 
@@ -26,7 +26,7 @@ class SafeArray extends Array {
 	}
 }
 
-class SafeMap extends Map {
+class WeakMap extends Map {
 	__New(arguments*) {
 		this.Default := ""
 
@@ -84,9 +84,9 @@ class CaseInsenseMap extends Map {
 	}
 }
 
-global CaseSenseSafeMap := SafeMap
+global CaseSenseWeakMap := WeakMap
 
-class CaseInsenseSafeMap extends SafeMap {
+class CaseInsenseWeakMap extends WeakMap {
 	__New(arguments*) {
 		this.CaseSense := false
 

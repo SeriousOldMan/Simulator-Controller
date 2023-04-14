@@ -108,11 +108,11 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		Redraw() {
-			this.iRedraw := (A_TickCount + 500)
+			this.iRedraw := true
 		}
 
 		RedrawHTMLViwer() {
-			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+			if this.iRedraw {
 				local workbench := StrategyWorkbench.Instance
 				local ignore, button
 
@@ -527,7 +527,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (isNumber(value) && (value >= minValue))
 				field.ValidText := field.Text
 			else
-				field.Text:= (field.HasProp("ValidText") ? field.ValidText : minValue)
+				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
 		}
 
 		validateInteger(field, minValue := 0) {
@@ -536,7 +536,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (isInteger(field.Text) && (field.Text >= minValue))
 				field.ValidText := field.Text
 			else
-				field.Text:= (field.HasProp("ValidText") ? field.ValidText : minValue)
+				field.Text := (field.HasProp("ValidText") ? field.ValidText : minValue)
 		}
 
 		validateSimMaxTyreLaps(*) {
@@ -3296,7 +3296,7 @@ runStrategyWorkbench() {
 	local track := getMultiMapValue(settings, "Strategy Workbench", "Track", false)
 	local weather := "Dry"
 	local airTemperature := 23
-	local trackTemperature:= 27
+	local trackTemperature := 27
 	local compound := "Dry"
 	local compoundColor := "Black"
 	local index := 1

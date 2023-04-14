@@ -103,7 +103,7 @@ class StreamDeckPreview extends ControllerPreview {
 			loop this.Columns {
 				column := A_Index
 
-				button := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row), false, SafeArray)[column]
+				button := string2Values(";", getMultiMapValue(this.Configuration, "Layouts", this.Name . "." . row), false, WeakArray)[column]
 
 				if (button && (button != "")) {
 					icon := getMultiMapValue(this.Configuration, "Buttons", this.Name . "." . button . ".Icon", true)

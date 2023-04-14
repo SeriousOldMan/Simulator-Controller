@@ -682,7 +682,7 @@ class LabelsList extends ConfigurationItemList {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class LayoutsList extends ConfigurationItemList {
-	iRowDefinitions := SafeArray()
+	iRowDefinitions := WeakArray()
 	iSelectedRow := false
 
 	iStreamDeckConfiguration := false
@@ -833,7 +833,7 @@ class LayoutsList extends ConfigurationItemList {
 			name := descriptor[1]
 
 			if !layouts.Has(name) {
-				layouts[name] := CaseInsenseSafeMap()
+				layouts[name] := CaseInsenseWeakMap()
 				layouts[name].Default := ""
 			}
 
@@ -862,7 +862,7 @@ class LayoutsList extends ConfigurationItemList {
 			name := descriptor[1]
 
 			if !layouts.Has(name) {
-				layouts[name] := CaseInsenseSafeMap()
+				layouts[name] := CaseInsenseWeakMap()
 				layouts[name].Default := ""
 			}
 
@@ -1025,7 +1025,7 @@ class LayoutsList extends ConfigurationItemList {
 		}
 
 		choices := []
-		rows := SafeArray()
+		rows := WeakArray()
 
 		loop
 			if item[2].Has(A_Index) {
@@ -1102,12 +1102,12 @@ class LayoutsList extends ConfigurationItemList {
 				this.iRowDefinitions[this.Control["layoutRowDropDown"].Value] := this.Control["layoutRowEdit"].Text
 
 			if (["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value] = "Button Box")
-				layout := CaseInsenseSafeMap("Type", "Button Box", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text
+				layout := CaseInsenseWeakMap("Type", "Button Box", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text
 										   , "Visible", this.Control["layoutVisibleCheck"].Value
 										   , "Margins", Array(this.Control["layoutRowMarginEdit"].Text, this.Control["layoutColumnMarginEdit"].Text
 															, this.Control["layoutSidesMarginEdit"].Text, this.Control["layoutBottomMarginEdit"].Text))
 			else
-				layout := CaseInsenseSafeMap("Type", "Stream Deck", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text, "Visible", false)
+				layout := CaseInsenseWeakMap("Type", "Stream Deck", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text, "Visible", false)
 
 			loop this.iRowDefinitions.Length
 				layout[A_Index] := this.iRowDefinitions[A_Index]

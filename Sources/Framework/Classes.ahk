@@ -69,7 +69,7 @@ class ConfigurationItem {
 	}
 
 	static splitDescriptor(descriptor) {
-		return toArray(StrSplit(descriptor, "."), SafeArray)
+		return toArray(StrSplit(descriptor, "."), WeakArray)
 	}
 
 	splitDescriptor(descriptor) {

@@ -98,17 +98,7 @@ class SetupWorkbench extends ConfigurationItem {
 	iKnowledgeBase := false
 
 	class WorkbenchWindow extends Window {
-		iWorkbench := false
-
-		Workbench {
-			Get {
-				return this.iWorkbench
-			}
-		}
-
-		__New(Workbench) {
-			this.iWorkbench := workbench
-
+		__New() {
 			super.__New({Descriptor: "Setup Workbench", Resizeable: true, Closeable: true})
 		}
 
@@ -127,11 +117,11 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 
 		Redraw() {
-			this.iRedraw := (A_TickCount + 500)
+			this.iRedraw := true
 		}
 
 		RedrawHTMLViwer() {
-			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+			if this.iRedraw {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -407,7 +397,7 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 		}
 
-		workbenchGui := SetupWorkbench.WorkbenchWindow(this)
+		workbenchGui := SetupWorkbench.WorkbenchWindow()
 
 		this.iWindow := workbenchGui
 

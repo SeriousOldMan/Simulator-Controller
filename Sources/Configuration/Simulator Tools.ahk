@@ -81,10 +81,10 @@ global gSplashTheme := false
 
 global gTargetsCount := 0
 
-global gUpdateSettings := CaseInsenseSafeMap()
-global gCleanupSettings := CaseInsenseSafeMap()
-global gCopySettings := CaseInsenseSafeMap()
-global gBuildSettings := CaseInsenseSafeMap()
+global gUpdateSettings := CaseInsenseWeakMap()
+global gCleanupSettings := CaseInsenseWeakMap()
+global gCopySettings := CaseInsenseWeakMap()
+global gBuildSettings := CaseInsenseWeakMap()
 
 global gProgressCount := 0
 
@@ -940,10 +940,10 @@ readToolsConfiguration(&updateSettings, &cleanupSettings, &copySettings, &buildS
 	local updateConfiguration := readMultiMap(getFileName("UPDATES", kUserConfigDirectory))
 	local target, rule
 
-	updateSettings := CaseInsenseSafeMap()
-	cleanupSettings := CaseInsenseSafeMap()
-	copySettings := CaseInsenseSafeMap()
-	buildSettings := CaseInsenseSafeMap()
+	updateSettings := CaseInsenseWeakMap()
+	cleanupSettings := CaseInsenseWeakMap()
+	copySettings := CaseInsenseWeakMap()
+	buildSettings := CaseInsenseWeakMap()
 
 	for target, rule in getMultiMapValues(targets, "Update")
 		if !getMultiMapValue(updateConfiguration, "Processed", target, false)

@@ -529,7 +529,7 @@ updateApplicationStates() {
 
 	static plugin := false
 	static controller := false
-	static mode:= false
+	static mode := false
 
 	if !plugin {
 		controller := SimulatorController.Instance

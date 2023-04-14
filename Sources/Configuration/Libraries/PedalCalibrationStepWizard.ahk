@@ -137,7 +137,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		widget7.OnEvent("DoubleClick", pedalCalibrationActionFunctionSelect)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 		widget8 := window.Add("ActiveX", "x" . x . " yp+265 w" . width . " h80 VpedalCalibrationInfoText Hidden", "shell.explorer")
 

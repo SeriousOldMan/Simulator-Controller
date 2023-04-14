@@ -115,11 +115,11 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		__New(arguments*) {
 			super.__New(arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RedrawTrackViwer"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RedrawTrackViewer"), 500, kLowPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
-			this.iRedraw := (A_TickCount + 500)
+			this.iRedraw := true
 		}
 
 		RestrictResize(&deltaWidth, &deltaHeight) {
@@ -132,8 +132,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				return false
 		}
 
-		RedrawTrackViwer() {
-			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+		RedrawTrackViewer() {
+			if this.iRedraw {
 				local editor := SessionDatabaseEditor.Instance
 				local ignore, button
 
@@ -5353,7 +5353,7 @@ showSessionDatabaseEditor() {
 	local track := getMultiMapValue(settings, "Session Database", "Track", false)
 	local weather := false
 	local airTemperature := 23
-	local trackTemperature:= 27
+	local trackTemperature := 27
 	local compound := false
 	local compoundColor := false
 	local requestorPID := false

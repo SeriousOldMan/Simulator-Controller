@@ -160,6 +160,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		local page, assistant, labelWidth, labelX, labelY, label
 		local listX, listY, listWidth, info, html, configurator, colWidth, wddget
 
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
+
 		assistantActionFunctionSelect(listView, line, *) {
 			this.actionFunctionSelect(line)
 		}
@@ -198,14 +203,14 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			widget := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Action", "Label", "Function"], translate))
 			widget.OnEvent("Click", assistantActionFunctionSelect)
 			widget.OnEvent("DoubleClick", assistantActionFunctionSelect)
-			widget.OnEvent("ContextMenu", assistantActionFunctionMenu)
+			widget.OnEvent("ContextMenu", noSelect)
 
 			widgets.Push(widget)
 
 			this.iActionsListViews.Push(widget)
 
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 			widget := window.Add("ActiveX", "x" . x . " yp+352 w" . width . " h58 VactionsInfoText" . page . " Hidden", "shell.explorer")
 
@@ -242,7 +247,11 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			if configurator {
 				this.iAssistantConfigurators.Push(configurator)
 
+				window.Resizeable := false
+
 				configurator.createGui(this, x, listY + 30, colWidth, height)
+
+				window.Resizeable := true
 			}
 
 			this.registerWidgets(page, widgets*)

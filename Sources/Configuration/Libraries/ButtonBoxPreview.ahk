@@ -246,7 +246,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		this.Columns := layout[2]
 
 		loop this.Rows
-			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), ""), false, SafeArray))
+			rows.Push(string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Name, A_Index), ""), false, WeakArray))
 
 		this.iRowDefinitions := rows
 	}

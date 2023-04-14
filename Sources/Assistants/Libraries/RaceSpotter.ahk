@@ -715,7 +715,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	iDriverCar := false
 	iOtherCars := CaseInsenseMap()
-	iPositions := CaseInsenseSafeMap()
+	iPositions := CaseInsenseWeakMap()
 
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
@@ -3093,7 +3093,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local count := getMultiMapValue(data, "Position Data", "Car.Count", 0)
 		local notAlone := (count > 1)
 		local carPositions := []
-		local positions := CaseInsenseSafeMap()
+		local positions := CaseInsenseWeakMap()
 		local trackAhead := false
 		local trackBehind := false
 		local standingsAhead := false

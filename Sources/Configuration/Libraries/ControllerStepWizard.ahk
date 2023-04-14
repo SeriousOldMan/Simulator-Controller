@@ -29,10 +29,19 @@ class ControllerStepWizard extends StepWizard {
 	iFunctionTriggers := false
 
 	class StepControllerEditor extends ControllerEditor {
+		iStepWizard := false
+
+		__New(wizard) {
+			this.iStepWizard := wizard
+
+			super.__New("Default", wizard.SetupWizard.Configuration
+					  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
+					  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+		}
+
 		configurationChanged(type, name) {
 			local bbConfiguration := newMultiMap()
 			local sdConfiguration := newMultiMap()
-			local controllerWizard
 
 			super.configurationChanged(type, name)
 
@@ -41,12 +50,10 @@ class ControllerStepWizard extends StepWizard {
 			writeMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini", bbConfiguration)
 			writeMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", sdConfiguration)
 
-			controllerWizard := this.SetupWizard.StepWizards["Controller"]
+			if this.iStepWizard.iFunctionTriggers {
+				this.iStepWizard.saveFunctions(bbConfiguration, sdConfiguration)
 
-			if controllerWizard.iFunctionTriggers {
-				this.SetupWizard.StepWizards["Controller"].saveFunctions(bbConfiguration, sdConfiguration)
-
-				this.SetupWizard.StepWizards["Controller"].loadFunctions(bbConfiguration, sdConfiguration)
+				this.iStepWizard.loadFunctions(bbConfiguration, sdConfiguration)
 			}
 		}
 	}
@@ -85,11 +92,11 @@ class ControllerStepWizard extends StepWizard {
 				}
 			}
 
-			controls := CaseInsenseMap()
+			controls := CaseInsenseWeakMap()
 			buttonBoxControllers := []
 
 			for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
-				controls[control] := string2Values(";", descriptor)[1]
+				controls[control] := string2Values(";", descriptor, false, WeakArray)[1]
 
 			for controller, definition in getMultiMapValues(buttonBoxConfiguration, "Layouts") {
 				controller := ConfigurationItem.splitDescriptor(controller)
@@ -101,10 +108,10 @@ class ControllerStepWizard extends StepWizard {
 						buttonBoxControllers.Push(controller)
 
 					for ignore, control in string2Values(";", definition) {
-						Control:= string2Values(",", control)[1]()
+						control := string2Values(",", control, false, WeakArray)[1]
 
 						if (control != "") {
-							Control:= ConfigurationItem.splitDescriptor(control)()
+							control:= ConfigurationItem.splitDescriptor(control)
 							theFunction := ConfigurationItem.descriptor(controls[control[1]], control[2])
 
 							functionTriggers := wizard.getControllerFunctionTriggers(theFunction)
@@ -142,6 +149,11 @@ class ControllerStepWizard extends StepWizard {
 		local labelX := x + 35
 		local labelY := y + 8
 		local info, html
+
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
 
 		functionTriggersSelect(listView, line, *) {
 			local function, row, curCoordMode, control, number, trigger, menuItem
@@ -210,15 +222,15 @@ class ControllerStepWizard extends StepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], translate))
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h240 W:Grow H:Grow(0.66) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], translate))
 		widget3.OnEvent("Click", functionTriggersSelect)
 		widget3.OnEvent("DoubleClick", functionTriggersSelect)
-		widget3.OnEvent("ContextMenu", functionTriggersMenu)
+		widget3.OnEvent("ContextMenu", noSelect)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget4 := window.Add("ActiveX", "x" . x . " yp+245 w" . width . " h195 VfunctionsInfoText Hidden", "shell.explorer")
+		widget4 := window.Add("ActiveX", "x" . x . " yp+245 w" . width . " h195 W:Grow Y:Move(0.66) H:Grow(0.33) VfunctionsInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -256,13 +268,17 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	showPage(page) {
+		local editor
+
 		super.showPage(page)
 
-		this.iControllerEditor := this.StepControllerEditor("Default", this.SetupWizard.Configuration
-														  , kUserHomeDirectory . "Setup\Button Box Configuration.ini"
-														  , kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", false)
+		editor := ControllerStepWizard.StepControllerEditor(this)
 
-		this.iControllerEditor.open(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450), "Center")
+		this.iControllerEditor := editor
+
+		editor.createGui(editor.ButtonBoxConfiguration, editor.StreamDeckConfiguration, false)
+
+		editor.show(Min(A_ScreenWidth - Round(A_ScreenWidth / 3) + Round(A_ScreenWidth / 3 / 2) - 225, A_ScreenWidth - 450), "Center")
 
 		this.loadFunctions(readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 						 , readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini"), true)
@@ -320,19 +336,19 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	controllerFunctions(buttonBoxConfiguration, streamDeckConfiguration) {
-		local controls := CaseInsenseMap()
-		local functions := CaseInsenseMap()
+		local controls := CaseInsenseWeakMap()
+		local functions := []
 		local function, control, descriptor, controller, definition, ignore
 
 		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
-			controls[control] := string2Values(";", descriptor)[1]
+			controls[control] := string2Values(";", descriptor, false, WeakArray)[1]
 
 		for controller, definition in getMultiMapValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
 				for ignore, function in string2Values(";", definition) {
-					function := string2Values(",", function)[1]
+					function := string2Values(",", function, false, WeakArray)[1]
 					function := ConfigurationItem.splitDescriptor(function)
 					function := ConfigurationItem.descriptor(controls[function[1]], function[2])
 
@@ -357,13 +373,13 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	conflictingFunctions(buttonBoxConfiguration) {
-		local controls := CaseInsenseMap()
-		local functions := CaseInsenseMap()
+		local controls := CaseInsenseWeakMap()
+		local functions := CaseInsenseWeakMap()
 		local conflict := false
 		local function, control, descriptor, controller, definition, ignore
 
 		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
-			controls[control] := string2Values(";", descriptor)[1]
+			controls[control] := string2Values(";", descriptor, false, WeakArray)[1]
 
 		for controller, definition in getMultiMapValues(buttonBoxConfiguration, "Layouts") {
 			controller := ConfigurationItem.splitDescriptor(controller)
@@ -372,7 +388,7 @@ class ControllerStepWizard extends StepWizard {
 				controller := controller[1]
 
 				for ignore, function in string2Values(";", definition) {
-					function := string2Values(",", function)[1]
+					function := string2Values(",", function, false, WeakArray)[1]
 
 					if (function != "") {
 						function := ConfigurationItem.splitDescriptor(function)
@@ -394,7 +410,7 @@ class ControllerStepWizard extends StepWizard {
 	}
 
 	conflictingTriggers(buttonBoxConfiguration) {
-		local triggers := CaseInsenseMap()
+		local triggers := CaseInsenseWeakMap()
 		local conflict := false
 		local function, functionTriggers, ignore, trigger
 
@@ -413,13 +429,13 @@ class ControllerStepWizard extends StepWizard {
 
 	loadFunctions(buttonBoxConfiguration, streamDeckConfiguration, load := false) {
 		local wizard := this.SetupWizard
-		local controls := CaseInsenseMap()
+		local controls := CaseInsenseWeakMap()
 		local lastController := false
 		local function, ignore, control, descriptor, first, conflict, trigger, triggers
 		local functionConflicts, triggerConflicts, controller, definition, functionTriggers
 
 		for control, descriptor in getMultiMapValues(buttonBoxConfiguration, "Controls")
-			controls[control] := string2Values(";", descriptor)[1]
+			controls[control] := string2Values(";", descriptor, false, WeakArray)[1]
 
 		if (load || !this.iFunctionTriggers)
 			this.iFunctionTriggers := CaseInsenseMap()
@@ -436,10 +452,10 @@ class ControllerStepWizard extends StepWizard {
 				controller := controller[1]
 
 				for ignore, control in string2Values(";", definition) {
-					Control:= string2Values(",", control)[1]()
+					control := string2Values(",", control, false, WeakArray)[1]
 
 					if (control != "") {
-						Control:= ConfigurationItem.splitDescriptor(control)()
+						control := ConfigurationItem.splitDescriptor(control)
 						function := ConfigurationItem.descriptor(controls[control[1]], control[2])
 
 						first := (controller != lastController)
@@ -452,12 +468,12 @@ class ControllerStepWizard extends StepWizard {
 
 						conflict := 0
 
-						if (functionConflicts && functionConflicts[function].Length() > 1)
+						if (functionConflicts && functionConflicts[function].Length > 1)
 							conflict += 1
 
 						if triggerConflicts
 							for ignore, trigger in functionTriggers
-								if (triggerConflicts[trigger].Length() > 1) {
+								if (triggerConflicts[trigger].Length > 1) {
 									conflict += 2
 
 									break
@@ -806,7 +822,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 				else
 					this.iControllerPreviewCenterY -= Round(preview.Height / 2)
 
-				preview.open()
+				preview.show()
 
 				this.iControllerPreviewCenterY -= Round(preview.Height / 2)
 				this.ControllerPreviews.Push(preview)
@@ -897,16 +913,17 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		}
 
 		createGui(configuration) {
-			local window := this.Window
 			local modeDropDownHandle := false
 			local modes := []
-			local ignore, mode
+			local ignore, mode, window
 
 			updateControllerLabels(*) {
 				this.loadControllerLabels()
 			}
 
 			super.createGui(configuration)
+
+			window := this.Window
 
 			for ignore, mode in this.iModes
 				if mode
@@ -954,16 +971,17 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		}
 
 		createGui(configuration) {
-			local window := this.Window
 			local modeDropDownHandle := false
 			local modes := []
-			local ignore, mode
+			local ignore, mode, window
 
 			updateControllerLabels(*) {
 				this.loadControllerLabels()
 			}
 
 			super.createGui(configuration)
+
+			window := this.Window
 
 			for ignore, mode in this.iModes
 				if mode
@@ -986,7 +1004,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		}
 	}
 
-	CurrentActionsStep {
+	static CurrentActionsStep {
 		Get {
 			return ActionsStepWizard.sCurrentActionsStep
 		}
@@ -1185,9 +1203,9 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 	createControllerPreview(type, controller, configuration) {
 		if (type = "Button Box")
-			return this.ActionsButtonBoxPreview(this, controller, configuration, this.getModes())
+			return ActionsStepWizard.ActionsButtonBoxPreview(this, controller, configuration, this.getModes())
 		else
-			return this.ActionsStreamDeckPreview(this, controller, configuration, this.getModes())
+			return ActionsStepWizard.ActionsStreamDeckPreview(this, controller, configuration, this.getModes())
 	}
 
 	openControllerPreviews() {

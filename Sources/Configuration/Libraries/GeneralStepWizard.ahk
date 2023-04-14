@@ -29,7 +29,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	iLaunchApplicationsListView := false
 
 	iModeSelectors := []
-	iLaunchApplications := {}
+	iLaunchApplications := CaseInsenseWeakMap()
 
 	iPendingApplicationRegistration := false
 	iPendingFunctionRegistration := false
@@ -43,7 +43,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		}
 	}
 
-	CurrentGeneralStep {
+	static CurrentGeneralStep {
 		Get {
 			return GeneralStepWizard.sCurrentGeneralStep
 		}
@@ -143,6 +143,11 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local col2Width := width - 140 - secondX + x
 		local choices, code, language, info, html, configurator
 
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
+
 		openFormatsEditor(*) {
 			this.openFormatsEditor()
 		}
@@ -150,10 +155,10 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		updateApplicationFunction(row) {
 			local function, application, curCoordMode, menuItem, contextMenu
 
-			inputLabel(row) {
+			inputLabel(row, *) {
 				local function, application, label, function, result
 
-				application := this.iLaunchApplicationsListViewGetText(row, 1)
+				application := this.iLaunchApplicationsListView.GetText(row, 1)
 				label := this.iLaunchApplicationsListView.GetText(row, 2)
 				function := this.iLaunchApplicationsListView.GetText(row, 3)
 
@@ -180,8 +185,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 			if (row > 0) {
 				if this.SetupWizard.isModuleSelected("Controller") {
-					if wizard.iPendingApplicationRegistration
-						wizard.setApplicationFunction(row)
+					if this.iPendingApplicationRegistration
+						this.setApplicationFunction(row)
 					else {
 						curCoordMode := A_CoordModeMouse
 
@@ -211,7 +216,12 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 						contextMenu.Add()
 
-						contextMenu.Add(translate("Input Label..."), inputLabel.Bind(row))
+						menuItem := translate("Input Label...")
+
+						contextMenu.Add(menuItem, inputLabel.Bind(row))
+
+						if (!function || (function = ""))
+							contextMenu.Disable(menuItem)
 
 						contextMenu.Show()
 					}
@@ -269,15 +279,15 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		widget13 := window.Add("ListBox", "x" . secondX . " yp w120 h60 Disabled ReadOnly Hidden")
 
 		widget14 := window.Add("Text", "x" . x . " yp+60 w140 h23 +0x200 Hidden", translate("Launchpad Mode"))
-		widget15 := window.Add("ListView", "x" . x . " yp+24 w" . col1Width . " h112 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Application", "Label", "Function"], translate))
+		widget15 := window.Add("ListView", "x" . x . " yp+24 w" . col1Width . " h112 H:Grow(0.5) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Application", "Label", "Function"], translate))
 		widget15.OnEvent("Click", applicationFunctionSelect)
 		widget15.OnEvent("DoubleClick", applicationFunctionSelect)
-		widget15.OnEvent("ContextMenu", applicationFunctionMenu)
+		widget15.OnEvent("ContextMenu", noSelect)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget16 := window.Add("ActiveX", "x" . x . " yp+118 w" . width . " h94 VgeneralInfoText Hidden", "shell.explorer")
+		widget16 := window.Add("ActiveX", "x" . x . " yp+118 w" . width . " h94 Y:Move(0.5) H:Grow(0.5) W:Grow Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -295,7 +305,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		this.iVoiceControlConfigurator := configurator
 
-		configurator.createGui(this, col2X, labelY + 30 + 30, col2Width, height, 0)
+		configurator.createGui(this, col2X, labelY + 30 + 30, col2Width, height)
 		configurator.hideWidgets()
 
 		this.iModeSelectorsListView := widget13
@@ -326,7 +336,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		this.iVoiceControlWidgets := []
 
 		this.iModeSelectors := []
-		this.iLaunchApplications := {}
+		this.iLaunchApplications := CaseInsenseWeakMap()
 	}
 
 	showPage(page) {
@@ -462,7 +472,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		local application, function, row, column, ignore, section, application, descriptor
 
 		if load
-			this.iLaunchApplications := {}
+			this.iLaunchApplications := CaseInsenseWeakMap()
 
 		this.iLaunchApplicationsListView.Delete()
 
@@ -625,7 +635,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 	controlClick(preview, element, function, row, column, isEmpty, applicationRegistration := false) {
 		local application, menuItem, count, ignore, candidate, wizard, descriptor, contextMenu
 
-		if (element[1] = "Control") {
+		if ((element[1] = "Control") && !isEmpty) {
 			if (!this.iPendingFunctionRegistration && !applicationRegistration) {
 				menuItem := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
 

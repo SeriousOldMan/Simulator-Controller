@@ -125,7 +125,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 	iCount := 0
 
-	iSteps := CaseInsenseSafeMap()
+	iSteps := CaseInsenseWeakMap()
 	iStep := 0
 	iPage := 0
 
@@ -133,6 +133,84 @@ class SetupWizard extends ConfiguratorPanel {
 	iInitialize := false
 
 	iCachedActions := CaseInsenseMap()
+
+	class SetupWindow extends Window {
+		iSetupWizard := false
+		iResizeEnabled := true
+
+		SetupWizard {
+			Get {
+				return this.iSetupWizard
+			}
+		}
+
+		Resizeable {
+			Get {
+				return (this.iResizeEnabled ? super.Resizeable : false)
+			}
+
+			Set {
+				if value {
+					this.iResizeEnabled := true
+
+					return super.Resizeable
+				}
+				else
+					return (this.iResizeEnabled := false)
+			}
+		}
+
+		__New(wizard) {
+			this.iSetupWizard := wizard
+
+			super.__New({Descriptor: "Simulator Setup", Closeable: true, Resizeable: "Deferred"})
+		}
+
+		DefineResizeRule(control, rule) {
+			if this.Resizeable
+				super.DefineResizeRule(control, rule)
+		}
+
+		Close(*) {
+			if this.SetupWizard.finishSetup(false)
+				ExitApp(0)
+		}
+	}
+
+	class HTMLResizer extends Window.Resizer {
+		iRedraw := false
+		iWindow := false
+
+		__New(window, arguments*) {
+			this.iWindow := window
+
+			super.__New(window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTML"), 500, kLowPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawHTML() {
+			if this.iRedraw {
+				local ignore, button, widget
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				for ignore, widget in this.iWindow
+					if widget.Visible && isInstance(widget, Gui.ActiveX)
+						widget.Value.document.location.reload()
+			}
+
+			return Task.CurrentTask
+		}
+	}
 
 	Debug[option] {
 		Get {
@@ -309,7 +387,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		this.iKnowledgeBase := this.createKnowledgeBase()
 
-		this.iSteps := CaseInsenseSafeMap()
+		this.iSteps := CaseInsenseWeakMap()
 		this.iStep := 0
 		this.iPage := 0
 
@@ -504,30 +582,30 @@ class SetupWizard extends ConfiguratorPanel {
 			}
 		}
 
-		wizardGui := Window({Descriptor: "Simulator Setup", Closeable: true, Resizable: true})
+		wizardGui := SetupWizard.SetupWindow(this)
 
 		this.Window := wizardGui
 
 		wizardGui.SetFont("s10 Bold", "Arial")
 
-		wizardGui.Add("Text", "w684 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(wizardGui, "Simulator Setup"))
+		wizardGui.Add("Text", "w684 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(wizardGui, "Simulator Setup"))
 
 		wizardGui.SetFont("s9 Norm", "Arial")
 		wizardGui.SetFont("Italic Underline", "Arial")
 
-		wizardGui.Add("Text", "x258 YP+20 w184 cBlue Center", translate("Setup && Configuration")).OnEvent("Click", openDocumentation.Bind(wizardGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup"))
+		wizardGui.Add("Text", "x258 YP+20 w184 H:Center cBlue Center", translate("Setup && Configuration")).OnEvent("Click", openDocumentation.Bind(wizardGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#setup"))
 
-		wizardGui.Add("Text", "x8 yp+20 w700 0x10")
+		wizardGui.Add("Text", "x8 yp+20 w700 0x10 W:Grow")
 
 		wizardGui.SetFont("s8 Norm", "Arial")
 
-		wizardGui.Add("Button", "x16 y540 w30 h30 Disabled VfirstPageButton").OnEvent("Click", firstPage)
+		wizardGui.Add("Button", "x16 y540 w30 h30 Y:Move Disabled VfirstPageButton").OnEvent("Click", firstPage)
 		setButtonIcon(wizardGui["firstPageButton"], kIconsDirectory . "First.ico", 1, "L2 T2 R2 B2 H24 W24")
-		wizardGui.Add("Button", "x48 y540 w30 h30 Disabled VpreviousPageButton").OnEvent("Click", previousPage)
+		wizardGui.Add("Button", "x48 y540 w30 h30 Y:Move Disabled VpreviousPageButton").OnEvent("Click", previousPage)
 		setButtonIcon(wizardGui["previousPageButton"], kIconsDirectory . "Previous.ico", 1, "L2 T2 R2 B2 H24 W24")
-		wizardGui.Add("Button", "x638 y540 w30 h30 Disabled VnextPageButton").OnEvent("Click", nextPage)
+		wizardGui.Add("Button", "x638 y540 w30 h30 Y:Move X:Move Disabled VnextPageButton").OnEvent("Click", nextPage)
 		setButtonIcon(wizardGui["nextPageButton"], kIconsDirectory . "Next.ico", 1, "L2 T2 R2 B2 H24 W24")
-		wizardGui.Add("Button", "x670 y540 w30 h30 Disabled VlastPageButton").OnEvent("Click", lastPage)
+		wizardGui.Add("Button", "x670 y540 w30 h30 Y:Move X:Move Disabled VlastPageButton").OnEvent("Click", lastPage)
 		setButtonIcon(wizardGui["lastPageButton"], kIconsDirectory . "Last.ico", 1, "L2 T2 R2 B2 H24 W24")
 
 		languages := string2Values("|", getMultiMapValue(this.Definition, "Setup", "Languages"))
@@ -543,35 +621,39 @@ class SetupWizard extends ConfiguratorPanel {
 					chosen := choices.Length
 			}
 
-		wizardGui.Add("Text", "x8 yp+34 w700 0x10")
+		wizardGui.Add("Text", "x8 yp+34 w700 0x10 Y:Move W:Grow")
 
-		wizardGui.Add("Text", "x16 y580 w85 h23 +0x200", translate("Language"))
-		wizardGui.Add("DropDownList", "x100 y580 w75 Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
+		wizardGui.Add("Text", "x16 y580 w85 h23 Y:Move +0x200", translate("Language"))
+		wizardGui.Add("DropDownList", "x100 y580 w75 Y:Move Choose" . chosen . "  VlanguageDropDown", collect(choices, translate)).OnEvent("Change", chooseLanguage)
 
-		wizardGui.Add("Button", "x535 y580 w80 h23 Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
-		wizardGui.Add("Button", "x620 y580 w80 h23", translate("Cancel")).OnEvent("Click", cancelSetup)
+		wizardGui.Add("Button", "x535 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
+		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)
 
-		helpGui := Window({Descriptor: "Simulator Setup.Help", Resizeable: true, Options: "0x400000"}, "")
+		wizardGui.Add(SetupWizard.HTMLResizer(wizardGui))
+
+		helpGui := Window({Descriptor: "Simulator Setup.Help", Resizeable: true, Options: "-SysMenu 0x400000"}, "")
 
 		this.iHelpWindow := helpGui
 
 		helpGui.SetFont("s10 Bold", "Arial")
 
-		helpGui.Add("Text", "w350 Center  VstepTitle", translate("Title")).OnEvent("Click", moveByMouse.Bind(helpGui, "Simulator Setup.Help"))
+		helpGui.Add("Text", "w350 H:Center Center VstepTitle", translate("Title")).OnEvent("Click", moveByMouse.Bind(helpGui, "Simulator Setup.Help"))
 
 		helpGui.SetFont("s9 Norm", "Arial")
 
-		helpGui.Add("Text", "YP+20 w350 Center VstepSubtitle", translate("Subtitle"))
+		helpGui.Add("Text", "YP+20 w350 H:Center Center VstepSubtitle", translate("Subtitle"))
 
-		helpGui.Add("Text", "yp+20 w350 0x10")
+		helpGui.Add("Text", "yp+20 w350 0x10 W:Grow")
 
-		helpGui.Add("ActiveX", "x12 yp+10 w350 h545 vinfoViewer", "shell.explorer")
+		helpGui.Add("ActiveX", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer", "shell.explorer")
 
 		helpGui["infoViewer"].Value.navigate("about:blank")
 
 		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 		helpGui["infoViewer"].Value.document.write(html)
+
+		helpGui.Add(SetupWizard.HTMLResizer(helpGui))
 
 		this.createStepsGui()
 	}
@@ -651,17 +733,6 @@ class SetupWizard extends ConfiguratorPanel {
 		local helpWindow := this.HelpWindow
 		local x, y, w, h, posX, settings
 
-		if getWindowPosition("Simulator Setup", &x, &y)
-			wizardWindow.Show("x" . x . " y" . y)
-		else {
-			posX := Round((A_ScreenWidth - 720 - 400) / 2)
-
-			wizardWindow.Show("x" . posX . " yCenter h610")
-		}
-
-		if getWindowSize("Simulator Setup", &w, &h)
-			wizardWindow.Resize("Initialize", w, h)
-
 		if getWindowPosition("Simulator Setup.Help", &x, &y)
 			helpWindow.Show("x" . x . " y" . y)
 		else {
@@ -670,8 +741,19 @@ class SetupWizard extends ConfiguratorPanel {
 			helpWindow.Show("x800 x" . posX . " yCenter h610")
 		}
 
-		if getWindowSize("Simulator Setup.Help", &w, &w)
+		if getWindowSize("Simulator Setup.Help", &w, &h)
 			helpWindow.Resize("Initialize", w, h)
+
+		if getWindowPosition("Simulator Setup", &x, &y)
+			wizardWindow.Show("x" . x . " y" . y)
+		else {
+			posX := Round((A_ScreenWidth - 720 - 400) / 2)
+
+			wizardWindow.Show("x" . posX . " yCenter")
+		}
+
+		if getWindowSize("Simulator Setup", &w, &h)
+			wizardWindow.Resize("Initialize", w, h)
 
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
@@ -1134,7 +1216,7 @@ class SetupWizard extends ConfiguratorPanel {
 				this.Control["finishButton"].Enabled := false
 			}
 
-			window.Opt("-Disabled")
+			this.WizardWindow.Opt("-Disabled")
 		}
 	}
 
@@ -1728,7 +1810,8 @@ class SetupWizard extends ConfiguratorPanel {
 
 		knowledgeBase.setFact("Module." . module . modeClause . ".Action.Count", actions.Length)
 
-		this.iCachedActions.Delete(module . mode)
+		if this.iCachedActions.Has(module . mode)
+			this.iCachedActions.Delete(module . mode)
 
 		this.updateState()
 	}
@@ -2063,6 +2146,57 @@ class StartStepWizard extends StepWizard {
 	iImageViewer := false
 	iImageViewerHTML := false
 
+	class RestartVideoResizer extends Window.Resizer {
+		iRedraw := false
+		iWizard := false
+
+		__New(wizard, window, arguments*) {
+			this.iWizard := wizard
+			this.iWindow := window
+
+			super.__New(window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RestartVideo"), 500, kLowPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RestartVideo() {
+			if this.iRedraw {
+				local ignore, button, audio, volume
+
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				if ((this.iWizard.SetupWizard.Step = this.iWizard) && (this.iWizard.SetupWizard.Page = 1)) {
+					audio := substituteVariables(getMultiMapValue(this.iWizard.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
+
+					if audio {
+						volume := fadeOut(20)
+
+						try {
+							SoundPlay("NonExistent.avi")
+						}
+						catch Any as exception {
+							logError(exception, false, false)
+						}
+
+						resetVolume(volume)
+
+						SoundPlay(audio)
+					}
+				}
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
 	Pages {
 		Get {
 			return (A_IsAdmin ? 1 : 2)
@@ -2093,7 +2227,7 @@ class StartStepWizard extends StepWizard {
 			}
 		}
 
-		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " VimageViewer Hidden", "shell.explorer")
+		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " W:Grow H:Grow Hidden", "shell.explorer")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
@@ -2102,9 +2236,11 @@ class StartStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
 
-		widget1.navigate("about:blank")
+		widget1.Value.navigate("about:blank")
+
+		window.Add(StartStepWizard.RestartVideoResizer(this, widget1))
 
 		this.iImageViewer := widget1
 		this.iImageViewerHTML := html
@@ -2121,20 +2257,20 @@ class StartStepWizard extends StepWizard {
 
 			window.SetFont("s10 Bold", "Arial")
 
-			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Security.ico")
-			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Unblocking Applications and DLLs"))
+			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 H:Center Hidden", kResourcesDirectory . "Setup\Images\Security.ico")
+			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 H:Center Hidden", translate("Unblocking Applications and DLLs"))
 
 			window.SetFont("s8 Norm", "Arial")
 
 			Sleep(200)
 
-			widget3 := window.Add("ActiveX", "x" . x . " yp+30 w" . width . " h350 VinfoText Hidden", "shell.explorer")
+			widget3 := window.Add("ActiveX", "x" . x . " yp+30 w" . width . " h350 W:Grow H:Grow Hidden", "shell.explorer")
 
 			x := x + Round((width - 240) / 2)
 
 			window.SetFont("s10 Bold", "Arial")
 
-			widget4 := window.Add("Button", "x" . x . " yp+380 w240 h30 Hidden", translate("Restart as Administrator"))
+			widget4 := window.Add("Button", "x" . x . " yp+380 w240 h30 Y:Move H:Center Hidden", translate("Restart as Administrator"))
 			widget4.OnEvent("Click", elevateAndRestart)
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
@@ -2175,7 +2311,7 @@ class StartStepWizard extends StepWizard {
 			SoundPlay("NonExistent.avi")
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, false, false)
 		}
 
 		resetVolume(volume)
@@ -2210,7 +2346,7 @@ class StartStepWizard extends StepWizard {
 				SoundPlay("NonExistent.avi")
 			}
 			catch Any as exception {
-				logError(exception)
+				logError(exception, false, false)
 			}
 
 			resetVolume(volume)
@@ -2249,7 +2385,7 @@ class FinishStepWizard extends StepWizard {
 		local window := this.Window
 		local image, text, html
 
-		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " VimageViewer Hidden", "shell.explorer")
+		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " H:Center Hidden", "shell.explorer")
 
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
@@ -2258,7 +2394,7 @@ class FinishStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center><br><br><br>" . text . "</body></html>"
 
 		widget1.Value.navigate("about:blank")
 		widget1.Value.document.write(html)
@@ -2377,7 +2513,7 @@ findInRegistry(collection, filterName, filterValue, valueName) {
 
 		loop Reg, collection, "R"
 			if (A_LoopRegName = filterName) {
-				candidate := RegRead("")
+				candidate := RegRead()
 
 				if ((exact && (candidate = filterValue)) || (!exact && InStr(candidate, filterValue) = 1)) {
 					try {
@@ -2542,7 +2678,7 @@ startupSimulatorSetup() {
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-openLabelsAndIconsEditor() {
+openLabelsAndIconsEditor(*) {
 	local window := SetupWizard.Instance.WizardWindow
 
 	window.Opt("+Disabled")
@@ -2669,7 +2805,7 @@ getApplicationDescriptor(application) {
 	return false
 }
 
-fadeOut() {
+fadeOut(delay := 200) {
 	local masterVolume, currentVolume
 
 	masterVolume := SoundGetVolume()
@@ -2687,7 +2823,7 @@ fadeOut() {
 			else {
 				SoundSetVolume(currentVolume)
 
-				Sleep(200)
+				Sleep(delay)
 			}
 		}
 	}

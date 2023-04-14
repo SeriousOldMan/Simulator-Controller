@@ -470,7 +470,7 @@ class ModulesStepWizard extends StepWizard {
 		local x2 := x + listWidth + 50
 		local buttonWidth := 40
 		local x3 := x + listWidth + 5
-		local module, selected, info, label, labelX, labelY, html
+		local module, selected, info, label, labelX, labelY, html, factor
 
 		compose(functions*) {
 			callFunctions(functions, arguments*) {
@@ -536,16 +536,18 @@ class ModulesStepWizard extends StepWizard {
 			module := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
 
 			label := substituteVariables(translate("Module: %module%"), {module: module})
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 			labelX := x + 35
 			labelY := y + 8
 
-			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Module.png")
-			widget2:= window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", label)
-			widget3:= window.Add("CheckBox", "Checked" . selected . " x" . checkX . " y" . labelY . " w23 h23 VmoduleCheck" . A_Index . " Hidden")
+			factor := (Mod(A_Index - 1, 3) * 0.33)
+
+			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Y:Move(" . factor . ") Hidden", kResourcesDirectory . "Setup\Images\Module.png")
+			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Y:Move(" . factor . ") Hidden", label)
+			widget3 := window.Add("CheckBox", "Checked" . selected . " x" . checkX . " y" . labelY . " w23 h23 X:Move Y:Move(" . factor . ") Hidden")
 			widget3.OnEvent("Click", updateSelectedModules)
-			widget4 := window.Add("ActiveX", "x" . x . " yp+26 w" . width . " h124 VinfoText" . A_Index . " Hidden", "shell.explorer")
+			widget4 := window.Add("ActiveX", "x" . x . " yp+26 w" . width . " h124 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden", "shell.explorer")
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -573,13 +575,13 @@ class ModulesStepWizard extends StepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . listWidth . " h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden Section", collect(["Available Presets"], translate))
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden Section", collect(["Available Presets"], translate))
 		widget3.OnEvent("Click", chooseAvailablePreset)
 		widget3.OnEvent("DoubleClick", compose(chooseAvailablePreset, installPreset))
 
 		this.iAvailablePresetsListView := widget3
 
-		widget4 := window.Add("ListView", "x" . x2 . " ys w" . listWidth . " h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Selected Presets"], translate))
+		widget4 := window.Add("ListView", "x" . x2 . " ys w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Selected Presets"], translate))
 		widget4.OnEvent("Click", chooseSelectedPreset)
 		widget4.OnEvent("DoubleClick", compose(chooseSelectedPreset, editSelectedPreset))
 
@@ -587,17 +589,17 @@ class ModulesStepWizard extends StepWizard {
 
 		window.SetFont("s10 Bold", "Arial")
 
-		widget5 := window.Add("Button", "x" . x3 . " ys+95 w" . buttonWidth . " vinstallPresetButton  Hidden", ">")
+		widget5 := window.Add("Button", "x" . x3 . " ys+95 w" . buttonWidth . " X:Move(0.5) Y:Move(0.35) vinstallPresetButton  Hidden", ">")
 		widget5.OnEvent("Click", installPreset)
-		widget6 := window.Add("Button", "x" . x3 . " yp+30 w" . buttonWidth . " vuninstallPresetButton  Hidden", "<")
+		widget6 := window.Add("Button", "x" . x3 . " yp+30 w" . buttonWidth . " X:Move(0.5) Y:Move(0.35) vuninstallPresetButton  Hidden", "<")
 		widget6.OnEvent("Click", uninstallPreset)
 
 		window.SetFont("s8 Norm", "Arial")
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget7 := window.Add("ActiveX", "x" . x . " ys+229 w" . width . " h210 VpresetsInfoText Hidden", "shell.explorer")
+		widget7 := window.Add("ActiveX", "x" . x . " ys+229 w" . width . " h210 Y:Move(0.7) W:Grow H:Grow(0.3) VpresetsInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -756,7 +758,7 @@ class ModulesStepWizard extends StepWizard {
 		if !info
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

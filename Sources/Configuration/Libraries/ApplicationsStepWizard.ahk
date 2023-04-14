@@ -142,19 +142,20 @@ class ApplicationsStepWizard extends StepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h170 Section -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Simulation", "Path"], translate))
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h170 H:Grow(0.5) W:Grow Section -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Simulation", "Path"], translate))
 		widget3.OnEvent("Click", noSelect)
 		widget3.OnEvent("DoubleClick", noSelect)
+		widget3.OnEvent("ContextMenu", noSelect)
 
 		buttonX := x + width - 90
 
-		widget4 := window.Add("Button", "x" . buttonX . " yp+177 w90 h23  Hidden", translate("Locate..."))
+		widget4 := window.Add("Button", "x" . buttonX . " yp+177 w90 h23 Y:Move(0.5) X:Move Hidden", translate("Locate..."))
 		widget4.OnEvent("Click", locateSimulator)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget5 := window.Add("ActiveX", "x" . x . " ys+205 w" . width . " h180 VsimulatorsInfoText Hidden", "shell.explorer")
+		widget5 := window.Add("ActiveX", "x" . x . " ys+205 w" . width . " h180 Y:Move(0.5) W:Grow VsimulatorsInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
@@ -172,19 +173,20 @@ class ApplicationsStepWizard extends StepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h230 Section -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr Hidden", collect(["Category", "Application", "Path"], translate))
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h230 H:Grow(0.5) W:Grow Section -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr Hidden", collect(["Category", "Application", "Path"], translate))
 		widget3.OnEvent("Click", updateSelectedApplications)
 		widget3.OnEvent("DoubleClick", updateSelectedApplications)
+		widget3.OnEvent("ContextMenu", noSelect)
 
 		buttonX := x + width - 90
 
-		widget4 := window.Add("Button", "x" . buttonX . " yp+237 w90 h23  Hidden", translate("Locate..."))
+		widget4 := window.Add("Button", "x" . buttonX . " yp+237 w90 h23 Y:Move(0.5) X:Move Hidden", translate("Locate..."))
 		widget4.OnEvent("Click", locateApplication)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget5 := window.Add("ActiveX", "x" . x . " ys+265 w" . width . " h120 VapplicationsInfoText Hidden", "shell.explorer")
+		widget5 := window.Add("ActiveX", "x" . x . " ys+265 w" . width . " h120 Y:Move(0.5) W:Grow VapplicationsInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 

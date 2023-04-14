@@ -2453,7 +2453,7 @@ class Strategy extends ConfigurationItem {
 
 		this.iFuelAmount := getMultiMapValue(configuration, "Setup", "FuelAmount", 0.0)
 		this.iStartFuelAmount := getMultiMapValue(configuration, "Setup", "StartFuelAmount", this.iFuelAmount)
-		this.iTyreLaps:= getMultiMapValue(configuration, "Setup", "TyreLaps", 0)
+		this.iTyreLaps := getMultiMapValue(configuration, "Setup", "TyreLaps", 0)
 
 		this.iTyreCompound := getMultiMapValue(configuration, "Setup", "TyreCompound", "Dry")
 		this.iTyreCompoundColor := getMultiMapValue(configuration, "Setup", "TyreCompoundColor", "Black")

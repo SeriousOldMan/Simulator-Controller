@@ -19,7 +19,7 @@
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class MultiMap extends CaseInsenseSafeMap {
+class MultiMap extends CaseInsenseWeakMap {
 	static read(multiMapFile) {
 		return readMultiMap(multiMapFile)
 	}

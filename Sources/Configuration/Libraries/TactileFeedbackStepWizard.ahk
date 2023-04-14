@@ -105,6 +105,11 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		local secondWidth := colWidth - 155
 		local info, html
 
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
+
 		changePedalEffects(*) {
 			this.changeEffects("Pedal Vibration")
 		}
@@ -162,10 +167,10 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		widget14 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
 		widget14.OnEvent("Click", tactileFeedbackActionFunctionSelect)
 		widget14.OnEvent("DoubleClick", tactileFeedbackActionFunctionSelect)
-		widget14.OnEvent("DoubleClick", tactileFeedbackActionFunctionMenu)
+		widget14.OnEvent("ContextMenu", noSelect)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 		widget15 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 VtactileFeedbackInfoText Hidden", "shell.explorer")
 

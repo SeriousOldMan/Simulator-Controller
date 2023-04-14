@@ -118,6 +118,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local listWidth := width - 250
 		local ignore, simulator, code, keys, keyY, key, default, label, info, html
 
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
+
 		simulatorActionFunctionSelect(listView, line, *) {
 			this.actionFunctionSelect(line)
 		}
@@ -186,24 +191,24 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		window.SetFont("Norm", "Arial")
 
-		widget9 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
+		widget9 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h300 W:Grow H:Grow(0.66) AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
 		widget9.OnEvent("Click", simulatorActionFunctionSelect)
 		widget9.OnEvent("DoubleClick", simulatorActionFunctionSelect)
-		widget9.OnEvent("ContextMenu", simulatorActionFunctionMenu)
+		widget9.OnEvent("ContextMenu", noSelect)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget10 := window.Add("ActiveX", "x" . x . " yp+305 w" . width . " h76 VactionsInfoText Hidden", "shell.explorer")
+		widget10 := window.Add("ActiveX", "x" . x . " yp+305 w" . width . " h76 Y:Move(0.66) H:Grow(0.33) W:Grow VactionsInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget10.Value.navigate("about:blank")
 		widget10.Value.document.write(html)
 
-		this.iControllerWidgets := [widget8, widget9]
+		this.iControllerWidgets := [widget7, widget8, widget9]
 
-		this.setActionsListView(widget10)
+		this.setActionsListView(widget9)
 
 		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget9, widget10)
 	}
@@ -301,7 +306,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		this.loadSimulatorMFDKeys(simulatorDropDown)
 
-		this.loadActions(simulatorDropDown, true)
+		this.loadActions(true)
 	}
 
 	loadActions(load := false) {

@@ -239,8 +239,8 @@ class RaceCenter extends ConfigurationItem {
 	iUseTraffic := false
 
 	iDrivers := []
-	iStints := CaseInsenseSafeMap()
-	iLaps := CaseInsenseSafeMap()
+	iStints := CaseInsenseWeakMap()
+	iLaps := CaseInsenseWeakMap()
 
 	iPitstops := CaseInsenseMap()
 	iLastPitstopUpdate := false
@@ -296,11 +296,11 @@ class RaceCenter extends ConfigurationItem {
 		}
 
 		Resize(deltaWidth, deltaHeight) {
-			this.iRedraw := (A_TickCount + 500)
+			this.iRedraw := true
 		}
 
 		RedrawHTMLViwer() {
-			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+			if this.iRedraw {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -3082,7 +3082,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	getPlanDrivers() {
-		local drivers := CaseInsenseSafeMap()
+		local drivers := CaseInsenseWeakMap()
 		local stint, driver
 
 		loop this.PlanListView.GetCount() {
@@ -3106,7 +3106,7 @@ class RaceCenter extends ConfigurationItem {
 
 			this.iSelectedPlanStint := false
 
-			pitstops := CaseInsenseSafeMap()
+			pitstops := CaseInsenseWeakMap()
 			numStints := 1
 
 			for ignore, pitstop in this.Strategy.Pitstops {
@@ -5060,7 +5060,7 @@ class RaceCenter extends ConfigurationItem {
 									+ getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".Lap.Running", 0))
 				}
 
-				laps := CaseInsenseSafeMap()
+				laps := CaseInsenseWeakMap()
 
 				consideredLaps := []
 
@@ -5295,8 +5295,8 @@ class RaceCenter extends ConfigurationItem {
 		this.iTeamDriversVersion := false
 
 		this.iDrivers := []
-		this.iStints := CaseInsenseSafeMap()
-		this.iLaps := CaseInsenseSafeMap()
+		this.iStints := CaseInsenseWeakMap()
+		this.iLaps := CaseInsenseWeakMap()
 
 		this.iPitstops := CaseInsenseMap()
 		this.iLastPitstopUpdate := false
@@ -7783,7 +7783,7 @@ class RaceCenter extends ConfigurationItem {
 	loadLaps() {
 		local ignore, lap, newLap, engineDamage
 
-		this.iLaps := CaseInsenseSafeMap()
+		this.iLaps := CaseInsenseWeakMap()
 
 		for ignore, lap in this.SessionStore.Tables["Lap.Data"] {
 			newLap := {Nr: lap["Nr"], Stint: lap["Stint"], Laptime: lap["Lap.Time"], Position: lap["Position"], Grip: lap["Grip"]
@@ -7841,7 +7841,7 @@ class RaceCenter extends ConfigurationItem {
 		local ignore, stint, newStint, driver, laps, lap, stintNr, stintLap, airTemperatures, trackTemperatures
 		local currentStint, lastLap, remainingFuel, fuelConsumption, penalty
 
-		this.iStints := CaseInsenseSafeMap()
+		this.iStints := CaseInsenseWeakMap()
 
 		for ignore, stint in this.SessionStore.Tables["Stint.Data"] {
 			driver := this.createDriver({Forname: stint["Driver.Forname"], Surname: stint["Driver.Surname"], Nickname: stint["Driver.Nickname"], ID: stint["Driver.ID"]})
@@ -8329,7 +8329,7 @@ class RaceCenter extends ConfigurationItem {
 		laps := false
 
 		if (settingsLaps && (settingsLaps.Length > 0)) {
-			laps := CaseInsenseSafeMap()
+			laps := CaseInsenseWeakMap()
 
 			for ignore, lap in settingsLaps
 				laps[lap] := lap
@@ -8682,7 +8682,7 @@ class RaceCenter extends ConfigurationItem {
 						brushCar := Gdip_BrushCreateSolid(0xff000000)
 						brushGray := Gdip_BrushCreateSolid(0xffBBBBBB)
 
-						carIndices := CaseInsenseSafeMap()
+						carIndices := CaseInsenseWeakMap()
 
 						if positions {
 							loop getMultiMapValue(positions, "Position Data", "Car.Count")
@@ -9462,7 +9462,7 @@ class RaceCenter extends ConfigurationItem {
 						if (positions && (positions != "")) {
 							positions := parseMultiMap(positions)
 
-							carIDs := CaseInsenseSafeMap()
+							carIDs := CaseInsenseWeakMap()
 
 							loop getMultiMapValue(positions, "Position Data", "Car.Count")
 								carIDs[A_Index] := getMultiMapValue(positions, "Position Data", "Car." . A_Index . ".ID")
@@ -10436,7 +10436,7 @@ class RaceCenter extends ConfigurationItem {
 		local hasGrain := false
 		local hasBlister := false
 		local hasFlatSpot := false
-		local tyres := CaseInsenseSafeMap()
+		local tyres := CaseInsenseWeakMap()
 		local ignore, tyreData, tyre, key, wear, tread, grain, blister, flatSpot
 
 		for ignore, tyreData in this.SessionStore.query("Pitstop.Tyre.Data", {Where: {Pitstop: pitstopNr}})

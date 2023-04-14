@@ -78,11 +78,11 @@ class RaceReports extends ConfigurationItem {
 		}
 
 		Redraw() {
-			this.iRedraw := (A_TickCount + 500)
+			this.iRedraw := true
 		}
 
 		RedrawHTMLViwer() {
-			if (this.iRedraw && (A_TickCount > this.iRedraw)) {
+			if this.iRedraw {
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]

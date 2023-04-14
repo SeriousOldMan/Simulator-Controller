@@ -181,7 +181,7 @@ class ConfiguratorPanel extends ConfigurationItem {
 	iEditor := false
 	iWindow := false
 
-	iValues := CaseInsenseSafeMap()
+	iValues := CaseInsenseWeakMap()
 
 	Editor {
 		Get {

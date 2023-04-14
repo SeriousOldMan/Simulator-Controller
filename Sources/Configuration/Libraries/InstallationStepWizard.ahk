@@ -28,7 +28,7 @@ class InstallationStepWizard extends StepWizard {
 		local definition := this.Definition
 		local startY := y
 		local ignore, software, installer, folder, locatable, info, label, installed, buttonX
-		local labelWidth, labelX, labelY, buttonY, page, html
+		local labelWidth, labelX, labelY, buttonY, page, html, factor
 
 		installSoftware(software, *) {
 			this.installSoftware(software)
@@ -36,11 +36,11 @@ class InstallationStepWizard extends StepWizard {
 
 		locateSoftware(software, *) {
 			local definition := this.Definition
-			local folder := getMultiMapValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
+			local folder := getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
 			local fileName
 
 			if folder
-				Run("explore " . substituteVariables(getMultiMapValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . software)))
+				Run("explore " . substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software)))
 			else {
 				window.Opt("+OwnDialogs")
 
@@ -49,7 +49,7 @@ class InstallationStepWizard extends StepWizard {
 				OnMessage(0x44, translateSelectCancelButtons, 0)
 
 				if (fileName != "")
-					stepWizard.locateSoftware(software, fileName)
+					this.locateSoftware(software, fileName)
 			}
 		}
 
@@ -60,7 +60,7 @@ class InstallationStepWizard extends StepWizard {
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
 
 			label := (translate("Software: ") . software)
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 			installed := (folder ? false : this.SetupWizard.isSoftwareInstalled(software))
 
@@ -73,34 +73,36 @@ class InstallationStepWizard extends StepWizard {
 			labelX := x + 35
 			labelY := y + 8
 
-			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Install.png")
+			factor := (Mod(A_Index - 1, 3) * 0.33)
+
+			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Y:Move(" . factor . ") Hidden", kResourcesDirectory . "Setup\Images\Install.png")
 
 			window.SetFont("s10 Bold", "Arial")
 
-			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", label)
+			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Y:Move(" . factor . ") Hidden", label)
 
 			window.SetFont("s8 Norm", "Arial")
 
 			buttonY := y + 5
 
-			widget3 := window.Add("Button", "x" . buttonX . " y" . buttonY . " w90 h23 Hidden"
+			widget3 := window.Add("Button", "x" . buttonX . " y" . buttonY . " w90 h23 X:Move Y:Move(" . factor . ") Hidden"
 								, folder ? translate("Open...") : (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install..."))
 			widget3.OnEvent("Click", installSoftware.Bind(software))
 
 			if locatable {
 				buttonX += 95
 
-				widget4 := window.Add("Button", "x" . buttonX . " y" . buttonY . " w90 h23 Hidden"
+				widget4 := window.Add("Button", "x" . buttonX . " y" . buttonY . " w90 h23 X:Move Y:Move(" . factor . ") Hidden"
 									, installed ? translate("Installed") : translate("Locate..."))
 				widget4.OnEvent("Click", locateSoftware.Bind(software))
 			}
 
-			widget5 := window.Add("ActiveX", "x" . x . " yp+33 w" . width . " h121 VinfoText" . A_Index . " Hidden", "shell.explorer")
+			widget5 := window.Add("ActiveX", "x" . x . " yp+33 w" . width . " h121 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden", "shell.explorer")
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 			widget5.Value.navigate("about:blank")
-			widget5.document.write(html)
+			widget5.Value.document.write(html)
 
 			y += 170
 

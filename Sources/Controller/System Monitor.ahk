@@ -136,9 +136,9 @@ updateDashboard(viewer, html := "") {
 
 	html := ("<html>" . script . "<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
-	viewer.Document.Open()
-	viewer.Document.Write(html)
-	viewer.Document.Close()
+	viewer.document.open()
+	viewer.document.write(html)
+	viewer.document.close()
 }
 
 systemMonitor(command := false, arguments*) {
@@ -777,7 +777,7 @@ systemMonitor(command := false, arguments*) {
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
 		simulationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+46 w300 h90", "shell.explorer").Value
-		simulationDashboard.Navigate("about:blank")
+		simulationDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+28 w375 h9", translate("Race Assistants"))
@@ -786,7 +786,7 @@ systemMonitor(command := false, arguments*) {
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
 		assistantsDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+46 w300 h90", "shell.explorer").Value
-		assistantsDashboard.Navigate("about:blank")
+		assistantsDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+138 w375 h9", translate("Team Session"))
@@ -795,7 +795,7 @@ systemMonitor(command := false, arguments*) {
 
 		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
 		sessionDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+156 w300 h90", "shell.explorer").Value
-		sessionDashboard.Navigate("about:blank")
+		sessionDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+138 w375 h9", translate("Data Synchronization"))
@@ -804,7 +804,7 @@ systemMonitor(command := false, arguments*) {
 
 		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
 		dataDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+156 w300 h90", "shell.explorer").Value
-		dataDashboard.Navigate("about:blank")
+		dataDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+248 w375 h9", translate("Track Automation"))
@@ -813,7 +813,7 @@ systemMonitor(command := false, arguments*) {
 
 		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
 		automationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+266 w300 h90", "shell.explorer").Value
-		automationDashboard.Navigate("about:blank")
+		automationDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+248 w375 h9", translate("Track Mapping"))
@@ -822,7 +822,7 @@ systemMonitor(command := false, arguments*) {
 
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
 		mapperDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+266 w300 h90", "shell.explorer").Value
-		mapperDashboard.Navigate("about:blank")
+		mapperDashboard.navigate("about:blank")
 
 		monitorTabView.UseTab(2)
 

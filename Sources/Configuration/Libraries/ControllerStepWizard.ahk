@@ -155,7 +155,6 @@ class ControllerStepWizard extends StepWizard {
 		}
 
 		functionTriggersMenu(window, listView, line, *) {
-			local window := this.Window
 			local function, row, curCoordMode, control, number, trigger, menuItem
 			local multiple, menuItem, handler, contextMenu
 
@@ -176,7 +175,7 @@ class ControllerStepWizard extends StepWizard {
 
 				contextMenu := Menu()
 
-				contextMenu.Add(menuItem, controlMenuIgnore)
+				contextMenu.Add(menuItem, (*) => {})
 				contextMenu.Disable(menuItem)
 
 				if (trigger != translate("n/a")) {
@@ -211,7 +210,7 @@ class ControllerStepWizard extends StepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], translate]))
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h240 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], translate))
 		widget3.OnEvent("Click", functionTriggersSelect)
 		widget3.OnEvent("DoubleClick", functionTriggersSelect)
 		widget3.OnEvent("ContextMenu", functionTriggersMenu)
@@ -223,8 +222,8 @@ class ControllerStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget4.Value.Navigate("about:blank")
-		widget4.Value.Document.write(html)
+		widget4.Value.navigate("about:blank")
+		widget4.Value.document.write(html)
 
 		this.iFunctionsListView := widget3
 
@@ -838,7 +837,7 @@ class ControllerPreviewStepWizard extends StepWizard {
 			preview.resetLabels()
 
 			for ignore, function in this.SetupWizard.getModuleStaticFunctions()
-				if preview.findFunction(function[1], row, column)
+				if preview.findFunction(function[1], &row, &column)
 					preview.setLabel(row, column, function[2])
 		}
 	}
@@ -1225,7 +1224,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 									for ignore, partFunction in function
 										if (partFunction && (partFunction != ""))
-											if preview.findFunction(partFunction, row, column)
+											if preview.findFunction(partFunction, &row, &column)
 												preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
 								}
 							}
@@ -1470,8 +1469,6 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 	}
 
 	actionFunctionSelect(row) {
-		local action, row, label, contextMenu
-
 		loop this.ActionsListView.GetCount()
 			this.ActionsListView.Modify(A_Index, "-Select")
 

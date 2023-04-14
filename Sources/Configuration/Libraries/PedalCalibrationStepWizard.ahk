@@ -47,7 +47,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 			function := wizard.getModuleActionFunction("Pedal Calibration", "Pedal Calibration", action)
 
 			if (function && (function != ""))
-				calibrations.Push("""" . action . """ " . (isObject(function) ? function[1] : function))
+				calibrations.Push("`"" . action . "`" " . (isObject(function) ? function[1] : function))
 		}
 
 		if (calibrations.Length > 0) {
@@ -57,7 +57,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 			arguments .= ("pedalCalibrations: " . values2String(", ", calibrations*))
 		}
 
-		new Plugin("Pedal Calibration", false, wizard.isModuleSelected("Pedal Calibration"), "", arguments).saveToConfiguration(configuration)
+		Plugin("Pedal Calibration", false, wizard.isModuleSelected("Pedal Calibration"), "", arguments).saveToConfiguration(configuration)
 	}
 
 	createGui(wizard, x, y, width, height) {
@@ -143,8 +143,8 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget8.Value.Navigate("about:blank")
-		widget8.Value.Document.Write(html)
+		widget8.Value.navigate("about:blank")
+		widget8.Value.document.write(html)
 
 		this.setActionsListView(widget7)
 

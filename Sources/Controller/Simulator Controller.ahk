@@ -1142,11 +1142,11 @@ class SimulatorController extends ConfigurationItem {
 			logoGui.SetFont("Norm")
 			logoGui.AddText("w200 Center", info)
 
-			videoPlayer.Navigate("about:blank")
+			videoPlayer.navigate("about:blank")
 
 			html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . this.getLogo() . "' width=209 height=180 border=0 padding=0></body></html>"
 
-			videoPlayer.Document.Write(html)
+			videoPlayer.document.write(html)
 
 			logoGui.Show("X" . x . " Y" . y . " W239 H259")
 

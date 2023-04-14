@@ -65,11 +65,11 @@ showLogo(name) {
 	logoGui.SetFont("Norm")
 	logoGui.AddText("w279 Center", info)
 
-	videoPlayer.Navigate("about:blank")
+	videoPlayer.navigate("about:blank")
 
 	html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . logo . "' width=279 height=155 border=0 padding=0></body></html>"
 
-	videoPlayer.Document.Write(html)
+	videoPlayer.document.write(html)
 
 	logoGui.Show("X" . x . " Y" . y)
 

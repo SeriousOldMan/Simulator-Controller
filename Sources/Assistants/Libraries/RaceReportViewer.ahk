@@ -89,7 +89,7 @@ class RaceReportViewer extends RaceReportReader {
 		local window, before, after, html
 
 		if this.ChartViewer {
-			this.ChartViewer.Document.open()
+			this.ChartViewer.document.open()
 
 			if (drawChartFunction && (drawChartFunction != "")) {
 				before := "
@@ -120,15 +120,15 @@ class RaceReportViewer extends RaceReportReader {
 
 				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.Width, height: this.ChartViewer.Height - 1}))
 
-				this.ChartViewer.Document.write(html)
+				this.ChartViewer.document.write(html)
 			}
 			else {
 				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.ChartViewer.Document.write(html)
+				this.ChartViewer.document.write(html)
 			}
 
-			this.ChartViewer.Document.close()
+			this.ChartViewer.document.close()
 		}
 	}
 
@@ -136,7 +136,7 @@ class RaceReportViewer extends RaceReportReader {
 		local window, infoText, conditions, descriptor, info, html
 
 		if this.InfoViewer {
-			this.InfoViewer.Document.open()
+			this.InfoViewer.document.open()
 
 			if raceData {
 				infoText := "<table>"
@@ -163,15 +163,15 @@ class RaceReportViewer extends RaceReportReader {
 
 				infoText := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 
-				this.InfoViewer.Document.write(infoText)
+				this.InfoViewer.document.write(infoText)
 			}
 			else {
 				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.InfoViewer.Document.write(html)
+				this.InfoViewer.document.write(html)
 			}
 
-			this.InfoViewer.Document.close()
+			this.InfoViewer.document.close()
 		}
 	}
 

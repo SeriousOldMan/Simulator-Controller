@@ -59,7 +59,7 @@ class SilentAssistant extends NamedPreset {
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.Assistant, this.iDisabled))
+		return concatenate(super.getArguments(), Array(this.Assistant, this.iDisabled))
 	}
 
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
@@ -172,7 +172,7 @@ class DefaultButtonBox extends NamedPreset {
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.File))
+		return concatenate(super.getArguments(), Array(this.File))
 	}
 
 	install(wizard) {
@@ -215,7 +215,7 @@ class DefaultStreamDeck extends NamedPreset {
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.File))
+		return concatenate(super.getArguments(), Array(this.File))
 	}
 
 	install(wizard) {
@@ -269,7 +269,7 @@ class FilesPreset extends NamedPreset {
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), this.Files)
+		return concatenate(super.getArguments(), this.Files)
 	}
 
 	install(wizard) {
@@ -329,7 +329,7 @@ class PitstopImages extends NamedPreset {
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.Directory))
+		return concatenate(super.getArguments(), Array(this.Directory))
 	}
 
 	install(wizard) {
@@ -389,7 +389,7 @@ class SetupPatch extends NamedPreset {
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.File))
+		return concatenate(super.getArguments(), Array(this.File))
 	}
 
 	edit() {
@@ -549,8 +549,8 @@ class ModulesStepWizard extends StepWizard {
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget4.Value.Navigate("about:blank")
-			widget4.Value.Document.write(html)
+			widget4.Value.navigate("about:blank")
+			widget4.Value.document.write(html)
 
 			y += 170
 
@@ -601,8 +601,8 @@ class ModulesStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget7.Value.Navigate("about:blank")
-		widget7.Value.Document.write(html)
+		widget7.Value.navigate("about:blank")
+		widget7.Value.document.write(html)
 
 		this.registerWidgets(this.Pages, widget1, widget2, widget3, widget4, widget5, widget6, widget7)
 	}
@@ -760,9 +760,9 @@ class ModulesStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		this.Control["presetsInfoText"].Value.Document.open()
-		this.Control["presetsInfoText"].Value.Document.write(html)
-		this.Control["presetsInfoText"].Value.Document.close()
+		this.Control["presetsInfoText"].Value.document.open()
+		this.Control["presetsInfoText"].Value.document.write(html)
+		this.Control["presetsInfoText"].Value.document.close()
 	}
 
 	installPreset() {

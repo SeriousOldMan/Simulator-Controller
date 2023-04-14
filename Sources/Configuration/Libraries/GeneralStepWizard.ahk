@@ -60,7 +60,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		setMultiMapValues(configuration, "Splash Window", getMultiMapValues(this.SetupWizard.Definition, "Splash Window"))
 		setMultiMapValues(configuration, "Splash Themes", getMultiMapValues(this.SetupWizard.Definition, "Splash Themes"))
 
-		wizard.getGeneralConfiguration(language, startWithWindows, silentMode)
+		wizard.getGeneralConfiguration(&language, &startWithWindows, &silentMode)
 
 		setMultiMapValue(configuration, "Configuration", "Language", language)
 		setMultiMapValue(configuration, "Configuration", "Start With Windows", startWithWindows)
@@ -148,7 +148,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		}
 
 		updateApplicationFunction(row) {
-			local function, row, curCoordMode, menuItem, contextMenu
+			local function, application, curCoordMode, menuItem, contextMenu
 
 			inputLabel(row) {
 				local function, application, label, function, result
@@ -253,7 +253,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		widget6 := window.Add("Button", "x" . secondX . " yp w23 h23 Hidden")
 		widget6.OnEvent("Click", openFormatsEditor)
 		setButtonIcon(widget6, kIconsDirectory . "Locale.ico", 1, "L4 T4 R4 B4")
-		widget7 := window.Add("DropDownList", "xp+24 yp w96 VuiLanguageDropDown Hidden", choices))
+		widget7 := window.Add("DropDownList", "xp+24 yp w96 VuiLanguageDropDown Hidden", choices)
 
 		widget8 := window.Add("CheckBox", "x" . x . " yp+30 w242 h23 Checked1 VstartWithWindowsCheck Hidden", translate("Start with Windows"))
 		widget9 := window.Add("CheckBox", "x" . x . " yp+24 w242 h23 Checked0 VsilentModeCheck Hidden", translate("Silent mode (no splash screen, no sound)"))
@@ -281,8 +281,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget16.Value.Navigate("about:blank")
-		widget16.Value.Document.write(html)
+		widget16.Value.navigate("about:blank")
+		widget16.Value.document.write(html)
 
 		window.SetFont("Bold", "Arial")
 
@@ -304,8 +304,8 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		this.iControllerWidgets := Array(widget12, widget13, widget14, widget15, widget10, widget11)
 		this.iVoiceControlWidgets := Array(widget17, widget18)
 
-		this.registerWidgets(1, widgt1, widgt2, widgt3, widgt4, widgt5, widgt6, widgt7, widgt8, widgt8, widgt9, widgt10
-							  , widgt11, widgt12, widgt13, widgt14, widgt15, widgt16, widgt17, widgt18)
+		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget8, widget9, widget10
+							  , widget11, widget12, widget13, widget14, widget15, widget16, widget17, widget18)
 	}
 
 	registerWidget(page, widget) {
@@ -341,7 +341,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		super.showPage(page)
 
-		wizard.getGeneralConfiguration(uiLanguage, startWithWindows, silentMode)
+		wizard.getGeneralConfiguration(&uiLanguage, &startWithWindows, &silentMode)
 
 		for code, language in availableLanguages() {
 			if (code = uiLanguage)
@@ -516,7 +516,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 								label := this.iLaunchApplications[application][1]
 
 								for ignore, preview in this.ControllerPreviews
-									if preview.findFunction(function, row, column) {
+									if preview.findFunction(function, &row, &column) {
 										preview.setLabel(row, column, (label != "") ? label : application)
 
 										break

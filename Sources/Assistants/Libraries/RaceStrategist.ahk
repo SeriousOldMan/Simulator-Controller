@@ -1463,7 +1463,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local driverNickname := ""
 		local compound, result, gapAhead, gapBehind, lap, simulator, car, track
 		local pitstop, prefix, validLap, weather, airTemperature, trackTemperature, compound, compoundColor
-		local fuelConsumption, fuelRemaining, lapTime, map, tc, abs, pressures, temperatures, wear, multiClass
+		local fuelConsumption, fuelRemaining, lapTime, map, tc, antiBS, pressures, temperatures, wear, multiClass
 
 		static lastLap := 0
 
@@ -1560,7 +1560,7 @@ class RaceStrategist extends GridRaceAssistant {
 		pitstop := knowledgeBase.getValue("Pitstop.Last", false)
 
 		if pitstop
-			pitstop := (Abs(lapNumber - (knowledgeBase.getValue("Pitstop." . pitstop . ".Lap"))) <= 2)
+			pitstop := (Abs(lapNumber - knowledgeBase.getValue("Pitstop." . pitstop . ".Lap")) <= 2)
 
 		if ((this.hasEnoughData(false) || pitstop) && this.collectTelemetryData()) {
 			prefix := "Lap." . lapNumber
@@ -1579,7 +1579,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				map := knowledgeBase.getValue(prefix . ".Map")
 				tc := knowledgeBase.getValue(prefix . ".TC")
-				abs := knowledgeBase.getValue(prefix . ".ABS")
+				antiBS := knowledgeBase.getValue(prefix . ".ABS")
 
 				pressures := [Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FL"), 1)
 							, Round(knowledgeBase.getValue(prefix . ".Tyre.Pressure.FR"), 1)
@@ -1600,7 +1600,7 @@ class RaceStrategist extends GridRaceAssistant {
 						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RR"))]
 
 				this.saveTelemetryData(lapNumber, simulator, car, track, weather, airTemperature, trackTemperature
-									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, abs
+									 , fuelConsumption, fuelRemaining, lapTime, pitstop, map, tc, antiBS
 									 , compound, compoundColor, pressures, temperatures, wear)
 			}
 		}

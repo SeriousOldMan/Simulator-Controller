@@ -78,11 +78,11 @@ showSplash(image, alwaysOnTop := true, video := false) {
 		if (extension = "GIF") {
 			videoPlayer := splashGui.Add("ActiveX", "x10 y30 w780 h439", "shell explorer").Value
 
-			videoPlayer.Navigate("about:blank")
+			videoPlayer.navigate("about:blank")
 
 			html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . image . "' width=780 height=438 border=0 padding=0></body></html>"
 
-			videoPlayer.Document.Write(html)
+			videoPlayer.document.write(html)
 		}
 		else
 			splashGui.Add("Picture", "x10 y30 w780 h439", image)

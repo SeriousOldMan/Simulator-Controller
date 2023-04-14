@@ -505,7 +505,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
 		this.iSettingsViewer := workbenchGui.Add("ActiveX", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer", "shell.explorer").Value
-		this.SettingsViewer.Navigate("about:blank")
+		this.SettingsViewer.navigate("about:blank")
 
 		this.showSettingsChart(false)
 
@@ -654,7 +654,7 @@ class SetupWorkbench extends ConfigurationItem {
 		isChart := !isObject(content)
 
 		if this.SettingsViewer {
-			this.SettingsViewer.Document.open()
+			this.SettingsViewer.document.open()
 
 			if (content && (content != "")) {
 				if isChart {
@@ -700,7 +700,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 					after := substituteVariables(after, {width: width, height: height, iWidth: iWidth, iHeight: iHeight, info: info})
 
-					this.SettingsViewer.Document.write(before . content . after)
+					this.SettingsViewer.document.write(before . content . after)
 				}
 				else {
 					width := this.SettingsViewer.Width
@@ -735,16 +735,16 @@ class SetupWorkbench extends ConfigurationItem {
 					</html>
 					)"
 
-					this.SettingsViewer.Document.write(substituteVariables(document, {width: width, height: height, html: html}))
+					this.SettingsViewer.document.write(substituteVariables(document, {width: width, height: height, html: html}))
 				}
 			}
 			else {
 				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.SettingsViewer.Document.write(html)
+				this.SettingsViewer.document.write(html)
 			}
 
-			this.SettingsViewer.Document.close()
+			this.SettingsViewer.document.close()
 		}
 	}
 

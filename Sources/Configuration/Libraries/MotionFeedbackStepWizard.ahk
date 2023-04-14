@@ -109,7 +109,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						if (actions != "")
 							actions .= ", "
 
-						actions .= ("""" . action . """ " . actionArguments[1] . A_Space . actionArguments[2] . A_Space . values2String(A_Space, function*))
+						actions .= ("`"" . action . "`" " . actionArguments[1] . A_Space . actionArguments[2] . A_Space . values2String(A_Space, function*))
 					}
 				}
 
@@ -219,8 +219,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget18.Value.Navigate("about:blank")
-		widget18.Value.Document.write(html)
+		widget18.Value.navigate("about:blank")
+		widget18.Value.document.write(html)
 
 		this.setActionsListView(widget17)
 
@@ -258,7 +258,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		if (this.Control["motionIntensityField"].Text != "")
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(this.Control["motionIntensityField"].Text, row, column) {
+				if preview.findFunction(this.Control["motionIntensityField"].Text, &row, &column) {
 					preview.setLabel(row, column, translate("Motion Intensity"))
 
 					break
@@ -266,7 +266,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		if (this.Control["effectSelectorField"].Text != "")
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(this.Control["effectSelectorField"].Text, row, column) {
+				if preview.findFunction(this.Control["effectSelectorField"].Text, &row, &column) {
 					preview.setLabel(row, column, translate("Effect Selector"))
 
 					break
@@ -274,7 +274,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		if (this.Control["effectIntensityField"].Text != "")
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(this.Control["effectIntensityField"].Text, row, column) {
+				if preview.findFunction(this.Control["effectIntensityField"].Text, &row, &column) {
 					preview.setLabel(row, column, translate("Effect Intensity"))
 
 					break
@@ -299,7 +299,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		if !function {
 			OnMessage(0x44, translateYesNoButtons)
-			msgResult := MsgBox(translate("The function for the ""Motion"" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
+			msgResult := MsgBox(translate("The function for the `"Motion`" action has not been set. You will not be able to activate or deactivate motion. Do you really want to proceed?"), translate("Warning"), 262436)
 			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "No")
@@ -311,9 +311,9 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		effectIntensityField := this.Control["effectIntensityField"].Text
 
 		if (((effectSelectorField != "") && (effectIntensityField = "")) || ((effectSelectorField = "") && (effectIntensityField != ""))) {
-			OnMessage(0x44, translateYesNonButtons)
-			msgResult := MsgBox(translate("You must specify both ""Effect Selector"" and ""Effect Intensity"" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
-			OnMessage(0x44, translateYesNonButtons, 0)
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("You must specify both `"Effect Selector`" and `"Effect Intensity`" functions, if you want to control effect intensities. Do you really want to proceed?"), translate("Warning"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
 			if (msgResult = "No")
 				return false
@@ -415,7 +415,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			for ignore, preview in this.ControllerPreviews {
 				mode := preview.Mode
 
-				if (((mode == true) || (mode = "Motion")) && preview.findFunction(motionIntensityField, row, column)) {
+				if (((mode == true) || (mode = "Motion")) && preview.findFunction(motionIntensityField, &row, &column)) {
 					preview.setLabel(row, column, translate("Motion Intensity"))
 
 					break
@@ -426,7 +426,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			for ignore, preview in this.ControllerPreviews {
 				mode := preview.Mode
 
-				if (((mode == true) || (mode = "Motion")) && preview.findFunction(effectSelectorField, row, column)) {
+				if (((mode == true) || (mode = "Motion")) && preview.findFunction(effectSelectorField, &row, &column)) {
 					preview.setLabel(row, column, translate("Effect Selector"))
 
 					break
@@ -437,7 +437,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			for ignore, preview in this.ControllerPreviews {
 				mode := preview.Mode
 
-				if (((mode == true) || (mode = "Motion")) && preview.findFunction(effectIntensityField, row, column)) {
+				if (((mode == true) || (mode = "Motion")) && preview.findFunction(effectIntensityField, &row, &column)) {
 					preview.setLabel(row, column, translate("Effect Intensity"))
 
 					break
@@ -587,7 +587,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			cColumn := false
 
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(motionIntensityField, cRow, cColumn) {
+				if preview.findFunction(motionIntensityField, &cRow, &cColumn) {
 					this.clearMotionIntensityDial(preview, motionIntensityField
 												, ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(motionIntensityField)[2])
 												, cRow, cColumn, false)
@@ -621,7 +621,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			cColumn := false
 
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(effectSelectorField, cRow, cColumn) {
+				if preview.findFunction(effectSelectorField, &cRow, &cColumn) {
 					this.clearEffectSelector(preview, effectSelectorField
 										   , ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(effectSelectorField)[2])
 										   , cRow, cColumn, false)
@@ -655,7 +655,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			cColumn := false
 
 			for ignore, preview in this.ControllerPreviews
-				if preview.findFunction(effectIntensityField, cRow, cColumn) {
+				if preview.findFunction(effectIntensityField, &cRow, &cColumn) {
 					this.clearEffectIntensityDial(preview, effectIntensityField
 												, ConfigurationItem.descriptor("Ignore", ConfigurationItem.splitDescriptor(effectIntensityField)[2])
 												, cRow, cColumn, false)
@@ -718,13 +718,8 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		result := InputBox(translate(mode ? "Please input initial effect intensity (use dot as decimal point):" : "Please input initial motion intensity:"), translate("Modular Simulator Controller System"), "w300 h150", value)
 
-		, value := IB.Value, ErrorLevel := IB.Result="OK" ? 0 : IB.Result="CANCEL" ? 1 : IB.Result="Timeout" ? 2 : "ERROR"
-
 		if (result.Result = "Ok") {
 			value := result.Value
-
-
-
 			valid := false
 
 			if isNumber(value)

@@ -338,9 +338,9 @@ class StrategyViewer {
 		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		if this.StrategyViewer {
-			this.StrategyViewer.Document.open()
-			this.StrategyViewer.Document.write(html)
-			this.StrategyViewer.Document.close()
+			this.StrategyViewer.document.open()
+			this.StrategyViewer.document.write(html)
+			this.StrategyViewer.document.close()
 		}
 	}
 }

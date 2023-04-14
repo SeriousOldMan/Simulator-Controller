@@ -295,7 +295,8 @@ class ConfigurationEditor extends ConfigurationItem {
 
 		super.__New(configuration)
 
-		this.registerConfigurator(translate("General"), GeneralTab(development, configuration))
+		if isSet(GeneralTab)
+			this.registerConfigurator(translate("General"), GeneralTab(development, configuration))
 
 		ConfigurationEditor.Instance := this
 	}

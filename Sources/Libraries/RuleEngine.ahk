@@ -2755,8 +2755,6 @@ class KnowledgeBase {
 
 	removeFact(fact) {
 		this.Facts.removeFact(fact)
-
-		this.removeFact := this.clearFact
 	}
 
 	produce() {
@@ -2965,8 +2963,6 @@ class Facts {
 
 	removeFact(fact) {
 		this.clearFact(fact)
-
-		this.removeFact := this.clearFact
 	}
 
 	registerObserver(fact, observer) {

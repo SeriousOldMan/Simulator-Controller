@@ -127,9 +127,9 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (workbench.Control["chartSourceDropDown"].Value = 1)
 					workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
 				else {
-					workbench.ChartViewer.Document.open()
-					workbench.ChartViewer.Document.write(workbench.iTelemetryChartHTML)
-					workbench.ChartViewer.Document.close()
+					workbench.ChartViewer.document.open()
+					workbench.ChartViewer.document.write(workbench.iTelemetryChartHTML)
+					workbench.ChartViewer.document.close()
 				}
 			}
 
@@ -421,9 +421,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			else
 				workbenchGui["chartTypeDropDown"].Visible := false
 
-			workbench.ChartViewer.Document.open()
-			workbench.ChartViewer.Document.write((chartSourceDropDown = 1) ? workbench.iTelemetryChartHTML : workbench.iStrategyChartHTML)
-			workbench.ChartViewer.Document.close()
+			workbench.ChartViewer.document.open()
+			workbench.ChartViewer.document.write((chartSourceDropDown = 1) ? workbench.iTelemetryChartHTML : workbench.iStrategyChartHTML)
+			workbench.ChartViewer.document.close()
 		}
 
 		chooseChartType(*) {
@@ -931,7 +931,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) AltSubmit Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		this.iChartViewer := workbenchGui.Add("ActiveX", "x400 yp+24 w950 h442 Border vchartViewer X:Move(0.1) W:Grow(0.9)", "shell.explorer").Value
-		this.iChartViewer.Navigate("about:blank")
+		this.iChartViewer.navigate("about:blank")
 
 		workbenchGui.Add("Text", "x8 yp+450 w1350 0x10 W:Grow")
 
@@ -955,7 +955,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("GroupBox", "-Theme x619 ys+39 w727 h9 W:Grow", translate("Strategy"))
 
-		workbenchGui.Add("ActiveX", "x619 yp+21 w727 h193 Border vstratViewer H:Grow W:Grow", "shell.explorer").Value.Navigate("about:blank")
+		workbenchGui.Add("ActiveX", "x619 yp+21 w727 h193 Border vstratViewer H:Grow W:Grow", "shell.explorer").Value.navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(window, workbenchGui["stratViewer"].Value)
 
@@ -1399,7 +1399,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	showTelemetryChart(drawChartFunction) {
 		local before, after, html
 
-		this.ChartViewer.Document.open()
+		this.ChartViewer.document.open()
 
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before := "
@@ -1429,26 +1429,26 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			html := (before . drawChartFunction . substituteVariables(after,  {width: (this.ChartViewer.Width - 5), height: (this.ChartViewer.Height - 5)}))
 
-			this.ChartViewer.Document.write(html)
+			this.ChartViewer.document.write(html)
 		}
 		else {
 			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-			this.ChartViewer.Document.write(html)
+			this.ChartViewer.document.write(html)
 		}
 
 		this.iTelemetryChartHTML := html
 
-		this.ChartViewer.Document.close()
+		this.ChartViewer.document.close()
 
 		this.Control["chartSourceDropDown"].Choose(1)
 		this.Control["chartTypeDropDown"].Visible := true
 	}
 
 	showComparisonChart(html) {
-		this.ChartViewer.Document.open()
-		this.ChartViewer.Document.write(html)
-		this.ChartViewer.Document.close()
+		this.ChartViewer.document.open()
+		this.ChartViewer.document.write(html)
+		this.ChartViewer.document.close()
 
 		this.iStrategyChartHTML := html
 

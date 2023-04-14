@@ -198,8 +198,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget10.Value.Navigate("about:blank")
-		widget10.Value.Document.Write(html)
+		widget10.Value.navigate("about:blank")
+		widget10.Value.document.write(html)
 
 		this.iControllerWidgets := [widget8, widget9]
 
@@ -509,7 +509,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 								for ignore, partFunction in function
 									if (partFunction && (partFunction != ""))
-										if preview.findFunction(partFunction, row, column)
+										if preview.findFunction(partFunction, &row, &column)
 											preview.setLabel(row, column, this.getActionLabel(this.getActionRow(mode, action), partFunction))
 							}
 						}

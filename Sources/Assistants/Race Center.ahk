@@ -1890,7 +1890,7 @@ class RaceCenter extends ConfigurationItem {
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
 		this.iChartViewer := centerGui.Add("ActiveX", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer", "shell.explorer").Value
-		this.iChartViewer.Navigate("about:blank")
+		this.iChartViewer.navigate("about:blank")
 
 		centerGui.Rules := "Y:Move(0.2)"
 
@@ -1904,7 +1904,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
 
 		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp-8 w30 h30 X:Move vwaitViewer", "shell.explorer").Value
-		this.iWaitViewer.Navigate("about:blank")
+		this.iWaitViewer.navigate("about:blank")
 
 		centerGui.SetFont("s8 Norm cBlack", "Arial")
 
@@ -1924,7 +1924,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("GroupBox", "-Theme x619 ys+39 w732 h9 W:Grow", translate("Output"))
 
 		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+21 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer", "shell.explorer").Value
-		this.iDetailsViewer.Navigate("about:blank")
+		this.iDetailsViewer.navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(window, this.iDetailsViewer)
 
@@ -5196,7 +5196,7 @@ class RaceCenter extends ConfigurationItem {
 
 	startWorking(state := true) {
 		local start := false
-		local document := this.WaitViewer.Document
+		local document := this.WaitViewer.document
 		local html
 
 		if state {
@@ -7279,9 +7279,9 @@ class RaceCenter extends ConfigurationItem {
 						else if ((this.SelectedDetailReport = "Strategy") && this.Strategy)
 							this.StrategyViewer.showStrategyInfo(this.Strategy)
 						else if (this.SelectedDetailReport && this.iSelectedDetailHTML) {
-							this.DetailsViewer.Document.open()
-							this.DetailsViewer.Document.write(this.iSelectedDetailHTML)
-							this.DetailsViewer.Document.close()
+							this.DetailsViewer.document.open()
+							this.DetailsViewer.document.write(this.iSelectedDetailHTML)
+							this.DetailsViewer.document.close()
 						}
 					}
 			}
@@ -8264,7 +8264,7 @@ class RaceCenter extends ConfigurationItem {
 	showChart(drawChartFunction) {
 		local before, after, html
 
-		this.ChartViewer.Document.open()
+		this.ChartViewer.document.open()
 
 		if (drawChartFunction && (drawChartFunction != "")) {
 			before := "
@@ -8294,15 +8294,15 @@ class RaceCenter extends ConfigurationItem {
 
 			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.Width - 5), height: (this.ChartViewer.Height - 5)}))
 
-			this.ChartViewer.Document.write(html)
+			this.ChartViewer.document.write(html)
 		}
 		else {
 			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-			this.ChartViewer.Document.write(html)
+			this.ChartViewer.document.write(html)
 		}
 
-		this.ChartViewer.Document.close()
+		this.ChartViewer.document.close()
 	}
 
 	showDataPlot(data, xAxis, yAxises) {
@@ -8475,9 +8475,9 @@ class RaceCenter extends ConfigurationItem {
 
 		this.iSelectedDetailHTML := html
 
-		this.DetailsViewer.Document.open()
-		this.DetailsViewer.Document.write(html)
-		this.DetailsViewer.Document.close()
+		this.DetailsViewer.document.open()
+		this.DetailsViewer.document.write(html)
+		this.DetailsViewer.document.close()
 	}
 
 	selectReport(report) {
@@ -8809,7 +8809,7 @@ class RaceCenter extends ConfigurationItem {
 			}
 		}
 
-		this.ChartViewer.Document.open()
+		this.ChartViewer.document.open()
 
 		if html {
 			this.selectReport("Track")
@@ -8840,15 +8840,15 @@ class RaceCenter extends ConfigurationItem {
 
 			html := ("<html>" . script . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
-			this.ChartViewer.Document.write(html)
+			this.ChartViewer.document.write(html)
 		}
 		else {
 			this.selectReport(false)
 
-			this.ChartViewer.Document.write("<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
+			this.ChartViewer.document.write("<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 		}
 
-		this.ChartViewer.Document.close()
+		this.ChartViewer.document.close()
 
 		this.updateState()
 	}

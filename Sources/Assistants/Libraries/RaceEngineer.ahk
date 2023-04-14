@@ -2604,7 +2604,7 @@ setupTyrePressures(context, weather, airTemperature, trackTemperature, tyreCompo
 	airTemperature := Round(airTemperature)
 	trackTemperature := Round(trackTemperature)
 
-	if context.KnowledgeBase.RaceAssistant.getTyrePressures(weather, airTemperature, trackTemperature, tyreCompound, tyreCompoundColor, pressures, certainty) {
+	if context.KnowledgeBase.RaceAssistant.getTyrePressures(weather, airTemperature, trackTemperature, &tyreCompound, &tyreCompoundColor, &pressures, &certainty) {
 		knowledgeBase.setFact("Tyre.Setup.Certainty", certainty)
 		knowledgeBase.setFact("Tyre.Setup.Compound", tyreCompound)
 		knowledgeBase.setFact("Tyre.Setup.Compound.Color", tyreCompoundColor)

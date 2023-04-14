@@ -422,11 +422,11 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 
 	htmlViewer := htmlGui.Add("ActiveX", "X8 YP+26 W" . innerWidth . " H" . editHeight . " vhtmlViewer", "shell.explorer").Value
 
-	htmlViewer.Navigate("about:blank")
+	htmlViewer.navigate("about:blank")
 
-	htmlViewer.Document.open()
-	htmlViewer.Document.write(html)
-	htmlViewer.Document.close()
+	htmlViewer.document.open()
+	htmlViewer.document.write(html)
+	htmlViewer.document.close()
 
 	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 

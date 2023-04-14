@@ -188,7 +188,7 @@ logError(exception, unhandled := false, report := true) {
 	if isObject(exception) {
 		message := exception.Message
 
-		logMessage(unhandled ? kLogCritical : kLogDebug
+		logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
 				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
 
@@ -197,7 +197,7 @@ logError(exception, unhandled := false, report := true) {
 			logMessage(unhandled ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
 	}
 	else
-		logMessage(unhandled ? kLogCritical : kLogDebug
+		logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
 	if (verbose && (unhandled || report))

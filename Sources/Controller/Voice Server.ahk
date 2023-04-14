@@ -673,7 +673,7 @@ class VoiceServer extends ConfigurationItem {
 
 	listen(toggle, down := true) {
 		local listen := false
-		local pressed
+		local pressed := false
 
 		static isPressed := false
 		static lastDown := 0
@@ -684,7 +684,8 @@ class VoiceServer extends ConfigurationItem {
 
 		static listenTask := false
 
-		pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
+		try
+			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount

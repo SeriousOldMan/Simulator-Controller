@@ -150,37 +150,37 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		widget10 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 ReadOnly Disabled Hidden")
 
 		widget11 := window.Add("Button", "x" . x . " yp+70 w" . colWidth . " h23  Hidden", translate("Edit Labels && Icons..."))
-		widget12.OnEvent("Click", openLabelsAndIconsEditor)
+		widget11.OnEvent("Click", openLabelsAndIconsEditor)
 
 		window.SetFont("s8 Bold", "Arial")
 
-		widget13 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions"))
-		widget14 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
+		widget12 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions"))
+		widget13 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget15 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect("Mode", "Action", "Label", "Function"], translate))
-		widget15.OnEvent("Click", tactileFeedbackActionFunctionSelect)
-		widget15.OnEvent("DoubleClick", tactileFeedbackActionFunctionSelect)
-		widget15.OnEvent("DoubleClick", tactileFeedbackActionFunctionMenu)
+		widget14 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
+		widget14.OnEvent("Click", tactileFeedbackActionFunctionSelect)
+		widget14.OnEvent("DoubleClick", tactileFeedbackActionFunctionSelect)
+		widget14.OnEvent("DoubleClick", tactileFeedbackActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-		widgert16 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 VtactileFeedbackInfoText Hidden", "shell.explorer")
+		widget15 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 VtactileFeedbackInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget16.Value.Navigate("about:blank")
-		widget16.Value.Document.write(html)
+		widget15.Value.navigate("about:blank")
+		widget15.Value.document.write(html)
 
 		this.setActionsListView(widget15)
 
 		this.iPedalEffectsList := widget7
-		this.iChassisEffectsList := widet10
+		this.iChassisEffectsList := widget10
 
 		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget9, widget10
-							  , widget11, widget12, widget13, widget14, widget15, widget16)
+							  , widget11, widget12, widget13, widget14, widget15)
 	}
 
 	reset() {
@@ -385,7 +385,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	changeEffects(mode) {
-		local actions := values2String(", ", this.getActions(mode)*))
+		local actions := values2String(", ", this.getActions(mode)*)
 		local result := InputBox(translate("Please input effect names (seperated by comma):"), translate("Modular Simulator Controller System"), "w450 h150", actions)
 
 		if (result.Result = "Ok") {

@@ -158,8 +158,8 @@ class ApplicationsStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget5.Value.Navigate("about:blank")
-		widget5.Value.Document.write(html)
+		widget5.Value.navigate("about:blank")
+		widget5.Value.document.write(html)
 
 		this.iSimulatorsListView := widget3
 
@@ -188,8 +188,8 @@ class ApplicationsStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget5.Value.Navigate("about:blank")
-		widget5.Value.Document.write(html)
+		widget5.Value.navigate("about:blank")
+		widget5.Value.document.write(html)
 
 		this.iApplicationsListView := widget3
 

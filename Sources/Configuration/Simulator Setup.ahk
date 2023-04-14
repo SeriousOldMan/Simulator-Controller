@@ -462,9 +462,6 @@ class SetupWizard extends ConfiguratorPanel {
 
 		this.iInitialize := initialize
 
-		if isDebug()
-			Sleep(1000)
-
 		if initialize {
 			this.addPatchFile("Settings", kUserHomeDirectory . "Setup\Settings Patch.ini")
 			this.addPatchFile("Configuration", kUserHomeDirectory . "Setup\Configuration Patch.ini")
@@ -2029,7 +2026,7 @@ class StepWizard extends ConfiguratorPanel {
 	}
 
 	loadDefinition(definition, stepDefinition) {
-		local rules := CaseInsenseMap()
+		local rules := CaseInsenseWeakMap()
 		local count := 0
 		local descriptor, rule, index
 

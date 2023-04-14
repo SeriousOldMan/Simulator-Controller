@@ -196,7 +196,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			window.SetFont("Bold", "Arial")
 
 			widgets.Push(window.Add("Text", "x" . listX . " yp+30 w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions")))
-			widgets.Push(window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden"))
+			widgets.Push(window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " W:Grow 0x10 Hidden"))
 
 			window.SetFont("Norm", "Arial")
 

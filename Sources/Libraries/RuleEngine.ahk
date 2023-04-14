@@ -3253,16 +3253,16 @@ class Rules {
 			loop {
 				if !candidate {
 					if last
-						this.Production(rule, last)
+						Rules.Production(rule, last)
 					else
-						this.iProductions := this.sProduction(rule)
+						this.iProductions := Rules.Production(rule)
 
 					this.iGeneration += 1
 
 					break
 				}
 				else if (priority > candidate.Rule.Priority) {
-					newProduction := this.Production(rule)
+					newProduction := Rules.Production(rule)
 
 					newProduction.insertBefore(candidate)
 

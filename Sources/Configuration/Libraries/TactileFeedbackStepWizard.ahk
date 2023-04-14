@@ -160,7 +160,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		window.SetFont("s8 Bold", "Arial")
 
 		widget12 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions"))
-		widget13 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
+		widget13 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " W:Grow 0x10 Hidden")
 
 		window.SetFont("s8 Norm", "Arial")
 

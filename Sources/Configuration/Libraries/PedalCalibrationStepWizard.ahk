@@ -128,7 +128,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		window.SetFont("Bold", "Arial")
 
 		widget5 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden", translate("Actions"))
-		widget6 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
+		widget6 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " W:Grow 0x10 Hidden")
 
 		window.SetFont("s8 Norm", "Arial")
 

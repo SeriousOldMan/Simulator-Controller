@@ -297,7 +297,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		window.SetFont("Bold", "Arial")
 
 		widget17 := window.Add("Text", "x" . col2X . " ys w" . col2Width . " h23 +0x200 Hidden Section", translate("Voice Control"))
-		widget18 := window.Add("Text", "yp+20 x" . col2X . " w" . col2Width . " 0x10 Hidden")
+		widget18 := window.Add("Text", "yp+20 x" . col2X . " w" . col2Width . " W:Grow 0x10 Hidden")
 
 		window.SetFont("Norm", "Arial")
 

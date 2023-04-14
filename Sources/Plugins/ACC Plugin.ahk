@@ -510,6 +510,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	sendCommand(command, count?) {
+		if isSet(count) {
+			loop count
+				super.sendCommand(command, 0)
+		}
+		else
+			super.sendCommand(command)
+	}
+
 	openPitstopMFD(descriptor := false, update := "__Undefined__") {
 		local car, track, settings, imgSearch, wasOpen
 
@@ -668,8 +677,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if !tyreChange {
 				this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				loop inList(availableOptions, "Change Tyres") - 1
-					this.sendCommand("{Down}")
+				this.sendCommand("{Down}", inList(availableOptions, "Change Tyres") - 1)
 
 				this.sendCommand("{Right}")
 			}
@@ -695,8 +703,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if !tyreChange {
 				this.sendCommand(this.OpenPitstopMFDHotkey)
 
-				loop inList(availableOptions, "Change Tyres") - 1
-					this.sendCommand("{Down}")
+				this.sendCommand("{Down}", inList(availableOptions, "Change Tyres") - 1)
 
 				this.sendCommand("{Left}")
 
@@ -733,8 +740,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		loop inList(options, "Change Tyres") - 1 + 3
-			this.sendCommand("{Down}")
+		this.sendCommand("{Down}", inList(options, "Change Tyres") - 1 + 3)
 
 		this.sendCommand("{Right}")
 
@@ -745,13 +751,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if listEqual(currentPressures, modifiedPressures) {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			loop inList(options, "Change Tyres") - 1
-				this.sendCommand("{Down}")
+			this.sendCommand("{Down}", inList(options, "Change Tyres") - 1)
 
 			this.sendCommand("{Right}")
 
-			loop 3
-				this.sendCommand("{Down}")
+			this.sendCommand("{Down}", 3)
 
 			this.sendCommand("{Right}")
 
@@ -759,8 +763,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.sendCommand("{Left}")
 
-			loop 3
-				this.sendCommand("{Up}")
+			this.sendCommand("{Up}", 3)
 
 			this.sendCommand("{Left}")
 
@@ -776,8 +779,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		loop inList(options, "Change Tyres") - 1 + 3
-			this.sendCommand("{Down}")
+		this.sendCommand("{Down}", inList(options, "Change Tyres") - 1 + 3)
 
 		this.sendCommand("{Right}")
 
@@ -794,8 +796,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		if this.iPSChangeTyres {
 			this.sendCommand(this.OpenPitstopMFDHotkey)
 
-			loop inList(options, "Change Tyres") - 1 + 4
-				this.sendCommand("{Down}")
+			this.sendCommand("{Down}", inList(options, "Change Tyres") - 1 + 4)
 
 			this.sendCommand("{Right}")
 
@@ -816,11 +817,9 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		loop inList(options, "Change Brakes") - 1
-			this.sendCommand("{Down}")
+		this.sendCommand("{Down}", inList(options, "Change Brakes") - 1)
 
-		loop 13 - (inList(options, "Strategy") ? 0 : 1) - (7 - this.iPSTyreOptions)
-			this.sendCommand("{Down}")
+		this.sendCommand("{Down}", 13 - (inList(options, "Strategy") ? 0 : 1) - (7 - this.iPSTyreOptions))
 
 		this.sendCommand("{Right}")
 
@@ -841,10 +840,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		this.sendCommand(this.OpenPitstopMFDHotkey)
 
-		loop inList(options, "Change Brakes") - 1 + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
-													   + (inList(options, "Strategy") ? 1 : 0)
-													   - (7 - this.iPSTyreOptions)
-			this.sendCommand("{Down}")
+		this.sendCommand("{Down}", inList(options, "Change Brakes") - 1 + 12 + (this.iPSChangeBrakes ? this.iPSBrakeOptions : 0)
+																	+ (inList(options, "Strategy") ? 1 : 0) - (7 - this.iPSTyreOptions))
 
 		this.sendCommand("{Right}")
 
@@ -900,13 +897,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 						this.activateWindow()
 
-						if (targetSelectedOption > this.iPSSelectedOption) {
-							loop targetSelectedOption - this.iPSSelectedOption
-								this.sendCommand("{Down}")
-						}
+						if (targetSelectedOption > this.iPSSelectedOption)
+							this.sendCommand("{Down}", targetSelectedOption - this.iPSSelectedOption)
 						else
-							loop this.iPSSelectedOption - targetSelectedOption
-								this.sendCommand("{Up}")
+							this.sendCommand("{Up}", this.iPSSelectedOption - targetSelectedOption)
 
 						this.iPSSelectedOption := targetSelectedOption
 
@@ -936,13 +930,11 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 						case "Increase":
 							this.activateWindow()
 
-							loop steps
-								this.sendCommand("{Right}")
+							this.sendCommand("{Right}", steps)
 						case "Decrease":
 							this.activateWindow()
 
-							loop steps
-								this.sendCommand("{Left}")
+							this.sendCommand("{Left}", steps)
 						default:
 							throw "Unsupported change operation `"" . direction . "`" detected in ACCPlugin.changePitstopOption..."
 					}

@@ -185,16 +185,16 @@ class ControllerStepWizard extends StepWizard {
 					multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
 
 					contextMenu.Add(translate(multiple ? "Assign multiple Triggers" : "Assign Trigger")
-								  , ObjBindMethod(this, "updateFunctionTriggers", row))
+								  , (*) => this.updateFunctionTriggers(row))
 
 					multiple := ((function = translate(k2WayToggleType)) || (function = translate(kDialType)))
 
 					contextMenu.Add(translate(multiple ? "Assign multiple Hotkeys" : "Assign Hotkey")
-								  , ObjBindMethod(this, "updateFunctionHotkeys", row))
+								  , (*) => this.updateFunctionHotkeys(row))
 
 					contextMenu.Add()
 
-					contextMenu.Add(translate("Clear Trigger && Hotkey"), ObjBindMethod(this, "clearFunctionTriggerAndHotkey", row))
+					contextMenu.Add(translate("Clear Trigger && Hotkey"), (*) => this.clearFunctionTriggerAndHotkey(row))
 				}
 
 				contextMenu.Show()
@@ -1315,7 +1315,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		contextMenu.Disable(title)
 		contextMenu.Add()
 
-		contextMenu.Add(translate("Set Function"), ObjBindMethod(this, "setFunction", row))
+		contextMenu.Add(translate("Set Function"), (*) => this.setFunction(row))
 
 		function := this.getActionFunction(this.getActionMode(row), this.getAction(row))
 		count := 0
@@ -1331,7 +1331,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 		menuItem := translate((count > 1) ? "Clear Function(s)" : "Clear Function")
 
-		contextMenu.Add(menuItem, ObjBindMethod(this, "clearFunction", row))
+		contextMenu.Add(menuItem, (*) => this.clearFunction(row))
 
 		this.getActionFunction(this.getActionMode(row), this.getAction(row))
 
@@ -1350,7 +1350,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		contextMenu.Disable(title)
 		contextMenu.Add()
 
-		contextMenu.Add(translate("Set Action"), ObjBindMethod(this, "setFunctionAction", Array(preview, element, function, row, column, false, true)))
+		contextMenu.Add(translate("Set Action"), (*) => this.setFunctionAction(Array(preview, element, function, row, column, false, true)))
 
 		count := 0
 
@@ -1362,7 +1362,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 
 		menuItem := translate((count > 1) ? "Clear Action(s)" : "Clear Action")
 
-		contextMenu.Add(menuItem, ObjBindMethod(this, "clearFunctionAction", preview, function, element[2], row, column))
+		contextMenu.Add(menuItem, (*) => this.clearFunctionAction(preview, function, element[2], row, column))
 
 		if (count = 0)
 			contextMenu.Disable(menuItem)
@@ -1520,7 +1520,3 @@ initializeControllerStepWizard() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeControllerStepWizard()
-
-
-
-

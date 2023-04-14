@@ -92,7 +92,7 @@ class PluginsConfigurator extends ConfigurationItemList {
 			}
 		}
 
-		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginsListView", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], translate))
+		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VpluginsListView", collect(["Active?", "Plugin", "Simulator(s)", "Arguments"], translate))
 
 		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Plugin"))
 		window.Add("Edit", "x110 y295 w154 h21 Y:Move W:Grow(0.2) VpluginEdit")

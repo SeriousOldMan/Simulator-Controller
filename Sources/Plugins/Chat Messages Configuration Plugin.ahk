@@ -26,7 +26,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
+		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
 
 		window.Add("Text", "x16 y295 w86 h23 Y:Move +0x200", translate("Button"))
 		window.Add("Text", "x95 y295 w23 h23 Y:Move +0x200", translate("#"))

@@ -1513,7 +1513,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 
 			headers := (inList(options, "Drivers") ? ["     Driver (Start)", "Car"] : ["     #", "Car"])
 
-			driversListView := reportSettingsGui.Add("ListView", "x90 yp-2 w264 h300 BackgroundD8D8D8 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(headers, translate))
+			driversListView := reportSettingsGui.Add("ListView", "x90 yp-2 w264 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(headers, translate))
 			driversListView.OnEvent("Click", selectDriver)
 
 			driverSelectCheck := reportSettingsGui.Add("CheckBox", "Check3 x72 yp+2 w15 h23")

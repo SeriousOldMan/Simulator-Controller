@@ -446,7 +446,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		widget28 := window.Add("Text", "x" . x0 . " yp+26 w90 h23 +0x200 Hidden", translate("Drivers"))
 
-		widget29:= window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h96 BackgroundD8D8D8 AltSubmit H:Grow(0.3) W:Grow(0.5) vdriverListBox Hidden")
+		widget29:= window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h96 AltSubmit H:Grow(0.3) W:Grow(0.5) vdriverListBox Hidden")
 		widget29.OnEvent("DoubleClick", selectDriver.Bind("DoubleClick"))
 
 		widget30 := window.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 X:Move(0.5) vaddDriverButton Hidden")
@@ -461,7 +461,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		widget33 := window.Add("Text", "x" . x0 . " yp+92 w90 h23 Y:Move(0.3) +0x200 Hidden", translate("Sessions"))
 
-		widget34 := window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h72 BackgroundD8D8D8 AltSubmit Y:Move(0.3) H:Grow(0.7) W:Grow(0.5) vsessionListBox Hidden")
+		widget34 := window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h72 AltSubmit Y:Move(0.3) H:Grow(0.7) W:Grow(0.5) vsessionListBox Hidden")
 		widget34.OnEvent("DoubleClick", selectSession.Bind("DoubleClick"))
 
 		widget35 := window.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 X:Move(0.5) Y:Move(0.3) vaddSessionButton Hidden")

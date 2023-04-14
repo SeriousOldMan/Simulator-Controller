@@ -422,7 +422,7 @@ class ControlsList extends ConfigurationItemList {
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("ListView", "x16 y79 w134 h108 BackGroundD8D8D8 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VcontrolsListView", collect(["Name", "Function", "Size"], translate))
+		window.Add("ListView", "x16 y79 w134 h108 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VcontrolsListView", collect(["Name", "Function", "Size"], translate))
 
 		window.Add("Text", "x164 y79 w80 h23 X:Move(0.2) +0x200", translate("Name"))
 		window.Add("Edit", "x214 y80 w101 h21 X:Move(0.2) W:Grow(0.3) VcontrolNameEdit")
@@ -570,7 +570,7 @@ class LabelsList extends ConfigurationItemList {
 
 		window.SetFont("Norm", "Arial")
 
-		window.Add("ListView", "x16 y224 w134 h84 W:Grow(0.2) BackGroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlabelsListView", collect(["Name", "Size"], translate))
+		window.Add("ListView", "x16 y224 w134 h84 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlabelsListView", collect(["Name", "Size"], translate))
 
 		window.Add("Text", "x164 y224 w80 h23 X:Move(0.2) +0x200", translate("Name"))
 		window.Add("Edit", "x214 y225 w101 h21 X:Move(0.2) W:Grow(0.3) VlabelNameEdit")
@@ -751,7 +751,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.openDisplayRulesEditor()
 		}
 
-		window.Add("ListView", "x8 y330 w424 h105 W:Grow BackGroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlayoutsListView", collect(["Name", "Grid", "Margins", "Definition"], translate))
+		window.Add("ListView", "x8 y330 w424 h105 W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlayoutsListView", collect(["Name", "Grid", "Margins", "Definition"], translate))
 
 		window.Add("Text", "x8 y445 w86 h23 +0x200", translate("Name && Type"))
 		window.Add("Edit", "x102 y445 w110 h21 W:Grow(0.2) VlayoutNameEdit")
@@ -1932,7 +1932,7 @@ class DisplayRulesList extends ConfigurationItemList {
 				window["iconFilePathEdit"].Text := pictureFile
 		}
 
-		window.Add("ListView", "x8 yp+30 w316 h120 W:Grow H:Grow BackGroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VdisplayRulesListView", collect(["Rule", "Icon"], translate))
+		window.Add("ListView", "x8 yp+30 w316 h120 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VdisplayRulesListView", collect(["Rule", "Icon"], translate))
 
 		window.Add("Text", "x8 yp+126 w80 h23 Y:Move +0x200", translate("Rule"))
 		window.Add("DropDownList", "x90 yp w150 Y:Move W:Grow(0.3) AltSubmit Choose1 VdisplayRuleDropDown", collect(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], translate))

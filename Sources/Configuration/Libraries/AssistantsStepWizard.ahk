@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ControllerStepWizard.ahk
+#Include "ControllerStepWizard.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -100,7 +100,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						if !isObject(function)
 							function := ((function != "") ? Array(function) : [])
 
-						if (function.Length() > 0) {
+						if (function.Length > 0) {
 							if (actions != "")
 								actions .= ", "
 
@@ -123,7 +123,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						if !isObject(function)
 							function := ((function != "") ? Array(function) : [])
 
-						if (function.Length() > 0)
+						if (function.Length > 0)
 							switch action {
 								case "RaceAssistant":
 									arguments .= ("; raceAssistant: On " . values2String(A_Space, function*))
@@ -146,79 +146,75 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							}
 					}
 
-				new Plugin(assistant, false, true, "", arguments).saveToConfiguration(configuration)
+				Plugin(assistant, false, true, "", arguments).saveToConfiguration(configuration)
 			}
 			else
-				new Plugin(assistant, false, false, "", "").saveToConfiguration(configuration)
+				Plugin(assistant, false, false, "", "").saveToConfiguration(configuration)
 
-		new Plugin("Team Server", false, assistantActive, "", "").saveToConfiguration(configuration)
+		Plugin("Team Server", false, assistantActive, "", "").saveToConfiguration(configuration)
 	}
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
+		local widgets
 		local page, assistant, labelWidth, labelX, labelY, label
-		local actionsIconHandle, actionsIconLabelHandle, actionsListViewHandle, actionsInfoTextHandle
-		local colummLabel1Handle, colummLine1Handle, colummLabel2Handle, colummLine2Handle, listX, listY, listWidth
-		local info, html, configurator, colWidth
+		local listX, listY, listWidth, info, html, configurator, colWidth, wddget
 
-		static actionsInfoText1
-		static actionsInfoText2
-		static actionsInfoText3
-		static actionsInfoText4
-		static actionsInfoText5
+		assistantActionFunctionSelect(listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Default
+		assistantActionFunctionMenu(window, listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
 		for page, assistant in this.Definition {
-			actionsIconHandle := false
-			actionsIconLabelHandle := false
-			actionsListViewHandle := false
-			actionsInfoTextHandle := false
+			widgets := []
 
 			labelWidth := width - 30
 			labelX := x + 35
 			labelY := y + 8
 
-			Gui %window%:Font, s10 Bold, Arial
+			window.SetFont("s10 Bold", "Arial")
 
 			label := substituteVariables(translate("%assistant% Configuration"), {assistant: translate(assistant)})
 
-			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDactionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Artificial Intelligence.ico
-			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDactionsLabelHandle Hidden Section, % label
+			widgets.Push(window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Artificial Intelligence.ico"))
+			widgets.Push(window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden Section", label))
 
-			Gui %window%:Font, s8 Norm, Arial
-
-			colummLabel1Handle := false
-			colummLine1Handle := false
-			colummLabel2Handle := false
-			colummLine2Handle := false
+			window.SetFont("s8 Norm", "Arial")
 
 			listX := x + 375
 			listY := labelY + 30
 			listWidth := width - 375
 
-			Gui %window%:Font, Bold, Arial
+			window.SetFont("Bold", "Arial")
 
-			Gui %window%:Add, Text, x%listX% yp+30 w%listWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Actions")
-			Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine1Handle Hidden
+			widgets.Push(window.Add("Text", "x" . listX . " yp+30 w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions")))
+			widgets.Push(window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden"))
 
-			Gui %window%:Font, Norm, Arial
+			window.SetFont("Norm", "Arial")
 
-			Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateAssistantActionFunction Hidden, % values2String("|", collect(["Action", "Label", "Function"], "translate")*)
+			widget := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h347 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Action", "Label", "Function"], translate))
+			widget.OnEvent("Click", assistantActionFunctionSelect)
+			widget.OnEvent("DoubleClick", assistantActionFunctionSelect)
+			widget.OnEvent("ContextMenu", assistantActionFunctionMenu)
+
+			widgets.Push(widget)
+
+			this.iActionsListViews.Push(widget)
 
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Assistants", "Assistants.Actions.Info." . getLanguage()))
 			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-			Sleep 200
-
-			Gui %window%:Add, ActiveX, x%x% yp+352 w%width% h58 HWNDactionsInfoTextHandle VactionsInfoText%page% Hidden, shell.explorer
+			widget := window.Add("ActiveX", "x" . x . " yp+352 w" . width . " h58 VactionsInfoText" . page . " Hidden", "shell.explorer")
 
 			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			actionsInfoText%page%.Navigate("about:blank")
-			actionsInfoText%page%.Document.Write(html)
+			widget.Value.Navigate("about:blank")
+			widget.Value.Document.write(html)
 
-			this.iActionsListViews.Push(actionsListViewHandle)
+			widgets.Push(widget)
 
 			if (assistant = "Race Engineer")
 				configurator := RaceEngineerConfigurator(this)
@@ -231,12 +227,17 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			colWidth := 375 - x
 
-			Gui %window%:Font, Bold, Arial
+			window.SetFont("Bold", "Arial")
 
-			Gui %window%:Add, Text, x%x% ys w%colWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden Section, % translate("Configuration")
-			Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine2Handle Hidden
+			widget := window.Add("Text", "x" . x . " ys w" . colWidth . " h23 +0x200 Hidden Section", translate("Configuration"))
+			widgets.Push(widget)
+			this.iControllerWidgets.Push(widget)
 
-			Gui %window%:Font, Norm, Arial
+			widget := window.Add("Text", "yp+20 x" . x . " w" . colWidth . " 0x10 Hidden")
+			widgets.Push(widget)
+			this.iControllerWidgets.Push(widget)
+
+			window.SetFont("Norm", "Arial")
 
 			if configurator {
 				this.iAssistantConfigurators.Push(configurator)
@@ -244,10 +245,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				configurator.createGui(this, x, listY + 30, colWidth, height)
 			}
 
-			this.iControllerWidgets.Push(columnLabel1Handle)
-			this.iControllerWidgets.Push(columnLine1Handle)
-
-			this.registerWidgets(page, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
+			this.registerWidgets(page, widgets*)
 		}
 	}
 
@@ -283,7 +281,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		if !this.SetupWizard.isModuleSelected("Controller")
 			for ignore, widget in this.iControllerWidgets
-				GuiControl Hide, %widget%
+				widget.Visible := false
 
 		configuration := this.SetupWizard.getSimulatorConfiguration()
 		assistantConfiguration := readMultiMap(kUserHomeDirectory . "Setup\" . this.iCurrentAssistant . " Configuration.ini")
@@ -357,7 +355,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			wizard := this.SetupWizard
 
 			actions := concatenate(string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions"))
-								 , string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special")))
+													, string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Assistants", "Assistants.Actions.Special")))
 
 			wizard.setModuleAvailableActions(this.iCurrentAssistant, false, actions)
 
@@ -410,13 +408,9 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		this.clearActions()
 
-		Gui %window%:Default
-
-		Gui ListView, % this.ActionsListView
-
 		pluginLabels := getControllerActionLabels()
 
-		LV_Delete()
+		this.ActionsListView.Delete()
 
 		count := 1
 
@@ -463,7 +457,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				function := this.getActionFunction(false, action)
 
 				if function {
-					if (function.Length() == 1)
+					if (function.Length == 1)
 						function := (!isBinary ? function[1] : (translate("On/Off: ") . function[1]))
 					else
 						function := (translate("On: ") . function[1] . translate(" | Off: ") . function[2])
@@ -471,7 +465,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				else
 					function := ""
 
-				LV_Add("", subAction, StrReplace(label, "`n" , A_Space), function)
+				this.ActionsListView.Add("", subAction, StrReplace(label, "`n", A_Space), function)
 
 				count += 1
 			}
@@ -479,14 +473,14 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 		this.loadControllerLabels()
 
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
+		this.ActionsListView.ModifyCol(1, "AutoHdr")
+		this.ActionsListView.ModifyCol(2, "AutoHdr")
+		this.ActionsListView.ModifyCol(3, "AutoHdr")
 	}
 
 	saveAssistantActions(assistant) {
 		local wizard := this.SetupWizard
-		local functions := {}
+		local functions := CaseInsenseMap()
 		local function, ignore, action
 
 		for ignore, action in this.getActions()
@@ -506,10 +500,6 @@ class AssistantsStepWizard extends ActionsStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updateAssistantActionFunction() {
-	updateActionFunction(SetupWizard.Instance.StepWizards["Assistants"])
-}
 
 initializeAssistantsStepWizard() {
 	SetupWizard.Instance.registerStepWizard(AssistantsStepWizard(SetupWizard.Instance, "Assistants", kSimulatorConfiguration))

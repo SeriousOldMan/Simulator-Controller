@@ -85,7 +85,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			}
 		}
 
-		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr VapplicationsListView", collect(["Type", "Name", "Executable", "Window Title", "Working Directory"], translate))
+		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VapplicationsListView", collect(["Type", "Name", "Executable", "Window Title", "Working Directory"], translate))
 
 		window.Add("Text", "x16 y295 w141 h23 Y:Move +0x200", translate("Name"))
 		window.Add("Edit", "x180 y295 w268 h21 Y:Move W:Grow VapplicationNameEdit")

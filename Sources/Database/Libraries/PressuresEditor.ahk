@@ -188,7 +188,7 @@ class PressuresEditor {
 		this.PressuresViewer.Navigate("about:blank")
 		this.PressuresViewer.Document.Write("<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 
-		this.iPressuresListView := pressuresEditorGui.Add("ListView", "x16 yp+170 w394 h160 BackgroundD8D8D8 -Multi -LV0x10 AltSubmit", collect(["Tyre", "Pressure", "#"], translate))
+		this.iPressuresListView := pressuresEditorGui.Add("ListView", "x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit", collect(["Tyre", "Pressure", "#"], translate))
 		this.iPressuresListView.OnEvent("Click", choosePressure)
 
 		pressuresEditorGui.Add("Button", "x338 yp+162 w23 h23 vupPressureButton").OnEvent("Click", upPressure)

@@ -1299,7 +1299,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(1)
 
-		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 BackgroundD8D8D8 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
+		this.iSettingsListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Setting", "Value"], translate))
 		this.iSettingsListView.OnEvent("Click", chooseSetting)
 
 		editorGui.Add("Text", "x296 yp+332 w80 h23 Y:Move +0x200", translate("Setting"))
@@ -1320,7 +1320,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(2)
 
-		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iStrategyListView := editorGui.Add("ListView", "x296 ys w360 h326 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iStrategyListView.OnEvent("Click", chooseStrategy)
 
 		editorGui.Add("Button", "xp+260 yp+328 w23 h23 X:Move Y:Move vuploadStrategyButton").OnEvent("Click", uploadStrategy)
@@ -1342,7 +1342,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("DropDownList", "xp+90 yp w270 W:Grow Choose2 vsetupTypeDropDown"
 					, collect(["Qualifying (Dry)", "Race (Dry)", "Qualifying (Wet)", "Race (Wet)"], translate)).OnEvent("Change", chooseSetupType)
 
-		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h302 H:Grow W:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
+		this.iSetupListView := editorGui.Add("ListView", "x296 yp+24 w360 h302 H:Grow W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Name"], translate))
 		this.iSetupListView.OnEvent("Click", chooseSetup)
 
 		this.iSelectedSetupType := kDryRaceSetup
@@ -1428,7 +1428,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		this.iTrackDisplay := editorGui.Add("Picture", "x297 y239 BackgroundTrans vtrackDisplay")
 		this.iTrackDisplay.OnEvent("Click", selectTrackAction)
 
-		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
+		this.iTrackAutomationsListView := editorGui.Add("ListView", "x296 y597 w110 h85 Y:Move(0.9) W:Grow(0.3) H:Grow(0.1) -Multi -LV0x10 Checked AltSubmit NoSort NoSortHdr", collect(["Name", "#"], translate))
 		this.iTrackAutomationsListView.OnEvent("Click", selectTrackAutomation)
 
 		editorGui.Add("Text", "x415 yp w60 h23 Y:Move(0.9) X:Move(0.9) +0x200", translate("Name"))
@@ -1448,7 +1448,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("CheckBox", "-Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
 
-		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 W:Grow H:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)
 		this.iAdministrationListView.OnEvent("Click", noSelect)
 		this.iAdministrationListView.OnEvent("DoubleClick", noSelect)
@@ -1467,7 +1467,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("DropDownList", "x120 yp w140 AltSubmit Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
-		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 H:Grow BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
+		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
@@ -4455,7 +4455,7 @@ selectImportData(sessionDatabaseEditorOrCommand, directory := false, owner := fa
 		importSelectCheck := importDataGui.Add("CheckBox", "Check3 x16 yp+12 w15 h23 vimportSelectCheck")
 		importSelectCheck.OnEvent("Click", selectAllImportEntries)
 
-		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow BackgroundD8D8D8 -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
+		importListView := importDataGui.Add("ListView", "x34 yp-2 w375 h400 H:Grow W:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		importListView.OnEvent("Click", noSelect)
 		importListView.OnEvent("DoubleClick", noSelect)
 		importListView.OnEvent("ItemCheck", selectImportEntry)

@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ControllerStepWizard.ahk
+#Include "ControllerStepWizard.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,16 +20,14 @@
 ;;; SimulatorsStepWizard                                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global simulatorDropDown
-
 class SimulatorsStepWizard extends ActionsStepWizard {
 	iSimulators := []
 	iCurrentSimulator := false
 
-	iSimulatorMFDKeys := {}
+	iSimulatorMFDKeys := CaseInsenseMap()
 	iControllerWidgets := []
 
-	iCachedActions := {}
+	iCachedActions := CaseInsenseMap()
 	iCachedSimulator := false
 
 	Pages {
@@ -81,7 +79,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 							if !isObject(function)
 								function := ((function != "") ? Array(function) : [])
 
-							if (function.Length() > 0) {
+							if (function.Length > 0) {
 								if (actions != "")
 									actions .= ", "
 
@@ -97,10 +95,10 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					}
 				}
 
-				new Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
+				Plugin(code, false, true, simulator, arguments).saveToConfiguration(configuration)
 			}
 			else
-				new Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
+				Plugin(code, false, false, simulator, "").saveToConfiguration(configuration)
 		}
 
 		setMultiMapValue(configuration, "Configuration", "Simulators", values2String("|", simulators*))
@@ -108,19 +106,9 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
-		local actionsIconHandle := false
-		local actionsIconLabelHandle := false
-		local actionsListViewHandle := false
-		local actionsInfoTextHandle := false
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
-		local simulatorLabelHandle := false
-		local simulatorDropDownHandle := false
-		local columnLabel1Handle := false
-		local columnLine1Handle := false
-		local columnLabel2Handle := false
-		local columnLine2Handle := false
 		local secondX := x + 80
 		local secondWidth := 160
 		local col1Width := (secondX - x) + secondWidth
@@ -130,26 +118,35 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local listWidth := width - 250
 		local ignore, simulator, code, keys, keyY, key, default, label, info, html
 
-		static actionsInfoText
+		simulatorActionFunctionSelect(listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Default
+		simulatorActionFunctionMenu(window, listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		chooseSimulator(*) {
+			this.chooseSimulator()
+		}
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDactionsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gaming Wheel.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDactionsLabelHandle Hidden, % translate("Simulator Configuration")
+		window.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Gaming Wheel.ico")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Simulator Configuration"))
 
-		Gui %window%:Add, Text, x%x% yp+30 w105 h23 +0x200 HWNDsimulatorLabelHandle Hidden, % translate("Simulator")
-		Gui %window%:Add, DropDownList, x%secondX% yp w%secondWidth% HWNDsimulatorDropDownHandle gchooseSimulator vsimulatorDropDown Hidden
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Font, Bold, Arial
+		widget3 := window.Add("Text", "x" . x . " yp+30 w105 h23 +0x200 Hidden", translate("Simulator"))
+		widget4 := window.Add("DropDownList", "x" . secondX . " yp w" . secondWidth . "  vsimulatorDropDown Hidden")
+		widget4.OnEvent("Change", chooseSimulator)
 
-		Gui %window%:Add, Text, x%x% yp+30 w%col1Width% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Pitstop MFD")
-		Gui %window%:Add, Text, yp+20 x%x% w%col1Width% 0x10 HWNDcolumnLine1Handle Hidden
+		window.SetFont("Bold", "Arial")
 
-		Gui %window%:Font, Norm, Arial
+		widget5 := window.Add("Text", "x" . x . " yp+30 w" . col1Width . " h23 +0x200 Hidden Section", translate("Pitstop MFD"))
+		widget6 := window.Add("Text", "yp+20 x" . x . " w" . col1Width . " 0x10 Hidden")
+
+		window.SetFont("Norm", "Arial")
 
 		secondX := x + 150
 
@@ -168,8 +165,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 					label := getMultiMapValue(wizard.Definition, "Setup.Simulators", "Simulators.MFDKeys." . key . "." . getLanguage(), key)
 
-					Gui %window%:Add, Text, x%x% y%keyY% w148 h23 +0x200 HWNDlabelHandle Hidden, % label
-					Gui %window%:Add, Edit, x%secondX% yp w60 h23 +0x200 HWNDeditHandle Hidden, % default
+					labelHandle := window.Add("Text", "x" . x . " y" . keyY . " w148 h23 +0x200 Hidden", label)
+					editHandle := window.Add("Edit", "x" . secondX . " yp w60 h23 +0x200 Hidden", default)
 
 					this.iSimulatorMFDKeys[simulator].Push(Array(labelHandle, editHandle, key, default))
 					this.registerWidgets(1, labelHandle, editHandle)
@@ -182,40 +179,41 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		listX := x + 250
 		listWidth := width - 250
 
-		Gui %window%:Font, Bold, Arial
+		window.SetFont("Bold", "Arial")
 
-		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden, % translate("Actions")
-		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
+		widget7 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden", translate("Actions"))
+		widget8 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " 0x10 Hidden")
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDactionsListViewHandle gupdateSimulatorActionFunction Hidden, % values2String("|", collect(["Mode", "Action", "Label", "Function"], "translate")*)
+		widget9 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h300 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
+		widget9.OnEvent("Click", simulatorActionFunctionSelect)
+		widget9.OnEvent("DoubleClick", simulatorActionFunctionSelect)
+		widget9.OnEvent("ContextMenu", simulatorActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
 
-		Sleep 200
-
-		Gui %window%:Add, ActiveX, x%x% yp+305 w%width% h76 HWNDactionsInfoTextHandle VactionsInfoText Hidden, shell.explorer
+		widget10 := window.Add("ActiveX", "x" . x . " yp+305 w" . width . " h76 VactionsInfoText Hidden", "shell.explorer")
 
 		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		actionsInfoText.Navigate("about:blank")
-		actionsInfoText.Document.Write(html)
+		widget10.Value.Navigate("about:blank")
+		widget10.Value.Document.Write(html)
 
-		this.iControllerWidgets := [columnLabel2Handle, columnLine2Handle]
+		this.iControllerWidgets := [widget8, widget9]
 
-		this.setActionsListView(actionsListViewHandle)
+		this.setActionsListView(widget10)
 
-		this.registerWidgets(1, actionsIconHandle, actionsLabelHandle, actionsListViewHandle, actionsInfoTextHandle, simulatorLabelHandle, simulatorDropDownHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle)
+		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget9, widget10)
 	}
 
 	reset() {
 		super.reset()
 
-		this.iSimulatorMFDKeys := {}
+		this.iSimulatorMFDKeys := CaseInsenseMap()
 		this.iControllerWidgets := []
-		this.iCachedActions := {}
+		this.iCachedActions := CaseInsenseMap()
 		this.iCachedSimulator := false
 	}
 
@@ -234,7 +232,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	showPage(page) {
-		local chosen := (this.iSimulators.Length() > 0) ? 1 : 0
+		local chosen := (this.iSimulators.Length > 0) ? 1 : 0
 		local ignore, widget
 
 		this.iCurrentSimulator := ((chosen > 0) ? this.iSimulators[chosen] : false)
@@ -243,12 +241,13 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		if !this.SetupWizard.isModuleSelected("Controller")
 			for ignore, widget in this.iControllerWidgets
-				GuiControl Hide, %widget%
+				widget.Visible := false
 
 		this.loadSimulatorMFDKeys(this.iCurrentSimulator)
 
-		GuiControl, , simulatorDropDown, % "|" . values2String("|", this.iSimulators*)
-		GuiControl Choose, simulatorDropDown, % chosen
+		this.Control["simulatorDropDown"].Delete()
+		this.Control["simulatorDropDown"].Add(this.iSimulators)
+		this.Control["simulatorDropDown"].Choose(chosen)
 	}
 
 	hidePage(page) {
@@ -272,12 +271,12 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			simulator := this.iCurrentSimulator
 
 		if (simulator != this.iCachedSimulator) {
-			this.iCachedActions := {}
+			this.iCachedActions := CaseInsenseMap()
 
 			this.iCachedSimulator := simulator
 		}
 
-		if this.iCachedActions.HasKey(mode)
+		if this.iCachedActions.Has(mode)
 			return this.iCachedActions[mode]
 		else {
 			wizard := this.SetupWizard
@@ -292,11 +291,11 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 	}
 
 	chooseSimulator() {
+		local simulatorDropDown := this.Control["simulatorDropDown"].Text
+
 		this.saveActions()
 
 		this.saveSimulatorMFDKeys(this.iCurrentSimulator)
-
-		GuiControlGet simulatorDropDown
 
 		this.iCurrentSimulator := simulatorDropDown
 
@@ -322,22 +321,18 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local subAction, isInformationRequest, label, isToggle, isBinary, isDial, onLabel, offLabel
 
 		if load {
-			this.iCachedActions := {}
+			this.iCachedActions := CaseInsenseMap()
 
 			this.clearActionFunctions()
 		}
 
 		this.clearActions()
 
-		Gui %window%:Default
-
-		Gui ListView, % this.ActionsListView
-
 		pluginLabels := getControllerActionLabels()
 
 		code := getApplicationDescriptor(simulator)[1]
 
-		LV_Delete()
+		this.ActionsListView.Delete()
 
 		lastMode := false
 		count := 1
@@ -405,7 +400,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					function := this.getActionFunction(mode, action)
 
 					if function {
-						if (function.Length() == 1)
+						if (function.Length == 1)
 							function := (!isBinary ? function[1] : ((isDial ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
 						else {
 							onLabel := getMultiMapValue(pluginLabels, code, subAction . ".Increase", false)
@@ -423,7 +418,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 
-					LV_Add("", (first ? translate(mode) : ""), subAction, StrReplace(label, "`n" , A_Space), function)
+					this.ActionsListView.Add("", (first ? translate(mode) : ""), subAction, StrReplace(label, "`n", A_Space), function)
 
 					count += 1
 				}
@@ -431,10 +426,10 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		this.loadControllerLabels()
 
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr")
+		this.ActionsListView.ModifyCol(1, "AutoHdr")
+		this.ActionsListView.ModifyCol(2, "AutoHdr")
+		this.ActionsListView.ModifyCol(3, "AutoHdr")
+		this.ActionsListView.ModifyCol(4, "AutoHdr")
 	}
 
 	saveSimulatorActions(simulator) {
@@ -443,7 +438,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local function, action, mode, modeFunctions, ignore
 
 		for ignore, mode in ["Pitstop", "Assistant"] {
-			modeFunctions := {}
+			modeFunctions := CaseInsenseMap()
 
 			for ignore, action in this.getActions(mode, simulator)
 				if wizard.simulatorActionAvailable(simulator, mode, action) {
@@ -463,8 +458,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		for ignore, descriptors in this.iSimulatorMFDKeys
 			for ignore, descriptor in descriptors {
-				GuiControl Hide, % descriptor[1]
-				GuiControl Hide, % descriptor[2]
+				descriptor[1].Visible := false
+				descriptor[2].Visible := false
 			}
 
 		if (wizard.isModuleSelected("Controller") || wizard.isModuleSelected("Race Engineer"))
@@ -473,12 +468,14 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 				widget := descriptor[2]
 
-				GuiControl, , %widget%, %value%
+				widget.Value := value
+				widget.Visible := true
+				widget.Enabled := true
 
-				GuiControl Show, % descriptor[1]
-				GuiControl Show, % descriptor[2]
-				GuiControl Enable, % descriptor[1]
-				GuiControl Enable, % descriptor[2]
+				widget := descriptor[1]
+
+				widget.Visible := true
+				widget.Enabled := true
 			}
 	}
 
@@ -486,11 +483,8 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local ignore, descriptor, value
 
-		for ignore, descriptor in this.iSimulatorMFDKeys[simulator] {
-			GuiControlGet value, , % descriptor[2]
-
-			wizard.setSimulatorValue(simulator, descriptor[3], value, false)
-		}
+		for ignore, descriptor in this.iSimulatorMFDKeys[simulator]
+			wizard.setSimulatorValue(simulator, descriptor[3], descriptor[2].Text, false)
 	}
 
 	loadControllerLabels() {
@@ -527,14 +521,6 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-updateSimulatorActionFunction() {
-	updateActionFunction(SetupWizard.Instance.StepWizards["Simulators"])
-}
-
-chooseSimulator() {
-	SetupWizard.Instance.StepWizards["Simulators"].chooseSimulator()
-}
 
 initializeSimulatorsStepWizard() {
 	SetupWizard.Instance.registerStepWizard(SimulatorsStepWizard(SetupWizard.Instance, "Simulators", kSimulatorConfiguration))

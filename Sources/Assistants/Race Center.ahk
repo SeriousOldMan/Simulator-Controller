@@ -1856,7 +1856,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x24 yp+31 w356 0x10")
 
-		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h230 H:Grow(0.2) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
+		this.iReportsListView := centerGui.Add("ListView", "x16 yp+10 w115 h230 H:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", [translate("Report")])
 		this.iReportsListView.OnEvent("Click", chooseReport)
 
 		for ignore, report in kSessionReports
@@ -1950,7 +1950,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("DateTime", "x106 yp w80 h23 vsessionDateCal").OnEvent("Change", updateDate)
 		centerGui.Add("DateTime", "x190 yp w50 h23  vsessionTimeEdit  1", "HH:mm").OnEvent("Change", updateTime)
 
-		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
+		this.iPlanListView := centerGui.Add("ListView", "x24 ys+63 w344 h240 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver", "Time (est.)", "Time (act.)", "Lap (est.)", "Lap (act.)", "Refuel", "Tyre Change"], translate))
 		this.iPlanListView.OnEvent("Click", choosePlan)
 
 		centerGui.Add("Text", "x378 ys+68 w90 h23 +0x200", translate("Driver"))
@@ -1986,12 +1986,12 @@ class RaceCenter extends ConfigurationItem {
 
 		centerTab.UseTab(2)
 
-		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
+		this.iStintsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Driver", "Weather", "Compound", "Laps", "Pos. (Start)", "Pos. (End)", "Avg. Lap Time", "Consumption", "Accidents", "Penalties", "Potential", "Race Craft", "Speed", "Consistency", "Car Control"], translate))
 		this.iStintsListView.OnEvent("Click", chooseStint)
 
 		centerTab.UseTab(3)
 
-		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident", "Penalty"], translate))
+		this.iLapsListView := centerGui.Add("ListView", "x24 ys+33 w577 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["#", "Stint", "Driver", "Position", "Weather", "Grip", "Lap Time", "Consumption", "Remaining", "Pressures", "Accident", "Penalty"], translate))
 		this.iLapsListView.OnEvent("Click", chooseLap)
 
 		centerTab.UseTab(4)
@@ -2069,7 +2069,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerTab.UseTab(5)
 
-		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
+		this.iSetupsListView := centerGui.Add("ListView", "x24 ys+33 w344 h270 H:Grow(0.8) -Multi -LV0x10 AltSubmit", collect(["Driver", "Conditions", "Compound", "Pressures", "Notes"], translate))
 		this.iSetupsListView.OnEvent("Click", chooseSetup)
 
 		centerGui.Add("Text", "x378 ys+38 w90 h23 +0x200", translate("Driver"))
@@ -2171,7 +2171,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Button", "x66 ys+279 w160", translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
-		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow(0.8) BackgroundD8D8D8 -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
+		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow(0.8) -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop)
 
 		centerGui.Rules := ""
@@ -11426,7 +11426,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 					connectedDrivers.Push(connection.Name)
 			}
 
-		availableDriversListView := teamGui.Add("ListView", "x16 yp+30 w160 h184 AltSubmit BackgroundD8D8D8 -Multi -LV0x10 NoSort NoSortHdr  Section", collect(["Available Driver", "Online"], translate))
+		availableDriversListView := teamGui.Add("ListView", "x16 yp+30 w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Section", collect(["Available Driver", "Online"], translate))
 		availableDriversListView.OnEvent("Click", manageTeam.Bind("UpdateState"))
 
 		if !teamDrivers
@@ -11440,7 +11440,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 		availableDriversListView.ModifyCol(1, "AutoHdr")
 		availableDriversListView.ModifyCol(2, "AutoHdr Center")
 
-		selectedDriversListView := teamGui.Add("ListView", "x230 ys w160 h184 BackgroundD8D8D8 AltSubmit -Multi -LV0x10 NoSort NoSortHdr", collect(["Selected Driver", "Online"], translate))
+		selectedDriversListView := teamGui.Add("ListView", "x230 ys w160 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr", collect(["Selected Driver", "Online"], translate))
 		selectedDriversListView.OnEvent("Click", manageTeam.Bind("UpdateState"))
 
 		for ignore, name in teamDrivers
@@ -11583,7 +11583,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 
 			settingsGui.SetFont("s8 Norm", "Arial")
 
-			settingsListView := settingsGui.Add("ListView", "x16 yp+30 w284 h184 BackgroundD8D8D8 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Section", collect(["Setting", "Value"], translate))
+			settingsListView := settingsGui.Add("ListView", "x16 yp+30 w284 h184 AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Section", collect(["Setting", "Value"], translate))
 			settingsListView.OnEvent("Click", noSelect)
 			settingsListView.OnEvent("DoubleClick", noSelect)
 

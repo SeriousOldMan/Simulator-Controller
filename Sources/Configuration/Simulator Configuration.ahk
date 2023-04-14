@@ -421,7 +421,7 @@ class SimulatorsList extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		window.Add("ListBox", "x24 y284 w194 h96 BackGroundD8D8D8 vsimulatorsListBox")
+		window.Add("ListBox", "x24 y284 w194 h96 vsimulatorsListBox")
 
 		window.Add("Edit", "x224 y284 w239 h21 W:Grow VsimulatorEdit")
 

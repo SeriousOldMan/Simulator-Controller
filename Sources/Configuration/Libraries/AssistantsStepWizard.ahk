@@ -98,7 +98,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						function := wizard.getAssistantActionFunction(assistant, action)
 
 						if !isObject(function)
-							function := ((function != "") ? Array(function) : [])
+							function := ((function && (function != "")) ? Array(function) : [])
 
 						if (function.Length > 0) {
 							if (actions != "")
@@ -121,7 +121,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 						function := wizard.getAssistantActionFunction(assistant, action)
 
 						if !isObject(function)
-							function := ((function != "") ? Array(function) : [])
+							function := ((function && (function != "")) ? Array(function) : [])
 
 						if (function.Length > 0)
 							switch action {
@@ -169,7 +169,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			this.actionFunctionSelect(line)
 		}
 
-		assistantActionFunctionMenu(window, listView, line, *) {
+		assistantActionFunctionMenu(listView, line, *) {
 			this.actionFunctionSelect(line)
 		}
 
@@ -203,7 +203,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 			widget := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h347 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Action", "Label", "Function"], translate))
 			widget.OnEvent("Click", assistantActionFunctionSelect)
 			widget.OnEvent("DoubleClick", assistantActionFunctionSelect)
-			widget.OnEvent("ContextMenu", noSelect)
+			widget.OnEvent("ContextMenu", assistantActionFunctionMenu)
 
 			widgets.Push(widget)
 
@@ -428,7 +428,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 				if load {
 					function := wizard.getAssistantActionFunction(assistant, action)
 
-					if (function != "")
+					if (function && (function != ""))
 						this.setActionFunction(false, action, (isObject(function) ? function : Array(function)))
 				}
 

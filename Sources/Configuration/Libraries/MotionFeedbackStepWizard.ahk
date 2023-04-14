@@ -65,7 +65,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 				actionArguments := Array("On", 50)
 
 			if !isObject(function)
-				function := ((function != "") ? Array(function) : [])
+				function := ((function && (function != "")) ? Array(function) : [])
 
 			if (function.Length > 0) {
 				if (arguments != "")
@@ -103,7 +103,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 						actionArguments := Array("On", 1.0)
 
 					if !isObject(function)
-						function := ((function != "") ? Array(function) : [])
+						function := ((function && (function != "")) ? Array(function) : [])
 
 					if (function.Length > 0) {
 						if (actions != "")
@@ -153,7 +153,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 			this.actionFunctionSelect(line)
 		}
 
-		motionFeedbackActionFunctionMenu(window, listView, line, *) {
+		motionFeedbackActionFunctionMenu(listView, line, *) {
 			this.actionFunctionSelect(line)
 		}
 
@@ -215,7 +215,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		widget17 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "State", "Intensity", "Function"], translate))
 		widget17.OnEvent("Click", motionFeedbackActionFunctionSelect)
 		widget17.OnEvent("DoubleClick", motionFeedbackActionFunctionSelect)
-		widget17.OnEvent("ContextMenu", noSelect)
+		widget17.OnEvent("ContextMenu", motionFeedbackActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Motion Feedback", "Motion Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"

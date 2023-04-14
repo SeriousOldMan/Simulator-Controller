@@ -87,7 +87,7 @@ class ControllerStepWizard extends StepWizard {
 						streamDeckControllers.Push(controller)
 
 					for ignore, theFunction in string2Values(";", definition)
-						if (theFunction != "")
+						if (theFunction && (theFunction != ""))
 							Function.createFunction(theFunction, false, "", "", "", "").saveToConfiguration(configuration)
 				}
 			}
@@ -117,7 +117,7 @@ class ControllerStepWizard extends StepWizard {
 							functionTriggers := wizard.getControllerFunctionTriggers(theFunction)
 
 							if (functionTriggers.Length > 0)
-								theFunction := Function.createFunction(theFunction, false, functionTriggers[1], "", functionTriggers[2], "")
+								theFunction := Function.createFunction(theFunction, false, functionTriggers[1], "", ((functionTriggers.Length > 1) ? functionTriggers[2] : ""), "")
 							else
 								theFunction := Function.createFunction(theFunction, false, "", "", "", "")
 
@@ -166,15 +166,15 @@ class ControllerStepWizard extends StepWizard {
 				this.updateFunctionTriggers(line)
 		}
 
-		functionTriggersMenu(window, listView, line, *) {
+		functionTriggersMenu(listView, line, *) {
 			local function, row, curCoordMode, control, number, trigger, menuItem
 			local multiple, menuItem, handler, contextMenu
 
-			loop this.iFunctionsListView.GetCount()
-				this.iFunctionsListView.Modify(A_Index, "-Select")
-
 			if (line > 0) {
-				row := line
+				row := this.iFunctionsListView.GetNext()
+
+				if !row
+					row := line
 
 				curCoordMode := A_CoordModeMouse
 
@@ -225,7 +225,7 @@ class ControllerStepWizard extends StepWizard {
 		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h240 W:Grow H:Grow(0.66) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Controller", "Control", "Function", "Number", "Trigger(s)", "Hints & Conflicts"], translate))
 		widget3.OnEvent("Click", functionTriggersSelect)
 		widget3.OnEvent("DoubleClick", functionTriggersSelect)
-		widget3.OnEvent("ContextMenu", noSelect)
+		widget3.OnEvent("ContextMenu", functionTriggersMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
@@ -304,7 +304,7 @@ class ControllerStepWizard extends StepWizard {
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
 				for ignore, function in string2Values(";", definition)
-					if (function != "")
+					if (function && (function != ""))
 						streamDeckFunctions += 1
 		}
 
@@ -352,7 +352,7 @@ class ControllerStepWizard extends StepWizard {
 					function := ConfigurationItem.splitDescriptor(function)
 					function := ConfigurationItem.descriptor(controls[function[1]], function[2])
 
-					if (function != "")
+					if (function && (function != ""))
 						if this.iFunctionTriggers.Has(function)
 							functions.Push(Array(function, this.iFunctionTriggers[function]*))
 						else
@@ -365,7 +365,7 @@ class ControllerStepWizard extends StepWizard {
 
 			if ((controller[2] != "Layout") && (controller[2] != "Visible"))
 				for ignore, function in string2Values(";", definition)
-					if (function != "")
+					if (function && (function != ""))
 						functions.Push(function)
 		}
 
@@ -390,7 +390,7 @@ class ControllerStepWizard extends StepWizard {
 				for ignore, function in string2Values(";", definition) {
 					function := string2Values(",", function, false, WeakArray)[1]
 
-					if (function != "") {
+					if (function && (function != "")) {
 						function := ConfigurationItem.splitDescriptor(function)
 						function := ConfigurationItem.descriptor(controls[function[1]], function[2])
 
@@ -510,7 +510,7 @@ class ControllerStepWizard extends StepWizard {
 				controller := controller[1]
 
 				for ignore, function in string2Values(";", definition)
-					if (function != "") {
+					if (function && (function != "")) {
 						first := (controller != lastController)
 						lastController := controller
 
@@ -536,8 +536,8 @@ class ControllerStepWizard extends StepWizard {
 		trigger := this.iFunctionsListView.GetText(row, 5)
 
 		if (trigger != translate("n/a")) {
-			type := this.iFunctionsListView.GetText(row, 4)
-			number := this.iFunctionsListView.GetText(row, 3)
+			type := this.iFunctionsListView.GetText(row, 3)
+			number := this.iFunctionsListView.GetText(row, 4)
 
 			switch type {
 				case translate(k2WayToggleType):
@@ -548,6 +548,8 @@ class ControllerStepWizard extends StepWizard {
 					callback := ObjBindMethod(this, "registerHotkey", k1WayToggleType . "." . number, row, false)
 				case translate(kButtonType):
 					callback := ObjBindMethod(this, "registerHotkey", kButtonType . "." . number, row, false)
+				default:
+					throw "Unknown function type detected in ControllerStepWizard.updateFunctionTriggers..."
 			}
 
 			wizard.toggleTriggerDetector(callback)
@@ -577,6 +579,8 @@ class ControllerStepWizard extends StepWizard {
 					type := k1WayToggleType
 				case translate(kButtonType):
 					type := kButtonType
+				default:
+					throw "Unknown function type detected in ControllerStepWizard.updateFunctionHotkeys..."
 			}
 
 			function := (type . "." . number)
@@ -650,6 +654,8 @@ class ControllerStepWizard extends StepWizard {
 					type := k1WayToggleType
 				case translate(kButtonType):
 					type := kButtonType
+				default:
+					throw "Unknown function type detected in ControllerStepWizard.clearFunctionTriggerAndHotkey..."
 			}
 
 			function := (type . "." . number)
@@ -918,7 +924,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			local ignore, mode, window
 
 			updateControllerLabels(*) {
-				this.loadControllerLabels()
+				this.PreviewManager.loadControllerLabels()
 			}
 
 			super.createGui(configuration)
@@ -976,7 +982,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			local ignore, mode, window
 
 			updateControllerLabels(*) {
-				this.loadControllerLabels()
+				this.PreviewManager.loadControllerLabels()
 			}
 
 			super.createGui(configuration)
@@ -1341,7 +1347,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 			else if (function[1] != "")
 				count := 1
 		}
-		else if (function != "")
+		else if (function && (function != ""))
 			count := 1
 
 		menuItem := translate((count > 1) ? "Clear Function(s)" : "Clear Function")
@@ -1484,15 +1490,24 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 		}
 	}
 
-	actionFunctionSelect(row) {
+	actionFunctionSelect(line) {
+		local row
+
+		if (line > 0) {
+			row := this.ActionsListView.GetNext()
+
+			if !row
+				row := line
+
+			if (this.SetupWizard.isModuleSelected("Controller"))
+				if this.iPendingActionRegistration
+					this.setFunction(row)
+				else
+					this.createActionsMenu(this.getAction(row) . ": " . StrReplace(this.getActionLabel(row), "`n", A_Space), row).Show()
+		}
+
 		loop this.ActionsListView.GetCount()
 			this.ActionsListView.Modify(A_Index, "-Select")
-
-		if (this.SetupWizard.isModuleSelected("Controller") && (row > 0))
-			if this.iPendingActionRegistration
-				this.setFunction(row)
-			else
-				this.createActionsMenu(this.getAction(row) . ": " . StrReplace(this.getActionLabel(row), "`n", A_Space), row).Show()
 	}
 }
 

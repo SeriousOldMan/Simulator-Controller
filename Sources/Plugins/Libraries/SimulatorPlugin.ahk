@@ -507,9 +507,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			WinActivate(window)
 	}
 
-	sendCommand(command) {
-		local delay
-
+	sendCommand(command, delay?) {
 		try {
 			switch this.CommandMode, false {
 				case "Event":
@@ -528,7 +526,8 @@ class SimulatorPlugin extends ControllerPlugin {
 			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%command%) - please check the configuration"), {command: command}))
 		}
 
-		delay := this.CommandDelay
+		if !isSet(delay)
+			delay := this.CommandDelay
 
 		if delay
 			Sleep(delay)

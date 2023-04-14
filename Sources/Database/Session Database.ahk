@@ -3850,7 +3850,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadPressures() {
 		local sessionDB := this.SessionDatabase
-		local window, compounds, chosenCompound, compound, compoundColor, pressureInfos, index
+		local window, compounds, chosenCompound, tyreCompound, tyreCompoundColor, pressureInfos, index
 		local ignore, tyre, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
 		local drivers, driver, selectedDriver
 
@@ -3862,7 +3862,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
-		 && this.SelectedTrack && (this.SelectedSimulator != true)) {
+		 && this.SelectedTrack && (this.SelectedTrack != true)) {
 			window := this.Window
 
 			lastColor := "D0D0D0"
@@ -3923,19 +3923,19 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				lastCommunity := this.UseCommunity
 
 				if chosenCompound {
-					compound := false
-					compoundColor := false
+					tyreCompound := false
+					tyreCompoundColor := false
 
-					splitCompound(compounds[chosenCompound], &compound, &compoundColor)
+					splitCompound(compounds[chosenCompound], &tyreCompound, &tyreCompoundColor)
 
-					this.iTyreCompound := compound
-					this.iTyreCompoundColor := compoundColor
+					this.iTyreCompound := tyreCompound
+					this.iTyreCompoundColor := tyreCompoundColor
 
 					pressureInfos := SessionDatabaseEditor.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
 																							, this.SelectedTrack, this.SelectedWeather
 																							, convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
 																							, convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
-																							, compound, compoundColor, driver*)
+																							, tyreCompound, tyreCompoundColor, driver*)
 				}
 				else
 					pressureInfos := []
@@ -3973,7 +3973,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							window[tyre . "Pressure" . postfix].Text := displayValue("Float", convertUnit("Pressure", pressure))
 
 							if (index = (3 + airDelta)) {
-								window[tyre . "Pressure" . postfix].Opt("ReadOnly Background" . color . ((color = "Green") ? " cWhite" : ""))
+								window[tyre . "Pressure" . postfix].Opt("ReadOnly Background" . color . ((color = "Green") ? " cWhite" : " cBlack"))
 								window[tyre . "Pressure" . postfix].Enabled := true
 							}
 							else {
@@ -3990,6 +3990,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 			}
 			catch Any as exception {
+				msgbox(exception.Stack)
 				logError(exception)
 			}
 

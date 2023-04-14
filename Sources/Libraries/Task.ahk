@@ -199,6 +199,11 @@ class Task {
 		try {
 			return this.run()
 		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
+		}
 		finally {
 			this.iRunning := false
 		}
@@ -394,7 +399,7 @@ class Task {
 	static launch(theTask) {
 		local oldCurrentTask := Task.CurrentTask
 		local window := theTask.Window
-		local next
+		local next := false
 
 		Task.sCurrentTask := theTask
 
@@ -403,11 +408,6 @@ class Task {
 
 		try {
 			next := theTask.execute()
-		}
-		catch Any as exception {
-			logError(exception, true)
-
-			next := false
 		}
 		finally {
 			if window

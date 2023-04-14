@@ -418,6 +418,8 @@ class RaceStrategistPlugin extends RaceAssistantPlugin  {
 			deleteFile(fileName)
 		}
 		else {
+			DirCreate(kTempDirectory . "Race Report")
+
 			FileMove(fileName, kTempDirectory . "Race Report\Lap." lapNumber, 1)
 
 			loop {

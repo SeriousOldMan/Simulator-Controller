@@ -804,7 +804,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 
 		sdWidget1 := window.Add("Text", "x8 ys w86 h23 +0x200", translate("Layout"))
-		sdWidget2 := window.Add("DropDownList", "x102 yp w110 W:Grow(0.2) AltSubmit Choose2 VlayoutDropDown", collect(["Mini", "Standard", "XL"], translate))
+		sdWidget2 := window.Add("DropDownList", "x102 yp w110 W:Grow(0.2) AltSubmit Choose2 VlayoutDropDown", collect(["Mini", "Standard", "XL", "Plus"], translate))
 		sdWidget2.OnEvent("Change", chooseLayout)
 
 		sdWidget3 := window.Add("Button", "x102 yp+30 w230 h23 W:Grow(0.4) Center", translate("Edit Display Rules..."))
@@ -997,12 +997,14 @@ class LayoutsList extends ConfigurationItemList {
 			this.Control["layoutSidesMarginEdit"].Text := ""
 			this.Control["layoutBottomMarginEdit"].Text := ""
 
-			if (size[1] = 2)
+			if ((size[1] = 2) && (size[1] = 3))
 				this.Control["layoutDropDown"].Choose(1)
 			else if (size[1] = 3)
 				this.Control["layoutDropDown"].Choose(2)
-			else
+			else if (size[1] = 4)
 				this.Control["layoutDropDown"].Choose(3)
+			else
+				this.Control["layoutDropDown"].Choose(4)
 		}
 
 		this.Control["layoutTypeDropDown"].Choose(inList(["Button Box", "Stream Deck"], layoutType))
@@ -1139,17 +1141,27 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	chooseLayout(update := true) {
-		if (this.Control["layoutDropDown"].Value = 1) {
+		Sleep 1000
+
+		local layoutDropDown := this.Control["layoutDropDown"].Value
+
+		sleep 1000
+
+		if (layoutDropDown = 1) {
 			this.Control["layoutRowsEdit"].Text := 2
 			this.Control["layoutColumnsEdit"].Text := 3
 		}
-		else if (this.Control["layoutDropDown"].Value = 2) {
+		else if (layoutDropDown = 2) {
 			this.Control["layoutRowsEdit"].Text := 3
 			this.Control["layoutColumnsEdit"].Text := 5
 		}
-		else {
+		else if (layoutDropDown = 3) {
 			this.Control["layoutRowsEdit"].Text := 4
 			this.Control["layoutColumnsEdit"].Text := 8
+		}
+		else {
+			this.Control["layoutRowsEdit"].Text := 2
+			this.Control["layoutColumnsEdit"].Text := 4
 		}
 
 		if (update && (this.CurrentItem != 0))

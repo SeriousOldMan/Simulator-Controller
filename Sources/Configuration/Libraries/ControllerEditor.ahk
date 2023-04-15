@@ -418,7 +418,7 @@ class ControlsList extends ConfigurationItemList {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x8 y60 w424 h138 W:Grow", translate("Controls"))
+		window.Add("GroupBox", "x8 y60 w424 h138 W:Grow", translate("Controls"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -566,7 +566,7 @@ class LabelsList extends ConfigurationItemList {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x8 y205 w424 h115 W:Grow", translate("Labels"))
+		window.Add("GroupBox", "x8 y205 w424 h115 W:Grow", translate("Labels"))
 
 		window.SetFont("Norm", "Arial")
 

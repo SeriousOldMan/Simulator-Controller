@@ -953,9 +953,10 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x619 ys+39 w727 h9 W:Grow", translate("Strategy"))
+		workbenchGui.Add("Text", "x619 ys+39 w80 h21", translate("Strategy"))
+		workbenchGui.Add("Text", "x700 yp+7 w646 0x10 W:Grow")
 
-		workbenchGui.Add("ActiveX", "x619 yp+21 w727 h193 Border vstratViewer H:Grow W:Grow", "shell.explorer").Value.navigate("about:blank")
+		workbenchGui.Add("ActiveX", "x619 yp+14 w727 h193 Border vstratViewer H:Grow W:Grow", "shell.explorer").Value.navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(window, workbenchGui["stratViewer"].Value)
 
@@ -993,7 +994,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x24 ys+34 w209 h171", translate("Race"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w209 h171", translate("Race"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1018,7 +1019,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x243 ys+34 w354 h171", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x243 ys+34 w354 h171", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1067,7 +1068,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x24 ys+34 w410 h171", translate("Pitstop"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w410 h171", translate("Pitstop"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1163,7 +1164,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x24 ys+34 w179 h171", translate("Initial Conditions"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w179 h171", translate("Initial Conditions"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1212,7 +1213,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x214 ys+34 w174 h120", translate("Optimizer"))
+		workbenchGui.Add("GroupBox", "x214 ys+34 w174 h120", translate("Optimizer"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1245,7 +1246,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x399 ys+34 w197 h171", translate("Summary"))
+		workbenchGui.Add("GroupBox", "x399 ys+34 w197 h171", translate("Summary"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1289,7 +1290,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x24 ys+34 w143 h171", translate("Electronics"))
+		workbenchGui.Add("GroupBox", "x24 ys+34 w143 h171", translate("Electronics"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1314,7 +1315,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x178 ys+34 w174 h171", translate("Tyres"))
+		workbenchGui.Add("GroupBox", "x178 ys+34 w174 h171", translate("Tyres"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 
@@ -1357,7 +1358,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Italic", "Arial")
 
-		workbenchGui.Add("GroupBox", "-Theme x363 ys+34 w233 h171", translate("Pitstops"))
+		workbenchGui.Add("GroupBox", "x363 ys+34 w233 h171", translate("Pitstops"))
 
 		workbenchGui.SetFont("Norm", "Arial")
 

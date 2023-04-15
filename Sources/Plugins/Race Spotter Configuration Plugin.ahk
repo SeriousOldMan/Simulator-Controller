@@ -89,7 +89,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget4 := window.Add("GroupBox", "-Theme x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Data Analysis"))
+		widget4 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Data Analysis"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -111,7 +111,7 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget16 := window.Add("GroupBox", "-Theme x" . x . " yp+35 w" . width . " h206 W:Grow Hidden", translate("Announcements"))
+		widget16 := window.Add("GroupBox", "x" . x . " yp+35 w" . width . " h206 W:Grow Hidden", translate("Announcements"))
 
 		window.SetFont("Norm", "Arial")
 

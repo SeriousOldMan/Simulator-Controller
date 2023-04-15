@@ -771,7 +771,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+28 w375 h9", translate("Simulation"))
+		systemMonitorGui.Add("GroupBox", "x24 ys+28 w375 h9", translate("Simulation"))
 		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
@@ -780,7 +780,7 @@ systemMonitor(command := false, arguments*) {
 		simulationDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+28 w375 h9", translate("Race Assistants"))
+		systemMonitorGui.Add("GroupBox", "x405 ys+28 w375 h9", translate("Race Assistants"))
 		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
@@ -789,7 +789,7 @@ systemMonitor(command := false, arguments*) {
 		assistantsDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+138 w375 h9", translate("Team Session"))
+		systemMonitorGui.Add("GroupBox", "x24 ys+138 w375 h9", translate("Team Session"))
 		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
@@ -798,7 +798,7 @@ systemMonitor(command := false, arguments*) {
 		sessionDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+138 w375 h9", translate("Data Synchronization"))
+		systemMonitorGui.Add("GroupBox", "x405 ys+138 w375 h9", translate("Data Synchronization"))
 		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
@@ -807,7 +807,7 @@ systemMonitor(command := false, arguments*) {
 		dataDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+248 w375 h9", translate("Track Automation"))
+		systemMonitorGui.Add("GroupBox", "x24 ys+248 w375 h9", translate("Track Automation"))
 		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
@@ -816,7 +816,7 @@ systemMonitor(command := false, arguments*) {
 		automationDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
-		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+248 w375 h9", translate("Track Mapping"))
+		systemMonitorGui.Add("GroupBox", "x405 ys+248 w375 h9", translate("Track Mapping"))
 		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
@@ -841,7 +841,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 
-		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+28 w375 h150", translate("Connection"))
+		systemMonitorGui.Add("GroupBox", "x405 ys+28 w375 h150", translate("Connection"))
 
 		systemMonitorGui.SetFont("Norm", "Arial")
 
@@ -862,7 +862,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 
-		systemMonitorGui.Add("GroupBox", "-Theme x24 ys+188 w375 h9", translate("Drivers"))
+		systemMonitorGui.Add("GroupBox", "x24 ys+188 w375 h9", translate("Drivers"))
 
 		systemMonitorGui.SetFont("Norm", "Arial")
 
@@ -872,7 +872,7 @@ systemMonitor(command := false, arguments*) {
 
 		systemMonitorGui.SetFont("Italic", "Arial")
 
-		systemMonitorGui.Add("GroupBox", "-Theme x405 ys+188 w375 h142", translate("Stint"))
+		systemMonitorGui.Add("GroupBox", "x405 ys+188 w375 h142", translate("Stint"))
 
 		systemMonitorGui.SetFont("Norm", "Arial")
 

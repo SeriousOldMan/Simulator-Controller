@@ -423,7 +423,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		window.SetFont("Italic", "Arial")
 
-		widget22 := window.Add("GroupBox", "-Theme x" . x . " yp+36 w" . width . " h214 H:Grow W:Grow Hidden", translate("Teams"))
+		widget22 := window.Add("GroupBox", "x" . x . " yp+36 w" . width . " h214 H:Grow W:Grow Hidden", translate("Teams"))
 
 		window.SetFont("Norm", "Arial")
 

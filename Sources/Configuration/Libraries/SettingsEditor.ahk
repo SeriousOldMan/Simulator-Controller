@@ -445,7 +445,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 		settingsEditorGui.SetFont("Norm", "Arial")
 		settingsEditorGui.SetFont("Italic", "Arial")
 
-		settingsEditorGui.Add("GroupBox", "-Theme x8 YP+30 w220 h" . coreHeight, translate("Start Core System"))
+		settingsEditorGui.Add("GroupBox", "x8 YP+30 w220 h" . coreHeight, translate("Start Core System"))
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 
@@ -466,7 +466,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 			settingsEditorGui.SetFont("Norm", "Arial")
 			settingsEditorGui.SetFont("Italic", "Arial")
 
-			settingsEditorGui.Add("GroupBox", "-Theme XP-10 YP+30 w220 h" . feedbackHeight, translate("Start Feedback System"))
+			settingsEditorGui.Add("GroupBox", "XP-10 YP+30 w220 h" . feedbackHeight, translate("Start Feedback System"))
 
 			settingsEditorGui.SetFont("Norm", "Arial")
 
@@ -504,7 +504,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 		settingsEditorGui.SetFont("Norm", "Arial")
 		settingsEditorGui.SetFont("Italic", "Arial")
 
-		settingsEditorGui.Add("GroupBox", "-Theme XP-10 YP+30 w220 h160", translate("Controller Notifications"))
+		settingsEditorGui.Add("GroupBox", "XP-10 YP+30 w220 h160", translate("Controller Notifications"))
 
 		settingsEditorGui.SetFont("Norm", "Arial")
 

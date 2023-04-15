@@ -1446,7 +1446,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(6)
 
-		editorGui.Add("CheckBox", "-Theme Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
+		editorGui.Add("CheckBox", "Check3 x296 ys+2 w15 h23 vdataSelectCheck").OnEvent("Click", selectAllData)
 
 		this.iAdministrationListView := editorGui.Add("ListView", "x314 ys w342 h404 W:Grow H:Grow -Multi -LV0x10 Checked AltSubmit", collect(["Type", "Car / Track", "Driver", "#"], translate))
 		this.iAdministrationListView.OnEvent("ItemCheck", selectData)

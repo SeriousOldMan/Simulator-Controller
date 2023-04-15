@@ -111,7 +111,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y411 w458 h71 Y:Move W:Grow", translate("Function Hooks (optional)"))
+		window.Add("GroupBox", "x16 y411 w458 h71 Y:Move W:Grow", translate("Function Hooks (optional)"))
 
 		window.SetFont("Norm", "Arial")
 

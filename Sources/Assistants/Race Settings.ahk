@@ -1082,7 +1082,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
 
-		settingsGui.Add("GroupBox", "-Theme x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
+		settingsGui.Add("GroupBox", "x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
 
 		settingsGui.SetFont("Norm", "Arial")
 
@@ -1109,7 +1109,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
 
-		settingsGui.Add("GroupBox", "-Theme x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
+		settingsGui.Add("GroupBox", "x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
 
 		settingsGui.SetFont("Norm", "Arial")
 
@@ -1208,7 +1208,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
 
-		settingsGui.Add("GroupBox", "-Theme x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
+		settingsGui.Add("GroupBox", "x16 yp+30 w180 h120 Section", translate("Dry Tyres"))
 
 		settingsGui.SetFont("Norm", "Arial")
 
@@ -1231,7 +1231,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		settingsGui.SetFont("Norm", "Arial")
 		settingsGui.SetFont("Italic", "Arial")
 
-		settingsGui.Add("GroupBox", "-Theme x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
+		settingsGui.Add("GroupBox", "x202 ys w180 h120", translate("Wet / Intermediate Tyres"))
 
 		settingsGui.SetFont("Norm", "Arial")
 

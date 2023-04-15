@@ -112,7 +112,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget8 := window.Add("GroupBox", "-Theme x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Data Analysis"))
+		widget8 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Data Analysis"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -134,7 +134,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget20 := window.Add("GroupBox", "-Theme x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Actions"))
+		widget20 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h96 W:Grow Hidden", translate("Actions"))
 
 		window.SetFont("Norm", "Arial")
 

@@ -51,7 +51,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 				function := wizard.getModuleActionFunction("Tactile Feedback", false, action)
 
 				if !isObject(function)
-					function := ((function != "") ? Array(function) : [])
+					function := ((function && (function != "")) ? Array(function) : [])
 
 				if (function.Length > 0) {
 					if (arguments != "")
@@ -68,7 +68,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					function := wizard.getModuleActionFunction("Tactile Feedback", mode, action)
 
 					if !isObject(function)
-						function := ((function != "") ? Array(function) : [])
+						function := ((function && (function != "")) ? Array(function) : [])
 
 					if (function.Length > 0) {
 						if (actions != "")
@@ -122,7 +122,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 			this.actionFunctionSelect(line)
 		}
 
-		tactileFeedbackActionFunctionMenu(window, listView, line, *) {
+		tactileFeedbackActionFunctionMenu(listView, line, *) {
 			this.actionFunctionSelect(line)
 		}
 
@@ -167,7 +167,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		widget14 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
 		widget14.OnEvent("Click", tactileFeedbackActionFunctionSelect)
 		widget14.OnEvent("DoubleClick", tactileFeedbackActionFunctionSelect)
-		widget14.OnEvent("ContextMenu", noSelect)
+		widget14.OnEvent("ContextMenu", tactileFeedbackActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"

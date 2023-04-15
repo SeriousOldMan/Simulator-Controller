@@ -135,6 +135,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		widget7 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h260 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Mode", "Pedal", "Action", "Label", "Function"], translate))
 		widget7.OnEvent("Click", pedalCalibrationActionFunctionSelect)
 		widget7.OnEvent("DoubleClick", pedalCalibrationActionFunctionSelect)
+		widget7.OnEvent("ContextMenu", pedalCalibrationActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"

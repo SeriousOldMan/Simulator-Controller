@@ -2413,7 +2413,7 @@ class FinishStepWizard extends StepWizard {
 		local window := this.Window
 		local image, text, html
 
-		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " W:Grow H:Grow Hidden", "shell.explorer")
+		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " H:Center V:Center Hidden", "shell.explorer")
 
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
@@ -2422,7 +2422,7 @@ class FinishStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center><br><br><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
 		widget1.Value.navigate("about:blank")
 		widget1.Value.document.write(html)
@@ -2714,7 +2714,7 @@ openLabelsAndIconsEditor(*) {
 	window.Opt("+Disabled")
 
 	try {
-		ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(window)
+		ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(false, window)
 	}
 	finally {
 		window.Opt("-Disabled")

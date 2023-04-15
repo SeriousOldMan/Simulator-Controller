@@ -240,6 +240,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 	static result
 	static restart
 	static newSettings
+	static origSettings
 
 	static settingsEditorGui
 	static voiceRecognition
@@ -328,53 +329,61 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 	}
 
 	if (settingsOrCommand == kSave) {
-		newSettings := newMultiMap()
+		try {
+			newSettings := newMultiMap()
 
-		for index, coreDescriptor in coreSettings {
-			if (index > 1) {
-				coreVariable := "coreVariable" . index
+			for index, coreDescriptor in coreSettings {
+				if (index > 1) {
+					coreVariable := "coreVariable" . index
 
-				setMultiMapValue(newSettings, "Core", coreDescriptor[1], %coreVariable%.Value)
+					setMultiMapValue(newSettings, "Core", coreDescriptor[1], %coreVariable%.Value)
+				}
 			}
+
+			for index, feedbackDescriptor in feedbackSettings {
+				feedbackVariable := "feedbackVariable" . index
+
+				setMultiMapValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%.Value)
+			}
+
+			setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Duration", (trayTipCheck.Value ? trayTipDurationInput.Value : false))
+			setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Simulation Duration", (trayTipSimulationCheck.Value ? trayTipSimulationDurationInput.Value : false))
+			setMultiMapValue(newSettings, "Button Box", "Button Box Duration", (buttonBoxCheck.Value ? buttonBoxDurationInput.Value : false))
+			setMultiMapValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulationCheck.Value ? buttonBoxSimulationDurationInput.Value : false))
+
+			positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
+
+			setMultiMapValue(newSettings, "Button Box", "Button Box Position", positions[inList(collect(positions, translate), buttonBoxPosition.Text)])
+
+			positions := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
+
+			applicationSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(applicationSettings, "General", "Popup Position", positions[inList(collect(positions, translate), popupPosition.Text)])
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
+
+			for descriptor, value in lastPositions
+				setMultiMapValue(newSettings, "Button Box", descriptor, value)
+
+			setMultiMapValue(newSettings, "Startup", "Splash Theme", (splashTheme.Text = translate("None")) ? false : splashTheme.Text)
+			setMultiMapValue(newSettings, "Startup", "Simulator", (startup.Value ? startupOption.Text : false))
+
+			settingsEditorGui.Destroy()
+
+			setMultiMapValues(newSettings, "Modes", getMultiMapValues(modeSettings, "Modes"))
+
+			if fromSetup
+				return newSettings
+			else
+				result := settingsOrCommand
 		}
-
-		for index, feedbackDescriptor in feedbackSettings {
-			feedbackVariable := "feedbackVariable" . index
-
-			setMultiMapValue(newSettings, "Feedback", feedbackDescriptor[1], %feedbackVariable%.Value)
+		catch Any as exception {
+			if fromSetup
+				return origSettings
+			else
+				logError(exception)
 		}
-
-		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Duration", (trayTipCheck.Value ? trayTipDurationInput.Value : false))
-		setMultiMapValue(newSettings, "Tray Tip", "Tray Tip Simulation Duration", (trayTipSimulationCheck.Value ? trayTipSimulationDurationInput.Value : false))
-		setMultiMapValue(newSettings, "Button Box", "Button Box Duration", (buttonBoxCheck.Value ? buttonBoxDurationInput.Value : false))
-		setMultiMapValue(newSettings, "Button Box", "Button Box Simulation Duration", (buttonBoxSimulationCheck.Value ? buttonBoxSimulationDurationInput.Value : false))
-
-		positions := ["Top Left", "Top Right", "Bottom Left", "Bottom Right", "2nd Screen", "Last Position"]
-
-		setMultiMapValue(newSettings, "Button Box", "Button Box Position", positions[inList(collect(positions, translate), buttonBoxPosition.Text)])
-
-		positions := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
-
-		applicationSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		setMultiMapValue(applicationSettings, "General", "Popup Position", positions[inList(collect(positions, translate), popupPosition.Text)])
-
-		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
-
-		for descriptor, value in lastPositions
-			setMultiMapValue(newSettings, "Button Box", descriptor, value)
-
-		setMultiMapValue(newSettings, "Startup", "Splash Theme", (splashTheme.Text = translate("None")) ? false : splashTheme.Text)
-		setMultiMapValue(newSettings, "Startup", "Simulator", (startup.Value ? startupOption.Text : false))
-
-		settingsEditorGui.Destroy()
-
-		setMultiMapValues(newSettings, "Modes", getMultiMapValues(modeSettings, "Modes"))
-
-		if fromSetup
-			return newSettings
-		else
-			result := settingsOrCommand
 	}
 	else if (settingsOrCommand == kContinue) {
 		settingsEditorGui.Destroy()
@@ -392,6 +401,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 	else if (settingsOrCommand = "Restart")
 		restart := true
 	else {
+		origSettings := settingsOrCommand
 		configuration := (fromSetup ? fromSetup : kSimulatorConfiguration)
 		modeSettings := newMultiMap()
 

@@ -91,7 +91,6 @@ class TriggerDetectorContinuation extends Continuation {
 
 	run() {
 		local found, joysticks, joystickNumber, joy_buttons, joy_name, joy_state, buttons_down, joy_info
-		local joy1, joy2, joy3, joy4, joy5, joy6, joy7, joy8, joy9, joy10, joy11, joy12, joy13, joy14, joy15, joy16
 		local axis_info, buttonsDown, callback
 
 		if !this.Task.Stopped {
@@ -112,16 +111,15 @@ class TriggerDetectorContinuation extends Continuation {
 
 			; SetFormat Float, 03  ; Omit decimal point from axis position percentages.
 
-			joy_buttons := (GetKeyState(joystickNumber . "JoyButtons", ) ? "D" : "U")
-			joy_name := (GetKeyState(joystickNumber . "JoyName") ? "D" : "U")
-			joy_info := (GetKeyState(joystickNumber . "JoyInfo") ? "D" : "U")
+			joy_buttons := GetKeyState(joystickNumber . "JoyButtons")
+			joy_name := GetKeyState(joystickNumber . "JoyName")
+			joy_info := GetKeyState(joystickNumber . "JoyInfo")
 
 			buttons_down := ""
+			buttons := []
 
 			loop joy_buttons {
-				joy%A_Index% := (GetKeyState(joystickNumber . "joy" . A_Index) ? "D" : "U")
-
-				if (joy%A_Index% = "D") {
+				if GetKeyState(joystickNumber . "joy" . A_Index) {
 					buttons_down := (buttons_down . A_Space . A_Index)
 
 					found := A_Index

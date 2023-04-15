@@ -77,7 +77,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 							function := wizard.getSimulatorActionFunction(simulator, mode, action)
 
 							if !isObject(function)
-								function := ((function != "") ? Array(function) : [])
+								function := ((function && (function != "")) ? Array(function) : [])
 
 							if (function.Length > 0) {
 								if (actions != "")
@@ -127,7 +127,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			this.actionFunctionSelect(line)
 		}
 
-		simulatorActionFunctionMenu(window, listView, line, *) {
+		simulatorActionFunctionMenu(listView, line, *) {
 			this.actionFunctionSelect(line)
 		}
 
@@ -194,7 +194,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		widget9 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h300 W:Grow H:Grow(0.66) AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
 		widget9.OnEvent("Click", simulatorActionFunctionSelect)
 		widget9.OnEvent("DoubleClick", simulatorActionFunctionSelect)
-		widget9.OnEvent("ContextMenu", noSelect)
+		widget9.OnEvent("ContextMenu", simulatorActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
@@ -351,7 +351,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					if load {
 						function := wizard.getSimulatorActionFunction(simulator, mode, action)
 
-						if (function != "")
+						if (function && (function != ""))
 							this.setActionFunction(mode, action, (isObject(function) ? function : Array(function)))
 					}
 

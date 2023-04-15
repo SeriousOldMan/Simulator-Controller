@@ -236,7 +236,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 			updateApplicationFunction(row)
 		}
 
-		applicationFunctionMenu(window, listView, row, *) {
+		applicationFunctionMenu(listView, row, *) {
 			updateApplicationFunction(row)
 		}
 
@@ -282,7 +282,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		widget15 := window.Add("ListView", "x" . x . " yp+24 w" . col1Width . " h112 H:Grow(0.5) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Application", "Label", "Function"], translate))
 		widget15.OnEvent("Click", applicationFunctionSelect)
 		widget15.OnEvent("DoubleClick", applicationFunctionSelect)
-		widget15.OnEvent("ContextMenu", noSelect)
+		widget15.OnEvent("ContextMenu", applicationFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
@@ -485,7 +485,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 					if load {
 						function := wizard.getLaunchApplicationFunction(application)
 
-						if (function != "")
+						if (function && (function != ""))
 							this.iLaunchApplications[application] := Array(wizard.getLaunchApplicationLabel(application), function)
 					}
 
@@ -522,7 +522,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 						if this.iLaunchApplications.Has(application) {
 							function := this.iLaunchApplications[application][2]
 
-							if (function != "") {
+							if (function && (function != "")) {
 								label := this.iLaunchApplications[application][1]
 
 								for ignore, preview in this.ControllerPreviews

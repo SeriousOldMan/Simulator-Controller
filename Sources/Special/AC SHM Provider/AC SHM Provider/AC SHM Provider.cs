@@ -351,7 +351,7 @@ namespace ACSHMProvider
 
                     if (timeLeft < 0)
                     {
-                        timeLeft = 3600 * 1000;
+                        timeLeft = 24 * 3600 * 1000;
                     }
 
                     Console.Write("SessionTimeRemaining="); Console.WriteLine(GetRemainingTime(timeLeft));

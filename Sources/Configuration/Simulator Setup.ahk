@@ -134,6 +134,8 @@ class SetupWizard extends ConfiguratorPanel {
 
 	iCachedActions := CaseInsenseMap()
 
+	iHTMLResizer := false
+
 	class SetupWindow extends Window {
 		iSetupWizard := false
 		iResizeEnabled := true
@@ -179,23 +181,34 @@ class SetupWizard extends ConfiguratorPanel {
 
 	class HTMLResizer extends Window.Resizer {
 		iRedraw := false
-		iWindow := false
 
-		__New(window, arguments*) {
-			this.iWindow := window
+		iHTMLViewer := []
 
-			super.__New(window, arguments*)
+		HTMLViewer {
+			Get {
+				return this.iHTMLViewer
+			}
 
-			Task.startTask(ObjBindMethod(this, "RedrawHTML"), 500, kLowPriority)
+			Set {
+				return (this.iHTMLViewer := value)
+			}
+		}
+
+		__New(window, viewer*) {
+			this.iHTMLViewer := viewer
+
+			super.__New(window)
+
+			Task.startTask(ObjBindMethod(this, "RedrawHTMLViewer"), 100, kInterruptPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
 			this.iRedraw := true
 		}
 
-		RedrawHTML() {
+		RedrawHTMLViewer() {
 			if this.iRedraw {
-				local ignore, button, widget
+				local ignore, button, viewer
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
 					if GetKeyState(button, "P")
@@ -203,9 +216,9 @@ class SetupWizard extends ConfiguratorPanel {
 
 				this.iRedraw := false
 
-				for ignore, widget in this.iWindow
-					if widget.Visible && isInstance(widget, Gui.ActiveX)
-						widget.Value.document.location.reload()
+				for ignore, viewer in this.HTMLViewer
+					if viewer.Visible
+						viewer.Value.document.location.reload()
 			}
 
 			return Task.CurrentTask
@@ -626,7 +639,9 @@ class SetupWizard extends ConfiguratorPanel {
 		wizardGui.Add("Button", "x535 y580 w80 h23 Y:Move X:Move Disabled VfinishButton", translate("Finish")).OnEvent("Click", finishSetup)
 		wizardGui.Add("Button", "x620 y580 w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelSetup)
 
-		wizardGui.Add(SetupWizard.HTMLResizer(wizardGui))
+		this.iHTMLResizer := SetupWizard.HTMLResizer(wizardGui)
+
+		wizardGui.Add(this.iHTMLResizer)
 
 		helpGui := Window({Descriptor: "Simulator Setup.Help", Resizeable: true, Options: "-MaximizeBox 0x400000"})
 
@@ -650,7 +665,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		helpGui["infoViewer"].Value.document.write(html)
 
-		helpGui.Add(SetupWizard.HTMLResizer(helpGui))
+		helpGui.Add(SetupWizard.HTMLResizer(helpGui, helpGui["infoViewer"]))
 
 		this.createStepsGui()
 	}
@@ -749,8 +764,15 @@ class SetupWizard extends ConfiguratorPanel {
 			wizardWindow.Show("x" . posX . " yCenter")
 		}
 
-		if getWindowSize("Simulator Setup", &w, &h)
+		if getWindowSize("Simulator Setup", &w, &h) {
 			wizardWindow.Resize("Initialize", w, h)
+
+			Sleep(500)
+
+			this.nextPage()
+		}
+		else
+			this.nextPage()
 
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
@@ -769,9 +791,11 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	startSetup() {
+		local ignore, viewer, viewers
+
 		showProgress({progress: ++this.ProgressCount, message: translate("Initializing Settings && Options...")})
 
-		this.updateState()
+		this.updateState(false)
 
 		this.iStep := false
 		this.iPage := false
@@ -779,7 +803,13 @@ class SetupWizard extends ConfiguratorPanel {
 		showProgress({progress: ++this.ProgressCount, color: "Green", title: translate("Starting Setup Wizard")
 					, message: translate("Starting Configuration Engine...")})
 
-		this.nextPage()
+		viewers := []
+
+		for ignore, viewer in this.WizardWindow
+			if isInstance(viewer, Gui.ActiveX)
+				viewers.Push(viewer)
+
+		this.iHTMLResizer.HTMLViewer := viewers
 	}
 
 	applyPatches(configuration, patches) {
@@ -1182,7 +1212,7 @@ class SetupWizard extends ConfiguratorPanel {
 		}
 	}
 
-	updateState() {
+	updateState(unlock := true) {
 		this.KnowledgeBase.produce()
 
 		if this.Debug[kDebugKnowledgeBase]
@@ -1213,7 +1243,8 @@ class SetupWizard extends ConfiguratorPanel {
 				this.Control["finishButton"].Enabled := false
 			}
 
-			this.WizardWindow.Opt("-Disabled")
+			if unlock
+				this.WizardWindow.Opt("-Disabled")
 		}
 	}
 
@@ -2153,7 +2184,7 @@ class StartStepWizard extends StepWizard {
 
 			super.__New(window, arguments*)
 
-			Task.startTask(ObjBindMethod(this, "RestartVideo"), 500, kLowPriority)
+			Task.startTask(ObjBindMethod(this, "RestartVideo"), 100, kInterruptPriority)
 		}
 
 		Resize(deltaWidth, deltaHeight) {
@@ -2600,7 +2631,7 @@ initializeSimulatorSetup() {
 	if wizard.Debug[kDebugKnowledgeBase]
 		SupportMenu.Check(label)
 
-	; showSplashTheme("Rotating Brain")
+	showSplashTheme("Rotating Brain")
 
 	wizard.ProgressCount := 0
 

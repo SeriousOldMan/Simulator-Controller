@@ -499,25 +499,40 @@ class RaceReportReader {
 
 			try {
 				if drivers {
-					loop Read, report . "\Drivers.CSV"
-						if (!laps || inList(laps, A_Index))
-							drivers.Push(string2Values(";", A_LoopReadLine))
+					try {
+						loop Read, report . "\Drivers.CSV"
+							if (!laps || inList(laps, A_Index))
+								drivers.Push(string2Values(";", A_LoopReadLine))
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 
 					drivers := correctEmptyValues(drivers, "")
 				}
 
 				if positions {
-					loop Read, report . "\Positions.CSV"
-						if (!laps || inList(laps, A_Index))
-							positions.Push(string2Values(";", A_LoopReadLine))
+					try {
+						loop Read, report . "\Positions.CSV"
+							if (!laps || inList(laps, A_Index))
+								positions.Push(string2Values(";", A_LoopReadLine))
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 
 					positions := correctEmptyValues(positions, kNull)
 				}
 
 				if times {
-					loop Read, report . "\Times.CSV"
-						if (!laps || inList(laps, A_Index))
-							times.Push(string2Values(";", A_LoopReadLine))
+					try {
+						loop Read, report . "\Times.CSV"
+							if (!laps || inList(laps, A_Index))
+								times.Push(string2Values(";", A_LoopReadLine))
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 
 					times := correctEmptyValues(times, kNull)
 					times := correctLapTimes(times)

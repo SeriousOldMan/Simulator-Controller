@@ -162,7 +162,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 			types := ["Core", "Feedback", "Other"]
 
 			setMultiMapValue(configuration, "Applications"
-						   , ConfigurationItem.descriptor(types[inList(collect(types, "translate"), type)], count), theApplication.Application)
+						   , ConfigurationItem.descriptor(types[inList(collect(types, translate), type)], count), theApplication.Application)
 
 			theApplication.saveToConfiguration(configuration)
 		}

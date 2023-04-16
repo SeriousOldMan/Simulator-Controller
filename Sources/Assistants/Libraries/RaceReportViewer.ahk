@@ -452,41 +452,44 @@ class RaceReportViewer extends RaceReportReader {
 			pitstops := string2Values(",", getMultiMapValue(raceData, "Laps", "Pitstops", ""))
 
 			for ignore, lap in this.getReportLaps(raceData, true) {
-				weather := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Weather")
-				weather := (weather ? translate(weather) : "n/a")
+				weather := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Weather", kUndefined)
 
-				if getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", false)
-					tyreCompound := translate(compound(getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
-													 , getMultiMapValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
-				else
-					tyreCompound := "-"
+				if (weather != kUndefined) {
+					weather := (weather ? translate(weather) : "n/a")
 
-				consumption := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
+					if getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", false)
+						tyreCompound := translate(compound(getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
+														 , getMultiMapValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
+					else
+						tyreCompound := "-"
 
-				if (consumption == 0)
-					consumption := translate("n/a")
+					consumption := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
 
-				if isNumber(consumption)
-					consumption := displayValue("Float", convertUnit("Volume", consumption))
+					if (consumption == 0)
+						consumption := translate("n/a")
 
-				lapTime := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".LapTime", "-")
+					if isNumber(consumption)
+						consumption := displayValue("Float", convertUnit("Volume", consumption))
 
-				if (lapTime != "-")
-					lapTime := Round(lapTime / 1000, 1)
+					lapTime := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".LapTime", "-")
 
-				pitstop := ((pitstops.Length > 0) ? inList(pitstops, lap) : (getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false)))
+					if (lapTime != "-")
+						lapTime := Round(lapTime / 1000, 1)
 
-				row := values2String(", ", lap
-										 , "'" . weather . "'"
-										 , "'" . tyreCompound . "'"
-										 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
-										 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
-										 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
-										 , "'" . consumption . "'"
-										 , "'" . RaceReportViewer.lapTimeDisplayValue(lapTime) . "'"
-										 , "'" . (pitstop ? translate("x") : "") . "'")
+					pitstop := ((pitstops.Length > 0) ? inList(pitstops, lap) : (getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false)))
 
-				rows.Push("[" . row	. "]")
+					row := values2String(", ", lap
+											 , "'" . weather . "'"
+											 , "'" . tyreCompound . "'"
+											 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
+											 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
+											 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
+											 , "'" . consumption . "'"
+											 , "'" . RaceReportViewer.lapTimeDisplayValue(lapTime) . "'"
+											 , "'" . (pitstop ? translate("x") : "") . "'")
+
+					rows.Push("[" . row	. "]")
+				}
 			}
 
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
@@ -813,17 +816,15 @@ class RaceReportViewer extends RaceReportReader {
 				for ignore, car in selectedCars
 					if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
 						if times.Has(lap) {
-							if times.Has(lap) {
-								time := (times[lap].Has(car) ? times[lap][car] : 0)
-								time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
+							time := (times[lap].Has(car) ? times[lap][car] : 0)
+							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
 
-								if (time > 0) {
-									allTimes.Push(time)
-									lapTimes.Push(time)
-								}
-								else
-									lapTimes.Push(kNull)
+							if (time > 0) {
+								allTimes.Push(time)
+								lapTimes.Push(time)
 							}
+							else
+								lapTimes.Push(kNull)
 						}
 						else
 							lapTimes.Push(kNull)
@@ -837,7 +838,7 @@ class RaceReportViewer extends RaceReportReader {
 				carTimes := []
 
 				for ignore, lap in laps {
-					if driverTimes.Has(lap) {
+					if (driverTimes.Has(lap) && times.Has(lap)) {
 						time := (times[lap].Has(car) ? times[lap][car] : 0)
 
 						if !extendedIsNull(time)
@@ -1307,7 +1308,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		rangeLapsEdit.Enabled := true
 	}
 
-	selectDriver(*) {
+	selectDriver(listView, line) {
 		local selected := 0
 		local row := 0
 
@@ -1326,6 +1327,9 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			driverSelectCheck.Value := -1
 		else
 			driverSelectCheck.Value := 1
+
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
 	}
 
 	selectDrivers(*) {
@@ -1422,7 +1426,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			FileEncoding(oldEncoding)
 		}
 
-		reportSettingsGui := Gui()
+		reportSettingsGui := Window()
 
 		reportSettingsGui.Opt("+Owner" . raceReport.Window.Hwnd)
 

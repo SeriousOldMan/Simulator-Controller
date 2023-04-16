@@ -8973,6 +8973,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editPressuresReportSettings() {
+		this.Window.Opt("+Disabled")
+
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}
@@ -8990,6 +8992,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editBrakesReportSettings() {
+		this.Window.Opt("+Disabled")
+
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}
@@ -9007,6 +9011,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editTemperaturesReportSettings() {
+		this.Window.Opt("+Disabled")
+
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}
@@ -9024,6 +9030,8 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	editCustomReportSettings() {
+		this.Window.Opt("+Disabled")
+
 		try {
 			return this.ReportViewer.editReportSettings("Laps")
 		}

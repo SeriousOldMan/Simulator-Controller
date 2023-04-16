@@ -2083,13 +2083,9 @@ stopACC() {
 }
 
 isACCRunning() {
-	local running, thePlugin
+	local thePlugin
 
-	ErrorLevel := ProcessExist("acc.exe")
-
-	running := (ErrorLevel != 0)
-
-	if !running {
+	if !ProcessExist("acc.exe") {
 		try {
 			thePlugin := SimulatorController.Instance.findPlugin("ACC")
 
@@ -2101,9 +2097,11 @@ isACCRunning() {
 		catch Any as exception {
 			logError(exception)
 		}
-	}
 
-	return running
+		return false
+	}
+	else
+		return true
 }
 
 

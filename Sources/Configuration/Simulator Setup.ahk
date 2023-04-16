@@ -643,7 +643,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		wizardGui.Add(this.iHTMLResizer)
 
-		helpGui := Window({Descriptor: "Simulator Setup.Help", Resizeable: true, Options: "-SysMenu 0x400000"}, "")
+		helpGui := Window({Descriptor: "Simulator Setup.Help", Resizeable: true, Options: "-MaximizeBox 0x400000"})
 
 		this.iHelpWindow := helpGui
 
@@ -1343,7 +1343,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	getPatchFiles(type) {
-		return collect(string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", "")), "substituteVariables")
+		return collect(string2Values(";", this.KnowledgeBase.getValue("Patch." . type . ".Files", "")), substituteVariables)
 	}
 
 	selectModule(module, selected, update := true) {

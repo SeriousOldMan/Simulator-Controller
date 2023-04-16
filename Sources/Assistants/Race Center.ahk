@@ -1947,9 +1947,10 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "-Theme x619 ys+39 w732 h9 W:Grow", translate("Output"))
+		centerGui.Add("Text", "x619 ys+39 w80 h21", translate("Output"))
+		centerGui.Add("Text", "x700 yp+7 w651 0x10 W:Grow")
 
-		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+21 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer", "shell.explorer").Value
+		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer", "shell.explorer").Value
 		this.iDetailsViewer.navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(window, this.iDetailsViewer)
@@ -2025,7 +2026,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "-Theme x24 ys+33 w260 h124", translate("Simulation"))
+		centerGui.Add("GroupBox", "x24 ys+33 w260 h124", translate("Simulation"))
 
 		centerGui.SetFont("Norm", "Arial")
 
@@ -2047,7 +2048,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "-Theme x304 ys+33 w296 h124", translate("Settings"))
+		centerGui.Add("GroupBox", "x304 ys+33 w296 h124", translate("Settings"))
 
 		centerGui.SetFont("Norm", "Arial")
 
@@ -2066,7 +2067,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
 
-		centerGui.Add("GroupBox", "-Theme x24 yp+37 w576 h148", translate("Traffic Analysis (Monte Carlo)"))
+		centerGui.Add("GroupBox", "x24 yp+37 w576 h148", translate("Traffic Analysis (Monte Carlo)"))
 
 		centerGui.SetFont("Norm", "Arial")
 
@@ -3122,7 +3123,7 @@ class RaceCenter extends ConfigurationItem {
 			stint := this.PlanListView.GetText(A_Index, 1)
 			driver := this.PlanListView.GetText(A_Index, 2)
 
-			drivers[stint + 0] := driver
+			drivers[stint] := driver
 		}
 
 		return drivers
@@ -6337,7 +6338,7 @@ class RaceCenter extends ConfigurationItem {
 				lapPressures := this.LapsListView.GetText(lap, 10)
 
 				if (lapPressures = "-, -, -, -")
-					this.LapsListView.Modify(this.Laps[lap].Row, "Col10", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : p)*))
+					this.LapsListView.Modify(this.Laps[lap].Row, "Col10", values2String(", ", collect(pressures, p => isNumber(p) ? displayValue("Float", convertUnit("Pressure", p)) : "-")*))
 
 				newData := true
 				lap += 1
@@ -7101,7 +7102,7 @@ class RaceCenter extends ConfigurationItem {
 
 	syncSession() {
 		local initial := !this.LastLap
-		local strategy, session, lastLap, simulator, car, track, newLaps, newData, finished, message, forcePitstopUpdate
+		local strategy, session, lastLap, simulator, car, track, newLaps, newData, newReports, finished, message, forcePitstopUpdate
 		local selectedLap, selectedStint, currentStint, driverSwapRequest
 
 		static hadLastLap := false
@@ -7174,8 +7175,13 @@ class RaceCenter extends ConfigurationItem {
 				if lastLap
 					newLaps := this.syncLaps(lastLap)
 
-				if this.syncRaceReport()
+				if this.syncRaceReport() {
 					newData := true
+
+					newReports := true
+				}
+				else
+					newReports := false
 
 				if this.syncTelemetry()
 					newData := true
@@ -7230,6 +7236,13 @@ class RaceCenter extends ConfigurationItem {
 						this.showSessionSummary()
 					else if (this.SelectedDetailReport = "Drivers")
 						this.showDriverStatistics()
+				}
+				else if newReports {
+					if (selectedLap && (this.SelectedDetailReport = "Lap")) {
+						this.LapsListView.Modify(this.LapsListView.GetCount(), "Select Vis")
+
+						this.showLapDetails(this.LastLap)
+					}
 				}
 				else if (!newLaps && !this.SessionFinished) {
 					finished := parseObject(this.Connector.GetSession(this.SelectedSession[true])).Finished

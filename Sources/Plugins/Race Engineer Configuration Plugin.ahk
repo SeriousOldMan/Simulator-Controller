@@ -85,7 +85,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget4 := window.Add("GroupBox", "-Theme x" . x . " yp+40 w" . width . " h70 W:Grow Hidden", translate("Settings (for all Race Assistants)"))
+		widget4 := window.Add("GroupBox", "x" . x . " yp+40 w" . width . " h70 W:Grow Hidden", translate("Settings (for all Race Assistants)"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -100,7 +100,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget9 := window.Add("GroupBox", "-Theme x" . x . " yp+35 w" . width . " h70 W:Grow Hidden", translate("Tyre Pressures"))
+		widget9 := window.Add("GroupBox", "x" . x . " yp+35 w" . width . " h70 W:Grow Hidden", translate("Tyre Pressures"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -115,7 +115,7 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		widget14 := window.Add("GroupBox", "-Theme x" . x . " yp+35 w" . width . " h156 W:Grow Hidden", translate("Data Analysis"))
+		widget14 := window.Add("GroupBox", "x" . x . " yp+35 w" . width . " h156 W:Grow Hidden", translate("Data Analysis"))
 
 		window.SetFont("Norm", "Arial")
 

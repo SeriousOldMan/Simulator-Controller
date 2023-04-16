@@ -1602,8 +1602,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local fragments := speaker.Fragments
 		local airTemperature := Round(knowledgebase.getValue("Weather.Temperature.Air"))
 		local trackTemperature := Round(knowledgebase.getValue("Weather.Temperature.Track"))
-		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session")
-		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint")
+		local remainingSessionLaps := knowledgeBase.getValue("Lap.Remaining.Session", kUndefined)
+		local remainingStintLaps := knowledgeBase.getValue("Lap.Remaining.Stint", kUndefined)
 		local remainingSessionTime := Round(knowledgeBase.getValue("Session.Time.Remaining") / 60000)
 		local standingsAhead := false
 		local standingsBehind := false
@@ -1612,6 +1612,9 @@ class RaceSpotter extends GridRaceAssistant {
 		local leader := false
 		local situation, sessionDuration, lapTime, sessionEnding, minute, lastTemperature, stintLaps
 		local minute, rnd, phrase, bestLapTime
+
+		if ((remainingSessionLaps = kUndefined) || (remainingStintLaps = kUndefined))
+			return false
 
 		if (this.Session == kSessionRace)
 			if (lastLap == 2) {

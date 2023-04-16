@@ -730,7 +730,7 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.SetFont("Italic", "Arial")
 
-		widget5 := analyzerGui.Add("GroupBox", "-Theme x16 yp+34 w320 h215", translate("Thresholds"))
+		widget5 := analyzerGui.Add("GroupBox", "x16 yp+34 w320 h215", translate("Thresholds"))
 
 		analyzerGui.SetFont("Norm", "Arial")
 

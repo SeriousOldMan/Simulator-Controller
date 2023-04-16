@@ -1138,7 +1138,7 @@ editTargets(command := "", *) {
 			if (updateHeight == 20)
 				updateHeight := 40
 
-			targetsGui.Add("GroupBox", "-Theme YP+30 w200 h" . updateHeight, translate("Update"))
+			targetsGui.Add("GroupBox", "YP+30 w200 h" . updateHeight, translate("Update"))
 
 			targetsGui.SetFont("Norm", "Arial")
 
@@ -1164,7 +1164,7 @@ editTargets(command := "", *) {
 		if (cleanupHeight == 20)
 			cleanupHeight := 40
 
-		targetsGui.Add("GroupBox", "-Theme " . cleanupPosOption . " YP+30 w200 h" . cleanupHeight . " Section", translate("Cleanup"))
+		targetsGui.Add("GroupBox", "" . cleanupPosOption . " YP+30 w200 h" . cleanupHeight . " Section", translate("Cleanup"))
 
 		targetsGui.SetFont("Norm", "Arial")
 
@@ -1189,7 +1189,7 @@ editTargets(command := "", *) {
 		if (copyHeight == 20)
 			copyHeight := 40
 
-		targetsGui.Add("GroupBox", "-Theme XP-10 YP+30 w200 h" . copyHeight, translate("Copy"))
+		targetsGui.Add("GroupBox", "XP-10 YP+30 w200 h" . copyHeight, translate("Copy"))
 
 		targetsGui.SetFont("Norm", "Arial")
 
@@ -1214,7 +1214,7 @@ editTargets(command := "", *) {
 		if (buildHeight == 20)
 			buildHeight := 40
 
-		targetsGui.Add("GroupBox", "-Theme X220 YS w200 h" . buildHeight, translate("Compile"))
+		targetsGui.Add("GroupBox", "X220 YS w200 h" . buildHeight, translate("Compile"))
 
 		targetsGui.SetFont("Norm", "Arial")
 

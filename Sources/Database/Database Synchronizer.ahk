@@ -220,8 +220,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 }
 
 downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategies) {
-	local sessionDB := SessionDatabase()
-	local sessionDBPath := sessionDB.DatabasePath
+	local sessionDBPath := SessionDatabase.DatabasePath
 	local downloadTimeStamp := sessionDBPath . "DOWNLOAD"
 	local ignore, fileName, type, databaseDirectory, configuration
 
@@ -239,8 +238,8 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		configuration := newMultiMap()
 
-		setMultiMapValue(configuration, "Database Synchronizer", "UserID", sessionDB.ID)
-		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", sessionDB.DatabaseID)
+		setMultiMapValue(configuration, "Database Synchronizer", "UserID", SessionDatabase.ID)
+		setMultiMapValue(configuration, "Database Synchronizer", "DatabaseID", SessionDatabase.DatabaseID)
 
 		setMultiMapValue(configuration, "Database Synchronizer", "State", "Active")
 
@@ -251,15 +250,13 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 
 		writeMultiMap(kTempDirectory . "Database Synchronizer.state", configuration)
 
-		sessionDB := SessionDatabase()
-
 		for ignore, fileName in ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads") {
 			SplitPath(fileName, , , , &databaseDirectory)
 
 			type := StrSplit(Trim(fileName), ".", "", 2)[1]
 
 			if ((type = (downloadPressures . downloadSetups . downloadStrategies)) || (type = (downloadPressures . downloadSetups))) {
-				if (sessionDB.DatabaseVersion != databaseDirectory) {
+				if (SessionDatabase.DatabaseVersion != databaseDirectory) {
 					ftpDownload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "simulator-controller/database-downloads/" . fileName, kTempDirectory . fileName)
 
 					try {
@@ -282,7 +279,9 @@ downloadSessionDatabase(id, downloadPressures, downloadSetups, downloadStrategie
 						logError(exception)
 					}
 
-					sessionDB.DatabaseVersion := databaseDirectory
+					SessionDatabase.DatabaseVersion := databaseDirectory
+
+					break
 				}
 			}
 		}

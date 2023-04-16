@@ -99,7 +99,7 @@ class ControllerList extends ConfigurationItemList {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y80 w457 h115 W:Grow", translate("Controller"))
+		window.Add("GroupBox", "x16 y80 w457 h115 W:Grow", translate("Controller"))
 
 		window.SetFont("Norm", "Arial")
 		window.Add("ListBox", "x24 y99 w194 h96 W:Grow(0.4) VcontrollerListBox")
@@ -316,7 +316,7 @@ class FunctionsList extends ConfigurationItemList {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y388 w457 h95 Y:Move W:Grow", translate("Bindings"))
+		window.Add("GroupBox", "x16 y388 w457 h95 Y:Move W:Grow", translate("Bindings"))
 
 		window.SetFont("Norm", "Arial")
 

@@ -174,7 +174,7 @@ class GeneralTab extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y80 w458 h70 W:Grow", translate("Installation"))
+		window.Add("GroupBox", "x16 y80 w458 h70 W:Grow", translate("Installation"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -189,7 +189,7 @@ class GeneralTab extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y160 w458 h95 W:Grow", translate("Settings"))
+		window.Add("GroupBox", "x16 y160 w458 h95 W:Grow", translate("Settings"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -221,7 +221,7 @@ class GeneralTab extends ConfiguratorPanel {
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
 
-		window.Add("GroupBox", "-Theme x16 y265 w458 h115 W:Grow", translate("Simulators"))
+		window.Add("GroupBox", "x16 y265 w458 h115 W:Grow", translate("Simulators"))
 
 		window.SetFont("Norm", "Arial")
 
@@ -231,7 +231,7 @@ class GeneralTab extends ConfiguratorPanel {
 			window.SetFont("Norm", "Arial")
 			window.SetFont("Italic", "Arial")
 
-			window.Add("GroupBox", "-Theme x16 y388 w458 h119 W:Grow", translate("Development"))
+			window.Add("GroupBox", "x16 y388 w458 h119 W:Grow", translate("Development"))
 
 			window.SetFont("Norm", "Arial")
 

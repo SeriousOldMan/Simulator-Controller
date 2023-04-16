@@ -754,13 +754,15 @@ class RaceAssistant extends ConfigurationItem {
 					try {
 						speaker.speakPhrase("Joke")
 
-						speaker.speak(joke.value)
+						speaker.speak(joke["value"])
 					}
 					finally {
 						speaker.endTalk()
 					}
 				}
-				catch Any {
+				catch Any as exception {
+					logError(exception, true, true)
+
 					hasJoke := false
 				}
 			}
@@ -776,7 +778,7 @@ class RaceAssistant extends ConfigurationItem {
 
 					joke := html.documentElement.innerText
 
-					joke := StrReplace(StrReplace(StrReplace(joke, "document.writeln('", ""), "`n", " "), "\", "")
+					joke := StrReplace(StrReplace(StrReplace(StrReplace(StrReplace(joke, "document.writeln('", ""), "`n", " "), "\", ""), "`"", ""), "`r", " ")
 
 					index := InStr(joke, "</div")
 
@@ -796,7 +798,9 @@ class RaceAssistant extends ConfigurationItem {
 						speaker.endTalk()
 					}
 				}
-				catch Any {
+				catch Any as exception {
+					logError(exception, true, true)
+
 					hasJoke := false
 				}
 			}

@@ -1030,7 +1030,7 @@ if !GetKeyState("Ctrl") {
 else {
 	raceNr := (GetKeyState("Alt") ? 18 : ((GetKeyState("Shift") ? 2 : 1)))
 	engineer := TestRaceEngineer(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Engineer.settings")
-							   , TestPitStopHandler(), "Jona", "de", "Windows", true, true, true)
+							   , TestPitStopHandler(), "Jona", "en", "Windows", true, true, true)
 
 	engineer.VoiceManager.setDebug(kDebugGrammars, false)
 
@@ -1042,7 +1042,7 @@ else {
 				break
 			else {
 				engineer.addLap(A_Index, &data)
-
+msgbox "break"
 				if (A_Index = 3) {
 					engineer.planPitstop()
 					engineer.preparePitstop()

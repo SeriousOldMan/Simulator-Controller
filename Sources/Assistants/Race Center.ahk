@@ -1730,10 +1730,10 @@ class RaceCenter extends ConfigurationItem {
 								 . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", "
 								 . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . translate(")"))
 
-					tyreCompound := compound(tyreCompound, tryeCompounColor)
+					tyreCompound := compound(tyreCompound, tyreCompoundColor)
 
 					label := (translate("Session") . translate(" - ") . driver . translate(" - "))
-						   . (conditions . translate(" - ") . tyreCompound . translate(": ") . values2Strin(", ", pressures*))
+						   . (conditions . translate(" - ") . tyreCompound . translate(": ") . values2String(", ", pressures*))
 
 					pressuresMenu.Add(label, copyPressure.Bind(driver, tyreCompound, pressures))
 

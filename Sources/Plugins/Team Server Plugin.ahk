@@ -196,7 +196,7 @@ class TeamServerPlugin extends ControllerPlugin {
 		}
 
 		Set {
-			return (this.iLastMessage := StrReplace(value, "`n", A_Space))
+			return (this.iLastMessage := StrReplace(StrReplace(value, "`n", A_Space), "`r", ""))
 		}
 	}
 
@@ -533,7 +533,7 @@ class TeamServerPlugin extends ControllerPlugin {
 	updateTrayLabel(label, enabled) {
 		static hasTrayMenu := false
 
-		label := StrReplace(label, "`n", A_Space)
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
 			A_TrayMenu.Insert("1&")

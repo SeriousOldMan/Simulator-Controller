@@ -355,7 +355,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 
-					this.ActionsListView.Add("", (first ? translate(mode ? mode : "Independent") : ""), action, StrReplace(label, "`n", A_Space), function)
+					this.ActionsListView.Add("", (first ? translate(mode ? mode : "Independent") : ""), action, StrReplace(StrReplace(label, "`n", A_Space), "`r", ""), function)
 
 					count += 1
 				}

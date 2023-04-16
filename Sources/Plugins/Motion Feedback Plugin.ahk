@@ -1006,7 +1006,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 
 		static hasTrayMenu := false
 
-		label := StrReplace(label, "`n", A_Space)
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
 			callback := ObjBindMethod(this, "toggleMotion")

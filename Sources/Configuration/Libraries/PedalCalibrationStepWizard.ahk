@@ -264,7 +264,7 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 				else
 					pedal := ""
 
-				this.ActionsListView.Add("", ((count = 1) ? translate("Pedal Calibration") : ""), pedal, action, StrReplace(label, "`n", A_Space), function)
+				this.ActionsListView.Add("", ((count = 1) ? translate("Pedal Calibration") : ""), pedal, action, StrReplace(StrReplace(label, "`n", A_Space), "`r", ""), function)
 
 				count += 1
 			}

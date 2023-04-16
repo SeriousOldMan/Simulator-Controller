@@ -1460,7 +1460,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				return
 
 			if (!this.iPendingFunctionRegistration && !actionRegistration) {
-				title := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
+				title := (translate(element[1]) . translate(": ") . StrReplace(StrReplace(element[2], "`n", A_Space), "`r", "") . " (" . row . " x " . column . ")")
 
 				this.createControlMenu(title, preview, element, function, row, column).Show()
 			}
@@ -1503,7 +1503,7 @@ class ActionsStepWizard extends ControllerPreviewStepWizard {
 				if this.iPendingActionRegistration
 					this.setFunction(row)
 				else
-					this.createActionsMenu(this.getAction(row) . ": " . StrReplace(this.getActionLabel(row), "`n", A_Space), row).Show()
+					this.createActionsMenu(this.getAction(row) . ": " . StrReplace(StrReplace(this.getActionLabel(row), "`n", A_Space), "`r", ""), row).Show()
 		}
 
 		loop this.ActionsListView.GetCount()

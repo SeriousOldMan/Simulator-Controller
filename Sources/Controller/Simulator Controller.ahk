@@ -1928,7 +1928,7 @@ getLabelForLogMessage(action) {
 	if (label == "")
 		label := action.base.__Class
 
-	return StrReplace(label, "`n", A_Space)
+	return StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 }
 
 getPluginForLogMessage(plugin) {

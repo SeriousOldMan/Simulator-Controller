@@ -423,7 +423,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 
-					this.ActionsListView.Add("", (first ? translate(mode) : ""), subAction, StrReplace(label, "`n", A_Space), function)
+					this.ActionsListView.Add("", (first ? translate(mode) : ""), subAction, StrReplace(StrReplace(label, "`n", A_Space), "`r", ""), function)
 
 					count += 1
 				}

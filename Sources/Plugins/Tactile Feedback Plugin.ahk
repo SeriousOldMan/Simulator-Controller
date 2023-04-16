@@ -511,7 +511,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		static hasTrayMenu := CaseInsenseMap()
 		static first := true
 
-		label := StrReplace(label, "`n", A_Space)
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu.Has(callback) {
 			if first

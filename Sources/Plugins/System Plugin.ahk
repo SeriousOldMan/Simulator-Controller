@@ -112,7 +112,7 @@ class SystemPlugin extends ControllerPlugin {
 				if mode
 					return mode.Mode
 				else
-					return StrReplace(translate("Mode Selector"), A_Space, "`n")
+					return StrReplace(StrReplace(translate("Mode Selector"), A_Space, "`n"), "`r", "")
 			}
 		}
 
@@ -574,10 +574,10 @@ updateModeSelector() {
 				if currentMode
 					currentMode := currentMode.Mode
 				else
-					currentMode := StrReplace(translate("Mode Selector"), A_Space, "`n")
+					currentMode := StrReplace(StrReplace(translate("Mode Selector"), A_Space, "`n"), "`r", "")
 			}
 			else
-				currentMode := StrReplace(translate("Mode Selector"), A_Space, "`n")
+				currentMode := StrReplace(StrReplace(translate("Mode Selector"), A_Space, "`n"), "`r", "")
 
 			if modeSelectorMode
 				function.setLabel(translate(currentMode))

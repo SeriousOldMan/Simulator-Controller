@@ -467,7 +467,7 @@ class ButtonBoxPreview extends ControllerPreview {
 		if (GetKeyState("Ctrl", "P") && !isEmpty)
 			this.PreviewManager.changeControl(row, column, "__Number__", false)
 		else {
-			menuItem := (translate(element[1]) . translate(": ") . StrReplace(element[2], "`n", A_Space) . " (" . row . " x " . column . ")")
+			menuItem := (translate(element[1]) . translate(": ") . StrReplace(StrReplace(element[2], "`n", A_Space), "`r", "") . " (" . row . " x " . column . ")")
 
 			mainMenu := Menu()
 

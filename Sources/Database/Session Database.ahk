@@ -711,7 +711,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 						settingValue := editorGui["settingValueText"].Value
 
 						if InStr(settingValue, "`n") {
-							settingValue := StrReplace(settingValue, "`n", A_Space)
+							settingValue := StrReplace(StrReplace(settingValue, "`n", A_Space), "`r", "")
 
 							editorGui["settingValueText"].Value := settingValue
 						}
@@ -733,7 +733,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 							value := settingValue
 						}
 						else if (type = "Float") {
-							value := internalValue("Float", editorGui["settingValueEdit"])
+							value := internalValue("Float", editorGui["settingValueEdit"].Text)
 
 							if !isNumber(value) {
 								editorGui["settingValueEdit"].Text := oldValue
@@ -3739,7 +3739,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else if (type = "Boolean")
 				display := (value ? "x" : "")
 			else if (type = "Text")
-				display := StrReplace(value, "`n", A_Space)
+				display := StrReplace(StrReplace(value, "`n", A_Space), "`r", "")
 			else if (type = "Float")
 				display := displayValue("Float", value)
 			else
@@ -3812,7 +3812,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else if (type = "Boolean")
 				display := (value ? "x" : "")
 			else if (type = "Text")
-				display := StrReplace(value, "`n", A_Space)
+				display := StrReplace(StrReplace(value, "`n", A_Space), "`r", "")
 			else if (type = "Float")
 				display := displayValue("Float", value)
 			else

@@ -573,7 +573,7 @@ class PluginActionsList extends ConfigurationItemList {
 			if action {
 				this.ItemList[this.CurrentItem] := action
 
-				this.Control["pluginActionsListView"].Modify(this.CurrentItem, "", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
+				this.Control["pluginActionsListView"].Modify(this.CurrentItem, "", action[2], action[3], StrReplace(StrReplace(action[4], "`n", A_Space), "`r", ""), action[1] ? action[1] : "")
 			}
 		}
 
@@ -601,7 +601,7 @@ class PluginActionsList extends ConfigurationItemList {
 		}
 
 		for ignore, action in items
-			this.Control["pluginActionsListView"].Add("", action[2], action[3], StrReplace(action[4], "`n", A_Space), action[1] ? action[1] : "")
+			this.Control["pluginActionsListView"].Add("", action[2], action[3], StrReplace(StrReplace(action[4], "`n", A_Space), "`r", ""), action[1] ? action[1] : "")
 
 		this.Control["pluginActionsListView"].ModifyCol(1, 100)
 		this.Control["pluginActionsListView"].ModifyCol(2, "AutoHdr")

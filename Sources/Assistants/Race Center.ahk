@@ -7708,7 +7708,7 @@ class RaceCenter extends ConfigurationItem {
 										, "Tyre.Pressure.Front.Right", convertUnit("Pressure", internalValue("Float", pressures[2]), false, false)
 										, "Tyre.Pressure.Rear.Left", convertUnit("Pressure", internalValue("Float", pressures[3]), false, false)
 										, "Tyre.Pressure.Rear.Right", convertUnit("Pressure", internalValue("Float", pressures[4]), false, false)
-										, "Notes", StrReplace(StrReplace(StrReplace(notes, "`n", A_Space), "`t", A_Space), ";", ",")))
+										, "Notes", StrReplace(StrReplace(StrReplace(StrReplace(notes, "`n", A_Space), "`t", A_Space), ";", ","), "`r", "")))
 		}
 
 		if flush

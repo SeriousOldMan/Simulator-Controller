@@ -2961,7 +2961,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							, tAirTemperature, tTrackTemperature))
 			}
 
-			bubbleSort(&weathers, (w1, w2)  => w1[1] > w2[1])
+			bubbleSort(&weathers, (w1, w2)  => strGreater(w1[1], w2[1]))
 
 			hour := Floor(minute / 60)
 			minute := minute - (hour * 60)

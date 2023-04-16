@@ -292,7 +292,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendFileMessage(pid, category, data) {
-		local text := category . ":" . StrReplace(data, "`n", A_Space) . "`n"
+		local text := category . ":" . StrReplace(StrReplace(data, "`n", A_Space), "`r", "") . "`n"
 
 		try {
 			FileAppend(text, kTempDirectory . "Messages\" . pid . ".msg")

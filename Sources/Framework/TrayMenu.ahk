@@ -143,8 +143,8 @@ trayMessage(title, message, duration := false, async := true) {
 	if (async && (duration || gTrayMessageDuration))
 		Task.startTask(trayMessage.Bind(title, message, duration, false), 0, kLowPriority)
 	else {
-		title := StrReplace(title, "`n", A_Space)
-		message := StrReplace(message, "`n", A_Space)
+		title := StrReplace(StrReplace(title, "`n", A_Space), "`r", "")
+		message := StrReplace(StrReplace(message, "`n", A_Space), "`r", "")
 
 		if !duration
 			duration := gTrayMessageDuration

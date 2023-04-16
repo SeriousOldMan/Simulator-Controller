@@ -1286,7 +1286,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 		static hasTrayMenu := Map()
 		static first := true
 
-		label := StrReplace(label, "`n", A_Space)
+		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu.Has(this) {
 			if first

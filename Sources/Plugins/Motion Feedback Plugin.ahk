@@ -665,7 +665,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			action.Function.setLabel(this.actionLabel(action), isRunning ? (action.Active ? "Green" : "Black") : "Olive")
 
 		if !this.iUpdateMotionStateTask {
-			this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 100, kLowPriority)
+			this.iUpdateMotionStateTask := PeriodicTask(ObjBindMethod(this, "updateMotionState"), 30000, kLowPriority)
 
 			this.iUpdateMotionStateTask.start()
 		}
@@ -962,7 +962,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	resetMotionIntensity() {
-		this.setMotionIntensity(this.kInitialMotionIntensity, false)
+		this.setMotionIntensity(this.kInitialMotionIntensity)
 	}
 
 	showMotionWindow() {
@@ -1142,7 +1142,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 		static isRunning := "__Undefined__"
 
 		if (isRunning == kUndefined)
-			isRunning := !this.Application.isRunning()
+			isRunning := this.Application.isRunning()
 
 		protectionOn()
 
@@ -1162,7 +1162,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			protectionOff()
 		}
 
-		Task.CurrentTask.Sleep := (isRunning ? 10000 : 5000)
+		Task.CurrentTask.Sleep := (isRunning ? 60000 : 30000)
 	}
 }
 

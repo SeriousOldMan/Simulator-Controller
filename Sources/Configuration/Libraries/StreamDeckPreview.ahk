@@ -30,9 +30,11 @@ class StreamDeckPreview extends ControllerPreview {
 	static kStandardHeight := 267
 	static kXLWidth := 572
 	static kXLHeight := 330
+	static kPlusWidth := 325
+	static kPlusHeight := 205
 
 	static kTopMargin := 50
-	static kLeftMargin := CaseInsenseMap("Mini", 38, "Standard", 44, "XL", 44)
+	static kLeftMargin := CaseInsenseMap("Mini", 38, "Standard", 44, "XL", 44, "Plus", 44)
 
 	static kButtonWidth := 50
 	static kButtonHeight := 50
@@ -69,11 +71,13 @@ class StreamDeckPreview extends ControllerPreview {
 				layout := [3, 5]
 			case "XL":
 				layout := [4, 8]
+			case "Plus":
+				layout := [2, 4]
 			default:
 				layout := string2Values("x", layout)
 		}
 
-		if (layout[1] = 2) {
+		if ((layout[1] = 2) && (layout[2] = 3)) {
 			this.Width := StreamDeckPreview.kMiniWidth
 			this.Height := StreamDeckPreview.kMiniHeight
 
@@ -90,6 +94,12 @@ class StreamDeckPreview extends ControllerPreview {
 			this.Height := StreamDeckPreview.kXLHeight
 
 			this.iSize := "XL"
+		}
+		else {
+			this.Width := StreamDeckPreview.kPlusWidth
+			this.Height := StreamDeckPreview.kPlusHeight
+
+			this.iSize := "Plus"
 		}
 
 		this.Rows := layout[1]

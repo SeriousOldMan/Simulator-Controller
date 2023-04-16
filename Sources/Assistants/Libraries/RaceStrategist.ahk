@@ -2427,7 +2427,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
-		if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
+		if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 			speaker := this.getSpeaker()
 
 			speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -2439,7 +2439,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local speaker, fragments
 
 		if (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
-			if (this.Speaker[false] && (this.Session == kSessionRace)) {
+			if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 
@@ -2474,7 +2474,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, plannedLap, laps, nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
 
-		if this.Speaker[false] {
+		if (this.hasEnoughData(false) && this.Speaker[false]) {
 			speaker := this.getSpeaker()
 
 			if this.hasEnoughData(false) {

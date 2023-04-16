@@ -2990,6 +2990,9 @@ class RaceSpotter extends GridRaceAssistant {
 
 		static lastSector := 1
 
+		if (lapNumber > this.LastLap)
+			this.updateDynamicValues({EnoughData: false})
+
 		update := false
 
 		if !isObject(data)
@@ -3014,7 +3017,7 @@ class RaceSpotter extends GridRaceAssistant {
 			gapBehind := getMultiMapValue(data, "Stint Data", "GapBehind", kUndefined)
 		}
 
-		if update {
+		if (update && (lapNumber = this.LastLap)) {
 			this.iPositions := this.computePositions(data, (gapAhead != kUndefined) ? gapAhead : false
 														 , (gapBehind != kUndefined) ? gapBehind : false)
 

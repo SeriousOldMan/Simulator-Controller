@@ -2301,7 +2301,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
-		if (this.Speaker[false] && this.Announcements["FuelWarning"])
+		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["FuelWarning"])
 			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
 
@@ -2335,7 +2335,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, phrase
 
-		if (this.Speaker[false] && this.Announcements["DamageReporting"])
+		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["DamageReporting"])
 			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
 				phrase := false
@@ -2373,7 +2373,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker
 
-		if (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
+		if (this.hasEnoughData(false) && knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3)
 			if (this.Speaker[false] && this.Announcements["DamageAnalysis"])
 				if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
 					speaker := this.getSpeaker()
@@ -2407,7 +2407,7 @@ class RaceEngineer extends RaceAssistant {
 
 		static tyreLookup := CaseInsenseMap("FL", "FrontLeft", "FR", "FrontRight", "RL", "RearLeft", "RR", "RearRight")
 
-		if (this.Session == kSessionRace)
+		if (this.hasEnoughData(false) && (this.Session == kSessionRace))
 			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false))
 				if (this.Speaker[false] && this.Announcements["PressureReporting"]) {
 					speaker := this.getSpeaker()
@@ -2424,7 +2424,7 @@ class RaceEngineer extends RaceAssistant {
 		local speaker
 
 		if !ProcessExist("Race Strategist.exe")
-			if (this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
+			if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace) && this.Announcements["WeatherUpdate"]) {
 				speaker := this.getSpeaker()
 
 				speaker.speakPhrase(change ? "WeatherChange" : "WeatherNoChange", {minutes: minutes})
@@ -2436,7 +2436,7 @@ class RaceEngineer extends RaceAssistant {
 		local speaker, fragments
 
 		if (!ProcessExist("Race Strategist.exe") && (knowledgeBase.getValue("Lap.Remaining.Session", knowledgeBase.getValue("Lap.Remaining", 0)) > 3))
-			if (this.Speaker[false] && (this.Session == kSessionRace)) {
+			if (this.hasEnoughData(false) && this.Speaker[false] && (this.Session == kSessionRace)) {
 				speaker := this.getSpeaker()
 				fragments := speaker.Fragments
 

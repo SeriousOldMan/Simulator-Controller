@@ -869,7 +869,7 @@ getWindowPosition(descriptor, &x, &y) {
 		loop MonitorGetCount() {
 			MonitorGetWorkArea(A_Index, &screenLeft, &screenTop, &screenRight, &screenBottom)
 
-			if ((posX >= (screenLeft - 50)) && (posX <= (screenRight + 50)) && (posY >= (screenTop - 50)) && (posY <= (screenBottom + 50))) {
+			if ((posX >= (screenLeft - 50)) && (posX <= screenRight) && (posY >= screenTop) && (posY <= screenBottom)) {
 				x := posX
 				y := posY
 

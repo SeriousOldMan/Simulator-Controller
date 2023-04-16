@@ -1692,7 +1692,7 @@ class RaceCenter extends ConfigurationItem {
 
 		copyPressures(*) {
 			local hasPitstops := false
-			local lap, driver, conditions, tyreCompound, pressures
+			local lap, driver, conditions, fuel, tyreCompound, tyreCompoundColor, tyreSet, pressures
 			local pressuresMenu, label
 
 			copyPressure(driver, compound, pressures, *) {
@@ -1718,7 +1718,33 @@ class RaceCenter extends ConfigurationItem {
 
 			pressuresMenu := Menu()
 
+			if this.Laps.Has(1) {
+				lap := this.Laps[1]
+
+				this.getStintSetup(1, &fuel, &tyreCompound, &tyreCompoundColor, &tyreSet, &pressures)
+
+				if pressures {
+					driver := lap.Stint.Driver.FullName
+
+					conditions := (translate(lap.Weather) . A_Space . translate("(")
+								 . displayValue("Float", convertUnit("Temperature", lap.AirTemperature)) . ", "
+								 . displayValue("Float", convertUnit("Temperature", lap.TrackTemperature)) . translate(")"))
+
+					tyreCompound := compound(tyreCompound, tryeCompounColor)
+
+					label := (translate("Session") . translate(" - ") . driver . translate(" - "))
+						   . (conditions . translate(" - ") . tyreCompound . translate(": ") . values2Strin(", ", pressures*))
+
+					pressuresMenu.Add(label, copyPressure.Bind(driver, tyreCompound, pressures))
+
+					hasPitstops := true
+				}
+			}
+
 			loop center.PitstopsListView.GetCount() {
+				if ((A_Index = 1) && hasPitstops)
+					pressuresMenu.Add()
+
 				lap := center.PitstopsListView.GetText(A_Index, 2)
 
 				if center.Laps.Has(lap) {
@@ -2995,8 +3021,15 @@ class RaceCenter extends ConfigurationItem {
 				logError(exception)
 			}
 
-			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"]
+			for ignore, entry in Database(directory . "\", kSessionDataSchemas).Tables["Setups.Data"] {
+				if !inList(this.SessionDrivers, entry["Driver"]) {
+					entry.Clone()
+
+					entry["Driver"] := "John Doe (JD)"
+				}
+
 				this.SessionStore.add("Setups.Data", entry)
+			}
 
 			this.loadSetups()
 		}
@@ -9425,7 +9458,7 @@ class RaceCenter extends ConfigurationItem {
 					}
 
 					try {
-						tries := ((lap == lastLap) ? 10 : 1)
+						tries := ((lap == lastLap) ? 30 : 5)
 
 						while (tries > 0) {
 							standingsData := this.Connector.GetSessionLapValue(session, lap, "Race Strategist Race Standings")

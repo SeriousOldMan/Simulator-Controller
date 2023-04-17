@@ -1462,13 +1462,40 @@ renewConsent() {
 	}
 }
 
-updateInstallationForV398() {
+updateInstallationForV500() {
 	local installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
-	local installLocation
+	local installLocation := getMultiMapValue(installOptions, "Install", "Location")
 
 	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
 		installLocation := getMultiMapValue(installOptions, "Install", "Location")
 
+		deleteFile(installLocation . "\Binaries\Setup Advisor.exe")
+
+		try {
+			FileCreateShortcut(installLocation . "\Binaries\Setup Workbench.exe", A_StartMenu . "\Simulator Controller\Setup Workbench.lnk", installLocation . "\Binaries")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	if (getMultiMapValue(installOptions, "Install", "Type", false) = "Registry") {
+		try {
+			RegWrite(installLocation . "\Binaries\Setup Workbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
+
+			RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+}
+
+updateInstallationForV398() {
+	local installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installLocation := getMultiMapValue(installOptions, "Install", "Location")
+
+	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
 		deleteFile(installLocation . "\Binaries\Setup Database.exe")
 
 		try {
@@ -1501,11 +1528,70 @@ updateInstallationForV392() {
 	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
 		installLocation := getMultiMapValue(installOptions, "Install", "Location")
 
-		FileCreateShortcut(installLocation . "\Binaries\Setup Workbench.exe", A_StartMenu . "\Simulator Controller\Setup Workbench.lnk", installLocation . "\Binaries")
+		FileCreateShortcut(installLocation . "\Binaries\Setup Advisor.exe", A_StartMenu . "\Simulator Controller\Setup Adisor.lnk", installLocation . "\Binaries")
 	}
 }
 
+updateConfigurationForV500() {
+	local text
+
+	copyDirectory(source, destination) {
+		local files := []
+		local ignore, fileName, file, subDirectory
+
+		DirCreate(destination)
+
+		loop Files, source . "\*.*", "DF"
+			files.Push(A_LoopFilePath)
+
+		for ignore, fileName in files {
+			if InStr(FileExist(fileName), "D") {
+				SplitPath(fileName, &subDirectory)
+
+				copyDirectory(fileName, destination . "\" . subDirectory)
+			}
+			else
+				FileCopy(fileName, destination, 1)
+		}
+	}
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
+
+		text := StrReplace(text, "SetupAdvisor", "SetupWorkbench")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+
+	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+		text := FileRead(kUserConfigDirectory . "Simulator Configuration.ini", "`n")
+
+		text := StrReplace(text, "SetupAdvisor", "SetupWorkbench")
+
+		deleteFile(kUserConfigDirectory . "Simulator Configuration.ini")
+
+		FileAppend(text, kUserConfigDirectory . "Simulator Configuration.ini")
+	}
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		text := FileRead(kUserConfigDirectory . "Application Settings.ini", "`n")
+
+		text := StrReplace(text, "Setup Advisor", "Setup Workbench")
+
+		deleteFile(kUserConfigDirectory . "Application Settings.ini")
+
+		FileAppend(text, kUserConfigDirectory . "Application Settings.ini")
+	}
+
+	copyDirectory(kUserHomeDirectory . "Advisor", kUserHomeDirectory . "Garage")
+
+	deleteDirectory(kUserHomeDirectory . "Advisor")
+}
+
 updateConfigurationForV463() {
+	local text
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
 		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
 
@@ -1559,13 +1645,14 @@ updateConfigurationForV452() {
 
 	settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-	for key, value in getMultiMapValues(settings, "Setup Workbench")
+	for key, value in getMultiMapValues(settings, "Setup Advisor")
 		tempValues[StrReplace(key, ".Unknown", ".*")] := value
 
 	for key, value in tempValues {
 		found := false
 
-		for ignore, subkey in [".LowspeedThreshold", ".OversteerThresholds", ".UndersteerThresholds"							 , ".SteerLock", ".SteerRatio", ".Wheelbase", ".TrackWidth"]
+		for ignore, subkey in [".LowspeedThreshold", ".OversteerThresholds", ".UndersteerThresholds"
+							 , ".SteerLock", ".SteerRatio", ".Wheelbase", ".TrackWidth"]
 			if (InStr(key, subkey) && (string2Values(".", key).Length < 4)) {
 				newValues[StrReplace(key, subkey, ".*" . subkey)] := value
 
@@ -1578,7 +1665,7 @@ updateConfigurationForV452() {
 			newValues[key] := value
 	}
 
-	setMultiMapValues(settings, "Setup Workbench", newValues)
+	setMultiMapValues(settings, "Setup Advisor", newValues)
 
 	writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 }

@@ -1,3 +1,125 @@
+# Gui Classes
+
+The base framework provide a specialized subclass of *Gui*, which supports resizing rules, customizeable closing behaviour and also basic method for applying UI themes.
+
+## Window ([Gui.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Gui.ahk))
+
+You can use the Window class anywhere you normally would use a *Gui*. Please note, that the constructor arguments work differently and the default look will be different than with a standard *Gui*.
+
+### Public Properties
+
+#### *Descriptor*
+Returns the symbolic name of this window, which is used, for example, by the [getWindowPosition](*), [getWindowSize](*) and [moveByMoue](*) functions.
+
+#### *Closeable*
+Returns *true*, if the window is closeable. In this case, the [Close](*) method is called, whenever the user wants to close the window.
+
+#### *Resizeable*
+Returns *true*, if the window is resizeable. In this case, the [Resize](*) method is called, whenever the user is resizing the window, or, if the value of *Resizeable* is "Deferred", **after** the window had been resized.
+
+#### *MinWidth*
+This is the mimimum width, the window is allowed to have. This property is set by default to the window width, that window had, when initially opened, bt can be set to a different size anytime.
+
+#### *MinHeight*
+This is the mimimum height, the window is allowed to have. This property is set by default to the window height, that window had, when initially opened, bt can be set to a different size anytime. 
+
+#### *MaxWidth*
+This is the mimimum width, the window is allowed to have. Default is *false*, which means unrestricted.
+
+#### *MaxHeight*
+This is the mimimum height, the window is allowed to have. Default is *false*, which means unrestricted.
+
+#### *Width*
+The current width of the window.
+
+#### *Height*
+The current height of the window.
+
+#### *TitleBarHeight*
+The height of the title bar. Returns *false*, if the window hasno displayed title bar.
+
+#### *Resizers[control :: Gui.Control := false]*
+Returns a list of all defined resizers for this window or only for the given *control*.
+
+#### *Rules[asText :: Boolean := *true*]*
+Returns the default resize rules, which will be applied automatically to all following defined controls for this window. You can either ask for textual representation or a list. Initialiiy, the default rules are empty. See [DefineResizeRule](*) below for detailed explanation of resize rules.
+
+### Public Methods
+
+#### *__New(options :: Object := {}, name :: String := *Name of the application*, #rest arguments)*
+Returns a new window. If yoo don*t supply any arguments, a non-closeable, non-resizeable window without a title bar will be created. The options support the following properties:
+
+  1. Descriptor - the symbolic name of the window
+  2. Closeable - whether the window is closeable (default is *false*)
+  3. Resizeable - whether the window is resizeable (default is *false*)
+  4. Options - all other options, which will be passed to the *Gui*
+ 
+The optional remaining *arguments* will be passed to the *Gui* as well.
+
+#### *ApplyTheme()*
+Is called once for a new window, to set the basic theming, like the background color.
+
+#### *ApplyThemeOptions(type :: String, options : String)*
+This method is called for each control, before it is created. The method can change inidividual options like color, etc., to apply target theming. The method must return the probably modified *options*.
+
+#### *ApplyThemeProperties(control :: Gui.Control)*
+This method is called for each control, after it has been created, also here to apply optical changes.
+
+#### *AddResizer(resizer :: Window.Resizer)*
+Adds a resizer to the list of resizers for this window. Must not be called manually (use the inherited *Add* method for custom resizers as well as controls), but you can overwrite it, to do some additional work here.
+
+#### *DefineResizeRule(control :: Gui.Control, rule :: String)*
+Also called automatically from *Add*. *rule* can consist of multiple resize actions sparated by spaces. A resize action looks like this:
+
+  *target property*:*action*[(*factor*)
+
+  1. Target property must be one of *x*, *y*, *w* (*width*), *h* (*height*), *v* (*vertical*) or *h* (*horizontal*) 
+  2. Action must be one of *Move*, *Grow* or *Center*
+  3. Factor can be any numeric value (normally a value between 0 and 1), which effects the amount of change applid to the property
+
+Examples:
+
+  - X:Move(0.33) - The control is move to the right by 1/3 of the increase of the window site.
+  - W:Grow - The control grows in width by the amount the window has grown horizontally.
+  - V:Center - The control is centered vertically in the window area.
+
+#### *Close(#rest arguments)*
+Will be called, when the window is closed by the user. The default method simply calls *ExitApp(*)*
+
+#### *Resize(minMax :: String, width :: Integer, height :: Integer)*
+Is called periodically, when the user is resizing the window. The default implementation applies the resiz rules.
+
+## [Abstract Class] Window.Resizer ([Gui.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Gui.ahk))
+
+Instances of this class do the actual work, when a window is beeing resized. Most of the them will work on a given control (actually implemented in a private subclass), but you can define als custom resizers, which, for example, will reload a HTML document, after a window had been resized.
+
+### Public Properties
+
+#### *Window*
+Returns the window, for which this resizer has been defined.
+
+#### *Control*
+Must return the control object, when the resizer is specific for a given control.
+
+### Public Methods
+
+#### *__New(window :: Window)* 
+Basic constructor, which sets the *Window* property.
+
+#### *Initialize()*
+Is called one, after the window has been created initially. Use this method to initialize some information, for example, the initial position and size of the handled control.
+
+#### *RestrictResize(&deltaWidth :: Integer, &deltaHeight :: Integer)*
+Is called during resizing. You can alter the supplied values of *deltaWidth* and *deltaHeight* (in window coordinate system) to restrict the resizing. Return *true*, if the resizing should actually be restricted.
+
+#### *Resize(deltaWidth :: Integer, deltaHeight :: Integer)*
+The window had been resized already, when this method is called. Apply any changes, this resizer is responsible for.
+
+#### *Redraw()*
+Called during resizing to redraw parts of the window. If you want the redraw to happen only once, after the resizing is finished, start a task which checks the mouse buttons and do the redraw, after the user has released the mount buttons.
+	
+***
+
 # Configuration Classes
 
 The following classes are defined in the [Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described [further down below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).
@@ -8,7 +130,7 @@ This is the base class for all objects, that can be stored to or retrieved from 
 
 ### Public Properties
 
-#### *Configuration[]*
+#### *Configuration*
 The configuration map this item belongs to, or *false*, if the item wasn't created from a configuration.
 
 ### Public Methods
@@ -57,29 +179,29 @@ This configuration item represents an application in the current Windows install
 
 ### Public Properties
 
-#### *Application[]*
+#### *Application*
 Returns the logical name of this application.
 
-#### *ExePath[]*
+#### *ExePath*
 Returns the name of the executable file in the file system.
 	
-#### *WorkingDirectory[]*
+#### *WorkingDirectory*
 Returns the directory, where the application will be executed.
 	
-#### *WindowTitle[]*
+#### *WindowTitle*
 Returns the pattern used to identify an active window for the given application. Fully supports the AutoHotkey *winTitle* syntax. See the AutoHotkey [documentation](https://www.autohotkey.com/docs/misc/WinTitle.htm) for reference.
 	
-#### *SpecialStartup[]*
+#### *SpecialStartup*
 Returns the name of a script function to be invoked as a special startup method, or *false*, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen.
 Important: Script functions used as special startup handler must return the rpocess id of the started application.
 
-#### *SpecialShutdown[]*
+#### *SpecialShutdown*
 Returns the name of a script function to be invoked as a special shutdown method, or *false*, if no special shutdown method is applicable. Ses the ACC Plugin mentioned above for an example as well.
 	
-#### *SpecialIsRunning[]*
+#### *SpecialIsRunning*
 Returns the name of the special script function used to test whether the application is running, or *false*, if no special method is applicable.
 	
-#### *CurrentPID[]*
+#### *CurrentPID*
 If the application is running and has been started by the *startup* method below, this property returns the Windows process id associated with the running process.
 
 ### Public Methods
@@ -106,16 +228,16 @@ This abstract class defines the protocol for all functions available for a given
 
 ### Public Properties
 
-#### [Abstract] *Type[]*
+#### [Abstract] *Type*
 Returns the [type constant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#controller-function-types-constantsahk) of the given function. This property must be implemented by a concrete subclass.
 	
-#### *Number[]*
+#### *Number*
 Returns the running number of the controller function. For example Button # **3**...
 	
-#### *Descriptor[]*
+#### *Descriptor*
 The resource descriptor of the given function. Typically looks like "Button.3" or "Dial.2".
 	
-#### [Abstract] *Trigger[]*
+#### [Abstract] *Trigger*
 Returns a list of all triggers available for this controller function. A button class might return ["Push"], beacause only this single functionality is provided, whereas a dial function might return ["Increase", "Decrease"].
 	
 #### *Hotkeys[trigger :: String := false, asText :: Boolean := false]*
@@ -127,38 +249,38 @@ Similar to the *Hotkeys* property, this property returns the defined actions. Th
 ### Public Methods
 
 #### *__New(functionNumber :: Integer, configuration :: ConfigurationMap := false, #rest hotkeyActions)*
-Constructs a new controller function. If *configuration* is not supplied, the hotkeys and actions must be supplied as string arguments for all triggers in the order returned by the *Trigger[]* property. The class factory method *createFunction* may be used to create an instance of a specific subclass.
+Constructs a new controller function. If *configuration* is not supplied, the hotkeys and actions must be supplied as string arguments for all triggers in the order returned by the *Trigger* property. The class factory method *createFunction* may be used to create an instance of a specific subclass.
 
 #### *fireAction(trigger)*
 Calls the action function defined for the given trigger, if any.
 
 #### [Class Factory Method] *createFunction(descriptor :: String, configuration :: ConfigurationMap := false, onHotkeys :: String := false, onAction :: String := false, offHotkeys :: String := false, offAction :: String := false)*
-Creates an instance of a specific subclass of *Function* according to the given descriptor. If *configuration* is *false*, the additional arguments may be used to initialize hotkeys and triggerable actions in the order of the defined triggers returned by the property *Trigger[]*.
+Creates an instance of a specific subclass of *Function* according to the given descriptor. If *configuration* is *false*, the additional arguments may be used to initialize hotkeys and triggerable actions in the order of the defined triggers returned by the property *Trigger*.
 
 ***
 
 ## TwoWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
-Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger[]* are ["On", "Off"].
+Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger* are ["On", "Off"].
 
 ***
 
 ## OneWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
-Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger[]* are ["On"].
+Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger* are ["On"].
 
 ***
 
 ## ButtonFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
-Concrete implementation for simple push buttons. The triggers returned by *Trigger[]* are ["Push"].
+Concrete implementation for simple push buttons. The triggers returned by *Trigger* are ["Push"].
 
 ***
 
 ## DialFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
-Concrete implementation for rotary dials. The triggers returned by *Trigger[]* are ["Increase", "Decrease"] for the two different rotary directions.
+Concrete implementation for rotary dials. The triggers returned by *Trigger* are ["Increase", "Decrease"] for the two different rotary directions.
 
 ***
 
 ## CustomFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
-Concrete implementation for a custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
+Concrete implementation for a custom or external function. The triggers returned by *Trigger* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
 
 ***
 
@@ -167,13 +289,13 @@ A plugin is used by the Simulator Controller framework to integrate custom code 
 
 ### Public Properties
 
-#### *Plugin[]*
+#### *Plugin*
 Returns the name of the plugin.
 
-#### *Active[]*
+#### *Active*
 Returns *true*, if the plugin is to be considered active according to the configuration.
 	
-#### *Simulators[]*
+#### *Simulators*
 Returns a list of names of simulation games, this plugin is aware of. In the default implementation, the modes of a given plugin will only be active, if one of these simulators is currently running. If the list is empty, the plugin and its modes are independently active.
 
 #### *Arguments[asText := false]*
@@ -201,16 +323,16 @@ This is the main class of the configuration tool. It opens the editor window and
 
 ### Public Properties
 
-#### [Class] *Instance[]*
+#### [Class] *Instance*
 This class property returns the single instance of *ConfigurationEditor*.
 
-#### *Configurators[]*
+#### *Configurators*
 A list of all registered configurators, which tpically have been provided by configuration plugins by calling [registerConfigurator](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#registerconfiguratorlabel--string-configurator--configurationitem).
 
-#### *AutoSave[]*
+#### *AutoSave*
 Returns *true*, if the user wants each change to be updated automatically.
 	
-#### *Window[]*
+#### *Window*
 This property returns the short string, which is used by all AutoHotKey *Gui* commands to identify the window of the configuration editor.
 
 ### Public Methods
@@ -254,13 +376,13 @@ This abstract class implements a list of items, which might be edited with an as
 
 ### Public Properties
 
-#### *ItemList[]*
+#### *ItemList*
 This property holds all items of the list. It is typically initialized in the implementation of *loadFromConfiguration*. You can read from and write to *ItemList*.
 
-#### *CurrentItem[]*
+#### *CurrentItem*
 The currently selected line in the list. You can read from and write to *CurrentItem*.
 
-#### *ListHandle[]*
+#### *ListHandle*
 Returns the AutoHotkey HNDL for the *ListView* or *ListBox* used for this list widget.
 
 ### Public Methods
@@ -315,37 +437,37 @@ This class implements the core functionality of Simulator Controller. The single
 
 ### Public Properties
 
-#### [Class] *Instance[]*
+#### [Class] *Instance*
 This class property returns the single instance of *SimulatorController*.
 
-#### *Settings[]*
+#### *Settings*
 Returns the controller configuration map, not to be confused with the complete simulator configration map. This small configuration defines settings for controller notifications such as tray tips and visual representation for connected controller hardware like Button Boxes and is maintained by the [settings editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
 	
 #### *FunctionController[class :: Class := false]*
 Returns a list all [FunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) instances registered for the controller. These must have been created by a specialized plugin and registered in the controller by calling [registerFunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk). See [this simple example](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ButtonBox%20Plugin.ahk) for an example. If the class parameter has been supplied, only instances of this given class will be returned.
 	
-#### *Functions[]*
+#### *Functions*
 Returns a list of all functions defined in the underlying configuration.
 	
-#### *Plugins[]*
+#### *Plugins*
 Returns a list of all registered plugins. Some of these plugins might be inactive according to the configuration.
 	
-#### *Modes[]*
+#### *Modes*
 A list of all modes defined by all plugins. Here also, not all modes might be active in a given situation.
 	
-#### *ActiveModes[]*
+#### *ActiveModes*
 The currently active modes. These modes define the currently active layer of controller functions and actions on your hardware controllers.
 
 #### *ActiveMode[controller :: FunctionController}*
 Returns the mode, which is currently active for the given controller argument. If more than one mode is active on this controller, only the first of these modes is returned.
 	
-#### *ActiveSimulator[]*
+#### *ActiveSimulator*
 If a simulation game is currently running, the name of this application is returned by this property.
 	
-#### *LastEvent[]*
+#### *LastEvent*
 This property returns an integer representing the time of the last controller hardware event as reported by the special AutoHotkey variable [A_TickCount](https://www.autohotkey.com/docs/Variables.htm#TickCount).
 
-#### *Started[]*
+#### *Started*
 Is *true*, if the startup process of the controller is complete, *false* before. Before *Startup* is *true* no user interface will be available and the controller must not react to any event.
 
 ### Public Methods
@@ -426,25 +548,25 @@ This is the root class of all controller functions used by the Simulator Control
 
 ### Public Properties
 
-#### *Controller[]*
+#### *Controller*
 Returns the controller, for which this function has been defined.
 
-#### *Function[]*
+#### *Function*
 Returns the wrapped original class, an instance of [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk).
 
-#### *Type[]*
+#### *Type*
 Returns the [type constant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#controller-function-types-constantsahk) of the given function. This property must be implemented by a concrete subclass.
 	
-#### *Number[]*
+#### *Number*
 Returns the running number of the controller function. For example Button # **3**...
 	
-#### *Descriptor[]*
+#### *Descriptor*
 The resource descriptor of the given function. Typically looks like "Button.3" or "Dial.2".
 
 #### *Enabled[action :: ControllerAction := false]*
 *true*, if the function can currently be triggered. If *action* is not supplied, the property will evaluate, if any of the actions might be triggered, otherwise the supplied action will be checked.
 
-#### *Trigger[]*
+#### *Trigger*
 Returns a list of all triggers available for this controller function. A button class might return ["Push"], beacause only this single functionality is provided, whereas a dial function might return ["Increase", "Decrease"].
 	
 #### *Hotkeys[trigger :: String := false]*
@@ -479,27 +601,27 @@ Disconnects the function from the given action. Normally, functions will be disc
 ***
 
 ## ControllerTwoWayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger[]* are ["On", "Off"].
+Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger* are ["On", "Off"].
 
 ***
 
 ## ControllerOneWayToggleFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger[]* are ["On"].
+Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger* are ["On"].
 
 ***
 
 ## ControllerButtonFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Concrete implementation for simple push buttons. The triggers returned by *Trigger[]* are ["Push"].
+Concrete implementation for simple push buttons. The triggers returned by *Trigger* are ["Push"].
 
 ***
 
 ## ControllerDialFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Concrete implementation for rotary dials. The triggers returned by *Trigger[]* are ["Increase", "Decrease"] for the two different rotary directions.
+Concrete implementation for rotary dials. The triggers returned by *Trigger* are ["Increase", "Decrease"] for the two different rotary directions.
 
 ***
 
 ## ControllerCustomFunction extends [ControllerFunction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-controllerfunction-simulator-controllerahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-Concrete implementation for custom or external function. The triggers returned by *Trigger[]* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
+Concrete implementation for custom or external function. The triggers returned by *Trigger* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
 
 ***
 
@@ -508,13 +630,13 @@ This is the central class, that must be implemented to extend the functionality 
 
 ### Public Properties
 
-#### *Controller[]* {
+#### *Controller* {
 Returns the controller, where this plugin has been registered.
 	
-#### *Modes[]*
+#### *Modes*
 A list of all [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) defined by this plugin.
 	
-#### *Actions[]*
+#### *Actions*
 A list of all actions defined by this plugin. Only the actions defined directly for the plugin will be returned, not including the actions defined by the modes of the plugin.
 
 ### Public Methods
@@ -575,19 +697,19 @@ Controller modes represent a layer or group of functionality for the hardware co
 	
 ### Public Properties
 
-#### [Abstract] *Mode[]*
+#### [Abstract] *Mode*
 Returns the name of the mode, wich might be displayed in the visual representation of the hardware controller, for example a Button Box. This property must be implemented by all subclasses.
 	
-#### *Plugin[]*
+#### *Plugin*
 Returns the plugin, which has defined this mode.
 	
-#### *Controller[]*
+#### *Controller*
 The controller, where the plugin of this mode has been registered.
 
-#### *FunctionController[]*
+#### *FunctionController*
 Returns a list all [FunctionController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-functioncontroller-extends-configurationitem-simulator-controllerahk) instances, on which this mode has registered actions.
 
-#### *Actions[]*
+#### *Actions*
 A list of all actions defined by this mode.
 
 ### Public Methods
@@ -620,16 +742,16 @@ This little class represents the actions, which can be connected to the hardware
 
 ### Public Properties
 
-#### *Function[]*
+#### *Function*
 Returns the function, to which this action will be connected, when the correspoding plugin or mode is active.
 	
-#### *Controller[]*
+#### *Controller*
 The controller, where the corresponding function has been registered.
 	
-#### *Label[]*
+#### *Label*
 Returns the label of this action.
 	
-#### *Icon[]*
+#### *Icon*
 Returns the path to the icon file of this action, or *false*, if no special has been defined.
 	
 ### Public Methods
@@ -653,25 +775,25 @@ Instances of this class represent a given hardware controller. Subclasses of *Fu
 
 ### Public Properties
 
-#### *Controller[]*
+#### *Controller*
 Returns the corresponding controller.
 
-#### *Descriptor[]*
+#### *Descriptor*
 Returns a unique descriptor for this instance of *Function Controller*. The default implementation returns the name of the class, which will be unique in most cases, unless you have more than one controller of the same type.
 
-#### *Type[]*
+#### *Type*
 Returns a unique string representation for this instance of *Function Controller*, which may be used in configuration files, for example. The default implementation returns the value of the property *Descriptor*.
 	
-#### *Num1WayToggles[]*
+#### *Num1WayToggles*
 The number of 1-way toggle switches of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
-#### *Num2WayToggles[]*
+#### *Num2WayToggles*
 The number of 2-way toggle switches of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
-#### *NumButtons[]*
+#### *NumButtons*
 The number of simple push buttons of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
-#### *NumDials[]*
+#### *NumDials*
 The number of rotary dials of the controller. This is maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 ### Public Methods
@@ -710,10 +832,10 @@ Although the Simulator Controller will provide complete functionality even witho
 
 ### Public Properties
 
-#### *Visible[]*
+#### *Visible*
 Returns *true*, if the controller window is currently visible.
 
-#### *VisibleDuration[]*
+#### *VisibleDuration*
 The time in milliseconds, the controller may be visible after an action has been triggered. You can specify two different durations with the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), depending being in a running simulation or not.
 
 ### Public Methods
@@ -760,7 +882,7 @@ This class may be used for simple simulator plugins which will NOT support the V
 
 ### Public Properties
 
-#### *Code[]*
+#### *Code*
 This property returns a three letter short name for the plugin, which is used as a descriminator in several functions of Simulator Controller. The default implementation simply returns the name of the plugin (for example "AC", "ACC", "RF2", ...).
 
 #### *CommandMode[}*
@@ -772,10 +894,10 @@ Returns the delay in ms, which is used between each command send to the simulati
 #### *Simulator[name :: Boolean := false]*
 The *Application* object representing the simulation game. If you supply *true* for *name* the actual name of the simulator is returned.
 
-#### *Car[]*
+#### *Car*
 The name of the car, if the player is currently on the track.
 
-#### *Track[]*
+#### *Track*
 The name of the track, if the player is currently on the track.
 
 #### *SessionState[asText :: Boolean := false]*
@@ -789,7 +911,7 @@ A list of all supported session states supported by the given simulator (excludi
 #### *__New(controller :: SimulatorController, name :: String, simulator :: String, configuration :: ConfigurationMap, register :: Boolean := true)*
 The constructor adds the additional parameter *simulator* to the inherited *__New* method. The name of the game application, as configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--configuration), must be supplied for the *simulator* parameter.
 
-#### *createPitstopAction(controller :: SimulatorController, action :: String, increaseFunction :: String, moreArguments* :: String)*
+#### *createPitstopAction(controller :: SimulatorController, action :: String, increaseFunction :: String, #rest moreArguments :: String)*
 This factory method will be called for each supplied action identifier for the [*pitstopCommands* plugin parameter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#configuration-4). Please see the documentation of [getPitstopActions] for more information. Depending on the concrete action, *moreArguments* may contain a second controller function descriptor, an initial state and other information, like the number of increments a value should be changed by the action.
 
 #### *getPitstopActions(ByRef allActions :: Map(String => String), ByRef selectActions :: Array)*
@@ -827,10 +949,10 @@ This method will be called, when a simulator has been started or finished, or wh
 
 ### Public Properties
 
-#### *RaceEngineer[]*
+#### *RaceEngineer*
 Returns the instance of *RaceEngineerPlugin* (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) of this plugin or the source code [Race Engineer Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Race%20Engineer%20Plugin.ahk) for more information), as long, as the simulation is running.
 
-#### *RaceStrategist[]*
+#### *RaceStrategist*
 Returns the instance of *RaceStrategistPlugin* (see the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) of this plugin or the source code [Race Strategist Plugin.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Race%20Strategist%20Plugin.ahk) for more information), as long, as the simulation is running.
 
 ### Public Methods
@@ -905,13 +1027,13 @@ The base class of all pitstop actions.
 
 ### Public Properties
 
-#### *Plugin[]*
+#### *Plugin*
 The plugin, that created and owns this action.
 
-#### *Option[]*
+#### *Option*
 The option identifier for the corresponding pitstop setting. See [getPitstopActions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#getpitstopactionsbyref-allactions--mapstring--string-byref-selectactions--array) for an explanation of option identifiers.
 
-#### *Steps[]*
+#### *Steps*
 The number of steps or incerements, the corresponding pitstop setting will be changed when the action fires.
 
 ### Public Methods
@@ -957,10 +1079,10 @@ Used for the *PitstopPlan* and *PitstopPrepare* pitstop actions. The implementat
 
 ### Public Properties
 
-#### *Plugin[]*
+#### *Plugin*
 The plugin, that created and owns this action.
 
-#### *Action[]*
+#### *Action*
 Either "PitstopPlan" or "PitstopPrepare".
 
 ### Public Methods

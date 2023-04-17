@@ -1088,22 +1088,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryFrontLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryFrontRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryRearLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryRearRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.SetFont("Norm", "Arial")

@@ -436,7 +436,6 @@ class Window extends Gui {
 	}
 
 	__New(options := {}, name := Strsplit(A_ScriptName, ".")[1], arguments*) {
-		local backColor := "D0D0D0"
 		local ignore, argument
 
 		for name, argument in options.OwnProps()
@@ -452,8 +451,6 @@ class Window extends Gui {
 						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 2000, kLowPriority)
 				case "Options":
 					options := argument
-				case "BackColor":
-					backColor := argument
 			}
 
 		super.__New("", name, arguments*)
@@ -471,7 +468,7 @@ class Window extends Gui {
 		if !isObject(options)
 			this.Opt(options)
 
-		this.BackColor := backColor
+		this.ApplyTheme()
 	}
 
 	Opt(options) {
@@ -479,6 +476,10 @@ class Window extends Gui {
 
 		if InStr(options, "-Disabled")
 			this.Show("NA")
+	}
+
+	ApplyTheme() {
+		this.BackColor := "D8D8D8"
 	}
 
 	ApplyThemeOptions(type, options) {

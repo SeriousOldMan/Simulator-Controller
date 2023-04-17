@@ -1334,19 +1334,19 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x" . x . " yp+26 w85 h20 +0x200", translate("Pressure"))
 		workbenchGui.Add("Text", "x" . x0 . " yp w85 h20 +0x200", translate("FL"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFLEdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFLEdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("FR"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFREdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFREdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("RL"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRLEdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRLEdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("RR"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRREdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRREdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		x := 371
@@ -2847,10 +2847,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			settings := SettingsDatabase().loadSettings(simulator, car, track, weather)
 
 			if (tyreCompound = "Dry")
-				tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 27.6)
-								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 27.6)
-								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 27.6)
-								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 27.6)]
+				tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)
+								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 26.5)
+								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)
+								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)]
 			else if (tyreCompound = "Intermediate") {
 				if (getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", kUndefined) != kUndefined)
 					tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", 29.0)

@@ -1109,13 +1109,13 @@ class RaceEngineer extends RaceAssistant {
 									, "Session.Settings.Tyre.Pressure.Correction.Pressure", getMultiMapValue(settings, "Session Settings"
 																													 , "Tyre.Pressure.Correction.Pressure", false)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.FL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.FL", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.FL", 26.5)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.FR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.FR", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.FR", 26.5)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.RL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.RL", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.RL", 26.5)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.RR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.RR", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.RR", 26.5)
 									, "Session.Settings.Tyre.Wet.Pressure.Target.FL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																												 , "Tyre.Wet.Pressure.Target.FL", 30.0)
 									, "Session.Settings.Tyre.Wet.Pressure.Target.FR", getDeprecatedValue(settings, "Session Settings", "Race Settings"

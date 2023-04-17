@@ -44,7 +44,7 @@ class DatabaseTest extends Assert {
 
 		for ignore, pressures in coldPressures
 			database.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
-								   , compound, compoundColor, pressures, [27.7, 27.7, 27.7, 27.7], false)
+								   , compound, compoundColor, pressures, [26.5, 26.5, 26.5, 26.5], false)
 
 		database.flush()
 	}

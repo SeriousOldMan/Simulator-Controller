@@ -47,10 +47,11 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 A couple of things to consider for this release:
 
-1. The controller action function "hotkey", with which you can send keyboard commands to any application, has been renamed to "trigger", since the name conflicted with a new builtin function.
-2. The "Setup Advisor" has ben renamed to "Setup Workbench". All occurences in the local configuration will be handled automatically, but, if you have created some links for example, you have to change them.
+1. The controller action function "hotkey", with which you can send keyboard commands to any application, has been renamed to "trigger", since the name conflicted with a new builtin function. Since this action function can only be used in custom configation, you have to make the change own your own, when you have used "hotkey".
+2. The "Setup Advisor" has ben renamed to "Setup Workbench". All occurences in the local configuration will be handled automatically, but if you have created some links for example, you have to change them.
 3. The local folder, where meta files for cars you have created for "Setup Workbench", has been renamed to "Garage". Renaming of this folder will be handled by the automated update procedure.
-4. The Stream Deck integration now supports also the new Stream Deck Plus, so if you are lucky to own this little gem, you can npw also configure your action on this 2 x 4 buton layout.
+4. The Stream Deck integration now supports also the new Stream Deck Plus, so if you are lucky to own this little gem, you can npw also configure your action for this 2 x 4 buton layout.
+5. [Developer only] When you have created and installed your own plugins, you have to port them to AutoHotkey V2 also, and you hav to change the custom include files in your [Documents]\Simulator Controller\Plugins folder as well.
 
 ***
 

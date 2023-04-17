@@ -416,8 +416,6 @@ createMessageReceiver() {
 
 unknownMessageHandler(category, data) {
 	logMessage(kLogCritical, translate("Unhandled message `"") . category . translate("`": ") . data)
-
-	messageSend(kLocalMessage, category, data)
 }
 
 encodeDWORD(string) {

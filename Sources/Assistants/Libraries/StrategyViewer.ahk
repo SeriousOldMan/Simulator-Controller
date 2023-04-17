@@ -40,7 +40,7 @@ class StrategyViewer {
 	}
 
 	__New(window, strategyViewer := false) {
-		this.iWIndow := window
+		this.iWindow := window
 		this.iStrategyViewer := strategyViewer
 	}
 
@@ -333,9 +333,9 @@ class StrategyViewer {
 			chartArea := ""
 		}
 
-		tableCSS := getTableCSS()
+		tableCSS := this.getTableCSS()
 
-		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		if this.StrategyViewer {
 			this.StrategyViewer.document.open()
@@ -343,64 +343,59 @@ class StrategyViewer {
 			this.StrategyViewer.document.close()
 		}
 	}
-}
+	
+	getTableCSS() {
+		local script
 
+		script := "
+		(
+			.table-std, .th-std, .td-std {
+				border-collapse: collapse;
+				padding: .3em .5em;
+			}
 
-;;;-------------------------------------------------------------------------;;;
-;;;                     Public Function Declaration Section                 ;;;
-;;;-------------------------------------------------------------------------;;;
+			.th-std, .td-std {
+				text-align: center;
+			}
 
-getTableCSS() {
-	local script
+			.th-std, .caption-std {
+				background-color: #BBB;
+				color: #000;
+				border: thin solid #BBB;
+			}
 
-	script := "
-	(
-		.table-std, .th-std, .td-std {
-			border-collapse: collapse;
-			padding: .3em .5em;
-		}
+			.td-std {
+				border-left: thin solid #BBB;
+				border-right: thin solid #BBB;
+			}
 
-		.th-std, .td-std {
-			text-align: center;
-		}
+			.th-left {
+				text-align: left;
+			}
 
-		.th-std, .caption-std {
-			background-color: #BBB;
-			color: #000;
-			border: thin solid #BBB;
-		}
+			.td-left {
+				text-align: left;
+			}
 
-		.td-std {
-			border-left: thin solid #BBB;
-			border-right: thin solid #BBB;
-		}
+			tfoot {
+				border-bottom: thin solid #BBB;
+			}
 
-		.th-left {
-			text-align: left;
-		}
+			.caption-std {
+				font-size: 1.5em;
+				border-radius: .5em .5em 0 0;
+				padding: .5em 0 0 0
+			}
 
-		.td-left {
-			text-align: left;
-		}
+			.table-std tbody tr:nth-child(even) {
+				background-color: #%altBackColor%;
+			}
 
-		tfoot {
-			border-bottom: thin solid #BBB;
-		}
+			.table-std tbody tr:nth-child(odd) {
+				background-color: #%backColor%;
+			}
+		)"
 
-		.caption-std {
-			font-size: 1.5em;
-			border-radius: .5em .5em 0 0;
-			padding: .5em 0 0 0
-		}
-
-		.table-std tbody tr:nth-child(even) {
-			background-color: #D8D8D8;
-		}
-
-		.table-std tbody tr:nth-child(odd) {
-			background-color: #D0D0D0;
-		}
-	)"
-
-	return script
+		return substituteVariables(script, {altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor})
+	}
 }

@@ -549,7 +549,7 @@ class ModulesStepWizard extends StepWizard {
 			widget3.OnEvent("Click", updateSelectedModules)
 			widget4 := window.Add("ActiveX", "x" . x . " yp+26 w" . width . " h124 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden", "shell.explorer")
 
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 			widget4.Value.navigate("about:blank")
 			widget4.Value.document.write(html)
@@ -601,7 +601,7 @@ class ModulesStepWizard extends StepWizard {
 
 		widget7 := window.Add("ActiveX", "x" . x . " ys+229 w" . width . " h210 Y:Move(0.7) W:Grow H:Grow(0.3) VpresetsInfoText Hidden", "shell.explorer")
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget7.Value.navigate("about:blank")
 		widget7.Value.document.write(html)
@@ -760,7 +760,7 @@ class ModulesStepWizard extends StepWizard {
 
 		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		this.Control["presetsInfoText"].Value.document.open()
 		this.Control["presetsInfoText"].Value.document.write(html)

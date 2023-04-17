@@ -661,7 +661,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		helpGui["infoViewer"].Value.navigate("about:blank")
 
-		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #" . helpGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 		helpGui["infoViewer"].Value.document.write(html)
 
@@ -1966,7 +1966,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	setInfo(html) {
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
 
 		this.HelpWindow["infoViewer"].Value.document.open()
 		this.HelpWindow["infoViewer"].Value.document.write(html)
@@ -2264,7 +2264,7 @@ class StartStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
 
 		widget1.Value.navigate("about:blank")
 
@@ -2301,7 +2301,7 @@ class StartStepWizard extends StepWizard {
 			widget4 := window.Add("Button", "x" . x . " yp+380 w240 h30 Y:Move H:Center Hidden", translate("Restart as Administrator"))
 			widget4.OnEvent("Click", elevateAndRestart)
 
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 			widget3.Value.navigate("about:blank")
 			widget3.Value.document.write(html)
@@ -2422,7 +2422,7 @@ class FinishStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
 		widget1.Value.navigate("about:blank")
 		widget1.Value.document.write(html)

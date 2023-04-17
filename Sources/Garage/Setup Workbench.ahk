@@ -675,7 +675,7 @@ class SetupWorkbench extends ConfigurationItem {
 					(
 							</script>
 						</head>
-						<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 							<div style="width: %iWidth%px; height: %iHeight%px">
 								<p style="font-family: Arial; font-size: 16px; margin: 5px">
@@ -688,7 +688,7 @@ class SetupWorkbench extends ConfigurationItem {
 					</html>
 					)"
 
-					after := substituteVariables(after, {width: width, height: height, iWidth: iWidth, iHeight: iHeight, info: info})
+					after := substituteVariables(after, {width: width, height: height, iWidth: iWidth, iHeight: iHeight, info: info, backColor: this.Window.AltBackColor})
 
 					this.SettingsViewer.document.write(before . content . after)
 				}
@@ -711,7 +711,7 @@ class SetupWorkbench extends ConfigurationItem {
 						<meta charset='utf-8'>
 						<head>
 						</head>
-						<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 							<div style="width: %width%px; height: %height%px; text-align: center">
 								<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
 									<br>
@@ -725,13 +725,13 @@ class SetupWorkbench extends ConfigurationItem {
 					</html>
 					)"
 
-					this.SettingsViewer.document.write(substituteVariables(document, {width: width, height: height, html: html}))
+					this.SettingsViewer.document.write(substituteVariables(document, {width: width, height: height, html: html, backColor: this.Window.AltBackColor}))
 				}
 			}
 			else {
-				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+				html := "<html><body style='background-color: #%backColor' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.SettingsViewer.document.write(html)
+				this.SettingsViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
 
 			this.SettingsViewer.document.close()

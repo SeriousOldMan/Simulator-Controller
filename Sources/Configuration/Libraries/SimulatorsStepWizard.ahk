@@ -201,7 +201,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 
 		widget10 := window.Add("ActiveX", "x" . x . " yp+305 w" . width . " h76 Y:Move(0.66) H:Grow(0.33) W:Grow VactionsInfoText Hidden", "shell.explorer")
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget10.Value.navigate("about:blank")
 		widget10.Value.document.write(html)

@@ -72,6 +72,8 @@ class Window extends Gui {
 
 	iTitleBarHeight := 0
 
+	iAltBackColor := "D8D8D8"
+
 	class Resizer {
 		iWindow := false
 
@@ -406,6 +408,16 @@ class Window extends Gui {
 		}
 	}
 
+	AltBackColor {
+		Get {
+			return this.iAltBackColor
+		}
+
+		Set {
+			return (this.iAltBackColor := value)
+		}
+	}
+
 	Resizers[control?] {
 		Get {
 			if isSet(control) {
@@ -480,6 +492,7 @@ class Window extends Gui {
 
 	ApplyTheme() {
 		this.BackColor := "D0D0D0"
+		this.AltBackColor := "D8D8D8"
 	}
 
 	ApplyThemeOptions(type, options) {
@@ -488,7 +501,7 @@ class Window extends Gui {
 		if !InStr(options, "Background") {
 			switch type, false {
 				case "ListView", "ListBox":
-					options .= " BackgroundD8D8D8"
+					options .= (" Background" . this.AltBackColor)
 				case "Edit":
 					options .= " BackgroundE0E0E0"
 				case "Button":

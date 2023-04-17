@@ -180,6 +180,8 @@ class SyncSessionTask extends RaceCenterTask {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RaceCenter extends ConfigurationItem {
+	static kInvalidToken := "__Invalid__"
+	
 	iWindow := false
 
 	iWorking := 0
@@ -192,7 +194,7 @@ class RaceCenter extends ConfigurationItem {
 	iConnection := false
 
 	iServerURL := ""
-	iServerToken := "__INVALID__"
+	iServerToken := RaceCenter.kInvalidToken
 
 	iTeams := CaseInsenseMap()
 	iSessions := CaseInsenseMap()
@@ -1185,7 +1187,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iServerURL := getMultiMapValue(settings, "Team Settings", "Server.URL"
 										  , getMultiMapValue(configuration, "Team Server", "Server.URL", ""))
 		this.iServerToken := getMultiMapValue(settings, "Team Settings", "Server.Token"
-											, getMultiMapValue(configuration, "Team Server", "Server.Token", "__INVALID__"))
+											, getMultiMapValue(configuration, "Team Server", "Server.Token", RaceCenter.kInvalidToken))
 		this.iTeamName := getMultiMapValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getMultiMapValue(settings, "Team Settings", "Session.Name", "")
@@ -1211,7 +1213,7 @@ class RaceCenter extends ConfigurationItem {
 
 		connectServer(*) {
 			center.iServerURL := centerGui["serverURLEdit"].Text
-			center.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? "__INVALID__" : centerGui["serverTokenEdit"].Text)
+			center.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : centerGui["serverTokenEdit"].Text)
 
 			center.connect()
 		}
@@ -2249,7 +2251,7 @@ class RaceCenter extends ConfigurationItem {
 					token := loginDialog(this.Connector, this.ServerURL, window)
 
 					if token {
-						this.iServerToken := ((token = "") ? "__INVALID__" : token)
+						this.iServerToken := ((token = "") ? RaceCenter.kInvalidToken : token)
 
 						window["serverTokenEdit"].Text := token
 					}
@@ -2302,7 +2304,7 @@ class RaceCenter extends ConfigurationItem {
 					throw "Cannot connect to Team Server..."
 			}
 			catch Any as exception {
-				this.iServerToken := "__INVALID__"
+				this.iServerToken := RaceCenter.kInvalidToken
 				this.iConnection := false
 
 				window["serverTokenEdit"].Text := ""
@@ -4196,7 +4198,7 @@ class RaceCenter extends ConfigurationItem {
 		switch line {
 			case 3: ; Connect...
 				this.iServerURL := this.Control["serverURLEdit"].Text
-				this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? "__INVALID__" : this.Control["serverTokenEdit"].Text)
+				this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : this.Control["serverTokenEdit"].Text)
 
 				this.connect()
 			case 4: ; Clear...
@@ -6049,10 +6051,10 @@ class RaceCenter extends ConfigurationItem {
 
 			data := readMultiMap(directory . "Race.data")
 
-			if (getMultiMapValue(data, "Cars", "Count") = "__NotInitialized__")
+			if (getMultiMapValue(data, "Cars", "Count") = kNotInitialized)
 				setMultiMapValue(data, "Cars", "Count", 0)
 
-			if (getMultiMapValue(data, "Cars", "Driver") = "__NotInitialized__")
+			if (getMultiMapValue(data, "Cars", "Driver") = kNotInitialized)
 				setMultiMapValue(data, "Cars", "Driver", 0)
 		}
 		else {

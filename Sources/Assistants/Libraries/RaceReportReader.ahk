@@ -558,7 +558,7 @@ numberValue(value) {
 	return (isNumber(value) ? value : (extendedIsNull(value) ? 0 : value))
 }
 
-correctEmptyValues(table, default := "__Undefined__") {
+correctEmptyValues(table, default := kUndefined) {
 	local line
 
 	loop table.Length {

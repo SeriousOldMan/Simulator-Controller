@@ -175,7 +175,7 @@ class Task {
 		}
 	}
 
-	__New(callable := false, sleep := "__Undefined__", priority := "__Undefined__") {
+	__New(callable := false, sleep := kUndefined, priority := kUndefined) {
 		if (callable && !isInstance(callable, Func))
 			throw "Non-function callable detected in Task.__New..."
 
@@ -296,7 +296,7 @@ class Task {
 		}
 	}
 
-	static startTask(theTask, sleep := "__Undefined__", priority := "__Undefined__") {
+	static startTask(theTask, sleep := kUndefined, priority := kUndefined) {
 		if isInstance(theTask, Task) {
 			if (sleep != kUndefined)
 				theTask.iNextExecution := (A_TickCount + sleep)
@@ -491,7 +491,7 @@ class Continuation extends Task {
 		}
 	}
 
-	__New(task := false, continuation := false, sleep := "__Undefined__", priority := "__Undefined__") {
+	__New(task := false, continuation := false, sleep := kUndefined, priority := kUndefined) {
 		if !task
 			task := Task.CurrentTask
 

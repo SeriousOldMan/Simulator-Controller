@@ -171,7 +171,7 @@ class VoiceManager {
 				this.speak(phrase, focus, cache)
 		}
 
-		number2Speech(number, precision := "__Undefined__") {
+		number2Speech(number, precision := kUndefined) {
 			static divider := false
 
 			if (precision != kUndefined)
@@ -310,7 +310,7 @@ class VoiceManager {
 				this.speak(phrase, focus, cache)
 		}
 
-		number2Speech(number, precision := "__Undefined__") {
+		number2Speech(number, precision := kUndefined) {
 			static divider := false
 
 			if (precision != kUndefined)

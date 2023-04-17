@@ -35,7 +35,7 @@ global kBuildConfiguration := "Production"
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceStrategist extends RaceStrategist {
-	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__"
+	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined
 		, service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
 		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 

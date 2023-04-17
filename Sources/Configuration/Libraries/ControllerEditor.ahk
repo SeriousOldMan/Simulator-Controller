@@ -255,7 +255,7 @@ class ControllerEditor extends ConfiguratorPanel {
 			}
 	}
 
-	show(x := "__Undefined__", y := "__Undefined__") {
+	show(x := kUndefined, y := kUndefined) {
 		local window := this.Window
 		local name, w, h
 

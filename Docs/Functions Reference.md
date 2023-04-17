@@ -61,6 +61,9 @@ Joins the given unlimited number of values using *delimiter* into one string. *v
 ## Collection Helper Functions ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
 Often used collection functions, that are not part of the AutoHotkey language.
 
+#### *toMap(values :: TypeUnion(Object, Map), class :: SubclassOf(Map))*
+Creates and returns an instance of *class* and propagates all values into this new map.
+
 #### *inList(list :: Array, value)*
 Returns the position of *value* in the given list or array, or *false*, if not found.
 

@@ -249,7 +249,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		VoiceCommands[key := "__Undefined__"] {
+		VoiceCommands[key := kUndefined] {
 			Get {
 				if (key != kUndefined)
 					return this.iVoiceCommands[key]
@@ -935,7 +935,7 @@ class VoiceServer extends ConfigurationItem {
 	registerVoiceClient(descriptor, routing, pid
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
-					  , speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined) {
 		local grammar, client, nextCharIndex, command, theDescriptor, ignore
 
 		static counter := 1

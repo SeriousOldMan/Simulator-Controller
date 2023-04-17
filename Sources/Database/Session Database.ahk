@@ -3857,7 +3857,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		static lastSimulator := false
 		static lastCar := false
 		static lastTrack := false
-		static lastCommunity := "__Undefined__"
+		static lastCommunity := kUndefined
 		static lastColor := "D0D0D0"
 
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)

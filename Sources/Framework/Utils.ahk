@@ -20,7 +20,7 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getControllerState(configuration := "__Undefined__") {
+getControllerState(configuration := kUndefined) {
 	local load := true
 	local pid, tries, options, exePath, fileName
 

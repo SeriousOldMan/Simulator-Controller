@@ -1830,7 +1830,7 @@ class DiscreteValuesHandler extends NumberHandler {
 		}
 	}
 
-	__New(zero := 0, increment := 1, minValue := "__Undefined__", maxValue := "__Undefined__") {
+	__New(zero := 0, increment := 1, minValue := kUndefined, maxValue := kUndefined) {
 		this.iZero := zero
 		this.iIncrement := increment
 		this.iMinValue := minValue
@@ -1869,7 +1869,7 @@ class DiscreteValuesHandler extends NumberHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RawHandler extends DiscreteValuesHandler {
-	__New(increment := 1, minValue := "__Undefined__", maxValue := "__Undefined__") {
+	__New(increment := 1, minValue := kUndefined, maxValue := kUndefined) {
 		super.__New(0, increment, minValue, maxValue)
 	}
 
@@ -1911,7 +1911,7 @@ class DecimalHandler extends DiscreteValuesHandler {
 		}
 	}
 
-	__New(zero := 0.0, increment := 1.0, precision := 0, minValue := "__Undefined__", maxValue := "__Undefined__") {
+	__New(zero := 0.0, increment := 1.0, precision := 0, minValue := kUndefined, maxValue := kUndefined) {
 		this.iPrecision := precision
 
 		super.__New(zero, increment, minValue, maxValue)
@@ -1940,7 +1940,7 @@ class FloatHandler extends DecimalHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ClicksHandler extends IntegerHandler {
-	__New(minValue := 0, maxValue := "__Undefined__") {
+	__New(minValue := 0, maxValue := kUndefined) {
 		super.__New(minValue, 1, minValue, maxValue)
 	}
 }

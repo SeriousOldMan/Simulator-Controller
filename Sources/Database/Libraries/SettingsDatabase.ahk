@@ -109,7 +109,7 @@ class SettingsDatabase extends SessionDatabase {
 				function.Call(simulator, car, track, weather, setting)
 	}
 
-	loadSettings(simulator, car, track, weather, community := "__Undefined__") {
+	loadSettings(simulator, car, track, weather, community := kUndefined) {
 		local settings := newMultiMap()
 		local id := this.ID
 		local dryPressure, wetPressure, ignore, tyre
@@ -143,7 +143,7 @@ class SettingsDatabase extends SessionDatabase {
 		return settings
 	}
 
-	readSettings(simulator, car, track, weather, inherited := true, community := "__Undefined__") {
+	readSettings(simulator, car, track, weather, inherited := true, community := kUndefined) {
 		local result := CaseInsenseMap()
 		local id := this.ID
 		local settings := []
@@ -174,7 +174,7 @@ class SettingsDatabase extends SessionDatabase {
 	}
 
 	readSettingValue(simulator, car, track, weather, section, key
-				   , default := false, inherited := true, community := "__Undefined__") {
+				   , default := false, inherited := true, community := kUndefined) {
 		local id := this.ID
 		local value
 

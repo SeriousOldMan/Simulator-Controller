@@ -76,11 +76,11 @@ class Condition {
 		throw "Virtual method Condition.match must be implemented in a subclass..."
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		throw "Virtual method Condition.toString must be implemented in a subclass..."
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		return this.toString(facts)
 	}
 }
@@ -109,7 +109,7 @@ class CompositeCondition extends Condition {
 			theCondition.getFacts(facts)
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		local conditions := []
 		local ignore, theCondition
 
@@ -119,7 +119,7 @@ class CompositeCondition extends Condition {
 		return values2String(", ", conditions*)
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local conditions := []
 		local ignore, theCondition
 
@@ -135,11 +135,11 @@ class CompositeCondition extends Condition {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Quantor extends CompositeCondition {
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		return "{" . this.Type . A_Space . super.toString(facts) . "}"
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local quantor := Object()
 
 		quantor[this.Type] := super.toObject(facts)
@@ -253,7 +253,7 @@ class Predicate extends Condition {
 		}
 	}
 
-	LeftPrimary[facts := "__NotInitialized__"] {
+	LeftPrimary[facts := kNotInitialized] {
 		Get {
 			if (facts != kNotInitialized)
 				return this.iLeftPrimary.getValue(facts)
@@ -268,7 +268,7 @@ class Predicate extends Condition {
 		}
 	}
 
-	RightPrimary[facts := "__NotInitialized__"] {
+	RightPrimary[facts := kNotInitialized] {
 		Get {
 			if ((facts != kNotInitialized) && (this.iRightPrimary != kNotInitialized))
 				return this.iRightPrimary.getValue(facts)
@@ -277,7 +277,7 @@ class Predicate extends Condition {
 		}
 	}
 
-	__New(leftPrimary, operator := "__NotInitialized__", rightPrimary := "__NotInitialized__") {
+	__New(leftPrimary, operator := kNotInitialized, rightPrimary := kNotInitialized) {
 		this.iLeftPrimary := leftPrimary
 		this.iOperator := operator
 		this.iRightPrimary := rightPrimary
@@ -367,14 +367,14 @@ class Predicate extends Condition {
 		}
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		if (this.Operator = kNotInitialized)
 			return ("[" . this.LeftPrimary.toString(facts) . "]")
 		else
 			return ("[" . this.LeftPrimary.toString(facts) . A_Space . this.Operator . A_Space . this.RightPrimary.toString(facts) "]")
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local predicate := Object()
 
 		if (this.Operator = kNotInitialized)
@@ -448,11 +448,11 @@ class Goal extends Condition {
 			return false
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		return ("{" . kProve . A_Space . this.Goal.toString() . "}")
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local predicate := Object()
 
 		predicate[kProve] := [this.Goal.toObject()]
@@ -466,11 +466,11 @@ class Goal extends Condition {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Primary extends Term {
-	getValue(factsOrResultSet, default := "__NotInitialized__") {
+	getValue(factsOrResultSet, default := kNotInitialized) {
 		return this
 	}
 
-	toString(factsOrResultSet := "__NotInitialized__") {
+	toString(factsOrResultSet := kNotInitialized) {
 		throw "Virtual method Primary.toString must be implemented in a subclass..."
 	}
 }
@@ -521,7 +521,7 @@ class Variable extends Primary {
 			throw "Subclassing of Variable is not allowed..."
 	}
 
-	getValue(variablesFactsOrResultSet, default := "__NotInitialized__") {
+	getValue(variablesFactsOrResultSet, default := kNotInitialized) {
 		local value
 
 		if (variablesFactsOrResultSet = kNotInitialized)
@@ -569,7 +569,7 @@ class Variable extends Primary {
 		}
 	}
 
-	toString(variablesFactsOrResultSet := "__NotInitialized__") {
+	toString(variablesFactsOrResultSet := kNotInitialized) {
 		local property := this.Property
 		local name := this.Variable
 		local root, value
@@ -628,7 +628,7 @@ class Fact extends Primary {
 			throw "Subclassing of Fact is not allowed..."
 	}
 
-	getValue(factsOrResultSet, default := "__NotInitialized__") {
+	getValue(factsOrResultSet, default := kNotInitialized) {
 		if isInstance(factsOrResultSet, Facts)
 			return factsOrResultSet.getValue(this.Fact, default)
 		else
@@ -644,7 +644,7 @@ class Fact extends Primary {
 			return false
 	}
 
-	toString(factsOrResultSet := "__NotInitialized__") {
+	toString(factsOrResultSet := kNotInitialized) {
 		if (factsOrResultSet = kNotInitialized)
 			return false
 		else if isInstance(factsOrResultSet, Facts)
@@ -690,7 +690,7 @@ class Literal extends Primary {
 			throw "Subclassing of Literal is not allowed..."
 	}
 
-	getValue(factsOrResultSet := "__NotInitialized__", *) {
+	getValue(factsOrResultSet := kNotInitialized, *) {
 		if (factsOrResultSet && (factsOrResultSet != kNotInitialized) && isInstance(factsOrResultSet, Facts))
 			return this.Literal
 		else
@@ -701,7 +701,7 @@ class Literal extends Primary {
 		return (this.iLiteral = kNotInitialized)
 	}
 
-	toString(factsOrResultSet := "__NotInitialized__") {
+	toString(factsOrResultSet := kNotInitialized) {
 		; return RegExReplace(this.Literal, "([^\\]) ", "$1\ ")
 		return this.Literal
 	}
@@ -725,7 +725,7 @@ class Action {
 		throw "Virtual method Action.execute must be implemented in a subclass..."
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		throw "Virtual method Action.toString must be implemented in a subclass..."
 	}
 }
@@ -744,7 +744,7 @@ class CallAction extends Action {
 		}
 	}
 
-	Function[variablesOrFacts := "__NotInitialized__"] {
+	Function[variablesOrFacts := kNotInitialized] {
 		Get {
 			if (variablesOrFacts = kNotInitialized)
 				return this.iFunction
@@ -753,7 +753,7 @@ class CallAction extends Action {
 		}
 	}
 
-	Arguments[variablesOrFacts := "__NotInitialized__"] {
+	Arguments[variablesOrFacts := kNotInitialized] {
 		Get {
 			if isNumber(variablesOrFacts)
 				return this.iArguments[variablesOrFacts]
@@ -803,7 +803,7 @@ class CallAction extends Action {
 		return values
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		local arguments := []
 		local ignore, argument
 
@@ -813,7 +813,7 @@ class CallAction extends Action {
 		return ("(" . this.Action . A_Space .  this.Function.toString(facts) . "(" . values2String(", ", arguments*) . "))")
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local action := Object()
 		local arguments := []
 		local ignore, argument
@@ -840,7 +840,7 @@ class ProveAction extends CallAction {
 		}
 	}
 
-	Functor[variablesOrFacts := "__NotInitialized__"] {
+	Functor[variablesOrFacts := kNotInitialized] {
 		Get {
 			return this.Function[variablesOrFacts]
 		}
@@ -898,7 +898,7 @@ class SetFactAction extends Action {
 	iFact := kNotInitialized
 	iValue := kNotInitialized
 
-	Fact[variablesOrFacts := "__NotInitialized__"] {
+	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
 			if (variablesOrFacts = kNotInitialized)
 				return this.iFact
@@ -907,7 +907,7 @@ class SetFactAction extends Action {
 		}
 	}
 
-	Value[variablesOrFacts := "__NotInitialized__"] {
+	Value[variablesOrFacts := kNotInitialized] {
 		Get {
 			if (variablesOrFacts = kNotInitialized)
 				return this.iValue
@@ -916,7 +916,7 @@ class SetFactAction extends Action {
 		}
 	}
 
-	__New(fact, value := "__NotInitialized__") {
+	__New(fact, value := kNotInitialized) {
 		this.iFact := fact
 		this.iValue := ((value = kNotInitialized) ? Literal(true) : value)
 	}
@@ -928,14 +928,14 @@ class SetFactAction extends Action {
 		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		if (this.Value == this.Fact)
 			return ("(Set: " . this.Fact.toString(facts) . ")")
 		else
 			return ("(Set: " . this.Fact.toString(facts) . ", " . this.Value.toString(facts) . ")")
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local action := Object()
 
 		if (this.Value == this.Fact)
@@ -955,7 +955,7 @@ class SetComposedFactAction extends Action {
 	iFact := kNotInitialized
 	iValue := kNotInitialized
 
-	Fact[variablesOrFacts := "__NotInitialized__"] {
+	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
 			local result, index, component
 
@@ -976,7 +976,7 @@ class SetComposedFactAction extends Action {
 		}
 	}
 
-	Value[variablesOrFacts := "__NotInitialized__"] {
+	Value[variablesOrFacts := kNotInitialized] {
 		Get {
 			if (variablesOrFacts = kNotInitialized)
 				return this.iValue
@@ -1005,7 +1005,7 @@ class SetComposedFactAction extends Action {
 		facts.setFact(fact, isInstance(this.Value, Variable) ? this.Value[variables] : this.Value[facts])
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		local fact := ""
 		local index, component
 
@@ -1019,7 +1019,7 @@ class SetComposedFactAction extends Action {
 		return ("(Set: " . fact . ", " . this.Value.toString(facts) . ")")
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local action := Object()
 		local fact := ""
 		local index, component
@@ -1044,7 +1044,7 @@ class SetComposedFactAction extends Action {
 class ClearFactAction extends Action {
 	iFact := kNotInitialized
 
-	Fact[variablesOrFacts := "__NotInitialized__"] {
+	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
 			if (variablesOrFacts = kNotInitialized)
 				return this.iFact
@@ -1063,11 +1063,11 @@ class ClearFactAction extends Action {
 		facts.clearFact(isInstance(this.Fact, Variable) ? this.Fact[variables] : this.Fact[facts])
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		return ("(Clear: " . this.Fact.toString(facts) . ")")
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local action := Object()
 
 		action[kClear] := this.Fact.toObject(facts)
@@ -1083,7 +1083,7 @@ class ClearFactAction extends Action {
 class ClearComposedFactAction extends Action {
 	iFact := kNotInitialized
 
-	Fact[variablesOrFacts := "__NotInitialized__"] {
+	Fact[variablesOrFacts := kNotInitialized] {
 		Get {
 			local result, index, component
 
@@ -1123,7 +1123,7 @@ class ClearComposedFactAction extends Action {
 		facts.clearFact(fact)
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		local fact := ""
 		local index, component
 
@@ -1137,7 +1137,7 @@ class ClearComposedFactAction extends Action {
 		return ("(Clear: " . fact . ")")
 	}
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		local action := Object()
 		local fact := ""
 		local index, component
@@ -1177,7 +1177,7 @@ class Term {
 			}
 		}
 
-		Arguments[resultSet := "__NotInitialized__"] {
+		Arguments[resultSet := kNotInitialized] {
 			Get {
 				if isNumber(resultSet)
 					return this.iArguments[resultSet]
@@ -1197,7 +1197,7 @@ class Term {
 				throw "Subclassing of Term.Complex is not allowed..."
 		}
 
-		toObject(resultSet := "__NotInitialized__") {
+		toObject(resultSet := kNotInitialized) {
 			local term := Map()
 			local arguments := []
 			local ignore, argument
@@ -1283,15 +1283,15 @@ class Term {
 		}
 	}
 
-	getValue(factsOrResultSet, default := "__NotInitialized__") {
+	getValue(factsOrResultSet, default := kNotInitialized) {
 		return this
 	}
 
-	toString(factsOrResultSet := "__NotInitialized__") {
+	toString(factsOrResultSet := kNotInitialized) {
 		throw "Virtual method Term.toString must be implemented in a subclass..."
 	}
 
-	toObject(factsOrResultSet := "__NotInitialized__") {
+	toObject(factsOrResultSet := kNotInitialized) {
 		return this.toString(factsOrResultSet)
 	}
 
@@ -1340,7 +1340,7 @@ class Struct extends Term.Complex {
 			throw "Subclassing of Struct is not allowed..."
 	}
 
-	toString(resultSet := "__NotInitialized__") {
+	toString(resultSet := kNotInitialized) {
 		local arguments := []
 		local ignore, argument
 
@@ -1363,7 +1363,7 @@ class Cut extends Term.Complex {
 			throw "Subclassing of Cut is not allowed..."
 	}
 
-	toString(resultSet := "__NotInitialized__") {
+	toString(resultSet := kNotInitialized) {
 		return "!"
 	}
 }
@@ -1380,7 +1380,7 @@ class Fail extends Term.Complex {
 			throw "Subclassing of Fail is not allowed..."
 	}
 
-	toString(resultSet := "__NotInitialized__") {
+	toString(resultSet := kNotInitialized) {
 		return "fail"
 	}
 }
@@ -1415,7 +1415,7 @@ class Pair extends Term {
 			throw "Subclassing of Pair is not allowed..."
 	}
 
-	toString(resultSet := "__NotInitialized__") {
+	toString(resultSet := kNotInitialized) {
 		local result := "["
 		local next := this
 		local left, right, separator
@@ -1441,7 +1441,7 @@ class Pair extends Term {
 		return (result . "]")
 	}
 
-	toObject(resultSet := "__NotInitialized__") {
+	toObject(resultSet := kNotInitialized) {
 		local list := []
 		local next := this
 
@@ -1518,11 +1518,11 @@ class Nil extends Term {
 			throw "Subclassing of Nil is not allowed..."
 	}
 
-	toString(resultSet := "__NotInitialized__") {
+	toString(resultSet := kNotInitialized) {
 		return "[]"
 	}
 
-	toObject(resultSet := "__NotInitialized__") {
+	toObject(resultSet := kNotInitialized) {
 		return []
 	}
 
@@ -1542,7 +1542,7 @@ class Variables {
 		this.iVariables[variable.Variable[true]] := value
 	}
 
-	getValue(variable, default := "__NotInitialized__") {
+	getValue(variable, default := kNotInitialized) {
 		local fullName := variable.Variable[true]
 
 		if this.iVariables.Has(fullName)
@@ -1563,7 +1563,7 @@ class Rule {
         }
     }
 
-	toObject(facts := "__NotInitialized__") {
+	toObject(facts := kNotInitialized) {
 		throw "Rules cannot be converted to objects in Rule.toObject..."
 	}
 }
@@ -1655,7 +1655,7 @@ class ProductionRule extends Rule {
 			return false
 	}
 
-	toString(facts := "__NotInitialized__") {
+	toString(facts := kNotInitialized) {
 		local priority := this.Priority
 		local conditions := ((priority != 0) ? ["Priority: " . priority] : [])
 		local actions := []
@@ -1704,7 +1704,7 @@ class ReductionRule extends Rule {
 		this.iHasVariables := this.hasVariables()
 	}
 
-	toString(resultSet := "__NotInitialized__") {
+	toString(resultSet := kNotInitialized) {
 		local tail := this.Tail
 		local terms, ignore, theTerm
 
@@ -1935,7 +1935,7 @@ class ResultSet {
 		}
 	}
 
-	getValue(var, default := "__NotInitialized__") {
+	getValue(var, default := kNotInitialized) {
 		local ruleEngine := this.RuleEngine
 		local bindings := this.iBindings
 		local last := default
@@ -2733,7 +2733,7 @@ class KnowledgeBase {
 		this.Facts.setValue(fact, value, propagate)
 	}
 
-	getValue(fact, default := "__NotInitialized__") {
+	getValue(fact, default := kNotInitialized) {
 		return this.Facts.getValue(fact, default)
 	}
 
@@ -2907,7 +2907,7 @@ class Facts {
 				throw "Unknown fact `"" . fact . "`" encountered in Facts.setValue..."
 	}
 
-	getValue(fact, default := "__NotInitialized__") {
+	getValue(fact, default := kNotInitialized) {
 		local facts := this.Facts
 
 		if isInstance(fact, Variable)
@@ -4012,31 +4012,31 @@ class RuleCompiler {
 		return this.createStructParser(goal).parse(goal)
 	}
 
-	createProductionRuleParser(condition, variables := "__NotInitialized__") {
+	createProductionRuleParser(condition, variables := kNotInitialized) {
 		return ProductionRuleParser(this, variables)
 	}
 
-	createReductionRuleParser(condition, variables := "__NotInitialized__") {
+	createReductionRuleParser(condition, variables := kNotInitialized) {
 		return ReductionRuleParser(this, variables)
 	}
 
-	createConditionParser(condition, variables := "__NotInitialized__") {
+	createConditionParser(condition, variables := kNotInitialized) {
 		return ConditionParser(this, variables)
 	}
 
-	createPredicateParser(predicate, variables := "__NotInitialized__") {
+	createPredicateParser(predicate, variables := kNotInitialized) {
 		return PredicateParser(this, variables)
 	}
 
-	createPrimaryParser(predicate, variables := "__NotInitialized__") {
+	createPrimaryParser(predicate, variables := kNotInitialized) {
 		return PrimaryParser(this, variables)
 	}
 
-	createActionParser(action, variables := "__NotInitialized__") {
+	createActionParser(action, variables := kNotInitialized) {
 		return ActionParser(this, variables)
 	}
 
-	createTermParser(term, variables := "__NotInitialized__", forArguments := true) {
+	createTermParser(term, variables := kNotInitialized, forArguments := true) {
 		local complex := isObject(term)
 
 		if ((term == "!") && !forArguments)
@@ -4057,7 +4057,7 @@ class RuleCompiler {
 		throw "Unexpected terms detected in RuleCompiler.createTermParser..."
 	}
 
-	createStructParser(term, variables := "__NotInitialized__") {
+	createStructParser(term, variables := kNotInitialized) {
 		return StructParser(this, variables)
 	}
 
@@ -4090,7 +4090,7 @@ class Parser {
 		}
 	}
 
-	__New(compiler, variables := "__NotInitialized__") {
+	__New(compiler, variables := kNotInitialized) {
 		this.iCompiler := compiler
 		this.iVariables := ((variables = kNotInitialized) ? CaseInsenseMap() : variables)
 	}

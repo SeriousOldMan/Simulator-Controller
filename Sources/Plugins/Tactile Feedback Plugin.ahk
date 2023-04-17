@@ -653,7 +653,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		local controller := this.Controller
 		local activeModes, pedalMode, chassisMode
 
-		static isRunning := "__Undefined__"
+		static isRunning := kUndefined
 
 		if (isRunning == kUndefined)
 			isRunning := !this.Application.isRunning()

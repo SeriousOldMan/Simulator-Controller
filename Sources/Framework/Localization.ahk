@@ -188,7 +188,7 @@ displayVolumeValue(liter, rnd) {
 	}
 }
 
-displayFloatValue(float, precision := "__Undefined__") {
+displayFloatValue(float, precision := kUndefined) {
 	if (precision = kUndefined)
 		return StrReplace(float, ".", getFloatSeparator())
 	else if (precision = 0)
@@ -303,7 +303,7 @@ internalVolumeValue(value, rnd) {
 	}
 }
 
-internalFloatValue(value, precision := "__Undefined__") {
+internalFloatValue(value, precision := kUndefined) {
 	if (precision = kUndefined)
 		return StrReplace(value, getFloatSeparator(), ".")
 	else

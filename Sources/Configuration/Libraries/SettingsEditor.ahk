@@ -225,7 +225,7 @@ editModes(&settingsOrCommand, arguments*) {
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
+editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x := kUndefined, y := kUndefined) {
 	global kSave, kCancel, kContinue, kUpdate, kEditModes
 
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions

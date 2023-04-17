@@ -120,6 +120,30 @@ Called during resizing to redraw parts of the window. If you want the redraw to 
 	
 ***
 
+# Collections Classes
+
+This part of the framework define a couple of convinience collection classes to achieve special behaviour when accessing collection elements. Some of this bahviour mimics that of the previous AutoHotkey language version, thereby preserving the functionality of the applications implementation.
+
+## CaseSenseMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Defines a hash map, that uses case sensitive keys. Actually the standard of the builtin *Map* class, but the name of the class documments this property.
+
+## CaseInsenseMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Defines a hash map, that uses case insensitive keys, which was the dfault behaviour of the object properties in AutoHotkey V1.
+
+## WeakArray ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Implements an array which returns an empty string, rather than throwing an error, when a non-existent index is accessed.
+
+## WeakMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Returns a (case sensitive) hash map, which returns an empty string, rather than throwing an error, when a non-existent key is used. Beside that, integers and strings containing integers are considered as similar, when used as keys.
+
+## CaseSenseWeakMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Synonymous to *WeakMap*.
+
+## CaseInsenseWeakMap ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
+Adds the case insensitive property to "WeakMap*.
+
+***
+
 # Configuration Classes
 
 The following classes are defined in the [Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described [further down below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).

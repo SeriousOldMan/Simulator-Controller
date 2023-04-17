@@ -479,7 +479,7 @@ class Window extends Gui {
 	}
 
 	ApplyTheme() {
-		this.BackColor := "D8D8D8"
+		this.BackColor := "D0D0D0"
 	}
 
 	ApplyThemeOptions(type, options) {
@@ -491,8 +491,6 @@ class Window extends Gui {
 					options .= " BackgroundD8D8D8"
 				case "Edit":
 					options .= " BackgroundE0E0E0"
-				case "Edit":
-					options .= " BackgroundWhite"
 				case "Button":
 					options .= " BackgroundCCCCCC"
 			}
@@ -782,7 +780,7 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 }
 
 fixIE(version := 0, exeName := "") {
-	local previousValue
+	local previousValue := ""
 
 	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
 	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
@@ -797,7 +795,12 @@ fixIE(version := 0, exeName := "") {
 			SplitPath(A_AhkPath, &exeName)
 	}
 
-	previousValue := RegRead("HKCU\" . key, exeName, "")
+	try {
+		previousValue := RegRead("HKCU\" . key, exeName, "")
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
 
 	try {
 		if (version = "") {

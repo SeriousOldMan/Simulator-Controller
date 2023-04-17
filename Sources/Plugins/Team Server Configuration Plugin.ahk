@@ -432,7 +432,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		x7 := x6 + 24
 
 		widget23 := window.Add("Text", "x" . x0 . " yp+24 w90 h23 +0x200 Hidden", translate("Team"))
-		widget24 := window.Add("DropDownList", "x" . x1 . " yp w" . w3 . " W:Grow(0.5) AltSubmit vteamDropDownList Hidden")
+		widget24 := window.Add("DropDownList", "x" . x1 . " yp w" . w3 . " W:Grow(0.5) vteamDropDownList Hidden")
 		widget24.OnEvent("Change", selectTeam)
 		widget25 := window.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 X:Move(0.5) vaddTeamButton Hidden")
 		widget25.OnEvent("Click", newTeam)
@@ -447,7 +447,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		widget28 := window.Add("Text", "x" . x0 . " yp+26 w90 h23 +0x200 Hidden", translate("Drivers"))
 
 		widget29:= window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h96 AltSubmit H:Grow(0.3) W:Grow(0.5) vdriverListBox Hidden")
-		widget29.OnEvent("DoubleClick", selectDriver.Bind("DoubleClick"))
+		widget29.OnEvent("DoubleClick", selectDriver)
 
 		widget30 := window.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 X:Move(0.5) vaddDriverButton Hidden")
 		widget30.OnEvent("Click", newDriver)
@@ -462,7 +462,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		widget33 := window.Add("Text", "x" . x0 . " yp+92 w90 h23 Y:Move(0.3) +0x200 Hidden", translate("Sessions"))
 
 		widget34 := window.Add("ListBox", "x" . x1 . " yp w" . w3 . " h72 AltSubmit Y:Move(0.3) H:Grow(0.7) W:Grow(0.5) vsessionListBox Hidden")
-		widget34.OnEvent("DoubleClick", selectSession.Bind("DoubleClick"))
+		widget34.OnEvent("DoubleClick", selectSession)
 
 		widget35 := window.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 X:Move(0.5) Y:Move(0.3) vaddSessionButton Hidden")
 		widget35.OnEvent("Click", newSession)
@@ -820,7 +820,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 
 		for name, identifier in this.Sessions {
 			try {
-				stints := string2Values(";", connector.GetSessionStints(identifier)).Length()
+				stints := string2Values(";", connector.GetSessionStints(identifier)).Length
 			}
 			catch Any as exception {
 				stints := 0

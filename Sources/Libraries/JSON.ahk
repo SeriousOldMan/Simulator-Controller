@@ -135,8 +135,7 @@ class JSON {
 			If !(obj is Array || obj is Map || obj is String || obj is Number)
 				throw Error("Object type not supported.", -1, Format("<Object at 0x{:p}>", ObjPtr(obj)))
 
-			if isInteger(indent)
-			{
+			if isInteger(indent) {
 				if (indent < 0)
 					throw Error("Indent parameter must be a postive integer.", -1, indent)
 				spaces := indent, indent := ""

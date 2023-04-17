@@ -1173,7 +1173,7 @@ startupVoiceServer() {
 	index := 1
 
 	while (index < A_Args.Length) {
-		switch A_Args[index] {
+		switch A_Args[index], false {
 			case "-Debug":
 				debug := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false)
 				index += 2

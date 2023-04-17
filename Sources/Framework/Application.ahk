@@ -165,7 +165,7 @@ requestShareSessionDatabaseConsent() {
 				if (getFileNames("Consent.*", kTranslationsDirectory).Length > 0)
 					result := consentDialog(id, consent)
 				else {
-					result := {}
+					result := CaseInsenseMap()
 
 					result["TyrePressures"] := "Retry"
 					result["RaceStrategies"] := "Retry"

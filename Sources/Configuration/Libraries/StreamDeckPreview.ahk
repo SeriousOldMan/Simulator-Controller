@@ -64,7 +64,7 @@ class StreamDeckPreview extends ControllerPreview {
 		local layout := getMultiMapValue(configuration, "Layouts", this.Name . ".Layout", "Standard")
 		local row, columns, column, button, icon, label, mode
 
-		switch layout {
+		switch layout, false {
 			case "Mini":
 				layout := [2, 3]
 			case "Standard":

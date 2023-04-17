@@ -779,27 +779,27 @@ initializeTactileFeedbackPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 enablePedalVibration() {
-	withProtection("activatePedalVibration")
+	withProtection(activatePedalVibration)
 }
 
 disablePedalVibration() {
-	withProtection("deactivatePedalVibration")
+	withProtection(deactivatePedalVibration)
 }
 
 enableFrontChassisVibration() {
-	withProtection("activateFrontChassisVibration")
+	withProtection(activateFrontChassisVibration)
 }
 
 disableFrontChassisVibration() {
-	withProtection("deactivateFrontChassisVibration")
+	withProtection(deactivateFrontChassisVibration)
 }
 
 enableRearChassisVibration() {
-	withProtection("activateRearChassisVibration")
+	withProtection(activateRearChassisVibration)
 }
 
 disableRearChassisVibration() {
-	withProtection("deactivateRearChassisVibration")
+	withProtection(deactivateRearChassisVibration)
 }
 
 

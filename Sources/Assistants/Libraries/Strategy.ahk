@@ -2960,8 +2960,7 @@ class Strategy extends ConfigurationItem {
 		pitstopRule := this.PitstopRule
 		numPitstops := pitstopRule
 
-		if isInteger(numPitstops)
-		{
+		if isInteger(numPitstops) {
 			if (numPitstops > 1) {
 				fuelLaps := Max(0, (currentFuel / fuelConsumption) - 1)
 				canonicalStintLaps := Round(sessionLaps / (numPitstops + 1))

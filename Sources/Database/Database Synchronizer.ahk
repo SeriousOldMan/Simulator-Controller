@@ -165,8 +165,7 @@ uploadSessionDatabase(id, uploadPressures, uploadSetups, uploadStrategies) {
 
 											directory := kTempDirectory . "Shared Database\Community\" . simulator . "\" . car . "\" . track . "\Race Strategies\"
 
-											loop Files, directory . "*.info", "F"
-											{
+											loop Files, directory . "*.info", "F" {
 												SplitPath(A_LoopFileName, , , , &name)
 
 												info := sessionDB.readStrategyInfo(simulator, car, track, name)

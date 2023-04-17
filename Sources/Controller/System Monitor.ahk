@@ -902,7 +902,7 @@ systemMonitor(command := false, arguments*) {
 		choices := kLogLevelNames
 		chosen := getLogLevel()
 
-		logLevelDropDown := systemMonitorGui.Add("DropDownList", "x689 yp-1 w91 AltSubmit Choose" . chosen, collect(choices, translate))
+		logLevelDropDown := systemMonitorGui.Add("DropDownList", "x689 yp-1 w91 Choose" . chosen, collect(choices, translate))
 		logLevelDropDown.OnEvent("Change", chooseLogLevel)
 
 		/*

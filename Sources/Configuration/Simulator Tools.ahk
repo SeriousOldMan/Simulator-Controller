@@ -217,7 +217,7 @@ installOptions(options, *) {
 		disabled := (options.Update ? "Disabled" : "")
 
 		installGui.Add("Text", "x16 yp+60 w100 h23 +0x200", translate("Installation Type"))
-		installGui.Add("DropDownList", "x116 yp w80 AltSubmit " . disabled . " Choose" . chosen . " vinstallationTypeDropDown", collect(["Registry", "Portable"], translate))
+		installGui.Add("DropDownList", "x116 yp w80 " . disabled . " Choose" . chosen . " vinstallationTypeDropDown", collect(["Registry", "Portable"], translate))
 
 		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Installation Folder"))
 		installGui.Add("Edit", "x116 yp w187 h21 " . disabled . " vinstallLocationPathEdit", options.InstallLocation)
@@ -1239,7 +1239,7 @@ editTargets(command := "", *) {
 		chosen := inList(["Development", "Production"], gTargetConfiguration)
 
 		targetsGui.Add("Text", "X10 Y" . yPos, translate("Target"))
-		targetsGui.Add("DropDownList", "X110 YP-5 w310 AltSubmit Choose" . chosen . " vtargetConfiguration", collect(["Development", "Production"], translate))
+		targetsGui.Add("DropDownList", "X110 YP-5 w310 Choose" . chosen . " vtargetConfiguration", collect(["Development", "Production"], translate))
 
 		themes := getAllThemes()
 		chosen := (gSplashTheme ? inList(themes, gSplashTheme) + 1 : 1)
@@ -1375,7 +1375,7 @@ updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false)
 			else {
 				bundledDefinitions := readMultiMap(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
 
-				if (bundledDefinitions.Count() == 0)
+				if (bundledDefinitions.Count == 0)
 					bundledDefinitions := enDefinitions
 			}
 

@@ -304,7 +304,7 @@ class ThemesList extends ConfigurationItemList {
 		window.Add("Edit", "x110 y270 w140 h21 Y:Move W:Grow(0.5) VthemeNameEdit")
 
 		window.Add("Text", "x16 y294 w86 h23 +0x200 Y:Move", translate("Type"))
-		window.Add("DropDownList", "x110 y294 w140 Y:Move W:Grow(0.5) AltSubmit VthemeTypeDropDown", [translate("Picture Carousel"), translate("Video")]).OnEvent("Change", updateThemesEditorState)
+		window.Add("DropDownList", "x110 y294 w140 Y:Move W:Grow(0.5) VthemeTypeDropDown", [translate("Picture Carousel"), translate("Video")]).OnEvent("Change", updateThemesEditorState)
 
 		window.Add("Text", "x16 y318 w160 h23 Y:Move +0x200", translate("Sound File"))
 		window.Add("Button", "x85 y317 w23 h23 Y:Move vplaySoundFileButton").OnEvent("Click", togglePlaySoundFile)

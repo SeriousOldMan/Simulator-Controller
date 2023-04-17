@@ -426,7 +426,7 @@ class ControlsList extends ConfigurationItemList {
 
 		window.Add("Text", "x164 y79 w80 h23 X:Move(0.2) +0x200", translate("Name"))
 		window.Add("Edit", "x214 y80 w101 h21 X:Move(0.2) W:Grow(0.3) VcontrolNameEdit")
-		window.Add("DropDownList", "x321 y79 w105 X:Move(0.5) W:Grow(0.5) AltSubmit Choose1 VcontrolTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Dial"], translate))
+		window.Add("DropDownList", "x321 y79 w105 X:Move(0.5) W:Grow(0.5) Choose1 VcontrolTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Dial"], translate))
 
 		window.Add("Text", "x164 y103 w80 h23 X:Move(0.2) +0x200", translate("Image"))
 		window.Add("Edit", "x214 y103 w186 h21 X:Move(0.2) W:Grow(0.8) VimageFilePathEdit")
@@ -755,7 +755,7 @@ class LayoutsList extends ConfigurationItemList {
 
 		window.Add("Text", "x8 y445 w86 h23 +0x200", translate("Name && Type"))
 		window.Add("Edit", "x102 y445 w110 h21 W:Grow(0.2) VlayoutNameEdit")
-		window.Add("DropDownList", "x215 y445 w117 X:Move(0.2) W:Grow(0.2) AltSubmit Choose1 VlayoutTypeDropDown", collect(["Button Box", "Stream Deck"], translate)).OnEvent("Change", chooseLayoutType)
+		window.Add("DropDownList", "x215 y445 w117 X:Move(0.2) W:Grow(0.2) Choose1 VlayoutTypeDropDown", collect(["Button Box", "Stream Deck"], translate)).OnEvent("Change", chooseLayoutType)
 
 		bbWidget1 := window.Add("Text", "x8 y469 w86 h23 +0x200 Section", translate("Visible"))
 		bbWidget2 := window.Add("CheckBox", "x102 y469 w110 h21 Checked VlayoutVisibleCheck")
@@ -796,7 +796,7 @@ class LayoutsList extends ConfigurationItemList {
 		bbWidget17 := window.Add("Edit", "x365 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutBottomMarginEdit")
 		bbWidget17.OnEvent("Change", updateLayoutRowEditor)
 
-		window.Add("DropDownList", "x8 y534 w86 AltSubmit Choose0 VlayoutRowDropDown", ["", ""]).OnEvent("Change", updateLayoutRowEditor)
+		window.Add("DropDownList", "x8 y534 w86 Choose0 VlayoutRowDropDown", ["", ""]).OnEvent("Change", updateLayoutRowEditor)
 
 		window.Add("Edit", "x102 y534 w330 h50 W:Grow Disabled VlayoutRowEdit")
 
@@ -804,7 +804,7 @@ class LayoutsList extends ConfigurationItemList {
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 
 		sdWidget1 := window.Add("Text", "x8 ys w86 h23 +0x200", translate("Layout"))
-		sdWidget2 := window.Add("DropDownList", "x102 yp w110 W:Grow(0.2) AltSubmit Choose2 VlayoutDropDown", collect(["Mini", "Standard", "XL", "Plus"], translate))
+		sdWidget2 := window.Add("DropDownList", "x102 yp w110 W:Grow(0.2) Choose2 VlayoutDropDown", collect(["Mini", "Standard", "XL", "Plus"], translate))
 		sdWidget2.OnEvent("Change", chooseLayout)
 
 		sdWidget3 := window.Add("Button", "x102 yp+30 w230 h23 W:Grow(0.4) Center", translate("Edit Display Rules..."))
@@ -1765,7 +1765,7 @@ class DisplayRulesEditor extends ConfiguratorPanel {
 		}
 
 		rulesGui.Add("Text", "x8 yp+30 w80 h23 +0x200", translate("Layout"))
-		rulesGui.Add("DropDownList", "x90 yp w150 W:Grow(0.3) AltSubmit Choose" . chosen . " VdisplayRuleLayoutDropDown", layouts).OnEvent("Change", chooseDisplayRuleLayout)
+		rulesGui.Add("DropDownList", "x90 yp w150 W:Grow(0.3) Choose" . chosen . " VdisplayRuleLayoutDropDown", layouts).OnEvent("Change", chooseDisplayRuleLayout)
 
 		disabled := ""
 
@@ -1777,7 +1777,7 @@ class DisplayRulesEditor extends ConfiguratorPanel {
 			chosen := 1
 
 		rulesGui.Add("Text", "x8 yp+24 w80 h23 +0x200", translate("Button"))
-		rulesGui.Add("DropDownList", "x90 yp w150 W:Grow(0.3) AltSubmit " . disabled . " Choose" . chosen . " vdisplayRuleButtonDropDown", [translate("All Buttons")]).OnEvent("Change", chooseDisplayRuleButton)
+		rulesGui.Add("DropDownList", "x90 yp w150 W:Grow(0.3) " . disabled . " Choose" . chosen . " vdisplayRuleButtonDropDown", [translate("All Buttons")]).OnEvent("Change", chooseDisplayRuleButton)
 
 		this.iDisplayRulesList.createGui(this, configuration)
 
@@ -1947,7 +1947,7 @@ class DisplayRulesList extends ConfigurationItemList {
 		window.Add("ListView", "x8 yp+30 w316 h120 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VdisplayRulesListView", collect(["Rule", "Icon"], translate))
 
 		window.Add("Text", "x8 yp+126 w80 h23 Y:Move +0x200", translate("Rule"))
-		window.Add("DropDownList", "x90 yp w150 Y:Move W:Grow(0.3) AltSubmit Choose1 VdisplayRuleDropDown", collect(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], translate))
+		window.Add("DropDownList", "x90 yp w150 Y:Move W:Grow(0.3) Choose1 VdisplayRuleDropDown", collect(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], translate))
 
 		window.Add("Text", "x8 yp+24 w80 h23 Y:Move +0x200", translate("Icon"))
 		window.Add("Edit", "x90 yp w211 h21 Y:Move W:Grow ViconFilePathEdit")

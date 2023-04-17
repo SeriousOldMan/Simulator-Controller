@@ -180,7 +180,7 @@ class PressuresEditor {
 		pressuresEditorGui.Add("Text", "x16 yp+20 w85 h23 +0x200", translate("Compound"))
 
 		pressuresEditorGui.Add("DropDownList", "x96 yp w100 vcompoundDropDown", compounds).OnEvent("Change", chooseCompound)
-		pressuresEditorGui.Add("DropDownList", "x205 yp w60 AltSubmit vtemperaturesDropDown").OnEvent("Change", chooseTemperatures)
+		pressuresEditorGui.Add("DropDownList", "x205 yp w60 vtemperaturesDropDown").OnEvent("Change", chooseTemperatures)
 
 		pressuresEditorGui.Add("Text", "x270 yp w140 h23 +0x200", substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)}))
 

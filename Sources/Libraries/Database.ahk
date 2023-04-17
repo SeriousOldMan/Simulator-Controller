@@ -286,14 +286,8 @@ class Database {
 		local tries := 10
 		local row, directory, fileName, ignore, column, value, newValues, file
 
-		if !isInstance(values, Database.Row) {
-			newValues := Database.Row()
-
-			for column, value in values.OwnProps()
-				newValues[column] := value
-
-			values := newValues
-		}
+		if !isInstance(values, Database.Row)
+			values := toMap(values, Database.Row)
 
 		this.Tables[name].Push(values)
 
@@ -341,16 +335,8 @@ class Database {
 		local ignore, key, value, result, where
 
 		query := query.Clone()
-		where := query.Where
 
-		if isInstance(where, Map)
-			where := where.Clone()
-		else {
-			where := CaseInsenseMap()
-
-			for key, value in query.Where.OwnProps()
-				where[key] := value
-		}
+		where := (isInstance(query.Where, Map) ? query.Where.Clone() : toMap(query.Where, CaseInsenseMap))
 
 		query.Where := where
 

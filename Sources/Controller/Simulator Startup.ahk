@@ -743,8 +743,7 @@ cancelStartup(*) {
 				msgResult := MsgBox(translate("Cancel Startup?"), translate("Startup"), 262180)
 				OnMessage(0x44, translateYesNoButtons, 0)
 
-				if (msgResult = "Yes")
-				{
+				if (msgResult = "Yes") {
 					if (startupManager.ControllerPID != 0)
 						messageSend(kFileMessage, "Startup", "stopStartupSong", startupManager.ControllerPID)
 

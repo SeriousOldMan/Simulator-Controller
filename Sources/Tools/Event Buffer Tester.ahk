@@ -92,7 +92,7 @@ selectCommand(title := "Event Buffer Tester", x := "Center", y := "Center", widt
 		Gui EBT:Add, DropDownList, x100 yp w191 Choose%simulator% vselectedSimulator, % values2String("|", simulators*)
 
 		Gui EBT:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Event Mode")
-		Gui EBT:Add, DropDownList, x100 yp w191 AltSubmit Choose1 veventMode, Event|Input|Play|Raw|Default
+		Gui EBT:Add, DropDownList, x100 yp w191 Choose1 veventMode, Event|Input|Play|Raw|Default
 
 		Gui EBT:Add, Text, x16 yp+24 w70 h23 +0x200, % translate("Hotkey")
 		Gui EBT:Add, Edit, x100 yp w50 vhotKey

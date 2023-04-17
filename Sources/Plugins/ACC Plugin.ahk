@@ -1536,8 +1536,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			imageX := kUndefined
 			imageY := kUndefined
 
-			loop compoundLabels.Length
-			{
+			loop compoundLabels.Length {
 				compoundLabel := compoundLabels[A_Index]
 
 				if !this.iPSImageSearchArea

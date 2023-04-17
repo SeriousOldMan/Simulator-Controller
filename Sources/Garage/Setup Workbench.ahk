@@ -460,7 +460,7 @@ class SetupWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		workbenchGui.Add("DropDownList", "x100 yp w196 AltSubmit Disabled Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
+		workbenchGui.Add("DropDownList", "x100 yp w196 Disabled Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
 
 		workbenchGui.Add("Button", "x305 ys+49 w94 h94 Disabled veditSetupButton").OnEvent("Click", editSetup)
 		setButtonIcon(workbenchGui["editSetupButton"], kIconsDirectory . "Car Setup.ico", 1, "W64 H64")

@@ -232,7 +232,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chosen := 0
 
 		widget3 := window.Add("Text", "x" . x . " yp+32 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
-		widget4 := window.Add("DropDownList", "AltSubmit x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceSynthesizerDropDown Hidden", choices)
+		widget4 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceSynthesizerDropDown Hidden", choices)
 		widget4.LastValue := chosen
 		widget4.OnEvent("Change", chooseVoiceSynthesizer)
 
@@ -277,7 +277,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		chosen := 0
 
 		widget18 := window.Add("Text", "x" . x . " yp+42 w110 h23 +0x200 vvoiceRecognizerLabel Hidden", translate("Speech Recognizer"))
-		widget19 := window.Add("DropDownList", "AltSubmit x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceRecognizerDropDown Hidden", choices)
+		widget19 := window.Add("DropDownList", "x" . x1 . " yp w160 W:Grow(0.3) Choose" . chosen . "  VvoiceRecognizerDropDown Hidden", choices)
 		widget19.LastValue := chosen
 		widget19.OnEvent("Change", chooseVoiceRecognizer)
 

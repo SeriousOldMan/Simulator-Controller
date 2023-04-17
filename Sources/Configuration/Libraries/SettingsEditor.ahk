@@ -490,7 +490,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 
 		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "Popup Position", "Bottom")
 
-		lastPositions := map()
+		lastPositions := CaseInsenseMap()
 
 		for descriptor, value in getMultiMapValues(settingsOrCommand, "Button Box")
 			if InStr(descriptor, ".Position.")

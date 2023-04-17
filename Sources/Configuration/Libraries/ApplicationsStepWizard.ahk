@@ -26,7 +26,7 @@ class ApplicationsStepWizard extends StepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local definition := this.Definition
-		local groups := map()
+		local groups := CaseInsenseMap()
 		local simulators := []
 		local stdApplications := []
 		local ignore, applications, theApplication, descriptor, exePath, workingDirectory, hooks, group

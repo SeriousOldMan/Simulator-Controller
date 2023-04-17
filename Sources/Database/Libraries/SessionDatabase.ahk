@@ -1271,7 +1271,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		compounds := collect(collect(availableTyreCompounds, compound), normalizeCompound)
 
-		switch weather {
+		switch weather, false {
 			case "Dry":
 				tyreCompound := "Dry"
 			case "Drizzle", "LightRain":

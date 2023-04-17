@@ -94,8 +94,8 @@ Returns a list of all values in the given map in the order of their keys.
 #### *combine(#rest maps :: Map)*
 Returns a freshly allocated map containing all the key/value pairs of all supplied maps. The maps are processed from left to right, which is important in case of duplicate keys.
 
-#### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
-Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
+#### *bubbleSort(ByRef array :: Array, comparator :: Function := numberGreater)*
+Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply. The default for *comparator* compares numbers. A function named *strGreater* exists, which can be used for string arrays.
 
 ***
 
@@ -273,6 +273,9 @@ You can call this function from a click handler of a GUI element. It will move t
 
 #### *getWindowPosition(descriptor :: String, ByRef x :: Integer, ByRef y :: Integer)*
 Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.
+
+#### *getWindowSize(descriptor :: String, ByRef w :: Integer, ByRef h :: Integer)*
+Retrieves the size of a window identified by the given *descriptor*, once it has been resized by the user. If a size is known, *getWindowSize* return *true* and *w* and *h* will be set. This will work only with instances of the [Window](*) class.
 
 #### *setButtonIcon(buttonHandle :: Handle, file :: String)*
 Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.

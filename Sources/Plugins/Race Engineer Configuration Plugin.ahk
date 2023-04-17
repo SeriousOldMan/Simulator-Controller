@@ -91,11 +91,11 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 		widget5 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("@ Session Begin"))
 		choices := collect(["Load from previous Session", "Load from Database"], translate)
-		widget6 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow AltSubmit vreLoadSettingsDropDown Hidden", choices)
+		widget6 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow vreLoadSettingsDropDown Hidden", choices)
 
 		widget7 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("@ Session End"))
 		choices := collect(["Ask", "Always save", "No action"], translate)
-		widget8 := window.Add("DropDownList", "x" . x1 . " yp w140 W:Grow(0.3) AltSubmit vreSaveSettingsDropDown Hidden", choices)
+		widget8 := window.Add("DropDownList", "x" . x1 . " yp w140 W:Grow(0.3) vreSaveSettingsDropDown Hidden", choices)
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")
@@ -106,11 +106,11 @@ class RaceEngineerConfigurator extends ConfiguratorPanel {
 
 		widget10 := window.Add("Text", "x" . x0 . " yp+17 w120 h23 +0x200 Hidden", translate("@ Session Begin"))
 		choices := collect(["Load from Settings", "Load from Database", "Import from Simulator", "Use initial pressures"], translate)
-		widget11 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow AltSubmit Choose1 vreLoadTyrePressuresDropDown Hidden", choices)
+		widget11 := window.Add("DropDownList", "x" . x1 . " yp w" . w1 . " W:Grow Choose1 vreLoadTyrePressuresDropDown Hidden", choices)
 
 		widget12 := window.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200 Hidden", translate("@ Session End"))
 		choices := collect(["Ask", "Always save", "No action"], translate)
-		widget13 := window.Add("DropDownList", "x" . x1 . " yp w140 W:Grow(0.3) AltSubmit vreSaveTyrePressuresDropDown Hidden", choices)
+		widget13 := window.Add("DropDownList", "x" . x1 . " yp w140 W:Grow(0.3) vreSaveTyrePressuresDropDown Hidden", choices)
 
 		window.SetFont("Norm", "Arial")
 		window.SetFont("Italic", "Arial")

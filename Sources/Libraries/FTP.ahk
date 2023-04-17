@@ -207,10 +207,12 @@ class FTP {
 		result["LastAccessTime"]    := FTP.fileTime(NumGet(WIN32_FIND_DATA, 12, "uint64"))
 		result["LastWriteTime"]     := FTP.fileTime(NumGet(WIN32_FIND_DATA, 20, "uint64"))
 		result["FileSize"]          := FTP.formatBytes((NumGet(WIN32_FIND_DATA, 28, "uint") * (MAXDWORD + 1)) + NumGet(WIN32_FIND_DATA, 32, "uint"), sizeFormat, sizeSuffix)
-		try
+		try {
 			result["FileName"]      := StrGet(WIN32_FIND_DATA.Ptr + 44, MAX_PATH, "utf-16")
-		catch Any
+		}
+		catch Any {
 			result["FileName"]      := ""
+		}
 
 		try {
 			result["AlternateFileName"] := StrGet(WIN32_FIND_DATA.Ptr + 44 + MAX_PATH, MAX_PATH, "utf-16")

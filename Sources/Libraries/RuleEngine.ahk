@@ -3506,8 +3506,7 @@ class RuleCompiler {
 				reductions := []
 		}
 
-		loop Parse, text, "`n", "`r"
-		{
+		loop Parse, text, "`n", "`r" {
 			line := Trim(A_LoopField)
 
 			if (InStr(line, "#Include") == 1) {

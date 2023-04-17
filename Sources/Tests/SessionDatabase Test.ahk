@@ -68,7 +68,7 @@ class PressuresAssert extends DatabaseTest {
 
 		if pressures
 			for tyre, pressureInfo in pressures {
-				switch tyre {
+				switch tyre, false {
 					case "FL":
 						this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
 					case "FR":
@@ -91,7 +91,7 @@ class PressuresAssert extends DatabaseTest {
 
 		if pressures
 			for tyre, pressureInfo in pressures {
-				switch tyre {
+				switch tyre, false {
 					case "FL":
 						this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
 					case "FR":

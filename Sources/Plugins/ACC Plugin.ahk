@@ -519,7 +519,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			super.sendCommand(command)
 	}
 
-	openPitstopMFD(descriptor := false, update := "__Undefined__") {
+	openPitstopMFD(descriptor := false, update := kUndefined) {
 		local car, track, settings, imgSearch, wasOpen
 
 		static reported := false
@@ -1536,8 +1536,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			imageX := kUndefined
 			imageY := kUndefined
 
-			loop compoundLabels.Length
-			{
+			loop compoundLabels.Length {
 				compoundLabel := compoundLabels[A_Index]
 
 				if !this.iPSImageSearchArea

@@ -1033,7 +1033,7 @@ class SetupWizard extends ConfiguratorPanel {
 			else
 				index := this.Steps[this.Step] + 1
 
-			Loop{
+			loop {
 				if (index > this.Count)
 					return false
 				else {
@@ -1308,7 +1308,7 @@ class SetupWizard extends ConfiguratorPanel {
 		local presets := []
 		local class, arguments, outerclass
 
-		Loop knowledgeBase.getValue("Preset.Count", 0) {
+		loop knowledgeBase.getValue("Preset.Count", 0) {
 			class := knowledgeBase.getValue("Preset." . A_Index . ".Class")
 			arguments := string2Values("###", knowledgeBase.getValue("Preset." . A_Index . ".Arguments"))
 
@@ -2783,7 +2783,7 @@ findSoftware(definition, software) {
 
 						if (installPath != "") {
 							try {
-								script := Fileread(installPath "\steamapps\libraryfolders.vdf")
+								script := FileRead(installPath . "\steamapps\libraryfolders.vdf")
 
 								jsScript := convertVDF2JSON(script)
 
@@ -2845,7 +2845,7 @@ fadeOut(delay := 200) {
 	else {
 		currentVolume := masterVolume
 
-		Loop{
+		loop {
 			currentVolume -= 5
 
 			if (currentVolume <= 0)

@@ -924,7 +924,7 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 	}
 
-	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
+	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Spotter", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
@@ -2011,7 +2011,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local opponentType, delta, deltaDifference, lapDifference, lapTimeDifference, car, remaining, speaker, rnd
 		local unsafe, driverPitstops, carPitstops
 
-		static lapUpRangeThreshold := "__Undefined__"
+		static lapUpRangeThreshold := kUndefined
 		static lapDownRangeThreshold := false
 		static frontAttackThreshold := false
 		static frontGainThreshold := false
@@ -2900,8 +2900,8 @@ class RaceSpotter extends GridRaceAssistant {
 		local gapAhead, gapBehind, lap, lastPitstop, result
 
 		static adjustGaps := true
-		static lastGapAhead := "__Undefined__"
-		static lastGapBehind := "__Undefined__"
+		static lastGapAhead := kUndefined
+		static lastGapBehind := kUndefined
 		static sameGapCount := 0
 
 		if knowledgeBase {

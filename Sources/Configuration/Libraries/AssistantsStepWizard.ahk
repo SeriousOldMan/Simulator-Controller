@@ -124,7 +124,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 							function := ((function && (function != "")) ? Array(function) : [])
 
 						if (function.Length > 0)
-							switch action {
+							switch action, false {
 								case "RaceAssistant":
 									arguments .= ("; raceAssistant: On " . values2String(A_Space, function*))
 								case "TeamServer":

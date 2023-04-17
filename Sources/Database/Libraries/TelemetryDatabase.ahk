@@ -116,7 +116,7 @@ class TelemetryDatabase extends SessionDatabase {
 		return schema
 	}
 
-	combineResults(table, query, drivers := "__Undefined__") {
+	combineResults(table, query, drivers := kUndefined) {
 		if (drivers = kUndefined)
 			drivers := this.Drivers
 
@@ -136,7 +136,7 @@ class TelemetryDatabase extends SessionDatabase {
 			return []
 	}
 
-	getElectronicsCount(drivers := "__Undefined__") {
+	getElectronicsCount(drivers := kUndefined) {
 		local result := this.combineResults("Electronics", {Group: [["Lap.Time", count, "Count"]]
 														  , Transform: removeInvalidLaps
 														  , Where: {}}, drivers)
@@ -144,7 +144,7 @@ class TelemetryDatabase extends SessionDatabase {
 		return ((result.Length > 0) ? result[1]["Count"] : 0)
 	}
 
-	getTyresCount(drivers := "__Undefined__") {
+	getTyresCount(drivers := kUndefined) {
 		local result := this.combineResults("Tyres", {Group: [["Lap.Time", count, "Count"]]
 													, Transform: removeInvalidLaps
 													, Where: {}}, drivers)
@@ -152,75 +152,75 @@ class TelemetryDatabase extends SessionDatabase {
 		return ((result.Length > 0) ? result[1]["Count"] : 0)
 	}
 
-	getElectronicEntries(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getElectronicEntries(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Electronics", {Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 												, drivers)
 	}
 
-	getTyreEntries(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getTyreEntries(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Tyres", {Transform: compose(removeInvalidLaps, computePressures, computeTemperatures, computeWear)
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
 
-	getMapsCount(weather, drivers := "__Undefined__") {
+	getMapsCount(weather, drivers := kUndefined) {
 		return this.combineResults("Electronics", {Group: [["Map", count, "Count"]], By: ["Map", "Tyre.Compound", "Tyre.Compound.Color"]
 												 , Transform: removeInvalidLaps
 												 , Where: {Weather: weather}}
 												, drivers)
 	}
 
-	getMapData(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getMapData(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Electronics", {Group: [["Lap.Time", average, "Lap.Time"], ["Fuel.Consumption", average, "Fuel.Consumption"]]
 												 , By: "Map", Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 												, drivers)
 	}
 
-	getTyreData(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getTyreData(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
 
-	getTyreCompoundColors(weather, compound, drivers := "__Undefined__") {
+	getTyreCompoundColors(weather, compound, drivers := kUndefined) {
 		return this.combineResults("Tyres", {Select: ["Tyre.Compound.Color"], By: "Tyre.Compound.Color"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound)}
 										  , drivers)
 	}
 
-	getMapLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getMapLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Electronics", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: ["Map", "Fuel.Remaining"]
 												 , Transform: removeInvalidLaps
 												 , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 												, drivers)
 	}
 
-	getTyreLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getTyreLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Tyre.Laps"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
 
-	getFuelLapTimes(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getFuelLapTimes(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Tyres", {Group: [["Lap.Time", minimum, "Lap.Time"]], By: "Fuel.Remaining"
 										   , Transform: removeInvalidLaps
 										   , Where: Map("Weather", weather, "Tyre.Compound", compound, "Tyre.Compound.Color", compoundColor)}
 										  , drivers)
 	}
 
-	getPressuresCount(weather, drivers := "__Undefined__") {
+	getPressuresCount(weather, drivers := kUndefined) {
 		return this.combineResults("Tyres", {Group: [["Tyre.Pressure", count, "Count"]], By: ["Tyre.Pressure", "Tyre.Compound", "Tyre.Compound.Color"]
 										   , Transform: compose(removeInvalidLaps, computePressures)
 										   , Where: {Weather: weather}}
 										  , drivers)
 	}
 
-	getLapTimePressures(weather, compound, compoundColor, drivers := "__Undefined__") {
+	getLapTimePressures(weather, compound, compoundColor, drivers := kUndefined) {
 		return this.combineResults("Tyres", {Group: [["Tyre.Pressure.Front.Left", average, "Tyre.Pressure.Front.Left"]
 												   , ["Tyre.Pressure.Front.Right", average, "Tyre.Pressure.Front.Right"]
 												   , ["Tyre.Pressure.Rear.Left", average, "Tyre.Pressure.Rear.Left"]
@@ -230,7 +230,7 @@ class TelemetryDatabase extends SessionDatabase {
 										  , drivers)
 	}
 
-	cleanupData(weather, compound, compoundColor, drivers := "__Undefined__") {
+	cleanupData(weather, compound, compoundColor, drivers := kUndefined) {
 		local database := this.Database
 		local where, ltAvg, ltStdDev, cAvg, cStdDev, rows, identifiers, filter, ignore, row, ignore, connector
 
@@ -512,7 +512,7 @@ validLap(ltAvg, ltStdDev, cAvg, cStdDev, row) {
 		return false
 }
 
-invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := "__Undefined__") {
+invalidLap(ltAvg, ltStdDev, cAvg, cStdDev, row, drivers := kUndefined) {
 	local driver := row["Driver"]
 
 	if ((drivers = kUndefined)

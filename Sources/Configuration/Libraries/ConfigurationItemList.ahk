@@ -53,7 +53,7 @@ class ConfigurationItemList extends ConfiguratorPanel {
 		}
 	}
 
-	ItemList[index := "__Undefined__"] {
+	ItemList[index := kUndefined] {
 		Get {
 			if (index != kUndefined) {
 				if !this.iItemList.Has(index)

@@ -1097,7 +1097,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 				assistant.restoreSessionState(data)
 	}
 
-	static updateAssistantsSession(session := "__Undefined__") {
+	static updateAssistantsSession(session := kUndefined) {
 		local ignore, assistant
 
 		if (session == kUndefined)

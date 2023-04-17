@@ -122,7 +122,7 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	__New(configuration, remoteHandler := false, name := false, language := "__Undefined__"
+	__New(configuration, remoteHandler := false, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Engineer", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
@@ -1109,13 +1109,13 @@ class RaceEngineer extends RaceAssistant {
 									, "Session.Settings.Tyre.Pressure.Correction.Pressure", getMultiMapValue(settings, "Session Settings"
 																													 , "Tyre.Pressure.Correction.Pressure", false)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.FL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.FL", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.FL", 26.5)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.FR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.FR", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.FR", 26.5)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.RL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.RL", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.RL", 26.5)
 									, "Session.Settings.Tyre.Dry.Pressure.Target.RR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
-																												 , "Tyre.Dry.Pressure.Target.RR", 27.7)
+																												 , "Tyre.Dry.Pressure.Target.RR", 26.5)
 									, "Session.Settings.Tyre.Wet.Pressure.Target.FL", getDeprecatedValue(settings, "Session Settings", "Race Settings"
 																												 , "Tyre.Wet.Pressure.Target.FL", 30.0)
 									, "Session.Settings.Tyre.Wet.Pressure.Target.FR", getDeprecatedValue(settings, "Session Settings", "Race Settings"
@@ -1642,11 +1642,11 @@ class RaceEngineer extends RaceAssistant {
 		}
 	}
 
-	planPitstop(optionsOrLap := "__Undefined__", refuelAmount := "__Undefined__"
-			  , changeTyres := "__Undefined__", tyreSet := "__Undefined__"
-			  , tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__", tyrePressures := "__Undefined__"
-			  , repairBodywork := "__Undefined__", repairSuspension := "__Undefined__", repairEngine := "__Undefined__"
-			  , requestDriver := "__Undefined__") {
+	planPitstop(optionsOrLap := kUndefined, refuelAmount := kUndefined
+			  , changeTyres := kUndefined, tyreSet := kUndefined
+			  , tyreCompound := kUndefined, tyreCompoundColor := kUndefined, tyrePressures := kUndefined
+			  , repairBodywork := kUndefined, repairSuspension := kUndefined, repairEngine := kUndefined
+			  , requestDriver := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
 		local confirm := true
 		local options := ((optionsOrLap = kUndefined) ? true : optionsOrLap)
@@ -1898,7 +1898,7 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 
-	planDriverSwap(lap := "__Undefined__", arguments*) {
+	planDriverSwap(lap := kUndefined, arguments*) {
 		local knowledgeBase := this.KnowledgeBase
 		local repairBodywork, repairSuspension, repairEngine, speaker
 
@@ -2134,7 +2134,7 @@ class RaceEngineer extends RaceAssistant {
 		return result
 	}
 
-	callPlanPitstop(lap := "__Undefined__", arguments*) {
+	callPlanPitstop(lap := kUndefined, arguments*) {
 		this.clearContinuation()
 
 		if !this.supportsPitstop()
@@ -2148,7 +2148,7 @@ class RaceEngineer extends RaceAssistant {
 			this.invokePlanPitstop(true, lap, arguments*)
 	}
 
-	invokePlanPitstop(confirm, lap := "__Undefined__", arguments*) {
+	invokePlanPitstop(confirm, lap := kUndefined, arguments*) {
 		this.clearContinuation()
 
 		if (lap == kUndefined) {
@@ -2167,7 +2167,7 @@ class RaceEngineer extends RaceAssistant {
 			this.planPitstop(lap, arguments*)
 	}
 
-	callPlanDriverSwap(lap := "__Undefined__", arguments*) {
+	callPlanDriverSwap(lap := kUndefined, arguments*) {
 		local speaker := this.getSpeaker()
 
 		this.clearContinuation()
@@ -2192,7 +2192,7 @@ class RaceEngineer extends RaceAssistant {
 			this.invokePlanDriverSwap(true, lap, arguments*)
 	}
 
-	invokePlanDriverSwap(confirm, lap := "__Undefined__", arguments*) {
+	invokePlanDriverSwap(confirm, lap := kUndefined, arguments*) {
 		this.clearContinuation()
 
 		if (lap == kUndefined) {

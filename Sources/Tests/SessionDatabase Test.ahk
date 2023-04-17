@@ -44,7 +44,7 @@ class DatabaseTest extends Assert {
 
 		for ignore, pressures in coldPressures
 			database.updatePressures(simulator, car, track, weather, airTemperature, trackTemperature
-								   , compound, compoundColor, pressures, [27.7, 27.7, 27.7, 27.7], false)
+								   , compound, compoundColor, pressures, [26.5, 26.5, 26.5, 26.5], false)
 
 		database.flush()
 	}
@@ -68,7 +68,7 @@ class PressuresAssert extends DatabaseTest {
 
 		if pressures
 			for tyre, pressureInfo in pressures {
-				switch tyre {
+				switch tyre, false {
 					case "FL":
 						this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
 					case "FR":
@@ -91,7 +91,7 @@ class PressuresAssert extends DatabaseTest {
 
 		if pressures
 			for tyre, pressureInfo in pressures {
-				switch tyre {
+				switch tyre, false {
 					case "FL":
 						this.AssertEqual(flPressure, pressureInfo["Pressure"], "FL pressure should be " . flPressure . "...")
 					case "FR":

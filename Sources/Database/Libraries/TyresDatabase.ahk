@@ -129,7 +129,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getPressureDistributions(database, weather, airTemperature, trackTemperature, compound, compoundColor
-						   , distributions, driver := "__Undefined__") {
+						   , distributions, driver := kUndefined) {
 		local where := Map("Temperature.Air", Round(airTemperature), "Temperature.Track", Round(trackTemperature)
 						 , "Compound", compound, "Compound.Color", compoundColor, "Type", "Cold")
 		local ignore, pressureData, tyre, pressure
@@ -151,7 +151,7 @@ class TyresDatabase extends SessionDatabase {
 		}
 	}
 
-	getConditions(simulator, car, track, driver := "__Undefined__") {
+	getConditions(simulator, car, track, driver := kUndefined) {
 		local database, condition, compound, where, path, conditions, ignore, condition, result
 
 		car := this.getCarCode(simulator, car)
@@ -196,7 +196,7 @@ class TyresDatabase extends SessionDatabase {
 	}
 
 	getTyreSetup(simulator, car, track, weather, airTemperature, trackTemperature
-			   , &compound, &compoundColor, &pressures, &certainty, driver := "__Undefined__") {
+			   , &compound, &compoundColor, &pressures, &certainty, driver := kUndefined) {
 		local condition, weatherIndex, visited, compounds, theCompound, conditionIndex, valid
 		local settings, correctionAir, correctionTrack, thePressures, theCertainty, compoundInfo
 		local theCompound, theCompoundColor, ignore, pressureInfo, deltaAir, deltaTrack
@@ -263,7 +263,7 @@ class TyresDatabase extends SessionDatabase {
 		return false
 	}
 
-	getPressureInfo(simulator, car, track, weather, driver := "__Undefined__") {
+	getPressureInfo(simulator, car, track, weather, driver := kUndefined) {
 		local database, where, info, ignore, row
 
 		if ((driver = kUndefined) || !driver)

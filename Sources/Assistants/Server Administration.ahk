@@ -710,7 +710,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 		administrationGui.Add("CheckBox", "xp+24 yp w23 Y:Move vaccountDataAccessCheck")
 
 		administrationGui.Add("Text", "x" . x0 . " yp+22 w90 h23 Y:Move +0x200", translate("Contingent"))
-		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow Y:Move AltSubmit Choose2 vaccountContractDropDown", collect(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "UpdateState"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow Y:Move Choose2 vaccountContractDropDown", collect(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "UpdateState"))
 		administrationGui.Add("Edit", "x" . x3 . " yp w60 h21 X:Move Y:Move Number vaccountMinutesEdit")
 		administrationGui.Add("Text", "x" . x4 . " yp w90 h23 X:Move Y:Move +0x200", translate("Minutes"))
 		administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Y:Move Center +0x200 vavailableMinutesButton").OnEvent("Click", administrationEditor.Bind(kEvent, "UpdateAvailableMinutes"))
@@ -730,20 +730,20 @@ administrationEditor(configurationOrCommand, arguments*) {
 		administrationTab.UseTab(2)
 
 		administrationGui.Add("Text", "x" . x0 . " y" . y . " w120 h23 +0x200", translate("Expired Tokens"))
-		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) AltSubmit Choose1 vtaskTokenOperationDropDown", [translate("Delete")]).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Token"))
-		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) AltSubmit Choose1 vtaskTokenFrequencyDropDown", collect(["Never", "Daily", "Weekly"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Token"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose1 vtaskTokenOperationDropDown", [translate("Delete")]).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Token"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskTokenFrequencyDropDown", collect(["Never", "Daily", "Weekly"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Token"))
 
 		administrationGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Expired Accounts"))
-		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) AltSubmit Choose1 vtaskAccountOperationDropDown", [translate("Delete")]).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Account"))
-		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) AltSubmit Choose1 vtaskAccountFrequencyDropDown", collect(["Never", "Daily", "Weekly", "1st of Month"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Account"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose1 vtaskAccountOperationDropDown", [translate("Delete")]).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Account"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskAccountFrequencyDropDown", collect(["Never", "Daily", "Weekly", "1st of Month"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Account"))
 
 		administrationGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Finished Sessions"))
-		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) AltSubmit Choose3 vtaskSessionOperationDropDown", collect(["Delete", "Clear", "Reset"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Session"))
-		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) AltSubmit Choose1 vtaskSessionFrequencyDropDown", collect(["Never", "Daily", "Weekly"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Session"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose3 vtaskSessionOperationDropDown", collect(["Delete", "Clear", "Reset"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Session"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskSessionFrequencyDropDown", collect(["Never", "Daily", "Weekly"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Session"))
 
 		administrationGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Quotas"))
-		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) AltSubmit Choose1 vtaskQuotaOperationDropDown", collect(["Renew"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Quota"))
-		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) AltSubmit Choose1 vtaskQuotaFrequencyDropDown", collect(["Never", "Daily", "Weekly", "1st of Month"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Quota"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose1 vtaskQuotaOperationDropDown", collect(["Renew"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Quota"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskQuotaFrequencyDropDown", collect(["Never", "Daily", "Weekly", "1st of Month"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Quota"))
 
 		administrationTab.UseTab(3)
 

@@ -72,42 +72,42 @@ class FormatsEditor extends ConfiguratorPanel {
 		chosen := inList(kTemperatureUnits, this.Value["temperatureUnit"])
 
 		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Temperature"))
-		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vtemperatureUnitDropDown", kTemperatureUnits)
+		formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vtemperatureUnitDropDown", kTemperatureUnits)
 
 		chosen := inList(kMassUnits, this.Value["massUnit"])
 
 		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Mass"))
-		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vmassUnitDropDown", kMassUnits)
+		formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vmassUnitDropDown", kMassUnits)
 
 		chosen := inList(kPressureUnits, this.Value["pressureUnit"])
 
 		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Pressure"))
-		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vpressureUnitDropDown", kPressureUnits)
+		formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vpressureUnitDropDown", kPressureUnits)
 
 		chosen := inList(kVolumeUnits, this.Value["volumeUnit"])
 
 		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Volume"))
-		ogcvolumeUnitDropDown := formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vvolumeUnitDropDown", kVolumeUnits)
+		ogcvolumeUnitDropDown := formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vvolumeUnitDropDown", kVolumeUnits)
 
 		chosen := inList(kLengthUnits, this.Value["lengthUnit"])
 
 		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Length"))
-		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vlengthUnitDropDown", kLengthUnits)
+		formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vlengthUnitDropDown", kLengthUnits)
 
 		chosen := inList(kSpeedUnits, this.Value["speedUnit"])
 
 		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Speed"))
-		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vspeedUnitDropDown", kSpeedUnits)
+		formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vspeedUnitDropDown", kSpeedUnits)
 
 		chosen := inList(kNumberFormats, this.Value["numberFormat"])
 
 		formatsGui.Add("Text", "x16 yp+30 w100 h23 +0x200", translate("Float"))
-		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vnumberFormatDropDown", kNumberFormats)
+		formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vnumberFormatDropDown", kNumberFormats)
 
 		chosen := inList(kTimeFormats, this.Value["timeFormat"])
 
 		formatsGui.Add("Text", "x16 yp+24 w100 h23 +0x200", translate("Time"))
-		formatsGui.Add("DropDownList", "x120 yp w125 AltSubmit Choose" . chosen . " vtimeFormatDropDown", kTimeFormats)
+		formatsGui.Add("DropDownList", "x120 yp w125 Choose" . chosen . " vtimeFormatDropDown", kTimeFormats)
 
 		formatsGui.Add("Text", "x24 y+10 w213 0x10")
 

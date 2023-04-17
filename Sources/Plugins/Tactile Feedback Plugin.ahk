@@ -653,7 +653,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 		local controller := this.Controller
 		local activeModes, pedalMode, chassisMode
 
-		static isRunning := "__Undefined__"
+		static isRunning := kUndefined
 
 		if (isRunning == kUndefined)
 			isRunning := !this.Application.isRunning()
@@ -779,27 +779,27 @@ initializeTactileFeedbackPlugin() {
 ;;;-------------------------------------------------------------------------;;;
 
 enablePedalVibration() {
-	withProtection("activatePedalVibration")
+	withProtection(activatePedalVibration)
 }
 
 disablePedalVibration() {
-	withProtection("deactivatePedalVibration")
+	withProtection(deactivatePedalVibration)
 }
 
 enableFrontChassisVibration() {
-	withProtection("activateFrontChassisVibration")
+	withProtection(activateFrontChassisVibration)
 }
 
 disableFrontChassisVibration() {
-	withProtection("deactivateFrontChassisVibration")
+	withProtection(deactivateFrontChassisVibration)
 }
 
 enableRearChassisVibration() {
-	withProtection("activateRearChassisVibration")
+	withProtection(activateRearChassisVibration)
 }
 
 disableRearChassisVibration() {
-	withProtection("deactivateRearChassisVibration")
+	withProtection(deactivateRearChassisVibration)
 }
 
 

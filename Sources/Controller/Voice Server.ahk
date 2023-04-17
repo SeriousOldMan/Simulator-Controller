@@ -249,7 +249,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		VoiceCommands[key := "__Undefined__"] {
+		VoiceCommands[key := kUndefined] {
 			Get {
 				if (key != kUndefined)
 					return this.iVoiceCommands[key]
@@ -935,7 +935,7 @@ class VoiceServer extends ConfigurationItem {
 	registerVoiceClient(descriptor, routing, pid
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
-					  , speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined) {
 		local grammar, client, nextCharIndex, command, theDescriptor, ignore
 
 		static counter := 1
@@ -1173,7 +1173,7 @@ startupVoiceServer() {
 	index := 1
 
 	while (index < A_Args.Length) {
-		switch A_Args[index] {
+		switch A_Args[index], false {
 			case "-Debug":
 				debug := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false)
 				index += 2

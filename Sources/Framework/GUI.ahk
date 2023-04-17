@@ -436,7 +436,6 @@ class Window extends Gui {
 	}
 
 	__New(options := {}, name := Strsplit(A_ScriptName, ".")[1], arguments*) {
-		local backColor := "D0D0D0"
 		local ignore, argument
 
 		for name, argument in options.OwnProps()
@@ -452,8 +451,6 @@ class Window extends Gui {
 						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 2000, kLowPriority)
 				case "Options":
 					options := argument
-				case "BackColor":
-					backColor := argument
 			}
 
 		super.__New("", name, arguments*)
@@ -471,7 +468,7 @@ class Window extends Gui {
 		if !isObject(options)
 			this.Opt(options)
 
-		this.BackColor := backColor
+		this.ApplyTheme()
 	}
 
 	Opt(options) {
@@ -479,6 +476,10 @@ class Window extends Gui {
 
 		if InStr(options, "-Disabled")
 			this.Show("NA")
+	}
+
+	ApplyTheme() {
+		this.BackColor := "D0D0D0"
 	}
 
 	ApplyThemeOptions(type, options) {
@@ -490,8 +491,6 @@ class Window extends Gui {
 					options .= " BackgroundD8D8D8"
 				case "Edit":
 					options .= " BackgroundE0E0E0"
-				case "Edit":
-					options .= " BackgroundWhite"
 				case "Button":
 					options .= " BackgroundCCCCCC"
 			}
@@ -781,7 +780,7 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 }
 
 fixIE(version := 0, exeName := "") {
-	local previousValue
+	local previousValue := ""
 
 	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
 	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
@@ -796,7 +795,12 @@ fixIE(version := 0, exeName := "") {
 			SplitPath(A_AhkPath, &exeName)
 	}
 
-	previousValue := RegRead("HKCU\" . key, exeName, "")
+	try {
+		previousValue := RegRead("HKCU\" . key, exeName, "")
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
 
 	try {
 		if (version = "") {

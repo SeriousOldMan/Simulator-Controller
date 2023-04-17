@@ -120,35 +120,35 @@ class RaceSpotterConfigurator extends ConfiguratorPanel {
 		x5 := x1 + 72
 
 		widget17 := window.Add("Text", "x" . x0 . " yp+20 w120 h20 Section Hidden", translate("Side / Rear Proximity"))
-		widget18 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vsideProximityDropDown Hidden", [translate("Off"), translate("On")])
-		widget19 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) AltSubmit Choose1 vrearProximityDropDown Hidden", [translate("Off"), translate("On")])
+		widget18 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vsideProximityDropDown Hidden", [translate("Off"), translate("On")])
+		widget19 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) Choose1 vrearProximityDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget20 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Yellow / Blue Flags"))
-		widget21 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vyellowFlagsDropDown Hidden", [translate("Off"), translate("On")])
-		widget22 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) AltSubmit Choose1 vblueFlagsDropDown Hidden", [translate("Off"), translate("On")])
+		widget21 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vyellowFlagsDropDown Hidden", [translate("Off"), translate("On")])
+		widget22 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) Choose1 vblueFlagsDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget23 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Pit Window"))
-		widget24 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vpitWindowDropDown Hidden", [translate("Off"), translate("On")])
+		widget24 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpitWindowDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget25 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Cut Warnings"))
-		widget26 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vcutWarningsDropDown Hidden", [translate("Off"), translate("On")])
+		widget26 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vcutWarningsDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget27 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("General Information"))
-		widget28 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vsessionInformationDropDown Hidden", [translate("Off"), translate("On")])
+		widget28 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vsessionInformationDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget29 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Penalty Information"))
-		widget30 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vpenaltyInformationDropDown Hidden", [translate("Off"), translate("On")])
+		widget30 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vpenaltyInformationDropDown Hidden", [translate("Off"), translate("On")])
 
 		widget31 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Opponent Infos every"))
-		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
-		widget33 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) AltSubmit Choose1 vdeltaInformationMethodDropDown Hidden", [translate("Static"), translate("Dynamic"), translate("Both")])
+		widget32 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose3 vdeltaInformationDropDown Hidden", [translate("Off"), translate("Sector"), translate("Lap"), translate("2 Laps"), translate("3 Laps"), translate("4 Laps")])
+		widget33 := window.Add("DropDownList", "x" . x5 . " yp w70 X:Move(0.1) W:Grow(0.1) Choose1 vdeltaInformationMethodDropDown Hidden", [translate("Static"), translate("Dynamic"), translate("Both")])
 
 		widget34 := window.Add("Text", "x" . x0 . " yp+26 w120 h20 Section Hidden", translate("Tactical Advices"))
-		widget35 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) AltSubmit Choose1 vtacticalAdvicesDropDown Hidden", [translate("Off"), translate("On")])
+		widget35 := window.Add("DropDownList", "x" . x1 . " yp-4 w70 W:Grow(0.1) Choose1 vtacticalAdvicesDropDown Hidden", [translate("Off"), translate("On")])
 
 		window.SetFont("Norm", "Arial")
 
-		Loop 35
+		loop 35
 			editor.registerWidget(this, widget%A_Index%)
 
 		this.loadSimulatorConfiguration()

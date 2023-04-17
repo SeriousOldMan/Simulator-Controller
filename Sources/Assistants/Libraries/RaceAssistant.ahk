@@ -414,7 +414,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	__New(configuration, assistantType, remoteHandler, name := false, language := "__Undefined__"
+	__New(configuration, assistantType, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		global kUnknown
 		local options
@@ -1181,7 +1181,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	addLap(lapNumber, &data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
+	addLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
 		local adjustedLapTime := false
 		local driverForname, driverSurname, driverNickname, tyreSet, timeRemaining, airTemperature, trackTemperature
@@ -1420,7 +1420,7 @@ class RaceAssistant extends ConfigurationItem {
 		}
 	}
 
-	updateLap(lapNumber, &data, dump := true, lapValid := "__Undefined__", lapPenalty := "__Undefined__") {
+	updateLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
 		local result
 

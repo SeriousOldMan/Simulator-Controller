@@ -706,7 +706,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		addSimWeather(*) {
 			local after := false
-			local row, msgResult, handler, lastWeather, lastAirTemperature, lastTrackTemperature, lastTime, currentTime
+			local row, msgResult, translator, lastWeather, lastAirTemperature, lastTrackTemperature, lastTime, currentTime
 
 			row := workbench.WeatherListView.GetNext(0)
 
@@ -716,11 +716,11 @@ class StrategyWorkbench extends ConfigurationItem {
 				lastAirTemperature := workbench.WeatherListView.GetText(row, 3)
 				lastTrackTemperature := workbench.WeatherListView.GetText(row, 4)
 
-				handler := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
+				translator := translateMsgBoxButtons.Bind(["Before", "After", "Cancel"])
 
-				OnMessage(0x44, handler)
+				OnMessage(0x44, translator)
 				msgResult := MsgBox(translate("Do you want to add the new entry before or after the currently selected entry?"), translate("Insert"), 262179)
-				OnMessage(0x44, handler, 0)
+				OnMessage(0x44, translator, 0)
 
 				if (msgResult = "Cancel")
 					return
@@ -853,7 +853,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			simulator := false
 
 		workbenchGui.Add("Text", "x16 yp+24 w70 h23 +0x200", translate("Car"))
-		workbenchGui.Add("DropDownList", "AltSubmit x90 yp w290 W:Grow(0.1) vcarDropDown").OnEvent("Change", chooseCar)
+		workbenchGui.Add("DropDownList", "x90 yp w290 W:Grow(0.1) vcarDropDown").OnEvent("Change", chooseCar)
 
 		workbenchGui.Add("Text", "x16 yp24 w70 h23 +0x200", translate("Track"))
 		workbenchGui.Add("DropDownList", "x90 yp w290 W:Grow(0.1) vtrackDropDown").OnEvent("Change", chooseTrack)
@@ -869,7 +869,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		workbenchGui.Add("DropDownList", "x90 yp w120 W:Grow(0.1) AltSubmit Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
+		workbenchGui.Add("DropDownList", "x90 yp w120 W:Grow(0.1) Choose" . chosen . "  vweatherDropDown", choices).OnEvent("Change", chooseWeather)
 
 		workbenchGui.Add("Edit", "x215 yp w40 X:Move(0.1) Number Limit2 vairTemperatureEdit", this.AirTemperature).OnEvent("Change", updateTemperatures)
 		workbenchGui.Add("UpDown", "x242 yp-2 w18 h20 X:Move(0.1) Range0-99", this.AirTemperature)
@@ -886,14 +886,14 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("DropDownList", "x12 yp+28 w76 AltSubmit Choose1 vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
+		workbenchGui.Add("DropDownList", "x12 yp+28 w76 Choose1 vdataTypeDropDown  +0x200", collect(["Electronics", "Tyres", "-----------------", "Cleanup Data"], translate)).OnEvent("Change", chooseDataType)
 
 		this.iDataListView := workbenchGui.Add("ListView", "x12 yp+24 w170 h263 W:Grow(0.1) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Compound", "Map", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
 		this.iDataListView.OnEvent("DoubleClick", noSelect)
 
 		workbenchGui.Add("Text", "x195 yp w70 h23 X:Move(0.1) +0x200", translate("Driver"))
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit vdriverDropDown").OnEvent("Change", chooseDriver)
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) vdriverDropDown").OnEvent("Change", chooseDriver)
 
 		compound := this.SelectedCompound[true]
 		choices := collect([normalizeCompound("Dry")], translate)
@@ -905,7 +905,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move(0.1) +0x200", translate("Compound"))
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit Choose" . chosen . "  vcompoundDropDown", choices).OnEvent("Change", chooseCompound)
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) Choose" . chosen . "  vcompoundDropDown", choices).OnEvent("Change", chooseCompound)
 
 		workbenchGui.Add("Text", "x195 yp+28 w70 h23 X:Move(0.1) +0x200", translate("X-Axis"))
 
@@ -913,22 +913,22 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		chosen := inList(schema, "Map")
 
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit Choose" . chosen . " vdataXDropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) Choose" . chosen . " vdataXDropDown", schema).OnEvent("Change", chooseAxis)
 
 		workbenchGui.Add("Text", "x195 yp+24 w70 h23 X:Move(0.1) +0x200", translate("Series"))
 
 		chosen := inList(schema, "Fuel.Consumption")
 
-		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) AltSubmit Choose" . chosen . " vdataY1DropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp w130 X:Move(0.1) Choose" . chosen . " vdataY1DropDown", schema).OnEvent("Change", chooseAxis)
 
 		schema := concatenate([translate("None")], schema)
 
-		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) AltSubmit Choose1 vdataY2DropDown", schema).OnEvent("Change", chooseAxis)
-		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) AltSubmit Choose1 vdataY3DropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) Choose1 vdataY2DropDown", schema).OnEvent("Change", chooseAxis)
+		workbenchGui.Add("DropDownList", "x250 yp+24 w130 X:Move(0.1) Choose1 vdataY3DropDown", schema).OnEvent("Change", chooseAxis)
 
 		workbenchGui.Add("Text", "x400 ys w40 h23 X:Move(0.1) +0x200", translate("Chart"))
-		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move(0.1) AltSubmit Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
-		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) AltSubmit Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move(0.1) Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
+		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		this.iChartViewer := workbenchGui.Add("ActiveX", "x400 yp+24 w950 h442 Border vchartViewer X:Move(0.1) W:Grow(0.9)", "shell.explorer").Value
 		this.iChartViewer.navigate("about:blank")
@@ -942,13 +942,13 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
-		workbenchGui.Add("DropDownList", "x250 yp-2 w180 AltSubmit Choose1 +0x200 VsettingsMenuDropDown").OnEvent("Change", settingsMenu)
+		workbenchGui.Add("DropDownList", "x250 yp-2 w180 Choose1 +0x200 VsettingsMenuDropDown").OnEvent("Change", settingsMenu)
 
 		this.updateSettingsMenu()
 
-		workbenchGui.Add("DropDownList", "x435 yp w180 AltSubmit Choose1 +0x200 VsimulationMenuDropDown", collect(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], translate)).OnEvent("Change", simulationMenu)
+		workbenchGui.Add("DropDownList", "x435 yp w180 Choose1 +0x200 VsimulationMenuDropDown", collect(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], translate)).OnEvent("Change", simulationMenu)
 
-		workbenchGui.Add("DropDownList", "x620 yp w180 AltSubmit Choose1 +0x200 VstrategyMenuDropDown", collect(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], translate)).OnEvent("Change", strategyMenu)
+		workbenchGui.Add("DropDownList", "x620 yp w180 Choose1 +0x200 VstrategyMenuDropDown", collect(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], translate)).OnEvent("Change", strategyMenu)
 
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
@@ -998,7 +998,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 AltSubmit Choose1  VsessionTypeDropDown", collect(["Duration", "Laps"], translate)).OnEvent("Change", chooseSessionType)
+		workbenchGui.Add("DropDownList", "x" . x0 . " yp+21 w70 Choose1  VsessionTypeDropDown", collect(["Duration", "Laps"], translate)).OnEvent("Change", chooseSessionType)
 		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 Limit4 Number VsessionLengthEdit", 60)
 		workbenchGui.Add("UpDown", "x" . x2 . " yp-2 w18 h20 Range1-9999 0x80", 60)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w60 h20 VsessionLengthLabel", translate("Minutes"))
@@ -1024,15 +1024,15 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("Norm", "Arial")
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+23 w75 h20", translate("Pitstop"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 AltSubmit Choose3 VpitstopRequirementsDropDown", collect(["Optional", "Required", "Window"], translate)).OnEvent("Change", choosePitstopRule)
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp-4 w80 Choose3 VpitstopRequirementsDropDown", collect(["Optional", "Required", "Window"], translate)).OnEvent("Change", choosePitstopRule)
 		workbenchGui.Add("Edit", "x" . x11 . " yp+1 w50 h20 VpitstopWindowEdit", "25 - 35").OnEvent("Change", updatePitstopRule)
 		workbenchGui.Add("Text", "x" . x12 . " yp+3 w120 h20 VpitstopWindowLabel", translate("Minute (From - To)"))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+22 w75 h23 +0x200 VrefuelRequirementsLabel", translate("Refuel"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 AltSubmit Choose2 VrefuelRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose2 VrefuelRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h23 +0x200 VtyreChangeRequirementsLabel", translate("Tyre Change"))
-		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 AltSubmit Choose2 VtyreChangeRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
+		workbenchGui.Add("DropDownList", "x" . x7 . " yp w80 Choose2 VtyreChangeRequirementsDropDown", collect(["Optional", "Required", "Always", "Disallowed"], translate))
 
 		workbenchGui.Add("Text", "x" . x5 . " yp+26 w75 h23 +0x200", translate("Tyre Sets"))
 
@@ -1043,7 +1043,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		x13 := (x7 + w12 + 5)
 
-		workbenchGui.Add("DropDownList", "x" . x13 . " yp w116 AltSubmit Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreSet)
+		workbenchGui.Add("DropDownList", "x" . x13 . " yp w116 Choose0 vtyreSetDropDown", [translate(normalizeCompound("Dry"))]).OnEvent("Change", updateTyreSet)
 		workbenchGui.Add("Edit", "x" . x13 . " yp+24 w40 h20 Limit2 Number vtyreSetCountEdit").OnEvent("Change", updateTyreSet)
 		workbenchGui.Add("UpDown", "x" . x13 . " yp w18 h20 0x80 Range0-99")
 
@@ -1082,13 +1082,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("UpDown", "x" . x2 . " yp w18 h20 0x80 Range0-99", 30)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20", translate("Seconds (Change four tyres)"))
 
-		workbenchGui.Add("DropDownList", "x" . x0 . " yp+20 w110 AltSubmit Choose2 VpitstopFuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
+		workbenchGui.Add("DropDownList", "x" . x0 . " yp+20 w110 Choose2 VpitstopFuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
 
 		workbenchGui.Add("Edit", "x" . x1 . " yp w50 h20 VpitstopFuelServiceEdit", displayValue("Float", 1.2)).OnEvent("Change", validatePitstopFuelService)
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w220 h20 VpitstopFuelServiceLabel", translate("Seconds (Refuel of 10 liters)"))
 
 		workbenchGui.Add("Text", "x" . x . " yp+24 w160 h23", translate("Service"))
-		workbenchGui.Add("DropDownList", "x" . x1 . " yp-3 w100 AltSubmit Choose1 vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
+		workbenchGui.Add("DropDownList", "x" . x1 . " yp-3 w100 Choose1 vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
 
 		workbenchGui.Add("Text", "x" . x . " yp+27 w85 h20 +0x200", translate("Fuel Capacity"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w50 h20 VfuelCapacityEdit", displayValue("Float", convertUnit("Volume", 125))).OnEvent("Change", validateFuelCapacity)
@@ -1112,7 +1112,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iDriversListView.OnEvent("DoubleClick", chooseSimDriver)
 
 		workbenchGui.Add("Text", "x" . x2 . " ys+34 w90 h23 +0x200", translate("Driver"))
-		workbenchGui.Add("DropDownList", "x" . x3 . " yp w" . w3 . " AltSubmit vsimDriverDropDown").OnEvent("Change", updateSimDriver)
+		workbenchGui.Add("DropDownList", "x" . x3 . " yp w" . w3 . " vsimDriverDropDown").OnEvent("Change", updateSimDriver)
 
 		workbenchGui.Add("Button", "x" . x4 . " yp+30 w23 h23 Center +0x200 vaddDriverButton").OnEvent("Click", addSimDriver)
 		setButtonIcon(workbenchGui["addDriverButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -1139,7 +1139,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DateTime", "x" . x3 . " yp w50 h23 vsimWeatherTimeEdit  1", "HH:mm").OnEvent("Change", updateSimWeather)
 
 		workbenchGui.Add("Text", "x" . x2 . " yp+24 w70 h23 +0x200", translate("Weather"))
-		workbenchGui.Add("DropDownList", "x" . x3 . " yp w" . w3 . " AltSubmit vsimWeatherDropDown", collect(kWeatherConditions, translate)).OnEvent("Change", updateSimWeather)
+		workbenchGui.Add("DropDownList", "x" . x3 . " yp w" . w3 . " vsimWeatherDropDown", collect(kWeatherConditions, translate)).OnEvent("Change", updateSimWeather)
 
 		workbenchGui.Add("Edit", "x" . x6 . " yp w40 Number Limit2 vsimWeatherAirTemperatureEdit").OnEvent("Change", updateSimWeather)
 		workbenchGui.Add("UpDown", "x" . x6 . " yp-2 w18 h20 Range0-99", this.AirTemperature)
@@ -1179,7 +1179,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		workbenchGui.Add("DropDownList", "x" . x1 . " yp w84 AltSubmit Choose" . chosen . " VsimCompoundDropDown", choices)
+		workbenchGui.Add("DropDownList", "x" . x1 . " yp w84 Choose" . chosen . " VsimCompoundDropDown", choices)
 
 		workbenchGui.Add("Text", "x" . x . " yp+25 w70 h20 +0x200", translate("Tyre Usage"))
 		workbenchGui.Add("Edit", "x" . x1 . " yp-1 w45 h20 Number Limit3 VsimMaxTyreLapsEdit", 40).OnEvent("Change", validateSimMaxTyreLaps)
@@ -1233,7 +1233,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		choices := collect(["Initial Conditions", "Telemetry Data", "Initial Cond. + Telemetry"], translate)
 
-		workbenchGui.Add("DropDownList", "x250 yp w138 AltSubmit Choose3 VsimInputDropDown", choices)
+		workbenchGui.Add("DropDownList", "x250 yp w138 Choose3 VsimInputDropDown", choices)
 
 		workbenchGui.Add("Button", "x214 yp+26 w174 h20", translate("Simulate!")).OnEvent("Click", runSimulation)
 
@@ -1330,23 +1330,23 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 1
 		}
 
-		workbenchGui.Add("DropDownList", "x" . x1 . " yp w85 AltSubmit Choose" . chosen . " VstrategyCompoundDropDown Disabled", choices)
+		workbenchGui.Add("DropDownList", "x" . x1 . " yp w85 Choose" . chosen . " VstrategyCompoundDropDown Disabled", choices)
 
 		workbenchGui.Add("Text", "x" . x . " yp+26 w85 h20 +0x200", translate("Pressure"))
 		workbenchGui.Add("Text", "x" . x0 . " yp w85 h20 +0x200", translate("FL"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFLEdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFLEdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("FR"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFREdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureFREdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("RL"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRLEdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRLEdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		workbenchGui.Add("Text", "x" . x0 . " yp+21 w85 h20 +0x200", translate("RR"))
-		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRREdit Disabled", displayValue("Float", convertUnit("Pressure", 27.6)))
+		workbenchGui.Add("Edit", "x" . x1 . " yp-2 w50 h20 VstrategyPressureRREdit Disabled", displayValue("Float", convertUnit("Pressure", 26.5)))
 		workbenchGui.Add("Text", "x" . x3 . " yp+4 w30 h20", getUnit("Pressure"))
 
 		x := 371
@@ -2550,7 +2550,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		local car := this.SelectedCar
 		local track := this.SelectedTrack
 		local sessionDB, strategy, strategies, simulatorCode, dirName, ignore, fileName, configuration
-		local info, name, files, directory, handler
+		local info, name, files, directory, translator
 
 		if (simulator && car && track) {
 			directory := SessionDatabase.DatabasePath
@@ -2631,11 +2631,11 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 7: ; "Compare Strategies..."
 				this.Window.Opt("+OwnDialogs")
 
-				handler := translateMsgBoxButtons.Bind(["Compare", "Cancel"])
+				translator := translateMsgBoxButtons.Bind(["Compare", "Cancel"])
 
-				OnMessage(0x44, handler)
+				OnMessage(0x44, translator)
 				files := FileSelect("M1", dirName, translate("Choose two or more Race Strategies for comparison..."), "Strategy (*.strategy)")
-				OnMessage(0x44, handler, 0)
+				OnMessage(0x44, translator, 0)
 
 				if (files != "") {
 					strategies := []
@@ -2847,10 +2847,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			settings := SettingsDatabase().loadSettings(simulator, car, track, weather)
 
 			if (tyreCompound = "Dry")
-				tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 27.6)
-								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 27.6)
-								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 27.6)
-								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 27.6)]
+				tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)
+								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.FR", 26.5)
+								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)
+								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)]
 			else if (tyreCompound = "Intermediate") {
 				if (getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", kUndefined) != kUndefined)
 					tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", 29.0)

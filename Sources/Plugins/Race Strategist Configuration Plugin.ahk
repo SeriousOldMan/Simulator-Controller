@@ -140,7 +140,7 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		choices := collect(["Ask", "Always save", "No action"], translate)
 		widget21 := window.Add("Text", "x" . x0 . " yp+17 w105 h23 +0x200 Hidden", translate("Save Race Report"))
-		widget22 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) AltSubmit vrsSaveRaceReportDropDown Hidden", choices)
+		widget22 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsSaveRaceReportDropDown Hidden", choices)
 
 		x5 := x1 + 114
 
@@ -148,13 +148,13 @@ class RaceStrategistConfigurator extends ConfiguratorPanel {
 
 		choices := collect(["Ask", "Always save", "No action"], translate)
 		widget24 := window.Add("Text", "x" . x0 . " yp+21 w105 h23 +0x200 Hidden", translate("Save Telemetry"))
-		widget25 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) AltSubmit vrsSaveTelemetryDropDown Hidden", choices)
+		widget25 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsSaveTelemetryDropDown Hidden", choices)
 
 		widget26 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))
 
 		choices := collect(["No", "Yes"], translate)
 		widget27 := window.Add("Text", "x" . x0 . " yp+21 w105 h23 +0x200 Hidden", translate("Race Review"))
-		widget28 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) AltSubmit vrsRaceReviewDropDown Hidden", choices)
+		widget28 := window.Add("DropDownList", "x" . x1 . " yp w110 W:Grow(0.3) vrsRaceReviewDropDown Hidden", choices)
 
 		widget29 := window.Add("Text", "x" . x5 . " yp+3 w110 h20 X:Move(0.3) Hidden", translate("@ Session End"))
 

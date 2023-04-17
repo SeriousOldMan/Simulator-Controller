@@ -716,7 +716,7 @@ startSimulation(name := false) {
 				name := simulators[1]
 		}
 
-		withProtection("startupSimulator", name)
+		withProtection(startupSimulator, name)
 	}
 }
 
@@ -724,7 +724,7 @@ stopSimulation() {
 	local simulator := SimulatorController.Instance.ActiveSimulator
 
 	if (simulator != false)
-		withProtection("shutdownSimulator", simulator)
+		withProtection(shutdownSimulator, simulator)
 }
 
 shutdownSystem() {

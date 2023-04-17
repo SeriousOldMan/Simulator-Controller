@@ -180,6 +180,8 @@ class SyncSessionTask extends RaceCenterTask {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RaceCenter extends ConfigurationItem {
+	static kInvalidToken := "__Invalid__"
+	
 	iWindow := false
 
 	iWorking := 0
@@ -192,7 +194,7 @@ class RaceCenter extends ConfigurationItem {
 	iConnection := false
 
 	iServerURL := ""
-	iServerToken := "__INVALID__"
+	iServerToken := RaceCenter.kInvalidToken
 
 	iTeams := CaseInsenseMap()
 	iSessions := CaseInsenseMap()
@@ -1185,7 +1187,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iServerURL := getMultiMapValue(settings, "Team Settings", "Server.URL"
 										  , getMultiMapValue(configuration, "Team Server", "Server.URL", ""))
 		this.iServerToken := getMultiMapValue(settings, "Team Settings", "Server.Token"
-											, getMultiMapValue(configuration, "Team Server", "Server.Token", "__INVALID__"))
+											, getMultiMapValue(configuration, "Team Server", "Server.Token", RaceCenter.kInvalidToken))
 		this.iTeamName := getMultiMapValue(settings, "Team Settings", "Team.Name", "")
 		this.iTeamIdentifier := getMultiMapValue(settings, "Team Settings", "Team.Identifier", false)
 		this.iSessionName := getMultiMapValue(settings, "Team Settings", "Session.Name", "")
@@ -1211,7 +1213,7 @@ class RaceCenter extends ConfigurationItem {
 
 		connectServer(*) {
 			center.iServerURL := centerGui["serverURLEdit"].Text
-			center.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? "__INVALID__" : centerGui["serverTokenEdit"].Text)
+			center.iServerToken := ((centerGui["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : centerGui["serverTokenEdit"].Text)
 
 			center.connect()
 		}
@@ -1867,14 +1869,14 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x16 yp+26 w90 h23 +0x200", translate("Team / Session"))
 
 		if this.SelectedTeam[true]
-			centerGui.Add("DropDownList", "x141 yp w120 AltSubmit Choose1 vteamDropDownMenu", [this.SelectedTeam]).OnEvent("Change", chooseTeam)
+			centerGui.Add("DropDownList", "x141 yp w120 Choose1 vteamDropDownMenu", [this.SelectedTeam]).OnEvent("Change", chooseTeam)
 		else
-			centerGui.Add("DropDownList", "x141 yp w120 AltSubmit vteamDropDownMenu").OnEvent("Change", chooseTeam)
+			centerGui.Add("DropDownList", "x141 yp w120 vteamDropDownMenu").OnEvent("Change", chooseTeam)
 
 		if this.SelectedSession[true]
-			centerGui.Add("DropDownList", "x266 yp w120 AltSubmit Choose1 vsessionDropDownMenu", [this.SelectedSession]).OnEvent("Change", chooseSession)
+			centerGui.Add("DropDownList", "x266 yp w120 Choose1 vsessionDropDownMenu", [this.SelectedSession]).OnEvent("Change", chooseSession)
 		else
-			centerGui.Add("DropDownList", "x266 yp w120 AltSubmit Choose0 vsessionDropDownMenu").OnEvent("Change", chooseSession)
+			centerGui.Add("DropDownList", "x266 yp w120 Choose0 vsessionDropDownMenu").OnEvent("Change", chooseSession)
 
 		button := centerGui.Add("Button", "x116 yp-1 w23 h23 Center +0x200")
 		button.OnEvent("Click", connectSession)
@@ -1894,23 +1896,23 @@ class RaceCenter extends ConfigurationItem {
 		this.iReportsListView.ModifyCol(1, "AutoHdr")
 
 		centerGui.Add("Text", "x141 yp+2 w70 h23 +0x200", translate("Driver"))
-		centerGui.Add("DropDownList", "x195 yp w191 AltSubmit vdriverDropDown").OnEvent("Change", chooseDriver)
+		centerGui.Add("DropDownList", "x195 yp w191 vdriverDropDown").OnEvent("Change", chooseDriver)
 
 		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("X-Axis"))
 
-		centerGui.Add("DropDownList", "x195 yp w191 AltSubmit vdataXDropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x195 yp w191 vdataXDropDown").OnEvent("Change", chooseAxis)
 
 		centerGui.Add("Text", "x141 yp+24 w70 h23 +0x200", translate("Series"))
 
-		centerGui.Add("DropDownList", "x195 yp w191 AltSubmit vdataY1DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 AltSubmit vdataY2DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 AltSubmit vdataY3DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 AltSubmit vdataY4DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 AltSubmit vdataY5DropDown").OnEvent("Change", chooseAxis)
-		centerGui.Add("DropDownList", "x195 yp+24 w191 AltSubmit vdataY6DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x195 yp w191 vdataY1DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY2DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY3DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY4DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY5DropDown").OnEvent("Change", chooseAxis)
+		centerGui.Add("DropDownList", "x195 yp+24 w191 vdataY6DropDown").OnEvent("Change", chooseAxis)
 
 		centerGui.Add("Text", "x400 ys w40 h23 +0x200", translate("Plot"))
-		centerGui.Add("DropDownList", "x444 yp w80 AltSubmit Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+		centerGui.Add("DropDownList", "x444 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
@@ -1934,13 +1936,13 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.SetFont("s8 Norm cBlack", "Arial")
 
-		centerGui.Add("DropDownList", "x195 yp-2 w180 AltSubmit Choose1 +0x200 vsessionMenuDropDown").OnEvent("Change", sessionMenu)
+		centerGui.Add("DropDownList", "x195 yp-2 w180 Choose1 +0x200 vsessionMenuDropDown").OnEvent("Change", sessionMenu)
 
-		centerGui.Add("DropDownList", "x380 yp w180 AltSubmit Choose1 +0x200 vplanMenuDropDown", collect(["Plan", "---------------------------------------------", "Update from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], translate)).OnEvent("Change", planMenu)
+		centerGui.Add("DropDownList", "x380 yp w180 Choose1 +0x200 vplanMenuDropDown", collect(["Plan", "---------------------------------------------", "Update from Strategy", "Clear Plan...", "---------------------------------------------", "Plan Summary", "---------------------------------------------", "Release Plan"], translate)).OnEvent("Change", planMenu)
 
-		centerGui.Add("DropDownList", "x565 yp w180 AltSubmit Choose1 +0x200 vstrategyMenuDropDown").OnEvent("Change", strategyMenu)
+		centerGui.Add("DropDownList", "x565 yp w180 Choose1 +0x200 vstrategyMenuDropDown").OnEvent("Change", strategyMenu)
 
-		centerGui.Add("DropDownList", "x750 yp w180 AltSubmit Choose1 +0x200 vpitstopMenuDropDown").OnEvent("Change", pitstopMenu)
+		centerGui.Add("DropDownList", "x750 yp w180 Choose1 +0x200 vpitstopMenuDropDown").OnEvent("Change", pitstopMenu)
 
 		centerGui.SetFont("s8 Norm", "Arial")
 
@@ -1981,7 +1983,7 @@ class RaceCenter extends ConfigurationItem {
 		this.iPlanListView.OnEvent("Click", choosePlan)
 
 		centerGui.Add("Text", "x378 ys+68 w90 h23 +0x200", translate("Driver"))
-		centerGui.Add("DropDownList", "x474 yp w126 AltSubmit vplanDriverDropDownMenu").OnEvent("Change", updatePlan)
+		centerGui.Add("DropDownList", "x474 yp w126 vplanDriverDropDownMenu").OnEvent("Change", updatePlan)
 
 		centerGui.Add("Text", "x378 yp+28 w90 h23 +0x200", translate("Time (est. / act.)"))
 		centerGui.Add("DateTime", "x474 yp w50 h23 vplanTimeEdit  1", "HH:mm").OnEvent("Change", updatePlan)
@@ -2002,7 +2004,7 @@ class RaceCenter extends ConfigurationItem {
 
 		choices := collect(["Yes", "No"], translate)
 
-		centerGui.Add("DropDownList", "x474 yp w50 AltSubmit Choose1 vplanTyreCompoundDropDown", choices).OnEvent("Change", updatePlan)
+		centerGui.Add("DropDownList", "x474 yp w50 Choose1 vplanTyreCompoundDropDown", choices).OnEvent("Change", updatePlan)
 
 		centerGui.Add("Button", "x550 yp+30 w23 h23 Center +0x200 vaddPlanButton").OnEvent("Click", addPlan)
 		setButtonIcon(centerGui["addPlanButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
@@ -2053,16 +2055,16 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 
 		centerGui.Add("Text", "x312 yp+24 w160 h23", translate("Use Session Data"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 AltSubmit Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose1 vuseSessionDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 		centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Use Telemetry Database"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 AltSubmit Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose2 vuseTelemetryDataDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 		centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Keep current Map"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 AltSubmit Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose1 vkeepMapDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 		centerGui.Add("Text", "x312 yp+27 w160 h23", translate("Analyze Traffic"))
-		centerGui.Add("DropDownList", "x480 yp-3 w50 AltSubmit Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
+		centerGui.Add("DropDownList", "x480 yp-3 w50 Choose2 vconsiderTrafficDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", chooseSimulationSettings)
 
 		centerGui.SetFont("Norm", "Arial")
 		centerGui.SetFont("Italic", "Arial")
@@ -2072,15 +2074,15 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.SetFont("Norm", "Arial")
 
 		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Laptime Variation"))
-		centerGui.Add("DropDownList", "x162 yp w50 AltSubmit Choose1 vlapTimeVariationDropDown", collect(["Yes", "No"], translate))
+		centerGui.Add("DropDownList", "x162 yp w50 Choose1 vlapTimeVariationDropDown", collect(["Yes", "No"], translate))
 		centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to driver consistency"))
 
 		centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("Driver Errors"))
-		centerGui.Add("DropDownList", "x162 yp w50 AltSubmit Choose1 vdriverErrorsDropDown", collect(["Yes", "No"], translate))
+		centerGui.Add("DropDownList", "x162 yp w50 Choose1 vdriverErrorsDropDown", collect(["Yes", "No"], translate))
 		centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to driver car control"))
 
 		centerGui.Add("Text", "x32 yp+22 w85 h23 +0x200", translate("Pitstops"))
-		centerGui.Add("DropDownList", "x162 yp w50 AltSubmit Choose1 vpitstopsDropDown", collect(["Yes", "No"], translate))
+		centerGui.Add("DropDownList", "x162 yp w50 Choose1 vpitstopsDropDown", collect(["Yes", "No"], translate))
 		centerGui.Add("Text", "x220 yp+2 w290 h20", translate("according to random factor"))
 
 		centerGui.Add("Text", "x32 yp+24 w85 h23 +0x200", translate("Overtake"))
@@ -2100,13 +2102,13 @@ class RaceCenter extends ConfigurationItem {
 		this.iSetupsListView.OnEvent("Click", chooseSetup)
 
 		centerGui.Add("Text", "x378 ys+38 w90 h23 +0x200", translate("Driver"))
-		centerGui.Add("DropDownList", "x474 yp w126 AltSubmit vsetupDriverDropDownMenu").OnEvent("Change", updateSetup)
+		centerGui.Add("DropDownList", "x474 yp w126 vsetupDriverDropDownMenu").OnEvent("Change", updateSetup)
 
 		centerGui.Add("Text", "x378 yp+30 w70 h23 +0x200", translate("Weather"))
 
 		choices := collect(kWeatherConditions, translate)
 
-		centerGui.Add("DropDownList", "x474 yp w126 AltSubmit Choose0 vsetupWeatherDropDownMenu", choices).OnEvent("Change", updateSetup)
+		centerGui.Add("DropDownList", "x474 yp w126 Choose0 vsetupWeatherDropDownMenu", choices).OnEvent("Change", updateSetup)
 
 		centerGui.Add("Text", "x378 yp+24 w70 h23 +0x200", translate("Temperatures"))
 
@@ -2120,7 +2122,7 @@ class RaceCenter extends ConfigurationItem {
 		choices := collect([normalizeCompound("Dry")], translate)
 
 		centerGui.Add("Text", "x378 yp+24 w70 h23 +0x200", translate("Compound"))
-		centerGui.Add("DropDownList", "x474 yp+1 w126 AltSubmit Choose0 vsetupCompoundDropDownMenu", choices).OnEvent("Change", updateSetup)
+		centerGui.Add("DropDownList", "x474 yp+1 w126 Choose0 vsetupCompoundDropDownMenu", choices).OnEvent("Change", updateSetup)
 
 		centerGui.Add("Text", "x378 yp+30 w90 h23 +0x200", translate("Pressure Front"))
 		centerGui.Add("Edit", "x474 yp+1 w50 h23 vsetupBasePressureFLEdit").OnEvent("Change", updateSetup)
@@ -2172,7 +2174,7 @@ class RaceCenter extends ConfigurationItem {
 
 		choices := collect(["No Tyre Change", normalizeCompound("Dry")], translate)
 
-		centerGui.Add("DropDownList", "x106 yp w133 AltSubmit Choose1 vpitstopTyreCompoundDropDown", choices).OnEvent("Change", updateState)
+		centerGui.Add("DropDownList", "x106 yp w133 Choose1 vpitstopTyreCompoundDropDown", choices).OnEvent("Change", updateState)
 
 		centerGui.Add("Button", "x240 yp w23 h23 Center +0x200 vcopyPressuresButton").OnEvent("Click", copyPressures)
 		setButtonIcon(centerGui["copyPressuresButton"], kIconsDirectory . "Copy.ico", 1, "")
@@ -2194,7 +2196,7 @@ class RaceCenter extends ConfigurationItem {
 
 		choices := collect(["No Repairs", "Bodywork & Aerodynamics", "Suspension & Chassis", "Engine", "Everything"], translate)
 
-		centerGui.Add("DropDownList", "x106 yp w157 AltSubmit Choose5 vpitstopRepairsDropDown", choices)
+		centerGui.Add("DropDownList", "x106 yp w157 Choose5 vpitstopRepairsDropDown", choices)
 
 		centerGui.Add("Button", "x66 ys+279 w160", translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
@@ -2249,7 +2251,7 @@ class RaceCenter extends ConfigurationItem {
 					token := loginDialog(this.Connector, this.ServerURL, window)
 
 					if token {
-						this.iServerToken := ((token = "") ? "__INVALID__" : token)
+						this.iServerToken := ((token = "") ? RaceCenter.kInvalidToken : token)
 
 						window["serverTokenEdit"].Text := token
 					}
@@ -2302,7 +2304,7 @@ class RaceCenter extends ConfigurationItem {
 					throw "Cannot connect to Team Server..."
 			}
 			catch Any as exception {
-				this.iServerToken := "__INVALID__"
+				this.iServerToken := RaceCenter.kInvalidToken
 				this.iConnection := false
 
 				window["serverTokenEdit"].Text := ""
@@ -2328,7 +2330,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	loadTeams() {
-		local teams := (this.Connected ? loadTeams(this.Connector) : {})
+		local teams := (this.Connected ? loadTeams(this.Connector) : Map())
 		local names := getKeys(teams)
 		local identifiers := getValues(teams)
 		local chosen
@@ -2372,7 +2374,7 @@ class RaceCenter extends ConfigurationItem {
 
 		teamIdentifier := this.SelectedTeam[true]
 
-		sessions := ((this.Connected && teamIdentifier) ? loadSessions(this.Connector, teamIdentifier) : {})
+		sessions := ((this.Connected && teamIdentifier) ? loadSessions(this.Connector, teamIdentifier) : Map())
 
 		this.iSessions := sessions
 
@@ -2396,7 +2398,7 @@ class RaceCenter extends ConfigurationItem {
 		if this.SessionActive {
 			teamIdentifier := this.SelectedTeam[true]
 
-			drivers := ((this.Connected && teamIdentifier) ? loadDrivers(this.Connector, teamIdentifier) : {})
+			drivers := ((this.Connected && teamIdentifier) ? loadDrivers(this.Connector, teamIdentifier) : Map())
 
 			session := this.SelectedSession[true]
 		}
@@ -3277,7 +3279,7 @@ class RaceCenter extends ConfigurationItem {
 	}
 
 	clearPlan(verbose := true) {
-		local delete
+		local delete, msgResult
 
 		if (this.PlanListView.GetCount() > 0) {
 			delete := false
@@ -4196,7 +4198,7 @@ class RaceCenter extends ConfigurationItem {
 		switch line {
 			case 3: ; Connect...
 				this.iServerURL := this.Control["serverURLEdit"].Text
-				this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? "__INVALID__" : this.Control["serverTokenEdit"].Text)
+				this.iServerToken := ((this.Control["serverTokenEdit"].Text = "") ? RaceCenter.kInvalidToken : this.Control["serverTokenEdit"].Text)
 
 				this.connect()
 			case 4: ; Clear...
@@ -6049,10 +6051,10 @@ class RaceCenter extends ConfigurationItem {
 
 			data := readMultiMap(directory . "Race.data")
 
-			if (getMultiMapValue(data, "Cars", "Count") = "__NotInitialized__")
+			if (getMultiMapValue(data, "Cars", "Count") = kNotInitialized)
 				setMultiMapValue(data, "Cars", "Count", 0)
 
-			if (getMultiMapValue(data, "Cars", "Driver") = "__NotInitialized__")
+			if (getMultiMapValue(data, "Cars", "Driver") = kNotInitialized)
 				setMultiMapValue(data, "Cars", "Driver", 0)
 		}
 		else {

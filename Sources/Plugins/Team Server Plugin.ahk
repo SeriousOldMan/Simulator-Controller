@@ -911,7 +911,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			return false
 	}
 
-	getSessionValue(name, default := "__Undefined__") {
+	getSessionValue(name, default := kUndefined) {
 		local value
 
 		if this.SessionActive {

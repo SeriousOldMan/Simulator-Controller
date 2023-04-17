@@ -195,7 +195,7 @@ installOptions(options, *) {
 
 		installGui.SetFont("Bold", "Arial")
 
-		installGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse(installGui, "Install"))
+		installGui.Add("Text", "w330 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(installGui, "Install"))
 
 		installGui.SetFont("Norm", "Arial")
 		installGui.SetFont("Italic Underline", "Arial")
@@ -217,7 +217,7 @@ installOptions(options, *) {
 		disabled := (options.Update ? "Disabled" : "")
 
 		installGui.Add("Text", "x16 yp+60 w100 h23 +0x200", translate("Installation Type"))
-		installGui.Add("DropDownList", "x116 yp w80 AltSubmit " . disabled . " Choose" . chosen . " vinstallationTypeDropDown", collect(["Registry", "Portable"], translate))
+		installGui.Add("DropDownList", "x116 yp w80 " . disabled . " Choose" . chosen . " vinstallationTypeDropDown", collect(["Registry", "Portable"], translate))
 
 		installGui.Add("Text", "x16 yp+24 w110 h23 +0x200", translate("Installation Folder"))
 		installGui.Add("Edit", "x116 yp w187 h21 " . disabled . " vinstallLocationPathEdit", options.InstallLocation)
@@ -383,13 +383,19 @@ exitProcesses(silent := false, force := false) {
 checkInstallation() {
 	global gProgressCount
 
-	local installLocation, installOptions, quiet, options, msgResult
+	local installLocation := ""
+	local installInfo, quiet, options, msgResult
 	local install, index, options, isNew, packageLocation, ignore, directory, currentDirectory
 
-	installLocation := RegRead("HKLM\" kUninstallKey, "InstallLocation")
+	try {
+		installLocation := RegRead("HKLM\" . kUninstallKey, "InstallLocation")
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
 
-	installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
-	installLocation := getMultiMapValue(installOptions, "Install", "Location", installLocation)
+	installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
 
 	if inList(A_Args, "-Uninstall") {
 		quiet := inList(A_Args, "-Quiet")
@@ -413,11 +419,11 @@ checkInstallation() {
 		if !exitProcesses()
 			ExitApp(1)
 
-		options := {InstallType: getMultiMapValue(installOptions, "Install", "Type", "Registry")
+		options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
 				  , InstallLocation: normalizeDirectoryPath(installLocation)
-				  , AutomaticUpdates: getMultiMapValue(installOptions, "Updates", "Automatic", true)
-				  , DesktopShortcuts: getMultiMapValue(installOptions, "Shortcuts", "Desktop", false)
-				  , StartMenuShortcuts: getMultiMapValue(installOptions, "Shortcuts", "StartMenu", true)
+				  , AutomaticUpdates: getMultiMapValue(installInfo, "Updates", "Automatic", true)
+				  , DesktopShortcuts: getMultiMapValue(installInfo, "Shortcuts", "Desktop", false)
+				  , StartMenuShortcuts: getMultiMapValue(installInfo, "Shortcuts", "StartMenu", true)
 				  , DeleteUserFiles: false}
 
 		if (quiet || uninstallOptions(options)) {
@@ -512,12 +518,12 @@ checkInstallation() {
 				if !exitProcesses()
 					ExitApp(1)
 
-			options := {InstallType: getMultiMapValue(installOptions, "Install", "Type", "Registry")
-					  , InstallLocation: normalizeDirectoryPath(getMultiMapValue(installOptions, "Install", "Location", installLocation))
-					  , AutomaticUpdates: getMultiMapValue(installOptions, "Updates", "Automatic", true)
-					  , Verbose: getMultiMapValue(installOptions, "Updates", "Verbose", false)
-					  , DesktopShortcuts: getMultiMapValue(installOptions, "Shortcuts", "Desktop", false)
-					  , StartMenuShortcuts: getMultiMapValue(installOptions, "Shortcuts", "StartMenu", true)
+			options := {InstallType: getMultiMapValue(installInfo, "Install", "Type", "Registry")
+					  , InstallLocation: normalizeDirectoryPath(getMultiMapValue(installInfo, "Install", "Location", installLocation))
+					  , AutomaticUpdates: getMultiMapValue(installInfo, "Updates", "Automatic", true)
+					  , Verbose: getMultiMapValue(installInfo, "Updates", "Verbose", false)
+					  , DesktopShortcuts: getMultiMapValue(installInfo, "Shortcuts", "Desktop", false)
+					  , StartMenuShortcuts: getMultiMapValue(installInfo, "Shortcuts", "StartMenu", true)
 					  , StartSetup: isNew, Update: !isNew}
 
 			packageLocation := normalizeDirectoryPath(kHomeDirectory)
@@ -525,12 +531,12 @@ checkInstallation() {
 			if ((!isNew && !options.Verbose) || installOptions(options)) {
 				installLocation := options.InstallLocation
 
-				setMultiMapValue(installOptions, "Install", "Type", options.InstallType)
-				setMultiMapValue(installOptions, "Install", "Location", installLocation)
-				setMultiMapValue(installOptions, "Updates", "Automatic", options.AutomaticUpdates)
-				setMultiMapValue(installOptions, "Updates", "Verbose", options.Verbose)
-				setMultiMapValue(installOptions, "Shortcuts", "Desktop", options.DesktopShortcuts)
-				setMultiMapValue(installOptions, "Shortcuts", "StartMenu", options.StartMenuShortcuts)
+				setMultiMapValue(installInfo, "Install", "Type", options.InstallType)
+				setMultiMapValue(installInfo, "Install", "Location", installLocation)
+				setMultiMapValue(installInfo, "Updates", "Automatic", options.AutomaticUpdates)
+				setMultiMapValue(installInfo, "Updates", "Verbose", options.Verbose)
+				setMultiMapValue(installInfo, "Shortcuts", "Desktop", options.DesktopShortcuts)
+				setMultiMapValue(installInfo, "Shortcuts", "StartMenu", options.StartMenuShortcuts)
 
 				gProgressCount := 0
 
@@ -604,7 +610,7 @@ checkInstallation() {
 					fixIE(10, "Simulator Setup.exe")
 					fixIE(11, "System Monitor.exe")
 
-					writeMultiMap(kUserConfigDirectory . "Simulator Controller.install", installOptions)
+					writeMultiMap(kUserConfigDirectory . "Simulator Controller.install", installInfo)
 
 					if (installLocation != packageLocation) {
 						showProgress({message: translate("Removing installation files...")})
@@ -639,7 +645,7 @@ checkInstallation() {
 
 				if isNew {
 					if options.StartSetup
-						Run(installLocation "\Binaries\Simulator Setup.exe")
+						Run(installLocation . "\Binaries\Simulator Setup.exe")
 				}
 				else {
 					Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes")
@@ -694,7 +700,7 @@ copyFiles(source, destination, deleteOrphanes) {
 	step := ((deleteOrphanes ? 70 : 80) / count)
 	stepCount := 0
 
-	copyDirectory(source, destination, step, stepCount)
+	copyDirectory(source, destination, step, &stepCount)
 
 	gProgressCount := (gProgressCount + Round(step * count))
 
@@ -705,7 +711,7 @@ copyFiles(source, destination, deleteOrphanes) {
 
 		stepCount := 0
 
-		cleanupDirectory(source, destination, 10, stepCount)
+		cleanupDirectory(source, destination, 10, &stepCount)
 
 		gProgressCount := (gProgressCount + 10)
 
@@ -738,7 +744,7 @@ deleteFiles(installLocation) {
 	step := (70 / count)
 	stepCount := 0
 
-	clearDirectory(installLocation, step, stepCount)
+	clearDirectory(installLocation, step, &stepCount)
 
 	gProgressCount := (gProgressCount + Round(step * count))
 
@@ -764,7 +770,7 @@ copyDirectory(source, destination, progressStep, &count) {
 		if InStr(FileExist(fileName), "D") {
 			SplitPath(fileName, &subDirectory)
 
-			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, count)
+			copyDirectory(fileName, destination . "\" . subDirectory, progressStep, &count)
 		}
 		else
 			FileCopy(fileName, destination, 1)
@@ -788,7 +794,7 @@ clearDirectory(directory, progressStep, &count) {
 		if InStr(FileExist(fileName), "D") {
 			SplitPath(fileName, &subDirectory)
 
-			clearDirectory(directory . "\" . subDirectory, progressStep, count)
+			clearDirectory(directory . "\" . subDirectory, progressStep, &count)
 		}
 		else
 			deleteFile(fileName)
@@ -804,7 +810,7 @@ cleanupDirectory(source, destination, maxStep, &count) {
 		SplitPath(A_LoopFilePath, &fileName)
 
 		if InStr(FileExist(A_LoopFilePath), "D") {
-			cleanupDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, count)
+			cleanupDirectory(source . "\" . fileName, A_LoopFilePath, maxStep, &count)
 
 			try {
 				DirDelete(A_LoopFilePath)
@@ -836,7 +842,7 @@ cd C:\
 rmdir "%directory%" /s /q
 )"
 
-	FileAppend(command, A_Temp . "\Cleanup.bat")
+	FileAppend(substituteVariables(command, {directory: directory}), A_Temp . "\Cleanup.bat")
 
 	Run("`"" . A_Temp . "\Cleanup.bat`"", "C:\", "Hide")
 }
@@ -900,18 +906,27 @@ writeAppPaths(installLocation) {
 }
 
 deleteAppPaths() {
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
-	RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
+	deleteRegEntry(path) {
+		try {
+			RegDelete(path)
+		}
+		catch Any as exception {
+			logError(exception, false, false)
+		}
+	}
+
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorStartup.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorController.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSettings.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorSetup.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SimulatorConfiguration.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceSettings.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceReports.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\StrategyWorkbench.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\ServerAdministration.exe")
+	deleteRegEntry("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
 }
 
 writeUninstallerInfo(installLocation) {
@@ -930,7 +945,12 @@ writeUninstallerInfo(installLocation) {
 }
 
 deleteUninstallerInfo() {
-	RegDelete("HKLM", kUninstallKey)
+	try {
+		RegDeleteKey("HKLM\" . kUninstallKey)
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
 }
 
 readToolsConfiguration(&updateSettings, &cleanupSettings, &copySettings, &buildSettings
@@ -1239,7 +1259,7 @@ editTargets(command := "", *) {
 		chosen := inList(["Development", "Production"], gTargetConfiguration)
 
 		targetsGui.Add("Text", "X10 Y" . yPos, translate("Target"))
-		targetsGui.Add("DropDownList", "X110 YP-5 w310 AltSubmit Choose" . chosen . " vtargetConfiguration", collect(["Development", "Production"], translate))
+		targetsGui.Add("DropDownList", "X110 YP-5 w310 Choose" . chosen . " vtargetConfiguration", collect(["Development", "Production"], translate))
 
 		themes := getAllThemes()
 		chosen := (gSplashTheme ? inList(themes, gSplashTheme) + 1 : 1)
@@ -1375,7 +1395,7 @@ updateActionDefinitions(fileName := "Controller Plugin Labels", preset := false)
 			else {
 				bundledDefinitions := readMultiMap(kResourcesDirectory . "Templates\" . fileName . "." . languageCode)
 
-				if (bundledDefinitions.Count() == 0)
+				if (bundledDefinitions.Count == 0)
 					bundledDefinitions := enDefinitions
 			}
 
@@ -1462,13 +1482,40 @@ renewConsent() {
 	}
 }
 
+updateInstallationForV500() {
+	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
+
+	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
+		installLocation := getMultiMapValue(installInfo, "Install", "Location")
+
+		deleteFile(installLocation . "\Binaries\Setup Advisor.exe")
+
+		try {
+			FileCreateShortcut(installLocation . "\Binaries\Setup Workbench.exe", A_StartMenu . "\Simulator Controller\Setup Workbench.lnk", installLocation . "\Binaries")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+
+	if (getMultiMapValue(installInfo, "Install", "Type", false) = "Registry") {
+		try {
+			RegWrite(installLocation . "\Binaries\Setup Workbench.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupWorkbench.exe")
+
+			RegDelete("HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SetupAdvisor.exe")
+		}
+		catch Any as exception {
+			logError(exception)
+		}
+	}
+}
+
 updateInstallationForV398() {
-	local installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
-	local installLocation
+	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installLocation := getMultiMapValue(installInfo, "Install", "Location")
 
-	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getMultiMapValue(installOptions, "Install", "Location")
-
+	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
 		deleteFile(installLocation . "\Binaries\Setup Database.exe")
 
 		try {
@@ -1479,7 +1526,7 @@ updateInstallationForV398() {
 		}
 	}
 
-	if (getMultiMapValue(installOptions, "Install", "Type", false) = "Registry") {
+	if (getMultiMapValue(installInfo, "Install", "Type", false) = "Registry") {
 		try {
 			RegWrite(installLocation . "\Binaries\Session Database.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\SessionDatabase.exe")
 			RegWrite(installLocation . "\Binaries\Race Center.exe", "REG_SZ", "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\RaceCenter.exe")
@@ -1495,17 +1542,76 @@ updateInstallationForV398() {
 }
 
 updateInstallationForV392() {
-	local installOptions := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
+	local installInfo := readMultiMap(kUserConfigDirectory . "Simulator Controller.install")
 	local installLocation
 
-	if (getMultiMapValue(installOptions, "Shortcuts", "StartMenu", false)) {
-		installLocation := getMultiMapValue(installOptions, "Install", "Location")
+	if (getMultiMapValue(installInfo, "Shortcuts", "StartMenu", false)) {
+		installLocation := getMultiMapValue(installInfo, "Install", "Location")
 
-		FileCreateShortcut(installLocation . "\Binaries\Setup Workbench.exe", A_StartMenu . "\Simulator Controller\Setup Workbench.lnk", installLocation . "\Binaries")
+		FileCreateShortcut(installLocation . "\Binaries\Setup Advisor.exe", A_StartMenu . "\Simulator Controller\Setup Adisor.lnk", installLocation . "\Binaries")
 	}
 }
 
+updateConfigurationForV500() {
+	local text
+
+	copyDirectory(source, destination) {
+		local files := []
+		local ignore, fileName, file, subDirectory
+
+		DirCreate(destination)
+
+		loop Files, source . "\*.*", "DF"
+			files.Push(A_LoopFilePath)
+
+		for ignore, fileName in files {
+			if InStr(FileExist(fileName), "D") {
+				SplitPath(fileName, &subDirectory)
+
+				copyDirectory(fileName, destination . "\" . subDirectory)
+			}
+			else
+				FileCopy(fileName, destination, 1)
+		}
+	}
+
+	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
+		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
+
+		text := StrReplace(text, "SetupAdvisor", "SetupWorkbench")
+
+		deleteFile(kUserHomeDirectory . "Setup\Setup.data")
+
+		FileAppend(text, kUserHomeDirectory . "Setup\Setup.data", "UTF-16")
+	}
+
+	if FileExist(kUserConfigDirectory . "Simulator Configuration.ini") {
+		text := FileRead(kUserConfigDirectory . "Simulator Configuration.ini", "`n")
+
+		text := StrReplace(text, "SetupAdvisor", "SetupWorkbench")
+
+		deleteFile(kUserConfigDirectory . "Simulator Configuration.ini")
+
+		FileAppend(text, kUserConfigDirectory . "Simulator Configuration.ini")
+	}
+
+	if FileExist(kUserConfigDirectory . "Application Settings.ini") {
+		text := FileRead(kUserConfigDirectory . "Application Settings.ini", "`n")
+
+		text := StrReplace(text, "Setup Advisor", "Setup Workbench")
+
+		deleteFile(kUserConfigDirectory . "Application Settings.ini")
+
+		FileAppend(text, kUserConfigDirectory . "Application Settings.ini")
+	}
+
+	copyDirectory(kUserHomeDirectory . "Advisor", kUserHomeDirectory . "Garage")
+
+	deleteDirectory(kUserHomeDirectory . "Advisor")
+}
+
 updateConfigurationForV463() {
+	local text
 	if FileExist(kUserHomeDirectory . "Setup\Setup.data") {
 		text := FileRead(kUserHomeDirectory . "Setup\Setup.data", "`n")
 
@@ -1559,13 +1665,14 @@ updateConfigurationForV452() {
 
 	settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-	for key, value in getMultiMapValues(settings, "Setup Workbench")
+	for key, value in getMultiMapValues(settings, "Setup Advisor")
 		tempValues[StrReplace(key, ".Unknown", ".*")] := value
 
 	for key, value in tempValues {
 		found := false
 
-		for ignore, subkey in [".LowspeedThreshold", ".OversteerThresholds", ".UndersteerThresholds"							 , ".SteerLock", ".SteerRatio", ".Wheelbase", ".TrackWidth"]
+		for ignore, subkey in [".LowspeedThreshold", ".OversteerThresholds", ".UndersteerThresholds"
+							 , ".SteerLock", ".SteerRatio", ".Wheelbase", ".TrackWidth"]
 			if (InStr(key, subkey) && (string2Values(".", key).Length < 4)) {
 				newValues[StrReplace(key, subkey, ".*" . subkey)] := value
 
@@ -1578,7 +1685,7 @@ updateConfigurationForV452() {
 			newValues[key] := value
 	}
 
-	setMultiMapValues(settings, "Setup Workbench", newValues)
+	setMultiMapValues(settings, "Setup Advisor", newValues)
 
 	writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 }
@@ -2936,16 +3043,3 @@ Escape:: {
 
 	return
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

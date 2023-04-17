@@ -1208,7 +1208,7 @@ class SessionDatabase extends ConfigurationItem {
 		return SessionDatabase.getTyreCompounds(simulator, car, track, codes)
 	}
 
-	static getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
+	static getTyreCompoundName(simulator, car, track, compound, default := kUndefined) {
 		local index, code
 
 		for index, code in SessionDatabase.getTyreCompounds(simulator, car, track, true)
@@ -1218,7 +1218,7 @@ class SessionDatabase extends ConfigurationItem {
 		return ((default = kUndefined) ? compound : default)
 	}
 
-	getTyreCompoundName(simulator, car, track, compound, default := "__Undefined__") {
+	getTyreCompoundName(simulator, car, track, compound, default := kUndefined) {
 		return SessionDatabase.getTyreCompoundName(simulator, car, track, compound, default)
 	}
 
@@ -1271,7 +1271,7 @@ class SessionDatabase extends ConfigurationItem {
 
 		compounds := collect(collect(availableTyreCompounds, compound), normalizeCompound)
 
-		switch weather {
+		switch weather, false {
 			case "Dry":
 				tyreCompound := "Dry"
 			case "Drizzle", "LightRain":
@@ -1479,7 +1479,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
-			 , driver := "__Undefined__", identifier := "__Undefined__", synchronized := false) {
+			 , driver := kUndefined, identifier := kUndefined, synchronized := false) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 
@@ -1667,7 +1667,7 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	writeStrategy(simulator, car, track, name, strategy, share, synchronize
-				, driver := "__Undefined__", identifier := "__Undefined__", synchronized := false) {
+				, driver := kUndefined, identifier := kUndefined, synchronized := false) {
 		local simulatorCode := this.getSimulatorCode(simulator)
 		local fileName, file, info
 

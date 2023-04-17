@@ -70,7 +70,7 @@ class MessagesTest extends Assert {
 		while (vIncomingValues.Length < 5) {
 			priority := Random(1, 4)
 
-			; Task.startTask("disturb", 50, Round(priority))
+			Task.startTask(disturb, 50, Round(priority))
 
 			Sleep(1)
 		}

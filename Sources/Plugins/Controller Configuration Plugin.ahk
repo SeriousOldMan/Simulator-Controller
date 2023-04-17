@@ -309,7 +309,7 @@ class FunctionsList extends ConfigurationItemList {
 		window.Add("ListView", "x16 y200 w457 h146 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))
 
 		window.Add("Text", "x16 y356 w86 h23 Y:Move +0x200", translate("Function"))
-		window.Add("DropDownList", "x124 y356 w91 Y:Move AltSubmit Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)
+		window.Add("DropDownList", "x124 y356 w91 Y:Move Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)
 		window.Add("Edit", "x220 y356 w40 h21 Y:Move Number Limit3 VfunctionNumberEdit")
 		window.Add("UpDown", "Range1-999 x260 y356 w17 h21 Y:Move", 1)
 
@@ -465,7 +465,7 @@ class FunctionsList extends ConfigurationItemList {
 		local offKey := false
 		local chosen
 
-		switch item.Type {
+		switch item.Type, false {
 			case k1WayToggleType:
 				chosen := 1
 				onKey := "On"

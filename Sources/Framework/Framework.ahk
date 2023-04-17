@@ -7,6 +7,7 @@
 
 #Include "..\Framework\Constants.ahk"
 #Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Types.ahk"
 #Include "..\Framework\Utils.ahk"
 #Include "..\Framework\Debug.ahk"
 #Include "..\Framework\Files.ahk"

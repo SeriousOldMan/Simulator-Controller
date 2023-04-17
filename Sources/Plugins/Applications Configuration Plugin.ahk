@@ -96,7 +96,7 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 
 		window.Add("Text", "x16 y343 w138 h23 Y:Move +0x200", translate("Working Directory (optional)"))
 		window.Add("Edit", "x180 y343 w268 h21 Y:Move W:Grow VapplicationWorkingDirectoryPathEdit")
-		window.Add("Button", "x451 y342 w23 h23 X:Move Y:Move", translate("...")).OnEvent("Click", chooseApplicationWorkingDirectoryPath.Bind("Normal"))
+		window.Add("Button", "x451 y342 w23 h23 X:Move Y:Move", translate("...")).OnEvent("Click", chooseApplicationWorkingDirectoryPath)
 
 		window.Add("Text", "x16 y367 w140 h23 Y:Move +0x200", translate("Window Title (optional)"))
 

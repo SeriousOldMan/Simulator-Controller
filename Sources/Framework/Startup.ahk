@@ -186,9 +186,6 @@ initializeEnvironment() {
 
 		if !FileExist(A_MyDocuments . "\Simulator Controller\Plugins\Configuration Plugins.ahk")
 			FileCopy(kResourcesDirectory . "Templates\Configuration Plugins.ahk", A_MyDocuments . "\Simulator Controller\Plugins")
-
-		if !FileExist(kUserConfigDirectory . "Race.settings")
-			FileCopy(kResourcesDirectory . "Templates\Race.settings", kUserConfigDirectory)
 	}
 
 	newID := !FileExist(kUserConfigDirectory . "ID")

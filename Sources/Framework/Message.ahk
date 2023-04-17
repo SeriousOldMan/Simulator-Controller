@@ -20,8 +20,8 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showMessage(message, title := false, icon := "__Undefined__", duration := 1000
-		  , x := "Center", y := "__Undefined__", width := 400, height := 100, *) {
+showMessage(message, title := false, icon := kUndefined, duration := 1000
+		  , x := "Center", y := kUndefined, width := 400, height := 100, *) {
 	local screenLeft, screenRight, screenTop, screenBottom, messageGui
 	local innerWidth := width - 16
 

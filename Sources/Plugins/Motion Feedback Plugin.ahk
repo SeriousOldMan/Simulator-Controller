@@ -1139,7 +1139,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	updateMotionState() {
-		static isRunning := "__Undefined__"
+		static isRunning := kUndefined
 
 		if (isRunning == kUndefined)
 			isRunning := this.Application.isRunning()

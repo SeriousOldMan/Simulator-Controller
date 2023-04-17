@@ -539,7 +539,7 @@ class ControllerStepWizard extends StepWizard {
 			type := this.iFunctionsListView.GetText(row, 3)
 			number := this.iFunctionsListView.GetText(row, 4)
 
-			switch type {
+			switch type, false {
 				case translate(k2WayToggleType):
 					callback := ObjBindMethod(this, "registerHotkey", k2WayToggleType . "." . number, row, true)
 				case translate(kDialType):
@@ -568,7 +568,7 @@ class ControllerStepWizard extends StepWizard {
 
 			double := false
 
-			switch type {
+			switch type, false {
 				case translate(k2WayToggleType):
 					type := k2WayToggleType
 					double := true
@@ -643,7 +643,7 @@ class ControllerStepWizard extends StepWizard {
 
 			double := false
 
-			switch type {
+			switch type, false {
 				case translate(k2WayToggleType):
 					type := k2WayToggleType
 					double := true

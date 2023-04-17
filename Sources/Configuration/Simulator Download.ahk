@@ -49,7 +49,7 @@ updateProgress(max) {
 
 downloadSimulatorController() {
 	local icon := kIconsDirectory . "Installer.ico"
-	local options, index, cState, sState, devVersion, release, version, download, updateTask
+	local options, index, cState, sState, devVersion, release, version, package, updateTask
 	local directory, currentDirectory, start, ignore, url, error
 
 	TraySetIcon(icon, "1")
@@ -110,11 +110,11 @@ downloadSimulatorController() {
 
 	if version {
 		if devVersion
-			download := getMultiMapValue(release, "Development", "Download", false)
+			package := getMultiMapValue(release, "Development", "Download", false)
 		else
-			download := getMultiMapValue(release, "Release", "Download", false)
+			package := getMultiMapValue(release, "Release", "Download", false)
 
-		if download {
+		if package {
 			showProgress({color: "Green", title: translate(inList(A_Args, "-Update") ? "Updating Simulator Controller" : "Installing Simulator Controller")
 						, message: translate("Downloading Version ") . version})
 
@@ -124,7 +124,7 @@ downloadSimulatorController() {
 
 			error := false
 
-			for ignore, url in string2Values(";", download)
+			for ignore, url in string2Values(";", package)
 				try {
 					Download(url, A_Temp . "\Simulator Controller.zip")
 

@@ -225,7 +225,7 @@ editModes(&settingsOrCommand, arguments*) {
 ;;;                     Public Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x := "__Undefined__", y := "__Undefined__") {
+editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x := kUndefined, y := kUndefined) {
 	global kSave, kCancel, kContinue, kUpdate, kEditModes
 
 	local index, coreDescriptor, coreVariable, feedbackDescriptor, feedbackVariable, positions
@@ -490,7 +490,7 @@ editSettings(&settingsOrCommand, withContinue := false, fromSetup := false, x :=
 
 		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "Popup Position", "Bottom")
 
-		lastPositions := map()
+		lastPositions := CaseInsenseMap()
 
 		for descriptor, value in getMultiMapValues(settingsOrCommand, "Button Box")
 			if InStr(descriptor, ".Position.")

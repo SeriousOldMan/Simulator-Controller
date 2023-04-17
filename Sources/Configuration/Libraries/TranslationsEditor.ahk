@@ -497,7 +497,7 @@ class TranslationsList extends ConfigurationItemList {
 			if (msgResult = "Yes") {
 				this.iChanged := false
 
-				translations := map()
+				translations := CaseInsenseMap()
 
 				this.iLanguageCode := this.Control["isoCodeEdit"].Text
 

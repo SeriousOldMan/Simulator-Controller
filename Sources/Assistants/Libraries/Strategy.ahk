@@ -1312,10 +1312,10 @@ class Strategy extends ConfigurationItem {
 
 	iAvailableTyreSets := CaseInsenseMap()
 
-	iTyrePressureFL := 27.6
-	iTyrePressureFR := 27.6
-	iTyrePressureRL := 27.6
-	iTyrePressureRR := 27.6
+	iTyrePressureFL := 26.5
+	iTyrePressureFR := 26.5
+	iTyrePressureRL := 26.5
+	iTyrePressureRR := 26.5
 
 	iStintLength := 0
 	iFormationLap := false
@@ -2458,7 +2458,7 @@ class Strategy extends ConfigurationItem {
 		this.iTyreCompound := getMultiMapValue(configuration, "Setup", "TyreCompound", "Dry")
 		this.iTyreCompoundColor := getMultiMapValue(configuration, "Setup", "TyreCompoundColor", "Black")
 
-		defaultPressure := ((this.iTyreCompound = "Dry") ? 27.7 : 30.0)
+		defaultPressure := ((this.iTyreCompound = "Dry") ? 26.5 : 30.0)
 
 		this.iTyrePressureFL := getMultiMapValue(configuration, "Setup", "TyrePressureFL", defaultPressure)
 		this.iTyrePressureFR := getMultiMapValue(configuration, "Setup", "TyrePressureFR", defaultPressure)
@@ -2960,8 +2960,7 @@ class Strategy extends ConfigurationItem {
 		pitstopRule := this.PitstopRule
 		numPitstops := pitstopRule
 
-		if isInteger(numPitstops)
-		{
+		if isInteger(numPitstops) {
 			if (numPitstops > 1) {
 				fuelLaps := Max(0, (currentFuel / fuelConsumption) - 1)
 				canonicalStintLaps := Round(sessionLaps / (numPitstops + 1))

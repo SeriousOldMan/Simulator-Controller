@@ -1000,7 +1000,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := inList(["Never", "Always", "Threshold", "Impact"]
 					   , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair", "Always"))
 
-		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VrepairSuspensionDropDown", choices).OnEvent("Change", updateRepairSuspensionState)
+		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairSuspensionDropDown", choices).OnEvent("Change", updateRepairSuspensionState)
 		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairSuspensionGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairSuspensionThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Suspension.Repair.Threshold", 0), 1)).OnEvent("Change", validateNumber.Bind("repairSuspensionThresholdEdit"))
@@ -1014,7 +1014,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := inList(["Never", "Always", "Threshold", "Impact"]
 					   , getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair", "Impact"))
 
-		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VrepairBodyworkDropDown", choices).OnEvent("Change", updateRepairBodyworkState)
+		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairBodyworkDropDown", choices).OnEvent("Change", updateRepairBodyworkState)
 		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairBodyworkGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairBodyworkThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Bodywork.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairBodyworkThresholdEdit"))
@@ -1027,7 +1027,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		choices := collect(["Never", "Always", "Threshold", "Impact"], translate)
 		chosen := inList(["Never", "Always", "Threshold", "Impact"], getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair", "Impact"))
 
-		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VrepairEngineDropDown", choices).OnEvent("Change", updateRepairEngineState)
+		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VrepairEngineDropDown", choices).OnEvent("Change", updateRepairEngineState)
 		settingsGui.Add("Text", "x245 yp+2 w20 h20 VrepairEngineGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VrepairEngineThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Damage.Engine.Repair.Threshold", 1), 1)).OnEvent("Change", validateNumber.Bind("repairEngineThresholdEdit"))
@@ -1040,7 +1040,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		choices := collect(["Never", "Tyre Temperature", "Weather"], translate)
 		chosen := inList(["Never", "Temperature", "Weather"], getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change", "Never"))
 
-		settingsGui.Add("DropDownList", "x126 yp w110 AltSubmit Choose" . chosen . " VchangeTyreDropDown", choices).OnEvent("Change", updateChangeTyreState)
+		settingsGui.Add("DropDownList", "x126 yp w110 Choose" . chosen . " VchangeTyreDropDown", choices).OnEvent("Change", updateChangeTyreState)
 		settingsGui.Add("Text", "x245 yp+2 w20 h20 VchangeTyreGreaterLabel", translate(">"))
 		settingsGui.Add("Edit", "x260 yp-2 w50 h20 VchangeTyreThresholdEdit"
 							  , displayValue("Float", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Compound.Change.Threshold", 0), 1))
@@ -1088,22 +1088,22 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryFrontLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Front Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryFrontRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryFrontRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.FR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryFrontRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Left"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearLeftEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryRearLeftEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearLeftEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.Add("Text", "x26 yp+24 w75 h20", translate("Rear Right"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit4 VtpDryRearRightEdit"
-							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 27.7)))).OnEvent("Change", validateNumber.Bind("tpDryRearRightEdit"))
+							  , displayValue("Float", convertUnit("Pressure", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)))).OnEvent("Change", validateNumber.Bind("tpDryRearRightEdit"))
 		settingsGui.Add("Text", "x164 yp+2 w30 h20", getUnit("Pressure"))
 
 		settingsGui.SetFont("Norm", "Arial")
@@ -1176,7 +1176,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		if ((chosen == 0) && (choices.Length > 0))
 			chosen := 1
 
-		settingsGui.Add("DropDownList", "x106 yp w110 AltSubmit Choose" . chosen . " VspSetupTyreCompoundDropDown", choices)
+		settingsGui.Add("DropDownList", "x106 yp w110 Choose" . chosen . " VspSetupTyreCompoundDropDown", choices)
 
 		settingsGui.Add("Text", "x16 yp+26 w90 h20", translate("Start Tyre Set"))
 		settingsGui.Add("Edit", "x106 yp-2 w50 h20 Limit2 Number VspSetupTyreSetEdit", setupTyreSet)
@@ -1300,7 +1300,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		chosen := inList(["Fixed", "Dynamic"], getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel.Rule", "Dynamic"))
 
-		settingsGui.Add("DropDownList", "x12 yp+21 w110 AltSubmit Choose" . chosen . " VpitstopRefuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
+		settingsGui.Add("DropDownList", "x12 yp+21 w110 Choose" . chosen . " VpitstopRefuelServiceRuleDropdown", collect(["Refuel Fixed", "Refuel Dynamic"], translate)).OnEvent("Change", chooseRefuelService)
 
 		settingsGui.Add("Edit", "x126 yp w50 h20 VpitstopRefuelServiceEdit"
 							  , displayValue("Float", getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Refuel", 1.5), 1)).OnEvent("Change", validateNumber.Bind("pitstopRefuelServiceEdit"))
@@ -1309,7 +1309,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		chosen := ((getMultiMapValue(settingsOrCommand, "Strategy Settings", "Service.Order", "Simultaneous") = "Simultaneous") ? 1 : 2)
 
 		settingsGui.Add("Text", "x16 yp+24 w85 h23", translate("Service"))
-		settingsGui.Add("DropDownList", "x126 yp-3 w100 AltSubmit Choose" . chosen . " vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
+		settingsGui.Add("DropDownList", "x126 yp-3 w100 Choose" . chosen . " vpitstopServiceDropDown", collect(["Simultaneous", "Sequential"], translate))
 
 		value := displayValue("Float", convertUnit("Volume", getDeprecatedValue(settingsOrCommand, "Session Settings", "Race Settings", "Fuel.SafetyMargin", 4)), 0)
 
@@ -1354,21 +1354,21 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			settingsGui.Add("Text", "x16 yp+30 w90 h23 +0x200", translate("Team / Driver"))
 
 			if teamIdentifier
-				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit Choose1 vteamDropDownMenu", [teamName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
+				settingsGui.Add("DropDownList", "x126 yp w126 Choose1 vteamDropDownMenu", [teamName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
 			else
-				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit vteamDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
+				settingsGui.Add("DropDownList", "x126 yp w126 vteamDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Team"))
 
 			if driverIdentifier
-				settingsGui.Add("DropDownList", "x256 yp w126 AltSubmit Choose1 vdriverDropDownMenu", [driverName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
+				settingsGui.Add("DropDownList", "x256 yp w126 Choose1 vdriverDropDownMenu", [driverName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 			else
-				settingsGui.Add("DropDownList", "x256 yp w126 AltSubmit vdriverDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
+				settingsGui.Add("DropDownList", "x256 yp w126 vdriverDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Driver"))
 
 			settingsGui.Add("Text", "x16 yp+24 w90 h23 +0x200", translate("Session"))
 
 			if sessionIdentifier
-				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit Choose1 vsessionDropDownMenu", [sessionName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Session"))
+				settingsGui.Add("DropDownList", "x126 yp w126 Choose1 vsessionDropDownMenu", [sessionName]).OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Session"))
 			else
-				settingsGui.Add("DropDownList", "x126 yp w126 AltSubmit vsessionDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Session"))
+				settingsGui.Add("DropDownList", "x126 yp w126 vsessionDropDownMenu").OnEvent("Change", editRaceSettings.Bind(&kUpdate, "Session"))
 
 			settingsGui.Add("Text", "x126 yp+30 r6 w256", translate("Note: These settings define the access data for a team session. In order to join this session, it is still necessary for you to activate the team mode within the first lap of the session. Please consult the documentation for more information and detailed instructions."))
 		}

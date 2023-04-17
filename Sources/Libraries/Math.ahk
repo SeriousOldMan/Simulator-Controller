@@ -89,8 +89,7 @@ linRegression(xValues, yValues, &a, &b) {
 	local index, xValue, xDelta, yDelta
 
 	for index, xValue in xValues {
-		if isNumber(xValue)
-		{
+		if isNumber(xValue) {
 			xDelta := (xValue - xAverage)
 			yDelta := (yValues[index] - yAverage)
 

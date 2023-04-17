@@ -1465,7 +1465,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		choices := ["User", "User & Community"]
 		chosen := (this.UseCommunity ? 2 : 1)
 
-		editorGui.Add("DropDownList", "x120 yp w140 AltSubmit Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
+		editorGui.Add("DropDownList", "x120 yp w140 Choose" . chosen . " vdatabaseScopeDropDown", collect(choices, translate)).OnEvent("Change", chooseDatabaseScope)
 
 		this.iDataListView := editorGui.Add("ListView", "x16 ys+301 w244 h151 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Type", "#"], translate))
 		this.iDataListView.OnEvent("Click", noSelect)
@@ -3857,7 +3857,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		static lastSimulator := false
 		static lastCar := false
 		static lastTrack := false
-		static lastCommunity := "__Undefined__"
+		static lastCommunity := kUndefined
 		static lastColor := "D0D0D0"
 
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
@@ -4346,7 +4346,7 @@ actionDialog(xOrCommand := false, y := false, action := false, *) {
 			actionEdit := ""
 		}
 
-		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 AltSubmit Choose" . chosen, collect(["Hotkey(s)", "Command"], translate))
+		actionTypeDropDown := actionDialogGui.Add("DropDownList", "x90 yp+1 w180 Choose" . chosen, collect(["Hotkey(s)", "Command"], translate))
 		actionTypeDropDown.OnEvent("Change", actionDialog.Bind("Type"))
 
 		actionLabel := actionDialogGui.Add("Text", "x16 yp+23 w70 h23 +0x200", translate("Hotkey(s)"))

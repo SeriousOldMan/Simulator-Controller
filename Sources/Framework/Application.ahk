@@ -165,7 +165,7 @@ requestShareSessionDatabaseConsent() {
 				if (getFileNames("Consent.*", kTranslationsDirectory).Length > 0)
 					result := consentDialog(id, consent)
 				else {
-					result := {}
+					result := CaseInsenseMap()
 
 					result["TyrePressures"] := "Retry"
 					result["RaceStrategies"] := "Retry"
@@ -386,7 +386,7 @@ broadcastMessage(applications, message, arguments*) {
 
 }
 
-viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", width := 800, height := 400, *) {
+viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
 	local html, innerWidth, editHeight, buttonX
 	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, htmlGui
 

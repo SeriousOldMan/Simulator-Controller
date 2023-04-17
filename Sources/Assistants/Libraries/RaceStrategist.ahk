@@ -466,7 +466,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	__New(configuration, remoteHandler, name := false, language := "__Undefined__"
+	__New(configuration, remoteHandler, name := false, language := kUndefined
 		, synthesizer := false, speaker := false, vocalics := false, recognizer := false, listener := false, muted := false, voiceServer := false) {
 		super.__New(configuration, "Race Strategist", remoteHandler, name, language, synthesizer, speaker, vocalics, recognizer, listener, muted, voiceServer)
 
@@ -2352,8 +2352,8 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	planPitstop(plannedLap := false, refuel := "__Undefined__", tyreChange := "__Undefined__"
-			  , tyreCompound := "__Undefined__", tyreCompoundColor := "__Undefined__") {
+	planPitstop(plannedLap := false, refuel := kUndefined, tyreChange := kUndefined
+			  , tyreCompound := kUndefined, tyreCompoundColor := kUndefined) {
 		local engineerPID
 
 		Task.yield()

@@ -2773,7 +2773,7 @@ class RaceStrategist extends GridRaceAssistant {
 						carIndex := false
 				}
 
-				if carIndex {
+				if (carIndex && times.Has(carIndex)) {
 					times[carIndex] := knowledgeBase.getValue(carPrefix . ".Time", "-")
 					positions[carIndex] := knowledgeBase.getValue(carPrefix . ".Position", "-")
 					laps[carIndex] := Floor(knowledgeBase.getValue(carPrefix . ".Laps", "-"))

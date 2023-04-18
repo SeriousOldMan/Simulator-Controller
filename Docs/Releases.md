@@ -7,18 +7,18 @@
   4. Modernized UI for all windows, especially on Windows 11.
   5. Support for window resizing in almost all applications.
   6. Renamed controller action function "hotkey" to "trigger" to avoid conflict with a new builtin function.
-  7. Renamed "Setup Advisor" to "Setup Workbench".
+  7. Renamed "Setup Advisor" to ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench).
   8. Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor"
-  9. Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins.
+  9. Renamed plugin argument "openSetupAdvisor" to ["openSetupWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for all Race Assistant plugins.
   10. Big performance improvements in the rule engine.
   11. Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty.
-  12. Introduced Stream Deck Plus Layout.
+  12. Introduced support for the new Stream Deck Plus Layout.
   13. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
   14. Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap.
   15. Updated th car meta data to the latest version.
-  16. [Developer] Renamed configuration map functions to multi map functions.
-  17. [Developer] Introduced a couple of specialized Array and Map subtypes, which supports failure safe handling of unset elements.
-  18. [Developer] Introduced of a specialized subclass of *Gui* which supports seamless resizing rules for controls.
+  16. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
+  17. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
+  18. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500).
 

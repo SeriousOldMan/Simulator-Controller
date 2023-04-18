@@ -174,7 +174,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		widget15 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 Y:Move(0.66) W:Grow H:Grow(0.33) VtactileFeedbackInfoText Hidden", "shell.explorer")
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget15.Value.navigate("about:blank")
 		widget15.Value.document.write(html)

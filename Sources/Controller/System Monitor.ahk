@@ -62,7 +62,7 @@ global gStartupFinished := false
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getTableCSS() {
+getTableCSS(window) {
 	local script
 
 	script := "
@@ -102,18 +102,18 @@ getTableCSS() {
 		}
 
 		.table-std tbody tr:nth-child(even) {
-			background-color: #D8D8D8;
+			background-color: #%altBackColor%;
 		}
 
 		.table-std tbody tr:nth-child(odd) {
-			background-color: #D0D0D0;
+			background-color: #%backColor%;
 		}
 	)"
 
-	return script
+	return substituteVariables(script, {altBackColor: window.AltBackColor, backColor: window.BackColor})
 }
 
-updateDashboard(viewer, html := "") {
+updateDashboard(window, viewer, html := "") {
 	local script, ignore, chart
 
 	if (html == false)
@@ -132,9 +132,9 @@ updateDashboard(viewer, html := "") {
 		</head>
 	)"
 
-	script := substituteVariables(script, {tableCSS: getTableCSS()})
+	script := substituteVariables(script, {tableCSS: getTableCSS(window)})
 
-	html := ("<html>" . script . "<body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+	html := ("<html>" . script . "<body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
@@ -227,7 +227,7 @@ systemMonitor(command := false, arguments*) {
 		else
 			html := ""
 
-		updateDashboard(simulationDashboard, html)
+		updateDashboard(systemMonitorGui, simulationDashboard, html)
 	}
 
 	updateAssistantsState(controllerState) {
@@ -277,7 +277,7 @@ systemMonitor(command := false, arguments*) {
 		else
 			html .= "</table>"
 
-		updateDashboard(assistantsDashboard, html)
+		updateDashboard(systemMonitorGui, assistantsDashboard, html)
 	}
 
 	updateSessionState(controllerState) {
@@ -317,7 +317,7 @@ systemMonitor(command := false, arguments*) {
 		else
 			html := ""
 
-		updateDashboard(sessionDashboard, html)
+		updateDashboard(systemMonitorGui, sessionDashboard, html)
 	}
 
 	updateDataState(databaseState) {
@@ -391,7 +391,7 @@ systemMonitor(command := false, arguments*) {
 		else
 			html := ""
 
-		updateDashboard(dataDashboard, html)
+		updateDashboard(systemMonitorGui, dataDashboard, html)
 	}
 
 	updateAutomationState(controllerState) {
@@ -428,7 +428,7 @@ systemMonitor(command := false, arguments*) {
 		else
 			html := ""
 
-		updateDashboard(automationDashboard, html)
+		updateDashboard(systemMonitorGui, automationDashboard, html)
 	}
 
 	updateMapperState(trackMapperState) {
@@ -480,7 +480,7 @@ systemMonitor(command := false, arguments*) {
 		else
 			html := ""
 
-		updateDashboard(mapperDashboard, html)
+		updateDashboard(systemMonitorGui, mapperDashboard, html)
 	}
 
 	closeSystemMonitor(*) {
@@ -922,12 +922,12 @@ systemMonitor(command := false, arguments*) {
 		else
 			systemMonitorGui.Show()
 
-		updateDashboard(simulationDashboard)
-		updateDashboard(assistantsDashboard)
-		updateDashboard(sessionDashboard)
-		updateDashboard(dataDashboard)
-		updateDashboard(automationDashboard)
-		updateDashboard(mapperDashboard)
+		updateDashboard(systemMonitorGui, simulationDashboard)
+		updateDashboard(systemMonitorGui, assistantsDashboard)
+		updateDashboard(systemMonitorGui, sessionDashboard)
+		updateDashboard(systemMonitorGui, dataDashboard)
+		updateDashboard(systemMonitorGui, automationDashboard)
+		updateDashboard(systemMonitorGui, mapperDashboard)
 
 		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()

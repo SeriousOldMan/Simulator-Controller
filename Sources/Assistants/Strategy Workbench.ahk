@@ -78,8 +78,8 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iSelectedSessionType := "Duration"
 
-	iTelemetryChartHTML := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
-	iStrategyChartHTML := this.iTelemetryChartHTML
+	iTelemetryChartHTML := false
+	iStrategyChartHTML := false
 
 	iTyreSetListView := false
 
@@ -128,7 +128,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					workbench.loadChart(["Scatter", "Bar", "Bubble", "Line"][workbench.Control["chartTypeDropDown"].Value])
 				else {
 					workbench.ChartViewer.document.open()
-					workbench.ChartViewer.document.write(workbench.iTelemetryChartHTML)
+					workbench.ChartViewer.document.write(workbench.iStrategyChartHTML)
 					workbench.ChartViewer.document.close()
 				}
 			}
@@ -812,6 +812,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui := Window({Descriptor: "Strategy Workbench", Resizeable: true, Closeable: true})
 
 		this.iWindow := workbenchGui
+		
+		this.iTelemetryChartHTML := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: workbenchGui.AltBackColor})
+		this.iStrategyChartHTML := this.iTelemetryChartHTML
 
 		workbenchGui.SetFont("s10 Bold", "Arial")
 
@@ -958,7 +961,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("ActiveX", "x619 yp+14 w727 h193 Border vstratViewer H:Grow W:Grow", "shell.explorer").Value.navigate("about:blank")
 
-		this.iStrategyViewer := StrategyViewer(window, workbenchGui["stratViewer"].Value)
+		this.iStrategyViewer := StrategyViewer(workbenchGui, workbenchGui["stratViewer"].Value)
 
 		this.showStrategyInfo(false)
 
@@ -1422,20 +1425,20 @@ class StrategyWorkbench extends ConfigurationItem {
 			(
 					</script>
 				</head>
-				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after,  {width: (this.ChartViewer.Width - 5), height: (this.ChartViewer.Height - 5)}))
+			html := (before . drawChartFunction . substituteVariables(after,  {width: (this.ChartViewer.Width - 5), height: (this.ChartViewer.Height - 5), backColor: this.Window.AltBackColor}))
 
 			this.ChartViewer.document.write(html)
 		}
 		else {
-			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+			html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-			this.ChartViewer.document.write(html)
+			this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 		}
 
 		this.iTelemetryChartHTML := html
@@ -1700,7 +1703,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		vAxis .= "}"
 
 		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
@@ -1711,16 +1714,16 @@ class StrategyWorkbench extends ConfigurationItem {
 			if (maxValue = kUndefined)
 				maxValue := 0
 
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: {minValue: " . minValue . ", maxValue: " . maxValue . "} };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: {minValue: " . minValue . ", maxValue: " . maxValue . "} };")
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Bubble") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8', hAxis: { title: '" . translate(xAxis) . "', viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', viewWindowMode: 'pretty' }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', viewWindowMode: 'pretty' }, vAxis: { title: '" . translate(yAxises[1]) . "', viewWindowMode: 'pretty' }, colorAxis: { legend: {position: 'none'}, colors: ['blue', 'red'] }, sizeAxis: { maxSize: 15 } };")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.BubbleChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
 		else if (this.SelectedChartType = "Line") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#D8D8D8' };")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "' };")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
@@ -2643,7 +2646,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					for ignore, fileName in files
 						strategies.Push(this.createStrategy(readMultiMap(fileName)))
 
-					if (strategies.Count > 1)
+					if (strategies.Length > 1)
 						this.compareStrategies(strategies*)
 				}
 			case 9: ; "Export Strategy..."
@@ -2785,9 +2788,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		chartArea := ("<div id=`"header`"><i><b>" . translate("Performance") . "</b></i></div><br><div id=`"chart_id`" style=`"width: " . (this.ChartViewer.Width - 5) . "px; height: 348px`">")
 
-		tableCSS := getTableCSS()
+		tableCSS := this.StrategyViewer.getTableCSS()
 
-		html := ("<html>" . before . chart . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . chart . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style>" . html . "<br><hr style=`"width: 50%`"><br>" . chartArea . "</body></html>")
 
 		this.showComparisonChart(html)
 	}

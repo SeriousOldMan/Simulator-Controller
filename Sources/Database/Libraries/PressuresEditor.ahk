@@ -186,7 +186,7 @@ class PressuresEditor {
 
 		this.iPressuresViewer := pressuresEditorGui.Add("ActiveX", "x16 yp+30 w394 h160 Border vpressuresViewer", "shell.explorer").Value
 		this.PressuresViewer.navigate("about:blank")
-		this.PressuresViewer.document.write("<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
+		this.PressuresViewer.document.write("<html><body style='background-color: #" . pressuresEditorGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 
 		this.iPressuresListView := pressuresEditorGui.Add("ListView", "x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit", collect(["Tyre", "Pressure", "#"], translate))
 		this.iPressuresListView.OnEvent("Click", choosePressure)
@@ -530,20 +530,20 @@ class PressuresEditor {
 			(
 					</script>
 				</head>
-				<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.Width, height: this.PressuresViewer.Height - 1}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.Width, height: this.PressuresViewer.Height - 1, backColor: this.Window.AltBackColor}))
 
 			this.PressuresViewer.document.write(html)
 		}
 		else {
-			html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+			html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-			this.PressuresViewer.document.write(html)
+			this.PressuresViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 		}
 
 		this.PressuresViewer.document.close()

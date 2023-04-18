@@ -249,7 +249,7 @@ setLogLevel(level, *) {
 	local ignore, title, state
 
 	if hasTrayMenu()
-		for ignore, label in ["Off", "Info", "Warn", "Critical"]
+		for ignore, label in ["Debug", "Off", "Info", "Warn", "Critical"]
 			LogMenu.Uncheck(translate(label))
 
 	switch level, false {

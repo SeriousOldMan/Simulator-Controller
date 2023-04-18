@@ -157,7 +157,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		widget5 := window.Add("ActiveX", "x" . x . " ys+205 w" . width . " h180 Y:Move(0.5) W:Grow VsimulatorsInfoText Hidden", "shell.explorer")
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget5.Value.navigate("about:blank")
 		widget5.Value.document.write(html)
@@ -188,7 +188,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		widget5 := window.Add("ActiveX", "x" . x . " ys+265 w" . width . " h120 Y:Move(0.5) W:Grow VapplicationsInfoText Hidden", "shell.explorer")
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget5.Value.navigate("about:blank")
 		widget5.Value.document.write(html)

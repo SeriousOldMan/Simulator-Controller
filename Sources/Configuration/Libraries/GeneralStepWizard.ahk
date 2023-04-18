@@ -289,7 +289,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		widget16 := window.Add("ActiveX", "x" . x . " yp+118 w" . width . " h94 Y:Move(0.5) H:Grow(0.5) W:Grow Hidden", "shell.explorer")
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
 		widget16.Value.navigate("about:blank")
 		widget16.Value.document.write(html)

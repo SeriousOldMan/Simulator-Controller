@@ -112,20 +112,20 @@ class RaceReportViewer extends RaceReportReader {
 				(
 						</script>
 					</head>
-					<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 					</body>
 				</html>
 				)"
 
-				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.Width, height: this.ChartViewer.Height - 1}))
+				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.Width, height: this.ChartViewer.Height - 1, backColor: this.Window.AltBackColor}))
 
 				this.ChartViewer.document.write(html)
 			}
 			else {
-				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.ChartViewer.document.write(html)
+				this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
 
 			this.ChartViewer.document.close()
@@ -161,14 +161,14 @@ class RaceReportViewer extends RaceReportReader {
 				infoText .= ("<tr><td>" . translate("Conditions: ") . "</td><td>" . values2String(", ", collect(conditions, translate)*) . "</td></tr>")
 				infoText .= "</table>"
 
-				infoText := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+				infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 
-				this.InfoViewer.document.write(infoText)
+				this.InfoViewer.document.write(substituteVariables(infoText, {backColor: this.Window.AltBackColor}))
 			}
 			else {
-				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.InfoViewer.document.write(html)
+				this.InfoViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
 
 			this.InfoViewer.document.close()
@@ -939,7 +939,7 @@ class RaceReportViewer extends RaceReportReader {
 				title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
 			}
 
-			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#D8D8D8', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
+			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 

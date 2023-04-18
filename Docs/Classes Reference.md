@@ -9,13 +9,13 @@ You can use the Window class anywhere you normally would use a *Gui*. Please not
 ### Public Properties
 
 #### *Descriptor*
-Returns the symbolic name of this window, which is used, for example, by the [getWindowPosition](*), [getWindowSize](*) and [moveByMoue](*) functions.
+Returns the symbolic name of this window, which is used, for example, by the [getWindowPosition](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#getwindowpositiondescriptor--string-byref-x--integer-byref-y--integer), [getWindowSize](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#getwindowsizedescriptor--string-byref-w--integer-byref-h--integer) and [moveByMoue](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#movebymouseguiprefix--string-descriptor--string--false) functions.
 
 #### *Closeable*
-Returns *true*, if the window is closeable. In this case, the [Close](*) method is called, whenever the user wants to close the window.
+Returns *true*, if the window is closeable. In this case, the [Close](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#closerest-arguments) method is called, whenever the user wants to close the window.
 
 #### *Resizeable*
-Returns *true*, if the window is resizeable. In this case, the [Resize](*) method is called, whenever the user is resizing the window, or, if the value of *Resizeable* is "Deferred", **after** the window had been resized.
+Returns *true*, if the window is resizeable. In this case, the [Resize](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#resizeminmax--string-width--integer-height--integer) method is called, whenever the user is resizing the window, or, if the value of *Resizeable* is "Deferred", **after** the window had been resized.
 
 #### *MinWidth*
 This is the mimimum width, the window is allowed to have. This property is set by default to the window width, that window had, when initially opened, bt can be set to a different size anytime.
@@ -42,7 +42,7 @@ The height of the title bar. Returns *false*, if the window hasno displayed titl
 Returns a list of all defined resizers for this window or only for the given *control*.
 
 #### *Rules[asText :: Boolean := *true*]*
-Returns the default resize rules, which will be applied automatically to all following defined controls for this window. You can either ask for textual representation or a list. Initialiiy, the default rules are empty. See [DefineResizeRule](*) below for detailed explanation of resize rules.
+Returns the default resize rules, which will be applied automatically to all following defined controls for this window. You can either ask for textual representation or a list. Initialliy, the default rules are empty. See [DefineResizeRule](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#resizeminmax--string-width--integer-height--integer) below for detailed explanation of resize rules.
 
 ### Public Methods
 
@@ -69,11 +69,11 @@ This method is called for each control, after it has been created, also here to 
 Adds a resizer to the list of resizers for this window. Must not be called manually (use the inherited *Add* method for custom resizers as well as controls), but you can overwrite it, to do some additional work here.
 
 #### *DefineResizeRule(control :: Gui.Control, rule :: String)*
-Also called automatically from *Add*. *rule* can consist of multiple resize actions sparated by spaces. A resize action looks like this:
+Also called automatically from *Add*. *rule* can consist of multiple resize actions separated by spaces. A resize action looks like this:
 
-  *target property*:*action*[(*factor*)
+  *Property*:*Action*[(*Factor*)
 
-  1. Target property must be one of *x*, *y*, *w* (*width*), *h* (*height*), *v* (*vertical*) or *h* (*horizontal*) 
+  1. Property must be one of *x*, *y*, *w* (*width*), *h* (*height*), *v* (*vertical*) or *h* (*horizontal*) 
   2. Action must be one of *Move*, *Grow* or *Center*
   3. Factor can be any numeric value (normally a value between 0 and 1), which effects the amount of change applid to the property
 
@@ -83,8 +83,10 @@ Examples:
   - W:Grow - The control grows in width by the amount the window has grown horizontally.
   - V:Center - The control is centered vertically in the window area.
 
+Please note, that you don't have to call *DefineResizeRule* manually. Simply include the resize rules into the options string, when add ing a new control to the window using the *Add* method.
+
 #### *Close(#rest arguments)*
-Will be called, when the window is closed by the user. The default method simply calls *ExitApp(*)*
+Will be called, when the window is closed by the user. The default method simply calls *ExitApp(0)*
 
 #### *Resize(minMax :: String, width :: Integer, height :: Integer)*
 Is called periodically, when the user is resizing the window. The default implementation applies the resiz rules.

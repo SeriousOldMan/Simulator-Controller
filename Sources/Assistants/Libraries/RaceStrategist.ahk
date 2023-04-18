@@ -101,6 +101,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 	class ExplainPitstopContinuation extends VoiceManager.ReplyContinuation {
 		iPlannedLap := false
+		iPitstopOptions := []
 
 		PlannedLap {
 			Get {
@@ -108,8 +109,15 @@ class RaceStrategist extends GridRaceAssistant {
 			}
 		}
 
-		__New(manager, plannedLap, arguments*) {
+		PitstopOptions {
+			Get {
+				return this.iPitstopOptions
+			}
+		}
+
+		__New(manager, plannedLap, pitstopOptions, arguments*) {
 			this.iPlannedLap := plannedLap
+			this.iPitstopOptions := pitstopOptions
 
 			super.__New(manager, arguments*)
 		}
@@ -118,7 +126,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if ProcessExist("Race Engineer.exe") {
 				this.Manager.getSpeaker().speakPhrase("ConfirmInformEngineerAnyway", false, true)
 
-				this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop", this.PlannedLap))
+				this.Manager.setContinuation(ObjBindMethod(this.Manager, "planPitstop", this.PlannedLap, this.PitstopOptions*))
 			}
 			else
 				super.cancel()
@@ -563,6 +571,9 @@ class RaceStrategist extends GridRaceAssistant {
 			case "StrategyRecommend":
 				this.clearContinuation()
 
+				if !this.hasEnoughData()
+					return
+
 				this.getSpeaker().speakPhrase("Confirm")
 
 				Task.yield()
@@ -574,6 +585,9 @@ class RaceStrategist extends GridRaceAssistant {
 			case "PitstopRecommend":
 				this.clearContinuation()
 
+				if !this.hasEnoughData()
+					return
+
 				this.getSpeaker().speakPhrase("Confirm")
 
 				Task.yield()
@@ -584,6 +598,9 @@ class RaceStrategist extends GridRaceAssistant {
 				this.recommendPitstopRecognized(words)
 			case "PitstopSimulate":
 				this.clearContinuation()
+
+				if !this.hasEnoughData()
+					return
 
 				this.getSpeaker().speakPhrase("Confirm")
 
@@ -2239,23 +2256,33 @@ class RaceStrategist extends GridRaceAssistant {
 	recommendPitstop(lap := false) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
-		local strategyLap, lastLap, plannedLap, position, traffic, hasEngineer
+		local refuel := kUndefined
+		local tyreChange := kUndefined
+		local tyreCompound := kUndefined
+		local tyreCompoundColor := kUndefined
+		local strategyLap := false
+		local lastLap, plannedLap, position, traffic, hasEngineer, nextPitstop, pitstopOptions
 
 		if !this.hasEnoughData()
 			return
 
-		if !lap {
-			strategyLap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
-			lap := strategyLap
+		strategyLap := knowledgeBase.getValue("Strategy.Pitstop.Lap", false)
+		lastLap := knowledgeBase.getValue("Lap")
 
-			if (lap && (lap >= (knowledgeBase.getValue("Lap") - knowledgeBase.getValue("Session.Settings.Lap.PitstopWarning"))))
-				lap := false
+		if strategyLap {
+			nextPitstop := knowledgeBase.getValue("Strategy.Pitstop.Next")
 
-			lastLap := knowledgeBase.getValue("Lap")
+			refuel := Round(knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Fuel.Amount"))
+			tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
+			tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
+			tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
 
-			if (strategyLap && ((Abs(strategyLap - lastLap) / lastLap) > 0.1))
-				strategyLap := false
+			if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
+				refuel := ("!" . refuel)
 		}
+
+		if !lap
+			lap := strategyLap
 
 		knowledgeBase.setFact("Pitstop.Strategy.Plan", lap ? lap : true)
 
@@ -2274,7 +2301,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-				this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap))
+				this.setContinuation(ObjBindMethod(this, "planPitstop", strategyLap, refuel, tyreChange, tyreCompound, tyreCompoundColor))
 			}
 			else
 				speaker.speakPhrase("NoPlannedPitstop")
@@ -2282,6 +2309,11 @@ class RaceStrategist extends GridRaceAssistant {
 		else if !plannedLap
 			speaker.speakPhrase("NoPitstopNeeded")
 		else {
+			if (strategyLap && (Abs(strategyLap - plannedLap) < 5))
+				pitstopOptions := Array(refuel, tyreChange, tyreCompound, tyreCompoundColor)
+			else
+				pitstopOptions := []
+
 			speaker.beginTalk()
 
 			try {
@@ -2290,8 +2322,8 @@ class RaceStrategist extends GridRaceAssistant {
 				speaker.speakPhrase("Explain", false, true)
 
 				if hasEngineer
-					this.setContinuation(RaceStrategist.ExplainPitstopContinuation(this, plannedLap
-																				 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap)
+					this.setContinuation(RaceStrategist.ExplainPitstopContinuation(this, plannedLap, pitstopOptions
+																				 , ObjBindMethod(this, "explainPitstopRecommendation", plannedLap, pitstopOptions)
 																				 , false, "Okay"))
 				else
 					this.setContinuation(ObjBindMethod(this, "explainPitstopRecommendation", plannedLap))
@@ -2302,7 +2334,7 @@ class RaceStrategist extends GridRaceAssistant {
 		}
 	}
 
-	explainPitstopRecommendation(plannedLap) {
+	explainPitstopRecommendation(plannedLap, pitstopOptions := []) {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker := this.getSpeaker()
 		local position := knowledgeBase.getValue("Pitstop.Strategy.Position", false)
@@ -2347,7 +2379,7 @@ class RaceStrategist extends GridRaceAssistant {
 			if ProcessExist("Race Engineer.exe") {
 				speaker.speakPhrase("ConfirmInformEngineer", false, true)
 
-				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap))
+				this.setContinuation(ObjBindMethod(this, "planPitstop", plannedLap, pitstopOptions*))
 			}
 		}
 	}
@@ -2474,22 +2506,20 @@ class RaceStrategist extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, plannedLap, laps, nextPitstop, refuel, tyreChange, tyreCompound, tyreCompoundColor
 
-		if (this.hasEnoughData(false) && this.Speaker[false]) {
+		if (this.Speaker[false]) {
 			speaker := this.getSpeaker()
 
-			if this.hasEnoughData(false) {
-				knowledgeBase.setFact("Pitstop.Strategy.Plan", plannedPitstopLap)
+			knowledgeBase.setFact("Pitstop.Strategy.Plan", plannedPitstopLap)
 
-				knowledgeBase.produce()
+			knowledgeBase.produce()
 
-				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledgeBase(this.KnowledgeBase)
+			if this.Debug[kDebugKnowledgeBase]
+				this.dumpKnowledgeBase(this.KnowledgeBase)
 
-				plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
+			plannedLap := knowledgeBase.getValue("Pitstop.Strategy.Lap", kUndefined)
 
-				if (plannedLap && (plannedLap != kUndefined))
-					plannedPitstopLap := plannedLap
-			}
+			if (plannedLap && (plannedLap != kUndefined))
+				plannedPitstopLap := plannedLap
 
 			laps := (plannedPitstopLap - knowledgeBase.getValue("Lap"))
 
@@ -2507,6 +2537,9 @@ class RaceStrategist extends GridRaceAssistant {
 					tyreChange := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Change")
 					tyreCompound := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound")
 					tyreCompoundColor := knowledgeBase.getValue("Strategy.Pitstop." . nextPitstop . ".Tyre.Compound.Color")
+
+					if (knowledgeBase.getValue("Strategy.Pitstop.Count") > nextPitstop)
+						refuel := ("!" . refuel)
 
 					this.setContinuation(ObjBindMethod(this, "planPitstop", plannedPitstopLap
 																		  , refuel, "!" . tyreChange, tyreCompound, tyreCompoundColor))

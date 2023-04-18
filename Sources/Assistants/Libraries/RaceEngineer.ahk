@@ -1663,6 +1663,10 @@ class RaceEngineer extends RaceAssistant {
 			force := true
 		}
 		else if (optionsOrLap != kUndefined) {
+			if (InStr(optionsOrLap, "!") = 1)
+				optionsOrLap := SubStr(optionsOrLap, 2)
+
+
 			if isNumber(optionsOrLap) {
 				options := true
 
@@ -1689,7 +1693,7 @@ class RaceEngineer extends RaceAssistant {
 		correctedFuel := false
 
 		if (refuelAmount != kUndefined) {
-			if (InStr(refuelAmount . "", "!") = 1)
+			if (InStr(refuelAmount, "!") = 1)
 				knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", SubStr(refuelAmount, 2) + 0)
 			else {
 				targetFuel := knowledgeBase.getValue("Fuel.Amount.Target", false)

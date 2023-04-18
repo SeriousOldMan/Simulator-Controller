@@ -955,7 +955,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		result := false
 
-		settingsGui := Window({Descriptor: "Race Settings", Options: "0x400000"}, "")
+		settingsGui := Window({Descriptor: "Race Settings", Options: "0x400000"}	)
 
 		settingsGui.SetFont("Bold", "Arial")
 

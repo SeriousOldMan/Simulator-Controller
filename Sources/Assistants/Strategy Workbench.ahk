@@ -812,7 +812,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui := Window({Descriptor: "Strategy Workbench", Resizeable: true, Closeable: true})
 
 		this.iWindow := workbenchGui
-		
+
 		this.iTelemetryChartHTML := substituteVariables("<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>", {backColor: workbenchGui.AltBackColor})
 		this.iStrategyChartHTML := this.iTelemetryChartHTML
 
@@ -1892,7 +1892,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 				tyreCompound := compound(category["Tyre.Compound"], category["Tyre.Compound.Color"])
 
-				this.DataListView.Add("", translate(tyreCompound), value, category.Count)
+				this.DataListView.Add("", translate(tyreCompound), value, category["Count"])
 
 				if !inList(availableCompounds, tyreCompound)
 					availableCompounds.Push(tyreCompound)

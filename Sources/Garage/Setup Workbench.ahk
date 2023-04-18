@@ -98,7 +98,17 @@ class SetupWorkbench extends ConfigurationItem {
 	iKnowledgeBase := false
 
 	class WorkbenchWindow extends Window {
-		__New() {
+		iWorkbench := false
+
+		Workbench {
+			Get {
+				return this.iWorkbench
+			}
+		}
+
+		__New(workbench) {
+			this.iWorkbench := workbench
+
 			super.__New({Descriptor: "Setup Workbench", Resizeable: true, Closeable: true})
 		}
 
@@ -130,7 +140,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				try this.Window.Workbench.updateRecommendations(true, false)
+				try
+					this.Window.Workbench.updateRecommendations(true, false)
 			}
 
 			return Task.CurrentTask
@@ -397,7 +408,7 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 		}
 
-		workbenchGui := SetupWorkbench.WorkbenchWindow()
+		workbenchGui := SetupWorkbench.WorkbenchWindow(this)
 
 		this.iWindow := workbenchGui
 

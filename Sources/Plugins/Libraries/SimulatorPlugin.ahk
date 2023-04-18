@@ -1166,8 +1166,10 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	acquirePositionsData(telemetryData) {
+		local positions := Map()
+		local needCorrection := false
 		local cars := []
-		local positionsData, count
+		local positionsData, count, position
 
 		if telemetryData.Has("Position Data") {
 			positionsData := newMultiMap()
@@ -1179,25 +1181,36 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 
 		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
-		loop count
-			cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
-								   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
+		loop count {
+			position := (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position", 0) + 0)
 
-		bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
-
-		if isDebug() {
-			loop count {
-				if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position") != A_Index)
-					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index][1] . ": "
-										. getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position")
-										. " -> " . A_Index)
-
-				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
-			}
+			if positions.Has(position)
+				needCorrection := true
+			else
+				positions[position] := true
 		}
-		else
+
+		if needCorrection {
 			loop count
-				setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
+				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
+									   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
+
+			bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
+
+			if isDebug() {
+				loop count {
+					if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position") != A_Index)
+						logMessage(kLogDebug, "Corrected position for car " . cars[A_Index][1] . ": "
+											. getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position")
+											. " -> " . A_Index)
+
+					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
+				}
+			}
+			else
+				loop count
+					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
+		}
 
 		return positionsData
 	}

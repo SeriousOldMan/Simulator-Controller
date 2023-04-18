@@ -485,11 +485,11 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x50 yp+5 w180 h26", translate("Characteristics"))
 
 		workbenchGui.SetFont("s8 Norm")
-		workbenchGui.Add("GroupBox", "x16 yp+30 w382 h469 H:Grow -Theme")
+		workbenchGui.Add("Picture", "x16 yp+30 w382 h469 H:Grow Border BackgroundTrans")
 
 		this.iCharacteristicsArea := {X: 16, Y: 262, Width: 382, W: 482, Height: 439, H: 439}
 
-		workbenchGui.Add("Button", "x280 yp-24 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
+		workbenchGui.Add("Button", "x280 yp-32 w70 h23 vcharacteristicsButton", translate("Problem...")).OnEvent("Click", chooseCharacteristic)
 		button := workbenchGui.Add("Button", "x352 yp w23 h23")
 		button.OnEvent("Click", loadSetup)
 		setButtonIcon(button, kIconsDirectory . "Load.ico", 1, "L2 T2 R2 B2")
@@ -1177,7 +1177,7 @@ class SetupWorkbench extends ConfigurationItem {
 		knowledgeBase.setFact("Workbench.Car", this.SelectedCar["*"])
 		knowledgeBase.setFact("Workbench.Track", this.SelectedTrack["*"])
 
-		knowledgeBase.addFact("Calculate", true)
+		knowledgeBase.setFact("Calculate", true)
 
 		knowledgeBase.produce()
 
@@ -1548,12 +1548,14 @@ class SetupWorkbench extends ConfigurationItem {
 					knowledgeBase.setFact(characteristic . ".Value", value2, true)
 				}
 
-				knowledgeBase.addFact("Calculate", true)
+				if !noProblem {
+					knowledgeBase.setFact("Calculate", true)
 
-				this.KnowledgeBase.produce()
+					this.KnowledgeBase.produce()
 
-				if this.Debug[kDebugKnowledgeBase]
-					this.dumpKnowledgeBase(this.KnowledgeBase)
+					if this.Debug[kDebugKnowledgeBase]
+						this.dumpKnowledgeBase(this.KnowledgeBase)
+				}
 			}
 
 			if draw {

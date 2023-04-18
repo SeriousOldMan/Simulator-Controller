@@ -35,8 +35,7 @@
 #### General
   1. Choosing a specific theme depending on the selected simulation game
   2. Further simplification of the overall configuration process. Overhaul of "Race Settings", "Simulator Settings" and "Simulator Configuration"
-  3. Port all AHK applications to AutoHotkey 2.0.2 (see https://www.autohotkey.com/boards/viewtopic.php?f=6&t=25100)
-  4. Integrate WebView2 with Edge to cope with the pending shutdown of IE 11
+  3. Integrate WebView2 with Edge to cope with the pending shutdown of IE 11
      - https://www.autohotkey.com/boards/viewtopic.php?f=83&t=79868
 	 - https://www.autohotkey.com/boards/viewtopic.php?t=95666
-  5. Resizeable windows or larger window sizes for the "large" applications
+  4. Resizeable windows or larger window sizes for the "large" applications

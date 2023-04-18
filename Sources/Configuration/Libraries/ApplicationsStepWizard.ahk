@@ -6,13 +6,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Private Constant Section                        ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global ApplicationClass := Application	; Spooky, sometimes the reference to Application is lost
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Classes Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -24,7 +17,7 @@ class ApplicationsStepWizard extends StepWizard {
 	iSimulatorsListView := false
 	iApplicationsListView := false
 
-	Pages[] {
+	Pages {
 		Get {
 			return 2
 		}
@@ -33,15 +26,15 @@ class ApplicationsStepWizard extends StepWizard {
 	saveToConfiguration(configuration) {
 		local wizard := this.SetupWizard
 		local definition := this.Definition
-		local groups := {}
+		local groups := CaseInsenseMap()
 		local simulators := []
 		local stdApplications := []
 		local ignore, applications, theApplication, descriptor, exePath, workingDirectory, hooks, group
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, applications in concatenate([definition[1]], string2Values(",", definition[2]))
-			for theApplication, ignore in getConfigurationSectionValues(wizard.Definition, applications)
+			for theApplication, ignore in getMultiMapValues(wizard.Definition, applications)
 				if (((applications != "Applications.Simulators") || wizard.isApplicationInstalled(theApplication)) && wizard.isApplicationSelected(theApplication)) {
 					descriptor := getApplicationDescriptor(theApplication)
 
@@ -50,11 +43,11 @@ class ApplicationsStepWizard extends StepWizard {
 					if !exePath
 						exePath := ""
 
-					SplitPath exePath, , workingDirectory
+					SplitPath(exePath, , &workingDirectory)
 
 					hooks := string2Values(";", descriptor[5])
 
-					new ApplicationClass(theApplication, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
+					Application(theApplication, false, exePath, workingDirectory, descriptor[4], hooks[1], hooks[2], hooks[3]).saveToConfiguration(configuration)
 
 					group := ConfigurationItem.splitDescriptor(applications)[2]
 
@@ -64,7 +57,7 @@ class ApplicationsStepWizard extends StepWizard {
 						group := "Other"
 					}
 
-					if !groups.HasKey(group)
+					if !groups.Has(group)
 						groups[group] := []
 
 					groups[group].Push(theApplication)
@@ -74,7 +67,7 @@ class ApplicationsStepWizard extends StepWizard {
 
 		for ignore, theApplication in wizard.installedApplications()
 			if !inList(stdApplications, theApplication) {
-				if !groups.HasKey("Other")
+				if !groups.Has("Other")
 					groups["Other"] := []
 
 				groups["Other"].Push(theApplication)
@@ -82,110 +75,145 @@ class ApplicationsStepWizard extends StepWizard {
 
 		for group, applications in groups
 			for ignore, theApplication in applications
-				setConfigurationValue(configuration, "Applications", group . "." . A_Index, theApplication)
+				setMultiMapValue(configuration, "Applications", group . "." . A_Index, theApplication)
 	}
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
-		local simulatorsIconHandle := false
-		local simulatorsLabelHandle := false
-		local simulatorsListViewHandle := false
-		local simulatorsInfoTextHandle := false
-		local applicationsIconHandle := false
-		local applicationsLabelHandle := false
-		local applicationsListViewHandle := false
-		local applicationsInfoTextHandle
-		local locateSimButtonHandle
-		local locateAppButtonHandle
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
 		local application, info, html, buttonX
 
-		static simulatorsInfoText
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
 
-		Gui %window%:Default
+		locateSimulator(*) {
+			local fileName, simulator
 
-		Gui %window%:Font, s10 Bold, Arial
+			window.Opt("+OwnDialogs")
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDsimulatorsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Gaming Wheel.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDsimulatorsLabelHandle Hidden, % translate("Simulations")
+			OnMessage(0x44, translateSelectCancelButtons)
+			fileName := FileSelect(1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")}), "Executable (*.exe)")
+			OnMessage(0x44, translateSelectCancelButtons, 0)
 
-		Gui %window%:Font, s8 Norm, Arial
+			if (fileName != "") {
+				simulator := standardApplication(this.SetupWizard.Definition, ["Applications.Simulators"], fileName)
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h170 Section -Multi -LV0x10 Checked NoSort NoSortHdr HWNDsimulatorsListViewHandle Hidden, % values2String("|", map(["Simulation", "Path"], "translate")*)
+				if simulator
+					this.locateSimulator(simulator, fileName)
+			}
+		}
+
+		locateApplication(*) {
+			local fileName, application
+
+			window.Opt("+OwnDialogs")
+
+			OnMessage(0x44, translateSelectCancelButtons)
+			fileName := FileSelect(1, "", substituteVariables(translate("Select %name% executable..."), {name: translate("Application")}), "Executable (*.exe)")
+			OnMessage(0x44, translateSelectCancelButtons, 0)
+
+			if (fileName != "") {
+				application := standardApplication(this.SetupWizard.Definition, ["Applications.Core", "Applications.Feedback", "Applications.Other"], fileName)
+
+				if application
+					this.locateApplication(application, fileName)
+				else {
+					SplitPath(file, , , , &application)
+
+					this.locateApplication(application, fileName)
+				}
+			}
+		}
+
+		updateSelectedApplications(*) {
+			this.updateSelectedApplications(SetupWizard.Instance.Page, false)
+
+			noSelect(this.iApplicationsListView)
+		}
+
+		window.SetFont("s10 Bold", "Arial")
+
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Gaming Wheel.ico")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Simulations"))
+
+		window.SetFont("s8 Norm", "Arial")
+
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h170 H:Grow(0.5) W:Grow Section -Multi -LV0x10 Checked NoSort NoSortHdr Hidden", collect(["Simulation", "Path"], translate))
+		widget3.OnEvent("Click", noSelect)
+		widget3.OnEvent("DoubleClick", noSelect)
+		widget3.OnEvent("ContextMenu", noSelect)
 
 		buttonX := x + width - 90
 
-		Gui %window%:Add, Button, x%buttonX% yp+177 w90 h23 HWNDlocateSimButtonHandle glocateSimulator Hidden, % translate("Locate...")
+		widget4 := window.Add("Button", "x" . buttonX . " yp+177 w90 h23 Y:Move(0.5) X:Move Hidden", translate("Locate..."))
+		widget4.OnEvent("Click", locateSimulator)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		Sleep 200
+		widget5 := window.Add("ActiveX", "x" . x . " ys+205 w" . width . " h180 Y:Move(0.5) W:Grow VsimulatorsInfoText Hidden", "shell.explorer")
 
-		Gui %window%:Add, ActiveX, x%x% ys+205 w%width% h180 HWNDsimulatorsInfoTextHandle VsimulatorsInfoText Hidden, shell.explorer
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		widget5.Value.navigate("about:blank")
+		widget5.Value.document.write(html)
 
-		simulatorsInfoText.Navigate("about:blank")
-		simulatorsInfoText.Document.Write(html)
+		this.iSimulatorsListView := widget3
 
-		this.iSimulatorsListView := simulatorsListViewHandle
+		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5)
 
-		this.registerWidgets(1, simulatorsIconHandle, simulatorsLabelHandle, simulatorsListViewHandle, simulatorsInfoTextHandle, locateSimButtonHandle)
+		window.SetFont("s10 Bold", "Arial")
 
-		applicationsIconHandle := false
-		applicationsLabelHandle := false
-		applicationsListViewHandle := false
-		applicationsInfoTextHandle := false
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Tool Chest.ico")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Applications && Tools"))
 
-		Gui %window%:Font, s10 Bold, Arial
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDapplicationsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Tool Chest.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDapplicationsLabelHandle Hidden, % translate("Applications && Tools")
-
-		Gui %window%:Font, s8 Norm, Arial
-
-		Gui %window%:Add, ListView, x%x% yp+30 w%width% h230 Section -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr HWNDapplicationsListViewHandle GupdateSelectedApplications Hidden, % values2String("|", map(["Category", "Application", "Path"], "translate")*)
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . width . " h230 H:Grow(0.5) W:Grow Section -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr Hidden", collect(["Category", "Application", "Path"], translate))
+		widget3.OnEvent("Click", updateSelectedApplications)
+		widget3.OnEvent("DoubleClick", updateSelectedApplications)
+		widget3.OnEvent("ContextMenu", noSelect)
 
 		buttonX := x + width - 90
 
-		Gui %window%:Add, Button, x%buttonX% yp+237 w90 h23 HWNDlocateAppButtonHandle glocateApplication Hidden, % translate("Locate...")
+		widget4 := window.Add("Button", "x" . buttonX . " yp+237 w90 h23 Y:Move(0.5) X:Move Hidden", translate("Locate..."))
+		widget4.OnEvent("Click", locateApplication)
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		Sleep 200
+		widget5 := window.Add("ActiveX", "x" . x . " ys+265 w" . width . " h120 Y:Move(0.5) W:Grow VapplicationsInfoText Hidden", "shell.explorer")
 
-		Gui %window%:Add, ActiveX, x%x% ys+265 w%width% h120 HWNDapplicationsInfoTextHandle VapplicationsInfoText Hidden, shell.explorer
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		widget5.Value.navigate("about:blank")
+		widget5.Value.document.write(html)
 
-		applicationsInfoText.Navigate("about:blank")
-		applicationsInfoText.Document.Write(html)
+		this.iApplicationsListView := widget3
 
-		this.iApplicationsListView := applicationsListViewHandle
-
-		this.registerWidgets(2, applicationsIconHandle, applicationsLabelHandle, applicationsListViewHandle, applicationsInfoTextHandle, locateAppButtonHandle)
+		this.registerWidgets(2, widget1, widget2, widget3, widget4, widget5)
 	}
 
 	loadStepDefinition(definition) {
-		base.loadStepDefinition(definition)
+		super.loadStepDefinition(definition)
 
 		if !FileExist(kUserHomeDirectory . "Setup\Simulator Setup.data")
 			this.updateAvailableApplications(true)
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iSimulatorsListView := false
 		this.iApplicationsListView := false
 	}
 
 	updateState() {
-		base.updateState()
+		super.updateState()
 
 		if (this.Definition && (SetupWizard.Instance.Step == this))
 			this.updateAvailableApplications()
@@ -194,7 +222,7 @@ class ApplicationsStepWizard extends StepWizard {
 	showPage(page) {
 		this.updateAvailableApplications()
 
-		base.showPage(page)
+		super.showPage(page)
 
 		this.loadApplications(page == 1)
 	}
@@ -202,7 +230,7 @@ class ApplicationsStepWizard extends StepWizard {
 	hidePage(page) {
 		this.updateSelectedApplications(page, false)
 
-		return base.hidePage(page)
+		return super.hidePage(page)
 	}
 
 	updateAvailableApplications(initialize := false) {
@@ -213,7 +241,7 @@ class ApplicationsStepWizard extends StepWizard {
 		for ignore, section in concatenate([definition[1]], string2Values(",", definition[2])) {
 			category := ConfigurationItem.splitDescriptor(section)[2]
 
-			for application, ignore in getConfigurationSectionValues(wizard.Definition, section) {
+			for application, ignore in getMultiMapValues(wizard.Definition, section) {
 				if !wizard.isApplicationInstalled(application) {
 					wizard.locateApplication(application, false, false)
 
@@ -229,17 +257,16 @@ class ApplicationsStepWizard extends StepWizard {
 	updateSelectedApplications(page, update := true) {
 		local wizard := this.SetupWizard
 		local column := ((page == 1) ? 1 : 2)
-		local checked := {}
+		local listView := ((page == 1) ? this.iSimulatorsListView : this.iApplicationsListView)
+		local checked := CaseInsenseMap()
 		local row := 0
 		local name
 
-		Gui ListView, % ((page == 1) ? [this.iSimulatorsListView] : [this.iApplicationsListView])
-
 		loop {
-			row := LV_GetNext(row, "C")
+			row := listView.GetNext(row,"C")
 
 			if row {
-				LV_GetText(name, row, column)
+				name := listView.GetText(row, column)
 
 				checked[name] := true
 			}
@@ -247,14 +274,13 @@ class ApplicationsStepWizard extends StepWizard {
 				break
 		}
 
-		loop % LV_GetCount()
-		{
-			LV_GetText(name, A_Index, column)
+		loop listView.GetCount() {
+			name := listView.GetText(A_Index, column)
 
 			if wizard.isApplicationOptional(name)
-				wizard.selectApplication(name, checked.HasKey(name) ? checked[name] : false, false)
+				wizard.selectApplication(name, checked.Has(name) ? checked[name] : false, false)
 			else
-				LV_Modify(A_Index, "Check")
+				listView.Modify(A_Index, "Check")
 		}
 
 		if update
@@ -274,11 +300,9 @@ class ApplicationsStepWizard extends StepWizard {
 		static first2 := true
 
 		if simulators {
-			Gui ListView, % this.iSimulatorsListView
+			this.iSimulatorsListView.Delete()
 
-			LV_Delete()
-
-			for simulator, descriptor in getConfigurationSectionValues(wizard.Definition, definition[1]) {
+			for simulator, descriptor in getMultiMapValues(wizard.Definition, definition[1]) {
 				if wizard.isApplicationInstalled(simulator) {
 					descriptor := string2Values("|", descriptor)
 
@@ -293,42 +317,40 @@ class ApplicationsStepWizard extends StepWizard {
 					else
 						icons.Push("")
 
-					rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length() + 1), simulator, executable ? executable : translate("Not installed")))
+					rows.Push(Array((wizard.isApplicationSelected(simulator) ? "Check Icon" : "Icon") . (rows.Length + 1), simulator, executable ? executable : translate("Not installed")))
 				}
 			}
 
-			listViewIcons := IL_Create(icons.Length())
+			listViewIcons := IL_Create(icons.Length)
 
 			for ignore, icon in icons
 				IL_Add(listViewIcons, icon)
 
-			LV_SetImageList(listViewIcons)
+			this.iSimulatorsListView.SetImageList(listViewIcons)
 
 			for ignore, row in rows
-				LV_Add(row*)
+				this.iSimulatorsListView.Add(row*)
 
 			if first1 {
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
+				this.iSimulatorsListView.ModifyCol(1, "AutoHdr")
+				this.iSimulatorsListView.ModifyCol(2, "AutoHdr")
 
 				first1 := false
 			}
 		}
 		else {
-			Gui ListView, % this.iApplicationsListView
-
-			LV_Delete()
+			this.iApplicationsListView.Delete()
 
 			for ignore, section in string2Values(",", definition[2]) {
 				category := ConfigurationItem.splitDescriptor(section)[2]
 
-				for application, descriptor in getConfigurationSectionValues(wizard.Definition, section) {
+				for application, descriptor in getMultiMapValues(wizard.Definition, section) {
 					if (wizard.isApplicationSelected(application) || wizard.isApplicationInstalled(application) || !wizard.isApplicationOptional(application)) {
 						descriptor := string2Values("|", descriptor)
 
 						executable := wizard.applicationPath(application)
 
-						LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate(category), application, executable ? executable : translate("Not installed"))
+						this.iApplicationsListView.Add(wizard.isApplicationSelected(application) ? "Check" : "", translate(category), application, executable ? executable : translate("Not installed"))
 
 						stdApplications.Push(application)
 					}
@@ -339,24 +361,24 @@ class ApplicationsStepWizard extends StepWizard {
 				if !inList(stdApplications, application) {
 					executable := wizard.applicationPath(application)
 
-					LV_Add(wizard.isApplicationSelected(application) ? "Check" : "", translate("Other"), application, executable ? executable : translate("Not installed"))
+					this.iApplicationsListView.Add(wizard.isApplicationSelected(application) ? "Check" : "", translate("Other"), application, executable ? executable : translate("Not installed"))
 				}
 
 			if first2 {
-				LV_ModifyCol(1, "AutoHdr")
-				LV_ModifyCol(2, "AutoHdr")
-				LV_ModifyCol(3, "AutoHdr")
+				this.iApplicationsListView.ModifyCol(1, "AutoHdr")
+				this.iApplicationsListView.ModifyCol(2, "AutoHdr")
+				this.iApplicationsListView.ModifyCol(3, "AutoHdr")
 
 				first2 := false
 			}
 		}
 	}
 
-	locateSimulator(name, file) {
+	locateSimulator(name, fileName) {
 		local wizard := this.SetupWizard
 		local wasInstalled := wizard.isApplicationInstalled(name)
 
-		wizard.locateApplication(name, file, false)
+		wizard.locateApplication(name, fileName, false)
 
 		if !wasInstalled
 			wizard.selectApplication(name, true, false)
@@ -364,11 +386,11 @@ class ApplicationsStepWizard extends StepWizard {
 		this.loadApplications(true)
 	}
 
-	locateApplication(name, file) {
+	locateApplication(name, fileName) {
 		local wizard := this.SetupWizard
 		local wasInstalled := wizard.isApplicationInstalled(name)
 
-		wizard.locateApplication(name, file, false)
+		wizard.locateApplication(name, fileName, false)
 
 		if !wasInstalled
 			wizard.selectApplication(name, true, false)
@@ -382,59 +404,8 @@ class ApplicationsStepWizard extends StepWizard {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-locateSimulator() {
-	local stepWizard := SetupWizard.Instance.StepWizards["Applications"]
-	local title := substituteVariables(translate("Select %name% executable..."), {name: translate("Simulator")})
-	local file, simulator
-
-	Gui +OwnDialogs
-
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-	FileSelectFile file, 1, , %title%, Executable (*.exe)
-	OnMessage(0x44, "")
-
-	if (file != "") {
-		simulator := standardApplication(SetupWizard.Instance.Definition, ["Applications.Simulators"], file)
-
-		if simulator
-			stepWizard.locateSimulator(simulator, file)
-	}
-}
-
-locateApplication() {
-	local stepWizard := SetupWizard.Instance.StepWizards["Applications"]
-	local title := substituteVariables(translate("Select %name% executable..."), {name: translate("Application")})
-	local file, application
-
-	Gui +OwnDialogs
-
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-	FileSelectFile file, 1, , %title%, Executable (*.exe)
-	OnMessage(0x44, "")
-
-	if (file != "") {
-		application := standardApplication(SetupWizard.Instance.Definition, ["Applications.Core", "Applications.Feedback", "Applications.Other"], file)
-
-		if application
-			stepWizard.locateApplication(application, file)
-		else {
-			SplitPath file, , , , application
-
-			stepWizard.locateApplication(application, file)
-		}
-	}
-}
-
-updateSelectedApplications() {
-	loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
-
-	if ((A_GuiEvent = "Normal") || (A_GuiEvent = "RightClick"))
-		SetupWizard.Instance.StepWizards["Applications"].updateSelectedApplications(SetupWizard.Instance.Page, false)
-}
-
 initializeApplicationsStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new ApplicationsStepWizard(SetupWizard.Instance, "Applications", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(ApplicationsStepWizard(SetupWizard.Instance, "Applications", kSimulatorConfiguration))
 }
 
 

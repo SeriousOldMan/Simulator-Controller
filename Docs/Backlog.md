@@ -17,6 +17,7 @@
   4. Controller action and voice command to enable/disable data collection
   5. Multi-category awareness (Pro, Pro-AM, ...)
   6. Graphical Editor for Vocalics Settings inkl. Test-Modus...
+  7. Better answers by the Strategist, when a pitstop cannot be recommend
 
 #### Race Center
   1. Multi-category awareness (Pro, Pro-AM, ...)
@@ -24,7 +25,7 @@
 #### Race Reports
   1. Multi-category awareness (Pro, Pro-AM, ...)
 
-#### Setup Advisor
+#### Setup Workbench
   1. General detection of counter steering in the telemetry analyzer
   2. Collect telemetry data from multiple drivers and generate combined setup recommendations
 

@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Math.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\RaceReportReader.ahk
+#Include "..\..\Libraries\Math.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "RaceReportReader.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,71 +38,61 @@ class RaceReportViewer extends RaceReportReader {
 	iChartViewer := false
 	iInfoViewer := false
 
-	iSettings := {}
+	iSettings := CaseInsenseMap()
 
-	Window[] {
+	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	ChartViewer[] {
+	ChartViewer {
 		Get {
 			return this.iChartViewer
 		}
 	}
 
-	InfoViewer[] {
+	InfoViewer {
 		Get {
 			return this.iInfoViewer
 		}
 	}
 
-	Settings[key := false] {
+	Settings[key?] {
 		Get {
-			if key
-				return this.iSettings[key]
-			else
-				return this.iSettings
+			return (isSet(key) ? this.iSettings[key] : this.iSettings)
 		}
 
 		Set {
-			if key
-				return this.iSettings[key] := value
-			else
-				return this.iSettings := value
+			return (isSet(key) ? (this.iSettings[key] := value) : (this.iSettings := value))
 		}
 	}
 
 	__New(window, chartViewer := false, infoViewer := false) {
-		base.__New()
+		super.__New()
 
 		this.iWindow := window
 		this.iChartViewer := chartViewer
 		this.iInfoViewer := infoViewer
 	}
 
-	lapTimeDisplayValue(lapTime) {
+	static lapTimeDisplayValue(lapTime) {
 		local seconds, fraction, minutes
 
-		if lapTime is Number
+		if isNumber(lapTime)
 			return displayValue("Time", lapTime)
 		else
 			return lapTime
 	}
 
 	showReportChart(drawChartFunction) {
-		local window, before, after, width, height, html
+		local window, before, after, html
 
 		if this.ChartViewer {
-			window := this.Window
-
-			Gui %window%:Default
-
-			this.ChartViewer.Document.open()
+			this.ChartViewer.document.open()
 
 			if (drawChartFunction && (drawChartFunction != "")) {
-				before =
+				before := "
 				(
 				<html>
 					<meta charset='utf-8'>
@@ -116,32 +106,29 @@ class RaceReportViewer extends RaceReportReader {
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 						<script type="text/javascript">
 							google.charts.load('current', {'packages':['corechart', 'bar', 'table']}).then(drawChart);
-				)
+				)"
 
-				width := this.ChartViewer.Width
-				height := (this.ChartViewer.Height - 1)
-
-				after =
+				after := "
 				(
 						</script>
 					</head>
-					<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 						<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 					</body>
 				</html>
-				)
+				)"
 
-				html := (before . drawChartFunction . after)
+				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.Width, height: this.ChartViewer.Height - 1, backColor: this.Window.AltBackColor}))
 
-				this.ChartViewer.Document.write(html)
+				this.ChartViewer.document.write(html)
 			}
 			else {
-				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.ChartViewer.Document.write(html)
+				this.ChartViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
 
-			this.ChartViewer.Document.close()
+			this.ChartViewer.document.close()
 		}
 	}
 
@@ -149,65 +136,64 @@ class RaceReportViewer extends RaceReportReader {
 		local window, infoText, conditions, descriptor, info, html
 
 		if this.InfoViewer {
-			window := this.Window
-
-			Gui %window%:Default
-
-			this.InfoViewer.Document.open()
+			this.InfoViewer.document.open()
 
 			if raceData {
 				infoText := "<table>"
-				infoText .= ("<tr><td>" . translate("Duration: ") . "</td><td>" . Round(getConfigurationValue(raceData, "Session", "Duration") / 60) . translate(" Minutes") . "</td></tr>")
-				infoText .= ("<tr><td>" . translate("Format: ") . "</td><td>" . translate((getConfigurationValue(raceData, "Session", "Format") = "Time") ? "Duration" : "Laps") . "</td></tr>")
+				infoText .= ("<tr><td>" . translate("Duration: ") . "</td><td>" . Round(getMultiMapValue(raceData, "Session", "Duration") / 60) . translate(" Minutes") . "</td></tr>")
+				infoText .= ("<tr><td>" . translate("Format: ") . "</td><td>" . translate((getMultiMapValue(raceData, "Session", "Format") = "Time") ? "Duration" : "Laps") . "</td></tr>")
 				infoText .= "<tr/>"
-				infoText .= ("<tr><td>" . translate("# Cars: ") . "</td><td>" . getConfigurationValue(raceData, "Cars", "Count") . "</td></tr>")
-				infoText .= ("<tr><td>" . translate("# Laps: ") . "</td><td>" . getConfigurationValue(raceData, "Laps", "Count") . "</td></tr>")
+				infoText .= ("<tr><td>" . translate("# Cars: ") . "</td><td>" . getMultiMapValue(raceData, "Cars", "Count") . "</td></tr>")
+				infoText .= ("<tr><td>" . translate("# Laps: ") . "</td><td>" . getMultiMapValue(raceData, "Laps", "Count") . "</td></tr>")
 				infoText .= "<tr/>"
-				infoText .= ("<tr><td>" . translate("My Car: ") . "</td><td>" . translate("#") . getConfigurationValue(raceData, "Cars", "Car." . getConfigurationValue(raceData, "Cars", "Driver") . ".Nr") . "</td></tr>")
+				infoText .= ("<tr><td>" . translate("My Car: ") . "</td><td>" . translate("#") . getMultiMapValue(raceData, "Cars", "Car." . getMultiMapValue(raceData, "Cars", "Driver") . ".Nr") . "</td></tr>")
 				infoText .= "<tr/>"
 
-				conditions := {}
+				conditions := CaseInsenseMap()
 
-				for descriptor, info in getConfigurationSectionValues(raceData, "Laps")
-					if (ConfigurationItem.splitDescriptor(descriptor)[3] = "Weather")
+				for descriptor, info in getMultiMapValues(raceData, "Laps") {
+					descriptor := ConfigurationItem.splitDescriptor(descriptor)
+
+					if ((descriptor.Length > 2) && (descriptor[3] = "Weather"))
 						conditions[info] := info
+				}
 
-				infoText .= ("<tr><td>" . translate("Conditions: ") . "</td><td>" . values2String(", ", map(conditions, "translate")*) . "</td></tr>")
+				infoText .= ("<tr><td>" . translate("Conditions: ") . "</td><td>" . values2String(", ", collect(conditions, translate)*) . "</td></tr>")
 				infoText .= "</table>"
 
-				infoText := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
+				infoText := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='3' topmargin='3' rightmargin='3' bottommargin='3'><style> table, p { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><p>" . infoText . "</p></body></html>"
 
-				this.InfoViewer.Document.write(infoText)
+				this.InfoViewer.document.write(substituteVariables(infoText, {backColor: this.Window.AltBackColor}))
 			}
 			else {
-				html := "<html><body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
+				html := "<html><body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-				this.InfoViewer.Document.write(html)
+				this.InfoViewer.document.write(substituteVariables(html, {backColor: this.Window.AltBackColor}))
 			}
 
-			this.InfoViewer.Document.close()
+			this.InfoViewer.document.close()
 		}
 	}
 
 	getLaps(raceData, alwaysAll := false) {
-		if (!alwaysAll && this.Settings.HasKey("Laps"))
+		if (!alwaysAll && this.Settings.Has("Laps"))
 			return this.Settings["Laps"]
 		else
-			return base.getLaps(raceData)
+			return super.getLaps(raceData)
 	}
 
 	getClasses(raceData, alwaysAll := false) {
-		if (!alwaysAll && this.Settings.HasKey("Classes"))
+		if (!alwaysAll && this.Settings.Has("Classes"))
 			return this.Settings["Classes"]
 		else
-			return base.getClasses(raceData)
+			return super.getClasses(raceData)
 	}
 
 	getDrivers(raceData) {
-		if this.Settings.HasKey("Drivers")
+		if this.Settings.Has("Drivers")
 			return this.Settings["Drivers"]
 		else
-			return base.getDrivers(raceData)
+			return super.getDrivers(raceData)
 	}
 
 	getReportLaps(raceData, alwaysAll := false) {
@@ -221,12 +207,13 @@ class RaceReportViewer extends RaceReportReader {
 	getReportDrivers(raceData, drivers := false) {
 		local result
 
-		if drivers {
+		if (drivers && (drivers.Length > 0)) {
 			result := []
 
-			loop % getConfigurationValue(raceData, "Cars", "Count")
-				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
-					result.Push(drivers[1][A_Index])
+			loop getMultiMapValue(raceData, "Cars", "Count")
+				if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized)
+					if drivers[1].Has(A_Index)
+						result.Push(drivers[1][A_Index])
 
 			return result
 		}
@@ -234,8 +221,8 @@ class RaceReportViewer extends RaceReportReader {
 			return this.getDrivers(raceData)
 	}
 
-	loadReportData(laps, ByRef raceData, ByRef drivers, ByRef positions, ByRef times) {
-		return this.loadData(laps, raceData, drivers, positions, times)
+	loadReportData(laps, &raceData, &drivers, &positions, &times) {
+		return this.loadData(laps, &raceData, &drivers, &positions, &times)
 	}
 
 	editReportSettings(settings*) {
@@ -244,12 +231,14 @@ class RaceReportViewer extends RaceReportReader {
 
 		if result {
 			for setting, values in result
-				if ((setting = "Laps") && (values == true))
-					this.Settings.Delete("Laps")
+				if ((setting = "Laps") && (values == true)) {
+					if this.Settings.Has("Laps")
+						this.Settings.Delete("Laps")
+				}
 				else
 					this.Settings[setting] := values
 
-			if !result.HasKey("Classes")
+			if (!result.Has("Classes") && this.Settings.Has("Classes"))
 				this.Settings.Delete("Classes")
 		}
 
@@ -259,11 +248,24 @@ class RaceReportViewer extends RaceReportReader {
 	showOverviewReport() {
 		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 		local report := this.Report
-		local classes := {}
+		local classes := CaseInsenseMap()
 		local invalids := 0
 		local raceData, drivers, positions, times, cars, carsCount, lapsCount, simulator, sessionDB, car
 		local class, hasClasses, classResults, valid
 		local ignore, lap, rows, hasDNF, result, lapTimes, hasNull, lapTime, min, avg, filteredLapTimes, nr, row
+
+		comparePositions(c1, c2) {
+			local pos1 := c1[2]
+			local pos2 := c2[2]
+
+			if !isNumber(pos1)
+				pos1 := 999
+
+			if !isNumber(pos2)
+				pos2 := 999
+
+			return (pos1 > pos2)
+		}
 
 		if report {
 			raceData := true
@@ -271,60 +273,67 @@ class RaceReportViewer extends RaceReportReader {
 			positions := true
 			times := true
 
-			this.loadReportData(false, raceData, drivers, positions, times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times)
 
 			cars := []
 
-			carsCount := getConfigurationValue(raceData, "Cars", "Count")
-			lapsCount := getConfigurationValue(raceData, "Laps", "Count")
-			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			carsCount := getMultiMapValue(raceData, "Cars", "Count")
+			lapsCount := getMultiMapValue(raceData, "Laps", "Count")
+			simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
-			sessionDB := new SessionDatabase()
+			sessionDB := SessionDatabase()
 
-			loop %carsCount% {
+			loop carsCount {
 				car := A_Index
 				valid := false
 
 				for ignore, lap in this.getReportLaps(raceData, true)
-					if (positions.Length() >= lap) {
-						if (positions[lap].HasKey(car) && (positions[lap][car] > 0))
+					if (positions.Length >= lap) {
+						if (positions[lap].Has(car) && isNumber(positions[lap][car]) && (positions[lap][car] > 0))
 							valid := true
-						else
+						else if positions[lap].Has(car)
 							positions[lap][car] := kNull ; carsCount
 					}
 					else
 						valid := false
 
 				if valid
-					cars.Push(Array(getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"), getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")))
+					cars.Push(Array(getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr"), getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")))
 				else
 					for ignore, lap in this.getReportLaps(raceData, true) {
-						if (drivers.Length() >= lap) {
-							drivers[lap].RemoveAt(car)
-							positions[lap].RemoveAt(car)
-							times[lap].RemoveAt(car)
+						if (drivers.Length >= lap) {
+							if drivers[lap].Has(car)
+								drivers[lap].RemoveAt(car)
+
+							if positions[lap].Has(car)
+								positions[lap].RemoveAt(car)
+
+							if times[lap].Has(car)
+								times[lap].RemoveAt(car)
 						}
 					}
 			}
 
-			carsCount := cars.Length()
+			carsCount := cars.Length
 
 			rows := []
 			hasDNF := false
 
-			loop % carsCount
-			{
+			loop carsCount {
 				car := A_Index
 
-				result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
+				if positions[lapsCount].Has(car)
+					result := (extendedIsNull(positions[lapsCount][car]) ? "DNF" : positions[lapsCount][car])
+				else
+					result := "DNF"
+
 				lapTimes := []
 				hasNull := false
 
-				loop % lapsCount
-				{
-					lapTime := times[A_Index][car]
+				loop lapsCount {
+					lapTime := (times[A_Index].Has(car) ? times[A_Index][car] : 0)
 
-					if (!extendedIsNull(lapTime, lap < 2) && (lapTime > 0))
+					if (!extendedIsNull(lapTime, A_Index < 2) && (lapTime > 0))
 						lapTimes.Push(lapTime)
 					else {
 						if (A_Index == lapsCount)
@@ -347,32 +356,32 @@ class RaceReportViewer extends RaceReportReader {
 
 				hasDNF := (hasDNF || (result = "DNF"))
 
-				nr := StrReplace(cars[A_Index][1], """", "")
+				nr := cars[A_Index][1]
 
-				if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
-					class := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
+				if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
+					class := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)
 
-					if !classes.HasKey(class)
+					if !classes.Has(class)
 						classes[class] := [Array(A_Index, result)]
 					else
 						classes[class].Push(Array(A_Index, result))
 
 					rows.Push(Array("'" . class . "'", "'" . nr . "'"
 								  , "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
-								  , "'" . this.lapTimeDisplayValue(min) . "'"
-								  , "'" . this.lapTimeDisplayValue(avg) . "'", result, result))
+								  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
+								  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
 				}
 				else
 					invalids += 1
 			}
 
-			hasClasses := (classes.Count() > 1)
+			hasClasses := (classes.Count > 1)
 
 			if hasClasses {
-				classResults := {}
+				classResults := CaseInsenseMap()
 
 				for ignore, class in classes {
-					bubbleSort(class, "comparePositions")
+					bubbleSort(&class, comparePositions)
 
 					for ignore, car in class {
 						result := car[2]
@@ -382,8 +391,7 @@ class RaceReportViewer extends RaceReportReader {
 				}
 			}
 
-			loop % carsCount - invalids
-			{
+			loop carsCount - invalids {
 				row := rows[A_Index]
 
 				if hasClasses
@@ -396,7 +404,7 @@ class RaceReportViewer extends RaceReportReader {
 
 				if !hasClasses {
 					row.RemoveAt(1)
-					row.RemoveAt(row.Length())
+					row.RemoveAt(row.Length)
 				}
 
 				rows[A_Index] := ("[" . values2String(", ", row*) . "]")
@@ -433,53 +441,55 @@ class RaceReportViewer extends RaceReportReader {
 	showCarReport() {
 		local drawChartFunction := "function drawChart() {`nvar data = new google.visualization.DataTable();`n"
 		local report := this.Report
-		local compound, cars, rows, raceData, pitstops, ignore, lap, weather, consumption, lapTime, pitstop, row
+		local tyreCompound, cars, rows, raceData, pitstops, ignore, lap, weather, consumption, lapTime, pitstop, row
 
 		if report {
-			raceData := readConfiguration(report . "\Race.data")
+			raceData := readMultiMap(report . "\Race.data")
 
 			cars := []
 			rows := []
 
-			pitstops := string2Values(",", getConfigurationValue(raceData, "Laps", "Pitstops", ""))
+			pitstops := string2Values(",", getMultiMapValue(raceData, "Laps", "Pitstops", ""))
 
 			for ignore, lap in this.getReportLaps(raceData, true) {
-				weather := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Weather")
-				weather := (weather ? translate(weather) : "n/a")
+				weather := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Weather", kUndefined)
 
-				if getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", false)
-					compound := translate(compound(getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
-												 , getConfigurationValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
-				else
-					compound := "-"
+				if (weather != kUndefined) {
+					weather := (weather ? translate(weather) : "n/a")
 
-				consumption := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
+					if getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", false)
+						tyreCompound := translate(compound(getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Compound", "Dry")
+														 , getMultiMapValue(raceData, "Laps", "Lap." . lap . ".CompoundColor", "Black")))
+					else
+						tyreCompound := "-"
 
-				if (consumption == 0)
-					consumption := translate("n/a")
+					consumption := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Consumption", translate("n/a"))
 
-				if consumption is Number
-					consumption := displayValue("Float", convertUnit("Volume", consumption))
+					if (consumption == 0)
+						consumption := translate("n/a")
 
-				lapTime := getConfigurationValue(raceData, "Laps", "Lap." . lap . ".LapTime", "n/a")
+					if isNumber(consumption)
+						consumption := displayValue("Float", convertUnit("Volume", consumption))
 
-				if (lapTime != "-")
-					lapTime := Round(lapTime / 1000, 1)
+					lapTime := getMultiMapValue(raceData, "Laps", "Lap." . lap . ".LapTime", "-")
 
-				pitstop := ((pitstops.Length() > 0) ? inList(pitstops, lap) : (getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false)))
+					if (lapTime != "-")
+						lapTime := Round(lapTime / 1000, 1)
 
-				row := values2String(", "
-									, lap
-									, "'" . weather . "'"
-									, "'" . compound . "'"
-									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
-									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
-									, "'" . getConfigurationValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
-									, "'" . consumption . "'"
-									, "'" . this.lapTimeDisplayValue(lapTime) . "'"
-									, "'" . (pitstop ? translate("x") : "") . "'")
+					pitstop := ((pitstops.Length > 0) ? inList(pitstops, lap) : (getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Pitstop", false)))
 
-				rows.Push("[" . row	. "]")
+					row := values2String(", ", lap
+											 , "'" . weather . "'"
+											 , "'" . tyreCompound . "'"
+											 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".Map", translate("n/a")) . "'"
+											 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".TC", translate("n/a")) . "'"
+											 , "'" . getMultiMapValue(raceData, "Laps", "Lap." . lap . ".ABS", translate("n/a")) . "'"
+											 , "'" . consumption . "'"
+											 , "'" . RaceReportViewer.lapTimeDisplayValue(lapTime) . "'"
+											 , "'" . (pitstop ? translate("x") : "") . "'")
+
+					rows.Push("[" . row	. "]")
+				}
 			}
 
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("#") . "');"
@@ -519,7 +529,7 @@ class RaceReportViewer extends RaceReportReader {
 			positions := true
 			times := true
 
-			this.loadReportData(false, raceData, drivers, positions, times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times)
 
 			classes := this.getReportClasses(raceData)
 
@@ -528,7 +538,7 @@ class RaceReportViewer extends RaceReportReader {
 			cars := []
 
 			for ignore, car in this.Settings["Drivers"]
-				if (allDrivers.HasKey(car) && inList(classes, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)))
+				if (allDrivers.Has(car) && inList(classes, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)))
 					cars.Push(car)
 
 			drivers := []
@@ -542,9 +552,9 @@ class RaceReportViewer extends RaceReportReader {
 			consistencies := false
 			carControls := false
 
-			this.getDriverStatistics(raceData, cars, positions, times, potentials, raceCrafts, speeds, consistencies, carControls)
+			this.getDriverStatistics(raceData, cars, positions, times, &potentials, &raceCrafts, &speeds, &consistencies, &carControls)
 
-			if (potentials && (potentials.Length() > 0)) {
+			if (potentials && (potentials.Length > 0)) {
 				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 				drawChartFunction .= "`n['" . values2String("', '", translate("Category"), drivers*) . "'],"
 
@@ -587,34 +597,33 @@ class RaceReportViewer extends RaceReportReader {
 			positions := true
 			times := true
 
-			this.loadReportData(false, raceData, drivers, positions, times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times)
 
 			cars := []
 
-			carsCount := getConfigurationValue(raceData, "Cars", "Count")
-			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			carsCount := getMultiMapValue(raceData, "Cars", "Count")
+			simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
-			sessionDB := new SessionDatabase()
+			sessionDB := SessionDatabase()
 			carIndices := []
 			minPosition := 9999
 			maxPosition := 0
 
 			selectedClasses := this.getReportClasses(raceData)
 
-			loop % carsCount
-			{
+			loop carsCount {
 				car := A_Index
 
-				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)) {
+				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)) {
 					valid := false
 
 					newMinPosition := minPosition
 					newMaxPosition := maxPosition
 
 					for ignore, lap in this.getReportLaps(raceData)
-						if (positions.HasKey(lap) && times.HasKey(lap))
-							if (positions[lap].HasKey(car) && !extendedIsNull(positions[lap][car]) && (positions[lap][car] > 0)
-							 && times[lap].HasKey(car) && !extendedIsNull(times[lap][car], lap < 2)) {
+						if (positions.Has(lap) && times.Has(lap) && positions[lap].Has(car))
+							if (!extendedIsNull(positions[lap][car]) && (positions[lap][car] > 0)
+							 && times[lap].Has(car) && !extendedIsNull(times[lap][car], lap < 2)) {
 								valid := true
 
 								newMinPosition := Min(newMinPosition, positions[lap][car])
@@ -631,38 +640,35 @@ class RaceReportViewer extends RaceReportReader {
 
 						carIndices.Push(car)
 
-						cars.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
-									   . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
+						cars.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
+									   . StrReplace(sessionDB.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
 				}
-
-				if getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") = 414
-					x := 1 + 1
 			}
 
 			for ignore, lap in this.getReportLaps(raceData)
-				loop % carsCount {
+				loop carsCount {
 					car := (carsCount - A_Index + 1)
 
-					if (!inList(carIndices, car) && positions.HasKey(lap) && positions[lap].HasKey(car))
+					if (!inList(carIndices, car) && positions.Has(lap) && positions[lap].Has(car))
 						positions[lap].RemoveAt(car)
-			}
+				}
 
 			drawChartFunction := ("function drawChart() {`nvar data = google.visualization.arrayToDataTable([`n[" . values2String(", ", "'" . translate("Laps") . "'", cars*) . "]")
 
 			hasData := false
 
-			if !this.Settings.HasKey("Laps")
-				if (getConfigurationValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
+			if !this.Settings.Has("Laps")
+				if (getMultiMapValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
 					drawChartFunction .= ",`n[0"
 
-					loop % cars.Length() {
-						position := getConfigurationValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position", "null")
+					loop cars.Length {
+						position := getMultiMapValue(raceData, "Cars", "Car." . carIndices[A_Index] . ".Position", "null")
 
 						if (StrLen(Trim(position)) == 0)
 							position := A_Index
 						else if (position != "null")
-							if position is not Number
+							if !isNumber(position)
 								position := "null"
 
 						drawChartFunction := (drawChartFunction . ", " . position)
@@ -672,15 +678,15 @@ class RaceReportViewer extends RaceReportReader {
 				}
 
 			for ignore, lap in this.getReportLaps(raceData) {
-				if (positions.Length() >= lap) {
+				if (positions.Length >= lap) {
 					hasData := true
 
 					drawChartFunction .= (",`n[" . lap)
 
 					lapPositions := positions[lap]
 
-					loop % cars.Length() {
-						if (lapPositions.HasKey(A_Index) && !extendedIsNull(lapPositions[A_Index], lap < 2))
+					loop cars.Length {
+						if (lapPositions.Has(A_Index) && !extendedIsNull(lapPositions[A_Index], lap < 2))
 							drawChartFunction := (drawChartFunction . ", " . lapPositions[A_Index])
 						else
 							drawChartFunction := (drawChartFunction . ", null")
@@ -724,25 +730,25 @@ class RaceReportViewer extends RaceReportReader {
 			positions := false
 			times := true
 
-			this.loadReportData(false, raceData, drivers, positions, times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times)
 
 			selectedClasses := this.getReportClasses(raceData)
 			selectedCars := this.getReportDrivers(raceData)
 
 			laps := this.getReportLaps(raceData)
-			driverTimes := {}
+			driverTimes := CaseInsenseMap()
 
 			for ignore, lap in laps {
 				lapTimes := []
 
 				for ignore, car in selectedCars
-					if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
-						if times.hasKey(lap) {
-							time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-							time := (extendedIsNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+					if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+						if times.Has(lap) {
+							time := (times[lap].Has(car) ? times[lap][car] : 0)
+							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
 
 							if (time > 0)
-								lapTimes.Push("'" . this.lapTimeDisplayValue(time) . "'")
+								lapTimes.Push("'" . RaceReportViewer.lapTimeDisplayValue(time) . "'")
 							else
 								lapTimes.Push(kNull)
 						}
@@ -760,7 +766,7 @@ class RaceReportViewer extends RaceReportReader {
 			drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . "');"
 
 			for ignore, car in selectedCars
-				drawChartFunction .= "`ndata.addColumn('string', '#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . "');"
+				drawChartFunction .= "`ndata.addColumn('string', '#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . "');"
 
 			drawChartFunction .= ("`ndata.addRows([" . values2String(", ", rows*) . "]);")
 
@@ -785,7 +791,7 @@ class RaceReportViewer extends RaceReportReader {
 		local drawChartFunction := "function drawChart() {"
 		local report := this.Report
 		local raceData, drivers, positions, times, selectedCars, laps, driverTimes, allTimes, ignore, lap, lapTimes
-		local time, invalidCars, carTimes, avg, cars, offset, singleCar, min, avg, max, window
+		local time, invalidCars, carTimes, avg, cars, offset, singleCar, theMin, theAvg, theMax, window
 		local series, title, consistency, delta, car, index, selectedClasses
 
 		if report {
@@ -794,13 +800,13 @@ class RaceReportViewer extends RaceReportReader {
 			positions := false
 			times := true
 
-			this.loadReportData(false, raceData, drivers, positions, times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times)
 
 			selectedClasses := this.getReportClasses(raceData)
 			selectedCars := this.getReportDrivers(raceData)
 
 			laps := this.getReportLaps(raceData)
-			driverTimes := {}
+			driverTimes := CaseInsenseMap()
 
 			allTimes := []
 
@@ -808,10 +814,10 @@ class RaceReportViewer extends RaceReportReader {
 				lapTimes := []
 
 				for ignore, car in selectedCars
-					if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
-						if times.hasKey(lap) {
-							time := (times[lap].HasKey(car) ? times[lap][car] : 0)
-							time := (extendedIsNull(time) ? 0 : Round(times[lap][car] / 1000, 1))
+					if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+						if times.Has(lap) {
+							time := (times[lap].Has(car) ? times[lap][car] : 0)
+							time := (extendedIsNull(time) ? 0 : Round(time / 1000, 1))
 
 							if (time > 0) {
 								allTimes.Push(time)
@@ -832,20 +838,23 @@ class RaceReportViewer extends RaceReportReader {
 				carTimes := []
 
 				for ignore, lap in laps {
-					time := driverTimes[lap][car]
+					if (driverTimes.Has(lap) && times.Has(lap)) {
+						time := (times[lap].Has(car) ? times[lap][car] : 0)
 
-					if !extendedIsNull(time)
-						carTimes.Push(time)
+						if !extendedIsNull(time)
+							carTimes.Push(time)
+					}
 				}
 
-				if (carTimes.Length() == 0)
+				if (carTimes.Length == 0)
 					invalidCars.Push(car)
 				else {
-					avg := average(carTimes)
+					theAvg := average(carTimes)
 
 					for ignore, lap in laps
-						if (driverTimes[lap][car] = kNull)
-							driverTimes[lap][car] := avg
+						if (driverTimes.Has(lap) && driverTimes[lap].Has(car))
+							if (driverTimes[lap][car] = kNull)
+								driverTimes[lap][car] := theAvg
 				}
 			}
 
@@ -856,7 +865,7 @@ class RaceReportViewer extends RaceReportReader {
 			offset := 0
 
 			for index, car in selectedCars
-				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
 					if inList(invalidCars, car) {
 						for ignore, lap in laps
 							driverTimes[lap].RemoveAt(index - offset)
@@ -864,9 +873,9 @@ class RaceReportViewer extends RaceReportReader {
 						offset += 1
 					}
 					else
-						cars.Push("#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr"))
+						cars.Push("#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr"))
 
-			singleCar := (cars.Length() = 1)
+			singleCar := (cars.Length = 1)
 
 			if singleCar {
 				cars.Push(translate("Max"))
@@ -878,24 +887,24 @@ class RaceReportViewer extends RaceReportReader {
 				for ignore, lap in laps {
 					time := driverTimes[lap][1]
 
-					if time is Number
+					if isNumber(time)
 						carTimes.Push(time)
 				}
 
-				min := minimum(carTimes)
-				avg := average(carTimes)
-				max := maximum(carTimes)
+				theMin := minimum(carTimes)
+				theAvg := average(carTimes)
+				theMax := maximum(carTimes)
 
 				for ignore, lap in laps {
-					driverTimes[lap].Push(max)
-					driverTimes[lap].Push(avg)
-					driverTimes[lap].Push(min)
+					driverTimes[lap].Push(theMax)
+					driverTimes[lap].Push(theAvg)
+					driverTimes[lap].Push(theMin)
 				}
 			}
 			else {
-				min := minimum(allTimes)
-				avg := average(allTimes)
-				max := maximum(allTimes)
+				theMin := minimum(allTimes)
+				theAvg := average(allTimes)
+				theMax := maximum(allTimes)
 			}
 
 			drawChartFunction .= "`n['" . values2String("', '", translate("Lap"), cars*) . "']"
@@ -905,15 +914,15 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`n]);")
 
-			delta := (max - min)
+			delta := (theMax - theMin)
 
-			min := Max(avg - (3 * delta), 0)
-			max := Min(avg + (2 * delta), max)
+			theMin := Max(theAvg - (3 * delta), 0)
+			theMax := Min(theAvg + (2 * delta), theMax)
 
-			if (min = 0)
-				min := (avg / 3)
+			if (theMin = 0)
+				theMin := (theAvg / 3)
 
-			window := ("baseline: " . min . ", viewWindow: {min: " . min . ", max: " . max . "}, ")
+			window := ("baseline: " . theMin . ", viewWindow: {min: " . theMin . ", max: " . theMax . "}, ")
 			series := ""
 			title := ""
 
@@ -921,16 +930,16 @@ class RaceReportViewer extends RaceReportReader {
 				consistency := 0
 
 				for ignore, time in allTimes
-					consistency += (100 - Abs(avg - time))
+					consistency += (100 - Abs(theAvg - time))
 
-				consistency := Round(consistency / allTimes.Length(), 2)
+				consistency := Round(consistency / allTimes.Length, 2)
 
 				series := ", series: {1: {type: 'line'}, 2: {type: 'line'}, 3: {type: 'line'}}"
 
 				title := ("title: '" . translate("Consistency: ") . consistency . translate(" %") . "', titleTextStyle: {bold: false}, ")
 			}
 
-			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#D8D8D8', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
+			drawChartFunction .= ("`nvar options = {" . title . "seriesType: 'bars'" . series . ", backgroundColor: '#" . this.Window.AltBackColor . "', vAxis: {" . window . "title: '" . translate("Lap Time") . "', gridlines: {count: 0}}, hAxis: {title: '" . translate("Laps") . "', gridlines: {count: 0}}, chartArea: { left: '10%', top: '15%', right: '15%', bottom: '15%' } };")
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
@@ -959,7 +968,7 @@ class RaceReportViewer extends RaceReportReader {
 			positions := false
 			times := true
 
-			this.loadReportData(false, raceData, drivers, positions, times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times)
 
 			selectedClasses := this.getReportClasses(raceData)
 			selectedCars := this.getReportDrivers(raceData)
@@ -968,15 +977,15 @@ class RaceReportViewer extends RaceReportReader {
 			laps := this.getReportLaps(raceData)
 			lapTimes := []
 
-			driverTimes := {}
+			driverTimes := CaseInsenseMap()
 			length := 20000
 
 			for ignore, car in selectedCars
-				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)) {
+				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)) {
 					carTimes := this.getDriverTimes(raceData, times, car)
 
-					if (carTimes.Length() > 0) {
-						length := Min(length, carTimes.Length())
+					if (carTimes.Length > 0) {
+						length := Min(length, carTimes.Length)
 
 						driverTimes[car] := carTimes
 					}
@@ -986,9 +995,9 @@ class RaceReportViewer extends RaceReportReader {
 				length := false
 
 			for index, car in selectedCars
-				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
-					if driverTimes.HasKey(car) {
-						carTimes := Array("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . "'")
+				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+					if driverTimes.Has(car) {
+						carTimes := Array("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . "'")
 
 						for dIndex, time in driverTimes[car]
 							if (dIndex > length)
@@ -1004,10 +1013,10 @@ class RaceReportViewer extends RaceReportReader {
 			drawChartFunction .= "`nvar data = new google.visualization.DataTable();"
 			drawChartFunction .= "`ndata.addColumn('string', '" . translate("Car") . "');"
 
-			loop % Min(length, laps.Length())
+			loop Min(length, laps.Length)
 				drawChartFunction .= "`ndata.addColumn('number', '" . translate("Lap") . A_Space . laps[A_Index] . "');"
 
-			text =
+			text := "
 			(
 			data.addColumn({id:'max', type:'number', role:'interval'});
 			data.addColumn({id:'min', type:'number', role:'interval'});
@@ -1015,27 +1024,27 @@ class RaceReportViewer extends RaceReportReader {
 			data.addColumn({id:'median', type:'number', role:'interval'});
 			data.addColumn({id:'mean', type:'number', role:'interval'});
 			data.addColumn({id:'thirdQuartile', type:'number', role:'interval'});
-			)
+			)"
 
 			drawChartFunction .= ("`n" . text)
 
-			drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (Min(length, laps.Length()) + 1) . "));")
+			drawChartFunction .= ("`n" . "data.addRows(getBoxPlotValues(array, " . (Min(length, laps.Length) + 1) . "));")
 
 			drawChartFunction .= ("`n" . getBoxAndWhiskerJSFunctions())
 
-			text =
+			text := "
 			(
 			var options = {
-				backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '5`%', bottom: '20`%' },
+				backgroundColor: 'D8D8D8', chartArea: { left: '10%', top: '5%', right: '5%', bottom: '20%' },
 				legend: { position: 'none' },
-			)
+			)"
 
 			drawChartFunction .= text
 
-			text =
+			text := "
 			(
-				hAxis: { title: '`%cars`%', gridlines: {count: 0} },
-				vAxis: { title: '`%seconds`%', gridlines: {count: 0} },
+				hAxis: { title: '%cars%', gridlines: {count: 0} },
+				vAxis: { title: '%seconds%', gridlines: {count: 0} },
 				lineWidth: 0,
 				series: [ { 'color': 'D8D8D8' } ],
 				intervals: { barWidth: 1, boxWidth: 1, lineWidth: 2, style: 'boxes' },
@@ -1043,7 +1052,7 @@ class RaceReportViewer extends RaceReportReader {
 							min: { style: 'bars', fillOpacity: 1, color: '#777' },
 							mean: { style: 'points', color: 'grey', pointsize: 5 } }
 			};
-			)
+			)"
 
 			drawChartFunction .= ("`n" . substituteVariables(text, {cars: translate("Cars"), seconds: translate("Seconds")}))
 
@@ -1075,7 +1084,7 @@ class RaceReportViewer extends RaceReportReader {
 			positions := false
 			times := true
 
-			this.loadReportData(false, raceData, drivers, positions, times)
+			this.loadReportData(false, &raceData, &drivers, &positions, &times)
 
 			selectedClasses := this.getReportClasses(raceData)
 			selectedCars := this.getReportDrivers(raceData)
@@ -1084,15 +1093,15 @@ class RaceReportViewer extends RaceReportReader {
 			laps := this.getReportLaps(raceData)
 			lapTimes := []
 
-			driverTimes := {}
+			driverTimes := CaseInsenseMap()
 			length := 20000
 
 			for ignore, car in selectedCars
-				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)) {
+				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown)) {
 					carTimes := this.getDriverTimes(raceData, times, car)
 
-					if (carTimes.Length() > 0) {
-						length := Min(length, carTimes.Length())
+					if (carTimes.Length > 0) {
+						length := Min(length, carTimes.Length)
 
 						driverTimes[car] := carTimes
 					}
@@ -1101,15 +1110,15 @@ class RaceReportViewer extends RaceReportReader {
 			if (length == 20000)
 				length := false
 
-			simulator := getConfigurationValue(raceData, "Session", "Simulator")
-			sessionDB := new SessionDatabase()
+			simulator := getMultiMapValue(raceData, "Session", "Simulator")
+			sessionDB := SessionDatabase()
 			columns := ["'" . translate("Lap") . "'"]
 
 			for index, car in selectedCars
-				if inList(selectedClasses, getConfigurationValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
-					if driverTimes.HasKey(car) {
-						columns.Push("'#" . getConfigurationValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
-										  . StrReplace(sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
+				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
+					if driverTimes.Has(car) {
+						columns.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
+										  . StrReplace(sessionDB.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 
 						carTimes := []
 
@@ -1125,8 +1134,7 @@ class RaceReportViewer extends RaceReportReader {
 			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
 			drawChartFunction .= "`n[" . values2String(", ", columns*) . "]"
 
-			loop % Min(length, laps.Length())
-			{
+			loop Min(length, laps.Length) {
 				lap := A_Index
 				drawChartFunction .= ",`n[" . laps[lap]
 
@@ -1138,21 +1146,21 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= "]);"
 
-			text =
+			text := "
 			(
 			var options = {
-				backgroundColor: 'D8D8D8', chartArea: { left: '10`%', top: '5`%', right: '20`%', bottom: '20`%' },
+				backgroundColor: 'D8D8D8', chartArea: { left: '10%', top: '5%', right: '20%', bottom: '20%' },
 				legend: { position: 'right' }, curveType: 'function',
-			)
+			)"
 
 			drawChartFunction .= "`n" . text
 
-			text =
+			text := "
 			(
-				hAxis: { title: '`%lap`%', gridlines: {count: 0} },
-				vAxis: { title: '`%seconds`%', gridlines: {count: 0} }
+				hAxis: { title: '%lap%', gridlines: {count: 0} },
+				vAxis: { title: '%seconds%', gridlines: {count: 0} }
 			};
-			)
+			)"
 
 			drawChartFunction .= ("`n" . substituteVariables(text, {lap: translate("Lap"), seconds: translate("Seconds")}))
 
@@ -1180,7 +1188,7 @@ class RaceReportViewer extends RaceReportReader {
 getBoxAndWhiskerJSFunctions() {
 	local script
 
-	script =
+	script := "
 	(
 	/**
 	* Takes an array of input data and returns an
@@ -1198,7 +1206,7 @@ getBoxAndWhiskerJSFunctions() {
 			var median = getMedian(arr);
 			var average = getAverage(arr);
 
-			if (arr.length `% 2 === 0) {
+			if (arr.length % 2 === 0) {
 				var midUpper = arr.length / 2;
 				var midLower = midUpper - 1;
 
@@ -1233,7 +1241,7 @@ getBoxAndWhiskerJSFunctions() {
 		* middle-most values. Otherwise the
 		* median is the middle-most value.
 		*/
-		if (length `% 2 === 0) {
+		if (length % 2 === 0) {
 			var midUpper = length / 2;
 			var midLower = midUpper - 1;
 
@@ -1255,12 +1263,12 @@ getBoxAndWhiskerJSFunctions() {
 			return 0;
 		else {
 			for (var i = 0; i < array.length; i++)
-				value = value + array[i];
+				value = value + array[i]
 
 			return value / array.length;
 		}
 	}
-	)
+	)"
 
 	return script
 }
@@ -1270,16 +1278,17 @@ getBoxAndWhiskerJSFunctions() {
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global rangeLapsEdit
-global driverSelectCheck
-global classesDropDownMenu
-
 editReportSettings(raceReport, report := false, availableOptions := false) {
-	local x, y, oldEncoding, owner
+	local x, y, oldEncoding
 	local lapsDef, laps, baseLap, lastLap, ignore, lap, yOption, headers, allDrivers, selectedDrivers
 	local sessionDB, simulator, ignore, driver, column1, column2, startLap, endLap, lap, index
 	local newLaps, newDrivers, rowNumber, classes, selectedClass, valid
 
+	static reportSettingsGui
+
+	static rangeLapsEdit
+	static driverSelectCheck
+	static classesDropDownMenu
 	static allLapsRadio
 	static rangeLapsRadio
 	static driversListView
@@ -1290,6 +1299,47 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 	static raceData := false
 	static options := false
 
+	chooseAllLapSelection(*) {
+		rangeLapsEdit.Enabled := false
+		rangeLapsEdit.Text := ""
+	}
+
+	chooseRangeLapSelection(*) {
+		rangeLapsEdit.Enabled := true
+	}
+
+	selectDriver(listView, line) {
+		local selected := 0
+		local row := 0
+
+		loop {
+			row := driversListView.GetNext(row, "C")
+
+			if row
+				selected += 1
+			else
+				break
+		}
+
+		if (selected == 0)
+			driverSelectCheck.Value := 0
+		else if (selected < driversListView.GetCount())
+			driverSelectCheck.Value := -1
+		else
+			driverSelectCheck.Value := 1
+
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
+	}
+
+	selectDrivers(*) {
+		if (driverSelectCheck.Value == -1)
+			driverSelectCheck.Value := 0
+
+		loop driversListView.GetCount()
+			driversListView.Modify(A_Index, driverSelectCheck.Value ? "Check" : "-Check")
+	}
+
 	if (raceReport = kCancel)
 		result := kCancel
 	else if (raceReport = kOk)
@@ -1299,56 +1349,52 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			allDrivers := reportViewer.getReportDrivers(raceData, drivers)
 			selectedDrivers := []
 
-			if reportViewer.Settings.HasKey("Drivers")
+			if reportViewer.Settings.Has("Drivers")
 				selectedDrivers := reportViewer.Settings["Drivers"]
 			else
-				loop % allDrivers.Length()
+				loop allDrivers.Length
 					selectedDrivers.Push(A_Index)
 
-			sessionDB := new SessionDatabase()
-			simulator := getConfigurationValue(raceData, "Session", "Simulator")
+			sessionDB := SessionDatabase()
+			simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
 			if inList(options, "Classes") {
-				GuiControlGet classesDropDownMenu
-
-				if (classesDropDownMenu > 1)
-					selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu - 1]
+				if (classesDropDownMenu.Value > 1)
+					selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu.Value - 1]
 				else
 					selectedClass := false
 			}
 			else
 				selectedClass := false
 
-			Gui ListView, %driversListView%
-
-			LV_Delete()
+			driversListView.Delete()
 
 			for ignore, driver in allDrivers
-				if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
-					if (getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
+				if (!selectedClass || (selectedClass = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
+					if (getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car", kNotInitialized) != kNotInitialized) {
 						if inList(options, "Cars")
-							column1 := getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr")
+							column1 := getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr")
 						else
 							column1 := driver
 
-						column2 := sessionDB.getCarName(simulator, getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+						column2 := sessionDB.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
-						LV_Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
+						driversListView.Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
 					}
 
-			if (!selectedDrivers || (selectedDrivers.Length() == LV_GetCount()))
-				GuiControl, , driverSelectCheck, 1
-			else if ((selectedDrivers.Length() > 0) && (selectedDrivers.Length() != LV_GetCount()))
-				GuiControl, , driverSelectCheck, -1
+			if (!selectedDrivers || (selectedDrivers.Length == driversListView.GetCount()))
+				driverSelectCheck.Value := 1
+			else if ((selectedDrivers.Length > 0) && (selectedDrivers.Length != driversListView.GetCount()))
+				driverSelectCheck.Value := -1
 			else
-				GuiControl, , driverSelectCheck, 0
+				driverSelectCheck.Value := 0
 
 			if inList(options, "Cars")
-				LV_ModifyCol(1, "AutoHdr Right")
+				driversListView.ModifyCol(1, "AutoHdr Right")
 			else
-				LV_ModifyCol(1, "AutoHdr")
+				driversListView.ModifyCol(1, "AutoHdr")
 
-			LV_ModifyCol(2, "AutoHdr")
+			driversListView.ModifyCol(2, "AutoHdr")
 		}
 	}
 	else {
@@ -1356,66 +1402,69 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		result := false
 		options := availableOptions
 
-		raceData := readConfiguration(report . "\Race.data")
+		raceData := readMultiMap(report . "\Race.data")
 
 		drivers := []
 		laps := []
 
 		oldEncoding := A_FileEncoding
 
-		FileEncoding UTF-8
+		FileEncoding("UTF-8")
 
 		try {
-			loop Read, % report . "\Drivers.CSV"
+			loop Read, report . "\Drivers.CSV"
 				drivers.Push(string2Values(";", A_LoopReadLine))
 
 			drivers := correctEmptyValues(drivers)
 
-			loop Read, % report . "\Laps.CSV"
+			loop Read, report . "\Laps.CSV"
 				laps.Push(string2Values(";", A_LoopReadLine))
 
 			laps := correctEmptyValues(laps)
 		}
 		finally {
-			FileEncoding %oldEncoding%
+			FileEncoding(oldEncoding)
 		}
 
-		owner := raceReport.Window
+		reportSettingsGui := Window()
 
-		Gui RRS:Default
-		Gui RRS:+Owner%owner%
+		reportSettingsGui.Opt("+Owner" . raceReport.Window.Hwnd)
 
-		Gui RRS:-Border ; -Caption
-		Gui RRS:Color, D0D0D0, D8D8D8
+		reportSettingsGui.Opt("-Border -Caption +0x800000")
+		reportSettingsGui.BackColor := "D0D0D0"
 
-		Gui RRS:Font, s10 Bold, Arial
+		reportSettingsGui.SetFont("s10 Bold", "Arial")
 
-		Gui RRS:Add, Text, w351 Center gmoveSettings, % translate("Modular Simulator Controller System")
+		reportSettingsGui.Add("Text", "w351 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(reportSettingsGui, "Race Reports.Settings"))
 
-		Gui RRS:Font, s9 Norm, Arial
-		Gui RRS:Font, Italic Underline, Arial
+		reportSettingsGui.SetFont("s9 Norm", "Arial")
+		reportSettingsGui.SetFont("Italic Underline", "Arial")
 
-		Gui RRS:Add, Text, x106 YP+20 w164 cBlue Center gopenReportSettingsDocumentation, % translate("Report Settings")
+		reportSettingsGui.Add("Text", "x106 YP+20 w164 cBlue Center", translate("Report Settings")).OnEvent("Click", openDocumentation.Bind(reportSettingsGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports"))
 
-		Gui RRS:Font, s8 Norm, Arial
+		reportSettingsGui.SetFont("s8 Norm", "Arial")
 
-		Gui RRS:Add, Text, x8 yp+30 w360 0x10
+		reportSettingsGui.Add("Text", "x8 yp+30 w360 0x10")
 
 		if inList(options, "Laps") {
-			Gui RRS:Add, Text, x16 yp+10 w70 h23 +0x200 Section, % translate("Laps")
+			reportSettingsGui.Add("Text", "x16 yp+10 w70 h23 +0x200 Section", translate("Laps"))
 
-			Gui RRS:Add, Radio, x90 yp+4 w80 Group vallLapsRadio gchooseLapSelection, % translate(" All")
-			Gui RRS:Add, Radio, x90 yp+24 w80 vrangeLapsRadio gchooseLapSelection, % translate(" Range:")
-			Gui RRS:Add, Edit, x170 yp-3 w80 vrangeLapsEdit
-			Gui RRS:Add, Text, x255 yp+3 w110, % translate("(e.g.: 1-5;8;12)")
+			allLapsRadio := reportSettingsGui.Add("Radio", "x90 yp+4 w80 Group", translate(" All"))
+			allLapsRadio.OnEvent("Click", chooseAllLapSelection)
 
-			if !raceReport.Settings.HasKey("Laps") {
-				GuiControl, , allLapsRadio, 1
-				GuiControl Disable, rangeLapsEdit
+			rangeLapsRadio := reportSettingsGui.Add("Radio", "x90 yp+24 w80", translate(" Range:"))
+			rangeLapsRadio.OnEvent("Click", chooseRangeLapSelection)
+
+			rangeLapsEdit := reportSettingsGui.Add("Edit", "x170 yp-3 w80")
+			reportSettingsGui.Add("Text", "x255 yp+3 w110", translate("(e.g.: 1-5;8;12)"))
+
+			if !raceReport.Settings.Has("Laps") {
+				allLapsRadio.Value := 1
+				rangeLapsEdit.Enabled := false
 			}
 			else {
-				GuiControl, , rangeLapsRadio, 1
-				GuiControl Enable, rangeLapsEdit
+				rangeLapsRadio.Value := 1
+				rangeLapsEdit.Enabled := true
 
 				lapsDef := ""
 				laps := raceReport.Settings["Laps"]
@@ -1442,94 +1491,94 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 				else
 					lapsDef .= (((lapsDef != "") ? ";" : "") . (baseLap . "-" . lastLap))
 
-				GuiControl Text, rangeLapsEdit, %lapsDef%
+				rangeLapsEdit.Text := lapsDef
 			}
 		}
 
 		if inList(options, "Classes") {
-			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10") + 2
+			yOption := (inList(options, "Laps") ? "yp+30" : "yp+10")
 
 			classes := raceReport.getReportClasses(raceData, true)
 
-			Gui RRS:Add, Text, x16 %yOption% w70 h23 +0x200 Section, % translate("Class")
-			Gui RRS:Add, DropDownList, x90 yp-2 w160 AltSubmit vclassesDropDownMenu gselectClass, % values2String("|", translate("All"), classes*)
+			reportSettingsGui.Add("Text", "x16 " . yOption . " w70 h23 +0x200 Section", translate("Class"))
+			classesDropDownMenu := reportSettingsGui.Add("DropDownList", "x90 yp-2 w160", concatenate([translate("All")], classes))
+			classesDropDownMenu.OnEvent("Change", editReportSettings.Bind("UpdateDrivers"))
 
-			if raceReport.Settings.HasKey("Classes")
-				GuiControl Choose, classesDropDownMenu, % 1 + inList(classes, raceReport.Settings["Classes"][1])
+			if raceReport.Settings.Has("Classes")
+				classesDropDownMenu.Choose(1 + inList(classes, raceReport.Settings["Classes"][1]))
 			else
-				GuiControl Choose, classesDropDownMenu, 1
+				classesDropDownMenu.Choose(1)
 		}
 
 		if (inList(options, "Drivers") || inList(options, "Cars")) {
-			yOption := ((inList(options, "Laps") || inList(options, "Classes")) ? "yp+30" : "yp+10") + 2
+			yOption := ((inList(options, "Laps") || inList(options, "Classes")) ? "yp+30" : "yp+10")
 
-			Gui RRS:Add, Text, x16 %yOption% w70 h23 +0x200 Section, % translate(inList(options, "Cars") ? "Cars" : "Drivers")
+			reportSettingsGui.Add("Text", "x16 " . yOption . " w70 h23 +0x200 Section", translate(inList(options, "Cars") ? "Cars" : "Drivers"))
 
 			headers := (inList(options, "Drivers") ? ["     Driver (Start)", "Car"] : ["     #", "Car"])
 
-			Gui RRS:Add, ListView, x90 yp-2 w264 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr HWNDdriversListView gselectDriver, % values2String("|", map(headers, "translate")*)
+			driversListView := reportSettingsGui.Add("ListView", "x90 yp-2 w264 h300 AltSubmit -Multi -LV0x10 Checked NoSort NoSortHdr", collect(headers, translate))
+			driversListView.OnEvent("Click", selectDriver)
 
-			Gui RRS:Add, CheckBox, Check3 x72 yp+2 w15 h23 vdriverSelectCheck gselectDrivers
+			driverSelectCheck := reportSettingsGui.Add("CheckBox", "Check3 x72 yp+2 w15 h23")
+			driverSelectCheck.OnEvent("Click", selectDrivers)
 
 			editReportSettings("UpdateDrivers")
 		}
 
-		Gui RRS:Font, s8 Norm, Arial
+		reportSettingsGui.SetFont("s8 Norm", "Arial")
 
 		yOption := ((inList(options, "Drivers") || inList(options, "Cars")) ? "yp+306" : "yp+30")
 
-		Gui RRS:Add, Text, x8 %yOption% w360 0x10
+		reportSettingsGui.Add("Text", "x8 " . yOption . " w360 0x10")
 
-		Gui RRS:Add, Button, x108 yp+10 w80 h23 Default GacceptSettings, % translate("Ok")
-		Gui RRS:Add, Button, x196 yp w80 h23 GcancelSettings, % translate("&Cancel")
+		reportSettingsGui.Add("Button", "x108 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editReportSettings.Bind(kOk))
+		reportSettingsGui.Add("Button", "x196 yp w80 h23", translate("&Cancel")).OnEvent("Click", editReportSettings.Bind(kCancel))
 
-		if getWindowPosition("Race Reports.Settings", x, y)
-			Gui RRS:Show, x%x% y%y%
+		if getWindowPosition("Race Reports.Settings", &x, &y)
+			reportSettingsGui.Show("x" . x . " y" . y)
 		else
-			Gui RRS:Show
-
-		Gui RRS:Show
+			reportSettingsGui.Show()
 
 		loop
-			Sleep 100
+			Sleep(100)
 		until result
 
 		if (result = kOk) {
-			result := {}
-
-			Gui RRS:Submit
+			result := CaseInsenseMap()
 
 			if inList(options, "Laps") {
-				if allLapsRadio
+				if allLapsRadio.Value
 					result["Laps"] := true
 				else {
-					laps := {}
+					laps := CaseInsenseMap()
 					valid := true
 
-					for ignore, lap in string2Values(";", rangeLapsEdit)
+					for ignore, lap in string2Values(";", rangeLapsEdit.Text)
 						if InStr(lap, "-") {
 							lap := string2Values("-", lap)
 							startLap := lap[1]
 							endLap := lap[2]
 
-							if startLap is Integer
-							{
-								if endLap is Integer
-								{
+							if isInteger(startLap) {
+								if isInteger(endLap) {
 									if (endLap = startLap)
 										laps[startLap] := startLap
-									else if (endLap < startLap)
+									else if (endLap < startLap) {
 										loop {
 											index := endLap + A_Index - 1
 
 											laps[index] := index
-										} until (index = startLap)
+										}
+										until (index = startLap)
+									}
 									else
 										loop {
 											index := startLap + A_Index - 1
 
 											laps[index] := index
-										} until (index = endLap)
+										}
+										until (index = endLap)
 								}
 								else
 									valid := false
@@ -1537,7 +1586,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 							else
 								valid := false
 						}
-						else if lap is Integer
+						else if isInteger(lap)
 							laps[lap] := lap
 						else
 							valid := false
@@ -1556,21 +1605,19 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 			}
 
 			if inList(options, "Classes")
-				if (classesDropDownMenu > 1)
-					result["Classes"] := [raceReport.getReportClasses(raceData, true)[classesDropDownMenu - 1]]
+				if (classesDropDownMenu.Value > 1)
+					result["Classes"] := [raceReport.getReportClasses(raceData, true)[classesDropDownMenu.Value - 1]]
 
 			if (inList(options, "Drivers") || inList(options, "Cars")) {
 				allDrivers := reportViewer.getReportDrivers(raceData, drivers)
-				selectedDrivers := {}
+				selectedDrivers := CaseInsenseMap()
 
-				sessionDB := new SessionDatabase()
-				simulator := getConfigurationValue(raceData, "Session", "Simulator")
+				sessionDB := SessionDatabase()
+				simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
 				if inList(options, "Classes") {
-					GuiControlGet classesDropDownMenu
-
-					if (classesDropDownMenu > 1)
-						selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu - 1]
+					if (classesDropDownMenu.Value > 1)
+						selectedClass := reportViewer.getReportClasses(raceData, true)[classesDropDownMenu.Value - 1]
 					else
 						selectedClass := false
 				}
@@ -1578,23 +1625,20 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 					selectedClass := false
 
 				for ignore, driver in allDrivers
-					if (!selectedClass || (selectedClass = getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
-						selectedDrivers[inList(options, "Cars") ? getConfigurationValue(raceData, "Cars", "Car." . A_Index . ".Nr") : driver] := A_Index
+					if (!selectedClass || (selectedClass = getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Class", kUnknown)))
+						selectedDrivers[inList(options, "Cars") ? getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Nr") : driver] := A_Index
 
 				newDrivers := []
 
 				rowNumber := 0
 
 				loop {
-					rowNumber := LV_GetNext(rowNumber, "C")
+					rowNumber := driversListView.GetNext(rowNumber, "C")
 
 					if !rowNumber
 						break
-					else {
-						LV_GetText(column1, rowNumber)
-
-						newDrivers.Push(selectedDrivers[column1])
-					}
+					else
+						newDrivers.Push(selectedDrivers[driversListView.GetText(rowNumber, 1)])
 				}
 
 				result["Drivers"] := newDrivers
@@ -1604,71 +1648,8 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		else
 			result := false
 
-		Gui RRS:Destroy
+		reportSettingsGui.Destroy()
 
 		return result
 	}
-}
-
-acceptSettings() {
-	editReportSettings(kOk)
-}
-
-cancelSettings() {
-	editReportSettings(kCancel)
-}
-
-chooseLapSelection() {
-	if (A_GuiControl = "allLapsRadio") {
-		GuiControl Disable, rangeLapsEdit
-		GuiControl Text, rangeLapsEdit, % ""
-	}
-	else
-		GuiControl Enable, rangeLapsEdit
-}
-
-selectClass() {
-	editReportSettings("UpdateDrivers")
-}
-
-selectDriver() {
-	local selected := 0
-	local row := 0
-
-	loop {
-		row := LV_GetNext(row, "C")
-
-		if row
-			selected += 1
-		else
-			break
-	}
-
-	if (selected == 0)
-		GuiControl, , driverSelectCheck, 0
-	else if (selected < LV_GetCount())
-		GuiControl, , driverSelectCheck, -1
-	else
-		GuiControl, , driverSelectCheck, 1
-}
-
-selectDrivers() {
-	GuiControlGet driverSelectCheck
-
-	if (driverSelectCheck == -1) {
-		driverSelectCheck := 0
-
-		GuiControl, , driverSelectCheck, 0
-	}
-
-	loop % LV_GetCount()
-		LV_Modify(A_Index, driverSelectCheck ? "Check" : "-Check")
-}
-
-moveSettings() {
-	moveByMouse("RRS", "Race Reports.Settings")
-}
-
-openReportSettingsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Virtual-Race-Strategist#race-reports
 }

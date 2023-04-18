@@ -1,0 +1,22 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Generic Setup Rules             ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSimulator(*)),
+				 (Prove: addCharacteristics(*, *, *, *)),
+				 (Prove: addSettings(*, *, *)),
+				 (Prove: removeSetting(*, *, Aero.Splitter.Front))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Setup Recommendations                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

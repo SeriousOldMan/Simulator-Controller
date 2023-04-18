@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ControllerStepWizard.ahk
+#Include "ControllerStepWizard.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -24,9 +24,9 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	iPedalEffectsList := false
 	iChassisEffectsList := false
 
-	iCachedActions := {}
+	iCachedActions := CaseInsenseMap()
 
-	Pages[] {
+	Pages {
 		Get {
 			local wizard := this.SetupWizard
 
@@ -42,18 +42,18 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		local arguments := ""
 		local function, action, parameters, ignore, mode, actions
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		if wizard.isModuleSelected("Tactile Feedback") {
-			parameters := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Parameters", ""))
+			parameters := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Parameters", ""))
 
-			for ignore, action in string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", "")) {
+			for ignore, action in string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", "")) {
 				function := wizard.getModuleActionFunction("Tactile Feedback", false, action)
 
-				if !IsObject(function)
-					function := ((function != "") ? Array(function) : [])
+				if !isObject(function)
+					function := ((function && (function != "")) ? Array(function) : [])
 
-				if (function.Length() > 0) {
+				if (function.Length > 0) {
 					if (arguments != "")
 						arguments .= "; "
 
@@ -67,10 +67,10 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 				for ignore, action in this.getActions(mode) {
 					function := wizard.getModuleActionFunction("Tactile Feedback", mode, action)
 
-					if !IsObject(function)
-						function := ((function != "") ? Array(function) : [])
+					if !isObject(function)
+						function := ((function && (function != "")) ? Array(function) : [])
 
-					if (function.Length() > 0) {
+					if (function.Length > 0) {
 						if (actions != "")
 							actions .= ", "
 
@@ -86,32 +86,17 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 				}
 			}
 
-			new Plugin("Tactile Feedback", false, true, "", arguments).saveToConfiguration(configuration)
+			Plugin("Tactile Feedback", false, true, "", arguments).saveToConfiguration(configuration)
 		}
 		else
-			new Plugin("Tactile Feedback", false, false, "", "").saveToConfiguration(configuration)
+			Plugin("Tactile Feedback", false, false, "", "").saveToConfiguration(configuration)
 	}
 
 	createGui(wizard, x, y, width, height) {
 		local window := this.Window
-		local tactileFeedbackIconHandle := false
-		local tactileFeedbackLabelHandle := false
-		local tactileFeedbackListViewHandle := false
-		local tactileFeedbackInfoTextHandle := false
-		local pedalEffectsLabelHandle := false
-		local pedalEffectsButtonHandle := false
-		local pedalEffectsListHandle := false
-		local chassisEffectsLabelHandle := false
-		local chassisEffectsButtonHandle := false
-		local chassisEffectsListHandle := false
-		local labelsEditorButtonHandle := false
 		local labelWidth := width - 30
 		local labelX := x + 35
 		local labelY := y + 8
-		local columnLabel1Handle := false
-		local columnLine1Handle := false
-		local columnLabel2Handle := false
-		local columnLine2Handle := false
 		local listX := x + 300
 		local listWidth := width - 300
 		local colWidth := width - listWidth - x
@@ -120,90 +105,110 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		local secondWidth := colWidth - 155
 		local info, html
 
-		static tactileFeedbackInfoText
+		noSelect(listView, *) {
+			loop listView.GetCount()
+				listView.Modify(A_Index, "-Select")
+		}
 
-		Gui %window%:Default
+		changePedalEffects(*) {
+			this.changeEffects("Pedal Vibration")
+		}
 
-		Gui %window%:Font, s10 Bold, Arial
+		changeChassisEffects(*) {
+			this.changeEffects("Chassis Vibration")
+		}
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDtactileFeedbackIconHandle Hidden, %kResourcesDirectory%Setup\Images\Vibration 1.ico
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDtactileFeedbackLabelHandle Hidden, % translate("Tactile Feedback Configuration")
+		tactileFeedbackActionFunctionSelect(listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Font, s8 Norm, Arial
+		tactileFeedbackActionFunctionMenu(listView, line, *) {
+			this.actionFunctionSelect(line)
+		}
 
-		Gui %window%:Font, Bold, Arial
+		window.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Text, x%x% yp+30 w%colWidth% h23 +0x200 HWNDcolumnLabel1Handle Hidden Section, % translate("Setup ")
-		Gui %window%:Add, Text, yp+20 x%x% w%colWidth% 0x10 HWNDcolumnLine1Handle Hidden
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Vibration 1.ico")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Tactile Feedback Configuration"))
 
-		Gui %window%:Font, s8 Norm, Arial
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, Text, x%x% yp+10 w105 h23 +0x200 HWNDpedalEffectsLabelHandle Hidden, % translate("Pedal Effects")
+		window.SetFont("Bold", "Arial")
 
-		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDpedalEffectsButtonHandle gchangePedalEffects Hidden
-		setButtonIcon(pedalEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 ReadOnly Disabled HWNDpedalEffectsListHandle Hidden
+		widget3 := window.Add("Text", "x" . x . " yp+30 w" . colWidth . " h23 +0x200 Hidden Section", translate("Setup "))
+		widget4 := window.Add("Text", "yp+20 x" . x . " w" . colWidth . " 0x10 Hidden")
 
-		Gui %window%:Add, Text, x%x% yp+65 w105 h23 +0x200 HWNDchassisEffectsLabelHandle Hidden, % translate("Chassis Effects")
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, Button, x%buttonX% yp w23 h23 HWNDchassisEffectsButtonHandle gchangeChassisEffects Hidden
-		setButtonIcon(chassisEffectsButtonHandle, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
-		Gui %window%:Add, ListBox, x%secondX% yp w%secondWidth% h60 ReadOnly Disabled HWNDchassisEffectsListHandle Hidden
+		widget5 := window.Add("Text", "x" . x . " yp+10 w105 h23 +0x200 Hidden", translate("Pedal Effects"))
 
-		Gui %window%:Add, Button, x%x% yp+70 w%colWidth% h23 HWNDlabelsEditorButtonHandle gopenLabelsAndIconsEditor Hidden, % translate("Edit Labels && Icons...")
+		widget6 := window.Add("Button", "x" . buttonX . " yp w23 h23  Hidden")
+		widget6.OnEvent("Click", changePedalEffects)
+		setButtonIcon(widget6, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
+		widget7 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 ReadOnly Disabled Hidden")
 
-		Gui %window%:Font, s8 Bold, Arial
+		widget8 := window.Add("Text", "x" . x . " yp+65 w105 h23 +0x200 Hidden", translate("Chassis Effects"))
 
-		Gui %window%:Add, Text, x%listX% ys w%listWidth% h23 +0x200 HWNDcolumnLabel2Handle Hidden Section, % translate("Actions")
-		Gui %window%:Add, Text, yp+20 x%listX% w%listWidth% 0x10 HWNDcolumnLine2Handle Hidden
+		widget9 := window.Add("Button", "x" . buttonX . " yp w23 h23  Hidden")
+		widget9.OnEvent("Click", changeChassisEffects)
+		setButtonIcon(widget9, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
+		widget10 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 H:Grow(0.33) ReadOnly Disabled Hidden")
 
-		Gui %window%:Font, s8 Norm, Arial
+		widget11 := window.Add("Button", "x" . x . " yp+70 w" . colWidth . " h23 Y:Move(0.33) Hidden", translate("Edit Labels && Icons..."))
+		widget11.OnEvent("Click", openLabelsAndIconsEditor)
 
-		Gui %window%:Add, ListView, x%listX% yp+10 w%listWidth% h270 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDtactileFeedbackListViewHandle gupdateTactileFeedbackActionFunction Hidden, % values2String("|", map(["Mode", "Action", "Label", "Function"], "translate")*)
+		window.SetFont("s8 Bold", "Arial")
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		widget12 := window.Add("Text", "x" . listX . " ys w" . listWidth . " h23 +0x200 Hidden Section", translate("Actions"))
+		widget13 := window.Add("Text", "yp+20 x" . listX . " w" . listWidth . " W:Grow 0x10 Hidden")
 
-		Sleep 200
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, ActiveX, x%x% yp+275 w%width% h135 HWNDtactileFeedbackInfoTextHandle VtactileFeedbackInfoText Hidden, shell.explorer
+		widget14 := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h270 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Mode", "Action", "Label", "Function"], translate))
+		widget14.OnEvent("Click", tactileFeedbackActionFunctionSelect)
+		widget14.OnEvent("DoubleClick", tactileFeedbackActionFunctionSelect)
+		widget14.OnEvent("ContextMenu", tactileFeedbackActionFunctionMenu)
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Actions.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		tactileFeedbackInfoText.Navigate("about:blank")
-		tactileFeedbackInfoText.Document.Write(html)
+		widget15 := window.Add("ActiveX", "x" . x . " yp+275 w" . width . " h135 Y:Move(0.66) W:Grow H:Grow(0.33) VtactileFeedbackInfoText Hidden", "shell.explorer")
 
-		this.setActionsListView(tactileFeedbackListViewHandle)
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		this.iPedalEffectsList := pedalEffectsListHandle
-		this.iChassisEffectsList := chassisEffectsListHandle
+		widget15.Value.navigate("about:blank")
+		widget15.Value.document.write(html)
 
-		this.registerWidgets(1, tactileFeedbackIconHandle, tactileFeedbackLabelHandle, tactileFeedbackListViewHandle, tactileFeedbackInfoTextHandle, columnLabel1Handle, columnLine1Handle, columnLabel2Handle, columnLine2Handle, pedalEffectsLabelHandle, pedalEffectsButtonHandle, pedalEffectsListHandle, chassisEffectsLabelHandle, chassisEffectsButtonHandle, chassisEffectsListHandle, labelsEditorButtonHandle)
+		this.setActionsListView(widget14)
+
+		this.iPedalEffectsList := widget7
+		this.iChassisEffectsList := widget10
+
+		this.registerWidgets(1, widget1, widget2, widget3, widget4, widget5, widget6, widget7, widget8, widget9, widget10
+							  , widget11, widget12, widget13, widget14, widget15)
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
-		this.iPedalEffectsList := {}
-		this.iChassisEffectsList := {}
-		this.iCachedActions := {}
+		this.iPedalEffectsList := CaseInsenseMap()
+		this.iChassisEffectsList := CaseInsenseMap()
+		this.iCachedActions := CaseInsenseMap()
 	}
 
 	hidePage(page) {
-		local wizard := this.SetupWizard
-		local title
+		local msgResult
 
-		if !wizard.isSoftwareInstalled("SimHub") {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Warning")
-			MsgBox 262436, %title%, % translate("SimHub cannot be found. Do you really want to proceed?")
-			OnMessage(0x44, "")
+		if !this.SetupWizard.isSoftwareInstalled("SimHub") {
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("SimHub cannot be found. Do you really want to proceed?"), translate("Warning"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-			IfMsgBox No
+			if (msgResult = "No")
 				return false
 		}
 
-		return base.hidePage(page)
+		return super.hidePage(page)
 	}
 
 	getModule() {
@@ -217,19 +222,19 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	getActions(mode := false) {
 		local wizard, actions
 
-		if this.iCachedActions.HasKey(mode)
+		if this.iCachedActions.Has(mode)
 			return this.iCachedActions[mode]
 		else {
 			wizard := this.SetupWizard
 
 			actions := wizard.moduleAvailableActions("Tactile Feedback", mode)
 
-			if (actions.Length() == 0) {
+			if (actions.Length == 0) {
 				if mode
-					actions := concatenate(string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Effects", ""))
-										 , string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Intensity", "")))
+					actions := concatenate(string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Effects", ""))
+										 , string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback." . mode . ".Intensity", "")))
 				else
-					actions := string2Values(",", getConfigurationValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", ""))
+					actions := string2Values(",", getMultiMapValue(wizard.Definition, "Setup.Tactile Feedback", "Tactile Feedback.Toggles", ""))
 
 				wizard.setModuleAvailableActions("Tactile Feedback", mode, actions)
 			}
@@ -244,7 +249,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		local wizard := this.SetupWizard
 		local function, functions, ignore
 
-		base.setAction(row, mode, action, actionDescriptor, label, argument)
+		super.setAction(row, mode, action, actionDescriptor, label, argument)
 
 		if inList(this.getActions(false), action) {
 			functions := this.getActionFunction(this.getActionMode(row), action)
@@ -257,41 +262,34 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	clearActionFunction(mode, action, function) {
-		base.clearActionFunction(mode, action, function)
+		super.clearActionFunction(mode, action, function)
 
 		if inList(this.getActions(false), action)
 			this.SetupWizard.removeModuleStaticFunction("Tactile Feedback", function)
 	}
 
 	loadActions(load := false) {
-		local window := this.Window
 		local wizard := this.SetupWizard
 		local function, action, count, list, pluginLabels, lastMode, count, ignore, mode, first, lastMode
 		local label, isBinary, onLabel, offLabel
 
-		Gui %window%:Default
-
 		if load {
-			this.iCachedActions := {}
+			this.iCachedActions := CaseInsenseMap()
 
 			this.clearActionFunctions()
 
-			list := this.iPedalEffectsList
+			this.iPedalEffectsList.Delete()
+			this.iPedalEffectsList.Add(this.getActions("Pedal Vibration"))
 
-			GuiControl, , %list%, % "|" . values2String("|", this.getActions("Pedal Vibration")*)
-
-			list := this.iChassisEffectsList
-
-			GuiControl, , %list%, % "|" . values2String("|", this.getActions("Chassis Vibration")*)
+			this.iChassisEffectsList.Delete()
+			this.iChassisEffectsList.Add(this.getActions("Chassis Vibration"))
 		}
 
 		this.clearActions()
 
-		Gui ListView, % this.ActionsListView
-
 		pluginLabels := getControllerActionLabels()
 
-		LV_Delete()
+		this.ActionsListView.Delete()
 
 		lastMode := -1
 		count := 1
@@ -306,13 +304,13 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 						function := wizard.getModuleActionFunction("Tactile Feedback", mode, action)
 
 						if (function && (function != ""))
-							this.setActionFunction(mode, action, (IsObject(function) ? function : Array(function)))
+							this.setActionFunction(mode, action, (isObject(function) ? function : Array(function)))
 					}
 
-					label := getConfigurationValue(pluginLabels, "Tactile Feedback", action . (mode ? ".Dial" : ".Toggle"), kUndefined)
+					label := getMultiMapValue(pluginLabels, "Tactile Feedback", action . (mode ? ".Dial" : ".Toggle"), kUndefined)
 
 					if (label == kUndefined) {
-						label := getConfigurationValue(pluginLabels, "Tactile Feednack", action . ".Activate", kUndefined)
+						label := getMultiMapValue(pluginLabels, "Tactile Feednack", action . ".Activate", kUndefined)
 
 						if (label == kUndefined) {
 							label := ""
@@ -339,11 +337,11 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					function := this.getActionFunction(mode, action)
 
 					if function {
-						if (function.Length() == 1)
+						if (function.Length == 1)
 							function := (!isBinary ? function[1] : ((mode ? translate("+/-: ") : translate("On/Off: ")) . function[1]))
 						else {
-							onLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Increase", false)
-							offLabel := getConfigurationValue(pluginLabels, "Tactile Feedback", action . ".Decrease", false)
+							onLabel := getMultiMapValue(pluginLabels, "Tactile Feedback", action . ".Increase", false)
+							offLabel := getMultiMapValue(pluginLabels, "Tactile Feedback", action . ".Decrease", false)
 
 							if (onLabel && (function[1] != ""))
 								this.setActionLabel(count, function[1], onLabel)
@@ -357,7 +355,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 					else
 						function := ""
 
-					LV_Add("", (first ? translate(mode ? mode : "Independent") : ""), action, StrReplace(label, "`n" , A_Space), function)
+					this.ActionsListView.Add("", (first ? translate(mode ? mode : "Independent") : ""), action, StrReplace(StrReplace(label, "`n", A_Space), "`r", ""), function)
 
 					count += 1
 				}
@@ -366,10 +364,10 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		this.loadControllerLabels()
 
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
-		LV_ModifyCol(3, "AutoHdr")
-		LV_ModifyCol(4, "AutoHdr")
+		this.ActionsListView.ModifyCol(1, "AutoHdr")
+		this.ActionsListView.ModifyCol(2, "AutoHdr")
+		this.ActionsListView.ModifyCol(3, "AutoHdr")
+		this.ActionsListView.ModifyCol(4, "AutoHdr")
 	}
 
 	saveActions() {
@@ -377,7 +375,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		local function, action, ignore, mode, modeFunctions
 
 		for ignore, mode in this.getModes() {
-			modeFunctions := {}
+			modeFunctions := CaseInsenseMap()
 
 			for ignore, action in this.getActions(mode)
 				if wizard.moduleActionAvailable("Tactile Feedback", mode, action) {
@@ -392,19 +390,13 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 	}
 
 	changeEffects(mode) {
-		local actions := this.getActions(mode)
-		local title := translate("Modular Simulator Controller System")
-		local prompt := translate("Please input effect names (seperated by comma):")
-		local locale := ((getLanguage() = "en") ? "" : "Locale")
+		local actions := values2String(", ", this.getActions(mode)*)
+		local result := InputBox(translate("Please input effect names (seperated by comma):"), translate("Modular Simulator Controller System"), "w450 h150", actions)
 
-		actions := values2String(", ", actions*)
-
-		InputBox actions, %title%, %prompt%, , 450, 150, , , %locale%, , %actions%
-
-		if !ErrorLevel {
+		if (result.Result = "Ok") {
 			this.saveActions()
 
-			this.SetupWizard.setModuleAvailableActions("Tactile Feedback", mode, string2Values(",", actions))
+			this.SetupWizard.setModuleAvailableActions("Tactile Feedback", mode, string2Values(",", result.Value))
 
 			this.loadActions(true)
 		}
@@ -416,20 +408,8 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-changePedalEffects() {
-	SetupWizard.Instance.StepWizards["Tactile Feedback"].changeEffects("Pedal Vibration")
-}
-
-changeChassisEffects() {
-	SetupWizard.Instance.StepWizards["Tactile Feedback"].changeEffects("Chassis Vibration")
-}
-
-updateTactileFeedbackActionFunction() {
-	updateActionFunction(SetupWizard.Instance.StepWizards["Tactile Feedback"])
-}
-
 initializeTactileFeedbackStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new TactileFeedbackStepWizard(SetupWizard.Instance, "Tactile Feedback", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(TactileFeedbackStepWizard(SetupWizard.Instance, "Tactile Feedback", kSimulatorConfiguration))
 }
 
 

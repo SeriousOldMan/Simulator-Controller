@@ -9,35 +9,43 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Debug.ahk
-#Include ..\Framework\Files.ahk
-#Include ..\Framework\Localization.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\Files.ahk"
+#Include "..\Framework\Localization.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vTrayMessageDuration := false
+global gTrayMessageDuration := false
 
-global vHasTrayMenu := false
+global gHasTrayMenu := false
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-exitApplication() {
-	ExitApp 0
+emptyLogsDirectory(*) {
+	deleteDirectory(kLogsDirectory, false)
+}
+
+emptyTempDirectory(*) {
+	deleteDirectory(kTempDirectory, false)
+}
+
+exitApplication(*) {
+	ExitApp(0)
 }
 
 
@@ -46,41 +54,43 @@ exitApplication() {
 ;;;-------------------------------------------------------------------------;;;
 
 hasTrayMenu() {
-	return vHasTrayMenu
+	return gHasTrayMenu
 }
 
 installTrayMenu(update := false) {
+	global gHasTrayMenu
 	local icon := kIconsDirectory . "Pause.ico"
 	local label := translate("Exit")
-	local levels, level, ignore, oldLabel, label, handler
+	local levels, level, ignore, oldLabel
 
 	if !update {
-		Menu Tray, Icon, %icon%, , 1
+		TraySetIcon(icon, "1")
 
-		Sleep 50
+		Sleep(50)
 	}
 
-	if (update && vHasTrayMenu) {
-		oldLabel := translate("Exit", vHasTrayMenu)
+	if (update && gHasTrayMenu) {
+		oldLabel := translate("Exit", gHasTrayMenu)
 
-		Menu Tray, Rename, %oldLabel%, %label%
+		A_TrayMenu.Rename(oldLabel, label)
 	}
 	else {
-		Menu Tray, NoStandard
-		Menu Tray, Add, %label%, exitApplication
+		A_TrayMenu.Delete()
+
+		A_TrayMenu.Add(label, exitApplication)
 	}
 
 	try {
-		Menu LogMenu, DeleteAll
+		LogMenu.Delete()
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 	}
 
 	try {
-		Menu SupportMenu, DeleteAll
+		SupportMenu.Delete()
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 	}
 
@@ -90,78 +100,69 @@ installTrayMenu(update := false) {
 		level := levels[label]
 
 		label := translate(label)
-		handler := Func("setLogLevel").Bind(level)
 
-		Menu LogMenu, Add, %label%, %handler%
+		LogMenu.Add(label, setLogLevel.Bind(level))
 
 		if (level == getLogLevel())
-			Menu LogMenu, Check, %label%
+			LogMenu.Check(label)
 	}
 
 	label := translate("Debug")
-	handler := Func("toggleDebug")
 
-	Menu SupportMenu, Add, %label%, %handler%
+	SupportMenu.Add(label, toggleDebug)
 
 	if isDebug()
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
-	label := translate("Logging")
+	SupportMenu.Add(translate("Logging"), LogMenu)
 
-	Menu SupportMenu, Add, %label%, :LogMenu
+	SupportMenu.Add()
 
-	Menu SupportMenu, Add
-
-	label := translate("Clear log files")
-	handler := Func("deleteDirectory").Bind(kLogsDirectory, false)
-
-	Menu SupportMenu, Add, %label%, %handler%
-
-	label := translate("Clear temporary files")
-	handler := Func("deleteDirectory").Bind(kTempDirectory, false)
-
-	Menu SupportMenu, Add, %label%, %handler%
+	SupportMenu.Add(translate("Clear log files"), emptyLogsDirectory)
+	SupportMenu.Add(translate("Clear temporary files"), emptyTempDirectory)
 
 	label := translate("Support")
 
-	if (update && vHasTrayMenu) {
-		oldLabel := translate("Support", vHasTrayMenu)
+	if (update && gHasTrayMenu) {
+		oldLabel := translate("Support", gHasTrayMenu)
 
-		Menu Tray, Delete, %oldLabel%
-		Menu Tray, Insert, 1&, %label%, :SupportMenu
+		A_TrayMenu.Delete(oldLabel)
+		A_TrayMenu.Insert("1&", label, SupportMenu)
 	}
 	else {
-		Menu Tray, Insert, 1&
-		Menu Tray, Insert, 1&, %label%, :SupportMenu
+		A_TrayMenu.Insert("1&")
+		A_TrayMenu.Insert("1&", label, SupportMenu)
 	}
 
-	vHasTrayMenu := getLanguage()
+	gHasTrayMenu := getLanguage()
 }
 
 trayMessage(title, message, duration := false, async := true) {
-	if (async && (duration || vTrayMessageDuration))
-		Task.startTask(Func("trayMessage").Bind(title, message, duration, false), 0, kLowPriority)
+	global gTrayMessageDuration
+
+	if (async && (duration || gTrayMessageDuration))
+		Task.startTask(trayMessage.Bind(title, message, duration, false), 0, kLowPriority)
 	else {
-		title := StrReplace(title, "`n", A_Space)
-		message := StrReplace(message, "`n", A_Space)
+		title := StrReplace(StrReplace(title, "`n", A_Space), "`r", "")
+		message := StrReplace(StrReplace(message, "`n", A_Space), "`r", "")
 
 		if !duration
-			duration := vTrayMessageDuration
+			duration := gTrayMessageDuration
 
 		if duration {
 			protectionOn()
 
 			try {
-				TrayTip %title%, %message%
+				TrayTip(title, message)
 
-				Sleep %duration%
+				Sleep(duration)
 
-				TrayTip
+				TrayTip()
 
-				if SubStr(A_OSVersion,1,3) = "10." {
-					Menu Tray, NoIcon
-					Sleep 200  ; It may be necessary to adjust this sleep...
-					Menu Tray, Icon
+				if SubStr(A_OSVersion, 1, 3) = "10." {
+					A_IconHidden := true
+					Sleep(200)  ; It may be necessary to adjust this sleep...
+					A_IconHidden := false
 				}
 			}
 			finally {
@@ -172,11 +173,15 @@ trayMessage(title, message, duration := false, async := true) {
 }
 
 disableTrayMessages() {
-	vTrayMessageDuration := false
+	global gTrayMessageDuration
+
+	gTrayMessageDuration := false
 }
 
 enableTrayMessages(duration := 1500) {
-	vTrayMessageDuration := duration
+	global gTrayMessageDuration
+
+	gTrayMessageDuration := duration
 }
 
 
@@ -184,6 +189,6 @@ enableTrayMessages(duration := 1500) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-registerLocalizationCallback("installTrayMenu")
+registerLocalizationCallback(installTrayMenu)
 
 installTrayMenu()

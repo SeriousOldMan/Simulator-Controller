@@ -9,8 +9,8 @@
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-substituteVariables(string, values := false) {
-	local result := string
+substituteVariables(text, values := false) {
+	local result := text
 	local variable, startPos, endPos, value
 
 	loop {
@@ -23,12 +23,17 @@ substituteVariables(string, values := false) {
 			if endPos {
 				variable := Trim(SubStr(result, startPos, endPos - startPos))
 
-				value := (values && values.HasKey(variable)) ? values[variable] : %variable%
+				if isInstance(values, Map)
+					value := (values && values.Has(variable)) ? values[variable] : %variable%
+				else if isInstance(values, Object)
+					value := (values && values.HasProp(variable)) ? values.%variable% : %variable%
+				else
+					value := %variable%
 
 				result := StrReplace(result, "%" . variable . "%", value)
 			}
 			else
-				throw "Second % not found while scanning (" . string . ") for variables in substituteVariables..."
+				throw "Second % not found while scanning (" . text . ") for variables in substituteVariables..."
 		}
 		else
 			break
@@ -37,8 +42,11 @@ substituteVariables(string, values := false) {
 	return result
 }
 
-string2Values(delimiter, string, count := false) {
-	return (count ? StrSplit(Trim(string), delimiter, " `t", count) : StrSplit(Trim(string), delimiter, " `t"))
+string2Values(delimiter, text, count := false, class := Array) {
+	if (class == Array)
+		return (count ? StrSplit(Trim(text), delimiter, " `t", count) : StrSplit(Trim(text), delimiter, " `t"))
+	else
+		return toArray((count ? StrSplit(Trim(text), delimiter, " `t", count) : StrSplit(Trim(text), delimiter, " `t")), class)
 }
 
 values2String(delimiter, values*) {
@@ -55,11 +63,11 @@ values2String(delimiter, values*) {
 	return result
 }
 
-string2Map(elementSeparator, valueSeparator, map) {
-	local result := {}
+string2Map(elementSeparator, valueSeparator, text) {
+	local result := CaseInsenseMap()
 	local ignore, keyValue
 
-	for ignore, keyValue in string2Values(elementSeparator, map) {
+	for ignore, keyValue in string2Values(elementSeparator, text) {
 		keyValue := string2Values(valueSeparator, keyValue)
 
 		result[keyValue[1]] := keyValue[2]

@@ -1,0 +1,24 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Setup Rules       ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSimulator("Assetto Corsa")),
+				 (Prove: addCharacteristics("Assetto Corsa", *, *, *)),
+				 (Prove: addSettings("Assetto Corsa", *, *)),
+				 (Prove: removeSettings("Assetto Corsa", *, [Aero.Splitter.Front, Brake.Duct.Front, Brake.Duct.Rear,
+															 Electronics.Map,
+															 Geometry.Caster.Left, Geometry.Caster.Right]))
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Setup Recommendations                           ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include %kResourcesDirectory%Garage\Rules\Generic Recommendations.rules

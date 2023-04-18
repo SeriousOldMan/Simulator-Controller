@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Rule Engine Test                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,27 +9,23 @@
 ;;;                       Global Declaration Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Requires AutoHotkey >=2.0
 #SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
+SendMode("Input")				; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
-; SetBatchLines -1				; Maximize CPU utilization
-; ListLines Off					; Disable execution history
-
-
-global vBuildConfiguration := "Development"
+global kBuildConfiguration := "Production"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\RuleEngine.ahk
-#Include AHKUnit\AHKUnit.ahk
+#Include "..\Libraries\RuleEngine.ahk"
+#Include "AHKUnit\AHKUnit.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -37,21 +33,21 @@ global vBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 global kCompilerCompliantTestRules
-				= ["persist(?A.grandchild, ?B) <= Call(showRelationship, ?A.grandchild, ?B), !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
-				 , "reverse([1,2,3,4], ?L)"
-				 , "foo(?A, bar(?B, [?C])) <= baz(?, foo(?A, ?)), !, fail"
-				 , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
-				 , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"
-				 , "fac(?X, ?R) <= >(?X, 0), -(?N, ?X, 1), fac(?N, ?T), *(?R, ?T, ?X)"]
+				:= ["persist(?A.grandchild, ?B) <= Call(showRelationship, ?A.grandchild, ?B), !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
+				  , "reverse([1,2,3,4], ?L)"
+				  , "foo(?A, bar(?B, [?C])) <= baz(?, foo(?A, ?)), !, fail"
+				  , "reverse([ ?H |?T ], ?REV )<= reverse(?T,?RT), concat(?RT,[?H],?REV)"
+				  , "Priority: 5, {Any: [?Peter.grandchild], [Predicate: ?Peter.son = true]} => (Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"
+				  , "fac(?X, ?R) <= >(?X, 0), -(?N, ?X, 1), fac(?N, ?T), *(?R, ?T, ?X)"]
 
 global kCompilerNonCompliantTestRules
-				= ["persist(?A.grandchild  ?B) <= Call(showRelationship, ?A.grandchild, ?B, !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
-				 , "reverse([1,2,3,4]], ?L)"
-				 , "foo(?A, bar(?B)) => baz(?, foo([?A], !), !, fail"
-				 , "reverse([ ?H | ], ?REV )<= reverse(?T,,?RT), concat ?RT,[?H],?REV)"
-				 , "Priority: 5, [Any: [?Peter.grandchild], [Preddicate: ?Peter.son = true]} => [Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"]
+				:= ["persist(?A.grandchild  ?B) <= Call(showRelationship, ?A.grandchild, ?B, !, Set(?A.grandchild, true), Set(?B, grandfather), Produce()"
+				  , "reverse([1,2,3,4]], ?L)"
+				  , "foo(?A, bar(?B)) => baz(?, foo([?A], !), !, fail"
+				  , "reverse([ ?H | ], ?REV )<= reverse(?T,,?RT), concat ?RT,[?H],?REV)"
+				  , "Priority: 5, [Any: [?Peter.grandchild], [Preddicate: ?Peter.son = true]} => [Set: Peter, happy), (Call: showRelationship(1, 2)), (Prove: father(maria, willy)), (Call: showRelationship(2, 1))"]
 
-kRules =
+global kExecutionTestRules := "
 (
 				oc(?O) <= ?O = f(?O)
 				eq(?X, ?X)
@@ -96,12 +92,10 @@ kRules =
 
 				{Any: [?Peter.grandchild], [?Peter.son]} => (Set: Peter, happy)
 				[?Peter = happy] => (Call: celebrate())
-				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandchild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
+				{Any: [?Paul.grandchild], [?Willy.grandChild]} => (Set: Bound, ?Paul.grandChild), (Set: NotBound, ?Peter.son), (Set: ForcedBound, !Willy.grandchild)
 
 				{All: [?Peter], {Prove: isHappy(?Peter, ?gf)}} => (Prove: father(?father, ?gf)), (Call: celebrate())
-)
-
-global kExecutionTestRules := kRules
+)"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -132,7 +126,7 @@ class Compiler extends Assert {
 	}
 
 	Compiler_Compliance_Test() {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 		productions := false
 		reductions := false
 		text := ""
@@ -140,14 +134,14 @@ class Compiler extends Assert {
 		for ignore, theRule in kCompilerCompliantTestRules
 			text := (text . theRule . "`n")
 
-		compiler.compileRules(text, productions, reductions)
+		compiler.compileRules(text, &productions, &reductions)
 
-		this.AssertEqual(1, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(5, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(1, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(5, reductions.Length, "Not all reduction rules compiled...")
 	}
 
 	Compiler_NonCompliance_Test() {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 		productions := false
 		reductions := false
 		text := ""
@@ -156,21 +150,21 @@ class Compiler extends Assert {
 			try {
 				compiler.compileRule(text)
 
-				this.AssertEqual(false, true, "Syntax error not reported for rule """ . theRule . """...")
+				this.AssertEqual(false, true, "Syntax error not reported for rule `"" . theRule . "`"...")
 			}
-			catch exception {
+			catch Any as exception {
 				this.AssertEqual(true, true)
 			}
 		}
 	}
 
 	Compiler_Identity_Test() {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 
 		for ignore, theRule in kCompilerCompliantTestRules {
 			compiledRule := compiler.compileRule(theRule)
 
-			this.AssertEqual(this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule))),
+			this.AssertEqual(this.substitutePredicate(this.substituteBoolean(this.removeWhiteSpace(theRule)))
 						   , this.removeWhiteSpace(compiledRule.toString()), "Error in compiled rule " . compiledRule.toString())
 
 			newCompiledRule := compiler.compileRule(compiledRule.toString())
@@ -180,29 +174,29 @@ class Compiler extends Assert {
 	}
 
 	Compiler_FullScript_Test() {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 
 		productions := false
 		reductions := false
 
-		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(4, productions.Length(), "Not all production rules compiled...")
-		this.AssertEqual(26, reductions.Length(), "Not all reduction rules compiled...")
+		this.AssertEqual(4, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(26, reductions.Length, "Not all reduction rules compiled...")
 	}
 }
 
 class CoreEngine extends Assert {
 	OccurCheck_Test() {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 		local resultSet, goal
 
 		productions := false
 		reductions := false
 
-		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		engine := new RuleEngine(productions, reductions, {})
+		engine := RuleEngine(productions, reductions, Map())
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 
 		loop 1 {
@@ -222,14 +216,15 @@ class CoreEngine extends Assert {
 
 				resultSet := kb.prove(goal)
 
-				if (test[2].Length() > 0) {
+				if (test[2].Length > 0) {
 					this.AssertEqual(true, (resultSet != (A_Index == 2)), "Unexpected remaining results...")
 
-					for index, result in test[2] {
-						this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
+					if resultSet
+						for index, result in test[2] {
+							this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 
-						this.AssertEqual(true, resultSet.nextResult(), "Unexpected remaining results...")
-					}
+							this.AssertEqual(true, resultSet.nextResult(), "Unexpected remaining results...")
+						}
 				}
 				else
 					this.AssertEqual(true, (resultSet == false), "Unexpected remaining results...")
@@ -238,15 +233,15 @@ class CoreEngine extends Assert {
 	}
 
 	Deterministic_Test() {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 		local resultSet, goal
 
 		productions := false
 		reductions := false
 
-		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		engine := new RuleEngine(productions, reductions, {})
+		engine := RuleEngine(productions, reductions, Map())
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 
 		kb.enableDeterministicFacts()
@@ -273,15 +268,15 @@ class CoreEngine extends Assert {
 
 class Unification extends Assert {
 	executeTests(tests, trace := false) {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 		local resultSet, goal
 
 		productions := false
 		reductions := false
 
-		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		engine := new RuleEngine(productions, reductions, {})
+		engine := RuleEngine(productions, reductions, Map())
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 
 		if trace
@@ -292,17 +287,18 @@ class Unification extends Assert {
 
 			resultSet := kb.prove(goal)
 
-			if (test[2].Length() > 0) {
+			if (test[2].Length > 0) {
 				this.AssertEqual(true, (resultSet != false), "Unexpected remaining results...")
 
-				for index, result in test[2] {
-					this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
+				if resultSet
+					for index, result in test[2] {
+						this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 
-					if ((index == (test[2].Length() - 1)) && (test[2][index + 1] == "..."))
-						break
+						if ((index == (test[2].Length - 1)) && (test[2][index + 1] == "..."))
+							break
 
-					this.AssertEqual(index < test[2].Length(), resultSet.nextResult(), "Unexpected remaining results...")
-				}
+						this.AssertEqual(index < test[2].Length, resultSet.nextResult(), "Unexpected remaining results...")
+					}
 			}
 			else
 				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
@@ -314,7 +310,7 @@ class Unification extends Assert {
 	Simple_Test() {
 		tests := [["empty()", ["empty()"]]]
 
-		this.executeTests(tests, kTraceFull)
+		this.executeTests(tests, isDebug() ? kTraceFull : kTraceOff)
 	}
 
 	Concat_Test() {
@@ -358,15 +354,15 @@ class Unification extends Assert {
 
 class HybridEngine extends Assert {
 	executeTests(tests, trace := false) {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 		local resultSet, goal
 
 		productions := false
 		reductions := false
 
-		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		engine := new RuleEngine(productions, reductions, {})
+		engine := RuleEngine(productions, reductions, Map())
 
 		if trace
 			engine.setTraceLevel(trace)
@@ -375,21 +371,22 @@ class HybridEngine extends Assert {
 
 		kb.produce()
 
-		this.AssertEqual(0, kb.Facts.Facts.Count(), "Unexpected facts materialized...")
+		this.AssertEqual(0, kb.Facts.Facts.Count, "Unexpected facts materialized...")
 
 		for ignore, test in tests {
 			goal := compiler.compileGoal(test[1])
 
 			resultSet := kb.prove(goal)
 
-			if (test[2].Length() > 0) {
+			if (test[2].Length > 0) {
 				this.AssertEqual(true, (resultSet != false), "Unexpected remaining results...")
 
-				for index, result in test[2] {
-					this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
+				if resultSet
+					for index, result in test[2] {
+						this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 
-					this.AssertEqual(index < test[2].Length(), resultSet.nextResult(), "Unexpected remaining results...")
-				}
+						this.AssertEqual(index < test[2].Length, resultSet.nextResult(), "Unexpected remaining results...")
+					}
 			}
 			else
 				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
@@ -405,8 +402,8 @@ class HybridEngine extends Assert {
 
 		resultSet := this.executeTests(tests)
 
-		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Peter.son", false), "Fact Peter.son is missing...")
-		this.AssertEqual(true, resultSet.KnowledgeBase.getValue("Celebrated", false), "Fact Celebrated is missing...")
+		this.AssertEqual(true, resultSet && resultSet.KnowledgeBase.getValue("Peter.son", false), "Fact Peter.son is missing...")
+		this.AssertEqual(true, resultSet && resultSet.KnowledgeBase.getValue("Celebrated", false), "Fact Celebrated is missing...")
 	}
 
 	Script_Integration_Test() {
@@ -437,19 +434,19 @@ class HybridEngine extends Assert {
 	}
 
 	Fact_Unification_Test() {
-		local compiler := new RuleCompiler()
+		local compiler := RuleCompiler()
 		local resultSet, goal
 
-		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]],
+		tests := [["grandfather(?A, ?B)", ["grandfather(Peter, Paul)", "grandfather(Peter, Willy)"]]
 				, ["happy(Peter)", ["happy(Peter)"]]
 				, ["unhappy(Peter)", []]]
 
 		productions := false
 		reductions := false
 
-		compiler.compileRules(kExecutionTestRules, productions, reductions)
+		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		engine := new RuleEngine(productions, reductions, {})
+		engine := RuleEngine(productions, reductions, Map())
 		kb := engine.createKnowledgeBase(engine.createFacts(), engine.createRules())
 
 		for ignore, test in tests {
@@ -457,14 +454,15 @@ class HybridEngine extends Assert {
 
 			resultSet := kb.prove(goal)
 
-			if (test[2].Length() > 0) {
+			if (test[2].Length > 0) {
 				this.AssertEqual(true, (resultSet != false), "Unexpected remaining results...")
 
-				for index, result in test[2] {
-					this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
+				if resultSet
+					for index, result in test[2] {
+						this.AssertEqual(result, goal.toString(resultSet), "Unexpected result " . goal.toString(resultSet))
 
-					this.AssertEqual(index < test[2].Length(), resultSet.nextResult(), "Unexpected remaining results...")
-				}
+						this.AssertEqual(index < test[2].Length, resultSet.nextResult(), "Unexpected remaining results...")
+					}
 			}
 			else
 				this.AssertEqual(false, (resultSet != false), "Unexpected remaining results...")
@@ -475,9 +473,9 @@ class HybridEngine extends Assert {
 celebrate(knowledgeBase) {
 	if !knowledgeBase.getValue("Celebrated", false) {
 		if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
-			SplashTextOn 200, 60, Message, Party, Party...
-			Sleep 1000
-			SplashTextOff
+			SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, "Party, Party..."), SplashTextGui.Show("w200 h60")
+			Sleep(1000)
+			SplashTextGui.Destroy()
 		}
 
 		knowledgeBase.setFact("Celebrated", true)
@@ -489,9 +487,9 @@ showRelationship(choicePoint, grandchild, grandfather) {
 	local knowledgeBase := choicePoint.ResultSet.KnowledgeBase
 
 	if (knowledgeBase.RuleEngine.TraceLevel < kTraceOff) {
-		SplashTextOn 200, 60, Message, %grandchild% is grandchild of %grandfather%
-		Sleep 1000
-		SplashTextOff
+		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Message"), SplashTextGui.Add("Text",, grandchild " is grandchild of " grandfather), SplashTextGui.Show("w200 h60")
+		Sleep(1000)
+		SplashTextGui.Destroy()
 	}
 
 	if !knowledgeBase.hasFact(fact)
@@ -507,9 +505,9 @@ showFacts(knowledgeBase) {
 		for key, value in knowledgeBase.Facts.Facts
 			message.Push(key . " = " . value)
 
-		SplashTextOn 200, 250, Facts, % values2String("`n", message*)
-		Sleep 5000
-		SplashTextOff
+		SplashTextGui := Gui("ToolWindow -Sysmenu Disabled", "Facts"), SplashTextGui.Add("Text",, values2String("`n", message*)), SplashTextGui.Show("w200 h250")
+		Sleep(5000)
+		SplashTextGui.Destroy
 	}
 }
 
@@ -527,7 +525,7 @@ if true {
 	AHKUnit.Run()
 }
 else {
-	theRules =
+	theRules := "
 	(
 		=<(?x, ?y) <= ?x =< ?y
 
@@ -596,29 +594,32 @@ else {
 		weatherSymbol(?index, ?weather) <= weatherIndex(?weather, ?index)
 
 		{Any: [?Peter.grandchild], [?Peter.son], {Prove: grandFather(?A, ?Peter.grandchild)}} => (Call: celebrate())
-	)
+
+		reportAnalysis(?sDelta, ?bDelta, ?eDelta) <= max(?sDelta, ?bDelta, ?tDelta), max(?tDelta, ?eDelta, ?delta),
+													 Call(messageBox, ?delta)
+	)"
 
 	productions := false
 	reductions := false
 
-	rc := new RuleCompiler()
+	rc := RuleCompiler()
 
-	rc.compileRules(theRules, productions, reductions)
+	rc.compileRules(theRules, &productions, &reductions)
 
-	eng := new RuleEngine(productions, reductions, {})
+	eng := RuleEngine(productions, reductions, Map())
 
 	kb := eng.createKnowledgeBase(eng.createFacts(), eng.createRules())
 	; eng.setTraceLevel(kTraceFull)
-	g := rc.compileGoal("any?(?r, [1, 2, 3])")
+	g := rc.compileGoal("reportAnalysis(0, 0, 0)")
 
 	rs := kb.prove(g)
 
 	while (rs != false) {
-		MsgBox % g.toString(rs)
+		MsgBox(g.toString(rs))
 
 		if !rs.nextResult()
 			rs := false
 	}
 
-	msgbox Done
+	MsgBox("Done")
 }

@@ -55,9 +55,9 @@ global kSimulatorSettingsFile := "Simulator Settings.ini"
 
 global kUndefined := "__Undefined__"
 
-global kVersion := kUndefined
+global kVersion := "0.0.0.0-dev"
 
-global kSimulatorConfiguration
+global kSimulatorConfiguration := Map()
 
 global kSilentMode := false
 
@@ -66,7 +66,7 @@ global kSoX := false
 
 global kBackgroundApps := ["Simulator Tools", "Simulator Download", "Database Synchronizer", "Simulator Controller", "Voice Server", "Race Engineer", "Race Strategist", "Race Spotter", "Race Settings", "Team Server"]
 
-global kForegroundApps := ["Simulator Startup", "System Monitor", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Advisor"]
+global kForegroundApps := ["Simulator Startup", "System Monitor", "Simulator Setup", "Simulator Configuration", "Simulator Settings", "Server Administration", "Session Database", "Race Reports", "Race Center", "Strategy Workbench", "Setup Workbench"]
 
 global k1WayToggleType := "1WayToggle"
 global k2WayToggleType := "2WayToggle"
@@ -91,5 +91,5 @@ global kLogWarn := 3
 global kLogCritical := 4
 global kLogOff := 5
 
-global kLogLevels := {Off: kLogOff, Debug: kLogDebug, Info: kLogInfo, Warn: kLogWarn, Critical: kLogCritical}
+global kLogLevels := Map("Off", kLogOff, "Debug", kLogDebug, "Info", kLogInfo, "Warn", kLogWarn, "Critical", kLogCritical)
 global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]

@@ -29,7 +29,7 @@ Welcome to the Simulator Controller documentation. Here you will find everything
 
     Gives you detailed information, how to configure and manage all available tyre compounds for a specific car in a given simulator.
 
-  - [Setup Advisor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Advisor)
+  - [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench)
 
     This smart tool gives valuable recommendations on how to change a car setup for a given problem. The tool follows an interview-like approach and can even handle contradictory requirements.
 	

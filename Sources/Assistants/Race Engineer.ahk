@@ -10,11 +10,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Framework\Production.ahk
+;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Artificial Intelligence.ico
@@ -25,17 +25,17 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Process.ahk
+#Include "..\Framework\Process.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\RaceEngineer.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\RuleEngine.ahk"
+#Include "Libraries\RaceEngineer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -45,47 +45,40 @@
 showLogo(name) {
 	local info := kVersion . " - 2023, Oliver Juwig`nCreative Commons - BY-NC-SA"
 	local logo := kResourcesDirectory . "Rotating Brain.gif"
-	local image := "1:" . logo
-	local mainScreen, mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, title1, title2, html
+	local title1 := translate("Modular Simulator Controller System")
+	local title2 := substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})
+	local mainScreenTop, mainScreenLeft, mainScreenRight, mainScreenBottom, x, y, html
+	local logoGui, videoPlayer
 
-	static videoPlayer
-
-	SysGet mainScreen, MonitorWorkArea
+	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
 	x := mainScreenRight - 299
 	y := mainScreenBottom - 234
 
-	title1 := translate("Modular Simulator Controller System")
-	title2 := substituteVariables(translate("%name% - The Virtual Race Engineer"), {name: name})
-	SplashImage %image%, B FS8 CWD0D0D0 w299 x%x% y%y% ZH155 ZW279, %info%, %title1%`n%title2%
+	logoGui := Window()
 
-	Gui Logo:-Border -Caption
-	Gui Logo:Add, ActiveX, x0 y0 w279 h155 VvideoPlayer, shell explorer
+	logoGui.SetFont("Bold")
+	logoGui.AddText("w279 Center", title1 . "`n" . title2)
 
-	videoPlayer.Navigate("about:blank")
+	videoPlayer := logoGui.Add("ActiveX", "x10 y40 w279 h155", "shell explorer").Value
+
+	logoGui.SetFont("Norm")
+	logoGui.AddText("w279 Center", info)
+
+	videoPlayer.navigate("about:blank")
 
 	html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . logo . "' width=279 height=155 border=0 padding=0></body></html>"
 
 	videoPlayer.document.write(html)
 
-	x += 10
-	y += 40
+	logoGui.Show("X" . x . " Y" . y)
 
-	Gui Logo:Margin, 0, 0
-	Gui Logo:+AlwaysOnTop
-	Gui Logo:Show, AutoSize x%x% y%y%
-}
-
-hideLogo() {
-	Gui Logo:Destroy
-	SplashImage 1:Off
+	WinSetTransparent(255, , translate("Creative Commons - BY-NC-SA"))
 }
 
 checkRemoteProcessAlive(pid) {
-	Process Exist, %pid%
-
-	if !ErrorLevel
-		ExitApp 0
+	if !ProcessExist(pid)
+		ExitApp(0)
 }
 
 startRaceEngineer() {
@@ -101,19 +94,17 @@ startRaceEngineer() {
 	local engineerListener := false
 	local engineerMuted := false
 	local debug := false
-	local voiceServer, index, engineer, label, callback
+	local voiceServer, index, engineer, label
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Race Engineer
+	TraySetIcon(icon, "1")
+	A_IconTip := "Race Engineer"
 
-	Process Exist, Voice Server.exe
-
-	voiceServer := ErrorLevel
+	voiceServer := ProcessExist("Voice Server.exe")
 
 	index := 1
 
-	while (index < A_Args.Length()) {
-		switch A_Args[index] {
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
 			case "-Remote":
 				remotePID := A_Args[index + 1]
 				index += 2
@@ -168,45 +159,43 @@ startRaceEngineer() {
 	if debug
 		setDebug(true)
 
-	engineer := new RaceEngineer(kSimulatorConfiguration
-							   , remotePID ? new RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
-							   , engineerName, engineerLanguage
-							   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
-							   , engineerRecognizer, engineerListener, engineerMuted, voiceServer)
+	engineer := RaceEngineer(kSimulatorConfiguration
+						   , remotePID ? RaceEngineer.RaceEngineerRemoteHandler(remotePID) : false
+						   , engineerName, engineerLanguage
+						   , engineerSynthesizer, engineerSpeaker, engineerSpeakerVocalics
+						   , engineerRecognizer, engineerListener, engineerMuted, voiceServer)
 
 	RaceEngineer.Instance := engineer
 
-	Menu SupportMenu, Insert, 1&
+	SupportMenu.Insert("1&")
 
 	label := translate("Debug Rule System")
-	callback := ObjBindMethod(engineer, "toggleDebug", kDebugRules)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(engineer, "toggleDebug", kDebugRules))
 
 	if engineer.Debug[kDebugRules]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	label := translate("Debug Knowledgebase")
-	callback := ObjBindMethod(engineer, "toggleDebug", kDebugKnowledgeBase)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(engineer, "toggleDebug", kDebugKnowledgeBase))
 
 	if engineer.Debug[kDebugKnowledgebase]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
-	registerMessageHandler("Race Engineer", "handleEngineerMessage")
+	registerMessageHandler("Race Engineer", handleEngineerMessage)
 
 	if (debug && engineerSpeaker) {
 		engineer.getSpeaker()
 
-		engineer.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase({})})
+		engineer.updateDynamicValues({KnowledgeBase: RaceEngineer.Instance.createKnowledgeBase()})
 	}
 
 	if (engineerLogo && !kSilentMode)
 		showLogo(engineerName)
 
 	if remotePID
-		Task.startTask(new PeriodicTask(Func("checkRemoteProcessAlive").Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
 
 	return
 }
@@ -218,12 +207,12 @@ startRaceEngineer() {
 
 shutdownRaceEngineer(shutdown := false) {
 	if shutdown
-		ExitApp 0
+		ExitApp(0)
 
 	if (RaceEngineer.Instance.Session == kSessionFinished)
-		Task.startTask(Func("shutdownRaceEngineer").Bind(true), 10000, kLowPriority)
+		Task.startTask(shutdownRaceEngineer.Bind(true), 10000, kLowPriority)
 	else
-		Task.startTask("shutdownRaceEngineer", 1000, kLowPriority)
+		Task.startTask(shutdownRaceEngineer, 1000, kLowPriority)
 
 	return false
 }
@@ -233,7 +222,7 @@ handleEngineerMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Task.startTask("shutdownRaceEngineer", 20000, kLowPriority)
+			Task.startTask(shutdownRaceEngineer, 20000, kLowPriority)
 
 			return true
 		}
@@ -241,7 +230,7 @@ handleEngineerMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.startTask("shutdownRaceEngineer", 20000, kLowPriority)
+		Task.startTask(shutdownRaceEngineer, 20000, kLowPriority)
 	else
 		return withProtection(ObjBindMethod(RaceEngineer.Instance, data))
 }

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Applications Configuration      ;;;
 ;;;                                         Plugin                          ;;;
 ;;;                                                                         ;;;
@@ -14,29 +14,7 @@
 ;;; ApplicationsConfigurator                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global applicationsListView := false
-
-global applicationNameEdit := ""
-global applicationExePathEdit := ""
-global applicationWorkingDirectoryPathEdit := ""
-global applicationWindowTitleEdit := ""
-global applicationStartupEdit := ""
-global applicationShutdownEdit := ""
-global applicationIsRunningEdit := ""
-
-global applicationAddButton
-global applicationDeleteButton
-global applicationUpdateButton
-
 class ApplicationsConfigurator extends ConfigurationItemList {
-	iEditor := false
-
-	Editor[] {
-		Get {
-			return this.iEditor
-		}
-	}
-
 	Applications[types := false] {
 		Get {
 			local result := []
@@ -53,9 +31,9 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	}
 
 	__New(editor, configuration) {
-		this.iEditor := editor
+		this.Editor := editor
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ApplicationsConfigurator.Instance := this
 	}
@@ -63,63 +41,110 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		Gui %window%:Add, ListView, x16 y80 w457 h205 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndapplicationsListViewHandle VapplicationsListView glistEvent
-						, % values2String("|", map(["Type", "Name", "Executable", "Window Title", "Working Directory"], "translate")*)
+		chooseApplicationExePath(*) {
+			local fileName
 
-		Gui %window%:Add, Text, x16 y295 w141 h23 +0x200, % translate("Name")
-		Gui %window%:Add, Edit, x180 y295 w268 h21 VapplicationNameEdit, %applicationNameEdit%
+			protectionOn()
 
-		Gui %window%:Add, Text, x16 y319 w138 h23 +0x200, % translate("Executable")
-		Gui %window%:Add, Edit, x180 y319 w268 h21 VapplicationExePathEdit, %applicationExePathEdit%
-		Gui %window%:Add, Button, x451 y318 w23 h23 gchooseApplicationExePath, % translate("...")
+			try {
+				window.Opt("+OwnDialogs")
 
-		Gui %window%:Add, Text, x16 y343 w138 h23 +0x200, % translate("Working Directory (optional)")
-		Gui %window%:Add, Edit, x180 y343 w268 h21 VapplicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
-		Gui %window%:Add, Button, x451 y342 w23 h23 gchooseApplicationWorkingDirectoryPath, % translate("...")
+				OnMessage(0x44, translateSelectCancelButtons)
+				fileName := FileSelect(1, window["applicationExePathEdit"].Text, translate("Select application executable..."), "Executable (*.exe)")
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
-		Gui %window%:Add, Text, x16 y367 w140 h23 +0x200, % translate("Window Title (optional)")
-		Gui %window%:Font, c505050 s8
-		Gui %window%:Add, Text, x24 y385 w133 h23, % translate("(Use AHK WinTitle Syntax)")
-		Gui %window%:Font
-		Gui %window%:Add, Edit, x180 y367 w268 h21 VapplicationWindowTitleEdit, %applicationWindowTitleEdit%
+				if (fileName != "") {
+					window["applicationExePathEdit"].Text := fileName
+					window["applicationWorkingDirectoryPathEdit"].Text := ""
+				}
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		chooseApplicationWorkingDirectoryPath(*) {
+			local directory, translator
 
-		Gui %window%:Add, GroupBox, -Theme x16 y411 w458 h71, % translate("Function Hooks (optional)")
+			protectionOn()
 
-		Gui %window%:Font, Norm, Arial
+			try {
+				window.Opt("+OwnDialogs")
 
-		Gui %window%:Add, Text, x20 y427 w136 h23 +0x200 +Center, % translate("Startup")
-		Gui %window%:Add, Edit, x20 y451 w136 h21 VapplicationStartupEdit, %applicationStartupEdit%
+				translator := translateMsgBoxButtons.Bind(["Select", "Select", "Cancel"])
 
-		Gui %window%:Add, Text, x177 y427 w136 h23 +0x200 +Center, % translate("Shutdown ")
-		Gui %window%:Add, Edit, x177 y451 w136 h21 VapplicationShutdownEdit, %applicationShutdownEdit%
+				OnMessage(0x44, translator)
+				directory := DirSelect("*" . window["applicationWorkingDirectoryPathEdit"].Text, 0, translate("Select working directory..."))
+				OnMessage(0x44, translator, 0)
 
-		Gui %window%:Add, Text, x334 y427 w136 h23 +0x200 +Center, % translate("Running?")
-		Gui %window%:Add, Edit, x334 y451 w136 h21 VapplicationIsRunningEdit, %applicationIsRunningEdit%
+				if (directory != "")
+					window["applicationWorkingDirectoryPathEdit"].Text := directory
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui %window%:Add, Button, x264 y490 w46 h23 VapplicationAddButton gaddItem, % translate("Add")
-		Gui %window%:Add, Button, x312 y490 w50 h23 Disabled VapplicationDeleteButton gdeleteItem, % translate("Delete")
-		Gui %window%:Add, Button, x418 y490 w55 h23 Disabled VapplicationUpdateButton gupdateItem, % translate("&Save")
+		window.Add("ListView", "x16 y80 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VapplicationsListView", collect(["Type", "Name", "Executable", "Window Title", "Working Directory"], translate))
 
-		this.initializeList(applicationsListViewHandle, "applicationsListView", "applicationAddButton", "applicationDeleteButton", "applicationUpdateButton")
+		window.Add("Text", "x16 y295 w141 h23 Y:Move +0x200", translate("Name"))
+		window.Add("Edit", "x180 y295 w268 h21 Y:Move W:Grow VapplicationNameEdit")
+
+		window.Add("Text", "x16 y319 w138 h23 Y:Move +0x200", translate("Executable"))
+		window.Add("Edit", "x180 y319 w268 h21 Y:Move W:Grow VapplicationExePathEdit")
+		window.Add("Button", "x451 y318 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseApplicationExePath)
+
+		window.Add("Text", "x16 y343 w138 h23 Y:Move +0x200", translate("Working Directory (optional)"))
+		window.Add("Edit", "x180 y343 w268 h21 Y:Move W:Grow VapplicationWorkingDirectoryPathEdit")
+		window.Add("Button", "x451 y342 w23 h23 X:Move Y:Move", translate("...")).OnEvent("Click", chooseApplicationWorkingDirectoryPath)
+
+		window.Add("Text", "x16 y367 w140 h23 Y:Move +0x200", translate("Window Title (optional)"))
+
+		window.SetFont("c505050 s8")
+
+		window.Add("Text", "x24 y385 w133 h23 Y:Move", translate("(Use AHK WinTitle Syntax)"))
+
+		window.SetFont()
+
+		window.Add("Edit", "x180 y367 w268 h21 Y:Move W:Grow VapplicationWindowTitleEdit")
+
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
+
+		window.Add("GroupBox", "x16 y411 w458 h71 Y:Move W:Grow", translate("Function Hooks (optional)"))
+
+		window.SetFont("Norm", "Arial")
+
+		window.Add("Text", "x20 y427 w136 h23 +0x200 Y:Move X:Move(0.16) +Center", translate("Startup"))
+		window.Add("Edit", "x20 y451 w136 h21 Y:Move W:Grow(0.33) VapplicationStartupEdit")
+
+		window.Add("Text", "x177 y427 w136 h23 Y:Move X:Move(0.5) +0x200 +Center", translate("Shutdown "))
+		window.Add("Edit", "x177 y451 w136 h21 Y:Move X:Move(0.33) W:Grow(0.33) VapplicationShutdownEdit")
+
+		window.Add("Text", "x334 y427 w136 h23 Y:Move X:Move(0.84) +0x200 +Center", translate("Running?"))
+		window.Add("Edit", "x334 y451 w136 h21 Y:Move X:Move(0.66) W:Grow(0.34) VapplicationIsRunningEdit")
+
+		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VapplicationAddButton", translate("Add"))
+		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VapplicationDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VapplicationUpdateButton", translate("&Save"))
+
+		this.initializeList(editor, window["applicationsListView"], window["applicationAddButton"], window["applicationDeleteButton"], window["applicationUpdateButton"])
 	}
 
 	loadFromConfiguration(configuration) {
 		local descriptor, name
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, name in getConfigurationSectionValues(configuration, "Applications", Object())
-			this.ItemList.Push(Array(translate(ConfigurationItem.splitDescriptor(descriptor)[1]), new Application(name, configuration)))
+		for descriptor, name in getMultiMapValues(configuration, "Applications")
+			this.ItemList.Push(Array(translate(ConfigurationItem.splitDescriptor(descriptor)[1]), Application(name, configuration)))
 	}
 
 	saveToConfiguration(configuration) {
 		local count := 0
 		local lastType, index, theApplication, type, types
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		lastType := ""
 
@@ -136,8 +161,8 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 
 			types := ["Core", "Feedback", "Other"]
 
-			setConfigurationValue(configuration, "Applications"
-								, ConfigurationItem.descriptor(types[inList(map(types, "translate"), type)], count), theApplication.Application)
+			setMultiMapValue(configuration, "Applications"
+						   , ConfigurationItem.descriptor(types[inList(collect(types, translate), type)], count), theApplication.Application)
 
 			theApplication.saveToConfiguration(configuration)
 		}
@@ -146,31 +171,33 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	updateState() {
 		local theApplication, type
 
-		base.updateState()
+		super.updateState()
 
 		if (this.CurrentItem != 0) {
 			theApplication := this.ItemList[this.CurrentItem]
+
 			type := theApplication[1]
 
 			if (type != translate("Other")) {
-				GuiControl Disable, applicationNameEdit
-				GuiControl Disable, applicationDeleteButton
+				this.Control["applicationNameEdit"].Enabled := false
+				this.Control["applicationDeleteButton"].Enabled := false
 			}
 			else {
-				GuiControl Enable, applicationNameEdit
-				GuiControl Enable, applicationDeleteButton
+				this.Control["applicationNameEdit"].Enabled := true
+				this.Control["applicationDeleteButton"].Enabled := true
 			}
 
-			GuiControl Enable, applicationUpdateButton
+			this.Control["applicationUpdateButton"].Enabled := true
 		}
 		else {
-			GuiControl Enable, applicationNameEdit
-			GuiControl Disable, applicationDeleteButton
-			GuiControl Disable, applicationUpdateButton
+			this.Control["applicationNameEdit"].Enabled := true
+			this.Control["applicationDeleteButton"].Enabled := false
+			this.Control["applicationUpdateButton"].Enabled := false
 		}
 
-		if LaunchpadConfigurator.Instance
-			LaunchpadConfigurator.Instance.loadApplicationChoices(true)
+		if (isSet(LaunchpadConfigurator) && LaunchpadConfigurator.hasOwnProp("Instance"))
+			try
+				LaunchpadConfigurator.Instance.loadApplicationChoices(true)
 	}
 
 	loadList(items) {
@@ -178,23 +205,21 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
-
-		LV_Delete()
+		this.Control["applicationsListView"].Delete()
 
 		for index, theApplication in items {
 			type := theApplication[1]
 			theApplication := theApplication[2]
 
-			LV_Add("", type, theApplication.Application, theApplication.ExePath, theApplication.WindowTitle, theApplication.WorkingDirectory)
+			this.Control["applicationsListView"].Add("", type, theApplication.Application, theApplication.ExePath, theApplication.WindowTitle, theApplication.WorkingDirectory)
 		}
 
 		if first {
-			LV_ModifyCol()
-			LV_ModifyCol(1, "Center AutoHdr")
-			LV_ModifyCol(2, 120)
-			LV_ModifyCol(3, 80)
-			LV_ModifyCol(4, 80)
+			this.Control["applicationsListView"].ModifyCol()
+			this.Control["applicationsListView"].ModifyCol(1, "Center AutoHdr")
+			this.Control["applicationsListView"].ModifyCol(2, 120)
+			this.Control["applicationsListView"].ModifyCol(3, 80)
+			this.Control["applicationsListView"].ModifyCol(4, 80)
 
 			first := false
 		}
@@ -203,53 +228,30 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 	loadEditor(item) {
 		local theApplication := item[2]
 
-		applicationNameEdit := theApplication.Application
-		applicationExePathEdit := theApplication.ExePath
-		applicationWorkingDirectoryPathEdit := theApplication.WorkingDirectory
-		applicationWindowTitleEdit := theApplication.WindowTitle
-		applicationStartupEdit := (theApplication.SpecialStartup ? theApplication.SpecialStartup : "")
-		applicationShutdownEdit := (theApplication.SpecialShutdown ? theApplication.SpecialShutdown : "")
-		applicationIsRunningEdit := (theApplication.SpecialIsRunning ? theApplication.SpecialIsRunning : "")
-
-		GuiControl Text, applicationNameEdit, %applicationNameEdit%
-		GuiControl Text, applicationExePathEdit, %applicationExePathEdit%
-		GuiControl Text, applicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
-		GuiControl Text, applicationWindowTitleEdit, %applicationWindowTitleEdit%
-		GuiControl Text, applicationStartupEdit, %applicationStartupEdit%
-		GuiControl Text, applicationShutdownEdit, %applicationShutdownEdit%
-		GuiControl Text, applicationIsRunningEdit, %applicationIsRunningEdit%
+		this.Control["applicationNameEdit"].Text := theApplication.Application
+		this.Control["applicationExePathEdit"].Text := theApplication.ExePath
+		this.Control["applicationWorkingDirectoryPathEdit"].Text := theApplication.WorkingDirectory
+		this.Control["applicationWindowTitleEdit"].Text := theApplication.WindowTitle
+		this.Control["applicationStartupEdit"].Text := (theApplication.SpecialStartup ? theApplication.SpecialStartup : "")
+		this.Control["applicationShutdownEdit"].Text := (theApplication.SpecialShutdown ? theApplication.SpecialShutdown : "")
+		this.Control["applicationIsRunningEdit"].Text := (theApplication.SpecialIsRunning ? theApplication.SpecialIsRunning : "")
 	}
 
 	clearEditor() {
-		applicationNameEdit := ""
-		applicationExePathEdit := ""
-		applicationWorkingDirectoryPathEdit := ""
-		applicationWindowTitleEdit := ""
-		applicationStartupEdit := ""
-		applicationShutdownEdit := ""
-		applicationIsRunningEdit := ""
-
-		GuiControl Text, applicationNameEdit, %applicationNameEdit%
-		GuiControl Text, applicationExePathEdit, %applicationExePathEdit%
-		GuiControl Text, applicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
-		GuiControl Text, applicationWindowTitleEdit, %applicationWindowTitleEdit%
-		GuiControl Text, applicationStartupEdit, %applicationStartupEdit%
-		GuiControl Text, applicationShutdownEdit, %applicationShutdownEdit%
-		GuiControl Text, applicationIsRunningEdit, %applicationIsRunningEdit%
+		this.Control["applicationNameEdit"].Text := ""
+		this.Control["applicationExePathEdit"].Text := ""
+		this.Control["applicationWorkingDirectoryPathEdit"].Text := ""
+		this.Control["applicationWindowTitleEdit"].Text := ""
+		this.Control["applicationStartupEdit"].Text := ""
+		this.Control["applicationShutdownEdit"].Text := ""
+		this.Control["applicationIsRunningEdit"].Text := ""
 	}
 
 	buildItemFromEditor(isNew := false) {
-		GuiControlGet applicationNameEdit
-		GuiControlGet applicationExePathEdit
-		GuiControlGet applicationWorkingDirectoryPathEdit
-		GuiControlGet applicationWindowTitleEdit
-		GuiControlGet applicationStartupEdit
-		GuiControlGet applicationShutdownEdit
-		GuiControlGet applicationIsRunningEdit
-
 		return Array(isNew ? translate("Other") : this.ItemList[this.CurrentItem][1]
-				   , new Application(applicationNameEdit, false, applicationExePathEdit, applicationWorkingDirectoryPathEdit, applicationWindowTitleEdit
-				   , applicationStartupEdit, applicationShutdownEdit, applicationIsRunningEdit))
+				   , Application(this.Control["applicationNameEdit"].Text, false
+							   , this.Control["applicationExePathEdit"].Text, this.Control["applicationWorkingDirectoryPathEdit"].Text, this.Control["applicationWindowTitleEdit"].Text
+							   , this.Control["applicationStartupEdit"].Text, this.Control["applicationShutdownEdit"].Text, this.Control["applicationIsRunningEdit"].Text))
 	}
 }
 
@@ -257,65 +259,13 @@ class ApplicationsConfigurator extends ConfigurationItemList {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-chooseApplicationExePath() {
-	local title, file
-
-	protectionOn()
-
-	try {
-		GuiControlGet applicationExePathEdit
-
-		title := translate("Select application executable...")
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-		FileSelectFile file, 1, %applicationExePathEdit%, %title%, Executable (*.exe)
-		OnMessage(0x44, "")
-
-		if (file != "") {
-			GuiControl Text, applicationExePathEdit, %file%
-
-			applicationWorkingDirectoryPathEdit := ""
-
-			GuiControl Text, applicationWorkingDirectoryPathEdit, %applicationWorkingDirectoryPathEdit%
-		}
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-chooseApplicationWorkingDirectoryPath() {
-	local directory
-
-	protectionOn()
-
-	try {
-		GuiControlGet applicationWorkingDirectoryPathEdit
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Select", "Cancel"]))
-		FileSelectFolder directory, *%applicationWorkingDirectoryPathEdit%, 0, % translate("Select working directory...")
-		OnMessage(0x44, "")
-
-		if (directory != "")
-			GuiControl Text, applicationWorkingDirectoryPathEdit, %directory%
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-
 initializeApplicationsConfigurator() {
 	local editor
 
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Applications"), new ApplicationsConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Applications"), ApplicationsConfigurator(editor, editor.Configuration))
 	}
 }
 

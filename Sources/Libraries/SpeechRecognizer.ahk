@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Speech Recognizer               ;;;
 ;;;                                                                         ;;;
 ;;;   Part of this code is based on work of evilC. See the GitHub page      ;;;
@@ -12,145 +12,145 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\CLR.ahk
+#Include "..\Libraries\CLR.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Constant Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kAzureLanguages := {"af-ZA": "Afrikaans (South Africa)"
-						, "am-ET": "Amharic (Ethiopia)"
-						, "ar-DZ": "Arabic (Algeria)"
-						, "ar-BH": "Arabic (Bahrain)"
-						, "ar-EG": "Arabic (Egypt)"
-						, "ar-IQ": "Arabic (Iraq)"
-						, "ar-IL": "Arabic (Israel)"
-						, "ar-JO": "Arabic (Jordan)"
-						, "ar-KW": "Arabic (Kuwait)"
-						, "ar-LB": "Arabic (Lebanon)"
-						, "ar-LY": "Arabic (Libya)"
-						, "ar-MA": "Arabic (Morocco)"
-						, "ar-OM": "Arabic (Oman)"
-						, "ar-PS": "Arabic (Palestinian Authority)"
-						, "ar-QA": "Arabic (Qatar)"
-						, "ar-SA": "Arabic (Saudi Arabia)"
-						, "ar-SY": "Arabic (Syria)"
-						, "ar-TN": "Arabic (Tunisia)"
-						, "ar-AE": "Arabic (United Arab Emirates)"
-						, "ar-YE": "Arabic (Yemen)"
-						, "bg-BG": "Bulgarian (Bulgaria)"
-						, "my-MM": "Burmese (Myanmar)"
-						, "ca-ES": "Catalan (Spain)"
-						, "zh-HK": "Chinese (Cantonese, Traditional)"
-						, "zh-CN": "Chinese (Mandarin, Simplified)"
-						, "zh-TW": "Chinese (Taiwanese Mandarin)"
-						, "hr-HR": "Croatian (Croatia)"
-						, "cs-CZ": "Czech (Czech)"
-						, "da-DK": "Danish (Denmark)"
-						, "nl-BE": "Dutch (Belgium)"
-						, "nl-NL": "Dutch (Netherlands)"
-						, "en-AU": "English (Australia)"
-						, "en-CA": "English (Canada)"
-						, "en-GH": "English (Ghana)"
-						, "en-HK": "English (Hong Kong)"
-						, "en-IN": "English (India)"
-						, "en-IE": "English (Ireland)"
-						, "en-KE": "English (Kenya)"
-						, "en-NZ": "English (New Zealand)"
-						, "en-NG": "English (Nigeria)"
-						, "en-PH": "English (Philippines)"
-						, "en-SG": "English (Singapore)"
-						, "en-ZA": "English (South Africa)"
-						, "en-TZ": "English (Tanzania)"
-						, "en-GG": "English (United Kingdom)"
-						, "en-US": "English (United States)"}
+global kAzureLanguages := Map("af-ZA", "Afrikaans (South Africa)"
+							, "am-ET", "Amharic (Ethiopia)"
+							, "ar-DZ", "Arabic (Algeria)"
+							, "ar-BH", "Arabic (Bahrain)"
+							, "ar-EG", "Arabic (Egypt)"
+							, "ar-IQ", "Arabic (Iraq)"
+							, "ar-IL", "Arabic (Israel)"
+							, "ar-JO", "Arabic (Jordan)"
+							, "ar-KW", "Arabic (Kuwait)"
+							, "ar-LB", "Arabic (Lebanon)"
+							, "ar-LY", "Arabic (Libya)"
+							, "ar-MA", "Arabic (Morocco)"
+							, "ar-OM", "Arabic (Oman)"
+							, "ar-PS", "Arabic (Palestinian Authority)"
+							, "ar-QA", "Arabic (Qatar)"
+							, "ar-SA", "Arabic (Saudi Arabia)"
+							, "ar-SY", "Arabic (Syria)"
+							, "ar-TN", "Arabic (Tunisia)"
+							, "ar-AE", "Arabic (United Arab Emirates)"
+							, "ar-YE", "Arabic (Yemen)"
+							, "bg-BG", "Bulgarian (Bulgaria)"
+							, "my-MM", "Burmese (Myanmar)"
+							, "ca-ES", "Catalan (Spain)"
+							, "zh-HK", "Chinese (Cantonese, Traditional)"
+							, "zh-CN", "Chinese (Mandarin, Simplified)"
+							, "zh-TW", "Chinese (Taiwanese Mandarin)"
+							, "hr-HR", "Croatian (Croatia)"
+							, "cs-CZ", "Czech (Czech)"
+							, "da-DK", "Danish (Denmark)"
+							, "nl-BE", "Dutch (Belgium)"
+							, "nl-NL", "Dutch (Netherlands)"
+							, "en-AU", "English (Australia)"
+							, "en-CA", "English (Canada)"
+							, "en-GH", "English (Ghana)"
+							, "en-HK", "English (Hong Kong)"
+							, "en-IN", "English (India)"
+							, "en-IE", "English (Ireland)"
+							, "en-KE", "English (Kenya)"
+							, "en-NZ", "English (New Zealand)"
+							, "en-NG", "English (Nigeria)"
+							, "en-PH", "English (Philippines)"
+							, "en-SG", "English (Singapore)"
+							, "en-ZA", "English (South Africa)"
+							, "en-TZ", "English (Tanzania)"
+							, "en-GG", "English (United Kingdom)"
+							, "en-US", "English (United States)")
 
 initializeAzureLanguages() {
 	local culture, name
 
-	for culture, name in {"et-EE": "Estonian (Estonia)"
-						, "fil-PH": "Filipino (Philippines)"
-						, "fi-FI": "Finnish (Finland)"
-						, "fr-BE": "French (Belgium)"
-						, "fr-CA": "French (Canada)"
-						, "fr-FR": "French (France)"
-						, "fr-CH": "French (Switzerland)"
-						, "de-AT": "German (Austria)"
-						, "de-DE": "German (Germany)"
-						, "de-CH": "German (Switzerland)"
-						, "el-GR": "Greek (Greece)"
-						, "gu-IN": "Gujarati (Indian)"
-						, "he-IL": "Hebrew (Israel)"
-						, "hi-IN": "Hindi (India)"
-						, "hu-HU": "Hungarian (Hungary)"
-						, "is-IS": "Icelandic (Iceland)"
-						, "id-ID": "Indonesian (Indonesia)"
-						, "ga-IE": "Irish (Ireland)"
-						, "it-IT": "Italian (Italy)"
-						, "ja-JP": "Japanese (Japan)"
-						, "jv-ID": "Javanese (Indonesia)"
-						, "kn-IN": "Kannada (India)"
-						, "km-KH": "Khmer (Cambodia)"
-						, "ko-KR": "Korean (Korea)"
-						, "lo-LA": "Lao (Laos)"
-						, "lv-LV": "Latvian (Latvia)"
-						, "lt-LT": "Lithuanian (Lithuania)"
-						, "mk-MK": "Macedonian (North Macedonia)"
-						, "ms-MY": "Malay (Malaysia)"
-						, "mt-MT": "Maltese (Malta)"
-						, "mr-IN": "Marathi (India)"
-						, "nb-NO": "Norwegian (Bokmal, Norway)"
-						, "fa-IR": "Persian (Iran)"
-						, "pl-PL": "Polish (Poland)"
-						, "pt-BR": "Portuguese (Brazil)"
-						, "pt-PT": "Portuguese (Portugal)"
-						, "ro-RO": "Romanian (Romania)"
-						, "ru-RU": "Russian (Russia)"
-						, "sr-RS": "Serbian (Serbia)"
-						, "si-LK": "Sinhala (Sri Lanka)"
-						, "sk-SK": "Slovak (Slovakia)"
-						, "sl-SI": "Slovenian (Slovenia)"
-						, "es-AR": "Spanish (Argentina)"
-						, "es-BO": "Spanish (Bolivia)"
-						, "es-CL": "Spanish (Chile)"
-						, "es-CO": "Spanish (Colombia)"
-						, "es-CR": "Spanish (Costa Rica)"
-						, "es-CU": "Spanish (Cuba)"
-						, "es-DO": "Spanish (Dominican Republic)"
-						, "es-EC": "Spanish (Ecuador)"
-						, "es-SV": "Spanish (El Salvador)"
-						, "es-GQ": "Spanish (Equatorial Guinea)"
-						, "es-GT": "Spanish (Guatemala)"
-						, "es-HN": "Spanish (Honduras)"
-						, "es-MX": "Spanish (Mexico)"
-						, "es-NI": "Spanish (Nicaragua)"
-						, "es-PA": "Spanish (Panama)"
-						, "es-PY": "Spanish (Paraguay)"
-						, "es-PE": "Spanish (Peru)"
-						, "es-PR": "Spanish (Puerto Rico)"
-						, "es-ES": "Spanish (Spain)"
-						, "es-UY": "Spanish (Uruguay)"
-						, "es-US": "Spanish (USA)"
-						, "es-VE": "Spanish (Venezuela)"
-						, "sw-KE": "Swahili (Kenya)"
-						, "sw-TZ": "Swahili (Tanzania)"
-						, "sv-SE": "Swedish (Sweden)"
-						, "ta-IN": "Tamil (India)"
-						, "te-IN": "Telugu (India)"
-						, "th-TH": "Thai (Thailand)"
-						, "tr-TR": "Turkish (Turkey)"
-						, "uk-UA": "Ukrainian (Ukraine)"
-						, "uz-UZ": "Uzbek (Uzbekistan)"
-						, "vi-VN": "Vietnamese (Vietnam)"
-						, "zu-ZA": "Zulu (South Africa)"}
+	for culture, name in Map("et-EE", "Estonian (Estonia)"
+						   , "fil-PH", "Filipino (Philippines)"
+						   , "fi-FI", "Finnish (Finland)"
+						   , "fr-BE", "French (Belgium)"
+						   , "fr-CA", "French (Canada)"
+						   , "fr-FR", "French (France)"
+						   , "fr-CH", "French (Switzerland)"
+						   , "de-AT", "German (Austria)"
+						   , "de-DE", "German (Germany)"
+						   , "de-CH", "German (Switzerland)"
+						   , "el-GR", "Greek (Greece)"
+						   , "gu-IN", "Gujarati (Indian)"
+						   , "he-IL", "Hebrew (Israel)"
+						   , "hi-IN", "Hindi (India)"
+						   , "hu-HU", "Hungarian (Hungary)"
+						   , "is-IS", "Icelandic (Iceland)"
+						   , "id-ID", "Indonesian (Indonesia)"
+						   , "ga-IE", "Irish (Ireland)"
+						   , "it-IT", "Italian (Italy)"
+						   , "ja-JP", "Japanese (Japan)"
+						   , "jv-ID", "Javanese (Indonesia)"
+						   , "kn-IN", "Kannada (India)"
+						   , "km-KH", "Khmer (Cambodia)"
+						   , "ko-KR", "Korean (Korea)"
+						   , "lo-LA", "Lao (Laos)"
+						   , "lv-LV", "Latvian (Latvia)"
+						   , "lt-LT", "Lithuanian (Lithuania)"
+						   , "mk-MK", "Macedonian (North Macedonia)"
+						   , "ms-MY", "Malay (Malaysia)"
+						   , "mt-MT", "Maltese (Malta)"
+						   , "mr-IN", "Marathi (India)"
+						   , "nb-NO", "Norwegian (Bokmal, Norway)"
+						   , "fa-IR", "Persian (Iran)"
+						   , "pl-PL", "Polish (Poland)"
+						   , "pt-BR", "Portuguese (Brazil)"
+						   , "pt-PT", "Portuguese (Portugal)"
+						   , "ro-RO", "Romanian (Romania)"
+						   , "ru-RU", "Russian (Russia)"
+						   , "sr-RS", "Serbian (Serbia)"
+						   , "si-LK", "Sinhala (Sri Lanka)"
+						   , "sk-SK", "Slovak (Slovakia)"
+						   , "sl-SI", "Slovenian (Slovenia)"
+						   , "es-AR", "Spanish (Argentina)"
+						   , "es-BO", "Spanish (Bolivia)"
+						   , "es-CL", "Spanish (Chile)"
+						   , "es-CO", "Spanish (Colombia)"
+						   , "es-CR", "Spanish (Costa Rica)"
+						   , "es-CU", "Spanish (Cuba)"
+						   , "es-DO", "Spanish (Dominican Republic)"
+						   , "es-EC", "Spanish (Ecuador)"
+						   , "es-SV", "Spanish (El Salvador)"
+						   , "es-GQ", "Spanish (Equatorial Guinea)"
+						   , "es-GT", "Spanish (Guatemala)"
+						   , "es-HN", "Spanish (Honduras)"
+						   , "es-MX", "Spanish (Mexico)"
+						   , "es-NI", "Spanish (Nicaragua)"
+						   , "es-PA", "Spanish (Panama)"
+						   , "es-PY", "Spanish (Paraguay)"
+						   , "es-PE", "Spanish (Peru)"
+						   , "es-PR", "Spanish (Puerto Rico)"
+						   , "es-ES", "Spanish (Spain)"
+						   , "es-UY", "Spanish (Uruguay)"
+						   , "es-US", "Spanish (USA)"
+						   , "es-VE", "Spanish (Venezuela)"
+						   , "sw-KE", "Swahili (Kenya)"
+						   , "sw-TZ", "Swahili (Tanzania)"
+						   , "sv-SE", "Swedish (Sweden)"
+						   , "ta-IN", "Tamil (India)"
+						   , "te-IN", "Telugu (India)"
+						   , "th-TH", "Thai (Thailand)"
+						   , "tr-TR", "Turkish (Turkey)"
+						   , "uk-UA", "Ukrainian (Ukraine)"
+						   , "uz-UZ", "Uzbek (Uzbekistan)"
+						   , "vi-VN", "Vietnamese (Vietnam)"
+						   , "zu-ZA", "Zulu (South Africa)")
 		kAzureLanguages[culture] := name
 }
 
@@ -167,16 +167,16 @@ initializeAzureLanguages()
 
 class SpeechRecognizer {
 	iEngine := false
-	iChoices := {}
+	iChoices := CaseInsenseMap()
 
 	static sAudioRoutingInitialized := false
 	static sRecognizerAudioDevice := false
 	static sDefaultAudioDevice := false
 
-	_grammarCallbacks := {}
-	_grammars := {}
+	_grammarCallbacks := CaseInsenseMap()
+	_grammars := CaseInsenseMap()
 
-	Routing[] {
+	Routing {
 		Get {
 			return "Standard"
 		}
@@ -218,19 +218,19 @@ class SpeechRecognizer {
 			if !SpeechRecognizer.sAudioRoutingInitialized {
 				SpeechRecognizer.sAudioRoutingInitialized := true
 
-				configuration := readConfiguration(kUserConfigDirectory . "Audio Settings.ini")
+				configuration := readMultiMap(kUserConfigDirectory . "Audio Settings.ini")
 
-				SpeechRecognizer.sRecognizerAudioDevice := getConfigurationValue(configuration, "Input", this.Routing . ".AudioDevice", false)
-				SpeechRecognizer.sDefaultAudioDevice := getConfigurationValue(configuration, "Input", "Default.AudioDevice", SpeechRecognizer.sRecognizerAudioDevice)
+				SpeechRecognizer.sRecognizerAudioDevice := getMultiMapValue(configuration, "Input", this.Routing . ".AudioDevice", false)
+				SpeechRecognizer.sDefaultAudioDevice := getMultiMapValue(configuration, "Input", "Default.AudioDevice", SpeechRecognizer.sRecognizerAudioDevice)
 			}
 
 			if (SpeechRecognizer.sRecognizerAudioDevice && kNirCmd) {
 				audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
 				try {
-					Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
+					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
-				catch exception {
+				catch Any as exception {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -250,7 +250,7 @@ class SpeechRecognizer {
 
 				if !instance.Connect(engine[2], engine[3], language, ObjBindMethod(this, "_onTextCallback")) {
 					logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-					logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
+					logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
 					throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 				}
@@ -274,14 +274,14 @@ class SpeechRecognizer {
 
 			if (this.Instance.OkCheck() != "OK") {
 				logMessage(kLogCritical, translate("Could not communicate with speech recognizer library (") . dllName . translate(")"))
-				logMessage(kLogCritical, translate("Try running the Powershell command ""Get-ChildItem -Path '.' -Recurse | Unblock-File"" in the Binaries folder"))
+				logMessage(kLogCritical, translate("Try running the Powershell command `"Get-ChildItem -Path '.' -Recurse | Unblock-File`" in the Binaries folder"))
 
 				throw "Could not communicate with speech recognizer library (" . dllName . ")..."
 			}
 
 			this.RecognizerList := this.createRecognizerList()
 
-			if (this.RecognizerList.Length() == 0) {
+			if (this.RecognizerList.Length == 0) {
 				logMessage(kLogCritical, translate("No languages found while initializing speech recognition system - please install the speech recognition software"))
 
 				if !silent
@@ -293,8 +293,8 @@ class SpeechRecognizer {
 
 			if ((recognizer == true) && language) {
 				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor["Language"] = language) {
-						recognizer := recognizerDescriptor["ID"]
+					if (recognizerDescriptor.Language = language) {
+						recognizer := recognizerDescriptor.ID
 
 						found := true
 
@@ -303,8 +303,8 @@ class SpeechRecognizer {
 			}
 			else if (recognizer && (recognizer != true))
 				for ignore, recognizerDescriptor in this.getRecognizerList()
-					if (recognizerDescriptor["Name"] = recognizer) {
-						recognizer := recognizerDescriptor["ID"]
+					if (recognizerDescriptor.Name = recognizer) {
+						recognizer := recognizerDescriptor.ID
 
 						found := true
 
@@ -316,7 +316,7 @@ class SpeechRecognizer {
 
 			this.initialize(recognizer)
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
 			if !silent
@@ -330,9 +330,9 @@ class SpeechRecognizer {
 				audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 				try {
-					Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
+					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
-				catch exception {
+				catch Any as exception {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -354,16 +354,15 @@ class SpeechRecognizer {
 			}
 		}
 		else if this.Instance {
-			loop % this.Instance.GetRecognizerCount()
-			{
+			loop this.Instance.GetRecognizerCount() {
 				index := A_Index - 1
 
 				recognizer := {ID: index, Culture: this.Instance.GetRecognizerCultureName(index), Language: this.Instance.GetRecognizerTwoLetterISOLanguageName(index)}
 
 				if (this.iEngine = "Server")
-					recognizer["Name"] := this.Instance.GetRecognizerName(index)
+					recognizer.Name := this.Instance.GetRecognizerName(index)
 				else
-					recognizer["Name"] := (this.Instance.GetRecognizerName(index) . " (" . recognizer["Culture"] . ")")
+					recognizer.Name := (this.Instance.GetRecognizerName(index) . " (" . recognizer.Culture . ")")
 
 				recognizerList.Push(recognizer)
 			}
@@ -375,7 +374,7 @@ class SpeechRecognizer {
 	initialize(id) {
 		if this.Instance
 			if (this.iEngine = "Azure")
-				this.Instance.SetLanguage(this.getRecognizerList()[id + 1]["Culture"])
+				this.Instance.SetLanguage(this.getRecognizerList()[id + 1].Culture)
 			else if (id > this.Instance.getRecognizerCount() - 1)
 				throw "Invalid recognizer ID (" . id . ") detected in SpeechRecognizer.initialize..."
 			else
@@ -389,9 +388,9 @@ class SpeechRecognizer {
 			audioDevice := SpeechRecognizer.sRecognizerAudioDevice
 
 			try {
-				Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
+				Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" .audioDevice . "`"")
 			}
-			catch exception {
+			catch Any as exception {
 				showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
@@ -411,9 +410,9 @@ class SpeechRecognizer {
 				audioDevice := SpeechRecognizer.sDefaultAudioDevice
 
 				try {
-					Run "%kNirCmd%" setdefaultsounddevice "%audioDevice%"
+					Run("`"" . kNirCmd . "`" setdefaultsounddevice `"" . audioDevice . "`"")
 				}
-				catch exception {
+				catch Any as exception {
 					showMessage(substituteVariables(translate("Cannot start NirCmd (%kNirCmd%) - please check the configuration..."))
 							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 				}
@@ -428,14 +427,14 @@ class SpeechRecognizer {
 	getWords(list) {
 		local result := []
 
-		loop % list.MaxIndex() + 1
+		loop list.MaxIndex() + 1
 			result.Push(list[A_Index - 1])
 
 		return result
 	}
 
 	getChoices(name) {
-		if this.iChoices.HasKey(name)
+		if this.iChoices.Has(name)
 			return this.iChoices[name]
 		else if (this.iEngine = "Azure")
 			return []
@@ -448,35 +447,37 @@ class SpeechRecognizer {
 	}
 
 	newGrammar() {
-		if this.Instance
-			switch this.iEngine {
+		if this.Instance {
+			switch this.iEngine, false {
 				case "Desktop":
 					return this.Instance.NewDesktopGrammar()
 				case "Azure":
-					return new Grammar()
+					return Grammar()
 				case "Server":
 					return this.Instance.NewServerGrammar()
 			}
+		}
 		else
 			return false
 	}
 
 	newChoices(choices) {
-		if this.Instance
-			switch this.iEngine {
+		if this.Instance {
+			switch this.iEngine, false {
 				case "Desktop":
-					return this.Instance.NewDesktopChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
+					return this.Instance.NewDesktopChoices(isObject(choices) ? values2String(", ", choices*) : choices)
 				case "Azure":
-					return new Grammar.Choices(!IsObject(choices) ? string2Values(",", choices) : choices)
+					return Grammar.Choices(!isObject(choices) ? string2Values(",", choices) : choices)
 				case "Server":
-					return this.Instance.NewServerChoices(IsObject(choices) ? values2String(", ", choices*) : choices)
+					return this.Instance.NewServerChoices(isObject(choices) ? values2String(", ", choices*) : choices)
 			}
+		}
 		else
 			return false
 	}
 
 	loadGrammar(name, grammar, callback) {
-		if (this._grammarCallbacks.HasKey(name))
+		if (this._grammarCallbacks.Has(name))
 			throw "Grammar " . name . " already exists in SpeechRecognizer.loadGrammar..."
 
 		this._grammarCallbacks[name] := callback
@@ -495,7 +496,7 @@ class SpeechRecognizer {
 	}
 
 	compileGrammar(text) {
-		return new GrammarCompiler(this).compileGrammar(text)
+		return GrammarCompiler(this).compileGrammar(text)
 	}
 
 	allMatches(string, minRating, maxRating, strings*) {
@@ -514,8 +515,8 @@ class SpeechRecognizer {
 				}
 			}
 
-		if (ratings.Length() > 0) {
-			bubbleSort(ratings, "compareRating")
+		if (ratings.Length > 0) {
+			bubbleSort(&ratings, (r1, r2) => r1.Rating < r2.Rating)
 
 			return {BestMatch: ratings[1], Ratings: ratings}
 		}
@@ -551,7 +552,7 @@ class SpeechRecognizer {
 
 	_onTextCallback(text) {
 		local words := string2Values(A_Space, text)
-		local name, grammar, rating, index, literal, bestRating, bestMatch, callback
+		local ignore, name, grammar, rating, index, literal, bestRating, bestMatch, callback
 
 		for index, literal in words {
 			literal := StrReplace(literal, ".", "")
@@ -567,7 +568,7 @@ class SpeechRecognizer {
 			bestRating := 0
 			bestMatch := false
 
-			for name, grammar in this._grammars {
+			for ignore, grammar in this._grammars {
 				rating := this.match(text, grammar.Grammar)
 
 				if (rating > bestRating) {
@@ -579,12 +580,12 @@ class SpeechRecognizer {
 			if bestMatch {
 				callback := bestMatch.Callback
 
-				%callback%(bestMatch.Name, words)
+				callback.Call(bestMatch.Name, words)
 			}
-			else if this._grammars.HasKey("?") {
+			else if this._grammars.Has("?") {
 				callback := this._grammars["?"].Callback
 
-				%callback%("?", words)
+				callback.Call("?", words)
 			}
 		}
 		else {
@@ -592,15 +593,15 @@ class SpeechRecognizer {
 				if grammar.Grammar.match(words) {
 					callback := grammar.Callback
 
-					%callback%(name, words)
+					callback.Call(name, words)
 
 					return
 				}
 
-			if this._grammars.HasKey("?") {
+			if this._grammars.Has("?") {
 				callback := this._grammars["?"].Callback
 
-				%callback%("?", words)
+				callback.Call("?", words)
 			}
 		}
 	}
@@ -608,7 +609,7 @@ class SpeechRecognizer {
 	match(words, grammar, minRating := 0.7, maxRating := 0.85) {
 		local matches := this.allMatches(words, minRating, maxRating, grammar.Phrases*)
 
-		return (matches.HasKey("BestMatch") ? matches["BestMatch"]["Rating"] : false)
+		return (matches.HasProp("BestMatch") ? matches.BestMatch.Rating : false)
 	}
 }
 
@@ -619,7 +620,7 @@ class SpeechRecognizer {
 class GrammarCompiler {
 	iSpeechRecognizer := false
 
-	SpeechRecognizer[] {
+	SpeechRecognizer {
 		Get {
 			return this.iSpeechRecognizer
 		}
@@ -632,13 +633,14 @@ class GrammarCompiler {
 	compileGrammars(text) {
 		local grammars := []
 		local incompleteLine := false
-		local line
+		local line, one
 
-		loop Parse, text, `n, `r
-		{
+		loop Parse, text, "`n", "`r" {
 			line := Trim(A_LoopField)
 
-			if ((line != "") && this.skipDelimiter(";", line, 1, false))
+			one := 1
+
+			if ((line != "") && this.skipDelimiter(";", &line, &one, false))
 				line := ""
 
 			if (incompleteLine && (line != "")) {
@@ -660,57 +662,57 @@ class GrammarCompiler {
 		local grammar
 		local nextCharIndex := 1
 
-		grammar := this.readGrammar(text, nextCharIndex)
+		grammar := this.readGrammar(&text, &nextCharIndex)
 
 		if !grammar
-			throw "Syntax error detected in """ . text . """ at 1 in GrammarCompiler.compileGrammar..."
+			throw "Syntax error detected in `"" . text . "`" at 1 in GrammarCompiler.compileGrammar..."
 
 		return this.parseGrammar(grammar)
 	}
 
-	readGrammar(ByRef text, ByRef nextCharIndex, level := 0) {
-		this.skipWhiteSpace(text, nextCharIndex)
+	readGrammar(&text, &nextCharIndex, level := 0) {
+		this.skipWhiteSpace(&text, &nextCharIndex)
 
 		if (SubStr(text, nextCharIndex, 1) = "[") {
 			if (level = 0)
-				return this.readGrammars(text, nextCharIndex, level)
+				return this.readGrammars(&text, &nextCharIndex, level)
 			else
-				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
+				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readGrammar..."
 		}
 		else
-			return this.readList(text, nextCharIndex)
+			return this.readList(&text, &nextCharIndex)
 	}
 
-	readGrammars(ByRef text, ByRef nextCharIndex, level := 0) {
+	readGrammars(&text, &nextCharIndex, level := 0) {
 		local grammars := []
 
-		this.skipDelimiter("[", text, nextCharIndex)
+		this.skipDelimiter("[", &text, &nextCharIndex)
 
 		loop {
-			grammars.Push(this.readGrammar(text, nextCharIndex, level + 1))
+			grammars.Push(this.readGrammar(&text, &nextCharIndex, level + 1))
 
-			if !this.skipDelimiter(",", text, nextCharIndex, false)
+			if !this.skipDelimiter(",", &text, &nextCharIndex, false)
 				break
 		}
 
-		this.skipDelimiter("]", text, nextCharIndex)
+		this.skipDelimiter("]", &text, &nextCharIndex)
 
-		return new GrammarGrammars(grammars)
+		return GrammarGrammars(grammars)
 	}
 
-	readList(ByRef text, ByRef nextCharIndex) {
+	readList(&text, &nextCharIndex) {
 		local grammars := []
 		local literalValue
 
-		while !this.isEmpty(text, nextCharIndex) {
-			this.skipWhiteSpace(text, nextCharIndex)
+		while !this.isEmpty(&text, &nextCharIndex) {
+			this.skipWhiteSpace(&text, &nextCharIndex)
 
 			if (SubStr(text, nextCharIndex, 1) = "{")
-				grammars.Push(this.readChoices(text, nextCharIndex))
+				grammars.Push(this.readChoices(&text, &nextCharIndex))
 			else if (SubStr(text, nextCharIndex, 1) = "(")
-				grammars.Push(this.readBuiltinChoices(text, nextCharIndex))
+				grammars.Push(this.readBuiltinChoices(&text, &nextCharIndex))
 			else {
-				literalValue := this.readLiteral(text, nextCharIndex)
+				literalValue := this.readLiteral(&text, &nextCharIndex)
 
 				if literalValue
 					grammars.Push(literalValue)
@@ -719,82 +721,83 @@ class GrammarCompiler {
 			}
 		}
 
-		return new GrammarList(grammars)
+		return GrammarList(grammars)
 	}
 
-	readChoices(ByRef text, ByRef nextCharIndex) {
+	readChoices(&text, &nextCharIndex) {
 		local grammars := []
 		local literalValue
 
-		this.skipDelimiter("{", text, nextCharIndex)
+		this.skipDelimiter("{", &text, &nextCharIndex)
 
 		loop {
-			literalValue := this.readLiteral(text, nextCharIndex)
+			literalValue := this.readLiteral(&text, &nextCharIndex)
 
 			if literalValue
 				grammars.Push(literalValue)
 			else
-				throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readChoices..."
+				throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readChoices..."
 
-			if !this.skipDelimiter(",", text, nextCharIndex, false)
+			if !this.skipDelimiter(",", &text, &nextCharIndex, false)
 				break
 		}
 
-		this.skipDelimiter("}", text, nextCharIndex)
+		this.skipDelimiter("}", &text, &nextCharIndex)
 
-		return new GrammarChoices(grammars)
+		return GrammarChoices(grammars)
 	}
 
-	readBuiltinChoices(ByRef text, ByRef nextCharIndex) {
+	readBuiltinChoices(&text, &nextCharIndex) {
 		local builtin := false
 		local literalValue
 
-		this.skipDelimiter("(", text, nextCharIndex)
+		this.skipDelimiter("(", &text, &nextCharIndex)
 
-		literalValue := this.readLiteral(text, nextCharIndex)
+		literalValue := this.readLiteral(&text, &nextCharIndex)
 
 		if literalValue
 			builtin := literalValue.Value
 		else
-			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
+			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.readBuiltinChoices..."
 
-		this.skipDelimiter(")", text, nextCharIndex)
+		this.skipDelimiter(")", &text, &nextCharIndex)
 
-		return new GrammarBuiltinChoices(builtin)
+		return GrammarBuiltinChoices(builtin)
 	}
 
-	readLiteral(ByRef text, ByRef nextCharIndex, delimiters := "{}[]()`,") {
+	readLiteral(&text, &nextCharIndex, delimiters := "{}[]()`,") {
 		local length := StrLen(text)
 		local literal, beginCharIndex, character
 
-		this.skipWhiteSpace(text, nextCharIndex)
+		this.skipWhiteSpace(&text, &nextCharIndex)
 
 		beginCharIndex := nextCharIndex
 
 		loop {
 			character := SubStr(text, nextCharIndex, 1)
 
-			if (InStr(delimiters, character) || (nextCharIndex > length)) {
+			if ((nextCharIndex > length) || InStr(delimiters, character)) {
 				if (beginCharIndex == nextCharIndex)
 					return false
 				else
-					return new GrammarLiteral(SubStr(text, beginCharIndex, nextCharIndex - beginCharIndex))
+					return GrammarLiteral(SubStr(text, beginCharIndex, nextCharIndex - beginCharIndex))
 			}
 			else
 				nextCharIndex += 1
 		}
 	}
 
-	isEmpty(ByRef text, ByRef nextCharIndex) {
+	isEmpty(&text, &nextCharIndex) {
 		local remainingText := Trim(SubStr(text, nextCharIndex))
+		local one := 1
 
-		if ((remainingText != "") && this.skipDelimiter(";", remainingText, 1, false))
+		if ((remainingText != "") && this.skipDelimiter(";", &remainingText, &one, false))
 			remainingText := ""
 
 		return (remainingText == "")
 	}
 
-	skipWhiteSpace(ByRef text, ByRef nextCharIndex) {
+	skipWhiteSpace(&text, &nextCharIndex) {
 		local length := StrLen(text)
 
 		loop {
@@ -808,10 +811,10 @@ class GrammarCompiler {
 		}
 	}
 
-	skipDelimiter(delimiter, ByRef text, ByRef nextCharIndex, throwError := true) {
+	skipDelimiter(delimiter, &text, &nextCharIndex, throwError := true) {
 		local length := StrLen(delimiter)
 
-		this.skipWhiteSpace(text, nextCharIndex)
+		this.skipWhiteSpace(&text, &nextCharIndex)
 
 		if (SubStr(text, nextCharIndex, length) = delimiter) {
 			nextCharIndex += length
@@ -819,7 +822,7 @@ class GrammarCompiler {
 			return true
 		}
 		else if throwError
-			throw "Syntax error detected in """ . text . """ at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
+			throw "Syntax error detected in `"" . text . "`" at " . nextCharIndex . " in GrammarCompiler.skipDelimiter..."
 		else
 			return false
 	}
@@ -829,7 +832,7 @@ class GrammarCompiler {
 	}
 
 	createGrammarParser(grammar) {
-		return new GrammarParser(this)
+		return GrammarParser(this)
 	}
 }
 
@@ -844,7 +847,7 @@ class Grammar {
 	class Choices {
 		iChoices := []
 
-		Choices[] {
+		Choices {
 			Get {
 				return this.iChoices
 			}
@@ -854,18 +857,18 @@ class Grammar {
 			local index, choice
 
 			for index, choice in choices
-				if !IsObject(choice)
-					choices[index] := new Grammar.Words(choice)
+				if !isObject(choice)
+					choices[index] := Grammar.Words(choice)
 
 			this.iChoices := choices
 		}
 
-		matchWords(words, ByRef index) {
+		matchWords(words, &index) {
 			local running := index
 			local ignore, choice
 
 			for ignore, choice in this.Choices
-				if choice.matchWords(words, running) {
+				if choice.matchWords(words, &running) {
 					index := running
 
 					return true
@@ -885,7 +888,7 @@ class Grammar {
 	class Words {
 		iWords := []
 
-		Words[] {
+		Words {
 			Get {
 				return this.iWords
 			}
@@ -894,7 +897,7 @@ class Grammar {
 		__New(string) {
 			local index, literal
 
-			if !IsObject(string)
+			if !isObject(string)
 				string := string2Values(A_Space, string)
 
 			for index, literal in string {
@@ -910,12 +913,12 @@ class Grammar {
 			this.iWords := string
 		}
 
-		matchWords(words, ByRef index) {
+		matchWords(words, &index) {
 			local running := index
 			local ignore, word
 
 			for ignore, word in this.Words
-				if (words.Length() < running)
+				if (words.Length < running)
 					return false
 				else if !this.matchWord(words[running++], word)
 					return false
@@ -934,13 +937,13 @@ class Grammar {
 		}
 	}
 
-	Parts[] {
+	Parts {
 		Get {
 			return this.iParts
 		}
 	}
 
-	Phrases[] {
+	Phrases {
 		Get {
 			if !this.iPhrases
 				this.iPhrases := this.allPhrases()
@@ -954,23 +957,23 @@ class Grammar {
 	}
 
 	AppendString(string) {
-		this.iParts.Push(new this.Words(string))
+		this.iParts.Push(Grammar.Words(string))
 	}
 
 	AppendGrammars(grammars*) {
-		this.AppendChoices(new this.Choices(grammars))
+		this.AppendChoices(Grammar.Choices(grammars))
 	}
 
 	match(words) {
 		local index := 1
 
-		return this.matchWords(words, index)
+		return this.matchWords(words, &index)
 	}
 
-	matchWords(words, ByRef index) {
+	matchWords(words, &index) {
 		local alternatives, running, ignore, part
 
-		if (words.Length() < index)
+		if (words.Length < index)
 			return true
 		else {
 			alternatives := false
@@ -981,11 +984,11 @@ class Grammar {
 					alternatives := true
 
 				if alternatives {
-					if part.matchWords(words, index)
+					if part.matchWords(words, &index)
 						return true
 				}
 				else {
-					if !part.matchWords(words, running)
+					if !part.matchWords(words, &running)
 						return false
 				}
 			}
@@ -1058,7 +1061,7 @@ class Grammar {
 class GrammarParser {
 	iCompiler := false
 
-	Compiler[] {
+	Compiler {
 		Get {
 			return this.iCompiler
 		}
@@ -1110,7 +1113,7 @@ class GrammarParser {
 class GrammarGrammars {
 	iGrammarLists := []
 
-	GrammarLists[] {
+	GrammarLists {
 		Get {
 			return this.iGrammarLists
 		}
@@ -1156,7 +1159,7 @@ class GrammarGrammars {
 class GrammarChoices {
 	iChoices := []
 
-	Choices[] {
+	Choices {
 		Get {
 			return this.iChoices
 		}
@@ -1202,7 +1205,7 @@ class GrammarChoices {
 class GrammarBuiltinChoices {
 	iBuiltin := false
 
-	Builtin[] {
+	Builtin {
 		Get {
 			return this.iBuiltin
 		}
@@ -1228,7 +1231,7 @@ class GrammarBuiltinChoices {
 class GrammarList {
 	iList := []
 
-	List[] {
+	List {
 		Get {
 			return this.iList
 		}
@@ -1260,7 +1263,7 @@ class GrammarList {
 class GrammarLiteral {
 	iValue := []
 
-	Value[] {
+	Value {
 		Get {
 			return this.iValue
 		}
@@ -1297,21 +1300,13 @@ matchWords(string1, string2) {
 
 			recognizer := CLR_LoadLibrary(dllFile).CreateInstance("Speech.SpeechRecognizer")
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogCritical, translate("Error while initializing speech recognition module - please install the speech recognition software"))
 
 			showMessage(translate("Error while initializing speech recognition module - please install the speech recognition software") . translate("...")
-					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+								, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 	}
 
 	return (recognizer ? recognizer.Compare(string1, string2) : false)
-}
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-compareRating(r1, r2) {
-	return (r1.Rating < r2.Rating)
 }

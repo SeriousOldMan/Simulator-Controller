@@ -10,7 +10,7 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 	
 	__New() {
 		global ahkUnitResultTree
-		base.__New()
+		super.__New()
 		guiWindowIndex := AhkUnit_GuiRunner.nextGuiWindowIndex++
 		this.guiWindowName := "AhkUnitGuiRunner" . guiWindowIndex
 		this.GuiBegin_()
@@ -22,7 +22,7 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 	}
 	
 	Default() {
-		base.Default()
+		super.Default()
 		this.ShowReport()
 	}
 	
@@ -40,7 +40,7 @@ class AhkUnit_GuiRunner extends AhkUnit_Runner {
 	
 	Run(params*) {
 		global ahkUnitResultTree
-		base.Run(params*)
+		super.Run(params*)
 		this.GuiBegin_()
 		GuiControl,-Redraw,ahkUnitResultTree
 		count := this.GetCount()

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Pedal Calibration Plugin        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -53,7 +53,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	iPedalProfileMode := false
 
 	class PedalProfileMode extends ControllerMode {
-		Mode[] {
+		Mode {
 			Get {
 				return kPedalCalibrationMode
 			}
@@ -66,13 +66,13 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		iSelectionIndex := false
 		iSelectionXPosition := false
 
-		Pedal[] {
+		Pedal {
 			Get {
 				return this.iPedal
 			}
 		}
 
-		Shape[] {
+		Shape {
 			Get {
 				return this.iShape
 			}
@@ -84,9 +84,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 			this.iSelectionIndex := inList(kCurveShapes, shape)
 
 			if !this.iSelectionIndex
-				throw "Unknown calibration shape """ . shape . """ detected in CurveShapeAction.__New..."
+				throw "Unknown calibration shape `"" . shape . "`" detected in CurveShapeAction.__New..."
 
-			switch pedal {
+			switch pedal, false {
 				case "Clutch":
 					this.iSelectionXPosition := kClutchXPosition
 				case "Brake":
@@ -94,10 +94,10 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				case "Throttle":
 					this.iSelectionXPosition := kThrottleXPosition
 				default:
-					throw "Unknown pedal type """ . pedal . """ detected in CurveShapeAction.__New..."
+					throw "Unknown pedal type `"" . pedal . "`" detected in CurveShapeAction.__New..."
 			}
 
-			base.__New(function, label, icon)
+			super.__New(function, label, icon)
 		}
 
 		fireAction(function, trigger) {
@@ -110,72 +110,72 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				application.startup()
 
 			try {
-				WinWait %windowTitle%, , 5
+				WinWait(windowTitle, , 5)
 
 				if kNeedsActivation {
-					WinMove %windowTitle%, , 50, 50
-					WinSet AlwaysOnTop, On, %windowTitle%
-					WinSet Top, , %windowTitle%
+					WinMove(50, 50, , , windowTitle)
+					WinSetAlwaysOnTop(1, windowTitle)
+					WinMoveTop(, windowTitle)
 
-					WinActivate %windowTitle%
+					WinActivate(windowTitle)
 
 					if (!WinActive(windowTitle) && SimulatorController.Instance.ActiveSimulator) {
-						Send !{Tab}
+						Send("!{Tab}")
 
-						WinActivate %windowTitle%
+						WinActivate(windowTitle)
 					}
 
 					if WinActive(windowTitle) {
 						xPosition := this.iSelectionXPosition
 						yPosition := kShapeYPosition
 
-						MouseClick Left, %xPosition%, %yPosition%
+						MouseClick("Left", xPosition, yPosition)
 
-						Sleep 500
+						Sleep(500)
 
 						yPosition += (this.iSelectionIndex * kShapeYDelta)
 
-						MouseClick Left, %xPosition%, %yPosition%
+						MouseClick("Left", xPosition, yPosition)
 
-						Sleep 500
+						Sleep(500)
 
-						MouseClick Left, %kSaveToPedalX%, %kSaveToPedalY%
+						MouseClick("Left", kSaveToPedalX, kSaveToPedalY)
 					}
 				}
 				else {
 					xPosition := this.iSelectionXPosition
 					yPosition := kShapeYPosition
 
-					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+					ControlClick("X" . xPosition . " Y" . yPosition, windowTitle, , , , "NA")
 
-					Sleep 500
+					Sleep(500)
 
 					yPosition += (this.iSelectionIndex * kShapeYDelta)
 
-					ControlClick X%xPosition% Y%yPosition%, %windowTitle%, , , , NA
+					ControlClick("X" . xPosition . " Y" . yPosition, windowTitle, , , , "NA")
 
-					Sleep 500
+					Sleep(500)
 
-					ControlClick X%kSaveToPedalX% Y%yPosition%, %kSaveToPedalY%, , , , NA
+					ControlClick("X" . kSaveToPedalX . " Y" . yPosition, kSaveToPedalY, , , , "NA")
 				}
 
 				trayMessage(translate(this.Pedal), translate("Calibration: ") . this.Shape)
 
-				Sleep 500
+				Sleep(500)
 			}
 			finally {
 				if !wasRunning
 					application.shutdown()
 				else {
-					WinSet AlwaysOnTop, Off, %windowTitle%
+					WinSetAlwaysOnTop(0, windowTitle)
 
-					WinMinimize %windowTitle%
+					WinMinimize(windowTitle)
 				}
 			}
 		}
 	}
 
-	Application[] {
+	Application {
 		Get {
 			return this.iSmartCtrlApplication
 		}
@@ -184,10 +184,10 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 	__New(controller, name, configuration := false, register := true) {
 		local smartCtrl, ignore, theAction
 
-		base.__New(controller, name, configuration, false)
+		super.__New(controller, name, configuration, false)
 
 		if (this.Active || isDebug()) {
-			this.iSmartCtrlApplication := new Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
+			this.iSmartCtrlApplication := Application(this.getArgumentValue("controlApplication", kPedalCalibrationPlugin), configuration)
 
 			smartCtrl := this.iSmartCtrlApplication.ExePath
 
@@ -198,7 +198,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 					return false
 			}
 
-			this.iPedalProfileMode := new this.PedalProfileMode(this)
+			this.iPedalProfileMode := PedalCalibrationPlugin.PedalProfileMode(this)
 
 			this.registerMode(this.iPedalProfileMode)
 
@@ -223,7 +223,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 		if (function != false) {
 			icon := this.getIcon("CurveShape." . shape . ".Activate", this.getIcon("CurveShape.Activate"))
 
-			this.iPedalProfileMode.registerAction(new this.CurveShapeAction(function, label, icon, pedal, shape))
+			this.iPedalProfileMode.registerAction(PedalCalibrationPlugin.CurveShapeAction(function, label, icon, pedal, shape))
 		}
 		else
 			this.logFunctionNotFound(descriptor)
@@ -231,9 +231,9 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 
 	writePluginState(configuration) {
 		if this.Active
-			setConfigurationValue(configuration, this.Plugin, "State", "Active")
+			setMultiMapValue(configuration, this.Plugin, "State", "Active")
 		else
-			base.writePluginState(configuration)
+			super.writePluginState(configuration)
 	}
 }
 
@@ -245,7 +245,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 initializePedalCalibrationPlugin() {
 	local controller := SimulatorController.Instance
 
-	new PedalCalibrationPlugin(controller, kPedalCalibrationPlugin, controller.Configuration)
+	PedalCalibrationPlugin(controller, kPedalCalibrationPlugin, controller.Configuration)
 }
 
 

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Simulator Plugin                ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -44,14 +44,14 @@ global kAssistantRaceActions := ["PitstopPlan", "DriverSwapPlan", "PitstopPrepar
 ;;;-------------------------------------------------------------------------;;;
 
 class AssistantMode extends ControllerMode {
-	Mode[] {
+	Mode {
 		Get {
 			return kAssistantMode
 		}
 	}
 
 	activate() {
-		base.activate()
+		super.activate()
 
 		this.updateActions(this.Plugin.Session)
 	}
@@ -84,7 +84,7 @@ class AssistantMode extends ControllerMode {
 }
 
 class PitstopMode extends AssistantMode {
-	Mode[] {
+	Mode {
 		Get {
 			return kPitstopMode
 		}
@@ -93,7 +93,7 @@ class PitstopMode extends AssistantMode {
 	updateActions(session) {
 		this.updatePitstopActions(session)
 
-		base.updateActions(session)
+		super.updateActions(session)
 	}
 
 	updatePitstopActions(session) {
@@ -117,19 +117,19 @@ class PitstopAction extends ControllerAction {
 	iOption := false
 	iSteps := 1
 
-	Plugin[] {
+	Plugin {
 		Get {
 			return this.iPlugin
 		}
 	}
 
-	Option[] {
+	Option {
 		Get {
 			return this.iOption
 		}
 	}
 
-	Steps[] {
+	Steps {
 		Get {
 			return this.iSteps
 		}
@@ -140,10 +140,10 @@ class PitstopAction extends ControllerAction {
 		this.iOption := option
 		this.iSteps := steps
 
-		if (moreArguments.Length() > 0)
+		if (moreArguments.Length > 0)
 			throw "Unsupported arguments (" . values2String(", ", moreArguments*) . ") detected in PitstopAction.__New"
 
-		base.__New(function, label, icon)
+		super.__New(function, label, icon)
 	}
 
 	fireAction(function, trigger) {
@@ -156,7 +156,7 @@ class PitstopAction extends ControllerAction {
 class PitstopChangeAction extends PitstopAction {
 	iDirection := false
 
-	Direction[] {
+	Direction {
 		Get {
 			return this.iDirection
 		}
@@ -165,11 +165,11 @@ class PitstopChangeAction extends PitstopAction {
 	__New(plugin, function, label, icon, option, direction, moreArguments*) {
 		this.iDirection := direction
 
-		base.__New(plugin, function, label, icon, option, moreArguments*)
+		super.__New(plugin, function, label, icon, option, moreArguments*)
 	}
 
 	fireAction(function, trigger) {
-		if base.fireAction(function, trigger) {
+		if super.fireAction(function, trigger) {
 			this.Plugin.changePitstopOption(this.Option, this.Direction, this.Steps)
 
 			this.Plugin.notifyPitstopChanged(this.Option)
@@ -179,13 +179,13 @@ class PitstopChangeAction extends PitstopAction {
 
 class PitstopSelectAction extends PitstopChangeAction {
 	__New(plugin, function, label, icon, option, moreArguments*) {
-		base.__New(plugin, function, label, icon, option, "Increase", moreArguments*)
+		super.__New(plugin, function, label, icon, option, "Increase", moreArguments*)
 	}
 }
 
 class PitstopToggleAction extends PitstopAction {
 	fireAction(function, trigger) {
-		if base.fireAction(function, trigger) {
+		if super.fireAction(function, trigger) {
 			if ((trigger == "On") || (trigger = kIncrease) || (trigger == "Push") || (trigger == "Call"))
 				this.Plugin.changePitstopOption(this.Option, "Increase", this.Steps)
 			else
@@ -211,25 +211,37 @@ class SimulatorPlugin extends ControllerPlugin {
 
 	iTrackAutomation := kUndefined
 
-	ActiveSimulator[] {
+	static ActiveSimulator {
 		Get {
 			return SimulatorPlugin.sActiveSimulator
 		}
 	}
 
-	ActiveSimulation[] {
+	ActiveSimulator {
+		Get {
+			return SimulatorPlugin.ActiveSimulator
+		}
+	}
+
+	static ActiveSimulation {
 		Get {
 			return SimulatorPlugin.sActiveSimulation
 		}
 	}
 
-	Code[] {
+	ActiveSimulation {
+		Get {
+			return SimulatorPlugin.ActiveSimulation
+		}
+	}
+
+	Code {
 		Get {
 			return this.Plugin
 		}
 	}
 
-	CommandMode[] {
+	CommandMode {
 		Get {
 			return this.iCommandMode
 		}
@@ -239,7 +251,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
-	CommandDelay[] {
+	CommandDelay {
 		Get {
 			local simulator, car, track, settings, default
 
@@ -248,11 +260,11 @@ class SimulatorPlugin extends ControllerPlugin {
 				car := (this.Car ? this.Car : "*")
 				track := (this.Track ? this.Track : "*")
 
-				settings := new SettingsDatabase().loadSettings(simulator, car, track, "*")
+				settings := SettingsDatabase().loadSettings(simulator, car, track, "*")
 
-				default := getConfigurationValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 30)
+				default := getMultiMapValue(settings, "Simulator." . simulator, "Pitstop.KeyDelay", 30)
 
-				this.iCommandDelay := getConfigurationValue(settings, "Simulator." . simulator, "Command.KeyDelay", default)
+				this.iCommandDelay := getMultiMapValue(settings, "Simulator." . simulator, "Command.KeyDelay", default)
 			}
 
 			return this.iCommandDelay
@@ -269,7 +281,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
-	Car[] {
+	Car {
 		Get {
 			return this.iCar
 		}
@@ -284,7 +296,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
-	Track[] {
+	Track {
 		Get {
 			return this.iTrack
 		}
@@ -299,7 +311,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		}
 	}
 
-	TrackAutomation[] {
+	TrackAutomation {
 		Get {
 			local simulator, car, track
 
@@ -308,7 +320,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				car := this.Car
 				track := this.Track
 
-				this.iTrackAutomation := new SessionDatabase().getTrackAutomation(simulator, car, track)
+				this.iTrackAutomation := SessionDatabase().getTrackAutomation(simulator, car, track)
 			}
 
 			return this.iTrackAutomation
@@ -345,9 +357,9 @@ class SimulatorPlugin extends ControllerPlugin {
 	__New(controller, name, simulator, configuration := false, register := true) {
 		local ignore, theAction, arguments
 
-		this.iSimulator := new Application(simulator, SimulatorController.Instance.Configuration)
+		this.iSimulator := Application(simulator, SimulatorController.Instance.Configuration)
 
-		base.__New(controller, name, configuration, register)
+		super.__New(controller, name, configuration, register)
 
 		if (this.Active || isDebug()) {
 			this.iCommandMode := this.getArgumentValue("pitstopMFDMode", "Event")
@@ -370,12 +382,12 @@ class SimulatorPlugin extends ControllerPlugin {
 	createPitstopAction(controller, action, increaseFunction, moreArguments*) {
 		local function, decreaseFunction, mode, label, icon, actions, selectActions, descriptor
 
-		this.getPitstopActions(actions, selectActions)
+		this.getPitstopActions(&actions, &selectActions)
 
-		if actions.HasKey(action) {
+		if actions.Has(action) {
 			decreaseFunction := false
 
-			if (moreArguments.Length() > 0) {
+			if (moreArguments.Length > 0) {
 				decreaseFunction := moreArguments[1]
 
 				if (controller.findFunction(decreaseFunction) != false)
@@ -388,7 +400,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			mode := this.findMode(kPitstopMode)
 
 			if (mode == false)
-				mode := new PitstopMode(this)
+				mode := PitstopMode(this)
 
 			if !decreaseFunction {
 				if (function != false) {
@@ -408,9 +420,9 @@ class SimulatorPlugin extends ControllerPlugin {
 						icon := this.getIcon(ConfigurationItem.descriptor(action, "Toggle"))
 
 					if (inList(selectActions, action))
-						mode.registerAction(new PitstopSelectAction(this, function, label, icon, actions[action], moreArguments*))
+						mode.registerAction(PitstopSelectAction(this, function, label, icon, actions[action], moreArguments*))
 					else
-						mode.registerAction(new PitstopToggleAction(this, function, label, icon, actions[action], moreArguments*))
+						mode.registerAction(PitstopToggleAction(this, function, label, icon, actions[action], moreArguments*))
 				}
 				else
 					this.logFunctionNotFound(increaseFunction)
@@ -419,7 +431,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				if (function != false) {
 					descriptor := ConfigurationItem.descriptor(action, "Increase")
 
-					mode.registerAction(new PitstopChangeAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), actions[action], "Increase", moreArguments*))
+					mode.registerAction(PitstopChangeAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), actions[action], "Increase", moreArguments*))
 				}
 				else
 					this.logFunctionNotFound(increaseFunction)
@@ -429,7 +441,7 @@ class SimulatorPlugin extends ControllerPlugin {
 				if (function != false) {
 					descriptor := ConfigurationItem.descriptor(action, "Decrease")
 
-					mode.registerAction(new PitstopChangeAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), actions[action], "Decrease", moreArguments*))
+					mode.registerAction(PitstopChangeAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), actions[action], "Decrease", moreArguments*))
 				}
 				else
 					this.logFunctionNotFound(decreaseFunction)
@@ -440,11 +452,12 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	createRaceAssistantAction(controller, action, actionFunction, arguments*) {
-		logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+		logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap()
+
 		selectActions := []
 	}
 
@@ -453,34 +466,34 @@ class SimulatorPlugin extends ControllerPlugin {
 		local sessionDB, car, track
 
 		if this.Active {
-			setConfigurationValue(configuration, this.Plugin, "State", simulator ? "Active" : "Passive")
+			setMultiMapValue(configuration, this.Plugin, "State", simulator ? "Active" : "Passive")
 
 			if simulator {
 				if (this.Car && this.Track) {
-					setConfigurationValue(configuration, "Simulation", "State", "Active")
+					setMultiMapValue(configuration, "Simulation", "State", "Active")
 
-					setConfigurationValue(configuration, "Simulation", "Session", this.Session[true])
+					setMultiMapValue(configuration, "Simulation", "Session", this.Session[true])
 
-					sessionDB := new SessionDatabase()
+					sessionDB := SessionDatabase()
 
 					car := sessionDB.getCarName(simulator, this.Car)
 					track := sessionDB.getTrackName(simulator, this.Track)
 
-					setConfigurationValue(configuration, "Simulation", "Simulator", simulator)
-					setConfigurationValue(configuration, "Simulation", "Car", car)
-					setConfigurationValue(configuration, "Simulation", "Track", track)
+					setMultiMapValue(configuration, "Simulation", "Simulator", simulator)
+					setMultiMapValue(configuration, "Simulation", "Car", car)
+					setMultiMapValue(configuration, "Simulation", "Track", track)
 
-					setConfigurationValue(configuration, this.Plugin, "Information"
-										, values2String("; ", translate("Simulator: ") . simulator
-															, translate("Car: ") . car
-															, translate("Track: ") . track))
+					setMultiMapValue(configuration, this.Plugin, "Information"
+								   , values2String("; ", translate("Simulator: ") . simulator
+								   , translate("Car: ") . car
+								   , translate("Track: ") . track))
 				}
 				else
-					setConfigurationValue(configuration, "Simulation", "State", "Passive")
+					setMultiMapValue(configuration, "Simulation", "State", "Passive")
 			}
 		}
 		else
-			base.writePluginState(configuration)
+			super.writePluginState(configuration)
 	}
 
 	activateWindow() {
@@ -491,34 +504,33 @@ class SimulatorPlugin extends ControllerPlugin {
 				showMessage(this.Simulator[true] . " not found...")
 
 		if !WinActive(window)
-			WinActivate %window%
+			WinActivate(window)
 	}
 
-	sendCommand(command) {
-		local delay
-
+	sendCommand(command, delay?) {
 		try {
-			switch this.CommandMode {
+			switch this.CommandMode, false {
 				case "Event":
-					SendEvent %command%
+					SendEvent(command)
 				case "Input":
-					SendInput %command%
+					SendInput(command)
 				case "Play":
-					SendPlay %command%
+					SendPlay(command)
 				case "Raw":
-					SendRaw %command%
+					Send("{Raw}" . command)
 				default:
-					Send %command%
+					Send(command)
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogWarn, substituteVariables(translate("Cannot send command (%command%) - please check the configuration"), {command: command}))
 		}
 
-		delay := this.CommandDelay
+		if !isSet(delay)
+			delay := this.CommandDelay
 
 		if delay
-			Sleep %delay%
+			Sleep(delay)
 	}
 
 	runningSimulator() {
@@ -526,7 +538,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	simulatorStartup(simulator) {
-		base.simulatorStartup(simulator)
+		super.simulatorStartup(simulator)
 
 		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator != this)) {
 			if SimulatorPlugin.ActiveSimulator
@@ -540,7 +552,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	simulatorShutdown(simulator) {
-		base.simulatorShutdown(simulator)
+		super.simulatorShutdown(simulator)
 
 		if ((simulator = this.Simulator.Application) && (SimulatorPlugin.ActiveSimulator == this)) {
 			this.updateSession(kSessionFinished)
@@ -586,7 +598,7 @@ class SimulatorPlugin extends ControllerPlugin {
 		local newValues
 
 		if this.RaceEngineer
-			switch option {
+			switch option, false {
 				case "Refuel", "Tyre Compound", "Tyre Set", "Repair Suspension", "Repair Bodywork", "Repair Engine":
 					newValues := this.getPitstopOptionValues(option)
 
@@ -601,7 +613,7 @@ class SimulatorPlugin extends ControllerPlugin {
 	}
 
 	getPitstopAllOptionValues() {
-		local options := {}
+		local options := CaseInsenseMap()
 
 		options["Refuel"] := this.getPitstopOptionValues("Refuel")
 		options["Tyre Compound"] := this.getPitstopOptionValues("Tyre Compound")
@@ -647,19 +659,19 @@ class RaceAssistantAction extends ControllerAction {
 	iAction := false
 	iArguments := false
 
-	Plugin[] {
+	Plugin {
 		Get {
 			return this.iPlugin
 		}
 	}
 
-	Action[] {
+	Action {
 		Get {
 			return this.iAction
 		}
 	}
 
-	Arguments[] {
+	Arguments {
 		Get {
 			return this.iArguments
 		}
@@ -670,13 +682,13 @@ class RaceAssistantAction extends ControllerAction {
 		this.iAction := action
 		this.iArguments := arguments
 
-		base.__New(function, label, icon)
+		super.__New(function, label, icon)
 	}
 
 	fireAction(function, trigger) {
 		local plugin := this.Plugin
 
-		switch this.Action {
+		switch this.Action, false {
 			case "InformationRequest":
 				plugin.requestInformation(this.Arguments*)
 			case "PitstopRecommend":
@@ -696,7 +708,7 @@ class RaceAssistantAction extends ControllerAction {
 			case "Reject":
 				plugin.reject()
 			default:
-				throw "Invalid action """ . this.Action . """ detected in RaceAssistantAction.fireAction...."
+				throw "Invalid action `"" . this.Action . "`" detected in RaceAssistantAction.fireAction...."
 		}
 	}
 }
@@ -711,25 +723,25 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	iCurrentTyreCompound := false
 	iRequestedTyreCompound := false
 
-	RaceEngineer[] {
+	RaceEngineer {
 		Get {
 			return this.iRaceEngineer
 		}
 	}
 
-	RaceStrategist[] {
+	RaceStrategist {
 		Get {
 			return this.iRaceStrategist
 		}
 	}
 
-	RaceSpotter[] {
+	RaceSpotter {
 		Get {
 			return this.iRaceSpotter
 		}
 	}
 
-	CurrentTyreCompound[] {
+	CurrentTyreCompound {
 		Get {
 			return this.iCurrentTyreCompound
 		}
@@ -739,7 +751,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	RequestedTyreCompound[] {
+	RequestedTyreCompound {
 		Get {
 			return this.iRequestedTyreCompound
 		}
@@ -752,7 +764,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	__New(controller, name, simulator, configuration := false) {
 		local ignore, theAction
 
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iActionMode := kAssistantMode
@@ -777,22 +789,22 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		mode := this.findMode(this.iActionMode)
 
 		if (mode == false)
-			mode := ((this.iActionMode = "Pitstop") ? new PitstopMode(this) : new AssistantMode(this))
+			mode := ((this.iActionMode = "Pitstop") ? PitstopMode(this) : AssistantMode(this))
 
 		if (function != false) {
 			if (action = "InformationRequest") {
 				action := values2String("", arguments*)
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
+				mode.registerAction(RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), "InformationRequest", arguments*))
 			}
 			else if (inList(kAssistantRaceActions, action) || inList(kAssistantAnswerActions, action)) {
 				descriptor := ConfigurationItem.descriptor(action, "Activate")
 
-				mode.registerAction(new RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
+				mode.registerAction(RaceAssistantAction(this, function, this.getLabel(descriptor, action), this.getIcon(descriptor), action))
 			}
 			else
-				logMessage(kLogWarn, translate("Action """) . action . translate(""" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
+				logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))
 		}
 		else
 			this.logFunctionNotFound(actionFunction)
@@ -801,7 +813,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	simulatorStartup(simulator) {
 		local ignore, assistant
 
-		base.simulatorStartup(simulator)
+		super.simulatorStartup(simulator)
 
 		if (simulator = this.Simulator.Application) {
 			RaceAssistantPlugin.startSimulation(this)
@@ -819,7 +831,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	simulatorShutdown(simulator) {
 		local raceEngineer, raceStrategist, raceSpotter
 
-		base.simulatorShutdown(simulator)
+		super.simulatorShutdown(simulator)
 
 		if (simulator = this.Simulator.Application) {
 			RaceAssistantPlugin.stopSimulation(this)
@@ -852,7 +864,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateSession(session) {
-		base.updateSession(session)
+		super.updateSession(session)
 
 		if (session = kSessionFinished) {
 			this.CurrentTyreCompound := false
@@ -892,35 +904,34 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	sessionActive(data) {
-		return (getConfigurationValue(data, "Session Data", "Active", false) && !getConfigurationValue(data, "Session Data", "Paused", false))
+		return (getMultiMapValue(data, "Session Data", "Active", false) && !getMultiMapValue(data, "Session Data", "Paused", false))
 	}
 
 	driverActive(data, driverForName, driverSurName) {
 		return (this.sessionActive(data)
-			 && (getConfigurationValue(data, "Stint Data", "DriverForname") = driverForName)
-			 && (getConfigurationValue(data, "Stint Data", "DriverSurname") = driverSurName))
+			 && (getMultiMapValue(data, "Stint Data", "DriverForname") = driverForName)
+			 && (getMultiMapValue(data, "Stint Data", "DriverSurname") = driverSurName))
 	}
 
 	prepareSession(settings, data) {
-		local sessionDB := new SessionDatabase()
-		local simulator := getConfigurationValue(data, "Session Data", "Simulator", "Unknown")
-		local car := getConfigurationValue(data, "Session Data", "Car", "Unknown")
-		local track := getConfigurationValue(data, "Session Data", "Track", "Unknown")
+		local simulator := getMultiMapValue(data, "Session Data", "Simulator", "Unknown")
+		local car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
+		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 
-		sessionDB.registerCar(simulator, car, sessionDB.getCarName(simulator, car))
+		SessionDatabase.registerCar(simulator, car, SessionDatabase.getCarName(simulator, car))
 
-		sessionDB.registerTrack(simulator, car, track
-							  , sessionDB.getTrackName(simulator, track, false), sessionDB.getTrackName(simulator, track, true))
+		SessionDatabase.registerTrack(simulator, car, track
+									, SessionDatabase.getTrackName(simulator, track, false), SessionDatabase.getTrackName(simulator, track, true))
 	}
 
 	startSession(settings, data) {
-		local compound := getConfigurationValue(settings, "Session Setup", "Tyre.Compound", "Dry")
-		local compoundColor := getConfigurationValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
+		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
+		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
 
-		this.Car := getConfigurationValue(data, "Session Data", "Car")
-		this.Track := getConfigurationValue(data, "Session Data", "Track")
+		this.Car := getMultiMapValue(data, "Session Data", "Car")
+		this.Track := getMultiMapValue(data, "Session Data", "Track")
 
-		this.CurrentTyreCompound := compound(compound, compoundColor)
+		this.CurrentTyreCompound := compound(tyreCompound, tyreCompoundColor)
 
 		this.updateTyreCompound(data)
 
@@ -980,18 +991,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		}
 	}
 
-	tyreCompoundIndex(compound, compoundColor := false) {
+	tyreCompoundIndex(tyreCompound, tyreCompoundColor := false) {
 		local compounds, index, candidate
 
-		if compound {
-			compounds := new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
-			index := inList(compounds, compound(compound, compoundColor))
+		if tyreCompound {
+			compounds := SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track)
+			index := inList(compounds, compound(tyreCompound, tyreCompoundColor))
 
 			if index
 				return index
 			else
 				for index, candidate in compounds
-					if (InStr(candidate, compound) == 1)
+					if (InStr(candidate, tyreCompound) == 1)
 						return index
 
 			return false
@@ -1000,13 +1011,13 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			return false
 	}
 
-	tyreCompoundCode(compound, compoundColor := false) {
+	tyreCompoundCode(tyreCompound, tyreCompoundColor := false) {
 		local index
 
-		if compound {
-			index := this.tyreCompoundIndex(compound, compoundColor)
+		if tyreCompound {
+			index := this.tyreCompoundIndex(tyreCompound, tyreCompoundColor)
 
-			return (index ? new SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
+			return (index ? SessionDatabase().getTyreCompounds(this.Simulator[true], this.Car, this.Track, true)[index] : false)
 		}
 		else
 			return false
@@ -1028,7 +1039,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				for ignore, theHotkey in string2Values("|", action.Action) {
 					this.sendCommand(theHotKey)
 
-					Sleep 25
+					Sleep(25)
 				}
 			}
 			else if (action.Type = "Command")
@@ -1045,9 +1056,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	setPitstopRefuelAmount(pitstopNumber, liters) {
 	}
 
-	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
-		if compound
-			this.RequestedTyreCompound := compound(compound, compoundColor)
+	setPitstopTyreSet(pitstopNumber, tyreCompound, tyreCompoundColor := false, set := false) {
+		if tyreCompound
+			this.RequestedTyreCompound := compound(tyreCompound, tyreCompoundColor)
 		else
 			this.RequestedTyreCompound := false
 	}
@@ -1062,18 +1073,18 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateTyreCompound(data) {
-		local compound, compoundColor
+		local tyreCompound, tyreCompoundColor
 
-		if (!getConfigurationValue(data, "Car Data", "TyreCompound", false)
-		 && !getConfigurationValue(data, "Car Data", "TyreCompoundRaw", false))
+		if (!getMultiMapValue(data, "Car Data", "TyreCompound", false)
+		 && !getMultiMapValue(data, "Car Data", "TyreCompoundRaw", false))
 			if this.CurrentTyreCompound {
-				compound := "Dry"
-				compoundColor := "Black"
+				tyreCompound := "Dry"
+				tyreCompoundColor := "Black"
 
-				splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+				splitCompound(this.CurrentTyreCompound, &tyreCompound, &tyreCompoundColor)
 
-				setConfigurationValue(data, "Car Data", "TyreCompound", compound)
-				setConfigurationValue(data, "Car Data", "TyreCompoundColor", compoundColor)
+				setMultiMapValue(data, "Car Data", "TyreCompound", tyreCompound)
+				setMultiMapValue(data, "Car Data", "TyreCompoundColor", tyreCompoundColor)
 			}
 	}
 
@@ -1081,59 +1092,62 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		this.updateTyreCompound(data)
 
 		if (this.Session != kSessionFinished) {
-			this.Car := getConfigurationValue(data, "Session Data", "Car")
-			this.Track := getConfigurationValue(data, "Session Data", "Track")
+			this.Car := getMultiMapValue(data, "Session Data", "Car")
+			this.Track := getMultiMapValue(data, "Session Data", "Track")
 		}
 	}
 
 	updatePositionsData(data) {
+		loop getMultiMapValue(data, "Position Data", "Car.Count", 0)
+			setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr"
+								 , StrReplace(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Nr", ""), "`"", ""))
 	}
 
-	saveSessionState(ByRef sessionSettings, ByRef sessionState) {
-		local compound, compoundColor
+	saveSessionState(&sessionSettings, &sessionState) {
+		local tyreCompound, tyreCompoundColor
 
 		if !sessionSettings
-			sessionSettings := newConfiguration()
+			sessionSettings := newMultiMap()
 
 		if this.CurrentTyreCompound {
-			compound := "Dry"
-			compoundColor := "Black"
+			tyreCompound := "Dry"
+			tyreCompoundColor := "Black"
 
-			splitCompound(this.CurrentTyreCompound, compound, compoundColor)
+			splitCompound(this.CurrentTyreCompound, &tyreCompound, &tyreCompoundColor)
 
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", compound)
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound.Color", compoundColor)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", tyreCompound)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound.Color", tyreCompoundColor)
 		}
 
 		if this.RequestedTyreCompound {
-			compound := "Dry"
-			compoundColor := "Black"
+			tyreCompound := "Dry"
+			tyreCompoundColor := "Black"
 
-			splitCompound(this.RequestedTyreCompound, compound, compoundColor)
+			splitCompound(this.RequestedTyreCompound, &tyreCompound, &tyreCompoundColor)
 
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", compound)
-			setConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound.Color", compoundColor)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", tyreCompound)
+			setMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound.Color", tyreCompoundColor)
 		}
 	}
 
-	restoreSessionState(ByRef sessionSettings, ByRef sessionState) {
-		local compound
+	restoreSessionState(&sessionSettings, &sessionState) {
+		local tyreCompound
 
 		this.CurrentTyreCompound := false
 		this.RequestedTyreCompound := false
 
 		if sessionSettings {
-			compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", false)
+			tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Current.Compound", false)
 
-			if compound
-				this.CurrentTyreCompound := compound(compound, getConfigurationValue(sessionSettings
-																				   , "Simulator Settings", "Tyre.Current.Compound.Color"))
+			if tyreCompound
+				this.CurrentTyreCompound := compound(tyreCompound, getMultiMapValue(sessionSettings
+																				  , "Simulator Settings", "Tyre.Current.Compound.Color"))
 
-			compound := getConfigurationValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", false)
+			tyreCompound := getMultiMapValue(sessionSettings, "Simulator Settings", "Tyre.Requested.Compound", false)
 
-			if compound
-				this.RequestedTyreCompound := compound(compound, getConfigurationValue(sessionSettings
-																					 , "Simulator Settings", "Tyre.Requested.Compound.Color"))
+			if tyreCompound
+				this.RequestedTyreCompound := compound(tyreCompound, getMultiMapValue(sessionSettings
+																					, "Simulator Settings", "Tyre.Requested.Compound.Color"))
 		}
 	}
 
@@ -1143,55 +1157,69 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		static sessionDB := false
 
 		if !sessionDB
-			sessionDB := new SessionDatabase()
+			sessionDB := SessionDatabase()
 
 		code := this.Code
 		trackData := sessionDB.getTrackData(code, this.Track)
 
-		return (trackData ? readSimulatorData(code, "-Track """ . trackData . """") : readSimulatorData(code))
+		return (trackData ? readSimulatorData(code, "-Track `"" . trackData . "`"") : readSimulatorData(code))
 	}
 
 	acquirePositionsData(telemetryData) {
+		local positions := Map()
+		local needCorrection := false
 		local cars := []
-		local positionsData, count
+		local positionsData, count, position
 
-		if telemetryData.HasKey("Position Data") {
-			positionsData := newConfiguration()
+		if telemetryData.Has("Position Data") {
+			positionsData := newMultiMap()
 
-			setConfigurationSectionValues(positionsData, "Position Data", getConfigurationSectionValues(telemetryData, "Position Data"))
+			setMultiMapValues(positionsData, "Position Data", getMultiMapValues(telemetryData, "Position Data"))
 		}
 		else
 			positionsData := readSimulatorData(this.Code, "-Standings")
 
-		count := getConfigurationValue(positionsData, "Position Data", "Car.Count", 0)
+		count := getMultiMapValue(positionsData, "Position Data", "Car.Count", 0)
 
-		loop %count%
-			cars.Push(Array(A_Index, getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
-								   + getConfigurationValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
+		loop count {
+			position := (getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Position", 0) + 0)
 
-		bubbleSort(cars, "compareCarPositions")
+			if positions.Has(position)
+				needCorrection := true
+			else
+				positions[position] := true
+		}
 
-		if isDebug()
-			loop %count% {
-				if (getConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position") != A_Index)
-					logMessage(kLogDebug, "Corrected position for car " . cars[A_Index] . ": "
-										. getConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position")
-										. " -> " . A_Index)
+		if needCorrection {
+			loop count
+				cars.Push(Array(A_Index, getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap")
+									   + getMultiMapValue(positionsData, "Position Data", "Car." . A_Index . ".Lap.Running")))
 
-				setConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
+			bubbleSort(&cars, (c1, c2) => c1[2] < c2[2])
+
+			if isDebug() {
+				loop count {
+					if (getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position") != A_Index)
+						logMessage(kLogDebug, "Corrected position for car " . cars[A_Index][1] . ": "
+											. getMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position")
+											. " -> " . A_Index)
+
+					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
+				}
 			}
-		else
-			loop %count%
-				setConfigurationValue(positionsData, "Position Data", "Car." . cars[A_Index] . ".Position", A_Index)
+			else
+				loop count
+					setMultiMapValue(positionsData, "Position Data", "Car." . cars[A_Index][1] . ".Position", A_Index)
+		}
 
 		return positionsData
 	}
 
-	acquireSessionData(ByRef telemetryData, ByRef positionsData) {
-		local data := newConfiguration()
-		local section, values
+	acquireSessionData(&telemetryData, &positionsData) {
+		local data := newMultiMap()
+		local section, values, driver
 
-		setConfigurationValue(data, "System", "Time", A_TickCount)
+		setMultiMapValue(data, "System", "Time", A_TickCount)
 
 		telemetryData := this.acquireTelemetryData()
 		positionsData := this.acquirePositionsData(telemetryData)
@@ -1200,10 +1228,22 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		RaceAssistantPlugin.updateAssistantsPositionsData(positionsData)
 
 		for section, values in telemetryData
-			setConfigurationSectionValues(data, section, values)
+			setMultiMapValues(data, section, values)
 
 		for section, values in positionsData
-			setConfigurationSectionValues(data, section, values)
+			setMultiMapValues(data, section, values)
+
+		driver := getMultiMapValue(data, "Position Data", "Driver.Car", false)
+
+		if driver {
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
+				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+
+			if (getMultiMapValue(data, "Position Data", "Car." . A_Index . ".InPitlane", false)
+			 && !getMultiMapValue(data, "Stint Data", "InPitlane", false))
+				setMultiMapValue(data, "Stint Data", "InPitlane", true)
+		}
 
 		return data
 	}
@@ -1218,14 +1258,14 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	local exePath := kBinariesDirectory . simulator . A_Space . protocol . " Provider.exe"
 	local dataFile, data
 
-	FileCreateDir %kTempDirectory%%simulator% Data
+	DirCreate(kTempDirectory . simulator . " Data")
 
 	dataFile := temporaryFileName(simulator . " Data\" . protocol, "data")
 
 	try {
-		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
+		RunWait(A_ComSpec . " /c `"`"" . exePath . "`" " . options . " > `"" . dataFile . "`"`"", , "Hide")
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider (")
 												   , {simulator: simulator, protocol: protocol})
 							   . exePath . translate(") - please rebuild the applications in the binaries folder (")
@@ -1236,11 +1276,11 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 
-	data := readConfiguration(dataFile)
+	data := readMultiMap(dataFile)
 
 	deleteFile(dataFile)
 
-	setConfigurationValue(data, "Session Data", "Simulator", simulator)
+	setMultiMapValue(data, "Session Data", "Simulator", simulator)
 
 	return data
 }
@@ -1248,10 +1288,6 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-compareCarPositions(c1, c2) {
-	return (c1[2] > c2[2])
-}
 
 getCurrentSimulatorPlugin(option := false) {
 	local actions, ignore, candidate
@@ -1261,7 +1297,7 @@ getCurrentSimulatorPlugin(option := false) {
 			actions := false
 			ignore := false
 
-			SimulatorPlugin.ActiveSimulator.getPitstopActions(actions, ignore)
+			SimulatorPlugin.ActiveSimulator.getPitstopActions(&actions, &ignore)
 
 			for ignore, candidate in actions
 				if (candidate = option)
@@ -1322,55 +1358,55 @@ closePitstopMFD() {
 
 changePitstopStrategy(selection, steps := 1) {
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported strategy selection """) . selection . translate(""" detected in changePitstopStrategy - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported strategy selection `"") . selection . translate("`" detected in changePitstopStrategy - please check the configuration"))
 
 	changePitstopOption("Strategy", selection, steps)
 }
 
 changePitstopFuelAmount(direction, liters := 5) {
 	if !inList(["Increase", "Decrease"], direction)
-		logMessage(kLogWarn, translate("Unsupported fuel amount """) . direction . translate(""" detected in changePitstopFuelAmount - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported fuel amount `"") . direction . translate("`" detected in changePitstopFuelAmount - please check the configuration"))
 
 	changePitstopOption("Refuel", direction, liters)
 }
 
 changePitstopTyreCompound(selection) {
 	if !inList(["Next", "Previous", "Increase", "Decrease"], selection)
-		logMessage(kLogWarn, translate("Unsupported tyre compound selection """) . selection . translate(""" detected in changePitstopTyreCompound - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported tyre compound selection `"") . selection . translate("`" detected in changePitstopTyreCompound - please check the configuration"))
 
 	changePitstopOption("Tyre Compound", selection)
 }
 
 changePitstopTyreSet(selection, steps := 1) {
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported tyre set selection """) . selection . translate(""" detected in changePitstopTyreSet - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported tyre set selection `"") . selection . translate("`" detected in changePitstopTyreSet - please check the configuration"))
 
 	changePitstopOption("Tyre Set", selection, steps)
 }
 
 changePitstopTyrePressure(tyre, direction, increments := 1) {
 	if !inList(["All Around", "Front Left", "Front Right", "Rear Left", "Rear Right"], tyre)
-		logMessage(kLogWarn, translate("Unsupported tyre position """) . tyre . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported tyre position `"") . tyre . translate("`" detected in changePitstopTyrePressure - please check the configuration"))
 
 	if !inList(["Increase", "Decrease"], direction)
-		logMessage(kLogWarn, translate("Unsupported pressure change """) . direction . translate(""" detected in changePitstopTyrePressure - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported pressure change `"") . direction . translate("`" detected in changePitstopTyrePressure - please check the configuration"))
 
 	changePitstopOption(tyre, direction, increments)
 }
 
 changePitstopBrakePadType(brake, selection) {
 	if !inList(["Front Brake", "Rear Brake"], brake)
-		logMessage(kLogWarn, translate("Unsupported brake unit """) . brake . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake unit `"") . brake . translate("`" detected in changePitstopBrakePadType - please check the configuration"))
 
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported brake selection """) . selection . translate(""" detected in changePitstopBrakePadType - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported brake selection `"") . selection . translate("`" detected in changePitstopBrakePadType - please check the configuration"))
 
 	changePitstopOption(brake, selection)
 }
 
 changePitstopDriver(selection) {
 	if !inList(["Next", "Previous"], selection)
-		logMessage(kLogWarn, translate("Unsupported driver selection """) . selection . translate(""" detected in changePitstopDriver - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported driver selection `"") . selection . translate("`" detected in changePitstopDriver - please check the configuration"))
 
 	changePitstopOption("Driver", selection)
 }
@@ -1383,7 +1419,7 @@ changePitstopOption(option, selection := "Next", increments := 1) {
 	else if (selection = "Previous")
 		selection := "Decrease"
 	else if !inList(["Increase", "Decrease"], selection)
-		logMessage(kLogWarn, translate("Unsupported option selection """) . selection . translate(""" detected in changePitstopOption - please check the configuration"))
+		logMessage(kLogWarn, translate("Unsupported option selection `"") . selection . translate("`" detected in changePitstopOption - please check the configuration"))
 
 	plugin := getCurrentSimulatorPlugin(option)
 

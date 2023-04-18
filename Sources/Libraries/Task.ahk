@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Task Management                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,7 +9,7 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -55,7 +55,7 @@ class Task {
 
 	iCallable := false
 
-	LowTimer[] {
+	static LowTimer {
 		Get {
 			return (- Task.sLow)
 		}
@@ -65,7 +65,7 @@ class Task {
 		}
 	}
 
-	NormalTimer[] {
+	static NormalTimer {
 		Get {
 			return (- Task.sNormal)
 		}
@@ -75,7 +75,7 @@ class Task {
 		}
 	}
 
-	HighTimer[] {
+	static HighTimer {
 		Get {
 			return (- Task.sHigh)
 		}
@@ -85,7 +85,7 @@ class Task {
 		}
 	}
 
-	InterruptTimer[] {
+	static InterruptTimer {
 		Get {
 			return (- Task.sInterrupt)
 		}
@@ -95,25 +95,25 @@ class Task {
 		}
 	}
 
-	CurrentTask[] {
+	static CurrentTask {
 		Get {
 			return Task.sCurrentTask
 		}
 	}
 
-	Blocked[] {
+	static Blocked {
 		Get {
 			return Task.sBlocked
 		}
 	}
 
-	Window[] {
+	Window {
 		Get {
 			return false
 		}
 	}
 
-	Priority[] {
+	Priority {
 		Get {
 			return this.iPriority
 		}
@@ -123,7 +123,7 @@ class Task {
 		}
 	}
 
-	NextExecution[] {
+	NextExecution {
 		Get {
 			return this.iNextExecution
 		}
@@ -133,7 +133,7 @@ class Task {
 		}
 	}
 
-	Stopped[] {
+	Stopped {
 		Get {
 			return this.iStopped
 		}
@@ -143,7 +143,7 @@ class Task {
 		}
 	}
 
-	Runnable[] {
+	Runnable {
 		Get {
 			return ((A_TickCount >= this.NextExecution) && this.iRunnable && !this.Stopped)
 		}
@@ -153,7 +153,7 @@ class Task {
 		}
 	}
 
-	Sleep[] {
+	Sleep {
 		Get {
 			return this.iSleep
 		}
@@ -163,21 +163,24 @@ class Task {
 		}
 	}
 
-	Running[] {
+	Running {
 		Get {
 			return this.iRunning
 		}
 	}
 
-	Callable[] {
+	Callable {
 		Get {
 			return this.iCallable
 		}
 	}
 
-	__New(callable := false, sleep := 0, priority := 2) {
+	__New(callable := false, sleep := kUndefined, priority := kUndefined) {
+		if (callable && !isInstance(callable, Func))
+			throw "Non-function callable detected in Task.__New..."
+
 		this.iSleep := ((sleep = kUndefined) ? 0 : sleep)
-		this.iNextExecution := (A_TickCount + sleep)
+		this.iNextExecution := (A_TickCount + this.iSleep)
 
 		this.iCallable := callable
 		this.iPriority := ((priority = kUndefined) ? kNormalPriority : priority)
@@ -185,7 +188,7 @@ class Task {
 
 	run() {
 		local callable := this.Callable
-		local result := (isInstance(callable, Task) ? callable.run() : %callable%())
+		local result := (isInstance(callable, Task) ? callable.run() : callable.Call())
 
 		return (isInstance(result, Task) ? result : false)
 	}
@@ -195,6 +198,11 @@ class Task {
 
 		try {
 			return this.run()
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			return false
 		}
 		finally {
 			this.iRunning := false
@@ -217,7 +225,7 @@ class Task {
 		Task.stopTask(this)
 	}
 
-	getNextTask(priority, remove := true) {
+	static getNextTask(priority, remove := true) {
 		local index, candidate
 
 		switch priority {
@@ -258,7 +266,7 @@ class Task {
 		return false
 	}
 
-	addTask(theTask) {
+	static addTask(theTask) {
 		switch theTask.Priority {
 			case kNormalPriority:
 				Task.sNormalTasks.Push(theTask)
@@ -273,7 +281,7 @@ class Task {
 		}
 	}
 
-	removeTask(theTask) {
+	static removeTask(theTask) {
 		switch theTask.Priority {
 			case kNormalPriority:
 				Task.sNormalTasks := remove(Task.sNormalTasks, theTask)
@@ -288,7 +296,7 @@ class Task {
 		}
 	}
 
-	startTask(theTask, sleep := "__Undefined__", priority := "__Undefined__") {
+	static startTask(theTask, sleep := kUndefined, priority := kUndefined) {
 		if isInstance(theTask, Task) {
 			if (sleep != kUndefined)
 				theTask.iNextExecution := (A_TickCount + sleep)
@@ -297,7 +305,7 @@ class Task {
 				theTask.iPriority := priority
 		}
 		else
-			theTask := new Task(theTask, sleep, priority)
+			theTask := Task(theTask, sleep, priority)
 
 		Task.addTask(theTask)
 
@@ -307,14 +315,14 @@ class Task {
 		return theTask
 	}
 
-	stopTask(theTask) {
+	static stopTask(theTask) {
 		theTask.Runnable := false
 		theTask.Stopped := true
 
 		Task.removeTask(theTask)
 	}
 
-	block(priority) {
+	static block(priority) {
 		local oldBlocked := Task.sBlocked
 
 		Task.sBlocked := priority
@@ -322,36 +330,38 @@ class Task {
 		return oldBlocked
 	}
 
-	unblock(priority := false) {
+	static unblock(priority := false) {
 		Task.block(priority)
 	}
 
-	yield() {
+	static yield() {
 		Task.schedule()
 	}
 
-	schedule(priority := 2) {
+	static schedule(priority := 2) {
 		local next, worked, oldScheduling, visited, schedule
+		local unprotect := true
 
 		static scheduling := false
 
 		protectionOn(true)
 
 		try {
-			if ((scheduling >= priority) || (Task.CurrentTask && (Task.CurrentTask.Priority >= priority)) || (Task.Blocked >= priority)) {
-				protectionOff(true)
-
+			if ((scheduling >= priority) || (Task.CurrentTask && (Task.CurrentTask.Priority >= priority)) || (Task.Blocked >= priority))
 				return
-			}
+
 			else {
 				oldScheduling := scheduling
 				scheduling := priority
 
 				try {
-					if (priority < kInterruptPriority)
+					if (priority < kInterruptPriority) {
 						protectionOff(true)
 
-					visited := {}
+						unprotect := false
+					}
+
+					visited := Map()
 
 					loop {
 						worked := false
@@ -359,7 +369,7 @@ class Task {
 						next := Task.getNextTask(priority, true)
 
 						if next
-							if !visited.HasKey(next) {
+							if !visited.Has(next) {
 								visited[next] := true
 
 								worked := true
@@ -368,7 +378,8 @@ class Task {
 							}
 							else
 								Task.addTask(next)
-					} until !worked
+					}
+					until !worked
 				}
 				finally {
 					scheduling := oldScheduling
@@ -378,41 +389,29 @@ class Task {
 		finally {
 			schedule := ObjBindMethod(Task, "schedule", priority)
 
-			SetTimer %schedule%, % ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow)))
+			SetTimer(schedule, ((priority == kInterruptPriority) ? Task.sInterrupt : ((priority == kHighPriority) ? Task.sHigh : ((priority == kNormalPriority) ? Task.sNormal : Task.sLow))))
 
-			if (priority == kInterruptPriority)
+			if unprotect
 				protectionOff(true)
 		}
 	}
 
-	launch(theTask) {
+	static launch(theTask) {
 		local oldCurrentTask := Task.CurrentTask
-		local oldDefault := A_DefaultGui
 		local window := theTask.Window
-		local next
+		local next := false
 
 		Task.sCurrentTask := theTask
 
-		if window {
-			Gui %window%:Default
-
-			Gui %window%:+Disabled
-		}
+		if window
+			window.Opt("+Disabled")
 
 		try {
 			next := theTask.execute()
 		}
-		catch exception {
-			logError(exception, true)
-
-			next := false
-		}
 		finally {
-			if window {
-				Gui %oldDefault%:Default
-
-				Gui %window%:-Disabled
-			}
+			if window
+				window.Opt("-Disabled")
 
 			Task.sCurrentTask := oldCurrentTask
 		}
@@ -431,7 +430,7 @@ class Task {
 
 class PeriodicTask extends Task {
 	execute() {
-		base.execute()
+		super.execute()
 
 		this.NextExecution := (A_TickCount + this.Sleep)
 
@@ -446,7 +445,7 @@ class PeriodicTask extends Task {
 class WindowTask extends Task {
 	iWindow := false
 
-	Window[] {
+	Window {
 		Get {
 			return this.iWindow
 		}
@@ -455,7 +454,7 @@ class WindowTask extends Task {
 	__New(window, arguments*) {
 		this.iWindow := window
 
-		base.__New(arguments*)
+		super.__New(arguments*)
 	}
 }
 
@@ -465,7 +464,7 @@ class WindowTask extends Task {
 
 class WindowPeriodicTask extends WindowTask {
 	execute() {
-		base.execute()
+		super.execute()
 
 		this.NextExecution := (A_TickCount + this.Sleep)
 
@@ -480,19 +479,19 @@ class WindowPeriodicTask extends WindowTask {
 class Continuation extends Task {
 	iTask := false
 
-	Task[] {
+	Task {
 		Get {
 			return this.iTask
 		}
 	}
 
-	Window[] {
+	Window {
 		Get {
 			return this.Task.Window
 		}
 	}
 
-	__New(task := false, continuation := false, sleep := "__Undefined__", priority := "__Undefined__") {
+	__New(task := false, continuation := false, sleep := kUndefined, priority := kUndefined) {
 		if !task
 			task := Task.CurrentTask
 
@@ -504,11 +503,11 @@ class Continuation extends Task {
 		if (priority = kUndefined)
 			priority := task.Priority
 
-		base.__New(continuation, sleep, priority)
+		super.__New(continuation, sleep, priority)
 	}
 
 	stop() {
-		base.stop()
+		super.stop()
 
 		this.Task.stop()
 	}
@@ -519,25 +518,25 @@ class Continuation extends Task {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-changeProtection(up, critical := false, block := false) {
+changeProtection(up, protect := false, block := false) {
 	static level := 0
 
-	if (critical || block) {
+	if (protect || block) {
 		level += (up ? 1 : -1)
 
 		if (level > 0) {
-			if critical
-				Critical 100
+			if protect
+				Critical(100)
 
 			if block
-				BlockInput On
+				BlockInput("On")
 		}
 		else if (level == 0) {
 			if block
-				BlockInput Off
+				BlockInput("Off")
 
-			if critical
-				Critical Off
+			if protect
+				Critical("Off")
 		}
 		else if (level <= 0)
 			throw "Nesting error detected in changeProtection..."
@@ -547,19 +546,19 @@ changeProtection(up, critical := false, block := false) {
 initializeTasks() {
 	schedule := ObjBindMethod(Task, "schedule", kLowPriority)
 
-	SetTimer %schedule%, % Task.sLow
+	SetTimer(schedule, Task.sLow)
 
 	schedule := ObjBindMethod(Task, "schedule", kNormalPriority)
 
-	SetTimer %schedule%, % Task.sNormal
+	SetTimer(schedule, Task.sNormal)
 
 	schedule := ObjBindMethod(Task, "schedule", kHighPriority)
 
-	SetTimer %schedule%, % Task.sHigh
+	SetTimer(schedule, Task.sHigh)
 
 	schedule := ObjBindMethod(Task, "schedule", kInterruptPriority)
 
-	SetTimer %schedule%, % Task.sInterrupt
+	SetTimer(schedule, Task.sInterrupt)
 }
 
 
@@ -579,7 +578,7 @@ withProtection(function, params*) {
 	protectionOn()
 
 	try {
-		return %function%(params*)
+		return function.Call(params*)
 	}
 	finally {
 		protectionOff()
@@ -591,4 +590,4 @@ withProtection(function, params*) {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-SetTimer, initializeTasks, -2000
+SetTimer(initializeTasks, -2000)

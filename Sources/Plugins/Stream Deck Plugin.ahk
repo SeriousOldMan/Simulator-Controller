@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Stream Deck Plugin              ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,10 +9,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
-#Include ..\Libraries\CLR.ahk
-#Include ..\Libraries\GDIP.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\CLR.ahk"
+#Include "..\Libraries\GDIP.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -40,67 +40,67 @@ class StreamDeck extends FunctionController {
 	iColumns := false
 
 	iFunctions := []
-	iLabels := {}
-	iIcons := {}
-	iModes := {}
-	iSpecial := {}
+	iLabels := CaseInsenseMap()
+	iIcons := CaseInsenseMap()
+	iModes := CaseInsenseMap()
+	iSpecial := CaseInsenseMap()
 
 	iConnector := false
 
-	iActions := {}
+	iActions := CaseInsenseMap()
 
-	iFunctionTitles := {}
-	iFunctionImages := {}
+	iFunctionTitles := CaseInsenseMap()
+	iFunctionImages := CaseInsenseMap()
 
-	iChangedFunctionTitles := {}
-	iChangedFunctionImages := {}
+	iChangedFunctionTitles := CaseInsenseMap()
+	iChangedFunctionImages := CaseInsenseMap()
 
 	iRefreshActive := false
 	iPendingUpdates := []
 
-	Descriptor[] {
+	Descriptor {
 		Get {
 			return this.Name
 		}
 	}
 
-	Type[] {
+	Type {
 		Get {
 			return "Stream Deck"
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	Layout[] {
+	Layout {
 		Get {
 			return this.iLayout
 		}
 	}
 
-	RowDefinitions[] {
+	RowDefinitions {
 		Get {
 			return this.iRowDefinitions
 		}
 	}
 
-	Rows[] {
+	Rows {
 		Get {
 			return this.iRows
 		}
 	}
 
-	Columns[] {
+	Columns {
 		Get {
 			return this.iColumns
 		}
 	}
 
-	Functions[] {
+	Functions {
 		Get {
 			return this.iFunctions
 		}
@@ -109,7 +109,7 @@ class StreamDeck extends FunctionController {
 	Actions[function := false] {
 		Get {
 			if function
-				return (function ? (this.iActions.HasKey(function) ? this.iActions[function] : []) : [])
+				return (function ? (this.iActions.Has(function) ? this.iActions[function] : []) : [])
 			else
 				return this.iActions
 		}
@@ -118,7 +118,7 @@ class StreamDeck extends FunctionController {
 	Label[function := false] {
 		Get {
 			if function
-				return (this.iLabels.HasKey(function) ? this.iLabels[function] : true)
+				return (this.iLabels.Has(function) ? this.iLabels[function] : true)
 			else
 				return this.iLabels
 		}
@@ -127,7 +127,7 @@ class StreamDeck extends FunctionController {
 	Icon[function := false] {
 		Get {
 			if function
-				return (this.iIcons.HasKey(function) ? this.iIcons[function] : true)
+				return (this.iIcons.Has(function) ? this.iIcons[function] : true)
 			else
 				return this.iIcons
 		}
@@ -144,30 +144,30 @@ class StreamDeck extends FunctionController {
 				if (icon != false) {
 					key := (function . "." . icon)
 
-					if this.iModes.HasKey(key)
+					if this.iModes.Has(key)
 						return this.iModes[key]
 
-					if this.iModes.HasKey(icon)
+					if this.iModes.Has(icon)
 						return this.iModes[icon]
 
-					if this.sModes.HasKey(icon)
-						return this.sModes[icon]
+					if StreamDeck.sModes.Has(icon)
+						return StreamDeck.sModes[icon]
 				}
 
-				return (this.iModes.HasKey(function) ? this.iModes[function] : kIconOrLabel)
+				return (this.iModes.Has(function) ? this.iModes[function] : kIconOrLabel)
 			}
 			else
 				return this.iModes
 		}
 	}
 
-	RefreshActive[] {
+	RefreshActive {
 		Get {
 			return this.iRefreshActive
 		}
 	}
 
-	Connector[] {
+	Connector {
 		Get {
 			return this.iConnector
 		}
@@ -184,7 +184,7 @@ class StreamDeck extends FunctionController {
 
 		this.iConnector := CLR_LoadLibrary(dllFile).CreateInstance("PluginConnector.PluginConnector")
 
-		base.__New(controller, configuration)
+		super.__New(controller, configuration)
 	}
 
 	loadFromConfiguration(configuration) {
@@ -194,31 +194,31 @@ class StreamDeck extends FunctionController {
 		local num2WayToggles := 0
 		local function, special, rows, row, ignore, label, icon, mode, isRunning, layout
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		if !this.sModes {
-			StreamDeck.sModes := {}
+		if !StreamDeck.sModes {
+			StreamDeck.sModes := CaseInsenseMap()
 
 			loop {
-				special := getConfigurationValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
+				special := getMultiMapValue(configuration, "Icons", "*.Icon.Mode." . A_Index, kUndefined)
 
 				if (special == kUndefined)
 					break
 				else {
 					special := string2values(";", special)
 
-					this.sModes[special[1]] := special[2]
+					StreamDeck.sModes[special[1]] := special[2]
 				}
 			}
 		}
 
-		layout := string2Values("x", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
+		layout := string2Values("x", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, "Layout"), ""))
 
 		this.iRows := layout[1]
 		this.iColumns := layout[2]
 
 		loop {
-			special := getConfigurationValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
+			special := getMultiMapValue(configuration, "Icons", this.Layout . ".Icon.Mode." . A_Index, kUndefined)
 
 			if (special == kUndefined)
 				break
@@ -231,17 +231,16 @@ class StreamDeck extends FunctionController {
 
 		rows := []
 
-		loop % this.Rows
-		{
-			row := string2Values(";", getConfigurationValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
+		loop this.Rows {
+			row := string2Values(";", getMultiMapValue(configuration, "Layouts", ConfigurationItem.descriptor(this.Layout, A_Index), ""))
 
 			for ignore, function in row
 				if (function != "") {
 					this.Functions.Push(function)
 
-					icon := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
-					label := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
-					mode := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
+					icon := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Icon", true)
+					label := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Label", true)
+					mode := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode", kIconOrLabel)
 
 					isRunning := this.isRunning()
 
@@ -269,7 +268,7 @@ class StreamDeck extends FunctionController {
 					}
 
 					loop {
-						special := getConfigurationValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
+						special := getMultiMapValue(configuration, "Buttons", this.Layout . "." . function . ".Mode.Icon." . A_Index, kUndefined)
 
 						if (special == kUndefined)
 							break
@@ -280,7 +279,7 @@ class StreamDeck extends FunctionController {
 						}
 					}
 
-					switch ConfigurationItem.splitDescriptor(function)[1] {
+					switch ConfigurationItem.splitDescriptor(function)[1], false {
 						case k1WayToggleType:
 							num1WayToggles += 1
 						case k2WayToggleType:
@@ -303,13 +302,11 @@ class StreamDeck extends FunctionController {
 	}
 
 	isRunning() {
-		Process Exist, SimulatorControllerPlugin.exe
-
-		return (ErrorLevel != 0)
+		return (ProcessExist("SimulatorControllerPlugin.exe") != 0)
 	}
 
 	hasFunction(function) {
-		if IsObject(function)
+		if isObject(function)
 			function := function.Descriptor
 
 		return (inList(this.Functions, function) != false)
@@ -318,7 +315,7 @@ class StreamDeck extends FunctionController {
 	connectAction(plugin, function, action) {
 		local actions := this.Actions
 
-		if actions.HasKey(function)
+		if actions.Has(function)
 			actions[function].Push(action)
 		else
 			actions[function] := Array(action)
@@ -334,7 +331,7 @@ class StreamDeck extends FunctionController {
 		if index
 			actions.RemoveAt(index)
 
-		if (actions.Length() = 0)
+		if (actions.Length = 0)
 			this.Actions.Delete(function)
 
 		this.setControlLabel(function, "")
@@ -344,7 +341,7 @@ class StreamDeck extends FunctionController {
 	setControlLabel(function, text, color := "Black", overlay := false) {
 		local actions, icon, ignore, theAction, displayMode, labelMode
 
-		if !IsObject(function)
+		if !isObject(function)
 			function := this.Controller.findFunction(function)
 
 		if (this.isRunning() && this.hasFunction(function)) {
@@ -381,7 +378,7 @@ class StreamDeck extends FunctionController {
 		local controller := this.Controller
 		local enabled, displayMode, iconMode, ignore, theAction
 
-		if !IsObject(function)
+		if !isObject(function)
 			function := controller.findFunction(function)
 
 		if (this.isRunning() && this.hasFunction(function)) {
@@ -427,7 +424,7 @@ class StreamDeck extends FunctionController {
 			return
 		}
 		else {
-			if this.iFunctionTitles.HasKey(function) {
+			if this.iFunctionTitles.Has(function) {
 				if (this.iFunctionTitles[function] != title)
 					this.iChangedFunctionTitles[function] := true
 			}
@@ -449,7 +446,7 @@ class StreamDeck extends FunctionController {
 			return
 		}
 		else {
-			if this.iFunctionImages.HasKey(function) {
+			if this.iFunctionImages.Has(function) {
 				if (this.iFunctionImages[function] != icon)
 					this.iChangedFunctionImages[function] := true
 			}
@@ -472,13 +469,13 @@ class StreamDeck extends FunctionController {
 
 			try {
 				for theFunction, title in this.iFunctionTitles
-					if (full || (this.iChangedFunctionTitles.HasKey(theFunction) && this.iChangedFunctionTitles[theFunction]))
+					if (full || (this.iChangedFunctionTitles.Has(theFunction) && this.iChangedFunctionTitles[theFunction]))
 						this.setFunctionTitle(theFunction, title, true)
 
 				controller := this.Controller
 
 				for theFunction, image in this.iFunctionImages
-					if (full || (this.iChangedFunctionImages.HasKey(theFunction) && this.iChangedFunctionImages[theFunction])) {
+					if (full || (this.iChangedFunctionImages.Has(theFunction) && this.iChangedFunctionImages[theFunction])) {
 						enabled := false
 
 						function := controller.findFunction(theFunction)
@@ -495,15 +492,15 @@ class StreamDeck extends FunctionController {
 						}
 					}
 
-				this.iChangedFunctionTitles := {}
-				this.iChangedFunctionImages := {}
+				this.iChangedFunctionTitles := CaseInsenseMap()
+				this.iChangedFunctionImages := CaseInsenseMap()
 			}
 			finally {
 				this.iRefreshActive := false
 			}
 
 			for ignore, update in this.iPendingUpdates
-				%update%()
+				update.Call()
 
 			this.iPendingUpdates := []
 		}
@@ -518,12 +515,12 @@ class StreamDeck extends FunctionController {
 disabledIcon(fileName) {
 	local extension, name, disabledFileName, token, bitmap, graphics, x, y, value, red, green, blue, gray
 
-	SplitPath fileName, , , extension, name
+	SplitPath(fileName, , , &extension, &name)
 
 	disabledFileName := (kTempDirectory . "Icons\" . name . "_Dsbld." . extension)
 
 	if !FileExist(disabledFileName) {
-		FileCreateDir %kTempDirectory%Icons
+		DirCreate(kTempDirectory . "Icons")
 
 		token := Gdip_Startup()
 
@@ -531,12 +528,10 @@ disabledIcon(fileName) {
 
 		graphics := Gdip_GraphicsFromImage(bitmap)
 
-		loop % Gdip_GetImageHeight(bitmap)
-		{
+		loop Gdip_GetImageHeight(bitmap) {
 			x := A_Index - 1
 
-			loop % Gdip_GetImageWidth(bitmap)
-			{
+			loop Gdip_GetImageWidth(bitmap) {
 				y := A_Index - 1
 
 				value := Gdip_GetPixel(bitmap, x, y)
@@ -599,9 +594,9 @@ handleStreamDeckMessage(category, data) {
 
 	descriptor := ConfigurationItem.splitDescriptor(function)
 
-	switch descriptor[1] {
+	switch descriptor[1], false {
 		case k1WayToggleType, k2WayToggleType:
-			switchToggle(descriptor[1], descriptor[2], (command.Length() > 1) ? command[2] : "On")
+			switchToggle(descriptor[1], descriptor[2], (command.Length > 1) ? command[2] : "On")
 		case kButtonType:
 			pushButton(descriptor[2])
 		case kDialType:
@@ -613,18 +608,18 @@ handleStreamDeckMessage(category, data) {
 
 initializeStreamDeckPlugin() {
 	local controller := SimulatorController.Instance
-	local configuration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+	local configuration := readMultiMap(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 	local ignore, strmDeck
 
-	for ignore, strmDeck in string2Values("|", getConfigurationValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
+	for ignore, strmDeck in string2Values("|", getMultiMapValue(controller.Configuration, "Controller Layouts", "Stream Decks", "")) {
 		strmDeck := string2Values(":", strmDeck)
 
-		new StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
+		StreamDeck(strmDeck[1], strmDeck[2], controller, configuration)
 	}
 
-	registerMessageHandler("Stream Deck", "handleStreamDeckMessage")
+	registerMessageHandler("Stream Deck", handleStreamDeckMessage)
 
-	new PeriodicTask("refreshStreamDecks", 5000, kLowPriority).start()
+	PeriodicTask(refreshStreamDecks, 5000, kLowPriority).start()
 }
 
 

@@ -9,109 +9,115 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Localization.ahk
-#Include ..\Framework\Configuration.ahk
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                        Private Variable Section                         ;;;
-;;;-------------------------------------------------------------------------;;;
-
-global vProgressIsOpen := false
-global vProgressBar
-global vProgressTitle
-global vProgressMessage
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Localization.ahk"
+#Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\GUI.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showProgress(options) {
+showProgress(options := unset) {
 	local x, y, w, h, color, count
-	local secondScreen, secondScreenLeft, secondScreenRight, secondScreenTop, secondScreenBottom
+	local screenLeft, screenRight, screenTop, screenBottom
+	local newOptions, key, value
 
-	static popupPosition := false
+	static popupPosition
 
-	if !vProgressIsOpen {
-		if !popupPosition
-			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-												 , "General", "Popup Position", "Bottom")
+	static progressGui := false
+	static progressBar
+	static progressTitle
+	static progressMessage
 
-		if options.HasKey("X")
-			x := options.X
-		else if options.HasKey("Width")
-			x := Round((A_ScreenWidth - options.Width) / 2)
-		else
-			x := Round((A_ScreenWidth - 300) / 2)
+	if (isSet(options) && !options && progressGui) {
+		progressGui.Destroy()
 
-		if options.HasKey("Y")
-			y := options.Y
-		else {
-			SysGet count, MonitorCount
+		progressGui := false
+	}
+	else {
+		if !progressGui {
+			if !isSet(popupPosition)
+				popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+												, "General", "Popup Position", "Bottom")
 
-			if (count > 1)
-				SysGet, secondScreen, MonitorWorkArea, 2
+			if !isSet(options)
+				options := {}
 
-			if ((count > 1) && (popupPosition = "2nd Screen Top"))
-				y := (secondScreenTop + 150)
-			else if ((count > 1) && (popupPosition = "2nd Screen Bottom"))
-				y := (secondScreenTop + (secondScreenBottom - secondScreenTop) - 150)
+			w := (options.HasProp("Width") ? options.Width : 280)
+			h := 90
+
+			if options.HasProp("X")
+				x := options.X
 			else
-				y := ((popupPosition = "Top") ? 150 : A_ScreenHeight - 150)
+				x := "Center"
+
+			if options.HasProp("Y")
+				y := options.Y
+			else
+				y := popupPosition
+
+			if InStr(popupPosition, "2nd Screen")
+				MonitorGetWorkArea(1 + ((MonitorGetCount() > 1) ? 1 : 0), &screenLeft, &screenTop, &screenRight, &screenBottom)
+			else
+				MonitorGetWorkArea(, &screenLeft, &screenTop, &screenRight, &screenBottom)
+
+			if !isInteger(x)
+				switch x, false {
+					case "Left":
+						x := 25
+					case "Right":
+						x := screenRight - w - 25
+					default:
+						x := Round(screenLeft + ((screenRight - screenLeft) / 2) - (w / 2))
+				}
+
+			if !isInteger(y)
+				switch y, false {
+					case "Top", "2nd Screen Top":
+						y := screenTop + 25
+					case "Bottom", "2nd Screen Bottom":
+						y := screenBottom - h - 25
+					default:
+						y := Round(screenTop + ((screenBottom - screenTop) / 2) - (h / 2))
+				}
+
+			color := (options.HasProp("Color") ? options.Color : "Green")
+
+			progressGui := Window()
+
+			progressGui.SetFont("s10 Bold", "Arial")
+
+			progressTitle := progressGui.Add("Text", "x10 w" . (w - 20) . " Center")
+
+			progressBar := progressGui.Add("Progress", "x10 y30 w" . (w - 20) . " h20 c" . color . " BackgroundGray", "0")
+
+			progressGui.SetFont("s8 Norm", "Arial")
+
+			progressMessage := progressGui.Add("Text", "x10 y55 w" . (w - 20) . " Center")
+
+			progressGui.Opt("+AlwaysOnTop")
+			progressGui.Show("x" . x . " y" . y . " AutoSize NoActivate")
 		}
 
-		if options.HasKey("Width")
-			w := (options.Width - 20)
-		else
-			w := 280
+		if options.HasProp("title")
+			progressTitle.Value := options.Title
 
-		color := options.HasKey("Color") ? options.color : "Green"
+		if options.HasProp("message")
+			progressMessage.Value := options.Message
 
-		Gui Progress:Default
-		Gui Progress:-Border ; -Caption
-		Gui Progress:Color, D0D0D0, D8D8D8
+		if options.HasProp("progress")
+			progressBar.Value := Round(options.Progress)
 
-		Gui Progress:Font, s10 Bold, Arial
-		Gui Progress:Add, Text, x10 w%w% Center vvProgressTitle
-
-		Gui Progress:Add, Progress, x10 y30 w%w% h20 c%color% BackgroundGray vvProgressBar, 0
-
-		Gui Progress:Font, s8 Norm, Arial
-		Gui Progress:Add, Text, x10 y55 w%w% Center vvProgressMessage
-
-		Gui Progress:+AlwaysOnTop
-		Gui Progress:Show, x%x% y%y% AutoSize NoActivate
-
-		vProgressIsOpen := true
+		if options.HasProp("color")
+			progressBar.Opt("+c" . options.Color)
 	}
 
-	Gui Progress:Default
-
-	if options.HasKey("title")
-		GuiControl, , vProgressTitle, % options.title
-
-	if options.HasKey("message")
-		GuiControl, , vProgressMessage, % options.message
-
-	if options.HasKey("progress")
-		GuiControl, , vProgressBar, % Round(options.progress)
-
-	if options.HasKey("color") {
-		color := options.color
-
-		GuiControl +c%color%, vProgressBar
-	}
-
-	return "Progress"
+	return progressGui
 }
 
 hideProgress() {
-	if vProgressIsOpen {
-		Gui Progress:Destroy
-
-		vProgressIsOpen := false
-	}
+	showProgress(false)
 }

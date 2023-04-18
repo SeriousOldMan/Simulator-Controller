@@ -9,15 +9,15 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\ConfigurationItemList.ahk
-#Include Libraries\ConfigurationEditor.ahk
+#Include "ConfigurationItemList.ahk"
+#Include "ConfigurationEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,54 +28,101 @@
 ;;; TranslationsEditor                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global translationLanguageDropDown
-global addLanguageButton
-global deleteLanguageButton
+class TranslationsEditor extends ConfiguratorPanel {
+	iWindow := false
 
-global isoCodeEdit := ""
-global languageNameEdit := ""
-
-class TranslationsEditor extends ConfigurationItem {
 	iLanguagesChanged := false
 	iTranslationsList := false
 	iClosed := false
 
-	TranslationsList[] {
+	class TranslationsWindow extends Window {
+		iEditor := false
+
+		__New(editor) {
+			this.iEditor := editor
+
+			super.__New({Descriptor: "Translations Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
+		}
+
+		Close(*) {
+			this.iEditor.closeEditor()
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	TranslationsList {
 		Get {
 			return this.iTranslationsList
 		}
 	}
 
 	__New(configuration) {
-		this.iTranslationsList := new TranslationsList(configuration)
+		this.iTranslationsList := TranslationsList(configuration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		TranslationsEditor.Instance := this
-
-		this.createGui(configuration)
 	}
 
 	createGui(configuration) {
-		local choices, chosen, code, language
+		local choices, chosen, code, language, languageName, isoCode
 
-		Gui TE:Default
+		static translationGui
 
-		Gui TE:-Border ; -Caption
-		Gui TE:Color, D0D0D0, D8D8D8
+		addLanguage(*) {
+			protectionOn()
 
-		Gui TE:Font, Bold, Arial
+			try {
+				this.addLanguage()
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui TE:Add, Text, w388 Center gmoveTranslationsEditor, % translate("Modular Simulator Controller System")
+		deleteLanguage(*) {
+			protectionOn()
 
-		Gui TE:Font, Norm, Arial
-		Gui TE:Font, Italic Underline, Arial
+			try {
+				this.deleteLanguage()
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui TE:Add, Text, x158 YP+20 w88 cBlue Center gopenTranslationsDocumentation, % translate("Translations")
+		chooseTranslationLanguage(*) {
+			protectionOn()
 
-		Gui TE:Font, Norm, Arial
+			try {
+				this.chooseLanguage()
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui TE:Add, Text, x50 y+10 w310 0x10
+		translationGui := TranslationsEditor.TranslationsWindow(this)
+
+		this.Window := translationGui
+
+		translationGui.SetFont("Bold", "Arial")
+
+		translationGui.Add("Text", "w388 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(translationGui, "Translations Editor"))
+
+		translationGui.SetFont("Norm", "Arial")
+		translationGui.SetFont("Italic Underline", "Arial")
+
+		translationGui.Add("Text", "x158 YP+20 w88 H:Center cBlue Center", translate("Translations")).OnEvent("Click", openDocumentation.Bind(translationGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor"))
+
+		translationGui.SetFont("Norm", "Arial")
+
+		translationGui.Add("Text", "x50 y+10 w310 W:Grow 0x10")
 
 		choices := []
 		chosen := 0
@@ -83,53 +130,59 @@ class TranslationsEditor extends ConfigurationItem {
 		for code, language in availableLanguages() {
 			choices.Push(language)
 
-			if (language == languageDropDown) {
+			if (code == getLanguage()) {
 				chosen := A_Index
 
-				isoCodeEdit := code
-				languageNameEdit := language
+				isoCode := code
+				languageName := language
 			}
 		}
 
-		Gui TE:Add, Text, x16 w160 h23 +0x200, % translate("Language")
-		Gui TE:Add, DropDownList, x184 yp w158 Choose%chosen% VtranslationLanguageDropDown gchooseTranslationLanguage, % values2String("|", choices*)
-		Gui TE:Add, Button, x343 yp-1 w23 h23 HwndaddLanguageButtonHandle VaddLanguageButton gaddLanguage
-		Gui TE:Add, Button, x368 yp w23 h23 HwnddeleteLanguageButtonHandle VdeleteLanguageButton gdeleteLanguage
-		setButtonIcon(addLanguageButtonHandle, kIconsDirectory . "Plus.ico", 1)
-		setButtonIcon(deleteLanguageButtonHandle, kIconsDirectory . "Minus.ico", 1)
+		translationGui.Add("Text", "x16 w160 h23 +0x200", translate("Language"))
+		translationGui.Add("DropDownList", "x184 yp w158 W:Grow(0.2) Choose" . chosen . " vtranslationLanguageDropDown", choices).OnEvent("Change", chooseTranslationLanguage)
 
-		Gui TE:Add, Text, x16 w160 h23 +0x200, % translate("ISO Code / Identifier")
-		Gui TE:Add, Edit, x184 yp w40 h21 Disabled VisoCodeEdit, %isoCodeEdit%
-		Gui TE:Add, Edit, x236 yp w155 h21 Disabled VlanguageNameEdit, %languageNameEdit%
+		translationGui.Add("Button", "x343 yp-1 w23 h23 X:Move(0.2) vaddLanguageButton").OnEvent("Click", addLanguage)
+		translationGui.Add("Button", "x368 yp w23 h23 X:Move(0.2) vdeleteLanguageButton").OnEvent("Click", deleteLanguage)
 
-		this.iTranslationsList.createGui(configuration)
+		setButtonIcon(translationGui["addLanguageButton"], kIconsDirectory . "Plus.ico", 1)
+		setButtonIcon(translationGui["deleteLanguageButton"], kIconsDirectory . "Minus.ico", 1)
 
-		Gui TE:Add, Text, x50 y+10 w310 0x10
+		translationGui.Add("Text", "x16 w160 h23 +0x200", translate("ISO Code / Identifier"))
+		translationGui.Add("Edit", "x184 yp w40 h21 Disabled visoCodeEdit", isoCode)
+		translationGui.Add("Edit", "x236 yp w155 h21 W:Grow(0.2) Disabled vlanguageNameEdit", languageName)
 
-		Gui TE:Add, Button, x166 yp+10 w80 h23 Default GcloseTranslationsEditor, % translate("Close")
+		this.iTranslationsList.createGui(this, configuration)
 	}
 
-	editTranslations() {
-		local x, y
+	editTranslations(owner := false) {
+		local window, x, y, w, h
 
-		if getWindowPosition("Translations Editor", x, y)
-			Gui TE:Show, x%x% y%y%
+		this.createGui(this.Configuration)
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		if getWindowPosition("Translations Editor", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui TE:Show
+			window.Show()
 
-		GuiControlGet isoCodeEdit
+		if getWindowSize("Translations Editor", &w, &h)
+			window.Resize("Initialize", w, h)
 
-		this.iTranslationsList.loadTranslations((isoCodeEdit != "") ? isoCodeEdit : "en")
+		this.iTranslationsList.loadTranslations((this.Control["isoCodeEdit"].Text != "") ? this.Control["isoCodeEdit"].Text : "en")
 
 		loop
-			Sleep 200
+			Sleep(200)
 		until this.iClosed
 
 		try {
 			return this.iLanguagesChanged
 		}
 		finally {
-			Gui TE:Destroy
+			window.Destroy()
 		}
 	}
 
@@ -137,9 +190,6 @@ class TranslationsEditor extends ConfigurationItem {
 		local choices, chosen, found, code, language
 
 		if this.iTranslationsList.saveTranslations() {
-			GuiControlGet isoCodeEdit
-			GuiControlGet languageNameEdit
-
 			choices := []
 			chosen := 0
 			found := false
@@ -147,19 +197,20 @@ class TranslationsEditor extends ConfigurationItem {
 			for code, language in availableLanguages() {
 				choices.Push(language)
 
-				if (code = isoCodeEdit) {
+				if (code = this.Control["isoCodeEdit"].Text) {
 					chosen := A_Index
 					found := true
 				}
 			}
 
 			if !found {
-				choices.Push(languageNameEdit)
-				chosen := choices.Length()
+				choices.Push(this.Control["languageNameEdit"].Text)
+				chosen := choices.Length
 			}
 
-			GuiControl, , translationLanguageDropDown, % "|" . values2String("|", choices*)
-			GuiControl Choose, translationLanguageDropDown, % chosen
+			this.Control["translationLanguageDropDown"].Delete()
+			this.Control["translationLanguageDropDown"].Add(choices)
+			this.Control["translationLanguageDropDown"].Choose(chosen)
 		}
 	}
 
@@ -174,100 +225,91 @@ class TranslationsEditor extends ConfigurationItem {
 		local ignore, language
 
 		this.iLanguagesChanged := true
+
 		this.saveTranslations()
 
 		for ignore, language in availableLanguages()
 			choices.Push(language)
 
-		isoCodeEdit := "XX"
-		languageNameEdit := translate("New Language")
+		this.Control["isoCodeEdit"].Text := "XX"
+		this.Control["languageNameEdit"].Text := translate("New Language")
 
-		choices.Push(languageNameEdit)
+		choices.Push(this.Control["languageNameEdit"].Text)
 
-		GuiControl, , translationLanguageDropDown, % "|" . values2String("|", choices*)
-		GuiControl Choose, translationLanguageDropDown, % choices.Length()
+		this.Control["translationLanguageDropDown"].Delete()
+		this.Control["translationLanguageDropDown"].Add(choices)
+		this.Control["translationLanguageDropDown"].Choose(choices.Length)
 
-		GuiControl Text, isoCodeEdit, %isoCodeEdit%
-		GuiControl Text, languageNameEdit, %languageNameEdit%
-
-		GuiControl Enable, isoCodeEdit
-		GuiControl Enable, languageNameEdit
+		this.Control["isoCodeEdit"].Enabled := true
+		this.Control["languageNameEdit"].Enabled := true
 
 		this.iTranslationsList.newTranslations()
 	}
 
 	deleteLanguage() {
-		local title, languageCode, code, language, ignore, fileName
+		local msgResult, languageCode, code, language, ignore, fileName
 
-		GuiControlGet translationLanguageDropDown
+		SoundPlay("*32")
 
-		SoundPlay *32
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to delete this translation?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-		title := translate("Delete")
-		MsgBox 262436, %title%, % translate("Do you really want to delete this translation?")
-		OnMessage(0x44, "")
-
-		IfMsgBox Yes
-		{
+		if (msgResult = "Yes") {
 			this.iLanguagesChanged := true
 
 			languageCode := kUndefined
 
 			for code, language in availableLanguages()
-				if ((language = translationLanguageDropDown) && (code != "en"))
+				if ((language = this.Control["translationLanguageDropDown"].Text) && (code != "en"))
 					languageCode := code
 
 			if (languageCode != kUndefined)
 				for ignore, fileName in getFileNames("Translations." . languageCode, kUserTranslationsDirectory)
 					deleteFile(fileName)
 
-			this.chooseLanguage("en")
+			this.chooseLanguage("en", false)
 		}
 	}
 
-	chooseLanguage(languageCode := false) {
-		local availableLanguages, code, language, choices, chosen
+	chooseLanguage(languageCode := false, save := true) {
+		local allLanguages, code, language, choices, chosen
 
-		this.iTranslationsList.saveTranslations()
+		if save
+			this.iTranslationsList.saveTranslations()
 
-		availableLanguages := availableLanguages()
+		allLanguages := availableLanguages()
 
-		if !languageCode {
-			GuiControlGet translationLanguageDropDown
-
-			for code, language in availableLanguages
-				if (language = translationLanguageDropDown) {
+		if !languageCode
+			for code, language in allLanguages
+				if (language = this.Control["translationLanguageDropDown"].Text) {
 					languageCode := code
 
 					break
 				}
-		}
 
 		choices := []
 		chosen := 0
 
-		for code, language in availableLanguages {
+		for code, language in allLanguages {
 			choices.Push(language)
 
 			if (code = languageCode) {
-				isoCodeEdit := code
-				languageNameEdit := language
+				this.Control["isoCodeEdit"].Text := code
+				this.Control["languageNameEdit"].Text := language
 
 				chosen := A_Index
 			}
 		}
 
-		GuiControl, , translationLanguageDropDown, % "|" . values2String("|", choices*)
-		GuiControl Choose, translationLanguageDropDown, %chosen%
+		this.Control["translationLanguageDropDown"].Delete()
+		this.Control["translationLanguageDropDown"].Add(choices)
+		this.Control["translationLanguageDropDown"].Choose(chosen)
 
-		GuiControl Text, isoCodeEdit, %isoCodeEdit%
-		GuiControl Text, languageNameEdit, %languageNameEdit%
+		this.Control["isoCodeEdit"].Enabled := false
+		this.Control["languageNameEdit"].Enabled := false
 
-		GuiControl Disable, isoCodeEdit
-		GuiControl Disable, languageNameEdit
-
-		this.iTranslationsList.loadTranslations(isoCodeEdit)
+		this.iTranslationsList.loadTranslations(this.Control["isoCodeEdit"].Text)
 	}
 }
 
@@ -275,41 +317,51 @@ class TranslationsEditor extends ConfigurationItem {
 ;;; TranslationsList                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global translationsListView
-
-global originalTextEdit := ""
-global translationTextEdit := ""
-
-global nextUntranslatedButtonHandle
-
 class TranslationsList extends ConfigurationItemList {
 	iChanged := false
 	iLanguageCode := ""
 
 	__New(configuration) {
-		base.__New(configuration)
+		super.__New(configuration)
 
 		TranslationsList.Instance := this
 	}
 
-	createGui(configuration) {
+	createGui(editor, configuration) {
+		local window := editor.Window
 		local option
 
-		Gui TE:Add, ListView, x16 y+10 w377 h140 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndtranslationsListViewHandle VtranslationsListView glistEvent
-							, % values2String("|", map(["Original", "Translation"], "translate")*)
+		nextUntranslated(*) {
+			local untranslated
 
-		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Original")
-		Gui TE:Add, Edit, x110 yp w283 h80 Disabled VoriginalTextEdit, %originalTextEdit%
+			protectionOn()
 
-		Gui TE:Add, Text, x16 w86 h23 +0x200, % translate("Translation")
+			try {
+				untranslated := this.findNextUntranslated()
+
+				if untranslated
+					this.openEditor(untranslated)
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		window.Add("ListView", "x16 y+10 w377 h140 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VtranslationsListView", collect(["Original", "Translation"], translate))
+
+		window.Add("Text", "x16 w86 h23 Y:Move +0x200", translate("Original"))
+		window.Add("Edit", "x110 yp w283 h80 Y:Move W:Grow Disabled voriginalTextEdit")
+
+		window.Add("Text", "x16 w86 h23 Y:Move +0x200", translate("Translation"))
 
 		option := (this.iLanguageCode = "en") ? "Disabled" : ""
 
-		Gui TE:Add, Button, x85 yp w23 h23 %option% Default HwndnextUntranslatedButtonHandle gnextUntranslated
-		setButtonIcon(nextUntranslatedButtonHandle, kIconsDirectory . "Down Arrow.ico", 1)
-		Gui TE:Add, Edit, x110 yp w283 h80 VtranslationTextEdit, %translationTextEdit%
+		window.Add("Button", "x85 yp w23 h23 Y:Move " . option . " Default vnextUntranslatedButton").OnEvent("Click", nextUntranslated)
+		setButtonIcon(window["nextUntranslatedButton"], kIconsDirectory . "Down Arrow.ico", 1)
 
-		this.initializeList(translationsListViewHandle, "translationsListView")
+		window.Add("Edit", "x110 yp w283 h80 Y:Move W:Grow VtranslationTextEdit")
+
+		this.initializeList(editor, window["translationsListView"])
 	}
 
 	loadList(items) {
@@ -317,115 +369,106 @@ class TranslationsList extends ConfigurationItemList {
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
+		if (first != this.Control["translationsListView"])
+			first := true
 
-		count := LV_GetCount()
+		count := this.Control["translationsListView"].GetCount()
 
 		for index, translation in this.ItemList
 			if (index <= count)
-				LV_Modify(index, "", translation[1], translation[2])
+				this.Control["translationsListView"].Modify(index, "", translation[1], translation[2])
 			else
-				LV_Add("", translation[1], translation[2])
+				this.Control["translationsListView"].Add("", translation[1], translation[2])
 
-		if (items.Length() < count)
-			loop % count - items.Length()
-				LV_Delete(count - A_Index - 1)
+		if (items.Length < count)
+			loop count - items.Length
+				this.Control["translationsListView"].Delete(count - A_Index + 1)
 
-		if (first || (this.iLanguageCode = "en")) {
-			LV_ModifyCol()
-			LV_ModifyCol(1, 150)
-			LV_ModifyCol(2, 300)
+		if ((first == true) || (this.iLanguageCode = "en")) {
+			this.Control["translationsListView"].ModifyCol()
+			this.Control["translationsListView"].ModifyCol(1, 150)
+			this.Control["translationsListView"].ModifyCol(2, 300)
 
-			first := false
+			first := this.Control["translationsListView"]
 		}
 	}
 
 	updateState() {
-		base.updateState()
+		super.updateState()
 	}
 
 	loadEditor(item) {
-		originalTextEdit := item[1]
-		translationTextEdit := item[2]
+		local originalText := item[1]
+		local translationText := item[2]
 
-		if (translationTextEdit == "")
-			translationTextEdit := originalTextEdit
+		if (translationText == "")
+			translationText := originalText
 
-		GuiControl Text, originalTextEdit, %originalTextEdit%
-		GuiControl Text, translationTextEdit, %translationTextEdit%
+		this.Control["originalTextEdit"].Text := originalText
+		this.Control["translationTextEdit"].Text := translationText
 	}
 
 	clearEditor() {
-		originalTextEdit := ""
-		translationTextEdit := ""
-
-		GuiControl Text, originalTextEdit, %originalTextEdit%
-		GuiControl Text, translationTextEdit, %translationTextEdit%
+		this.Control["originalTextEdit"].Text := ""
+		this.Control["translationTextEdit"].Text := ""
 	}
 
 	buildItemFromEditor(isNew := false) {
-		GuiControlGet originalTextEdit
-		GuiControlGet translationTextEdit
+		local originalText := this.Control["originalTextEdit"].Text
+		local translationText := this.Control["translationTextEdit"].Text
 
-		translationTextEdit := (translationTextEdit == originalTextEdit) ? "" : translationTextEdit
+		translationText := (translationText == originalText) ? "" : translationText
 
 		if isNew
 			this.iChanged := true
 		else
-			this.iChanged := this.iChanged || (this.ItemList[this.CurrentItem][2] != translationTextEdit)
+			this.iChanged := this.iChanged || (this.ItemList[this.CurrentItem][2] != translationText)
 
-		return Array(originalTextEdit, translationTextEdit)
+		return Array(originalText, translationText)
 	}
 
 	openEditor(itemIndex) {
-		if (this.CurrentItem != 0) {
-			GuiControlGet translationTextEdit
-
-			if (this.ItemList[this.CurrentItem][2] != translationTextEdit)
+		if (this.CurrentItem != 0)
+			if (this.ItemList[this.CurrentItem][2] != this.Control["translationTextEdit"].Text)
 				this.updateItem()
-		}
 
-		base.openEditor(itemIndex)
+		super.openEditor(itemIndex)
 	}
 
 	findNextUntranslated() {
-		local index, translation, title
+		local index, translation
 
 		for index, translation in this.ItemList
 			if ((index > this.CurrentItem) && (translation[2] = ""))
 				return index
 
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		title := translate("Information")
-		MsgBox 262192, %title%, % translate("There is no missing translation...")
-		OnMessage(0x44, "")
+		OnMessage(0x44, translateOkButton)
+		MsgBox(translate("There is no missing translation..."), translate("Information"), 262192)
+		OnMessage(0x44, translateOkButton, 0)
 
 		return false
 	}
 
 	newTranslations() {
-		this.loadTranslations("en")
+		this.loadTranslations("xx", true)
 
 		this.iChanged := true
 	}
 
-	loadTranslations(languageCode) {
+	loadTranslations(languageCode, new := false) {
 		local translations, original, translation
 
 		this.iLanguageCode := languageCode
 
-		if (languageCode = "en")
-			GuiControl Disable, %nextUntranslatedButtonHandle%
-		else
-			GuiControl Enable, %nextUntranslatedButtonHandle%
+		this.Control["nextUntranslatedButton"].Enabled := (languageCode != "en")
 
 		this.ItemList := []
 
-		translations := readTranslations(this.iLanguageCode)
+		translations := readTranslations((this.iLanguageCode = "xx") ? "en" : this.iLanguageCode, true, true)
 
 		if (this.iLanguageCode != "en")
 			for original, translation in readTranslations("en")
-				if !translations.HasKey(original)
+				if !translations.Has(original)
 					translations[original] := translation
 
 		for original, translation in translations
@@ -439,39 +482,33 @@ class TranslationsList extends ConfigurationItemList {
 	}
 
 	saveTranslations() {
-		local title, translations, ignore, item, original, translated, title
+		local msgResult, translations, ignore, item, original, translated, title
 
 		if (this.CurrentItem != 0)
 			this.updateItem()
 
 		if this.iChanged {
-			SoundPlay *32
+			SoundPlay("*32")
 
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Save")
-			MsgBox 262436, %title%, % translate("Do you want to save your changes? Any existing translations will be overwritten.")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Do you want to save your changes? Any existing translations will be overwritten."), translate("Save"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-			IfMsgBox Yes
-			{
+			if (msgResult = "Yes") {
 				this.iChanged := false
 
-				translations := {}
+				translations := CaseInsenseMap()
 
-				GuiControlGet isoCodeEdit
-				GuiControlGet languageNameEdit
-
-				this.iLanguageCode := isoCodeEdit
+				this.iLanguageCode := this.Control["isoCodeEdit"].Text
 
 				for ignore, item in this.ItemList {
 					original := item[1]
 					translated := item[2]
 
-					if (translations.HasKey(original) && (translated != translations[original])) {
-						OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-						title := translate("Error")
-						MsgBox 262160, %title%, % translate("Inconsistent translations detected - please correct...")
-						OnMessage(0x44, "")
+					if (translations.Has(original) && (translated != translations[original])) {
+						OnMessage(0x44, translateOkButton)
+						MsgBox(translate("Inconsistent translations detected - please correct..."), translate("Error"), 262160)
+						OnMessage(0x44, translateOkButton, 0)
 
 						return false
 					}
@@ -479,13 +516,13 @@ class TranslationsList extends ConfigurationItemList {
 					translations[original] := translated
 				}
 
-				Gui TE:+Disabled
+				this.Window.Opt("+Disabled")
 
 				try {
-					writeTranslations(isoCodeEdit, languageNameEdit, translations)
+					writeTranslations(this.iLanguageCode , this.Control["languageNameEdit"].Text, translations)
 				}
 				finally {
-					Gui TE:-Disabled
+					this.Window.Opt("-Disabled")
 				}
 
 				return true
@@ -493,79 +530,5 @@ class TranslationsList extends ConfigurationItemList {
 		}
 
 		return false
-	}
-}
-
-
-;;;-------------------------------------------------------------------------;;;
-;;;                   Private Function Declaration Section                  ;;;
-;;;-------------------------------------------------------------------------;;;
-
-addLanguage(){
-	protectionOn()
-
-	try {
-		TranslationsEditor.Instance.addLanguage()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-deleteLanguage() {
-	protectionOn()
-
-	try {
-		TranslationsEditor.Instance.deleteLanguage()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-closeTranslationsEditor() {
-	protectionOn()
-
-	try {
-		TranslationsEditor.Instance.closeEditor()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-moveTranslationsEditor() {
-	moveByMouse("TE", "Translations Editor")
-}
-
-chooseTranslationLanguage() {
-	protectionOn()
-
-	try {
-		TranslationsEditor.Instance.chooseLanguage()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-openTranslationsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor
-}
-
-nextUntranslated() {
-	local list, untranslated
-
-	protectionOn()
-
-	try {
-		list := TranslationsEditor.Instance.TranslationsList
-		untranslated := list.findNextUntranslated()
-
-		if untranslated
-			list.openEditor(untranslated)
-	}
-	finally {
-		protectionOff()
 	}
 }

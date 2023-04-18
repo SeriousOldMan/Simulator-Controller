@@ -10,11 +10,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Framework\Production.ahk
+;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Microphon.ico
@@ -25,17 +25,17 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Process.ahk
+#Include "..\Framework\Process.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Libraries\Messages.ahk
-#Include ..\Libraries\SpeechSynthesizer.ahk
-#Include ..\Libraries\SpeechRecognizer.ahk
+#Include "..\Libraries\Task.ahk"
+#Include "..\Libraries\Messages.ahk"
+#Include "..\Libraries\SpeechSynthesizer.ahk"
+#Include "..\Libraries\SpeechRecognizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -55,7 +55,7 @@ global kDebugRecognitions := 4
 class VoiceServer extends ConfigurationItem {
 	iDebug := kDebugOff
 
-	iVoiceClients := {}
+	iVoiceClients := CaseInsenseMap()
 	iActiveVoiceClient := false
 
 	iLanguage := "en"
@@ -107,18 +107,18 @@ class VoiceServer extends ConfigurationItem {
 
 		iActivationCallback := false
 		iDeactivationCallback := false
-		iVoiceCommands := {}
+		iVoiceCommands := CaseInsenseMap()
 
 		class ClientSpeechSynthesizer extends SpeechSynthesizer {
 			iVoiceClient := false
 
-			Routing[] {
+			Routing {
 				Get {
 					return this.VoiceClient.Routing
 				}
 			}
 
-			VoiceClient[] {
+			VoiceClient {
 				Get {
 					return this.iVoiceClient
 				}
@@ -127,20 +127,20 @@ class VoiceServer extends ConfigurationItem {
 			__New(voiceClient, arguments*) {
 				this.iVoiceClient := voiceClient
 
-				base.__New(arguments*)
+				super.__New(arguments*)
 			}
 		}
 
 		class ClientSpeechRecognizer extends SpeechRecognizer {
 			iVoiceClient := false
 
-			Routing[] {
+			Routing {
 				Get {
 					return this.VoiceClient.Routing
 				}
 			}
 
-			VoiceClient[] {
+			VoiceClient {
 				Get {
 					return this.iVoiceClient
 				}
@@ -149,107 +149,107 @@ class VoiceServer extends ConfigurationItem {
 			__New(voiceClient, arguments*) {
 				this.iVoiceClient := voiceClient
 
-				base.__New(arguments*)
+				super.__New(arguments*)
 			}
 		}
 
-		Routing[] {
+		Routing {
 			Get {
 				return this.iRouting
 			}
 		}
 
-		VoiceServer[] {
+		VoiceServer {
 			Get {
 				return this.iVoiceServer
 			}
 		}
 
-		Descriptor[] {
+		Descriptor {
 			Get {
 				return this.iDescriptor
 			}
 		}
 
-		PID[] {
+		PID {
 			Get {
 				return this.iPID
 			}
 		}
 
-		Language[] {
+		Language {
 			Get {
 				return this.iLanguage
 			}
 		}
 
-		Synthesizer[] {
+		Synthesizer {
 			Get {
 				return this.iSynthesizer
 			}
 		}
 
-		Speaker[] {
+		Speaker {
 			Get {
 				return this.iSpeaker
 			}
 		}
 
-		Speaking[] {
+		Speaking {
 			Get {
 				return this.iSpeaking
 			}
 		}
 
-		Recognizer[] {
+		Recognizer {
 			Get {
 				return this.iRecognizer
 			}
 		}
 
-		Listener[] {
+		Listener {
 			Get {
 				return this.iListener
 			}
 		}
 
-		Listening[] {
+		Listening {
 			Get {
 				return this.iListening
 			}
 		}
 
-		SpeakerVolume[] {
+		SpeakerVolume {
 			Get {
 				return this.iSpeakerVolume
 			}
 		}
 
-		SpeakerPitch[] {
+		SpeakerPitch {
 			Get {
 				return this.iSpeakerPitch
 			}
 		}
 
-		SpeakerSpeed[] {
+		SpeakerSpeed {
 			Get {
 				return this.iSpeakerSpeed
 			}
 		}
 
-		ActivationCallback[] {
+		ActivationCallback {
 			Get {
 				return this.iActivationCallback
 			}
 		}
 
-		DeactivationCallback[] {
+		DeactivationCallback {
 			Get {
 				return this.iDeactivationCallback
 			}
 		}
 
-		VoiceCommands[key := "__Undefined__"] {
+		VoiceCommands[key := kUndefined] {
 			Get {
 				if (key != kUndefined)
 					return this.iVoiceCommands[key]
@@ -268,7 +268,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechSynthesizer[create := false] {
 			Get {
 				if (!this.iSpeechSynthesizer && create && this.Speaker) {
-					this.iSpeechSynthesizer := new this.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language)
+					this.iSpeechSynthesizer := VoiceServer.VoiceClient.ClientSpeechSynthesizer(this, this.Synthesizer, this.Speaker, this.Language)
 
 					this.iSpeechSynthesizer.setVolume(this.SpeakerVolume)
 					this.iSpeechSynthesizer.setPitch(this.SpeakerPitch)
@@ -279,19 +279,19 @@ class VoiceServer extends ConfigurationItem {
 			}
 		}
 
-		Muted[] {
+		Muted {
 			Get {
 				return this.iMuted
 			}
 		}
 
-		Interrupted[] {
+		Interrupted {
 			Get {
 				return this.iInterrupted
 			}
 		}
 
-		Interruptable[] {
+		Interruptable {
 			Get {
 				return this.iInterruptable
 			}
@@ -300,7 +300,7 @@ class VoiceServer extends ConfigurationItem {
 		SpeechRecognizer[create := false] {
 			Get {
 				if (!this.iSpeechRecognizer && create && this.Listener)
-					this.iSpeechRecognizer := new this.ClientSpeechRecognizer(this, this.Recognizer, this.Listener, this.Language)
+					this.iSpeechRecognizer := VoiceServer.VoiceClient.ClientSpeechRecognizer(this, this.Recognizer, this.Listener, this.Language)
 
 				return this.iSpeechRecognizer
 			}
@@ -330,7 +330,7 @@ class VoiceServer extends ConfigurationItem {
 			local stopped, oldSpeaking, oldInterruptable
 
 			while this.Muted
-				Sleep 100
+				Sleep(100)
 
 			this.iInterrupted := false
 
@@ -351,10 +351,10 @@ class VoiceServer extends ConfigurationItem {
 								this.SpeechSynthesizer[true].speak(text, true)
 
 							if this.Interrupted {
-								Sleep 2000
+								Sleep(2000)
 
 								while this.Muted
-									Sleep 100
+									Sleep(100)
 
 								this.iInterrupted := false
 							}
@@ -384,7 +384,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 				else {
 					if this.VoiceServer.PushToTalk
-						SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+						SoundPlay(kResourcesDirectory . "Sounds\Talk.wav")
 
 					this.iListening := true
 
@@ -451,7 +451,7 @@ class VoiceServer extends ConfigurationItem {
 
 				grammar := ("__Grammar." . this.iCounter++)
 			}
-			else if this.VoiceCommands.HasKey(grammar) {
+			else if this.VoiceCommands.Has(grammar) {
 				descriptor := this.VoiceCommands[grammar]
 
 				if ((descriptor[1] = command) && (descriptor[2] = callback))
@@ -461,17 +461,17 @@ class VoiceServer extends ConfigurationItem {
 			if this.VoiceServer.Debug[kDebugGrammars] {
 				nextCharIndex := 1
 
-				showMessage("Register command phrase: " . new GrammarCompiler(recognizer).readGrammar(command, nextCharIndex).toString())
+				showMessage("Register command phrase: " . GrammarCompiler(recognizer).readGrammar(&command, &nextCharIndex).toString())
 			}
 
 			try {
 				if !recognizer.loadGrammar(grammar, recognizer.compileGrammar(command), ObjBindMethod(this.VoiceServer, "recognizeVoiceCommand", this))
 					throw "Recognizer not running..."
 			}
-			catch exception {
-				logMessage(kLogCritical, translate("Error while registering voice command """) . command . translate(""" - please check the configuration"))
+			catch Any as exception {
+				logMessage(kLogCritical, translate("Error while registering voice command `"") . command . translate("`" - please check the configuration"))
 
-				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: command})
+				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: command})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 
@@ -483,23 +483,23 @@ class VoiceServer extends ConfigurationItem {
 				if !words
 					words := []
 
-				sendMessage(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
+				messageSend(kFileMessage, "Voice", this.ActivationCallback . ":" . values2String(";", words*), this.PID)
 			}
 		}
 
 		deactivate() {
 			if this.DeactivationCallback
-				sendMessage(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
+				messageSend(kFileMessage, "Voice", this.DeactivationCallback, this.PID)
 		}
 
 		recognizeVoiceCommand(grammar, words) {
-			if this.VoiceCommands.HasKey(grammar)
+			if this.VoiceCommands.Has(grammar)
 				this.VoiceServer.recognizeVoiceCommand(this, grammar, words)
 		}
 	}
 
 	class ActivationSpeechRecognizer extends SpeechRecognizer {
-		Routing[] {
+		Routing {
 			Get {
 				return "Activation"
 			}
@@ -512,79 +512,83 @@ class VoiceServer extends ConfigurationItem {
 		}
 	}
 
-	VoiceClients[] {
+	VoiceClients[key?] {
 		Get {
-			return this.iVoiceClients
+			return (isSet(key) ? this.iVoiceClients[key] : this.iVoiceClients)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iVoiceClients[key] := value) : (this.iVoiceClients := value))
 		}
 	}
 
-	ActiveVoiceClient[] {
+	ActiveVoiceClient {
 		Get {
 			return this.iActiveVoiceClient
 		}
 	}
 
-	Language[] {
+	Language {
 		Get {
 			return this.iLanguage
 		}
 	}
 
-	Synthesizer[] {
+	Synthesizer {
 		Get {
 			return this.iSynthesizer
 		}
 	}
 
-	Speaker[] {
+	Speaker {
 		Get {
 			return this.iSpeaker
 		}
 	}
 
-	Speaking[] {
+	Speaking {
 		Get {
 			return this.iSpeaking
 		}
 	}
 
-	Recognizer[] {
+	Recognizer {
 		Get {
 			return this.iRecognizer
 		}
 	}
 
-	Listener[] {
+	Listener {
 		Get {
 			return this.iListener
 		}
 	}
 
-	Listening[] {
+	Listening {
 		Get {
 			return this.iListening
 		}
 	}
 
-	SpeakerVolume[] {
+	SpeakerVolume {
 		Get {
 			return this.iSpeakerVolume
 		}
 	}
 
-	SpeakerPitch[] {
+	SpeakerPitch {
 		Get {
 			return this.iSpeakerPitch
 		}
 	}
 
-	SpeakerSpeed[] {
+	SpeakerSpeed {
 		Get {
 			return this.iSpeakerSpeed
 		}
 	}
 
-	PushToTalk[] {
+	PushToTalk {
 		Get {
 			return this.iPushToTalk
 		}
@@ -595,20 +599,20 @@ class VoiceServer extends ConfigurationItem {
 			if (create && this.Listener && !this.iSpeechRecognizer) {
 				try {
 					try {
-						this.iSpeechRecognizer := new this.ActivationSpeechRecognizer("Server", true, this.Language, true)
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Server", true, this.Language, true)
 
-						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
+						if (this.iSpeechRecognizer.Recognizers.Length = 0)
 							throw "Server speech recognizer engine not installed..."
 					}
-					catch exception {
-						this.iSpeechRecognizer := new this.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
+					catch Any as exception {
+						this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer("Desktop", true, this.Language, true)
 
-						if (this.iSpeechRecognizer.Recognizers.Length() = 0)
+						if (this.iSpeechRecognizer.Recognizers.Length = 0)
 							throw "Desktop speech recognizer engine not installed..."
 					}
 				}
-				catch exception {
-					this.iSpeechRecognizer := new this.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
+				catch Any as exception {
+					this.iSpeechRecognizer := VoiceServer.ActivationSpeechRecognizer(this.Recognizer, this.Listener, this.Language)
 				}
 
 				if !this.PushToTalk
@@ -620,62 +624,56 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	__New(configuration := false) {
-		this.iDebug := (isDebug() ? (kDebugGrammars + kDebugPhrases + kDebugRecognitions) : kDebugOff)
-
-		base.__New(configuration)
+		super.__New(configuration)
 
 		VoiceServer.Instance := this
 
-		new PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500).start()
-		new PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority).start()
+		PeriodicTask(ObjBindMethod(this, "runPendingCommands"), 500).start()
+		PeriodicTask(ObjBindMethod(this, "unregisterStaleVoiceClients"), 5000, kLowPriority).start()
 
 		deleteFile(kTempDirectory . "Voice.mute")
 
-		new PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
+		PeriodicTask(ObjBindMethod(this, "muteVoiceClients"), 50, kInterruptPriority).start()
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.iLanguage := getConfigurationValue(configuration, "Voice Control", "Language", getLanguage())
-		this.iSynthesizer := getConfigurationValue(configuration, "Voice Control", "Synthesizer"
-												 , getConfigurationValue(configuration, "Voice Control", "Service", "dotNET"))
-		this.iSpeaker := getConfigurationValue(configuration, "Voice Control", "Speaker", true)
-		this.iSpeakerVolume := getConfigurationValue(configuration, "Voice Control", "SpeakerVolume", 100)
-		this.iSpeakerPitch := getConfigurationValue(configuration, "Voice Control", "SpeakerPitch", 0)
-		this.iSpeakerSpeed := getConfigurationValue(configuration, "Voice Control", "SpeakerSpeed", 0)
-		this.iRecognizer := getConfigurationValue(configuration, "Voice Control", "Recognizer", "Desktop")
-		this.iListener := getConfigurationValue(configuration, "Voice Control", "Listener", false)
-		this.iPushToTalk := getConfigurationValue(configuration, "Voice Control", "PushToTalk", false)
+		this.iLanguage := getMultiMapValue(configuration, "Voice Control", "Language", getLanguage())
+		this.iSynthesizer := getMultiMapValue(configuration, "Voice Control", "Synthesizer"
+											, getMultiMapValue(configuration, "Voice Control", "Service", "dotNET"))
+		this.iSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker", true)
+		this.iSpeakerVolume := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
+		this.iSpeakerPitch := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
+		this.iSpeakerSpeed := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
+		this.iRecognizer := getMultiMapValue(configuration, "Voice Control", "Recognizer", "Desktop")
+		this.iListener := getMultiMapValue(configuration, "Voice Control", "Listener", false)
+		this.iPushToTalk := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 
 		this.initializePushToTalk()
 	}
 
 	initializePushToTalk() {
 		local p2tHotkey := this.PushToTalk
-		local toggle, handler
+		local toggle
 
 		if p2tHotkey {
 			toggle := false
 
 			if FileExist(kUserConfigDirectory . "P2T Configuration.ini")
-				toggle := (getConfigurationValue(readConfiguration(kUserConfigDirectory . "P2T Configuration.ini")
-											   , "PushToTalk", "Mode", "Press") = "Toggle")
+				toggle := (getMultiMapValue(readMultiMap(kUserConfigDirectory . "P2T Configuration.ini")
+						 , "PushToTalk", "Mode", "Press") = "Toggle")
 
-			if toggle {
-				handler := ObjBindMethod(this, "listen", true)
-
-				Hotkey %p2tHotkey%, %handler%
-				Hotkey %p2tHotkey%, On
-			}
+			if toggle
+				Hotkey(p2tHotkey, ObjBindMethod(this, "listen", true), "On")
 			else
-				new PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
+				PeriodicTask(ObjBindMethod(this, "listen", false), 50, kInterruptPriority).start()
 		}
 	}
 
 	listen(toggle, down := true) {
 		local listen := false
-		local pressed
+		local pressed := false
 
 		static isPressed := false
 		static lastDown := 0
@@ -686,7 +684,8 @@ class VoiceServer extends ConfigurationItem {
 
 		static listenTask := false
 
-		pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
+		try
+			pressed := toggle ? down : GetKeyState(this.PushToTalk, "P")
 
 		if (pressed && !isPressed) {
 			lastDown := A_TickCount
@@ -744,7 +743,7 @@ class VoiceServer extends ConfigurationItem {
 						listening := true
 					}
 					else {
-						listenTask := new Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
+						listenTask := Task(ObjBindMethod(this, "listen", true, true), 400, kInterruptPriority)
 
 						Task.startTask(listenTask)
 					}
@@ -775,7 +774,7 @@ class VoiceServer extends ConfigurationItem {
 			this.listen(toggle, false)
 	}
 
-	setDebug(option, enabled) {
+	setDebug(option, enabled, *) {
 		local label := false
 
 		if enabled
@@ -792,20 +791,25 @@ class VoiceServer extends ConfigurationItem {
 
 		if label
 			if enabled
-				Menu SupportMenu, Check, %label%
+				SupportMenu.Check(label)
 			else
-				Menu SupportMenu, Uncheck, %label%
+				SupportMenu.Uncheck(label)
 	}
 
-	toggleDebug(option) {
+	toggleDebug(option, *) {
 		this.setDebug(option, !this.Debug[option])
 	}
 
 	getVoiceClient(descriptor := false) {
-		if descriptor
-			return this.VoiceClients[descriptor]
-		else
+		try {
+			if descriptor
+				return this.VoiceClients[descriptor]
+			else
+				return this.ActiveVoiceClient
+		}
+		catch Any {
 			return this.ActiveVoiceClient
+		}
 	}
 
 	activateVoiceClient(descriptor, words := false) {
@@ -817,14 +821,16 @@ class VoiceServer extends ConfigurationItem {
 			if this.ActiveVoiceClient
 				this.deactivateVoiceClient(this.ActiveVoiceClient.Descriptor)
 
-			activeVoiceClient := this.VoiceClients[descriptor]
+			if this.VoiceClients.Has(descriptor) {
+				activeVoiceClient := this.VoiceClients[descriptor]
 
-			this.iActiveVoiceClient := activeVoiceClient
+				this.iActiveVoiceClient := activeVoiceClient
 
-			activeVoiceClient.activate(words)
+				activeVoiceClient.activate(words)
 
-			if !this.PushToTalk
-				this.startListening()
+				if !this.PushToTalk
+					this.startListening()
+			}
 		}
 	}
 
@@ -850,7 +856,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 			else {
 				if this.PushToTalk
-					SoundPlay %kResourcesDirectory%Sounds\Talk.wav
+					SoundPlay(kResourcesDirectory . "Sounds\Talk.wav")
 
 				this.iListening := true
 
@@ -918,6 +924,9 @@ class VoiceServer extends ConfigurationItem {
 				this.activateVoiceClient(descriptor)
 
 		}
+		catch Any as exception {
+			logError(exception)
+		}
 		finally {
 			this.iSpeaking := oldSpeaking
 		}
@@ -926,7 +935,7 @@ class VoiceServer extends ConfigurationItem {
 	registerVoiceClient(descriptor, routing, pid
 					  , activationCommand := false, activationCallback := false, deactivationCallback := false, language := false
 					  , synthesizer := true, speaker := true, recognizer := false, listener := false
-					  , speakerVolume := "__Undefined__", speakerPitch := "__Undefined__", speakerSpeed := "__Undefined__") {
+					  , speakerVolume := kUndefined, speakerPitch := kUndefined, speakerSpeed := kUndefined) {
 		local grammar, client, nextCharIndex, command, theDescriptor, ignore
 
 		static counter := 1
@@ -955,12 +964,12 @@ class VoiceServer extends ConfigurationItem {
 		if (language == false)
 			language := this.Language
 
-		client := this.VoiceClients[descriptor]
+		client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
 
 		if (client && (this.ActiveVoiceClient == client))
 			this.deactivateVoiceClient(descriptor)
 
-		client := new this.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
+		client := VoiceServer.VoiceClient(this, descriptor, routing, pid, language, synthesizer, speaker, recognizer, listener, speakerVolume, speakerPitch, speakerSpeed, activationCallback, deactivationCallback)
 
 		this.VoiceClients[descriptor] := client
 
@@ -972,7 +981,7 @@ class VoiceServer extends ConfigurationItem {
 			if this.Debug[kDebugGrammars] {
 				nextCharIndex := 1
 
-				showMessage("Register activation phrase: " . new GrammarCompiler(recognizer).readGrammar(activationCommand, nextCharIndex).toString())
+				showMessage("Register activation phrase: " . GrammarCompiler(recognizer).readGrammar(&activationCommand, &nextCharIndex).toString())
 			}
 
 			try {
@@ -981,17 +990,17 @@ class VoiceServer extends ConfigurationItem {
 				if !recognizer.loadGrammar(grammar, command, ObjBindMethod(this, "recognizeActivationCommand", client))
 					throw "Recognizer not running..."
 			}
-			catch exception {
-				logMessage(kLogCritical, translate("Error while registering voice command """) . activationCommand . translate(""" - please check the configuration"))
+			catch Any as exception {
+				logMessage(kLogCritical, translate("Error while registering voice command `"") . activationCommand . translate("`" - please check the configuration"))
 
-				showMessage(substituteVariables(translate("Cannot register voice command ""%command%"" - please check the configuration..."), {command: activationCommand})
+				showMessage(substituteVariables(translate("Cannot register voice command `"%command%`" - please check the configuration..."), {command: activationCommand})
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 
-		if (this.VoiceClients.Count() = 1)
+		if (this.VoiceClients.Count = 1)
 			this.activateVoiceClient(descriptor)
-		else if (this.VoiceClients.Count() > 1) {
+		else if (this.VoiceClients.Count > 1) {
 			for theDescriptor, ignore in this.VoiceClients
 				if (descriptor != theDescriptor)
 					this.deactivateVoiceClient(theDescriptor)
@@ -1002,7 +1011,7 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	unregisterVoiceClient(descriptor, pid) {
-		local client := this.VoiceClients[descriptor]
+		local client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
 		local theDescriptor, ignore
 
 		if (client && (this.ActiveVoiceClient == client))
@@ -1010,7 +1019,7 @@ class VoiceServer extends ConfigurationItem {
 
 		this.VoiceClients.Delete(descriptor)
 
-		if (this.VoiceClients.Count() = 1) {
+		if (this.VoiceClients.Count = 1) {
 			for theDescriptor, ignore in this.VoiceClients
 				this.activateVoiceClient(theDescriptor)
 
@@ -1028,9 +1037,7 @@ class VoiceServer extends ConfigurationItem {
 			for descriptor, voiceClient in this.VoiceClients {
 				pid := voiceClient.PID
 
-				Process Exist, %pid%
-
-				if !ErrorLevel {
+				if !ProcessExist(pid) {
 					this.unregisterVoiceClient(descriptor, pid)
 
 					this.unregisterStaleVoiceClients()
@@ -1053,10 +1060,15 @@ class VoiceServer extends ConfigurationItem {
 	}
 
 	recognizeActivation(descriptor, grammar, words*) {
-		local voiceClient := this.VoiceClients[descriptor]
+		try {
+			local voiceClient := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
 
-		if voiceClient
-			this.recognizeActivationCommand(voiceClient, voiceClient.Descriptor, words)
+			if voiceClient
+				this.recognizeActivationCommand(voiceClient, voiceClient.Descriptor, words)
+		}
+		catch Any as exception {
+			logError(exception)
+		}
 	}
 
 	recognizeCommand(grammar, words*) {
@@ -1078,7 +1090,7 @@ class VoiceServer extends ConfigurationItem {
 		if activation
 			if (activation != this.ActiveVoiceClient)
 				this.iPendingCommands := []
-			else if (this.iPendingCommands.Length() > 0)
+			else if (this.iPendingCommands.Length > 0)
 				return
 
 		this.iLastCommand := A_TickCount
@@ -1111,7 +1123,7 @@ class VoiceServer extends ConfigurationItem {
 		protectionOn()
 
 		try {
-			if (this.iPendingCommands.Length() == 0)
+			if (this.iPendingCommands.Length == 0)
 				return
 			else {
 				command := this.iPendingCommands.RemoveAt(1)
@@ -1119,7 +1131,7 @@ class VoiceServer extends ConfigurationItem {
 				if command {
 					command := command[2]
 
-					%command%()
+					command.Call()
 				}
 			}
 		}
@@ -1141,7 +1153,7 @@ class VoiceServer extends ConfigurationItem {
 		if this.Debug[kDebugRecognitions]
 			showMessage("Command phrase recognized: " . grammar . " => " . values2String(A_Space, words*), false, "Information.png", 5000)
 
-		sendMessage(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
+		messageSend(kFileMessage, "Voice", descriptor[2] . ":" . values2String(";", grammar, descriptor[1], words*), voiceClient.PID)
 	}
 }
 
@@ -1151,17 +1163,17 @@ class VoiceServer extends ConfigurationItem {
 
 startupVoiceServer() {
 	local icon := kIconsDirectory . "Microphon.ico"
-	local debug, index, server, label, callback
+	local debug, index, server, label
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Voice Server
+	TraySetIcon(icon, "1")
+	A_IconTip := "Voice Server"
 
 	debug := false
 
 	index := 1
 
-	while (index < A_Args.Length()) {
-		switch A_Args[index] {
+	while (index < A_Args.Length) {
+		switch A_Args[index], false {
 			case "-Debug":
 				debug := (((A_Args[index + 1] = kTrue) || (A_Args[index + 1] = true)) ? true : false)
 				index += 2
@@ -1173,27 +1185,25 @@ startupVoiceServer() {
 	if debug
 		setDebug(true)
 
-	server := new VoiceServer(kSimulatorConfiguration)
+	server := VoiceServer(kSimulatorConfiguration)
 
-	Menu SupportMenu, Insert, 1&
+	SupportMenu.Insert("1&")
 
 	label := translate("Debug Recognitions")
-	callback := ObjBindMethod(server, "toggleDebug", kDebugRecognitions)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(server, "toggleDebug", kDebugRecognitions))
 
 	if server.Debug[kDebugRecognitions]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
 	label := translate("Debug Grammars")
-	callback := ObjBindMethod(server, "toggleDebug", kDebugGrammars)
 
-	Menu SupportMenu, Insert, 1&, %label%, %callback%
+	SupportMenu.Insert("1&", label, ObjBindMethod(server, "toggleDebug", kDebugGrammars))
 
 	if server.Debug[kDebugGrammars]
-		Menu SupportMenu, Check, %label%
+		SupportMenu.Check(label)
 
-	registerMessageHandler("Voice", "handleVoiceMessage")
+	registerMessageHandler("Voice", handleVoiceMessage)
 
 	return
 }
@@ -1208,17 +1218,17 @@ handleVoiceMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Sleep 30000
+			Sleep(30000)
 
-			ExitApp 0
+			ExitApp(0)
 		}
 
 		return withProtection(ObjBindMethod(VoiceServer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown") {
-		Sleep 30000
+		Sleep(30000)
 
-		ExitApp 0
+		ExitApp(0)
 	}
 	else
 		return withProtection(ObjBindMethod(VoiceServer.Instance, data))

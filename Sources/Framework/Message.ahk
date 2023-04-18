@@ -9,30 +9,30 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Localization.ahk
-#Include ..\Framework\Configuration.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Localization.ahk"
+#Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\GUI.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-showMessage(message, title := false, icon := "__Undefined__", duration := 1000
-		  , x := "Center", y := "__Undefined__", width := 400, height := 100) {
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+showMessage(message, title := false, icon := kUndefined, duration := 1000
+		  , x := "Center", y := kUndefined, width := 400, height := 100, *) {
+	local screenLeft, screenRight, screenTop, screenBottom, messageGui
 	local innerWidth := width - 16
 
-	static popupPosition := false
+	static popupPosition
 
-	if (y = kUndefined) {
-		if !popupPosition
-			popupPosition := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-																   , "General", "Popup Position", "Bottom")
+	if !isSet(popupPosition)
+		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+										, "General", "Popup Position", "Bottom")
 
+	if (y = kUndefined)
 		y := popupPosition
-	}
 
 	if (icon = kUndefined)
 		icon := "Information.png"
@@ -40,48 +40,51 @@ showMessage(message, title := false, icon := "__Undefined__", duration := 1000
 	if (!title || (title = ""))
 		title := translate("Modular Simulator Controller System")
 
-	Gui MSGW:-Border -Caption
-	Gui MSGW:Color, D0D0D0, D8D8D8
-	Gui MSGW:Font, s10 Bold
-	Gui MSGW:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
-	Gui MSGW:Font
+	messageGui := Window()
+
+	messageGui.SetFont("s10 Bold")
+	messageGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
+	messageGui.SetFont()
 
 	if icon {
-		Gui MSGW:Add, Picture, w50 h50, % kIconsDirectory . Icon
+		messageGui.Add("Picture", "w50 h50", kIconsDirectory . icon)
 
 		innerWidth -= 66
 
-		Gui MSGW:Add, Text, X74 YP+5 W%innerWidth% H%height%, % message
+		messageGui.Add("Text", "X74 YP+5 W" . innerWidth . " H" . height, message)
 	}
 	else
-		Gui MSGW:Add, Text, X8 YP+30 W%innerWidth% H%height%, % message
+		messageGui.Add("Text", "X8 YP+30 W" . innerWidth . " H" . height, message)
 
-	SysGet mainScreen, MonitorWorkArea
+	if InStr(popupPosition, "2nd Screen")
+		MonitorGetWorkArea(1 + ((MonitorGetCount() > 1) ? 1 : 0), &screenLeft, &screenTop, &screenRight, &screenBottom)
+	else
+		MonitorGetWorkArea(, &screenLeft, &screenTop, &screenRight, &screenBottom)
 
-	if x is not Integer
-		switch x {
+	if !isInteger(x)
+		switch x, false {
 			case "Left":
 				x := 25
 			case "Right":
-				x := mainScreenRight - width - 25
+				x := screenRight - width - 25
 			default:
-				x := "Center"
+				x := Round(screenLeft + ((screenRight - screenLeft) / 2) - (width / 2))
 		}
 
-	if y is not Integer
-		switch y {
-			case "Top":
-				y := 25
-			case "Bottom":
-				y := mainScreenBottom - height - 25
+	if !isInteger(y)
+		switch y, false {
+			case "Top", "2nd Screen Top":
+				y := screenTop + 25
+			case "Bottom", "2nd Screen Bottom":
+				y := screenBottom - height - 25
 			default:
-				y := "Center"
+				y := Round(screenTop + ((screenBottom - screenTop) / 2) - (height / 2))
 		}
 
-	Gui MSGW:+AlwaysOnTop
-	Gui MSGW:Show, X%x% Y%y% W%width% H%height% NoActivate
+	messageGui.Opt("+AlwaysOnTop")
+	messageGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
 
-	Sleep %duration%
+	Sleep(duration)
 
-	Gui MSGW:Destroy
+	messageGui.Destroy()
 }

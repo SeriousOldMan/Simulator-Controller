@@ -7,22 +7,28 @@
   4. Modernized UI for all windows, especially on Windows 11.
   5. Support for window resizing in almost all applications.
   6. Renamed controller action function "hotkey" to "trigger" to avoid conflict with a new builtin function.
-  7. Renamed "Setup Advisor" to "Setup Workbench".
+  7. Renamed "Setup Advisor" to ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench).
   8. Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor"
-  9. Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins.
+  9. Renamed plugin argument "openSetupAdvisor" to ["openSetupWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for all Race Assistant plugins.
   10. Big performance improvements in the rule engine.
   11. Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty.
-  12. Introduced Stream Deck Plus Layout.
+  12. Introduced support for the new Stream Deck Plus Layout.
   13. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
   14. Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap.
   15. Updated th car meta data to the latest version.
-  16. [Developer] Renamed configuration map functions to multi map functions.
-  17. [Developer] Introduced a couple of specialized Array and Map subtypes, which supports failure safe handling of unset elements.
-  18. [Developer] Introduced of a specialized subclass of *Gui* which supports seamless resizing rules for controls.
+  16. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
+  17. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
+  18. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500).
 
-## 4.6.3.1-release 03/17/23 (planned)
+## 4.6.3.2-release 04/07/23
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Stint plans are now reset in the Race Center, when a session is cleared.
+  4. A couple of performance improvements in the session database.
+
+## 4.6.3.1-release 03/17/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Improved detection of retired cars in "Race Reports" and "Race Center".
@@ -54,6 +60,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   17. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT Cup
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-463), when you are using a Stream Deck, or when you want to use the new audio routing capabilities for your streaming setup.
   
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always

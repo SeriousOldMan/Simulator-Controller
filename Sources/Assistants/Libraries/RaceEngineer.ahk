@@ -2335,7 +2335,7 @@ class RaceEngineer extends RaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local speaker, phrase
 
-		if (this.hasEnoughData(false) && this.Speaker[false] && this.Announcements["DamageReporting"])
+		if ((this.hasEnoughData(false) || (knowledgeBase.getValue("Lap", 0) < this.LearningLaps)) && this.Speaker[false] && this.Announcements["DamageReporting"])
 			if (!knowledgeBase.getValue("InPitlane", false) && !knowledgeBase.getValue("InPit", false)) {
 				speaker := this.getSpeaker()
 				phrase := false

@@ -15,6 +15,7 @@
 #Include "..\Framework\Strings.ahk"
 #Include "..\Framework\Localization.ahk"
 #Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\Configuration.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -48,6 +49,104 @@ getControllerActionDefinitions(type) {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+class Theme extends ConfigurationItem {
+	static sCurrentTheme := false
+
+	static CurrentTheme {
+		Get {
+			return Theme.sCurrentTheme
+		}
+
+		Set {
+			return (Theme.sCurrentTheme := value)
+		}
+	}
+
+	Descriptor {
+		Get {
+			return this.iDescriptor
+		}
+	}
+
+	WindwBackground {
+		Get {
+			return this.iWindowBackground
+		}
+	}
+
+	AltBackground {
+		Get {
+			return this.iAltBackground
+		}
+	}
+
+	FieldBackground {
+		Get {
+			return this.iFieldBackground
+		}
+	}
+
+	MenuBackground {
+		Get {
+			return this.iMenuBackground
+		}
+	}
+
+	HeaderBackground {
+		Get {
+			return this.iHeaderBackground
+		}
+	}
+
+	TextColor {
+		Get {
+			return this.iTextColor
+		}
+	}
+
+	ButtonColor {
+		Get {
+			return this.iButtonColor
+		}
+	}
+
+	DropDownColor {
+		Get {
+			return this.iDropDownColor
+		}
+	}
+
+	__New(descriptor, configuration := false) {
+		this.iDescriptor := descriptor
+
+		super.__New(configuration)
+	}
+
+	loadFromConfiguration(configuration) {
+		super.loadFromConfiguration(configuration)
+
+		this.iWindowBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"))
+		this.iAltBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"))
+		this.iFieldBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"))
+		this.iMenuBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"))
+		this.iHeaderBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"))
+		this.iTextColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"))
+		this.iButtonColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"))
+		this.iDropDownColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"))
+	}
+
+	saveToConfiguration(configuration) {
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"), this.WindowBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"), this.AltBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"), this.FieldBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"), this.MenuBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"), this.HeaderBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"), this.TextColor)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"), this.ButtonColor)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
+	}
+}
 
 class Window extends Gui {
 	iCloseable := false

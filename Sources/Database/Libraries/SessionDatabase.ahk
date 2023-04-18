@@ -10,7 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Framework\Framework.ahk"
-#Include "..\..\Framework\Classes.ahk"
+#Include "..\..\Framework\Configuration.ahk"
 #Include "..\..\Framework\Utils.ahk"
 
 

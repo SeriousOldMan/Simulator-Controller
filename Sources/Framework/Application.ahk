@@ -14,7 +14,7 @@
 #Include "..\Framework\Message.ahk"
 #Include "..\Framework\Progress.ahk"
 #Include "..\Framework\Splash.ahk"
-#Include "..\Framework\Classes.ahk"
+#Include "..\Framework\Configuration.ahk"
 #Include "..\Framework\Startup.ahk"
 
 

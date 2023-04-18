@@ -146,9 +146,9 @@ Adds the case insensitive property to "WeakMap*.
 
 # Configuration Classes
 
-The following classes are defined in the [Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described [further down below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).
+The following classes are defined in the [Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk) script. They define objects, that can be loaded from or can be saved to a configuration file maintained by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Many of these classes will be subclassed and extended with more functionality in other files of the Simulator Controller framework, especially in the script [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk). These classes are described [further down below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controller-classes).
 
-## [Abstract] ConfigurationItem ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## [Abstract] ConfigurationItem ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 
 This is the base class for all objects, that can be stored to or retrieved from a configuration file. Generally, configurations are maintaned by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). During runtime, all configuration data is accessible through the global constant *kSimulatorConfiguration*.
 
@@ -198,7 +198,7 @@ Returns an array with all different parts of the supplied descriptor string.
 
 ***
 
-## Application extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## Application extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 This configuration item represents an application in the current Windows installation.
 
 ### Public Properties
@@ -247,7 +247,7 @@ Low level method to start Windows applications. See above functions for an expla
 
 ***
 
-## [Abstract] Function extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## [Abstract] Function extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 This abstract class defines the protocol for all functions available for a given controller hardware. A function, which might be buttons, dials and swwitches, defines actions, which react to triggers. To connect to the underlying hardware, a controller function defines several [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys) per trigger, which is used by AutoHotkey to detect that a button has been pressed, a dial rotated and so on. At this point, the actions that might be triggered will be simple calls to global function in the script language, but more versatile capabilites will be defined by the [plugin framework](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#overview), where actions will be implemented by specialized classes.
 
 ### Public Properties
@@ -283,32 +283,32 @@ Creates an instance of a specific subclass of *Function* according to the given 
 
 ***
 
-## TwoWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## TwoWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 Concrete implementation for two state toggle switches, like On/Off switches. The triggers returned by *Trigger* are ["On", "Off"].
 
 ***
 
-## OneWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## OneWayToggleFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 Concrete implementation for single state switches, for example a momentary ignition switch. The triggers returned by *Trigger* are ["On"].
 
 ***
 
-## ButtonFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## ButtonFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 Concrete implementation for simple push buttons. The triggers returned by *Trigger* are ["Push"].
 
 ***
 
-## DialFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## DialFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 Concrete implementation for rotary dials. The triggers returned by *Trigger* are ["Increase", "Decrease"] for the two different rotary directions.
 
 ***
 
-## CustomFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## CustomFunction extends [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 Concrete implementation for a custom or external function. The triggers returned by *Trigger* are ["Call"] for a generic activation of the function. Normally, custom functions are not bound to a hardware controller, but serve as an interface for other event sources, like a voice control software or a keyboard macro tool.
 
 ***
 
-## Plugin extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Classes.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Classes.ahk))
+## Plugin extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
 A plugin is used by the Simulator Controller framework to integrate custom code and extensions. Plugins can be configured by the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Especially the more complex plugins may define a set of configuration parameters to define the function mapping, initial values for dynamic parameters, and so on. A special subclass named [ControllerPlugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllerplugin-extends-plugin-simulator-controllerahk) exists, which provides additional functionality to interact with the single instance of [SimulatorController](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#singleton-simulatorcontroller-extends-configurationitem-simulator-controllerahk), handle plugin modes and connect to controller functions. The base class *Plugin* only provides the functionality necessary for configuration reading and writing.
 
 ### Public Properties
@@ -342,7 +342,7 @@ Returns the values for the given argument as string, or the supplied *default* v
 
 The two classes *ConfigurationEditor* and *ConfigurationItemList* implement the configuration tool framework. The conifguration tool can be extended by registering so called configurators, which, in the end, will add a tab in the dialog of the configuration tool. Please see the corresponding documentation on [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool) for more information.
 
-## [Singleton] ConfigurationEditor extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Configuration/Simulator%20Configuration.ahk))
+## [Singleton] ConfigurationEditor extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Configuration/Simulator%20Configuration.ahk))
 This is the main class of the configuration tool. It opens the editor window and creates a tabbed view for all the configurator plugins.
 
 ### Public Properties
@@ -365,7 +365,7 @@ This property returns the short string, which is used by all AutoHotKey *Gui* co
 Constructs a new *ConfigurationEditor* instance. If *true* is passed for the first parameter, additional configuration options suitable for development tasks will be available in the first tab of the configuration editor. The second parameter is the configuration, which should be modified.
 
 #### *registerConfigurator(label :: String, configurator :: ConfigurationItem)*
-Registers the given configurator and creates a tab with the given label for it in the tabbed view of the configuration editor window. The registered *configurator* object will typically be an instance of a subclass of [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) and must implement a simple additional protocol, as described in the documentation on [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool).
+Registers the given configurator and creates a tab with the given label for it in the tabbed view of the configuration editor window. The registered *configurator* object will typically be an instance of a subclass of [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) and must implement a simple additional protocol, as described in the documentation on [Customizing the Configuration Tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#customizing-the-configuration-tool).
 
 	class MyConfigurator extends ConfigurationItem {
 		createGui(editor :: ConfigurationEditor, x :: Integer, y :: Integer, width :: Integer, height :: Integer) { ... }
@@ -376,7 +376,7 @@ Registers the given configurator and creates a tab with the given label for it i
 	}
 	
 The method *createGui* is called by the *editor* to create the controls for the configuration plugin. All controls must be created using the AutoHotkey *Gui* command in the window defined by *editor.Window* in the boundaries *x* <-> (*x* + *width*) and *y* <-> (*y* + *height*).
-*loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration* (also inherited from *ConfigurationItem*), will be called, whenever the user wants to save the current state of the configuration tool.
+*loadFromConfiguration* (inherited from [ConfigurationItem][https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk]) is called during the initialization process. It must load the initial state from the configuration. Please note, that the *createGui* method had not been called yet. The third method of the protocol, *saveToConfiguration* (also inherited from *ConfigurationItem*), will be called, whenever the user wants to save the current state of the configuration tool.
 
 #### *unregisterConfigurator(labelOrConfigurator :: TypeUnion(String, Object))*
 Removes a configurator (either identified directly as argument or identified by the label, which had been supplied, when registering the configurator), from the configuration tool.
@@ -395,7 +395,7 @@ Calling *toggleKeyDetector* enables or disables a special tool to detect buttons
 
 ***
 
-## [Abstract] ConfigurationItemList extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Configuration/Simulator%20Configuration.ahk))
+## [Abstract] ConfigurationItemList extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) ([Simulator Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Configuration/Simulator%20Configuration.ahk))
 This abstract class implements a list of items, which might be edited with an associated editor. Basis control on item selection, openening and closing the editor area, loading and saving items to and from the editor is already builtin. Please see the [implementation for the "Chat Messages Configuration" plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Chat%20Messages%20Configuration%20Plugin.ahk) for a simple example of a concrete implementation of *ConfigurationItemList*.
 
 ### Public Properties
@@ -456,7 +456,7 @@ This method must also be implemented by the concrete subclass of *ConfigurationI
 
 All the following classes are part of the Simulator Controller core framework defined in the [Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk) script. In many cases they are based on one of the configuration classes above.
 
-## [Singleton] SimulatorController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## [Singleton] SimulatorController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 This class implements the core functionality of Simulator Controller. The single instance manages a set of plugins and the connection between hardware functions of a given controller and the actions implemented by these plugins.
 
 ### Public Properties
@@ -568,7 +568,7 @@ This method is called, whenever a global state change occured in your simulation
 ***
 
 ## [Abstract] ControllerFunction ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-This is the root class of all controller functions used by the Simulator Controller framework. Due to restrictions in the AutoHotkey language (no multiple inheritance or multiple interface implementation capabilities), this class (and all of its subclasses) does not inherit from the configurable [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk) class. But the protocol of *Function* is completely implemented and *ControllerFunction* and all its descendants use some sort of delegation pattern to connect to the configuration information of *Function*.
+This is the root class of all controller functions used by the Simulator Controller framework. Due to restrictions in the AutoHotkey language (no multiple inheritance or multiple interface implementation capabilities), this class (and all of its subclasses) does not inherit from the configurable [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk) class. But the protocol of *Function* is completely implemented and *ControllerFunction* and all its descendants use some sort of delegation pattern to connect to the configuration information of *Function*.
 
 ### Public Properties
 
@@ -576,7 +576,7 @@ This is the root class of all controller functions used by the Simulator Control
 Returns the controller, for which this function has been defined.
 
 #### *Function*
-Returns the wrapped original class, an instance of [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk).
+Returns the wrapped original class, an instance of [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk).
 
 #### *Type*
 Returns the [type constant](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#controller-function-types-constantsahk) of the given function. This property must be implemented by a concrete subclass.
@@ -602,7 +602,7 @@ Similar to the *Hotkeys* property, this property returns the defined actions. Se
 ### Public Methods
 
 #### *__New(controller :: SimulatorController, function :: Function)*
-Constructs an instance of *ControllerFunction*. The supplied *function* must be an instance of the wrapped class [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-classesahk), which provides the configuration information.
+Constructs an instance of *ControllerFunction*. The supplied *function* must be an instance of the wrapped class [Function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-function-extends-configurationitem-configurationahk), which provides the configuration information.
 
 #### *enable(trigger :: String := false, action :: ControllerAction := false)*
 Enables the given trigger (for example "Push") for this controller function, which means, that the connected action can be triggered by the hardware controller. If *trigger* is not supplied, all triggers will be enabled. If *action* is supplied, the function is enabled only for the given action.
@@ -649,8 +649,8 @@ Concrete implementation for custom or external function. The triggers returned b
 
 ***
 
-## ControllerPlugin extends [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
-This is the central class, that must be implemented to extend the functionality of the Simulator Controller. Tha base class [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-classesahk) provides all the configuration information, wherease *ControllerPlugin* defines the protocol to interact with the simulator controller and, most important, supplies [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) and [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk).
+## ControllerPlugin extends [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-configurationahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+This is the central class, that must be implemented to extend the functionality of the Simulator Controller. Tha base class [Plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#plugin-extends-configurationitem-configurationahk) provides all the configuration information, wherease *ControllerPlugin* defines the protocol to interact with the simulator controller and, most important, supplies [modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controllermode-simulator-controllerahk) and [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk).
 
 ### Public Properties
 
@@ -794,7 +794,7 @@ This method must be implemented by every subclass of *ControllerAction* and act 
 
 ***
 
-## [Abstract] FunctionController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-classesahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
+## [Abstract] FunctionController extends [ConfigurationItem](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#abstract-configurationitem-configurationahk) ([Simulator Controller.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Controller/Simulator%20Controller.ahk))
 Instances of this class represent a given hardware controller. Subclasses of *FunctionController* must be implemented for each type of contrroller hardware (Button Boxes, Stream Decks, and so on), which will be supported by Simulator Controller.
 
 ### Public Properties

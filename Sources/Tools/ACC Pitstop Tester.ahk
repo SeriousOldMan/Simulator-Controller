@@ -55,26 +55,26 @@ class ACCPitstopTester extends Plugin {
 
 	iPSImageSearchArea := false
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	ClosePitstopMFDHotkey[] {
+	ClosePitstopMFDHotkey {
 		Get {
 			return this.iClosePitstopMFDHotkey
 		}
 	}
 
-	Messages[] {
+	Messages {
 		Get {
 			return this.iMessages
 		}
 	}
 
 	__New() {
-		base.__New("ACC", kSimulatorConfiguration)
+		super.__New("ACC", kSimulatorConfiguration)
 
 		this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
 		this.iClosePitstopMFDHotkey := this.getArgumentValue("closePitstopMFD", false)
@@ -215,7 +215,7 @@ class ACCPitstopTester extends Plugin {
 				return reload
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			this.iPSOpen := false
 		}
 
@@ -646,7 +646,7 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 	try {
 		RunWait %ComSpec% /c ""%exePath%" %options% > "%dataFile%"", , Hide
 	}
-	catch exception {
+	catch Any as exception {
 		logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Provider ("), {simulator: simulator, protocol: protocol})
 												   . exePath . translate(") - please rebuild the applications in the binaries folder (")
 												   . kBinariesDirectory . translate(")"))
@@ -656,11 +656,11 @@ readSimulatorData(simulator, options := "", protocol := "SHM") {
 				  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 	}
 
-	data := readConfiguration(dataFile)
+	data := readMultiMap(dataFile)
 
 	deleteFile(dataFile)
 
-	setConfigurationValue(data, "Session Data", "Simulator", simulator)
+	setMultiMapValue(data, "Session Data", "Simulator", simulator)
 
 	return data
 }
@@ -762,13 +762,13 @@ runACCPitstopTester() {
 	Menu Tray, Tip, ACC Pitstop Tester
 
 	while true {
-		pitstopTester := new ACCPitstopTester()
+		pitstopTester := ACCPitstopTester()
 
 		pitstopTester.logMessage("Peparation: Reading current MFD settings...`n`n")
 
 		data := readSimulatorData("ACC", "-Setup")
 
-		for key, value in getConfigurationSectionValues(data, "Setup Data")
+		for key, value in getMultiMapValues(data, "Setup Data")
 			pitstopTester.logMessage(key . " = " . value)
 
 		pitstopTester.logMessage("`n`nPPass #1: Learning MFD position and labels...`n`n")

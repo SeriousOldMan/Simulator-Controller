@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - AC Plugin                       ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,9 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include "Libraries\SimulatorPlugin.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -42,44 +42,44 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopAutoClose := false
 
 	iSettingsDatabase := false
-	iCarMetaData := {}
+	iCarMetaData := CaseInsenseMap()
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	PreviousOptionHotkey[] {
+	PreviousOptionHotkey {
 		Get {
 			return this.iPreviousOptionHotkey
 		}
 	}
 
-	NextOptionHotkey[] {
+	NextOptionHotkey {
 		Get {
 			return this.iNextOptionHotkey
 		}
 	}
 
-	PreviousChoiceHotkey[] {
+	PreviousChoiceHotkey {
 		Get {
 			return this.iPreviousChoiceHotkey
 		}
 	}
 
-	NextChoiceHotkey[] {
+	NextChoiceHotkey {
 		Get {
 			return this.iNextChoiceHotkey
 		}
 	}
 
-	SettingsDatabase[] {
+	SettingsDatabase {
 		Get {
 			local settingsDB := this.iSettingsDatabase
 
 			if !settingsDB {
-				settingsDB := new SettingsDatabase()
+				settingsDB := SettingsDatabase()
 
 				this.iSettingsDatabase := settingsDB
 			}
@@ -88,14 +88,18 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	CarMetaData[key := false] {
+	CarMetaData[key?] {
 		Get {
-			return (key ? this.iCarMetaData[key] : this.iCarMetaData)
+			return (isSet(key) ? this.iCarMetaData[key] : this.iCarMetaData)
+		}
+
+		Set {
+			return (isSet(key) ? (this.iCarMetaData[key] := value) : (this.iCarMetaData := value))
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "{Down}")
@@ -107,10 +111,12 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", TyreAllAround: "All Around"
-					 , TyreFrontLeft: "Front Left", TyreFrontRight: "Front Right", TyreRearLeft: "Rear Left", TyreRearRight: "Rear Right"
-					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension", EngineRepair: "Repair Engine"}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel"
+								   , "TyreCompound", "Tyre Compound", "TyreAllAround", "All Around"
+								   , "TyreFrontLeft", "Front Left", "TyreFrontRight", "Front Right"
+								   , "TyreRearLeft", "Rear Left", "TyreRearRight", "Rear Right"
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension", "EngineRepair", "Repair Engine")
 		selectActions := []
 	}
 
@@ -123,7 +129,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSession(session) {
-		base.updateSession(session)
+		super.updateSession(session)
 
 		if (session == kSessionFinished) {
 			this.iRepairSuspensionChosen := false
@@ -135,32 +141,32 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	updateTelemetryData(data) {
 		local forName, surName, nickName, name
 
-		base.updateTelemetryData(data)
+		super.updateTelemetryData(data)
 
-		setConfigurationValue(data, "Car Data", "TC", Round((getConfigurationValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
-		setConfigurationValue(data, "Car Data", "ABS", Round((getConfigurationValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
+		setMultiMapValue(data, "Car Data", "TC", Round((getMultiMapValue(data, "Car Data", "TCRaw", 0) / 0.2) * 10))
+		setMultiMapValue(data, "Car Data", "ABS", Round((getMultiMapValue(data, "Car Data", "ABSRaw", 0) / 0.2) * 10))
 
-		forName := getConfigurationValue(data, "Stint Data", "DriverForname", "John")
-		surName := getConfigurationValue(data, "Stint Data", "DriverSurname", "Doe")
-		nickName := getConfigurationValue(data, "Stint Data", "DriverNickname", "JDO")
+		forName := getMultiMapValue(data, "Stint Data", "DriverForname", "John")
+		surName := getMultiMapValue(data, "Stint Data", "DriverSurname", "Doe")
+		nickName := getMultiMapValue(data, "Stint Data", "DriverNickname", "JDO")
 
 		if ((forName = surName) && (surName = nickName)) {
 			name := string2Values(A_Space, forName, 2)
 
-			setConfigurationValue(data, "Stint Data", "DriverForname", name[1])
-			setConfigurationValue(data, "Stint Data", "DriverSurname", (name.Length() > 1) ? name[2] : "")
-			setConfigurationValue(data, "Stint Data", "DriverNickname", "")
+			setMultiMapValue(data, "Stint Data", "DriverForname", name[1])
+			setMultiMapValue(data, "Stint Data", "DriverSurname", (name.Length > 1) ? name[2] : "")
+			setMultiMapValue(data, "Stint Data", "DriverNickname", "")
 		}
 
 		if !isDebug() {
-			removeConfigurationValue(data, "Car Data", "TCRaw")
-			removeConfigurationValue(data, "Car Data", "ABSRaw")
-			removeConfigurationValue(data, "Track Data", "GripRaw")
+			removeMultiMapValue(data, "Car Data", "TCRaw")
+			removeMultiMapValue(data, "Car Data", "ABSRaw")
+			removeMultiMapValue(data, "Track Data", "GripRaw")
 		}
 
-		if !getConfigurationValue(data, "Stint Data", "InPit", false)
-			if (getConfigurationValue(data, "Car Data", "FuelRemaining", 0) = 0)
-				setConfigurationValue(data, "Session Data", "Paused", true)
+		if !getMultiMapValue(data, "Stint Data", "InPit", false)
+			if (getMultiMapValue(data, "Car Data", "FuelRemaining", 0) = 0)
+				setMultiMapValue(data, "Session Data", "Paused", true)
 	}
 
 	getCarMetaData(meta, default := 0) {
@@ -169,15 +175,15 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 		local key := (car . "." . meta)
 		local value, settings
 
-		if this.CarMetaData.HasKey(key)
+		if this.CarMetaData.Has(key)
 			return this.CarMetaData[key]
 		else {
-			value := getConfigurationValue(readConfiguration(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
+			value := getMultiMapValue(readMultiMap(kResourcesDirectory . "Simulator Data\AC\Car Data.ini"), "Pitstop Settings", key, kUndefined)
 
 			if (value == kUndefined) {
 				settings := this.SettingsDatabase.loadSettings(this.Simulator[true], car, track, "*")
 
-				value := getConfigurationValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, default)
+				value := getMultiMapValue(settings, "Simulator.Assetto Corsa", "Pitstop." . meta, default)
 			}
 
 			this.CarMetaData[key] := value
@@ -196,7 +202,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				logMessage(kLogCritical, translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration"))
 
 				showMessage(translate("The hotkeys for opening and closing the Pitstop MFD are undefined - please check the configuration...")
-						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+									, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 
 			return false
@@ -225,7 +231,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			return true
 		}
 		else {
-			Sleep 1200
+			Sleep(1200)
 
 			this.iPitstopAutoClose := (A_TickCount + 4000)
 
@@ -276,19 +282,19 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 				return true
 			}
 			else if (option = "Repair Bodywork") {
-				loop % 7 + this.getCarMetaData("CarSettings")
+				loop 7 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Suspension") {
-				loop % 8 + this.getCarMetaData("CarSettings")
+				loop 8 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
 			}
 			else if (option = "Repair Engine") {
-				loop % 9 + this.getCarMetaData("CarSettings")
+				loop 9 + this.getCarMetaData("CarSettings")
 					this.sendCommand(this.NextOptionHotkey)
 
 				return true
@@ -302,19 +308,19 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 
 	dialPitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			switch action {
+			switch action, false {
 				case "Increase":
 					this.activateWindow()
 
-					loop %steps%
+					loop steps
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
 					this.activateWindow()
 
-					loop %steps%
+					loop steps
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					throw "Unsupported change operation """ . action . """ detected in ACPlugin.dialPitstopOption..."
+					throw "Unsupported change operation `"" . action . "`" detected in ACPlugin.dialPitstopOption..."
 			}
 	}
 
@@ -334,27 +340,27 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Repair Bodywork") {
 				this.dialPitstopOption("Repair Bodywork", action, steps)
 
-				loop %steps%
+				loop steps
 					this.iRepairBodyworkChosen := !this.iRepairBodyworkChosen
 			}
 			else if (option = "Repair Suspension") {
 				this.dialPitstopOption("Repair Suspension", action, steps)
 
-				loop %steps%
+				loop steps
 					this.iRepairSuspensionChosen := !this.iRepairSuspensionChosen
 			}
 			else if (option = "Repair Engine") {
 				this.dialPitstopOption("Repair Engine", action, steps)
 
-				loop %steps%
+				loop steps
 					this.iRepairEngineChosen := !this.iRepairEngineChosen
 			}
 			else
-				throw "Unsupported change operation """ . action . """ detected in ACPlugin.changePitstopOption..."
+				throw "Unsupported change operation `"" . action . "`" detected in ACPlugin.changePitstopOption..."
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -369,7 +375,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		local delta
 
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			delta := this.tyreCompoundIndex(compound, compoundColor)
@@ -387,7 +393,7 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -395,35 +401,35 @@ class ACPlugin extends RaceAssistantSimulatorPlugin {
 			if this.selectPitstopOption("Front Left") {
 				this.dialPitstopOption("Front Left", "Decrease", 30)
 
-				loop % Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
+				loop Round(pressureFL - this.getCarMetaData("TyrePressureMinFL", 15))
 					this.dialPitstopOption("Front Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Front Right") {
 				this.dialPitstopOption("Front Right", "Decrease", 30)
 
-				loop % Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
+				loop Round(pressureFR - this.getCarMetaData("TyrePressureMinFR", 15))
 					this.dialPitstopOption("Front Right", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Left") {
 				this.dialPitstopOption("Rear Left", "Decrease", 30)
 
-				loop % Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
+				loop Round(pressureRL - this.getCarMetaData("TyrePressureMinRL", 15))
 					this.dialPitstopOption("Rear Left", "Increase")
 			}
 
 			if this.selectPitstopOption("Rear Right") {
 				this.dialPitstopOption("Rear Right", "Decrease", 30)
 
-				loop % Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
+				loop Round(pressureRR - this.getCarMetaData("TyrePressureMinRR", 15))
 					this.dialPitstopOption("Rear Right", "Increase")
 			}
 		}
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (this.iRepairSuspensionChosen != repairSuspension) {
@@ -468,7 +474,7 @@ startAC() {
 initializeACPlugin() {
 	local controller := SimulatorController.Instance
 
-	new ACPlugin(controller, kACPlugin, kACApplication, controller.Configuration)
+	ACPlugin(controller, kACPlugin, kACApplication, controller.Configuration)
 }
 
 

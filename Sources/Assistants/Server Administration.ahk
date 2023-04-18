@@ -10,11 +10,11 @@
 ;;;-------------------------------------------------------------------------;;;
 
 ;@SC-IF %configuration% == Development
-#Include ..\Framework\Development.ahk
+#Include "..\Framework\Development.ahk"
 ;@SC-EndIF
 
 ;@SC-If %configuration% == Production
-;@SC #Include ..\Framework\Production.ahk
+;@SC #Include "..\Framework\Production.ahk"
 ;@SC-EndIf
 
 ;@Ahk2Exe-SetMainIcon ..\..\Resources\Icons\Server Administration.ico
@@ -25,16 +25,16 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Process.ahk
+#Include "..\Framework\Process.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\CLR.ahk
-#Include ..\Libraries\Task.ahk
-#Include ..\Assistants\Libraries\SessionDatabase.ahk
+#Include "..\Libraries\CLR.ahk"
+#Include "..\Libraries\Task.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -48,206 +48,256 @@ global kToken := "Token"
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Private Classes Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class AdministrationResizer extends Window.Resizer {
+	RestrictResize(&deltaWidth, &deltaHeight) {
+		if (deltaWidth > 100) {
+			deltaWidth := (this.Window.Width - this.Window.MinWidth)
+
+			return true
+		}
+		else
+			return false
+	}
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 generatePassword(length) {
-	local valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+	local valid := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	local result := ""
 	local index
 
 	while (0 < length--) {
-		Random index, 1, % StrLen(valid)
+		index := Random(1, StrLen(valid))
 
-		result .= SubStr(valid, Round(index), 1)
+		result .= SubStr(valid, Round(index))
 	}
 
 	return result
 }
-
-parseObject(properties) {
-	local result := {}
-	local property
-
-	properties := StrReplace(properties, "`r", "")
-
-	loop Parse, properties, `n
-	{
-		property := string2Values("=", A_LoopField)
-
-		result[property[1]] := property[2]
-	}
-
-	return result
-}
-
-loadAccounts(connector, listView) {
-	local accounts := {}
-	local ignore, identifier, account, index
-
-	Gui ListView, % listView
-
-	LV_Delete()
-
-	if administrationEditor(kToken) {
-		for ignore, identifier in string2Values(";", connector.GetAllAccounts()) {
-			account := parseObject(connector.GetAccount(identifier))
-
-			accounts[A_Index] := account
-			accounts[account.Name] := account
-
-			index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
-
-			LV_Add("", account.Name, account.EMail
-					 , (account.SessionAccess = "true") ? translate("Yes") : translate("No")
-					 , (account.DataAccess = "true") ? translate("Yes") : translate("No")
-					 , translate(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"][index]) . translate(" (") . account.ContractMinutes . translate(")")
-					 , account.AvailableMinutes)
-		}
-	}
-
-	LV_ModifyCol()
-
-	loop 6
-		LV_ModifyCol(A_Index, "AutoHdr")
-
-	return accounts
-}
-
-loadConnections(connector, listView) {
-	local ignore, identifier, connection, session
-
-	Gui ListView, % listView
-
-	LV_Delete()
-
-	if administrationEditor(kToken) {
-		for ignore, identifier in string2Values(";", connector.GetAllConnections()) {
-			try {
-				connection := parseObject(connector.GetConnection(identifier))
-
-				session := connection.Session
-
-				if (session && (session != ""))
-					session := parseObject(connector.GetSession(session)).Name
-
-				LV_Add("", translate(connection.Type), connection.Name, connection.Created, session)
-			}
-			catch exception {
-				logError(exception)
-			}
-		}
-	}
-
-	LV_ModifyCol()
-
-	loop 4
-		LV_ModifyCol(A_Index, "AutoHdr")
-}
-
-updateTask(connector, tasks, task, which, operation, frequency) {
-	if operation is integer
-		operation := ["Delete", "Cleanup", "Reset", "Renew"][operation],
-
-	if frequency is integer
-		frequency := ["Never", "Daily", "Weekly", "Monthly"][frequency]
-
-	if (frequency = "Never") {
-		if task {
-			connector.DeleteTask(task)
-
-			tasks.Delete(which)
-		}
-	}
-	else if task
-		connector.UpdateTask(task, operation, frequency, true)
-	else
-		tasks[which] := connector.CreateTask((which = "Quota") ? "Account" : which, operation, frequency)
-
-	return tasks
-}
-
-global teamServerNameEdit := ""
-global teamServerPasswordEdit := ""
 
 administrationEditor(configurationOrCommand, arguments*) {
-	local task, title, prompt, locale, minutes, ignore, identifier, type, which, contract
+	local task, ignore, identifier, type, which, contract
 	local dllName, dllFile, sessionDB, connection, administrationConfig
-	local x, y, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
+	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
+	local button, administrationTab
+
+	static administrationGui
+
+	static accountsListView
+	static connectionsListView
 
 	static connector := false
 	static done := false
-	static accounts := {}
-	static tasks := {}
+	static accounts := CaseInsenseMap()
+	static tasks := CaseInsenseMap()
 	static account := false
 
 	static token := false
 
-	static teamServerURLEdit = "https://localhost:5001"
-	static changePasswordButton
-	static accountsListView
-	static connectionsListView
-
-	static accountNameEdit
-	static accountEMailEdit
-	static accountPasswordEdit
-	static accountContractDropDown
-	static accountMinutesEdit := 120
-	static accountSessionAccessCheck
-	static accountDataAccessCheck
-
-	static createPasswordButton
-	static copyPasswordButton
-	static availableMinutesButton
-
-	static taskTokenOperationDropDown
-	static taskTokenFrequencyDropDown
-	static taskSessionOperationDropDown
-	static taskSessionFrequencyDropDown
-	static taskQuotaOperationDropDown
-	static taskQuotaFrequencyDropDown
-	static taskAccountOperationDropDown
-	static taskAccountFrequencyDropDown
-
-	static refreshConnectionsListButton
-
-	static addAccountButton
-	static deleteAccountButton
-	static saveAccountButton
-
 	static keepAliveTask := false
+
+	parseObject(properties) {
+		local result := CaseInsenseMap()
+		local property
+
+		properties := StrReplace(properties, "`r", "")
+
+		loop Parse, properties, "`n" {
+			property := string2Values("=", A_LoopField)
+
+			result[property[1]] := property[2]
+		}
+
+		return result
+	}
+
+	updateTask(connector, tasks, task, which, operation, frequency) {
+		if isInteger(operation)
+			operation := ["Delete", "Cleanup", "Reset", "Renew"][operation]
+
+		if isInteger(frequency)
+			frequency := ["Never", "Daily", "Weekly", "Monthly"][frequency]
+
+		if (frequency = "Never") {
+			if task {
+				connector.DeleteTask(task)
+
+				tasks.Delete(which)
+			}
+		}
+		else if task
+			connector.UpdateTask(task, operation, frequency, true)
+		else
+			tasks[which] := connector.CreateTask((which = "Quota") ? "Account" : which, operation, frequency)
+
+		return tasks
+	}
+
+	loadAccounts(connector, listView) {
+		local accounts := CaseInsenseMap()
+		local ignore, identifier, account, index
+
+		listView.Delete()
+
+		if administrationEditor(kToken) {
+			for ignore, identifier in string2Values(";", connector.GetAllAccounts()) {
+				account := parseObject(connector.GetAccount(identifier))
+
+				accounts[A_Index] := account
+				accounts[account["Name"]] := account
+
+				index := inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account["Contract"])
+
+				listView.Add("", account["Name"], account["EMail"]
+							   , (account["SessionAccess"] = "true") ? translate("Yes") : translate("No")
+							   , (account["DataAccess"] = "true") ? translate("Yes") : translate("No")
+							   , translate(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"][index]) . translate(" (") . account["ContractMinutes"] . translate(")")
+							   , account["AvailableMinutes"])
+			}
+		}
+
+		listView.ModifyCol()
+
+		loop 6
+			listView.ModifyCol(A_Index, "AutoHdr")
+
+		return accounts
+	}
+
+	loadConnections(connector, listView) {
+		local ignore, identifier, connection, session
+
+		listView.Delete()
+
+		if administrationEditor(kToken) {
+			for ignore, identifier in string2Values(";", connector.GetAllConnections()) {
+				try {
+					connection := parseObject(connector.GetConnection(identifier))
+
+					session := connection["Session"]
+
+					if (session && (session != ""))
+						session := parseObject(connector.GetSession(session))["Name"]
+
+					listView.Add("", translate(connection["Type"]), connection["Name"], connection["Created"], session)
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+			}
+		}
+
+		listView.ModifyCol()
+
+		loop 4
+			listView.ModifyCol(A_Index, "AutoHdr")
+	}
+
+	changePassword(*) {
+		if administrationEditor(kToken) {
+			local teamServerNameEdit := administrationGui["teamServerNameEdit"].Text
+			local teamServerPasswordEdit := administrationGui["teamServerPasswordEdit"].Text
+			local title := translate("Team Server")
+			local password, firstPassword, secondPassword, result
+
+			administrationGui.Opt("+OwnDialogs")
+
+			result := InputBox(translate("Please enter your current password:"), title, "Password w200 h150")
+
+			if (result.Result = "Ok") {
+				password := result.Value
+
+				if (teamServerPasswordEdit != password) {
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("Invalid password."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
+
+					return
+				}
+
+				result := InputBox(translate("Please enter your new password:"), title, "Password w200 h150")
+
+				if (result.Result = "Ok") {
+					firstPassword := result.Value
+
+					InputBox(translate("Please re-enter your new password:"), title, "Password w200 h150")
+
+					if (result.Result = "Ok") {
+						secondPassword := result.Value
+
+						if (firstPassword != secondPassword) {
+							OnMessage(0x44, translateOkButton)
+							MsgBox(translate("The passwords do not match."), translate("Error"), 262160)
+							OnMessage(0x44, translateOkButton, 0)
+
+							return
+						}
+
+						administrationEditor(kEvent, "PasswordChange", firstPassword)
+					}
+				}
+			}
+		}
+		else {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("You must be connected to the Server to change your password."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
+		}
+	}
+
+	chooseAccount(listView, line, *) {
+		if line
+			administrationEditor.Bind(kEvent, "AccountLoad", line)
+	}
+
+	deleteAccount(*) {
+		local msgResult
+
+		OnMessage(0x44, translateYesNoButtons)
+		msgResult := MsgBox(translate("Do you really want to delete the selected account?"), translate("Delete"), 262436)
+		OnMessage(0x44, translateYesNoButtons, 0)
+
+		if (msgResult = "Yes")
+			administrationEditor(kEvent, "AccountDelete")
+	}
+
+	noSelect(listView, *) {
+		loop listView.GetCount()
+			listView.Modify(A_Index, "-Select")
+	}
 
 	if (configurationOrCommand == kClose)
 		done := true
 	else if (configurationOrCommand == kConnect) {
-		GuiControlGet teamServerURLEdit
-		GuiControlGet teamServerNameEdit
-		GuiControlGet teamServerPasswordEdit
-
 		try {
-			connector.Initialize(teamServerURLEdit)
+			connector.Initialize(administrationGui["teamServerURLEdit"].Text)
 
-			token := connector.Login(teamServerNameEdit, teamServerPasswordEdit)
+			token := connector.Login(administrationGui["teamServerNameEdit"].Text, administrationGui["teamServerPasswordEdit"].Text)
 
 			if (token = "")
 				token := false
 
 			if token {
-				sessionDB := new SessionDatabase()
+				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getUserName(), "Admin")
 
-				connection := connector.Connect(token, sessionDB.ID, sessionDB.getUserName(), "Admin")
+				administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-				administrationConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+				setMultiMapValue(administrationConfig, "Server Administration", "ServerURL", administrationGui["teamServerURLEdit"].Text)
+				setMultiMapValue(administrationConfig, "Server Administration", "Login", administrationGui["teamServerNameEdit"].Text)
 
-				setConfigurationValue(administrationConfig, "Server Administration", "ServerURL", teamServerURLEdit)
-				setConfigurationValue(administrationConfig, "Server Administration", "Login", teamServerNameEdit)
-
-				writeConfiguration(kUserConfigDirectory . "Application Settings.ini", administrationConfig)
+				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", administrationConfig)
 
 				if keepAliveTask
 					keepAliveTask.stop()
 
-				keepAliveTask := new PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
+				keepAliveTask := PeriodicTask(ObjBindMethod(connector, "KeepAlive", connection), 120000, kLowPriority)
 
 				keepAliveTask.start()
 
@@ -261,7 +311,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				showMessage(translate("Successfully connected to the Team Server."))
 			}
 		}
-		catch exception {
+		catch Any as exception {
 			token := false
 
 			accounts := loadAccounts(connector, accountsListView)
@@ -270,11 +320,9 @@ administrationEditor(configurationOrCommand, arguments*) {
 			administrationEditor(kEvent, "TasksReset")
 			administrationEditor(kEvent, "AccountClear")
 
-			title := translate("Error")
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %title%, % (translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message)
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateOkButton)
+			MsgBox((translate("Cannot connect to the Team Server.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 	else if (configurationOrCommand = kToken)
@@ -282,133 +330,132 @@ administrationEditor(configurationOrCommand, arguments*) {
 	else if (configurationOrCommand == kEvent) {
 		try {
 			if (arguments[1] = "TasksReset") {
-				 GuiControl Choose, taskTokenOperationDropDown, 1
-				 GuiControl Choose, taskTokenFrequencyDropDown, 1
-				 GuiControl Choose, taskSessionOperationDropDown, 3
-				 GuiControl Choose, taskSessionFrequencyDropDown, 1
-				 GuiControl Choose, taskQuotaOperationDropDown, 1
-				 GuiControl Choose, taskQuotaFrequencyDropDown, 1
-				 GuiControl Choose, taskAccountOperationDropDown, 1
-				 GuiControl Choose, taskAccountFrequencyDropDown, 1
+				 administrationGui["taskTokenOperationDropDown"].Choose(1)
+				 administrationGui["taskTokenFrequencyDropDown"].Choose(1)
+				 administrationGui["taskSessionOperationDropDown"].Choose(3)
+				 administrationGui["taskSessionFrequencyDropDown"].Choose(1)
+				 administrationGui["taskQuotaOperationDropDown"].Choose(1)
+				 administrationGui["taskQuotaFrequencyDropDown"].Choose(1)
+				 administrationGui["taskAccountOperationDropDown"].Choose(1)
+				 administrationGui["taskAccountFrequencyDropDown"].Choose(1)
 			}
 			else if (arguments[1] = "TasksLoad") {
 				administrationEditor(kEvent, "TasksReset")
 
-				tasks := {}
+				tasks := CaseInsenseMap()
 
 				for ignore, identifier in string2Values(";", connector.GetAllTasks()) {
 					task := parseObject(connector.GetTask(identifier))
 
-					if ((task.Which = "Account") && (task.What = "Renew"))
+					if ((task["Which"] = "Account") && (task["What"] = "Renew"))
 						type := "Quota"
 					else
-						type := task.Which
+						type := task["Which"]
 
-					tasks[type] := task.Identifier
+					tasks[type] := task["Identifier"]
 
 					if (type = "Token") {
-						GuiControl Choose, taskTokenOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What)
-						GuiControl Choose, taskTokenFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+						administrationGui["taskTokenOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task["What"]))
+						administrationGui["taskTokenFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 					else if (type = "Session") {
-						GuiControl Choose, taskSessionOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What)
-						GuiControl Choose, taskSessionFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+						administrationGui["taskSessionOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task["What"]))
+						administrationGui["taskSessionFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 					else if (type = "Quota") {
-						GuiControl Choose, taskQuotaOperationDropDown, % inList(["Delete", "Cleanup", "Reset", "Renew"], task.What) - 3
-						GuiControl Choose, taskQuotaFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+						administrationGui["taskQuotaOperationDropDown"].Choose(inList(["Delete", "Cleanup", "Reset", "Renew"], task["What"]) - 3)
+						administrationGui["taskQuotaFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 					else if (type = "Account") {
-						GuiControl Choose, taskAccountOperationDropDown, % inList(["Delete"], task.What)
-						GuiControl Choose, taskAccountFrequencyDropDown, % inList(["Never", "Daily", "Weekly", "Monthly"], task.When)
+						administrationGui["taskAccountOperationDropDown"].Choose(inList(["Delete"], task["What"]))
+						administrationGui["taskAccountFrequencyDropDown"].Choose(inList(["Never", "Daily", "Weekly", "Monthly"], task["When"]))
 					}
 				}
 			}
 			else if (arguments[1] = "TaskUpdate") {
 				which := arguments[2]
 
-				task := (tasks.HasKey(which) ? tasks[which] : false)
+				task := (tasks.Has(which) ? tasks[which] : false)
 
-				switch which {
+				switch which, false {
 					case "Token":
-						GuiControlGet taskTokenOperationDropDown
-						GuiControlGet taskTokenFrequencyDropDown
-
-						tasks := updateTask(connector, tasks, task, which, taskTokenOperationDropDown, taskTokenFrequencyDropDown)
+						tasks := updateTask(connector, tasks, task, which, administrationGui["taskTokenOperationDropDown"].Value
+																		 , administrationGui["taskTokenFrequencyDropDown"].Value)
 					case "Session":
-						GuiControlGet taskSessionOperationDropDown
-						GuiControlGet taskSessionFrequencyDropDown
-
-						tasks := updateTask(connector, tasks, task, which, taskSessionOperationDropDown, taskSessionFrequencyDropDown)
+						tasks := updateTask(connector, tasks, task, which, administrationGui["taskSessionOperationDropDown"].Value
+																		 , administrationGui["taskSessionFrequencyDropDown"].Value)
 					case "Quota":
-						GuiControlGet taskQuotaOperationDropDown
-						GuiControlGet taskQuotaFrequencyDropDown
-
-						tasks := updateTask(connector, tasks, task, which, taskQuotaOperationDropDown + 3, taskQuotaFrequencyDropDown)
+						tasks := updateTask(connector, tasks, task, which, administrationGui["taskQuotaOperationDropDown"].Value + 3
+																		 , administrationGui["taskQuotaFrequencyDropDown"].Value)
 					case "Account":
-						GuiControlGet taskAccountOperationDropDown
-						GuiControlGet taskAccountFrequencyDropDown
-
-						tasks := updateTask(connector, tasks, task, which, taskAccountOperationDropDown, taskAccountFrequencyDropDown)
+						tasks := updateTask(connector, tasks, task, which, administrationGui["taskAccountOperationDropDown"].Value
+																		 , administrationGui["taskAccountFrequencyDropDown"].Value)
 				}
 			}
 			else if (arguments[1] = "PasswordChange") {
 				connector.ChangePassword(arguments[2])
 
-				GuiControl, , teamServerPasswordEdit, % arguments[2]
+				administrationGui["teamServerPasswordEdit"].Value := arguments[2]
 			}
 			else if (arguments[1] = "AccountLoad") {
 				account := accounts[arguments[2]]
 
-				GuiControl, , accountNameEdit, % account.Name
-				GuiControl, , accountEMailEdit, % account.EMail
-				GuiControl, , accountPasswordEdit, % ""
-				GuiControl Choose, accountContractDropDown, % inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account.Contract)
-				GuiControl, , accountMinutesEdit, % account.ContractMinutes
-				GuiControl, , accountSessionAccessCheck, % (account.SessionAccess = kTrue)
-				GuiControl, , accountDataAccessCheck, % (account.DataAccess = kTrue)
+				administrationGui["accountNameEdit"].Text := account["Name"]
+				administrationGui["accountEMailEdit"].Text := account["EMail"]
+				administrationGui["accountPasswordEdit"].Text := ""
+				administrationGui["accountContractDropDown"].Choose(inList(["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"], account["Contract"]))
+				administrationGui["accountMinutesEdit"].Text := account["ContractMinutes"]
+				administrationGui["accountSessionAccessCheck"].Value := (account["SessionAccess"] = kTrue)
+				administrationGui["accountDataAccessCheck"].Value := (account["DataAccess"] = kTrue)
 
 				administrationEditor(kEvent, "UpdateState")
 			}
 			else if (arguments[1] = "AccountNew") {
 				administrationEditor(kEvent, "AccountClear")
 
-				GuiControl Choose, accountContractDropDown, 2
-				GuiControl, , accountMinutesEdit, 120
+				administrationGui["accountContractDropDown"].Choose(2)
+				administrationGui["accountMinutesEdit"].Text := 120
 
 				account := true
 
 				administrationEditor(kEvent, "UpdateState")
 			}
 			else if (arguments[1] = "AccountSave") {
-				GuiControlGet accountNameEdit
-				GuiControlGet accountEMailEdit
-				GuiControlGet accountPasswordEdit
-				GuiControlGet accountContractDropDown
-				GuiControlGet accountMinutesEdit
-				GuiControlGet accountSessionAccessCheck
-				GuiControlGet accountDataAccessCheck
+				local accountNameEdit := administrationGui["accountNameEdit"].Text
+				local accountEMailEdit := administrationGui["accountEMailEdit"].Text
+				local accountPasswordEdit := administrationGui["accountPasswordEdit"].Text
+				local accountContractDropDown := administrationGui["accountContractDropDown"].Valu
+				local accountMinutesEdit := administrationGui["accountMinutesEdit"].Text
+				local accountSessionAccessCheck := administrationGui["accountSessionAccessCheck"].Value
+				local accountDataAccessCheck := administrationGui["accountDataAccessCheck"].Value
 
 				contract := ["Expired", "OneTime", "FixedMinutes", "AdditionalMinutes", "Unlimited"][accountContractDropDown]
 
 				if (account == true) {
 					connector.CreateAccount(accountNameEdit, accountEMailEdit, accountPasswordEdit
-										  , accountSessionAccessCheck ? "true" : "false"
-										  , accountDataAccessCheck ? "true" : "false"
+										  , accountSessionAccessCheck ? kTrue : kFalse
+										  , accountDataAccessCheck ? kTrue : kFalse
 										  , accountMinutesEdit, contract, accountMinutesEdit)
 				}
 				else {
 					if (accountPasswordEdit != "")
-						connector.ChangeAccountPassword(account.Identifier, accountPasswordEdit)
+						connector.ChangeAccountPassword(account["Identifier"], accountPasswordEdit)
 
-					if ((account.Contract != contract) || (account.ContractMinutes != accountMinutesEdit))
-						connector.ChangeAccountContract(account.Identifier, contract, accountMinutesEdit)
+					if ((account["Contract"] != contract) || (account["ContractMinutes"] != accountMinutesEdit)) {
+						connector.ChangeAccountContract(account["Identifier"], contract, accountMinutesEdit)
 
-					if (accountEMailEdit != account.EMail)
-						connector.ChangeAccountEMail(account.Identifier, accountEMailEdit)
+						account["Contract"] := contract
+						account["ContractMinutes"] := accountMinutesEdit
+					}
 
-					connector.ChangeAccountAccess(account.Identifier, accountSessionAccessCheck ? "true" : "false"
-																	, accountDataAccessCheck ? "true" : "false")
+					if (accountEMailEdit != account["EMail"]) {
+						connector.ChangeAccountEMail(account["Identifier"], accountEMailEdit)
+
+						account["EMail"] := accountEMailEdit
+					}
+
+					connector.ChangeAccountAccess(account.Identifier, accountSessionAccessCheck ? kTrue : kFalse
+																	, accountDataAccessCheck ? kTrue : kFalse)
 				}
 
 				accounts := loadAccounts(connector, accountsListView)
@@ -416,7 +463,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				administrationEditor(kEvent, "AccountClear")
 			}
 			else if (arguments[1] = "AccountDelete") {
-				connector.DeleteAccount(account.Identifier)
+				connector.DeleteAccount(account["Identifier"])
 
 				accounts := loadAccounts(connector, accountsListView)
 
@@ -425,36 +472,29 @@ administrationEditor(configurationOrCommand, arguments*) {
 			else if (arguments[1] = "AccountClear") {
 				account := false
 
-				GuiControl, , accountNameEdit, % ""
-				GuiControl, , accountEMailEdit, % ""
-				GuiControl, , accountPasswordEdit, % ""
-				GuiControl, , accountSessionAccessCheck, 0
-				GuiControl, , accountDataAccessCheck, 0
-				GuiControl Choose, accountContractDropDown, 0
-				GuiControl, , accountMinutesEdit, % ""
+				administrationGui["accountNameEdit"].Text := ""
+				administrationGui["accountEMailEdit"].Text := ""
+				administrationGui["accountPasswordEdit"].Text := ""
+				administrationGui["accountSessionAccessCheck"].Value := 0
+				administrationGui["accountDataAccessCheck"].Value := 0
+				administrationGui["accountContractDropDown"].Choose(0)
+				administrationGui["accountMinutesEdit"].Text := ""
 
 				administrationEditor(kEvent, "UpdateState")
 			}
 			else if (arguments[1] = "UpdateAvailableMinutes") {
 				if (account == true) {
-					title := translate("Error")
-
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-					MsgBox 262160, %title%, % translate("You must save the account before you can change the number of available minutes.")
-					OnMessage(0x44, "")
+					OnMessage(0x44, translateOkButton)
+					MsgBox(translate("You must save the account before you can change the number of available minutes."), translate("Error"), 262160)
+					OnMessage(0x44, translateOkButton, 0)
 				}
 				else {
-					title := translate("Team Server")
-					prompt := translate("Please enter the amount of available minutes:")
+					administrationGui.Opt("+OwnDialogs")
 
-					locale := ((getLanguage() = "en") ? "" : "Locale")
-					minutes := account.AvailableMinutes
+					result := InputBox(translate("Please enter the amount of available minutes:"), translate("Team Server"), "w200 h150", account["AvailableMinutes"])
 
-					InputBox minutes, %title%, %prompt%, , 200, 150, , , %locale%, , %minutes%
-
-					if !ErrorLevel
-					{
-						connector.SetAccountMinutes(account.Identifier, minutes)
+					if (result.Result = "Ok") {
+						connector.SetAccountMinutes(account.Identifier, result.Value)
 
 						accounts := loadAccounts(connector, accountsListView)
 
@@ -463,97 +503,93 @@ administrationEditor(configurationOrCommand, arguments*) {
 				}
 			}
 			else if (arguments[1] = "UpdateState") {
-				GuiControl Disable, copyPasswordButton
+				administrationGui["copyPasswordButton"].Enabled := false
 
 				if token {
-					GuiControl Enable, changePasswordButton
-					GuiControl Enable, addAccountButton
+					administrationGui["changePasswordButton"].Enabled := true
+					administrationGui["addAccountButton"].Enabled := true
 
-					GuiControl Enable, taskTokenOperationDropDown
-					GuiControl Enable, taskTokenFrequencyDropDown
-					GuiControl Enable, taskSessionOperationDropDown
-					GuiControl Enable, taskSessionFrequencyDropDown
-					GuiControl Enable, taskQuotaOperationDropDown
-					GuiControl Enable, taskQuotaFrequencyDropDown
-					GuiControl Enable, taskAccountOperationDropDown
-					GuiControl Enable, taskAccountFrequencyDropDown
+					administrationGui["taskTokenOperationDropDown"].Enabled := true
+					administrationGui["taskTokenFrequencyDropDown"].Enabled := true
+					administrationGui["taskSessionOperationDropDown"].Enabled := true
+					administrationGui["taskSessionFrequencyDropDown"].Enabled := true
+					administrationGui["taskQuotaOperationDropDown"].Enabled := true
+					administrationGui["taskQuotaFrequencyDropDown"].Enabled := true
+					administrationGui["taskAccountOperationDropDown"].Enabled := true
+					administrationGui["taskAccountFrequencyDropDown"].Enabled := true
 
-					GuiControl Enable, refreshConnectionsListButton
+					administrationGui["refreshConnectionsListButton"].Enabled := true
 				}
 				else {
-					GuiControl Disable, changePasswordButton
-					GuiControl Disable, addAccountButton
+					administrationGui["changePasswordButton"].Enabled := false
+					administrationGui["addAccountButton"].Enabled := false
 
-					GuiControl Disable, taskTokenOperationDropDown
-					GuiControl Disable, taskTokenFrequencyDropDown
-					GuiControl Disable, taskSessionOperationDropDown
-					GuiControl Disable, taskSessionFrequencyDropDown
-					GuiControl Disable, taskQuotaOperationDropDown
-					GuiControl Disable, taskQuotaFrequencyDropDown
-					GuiControl Disable, taskAccountOperationDropDown
-					GuiControl Disable, taskAccountFrequencyDropDown
+					administrationGui["taskTokenOperationDropDown"].Enabled := false
+					administrationGui["taskTokenFrequencyDropDown"].Enabled := false
+					administrationGui["taskSessionOperationDropDown"].Enabled := false
+					administrationGui["taskSessionFrequencyDropDown"].Enabled := false
+					administrationGui["taskQuotaOperationDropDown"].Enabled := false
+					administrationGui["taskQuotaFrequencyDropDown"].Enabled := false
+					administrationGui["taskAccountOperationDropDown"].Enabled := false
+					administrationGui["taskAccountFrequencyDropDown"].Enabled := false
 
-					GuiControl Disable, refreshConnectionsListButton
+					administrationGui["refreshConnectionsListButton"].Enabled := false
 
-					Gui ListView, % connectionsListView
-
-					LV_Delete()
+					connectionsListView.Delete()
 				}
 
 				if account {
-					GuiControlGet accountContractDropDown
-
 					if (account == true)
-						GuiControl Enable, accountNameEdit
+						administrationGui["accountNameEdit"].Enabled := true
 					else
-						GuiControl Disable, accountNameEdit
+						administrationGui["accountNameEdit"].Enabled := false
 
-					GuiControl Enable, accountEMailEdit
-					GuiControl Enable, accountPasswordEdit
-					GuiControl Enable, accountSessionAccessCheck
-					GuiControl Enable, accountDataAccessCheck
-					GuiControl Enable, accountContractDropDown
+					administrationGui["accountEMailEdit"].Enabled := true
+					administrationGui["accountPasswordEdit"].Enabled := true
+					administrationGui["accountSessionAccessCheck"].Enabled := true
+					administrationGui["accountDataAccessCheck"].Enabled := true
+					administrationGui["accountContractDropDown"].Enabled := true
 
-					if (accountContractDropDown > 1) {
-						GuiControl Enable, availableMinutesButton
-						GuiControl Enable, accountMinutesEdit
+					if (administrationGui["accountContractDropDown"].Value > 1) {
+						administrationGui["availableMinutesButton"].Enabled := true
+						administrationGui["accountMinutesEdit"].Enabled := true
 					}
 					else {
-						GuiControl Disable, availableMinutesButton
-						GuiControl Disable, accountMinutesEdit
+						administrationGui["availableMinutesButton"].Enabled := false
+						administrationGui["accountMinutesEdit"].Enabled := false
 					}
 
-					GuiControl Enable, createPasswordButton
+					administrationGui["createPasswordButton"].Enabled := true
 
-					GuiControl Enable, deleteAccountButton
-					GuiControl Enable, saveAccountButton
+					administrationGui["deleteAccountButton"].Enabled := true
+					administrationGui["saveAccountButton"].Enabled := true
 				}
 				else {
-					GuiControl Disable, accountNameEdit
-					GuiControl Disable, accountEMailEdit
-					GuiControl Disable, accountPasswordEdit
-					GuiControl Disable, accountSessionAccessCheck
-					GuiControl Disable, accountDataAccessCheck
-					GuiControl Disable, accountContractDropDown
-					GuiControl Disable, accountMinutesEdit
+					administrationGui["accountNameEdit"].Enabled := false
+					administrationGui["accountEMailEdit"].Enabled := false
+					administrationGui["accountPasswordEdit"].Enabled := false
+					administrationGui["accountSessionAccessCheck"].Enabled := false
+					administrationGui["accountDataAccessCheck"].Enabled := false
+					administrationGui["accountContractDropDown"].Enabled := false
+					administrationGui["accountMinutesEdit"].Enabled := false
 
-					GuiControl Disable, createPasswordButton
-					GuiControl Disable, availableMinutesButton
+					administrationGui["createPasswordButton"].Enabled := false
+					administrationGui["availableMinutesButton"].Enabled := false
 
-					GuiControl Disable, deleteAccountButton
-					GuiControl Disable, saveAccountButton
+					administrationGui["deleteAccountButton"].Enabled := false
+					administrationGui["saveAccountButton"].Enabled := false
 				}
 			}
 			else if (arguments[1] = "PasswordCreate") {
-				GuiControl Enable, copyPasswordButton
+				administrationGui["copyPasswordButton"].Enabled := true
 
-				GuiControl Text, accountPasswordEdit, % generatePassword(20)
+				administrationGui["accountPasswordEdit"].Text := generatePassword(20)
 			}
 			else if (arguments[1] = "PasswordCopy") {
-				GuiControlGet accountPasswordEdit
+				local accountPasswordEdit := administrationGui["accountPasswordEdit"].Text
 
 				if (accountPasswordEdit && (accountPasswordEdit != "")) {
-					Clipboard := accountPasswordEdit
+					A_Clipboard := accountPasswordEdit
 
 					showMessage(translate("Password copied to the clipboard."))
 				}
@@ -561,12 +597,10 @@ administrationEditor(configurationOrCommand, arguments*) {
 			else if (arguments[1] = "LoadConnections")
 				loadConnections(connector, connectionsListView)
 		}
-		catch exception {
-			title := translate("Error")
-
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %title%, % (translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message)
-			OnMessage(0x44, "")
+		catch Any as exception {
+			OnMessage(0x44, translateOkButton)
+			MsgBox((translate("Error while executing command.") . "`n`n" . translate("Error: ") . exception.Message), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 		}
 	}
 	else {
@@ -582,37 +616,33 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.TeamServerConnector")
 		}
-		catch exception {
+		catch Any as exception {
 			logMessage(kLogCritical, translate("Error while initializing Team Server Connector - please rebuild the applications"))
 
 			showMessage(translate("Error while initializing Team Server Connector - please rebuild the applications") . translate("...")
 					  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		administrationConfig := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+		administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		teamServerURLEdit := getConfigurationValue(administrationConfig, "Server Administration", "ServerURL", "https://localhost:5001")
-		teamServerNameEdit := getConfigurationValue(administrationConfig, "Server Administration", "Login", "")
+		administrationGui := Window({Descriptor: "Server Administration", Resizeable: true, Closeable: true, Options: "-MaximizeBox"})
 
-		Gui ADM:Default
+		administrationGui.SetFont("Bold", "Arial")
 
-		Gui ADM:-Border ; -Caption
-		Gui ADM:Color, D0D0D0, D8D8D8
+		administrationGui.Add("Text", "w388 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(administrationGui, "Server Administration"))
 
-		Gui ADM:Font, Bold, Arial
+		administrationGui.SetFont("Norm", "Arial")
+		administrationGui.SetFont("Italic Underline", "Arial")
 
-		Gui ADM:Add, Text, w388 Center gmoveAdministrationEditor, % translate("Modular Simulator Controller System")
+		administrationGui.Add("Text", "x118 YP+20 w168 cBlue Center H:Center", translate("Server Administration")).OnEvent("Click", openDocumentation.Bind(administrationGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration"))
 
-		Gui ADM:Font, Norm, Arial
-		Gui ADM:Font, Italic Underline, Arial
+		administrationGui.SetFont("Norm", "Arial")
 
-		Gui ADM:Add, Text, x118 YP+20 w168 cBlue Center gopenAdministrationDocumentation, % translate("Server Administration")
+		/*
+		administrationGui.Add("Text", "x24 yp+30 w356 0x10")
 
-		Gui ADM:Add, Text, x24 yp+30 w356 0x10
-
-		Gui ADM:Font, Norm, Arial
-
-		Gui ADM:Add, Button, x164 y474 w80 h23 gcloseAdministrationEditor, % translate("Close")
+		administrationGui.Add("Button", "x164 y474 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", administrationEditor.Bind(kClose))
+		*/
 
 		x := 8
 		y := 68
@@ -638,249 +668,120 @@ administrationEditor(configurationOrCommand, arguments*) {
 		x5 := x3 + w3 + 2
 		w5 := w3 - 25
 
-		Gui ADM:Add, Text, x%x0% y%y% w90 h23 +0x200, % translate("Server URL")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w4% h21 VteamServerURLEdit, %teamServerURLEdit%
+		administrationGui.Add("Text", "x" . x0 . " y" . y . " w90 h23 +0x200", translate("Server URL"))
+		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w4 . " h21 W:Grow VteamServerURLEdit", getMultiMapValue(administrationConfig, "Server Administration", "ServerURL", "https://localhost:5001"))
 
-		Gui ADM:Add, Text, x%x0% yp+23 w90 h23 +0x200, % translate("Login Credentials")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% h21 HWNDloginHandle VteamServerNameEdit, %teamServerNameEdit%
-		Gui ADM:Add, Edit, x%x3% yp w%w3% h21 Password VteamServerPasswordEdit, %teamServerPasswordEdit%
-		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Default Center +0x200 HWNDconnectButton grenewToken
-		setButtonIcon(connectButton, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-		Gui ADM:Add, Button, x%x5% yp-1 w23 h23 Center +0x200 HWNDchangePasswordButtonHandle vchangePasswordButton gchangePassword
-		setButtonIcon(changePasswordButtonHandle, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+		administrationGui.Add("Text", "x" . x0 . " yp+23 w90 h23 +0x200", translate("Login Credentials"))
+		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " h21 W:Grow(0.5) VteamServerNameEdit", getMultiMapValue(administrationConfig, "Server Administration", "Login", ""))
+		administrationGui.Add("Edit", "x" . x3 . " yp w" . w3 . " h21 X:Move(0.5) W:Grow(0.5) Password VteamServerPasswordEdit", "")
 
-		Gui ADM:Add, Tab3, x8 y122 w388 h343 -Wrap, % values2String("|", map(["Accounts", "Jobs", "Connections"], "translate")*)
+		button := administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Default Center +0x200")
+		button.OnEvent("Click", administrationEditor.Bind(kConnect))
+		setButtonIcon(button, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+		button := administrationGui.Add("Button", "x" . x5 . " yp-1 w23 h23 X:Move Center +0x200 vchangePasswordButton")
+		button.OnEvent("Click", changePassword)
+		setButtonIcon(button, kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+
+		administrationTab := administrationGui.Add("Tab3", "x8 y122 w388 h343 W:Grow H:Grow -Wrap", collect(["Accounts", "Jobs", "Connections"], translate))
 
 		x0 := 16
 		y := 152
 
-		Gui Tab, 1
+		administrationTab.UseTab(1)
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h146 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDaccountsListView gaccountsListEvent, % values2String("|", map(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], "translate")*)
+		accountsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h146 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Account", "E-Mail", "Session", "Data", "Quota", "Available"], translate))
+		accountsListView.OnEvent("Click", chooseAccount)
 
-		Gui ADM:Add, Text, x%x0% yp+150 w90 h23 +0x200, % translate("Name")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w3% vaccountNameEdit
+		administrationGui.Add("Text", "x" . x0 . " yp+150 w90 h23 Y:Move +0x200", translate("Name"))
+		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Y:Move vaccountNameEdit")
 
-		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Password")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w4% ReadOnly Password vaccountPasswordEdit
-		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDcreatePasswordButtonHandle vcreatePasswordButton gcreatePassword
-		setButtonIcon(createPasswordButtonHandle, kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
-		Gui ADM:Add, Button, x%x5% yp w23 h23 Center +0x200 HWNDcopyPasswordButtonHandle vcopyPasswordButton gcopyPassword
-		setButtonIcon(copyPasswordButtonHandle, kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
+		administrationGui.Add("Text", "x" . x0 . " yp+24 w90 h23 Y:Move +0x200", translate("Password"))
+		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w4 . " W:Grow Y:Move ReadOnly Password vaccountPasswordEdit")
+		administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Y:Move Center +0x200 vcreatePasswordButton").OnEvent("Click", administrationEditor.Bind(kEvent, "PasswordCreate"))
+		setButtonIcon(administrationGui["createPasswordButton"], kIconsDirectory . "Authorize.ico", 1, "L4 T4 R4 B4")
+		administrationGui.Add("Button", "x" . x5 . " yp w23 h23 X:Move Y:Move Center +0x200 vcopyPasswordButton").OnEvent("Click", administrationEditor.Bind(kEvent, "PasswordCopy"))
+		setButtonIcon(administrationGui["copyPasswordButton"], kIconsDirectory . "Copy.ico", 1, "L4 T4 R4 B4")
 
-		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("E-Mail")
-		Gui ADM:Add, Edit, x%x1% yp+1 w%w4%  vaccountEMailEdit
+		administrationGui.Add("Text", "x" . x0 . " yp+24 w90 h23 Y:Move +0x200", translate("E-Mail"))
+		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w4 . " W:Grow Y:Move vaccountEMailEdit")
 
-		Gui ADM:Add, Text, x%x0% yp+24 w90 h23 +0x200, % translate("Session / Data")
-		Gui ADM:Add, CheckBox, x%x1% yp+3 w23 vaccountSessionAccessCheck
-		Gui ADM:Add, CheckBox, xp+24 yp w23 vaccountDataAccessCheck
+		administrationGui.Add("Text", "x" . x0 . " yp+24 w90 h23 Y:Move +0x200", translate("Session / Data"))
+		administrationGui.Add("CheckBox", "x" . x1 . " yp+3 w23 Y:Move vaccountSessionAccessCheck")
+		administrationGui.Add("CheckBox", "xp+24 yp w23 Y:Move vaccountDataAccessCheck")
 
-		Gui ADM:Add, Text, x%x0% yp+22 w90 h23 +0x200, % translate("Contingent")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose2 vaccountContractDropDown gupdateContract, % values2String("|", map(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], "translate")*)
-		Gui ADM:Add, Edit, x%x3% yp w60 h21 Number vaccountMinutesEdit
-		Gui ADM:Add, Text, x%x4% yp w90 h23 +0x200, % translate("Minutes")
-		Gui ADM:Add, Button, x%x2% yp-1 w23 h23 Center +0x200 HWNDavailableMinutesButtonHandle vavailableMinutesButton gupdateAvailableMinutes
-		setButtonIcon(availableMinutesButtonHandle, kIconsDirectory . "Watch.ico", 1, "L4 T4 R4 B4")
+		administrationGui.Add("Text", "x" . x0 . " yp+22 w90 h23 Y:Move +0x200", translate("Contingent"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow Y:Move Choose2 vaccountContractDropDown", collect(["Expired", "One-Time", "Fixed", "Additional", "Unlimited"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "UpdateState"))
+		administrationGui.Add("Edit", "x" . x3 . " yp w60 h21 X:Move Y:Move Number vaccountMinutesEdit")
+		administrationGui.Add("Text", "x" . x4 . " yp w90 h23 X:Move Y:Move +0x200", translate("Minutes"))
+		administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Y:Move Center +0x200 vavailableMinutesButton").OnEvent("Click", administrationEditor.Bind(kEvent, "UpdateAvailableMinutes"))
+		setButtonIcon(administrationGui["availableMinutesButton"], kIconsDirectory . "Watch.ico", 1, "L4 T4 R4 B4")
 
 		x5 := x4 - 1
 		x6 := x5 + 24
 		x7 := x6 + 24
 
-		Gui ADM:Add, Button, x%x5% yp+30 w23 h23 Center +0x200 gnewAccount HWNDaddAccountButtonHandle vaddAccountButton
-		setButtonIcon(addAccountButtonHandle, kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		Gui ADM:Add, Button, x%x6% yp w23 h23 Center +0x200 gdeleteAccount HWNDdeleteAccountButtonHandle vdeleteAccountButton
-		setButtonIcon(deleteAccountButtonHandle, kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
-		Gui ADM:Add, Button, x%x7% yp w23 h23 Center +0x200 gsaveAccount HWNDsaveAccountButtonHandle vsaveAccountButton
-		setButtonIcon(saveAccountButtonHandle, kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
+		administrationGui.Add("Button", "x" . x5 . " yp+30 w23 h23 X:Move Y:Move Center +0x200 vaddAccountButton").OnEvent("Click", administrationEditor.Bind(kEvent, "AccountNew"))
+		setButtonIcon(administrationGui["addAccountButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
+		administrationGui.Add("Button", "x" . x6 . " yp w23 h23 X:Move Y:Move Center +0x200 vdeleteAccountButton").OnEvent("Click", deleteAccount)
+		setButtonIcon(administrationGui["deleteAccountButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
+		administrationGui.Add("Button", "x" . x7 . " yp w23 h23 X:Move Y:Move Center +0x200 vsaveAccountButton").OnEvent("Click", administrationEditor.Bind(kEvent, "AccountSave"))
+		setButtonIcon(administrationGui["saveAccountButton"], kIconsDirectory . "Save.ico", 1, "L5 T5 R5 B5")
 
-		Gui Tab, 2
+		administrationTab.UseTab(2)
 
-		Gui ADM:Add, Text, x%x0% y%y% w120 h23 +0x200, % translate("Expired Tokens")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskTokenOperationDropDown gupdateTokenTask, % values2String("|", map(["Delete"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskTokenFrequencyDropDown gupdateTokenTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
+		administrationGui.Add("Text", "x" . x0 . " y" . y . " w120 h23 +0x200", translate("Expired Tokens"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose1 vtaskTokenOperationDropDown", [translate("Delete")]).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Token"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskTokenFrequencyDropDown", collect(["Never", "Daily", "Weekly"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Token"))
 
-		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Expired Accounts")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskAccountOperationDropDown gupdateAccountTask, % values2String("|", map(["Delete"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskAccountFrequencyDropDown gupdateAccountTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		administrationGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Expired Accounts"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose1 vtaskAccountOperationDropDown", [translate("Delete")]).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Account"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskAccountFrequencyDropDown", collect(["Never", "Daily", "Weekly", "1st of Month"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Account"))
 
-		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Finished Sessions")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose3 vtaskSessionOperationDropDown gupdateSessionTask, % values2String("|", map(["Delete", "Clear", "Reset"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskSessionFrequencyDropDown gupdateSessionTask, % values2String("|", map(["Never", "Daily", "Weekly"], "translate")*)
+		administrationGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Finished Sessions"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose3 vtaskSessionOperationDropDown", collect(["Delete", "Clear", "Reset"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Session"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskSessionFrequencyDropDown", collect(["Never", "Daily", "Weekly"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Session"))
 
-		Gui ADM:Add, Text, x%x0% yp+23 w120 h23 +0x200, % translate("Quotas")
-		Gui ADM:Add, DropDownList, x%x1% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaOperationDropDown gupdateQuotaTask, % values2String("|", map(["Renew"], "translate")*)
-		Gui ADM:Add, DropDownList, x%x3% yp+1 w%w3% AltSubmit Choose1 vtaskQuotaFrequencyDropDown gupdateQuotaTask, % values2String("|", map(["Never", "Daily", "Weekly", "1st of Month"], "translate")*)
+		administrationGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Quotas"))
+		administrationGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " W:Grow(0.5) Choose1 vtaskQuotaOperationDropDown", collect(["Renew"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Quota"))
+		administrationGui.Add("DropDownList", "x" . x3 . " yp+1 w" . w3 . " X:Move(0.5) W:Grow(0.5) Choose1 vtaskQuotaFrequencyDropDown", collect(["Never", "Daily", "Weekly", "1st of Month"], translate)).OnEvent("Change", administrationEditor.Bind(kEvent, "TaskUpdate", "Quota"))
 
-		Gui Tab, 3
+		administrationTab.UseTab(3)
 
-		Gui ADM:Add, ListView, x%x0% y%y% w372 h270 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HWNDconnectionsListView gconnectionsListEvent, % values2String("|", map(["Role", "Name", "Since", "Session"], "translate")*)
+		connectionsListView := administrationGui.Add("ListView", "x" . x0 . " y" . y . " w372 h270 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Role", "Name", "Since", "Session"], translate))
+		connectionsListView.OnEvent("Click", noSelect)
+		connectionsListView.OnEvent("DoubleClick", noSelect)
 
-		Gui ADM:Add, Button, x%x0% y430 w80 h23 vrefreshConnectionsListButton grefreshConnectionsList, % translate("Refresh")
+		administrationGui.Add("Button", "x" . x0 . " y430 w80 h23 Y:Move vrefreshConnectionsListButton", translate("Refresh")).OnEvent("Click", administrationEditor.Bind(kEvent, "LoadConnections"))
 
-		if getWindowPosition("Server Administration", x, y)
-			Gui ADM:Show, x%x% y%y%
+		administrationGui.Add(AdministrationResizer(administrationGui))
+
+		if getWindowPosition("Server Administration", &x, &y)
+			administrationGui.Show("x" . x . " y" . y)
 		else
-			Gui ADM:Show
+			administrationGui.Show()
 
-		ControlFocus, , ahk_id %loginHandle%
+		if getWindowSize("Server Administration", &w, &h)
+			administrationGui.Resize("Initialize", w, h)
+
+		ControlFocus(administrationGui["teamServerNameEdit"])
 
 		administrationEditor(kEvent, "AccountClear")
 
 		loop
-			Sleep 1000
+			Sleep(1000)
 		until done
 	}
-}
-
-moveAdministrationEditor() {
-	moveByMouse("ADM", "Server Administration")
-}
-
-closeAdministrationEditor() {
-	administrationEditor(kClose)
-}
-
-openAdministrationDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration
-}
-
-renewToken() {
-	administrationEditor(kConnect)
-}
-
-changePassword() {
-	local errorTitle := translate("Error")
-
-	if administrationEditor(kToken) {
-		local title := translate("Team Server")
-		local prompt := translate("Please enter your current password:")
-		local locale, password, firstPassword, secondPassword
-
-		Gui ADM:Default
-
-		GuiControlGet teamServerNameEdit
-		GuiControlGet teamServerPasswordEdit
-
-		locale := ((getLanguage() = "en") ? "" : "Locale")
-
-		InputBox password, %title%, %prompt%, Hide, 200, 150, , , %locale%
-
-		if ErrorLevel
-			return
-
-		if (teamServerPasswordEdit != password) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %errorTitle%, % translate("Invalid password.")
-			OnMessage(0x44, "")
-
-			return
-		}
-
-		prompt := translate("Please enter your new password:")
-
-		InputBox firstPassword, %title%, %prompt%, Hide, 200, 150, , , %locale%
-
-		if ErrorLevel
-			return
-
-		prompt := translate("Please re-enter your new password:")
-
-		InputBox secondPassword, %title%, %prompt%, Hide, 200, 150, , , %locale%
-
-		if ErrorLevel
-			return
-
-		if (firstPassword != secondPassword) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			MsgBox 262160, %errorTitle%, % translate("The passwords do not match.")
-			OnMessage(0x44, "")
-
-			return
-		}
-
-		administrationEditor(kEvent, "PasswordChange", firstPassword)
-	}
-	else {
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-		MsgBox 262160, %errorTitle%, % translate("You must be connected to the Server to change your password.")
-		OnMessage(0x44, "")
-	}
-}
-
-updateAvailableMinutes() {
-	administrationEditor(kEvent, "UpdateAvailableMinutes")
-}
-
-accountsListEvent() {
-	if ((A_GuiEvent == "DoubleClick") || (A_GuiEvent == "Normal"))
-		administrationEditor(kEvent, "AccountLoad", A_EventInfo)
-}
-
-connectionsListEvent() {
-	loop % LV_GetCount()
-		LV_Modify(A_Index, "-Select")
-}
-
-refreshConnectionsList() {
-	administrationEditor(kEvent, "LoadConnections")
-}
-
-createPassword() {
-	administrationEditor(kEvent, "PasswordCreate")
-}
-
-copyPassword() {
-	administrationEditor(kEvent, "PasswordCopy")
-}
-
-updateContract() {
-	administrationEditor(kEvent, "UpdateState")
-}
-
-newAccount() {
-	administrationEditor(kEvent, "AccountNew")
-}
-
-deleteAccount() {
-	local title := translate("Delete")
-
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-	MsgBox 262436, %title%, % translate("Do you really want to delete the selected account?")
-	OnMessage(0x44, "")
-
-	IfMsgBox Yes
-		administrationEditor(kEvent, "AccountDelete")
-}
-
-saveAccount() {
-	administrationEditor(kEvent, "AccountSave")
-}
-
-updateTokenTask() {
-	administrationEditor(kEvent, "TaskUpdate", "Token")
-}
-
-updateSessionTask() {
-	administrationEditor(kEvent, "TaskUpdate", "Session")
-}
-
-updateQuotaTask() {
-	administrationEditor(kEvent, "TaskUpdate", "Quota")
-}
-
-updateAccountTask() {
-	administrationEditor(kEvent, "TaskUpdate", "Account")
 }
 
 startupServerAdministration() {
 	local icon := kIconsDirectory . "Server Administration.ico"
 
-	Menu Tray, Icon, %icon%, , 1
-	Menu Tray, Tip, Server Administration
+	TraySetIcon(icon, "1")
+	A_IconTip := "Server Administration"
 
 	administrationEditor(kSimulatorConfiguration)
 
-	ExitApp 0
+	ExitApp(0)
 }
 
 

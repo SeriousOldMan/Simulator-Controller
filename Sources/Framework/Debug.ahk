@@ -9,22 +9,31 @@
 ;;;                        Private Variable Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global vDebug := false
-global vLogLevel := kLogWarn
+global gDebug := (kBuildConfiguration = "Development")
+global gLogLevel := ((kBuildConfiguration = "Development") ? kLogDebug : kLogWarn)
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                        Public Constants Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global SupportMenu := Menu()
+global LogMenu := Menu()
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Files.ahk
-#Include ..\Framework\Strings.ahk
-#Include ..\Framework\Localization.ahk
-#Include ..\Framework\TrayMenu.ahk
-#Include ..\Framework\Message.ahk
-#Include ..\Libraries\Messages.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Files.ahk"
+#Include "..\Framework\Strings.ahk"
+#Include "..\Framework\Localization.ahk"
+#Include "..\Framework\TrayMenu.ahk"
+#Include "..\Framework\Message.ahk"
+#Include "..\Framework\MultiMap.ahk"
+#Include "..\Libraries\Messages.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -47,22 +56,32 @@ global kLogLevelNames := ["Debug", "Info", "Warn", "Critical", "Off"]
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-reportNonObjectUsage(reference, p1 = "", p2 = "", p3 = "", p4 = "") {
+reportNonObjectUsage(reference, p1 := "", p2 := "", p3 := "", p4 := "") {
 	if isDebug() {
-		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . reference . " was used as an object: " . p1 . "; " . p2 . "; " . p3 . "; " . p4
+		showMessage(StrSplit(A_ScriptName, ".")[1] . ": The literal value " . String(reference) . " was used as an object: "
+												   . String(p1) . "; " . String(p2) . "; " . String(p3) . "; " . String(p4)
 				  , false, kUndefined, 5000)
 
 		if isDevelopment()
-			ListLines
+			ListLines()
 	}
 
 	return false
 }
 
 initializeDebugging() {
-	"".base.__Get := "".base.__Set := "".base.__Call := Func("reportNonObjectUsage")
+	String.__Call := reportNonObjectUsage
+	String.__Get := reportNonObjectUsage
+	String.__Set := reportNonObjectUsage
+	Number.__Get := reportNonObjectUsage
+	Number.__Call := reportNonObjectUsage
+	Number.__Set := reportNonObjectUsage
 
-	OnError(Func("logError").Bind(true))
+	OnError(logUnhandledError)
+}
+
+logUnhandledError(error, *) {
+	return logError(error, true)
 }
 
 
@@ -71,25 +90,37 @@ initializeDebugging() {
 ;;;-------------------------------------------------------------------------;;;
 
 isDebug() {
-	return vDebug
+	global gDebug
+
+	return gDebug
+}
+
+isLogLevel(logLevel) {
+	return (logLevel >= gLogLevel)
 }
 
 isDevelopment() {
-	return (vBuildConfiguration = "Development")
+	global kBuildConfiguration
+
+	return (kBuildConfiguration = "Development")
 }
 
 getLogLevel() {
-	return vLogLevel
+	global gLogLevel
+
+	return gLogLevel
 }
 
-logMessage(logLevel, message) {
+logMessage(logLevel, message, monitor := true) {
+	global gLogLevel
+
 	local script := StrSplit(A_ScriptName, ".")[1]
 	local time := A_Now
-	local level, fileName, directory, tries, logTime, logLine
+	local level, fileName, directory, tries, logTime, logLine, pid
 
 	static sending := false
 
-	if (logLevel >= vLogLevel) {
+	if isLogLevel(logLevel) {
 		level := ""
 
 		switch logLevel {
@@ -107,36 +138,38 @@ logMessage(logLevel, message) {
 				throw "Unknown log level (" . logLevel . ") encountered in logMessage..."
 		}
 
-		FormatTime, logTime, %time%, dd.MM.yy hh:mm:ss tt
+		logTime := FormatTime(time, "dd.MM.yy hh:mm:ss tt")
 
 		fileName := kLogsDirectory . script . " Logs.txt"
 		logLine := "[" level . " - " . logTime . "]: " . message . "`n"
 
-		SplitPath fileName, , directory
-		FileCreateDir %directory%
+		SplitPath(fileName, , &directory)
+		DirCreate(directory)
 
 		tries := 5
 
 		while (tries > 0)
 			try {
-				FileAppend %logLine%, %fileName%, UTF-16
+				FileAppend(logLine, fileName, "UTF-16")
 
 				break
 			}
-			catch exception {
-				Sleep 1
+			catch Any as exception {
+				Sleep(1)
 
 				tries -= 1
 			}
 
-		if (!sending && (script != "System Monitor")) {
-			Process Exist, System Monitor.exe
+		if (monitor && !sending && (script != "System Monitor")) {
+			pid := ProcessExist("System Monitor.exe")
 
-			if ErrorLevel {
+			if pid {
 				sending := true
 
+				message := StrReplace(StrReplace(message, "`n", A_Space), "`r", A_Space)
+
 				try {
-					sendMessage(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), ErrorLevel)
+					messageSend(kFileMessage, "Monitoring", "logMessage:" . values2String(";", script, time, logLevel, message), pid)
 				}
 				finally {
 					sending := false
@@ -146,22 +179,39 @@ logMessage(logLevel, message) {
 	}
 }
 
-logError(exception, unhandled := false) {
-	local message
+logError(exception, unhandled := false, report := true) {
+	local debug := (isDevelopment() && isDebug())
+	local handle, message, settings
 
-	if IsObject(exception) {
+	static verbose := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Debug.ini"), "Debug", "Verbose", debug && !A_IsCompiled)
+
+	if isObject(exception) {
 		message := exception.Message
 
-		if message is not Number
-			logMessage(unhandled ? kLogCritical : kLogDebug
-					 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
-					 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+		logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug
+				 , translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
+				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message)
+
+
+		if exception.HasProp("Stack")
+			logMessage(unhandled ? kLogCritical : kLogDebug, "`n`nStack:`n`n" . exception.Stack, false)
 	}
-	else if exception is not Number
-		logMessage(unhandled ? kLogCritical : kLogDebug
+	else
+		logMessage((unhandled || isDevelopment()) ? kLogCritical : kLogDebug
 				 , translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
 
-	return ((isDevelopment() || isDebug()) ? false : true)
+	if (verbose && (unhandled || report))
+		if isObject(exception)
+			MsgBox(translate(unhandled ? "Unhandled exception encountered in " : "Handled exception encountered in ")
+				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message
+				 . (exception.HasProp("Stack") ? ("`n`nStack:`n`n" . exception.Stack) : ""))
+		else
+			MsgBox(translate(unhandled ? "Unhandled exception encountered: " : "Handled exception encountered: ") . exception)
+
+	if debug
+		return (A_IsCompiled ? -1 : false)
+	else
+		return -1
 }
 
 
@@ -169,41 +219,40 @@ logError(exception, unhandled := false) {
 ;;;                        Controller Action Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-toggleDebug() {
+toggleDebug(*) {
 	setDebug(!isDebug())
 }
 
-setDebug(debug) {
-	local label := translate("Debug")
+setDebug(debug, *) {
+	global gDebug
 	local title, state
 
 	if hasTrayMenu()
 		if debug
-			Menu SupportMenu, Check, %label%
+			SupportMenu.Check(translate("Debug"))
 		else
-			Menu SupportMenu, Uncheck, %label%
+			SupportMenu.Uncheck(translate("Debug"))
 
-	if (vDebug || debug) {
+	if (gDebug || debug) {
 		title := translate("Modular Simulator Controller System")
 		state := (debug ? translate("Enabled") : translate("Disabled"))
 
-		TrayTip %title%, Debug: %state%
+		TrayTip(title, "Debug: " . state)
 	}
 
-	vDebug := debug
+	gDebug := debug
 }
 
-setLogLevel(level) {
-	local ignore, label, title, state
+setLogLevel(level, *) {
+	global gLogLevel
+
+	local ignore, title, state
 
 	if hasTrayMenu()
-		for ignore, label in ["Off", "Info", "Warn", "Critical"] {
-			label := translate(label)
+		for ignore, label in ["Debug", "Off", "Info", "Warn", "Critical"]
+			LogMenu.Uncheck(translate(label))
 
-			Menu LogMenu, Uncheck, %label%
-		}
-
-	switch level {
+	switch level, false {
 		case "Debug":
 			level := kLogDebug
 		case "Info":
@@ -215,7 +264,7 @@ setLogLevel(level) {
 		case "Off":
 			level := kLogOff
 		default:
-			if level is not Integer
+			if !isInteger(level)
 				level := kLogWarn
 	}
 
@@ -236,23 +285,23 @@ setLogLevel(level) {
 			state := translate("Off")
 	}
 
-	if (vLogLevel != level) {
-		vLogLevel := level
+	if (gLogLevel != level) {
+		gLogLevel := level
 
 		title := translate("Modular Simulator Controller System")
 
-		TrayTip %title%, % translate("Log Level: ") . state
+		TrayTip(title, translate("Log Level: ") . state)
 	}
 
 	if hasTrayMenu()
-		Menu LogMenu, Check, %state%
+		LogMenu.Check(state)
 }
 
-increaseLogLevel() {
+increaseLogLevel(*) {
 	setLogLevel(getLogLevel() - 1)
 }
 
-decreaseLogLevel() {
+decreaseLogLevel(*) {
 	setLogLevel(getLogLevel() + 1)
 }
 

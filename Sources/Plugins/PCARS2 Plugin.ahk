@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - PCARS2 Plugin                   ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,8 +9,9 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include "Libraries\SimulatorPlugin.ahk"
+#Include "..\Database\Libraries\SessionDatabase.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,38 +39,38 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
-	OpenPitstopMFDHotkey[] {
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	PreviousOptionHotkey[] {
+	PreviousOptionHotkey {
 		Get {
 			return this.iPreviousOptionHotkey
 		}
 	}
 
-	NextOptionHotkey[] {
+	NextOptionHotkey {
 		Get {
 			return this.iNextOptionHotkey
 		}
 	}
 
-	PreviousChoiceHotkey[] {
+	PreviousChoiceHotkey {
 		Get {
 			return this.iPreviousChoiceHotkey
 		}
 	}
 
-	NextChoiceHotkey[] {
+	NextChoiceHotkey {
 		Get {
 			return this.iNextChoiceHotkey
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", "I")
@@ -81,8 +82,9 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {NoRefuel: "NoRefuel", Refuel: "Refuel", TyreCompound: "Tyre Compound", BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap("NoRefuel", "NoRefuel", "Refuel", "Refuel", "TyreCompound", "Tyre Compound"
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension")
 		selectActions := []
 	}
 
@@ -187,15 +189,15 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 
 	dialPitstopOption(option, action, steps := 1) {
 		if (this.OpenPitstopMFDHotkey != "Off")
-			switch action {
+			switch action, false {
 				case "Increase":
-					loop %steps%
+					loop steps
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					loop %steps%
+					loop steps
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.dialPitstopOption..."
+					throw "Unsupported change operation `"" . action . "`" detected in AMS2Plugin.dialPitstopOption..."
 			}
 	}
 
@@ -214,9 +216,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Tyre Compound") {
 				this.iTyreCompoundChosen += 1
 
-				if (this.iTyreCompoundChosen > new SessionDatabase().getTyreCompounds(this.Simulator[true]
-																					, this.Car
-																					, this.Track).Length())
+				if (this.iTyreCompoundChosen > SessionDatabase.getTyreCompounds(this.Simulator[true], this.Car, this.Track).Length)
 					this.iTyreCompoundChosen := 0
 
 				this.dialPitstopOption("Tyre Compound", "Decrease", 10)
@@ -255,12 +255,12 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 				this.closePitstopMFD("Repair Suspension")
 			}
 			else
-				throw "Unsupported change operation """ . action . """ detected in AMS2Plugin.changePitstopOption..."
+				throw "Unsupported change operation `"" . action . "`" detected in AMS2Plugin.changePitstopOption..."
 		}
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -277,7 +277,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		local delta
 
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			delta := this.tyreCompoundIndex(compound, compoundColor)
@@ -299,7 +299,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (this.iRepairSuspensionChosen != repairSuspension) {
@@ -319,7 +319,7 @@ class PCARS2Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	updateSession(session) {
-		base.updateSession(session)
+		super.updateSession(session)
 
 		if (session == kSessionFinished) {
 			this.iTyreCompoundChosen := 0
@@ -347,7 +347,7 @@ startPCARS2() {
 initializePCARS2Plugin() {
 	local controller := SimulatorController.Instance
 
-	new PCARS2Plugin(controller, kPCARS2Plugin, kPCARS2Application, controller.Configuration)
+	PCARS2Plugin(controller, kPCARS2Plugin, kPCARS2Application, controller.Configuration)
 }
 
 

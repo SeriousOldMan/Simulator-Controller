@@ -9,12 +9,20 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Constants.ahk
-#Include ..\Framework\Variables.ahk
-#Include ..\Framework\Debug.ahk
-#Include ..\Framework\Strings.ahk
-#Include ..\Framework\Localization.ahk
-#Include ..\Framework\Configuration.ahk
+#Include "..\Framework\Constants.ahk"
+#Include "..\Framework\Variables.ahk"
+#Include "..\Framework\Debug.ahk"
+#Include "..\Framework\Strings.ahk"
+#Include "..\Framework\Localization.ahk"
+#Include "..\Framework\MultiMap.ahk"
+#Include "..\Framework\Configuration.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -28,13 +36,810 @@ getControllerActionDefinitions(type) {
 	if (!FileExist(kTranslationsDirectory . fileName) && !FileExist(kUserTranslationsDirectory . fileName))
 		fileName := ("Controller Action " . type . ".en")
 
-	definitions := readConfiguration(kTranslationsDirectory . fileName)
+	definitions := readMultiMap(kTranslationsDirectory . fileName)
 
-	for section, values in readConfiguration(kUserTranslationsDirectory . fileName)
+	for section, values in readMultiMap(kUserTranslationsDirectory . fileName)
 		for key, value in values
-			setConfigurationValue(definitions, section, key, value)
+			setMultiMapValue(definitions, section, key, value)
 
 	return definitions
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                    Public Classes Declaration Section                   ;;;
+;;;-------------------------------------------------------------------------;;;
+
+class Theme extends ConfigurationItem {
+	static sCurrentTheme := false
+
+	static CurrentTheme {
+		Get {
+			return Theme.sCurrentTheme
+		}
+
+		Set {
+			return (Theme.sCurrentTheme := value)
+		}
+	}
+
+	Descriptor {
+		Get {
+			return this.iDescriptor
+		}
+	}
+
+	WindwBackground {
+		Get {
+			return this.iWindowBackground
+		}
+	}
+
+	AltBackground {
+		Get {
+			return this.iAltBackground
+		}
+	}
+
+	FieldBackground {
+		Get {
+			return this.iFieldBackground
+		}
+	}
+
+	MenuBackground {
+		Get {
+			return this.iMenuBackground
+		}
+	}
+
+	HeaderBackground {
+		Get {
+			return this.iHeaderBackground
+		}
+	}
+
+	TextColor {
+		Get {
+			return this.iTextColor
+		}
+	}
+
+	ButtonColor {
+		Get {
+			return this.iButtonColor
+		}
+	}
+
+	DropDownColor {
+		Get {
+			return this.iDropDownColor
+		}
+	}
+
+	__New(descriptor, configuration := false) {
+		this.iDescriptor := descriptor
+
+		super.__New(configuration)
+	}
+
+	loadFromConfiguration(configuration) {
+		super.loadFromConfiguration(configuration)
+
+		this.iWindowBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"))
+		this.iAltBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"))
+		this.iFieldBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"))
+		this.iMenuBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"))
+		this.iHeaderBackground := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"))
+		this.iTextColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"))
+		this.iButtonColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"))
+		this.iDropDownColor := getMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"))
+	}
+
+	saveToConfiguration(configuration) {
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "WindowBackground"), this.WindowBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "AltBackground"), this.AltBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "FieldBackground"), this.FieldBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "MenuBackground"), this.MenuBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "HeaderBackground"), this.HeaderBackground)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"), this.TextColor)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"), this.ButtonColor)
+		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
+	}
+}
+
+class Window extends Gui {
+	iCloseable := false
+	iResizeable := false
+
+	iMinWidth := 0
+	iMinHeight := 0
+	iMaxWidth := 0
+	iMaxHeight := 0
+
+	iWidth := 0
+	iHeight := 0
+
+	iResizers := []
+
+	iDescriptor := false
+
+	iLastX := false
+	iLastY := false
+
+	iRules := []
+
+	iTitleBarHeight := 0
+
+	iAltBackColor := "D8D8D8"
+
+	class Resizer {
+		iWindow := false
+
+		Window {
+			Get {
+				return this.iWindow
+			}
+		}
+
+		Control {
+			Get {
+				return false
+			}
+		}
+
+		__New(window) {
+			this.iWindow := window
+		}
+
+		Initialize() {
+		}
+
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			return false
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+		}
+
+		Redraw() {
+		}
+	}
+
+	class ControlResizer extends Window.Resizer {
+		iRule := false
+		iCompiledRule := false
+
+		iControl := false
+
+		iOriginalX := 0
+		iOriginalY := 0
+		iOriginalWidth := 0
+		iOriginalHeight := 0
+
+		Control {
+			Get {
+				return this.iControl
+			}
+		}
+
+		Rule[optimized := false] {
+			Get {
+				return (optimized ? this.iCompiledRule : this.iRule)
+			}
+		}
+
+		OriginalX {
+			Get {
+				return this.iOriginalX
+			}
+
+			Set {
+				return (this.iOriginalX := value)
+			}
+		}
+
+		OriginalY {
+			Get {
+				return this.iOriginalY
+			}
+
+			Set {
+				return (this.iOriginalY := value)
+			}
+		}
+
+		OriginalWidth {
+			Get {
+				return this.iOriginalWidth
+			}
+
+			Set {
+				return (this.iOriginalWidth := value)
+			}
+		}
+
+		OriginalHeight {
+			Get {
+				return this.iOriginalHeight
+			}
+
+			Set {
+				return (this.iOriginalHeight := value)
+			}
+		}
+
+		__New(window, control, rule) {
+			this.iControl := control
+			this.iRule := rule
+
+			super.__New(window)
+
+			this.Optimize()
+		}
+
+		Initialize() {
+			local x, y, w, h
+
+			try {
+				ControlGetPos(&x, &y, &w, &h, this.Control)
+
+				this.iOriginalX := x
+				this.iOriginalY := y
+				this.iOriginalWidth := w
+				this.iOriginalHeight := h
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		}
+
+		Reset() {
+			this.Optimize()
+		}
+
+		Optimize() {
+			local ignore, part, variable, horizontal, rule, factor, rules
+
+			callRules(rules, &x, &y, &w, &h, dw, dh) {
+				local ignore, rule
+
+				for ignore, rule in rules
+					rule(&x, &y, &w, &h, dw, dh)
+			}
+
+			fastMover(horizontal, variable, factor) {
+				move(&x, &y, &w, &h, dw, dh) {
+					switch variable, false {
+						case "x":
+							x += Round((horizontal ? dw : dh) * factor)
+						case "y":
+							y += Round((horizontal ? dw : dh) * factor)
+						case "w":
+							w += Round((horizontal ? dw : dh) * factor)
+						case "h":
+							h += Round((horizontal ? dw : dh) * factor)
+						default:
+							logError("Unknown variable detected in Resizre.Optimize...")
+					}
+				}
+
+				return move
+			}
+
+			fastGrower := fastMover
+
+			fastCenter(horizontal, variable, factor) {
+				if (variable = "h")
+					return (&x, &y, &w, &h, dw, dh) => (x := Round((this.Window.Width / 2) - (w / 2)))
+				else
+					return (&x, &y, &w, &h, dw, dh) => (y := Round((this.Window.Height / 2) - (h / 2)))
+			}
+
+			rules := []
+
+			for ignore, part in string2Values(A_Space, this.Rule) {
+				part := StrSplit(part, ":", , 2)
+				variable := part[1]
+
+				if (variable = "Width")
+					variable := "w"
+				else if (variable = "Height")
+					variable := "h"
+				else if (variable = "Horizontal")
+					variable := "h"
+				else if (variable = "Vertical")
+					variable := "v"
+
+				horizontal := ((variable = "x") || (variable = "w"))
+
+				rule := part[2]
+
+				if Instr(rule, "(") {
+					rule := StrSplit(rule, "(", " `t)", 2)
+
+					factor := rule[2]
+					rule := rule[1]
+				}
+				else
+					factor := 1
+
+				switch rule, false {
+					case "Move":
+						rules.Push(fastMover(horizontal, variable, factor))
+					case "Grow":
+						rules.Push(fastGrower(horizontal, variable, factor))
+					case "Center":
+						rules.Push(fastCenter(horizontal, variable, factor))
+				}
+			}
+
+			this.iCompiledRule := callRules.Bind(rules)
+		}
+
+		RestrictResize(&deltaWidth, &deltaHeight) {
+			return false
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			local x := this.OriginalX
+			local y := this.OriginalY
+			local w := this.OriginalWidth
+			local h := this.OriginalHeight
+
+			this.Rule[true](&x, &y, &w, &h, deltaWidth, deltaHeight)
+
+			ControlMove(x, y, w, h, this.Control)
+		}
+
+		Redraw() {
+			this.Control.Redraw()
+		}
+	}
+
+	Descriptor {
+		Get {
+			return this.iDescriptor
+		}
+
+		Set {
+			return (this.iDescriptor := value)
+		}
+	}
+
+	Closeable {
+		Get {
+			return this.iCloseable
+		}
+	}
+
+	Resizeable {
+		Get {
+			return this.iResizeable
+		}
+	}
+
+	MinWidth {
+		Get {
+			return this.iMinWidth
+		}
+
+		Set {
+			try {
+				return (this.iMinWidth := value)
+			}
+			finally {
+				this.Resize("Auto", this.Width, this.Height)
+			}
+		}
+	}
+
+	MinHeight {
+		Get {
+			return this.iMinHeight
+		}
+
+		Set {
+			try {
+				return (this.iMinHeight := value)
+			}
+			finally {
+				this.Resize("Auto", this.Width, this.Height)
+			}
+		}
+	}
+
+	MaxWidth {
+		Get {
+			return this.iMaxWidth
+		}
+
+		Set {
+			try {
+				return (this.iMaxWidth := value)
+			}
+			finally {
+				if this.MaxWidth
+					this.Opt("+MaxSize" . this.MaxWidth . "x")
+				else
+					this.Opt("-MaxSize")
+
+				this.Resize("Auto", this.Width, this.Height)
+			}
+		}
+	}
+
+	MaxHeight {
+		Get {
+			return this.iMaxHeight
+		}
+
+		Set {
+			try {
+				return (this.iMaxHeight := value)
+			}
+			finally {
+				if this.MaxHeight
+					this.Opt("+MaxSize" . "x" . this.MaxHeight)
+				else
+					this.Opt("-MaxSize")
+
+				this.Resize("Auto", this.Width, this.Height)
+			}
+		}
+	}
+
+	Width {
+		Get {
+			return this.iWidth
+		}
+	}
+
+	Height {
+		Get {
+			return this.iHeight
+		}
+	}
+
+	TitleBarHeight {
+		Get {
+			return this.iTitleBarHeight
+		}
+	}
+
+	AltBackColor {
+		Get {
+			return this.iAltBackColor
+		}
+
+		Set {
+			return (this.iAltBackColor := value)
+		}
+	}
+
+	Resizers[control?] {
+		Get {
+			if isSet(control) {
+				local resizers := []
+				local ignore, resizer
+
+				for ignore, resizer in this.Resizers
+					if (resizer.Control = control)
+						resizers.Push(resizer)
+
+				return resizers
+			}
+			else
+				return this.iResizers
+		}
+	}
+
+	Rules[asText := true] {
+		Get {
+			return (asText ? values2String(A_Space, this.iRules*) : this.iRules)
+		}
+
+		Set {
+			this.iRules := (isObject(value) ? value : ((Trim(value) = "") ? [] : string2Values(A_Space, value)))
+
+			return this.Rules[asText]
+		}
+	}
+
+	__New(options := {}, name := Strsplit(A_ScriptName, ".")[1], arguments*) {
+		local ignore, argument
+
+		for name, argument in options.OwnProps()
+			switch name, false {
+				case "Closeable":
+					this.iCloseable := argument
+				case "Resizeable":
+					this.iResizeable := argument
+				case "Descriptor":
+					this.iDescriptor := argument
+
+					if argument
+						Task.startTask(ObjBindMethod(this, "UpdatePosition", argument), 2000, kLowPriority)
+				case "Options":
+					options := argument
+			}
+
+		super.__New("", name, arguments*)
+
+		this.OnEvent("Close", this.Close)
+
+		if this.Resizeable {
+			this.Opt("+Resize")
+
+			this.OnEvent("Size", this.Resize)
+		}
+		else
+			this.Opt("-SysMenu -Border -Caption +0x800000")
+
+		if !isObject(options)
+			this.Opt(options)
+
+		this.ApplyTheme()
+	}
+
+	Opt(options) {
+		super.Opt(options)
+
+		if InStr(options, "-Disabled")
+			this.Show("NA")
+	}
+
+	ApplyTheme() {
+		this.BackColor := "D0D0D0"
+		this.AltBackColor := "D8D8D8"
+	}
+
+	ApplyThemeOptions(type, options) {
+		options := StrReplace(options, "-Theme", "")
+
+		if !InStr(options, "Background") {
+			switch type, false {
+				case "ListView", "ListBox":
+					options .= (" Background" . this.AltBackColor)
+				case "Edit":
+					options .= " BackgroundE0E0E0"
+				case "Button":
+					options .= " BackgroundCCCCCC"
+			}
+		}
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		return options
+	}
+
+	ApplyThemeProperties(control) {
+	}
+
+	Add(type, options := "", arguments*) {
+		local rules := false
+		local newOptions, ignore, option, control
+
+		if type is Window.Resizer
+			return this.AddResizer(type)
+		else {
+			options := this.ApplyThemeOptions(type, options)
+
+			if RegExMatch(options, "i)[xywhv].*:") {
+				newOptions := []
+				rules := []
+
+				for ignore, option in string2Values(A_Space, options)
+					if RegExMatch(option, "i)[xywhv].*:")
+						rules.Push(option)
+					else
+						newOptions.Push(option)
+
+				options := values2String(A_Space, newOptions*)
+			}
+
+			control := super.Add(type, options, arguments*)
+
+			if (rules || this.Rules[false].Length > 0) {
+				if !rules
+					rules := []
+
+				this.DefineResizeRule(control, values2String(" ", concatenate(this.Rules[false], rules)*))
+			}
+
+			this.ApplyThemeProperties(control)
+
+			return control
+		}
+	}
+
+	Show(arguments*) {
+		local x, y, cWidth, cHeight, width, height
+		local fullHeight, clientHeight
+
+		super.Show(arguments*)
+
+		if !this.MinWidth {
+			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
+			WinGetPos(&x, &y, &width, &height, this)
+
+			this.iTitleBarHeight := (height - cHeight)
+
+			this.iMinWidth := width
+			this.iMinHeight := height
+
+			this.Opt("MinSize" . cWidth . "x" . cHeight)
+
+			this.iWidth := width
+			this.iHeight := height
+
+			for ignore, resizer in this.Resizers
+				resizer.Initialize()
+		}
+	}
+
+	AddResizer(resizer) {
+		this.Resizers.Push(resizer)
+
+		return resizer
+	}
+
+	DefineResizeRule(control, rule) {
+		this.AddResizer(Window.ControlResizer(this, control, rule))
+	}
+
+	UpdatePosition(descriptor) {
+		local x, y, settings
+
+		try {
+			WinGetPos(&x, &y, , , this)
+
+			if (x && y) {
+				if (this.iLastX && ((this.iLastX != x) || (this.iLastY != y))) {
+					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+					setMultiMapValue(settings, "Window Positions", descriptor . ".X", x)
+					setMultiMapValue(settings, "Window Positions", descriptor . ".Y", y)
+
+					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				}
+
+				this.iLastX := x
+				this.iLastY := y
+			}
+		}
+		catch Any {
+		}
+
+		return Task.CurrentTask
+	}
+
+	Close(*) {
+		if this.Closeable
+			ExitApp(0)
+		else
+			return true
+	}
+
+	Resize(minMax, width, height) {
+		local restricted := false
+		local x, y, w, h, ignore, resizer
+
+		static resizeTask := false
+
+		updateSettings(width, height) {
+			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
+			setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		}
+
+		runResizers(synchronous := false) {
+			local curPriority, width, height, ignore, button, fullWidth, fullHeight, deltaWidth, deltaHeight
+
+			if !synchronous {
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button, "P")
+						return Task.CurrentTask
+
+				resizeTask := false
+			}
+
+			curPriority := Task.block(kInterruptPriority)
+
+			try {
+				WinGetPos( , , &width, &height, this)
+
+				if (width < this.MinWidth) {
+					width := this.MinWidth
+					restricted := true
+				}
+				else if (this.MaxWidth && (width > this.MaxWidth)) {
+					width := this.MaxWidth
+					restricted := true
+				}
+
+				if (height < this.MinHeight) {
+					height := this.MinHeight
+					restricted := true
+				}
+				else if (this.MaxHeight && (height > this.MaxHeight)) {
+					height := this.MaxHeight
+					restricted := true
+				}
+
+				if this.ControlsRestrictResize(&width, &height)
+					restricted := true
+
+				this.iWidth := width
+				this.iHeight := height
+
+				this.ControlsResize(width, height)
+
+				if restricted
+					WinMove( , , width, height, this)
+				else {
+					for ignore, resizer in this.Resizers
+						resizer.Redraw()
+
+					WinRedraw(this)
+				}
+
+				if this.Descriptor
+					Task.startTask(updateSettings.Bind(width, height), 1000, kLowPriority)
+			}
+			catch Any as exception {
+				Task.startTask(logError.Bind(exception), 100, kLowPriority)
+			}
+			finally {
+				Task.unblock(curPriority)
+			}
+		}
+
+		if InStr(minMax, "Init")
+			WinMove( , , width, height, this)
+		else if this.Width {
+			if (this.Resizeable = "Deferred") {
+				if !resizeTask {
+					resizeTask := Task(runResizers, 100)
+
+					resizeTask.start()
+				}
+			}
+			else
+				runResizers(true)
+		}
+	}
+
+	ControlsRestrictResize(&width, &height) {
+		local deltaWidth := (width - this.MinWidth)
+		local deltaHeight := (height - this.MinHeight)
+		local restricted := false
+		local ignore, resizer
+
+		for ignore, resizer in this.Resizers
+			if resizer.RestrictResize(&deltaWidth, &deltaHeight)
+				restricted := true
+
+		if restricted {
+			width := (this.MinWidth + deltaWidth)
+			height := (this.MinHeight + deltaHeight)
+		}
+
+		return restricted
+	}
+
+	ControlsResize(width, height) {
+		local deltaWidth := (width - this.MinWidth)
+		local deltaHeight := (height - this.MinHeight)
+		local ignore, resizer
+
+		for ignore, resizer in this.Resizers
+			resizer.Resize(deltaWidth, deltaHeight)
+	}
 }
 
 
@@ -61,117 +866,126 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 ;						B = Botton Margin
 ;						A = Alignment (0 = left, 1 = right, 2 = top, 3 = bottom, 4 = center; default = 4)
 
-	RegExMatch(options, "i)w\K\d+", W), (W="") ? W := 16 :
-	RegExMatch(options, "i)h\K\d+", H), (H="") ? H := 16 :
-	RegExMatch(options, "i)s\K\d+", S), S ? W := H := S :
-	RegExMatch(options, "i)l\K\d+", L), (L="") ? L := 0 :
-	RegExMatch(options, "i)t\K\d+", T), (T="") ? T := 0 :
-	RegExMatch(options, "i)r\K\d+", R), (R="") ? R := 0 :
-	RegExMatch(options, "i)b\K\d+", B), (B="") ? B := 0 :
-	RegExMatch(options, "i)a\K\d+", A), (A="") ? A := 4 :
+	RegExMatch(options, "i)w\K\d+", &W), !W ? W := 16 : W := W[]
+	RegExMatch(options, "i)h\K\d+", &H), !H ? H := 16 : H := H[]
+	RegExMatch(options, "i)s\K\d+", &S), S ? W := H := S[] :
+	RegExMatch(options, "i)l\K\d+", &L), !L ? L := 0 : L := L[]
+	RegExMatch(options, "i)t\K\d+", &T), !T ? T := 0 : T := T[]
+	RegExMatch(options, "i)r\K\d+", &R), !R ? R := 0 : R := R[]
+	RegExMatch(options, "i)b\K\d+", &B), !B ? B := 0 : B := B[]
+	RegExMatch(options, "i)a\K\d+", &A), !A ? A := 4 : A := A[]
 
 	ptrSize := A_PtrSize = "" ? 4 : A_PtrSize, DW := "UInt", Ptr := A_PtrSize = "" ? DW : "Ptr"
 
-	VarSetCapacity(button_il, 20 + ptrSize, 0)
+	button_il := Buffer(20 + ptrSize, 0)
 
-	NumPut(normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0, Ptr)	; Width & Height
-	NumPut(L, button_il, 0 + ptrSize, DW)		; Left Margin
-	NumPut(T, button_il, 4 + ptrSize, DW)		; Top Margin
-	NumPut(R, button_il, 8 + ptrSize, DW)		; Right Margin
-	NumPut(B, button_il, 12 + ptrSize, DW)		; Bottom Margin
-	NumPut(A, button_il, 16 + ptrSize, DW)		; Alignment
+	NumPut(Ptr, normal_il := DllCall("ImageList_Create", DW, W, DW, H, DW, 0x21, DW, 1, DW, 1), button_il, 0)	; Width & Height
+	NumPut(DW, L, button_il, 0 + ptrSize)		; Left Margin
+	NumPut(DW, T, button_il, 4 + ptrSize)		; Top Margin
+	NumPut(DW, R, button_il, 8 + ptrSize)		; Right Margin
+	NumPut(DW, B, button_il, 12 + ptrSize)		; Bottom Margin
+	NumPut(DW, A, button_il, 16 + ptrSize)		; Alignment
 
-	SendMessage, BCM_SETIMAGELIST := 5634, 0, &button_il,, AHK_ID %buttonHandle%
+	SendMessage(BCM_SETIMAGELIST := 5634, 0, button_il, , "AHK_ID " . (buttonHandle is Gui.Control) ? buttonHandle.Hwnd : buttonHandle)
 
 	return IL_Add(normal_il, file, index)
 }
 
 fixIE(version := 0, exeName := "") {
-	local previousValue
+	local previousValue := ""
 
 	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
-	static versions := {7: 7000, 8: 8888, 9: 9999, 10: 10001, 11: 11001}
+	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
 
-	if versions.HasKey(version)
+	if versions.Has(version)
 		version := versions[version]
 
 	if !exeName {
 		if A_IsCompiled
 			exeName := A_ScriptName
 		else
-			SplitPath A_AhkPath, exeName
+			SplitPath(A_AhkPath, &exeName)
 	}
 
-	RegRead previousValue, HKCU, %key%, %exeName%
-
-	if (version = "") {
-		RegDelete, HKCU, %key%, %exeName%
-		RegDelete, HKLM, %key%, %exeName%
+	try {
+		previousValue := RegRead("HKCU\" . key, exeName, "")
 	}
-	else {
-		RegWrite, REG_DWORD, HKCU, %key%, %exeName%, %version%
-		RegWrite, REG_DWORD, HKLM, %key%, %exeName%, %version%
+	catch Any as exception {
+		logError(exception, false, false)
+	}
+
+	try {
+		if (version = "") {
+			RegDelete("HKCU\" . key, exeName)
+			RegDelete("HKLM\" . key, exeName)
+		}
+		else {
+			RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
+			RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
+		}
+	}
+	catch Any as exception {
+		logError(exception, false, false)
 	}
 
 	return previousValue
 }
 
-moveByMouse(window, descriptor := false) {
+openDocumentation(dialog, url, *) {
+	Run(url)
+}
+
+moveByMouse(window, descriptor := false, *) {
 	local curCoordMode := A_CoordModeMouse
-	local anchorX, anchorY, winX, winY, newX, newY, x, y, w, h
-	local curCoordMode, anchorX, anchorY, winX, winY, x, y, w, h, newX, newY, settings
+	local anchorX, anchorY, winX, winY, x, y, newX, newY, settings
 
-	if window is not Alpha
-		window := A_Gui
-
-	CoordMode Mouse, Screen
+	CoordMode("Mouse", "Screen")
 
 	try {
-		MouseGetPos anchorX, anchorY
-		WinGetPos winX, winY, w, h, A
+		MouseGetPos(&anchorX, &anchorY)
+		WinGetPos(&winX, &winY, , , window)
 
 		newX := winX
 		newY := winY
 
 		while GetKeyState("LButton", "P") {
-			MouseGetPos x, y
+			MouseGetPos(&x, &y)
 
 			newX := winX + (x - anchorX)
 			newY := winY + (y - anchorY)
 
-			Gui %window%:Show, X%newX% Y%newY%
+			window.Move(newX, newY)
 		}
 
+		WinGetPos(&winX, &winY, , , window)
+
 		if descriptor {
-			settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-			setConfigurationValue(settings, "Window Positions", descriptor . ".X", newX)
-			setConfigurationValue(settings, "Window Positions", descriptor . ".Y", newY)
+			setMultiMapValue(settings, "Window Positions", descriptor . ".X", winX)
+			setMultiMapValue(settings, "Window Positions", descriptor . ".Y", winY)
 
-			writeConfiguration(kUserConfigDirectory . "Application Settings.ini", settings)
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
 		}
 	}
 	finally {
-		CoordMode Mouse, %curCoordMode%
+		CoordMode("Mouse", curCoordMode)
 	}
 }
 
-getWindowPosition(descriptor, ByRef x, ByRef y) {
-	local settings := readConfiguration(kUserConfigDirectory . "Application Settings.ini")
-	local posX := getConfigurationValue(settings, "Window Positions", descriptor . ".X", kUndefined)
-	local posY := getConfigurationValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
-	local count, screen, screenLeft, screenRight, screenTop, screenBottom
-
+getWindowPosition(descriptor, &x, &y) {
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+	local posX := getMultiMapValue(settings, "Window Positions", descriptor . ".X", kUndefined)
+	local posY := getMultiMapValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
+	local screen, screenLeft, screenRight, screenTop, screenBottom
 
 	if ((posX == kUndefined) || (posY == kUndefined))
 		return false
 	else {
-		SysGet count, MonitorCount
+		loop MonitorGetCount() {
+			MonitorGetWorkArea(A_Index, &screenLeft, &screenTop, &screenRight, &screenBottom)
 
-		loop %count% {
-			SysGet, screen, MonitorWorkArea, %A_Index%
-
-			if ((posX >= screenLeft) && (posX <= screenRight) && (posY >= screenTop) && (posY <= screenBottom)) {
+			if ((posX >= (screenLeft - 50)) && (posX <= screenRight) && (posY >= screenTop) && (posY <= screenBottom)) {
 				x := posX
 				y := posY
 
@@ -183,29 +997,46 @@ getWindowPosition(descriptor, ByRef x, ByRef y) {
 	}
 }
 
-translateMsgBoxButtons(buttonLabels) {
+getWindowSize(descriptor, &width, &height) {
+	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+	width := getMultiMapValue(settings, "Window Positions", descriptor . ".Width", kUndefined)
+	height := getMultiMapValue(settings, "Window Positions", descriptor . ".Height", kUndefined)
+
+	if ((width == kUndefined) || (height == kUndefined))
+		return false
+	else
+		return true
+}
+
+translateMsgBoxButtons(buttonLabels, *) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local index, label
 
-    DetectHiddenWindows, On
+    DetectHiddenWindows(true)
 
 	try {
-		Process, Exist
-
-		If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
+		if WinExist("ahk_class #32770 ahk_pid " . ProcessExist()) {
 			for index, label in buttonLabels
 				try {
-					ControlSetText Button%index%, % translate(label)
+					ControlSetText(translate(label), "Button" index)
 				}
-				catch exception {
+				catch Any as exception {
 					logError(exception)
 				}
 		}
 	}
 	finally {
-		DetectHiddenWindows %curDetectHiddenWindows%
+		DetectHiddenWindows(curDetectHiddenWindows)
 	}
 }
+
+translateYesNoButtons := translateMsgBoxButtons.Bind(["Yes", "No"])
+translateOkButton := translateMsgBoxButtons.Bind(["Ok"])
+translateOkCancelButtons := translateMsgBoxButtons.Bind(["Ok", "Cancel"])
+translateLoadCancelButtons := translateMsgBoxButtons.Bind(["Load", "Cancel"])
+translateSaveCancelButtons := translateMsgBoxButtons.Bind(["Save", "Cancel"])
+translateSelectCancelButtons := translateMsgBoxButtons.Bind(["Select", "Cancel"])
 
 getControllerActionLabels() {
 	return getControllerActionDefinitions("Labels")

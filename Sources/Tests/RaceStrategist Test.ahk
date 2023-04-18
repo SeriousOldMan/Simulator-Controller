@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - RaceStrategist Test             ;;;
 ;;;                                         (Race Strategist Rules)         ;;;
 ;;;                                                                         ;;;
@@ -11,27 +11,23 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #SingleInstance Force			; Ony one instance allowed
-#NoEnv							; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn							; Enable warnings to assist with detecting common errors.
 #Warn LocalSameAsGlobal, Off
 
-SendMode Input					; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%		; Ensures a consistent starting directory.
+SendMode("Input")				; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir(A_ScriptDir)		; Ensures a consistent starting directory.
 
-; SetBatchLines -1				; Maximize CPU utilization
-; ListLines Off					; Disable execution history
-
-global vBuildConfiguration := "Development"
+global kBuildConfiguration := "Production"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Startup.ahk
-#Include ..\Libraries\RuleEngine.ahk
-#Include ..\Assistants\Libraries\RaceStrategist.ahk
-#Include AHKUnit\AHKUnit.ahk
+#Include "..\Framework\Startup.ahk"
+#Include "..\Libraries\RuleEngine.ahk"
+#Include "..\Assistants\Libraries\RaceStrategist.ahk"
+#Include "AHKUnit\AHKUnit.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -39,16 +35,21 @@ global vBuildConfiguration := "Development"
 ;;;-------------------------------------------------------------------------;;;
 
 class TestRaceStrategist extends RaceStrategist {
-	__New(configuration, settings, remoteHandler := false, name := false, language := "__Undefined__", service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
-		base.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
+	__New(configuration, settings, remoteHandler := false, name := false, language := kUndefined
+		, service := false, speaker := false, recognizer := false, listener := false, voiceServer := false) {
+		super.__New(configuration, remoteHandler, name, language, service, speaker, false, recognizer, listener, voiceServer)
 
 		this.updateConfigurationValues({Settings: settings})
+
+		setDebug(false)
+
+		this.setDebug(kDebugKnowledgeBase, false)
 	}
 
-	createKnowledgeBase(facts) {
-		local knowledgeBase := base.createKnowledgeBase(facts)
+	createKnowledgeBase(facts := false) {
+		local knowledgeBase := super.createKnowledgeBase(facts)
 
-		knowledgeBase.addRule(new RuleCompiler().compileRule("carNumber(?car, ?car)"))
+		knowledgeBase.addRule(RuleCompiler().compileRule("carNumber(?car, ?car)"))
 
 		return knowledgeBase
 	}
@@ -56,15 +57,15 @@ class TestRaceStrategist extends RaceStrategist {
 
 class BasicReporting extends Assert {
 	BasisTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
-				strategist.addLap(A_Index, data)
+				strategist.addLap(A_Index, &data)
 
 			switch A_Index {
 				case 1, 2, 3:
@@ -88,7 +89,8 @@ class BasicReporting extends Assert {
 					this.AssertEqual(11, fuel, "Unexpected remaining laps detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -98,17 +100,18 @@ class BasicReporting extends Assert {
 	}
 
 	StandingsMemoryTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
-				strategist.addLap(A_Index, data)
+				strategist.addLap(A_Index, &data)
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -157,15 +160,15 @@ class GapReporting extends Assert {
 	}
 
 	StandingsGapTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
-				strategist.addLap(A_Index, data)
+				strategist.addLap(A_Index, &data)
 
 			switch A_Index {
 				case 1:
@@ -180,7 +183,8 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Standings", 6, -4464, 4, 9153, 1, -519263), "Unexpected standings gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -190,21 +194,21 @@ class GapReporting extends Assert {
 	}
 
 	TrackGapTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
-				strategist.addLap(A_Index, data)
+				strategist.addLap(A_Index, &data)
 
 			switch A_Index {
 				case 1:
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 6, -871, 10, 219), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 2:
-					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 1, -6563, 6, 582), "Unexpected track gap detected in lap " . A_Index . "...")
+					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 22, -6563, 6, 582), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 3:
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 19, -9343, 6, 1446), "Unexpected track gap detected in lap " . A_Index . "...")
 				case 4:
@@ -213,7 +217,8 @@ class GapReporting extends Assert {
 					this.AssertTrue(this.checkGap(strategist.KnowledgeBase, "Track", 21, -4103, 4, 9153), "Unexpected track gap detected in lap " . A_Index . "...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -225,15 +230,15 @@ class GapReporting extends Assert {
 
 class PositionProjection extends Assert {
 	PositionProjectionTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
-				strategist.addLap(A_Index, data)
+				strategist.addLap(A_Index, &data)
 
 			if (A_Index = 3) {
 				strategist.KnowledgeBase.setFact("Standings.Extrapolate", 10)
@@ -242,7 +247,8 @@ class PositionProjection extends Assert {
 
 				position := strategist.KnowledgeBase.getValue("Standings.Extrapolated." . 10 . ".Car.13.Position", false)
 
-				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+				if strategist.Debug[kDebugKnowledgeBase]
+					strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 				this.AssertEqual(8, position, "Unexpected future position detected in lap 3...")
 			}
@@ -256,7 +262,8 @@ class PositionProjection extends Assert {
 				this.AssertEqual(4, position, "Unexpected future position detected in lap 3...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -268,15 +275,15 @@ class PositionProjection extends Assert {
 
 class PitstopRecommendation extends Assert {
 	PitstopRecommendationTest() {
-		strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
+		strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist.settings"), false, false, false)
 
 		loop {
-			data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
+			data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race 13\Race Strategist Lap " . A_Index . ".1.data")
 
-			if (data.Count() == 0)
+			if (data.Count == 0)
 				break
 			else
-				strategist.addLap(A_Index, data)
+				strategist.addLap(A_Index, &data)
 
 			if (A_Index = 2) {
 				strategist.KnowledgeBase.setFact("Strategy.Pitstop.Lap", 8)
@@ -293,7 +300,8 @@ class PitstopRecommendation extends Assert {
 				this.AssertEqual("[[11, 7, 5], [11, 7], [11], [], []]", strategist.KnowledgeBase.getValue("Pitstop.Strategy.Evaluation.Traffics"), "Unexpected evaluated cars ahead detected after pitstop recommmendation in lap 2...")
 			}
 
-			strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
+			if strategist.Debug[kDebugKnowledgeBase]
+				strategist.dumpKnowledgeBase(strategist.KnowledgeBase)
 
 			if (A_Index >= 5)
 				break
@@ -317,12 +325,12 @@ if !GetKeyState("Ctrl") {
 
 	AHKUnit.Run()
 
-	MsgBox % "Full run took " . (A_TickCount - startTime) . " ms"
+	MsgBox("Full run took " . (A_TickCount - startTime) . " ms")
 }
 else {
 	raceNr := 17
-	strategist := new TestRaceStrategist(kSimulatorConfiguration, readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
-									   , new RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
+	strategist := TestRaceStrategist(kSimulatorConfiguration, readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist.settings")
+								   , RaceStrategist.RaceStrategistRemoteHandler(0), "Khato", "EN", "Windows", true, true, true)
 
 	strategist.VoiceManager.setDebug(kDebugGrammars, false)
 
@@ -333,9 +341,9 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
-				if (data.Count() == 0) {
+				if (data.Count == 0) {
 					if (A_Index == 1)
 						done := true
 
@@ -343,9 +351,9 @@ else {
 				}
 				else {
 					if (A_Index == 1)
-						strategist.addLap(lap, data)
+						strategist.addLap(lap, &data)
 					else
-						strategist.updateLap(lap, data)
+						strategist.updateLap(lap, &data)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -358,14 +366,15 @@ else {
 			if (A_Index = 19) {
 				strategist.performPitstop()
 
-				MsgBox Pitstop...
+				MsgBox("Pitstop...")
 			}
-		} until done
+		}
+		until done
 
 		strategist.finishSession()
 
 		while strategist.KnowledgeBase
-			Sleep 1000
+			Sleep(1000)
 	}
 	else if (raceNr == 16) {
 		done := false
@@ -374,9 +383,9 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
-				if (data.Count() == 0) {
+				if (data.Count == 0) {
 					if (A_Index == 1)
 						done := true
 
@@ -384,9 +393,9 @@ else {
 				}
 				else {
 					if (A_Index == 1)
-						strategist.addLap(lap, data)
+						strategist.addLap(lap, &data)
 					else
-						strategist.updateLap(lap, data)
+						strategist.updateLap(lap, &data)
 
 					if isDebug()
 						showMessage("Data " lap . "." . A_Index . " loaded...")
@@ -395,12 +404,13 @@ else {
 				if (A_Index = 1)
 					break
 			}
-		} until done
+		}
+		until done
 
 		strategist.finishSession()
 
 		while strategist.KnowledgeBase
-			Sleep 1000
+			Sleep(1000)
 	}
 	else if (raceNr == 17) {
 		done := false
@@ -409,12 +419,12 @@ else {
 			lap := A_Index
 
 			loop {
-				data := readConfiguration(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
+				data := readMultiMap(kSourcesDirectory . "Tests\Test Data\Race " . raceNr . "\Race Strategist Lap " . lap . "." . A_Index . ".data")
 
 				if (lap == 1 && A_Index == 1)
 					strategist.prepareSession(false, data)
 
-				if (data.Count() == 0) {
+				if (data.Count == 0) {
 					if (lap == 82)
 						done := true
 
@@ -422,26 +432,27 @@ else {
 				}
 				else {
 					if (A_Index == 1)
-						strategist.addLap(lap, data)
+						strategist.addLap(lap, &data)
 					else
-						strategist.updateLap(lap, data)
+						strategist.updateLap(lap, &data)
 
 					if (isDebug() && (A_Index == 1))
 						showMessage("Data " lap . "." . A_Index . " loaded...")
 				}
 			}
-		} until done
+		}
+		until done
 
 		strategist.finishSession()
 
 		while strategist.KnowledgeBase
-			Sleep 1000
+			Sleep(1000)
 	}
 
 	if isDebug()
-		MsgBox Done...
+		MsgBox("Done...")
 
-	ExitApp
+	ExitApp()
 }
 
 show(context, args*) {

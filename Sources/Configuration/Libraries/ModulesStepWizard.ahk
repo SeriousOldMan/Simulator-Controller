@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\SpeechSynthesizer.ahk
+#Include "..\..\Libraries\SpeechSynthesizer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -23,7 +23,7 @@
 class NamedPreset extends Preset {
 	iName := false
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
@@ -45,7 +45,7 @@ class SilentAssistant extends NamedPreset {
 	iAssistant := false
 	iDisabled := true
 
-	Assistant[] {
+	Assistant {
 		Get {
 			return this.iAssistant
 		}
@@ -55,19 +55,19 @@ class SilentAssistant extends NamedPreset {
 		this.iAssistant := assistant
 		this.iDisabled := ((full = kTrue) ? true : ((full = kFalse) ? false : full))
 
-		base.__New(name)
+		super.__New(name)
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.Assistant, this.iDisabled))
+		return concatenate(super.getArguments(), Array(this.Assistant, this.iDisabled))
 	}
 
 	patchSimulatorConfiguration(wizard, simulatorConfiguration) {
 		local assistant
 
 		if wizard.isModuleSelected(this.Assistant)
-			if (getConfigurationValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
-				assistant := new Plugin(this.Assistant, simulatorConfiguration)
+			if (getMultiMapValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
+				assistant := Plugin(this.Assistant, simulatorConfiguration)
 
 				if this.iDisabled {
 					assistant.setArgumentValue("raceAssistantSpeaker", "Off")
@@ -88,11 +88,11 @@ class PassiveEngineer extends NamedPreset {
 		if wizard.isModuleSelected("Race Engineer") {
 			definition := wizard.Definition
 
-			for ignore, descriptor in getConfigurationSectionValues(definition, "Applications.Simulators", Object()) {
+			for ignore, descriptor in getMultiMapValues(definition, "Applications.Simulators") {
 				name := string2Values("|", descriptor)[1]
 
-				if (getConfigurationValue(simulatorConfiguration, "Plugins", name, kUndefined) != kUndefined) {
-					assistant := new Plugin(name, simulatorConfiguration)
+				if (getMultiMapValue(simulatorConfiguration, "Plugins", name, kUndefined) != kUndefined) {
+					assistant := Plugin(name, simulatorConfiguration)
 
 					assistant.setArgumentValue("openPitstopMFD", "Off")
 
@@ -108,16 +108,16 @@ class DifferentVoices extends NamedPreset {
 		local synthesizer, language, speaker, voices, ignore, voice, found, candidate, voice1, voice2, assistant
 
 		if wizard.isModuleSelected("Voice Control") {
-			synthesizer := getConfigurationValue(simulatorConfiguration, "Voice Control", "Synthesizer")
-			language := getConfigurationValue(simulatorConfiguration, "Voice Control", "Language")
-			speaker := getConfigurationValue(simulatorConfiguration, "Voice Control", "Speaker")
+			synthesizer := getMultiMapValue(simulatorConfiguration, "Voice Control", "Synthesizer")
+			language := getMultiMapValue(simulatorConfiguration, "Voice Control", "Language")
+			speaker := getMultiMapValue(simulatorConfiguration, "Voice Control", "Speaker")
 
 			voices := []
 
 			if (speaker && (speaker != true))
 				voices.Push(speaker)
 
-			for ignore, voice in new SpeechSynthesizer(synthesizer, true, language).Voices[language] {
+			for ignore, voice in SpeechSynthesizer(synthesizer, true, language).Voices[language] {
 				found := false
 
 				for ignore, candidate in voices {
@@ -135,19 +135,19 @@ class DifferentVoices extends NamedPreset {
 					voices.Push(voice)
 			}
 
-			if (voices.Length() > 0) {
+			if (voices.Length > 0) {
 				voices := reverse(voices)
 
-				for ignore, assistant in string2Values("|", getConfigurationValue(wizard.Definition, "Setup.Modules", "Modules.Definition.Assistants")) {
+				for ignore, assistant in string2Values("|", getMultiMapValue(wizard.Definition, "Setup.Modules", "Modules.Definition.Assistants")) {
 					if wizard.isModuleSelected(assistant)
-						if (getConfigurationValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
-							assistant := new Plugin(assistant, simulatorConfiguration)
+						if (getMultiMapValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
+							assistant := Plugin(assistant, simulatorConfiguration)
 
 							assistant.setArgumentValue("raceAssistantSpeaker", voices.Pop())
 
 							assistant.saveToConfiguration(simulatorConfiguration)
 
-							if (voices.Length() == 0)
+							if (voices.Length == 0)
 								break
 						}
 				}
@@ -159,20 +159,20 @@ class DifferentVoices extends NamedPreset {
 class DefaultButtonBox extends NamedPreset {
 	iFile := false
 
-	File[] {
+	File {
 		Get {
 			return this.iFile
 		}
 	}
 
 	__New(name, file) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iFile := substituteVariables(file)
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.File))
+		return concatenate(super.getArguments(), Array(this.File))
 	}
 
 	install(wizard) {
@@ -181,19 +181,19 @@ class DefaultButtonBox extends NamedPreset {
 
 		try {
 			if FileExist(kUserHomeDirectory . "Setup\Button Box Configuration.ini") {
-				config := readConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
+				config := readMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini")
 
-				for section, values in readConfiguration(file)
+				for section, values in readMultiMap(file)
 					for key, value in values
-						if (getConfigurationValue(config, section, key, kUndefined) == kUndefined)
-							setConfigurationValue(config, section, key, value)
+						if (getMultiMapValue(config, section, key, kUndefined) == kUndefined)
+							setMultiMapValue(config, section, key, value)
 
-				writeConfiguration(kUserHomeDirectory . "Setup\Button Box Configuration.ini", config)
+				writeMultiMap(kUserHomeDirectory . "Setup\Button Box Configuration.ini", config)
 			}
 			else
-				FileCopy %file%, %kUserHomeDirectory%Setup\Button Box Configuration.ini, 1
+				FileCopy(file, kUserHomeDirectory . "Setup\Button Box Configuration.ini", 1)
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -202,20 +202,20 @@ class DefaultButtonBox extends NamedPreset {
 class DefaultStreamDeck extends NamedPreset {
 	iFile := false
 
-	File[] {
+	File {
 		Get {
 			return this.iFile
 		}
 	}
 
 	__New(name, file) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iFile := substituteVariables(file)
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.File))
+		return concatenate(super.getArguments(), Array(this.File))
 	}
 
 	install(wizard) {
@@ -224,19 +224,19 @@ class DefaultStreamDeck extends NamedPreset {
 
 		try {
 			if FileExist(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini") {
-				config := readConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
+				config := readMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini")
 
-				for section, values in readConfiguration(file)
+				for section, values in readMultiMap(file)
 					for key, value in values
-						if (getConfigurationValue(config, section, key, kUndefined) == kUndefined)
-							setConfigurationValue(config, section, key, value)
+						if (getMultiMapValue(config, section, key, kUndefined) == kUndefined)
+							setMultiMapValue(config, section, key, value)
 
-				writeConfiguration(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", config)
+				writeMultiMap(kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", config)
 			}
 			else
-				FileCopy %file%, %kUserHomeDirectory%Setup\Stream Deck Configuration.ini, 1
+				FileCopy(file, kUserHomeDirectory . "Setup\Stream Deck Configuration.ini", 1)
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -245,13 +245,13 @@ class DefaultStreamDeck extends NamedPreset {
 class FilesPreset extends NamedPreset {
 	iFiles := []
 
-	Directory[] {
+	Directory {
 		Get {
 			throw "Virtual property FilesPreset.Directory must be implemented in a subclass..."
 		}
 	}
 
-	Files[] {
+	Files {
 		Get {
 			return this.iFiles
 		}
@@ -260,7 +260,7 @@ class FilesPreset extends NamedPreset {
 	__New(name, files*) {
 		local index, file
 
-		base.__New(name)
+		super.__New(name)
 
 		for index, file in files
 			files[index] := substituteVariables(file)
@@ -269,7 +269,7 @@ class FilesPreset extends NamedPreset {
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), this.Files)
+		return concatenate(super.getArguments(), this.Files)
 	}
 
 	install(wizard) {
@@ -278,9 +278,9 @@ class FilesPreset extends NamedPreset {
 
 		for ignore, file in this.Files
 			try {
-				FileCopy %file%, %directory%, 1
+				FileCopy(file, directory, 1)
 			}
-			catch exception {
+			catch Any as exception {
 				logError(exception)
 			}
 	}
@@ -290,7 +290,7 @@ class FilesPreset extends NamedPreset {
 		local ignore, file, name
 
 		for ignore, file in this.Files {
-			SplitPath file, name
+			SplitPath(file, &name)
 
 			deleteFile(directory . name)
 		}
@@ -298,7 +298,7 @@ class FilesPreset extends NamedPreset {
 }
 
 class StreamDeckIcons extends FilesPreset {
-	Directory[] {
+	Directory {
 		Get {
 			return kUserTranslationsDirectory
 		}
@@ -306,7 +306,7 @@ class StreamDeckIcons extends FilesPreset {
 }
 
 class P2TConfiguration extends FilesPreset {
-	Directory[] {
+	Directory {
 		Get {
 			return kUserConfigDirectory
 		}
@@ -316,34 +316,34 @@ class P2TConfiguration extends FilesPreset {
 class PitstopImages extends NamedPreset {
 	iDirectory := false
 
-	Directory[] {
+	Directory {
 		Get {
 			return this.iDirectory
 		}
 	}
 
 	__New(name, directory) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iDirectory := substituteVariables(directory)
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.Directory))
+		return concatenate(super.getArguments(), Array(this.Directory))
 	}
 
 	install(wizard) {
 		local directory := this.Directory
 		local name
 
-		SplitPath directory, , , , name
+		SplitPath(directory, , , , &name)
 
-		FileCreateDir %kUserHomeDirectory%Screen Images\%name%
+		DirCreate(kUserHomeDirectory . "Screen Images\" . name)
 
 		try {
-			FileCopy %directory%\*.*, %kUserHomeDirectory%Screen Images\%name%, 1
+			FileCopy(directory . "\*.*", kUserHomeDirectory . "Screen Images\" . name, 1)
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -352,7 +352,7 @@ class PitstopImages extends NamedPreset {
 		local directory := this.Directory
 		local name
 
-		SplitPath directory, , , , name
+		SplitPath(directory, , , , &name)
 
 		deleteDirectory(kUserHomeDirectory . "Screen Images\" . name)
 	}
@@ -363,8 +363,8 @@ class TeamServerAlwaysOn extends NamedPreset {
 		local thePlugin
 
 		if (wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
-			if (getConfigurationValue(simulatorConfiguration, "Plugins", "Team Server", kUndefined) != kUndefined) {
-				thePlugin := new Plugin("Team Server", simulatorConfiguration)
+			if (getMultiMapValue(simulatorConfiguration, "Plugins", "Team Server", kUndefined) != kUndefined) {
+				thePlugin := Plugin("Team Server", simulatorConfiguration)
 
 				thePlugin.setArgumentValue("teamServer", "On")
 
@@ -376,32 +376,32 @@ class TeamServerAlwaysOn extends NamedPreset {
 class SetupPatch extends NamedPreset {
 	iFile := false
 
-	File[] {
+	File {
 		Get {
 			return this.iFile
 		}
 	}
 
 	__New(name, file) {
-		base.__New(name)
+		super.__New(name)
 
 		this.iFile := substituteVariables(file)
 	}
 
 	getArguments() {
-		return concatenate(base.getArguments(), Array(this.File))
+		return concatenate(super.getArguments(), Array(this.File))
 	}
 
 	edit() {
 		local file := this.File
 		local name
 
-		SplitPath file, name
+		SplitPath(file, &name)
 
 		try {
-			Run notepad %kUserHomeDirectory%Setup\%name%
+			Run("notepad " . kUserHomeDirectory . "Setup\" . name)
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 	}
@@ -410,12 +410,12 @@ class SetupPatch extends NamedPreset {
 		local file := this.File
 		local name
 
-		SplitPath file, name
+		SplitPath(file, &name)
 
 		try {
-			FileCopy %file%, %kUserHomeDirectory%Setup\%name%, 1
+			FileCopy(file, kUserHomeDirectory . "Setup\" . name, 1)
 		}
-		catch exception {
+		catch Any as exception {
 			logError(exception)
 		}
 
@@ -426,7 +426,7 @@ class SetupPatch extends NamedPreset {
 		local file := this.File
 		local name
 
-		SplitPath file, name
+		SplitPath(file, &name)
 
 		deleteFile(kUserHomeDirectory . "Setup\" . name)
 	}
@@ -436,30 +436,25 @@ class SetupPatch extends NamedPreset {
 ;;; ModulesStepWizard                                                       ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global installPresetButton
-global uninstallPresetButton
-
-global presetsInfoText
-
 class ModulesStepWizard extends StepWizard {
 	iModuleSelectors := []
 
 	iAvailablePresetsListView := false
 	iSelectedPresetsListView := false
 
-	Pages[] {
+	Pages {
 		Get {
-			return Ceil(this.Definition.Length() / 3) + 1
+			return Ceil(this.Definition.Length / 3) + 1
 		}
 	}
 
-	AvailablePresetsListView[] {
+	AvailablePresetsListView {
 		Get {
 			return this.iAvailablePresetsListView
 		}
 	}
 
-	SelectedPresetsListView[] {
+	SelectedPresetsListView {
 		Get {
 			return this.iSelectedPresetsListView
 		}
@@ -471,89 +466,99 @@ class ModulesStepWizard extends StepWizard {
 		local startY := y
 		local checkX := x + width - 20
 		local labelWidth := width - 30
-		local presetsIconHandle := false
-		local presetsLabelHandle := false
-		local availablePresetsLabelHandle := false
-		local availablePresetsListViewHandle := false
-		local selectedPresetsListViewHandle := false
-		local selectedPresetsLabelHandle := false
-		local moveLeftButtonHandle := false
-		local moveRightButtonHandle := false
-		local presetsInfoTextHandle := false
 		local listWidth := Round((width - 50) / 2)
 		local x2 := x + listWidth + 50
 		local buttonWidth := 40
 		local x3 := x + listWidth + 5
-		local iconHandle, labelHandle, checkBoxHandle, infoTextHandle
-		local module, selected, info, label, labelX, labelY, html
+		local module, selected, info, label, labelX, labelY, html, factor
 
-		static infoText1
-		static infoText2
-		static infoText3
-		static infoText4
-		static infoText5
-		static infoText6
-		static infoText7
-		static infoText8
-		static infoText9
-		static infoText10
-		static infoText11
-		static infoText12
+		compose(functions*) {
+			callFunctions(functions, arguments*) {
+				local ignore, function
 
-		static moduleCheck1
-		static moduleCheck2
-		static moduleCheck3
-		static moduleCheck4
-		static moduleCheck5
-		static moduleCheck6
-		static moduleCheck7
-		static moduleCheck8
-		static moduleCheck9
-		static moduleCheck10
-		static moduleCheck11
-		static moduleCheck12
+				for ignore, function in functions
+					function.Call(arguments*)
+			}
 
-		if (definition.Length() > 12)
-			throw "Too many modules detected in ModulesStepWizard.createGui..."
+			return callFunctions.Bind(functions)
+		}
 
-		loop % definition.Length()
-		{
-			iconHandle := false
-			labelHandle := false
-			checkBoxHandle := false
-			infoTextHandle := false
+		choosePreset(list1, list2) {
+			local next, selected
 
-			Gui %window%:Font, s10 Bold, Arial
+			selected := list1.GetNext()
+
+			while selected {
+				list1.Modify(selected, "-Select")
+
+				selected := list1.GetNext()
+			}
+
+			if selected
+				list2.Modify(selected, "+Select")
+
+			this.updatePresetState()
+		}
+
+		chooseAvailablePreset(*) {
+			choosePreset(this.SelectedPresetsListView, this.AvailablePresetsListView)
+		}
+
+		chooseSelectedPreset(*) {
+			choosePreset(this.AvailablePresetsListView, this.SelectedPresetsListView)
+		}
+
+		editSelectedPreset(*) {
+			choosePreset(this.AvailablePresetsListView, this.SelectedPresetsListView)
+
+			this.editPreset()
+		}
+
+		installPreset(*) {
+			this.installPreset()
+		}
+
+		uninstallPreset(*) {
+			this.uninstallPreset()
+		}
+
+		updateSelectedModules(*) {
+			this.updateSelectedModules()
+		}
+
+		loop definition.Length {
+			window.SetFont("s10 Bold", "Arial")
 
 			module := definition[A_Index]
 			selected := this.SetupWizard.isModuleSelected(module)
 
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
-			module := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Info." . getLanguage()))
+			module := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . "." . getLanguage()))
 
 			label := substituteVariables(translate("Module: %module%"), {module: module})
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 			labelX := x + 35
 			labelY := y + 8
 
-			Sleep 200
+			factor := (Mod(A_Index - 1, 3) * 0.33)
 
-			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
-			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % label
-			Gui %window%:Add, CheckBox, Checked%selected% x%checkX% y%labelY% w23 h23 HWNDcheckBoxHandle VmoduleCheck%A_Index% Hidden gupdateSelectedModules
-			Gui %window%:Add, ActiveX, x%x% yp+26 w%width% h124 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell.explorer
+			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Y:Move(" . factor . ") Hidden", kResourcesDirectory . "Setup\Images\Module.png")
+			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Y:Move(" . factor . ") Hidden", label)
+			widget3 := window.Add("CheckBox", "Checked" . selected . " x" . checkX . " y" . labelY . " w23 h23 X:Move Y:Move(" . factor . ") Hidden")
+			widget3.OnEvent("Click", updateSelectedModules)
+			widget4 := window.Add("ActiveX", "x" . x . " yp+26 w" . width . " h124 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden", "shell.explorer")
 
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			infoText%A_Index%.Navigate("about:blank")
-			infoText%A_Index%.Document.Write(html)
+			widget4.Value.navigate("about:blank")
+			widget4.Value.document.write(html)
 
 			y += 170
 
-			this.iModuleSelectors.Push(checkBoxHandle)
+			this.iModuleSelectors.Push(widget3)
 
-			this.registerWidgets(Ceil(A_Index / 3), iconHandle, labelHandle, checkBoxHandle, infoTextHandle)
+			this.registerWidgets(Ceil(A_Index / 3), widget1, widget2, widget3, widget4)
 
 			if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
 				y := startY
@@ -563,51 +568,55 @@ class ModulesStepWizard extends StepWizard {
 		labelX := x + 35
 		labelY := y + 8
 
-		Gui %window%:Font, s10 Bold, Arial
+		window.SetFont("s10 Bold", "Arial")
 
-		Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDpresetsIconHandle Hidden, %kResourcesDirectory%Setup\Images\Module.png
-		Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDpresetsLabelHandle Hidden, % translate("Presets && Special Configurations")
+		widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Hidden", kResourcesDirectory . "Setup\Images\Module.png")
+		widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Hidden", translate("Presets && Special Configurations"))
 
-		Gui %window%:Font, s8 Norm, Arial
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, ListView, x%x% yp+30 w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDavailablePresetsListViewHandle gchooseAvailablePreset Hidden Section, % values2String("|", map(["Available Presets"], "translate")*)
+		widget3 := window.Add("ListView", "x" . x . " yp+30 w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden Section", collect(["Available Presets"], translate))
+		widget3.OnEvent("Click", chooseAvailablePreset)
+		widget3.OnEvent("DoubleClick", compose(chooseAvailablePreset, installPreset))
 
-		Gui %window%:Add, ListView, x%x2% ys w%listWidth% h224 AltSubmit -Multi -LV0x10 NoSort NoSortHdr HWNDselectedPresetsListViewHandle gchooseSelectedPreset Hidden, % values2String("|", map(["Selected Presets"], "translate")*)
+		this.iAvailablePresetsListView := widget3
 
-		Gui %window%:Font, s10 Bold, Arial
+		widget4 := window.Add("ListView", "x" . x2 . " ys w" . listWidth . " h224 X:Move(0.5) H:Grow(0.7) AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Selected Presets"], translate))
+		widget4.OnEvent("Click", chooseSelectedPreset)
+		widget4.OnEvent("DoubleClick", compose(chooseSelectedPreset, editSelectedPreset))
 
-		Gui %window%:Add, Button, x%x3% ys+95 w%buttonWidth% HWNDmoveRightButtonHandle vinstallPresetButton ginstallPreset Hidden, >
-		Gui %window%:Add, Button, x%x3% yp+30 w%buttonWidth% HWNDmoveLeftButtonHandle vuninstallPresetButton guninstallPreset Hidden, <
+		this.iSelectedPresetsListView := widget4
 
-		Gui %window%:Font, s8 Norm, Arial
+		window.SetFont("s10 Bold", "Arial")
 
-		info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		widget5 := window.Add("Button", "x" . x3 . " ys+95 w" . buttonWidth . " X:Move(0.5) Y:Move(0.35) vinstallPresetButton  Hidden", ">")
+		widget5.OnEvent("Click", installPreset)
+		widget6 := window.Add("Button", "x" . x3 . " yp+30 w" . buttonWidth . " X:Move(0.5) Y:Move(0.35) vuninstallPresetButton  Hidden", "<")
+		widget6.OnEvent("Click", uninstallPreset)
 
-		Sleep 200
+		window.SetFont("s8 Norm", "Arial")
 
-		Gui %window%:Add, ActiveX, x%x% ys+229 w%width% h210 HWNDpresetsInfoTextHandle VpresetsInfoText Hidden, shell.explorer
+		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		widget7 := window.Add("ActiveX", "x" . x . " ys+229 w" . width . " h210 Y:Move(0.7) W:Grow H:Grow(0.3) VpresetsInfoText Hidden", "shell.explorer")
 
-		presetsInfoText.Navigate("about:blank")
-		presetsInfoText.Document.Write(html)
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		this.iAvailablePresetsListView := availablePresetsListViewHandle
-		this.iSelectedPresetsListView := selectedPresetsListViewHandle
+		widget7.Value.navigate("about:blank")
+		widget7.Value.document.write(html)
 
-		this.registerWidgets(this.Pages, presetsIconHandle, presetsLabelHandle, availablePresetsLabelHandle, availablePresetsListViewHandle
-									   , selectedPresetsLabelHandle, selectedPresetsListViewHandle, moveLeftButtonHandle, moveRightButtonHandle, presetsInfoTextHandle)
+		this.registerWidgets(this.Pages, widget1, widget2, widget3, widget4, widget5, widget6, widget7)
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
 		this.iModuleSelectors := []
 	}
 
 	showPage(page) {
-		base.showPage(page)
+		super.showPage(page)
 
 		if (page = this.Pages) {
 			this.loadAvailablePresets()
@@ -618,40 +627,23 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	updateState() {
-		local window := this.Window
-		local variable, definition, name, chosen
+		local definition := this.Definition
 
-		base.updateState()
+		super.updateState()
 
-		Gui %window%:Default
-
-		definition := this.Definition
-
-		loop % definition.Length()
-		{
-			variable := this.iModuleSelectors[A_Index]
-			name := definition[A_Index]
-
-			chosen := this.SetupWizard.isModuleSelected(name)
-
-			GuiControl, , %variable%, %chosen%
-		}
+		loop definition.Length
+			this.iModuleSelectors[A_Index].Value := this.SetupWizard.isModuleSelected(definition[A_Index])
 	}
 
 	updateSelectedModules() {
-		local window := this.Window
-		local variable, definition, name, checked
+		local definition := this.Definition
+		local selector, name, checked
 
-		Gui %window%:Default
-
-		definition := this.Definition
-
-		loop % definition.Length()
-		{
-			variable := this.iModuleSelectors[A_Index]
+		loop definition.Length {
+			selector := this.iModuleSelectors[A_Index]
 			name := definition[A_Index]
 
-			GuiControlGet checked, , %variable%
+			checked := selector.Value
 
 			if (checked != this.SetupWizard.isModuleSelected(name)) {
 				this.SetupWizard.selectModule(name, checked)
@@ -662,93 +654,75 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	loadAvailablePresets() {
-		local window := this.Window
-		local preset, definition, presets, module, modulePresets, ignore
+		local definition := this.Definition
+		local presets := []
+		local preset, module, modulePresets, ignore
 
-		Gui %window%:Default
+		this.AvailablePresetsListView.Delete()
 
-		definition := this.Definition
-		presets := []
-
-		Gui ListView, % this.AvailablePresetsListView
-
-		LV_Delete()
-
-		loop % definition.Length()
-		{
+		loop definition.Length {
 			module := definition[A_Index]
 
 			if this.SetupWizard.isModuleSelected(module) {
-				modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
+				modulePresets := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 
 				for ignore, preset in string2Values("|", modulePresets)
-					LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+					this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 			}
 		}
 
-		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
-			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+		for ignore, preset in string2Values("|", substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			this.AvailablePresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 
-		LV_ModifyCol()
-		LV_ModifyCol(1, "AutoHdr")
+		this.AvailablePresetsListView.ModifyCol()
+		this.AvailablePresetsListView.ModifyCol(1, "AutoHdr")
 	}
 
 	loadSelectedPresets() {
-		local window := this.Window
 		local presets := []
 		local ignore, preset
 
-		Gui %window%:Default
-
-		Gui ListView, % this.SelectedPresetsListView
-
-		LV_Delete()
+		this.SelectedPresetsListView.Delete()
 
 		for ignore, preset in this.SetupWizard.Presets
-			LV_Add("", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset.Name . "." . getLanguage()))
+			this.SelectedPresetsListView.Add("", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset.Name . "." . getLanguage()))
 
-		LV_ModifyCol()
-		LV_ModifyCol(1, "AutoHdr")
+		this.SelectedPresetsListView.ModifyCol()
+		this.SelectedPresetsListView.ModifyCol(1, "AutoHdr")
 	}
 
 	presetName(label) {
 		local definition := this.Definition
 		local preset, module, modulePresets, ignore, preset
 
-		loop % definition.Length()
-		{
+		loop definition.Length {
 			module := definition[A_Index]
 
-			modulePresets := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
+			modulePresets := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules." . module . ".Presets", ""))
 
 			for ignore, preset in string2Values("|", modulePresets)
-				if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+				if (label = getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 					return preset
 		}
 
-		for ignore, preset in string2Values("|", substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
-			if (label = getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
+		for ignore, preset in string2Values("|", substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets", "")))
+			if (label = getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . "." . getLanguage()))
 				return preset
 
 		return false
 	}
 
 	updatePresetState() {
-		local window := this.Window
 		local info := false
 		local preset, selected, enable, ignore, candidate, info, html
 
-		Gui %window%:Default
+		this.Control["installPresetButton"].Enabled := false
+		this.Control["uninstallPresetButton"].Enabled := false
 
-		GuiControl Disable, installPresetButton
-		GuiControl Disable, uninstallPresetButton
-
-		Gui ListView, % this.AvailablePresetsListView
-
-		selected := LV_GetNext()
+		selected := this.AvailablePresetsListView.GetNext()
 
 		if selected {
-			LV_GetText(preset, selected)
+			preset := this.AvailablePresetsListView.GetText(selected, 1)
 
 			preset := this.presetName(preset)
 
@@ -762,58 +736,51 @@ class ModulesStepWizard extends StepWizard {
 				}
 
 			if enable
-				GuiControl Enable, installPresetButton
+				this.Control["installPresetButton"].Enabled := true
 
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 		}
 
-		Gui ListView, % this.SelectedPresetsListView
-
-		selected := LV_GetNext()
+		selected := this.SelectedPresetsListView.GetNext()
 
 		if selected {
-			GuiControl Enable, uninstallPresetButton
+			this.Control["uninstallPresetButton"].Enabled := true
 
 			if !info {
-				LV_GetText(preset, selected)
+				preset := this.SelectedPresetsListView.GetText(selected, 1)
 
 				preset := this.presetName(preset)
 
-				info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
+				info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Info." . getLanguage()))
 			}
 		}
 
 		if !info
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets.Info." . getLanguage()))
 
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
+		html := "<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		presetsInfoText.Document.Open()
-		presetsInfoText.Document.Write(html)
-		presetsInfoText.Document.Close()
+		this.Control["presetsInfoText"].Value.document.open()
+		this.Control["presetsInfoText"].Value.document.write(html)
+		this.Control["presetsInfoText"].Value.document.close()
 	}
 
 	installPreset() {
-		local window := this.Window
 		local preset, selected, label, class, arguments
 
-		Gui %window%:Default
-
-		Gui ListView, % this.AvailablePresetsListView
-
-		selected := LV_GetNext()
+		selected := this.AvailablePresetsListView.GetNext()
 
 		if selected {
-			LV_GetText(label, selected)
+			label := this.AvailablePresetsListView.GetText(selected, 1)
 
 			preset := this.presetName(label)
 
-			class := getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
-			arguments := string2Values(",", getConfigurationValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments"))
+			class := getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
+			arguments := string2Values(",", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments"))
 
-			this.SetupWizard.installPreset(new %class%(preset, arguments*))
+			this.SetupWizard.installPreset(%class%(preset, arguments*))
 
 			this.loadSelectedPresets()
 
@@ -822,33 +789,23 @@ class ModulesStepWizard extends StepWizard {
 	}
 
 	uninstallPreset() {
-		local window := this.Window
 		local selected
 
-		Gui %window%:Default
-
-		Gui ListView, % this.SelectedPresetsListView
-
-		selected := LV_GetNext()
+		selected := this.SelectedPresetsListView.GetNext()
 
 		if selected {
 			this.SetupWizard.uninstallPreset(this.SetupWizard.Presets[selected])
 
-			LV_Delete(selected)
+			this.SelectedPresetsListView.Delete(selected)
 
 			this.updatePresetState()
 		}
 	}
 
 	editPreset() {
-		local window := this.Window
 		local selected
 
-		Gui %window%:Default
-
-		Gui ListView, % this.SelectedPresetsListView
-
-		selected := LV_GetNext()
+		selected := this.SelectedPresetsListView.GetNext()
 
 		if selected
 			this.SetupWizard.Presets[selected].edit()
@@ -860,74 +817,8 @@ class ModulesStepWizard extends StepWizard {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-choosePreset(list1, list2) {
-	local step := SetupWizard.Instance.StepWizards["Modules"]
-	local window := step.Window
-	local next, selected
-
-	Gui %window%:Default
-
-	selected := LV_GetNext()
-
-	Gui ListView, %list1%
-
-	selected := LV_GetNext()
-
-	while selected {
-		LV_Modify(selected, "-Select")
-
-		selected := LV_GetNext()
-	}
-
-	Gui ListView, %list2%
-
-	if selected
-		LV_Modify(selected, "+Select")
-
-	SetupWizard.Instance.StepWizards["Modules"].updatePresetState()
-}
-
-chooseAvailablePreset() {
-	local step
-
-	if (A_GuiEvent = "Normal") {
-		step := SetupWizard.Instance.StepWizards["Modules"]
-
-		choosePreset(step.SelectedPresetsListView, step.AvailablePresetsListView)
-	}
-}
-
-chooseSelectedPreset() {
-	local step
-
-	if (A_GuiEvent = "Normal") {
-		step := SetupWizard.Instance.StepWizards["Modules"]
-
-		choosePreset(step.AvailablePresetsListView, step.SelectedPresetsListView)
-	}
-	else if (A_GuiEvent = "DoubleClick") {
-		step := SetupWizard.Instance.StepWizards["Modules"]
-
-		choosePreset(step.AvailablePresetsListView, step.SelectedPresetsListView)
-
-		step.editPreset()
-	}
-}
-
-installPreset() {
-	SetupWizard.Instance.StepWizards["Modules"].installPreset()
-}
-
-uninstallPreset() {
-	SetupWizard.Instance.StepWizards["Modules"].uninstallPreset()
-}
-
-updateSelectedModules() {
-	SetupWizard.Instance.StepWizards["Modules"].updateSelectedModules()
-}
-
 initializeModulesStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new ModulesStepWizard(SetupWizard.Instance, "Modules", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(ModulesStepWizard(SetupWizard.Instance, "Modules", kSimulatorConfiguration))
 }
 
 

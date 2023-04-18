@@ -1,3 +1,26 @@
+## 5.0.0.0-beta 03/21/23 (planned)
+  **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to make a backup copy of the "Simulator Controller" in your "Documents" folder, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
+
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Full rework of all applications to support the new AutoHotkey 2.0 language.
+  4. Modernized UI for all windows, especially on Windows 11.
+  5. Support for window resizing in almost all applications.
+  6. Renamed controller action function "hotkey" to "trigger" to avoid conflict with a new builtin function.
+  7. Renamed "Setup Advisor" to "Setup Workbench".
+  8. Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor"
+  9. Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins.
+  10. Big performance improvements in the rule engine.
+  11. Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty.
+  12. Introduced Stream Deck Plus Layout.
+  13. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
+  14. Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap.
+  15. [Developer] Renamed configuration map functions to multi map functions.
+  16. [Developer] Introduced a couple of specialized Array and Map subtypes, which supports failure safe handling of unset elements.
+  17. [Developer] Introduced of a specialized subclass of *Gui* which supports seamless resizing rules for controls.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500).
+
 ## 4.6.3.1-release 03/17/23 (planned)
   1. Minor bugfixes, as always
   2. Documentation updates, as always
@@ -1071,7 +1094,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   2. Documentation updates, as always
   3. New "Server Administration" application for [Team Server administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#server-administration).
   4. New application ["Team Dashboard"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#race-center) supports pitstop settings preparation by a team member in multiplayer endurance races.
-  5. [Developer]Added *parseConfiguration* and *printConfiguration* functions.
+  5. [Developer]Added *parseMultiMap* and *printMultiMap* functions.
 
 ## 3.7.2-release 12/03/21
 

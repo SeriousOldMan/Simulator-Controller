@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Inter Process Messages          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,14 +9,14 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
+#Include "..\Framework\Framework.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
+#Include "..\Libraries\Task.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -38,7 +38,7 @@ global kFileMessage := 3
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class MessageManager extends PeriodicTask {
-	static sMessageHandlers := {}
+	static sMessageHandlers := false
 	static sOutgoingMessages := []
 
 	iPaused := false
@@ -46,7 +46,7 @@ class MessageManager extends PeriodicTask {
 	class MessageHandler {
 		iHandler := false
 
-		Handler[] {
+		Handler {
 			Get {
 				return this.iHandler
 			}
@@ -66,14 +66,14 @@ class MessageManager extends PeriodicTask {
 			local handler := this.Handler
 
 			if handler
-				%handler%(category, data)
+				handler.Call(category, data)
 			else if InStr(data, ":") {
 				data := StrSplit(data, ":", , 2)
 
-				withProtection(data[1], string2Values(";", data[2])*)
+				withProtection(%data[1]%, string2Values(";", data[2])*)
 			}
 			else
-				withProtection(data)
+				withProtection(%data%)
 
 			return false
 		}
@@ -82,7 +82,7 @@ class MessageManager extends PeriodicTask {
 	class MethodMessageHandler extends MessageManager.MessageHandler {
 		iObject := false
 
-		Object[] {
+		Object {
 			Get {
 				return this.iObject
 			}
@@ -91,14 +91,14 @@ class MessageManager extends PeriodicTask {
 		__New(object, handler := false) {
 			this.iObject := object
 
-			base.__New(handler)
+			super.__New(handler)
 		}
 
 		call(category, data) {
 			local handler := this.Handler
 
 			if handler
-				%handler%(category, this.Object, data)
+				handler.Call(category, this.Object, data)
 			else if InStr(data, ":") {
 				data := StrSplit(data, ":", , 2)
 
@@ -117,55 +117,74 @@ class MessageManager extends PeriodicTask {
 		__New(messages) {
 			this.iMessages := messages
 
-			base.__New()
+			super.__New()
 		}
 
 		run() {
 			local ignore, message
 
 			for ignore, message in this.iMessages
-				withProtection(ObjBindMethod(message[1], "call", message[2], message[3]))
+				try {
+					withProtection(ObjBindMethod(message[1], "call", message[2], message[3]))
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 			return false
 		}
 	}
 
-	MessageHandlers[key := false] {
+	static MessageHandlers[key?] {
 		Get {
-			return (key ? MessageManager.sMessageHandlers[key] : MessageManager.sMessageHandlers)
+			MessageManager.initializeMessageHandlers()
+
+			return (isSet(key) ? MessageManager.sMessageHandlers[key] : MessageManager.sMessageHandlers)
 		}
 
 		Set {
+			MessageManager.initializeMessageHandlers()
+
 			return (key ? (MessageManager.sMessageHandlers[key] := value) : (MessageManager.sMessageHandlers := value))
 		}
 	}
 
-	OutgoingMessages[key := false] {
+	OutgoingMessages[key?] {
 		Get {
-			return (key ? MessageManager.sOutgoingMessages[key] : MessageManager.sOutgoingMessages)
+			return (isSet(key) ? MessageManager.sOutgoingMessages[key] : MessageManager.sOutgoingMessages)
 		}
 
 		Set {
-			eturn (key ? (MessageManager.sOutgoingMessages[key] := value) : (MessageManager.sOutgoingMessages := value))
+			return (isSet(key) ? (MessageManager.sOutgoingMessages[key] := value) : (MessageManager.sOutgoingMessages := value))
 		}
 	}
 
 	__New() {
 		MessageManager.Instance := this
 
-		base.__New(false, 4000, kHighPriority)
+		super.__New(false, 4000, kHighPriority)
 	}
 
-	pause() {
+	static initializeMessageHandlers() {
+		if !MessageManager.sMessageHandlers {
+			local cMap := Map()
+
+			cMap.CaseSens := false
+
+			MessageManager.sMessageHandlers := cMap
+		}
+	}
+
+	static pause() {
 		MessageManager.Instance.iPaused := true
 	}
 
-	resume() {
+	static resume() {
 		MessageManager.Instance.iPaused := false
 	}
 
 	receivePipeMessages() {
-		local messageHandlers := this.MessageHandlers
+		local messageHandlers := MessageManager.MessageHandlers
 		local result := []
 		local messageHandler, category, data, handler, pipeName
 
@@ -176,17 +195,16 @@ class MessageManager extends PeriodicTask {
 			pipeName := "\\.\pipe\SC." . category
 
 			if DllCall("WaitNamedPipe", "Str", pipeName, "UInt", 0xF)
-				loop Read, %pipeName%
-				{
+				loop Read, pipeName {
 					data := StrSplit(A_LoopReadLine, ":", , 2)
 					category := data[1]
 
-					messageHandler := (messageHandlers.HasKey(category) ? messageHandlers[category] : false)
+					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
 
 					if (!messageHandler)
 						messageHandler := messageHandlers["*"]
 
-					logMessage(kLogInfo, translate("Dispatching message """) . category . (data[2] ? translate(""": ") . data[2] : translate("""")))
+					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
 					result.Push(Array(messageHandler, category, data[2]))
 				}
@@ -199,11 +217,9 @@ class MessageManager extends PeriodicTask {
 		local result := []
 		local messageHandlers, messageHandler, result, pid, fileName, file, line, data, category
 
-		Process Exist
+		pid := ProcessExist()
 
-		pid := ErrorLevel
-
-		fileName := kTempDirectory . "Messages\" . pid . ".msg"
+		fileName := (kTempDirectory . "Messages\" . pid . ".msg")
 
 		if FileExist(fileName) {
 			file := false
@@ -214,11 +230,11 @@ class MessageManager extends PeriodicTask {
 				if !file
 					return result
 			}
-			catch exception {
+			catch Any as exception {
 				return result
 			}
 
-			messageHandlers := this.MessageHandlers
+			messageHandlers := MessageManager.MessageHandlers
 
 			while !file.AtEOF {
 				line := Trim(file.ReadLine(), " `t`n`r")
@@ -226,17 +242,19 @@ class MessageManager extends PeriodicTask {
 				if (StrLen(line) == 0)
 					break
 
-				data := StrSplit(line, ":", , 2)
-				category := data[1]
+				if InStr(line, ":") {
+					data := StrSplit(line, ":", , 2)
+					category := data[1]
 
-				messageHandler := (messageHandlers.HasKey(category) ? messageHandlers[category] : false)
+					messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
 
-				if (!messageHandler)
-					messageHandler := messageHandlers["*"]
+					if (!messageHandler)
+						messageHandler := messageHandlers["*"]
 
-				logMessage(kLogInfo, translate("Dispatching message """) . category . (data[2] ? translate(""": ") . data[2] : translate("""")))
+					logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
-				result.Push(Array(messageHandler, category, data[2]))
+					result.Push(Array(messageHandler, category, data[2]))
+				}
 			}
 
 			file.Length := 0
@@ -248,6 +266,7 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendPipeMessage(category, data) {
+		local zero := 0
 		local pipeName, pipe
 
 		static ERROR_PIPE_CONNECTED := 535
@@ -260,9 +279,9 @@ class MessageManager extends PeriodicTask {
 		DllCall("ConnectNamedPipe", "ptr", pipe, "ptr", 0)
 
 		if (true || (A_LastError = ERROR_PIPE_CONNECTED)) {
-			category := (A_IsUnicode ? chr(0xfeff) : chr(239) chr(187) chr(191)) . (category . ":" . data)
+			category := (chr(0xfeff) . (category . ":" . data))
 
-			DllCall("WriteFile", "ptr", pipe, "str", category, "uint", (StrLen(category) + 1) * (A_IsUnicode ? 2 : 1), "uint*", 0, "ptr", 0)
+			DllCall("WriteFile", "ptr", pipe, "str", category, "uint", (StrLen(category) + 1) * 2, "uint*", &zero, "ptr", 0)
 
 			DllCall("CloseHandle", "ptr", pipe)
 
@@ -273,12 +292,12 @@ class MessageManager extends PeriodicTask {
 	}
 
 	sendFileMessage(pid, category, data) {
-		local text := category . ":" . StrReplace(data, "`n", A_Space) . "`n"
+		local text := category . ":" . StrReplace(StrReplace(data, "`n", A_Space), "`r", "") . "`n"
 
 		try {
-			FileAppend %text%, % kTempDirectory . "Messages\" . pid . ".msg"
+			FileAppend(text, kTempDirectory . "Messages\" . pid . ".msg")
 		}
-		catch exception {
+		catch Any as exception {
 			return false
 		}
 
@@ -288,7 +307,7 @@ class MessageManager extends PeriodicTask {
 	receiveMessages() {
 		local fileMessages := this.receiveFileMessages()
 
-		return ((fileMessages.Length() > 0) ? fileMessages : this.receivePipeMessages())
+		return ((fileMessages.Length > 0) ? fileMessages : this.receivePipeMessages())
 	}
 
 	deliverMessages() {
@@ -300,11 +319,11 @@ class MessageManager extends PeriodicTask {
 		while worked {
 			worked := false
 
-			if (outgoingMessages.Length() > 0) {
+			if (outgoingMessages.Length > 0) {
 				handler := outgoingMessages[1]
 
 				if !inList(failed, handler)
-					if %handler%() {
+					if handler.Call() {
 						outgoingMessages.RemoveAt(1)
 
 						worked := true
@@ -324,8 +343,8 @@ class MessageManager extends PeriodicTask {
 			try {
 				messages := this.receiveMessages()
 
-				if (messages.Length() > 0)
-					new this.MessagesDispatcher(messages).start()
+				if (messages.Length > 0)
+					MessageManager.MessagesDispatcher(messages).start()
 				else
 					this.deliverMessages()
 			}
@@ -337,40 +356,40 @@ class MessageManager extends PeriodicTask {
 		this.Sleep := 200
 	}
 
-	sendMessage(messageType, category, data, target := false, request := "NORM") {
+	messageSend(messageType, category, data, target := false, request := "NORM") {
 		local messageHandlers, messageHandler
 
 		switch messageType {
 			case kLocalMessage:
-				logMessage(kLogInfo, translate("Sending message """) . category . (data ? translate(""": ") . data : translate("""")) . translate(" in current process"))
+				logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")) . translate(" in current process"))
 
-				messageHandlers := this.MessageHandlers
+				messageHandlers := MessageManager.MessageHandlers
 
-				messageHandler := (messageHandlers.HasKey(category) ? messageHandlers[category] : false)
+				messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
 
 				if (!messageHandler)
 					messageHandler := messageHandlers["*"]
 
-				logMessage(kLogInfo, translate("Dispatching message """) . category . (data ? translate(""": ") . data : translate("""")))
+				logMessage(kLogInfo, translate("Dispatching message `"") . category . (data ? translate("`": ") . data : translate("`"")))
 
 				Task.startTask(ObjBindMethod(messageHandler, "call", category, data))
 			case kWindowMessage:
-				logMessage(kLogInfo, translate("Sending message """) . category . (data ? translate(""": ") . data : translate("""")) . translate(" to target ") . target)
+				logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")) . translate(" to target ") . target)
 
 				if (request = "INTR")
 					sendWindowMessage(target, category, data, request)
 				else
-					this.OutgoingMessages.Push(Func("sendWindowMessage").Bind(target, category, data, request))
+					this.OutgoingMessages.Push(sendWindowMessage.Bind(target, category, data, request))
 			case kPipeMessage:
-				logMessage(kLogInfo, translate("Sending message """) . category . (data ? translate(""": ") . data : translate("""")))
+				logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")))
 
 				this.OutgoingMessages.Push(ObjBindMethod(this, "sendPipeMessage", category, data))
 			case kFileMessage:
-				logMessage(kLogInfo, translate("Sending message """) . category . (data ? translate(""": ") . data : translate("""")) . translate(" to target ") . target)
+				logMessage(kLogInfo, translate("Sending message `"") . category . (data ? translate("`": ") . data : translate("`"")) . translate(" to target ") . target)
 
 				this.OutgoingMessages.Push(ObjBindMethod(this, "sendFileMessage", target, category, data))
 			default:
-				throw "Unknown message type (" . messageType . ") detected in sendMessage..."
+				throw "Unknown message type (" . messageType . ") detected in messageSend..."
 		}
 	}
 }
@@ -381,28 +400,31 @@ class MessageManager extends PeriodicTask {
 ;;;-------------------------------------------------------------------------;;;
 
 createMessageReceiver() {
-	Gui MR:New, , % A_ScriptName
-	Gui MR:Color, D0D0D0, D8D8D8
-	Gui MR:Add, Text, X10 Y10, Modular Simulator Controller System
-	Gui MR:Add, Text, , % A_ScriptName
+	local messageReceiverGui := Gui("ToolWindow", A_ScriptName)
 
-	Gui MR:Margin, 10, 10
+	messageReceiverGui.BackColor := "D0D0D0"
 
-	Gui MR:Show, X0 Y0 Hide AutoSize
+	messageReceiverGui.Add("Text", "X10 Y10", "Modular Simulator Controller System")
+	messageReceiverGui.Add("Text", , A_ScriptName)
+
+	messageReceiverGui.MarginX := "10"
+	messageReceiverGui.MarginY := "10"
+
+	messageReceiverGui.Show("X-10000 Y-10000 NA")
+	; messageReceiverGui.Minimize()
 }
 
 unknownMessageHandler(category, data) {
-	logMessage(kLogCritical, translate("Unhandled message """) . category . translate(""": ") . data)
-
-	sendMessage(kLocalMessage, category, data)
+	logMessage(kLogCritical, translate("Unhandled message `"") . category . translate("`": ") . data)
 }
 
 encodeDWORD(string) {
 	local result := 0
 
-	loop % StrLen(string) {
+	loop StrLen(string) {
         result <<= 8
-        result += Asc(SubStr(string, A_Index, 1))
+
+        result += Ord(SubStr(string, A_Index, 1))
     }
 
     return result
@@ -410,11 +432,14 @@ encodeDWORD(string) {
 
 decodeDWORD(data) {
 	local result := ""
+	local char
 
     loop 4 {
-        result := Chr(data & 0xFF) . result
+		result := (Chr(data & 0xFF) . result)
+
         data >>= 8
     }
+	until !data
 
     return result
 }
@@ -422,7 +447,7 @@ decodeDWORD(data) {
 sendWindowMessage(target, category, data, request) {
 	local curDetectHiddenWindows := A_DetectHiddenWindows
 	local curTitleMatchMode := A_TitleMatchMode
-	local dwData, cbData, lpData, struct, message, wParam, lParam, control
+	local dwData, cbData, lpData, struct, message, wParam, lParam
 
 	category := (category . ":" . data)
 
@@ -430,53 +455,53 @@ sendWindowMessage(target, category, data, request) {
 	; construct the message to send
 	;---------------------------------------------------------------------------
 	dwData := encodeDWORD(request)
-	cbData := StrLen(category) * (A_IsUnicode + 1) + 1 ; length of DATA string (incl. ZERO)
-	lpData := &category                                ; pointer to DATA string
+	cbData := (StrLen(category) * 2) + 1 			; length of DATA string (incl. ZERO)
+	lpData := &category								; pointer to DATA string
 
 	;---------------------------------------------------------------------------
 	; put the message in a COPYDATASTRUCT
 	;---------------------------------------------------------------------------
-	VarSetCapacity(struct, A_PtrSize * 3, 0)        ; initialize COPYDATASTRUCT
-	NumPut(dwData, struct, A_PtrSize * 0, "UInt")   ; DWORD
-	NumPut(cbData, struct, A_PtrSize * 1, "UInt")   ; DWORD
-	NumPut(lpData, struct, A_PtrSize * 2, "UInt")   ; 32bit pointer
+	struct := Buffer(A_PtrSize * 3, 0)        		; initialize COPYDATASTRUCT
+	NumPut("UInt", dwData, struct, A_PtrSize * 0)   ; DWORD
+	NumPut("UInt", cbData, struct, A_PtrSize * 1)   ; DWORD
+	NumPut("UInt", lpData, struct, A_PtrSize * 2)   ; 32bit pointer
 
 	;---------------------------------------------------------------------------
 	; parameters for PostMessage command
 	;---------------------------------------------------------------------------
-	message := 0x4a     ; WM_COPYDATA
-	wParam  := ""       ; not used
-	lParam  := &struct  ; COPYDATASTRUCT
-	control := ""       ; not needed
+	message := 0x4a			; WM_COPYDATA
+	wParam  := ""			; not used
+	lParam  := &struct		; COPYDATASTRUCT
 
-	SetTitleMatchMode 2 ; match part of the title
-	DetectHiddenWindows On ; needed for sending messages
+	SetTitleMatchMode(2) 		; match part of the title
+	DetectHiddenWindows(true)	; needed for sending messages
 
 	try {
-		PostMessage %message%, %wParam%, %lParam%, %control%, %target%
+		PostMessage(message, wParam, lParam, "", target)
 
-		return (ErrorLevel != "FAIL")
+		return true
 	}
-	catch exception {
+	catch Any as exception {
 		logError(exception)
 
 		return false
 	}
 	finally {
-		DetectHiddenWindows %curDetectHiddenWindows%
-		SetTitleMatchMode %curTitleMatchMode%
+		DetectHiddenWindows(curDetectHiddenWindows)
+
+		SetTitleMatchMode(curTitleMatchMode)
 	}
 }
 
-receiveWindowMessage(wParam, lParam) {
+receiveWindowMessage(wParam, lParam, *) {
 	local messageHandlers, messageHandler, dwData, cbData, lpData, request, length, category, data, callable
 
 	;---------------------------------------------------------------------------
     ; retrieve info from COPYDATASTRUCT
     ;---------------------------------------------------------------------------
-    dwData := NumGet(lParam + A_PtrSize * 0)    ; DWORD encoded request
-    cbData := NumGet(lParam + A_PtrSize * 1)    ; length of DATA string (incl ZERO)
-    lpData := NumGet(lParam + A_PtrSize * 2)    ; pointer to DATA string
+    dwData := NumGet(lParam + A_PtrSize * 0, "UPtr")    ; DWORD encoded request
+    cbData := NumGet(lParam + A_PtrSize * 1, "UPtr")    ; length of DATA string (incl ZERO)
+    lpData := NumGet(lParam + A_PtrSize * 2, "UPtr")    ; pointer to DATA string
 
 	;---------------------------------------------------------------------------
     ; interpret available info
@@ -488,23 +513,23 @@ receiveWindowMessage(wParam, lParam) {
 		data    := StrGet(lpData, length, "")       ; DATA string from pointer
 	}
 	else if ((request = "NORM") || (request = "INTR")) {
-		length  := (cbData - 1) / (A_IsUnicode + 1) ; length of DATA string (excl ZERO)
+		length  := (cbData - 1) / 2					; length of DATA string (excl ZERO)
 		data    := StrGet(lpData, length)           ; DATA string from pointer
 	}
 	else
-		throw % "Unhandled message received: " . request . " in receiveWindowMessage..."
+		throw "Unhandled message received: " . request . " in receiveWindowMessage..."
 
 	data := StrSplit(data, ":", , 2)
 	category := data[1]
 
-	messageHandlers := MessageManager.Instance.MessageHandlers
+	messageHandlers := MessageManager.MessageHandlers
 
-	messageHandler := (messageHandlers.HasKey(category) ? messageHandlers[category] : false)
+	messageHandler := (messageHandlers.Has(category) ? messageHandlers[category] : false)
 
 	if (!messageHandler)
 		messageHandler := messageHandlers["*"]
 
-	logMessage(kLogInfo, translate("Dispatching message """) . category . (data[2] ? translate(""": ") . data[2] : translate("""")))
+	logMessage(kLogInfo, translate("Dispatching message `"") . category . (data[2] ? translate("`": ") . data[2] : translate("`"")))
 
 	callable := ObjBindMethod(messageHandler, "call", category, data[2])
 
@@ -514,14 +539,12 @@ receiveWindowMessage(wParam, lParam) {
 		Task.startTask(callable)
 }
 
-stopMessageManager() {
+stopMessageManager(*) {
 	local pid
 
 	Task.removeTask(MessageManager.Instance)
 
-	Process Exist
-
-	pid := ErrorLevel
+	pid := ProcessExist()
 
 	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
 		deleteFile(kTempDirectory . "Messages\" . pid . ".msg")
@@ -529,25 +552,23 @@ stopMessageManager() {
 	return false
 }
 
-startMessageManager() {
+startMessageManager(*) {
 	local pid
 
-	FileCreateDir %kTempDirectory%Messages
+	DirCreate(kTempDirectory . "Messages")
 
-	OnMessage(0x4a, "receiveWindowMessage")
+	OnMessage(0x4a, receiveWindowMessage)
 
-	registerMessageHandler("*", "unknownMessageHandler")
+	registerMessageHandler("*", unknownMessageHandler)
 
-	new MessageManager().start()
+	MessageManager().start()
 
-	Process Exist
-
-	pid := ErrorLevel
+	pid := ProcessExist()
 
 	if FileExist(kTempDirectory . "Messages\" . pid . ".msg")
 		deleteFile(kTempDirectory . "Messages\" . pid . ".msg")
 
-	OnExit("stopMessageManager")
+	OnExit(stopMessageManager)
 }
 
 
@@ -556,13 +577,15 @@ startMessageManager() {
 ;;;-------------------------------------------------------------------------;;;
 
 functionMessageHandler(category, data) {
+	local function
+
 	if InStr(data, ":") {
 		data := StrSplit(data, ":", , 2)
 
-		return withProtection(data[1], string2Values(";", data[2])*)
+		return withProtection(%data[1]%, string2Values(";", data[2])*)
 	}
 	else
-		return withProtection(data)
+		return withProtection(%data%)
 }
 
 methodMessageHandler(category, object, data) {
@@ -580,14 +603,14 @@ registerMessageHandler(category, handler, object := false) {
 		MessageManager.MessageHandlers[category] := handler
 	else {
 		if object
-			MessageManager.MessageHandlers[category] := new MessageManager.MethodMessageHandler(object, handler)
+			MessageManager.MessageHandlers[category] := MessageManager.MethodMessageHandler(object, handler)
 		else
-			MessageManager.MessageHandlers[category] := new MessageManager.FunctionMessageHandler(handler)
+			MessageManager.MessageHandlers[category] := MessageManager.FunctionMessageHandler(handler)
 	}
 }
 
-sendMessage(messageType, category, data, target := false, request := "NORM") {
-	MessageManager.Instance.sendMessage(messageType, category, data, target, request)
+messageSend(messageType, category, data, target := false, request := "NORM") {
+	MessageManager.Instance.messageSend(messageType, category, data, target, request)
 }
 
 

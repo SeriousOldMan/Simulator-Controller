@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Global Application Library      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,20 +9,20 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Framework\Framework.ahk
-#Include ..\Framework\GUI.ahk
-#Include ..\Framework\Message.ahk
-#Include ..\Framework\Progress.ahk
-#Include ..\Framework\Splash.ahk
-#Include ..\Framework\Classes.ahk
-#Include ..\Framework\Startup.ahk
+#Include "..\Framework\Framework.ahk"
+#Include "..\Framework\GUI.ahk"
+#Include "..\Framework\Message.ahk"
+#Include "..\Framework\Progress.ahk"
+#Include "..\Framework\Splash.ahk"
+#Include "..\Framework\Configuration.ahk"
+#Include "..\Framework\Startup.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Messages.ahk
+#Include "..\Libraries\Messages.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,21 +30,19 @@
 ;;;-------------------------------------------------------------------------;;;
 
 doApplications(applications, callback) {
-	local ignore, application
+	local ignore, application, pid
 
 	for ignore, application in applications {
-		if !InStr(application, ".exe")
-			application .= ".exe"
+		pid := ProcessExist(InStr(application, ".exe") ? application : (application . ".exe"))
 
-		Process Exist, %application%
-
-		if ErrorLevel
-			%callback%(ErrorLevel)
+		if pid
+			callback.Call(pid)
 	}
 }
 
-consentDialog(id, consent := false) {
+consentDialog(id, consent := false, *) {
 	local language, texts, chosen, x, y, rootDirectory, ignore, section, keyValues, key, value
+	local consentGui
 
 	static tyrePressuresConsentDropDown
 	static carSetupsConsentDropDown
@@ -66,85 +64,69 @@ consentDialog(id, consent := false) {
 	for ignore, rootDirectory in [kTranslationsDirectory, kUserTranslationsDirectory]
 		if FileExist(rootDirectory . "Consent." . language)
 			if !texts
-				texts := readConfiguration(rootDirectory . "Consent." . language)
+				texts := readMultiMap(rootDirectory . "Consent." . language)
 			else
-				for section, keyValues in readConfiguration(rootDirectory . "Consent." . language)
+				for section, keyValues in readMultiMap(rootDirectory . "Consent." . language)
 					for key, value in keyValues
-						setConfigurationValue(texts, section, key, value)
+						setMultiMapValue(texts, section, key, value)
 
 	if !texts
-		texts := readConfiguration(kTranslationsDirectory . "Consent.en")
+		texts := readMultiMap(kTranslationsDirectory . "Consent.en")
 
-	Gui CNS:-Border ; -Caption
-	Gui CNS:Color, D0D0D0, D8D8D8
-	Gui CNS:Font, s10 Bold
-	Gui CNS:Add, Text, x0 y8 w800 +0x200 +0x1 BackgroundTrans gmoveConsentDialog, % translate("Modular Simulator Controller System")
-	Gui CNS:Font, Norm, Arial
-	Gui CNS:Add, Text, x0 y32 w800 h23 +0x200 +0x1 BackgroundTrans, % translate("Declaration of consent")
+	consentGui := Window({Descriptor: "Consent", Options: "0x400000"}, "")
 
-	Gui CNS:Add, Text, x8 y70 w784 h180 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Introduction"), "``n", "`n"), "\<>", "=")
+	consentGui.SetFont("s10 Bold")
 
-	Gui CNS:Add, Text, x8 y260 w450 h23 +0x200, % translate("Your database identification key is:")
-	Gui CNS:Add, Edit, x460 y260 w332 h23 -VScroll ReadOnly Center, % id
+	consentGui.Add("Text", "x0 y8 w800 +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(consentGui, "Consent"))
 
-	Gui CNS:Add, Text, x8 y300 w450 h23 +0x200, % translate("Do you want to share your tyre pressure data?")
+	consentGui.SetFont("Norm", "Arial")
 
-	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "Undecided"))
-	Gui CNS:Add, DropDownList, x460 y300 w332 AltSubmit Choose%chosen% VtyrePressuresConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
+	consentGui.Add("Text", "x0 y32 w800 h23 +0x200 +0x1 BackgroundTrans", translate("Declaration of consent"))
 
-	Gui CNS:Add, Text, x8 y324 w450 h23 +0x200, % translate("Do you want to share your car setup data?")
+	consentGui.Add("Text", "x8 y70 w784 h180 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Introduction"), "``n", "`n"), "\<>", "="))
 
-	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Car Setups", "Undecided"))
-	Gui CNS:Add, DropDownList, x460 y324 w332 AltSubmit Choose%chosen% VcarSetupsConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
+	consentGui.Add("Text", "x8 y260 w450 h23 +0x200", translate("Your database identification key is:"))
+	consentGui.Add("Edit", "x460 y260 w332 h23 -VScroll ReadOnly Center", id)
 
-	Gui CNS:Add, Text, x8 y348 w450 h23 +0x200, % translate("Do you want to share your race strategies?")
+	consentGui.Add("Text", "x8 y300 w450 h23 +0x200", translate("Do you want to share your tyre pressure data?"))
 
-	chosen := inList(["Yes", "No", "Undecided"], getConfigurationValue(consent, "Consent", "Share Race Strategies", "Undecided"))
-	Gui CNS:Add, DropDownList, x460 y348 w332 AltSubmit Choose%chosen% VraceStrategiesConsentDropDown, % values2String("|", map(["Yes", "No", "Ask again later..."], "translate")*)
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "Undecided"))
+	tyrePressuresConsentDropDown := consentGui.Add("DropDownList", "x460 y300 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	Gui CNS:Add, Text, x8 y388 w784 h60 -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "=")
+	consentGui.Add("Text", "x8 y324 w450 h23 +0x200", translate("Do you want to share your car setup data?"))
 
-	Gui CNS:Add, Link, x8 y458 w784 h60 cRed -VScroll +Wrap ReadOnly, % StrReplace(StrReplace(getConfigurationValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "=")
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Car Setups", "Undecided"))
+	carSetupsConsentDropDown := consentGui.Add("DropDownList", "x460 y324 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	Gui CNS:Add, Button, x368 y514 w80 h23 Default gcloseConsentDialog, % translate("Save")
+	consentGui.Add("Text", "x8 y348 w450 h23 +0x200", translate("Do you want to share your race strategies?"))
 
-	Gui CNS:+AlwaysOnTop
+	chosen := inList(["Yes", "No", "Undecided"], getMultiMapValue(consent, "Consent", "Share Race Strategies", "Undecided"))
+	raceStrategiesConsentDropDown := consentGui.Add("DropDownList", "x460 y348 w332 Choose" . chosen, collect(["Yes", "No", "Ask again later..."], translate))
 
-	if getWindowPosition("Consent", x, y)
-		Gui CNS:Show, x%x% y%y%
+	consentGui.Add("Text", "x8 y388 w784 h60 -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Information"), "``n", "`n"), "\<>", "="))
+
+	consentGui.Add("Link", "x8 y458 w784 h60 cRed -VScroll +Wrap ReadOnly", StrReplace(StrReplace(getMultiMapValue(texts, "Consent", "Warning"), "``n", "`n"), "\<>", "="))
+
+	consentGui.Add("Button", "x368 y514 w80 h23 Default", translate("Save")).OnEvent("Click", consentDialog.Bind("Close"))
+
+	consentGui.Opt("+AlwaysOnTop")
+
+	if getWindowPosition("Consent", &x, &y)
+		consentGui.Show("x" . x . " y" . y)
 	else
-		Gui CNS:Show
-
-	Gui CNS:Default
+		consentGui.Show()
 
 	loop
-		Sleep 100
+		Sleep(100)
 	until closed
 
-	GuiControlGet tyrePressuresConsentDropDown
-	GuiControlGet carSetupsConsentDropDown
-	GuiControlGet raceStrategiesConsentDropDown
-
-	Gui CNS:Destroy
-
-	return {TyrePressures: ["Yes", "No", "Retry"][tyrePressuresConsentDropDown], CarSetups: ["Yes", "No", "Retry"][carSetupsConsentDropDown], RaceStrategies: ["Yes", "No", "Retry"][raceStrategiesConsentDropDown]}
-}
-
-closeConsentDialog() {
-	consentDialog("Close")
-}
-
-moveConsentDialog() {
-	moveByMouse("CNS", "Consent")
-}
-
-
-moveHTMLViewer() {
-	moveByMouse("HV", "HTML Viewer")
-}
-
-dismissHTMLViewer() {
-	viewHTML(false)
+	try {
+		return Map("TyrePressures", ["Yes", "No", "Retry"][tyrePressuresConsentDropDown.Value]
+				 , "CarSetups", ["Yes", "No", "Retry"][carSetupsConsentDropDown.Value]
+				 , "RaceStrategies", ["Yes", "No", "Retry"][raceStrategiesConsentDropDown.Value])
+	}
+	finally
+		consentGui.Destroy()
 }
 
 requestShareSessionDatabaseConsent() {
@@ -154,55 +136,54 @@ requestShareSessionDatabaseConsent() {
 		if inList(["Simulator Startup", "Simulator Configuration", "Simulator Settings", "Session Database", "Simulator Setup"], StrSplit(A_ScriptName, ".")[1]) {
 			idFileName := kUserConfigDirectory . "ID"
 
-			FileReadLine ID, %idFileName%, 1
+			ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
 
-			consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
-			request := ((consent.Count() == 0) || (ID != getConfigurationValue(consent, "General", "ID")) || getConfigurationValue(consent, "General", "ReNew", false))
+			request := ((consent.Count == 0) || (ID != getMultiMapValue(consent, "General", "ID")) || getMultiMapValue(consent, "General", "ReNew", false))
 
 			if !request {
-				countdown := getConfigurationValue(consent, "General", "Countdown", kUndefined)
+				countdown := getMultiMapValue(consent, "General", "Countdown", kUndefined)
 
 				if (countdown != kUndefined) {
 					if (--countdown <= 0)
 						request := true
 					else {
-						setConfigurationValue(consent, "General", "Countdown", countdown)
+						setMultiMapValue(consent, "General", "Countdown", countdown)
 
-						writeConfiguration(kUserConfigDirectory . "CONSENT", consent)
+						writeMultiMap(kUserConfigDirectory . "CONSENT", consent)
 					}
 				}
 			}
 
 			if request {
-				newConsent := newConfiguration()
+				newConsent := newMultiMap()
 
-				setConfigurationValue(newConsent, "General", "ID", id)
-				setConfigurationValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
+				setMultiMapValue(newConsent, "General", "ID", id)
+				setMultiMapValue(newConsent, "Consent", "Date", A_MM . "/" . A_DD . "/" . A_YYYY)
 
-				if (getFileNames("Consent.*", kTranslationsDirectory).Length() > 0)
+				if (getFileNames("Consent.*", kTranslationsDirectory).Length > 0)
 					result := consentDialog(id, consent)
 				else {
-					result := {}
+					result := CaseInsenseMap()
 
 					result["TyrePressures"] := "Retry"
 					result["RaceStrategies"] := "Retry"
 					result["CarSetups"] := "Retry"
 				}
 
-				for type, key in {TyrePressures: "Share Tyre Pressures", RaceStrategies: "Share Race Strategies"
-																	   , CarSetups: "Share Car Setups"}
-					switch result[type] {
+				for type, key in Map("TyrePressures", "Share Tyre Pressures", "RaceStrategies", "Share Race Strategies", "CarSetups", "Share Car Setups")
+					switch result[type], false {
 						case "Yes":
-							setConfigurationValue(newConsent, "Consent", key, "Yes")
+							setMultiMapValue(newConsent, "Consent", key, "Yes")
 						case "No":
-							setConfigurationValue(newConsent, "Consent", key, "No")
+							setMultiMapValue(newConsent, "Consent", key, "No")
 						case "Retry":
-							setConfigurationValue(newConsent, "Consent", key, "Undecided")
-							setConfigurationValue(newConsent, "General", "Countdown", 10)
+							setMultiMapValue(newConsent, "Consent", key, "Undecided")
+							setMultiMapValue(newConsent, "General", "Countdown", 10)
 					}
 
-				writeConfiguration(kUserConfigDirectory . "CONSENT", newConsent)
+				writeMultiMap(kUserConfigDirectory . "CONSENT", newConsent)
 			}
 		}
 	}
@@ -215,43 +196,37 @@ checkForNews() {
 		check := !FileExist(kUserConfigDirectory . "NEWS")
 
 		if !check {
-			FileGetTime lastModified, %kUserConfigDirectory%NEWS, M
+			lastModified := FileGetTime(kUserConfigDirectory "NEWS", "M")
 
-			EnvAdd lastModified, 1, Days
+			lastModified := DateAdd(lastModified, 1, "Days")
 
 			check := (lastModified < A_Now)
 		}
 
 		if check {
 			try {
-				URLDownloadToFile https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1, %kTempDirectory%NEWS
-
-				if ErrorLevel
-					throw "Error while downloading NEWS..."
+				Download("https://www.dropbox.com/s/3zfsgiepo85ufw3/NEWS?dl=1", kTempDirectory . "NEWS")
 			}
-			catch exception {
+			catch Any as exception {
 				check := false
 			}
 		}
 
 		if check {
-			news := readConfiguration(kUserConfigDirectory . "NEWS")
+			news := readMultiMap(kUserConfigDirectory . "NEWS")
 
-			for nr, html in getConfigurationSectionValues(readConfiguration(kTempDirectory . "NEWS"), "News")
-				if !getConfigurationValue(news, "News", nr, false)
+			for nr, html in getMultiMapValues(readMultiMap(kTempDirectory . "NEWS"), "News")
+				if !getMultiMapValue(news, "News", nr, false)
 					try {
-						URLDownloadToFile %html%, %kTempDirectory%NEWS.htm
+						Download(html, kTempDirectory . "NEWS.htm")
 
-						if ErrorLevel
-							throw "Error while downloading NEWS..."
+						setMultiMapValue(news, "News", nr, true)
 
-						setConfigurationValue(news, "News", nr, true)
-
-						writeConfiguration(kUserConfigDirectory . "NEWS", news)
+						writeMultiMap(kUserConfigDirectory . "NEWS", news)
 
 						viewHTML(kTempDirectory . "NEWS.htm")
 					}
-					catch exception {
+					catch Any as exception {
 						logError(exception)
 					}
 		}
@@ -261,83 +236,76 @@ checkForNews() {
 startDatabaseSynchronizer() {
 	local idFileName, ID, dbIDFileName, dbID, shareTyrePressures, shareCarSetups, shareRaceStrategies, options, consent
 
-	if (StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") {
-		Process Exist, Database Synchronizer.exe
+	if ((StrSplit(A_ScriptName, ".")[1] = "Simulator Startup") && !ProcessExist("Database Synchronizer.exe")) {
+		idFileName := kUserConfigDirectory . "ID"
 
-		if !ErrorLevel {
-			idFileName := kUserConfigDirectory . "ID"
+		ID := StrSplit(FileRead(idFileName), "`n", "`r")[1]
 
-			FileReadLine ID, %idFileName%, 1
+		dbIDFileName := kDatabaseDirectory . "ID"
 
-			dbIDFileName := kDatabaseDirectory . "ID"
+		dbID := StrSplit(FileRead(dbIDFileName),"`n","`r")[1]
 
-			FileReadLine dbID, %dbIDFileName%, 1
+		if (ID = dbID) {
+			consent := readMultiMap(kUserConfigDirectory . "CONSENT")
 
-			if (ID = dbID) {
-				consent := readConfiguration(kUserConfigDirectory . "CONSENT")
+			shareTyrePressures := (getMultiMapValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
+			shareCarSetups := (getMultiMapValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
+			shareRaceStrategies := (getMultiMapValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
 
-				shareTyrePressures := (getConfigurationValue(consent, "Consent", "Share Tyre Pressures", "No") = "Yes")
-				shareCarSetups := (getConfigurationValue(consent, "Consent", "Share Car Setups", "No") = "Yes")
-				shareRaceStrategies := (getConfigurationValue(consent, "Consent", "Share Race Strategies", "No") = "Yes")
+			options := ("-ID `"" . ID . "`" -Synchronize " . true)
 
-				options := ("-ID """ . ID . """ -Synchronize " . true)
+			if shareTyrePressures
+				options .= " -Pressures"
 
-				if shareTyrePressures
-					options .= " -Pressures"
+			if shareCarSetups
+				options .= " -Setups"
 
-				if shareCarSetups
-					options .= " -Setups"
+			if shareRaceStrategies
+				options .= " -Strategies"
 
-				if shareRaceStrategies
-					options .= " -Strategies"
+			try {
+				Run(kBinariesDirectory . "Database Synchronizer.exe " . options)
+			}
+			catch Any as exception {
+				logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
 
-				try {
-					Run %kBinariesDirectory%Database Synchronizer.exe %options%
-				}
-				catch exception {
-					logMessage(kLogCritical, translate("Cannot start Database Synchronizer - please rebuild the applications..."))
-
-					showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
-							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
-				}
+				showMessage(translate("Cannot start Database Synchronizer - please rebuild the applications...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
 	}
 }
 
 checkForUpdates() {
-	local check, lastModified, release, version, current, releasePostFix, currentPostFix, title, automaticUpdates
-	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments, versionPostfix
+	local check, lastModified, release, version, current, releasePostFix, currentPostFix, automaticUpdates
+	local toolTargets, userToolTargets, userToolTargetsFile, updates, target, arguments, versionPostfix, msgResult
 
-	if vDetachedInstallation
+	if isDetachedInstallation()
 		return
 
 	if inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1]) {
 		check := !FileExist(kUserConfigDirectory . "VERSION")
 
 		if !check {
-			FileGetTime lastModified, %kUserConfigDirectory%VERSION, M
+			lastModified := FileGetTime(kUserConfigDirectory . "VERSION", "M")
 
-			EnvAdd lastModified, 1, Days
+			lastModified := DateAdd(lastModified, 1, "Days")
 
 			check := (lastModified < A_Now)
 		}
 
 		if check {
 			try {
-				URLDownloadToFile https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1, %kUserConfigDirectory%VERSION
-
-				if ErrorLevel
-					throw "Error while checking VERSION..."
+				Download("https://www.dropbox.com/s/txa8muw9j3g66tl/VERSION?dl=1", kUserConfigDirectory . "VERSION")
 			}
-			catch exception {
+			catch Any as exception {
 				check := false
 			}
 		}
 
 		if check {
-			release := readConfiguration(kUserConfigDirectory . "VERSION")
-			version := getConfigurationValue(release, "Release", "Version", getConfigurationValue(release, "Version", "Release", false))
+			release := readMultiMap(kUserConfigDirectory . "VERSION")
+			version := getMultiMapValue(release, "Release", "Version", getMultiMapValue(release, "Version", "Release", false))
 
 			if version {
 				version := StrSplit(version, "-", , 2)
@@ -349,99 +317,54 @@ checkForUpdates() {
 				version := string2Values(".", version[1])
 				current := string2Values(".", current[1])
 
-				while (version.Length() < current.Length())
+				while (version.Length < current.Length)
 					version.Push("0")
 
-				while (current.Length() < version.Length())
+				while (current.Length < version.Length)
 					current.Push("0")
 
 				version := values2String("", version*)
 				current := values2String("", current*)
 
 				if ((version > current) || ((version = current) && (versionPostfix != currentPostfix))) {
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-					title := translate("Update")
-					MsgBox 262436, %title%, % translate("A newer version of Simulator Controller is available. Do you want to download it now?")
-					OnMessage(0x44, "")
+					OnMessage(0x44, translateYesNoButtons)
+					msgResult := MsgBox(translate("A newer version of Simulator Controller is available. Do you want to download it now?"), translate("Update"), 262436)
+					OnMessage(0x44, translateYesNoButtons, 0)
 
-					IfMsgBox Yes
-					{
-						automaticUpdates := getConfigurationValue(readConfiguration(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
+					if (msgResult = "Yes") {
+						automaticUpdates := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Simulator Controller.install"), "Updates", "Automatic", true)
 
 						if automaticUpdates
-							Run %kBinariesDirectory%Simulator Download.exe -NoUpdate -Download -Update -Start "%A_ScriptFullPath%" ; *RunAs
+							Run("*RunAs `"" . kBinariesDirectory . "Simulator Download.exe`" -NoUpdate -Download -Update -Start `"" . A_ScriptFullPath . "`"")
 						else
-							Run https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds
+							Run("https://github.com/SeriousOldMan/Simulator-Controller#latest-release-builds")
 
-						ExitApp 0
+						ExitApp(0)
 					}
 					else if FileExist(kUserConfigDirectory . "VERSION")
-						FileSetTime A_Now, %kUserConfigDirectory%VERSION
+						FileSetTime(A_Now, kUserConfigDirectory . "VERSION")
 				}
 			}
 		}
 	}
 
-	toolTargets := readConfiguration(getFileName("Simulator Tools.targets", kConfigDirectory))
+	toolTargets := readMultiMap(getFileName("Simulator Tools.targets", kConfigDirectory))
 
 	userToolTargetsFile := getFileName("Simulator Tools.targets", kUserConfigDirectory)
-	userToolTargets := readConfiguration(userToolTargetsFile)
+	userToolTargets := readMultiMap(userToolTargetsFile)
 
-	if (userToolTargets.Count() > 0) {
-		setConfigurationSectionValues(userToolTargets, "Update", getConfigurationSectionValues(toolTargets, "Update", Object()))
+	if (userToolTargets.Count > 0) {
+		setMultiMapValues(userToolTargets, "Update", getMultiMapValues(toolTargets, "Update"))
 
-		writeConfiguration(userToolTargetsFile, userToolTargets)
+		writeMultiMap(userToolTargetsFile, userToolTargets)
 	}
 
 	if (!inList(A_Args, "-NoUpdate") && inList(kForegroundApps, StrSplit(A_ScriptName, ".")[1])) {
-		updates := readConfiguration(getFileName("UPDATES", kUserConfigDirectory))
-restartUpdate:
-		for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
-			if !getConfigurationValue(updates, "Processed", target, false) {
-				/*
-				SoundPlay *32
+		updates := readMultiMap(getFileName("UPDATES", kUserConfigDirectory))
 
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No", "Never"]))
-				title := translate("Update")
-				MsgBox 262179, %title%, % translate("The local configuration database needs an update. Do you want to run the update now?")
-				OnMessage(0x44, "")
-
-				IfMsgBox Cancel
-				{
-					OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-					title := translate("Update")
-					MsgBox 262436, %title%, % translate("Are you really sure, you want to skip the automated update procedure?")
-					OnMessage(0x44, "")
-
-					IfMsgBox Yes
-					{
-						for target, arguments in getConfigurationSectionValues(toolTargets, "Update", Object())
-							setConfigurationValue(updates, "Processed", target, true)
-
-						writeConfiguration(getFileName("UPDATES", kUserConfigDirectory), updates)
-
-						break
-					}
-
-					Goto restartUpdate
-				}
-
-				IfMsgBox Yes
-				{
-					RunWait % kBinariesDirectory . "Simulator Tools.exe -Update"
-
-					loadSimulatorConfiguration()
-
-					break
-				}
-
-				IfMsgBox No
-				{
-					break
-				}
-				*/
-
-				RunWait % kBinariesDirectory . "Simulator Tools.exe -Update"
+		for target, arguments in getMultiMapValues(toolTargets, "Update")
+			if !getMultiMapValue(updates, "Processed", target, false) {
+				RunWait(kBinariesDirectory . "Simulator Tools.exe -Update")
 
 				loadSimulatorConfiguration()
 
@@ -456,16 +379,16 @@ restartUpdate:
 ;;;-------------------------------------------------------------------------;;;
 
 broadcastMessage(applications, message, arguments*) {
-	if (arguments.Length() > 0)
-		doApplications(applications, Func("sendMessage").Bind(kFileMessage, "Core", message . ":" . values2String(";", arguments*)))
+	if (arguments.Length > 0)
+		doApplications(applications, messageSend.Bind(kFileMessage, "Core", message . ":" . values2String(";", arguments*)))
 	else
-		doApplications(applications, Func("sendMessage").Bind(kFileMessage, "Core", message))
+		doApplications(applications, messageSend.Bind(kFileMessage, "Core", message))
 
 }
 
-viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", width := 800, height := 400) {
+viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
 	local html, innerWidth, editHeight, buttonX
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, htmlGui
 
 	static htmlViewer
 	static dismissed := false
@@ -481,36 +404,39 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 		return
 	}
 
-	FileRead html, %fileName%
+	html := FileRead(fileName)
 
 	innerWidth := width - 16
 
-	Gui HV:-Border -Caption
-	Gui HV:Color, D0D0D0, D8D8D8
-	Gui HV:Font, s10 Bold
-	Gui HV:Add, Text, x8 y8 W%innerWidth% +0x200 +0x1 BackgroundTrans gmoveHTMLViewer, % translate("Modular Simulator Controller System")
-	Gui HV:Font
-	Gui HV:Add, Text, x8 yp+26 W%innerWidth% +0x200 +0x1 BackgroundTrans, %title%
+	htmlGui := Window({Options: "0x400000"}, "")
+
+	htmlGui.SetFont("s10 Bold")
+
+	htmlGui.Add("Text", "x8 y8 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(htmlGui, "HTML Viewer"))
+
+	htmlGui.SetFont()
+
+	htmlGui.Add("Text", "x8 yp+26 W" . innerWidth . " +0x200 +0x1 BackgroundTrans", title)
 
 	editHeight := height - 102
 
-	Gui HV:Add, ActiveX, X8 YP+26 W%innerWidth% H%editHeight% vhtmlViewer, shell.explorer
+	htmlViewer := htmlGui.Add("ActiveX", "X8 YP+26 W" . innerWidth . " H" . editHeight . " vhtmlViewer", "shell.explorer").Value
 
-	htmlViewer.Navigate("about:blank")
+	htmlViewer.navigate("about:blank")
 
-	htmlViewer.Document.open()
-	htmlViewer.Document.write(html)
-	htmlViewer.Document.close()
+	htmlViewer.document.open()
+	htmlViewer.document.write(html)
+	htmlViewer.document.close()
 
-	SysGet mainScreen, MonitorWorkArea
+	MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
-	if !getWindowPosition("HTML Viewer", x, y) {
+	if !getWindowPosition("HTML Viewer", &x, &y) {
 		x := kUndefined
 		y := kUndefined
 	}
 
 	if (x = kUndefined)
-		switch x {
+		switch x, false {
 			case "Left":
 				x := 25
 			case "Right":
@@ -520,7 +446,7 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 		}
 
 	if (y = kUndefined)
-		switch y {
+		switch y, false {
 			case "Top":
 				y := 25
 			case "Bottom":
@@ -531,15 +457,15 @@ viewHTML(fileName, title := false, x := "__Undefined__", y := "__Undefined__", w
 
 	buttonX := Round(width / 2) - 40
 
-	Gui HV:Add, Button, Default X%buttonX% y+10 w80 gdismissHTMLViewer, % translate("Ok")
+	htmlGui.Add("Button", "Default X" . buttonX . " y+10 w80", translate("Ok")).OnEvent("Click", viewHTML.Bind(false))
 
-	Gui HV:+AlwaysOnTop
-	Gui HV:Show, X%x% Y%y% W%width% H%height% NoActivate
+	htmlGui.Opt("+AlwaysOnTop")
+	htmlGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
 
 	while !dismissed
-		Sleep 100
+		Sleep(100)
 
-	Gui HV:Destroy
+	htmlGui.Destroy()
 }
 
 
@@ -554,3 +480,6 @@ if (!isDetachedInstallation() && !isDebug()) {
 	startDatabaseSynchronizer()
 	checkForNews()
 }
+
+
+

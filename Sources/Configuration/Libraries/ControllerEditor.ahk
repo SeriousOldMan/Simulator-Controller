@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Controller Editor               ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,24 +9,18 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\Task.ahk
-#Include ..\Configuration\Libraries\ConfigurationItemList.ahk
-#Include ..\Configuration\Libraries\ButtonBoxPreview.ahk
-#Include ..\Configuration\Libraries\StreamDeckPreview.ahk
-#Include ..\Configuration\Libraries\ControllerActionsEditor.ahk
+#Include "..\..\Libraries\Task.ahk"
+#Include "ConfigurationItemList.ahk"
+#Include "ButtonBoxPreview.ahk"
+#Include "StreamDeckPreview.ahk"
+#Include "ControllerActionsEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Public Constants Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kControlTypes := {}
-
-kControlTypes[k1WayToggleType] := "1-way Toggle"
-kControlTypes[k2WayToggleType] := "2-way Toggle"
-kControlTypes[kButtonType] := "Button"
-kControlTypes[kDialType] := "Rotary"
-kControlTypes[kCustomType] := "Custom"
+global kControlTypes := CaseInsenseMap(k1WayToggleType, "1-way Toggle", k2WayToggleType, "2-way Toggle", kButtonType, "Button", kDialType, "Rotary", kCustomType, "Custom")
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -37,8 +31,8 @@ kControlTypes[kCustomType] := "Custom"
 ;;; ControllerEditor                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ControllerEditor extends ConfigurationItem {
-	static sPreviewCenters := {}
+class ControllerEditor extends ConfiguratorPanel {
+	static sPreviewCenters := CaseInsenseMap()
 
 	iControlsList := false
 	iLabelsList := false
@@ -58,61 +52,84 @@ class ControllerEditor extends ConfigurationItem {
 	iPreviewCenterX := 0
 	iPreviewCenterY := 0
 
-	ControllerPreview[] {
+	class ControllerWindow extends Window {
+		iEditor := false
+
+		__New(editor) {
+			this.iEditor := editor
+
+			super.__New({Descriptor: "Controller Editor", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
+		}
+
+		Close(*) {
+			this.iEditor.close(false)
+		}
+	}
+
+	ControllerPreview {
 		Get {
 			return this.iControllerPreview
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	ButtonBoxConfiguration[] {
+	ButtonBoxConfiguration {
 		Get {
 			return this.iButtonBoxConfiguration
 		}
 	}
 
-	ButtonBoxConfigurationFile[] {
+	ButtonBoxConfigurationFile {
 		Get {
 			return this.iButtonBoxConfigurationFile
 		}
 	}
 
-	StreamDeckConfiguration[] {
+	StreamDeckConfiguration {
 		Get {
 			return this.iStreamDeckConfiguration
 		}
 	}
 
-	StreamDeckConfigurationFile[] {
+	StreamDeckConfigurationFile {
 		Get {
 			return this.iStreamDeckConfigurationFile
 		}
 	}
 
-	AutoSave[] {
+	ControlsList {
 		Get {
-			try {
-				/*
-				if (ConfigurationEditor && ConfigurationEditor.Instance)
-					return ConfigurationEditor.Instance.AutoSave
-				else
-					return false
-				*/
-
-				return false
-			}
-			catch exception {
-				return false
-			}
+			return this.iControlsList
 		}
 	}
 
-	__New(name, configuration, buttonBoxConfigurationFile := false, streamDeckConfigurationFile := false, saveAndCancel := true) {
+	LabelsList {
+		Get {
+			return this.iLabelsList
+		}
+	}
+
+	LayoutsList {
+		Get {
+			return this.iLayoutsList
+		}
+	}
+
+	AutoSave {
+		Get {
+			if (isSet(ConfigurationEditor) && ConfigurationEditor.hasOwnProp("Instance"))
+				return ConfigurationEditor.Instance.AutoSave
+			else
+				return false
+		}
+	}
+
+	__New(name, configuration, buttonBoxConfigurationFile := false, streamDeckConfigurationFile := false) {
 		this.iName := name
 
 		if !buttonBoxConfigurationFile
@@ -124,71 +141,82 @@ class ControllerEditor extends ConfigurationItem {
 		this.iButtonBoxConfigurationFile := buttonBoxConfigurationFile
 		this.iStreamDeckConfigurationFile := streamDeckConfigurationFile
 
-		this.iButtonBoxConfiguration := readConfiguration(buttonBoxConfigurationFile)
-		this.iStreamDeckConfiguration := readConfiguration(streamDeckConfigurationFile)
+		this.iButtonBoxConfiguration := readMultiMap(buttonBoxConfigurationFile)
+		this.iStreamDeckConfiguration := readMultiMap(streamDeckConfigurationFile)
 
-		this.iControlsList := new ControlsList(this.iButtonBoxConfiguration)
-		this.iLabelsList := new LabelsList(this.iButtonBoxConfiguration)
-		this.iLayoutsList := new LayoutsList(this.iButtonBoxConfiguration, this.iStreamDeckConfiguration)
+		this.iControlsList := ControlsList(this, this.iButtonBoxConfiguration)
+		this.iLabelsList := LabelsList(this, this.iButtonBoxConfiguration)
+		this.iLayoutsList := LayoutsList(this, this.iButtonBoxConfiguration, this.iStreamDeckConfiguration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ControllerEditor.Instance := this
-
-		this.createGui(this.iButtonBoxConfiguration, this.iStreamDeckConfiguration, saveAndCancel)
 	}
 
 	createGui(buttonBoxConfiguration, streamDeckConfiguration, saveAndCancel) {
-		Gui CTRLE:Default
+		static controllerGui
 
-		Gui CTRLE:-Border ; -Caption
+		saveControllerEditor(*) {
+			this.close(true)
+		}
 
-		Gui CTRLE:Color, D0D0D0, D8D8D8
-		Gui CTRLE:Font, Bold, Arial
+		cancelControllerEditor(*) {
+			this.close(false)
+		}
 
-		Gui CTRLE:Add, Text, x0 w432 Center gmoveControllerEditor, % translate("Modular Simulator Controller System")
+		openControllerActionsEditor(*) {
+			this.openControllerActionsEditor()
+		}
 
-		Gui CTRLE:Font, Norm, Arial
-		Gui CTRLE:Font, Italic Underline, Arial
+		controllerGui := ControllerEditor.ControllerWindow(this)
 
-		Gui CTRLE:Add, Text, x160 YP+20 w112 cBlue Center gopenControllerDocumentation, % translate("Controller Layouts")
+		this.Window := controllerGui
 
-		this.iControlsList.createGui(buttonBoxConfiguration)
-		this.iLabelsList.createGui(buttonBoxConfiguration)
-		this.iLayoutsList.createGui(buttonBoxConfiguration, streamDeckConfiguration)
+		controllerGui.SetFont("Bold", "Arial")
+
+		controllerGui.Add("Text", "x0 w432 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(controllerGui, "Controller Editor"))
+
+		controllerGui.SetFont("Norm", "Arial")
+		controllerGui.SetFont("Italic Underline", "Arial")
+
+		controllerGui.Add("Text", "x160 YP+20 w112 H:Center cBlue Center", translate("Controller Layouts")).OnEvent("Click", openDocumentation.Bind(controllerGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts"))
+
+		this.ControlsList.createGui(this, buttonBoxConfiguration)
+		this.LabelsList.createGui(this, buttonBoxConfiguration)
+		this.LayoutsList.createGui(this, buttonBoxConfiguration, streamDeckConfiguration)
 
 		if saveAndCancel {
-			Gui CTRLE:Add, Text, x8 y620 w424 0x10
+			controllerGui.Add("Text", "x8 y620 w424 0x10 Y:Move W:Grow")
 
-			Gui CTRLE:Add, Button, x8 yp+10 w140 h23 gopenControllerActionsEditor, % translate("Edit Labels && Icons...")
+			controllerGui.Add("Button", "x8 yp+10 w140 h23 Y:Move", translate("Edit Labels && Icons...")).OnEvent("Click", openControllerActionsEditor)
 
-			Gui CTRLE:Add, Button, x260 yp w80 h23 Default GsaveControllerEditor, % translate("Save")
-			Gui CTRLE:Add, Button, x352 yp w80 h23 GcancelControllerEditor, % translate("Cancel")
+			controllerGui.Add("Button", "x260 yp w80 h23 Y:Move X:Move Default", translate("Save")).OnEvent("Click", saveControllerEditor)
+			controllerGui.Add("Button", "x352 yp w80 h23 Y:Move X:Move", translate("Cancel")).OnEvent("Click", cancelControllerEditor)
 		}
 	}
 
 	saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save := true) {
 		if save
-			base.saveToConfiguration(buttonBoxConfiguration)
+			super.saveToConfiguration(buttonBoxConfiguration)
 
-		this.iControlsList.saveToConfiguration(buttonBoxConfiguration, save)
-		this.iLabelsList.saveToConfiguration(buttonBoxConfiguration, save)
-		this.iLayoutsList.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save)
+		this.ControlsList.saveToConfiguration(buttonBoxConfiguration, save)
+		this.LabelsList.saveToConfiguration(buttonBoxConfiguration, save)
+		this.LayoutsList.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, save)
 	}
 
-	setPreviewCenter(descriptor, centerX, centerY) {
-		if descriptor
-			ControllerEditor.sPreviewCenters[descriptor] := [centerX, centerY]
+	setPreviewCenter(window, centerX, centerY) {
+		if window
+			ControllerEditor.sPreviewCenters[window] := [centerX, centerY]
 
 		this.iPreviewCenterX := centerX
 		this.iPreviewCenterY := centerY
 	}
 
-	getPreviewCenter(descriptor, ByRef centerX, ByRef centerY) {
+	getPreviewCenter(window, &centerX, &centerY) {
 		local center
 
-		if (descriptor && ControllerEditor.sPreviewCenters.HasKey(descriptor)) {
-			center := ControllerEditor.sPreviewCenters[descriptor]
+		if (window && ControllerEditor.sPreviewCenters.Has(window)) {
+			center := ControllerEditor.sPreviewCenters[window]
 
 			centerX := center[1]
 			centerY := center[2]
@@ -200,56 +228,68 @@ class ControllerEditor extends ConfigurationItem {
 	}
 
 	getPreviewMover() {
-		return "moveControllerPreview"
+		moveControllerPreview(window) {
+			local preview, x, y, width, height
+
+			moveByMouse(window)
+
+			WinGetPos(&x, &y, &width, &height, window)
+
+			preview := ControllerPreview.ControllerPreviews[window]
+
+			preview.PreviewManager.setPreviewCenter(window, x + Round(width / 2), y + Round(height / 2))
+		}
+
+		return moveControllerPreview
 	}
 
 	selectLayout(name) {
 		local index, item
 
-		Gui CTRLE:Default
-
-		Gui ListView, % this.iLayoutsList.ListHandle
-
-		for index, item in this.iLayoutsList.ItemList
+		for index, item in this.LayoutsList.ItemList
 			if (item[1] = name) {
-				this.iLayoutsList.openEditor(index)
-				this.iLayoutsList.selectItem(index)
+				this.LayoutsList.openEditor(index)
+				this.LayoutsList.selectItem(index)
 
 				break
 			}
 	}
 
-	open(x := "__Undefined__", y := "__Undefined__") {
-		local name
+	show(x := kUndefined, y := kUndefined) {
+		local window := this.Window
+		local name, w, h
 
 		if ((x = kUndefined) || (y = kUndefined)) {
-			if getWindowPosition("Controller Editor", x, y)
-				Gui CTRLE:Show, x%x% y%y%
+			if getWindowPosition("Controller Editor", &x, &y)
+				window.Show("x" . x . " y" . y)
 			else
-				Gui CTRLE:Show
+				window.Show()
 		}
 		else
-			Gui CTRLE:Show, AutoSize x%x% y%y%
+			window.Show("AutoSize x" . x . " y" . y)
 
-		name := this.Name
+		window.MaxHeight := window.MinHeight
 
-		Task.startTask(ObjBindMethod(this, "selectLayout", name), 1000)
+		if getWindowSize("Controller Editor", &w, &h)
+			window.Resize("Initialize", w, h)
+
+		if this.Name
+			this.selectLayout(this.Name)
+			; Task.startTask(ObjBindMethod(this, "selectLayout", this.Name), 1000)
 	}
 
 	close(save := true) {
 		local buttonBoxConfiguration, streamDeckConfiguration
 
 		if save {
-			buttonBoxConfiguration := newConfiguration()
-			streamDeckConfiguration := newConfiguration()
+			buttonBoxConfiguration := newMultiMap()
+			streamDeckConfiguration := newMultiMap()
 
 			this.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration)
 
-			writeConfiguration(this.ButtonBoxConfigurationFile, buttonBoxConfiguration)
-			writeConfiguration(this.StreamDeckConfigurationFile, streamDeckConfiguration)
+			writeMultiMap(this.ButtonBoxConfigurationFile, buttonBoxConfiguration)
+			writeMultiMap(this.StreamDeckConfigurationFile, streamDeckConfiguration)
 		}
-
-		this.saveController()
 
 		if this.ControllerPreview {
 			this.ControllerPreview.close()
@@ -257,17 +297,52 @@ class ControllerEditor extends ConfigurationItem {
 			this.iControllerPreview := false
 		}
 
-		Gui CTRLE:Destroy
+		this.Window.Hide()
 
 		this.iClosed := true
 	}
 
-	editController() {
-		this.open()
+	editController(saveAndCancel := true, owner := false) {
+		local window
 
-		loop
-			Sleep 200
-		until this.iClosed
+		this.createGui(this.iButtonBoxConfiguration, this.iStreamDeckConfiguration, saveAndCancel)
+
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		try {
+			this.show()
+
+			loop
+				Sleep(200)
+			until this.iClosed
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+
+	openControllerActionsEditor() {
+		local window := this.Window
+
+		window.Opt("+Disabled")
+
+		try {
+			ControllerActionsEditor(kSimulatorConfiguration).editPluginActions(false, window)
+		}
+		finally {
+			window.Opt("-Disabled")
+		}
+	}
+
+	changeControl(row, column, control, argument := false) {
+		this.LayoutsList.changeControl(row, column, control, argument)
+	}
+
+	changeLabel(row, column, label) {
+		this.LayoutsList.changeLabel(row, column, label)
 	}
 
 	configurationChanged(type, name) {
@@ -275,8 +350,8 @@ class ControllerEditor extends ConfigurationItem {
 	}
 
 	updateControllerPreview(type, name) {
-		local buttonBoxConfiguration := newConfiguration()
-		local streamDeckConfiguration := newConfiguration()
+		local buttonBoxConfiguration := newMultiMap()
+		local streamDeckConfiguration := newMultiMap()
 		local oldPreview
 
 		this.saveToConfiguration(buttonBoxConfiguration, streamDeckConfiguration, false)
@@ -288,11 +363,11 @@ class ControllerEditor extends ConfigurationItem {
 
 		if name {
 			if (type = "Button Box")
-				this.iControllerPreview := new ButtonBoxPreview(this, name, buttonBoxConfiguration)
+				this.iControllerPreview := ButtonBoxPreview(this, name, buttonBoxConfiguration)
 			else
-				this.iControllerPreview := new StreamDeckPreview(this, name, streamDeckConfiguration)
+				this.iControllerPreview := StreamDeckPreview(this, name, streamDeckConfiguration)
 
-			this.ControllerPreview.open()
+			this.ControllerPreview.show()
 		}
 		else
 			this.iControllerPreview := false
@@ -306,59 +381,67 @@ class ControllerEditor extends ConfigurationItem {
 ;;; ControlsList                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global controlsListView := "|"
-
-global controlNameEdit := ""
-global controlTypeDropDown := 0
-global imageFilePathEdit := ""
-global imageWidthEdit := 0
-global imageHeightEdit := 0
-
-global controlAddButton
-global controlDeleteButton
-global controlUpdateButton
-
 class ControlsList extends ConfigurationItemList {
-	AutoSave[] {
+	AutoSave {
 		Get {
-			return ControllerEditor.Instance.AutoSave
+			return this.Editor.AutoSave
 		}
 	}
 
-	__New(configuration) {
-		base.__New(configuration)
+	__New(editor, configuration) {
+		this.Editor := editor
+
+		super.__New(configuration)
 
 		ControlsList.Instance := this
 	}
 
-	createGui(configuration) {
-		Gui CTRLE:Font, Norm, Arial
-		Gui CTRLE:Font, Italic, Arial
+	createGui(editor, configuration) {
+		local window := editor.Window
 
-		Gui CTRLE:Add, GroupBox, -Theme x8 y60 w424 h138, % translate("Controls")
+		chooseImageFilePath(*) {
+			local path, pictureFile
 
-		Gui CTRLE:Font, Norm, Arial
-		Gui CTRLE:Add, ListView, x16 y79 w134 h108 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndcontrolsListViewHandle VcontrolsListView glistEvent
-							 , % values2String("|", map(["Name", "Function", "Size"], "translate")*)
+			path := window["imageFilePathEdit"].Text
 
-		Gui CTRLE:Add, Text, x164 y79 w80 h23 +0x200, % translate("Name")
-		Gui CTRLE:Add, Edit, x214 y80 w101 h21 VcontrolNameEdit, %controlNameEdit%
-		Gui CTRLE:Add, DropDownList, x321 y79 w105 AltSubmit Choose%controlTypeDropDown% VcontrolTypeDropDown, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Dial"], "translate")*)
-		;426 400
-		Gui CTRLE:Add, Text, x164 y103 w80 h23 +0x200, % translate("Image")
-		Gui CTRLE:Add, Edit, x214 y103 w186 h21 VimageFilePathEdit, %imageFilePathEdit%
-		Gui CTRLE:Add, Button, x403 y103 w23 h23 gchooseImageFilePath, % translate("...")
+			if (path && (path != ""))
+				path := getFileName(path, kButtonBoxImagesDirectory)
+			else
+				path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
 
-		Gui CTRLE:Add, Text, x164 y127 w80 h23 +0x200, % translate("Size")
-		Gui CTRLE:Add, Edit, x214 y127 w40 h21 Limit3 Number VimageWidthEdit, %imageWidthEdit%
-		Gui CTRLE:Add, Text, x254 y127 w21 h23 +0x200 Center, % translate("x")
-		Gui CTRLE:Add, Edit, x275 y127 w40 h21 Limit3 Number VimageHeightEdit, %imageHeightEdit%
+			pictureFile := chooseImageFile(window, path)
 
-		Gui CTRLE:Add, Button, x226 y164 w46 h23 VcontrolAddButton gaddItem, % translate("Add")
-		Gui CTRLE:Add, Button, x275 y164 w50 h23 Disabled VcontrolDeleteButton gdeleteItem, % translate("Delete")
-		Gui CTRLE:Add, Button, x371 y164 w55 h23 Disabled VcontrolUpdateButton gupdateItem, % translate("Save")
+			if pictureFile
+				window["imageFilePathEdit"].Text := pictureFile
+		}
 
-		this.initializeList(controlsListViewHandle, "controlsListView", "controlAddButton", "controlDeleteButton", "controlUpdateButton")
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
+
+		window.Add("GroupBox", "x8 y60 w424 h138 W:Grow", translate("Controls"))
+
+		window.SetFont("Norm", "Arial")
+
+		window.Add("ListView", "x16 y79 w134 h108 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VcontrolsListView", collect(["Name", "Function", "Size"], translate))
+
+		window.Add("Text", "x164 y79 w80 h23 X:Move(0.2) +0x200", translate("Name"))
+		window.Add("Edit", "x214 y80 w101 h21 X:Move(0.2) W:Grow(0.3) VcontrolNameEdit")
+		window.Add("DropDownList", "x321 y79 w105 X:Move(0.5) W:Grow(0.5) Choose1 VcontrolTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Dial"], translate))
+
+		window.Add("Text", "x164 y103 w80 h23 X:Move(0.2) +0x200", translate("Image"))
+		window.Add("Edit", "x214 y103 w186 h21 X:Move(0.2) W:Grow(0.8) VimageFilePathEdit")
+		window.Add("Button", "x403 y103 w23 h23 X:Move ", translate("...")).OnEvent("Click", chooseImageFilePath)
+
+		window.Add("Text", "x164 y127 w80 h23 X:Move(0.2) +0x200", translate("Size"))
+		window.Add("Edit", "x214 y127 w40 h21 X:Move(0.2) Limit3 Number VimageWidthEdit")
+		window.Add("Text", "x255 y127 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
+		window.Add("Edit", "x279 y127 w40 h21 X:Move(0.2) Limit3 Number VimageHeightEdit")
+
+		window.Add("Button", "x226 y164 w46 h23 X:Move VcontrolAddButton", translate("Add"))
+		window.Add("Button", "x275 y164 w50 h23 X:Move Disabled VcontrolDeleteButton", translate("Delete"))
+		window.Add("Button", "x371 y164 w55 h23 X:Move Disabled VcontrolUpdateButton", translate("Save"))
+
+		this.initializeList(editor, window["controlsListView"], window["controlAddButton"], window["controlDeleteButton"], window["controlUpdateButton"])
 
 		this.clearEditor()
 	}
@@ -367,25 +450,25 @@ class ControlsList extends ConfigurationItemList {
 		local controls := []
 		local name, definition
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for name, definition in getConfigurationSectionValues(configuration, "Controls", Object())
+		for name, definition in getMultiMapValues(configuration, "Controls")
 			controls.Push(Array(name, string2Values(";", definition)*))
 
 		this.ItemList := controls
 	}
 
 	saveToConfiguration(configuration, save := true) {
-		local controls := {}
+		local controls := newSectionMap()
 		local ignore, control
 
 		if save
-			base.saveToConfiguration(configuration)
+			super.saveToConfiguration(configuration, true)
 
 		for ignore, control in this.ItemList
 			controls[control[1]] := values2String(";", control[2], control[3], control[4])
 
-		setConfigurationSectionValues(configuration, "Controls", controls)
+		setMultiMapValues(configuration, "Controls", controls)
 	}
 
 	loadList(items) {
@@ -393,75 +476,60 @@ class ControlsList extends ConfigurationItemList {
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
-
-		LV_Delete()
+		this.Control["controlsListView"].Delete()
 
 		this.ItemList := items
 
 		for ignore, control in items
-			LV_Add("", control[1], translate(kControlTypes[control[2]]), control[4])
+			this.Control["controlsListView"].Add("", control[1], translate(kControlTypes[control[2]]), control[4])
 
 		if first {
-			LV_ModifyCol()
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
-			LV_ModifyCol(3, "AutoHdr")
+			this.Control["controlsListView"].ModifyCol()
+			this.Control["controlsListView"].ModifyCol(1, "AutoHdr")
+			this.Control["controlsListView"].ModifyCol(2, "AutoHdr")
+			this.Control["controlsListView"].ModifyCol(3, "AutoHdr")
 
 			first := false
 		}
 
-		ControllerEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentControllerType, LayoutsList.Instance.CurrentController)
+		this.Editor.configurationChanged(this.Editor.LayoutsList.CurrentControllerType, this.Editor.LayoutsList.CurrentController)
 	}
 
 	loadEditor(item) {
 		local size := string2Values("x", item[4])
 
-		controlNameEdit := item[1]
-		imageFilePathEdit := item[3]
+		this.Control["controlNameEdit"].Text := item[1]
+		this.Control["imageFilePathEdit"].Text := item[3]
 
-		imageWidthEdit := size[1]
-		imageHeightEdit := size[2]
+		this.Control["imageWidthEdit"].Text := size[1]
+		this.Control["imageHeightEdit"].Text := size[2]
 
-		controlTypeDropDown := inList([k1WayToggleType, k2WayToggleType, kButtonType, kDialType], item[2])
-
-		GuiControl Text, controlNameEdit, %controlNameEdit%
-		GuiControl Choose, controlTypeDropDown, %controlTypeDropDown%
-		GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
-		GuiControl Text, imageWidthEdit, %imageWidthEdit%
-		GuiControl Text, imageHeightEdit, %imageHeightEdit%
+		this.Control["controlTypeDropDown"].Choose(inList([k1WayToggleType, k2WayToggleType, kButtonType, kDialType], item[2]))
 	}
 
 	clearEditor() {
-		this.loadEditor(Array("", "", "", ""))
+		this.loadEditor(Array("", k1WayToggleType, "", "45x45"))
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local title
-
-		GuiControlGet controlNameEdit
-		GuiControlGet controlTypeDropDown
-		GuiControlGet imageFilePathEdit
-		GuiControlGet imageWidthEdit
-		GuiControlGet imageHeightEdit
-
-		if ((controlNameEdit = "") || !inList([1, 2, 3, 4], controlTypeDropDown) || (imageFilePathEdit = "")  || (imageWidthEdit = 0) || (imageHeightEdit = 0)) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+		if ((Trim(this.Control["controlNameEdit"].Text) = "") || !inList([1, 2, 3, 4], this.Control["controlTypeDropDown"].Value)
+		 || (Trim(this.Control["imageFilePathEdit"].Text) = "")  || (this.Control["imageWidthEdit"].Text = 0) || (this.Control["imageHeightEdit"].Text = 0)) {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
 		else
-			return Array(controlNameEdit, [k1WayToggleType, k2WayToggleType, kButtonType, kDialType][controlTypeDropDown], imageFilePathEdit, imageWidthEdit . " x " . imageHeightEdit)
+			return Array(this.Control["controlNameEdit"].Text, [k1WayToggleType, k2WayToggleType, kButtonType, kDialType][this.Control["controlTypeDropDown"].Value]
+					   , this.Control["imageFilePathEdit"].Text, this.Control["imageWidthEdit"].Text . " x " . this.Control["imageHeightEdit"].Text)
 	}
 
 	getControls() {
-		local controls := {}
+		local controls := CaseInsenseMap()
 		local ignore, control
 
-		if ControllerEditor.Instance.AutoSave {
+		if this.AutoSave {
 			if (this.CurrentItem != 0)
 				this.updateItem()
 		}
@@ -477,52 +545,46 @@ class ControlsList extends ConfigurationItemList {
 ;;; LabelsList                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global labelsListView := "|"
-
-global labelNameEdit := ""
-global labelWidthEdit := 0
-global labelHeightEdit := 0
-
-global labelAddButton
-global labelDeleteButton
-global labelUpdateButton
-
 class LabelsList extends ConfigurationItemList {
-	AutoSave[] {
+	AutoSave {
 		Get {
-			return ControllerEditor.Instance.AutoSave
+			return this.Editor.AutoSave
 		}
 	}
 
-	__New(configuration) {
-		base.__New(configuration)
+	__New(editor, configuration) {
+		this.Editor := editor
+
+		super.__New(configuration)
 
 		LabelsList.Instance := this
 	}
 
-	createGui(configuration) {
-		Gui CTRLE:Font, Norm, Arial
-		Gui CTRLE:Font, Italic, Arial
+	createGui(editor, configuration) {
+		local window := editor.Window
 
-		Gui CTRLE:Add, GroupBox, -Theme x8 y205 w424 h115, % translate("Labels")
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui CTRLE:Font, Norm, Arial
-		Gui CTRLE:Add, ListView, x16 y224 w134 h84 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlabelsListViewHandle VlabelsListView glistEvent
-							 , % values2String("|", map(["Name", "Size"], "translate")*)
+		window.Add("GroupBox", "x8 y205 w424 h115 W:Grow", translate("Labels"))
 
-		Gui CTRLE:Add, Text, x164 y224 w80 h23 +0x200, % translate("Name")
-		Gui CTRLE:Add, Edit, x214 y225 w101 h21 VlabelNameEdit, %labelNameEdit%
+		window.SetFont("Norm", "Arial")
 
-		Gui CTRLE:Add, Text, x164 y248 w80 h23 +0x200, % translate("Size")
-		Gui CTRLE:Add, Edit, x214 y248 w40 h21 Limit3 Number VlabelWidthEdit, %labelWidthEdit%
-		Gui CTRLE:Add, Text, x254 y248 w21 h23 +0x200 Center, % translate("x")
-		Gui CTRLE:Add, Edit, x275 y248 w40 h21 Limit3 Number VlabelHeightEdit, %labelHeightEdit%
+		window.Add("ListView", "x16 y224 w134 h84 W:Grow(0.2) -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlabelsListView", collect(["Name", "Size"], translate))
 
-		Gui CTRLE:Add, Button, x226 y285 w46 h23 VlabelAddButton gaddItem, % translate("Add")
-		Gui CTRLE:Add, Button, x275 y285 w50 h23 Disabled VlabelDeleteButton gdeleteItem, % translate("Delete")
-		Gui CTRLE:Add, Button, x371 y285 w55 h23 Disabled VlabelUpdateButton gupdateItem, % translate("Save")
+		window.Add("Text", "x164 y224 w80 h23 X:Move(0.2) +0x200", translate("Name"))
+		window.Add("Edit", "x214 y225 w101 h21 X:Move(0.2) W:Grow(0.3) VlabelNameEdit")
 
-		this.initializeList(labelsListViewHandle, "labelsListView", "labelAddButton", "labelDeleteButton", "labelUpdateButton")
+		window.Add("Text", "x164 y248 w80 h23 X:Move(0.2) +0x200", translate("Size"))
+		window.Add("Edit", "x214 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelWidthEdit")
+		window.Add("Text", "x255 y248 w23 h23 X:Move(0.2) +0x200 Center", translate("x"))
+		window.Add("Edit", "x279 y248 w40 h21 X:Move(0.2) Limit3 Number VlabelHeightEdit")
+
+		window.Add("Button", "x226 y285 w46 h23 X:Move VlabelAddButton", translate("Add"))
+		window.Add("Button", "x275 y285 w50 h23 X:Move Disabled VlabelDeleteButton", translate("Delete"))
+		window.Add("Button", "x371 y285 w55 h23 X:Move Disabled VlabelUpdateButton", translate("Save"))
+
+		this.initializeList(editor, window["labelsListView"], window["labelAddButton"], window["labelDeleteButton"], window["labelUpdateButton"])
 
 		this.clearEditor()
 	}
@@ -531,25 +593,25 @@ class LabelsList extends ConfigurationItemList {
 		local labels := []
 		local name, definition
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for name, definition in getConfigurationSectionValues(configuration, "Labels", Object())
+		for name, definition in getMultiMapValues(configuration, "Labels")
 			labels.Push(Array(name, definition))
 
 		this.ItemList := labels
 	}
 
 	saveToConfiguration(configuration, save := true) {
-		local labels := {}
+		local labels := newSectionMap()
 		local ignore, label
 
 		if save
-			base.saveToConfiguration(configuration)
+			super.saveToConfiguration(configuration)
 
 		for ignore, label in this.ItemList
 			labels[label[1]] := label[2]
 
-		setConfigurationSectionValues(configuration, "Labels", labels)
+		setMultiMapValues(configuration, "Labels", labels)
 	}
 
 	loadList(items) {
@@ -557,67 +619,53 @@ class LabelsList extends ConfigurationItemList {
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
-
-		LV_Delete()
+		this.Control["labelsListView"].Delete()
 
 		this.ItemList := items
 
 		for ignore, label in items
-			LV_Add("", label[1], label[2])
+			this.Control["labelsListView"].Add("", label[1], label[2])
 
 		if first {
-			LV_ModifyCol()
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
+			this.Control["labelsListView"].ModifyCol()
+			this.Control["labelsListView"].ModifyCol(1, "AutoHdr")
+			this.Control["labelsListView"].ModifyCol(2, "AutoHdr")
 
 			first := false
 		}
 
-		ControllerEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentControllerType, LayoutsList.Instance.CurrentController)
+		this.Editor.configurationChanged(this.Editor.LayoutsList.CurrentControllerType, this.Editor.LayoutsList.CurrentController)
 	}
 
 	loadEditor(item) {
 		local size := string2Values("x", item[2])
 
-		labelNameEdit := item[1]
-
-		labelWidthEdit := size[1]
-		labelHeightEdit := size[2]
-
-		GuiControl Text, labelNameEdit, %labelNameEdit%
-		GuiControl Text, labelWidthEdit, %labelWidthEdit%
-		GuiControl Text, labelHeightEdit, %labelHeightEdit%
+		this.Control["labelNameEdit"].Text := item[1]
+		this.Control["labelWidthEdit"].Text := size[1]
+		this.Control["labelHeightEdit"].Text := size[2]
 	}
 
 	clearEditor() {
-		this.loadEditor(Array("", ""))
+		this.loadEditor(Array("", "50x30"))
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local title
-
-		GuiControlGet labelNameEdit
-		GuiControlGet labelWidthEdit
-		GuiControlGet labelHeightEdit
-
-		if ((labelNameEdit = "") || (labelWidthEdit = 0) || (labelHeightEdit = 0)) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+		if ((Trim(this.Control["labelNameEdit"].Text) = "") || (this.Control["labelWidthEdit"].Text = 0) || (this.Control["labelHeightEdit"].Text = 0)) {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
 		else
-			return Array(labelNameEdit, labelWidthEdit . " x " . labelHeightEdit)
+			return Array(this.Control["labelNameEdit"].Text, this.Control["labelWidthEdit"].Text . " x " . this.Control["labelHeightEdit"].Text)
 	}
 
 	getLabels() {
-		local labels := {}
+		local labels := CaseInsenseMap()
 		local ignore, label
 
-		if ControllerEditor.Instance.AutoSave {
+		if this.AutoSave {
 			if (this.CurrentItem != 0)
 				this.updateItem()
 		}
@@ -633,30 +681,8 @@ class LabelsList extends ConfigurationItemList {
 ;;; LayoutsList                                                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global layoutsListView := "|"
-
-global layoutNameEdit := ""
-global layoutTypeDropDown
-global layoutDropDown
-
-global layoutRowsEdit := ""
-global layoutColumnsEdit := ""
-global layoutRowMarginEdit := ""
-global layoutColumnMarginEdit := ""
-global layoutSidesMarginEdit := ""
-global layoutBottomMarginEdit := ""
-
-global layoutRowDropDown := 0
-global layoutRowEdit := ""
-
-global layoutVisibleCheck := true
-
-global layoutAddButton
-global layoutDeleteButton
-global layoutUpdateButton
-
 class LayoutsList extends ConfigurationItemList {
-	iRowDefinitions := []
+	iRowDefinitions := WeakArray()
 	iSelectedRow := false
 
 	iStreamDeckConfiguration := false
@@ -666,119 +692,150 @@ class LayoutsList extends ConfigurationItemList {
 	iButtonBoxWidgets := []
 	iStreamDeckWidgets := []
 
-	AutoSave[] {
+	AutoSave {
 		Get {
-			return ControllerEditor.Instance.AutoSave
+			return this.Editor.AutoSave
 		}
 	}
 
-	ButtonBoxConfiguration[] {
+	ButtonBoxConfiguration {
 		Get {
 			return this.Configuration
 		}
 	}
 
-	StreamDeckConfiguration[] {
+	StreamDeckConfiguration {
 		Get {
 			return this.iStreamDeckConfiguration
 		}
 	}
 
-	CurrentControllerType[] {
+	CurrentControllerType {
 		Get {
 			return ((this.CurrentItem != 0) ? this.ItemList[this.CurrentItem][2]["Type"] : "Button Box")
 		}
 	}
 
-	CurrentController[] {
+	CurrentController {
 		Get {
 			return ((this.CurrentItem != 0) ? this.ItemList[this.CurrentItem][1] : false)
 		}
 	}
 
-	__New(buttonBoxConfiguration, streamDeckConfiguration) {
+	__New(editor, buttonBoxConfiguration, streamDeckConfiguration) {
+		this.Editor := editor
+
 		this.iStreamDeckConfiguration := streamDeckConfiguration
 
-		base.__New(buttonBoxConfiguration)
+		super.__New(buttonBoxConfiguration)
 
 		LayoutsList.Instance := this
 	}
 
-	createGui(buttonBoxConfiguration, streamDeckConfiguration) {
-		Gui CTRLE:Add, ListView, x8 y330 w424 h105 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndlayoutsListViewHandle VlayoutsListView glistEvent
-							 , % values2String("|", map(["Name", "Grid", "Margins", "Definition"], "translate")*)
+	createGui(editor, buttonBoxConfiguration, streamDeckConfiguration) {
+		local window := editor.Window
 
-		Gui CTRLE:Add, Text, x8 y445 w86 h23 +0x200, % translate("Name && Type")
-		Gui CTRLE:Add, Edit, x102 y445 w110 h21 VlayoutNameEdit, %layoutNameEdit%
-		Gui CTRLE:Add, DropDownList, x215 y445 w117 AltSubmit Choose1 VlayoutTypeDropDown gchooseLayoutType, % values2String("|", map(["Button Box", "Stream Deck"], "translate")*)
+		chooseLayoutType(*) {
+			this.chooseLayoutType()
+		}
 
-		Gui CTRLE:Add, Text, x8 y469 w86 h23 +0x200 Section hwndbbWidget1, % translate("Visible")
-		if layoutVisibleCheck
-			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 Checked VlayoutVisibleCheck hwndbbWidget2
-		else
-			Gui CTRLE:Add, CheckBox, x102 y469 w110 h21 VlayoutVisibleCheck hwndbbWidget2
+		chooseLayout(*) {
+			this.chooseLayout()
+		}
 
-		Gui CTRLE:Add, Text, x8 y493 w86 h23 +0x200 hwndbbWidget3, % translate("Layout")
-		Gui CTRLE:Font, c505050 s7
-		Gui CTRLE:Add, Text, x16 y517 w133 h21 hwndbbWidget4, % translate("(R x C, Margins)")
-		Gui CTRLE:Font
+		updateLayoutRowEditor(*) {
+			this.updateLayoutRowEditor()
+		}
 
-		Gui CTRLE:Add, Edit, x102 y493 w40 h21 Limit1 Number Limit2 gupdateLayoutRowEditor VlayoutRowsEdit hwndbbWidget5, %layoutRowsEdit%
-		Gui CTRLE:Add, UpDown, x125 y493 w17 h21 Range1-99 hwndbbWidget6, 1
-		Gui CTRLE:Add, Text, x147 y493 w20 h23 +0x200 Center hwndbbWidget7, % translate("x")
-		Gui CTRLE:Add, Edit, x172 y493 w40 h21 Limit1 Number Limit2 gupdateLayoutRowEditor VlayoutColumnsEdit hwndbbWidget8, %layoutColumnsEdit%
-		Gui CTRLE:Add, UpDown, x195 y493 w17 h21 Range1-99 hwndbbWidget9, 1
+		openDisplayRulesEditor(*) {
+			this.openDisplayRulesEditor()
+		}
 
-		Gui CTRLE:Font, c505050 s7
+		window.Add("ListView", "x8 y330 w424 h105 W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VlayoutsListView", collect(["Name", "Grid", "Margins", "Definition"], translate))
 
-		Gui CTRLE:Add, Text, x242 y474 w40 h23 +0x200 Center hwndbbWidget10, % translate("Row")
-		Gui CTRLE:Add, Text, x292 y474 w40 h23 +0x200 Center hwndbbWidget11, % translate("Column")
-		Gui CTRLE:Add, Text, x342 y474 w40 h23 +0x200 Center hwndbbWidget12, % translate("Sides")
-		Gui CTRLE:Add, Text, x392 y474 w40 h23 +0x200 Center hwndbbWidget13, % translate("Bottom")
+		window.Add("Text", "x8 y445 w86 h23 +0x200", translate("Name && Type"))
+		window.Add("Edit", "x102 y445 w110 h21 W:Grow(0.2) VlayoutNameEdit")
+		window.Add("DropDownList", "x215 y445 w117 X:Move(0.2) W:Grow(0.2) Choose1 VlayoutTypeDropDown", collect(["Button Box", "Stream Deck"], translate)).OnEvent("Change", chooseLayoutType)
 
-		Gui CTRLE:Font
+		bbWidget1 := window.Add("Text", "x8 y469 w86 h23 +0x200 Section", translate("Visible"))
+		bbWidget2 := window.Add("CheckBox", "x102 y469 w110 h21 Checked VlayoutVisibleCheck")
 
-		Gui CTRLE:Add, Edit, x242 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutRowMarginEdit hwndbbWidget14, %layoutRowMarginEdit%
-		Gui CTRLE:Add, Edit, x292 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutColumnMarginEdit hwndbbWidget15, %layoutColumnMarginEdit%
-		Gui CTRLE:Add, Edit, x342 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutSidesMarginEdit hwndbbWidget16, %layoutSidesMarginEdit%
-		Gui CTRLE:Add, Edit, x392 y493 w40 h21 Limit2 Number gupdateLayoutRowEditor VlayoutBottomMarginEdit hwndbbWidget17, %layoutBottomMarginEdit%
+		bbWidget3 := window.Add("Text", "x8 y493 w86 h23 +0x200", translate("Layout"))
 
-		Gui CTRLE:Add, DropDownList, x8 y534 w86 AltSubmit Choose0 gupdateLayoutRowEditor VlayoutRowDropDown hwndbbWidget18, |
+		window.SetFont("c505050 s7")
 
-		Gui CTRLE:Add, Edit, x102 y534 w330 h50 Disabled VlayoutRowEdit hwndbbWidget19, %layoutRowEdit%
+		bbWidget4 := window.Add("Text", "x16 y516 w133 h20", translate("(R x C, Margins)"))
+
+		window.SetFont()
+
+		bbWidget5 := window.Add("Edit", "x102 y493 w40 h21 Limit1 Number Limit2 VlayoutRowsEdit", 0)
+		bbWidget5.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget6 := window.Add("UpDown", "x125 y493 w17 h21 Range1-99", 0)
+
+		bbWidget7 := window.Add("Text", "x143 y493 w23 h23 +0x200 Center", translate("x"))
+
+		bbWidget8 := window.Add("Edit", "x168 y493 w40 h21 Limit1 Number Limit2  VlayoutColumnsEdit", 0)
+		bbWidget8.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget9 := window.Add("UpDown", "x195 y493 w17 h21 Range1-99", 0)
+
+		window.SetFont("c505050 s7")
+
+		bbWidget10 := window.Add("Text", "x215 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Row"))
+		bbWidget11 := window.Add("Text", "x265 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Column"))
+		bbWidget12 := window.Add("Text", "x315 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Sides"))
+		bbWidget13 := window.Add("Text", "x365 y474 w40 h23 X:Move(0.2) +0x200 Center", translate("Bottom"))
+
+		window.SetFont()
+
+		bbWidget14 := window.Add("Edit", "x215 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutRowMarginEdit")
+		bbWidget14.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget15 := window.Add("Edit", "x265 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutColumnMarginEdit")
+		bbWidget15.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget16 := window.Add("Edit", "x315 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutSidesMarginEdit")
+		bbWidget16.OnEvent("Change", updateLayoutRowEditor)
+		bbWidget17 := window.Add("Edit", "x365 y493 w40 h21 X:Move(0.2) Limit2 Number  VlayoutBottomMarginEdit")
+		bbWidget17.OnEvent("Change", updateLayoutRowEditor)
+
+		window.Add("DropDownList", "x8 y534 w86 Choose0 VlayoutRowDropDown", ["", ""]).OnEvent("Change", updateLayoutRowEditor)
+
+		window.Add("Edit", "x102 y534 w330 h50 W:Grow Disabled VlayoutRowEdit")
 
 		loop 17
 			this.iButtonBoxWidgets.Push(bbWidget%A_Index%)
 
-		Gui CTRLE:Add, Text, x8 ys w86 h23 +0x200 hwndsdWidget1, % translate("Layout")
-		Gui CTRLE:Add, DropDownList, x102 yp w110 AltSubmit Choose1 VlayoutDropDown gchooseLayout hwndsdWidget2, % values2String("|", map(["Mini", "Standard", "XL"], "translate")*)
+		sdWidget1 := window.Add("Text", "x8 ys w86 h23 +0x200", translate("Layout"))
+		sdWidget2 := window.Add("DropDownList", "x102 yp w110 W:Grow(0.2) Choose2 VlayoutDropDown", collect(["Mini", "Standard", "XL", "Plus"], translate))
+		sdWidget2.OnEvent("Change", chooseLayout)
 
-		Gui CTRLE:Add, Button, x102 yp+30 w230 h23 Center gopenDisplayRulesEditor hwndsdWidget3, % translate("Edit Display Rules...")
+		sdWidget3 := window.Add("Button", "x102 yp+30 w230 h23 W:Grow(0.4) Center", translate("Edit Display Rules..."))
+		sdWidget3.OnEvent("Click", openDisplayRulesEditor)
 
 		loop 3
 			this.iStreamDeckWidgets.Push(sdWidget%A_Index%)
 
-		Gui CTRLE:Add, Button, x223 y589 w46 h23 VlayoutAddButton gaddItem, % translate("Add")
-		Gui CTRLE:Add, Button, x271 y589 w50 h23 Disabled VlayoutDeleteButton gdeleteItem, % translate("Delete")
-		Gui CTRLE:Add, Button, x377 y589 w55 h23 Disabled VlayoutUpdateButton gupdateItem, % translate("&Save")
+		window.Add("Button", "x223 y589 w46 h23 X:Move VlayoutAddButton", translate("Add"))
+		window.Add("Button", "x271 y589 w50 h23 X:Move Disabled VlayoutDeleteButton", translate("Delete"))
+		window.Add("Button", "x377 y589 w55 h23 X:Move Disabled VlayoutUpdateButton", translate("&Save"))
 
-		this.initializeList(layoutsListViewHandle, "layoutsListView", "layoutAddButton", "layoutDeleteButton", "layoutUpdateButton")
+		this.initializeList(editor, window["layoutsListView"], window["layoutAddButton"], window["layoutDeleteButton"], window["layoutUpdateButton"])
 
 		this.clearEditor()
 	}
 
 	loadFromConfiguration(configuration) {
-		local layouts := {}
+		local layouts := CaseInsenseMap()
 		local descriptor, definition, name, rowMargin, columnMargin, sidesMargin, bottomMargin, items
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, definition in getConfigurationSectionValues(this.ButtonBoxConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(this.ButtonBoxConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			name := descriptor[1]
 
-			if !layouts.HasKey(name)
-				layouts[name] := Object()
+			if !layouts.Has(name) {
+				layouts[name] := CaseInsenseWeakMap()
+				layouts[name].Default := ""
+			}
 
 			layouts[name]["Type"] := "Button Box"
 			layouts[name]["Visible"] := true
@@ -786,10 +843,10 @@ class LayoutsList extends ConfigurationItemList {
 			if (descriptor[2] = "Layout") {
 				definition := string2Values(",", definition)
 
-				rowMargin := ((definition.Length() > 1) ? definition[2] : ButtonBoxPreview.kRowMargin)
-				columnMargin := ((definition.Length() > 2) ? definition[3] : ButtonBoxPreview.kColumnMargin)
-				sidesMargin := ((definition.Length() > 3) ? definition[4] : ButtonBoxPreview.kSidesMargin)
-				bottomMargin := ((definition.Length() > 4) ? definition[5] : ButtonBoxPreview.kBottomMargin)
+				rowMargin := ((definition.Length > 1) ? definition[2] : ButtonBoxPreview.kRowMargin)
+				columnMargin := ((definition.Length > 2) ? definition[3] : ButtonBoxPreview.kColumnMargin)
+				sidesMargin := ((definition.Length > 3) ? definition[4] : ButtonBoxPreview.kSidesMargin)
+				bottomMargin := ((definition.Length > 4) ? definition[5] : ButtonBoxPreview.kBottomMargin)
 
 				layouts[name]["Grid"] := definition[1]
 				layouts[name]["Margins"] := Array(rowMargin, columnMargin, sidesMargin, bottomMargin)
@@ -800,12 +857,14 @@ class LayoutsList extends ConfigurationItemList {
 				layouts[name][descriptor[2]] := definition
 		}
 
-		for descriptor, definition in getConfigurationSectionValues(this.StreamDeckConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(this.StreamDeckConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			name := descriptor[1]
 
-			if !layouts.HasKey(name)
-				layouts[name] := Object()
+			if !layouts.Has(name) {
+				layouts[name] := CaseInsenseWeakMap()
+				layouts[name].Default := ""
+			}
 
 			layouts[name]["Type"] := "Stream Deck"
 			layouts[name]["Visible"] := false
@@ -816,8 +875,8 @@ class LayoutsList extends ConfigurationItemList {
 				layouts[name][descriptor[2]] := definition
 		}
 
-		this.iButtonDefinitions := getConfigurationSectionValues(this.StreamDeckConfiguration, "Buttons", Object())
-		this.iIconDefinitions := getConfigurationSectionValues(this.StreamDeckConfiguration, "Icons", Object())
+		this.iButtonDefinitions := getMultiMapValues(this.StreamDeckConfiguration, "Buttons")
+		this.iIconDefinitions := getMultiMapValues(this.StreamDeckConfiguration, "Icons")
 
 		items := []
 
@@ -831,33 +890,33 @@ class LayoutsList extends ConfigurationItemList {
 		local ignore, layout, grid
 
 		if save
-			base.saveToConfiguration(buttonBoxConfiguration)
+			super.saveToConfiguration(buttonBoxConfiguration)
 
 		for ignore, layout in this.ItemList {
 			if (layout[2]["Type"] = "Button Box") {
 				grid := layout[2]["Grid"]
 
-				setConfigurationValue(buttonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
-									, grid . ", " . values2String(", ", layout[2]["Margins"]*))
+				setMultiMapValue(buttonBoxConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout")
+							   , grid . ", " . values2String(", ", layout[2]["Margins"]*))
 
-				loop % string2Values("x", grid)[1]
-					setConfigurationValue(buttonBoxConfiguration, "Layouts"
-										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
+				loop string2Values("x", grid)[1]
+					setMultiMapValue(buttonBoxConfiguration, "Layouts"
+								   , ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
-				setConfigurationValue(buttonBoxConfiguration, "Layouts"
-									, ConfigurationItem.descriptor(layout[1], "Visible"), layout[2]["Visible"])
+				setMultiMapValue(buttonBoxConfiguration, "Layouts"
+							   , ConfigurationItem.descriptor(layout[1], "Visible"), layout[2]["Visible"])
 			}
 			else {
 				grid := layout[2]["Grid"]
 
-				setConfigurationValue(streamDeckConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout"), grid)
+				setMultiMapValue(streamDeckConfiguration, "Layouts", ConfigurationItem.descriptor(layout[1], "Layout"), grid)
 
-				loop % string2Values("x", grid)[1]
-					setConfigurationValue(streamDeckConfiguration, "Layouts"
-										, ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
+				loop string2Values("x", grid)[1]
+					setMultiMapValue(streamDeckConfiguration, "Layouts"
+								   , ConfigurationItem.descriptor(layout[1], A_Index), layout[2][A_Index])
 
-				setConfigurationSectionValues(streamDeckConfiguration, "Buttons", this.iButtonDefinitions)
-				setConfigurationSectionValues(streamDeckConfiguration, "Icons", this.iIconDefinitions)
+				setMultiMapValues(streamDeckConfiguration, "Buttons", this.iButtonDefinitions)
+				setMultiMapValues(streamDeckConfiguration, "Icons", this.iIconDefinitions)
 			}
 		}
 	}
@@ -868,9 +927,7 @@ class LayoutsList extends ConfigurationItemList {
 		static first := true
 		static inCall := false
 
-		Gui ListView, % this.ListHandle
-
-		LV_Delete()
+		this.Control["layoutsListView"].Delete()
 
 		this.ItemList := items
 
@@ -879,8 +936,7 @@ class LayoutsList extends ConfigurationItemList {
 
 			definition := ""
 
-			loop % string2Values("x", grid)[1]
-			{
+			loop string2Values("x", grid)[1] {
 				if (A_Index > 1)
 					definition .= "; "
 
@@ -888,104 +944,93 @@ class LayoutsList extends ConfigurationItemList {
 			}
 
 
-			LV_Add("", layout[1], grid, (layout[2]["Type"] = "Button Box") ? values2String(", ", layout[2]["Margins"]*) : "", definition)
+			this.Control["layoutsListView"].Add("", layout[1], grid, (layout[2]["Type"] = "Button Box") ? values2String(", ", layout[2]["Margins"]*) : "", definition)
 		}
 
 		if first {
-			LV_ModifyCol()
-			LV_ModifyCol(1, "AutoHdr")
-			LV_ModifyCol(2, "AutoHdr")
-			LV_ModifyCol(3, "AutoHdr")
-			LV_ModifyCol(4, "AutoHdr")
+			this.Control["layoutsListView"].ModifyCol()
+			this.Control["layoutsListView"].ModifyCol(1, "AutoHdr")
+			this.Control["layoutsListView"].ModifyCol(2, "AutoHdr")
+			this.Control["layoutsListView"].ModifyCol(3, "AutoHdr")
+			this.Control["layoutsListView"].ModifyCol(4, "AutoHdr")
 
 			first := false
 		}
 
-		ControllerEditor.Instance.configurationChanged(LayoutsList.Instance.CurrentControllerType, LayoutsList.Instance.CurrentController)
+		this.Editor.configurationChanged(this.Editor.LayoutsList.CurrentControllerType, this.Editor.LayoutsList.CurrentController)
 	}
 
 	loadEditor(item) {
 		local size := string2Values("x", item[2]["Grid"])
+		local layoutType := item[2]["Type"]
 		local object, ignore, widget, margins, choices, rows, preview
 
-		layoutNameEdit := item[1]
-		layoutTypeDropDown := item[2]["Type"]
-		layoutVisibleCheck := item[2]["Visible"]
+		this.Control["layoutNameEdit"].Text := item[1]
+		this.Control["layoutVisibleCheck"].Value := item[2]["Visible"]
 
-		layoutRowsEdit := size[1]
-		layoutColumnsEdit := size[2]
+		this.Control["layoutRowsEdit"].Text := size[1]
+		this.Control["layoutColumnsEdit"].Text := size[2]
 
 		if (item[2]["Type"] = "Button Box") {
 			for ignore, widget in this.iButtonBoxWidgets
-				GuiControl Show, %widget%
+				widget.Visible := true
 
 			for ignore, widget in this.iStreamDeckWidgets
-				GuiControl Hide, %widget%
+				widget.Visible := false
 
 			margins := item[2]["Margins"]
 
-			layoutRowMarginEdit := margins[1]
-			layoutColumnMarginEdit := margins[2]
-			layoutSidesMarginEdit := margins[3]
-			layoutBottomMarginEdit := margins[4]
+			this.Control["layoutRowMarginEdit"].Text := margins[1]
+			this.Control["layoutColumnMarginEdit"].Text := margins[2]
+			this.Control["layoutSidesMarginEdit"].Text := margins[3]
+			this.Control["layoutBottomMarginEdit"].Text := margins[4]
 		}
 		else {
 			for ignore, widget in this.iButtonBoxWidgets
-				GuiControl Hide, %widget%
+				widget.Visible := false
 
 			for ignore, widget in this.iStreamDeckWidgets
-				GuiControl Show, %widget%
+				widget.Visible := true
 
-			layoutRowMarginEdit := ""
-			layoutColumnMarginEdit := ""
-			layoutSidesMarginEdit := ""
-			layoutBottomMarginEdit := ""
+			this.Control["layoutRowMarginEdit"].Text := ""
+			this.Control["layoutColumnMarginEdit"].Text := ""
+			this.Control["layoutSidesMarginEdit"].Text := ""
+			this.Control["layoutBottomMarginEdit"].Text := ""
 
-			if (layoutRowsEdit = 2)
-				GuiControl Choose, layoutDropDown, 1
-			else if (layoutRowsEdit = 3)
-				GuiControl Choose, layoutDropDown, 2
+			if ((size[1] = 2) && (size[1] = 3))
+				this.Control["layoutDropDown"].Choose(1)
+			else if (size[1] = 3)
+				this.Control["layoutDropDown"].Choose(2)
+			else if (size[1] = 4)
+				this.Control["layoutDropDown"].Choose(3)
 			else
-				GuiControl Choose, layoutDropDown, 3
+				this.Control["layoutDropDown"].Choose(4)
 		}
 
-		Gui CTRLE:Default
-
-		GuiControl Text, layoutNameEdit, %layoutNameEdit%
-		GuiControl Choose, layoutTypeDropDown, % inList(["Button Box", "Stream Deck"], layoutTypeDropDown)
-		GuiControl Text, layoutRowsEdit, %layoutRowsEdit%
-		GuiControl Text, layoutColumnsEdit, %layoutColumnsEdit%
-		GuiControl Text, layoutRowMarginEdit, %layoutRowMarginEdit%
-		GuiControl Text, layoutColumnMarginEdit, %layoutColumnMarginEdit%
-		GuiControl Text, layoutSidesMarginEdit, %layoutSidesMarginEdit%
-		GuiControl Text, layoutBottomMarginEdit, %layoutBottomMarginEdit%
-
-		GuiControl, , layoutVisibleCheck, %layoutVisibleCheck%
+		this.Control["layoutTypeDropDown"].Choose(inList(["Button Box", "Stream Deck"], layoutType))
 
 		if (item[2]["Type"] = "Button Box") {
-			GuiControl Enable, layoutRowMarginEdit
-			GuiControl Enable, layoutColumnMarginEdit
-			GuiControl Enable, layoutSidesMarginEdit
-			GuiControl Enable, layoutBottomMarginEdit
+			this.Control["layoutRowMarginEdit"].Enabled := true
+			this.Control["layoutColumnMarginEdit"].Enabled := true
+			this.Control["layoutSidesMarginEdit"].Enabled := true
+			this.Control["layoutBottomMarginEdit"].Enabled := true
 
-			GuiControl Enable, layoutVisibleCheck
+			this.Control["layoutVisibleCheck"].Enabled := true
 		}
 		else {
-			GuiControl Disable, layoutRowMarginEdit
-			GuiControl Disable, layoutColumnMarginEdit
-			GuiControl Disable, layoutSidesMarginEdit
-			GuiControl Disable, layoutBottomMarginEdit
+			this.Control["layoutRowMarginEdit"].Enabled := false
+			this.Control["layoutColumnMarginEdit"].Enabled := false
+			this.Control["layoutSidesMarginEdit"].Enabled := false
+			this.Control["layoutBottomMarginEdit"].Enabled := false
 
-			GuiControl Disable, layoutVisibleCheck
+			this.Control["layoutVisibleCheck"].Enabled := false
 		}
 
-		Gui CTRLE:Default
-
 		choices := []
-		rows := []
+		rows := WeakArray()
 
 		loop
-			if item[2].HasKey(A_Index) {
+			if item[2].Has(A_Index) {
 				choices.Push(translate("Row ") . A_Index)
 
 				definition := item[2]
@@ -995,240 +1040,218 @@ class LayoutsList extends ConfigurationItemList {
 			else
 				break
 
-		layoutRowEdit := ((rows.Length() > 0) ? rows[1] : "")
-
-		GuiControl Text, layoutRowEdit, %layoutRowEdit%
+		this.Control["layoutRowEdit"].Text := ((rows.Length > 0) ? rows[1] : "")
 
 		this.iRowDefinitions := rows
 
-		GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
+		this.Control["layoutRowDropDown"].Delete()
+		this.Control["layoutRowDropDown"].Add(choices)
 
-		if (choices.Length() > 0) {
-			GuiControl Choose, layoutRowDropDown, 1
+		if (choices.Length > 0) {
+			this.Control["layoutRowDropDown"].Choose(1)
 
 			this.iSelectedRow := 1
 		}
 		else {
-			GuiControl Choose, layoutRowDropDown, 0
+			this.Control["layoutRowDropDown"].Choose(0)
 
 			this.iSelectedRow := false
 		}
 
-		preview := ControllerEditor.Instance.ControllerPreview
+		this.updateLayoutRowEditor(false)
 
-		if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-			ControllerEditor.Instance.configurationChanged(item[2]["Type"], layoutNameEdit)
+		preview := this.Editor.ControllerPreview
+
+		if ((this.CurrentController != this.Control["layoutNameEdit"].Text) || (!preview && (Trim(this.Control["layoutNameEdit"].Text) != ""))
+																			|| (preview && (preview.Name != this.Control["layoutNameEdit"].Text)))
+			if this.CurrentItem
+				this.Editor.configurationChanged(item[2]["Type"], this.Control["layoutNameEdit"].Text)
 	}
 
 	addItem() {
 		local type, preview
 
-		base.addItem()
+		super.addItem()
 
 		if this.CurrentItem {
 			type := this.ItemList[this.CurrentItem][2]["Type"]
+			preview := this.Editor.ControllerPreview
 
-			GuiControl Text, layoutRowEdit, %layoutRowEdit%
-
-			preview := ControllerEditor.Instance.ControllerPreview
-
-			if ((this.CurrentController != layoutNameEdit) || (!preview && (layoutNameEdit != "")) || (preview && (preview.Name != layoutNameEdit)))
-				ControllerEditor.Instance.configurationChanged(type, this.CurrentController)
+			if ((this.CurrentController != this.Control["layoutNameEdit"].Text) || (!preview && (Trim(this.Control["layoutNameEdit"].Text) != ""))
+																				|| (preview && (preview.Name != this.Control["layoutNameEdit"].Text)))
+				this.Editor.configurationChanged(type, this.CurrentController)
 		}
 	}
 
 	clearEditor() {
 		local margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
 
-		this.loadEditor(Array("", {Type: "Button Box", Visible: true, Grid: "0x0", Margins: margins}))
+		this.loadEditor(Array("", CaseInsenseMap("Type", "Button Box", "Visible", true, "Grid", "1x1", "Margins", margins)))
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local title, layout
+		local layout
 
-		GuiControlGet layoutNameEdit
-		GuiControlGet layoutTypeDropDown
-		GuiControlGet layoutRowsEdit
-		GuiControlGet layoutColumnsEdit
-		GuiControlGet layoutRowMarginEdit
-		GuiControlGet layoutColumnMarginEdit
-		GuiControlGet layoutSidesMarginEdit
-		GuiControlGet layoutBottomMarginEdit
-		GuiControlGet layoutVisibleCheck
-
-		GuiControlGet layoutRowDropDown
-		GuiControlGet layoutRowEdit
-
-		if ((layoutNameEdit = "") || (layoutRowsEdit = 0) || (layoutColumnsEdit = 0)) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+		if ((Trim(this.Control["layoutNameEdit"].Text) = "") || (this.Control["layoutRowsEdit"].Text = 0) || (this.Control["layoutColumnsEdit"].Text = 0)) {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
 		else {
-			if (layoutRowDropDown > 0)
-				this.iRowDefinitions[layoutRowDropDown] := layoutRowEdit
+			if (this.Control["layoutRowDropDown"].Value > 0)
+				this.iRowDefinitions[this.Control["layoutRowDropDown"].Value] := this.Control["layoutRowEdit"].Text
 
-			if (["Button Box", "Stream Deck"][layoutTypeDropDown] = "Button Box")
-				layout := {Type: "Button Box", Grid: layoutRowsEdit . " x " . layoutColumnsEdit
-						 , Visible: layoutVisibleCheck
-						 , Margins: Array(layoutRowMarginEdit, layoutColumnMarginEdit, layoutSidesMarginEdit, layoutBottomMarginEdit)}
+			if (["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value] = "Button Box")
+				layout := CaseInsenseWeakMap("Type", "Button Box", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text
+										   , "Visible", this.Control["layoutVisibleCheck"].Value
+										   , "Margins", Array(this.Control["layoutRowMarginEdit"].Text, this.Control["layoutColumnMarginEdit"].Text
+															, this.Control["layoutSidesMarginEdit"].Text, this.Control["layoutBottomMarginEdit"].Text))
 			else
-				layout := {Type: "Stream Deck", Grid: layoutRowsEdit . " x " . layoutColumnsEdit, Visible: false}
+				layout := CaseInsenseWeakMap("Type", "Stream Deck", "Grid", this.Control["layoutRowsEdit"].Text . " x " . this.Control["layoutColumnsEdit"].Text, "Visible", false)
 
-			loop % this.iRowDefinitions.Length()
+			loop this.iRowDefinitions.Length
 				layout[A_Index] := this.iRowDefinitions[A_Index]
 
-			return Array(layoutNameEdit, layout)
+			return Array(this.Control["layoutNameEdit"].Text, layout)
 		}
 	}
 
 	chooseLayoutType() {
 		local grid, margins
 
-		GuiControlGet layoutNameEdit
-		GuiControlGet layoutTypeDropDown
-
-		if (layoutTypeDropDown = 2) {
-			grid := "3x5"
+		if (this.Control["layoutTypeDropDown"].Value = 2) {
+			this.chooseLayout(false)
 
 			margins := ["", "", "", ""]
 		}
-		else {
-			GuiControlGet layoutRowsEdit
-			GuiControlGet layoutColumnsEdit
-
-			grid := (layoutRowsEdit . "x" . layoutColumnsEdit)
-
+		else
 			margins := [ButtonBoxPreview.kRowMargin, ButtonBoxPreview.kColumnMargin, ButtonBoxPreview.kSidesMargin, ButtonBoxPreview.kBottomMargin]
-		}
 
-		this.loadEditor(Array(layoutNameEdit, {Type: ["Button Box", "Stream Deck"][layoutTypeDropDown], Visible: (layoutTypeDropDown = 1) ? true : false, Grid: grid, Margins: margins}))
+		grid := (this.Control["layoutRowsEdit"].Text . "x" . this.Control["layoutColumnsEdit"].Text)
+
+		this.loadEditor(Array(this.Control["layoutNameEdit"].Text
+					  , CaseInsenseMap("Type", ["Button Box", "Stream Deck"][this.Control["layoutTypeDropDown"].Value]
+									 , "Visible", (this.Control["layoutTypeDropDown"].Value = 1) ? true : false
+									 , "Grid", grid, "Margins", margins)))
 
 		if (this.CurrentItem != 0)
 			this.updateItem()
 	}
 
-	chooseLayout() {
-		GuiControlGet layoutDropDown
+	chooseLayout(update := true) {
+		Sleep 1000
+
+		local layoutDropDown := this.Control["layoutDropDown"].Value
+
+		sleep 1000
 
 		if (layoutDropDown = 1) {
-			GuiControl, , layoutRowsEdit, 2
-			GuiControl, , layoutColumnsEdit, 3
+			this.Control["layoutRowsEdit"].Text := 2
+			this.Control["layoutColumnsEdit"].Text := 3
 		}
 		else if (layoutDropDown = 2) {
-			GuiControl, , layoutRowsEdit, 3
-			GuiControl, , layoutColumnsEdit, 5
+			this.Control["layoutRowsEdit"].Text := 3
+			this.Control["layoutColumnsEdit"].Text := 5
+		}
+		else if (layoutDropDown = 3) {
+			this.Control["layoutRowsEdit"].Text := 4
+			this.Control["layoutColumnsEdit"].Text := 8
 		}
 		else {
-			GuiControl, , layoutRowsEdit, 4
-			GuiControl, , layoutColumnsEdit, 8
+			this.Control["layoutRowsEdit"].Text := 2
+			this.Control["layoutColumnsEdit"].Text := 4
 		}
 
-		if (this.CurrentItem != 0)
+		if (update && (this.CurrentItem != 0))
 			this.updateItem()
 	}
 
 	openDisplayRulesEditor() {
+		local window := this.Window
 		local name := false
 		local result, configuration
 
-		if this.CurrentItem {
-			GuiControlGet layoutNameEdit
+		if this.CurrentItem
+			name := this.Control["layoutNameEdit"].Text
 
-			name := layoutNameEdit
-		}
+		configuration := newMultiMap()
 
-		configuration := newConfiguration()
+		setMultiMapValues(configuration, "Icons", this.iIconDefinitions)
+		setMultiMapValues(configuration, "Buttons", this.iButtonDefinitions)
 
-		setConfigurationSectionValues(configuration, "Icons", this.iIconDefinitions)
-		setConfigurationSectionValues(configuration, "Buttons", this.iButtonDefinitions)
-
-		Gui IRE:+OwnerCTRLE
-		Gui CTRLE:+Disabled
+		window.Opt("+Disabled")
 
 		try {
-			result := (new DisplayRulesEditor(name, configuration)).editDisplayRules()
+			result := (DisplayRulesEditor(name, configuration)).editDisplayRules(window)
 		}
 		finally {
-			Gui CTRLE:-Disabled
+			window.Opt("-Disabled")
 		}
 
 		if result {
-			this.iIconDefinitions := getConfigurationSectionValues(configuration, "Icons", Object())
-			this.iButtonDefinitions := getConfigurationSectionValues(configuration, "Buttons", Object())
+			this.iIconDefinitions := getMultiMapValues(configuration, "Icons")
+			this.iButtonDefinitions := getMultiMapValues(configuration, "Buttons")
 		}
 	}
 
 	updateLayoutRowEditor(save := true) {
 		local rows, changed, choices
 
-		Gui CTRLE:Default
-
-		GuiControlGet layoutRowsEdit
-		GuiControlGet layoutRowDropDown
-		GuiControlGet layoutRowEdit
-
 		if (save && (this.iSelectedRow > 0))
-			this.iRowDefinitions[this.iSelectedRow] := layoutRowEdit
+			this.iRowDefinitions[this.iSelectedRow] := this.Control["layoutRowEdit"].Text
 
-		rows := this.iRowDefinitions.Length()
+		rows := this.iRowDefinitions.Length
 		changed := false
 
-		if (layoutRowsEdit > rows) {
-			loop % layoutRowsEdit - rows
+		if (this.Control["layoutRowsEdit"].Text > rows) {
+			loop this.Control["layoutRowsEdit"].Text - rows
 				this.iRowDefinitions.Push("")
 
 			changed := true
 		}
-		else if (layoutRowsEdit < rows) {
-			this.iRowDefinitions.RemoveAt(layoutRowsEdit + 1, rows - layoutRowsEdit)
+		else if (this.Control["layoutRowsEdit"].Text < rows) {
+			this.iRowDefinitions.RemoveAt(this.Control["layoutRowsEdit"].Text + 1, rows - this.Control["layoutRowsEdit"].Text)
 
 			changed := true
 		}
 
-		loop %layoutRowsEdit%
+		loop this.Control["layoutRowsEdit"].Text
 			this.iRowDefinitions[A_Index] := values2String(";", this.getRowDefinition(A_Index)*)
 
-		if (layoutRowDropDown > 0) {
-			layoutRowEdit := ((this.iRowDefinitions.Length() >= layoutRowDropDown) ? this.iRowDefinitions[layoutRowDropDown] : "")
+		if (this.Control["layoutRowDropDown"].Value > 0) {
+			this.iSelectedRow := this.Control["layoutRowDropDown"].Value
 
-			this.iSelectedRow := layoutRowDropDown
-
-			GuiControl Text, layoutRowEdit, %layoutRowEdit%
+			this.Control["layoutRowEdit"].Text := ((this.iRowDefinitions.Length >= this.iSelectedRow) ? this.iRowDefinitions[this.iSelectedRow] : "")
 		}
 
 		if changed {
 			choices := []
 
-			loop %layoutRowsEdit%
+			loop this.Control["layoutRowsEdit"].Text
 				choices.Push(translate("Row ") . A_Index)
 
-			GuiControl Text, layoutRowDropDown, % "|" . values2String("|", choices*)
+			this.Control["layoutRowDropDown"].Delete()
+			this.Control["layoutRowDropDown"].Add(choices)
 
-			if (layoutRowsEdit > 0) {
-				layoutRowDropDown := 1
+			if (this.Control["layoutRowsEdit"].Text > 0) {
+				this.Control["layoutRowDropDown"].Choose(1)
 
-				GuiControl Choose, layoutRowDropDown, 1
+				this.Control["layoutRowEdit"].Text := this.iRowDefinitions[1]
 
-				layoutRowEdit := this.iRowDefinitions[1]
+				this.iSelectedRow := 1
 			}
 			else {
-				layoutRowDropDown := 0
+				this.Control["layoutRowDropDown"].Choose(0)
 
-				GuiControl Choose, layoutRowDropDown, 0
+				this.Control["layoutRowEdit"].Text := ""
 
-				layoutRowEdit := ""
+				this.iSelectedRow := 0
 			}
-
-			this.iSelectedRow := layoutRowDropDown
-
-			GuiControl Text, layoutRowEdit, %layoutRowEdit%
 		}
 
-		if (save && ControllerEditor.Instance.AutoSave) {
+		if (save && this.AutoSave) {
 			if (this.CurrentItem != 0)
 				this.updateItem()
 		}
@@ -1237,12 +1260,10 @@ class LayoutsList extends ConfigurationItemList {
 	getRowDefinition(row) {
 		local rowDefinition := string2Values(";", this.iRowDefinitions[row])
 
-		GuiControlGet layoutColumnsEdit
-
-		if (rowDefinition.Length() > layoutColumnsEdit)
-			rowDefinition.RemoveAt(layoutColumnsEdit + 1, rowDefinition.Length() - layoutColumnsEdit)
+		if (rowDefinition.Length > this.Control["layoutColumnsEdit"].Text)
+			rowDefinition.RemoveAt(this.Control["layoutColumnsEdit"].Text + 1, rowDefinition.Length - this.Control["layoutColumnsEdit"].Text)
 		else
-			loop % layoutColumnsEdit - rowDefinition.Length()
+			loop this.Control["layoutColumnsEdit"].Text - rowDefinition.Length
 				rowDefinition.Push("")
 
 		return rowDefinition
@@ -1255,27 +1276,28 @@ class LayoutsList extends ConfigurationItemList {
 
 		this.updateItem()
 
-		ControllerEditor.Instance.configurationChanged(this.CurrentControllerType, this.CurrentController)
+		this.Editor.configurationChanged(this.CurrentControllerType, this.CurrentController)
 	}
 
 	changeControl(row, column, control, argument := false) {
 		local number := argument
 		local oldButton := false
-		local rowDefinition, definition, oldLabel, title, prompt, locale, oldImage, newImage, oldNumber
-
-		Gui CTRLE:Default
-
-		GuiControlGet layoutNameEdit
+		local rowDefinition, definition, oldLabel, oldImage, newImage, oldNumber, result
 
 		if (this.CurrentControllerType = "Stream Deck") {
-			oldButton := ControllerEditor.Instance.ControllerPreview.getButton(row, column)
+			oldButton := this.Editor.ControllerPreview.getButton(row, column)
 
 			if oldButton {
 				oldNumber := oldButton.Button
 
-				this.iButtonDefinitions.Delete(layoutNameEdit . "." . "Button." . oldNumber . ".Icon")
-				this.iButtonDefinitions.Delete(layoutNameEdit . "." . "Button." . oldNumber . ".Label")
-				this.iButtonDefinitions.Delete(layoutNameEdit . "." . "Button." . oldNumber . ".Mode")
+				if this.iButtonDefinitions.Has(this.Control["layoutNameEdit"].Text . "." . "Button." . oldNumber . ".Icon")
+					this.iButtonDefinitions.Delete(this.Control["layoutNameEdit"].Text . "." . "Button." . oldNumber . ".Icon")
+
+				if this.iButtonDefinitions.Has(this.Control["layoutNameEdit"].Text . "." . "Button." . oldNumber . ".Label")
+					this.iButtonDefinitions.Delete(this.Control["layoutNameEdit"].Text . "." . "Button." . oldNumber . ".Label")
+
+				if this.iButtonDefinitions.Has(this.Control["layoutNameEdit"].Text . "." . "Button." . oldNumber . ".Mode")
+					this.iButtonDefinitions.Delete(this.Control["layoutNameEdit"].Text . "." . "Button." . oldNumber . ".Mode")
 			}
 		}
 
@@ -1301,16 +1323,12 @@ class LayoutsList extends ConfigurationItemList {
 		else if (control = "__Text_Label__") {
 			oldLabel := (oldButton ? oldButton.Label : false)
 
-			title := translate("Button Label")
-			prompt := translate("Please enter a button label:")
-			locale := ((getLanguage() = "en") ? "" : "Locale")
+			result := InputBox(translate("Please enter a button label:"), translate("Button Label"), "w200 h150", ((oldLabel && (oldLabel != true)) ? oldLabel : ""))
 
-			InputBox argument, %title%, %prompt%, , 200, 150, , , %locale%, , % ((oldLabel && (oldLabel != true)) ? oldLabel : "")
-
-			if ErrorLevel
-				return
+			if (result.Result = "Ok")
+				oldButton.Label := result.Value
 			else
-				oldButton.Label := argument
+				return
 
 			number := oldButton.Button
 			definition := rowDefinition[column]
@@ -1328,7 +1346,7 @@ class LayoutsList extends ConfigurationItemList {
 		else if (control = "__Image_Icon__") {
 			oldImage := (oldButton ? oldButton.Icon : false)
 
-			newImage := chooseImageFile((oldImage && (oldImage != true)) ? oldImage : SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1))
+			newImage := chooseImageFile(this.Window, (oldImage && (oldImage != true)) ? oldImage : SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1))
 
 			if newImage
 				oldButton.Icon := newImage
@@ -1340,18 +1358,16 @@ class LayoutsList extends ConfigurationItemList {
 		}
 		else if (control = "__Number__") {
 			if !number {
-				title := translate("Function Number")
-				prompt := translate("Please enter a controller function number:")
-				number := ConfigurationItem.splitDescriptor(definition[1])[2]
-				locale := ((getLanguage() = "en") ? "" : "Locale")
+				result := InputBox(translate("Please enter a controller function number:"), translate("Function Number"), "w200 h150"
+								 , ConfigurationItem.splitDescriptor(definition[1])[2])
 
-				InputBox number, %title%, %prompt%, , 200, 150, , , %locale%, , %number%
-
-				if ErrorLevel
+				if (result.Result = "Ok")
+					number := result.Value
+				else
 					return
 			}
 
-			if (definition.Length() = 1)
+			if (definition.Length = 1)
 				definition := ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number)
 			else if (this.CurrentControllerType = "Stream Deck")
 				definition := ("Button." . number)
@@ -1359,11 +1375,11 @@ class LayoutsList extends ConfigurationItemList {
 				definition := (ConfigurationItem.descriptor(ConfigurationItem.splitDescriptor(definition[1])[1], number) . "," . definition[2])
 		}
 		else if control {
-			if (definition.Length() = 0) {
+			if ((definition.Length = 0) || ((definition.Length = 1) && (definition[1] = ""))) {
 				definition := ConfigurationItem.descriptor(control, 1)
 				number := 1
 			}
-			else if (definition.Length() = 1) {
+			else if (definition.Length = 1) {
 				number := ConfigurationItem.splitDescriptor(definition[1])[2]
 				definition := ConfigurationItem.descriptor(control, number)
 			}
@@ -1381,9 +1397,9 @@ class LayoutsList extends ConfigurationItemList {
 			if !oldButton
 				oldButton := {Button: number, Icon: true, Label: true, Mode: kIconOrLabel}
 
-			this.iButtonDefinitions[layoutNameEdit . "." . "Button." . number . ".Icon"] := oldButton.Icon
-			this.iButtonDefinitions[layoutNameEdit . "." . "Button." . number . ".Label"] := oldButton.Label
-			this.iButtonDefinitions[layoutNameEdit . "." . "Button." . number . ".Mode"] := oldButton.Mode
+			this.iButtonDefinitions[this.Control["layoutNameEdit"].Text . "." . "Button." . number . ".Icon"] := oldButton.Icon
+			this.iButtonDefinitions[this.Control["layoutNameEdit"].Text . "." . "Button." . number . ".Label"] := oldButton.Label
+			this.iButtonDefinitions[this.Control["layoutNameEdit"].Text . "." . "Button." . number . ".Mode"] := oldButton.Mode
 		}
 
 		rowDefinition[column] := definition
@@ -1395,9 +1411,9 @@ class LayoutsList extends ConfigurationItemList {
 		local rowDefinition := this.getRowDefinition(row)
 		local definition := string2Values(",", rowDefinition[column])
 
-		if (definition.Length() = 0)
+		if (definition.Length = 0)
 			definition := (label ? ("," . label) : "")
-		else if (definition.Length() >= 1)
+		else if (definition.Length >= 1)
 			definition := (definition[1] . (label ? ("," . label) : ""))
 
 		rowDefinition[column] := definition
@@ -1411,8 +1427,7 @@ class LayoutsList extends ConfigurationItemList {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ControllerPreview extends ConfigurationItem {
-	static sCurrentWindow := 0
-	static sControllerPreviews := {}
+	static sControllerPreviews := CaseInsenseMap()
 
 	iPreviewManager := false
 	iName := ""
@@ -1427,31 +1442,41 @@ class ControllerPreview extends ConfigurationItem {
 
 	iControlClickHandler := ObjBindMethod(this, "openControlMenu")
 
-	PreviewManager[] {
+	PreviewManager {
 		Get {
 			return this.iPreviewManager
 		}
 	}
 
-	Name[] {
+	Name {
 		Get {
 			return this.iName
 		}
 	}
 
-	Descriptor[] {
+	Window {
 		Get {
-			return this.Name
+			return this.iWindow
+		}
+
+		Set {
+			return (this.iWindow := value)
 		}
 	}
 
-	Type[] {
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
+
+	Type {
 		Get {
 			throw "Virtual property ControllerPreview.Type must be implemented in a subclass..."
 		}
 	}
 
-	Rows[] {
+	Rows {
 		Get {
 			return this.iRows
 		}
@@ -1461,7 +1486,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Columns[] {
+	Columns {
 		Get {
 			return this.iColumns
 		}
@@ -1471,7 +1496,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Width[] {
+	Width {
 		Get {
 			return this.iWidth
 		}
@@ -1481,7 +1506,7 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Height[] {
+	Height {
 		Get {
 			return this.iHeight
 		}
@@ -1491,25 +1516,23 @@ class ControllerPreview extends ConfigurationItem {
 		}
 	}
 
-	Window[] {
+	static ControllerPreviews[key?] {
 		Get {
-			return this.iWindow
-		}
-	}
-
-	CurrentWindow[] {
-		Get {
-			return ("CTRLP" . ControllerPreview.sCurrentWindow)
-		}
-	}
-
-	ControllerPreviews[key := false] {
-		Get {
-			return (key ? ControllerPreview.sControllerPreviews[key] : ControllerPreview.sControllerPreviews)
+			return (isSet(key) ? ControllerPreview.sControllerPreviews[key] : ControllerPreview.sControllerPreviews)
 		}
 
 		Set {
-			return (key ? (ControllerPreview.sControllerPreviews[key] := value) : (ControllerPreview.sControllerPreviews := value))
+			return (isSet(key) ? (ControllerPreview.sControllerPreviews[key] := value) : (ControllerPreview.sControllerPreviews := value))
+		}
+	}
+
+	ControllerPreviews[key?] {
+		Get {
+			return ControllerPreview.ControllerPreviews[key?]
+		}
+
+		Set {
+			return (ControllerPreview.ControllerPreviews[key?] := value)
 		}
 	}
 
@@ -1517,11 +1540,7 @@ class ControllerPreview extends ConfigurationItem {
 		this.iPreviewManager := previewManager
 		this.iName := name
 
-		ControllerPreview.sCurrentWindow += 1
-
-		this.iWindow := this.CurrentWindow
-
-		base.__New(configuration)
+		super.__New(configuration)
 
 		this.createGui(configuration)
 
@@ -1535,7 +1554,7 @@ class ControllerPreview extends ConfigurationItem {
 	createBackground(configuration) {
 	}
 
-	getControl(clickX, clickY, ByRef row, ByRef column, ByRef isEmpty) {
+	getControl(clickX, clickY, &row, &column, &isEmpty) {
 		throw "Virtual method ControllerPreview.getControl must be implemented in a subclass..."
 	}
 
@@ -1555,15 +1574,13 @@ class ControllerPreview extends ConfigurationItem {
 		throw "Virtual method ControllerPreview.getFunction must be implemented in a subclass..."
 	}
 
-	findFunction(function, ByRef row, ByRef column) {
+	findFunction(function, &row, &column) {
 		local cRow
 
-		loop % this.Rows
-		{
+		loop this.Rows {
 			cRow := A_Index
 
-			loop % this.Columns
-			{
+			loop this.Columns {
 				if (this.getFunction(cRow, A_Index) = function) {
 					row := cRow
 					column := A_Index
@@ -1579,12 +1596,10 @@ class ControllerPreview extends ConfigurationItem {
 	resetLabels() {
 		local function, row
 
-		loop % this.Rows
-		{
+		loop this.Rows {
 			row := A_Index
 
-			loop % this.Columns
-			{
+			loop this.Columns {
 				function := this.getFunction(row, A_Index)
 
 				if function
@@ -1597,7 +1612,7 @@ class ControllerPreview extends ConfigurationItem {
 		throw "Virtual method ControllerPreview.setLabel must be implemented in a subclass..."
 	}
 
-	open() {
+	show() {
 		local width := this.Width
 		local height := this.Height
 		local centerX := 0
@@ -1605,24 +1620,29 @@ class ControllerPreview extends ConfigurationItem {
 		local window, x, y
 		local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 
-		this.PreviewManager.getPreviewCenter(this.Descriptor, centerX, centerY)
+		this.PreviewManager.getPreviewCenter(this.Window, &centerX, &centerY)
 
-		SysGet mainScreen, MonitorWorkArea
-
-		x := mainScreenRight - width
-		y := mainScreenBottom - height
+		MonitorGetWorkArea(, &mainScreenLeft, &mainScreenTop, &mainScreenRight, &mainScreenBottom)
 
 		if centerX
 			x := centerX - Round(width / 2)
+		else
+			x := mainScreenRight - width
 
 		if centerY
 			y := centerY - Round(height / 2)
+		else
+			y := mainScreenBottom - height
 
 		window := this.Window
 
 		this.ControllerPreviews[window] := this
 
-		Gui %window%:Show, x%x% y%y% w%width% h%height% NoActivate
+		window.Show("x" . x . " y" . y . " w" . width . " h" . height . " NoActivate")
+	}
+
+	hide() {
+		this.Window.Hide()
 	}
 
 	close() {
@@ -1630,7 +1650,7 @@ class ControllerPreview extends ConfigurationItem {
 
 		this.ControllerPreviews.Delete(window)
 
-		Gui %window%:Destroy
+		window.Destroy()
 	}
 }
 
@@ -1638,10 +1658,7 @@ class ControllerPreview extends ConfigurationItem {
 ;;; DisplayRulesEditor                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global displayRuleLayoutDropDown
-global displayRuleButtonDropDown
-
-class DisplayRulesEditor extends ConfigurationItem {
+class DisplayRulesEditor extends ConfiguratorPanel {
 	iClosed := false
 	iSaved := false
 
@@ -1653,28 +1670,39 @@ class DisplayRulesEditor extends ConfigurationItem {
 
 	iDisplayRulesList := false
 
-	Layout[] {
+	class RulesWindow extends Window {
+		iEditor := false
+
+		__New(editor) {
+			this.iEditor := editor
+
+			super.__New({Descriptor: "Controller Editor.Display Rules", Closeable: true, Resizeable: true, Options: "-MaximizeBox"})
+		}
+
+		Close(*) {
+			this.iEditor.close(false)
+		}
+	}
+
+	Layout {
 		Get {
 			return this.iLayout
 		}
 	}
 
-	SelectedLayout[] {
+	SelectedLayout {
 		Get {
 			return this.iSelectedLayout
 		}
 	}
 
-	Buttons[index := false] {
+	Buttons[index?] {
 		Get {
-			if index
-				return this.iButtons[index]
-			else
-				return this.iButtons
+			return (isSet(index) ? this.iButtons[index] : this.iButtons)
 		}
 	}
 
-	SelectedButton[] {
+	SelectedButton {
 		Get {
 			return this.iSelectedButton
 		}
@@ -1684,33 +1712,48 @@ class DisplayRulesEditor extends ConfigurationItem {
 		this.iLayout := layout
 		this.iSelectedLayout := layout
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		DisplayRulesEditor.Instance := this
 
-		this.iDisplayRulesList := new DisplayRulesList(configuration)
-
-		this.createGui(configuration)
+		this.iDisplayRulesList := DisplayRulesList(this, configuration)
 	}
 
 	createGui(configuration) {
-		local layouts, chosen, buttons, disabled
+		local layouts, chosen, disabled
 
-		Gui IRE:Default
+		static rulesGui
 
-		Gui IRE:-Border ; -Caption
+		saveDisplayRulesEditor(*) {
+			this.close(true)
+		}
 
-		Gui IRE:Color, D0D0D0, D8D8D8
-		Gui IRE:Font, Bold, Arial
+		cancelDisplayRulesEditor(*) {
+			this.close(false)
+		}
 
-		Gui IRE:Add, Text, w316 Center gmoveDisplayRulesEditor, % translate("Modular Simulator Controller System")
+		chooseDisplayRuleLayout(*) {
+			this.chooseDisplayRuleLayout()
+		}
 
-		Gui IRE:Font, Norm, Arial
-		Gui IRE:Font, Italic Underline, Arial
+		chooseDisplayRuleButton(*) {
+			this.chooseDisplayRuleButton()
+		}
 
-		Gui IRE:Add, Text, x110 YP+20 w112 cBlue Center gopenDisplayRulesDocumentation, % translate("Display Rules")
+		rulesGui := DisplayRulesEditor.RulesWindow(this)
 
-		Gui IRE:Font, Norm, Arial
+		this.Window := rulesGui
+
+		rulesGui.SetFont("Bold", "Arial")
+
+		rulesGui.Add("Text", "w316 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(rulesGui, "Controller Editor.Display Rules"))
+
+		rulesGui.SetFont("Norm", "Arial")
+		rulesGui.SetFont("Italic Underline", "Arial")
+
+		rulesGui.Add("Text", "x110 YP+20 w112 H:Center cBlue Center", translate("Display Rules")).OnEvent("Click", openDocumentation.Bind(rulesGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#display-rules"))
+
+		rulesGui.SetFont("Norm", "Arial")
 
 		layouts := [translate("All Layouts")]
 		chosen := 1
@@ -1721,10 +1764,9 @@ class DisplayRulesEditor extends ConfigurationItem {
 			chosen := 2
 		}
 
-		Gui IRE:Add, Text, x8 yp+30 w80 h23 +0x200, % translate("Layout")
-		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit Choose%chosen% VdisplayRuleLayoutDropDown gchooseDisplayRuleLayout, % values2String("|", layouts*)
+		rulesGui.Add("Text", "x8 yp+30 w80 h23 +0x200", translate("Layout"))
+		rulesGui.Add("DropDownList", "x90 yp w150 W:Grow(0.3) Choose" . chosen . " VdisplayRuleLayoutDropDown", layouts).OnEvent("Change", chooseDisplayRuleLayout)
 
-		buttons := [translate("All Buttons")]
 		disabled := ""
 
 		if !this.Layout {
@@ -1734,15 +1776,15 @@ class DisplayRulesEditor extends ConfigurationItem {
 		else
 			chosen := 1
 
-		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200 hwndwidget1, % translate("Button")
-		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit %disabled% Choose%chosen% vdisplayRuleButtonDropDown gchooseDisplayRuleButton, % values2String("|", buttons*)
+		rulesGui.Add("Text", "x8 yp+24 w80 h23 +0x200", translate("Button"))
+		rulesGui.Add("DropDownList", "x90 yp w150 W:Grow(0.3) " . disabled . " Choose" . chosen . " vdisplayRuleButtonDropDown", [translate("All Buttons")]).OnEvent("Change", chooseDisplayRuleButton)
 
-		this.iDisplayRulesList.createGui(configuration)
+		this.iDisplayRulesList.createGui(this, configuration)
 
-		Gui IRE:Add, Text, x50 yp+30 w232 0x10
+		rulesGui.Add("Text", "x50 yp+30 w232 Y:Move W:Grow 0x10")
 
-		Gui IRE:Add, Button, x80 yp+10 w80 h23 Default GsaveDisplayRulesEditor, % translate("Save")
-		Gui IRE:Add, Button, x180 yp w80 h23 GcancelDisplayRulesEditor, % translate("Cancel")
+		rulesGui.Add("Button", "x80 yp+10 w80 h23 Y:Move X:Move(0.5) Default", translate("Save")).OnEvent("Click", saveDisplayRulesEditor)
+		rulesGui.Add("Button", "x180 yp w80 h23 Y:Move X:Move(0.5)", translate("Cancel")).OnEvent("Click", cancelDisplayRulesEditor)
 
 		this.loadLayoutButtons()
 	}
@@ -1755,10 +1797,8 @@ class DisplayRulesEditor extends ConfigurationItem {
 		local buttons := [translate("All Buttons")]
 		local descriptor, definition, ignore, button
 
-		Gui IRE:Default
-
 		if this.SelectedLayout
-			for descriptor, definition in getConfigurationSectionValues(LayoutsList.Instance.StreamDeckConfiguration, "Layouts", Object()) {
+			for descriptor, definition in getMultiMapValues(LayoutsList.Instance.StreamDeckConfiguration, "Layouts") {
 				descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 				if ((descriptor[1] = this.Layout) && (descriptor[2] != "Layout"))
@@ -1767,39 +1807,61 @@ class DisplayRulesEditor extends ConfigurationItem {
 							buttons.Push(button)
 			}
 
-		GuiControl, , displayRuleButtonDropDown, % ("|" . values2String("|", buttons*))
-		GuiControl Choose, displayRuleButtonDropDown, % (this.SelectedLayout ? 1 : 0)
+		this.Control["displayRuleButtonDropDown"].Delete()
+		this.Control["displayRuleButtonDropDown"].Add(buttons)
+		this.Control["displayRuleButtonDropDown"].Choose(1)
 
 		buttons.RemoveAt(1)
 
 		this.iButtons := buttons
 
 		if this.SelectedLayout
-			GuiControl Enable, displayRuleButtonDropDown
+			this.Control["displayRuleButtonDropDown"].Enabled := true
 		else
-			GuiControl Disable, displayRuleButtonDropDown
+			this.Control["displayRuleButtonDropDown"].Enabled := false
 
 		this.iSelectedButton := false
 	}
 
-	editDisplayRules() {
-		this.open()
+	editDisplayRules(owner := false) {
+		local window
 
-		loop
-			Sleep 200
-		until this.iClosed
+		this.createGui(this.Configuration)
 
-		return this.iSaved
+		window := this.Window
+
+		if owner
+			window.Opt("+Owner" . owner.Hwnd)
+
+		try {
+			this.show()
+
+			loop
+				Sleep(200)
+			until this.iClosed
+
+			return this.iSaved
+		}
+		finally {
+			window.Destroy()
+		}
 	}
 
-	open() {
+	show() {
 		local window := this.Window
-		local x, y
+		local x, y, w, h
 
-		if getWindowPosition("Controller Editor.Display Rules", x, y)
-			Gui IRE:Show, x%x% y%y%
+		if getWindowPosition("Controller Editor.Display Rules", &x, &y)
+			window.Show("x" . x . " y" . y)
 		else
-			Gui IRE:Show, AutoSize Center
+			window.Show("AutoSize Center")
+
+		if getWindowSize("Controller Editor.Display Rules", &w, &h)
+			window.Resize("Initialze", w, h)
+	}
+
+	hide() {
+		this.Window.hide()
 	}
 
 	close(save := true) {
@@ -1807,20 +1869,15 @@ class DisplayRulesEditor extends ConfigurationItem {
 			this.iDisplayRulesList.saveToConfiguration(this.Configuration)
 
 		this.iSaved := save
-
-		Gui IRE:Destroy
-
 		this.iClosed := true
 	}
 
 	chooseDisplayRuleLayout() {
 		local displayRulesList := this.iDisplayRulesList
 
-		GuiControlGet displayRuleLayoutDropDown
-
 		displayRulesList.saveToConfiguration(this.Configuration)
 
-		this.iSelectedLayout := ((displayRuleLayoutDropDown = 1) ? false : this.Layout)
+		this.iSelectedLayout := ((this.Control["displayRuleLayoutDropDown"].Value = 1) ? false : this.Layout)
 
 		this.loadLayoutButtons()
 
@@ -1835,11 +1892,9 @@ class DisplayRulesEditor extends ConfigurationItem {
 	chooseDisplayRuleButton() {
 		local displayRulesList := this.iDisplayRulesList
 
-		GuiControlGet displayRuleButtonDropDown
-
 		displayRulesList.saveToConfiguration(this.Configuration)
 
-		this.iSelectedButton := ((displayRuleButtonDropDown = 1) ? false : this.Buttons[displayRuleButtonDropDown - 1])
+		this.iSelectedButton := ((this.Control["displayRuleButtonDropDown"].Value = 1) ? false : this.Buttons[this.Control["displayRuleButtonDropDown"].Value - 1])
 
 		displayRulesList.loadFromConfiguration(this.Configuration)
 
@@ -1854,60 +1909,72 @@ class DisplayRulesEditor extends ConfigurationItem {
 ;;; DisplayRulesList                                                        ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global displayRulesListView := "|"
-
-global iconFilePathEdit := ""
-global displayRuleDropDown
-global displayRuleAddButton
-global displayRuleDeleteButton
-global displayRuleUpdateButton
-
 class DisplayRulesList extends ConfigurationItemList {
-	AutoSave[] {
+	AutoSave {
 		Get {
-			return ControllerEditor.Instance.AutoSave
+			if ControllerEditor.HasOwnProp("Instance")
+				return ControllerEditor.Instance.AutoSave
 		}
 	}
 
-	__New(configuration) {
-		base.__New(configuration)
+	__New(editor, configuration) {
+		this.Editor := editor
+
+		super.__New(configuration)
 
 		DisplayRulesList.Instance := this
 	}
 
-	createGui(configuration) {
-		Gui IRE:Add, ListView, x8 yp+30 w316 h120 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwnddisplayRulesListViewHandle VdisplayRulesListView glistEvent
-							 , % values2String("|", map(["Rule", "Icon"], "translate")*)
+	createGui(editor, configuration) {
+		local window := editor.Window
 
-		Gui IRE:Add, Text, x8 yp+126 w80 h23 +0x200, % translate("Rule")
-		Gui IRE:Add, DropDownList, x90 yp w150 AltSubmit Choose1 VdisplayRuleDropDown, % values2String("|", map(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], "translate")*)
+		chooseIconFilePath(*) {
+			local path, pictureFile
 
-		Gui IRE:Add, Text, x8 yp+24 w80 h23 +0x200, % translate("Icon")
-		Gui IRE:Add, Edit, x90 yp w211 h21 ViconFilePathEdit, %iconFilePathEdit%
-		Gui IRE:Add, Button, x303 yp-1 w23 h23 gchooseIconFilePath, % translate("...")
+			path := window["iconFilePathEdit"].Text
 
-		Gui IRE:Add, Button, x126 yp+40 w46 h23 VdisplayRuleAddButton gaddItem, % translate("Add")
-		Gui IRE:Add, Button, x175 yp w50 h23 Disabled VdisplayRuleDeleteButton gdeleteItem, % translate("Delete")
-		Gui IRE:Add, Button, x271 yp w55 h23 Disabled VdisplayRuleUpdateButton gupdateItem, % translate("Save")
+			if (path && (path != ""))
+				path := getFileName(path, kStreamDeckImagesDirectory)
+			else
+				path := SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1)
 
-		this.initializeList(displayRulesListViewHandle, "displayRulesListView", "displayRuleAddButton", "displayRuleDeleteButton", "displayRuleUpdateButton")
+			pictureFile := chooseImageFile(window, path)
+
+			if pictureFile
+				window["iconFilePathEdit"].Text := pictureFile
+		}
+
+		window.Add("ListView", "x8 yp+30 w316 h120 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VdisplayRulesListView", collect(["Rule", "Icon"], translate))
+
+		window.Add("Text", "x8 yp+126 w80 h23 Y:Move +0x200", translate("Rule"))
+		window.Add("DropDownList", "x90 yp w150 Y:Move W:Grow(0.3) Choose1 VdisplayRuleDropDown", collect(["Icon or Label", "Icon and Label", "Only Icon", "Only Label"], translate))
+
+		window.Add("Text", "x8 yp+24 w80 h23 Y:Move +0x200", translate("Icon"))
+		window.Add("Edit", "x90 yp w211 h21 Y:Move W:Grow ViconFilePathEdit")
+		window.Add("Button", "x303 yp-1 w23 h23 Y:Move X:Move", translate("...")).OnEvent("Click", chooseIconFilePath)
+
+		window.Add("Button", "x126 yp+40 w46 h23 Y:Move X:Move VdisplayRuleAddButton", translate("Add"))
+		window.Add("Button", "x175 yp w50 h23 Y:Move X:Move Disabled VdisplayRuleDeleteButton", translate("Delete"))
+		window.Add("Button", "x271 yp w55 h23 Y:Move X:Move Disabled VdisplayRuleUpdateButton", translate("Save"))
+
+		this.initializeList(editor, window["displayRulesListView"], window["displayRuleAddButton"], window["displayRuleDeleteButton"], window["displayRuleUpdateButton"])
 
 		this.clearEditor()
 	}
 
 	loadFromConfiguration(configuration) {
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		this.ItemList := this.loadDisplayRules(configuration, DisplayRulesEditor.Instance.SelectedLayout, DisplayRulesEditor.Instance.SelectedButton)
+		this.ItemList := this.loadDisplayRules(configuration, this.Editor.SelectedLayout, this.Editor.SelectedButton)
 	}
 
 	saveToConfiguration(configuration) {
 		local fullConfiguration := this.Configuration
 
-		this.saveDisplayRules(fullConfiguration, DisplayRulesEditor.Instance.SelectedLayout, DisplayRulesEditor.Instance.SelectedButton, this.ItemList)
+		this.saveDisplayRules(fullConfiguration, this.Editor.SelectedLayout, this.Editor.SelectedButton, this.ItemList)
 
-		setConfigurationSectionValues(configuration, "Icons", getConfigurationSectionValues(fullConfiguration, "Icons"))
-		setConfigurationSectionValues(configuration, "Buttons", getConfigurationSectionValues(fullConfiguration, "Buttons"))
+		setMultiMapValues(configuration, "Icons", getMultiMapValues(fullConfiguration, "Icons"))
+		setMultiMapValues(configuration, "Buttons", getMultiMapValues(fullConfiguration, "Buttons"))
 	}
 
 	loadDisplayRules(configuration, layout, button) {
@@ -1918,7 +1985,7 @@ class DisplayRulesList extends ConfigurationItemList {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
 			loop {
-				icon := getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined)
+				icon := getMultiMapValue(configuration, "Buttons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
 					break
@@ -1930,7 +1997,7 @@ class DisplayRulesList extends ConfigurationItemList {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
 			loop {
-				icon := getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined)
+				icon := getMultiMapValue(configuration, "Icons", prefix . A_Index, kUndefined)
 
 				if (icon = kUndefined)
 					break
@@ -1949,56 +2016,51 @@ class DisplayRulesList extends ConfigurationItemList {
 			prefix := (layout . "." . button . ".Mode.Icon.")
 
 			loop {
-				if (getConfigurationValue(configuration, "Buttons", prefix . A_Index, kUndefined) == kUndefined)
+				if (getMultiMapValue(configuration, "Buttons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else
-					removeConfigurationValue(configuration, "Buttons", prefix . A_Index)
+					removeMultiMapValue(configuration, "Buttons", prefix . A_Index)
 			}
 
 			for index, displayRule in displayRules
-				setConfigurationValue(configuration, "Buttons", prefix . index, values2String(";", displayRule*))
+				setMultiMapValue(configuration, "Buttons", prefix . index, values2String(";", displayRule*))
 		}
 		else {
 			prefix := ((layout ? layout : "*") . ".Icon.Mode.")
 
 			loop {
-				if (getConfigurationValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
+				if (getMultiMapValue(configuration, "Icons", prefix . A_Index, kUndefined) == kUndefined)
 					break
 				else
-					removeConfigurationValue(configuration, "Icons", prefix . A_Index)
+					removeMultiMapValue(configuration, "Icons", prefix . A_Index)
 			}
 
 			for index, displayRule in displayRules
-				setConfigurationValue(configuration, "Icons", prefix . index, values2String(";", displayRule*))
+				setMultiMapValue(configuration, "Icons", prefix . index, values2String(";", displayRule*))
 		}
 	}
 
 	loadList(items) {
 		local ignore, displayRule, rule
 
-		Gui ListView, % this.ListHandle
-
-		LV_Delete()
+		this.Control["displayRulesListView"].Delete()
 
 		this.ItemList := items
 
 		for ignore, displayRule in items {
 			rule := ["Icon or Label", "Icon and Label", "Only Icon", "Only Label"][inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], displayRule[2])]
 
-			LV_Add("", translate(rule), displayRule[1])
+			this.Control["displayRulesListView"].Add("", translate(rule), displayRule[1])
 		}
 
-		LV_ModifyCol()
-		LV_ModifyCol(1, "AutoHdr")
-		LV_ModifyCol(2, "AutoHdr")
+		this.Control["displayRulesListView"].ModifyCol()
+		this.Control["displayRulesListView"].ModifyCol(1, "AutoHdr")
+		this.Control["displayRulesListView"].ModifyCol(2, "AutoHdr")
 	}
 
 	loadEditor(item) {
-		iconFilePathEdit := item[1]
-		displayRuleDropDown := inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], item[2])
-
-		GuiControl Text, iconFilePathEdit, %iconFilePathEdit%
-		GuiControl Choose, displayRuleDropDown, %displayRuleDropDown%
+		this.Control["iconFilePathEdit"].Text := item[1]
+		this.Control["displayRuleDropDown"].Choose(inList([kIconOrLabel, kIconAndLabel, kIcon, kLabel], item[2]))
 	}
 
 	clearEditor() {
@@ -2006,10 +2068,7 @@ class DisplayRulesList extends ConfigurationItemList {
 	}
 
 	buildItemFromEditor(isNew := false) {
-		GuiControlGet iconFilePathEdit
-		GuiControlGet displayRuleDropDown
-
-		return Array(iconFilePathEdit, [kIconOrLabel, kIconAndLabel, kIcon, kLabel][displayRuleDropDown])
+		return Array(this.Control["iconFilePathEdit"].Text, [kIconOrLabel, kIconAndLabel, kIcon, kLabel][this.Control["displayRuleDropDown"].Value])
 	}
 }
 
@@ -2018,43 +2077,27 @@ class DisplayRulesList extends ConfigurationItemList {
 ;;;                   Public Function Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-controlClick() {
+controlClick(window, *) {
 	local curCoordMode := A_CoordModeMouse
 	local row, column, isEmpty, element, clickX, clickY
 
-	CoordMode Mouse, Window
+	CoordMode("Mouse", "Window")
 
 	try {
-		MouseGetPos clickX, clickY
+		MouseGetPos(&clickX, &clickY)
 
 		row := 0
 		column := 0
 		isEmpty := false
 
-		element := ControllerPreview.ControllerPreviews[A_Gui].getControl(clickX, clickY, row, column, isEmpty)
+		element := ControllerPreview.ControllerPreviews[window].getControl(clickX, clickY, &row, &column, &isEmpty)
 
 		if element
-			ControllerPreview.ControllerPreviews[A_Gui].controlClick(element, row, column, isEmpty)
+			ControllerPreview.ControllerPreviews[window].controlClick(element, row, column, isEmpty)
 	}
 	finally {
-		CoordMode Mouse, curCoordMode
+		CoordMode("Mouse", curCoordMode)
 	}
-}
-
-controlMenuIgnore() {
-}
-
-moveControllerPreview() {
-	local window := ControllerPreview.CurrentWindow
-	local preview, x, y, width, height
-
-	moveByMouse(window)
-
-	WinGetPos x, y, width, height, A
-
-	preview := ControllerPreview.ControllerPreviews[A_Gui]
-
-	preview.PreviewManager.setPreviewCenter(preview.Descriptor, x + Round(width / 2), y + Round(height / 2))
 }
 
 
@@ -2062,135 +2105,14 @@ moveControllerPreview() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-saveControllerEditor() {
-	ControllerEditor.Instance.close(true)
-}
-
-cancelControllerEditor() {
-	ControllerEditor.Instance.close(false)
-}
-
-moveControllerEditor() {
-	moveByMouse(A_Gui, "Controller Editor")
-}
-
-openControllerDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#controller-layouts
-}
-
-chooseLayoutType() {
-	LayoutsList.Instance.chooseLayoutType()
-}
-
-chooseLayout() {
-	LayoutsList.Instance.chooseLayout()
-}
-
-chooseImageFile(path) {
-	local title := translate("Select Image...")
+chooseImageFile(window, path) {
 	local pictureFile
 
-	Gui +OwnDialogs
+	window.Opt("+OwnDialogs")
 
-	OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-	FileSelectFile pictureFile, 1, %path%, %title%, Image (*.jpg; *.png; *.gif; *.ico)
-	OnMessage(0x44, "")
+	OnMessage(0x44, translateSelectCancelButtons)
+	pictureFile := FileSelect(1, path, translate("Select Image..."), "Image (*.jpg; *.png; *.gif; *.ico)")
+	OnMessage(0x44, translateSelectCancelButtons, 0)
 
 	return ((pictureFile != "") ? pictureFile : false)
-}
-
-chooseImageFilePath() {
-	local path, pictureFile
-
-	GuiControlGet imageFilePathEdit
-
-	path := imageFilePathEdit
-
-	if (path && (path != ""))
-		path := getFileName(path, kButtonBoxImagesDirectory)
-	else
-		path := SubStr(kButtonBoxImagesDirectory, 1, StrLen(kButtonBoxImagesDirectory) - 1)
-
-	pictureFile := chooseImageFile(path)
-
-	if pictureFile {
-		imageFilePathEdit := pictureFile
-
-		GuiControl Text, imageFilePathEdit, %imageFilePathEdit%
-	}
-}
-
-chooseIconFilePath() {
-	local path, pictureFile
-
-	GuiControlGet iconFilePathEdit
-
-	path := iconFilePathEdit
-
-	if (path && (path != ""))
-		path := getFileName(path, kStreamDeckImagesDirectory)
-	else
-		path := SubStr(kStreamDeckImagesDirectory, 1, StrLen(kStreamDeckImagesDirectory) - 1)
-
-	pictureFile := chooseImageFile(path)
-
-	if pictureFile {
-		iconFilePathEdit := pictureFile
-
-		GuiControl Text, iconFilePathEdit, %iconFilePathEdit%
-	}
-}
-
-updateLayoutRowEditor() {
-	local list
-
-	try {
-		list := ConfigurationItemList.getList("layoutsListView")
-
-		if list
-			list.updateLayoutRowEditor()
-	}
-	catch exception {
-		logError(exception)
-	}
-}
-
-openDisplayRulesEditor() {
-	LayoutsList.Instance.openDisplayRulesEditor()
-}
-
-openControllerActionsEditor() {
-	local owner := ControllerEditor.Instance.Window
-
-	Gui CTRLE:+Disabled
-
-	Gui PAE:+OwnerCTRLE
-
-	new ControllerActionsEditor(kSimulatorConfiguration).editPluginActions()
-
-	Gui CTRLE:-Disabled
-}
-
-saveDisplayRulesEditor() {
-	DisplayRulesEditor.Instance.close(true)
-}
-
-cancelDisplayRulesEditor() {
-	DisplayRulesEditor.Instance.close(false)
-}
-
-moveDisplayRulesEditor() {
-	moveByMouse(A_Gui, "Controller Editor.Display Rules")
-}
-
-openDisplayRulesDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#display-rules
-}
-
-chooseDisplayRuleLayout() {
-	DisplayRulesEditor.Instance.chooseDisplayRuleLayout()
-}
-
-chooseDisplayRuleButton() {
-	DisplayRulesEditor.Instance.chooseDisplayRuleButton()
 }

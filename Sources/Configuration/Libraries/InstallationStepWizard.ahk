@@ -14,12 +14,12 @@
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class InstallationStepWizard extends StepWizard {
-	iPages := {}
-	iSoftwareLocators := {}
+	iPages := CaseInsenseMap()
+	iSoftwareLocators := CaseInsenseMap()
 
-	Pages[] {
+	Pages {
 		Get {
-			return Ceil(this.Definition.Length() / 3)
+			return Ceil(this.Definition.Length / 3)
 		}
 	}
 
@@ -27,79 +27,40 @@ class InstallationStepWizard extends StepWizard {
 		local window := this.Window
 		local definition := this.Definition
 		local startY := y
-		local iconHandle, labelHandle, installButtonHandle, locateButtonHandle, infoTextHandle
 		local ignore, software, installer, folder, locatable, info, label, installed, buttonX
-		local labelWidth, labelX, labelY, buttonY, page, html
+		local labelWidth, labelX, labelY, buttonY, page, html, factor
 
-		static infoText1
-		static infoText2
-		static infoText3
-		static infoText4
-		static infoText5
-		static infoText6
-		static infoText7
-		static infoText8
-		static infoText9
-		static infoText10
-		static infoText11
-		static infoText12
-		static infoText13
-		static infoText14
-		static infoText15
-		static infoText16
+		installSoftware(software, *) {
+			this.installSoftware(software)
+		}
 
-		static installButton1
-		static installButton2
-		static installButton3
-		static installButton4
-		static installButton5
-		static installButton6
-		static installButton7
-		static installButton8
-		static installButton9
-		static installButton10
-		static installButton11
-		static installButton12
-		static installButton13
-		static installButton14
-		static installButton15
-		static installButton16
+		locateSoftware(software, *) {
+			local definition := this.Definition
+			local folder := getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
+			local fileName
 
-		static locateButton1
-		static locateButton2
-		static locateButton3
-		static locateButton4
-		static locateButton5
-		static locateButton6
-		static locateButton7
-		static locateButton8
-		static locateButton9
-		static locateButton10
-		static locateButton11
-		static locateButton12
-		static locateButton13
-		static locateButton14
-		static locateButton15
-		static locateButton16
+			if folder
+				Run("explore " . substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software)))
+			else {
+				window.Opt("+OwnDialogs")
 
-		if (this.Definition.Count() > 16)
-			throw "Too many modules detected in InstallationStepWizard.createGui..."
+				OnMessage(0x44, translateSelectCancelButtons)
+				fileName := FileSelect(1, "", substituteVariables(translate("Select %name% executable..."), {name: software}), "Executable (*.exe)")
+				OnMessage(0x44, translateSelectCancelButtons, 0)
 
-		for ignore, software in this.Definition
-		{
-			iconHandle := false
-			labelHandle := false
-			installButtonHandle := false
-			locateButtonHandle := false
-			infoTextHandle := false
+				if (fileName != "")
+					this.locateSoftware(software, fileName)
+			}
+		}
 
-			installer := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
-			folder := getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
-			locatable := getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
-			info := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
+		for ignore, software in this.Definition {
+			installer := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
+			folder := getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
+			locatable := getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
+			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
 
 			label := (translate("Software: ") . software)
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 			installed := (folder ? false : this.SetupWizard.isSoftwareInstalled(software))
 
@@ -112,48 +73,52 @@ class InstallationStepWizard extends StepWizard {
 			labelX := x + 35
 			labelY := y + 8
 
-			Gui %window%:Add, Picture, x%x% y%y% w30 h30 HWNDiconHandle Hidden, %kResourcesDirectory%Setup\Images\Install.png
+			factor := (Mod(A_Index - 1, 3) * 0.33)
 
-			Gui %window%:Font, s10 Bold, Arial
+			widget1 := window.Add("Picture", "x" . x . " y" . y . " w30 h30 Y:Move(" . factor . ") Hidden", kResourcesDirectory . "Setup\Images\Install.png")
 
-			Gui %window%:Add, Text, x%labelX% y%labelY% w%labelWidth% h26 HWNDlabelHandle Hidden, % label
+			window.SetFont("s10 Bold", "Arial")
 
-			Gui %window%:Font, s8 Norm, Arial
+			widget2 := window.Add("Text", "x" . labelX . " y" . labelY . " w" . labelWidth . " h26 Y:Move(" . factor . ") Hidden", label)
+
+			window.SetFont("s8 Norm", "Arial")
 
 			buttonY := y + 5
 
-			Gui %window%:Add, Button, x%buttonX% y%buttonY% w90 h23 HWNDinstallButtonHandle VinstallButton%A_Index% GinstallSoftware Hidden, % folder ? translate("Open...") : (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install...")
+			widget3 := window.Add("Button", "x" . buttonX . " y" . buttonY . " w90 h23 X:Move Y:Move(" . factor . ") Hidden"
+								, folder ? translate("Open...") : (InStr(installer, "http") = 1) ? translate("Download...") : translate("Install..."))
+			widget3.OnEvent("Click", installSoftware.Bind(software))
 
 			if locatable {
 				buttonX += 95
 
-				Gui %window%:Add, Button, x%buttonX% y%buttonY% w90 h23 HWNDlocateButtonHandle VlocateButton%A_Index% GlocateSoftware Hidden, % installed ? translate("Installed") : translate("Locate...")
+				widget4 := window.Add("Button", "x" . buttonX . " y" . buttonY . " w90 h23 X:Move Y:Move(" . factor . ") Hidden"
+									, installed ? translate("Installed") : translate("Locate..."))
+				widget4.OnEvent("Click", locateSoftware.Bind(software))
 			}
 
-			Sleep 200
+			widget5 := window.Add("ActiveX", "x" . x . " yp+33 w" . width . " h121 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden", "shell.explorer")
 
-			Gui %window%:Add, ActiveX, x%x% yp+33 w%width% h121 HWNDinfoTextHandle VinfoText%A_Index% Hidden, shell.explorer
+			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			html := "<html><body style='background-color: #D0D0D0' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
-
-			infoText%A_Index%.Navigate("about:blank")
-			infoText%A_Index%.Document.Write(html)
+			widget5.Value.navigate("about:blank")
+			widget5.Value.document.write(html)
 
 			y += 170
 
 			page := Ceil(A_Index / 3)
 
-			this.registerWidgets(page, iconHandle, labelHandle, installButtonHandle, infoTextHandle)
+			this.registerWidgets(page, widget1, widget2, widget3, widget5)
 
 			if locatable
-				this.registerWidget(page, locateButtonHandle)
+				this.registerWidget(page, widget4)
 
-			this.iSoftwareLocators[software] := (locatable ? [installButtonHandle, locateButtonHandle] : [installButtonHandle])
+			this.iSoftwareLocators[software] := (locatable ? [widget3, widget4] : [widget3])
 
-			if !this.iPages.HasKey(page)
-				this.iPages[page] := {}
+			if !this.iPages.Has(page)
+				this.iPages[page] := CaseInsenseMap()
 
-			this.iPages[page][software] := (locatable ? [installButtonHandle, locateButtonHandle] : [installButtonHandle])
+			this.iPages[page][software] := (locatable ? [widget3, widget4] : [widget3])
 
 			if (((A_Index / 3) - Floor(A_Index / 3)) == 0)
 				y := startY
@@ -161,16 +126,16 @@ class InstallationStepWizard extends StepWizard {
 	}
 
 	reset() {
-		base.reset()
+		super.reset()
 
-		this.iPages := {}
-		this.iSoftwareLocators := {}
+		this.iPages := CaseInsenseMap()
+		this.iSoftwareLocators := CaseInsenseMap()
 	}
 
 	loadStepDefinition(definition) {
 		local ignore, software
 
-		base.loadStepDefinition(definition)
+		super.loadStepDefinition(definition)
 
 		for ignore, software in this.Definition
 			this.SetupWizard.locateSoftware(software)
@@ -178,45 +143,42 @@ class InstallationStepWizard extends StepWizard {
 
 	installSoftware(software) {
 		local wizard := this.SetupWizard
-		local folder := getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
+		local folder := getMultiMapValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
 		local locatable, installer, extension, buttons, button
 
-		if folder {
-			folder := substituteVariables(getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software))
-
-			Run explore %folder%
-		}
+		if folder
+			Run("explore " . substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software)))
 		else {
-			locatable := getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
-			installer := substituteVariables(getConfigurationValue(wizard.Definition, "Setup.Installation", "Installation." . software))
+			locatable := getMultiMapValue(wizard.Definition, "Setup.Installation", "Installation." . software . ".Locatable", true)
+			installer := substituteVariables(getMultiMapValue(wizard.Definition, "Setup.Installation", "Installation." . software))
 
-			SplitPath installer, , , extension
+			SplitPath(installer, , , &extension)
 
 			if (!locatable || (extension = "EXE") || (extension = "MSI")) {
-				RunWait %installer%
+				RunWait(installer)
 
 				wizard.locateSoftware(software)
 
-				if (wizard.isSoftwareInstalled(software) && this.iSoftwareLocators.HasKey(software)) {
+				if (wizard.isSoftwareInstalled(software) && this.iSoftwareLocators.Has(software)) {
 					buttons := this.iSoftwareLocators[software]
 
-					GuiControl Disable, % buttons[1]
+					buttons[1].Enabled := false
 
-					if (buttons.Length() > 1) {
+					if (buttons.Length > 1) {
 						button := buttons[2]
 
-						GuiControl Disable, %button%
-						GuiControl Text, %button%, % translate("Installed")
+						button.Enabled := false
+						button.Text := translate("Installed")
 					}
 					else {
 						button := buttons[1]
 
-						GuiControl Text, %button%, % translate("Installed")
+						button.Text := translate("Installed")
 					}
 				}
 			}
 			else
-				Run %installer%
+				Run(installer)
 		}
 	}
 
@@ -227,42 +189,43 @@ class InstallationStepWizard extends StepWizard {
 
 		buttons := this.iSoftwareLocators[software]
 
-		GuiControl Disable, % buttons[1]
+		buttons[1].Enabled := false
 
 		button := buttons[2]
 
-		GuiControl Disable, %button%
-		GuiControl Text, %button%, % translate("Installed")
+		button.Enabled := false
+		button.Text := translate("Installed")
 	}
 
 	showPage(page) {
 		local software, widgets, ignore, widget, buttons, button
 
-		base.showPage(page)
+		super.showPage(page)
 
 		for software, widgets in this.iPages[page]
-			if !getConfigurationValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
-				if !this.SetupWizard.isSoftwareRequested(software)
+			if !getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Folder", false)
+				if !this.SetupWizard.isSoftwareRequested(software) {
 					for ignore, widget in widgets
-						GuiControl Disable, %widget%
+						widget.Enabled := false
+				}
 				else {
 					this.SetupWizard.locateSoftware(software)
 
-					if (this.SetupWizard.isSoftwareInstalled(software) && this.iSoftwareLocators.HasKey(software)) {
+					if (this.SetupWizard.isSoftwareInstalled(software) && this.iSoftwareLocators.Has(software)) {
 						buttons := this.iSoftwareLocators[software]
 
-						GuiControl Disable, % buttons[1]
+						buttons[1].Enabled := false
 
-						if (buttons.Length() > 1) {
+						if (buttons.Length > 1) {
 							button := buttons[2]
 
-							GuiControl Disable, %button%
-							GuiControl Text, %button%, % translate("Installed")
+							button.Enabled := false
+							button.Text := translate("Installed")
 						}
 						else {
 							button := buttons[1]
 
-							GuiControl Text, %button%, % translate("Installed")
+							button.Text := translate("Installed")
 						}
 					}
 				}
@@ -271,7 +234,7 @@ class InstallationStepWizard extends StepWizard {
 	hidePage(page) {
 		local wizard := this.SetupWizard
 		local done := true
-		local software, ignore, title
+		local software, ignore, msgResult
 
 		for software, ignore in this.iPages[page]
 			if (wizard.isSoftwareRequested(software) && !wizard.isSoftwareOptional(software) && !wizard.isSoftwareInstalled(software)) {
@@ -281,16 +244,15 @@ class InstallationStepWizard extends StepWizard {
 			}
 
 		if !done {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Yes", "No"]))
-			title := translate("Setup")
-			MsgBox 262436, %title%, % translate("Not all required software components have been installed. Do you really want to proceed?")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateYesNoButtons)
+			msgResult := MsgBox(translate("Not all required software components have been installed. Do you really want to proceed?"), translate("Setup"), 262436)
+			OnMessage(0x44, translateYesNoButtons, 0)
 
-			IfMsgBox No
+			if (msgResult = "No")
 				return false
 		}
 
-		return base.hidePage(page)
+		return super.hidePage(page)
 	}
 }
 
@@ -299,41 +261,8 @@ class InstallationStepWizard extends StepWizard {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-installSoftware() {
-	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
-	local definition := stepWizard.Definition
-
-	stepWizard.installSoftware(definition[StrReplace(A_GuiControl, "installButton", "")])
-}
-
-locateSoftware() {
-	local stepWizard := SetupWizard.Instance.StepWizards["Installation"]
-	local definition := stepWizard.Definition
-	local name := definition[StrReplace(A_GuiControl, "locateButton", "")]
-	local folder := getConfigurationValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . name . ".Folder", false)
-	local title, file
-
-	if folder {
-		folder := substituteVariables(getConfigurationValue(stepWizard.SetupWizard.Definition, "Setup.Installation", "Installation." . name))
-
-		Run explore %folder%
-	}
-	else {
-		title := substituteVariables(translate("Select %name% executable..."), {name: name})
-
-		Gui +OwnDialogs
-
-		OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Select", "Cancel"]))
-		FileSelectFile file, 1, , %title%, Executable (*.exe)
-		OnMessage(0x44, "")
-
-		if (file != "")
-			stepWizard.locateSoftware(name, file)
-	}
-}
-
 initializeInstallationStepWizard() {
-	SetupWizard.Instance.registerStepWizard(new InstallationStepWizard(SetupWizard.Instance, "Installation", kSimulatorConfiguration))
+	SetupWizard.Instance.registerStepWizard(InstallationStepWizard(SetupWizard.Instance, "Installation", kSimulatorConfiguration))
 }
 
 
@@ -342,3 +271,4 @@ initializeInstallationStepWizard() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeInstallationStepWizard()
+

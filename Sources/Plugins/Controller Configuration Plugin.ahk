@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Controller Configuration Plugin ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,7 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Configuration\Libraries\ControllerEditor.ahk
+#Include "..\Configuration\Libraries\ControllerEditor.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -20,25 +20,29 @@
 ;;; ControllerConfigurator                                                  ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class ControllerConfigurator extends ConfigurationItem {
-	iEditor := false
-
+class ControllerConfigurator extends ConfiguratorPanel {
 	iControllerList := false
-	iFunctionsist := false
+	iFunctionsList := false
 
-	Editor[] {
+	ControllerList {
 		Get {
-			return this.iEditor
+			return this.iControllerList
+		}
+	}
+
+	FunctionsList {
+		Get {
+			return this.iFunctionsList
 		}
 	}
 
 	__New(editor, configuration) {
 		this.iEditor := editor
 
-		this.iControllerList := new ControllerList(configuration)
-		this.iFunctionsList := new FunctionsList(configuration)
+		this.iControllerList := ControllerList(this.Editor, configuration)
+		this.iFunctionsList := FunctionsList(this.Editor, configuration)
 
-		base.__New(configuration)
+		super.__New(configuration)
 
 		ControllerConfigurator.Instance := this
 	}
@@ -46,17 +50,28 @@ class ControllerConfigurator extends ConfigurationItem {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		this.iControllerList.createGui(editor, x, y, width, height)
-		this.iFunctionsList.createGui(editor, x, y, width, height)
+		toggleTriggerDetector(*) {
+			protectionOn()
 
-		Gui %window%:Add, Button, x16 y490 w100 h23 gtoggleTriggerDetector, % translate("Trigger...")
+			try {
+				ConfigurationEditor.Instance.toggleTriggerDetector()
+			}
+			finally {
+				protectionOff()
+			}
+		}
+
+		this.ControllerList.createGui(editor, x, y, width, height)
+		this.FunctionsList.createGui(editor, x, y, width, height)
+
+		window.Add("Button", "x16 y490 w100 h23 Y:Move", translate("Trigger...")).OnEvent("Click", toggleTriggerDetector)
 	}
 
 	saveToConfiguration(configuration) {
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
-		this.iControllerList.saveToConfiguration(configuration)
-		this.iFunctionsList.saveToConfiguration(configuration)
+		this.ControllerList.saveToConfiguration(configuration)
+		this.FunctionsList.saveToConfiguration(configuration)
 	}
 }
 
@@ -64,62 +79,60 @@ class ControllerConfigurator extends ConfigurationItem {
 ;;; ControllerList                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global controllerListBox := "|"
-
-global controllerEdit := ""
-global controllerLayoutDropDown := 0
-global openControllerEditorButton
-
-global controllerUpButton
-global controllerDownButton
-
-global controllerAddButton
-global controllerDeleteButton
-global controllerUpdateButton
-
 class ControllerList extends ConfigurationItemList {
-	__New(configuration) {
-		base.__New(configuration)
+	__New(editor, configuration) {
+		this.Editor := editor
+
+		super.__New(configuration)
 
 		ControllerList.Instance := this
 	}
 
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
+		local choices, chosen
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		openControllerEditor(*) {
+			this.openControllerEditor()
+		}
 
-		Gui %window%:Add, GroupBox, -Theme x16 y80 w457 h115, % translate("Controller")
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Add, ListBox, x24 y99 w194 h96 HwndcontrollerListBoxHandle VcontrollerListBox glistEvent, %controllerListBox%
+		window.Add("GroupBox", "x16 y80 w457 h115 W:Grow", translate("Controller"))
 
-		Gui %window%:Add, Edit, x224 y99 w104 h21 VcontrollerEdit, %controllerEdit%
-		Gui %window%:Add, DropDownList, x330 y99 w108 Choose%controllerLayoutDropDown% VcontrollerLayoutDropDown, % values2String("|", this.computeLayoutChoices()*)
-		Gui %window%:Add, Button, x440 y98 w23 h23 gopenControllerEditor VopenControllerEditorButton, % translate("...")
+		window.SetFont("Norm", "Arial")
+		window.Add("ListBox", "x24 y99 w194 h96 W:Grow(0.4) VcontrollerListBox")
 
-		Gui %window%:Add, Button, x385 y124 w38 h23 Disabled VcontrollerUpButton gupItem, % translate("Up")
-		Gui %window%:Add, Button, x425 y124 w38 h23 Disabled VcontrollerDownButton gdownItem, % translate("Down")
+		window.Add("Edit", "x224 y99 w104 h21 X:Move(0.4) W:Grow(0.3) VcontrollerEdit")
 
-		Gui %window%:Add, Button, x265 y164 w46 h23 VcontrollerAddButton gaddItem, % translate("Add")
-		Gui %window%:Add, Button, x313 y164 w50 h23 Disabled VcontrollerDeleteButton gdeleteItem, % translate("Delete")
-		Gui %window%:Add, Button, x409 y164 w55 h23 Disabled VcontrollerUpdateButton gupdateItem, % translate("Save")
+		choices := this.computeLayoutChoices()
+		chosen := (choices.Length > 0)
 
-		this.initializeList(controllerListBoxHandle, "controllerListBox", "controllerAddButton", "controllerDeleteButton", "controllerUpdateButton"
-						  , "controllerUpButton", "controllerDownButton")
+		window.Add("DropDownList", "x330 y99 w108 X:Move(0.7) W:Grow(0.3) Choose" . chosen . " VcontrollerLayoutDropDown", choices)
+		window.Add("Button", "x440 y98 w23 h23 X:Move VopenControllerEditorButton", translate("...")).OnEvent("Click", openControllerEditor)
+
+		window.Add("Button", "x385 y124 w38 h23 X:Move Disabled VcontrollerUpButton", translate("Up"))
+		window.Add("Button", "x425 y124 w38 h23 X:Move Disabled VcontrollerDownButton", translate("Down"))
+
+		window.Add("Button", "x265 y164 w46 h23 X:Move VcontrollerAddButton", translate("Add"))
+		window.Add("Button", "x313 y164 w50 h23 X:Move Disabled VcontrollerDeleteButton", translate("Delete"))
+		window.Add("Button", "x409 y164 w55 h23 X:Move Disabled VcontrollerUpdateButton", translate("Save"))
+
+		this.initializeList(editor, window["controllerListBox"], window["controllerAddButton"], window["controllerDeleteButton"], window["controllerUpdateButton"]
+								  , window["controllerUpButton"], window["controllerDownButton"])
 	}
 
 	loadFromConfiguration(configuration) {
 		local items := []
 		local ignore, controller
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Button Boxes", ""))
+		for ignore, controller in string2Values("|", getMultiMapValue(configuration, "Controller Layouts", "Button Boxes", ""))
 			items.Push(string2Values(":", controller))
 
-		for ignore, controller in string2Values("|", getConfigurationValue(configuration, "Controller Layouts", "Stream Decks", ""))
+		for ignore, controller in string2Values("|", getMultiMapValue(configuration, "Controller Layouts", "Stream Decks", ""))
 			items.Push(string2Values(":", controller))
 
 		this.ItemList := items
@@ -128,26 +141,27 @@ class ControllerList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		local bbController := []
 		local sdController := []
-		local sdConfiguration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+		local sdConfiguration := readMultiMap(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 		local ignore, item
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, item in this.ItemList
-			if getConfigurationValue(sdConfiguration, "Layouts", item[2] . ".Layout", false)
+			if getMultiMapValue(sdConfiguration, "Layouts", item[2] . ".Layout", false)
 				sdController.Push(values2String(":", item*))
 			else
 				bbController.Push(values2String(":", item*))
 
-		setConfigurationValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", bbController*))
-		setConfigurationValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", sdController*))
+		setMultiMapValue(configuration, "Controller Layouts", "Button Boxes", values2String("|", bbController*))
+		setMultiMapValue(configuration, "Controller Layouts", "Stream Decks", values2String("|", sdController*))
 	}
 
+	/*
 	clickEvent(line, count) {
 		local index := false
 		local ignore, candidate
 
-		GuiControlGet controllerListBox
+		controllerListBox := ogccontrollerListBox.Text
 
 		for ignore, candidate in this.ItemList
 			if (controllerListBox = candidate[1]) {
@@ -158,10 +172,7 @@ class ControllerList extends ConfigurationItemList {
 
 		this.openEditor(index)
 	}
-
-	processListEvent() {
-		return true
-	}
+	*/
 
 	loadList(items) {
 		local controller := []
@@ -170,26 +181,18 @@ class ControllerList extends ConfigurationItemList {
 		for ignore, item in this.ItemList
 			controller.Push(item[1])
 
-		GuiControl, , controllerListBox, % "|" . values2String("|", controller*)
-	}
-
-	selectItem(itemNumber) {
-		this.CurrentItem := itemNumber
-
-		if itemNumber
-			GuiControl Choose, controllerListBox, %itemNumber%
-
-		this.updateState()
+		this.Control["controllerListBox"].Delete()
+		this.Control["controllerListBox"].Add(controller)
 	}
 
 	loadEditor(item) {
-		GuiControl Text, controllerEdit, % item[1]
+		this.Control["controllerEdit"].Text := item[1]
 
 		try {
-			GuiControl Choose, controllerLayoutDropDown, % item[2]
+			this.Control["controllerLayoutDropDown"].Choose(item[2])
 		}
-		catch exception {
-			GuiControl Choose, controllerLayoutDropDown, 0
+		catch Any as exception {
+			this.Control["controllerLayoutDropDown"].Choose(0)
 		}
 	}
 
@@ -198,21 +201,15 @@ class ControllerList extends ConfigurationItemList {
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local title
-
-		GuiControlGet controllerEdit
-		GuiControlGet controllerLayoutDropDown
-
-		if ((controllerEdit = "") || (controllerLayoutDropDown = "") || !controllerLayoutDropDown) {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+		if ((Trim(this.Control["controllerEdit"].Text) = "") || (this.Control["controllerLayoutDropDown"].Text = "") || !this.Control["controllerLayoutDropDown"].Value) {
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
 		else
-			return Array(controllerEdit, controllerLayoutDropDown)
+			return Array(this.Control["controllerEdit"].Text, this.Control["controllerLayoutDropDown"].Text)
 	}
 
 	computeLayoutChoices(bbConfiguration := false, sdConfiguration := false) {
@@ -220,20 +217,20 @@ class ControllerList extends ConfigurationItemList {
 		local descriptor, definition
 
 		if !bbConfiguration
-			bbConfiguration := readConfiguration(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+			bbConfiguration := readMultiMap(getFileName("Button Box Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 
 		if !sdConfiguration
-			sdConfiguration := readConfiguration(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
+			sdConfiguration := readMultiMap(getFileName("Stream Deck Configuration.ini", kUserConfigDirectory, kConfigDirectory))
 
 
-		for descriptor, definition in getConfigurationSectionValues(bbConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(bbConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 			if !inList(layouts, descriptor[1])
 				layouts.Push(descriptor[1])
 		}
 
-		for descriptor, definition in getConfigurationSectionValues(sdConfiguration, "Layouts", Object()) {
+		for descriptor, definition in getMultiMapValues(sdConfiguration, "Layouts") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 
 			if !inList(layouts, descriptor[1])
@@ -244,33 +241,24 @@ class ControllerList extends ConfigurationItemList {
 	}
 
 	openControllerEditor() {
-		local window := ConfigurationEditor.Instance.Window
-		local choices
+		local window := this.Window
+		local choices, layout
 
-		Gui %window%:Default
-
-		GuiControlGet controllerEdit
-		GuiControlGet controllerLayoutDropDown
-
-		Gui CTRLE:+Owner%window%
-		Gui %window%:+Disabled
+		window.Opt("+Disabled")
 
 		try {
-			new ControllerEditor(controllerLayoutDropDown, ConfigurationEditor.Instance.Configuration).editController()
+			layout := this.Control["controllerLayoutDropDown"].Text
 
-			Gui %window%:Default
+			ControllerEditor(layout, this.Configuration).editController(window)
 
 			choices := this.computeLayoutChoices()
 
-			GuiControl Text, controllerLayoutDropDown, % "|" . values2String("|", choices*)
-
-			if inList(choices, controllerLayoutDropDown)
-				GuiControl Choose, controllerLayoutDropDown, %controllerLayoutDropDown%
-			else
-				GuiControl Choose, controllerLayoutDropDown, 0
+			this.Control["controllerLayoutDropDown"].Delete()
+			this.Control["controllerLayoutDropDown"].Add(choices)
+			this.Control["controllerLayoutDropDown"].Choose(inList(choices, layout))
 		}
 		finally {
-			Gui %window%:-Disabled
+			window.Opt("-Disabled")
 		}
 	}
 }
@@ -279,24 +267,19 @@ class ControllerList extends ConfigurationItemList {
 ;;; FunctionsList                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-global functionsListView
-
-global functionTypeDropDown := 0
-global functionNumberEdit := ""
-global functionOnHotkeysEdit := ""
-global functionOnActionEdit := ""
-global functionOffHotkeysEdit := ""
-global functionOffActionEdit := ""
-
-global functionAddButton
-global functionDeleteButton
-global functionUpdateButton
-
 class FunctionsList extends ConfigurationItemList {
-	iFunctions := {}
+	iFunctions := CaseInsenseMap()
 
-	__New(configuration) {
-		base.__New(configuration)
+	Functions {
+		Get {
+			return this.iFunctions
+		}
+	}
+
+	__New(editor, configuration) {
+		this.Editor := editor
+
+		super.__New(configuration)
 
 		FunctionsList.Instance := this
 	}
@@ -304,63 +287,81 @@ class FunctionsList extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		Gui %window%:Add, ListView, x16 y200 w457 h150 -Multi -LV0x10 AltSubmit NoSort NoSortHdr HwndfunctionsListViewHandle VfunctionsListView glistEvent
-						, % values2String("|", map(["Function", "Number", "Hotkey(s) & Action(s)"], "translate")*)
+		updateFunctionEditorState(*) {
+			protectionOn()
 
-		Gui %window%:Add, Text, x16 y360 w86 h23 +0x200, % translate("Function")
-		Gui %window%:Add, DropDownList, x124 y360 w91 AltSubmit Choose%functionTypeDropDown% VfunctionTypeDropDown gupdateFunctionEditorState
-								, % values2String("|", map(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], "translate")*)
-		Gui %window%:Add, Edit, x220 y360 w40 h21 Number Limit3 VfunctionNumberEdit, %functionNumberEdit%
-		Gui %window%:Add, UpDown, Range1-999 x260 y360 w17 h21, 1
+			try {
+				this.updateState()
+			}
+			finally {
+				protectionOff()
+			}
+		}
 
-		Gui %window%:Font, Norm, Arial
-		Gui %window%:Font, Italic, Arial
+		openHotkeysDocumentation(*) {
+			Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys")
+		}
 
-		Gui %window%:Add, GroupBox, -Theme x16 y392 w457 h91, % translate("Bindings")
+		openActionsDocumentation(*) {
+			Run("https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions")
+		}
 
-		Gui %window%:Font, Norm, Arial
+		window.Add("ListView", "x16 y200 w457 h146 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VfunctionsListView", collect(["Function", "Number", "Hotkey(s) & Action(s)"], translate))
 
-		Gui %window%:Add, Text, x124 y401 w160 h22 +0x200 +Center, % translate("On or Increase")
-		Gui %window%:Add, Text, x303 y401 w160 h22 +0x200 +Center, % translate("Off or Decrease")
+		window.Add("Text", "x16 y356 w86 h23 Y:Move +0x200", translate("Function"))
+		window.Add("DropDownList", "x124 y356 w91 Y:Move Choose1 VfunctionTypeDropDown", collect(["1-way Toggle", "2-way Toggle", "Button", "Rotary", "Custom"], translate)).OnEvent("Change", updateFunctionEditorState)
+		window.Add("Edit", "x220 y356 w40 h21 Y:Move Number Limit3 VfunctionNumberEdit")
+		window.Add("UpDown", "Range1-999 x260 y356 w17 h21 Y:Move", 1)
 
-		Gui %window%:Font, Underline, Arial
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
 
-		Gui %window%:Add, Text, x24 y424 w83 h23 +0x200 cBlue gopenHotkeysDocumentation, % translate("Hotkey(s)")
+		window.Add("GroupBox", "x16 y388 w457 h95 Y:Move W:Grow", translate("Bindings"))
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Edit, x124 y424 w160 h21 VfunctionOnHotkeysEdit, %functionOnHotkeysEdit%
-		Gui %window%:Add, Edit, x303 y424 w160 h21 VfunctionOffHotkeysEdit, %functionOffHotkeysEdit%
+		window.Add("Text", "x124 y397 w160 h22 Y:Move X:Move(0.25) +0x200 +Center", translate("On or Increase"))
+		window.Add("Text", "x303 y397 w160 h22 Y:Move X:Move(0.75) +0x200 +Center", translate("Off or Decrease"))
 
-		Gui %window%:Font, Underline, Arial
+		window.SetFont("Underline", "Arial")
 
-		Gui %window%:Add, Text, x24 y450 w95 h23 cBlue gopenActionsDocumentation, % translate("Action(s) (optional)")
+		window.Add("Text", "x24 y420 w83 h23 Y:Move +0x200 cBlue", translate("Hotkey(s)")).OnEvent("Click", openHotkeysDocumentation)
 
-		Gui %window%:Font, Norm, Arial
+		window.SetFont("Norm", "Arial")
 
-		Gui %window%:Add, Edit, x124 y448 w160 h21 VfunctionOnActionEdit, %functionOnActionEdit%
-		Gui %window%:Add, Edit, x303 y448 w160 h21 VfunctionOffActionEdit, %functionOffActionEdit%
+		window.Add("Edit", "x124 y420 w160 h21 Y:Move W:Grow(0.5) VfunctionOnHotkeysEdit")
+		window.Add("Edit", "x303 y420 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffHotkeysEdit")
 
-		Gui %window%:Add, Button, x264 y490 w46 h23 VfunctionAddButton gaddItem, % translate("Add")
-		Gui %window%:Add, Button, x312 y490 w50 h23 Disabled VfunctionDeleteButton gdeleteItem, % translate("Delete")
-		Gui %window%:Add, Button, x418 y490 w55 h23 Disabled VfunctionUpdateButton gupdateItem, % translate("&Save")
+		window.SetFont("Underline", "Arial")
 
-		this.initializeList(functionsListViewHandle, "functionsListView", "functionAddButton", "functionDeleteButton", "functionUpdateButton")
+		window.Add("Text", "x24 y442 w95 h27 Y:Move cBlue", translate("Action(s) (optional)")).OnEvent("Click", openActionsDocumentation)
+
+		window.SetFont("Norm", "Arial")
+
+		window.Add("Edit", "x124 y444 w160 h21 Y:Move W:Grow(0.5) VfunctionOnActionEdit")
+		window.Add("Edit", "x303 y444 w160 h21 Y:Move X:Move(0.5) W:Grow(0.5) VfunctionOffActionEdit")
+
+		window.Add("Button", "x264 y490 w46 h23 Y:Move X:Move VfunctionAddButton", translate("Add"))
+		window.Add("Button", "x312 y490 w50 h23 Y:Move X:Move Disabled VfunctionDeleteButton", translate("Delete"))
+		window.Add("Button", "x418 y490 w55 h23 Y:Move X:Move Disabled VfunctionUpdateButton", translate("&Save"))
+
+		this.initializeList(editor, window["functionsListView"], window["functionAddButton"], window["functionDeleteButton"], window["functionUpdateButton"])
 	}
 
 	loadFromConfiguration(configuration) {
 		local descriptor, ignore, func
 
-		base.loadFromConfiguration(configuration)
+		super.loadFromConfiguration(configuration)
 
-		for descriptor, ignore in getConfigurationSectionValues(configuration, "Controller Functions", Object()) {
+		for descriptor, ignore in getMultiMapValues(configuration, "Controller Functions") {
 			descriptor := ConfigurationItem.splitDescriptor(descriptor)
 			descriptor := ConfigurationItem.descriptor(descriptor[1], descriptor[2])
 
-			if !this.iFunctions.HasKey(descriptor) {
+			if !this.Functions.Has(descriptor) {
 				func := Function.createFunction(descriptor, configuration)
 
-				this.iFunctions[descriptor] := func
+				this.Functions[descriptor] := func
+
 				this.ItemList.Push(func)
 			}
 		}
@@ -369,7 +370,7 @@ class FunctionsList extends ConfigurationItemList {
 	saveToConfiguration(configuration) {
 		local ignore, theFunction
 
-		base.saveToConfiguration(configuration)
+		super.saveToConfiguration(configuration)
 
 		for ignore, theFunction in this.ItemList
 			theFunction.saveToConfiguration(configuration)
@@ -378,27 +379,28 @@ class FunctionsList extends ConfigurationItemList {
 	updateState() {
 		local functionType
 
-		base.updateState()
+		super.updateState()
 
-		GuiControlGet functionType, , functionTypeDropDown
+		functionType := this.Control["functionTypeDropDown"].Value
 
 		if (functionType < 5) {
-			GuiControl Disable, functionOnActionEdit
-			GuiControl Disable, functionOffActionEdit
+			this.Control["functionOnActionEdit"].Enabled := false
+			this.Control["functionOffActionEdit"].Enabled := false
+			this.Control["functionOnActionEdit"].Text := ""
+			this.Control["functionOffActionEdit"].Text := ""
 		}
 		else {
-			GuiControl Enable, functionOnActionEdit
-			GuiControl Enable, functionOffActionEdit
+			this.Control["functionOnActionEdit"].Enabled := true
+			this.Control["functionOffActionEdit"].Enabled := true
 		}
 
 		if ((functionType == 2) || (functionType == 4))
-			GuiControl Enable, functionOffHotkeysEdit
+			this.Control["functionOffHotkeysEdit"].Enabled := true
 		else {
-			GuiControl Text, functionOffHotkeysEdit, % ""
-			GuiControl Text, functionOffActionEdit, % ""
-
-			GuiControl Disable, functionOffHotkeysEdit
-			GuiControl Disable, functionOffActionEdit
+			this.Control["functionOffHotkeysEdit"].Enabled := false
+			this.Control["functionOffActionEdit"].Enabled := false
+			this.Control["functionOffHotkeysEdit"].Text := ""
+			this.Control["functionOffActionEdit"].Text := ""
 		}
 	}
 
@@ -408,28 +410,27 @@ class FunctionsList extends ConfigurationItemList {
 
 	computeHotkeysAndActionText(hotkeys, action) {
 		if (hotKeys && (hotkeys != ""))
-			return hotkeys . ((action == "") ? "" : (" => " . action))
+			return (hotkeys . ((action == "") ? "" : (" => " . action)))
 		else
 			return ""
 	}
 
 	loadList(items) {
-		local round := 0
-		local qualifier, theFunction, hotkeysAndActions, index, trigger, nextHKA, hotkeys, action
+		local qualifier, theFunction, hotkeysAndActions, index, trigger, nextHKA, hotkeys, action, round
 
 		static first := true
 
-		Gui ListView, % this.ListHandle
-
 		this.ItemList := Array()
 
-		LV_Delete()
+		this.Control["functionsListView"].Delete()
+
+		round := 0
 
 		loop {
 			if (++round > 2)
 				break
 
-			for qualifier, theFunction in this.iFunctions
+			for qualifier, theFunction in this.Functions
 				if (((round == 1) && (theFunction.Type != kCustomType)) || ((round == 2) && (theFunction.Type == kCustomType))) {
 					hotkeysAndActions := ""
 
@@ -445,15 +446,15 @@ class FunctionsList extends ConfigurationItemList {
 						hotkeysAndActions := hotkeysAndActions . nextHKA
 					}
 
-					LV_Add("", translate(this.computeFunctionType(theFunction.Type)), theFunction.Number, hotkeysAndActions)
+					this.Control["functionsListView"].Add("", translate(this.computeFunctionType(theFunction.Type)), theFunction.Number, hotkeysAndActions)
 
 					this.ItemList.Push(theFunction)
 				}
 		}
 
 		if first {
-			LV_ModifyCol()
-			LV_ModifyCol(2, "Center AutoHdr")
+			this.Control["functionsListView"].ModifyCol()
+			this.Control["functionsListView"].ModifyCol(2, "Center AutoHdr")
 
 			first := false
 		}
@@ -462,71 +463,66 @@ class FunctionsList extends ConfigurationItemList {
 	loadEditor(item) {
 		local onKey := false
 		local offKey := false
+		local chosen
 
-		switch item.Type {
+		switch item.Type, false {
 			case k1WayToggleType:
-				functionTypeDropDown := 1
+				chosen := 1
 				onKey := "On"
 			case k2WayToggleType:
-				functionTypeDropDown := 2
+				chosen := 2
 				onKey := "On"
 				offKey := "Off"
 			case kButtonType:
-				functionTypeDropDown := 3
+				chosen := 3
 				onKey := "Push"
 			case kDialType:
-				functionTypeDropDown := 4
+				chosen := 4
 				onKey := "Increase"
 				offKey := "Decrease"
 			case kCustomType:
-				functionTypeDropDown := 5
+				chosen := 5
 				onKey := "Call"
 			default:
 				throw "Unknown function type (" . item.Type . ") detected in FunctionsList.loadEditor..."
 		}
 
-		GuiControl Choose, functionTypeDropDown, %functionTypeDropDown%
-		GuiControl Text, functionNumberEdit, % item.Number
-		GuiControl Text, functionOnHotkeysEdit, % item.Hotkeys[onKey, true]
-		GuiControl Text, functionOnActionEdit, % item.Actions[onKey, true]
-		GuiControl Text, functionOffHotkeysEdit, % (offKey ? item.Hotkeys[offKey, true] : "")
-		GuiControl Text, functionOffActionEdit, % (offKey ? item.Actions[offKey, true] : "")
+		this.Control["functionTypeDropDown"].Choose(chosen)
+		this.Control["functionNumberEdit"].Text := item.Number
+		this.Control["functionOnHotkeysEdit"].Text := item.Hotkeys[onKey, true]
+		this.Control["functionOnActionEdit"].Text := item.Actions[onKey, true]
+		this.Control["functionOffHotkeysEdit"].Text := (offKey ? item.Hotkeys[offKey, true] : "")
+		this.Control["functionOffActionEdit"].Text := (offKey ? item.Actions[offKey, true] : "")
 	}
 
 	clearEditor() {
-		GuiControl Choose, functionTypeDropDown, 0
-		GuiControl Text, functionNumberEdit, 0
-		GuiControl Text, functionOnHotkeysEdit, % ""
-		GuiControl Text, functionOnActionEdit, % ""
-		GuiControl Text, functionOffHotkeysEdit, % ""
-		GuiControl Text, functionOffActionEdit, % ""
+		this.Control["functionTypeDropDown"].Choose(0)
+		this.Control["functionNumberEdit"].Text := 0
+		this.Control["functionOnHotkeysEdit"].Text := ""
+		this.Control["functionOnActionEdit"].Text := ""
+		this.Control["functionOffHotkeysEdit"].Text := ""
+		this.Control["functionOffActionEdit"].Text := ""
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local functionType, title
+		local functionType
 
-		GuiControlGet functionTypeDropDown
-		GuiControlGet functionNumberEdit
-		GuiControlGet functionOnHotkeysEdit
-		GuiControlGet functionOnActionEdit
-		GuiControlGet functionOffHotkeysEdit
-		GuiControlGet functionOffActionEdit
+		functionType := [false, k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType][this.Control["functionTypeDropDown"].Value + 1]
 
-		functionType := [false, k1WayToggleType, k2WayToggleType, kButtonType, kDialType, kCustomType][functionTypeDropDown + 1]
-
-		if (functionType && (functionNumberEdit >= 0)) {
+		if (functionType && (this.Control["functionNumberEdit"].Text >= 0)) {
 			if ((functionType != k2WayToggleType) && (functionType != kDialType)) {
-				functionOffHotkeysEdit := ""
-				functionOffActionEdit := ""
+				this.Control["functionOffHotkeysEdit"].Text := ""
+				this.Control["functionOffActionEdit"].Text := ""
 			}
 
-			return Function.createFunction(ConfigurationItem.descriptor(functionType, functionNumberEdit), false, functionOnHotkeysEdit, functionOnActionEdit, functionOffHotkeysEdit, functionOffActionEdit)
+			return Function.createFunction(ConfigurationItem.descriptor(functionType, this.Control["functionNumberEdit"].Text), false
+										 , this.Control["functionOnHotkeysEdit"].Text, this.Control["functionOnActionEdit"].Text
+										 , this.Control["functionOffHotkeysEdit"].Text, this.Control["functionOffActionEdit"].Text)
 		}
 		else {
-			OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-			title := translate("Error")
-			MsgBox 262160, %title%, % translate("Invalid values detected - please correct...")
-			OnMessage(0x44, "")
+			OnMessage(0x44, translateOkButton)
+			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+			OnMessage(0x44, translateOkButton, 0)
 
 			return false
 		}
@@ -534,45 +530,43 @@ class FunctionsList extends ConfigurationItemList {
 
 	addItem() {
 		local function := this.buildItemFromEditor(true)
-		local title
 
 		if function
-			if this.iFunctions.HasKey(function.Descriptor) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				title := translate("Error")
-				MsgBox 262160, %title%, % translate("This function already exists - please use different values...")
-				OnMessage(0x44, "")
+			if this.Functions.Has(function.Descriptor) {
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("This function already exists - please use different values..."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
 			}
 			else {
-				this.iFunctions[function.Descriptor] := function
+				this.Functions[function.Descriptor] := function
 
-				base.addItem()
+				super.addItem()
 
 				this.selectItem(inList(this.ItemList, function))
 			}
 	}
 
 	deleteItem() {
-		this.iFunctions.Delete(this.ItemList[this.CurrentItem].Descriptor)
+		this.Functions.Delete(this.ItemList[this.CurrentItem].Descriptor)
 
-		base.deleteItem()
+		super.deleteItem()
 	}
 
 	updateItem() {
 		local function := this.buildItemFromEditor()
-		local title
 
 		if function
 			if (function.Descriptor != this.ItemList[this.CurrentItem].Descriptor) {
-				OnMessage(0x44, Func("translateMsgBoxButtons").Bind(["Ok"]))
-				title := translate("Error")
-				MsgBox 262160, %title%, % translate("The type and number of an existing function may not be changed...")
-				OnMessage(0x44, "")
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("The type and number of an existing function may not be changed..."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+
+				return false
 			}
 			else {
-				this.iFunctions[function.Descriptor] := function
+				this.Functions[function.Descriptor] := function
 
-				base.updateItem()
+				return super.updateItem()
 			}
 	}
 }
@@ -582,47 +576,13 @@ class FunctionsList extends ConfigurationItemList {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-toggleTriggerDetector(callback := false) {
-	protectionOn()
-
-	try {
-		ConfigurationEditor.Instance.toggleTriggerDetector()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-openControllerEditor() {
-	ControllerList.Instance.openControllerEditor()
-}
-
-updateFunctionEditorState() {
-	protectionOn()
-
-	try {
-		ConfigurationItemList.getList("functionsListView").updateState()
-	}
-	finally {
-		protectionOff()
-	}
-}
-
-openHotkeysDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys
-}
-
-openActionsDocumentation() {
-	Run https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#actions
-}
-
 initializeControllerConfigurator() {
 	local editor
 
 	if kConfigurationEditor {
 		editor := ConfigurationEditor.Instance
 
-		editor.registerConfigurator(translate("Controller"), new ControllerConfigurator(editor, editor.Configuration))
+		editor.registerConfigurator(translate("Controller"), ControllerConfigurator(editor, editor.Configuration))
 	}
 }
 

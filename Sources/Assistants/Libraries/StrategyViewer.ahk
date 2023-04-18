@@ -9,8 +9,8 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include Libraries\Strategy.ahk
-#Include Libraries\SessionDatabase.ahk
+#Include "Strategy.ahk"
+#Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -27,34 +27,34 @@ class StrategyViewer {
 	iWindow := false
 	iStrategyViewer := false
 
-	Window[] {
+	Window {
 		Get {
 			return this.iWindow
 		}
 	}
 
-	StrategyViewer[] {
+	StrategyViewer {
 		Get {
 			return this.iStrategyViewer
 		}
 	}
 
 	__New(window, strategyViewer := false) {
-		this.iWIndow := window
+		this.iWindow := window
 		this.iStrategyViewer := strategyViewer
 	}
 
-	lapTimeDisplayValue(lapTime) {
+	static lapTimeDisplayValue(lapTime) {
 		local seconds, fraction, minutes
 
-		if lapTime is Number
+		if isNumber(lapTime)
 			return displayValue("Time", lapTime)
 		else
 			return lapTime
 	}
 
 	createStrategyInfo(strategy) {
-		local sessionDB := new SessionDatabase()
+		local sessionDB := SessionDatabase()
 		local simulator := (strategy.Simulator ? strategy.Simulator : translate("Unknown"))
 		local car := (strategy.Car ? strategy.Car : translate("Unknown"))
 		local track := (strategy.Track ? strategy.Track : translate("Unknown"))
@@ -83,7 +83,7 @@ class StrategyViewer {
 		local html := "<table>"
 		local pressures := strategy.TyrePressures
 
-		loop % pressures.Length()
+		loop pressures.Length
 			pressures[A_Index] := displayValue("Float", convertUnit("Pressure", pressures[A_Index]))
 
 		html .= ("<tr><td><b>" . translate("Fuel:") . "</b></td><td>" . displayValue("Float", convertUnit("Volume", strategy.StartFuel)) . A_Space . getUnit("Volume", true) . "</td></tr>")
@@ -97,9 +97,9 @@ class StrategyViewer {
 		return html
 	}
 
-	createStintsInfo(strategy, ByRef timeSeries, ByRef lapSeries, ByRef fuelSeries, ByRef tyreSeries) {
+	createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries) {
 		local startStint := strategy.StartStint
-		local html := "<table class=""table-std"">"
+		local html := "<table class=`"table-std`">"
 		local stints, drivers, maps, laps, lapTimes, fuelConsumptions, pitstopLaps, refuels, tyreChanges, weathers
 		local lastDriver, lastMap, lastLap, lastLapTime, lastFuelConsumption, lastRefuel, lastPitstopLap
 		local lastWeather, lastTyreChange, lastTyreLaps, ignore, pitstop, pitstopLap
@@ -110,18 +110,18 @@ class StrategyViewer {
 		tyreSeries := [strategy.RemainingTyreLaps]
 
 		if !strategy.LastPitstop {
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Stint") . "</th><th class=""th-std"">" . startStint . "</th></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Driver") . "</th><td class=""td-std"">" . strategy.DriverName . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Map") . "</th><td class=""td-std"">" . strategy.Map . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Laps") . "</th><td class=""td-std"">" . strategy.RemainingLaps . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Lap Time") . "</th><td class=""td-std"">" . this.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
-			html .= ("<tr><th class=""th-std th-left"">" . translate("Consumption") . "</th><td class=""td-std"">" . displayValue("Float", convertUnit("Volume", strategy.FuelConsumption)) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Stint") . "</th><th class=`"th-std`">" . startStint . "</th></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Driver") . "</th><td class=`"td-std`">" . strategy.DriverName . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Map") . "</th><td class=`"td-std`">" . strategy.Map . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Laps") . "</th><td class=`"td-std`">" . strategy.RemainingSessionLaps . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time") . "</th><td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(strategy.AvgLapTime) . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Consumption") . "</th><td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", strategy.FuelConsumption)) . "</td></tr>")
 			html .= "</table>"
 
 			timeSeries.Push(strategy.getSessionDuration() / 60)
 			lapSeries.Push(strategy.getSessionLaps())
-			fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingLaps))
-			tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingLaps)
+			fuelSeries.Push(strategy.RemainingFuel - (strategy.FuelConsumption * strategy.RemainingSessionLaps))
+			tyreSeries.Push(strategy.RemainingTyreLaps - strategy.RemainingSessionLaps)
 		}
 		else {
 			stints := []
@@ -150,16 +150,16 @@ class StrategyViewer {
 			for ignore, pitstop in strategy.Pitstops {
 				pitstopLap := (pitstop.Lap - lastLap)
 
-				stints.Push("<th class=""th-std"">" . (startStint + A_Index - 1) . "</th>")
-				drivers.Push("<td class=""td-std"">" . lastDriver . "</td>")
-				maps.Push("<td class=""td-std"">" . lastMap . "</td>")
-				laps.Push("<td class=""td-std"">" . Max(pitstopLap, 0) . "</td>")
-				lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
-				fuelConsumptions.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
-				pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
-				weathers.Push("<td class=""td-std"">" . lastWeather . "</td>")
-				refuels.Push("<td class=""td-std"">" . ((pitstop.Nr > 1) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
-				tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
+				stints.Push("<th class=`"th-std`">" . (startStint + A_Index - 1) . "</th>")
+				drivers.Push("<td class=`"td-std`">" . lastDriver . "</td>")
+				maps.Push("<td class=`"td-std`">" . lastMap . "</td>")
+				laps.Push("<td class=`"td-std`">" . Max(pitstopLap, 0) . "</td>")
+				lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
+				fuelConsumptions.Push("<td class=`"td-std`">" . (isNumber(lastFuelConsumption) ? displayValue("Float", convertUnit("Volume", lastFuelConsumption)) : "") . "</td>")
+				pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
+				weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
+				refuels.Push("<td class=`"td-std`">" . (isNumber(lastRefuel) ? displayValue("Float", convertUnit("Volume", lastRefuel)) : "") . "</td>")
+				tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
 
 				timeSeries.Push(pitstop.Time / 60)
 				lapSeries.Push(pitstop.Lap)
@@ -183,37 +183,37 @@ class StrategyViewer {
 				tyreSeries.Push(lastTyreLaps)
 			}
 
-			stints.Push("<th class=""th-std"">" . (strategy.Pitstops.Length() + startStint) . "</th>")
-			drivers.Push("<td class=""td-std"">" . lastDriver . "</td>")
-			maps.Push("<td class=""td-std"">" . lastMap . "</td>")
-			laps.Push("<td class=""td-std"">" . strategy.LastPitstop.StintLaps . "</td>")
-			lapTimes.Push("<td class=""td-std"">" . this.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
-			fuelConsumptions.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
-			pitstopLaps.Push("<td class=""td-std"">" . lastPitstopLap . "</td>")
-			weathers.Push("<td class=""td-std"">" . lastWeather . "</td>")
-			refuels.Push("<td class=""td-std"">" . displayValue("Float", convertUnit("Volume", lastRefuel)) . "</td>")
-			tyreChanges.Push("<td class=""td-std"">" . lastTyreChange . "</td>")
+			stints.Push("<th class=`"th-std`">" . (strategy.Pitstops.Length + startStint) . "</th>")
+			drivers.Push("<td class=`"td-std`">" . lastDriver . "</td>")
+			maps.Push("<td class=`"td-std`">" . lastMap . "</td>")
+			laps.Push("<td class=`"td-std`">" . strategy.LastPitstop.StintLaps . "</td>")
+			lapTimes.Push("<td class=`"td-std`">" . StrategyViewer.lapTimeDisplayValue(Round(lastLapTime, 1)) . "</td>")
+			fuelConsumptions.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastFuelConsumption)) . "</td>")
+			pitstopLaps.Push("<td class=`"td-std`">" . lastPitstopLap . "</td>")
+			weathers.Push("<td class=`"td-std`">" . lastWeather . "</td>")
+			refuels.Push("<td class=`"td-std`">" . displayValue("Float", convertUnit("Volume", lastRefuel)) . "</td>")
+			tyreChanges.Push("<td class=`"td-std`">" . lastTyreChange . "</td>")
 
 			timeSeries.Push((strategy.LastPitstop.Time + (strategy.LastPitstop.StintLaps * lastLapTime)) / 60)
 			lapSeries.Push(lastLap + strategy.LastPitstop.StintLaps)
 			fuelSeries.Push(strategy.LastPitstop.RemainingFuel - (strategy.LastPitstop.StintLaps * strategy.LastPitstop.FuelConsumption))
 			tyreSeries.Push(lastTyreLaps - strategy.LastPitstop.StintLaps)
 
-			html .= "<table class=""table-std"">"
+			html .= "<table class=`"table-std`">"
 
-			html .= ("<tr><th class=""th-std"">" . translate("Stint") . "</th>"
-			       . "<th class=""th-std"">" . translate("Driver") . "</th>"
-			       . "<th class=""th-std"">" . translate("Weather") . "</th>"
-			       . "<th class=""th-std"">" . translate("Laps") . "</th>"
-			       . "<th class=""th-std"">" . translate("Map") . "</th>"
-			       . "<th class=""th-std"">" . translate("Lap Time") . "</th>"
-			       . "<th class=""th-std"">" . translate("Consumption") . "</th>"
-			       . "<th class=""th-std"">" . translate("Pitstop Lap") . "</th>"
-			       . "<th class=""th-std"">" . translate("Refuel Amount") . "</th>"
-			       . "<th class=""th-std"">" . translate("Tyre Change") . "</th>"
-			   . "</tr>")
+			html .= ("<tr><th class=`"th-std`">" . translate("Stint") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Driver") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Weather") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Laps") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Map") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Lap Time") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Consumption") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Pitstop Lap") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Refuel Amount") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Tyre Change") . "</th>"
+				   . "</tr>")
 
-			loop % stints.Length()
+			loop stints.Length
 				html .= ("<tr>" . stints[A_Index]
 								. drivers[A_Index]
 								. weathers[A_Index]
@@ -232,7 +232,7 @@ class StrategyViewer {
 		return html
 	}
 
-	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, ByRef drawChartFunction, ByRef chartID) {
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID) {
 		local durationSession := (strategy.SessionType = "Duration")
 		local ignore, time, xAxis
 
@@ -259,11 +259,12 @@ class StrategyViewer {
 			drawChartFunction .= ("[" . xAxis . ", " . convertUnit("Volume", fuelSeries[A_Index]) . ", " . tyreSeries[A_Index] . "]")
 		}
 
-		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '" . (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
+		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right' }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '"
+							. (durationSession ? translate("Lap") : translate("Minute")) . "' }, vAxis: { viewWindow: { min: 0 } }, backgroundColor: 'D8D8D8' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
-		return ("<div id=""chart_" . chartID . """ style=""width: " . width . "px; height: " . height . "px"">")
+		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . width . "px; height: " . height . "px`">")
 	}
 
 	showStrategyInfo(strategy) {
@@ -275,35 +276,35 @@ class StrategyViewer {
 			strategy := false
 
 		if strategy {
-			html := ("<div id=""header""><b>" . translate("Strategy: ") . strategy.Name . "</b></div>")
+			html := ("<div id=`"header`"><b>" . translate("Strategy: ") . strategy.Name . "</b></div>")
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Session") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Session") . "</i></div>")
 
 			html .= ("<br><br>" . this.createStrategyInfo(strategy))
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Setup") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Setup") . "</i></div>")
 
 			html .= ("<br><br>" . this.createSetupInfo(strategy))
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Stints") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Stints") . "</i></div>")
 
 			timeSeries := []
 			lapSeries := []
 			fuelSeries := []
 			tyreSeries := []
 
-			html .= ("<br><br>" . this.createStintsInfo(strategy, timeSeries, lapSeries, fuelSeries, tyreSeries))
+			html .= ("<br><br>" . this.createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries))
 
-			html .= ("<br><br><div id=""header""><i>" . translate("Consumables") . "</i></div>")
+			html .= ("<br><br><div id=`"header`"><i>" . translate("Consumables") . "</i></div>")
 
 			drawChartFunction := false
 			chartID := false
 
 			width := (this.StrategyViewer.Width - 10)
 
-			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID)
+			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
 
-			before =
+			before := "
 			(
 				<meta charset='utf-8'>
 				<head>
@@ -315,13 +316,15 @@ class StrategyViewer {
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
 						google.charts.load('current', {'packages':['corechart', 'table', 'scatter']}).then(drawChart%chartID%);
-			)
+			)"
 
-			after =
+			after := "
 			(
 					</script>
 				</head>
-			)
+			)"
+
+			before := substituteVariables(before, {chartID: chartID})
 		}
 		else {
 			before := ""
@@ -330,74 +333,69 @@ class StrategyViewer {
 			chartArea := ""
 		}
 
-		tableCSS := getTableCSS()
+		tableCSS := this.getTableCSS()
 
-		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #D8D8D8' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
+		html := ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 
 		if this.StrategyViewer {
-			this.StrategyViewer.Document.Open()
-			this.StrategyViewer.Document.Write(html)
-			this.StrategyViewer.Document.Close()
+			this.StrategyViewer.document.open()
+			this.StrategyViewer.document.write(html)
+			this.StrategyViewer.document.close()
 		}
 	}
-}
+	
+	getTableCSS() {
+		local script
 
+		script := "
+		(
+			.table-std, .th-std, .td-std {
+				border-collapse: collapse;
+				padding: .3em .5em;
+			}
 
-;;;-------------------------------------------------------------------------;;;
-;;;                     Public Function Declaration Section                 ;;;
-;;;-------------------------------------------------------------------------;;;
+			.th-std, .td-std {
+				text-align: center;
+			}
 
-getTableCSS() {
-	local script
+			.th-std, .caption-std {
+				background-color: #BBB;
+				color: #000;
+				border: thin solid #BBB;
+			}
 
-	script =
-	(
-		.table-std, .th-std, .td-std {
-			border-collapse: collapse;
-			padding: .3em .5em;
-		}
+			.td-std {
+				border-left: thin solid #BBB;
+				border-right: thin solid #BBB;
+			}
 
-		.th-std, .td-std {
-			text-align: center;
-		}
+			.th-left {
+				text-align: left;
+			}
 
-		.th-std, .caption-std {
-			background-color: #BBB;
-			color: #000;
-			border: thin solid #BBB;
-		}
+			.td-left {
+				text-align: left;
+			}
 
-		.td-std {
-			border-left: thin solid #BBB;
-			border-right: thin solid #BBB;
-		}
+			tfoot {
+				border-bottom: thin solid #BBB;
+			}
 
-		.th-left {
-			text-align: left;
-		}
+			.caption-std {
+				font-size: 1.5em;
+				border-radius: .5em .5em 0 0;
+				padding: .5em 0 0 0
+			}
 
-		.td-left {
-			text-align: left;
-		}
+			.table-std tbody tr:nth-child(even) {
+				background-color: #%altBackColor%;
+			}
 
-		tfoot {
-			border-bottom: thin solid #BBB;
-		}
+			.table-std tbody tr:nth-child(odd) {
+				background-color: #%backColor%;
+			}
+		)"
 
-		.caption-std {
-			font-size: 1.5em;
-			border-radius: .5em .5em 0 0;
-			padding: .5em 0 0 0
-		}
-
-		.table-std tbody tr:nth-child(even) {
-			background-color: #D8D8D8;
-		}
-
-		.table-std tbody tr:nth-child(odd) {
-			background-color: #D0D0D0;
-		}
-	)
-
-	return script
+		return substituteVariables(script, {altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor})
+	}
 }

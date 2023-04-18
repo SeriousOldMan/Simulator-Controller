@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - R3E Plugin                      ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -9,9 +9,10 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Libraries\JSON.ahk
-#Include ..\Plugins\Libraries\SimulatorPlugin.ahk
-#Include ..\Assistants\Libraries\SettingsDatabase.ahk
+#Include "..\Libraries\JSON.ahk"
+#Include "..\Libraries\Task.ahk"
+#Include "Libraries\SimulatorPlugin.ahk"
+#Include "..\Database\Libraries\SettingsDatabase.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -50,50 +51,53 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iPitstopOptions := []
 	iPitstopOptionStates := []
 
-	OpenPitstopMFDHotkey[] {
+	static sCarDB := false
+	static sClassDB := false
+
+	OpenPitstopMFDHotkey {
 		Get {
 			return this.iOpenPitstopMFDHotkey
 		}
 	}
 
-	ClosePitstopMFDHotkey[] {
+	ClosePitstopMFDHotkey {
 		Get {
 			return this.iClosePitstopMFDHotkey
 		}
 	}
 
-	PreviousOptionHotkey[] {
+	PreviousOptionHotkey {
 		Get {
 			return this.iPreviousOptionHotkey
 		}
 	}
 
-	NextOptionHotkey[] {
+	NextOptionHotkey {
 		Get {
 			return this.iNextOptionHotkey
 		}
 	}
 
-	PreviousChoiceHotkey[] {
+	PreviousChoiceHotkey {
 		Get {
 			return this.iPreviousChoiceHotkey
 		}
 	}
 
-	NextChoiceHotkey[] {
+	NextChoiceHotkey {
 		Get {
 			return this.iNextChoiceHotkey
 		}
 	}
 
-	AcceptChoiceHotkey[] {
+	AcceptChoiceHotkey {
 		Get {
 			return this.iAcceptChoiceHotkey
 		}
 	}
 
 	__New(controller, name, simulator, configuration := false) {
-		base.__New(controller, name, simulator, configuration)
+		super.__New(controller, name, simulator, configuration)
 
 		if (this.Active || isDebug()) {
 			this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
@@ -107,10 +111,28 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	getPitstopActions(ByRef allActions, ByRef selectActions) {
-		allActions := {Strategy: "Strategy", NoRefuel: "No Refuel", Refuel: "Refuel", TyreChange: "Change Tyres", TyreCompound: "Tyre Compound"
-					 , BodyworkRepair: "Repair Bodywork", SuspensionRepair: "Repair Suspension"}
+	getPitstopActions(&allActions, &selectActions) {
+		allActions := CaseInsenseMap("Strategy", "Strategy", "NoRefuel", "No Refuel", "Refuel", "Refuel", "TyreChange", "Change Tyres", "TyreCompound", "Tyre Compound"
+								   , "BodyworkRepair", "Repair Bodywork", "SuspensionRepair", "Repair Suspension")
+
 		selectActions := []
+	}
+
+	static loadDatabase() {
+		local data
+
+		if !R3EPlugin.sCarDB {
+			data := JSON.parse(FileRead(kResourcesDirectory . "Simulator Data\R3E\r3e-data.json"))
+
+			R3EPlugin.sCarDB := data["cars"]
+			R3EPlugin.sClassDB := data["classes"]
+		}
+	}
+
+	simulatorStartup(simulator) {
+		Task.startTask(ObjBindMethod(R3EPlugin, "loadDatabase"), 1000, kLowPriority)
+
+		super.simulatorStartup(simulator)
 	}
 
 	pitstopMFDIsOpen() {
@@ -176,7 +198,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			if this.ClosePitstopMFDHotkey {
 				this.sendCommand(this.ClosePitstopMFDHotkey)
 
-				Sleep 50
+				Sleep(50)
 			}
 			else if !reported {
 				reported := true
@@ -276,7 +298,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 		else {
-			pitMenuState := getConfigurationSectionValues(readSimulatorData(this.Code), "Pit Menu State")
+			pitMenuState := getMultiMapValues(readSimulatorData(this.Code), "Pit Menu State")
 
 			if (pitMenuState["Strategy"] != "Unavailable") {
 				this.iPitstopOptions.Push("Strategy")
@@ -361,17 +383,17 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.activateWindow()
 
-			switch action {
+			switch action, false {
 				case "Accept":
 					this.sendCommand(this.AcceptChoiceHotkey)
 				case "Increase":
-					loop %steps%
+					loop steps
 						this.sendCommand(this.NextChoiceHotkey)
 				case "Decrease":
-					loop %steps%
+					loop steps
 						this.sendCommand(this.PreviousChoiceHotkey)
 				default:
-					throw "Unsupported change operation """ . action . """ detected in R3EPlugin.dialPitstopOption..."
+					throw "Unsupported change operation `"" . action . "`" detected in R3EPlugin.dialPitstopOption..."
 			}
 		}
 	}
@@ -398,7 +420,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 					index -= 1
 
 					if index
-						loop %index%
+						loop index
 							this.sendCommand(this.NextOptionHotkey)
 
 					return true
@@ -451,7 +473,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			else if (option = "Repair Suspension")
 				this.toggleActivity("Repair Suspension", false, false)
 			else
-				throw "Unsupported change operation """ . action . """ detected in R3EPlugin.changePitstopOption..."
+				throw "Unsupported change operation `"" . action . "`" detected in R3EPlugin.changePitstopOption..."
 		}
 	}
 
@@ -459,11 +481,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if inList(kBinaryOptions, activity) {
 				if (!require || this.requirePitstopMFD())
-					if  (!select || this.selectPitstopOption(activity))
+					if (!select || this.selectPitstopOption(activity))
 						this.dialPitstopOption(activity, "Accept")
 			}
 			else
-				throw "Unsupported activity """ . activity . """ detected in R3EPlugin.toggleActivity..."
+				throw "Unsupported activity `"" . activity . "`" detected in R3EPlugin.toggleActivity..."
 		}
 	}
 
@@ -516,7 +538,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	startPitstopSetup(pitstopNumber) {
-		base.startPitstopSetup()
+		super.startPitstopSetup(pitstopNumber)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.requirePitstopMFD()
@@ -527,7 +549,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	finishPitstopSetup(pitstopNumber) {
-		base.finishPitstopSetup()
+		super.finishPitstopSetup(pitstopNumber)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			this.activateWindow()
@@ -540,7 +562,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopRefuelAmount(pitstopNumber, liters) {
-		base.setPitstopRefuelAmount(pitstopNumber, liters)
+		super.setPitstopRefuelAmount(pitstopNumber, liters)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Refuel") {
@@ -559,7 +581,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	setPitstopTyreSet(pitstopNumber, compound, compoundColor := false, set := false) {
 		local changed
 
-		base.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
+		super.setPitstopTyreSet(pitstopNumber, compound, compoundColor, set)
 
 		if (this.OpenPitstopMFDHotkey != "Off")
 			if this.optionAvailable("Change Front Tyres")
@@ -595,11 +617,11 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR) {
-		base.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
+		super.setPitstopTyrePressures(pitstopNumber, pressureFL, pressureFR, pressureRL, pressureRR)
 	}
 
 	requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine := false) {
-		base.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
+		super.requestPitstopRepairs(pitstopNumber, repairSuspension, repairBodywork, repairEngine)
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.optionAvailable("Repair Suspension")
@@ -621,39 +643,37 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	getCarName(carID) {
-		static carDB := false
+		local carDB := R3EPlugin.sCarDB
+
 		static lastCarID := false
 		static lastCarName := false
 
-		if !carDB {
-			FileRead script, %kResourcesDirectory%Simulator Data\R3E\r3e-data.json
-
-			carDB := JSON.parse(script)["cars"]
+		if carDB {
+			if (carID != lastCarID) {
+				lastCarID := carID
+				lastCarName := (carDB.Has(carID) ? carDB[carID]["Name"] : "Unknown")
+			}
 		}
-
-		if (carID != lastCarID) {
-			lastCarID := carID
-			lastCarName := (carDB.HasKey(carID) ? carDB[carID]["Name"] : "Unknown")
-		}
+		else
+			lastCarName := "Unknown"
 
 		return lastCarName
 	}
 
 	getClassName(classID) {
-		static classDB := false
+		local classDB := R3EPlugin.sClassDB
+
 		static lastClassID := false
 		static lastClassName := false
 
-		if !classDB {
-			FileRead script, %kResourcesDirectory%Simulator Data\R3E\r3e-data.json
-
-			classDB := JSON.parse(script)["classes"]
+		if classDB {
+			if (classID != lastClassID) {
+				lastClassID := classID
+				lastClassName := (classDB.Has(classID) ? classDB[classID]["Name"] : "Unknown")
+			}
 		}
-
-		if (classID != lastClassID) {
-			lastClassID := classID
-			lastClassName := (classDB.HasKey(classID) ? classDB[classID]["Name"] : "Unknown")
-		}
+		else
+			lastClassName := "Unknown"
 
 		return lastClassName
 	}
@@ -661,26 +681,26 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	updatePositionsData(data) {
 		local carID
 
-		base.updatePositionsData(data)
+		super.updatePositionsData(data)
 
 		loop {
-			carID := getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
+			carID := getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", kUndefined)
 
 			if (carID == kUndefined)
 				break
 			else {
-				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Car", this.getCarName(carID))
 
-				setConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class"
-									, this.getClassName(getConfigurationValue(data, "Position Data", "Car." . A_Index . ".Class")))
+				setMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class"
+									 , this.getClassName(getMultiMapValue(data, "Position Data", "Car." . A_Index . ".Class")))
 			}
 		}
 	}
 
 	updateTelemetryData(data) {
-		setConfigurationValue(data, "Session Data", "Car", this.getCarName(getConfigurationValue(data, "Session Data", "Car", "")))
+		setMultiMapValue(data, "Session Data", "Car", this.getCarName(getMultiMapValue(data, "Session Data", "Car", "")))
 
-		base.updateTelemetryData(data)
+		super.updateTelemetryData(data)
 	}
 
 	getImageFileNames(imageNames*) {
@@ -710,7 +730,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 				fileNames.Push(fileName)
 		}
 
-		if (fileNames.Length() == 0)
+		if (fileNames.Length == 0)
 			throw "Unknown image '" . imageName . "' detected in R3EPlugin.getLabelFileName..."
 		else {
 			if isDebug()
@@ -726,8 +746,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		static kSearchAreaLeft := 0
 		static kSearchAreaRight := 400
 
-		loop % imageNames.Length()
-		{
+		loop imageNames.Length {
 			imageName := imageNames[A_Index]
 			pitstopImages := this.getImageFileNames(imageName)
 
@@ -738,29 +757,27 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			imageX := kUndefined
 			imageY := kUndefined
 
-			loop % pitstopImages.Length()
-			{
+			loop pitstopImages.Length {
 				pitstopImage := pitstopImages[A_Index]
 
 				if !this.iPSImageSearchArea {
-					ImageSearch imageX, imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, *100 %pitstopImage%
+					ImageSearch(&imageX, &imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, "*100 " . pitstopImage)
 
 					if (getLogLevel() <= kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
 
-					if imageX is Integer
+					if isInteger(imageX)
 						if ((imageName = "PITSTOP 1") || (imageName = "PITSTOP 2"))
 							this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
 				}
 				else {
-					ImageSearch imageX, imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], *100 %pitstopImage%
+					ImageSearch(&imageX, &imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], "*100 " . pitstopImage)
 
 					if (getLogLevel() <= kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
 				}
 
-				if imageX is Integer
-				{
+				if isInteger(imageX) {
 					if (getLogLevel() <= kLogInfo)
 						logMessage(kLogInfo, substituteVariables(translate("'%image%' found at %x%, %y%"), {image: imageName, x: imageX, y: imageY}))
 
@@ -791,14 +808,10 @@ startR3E() {
 ;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-positionOrder(p1, p2) {
-	return p1[2] < p2[2]
-}
-
 initializeR3EPlugin() {
 	local controller := SimulatorController.Instance
 
-	new R3EPlugin(controller, kR3EPlugin, kR3EApplication, controller.Configuration)
+	R3EPlugin(controller, kR3EPlugin, kR3EApplication, controller.Configuration)
 }
 
 

@@ -44,10 +44,24 @@ Writes information about the exception to the log file and continues.
 
 ***
 
+## Type Helper Functions ([Types.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Types.ahk))
+A couple of functions to work with types.
+
+#### *isInstance(value :: Any, type :: SubclassOf(Any))*
+Returns *true*, if the given value is an instance of *type*. Similar to *value is type* construct of the programming language.
+
+#### *isNull(value :: Any)*
+Returns *true*, if the given value is to be considered the special value *null*. Mostly used in cases where you work with database entries.
+
+#### *toObject(values :: TypeUnion(Object, Map), class :: SubclassOf(Object))*
+Creates and returns an instance of *class* and propagates all values into this new object. All keys in values must be proper *property* names.
+
+***
+
 ## String Helper Functions ([Strings.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Strings.ahk))
 Often used string functions, that are not part of the AutoHotkey language.
 
-#### *substituteVariables(string :: String, values :: Map := {})*
+#### *substituteVariables(string :: String, values :: Properties := {})*
 Substitutes all variables enclosed by "%" with their values and returns the modified string. The values are lookedup from the supplied values map. If not found there, the global name space is used.
 
 #### *string2Values(delimiter :: String, string :: String, count :: Integer := false)*
@@ -60,6 +74,9 @@ Joins the given unlimited number of values using *delimiter* into one string. *v
 
 ## Collection Helper Functions ([Collections.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Collections.ahk))
 Often used collection functions, that are not part of the AutoHotkey language.
+
+#### *toMap(values :: TypeUnion(Object, Map), class :: SubclassOf(Map))*
+Creates and returns an instance of *class* and propagates all values into this new map.
 
 #### *inList(list :: Array, value)*
 Returns the position of *value* in the given list or array, or *false*, if not found.
@@ -76,7 +93,7 @@ Returns a freshly allocated list containing all the elements of the supplied lis
 #### *map(list :: Array, function :: TypeUnion(String, FuncObj))*
 Returns a new list with the result of *function* applied to each element in *list*, while preserving the order of elements.
 
-#### *remove(list :: Array, object :: Object)*
+#### *remove(list :: Array, object :: Any)*
 Returns a new list with all occurencies of *object* removed from the original list.
 
 #### *removeDuplicates(list :: Array)*
@@ -94,8 +111,19 @@ Returns a list of all values in the given map in the order of their keys.
 #### *combine(#rest maps :: Map)*
 Returns a freshly allocated map containing all the key/value pairs of all supplied maps. The maps are processed from left to right, which is important in case of duplicate keys.
 
-#### *bubbleSort(ByRef array :: Array, comparator :: Function Name)*
-Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply.
+#### *bubbleSort(ByRef array :: Array, comparator :: Function := numberGreater)*
+Sorts the given array in place, using *comparator* to define the order of the elements. This function will receive two objects and must return *true*, if the first one is considered larger or of the same order than the other. Stable sorting rules apply. The default for *comparator* compares numbers. A function named *strGreater* exists, which can be used for string arrays.
+
+***
+
+## Utiliy Functions ([Utils.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Utils.ahk))
+A couple of general utility functions used in all applications.
+
+#### *getControllerState()*
+This function returns a representation of the file *Simulator Controller.state* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The Multi Map consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller as well as a lot of information about the internal status (and health) of all components. This file is created by the *Simulator Controller.exe* application and is updated periodically.
+
+#### *createGUID()*
+Creates and returns a unique ID in the standard GUID format.
 
 ***
 
@@ -166,47 +194,47 @@ Sends the given message. The first parameter defines the delivery method, where 
 
 ***
 
-## Configurations ([Configuration.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Configuration.ahk))
-Configurations are used to store a definition or the state of an object to the file system. Configurations are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Configuration maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a configuration map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
+## Multi Maps ([MultiMap.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/MultiMap.ahk))
+Multi Maps are used to store a definition or the state of an object to the file system. Multi Maps are organized as maps divided by sections or topics. Inside a section, you may have an unlimited number of values referenced by keys. Multi Maps are typically stored in *.ini files, therefore the character "=" is not allowed in keys or values written to a Multi Map. Keys themselves may have a complex, pathlike structure. See [ConfigurationItem.descriptor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Class-Reference#class-method-descriptorrest-values) for reference.
 
-#### *newConfiguration()* 
-Returns a new empty configuration map. The configuration map is not derived from a public class and may be accessed only through the functions given below. 
+#### *newMultiMap()*
+Returns a new empty Multi Map. The Multi Map is not derived from a public class and may be accessed only through the functions given below.
 
-#### *getConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, default := false)*
+#### *newSectionMap()*
+Returns a new empty Section Map for a Multi Map. The Section Map is not derived from a public class and may be accessed only through the functions given below.
+
+#### *getMultiMapValue(multiMap :: MultiMap, section :: String, key :: String, default := false)*
 Returns the value defined for the given key or the *default*, if no such key has been defined.
 
-#### *setConfigurationValue(configuration :: ConfigurationMap, section :: String, key :: String, value)*
-Stores the given value for the given key in the configuration map. The value must be convertible to a String representation.
+#### *setMultiMapValue(multiMap :: MultiMap, section :: String, key :: String, value)*
+Stores the given value for the given key in the Multi Map. The value must be convertible to a String representation.
 
-#### *getConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, default := false)*
+#### *getMultiMapValues(multiMap :: MultiMap, section :: String, default := false)*
 Retrieves all key / value pairs for a given section as a map. Returns *default*, if the section does not exist.
 
-#### *setConfigurationValues(configuration, otherConfiguration)*
-This function takes all key / value pairs from all sections in *otherConfiguration* and copies them to *configuration*.
+#### *setMultiMapValues(multiMap, otherMultiMap)*
+This function takes all key / value pairs from all sections in *otherMultiMap* and copies them to *multiMap*.
 
-#### *setConfigurationSectionValues(configuration :: ConfigurationMap, section :: String, values :: Object)*
-Stores all the key / value pairs in the configuration map under the given section.
+#### *setMultiMapValues(multiMap :: MultiMap, section :: String, values :: SectionMap)*
+Stores all the key / value pairs in the Multi Map under the given section.
 
-#### *removeConfigurationValue(configuration :: ConfigurationMao, section :: String, key :: String)*
-Removes the given key and its value from the configuration map.
+#### *removeMultiMapValue(multiMap :: MultiMap, section :: String, key :: String)*
+Removes the given key and its value from the Multi Map.
 
-#### *removeConfigurationSection(configuration :: ConfigurationMao, section :: String)*
-Removes the given section including all keys and values from the configuration map.
+#### *removeMultiMapValues(multiMap :: MultiMap, section :: String)*
+Removes the given section including all keys and values from the Multi Map.
 
-#### *readConfiguration(configFile :: String)*
-Reads a configuration map from an *.ini file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the configuration file. If *configFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
+#### *readMultiMap(multiMapFile :: String)*
+Reads a Multi Map from a file. The Strings "true" and "false" will he converted to the literal values *true* and *false* when encountered as values in the Multi Map file. If *multiMapFile* denotes an absolute path, this path will be used. Otherwise, the file will be looked up in the *kUserConfigDirectory* and in *kConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference), in that order.
 
-#### *parseConfiguration(text :: String)*
-Simular to *readConfiguration*, but reads the configuration from a string instead of a file.
+#### *parseMultiMap(text :: String)*
+Simular to *readMultiMap*, but reads the Multi Map from a string instead of a file.
 
-#### *writeConfiguration(configFile :: String, configuration :: ConfigurationMap)*
-Stores a configuration map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the configuration file. If *configFile* denotes an absolute path, the configuration will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
+#### *writeMultiMap(multiMapFile :: String, multiMap :: MultiMap)*
+Stores a Multi Map in the given file. All previous content of the file will be overwritten. The literal values *true* and *false* will be converted to "true" and "false", before being written to the Multi Map file. If *multiMapFile* denotes an absolute path, the Multi Map will be saved in this file. Otherwise it will be saved relative to *kUserConfigDirectory* (see the [constants documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Constants-Reference#installation-paths-constantsahk) for reference).
 
-#### *printConfiguration(configuration :: ConfigurationMap)*
-Simular to *writeConfiguration*, but returns the textual configuration as a string.
-
-#### *getControllerState()*
-This function returns a representation of the file *Simulator Controller.status* which is located in the *Simulator Controller\Config* folder, which is located in your users *Documents* folder. The configuration object consists of information about the configured plugins and simulation applications and the available modes provided by the Simulator Controller as well as a lot of information about the internal status of all components. This file is created by the *Simulator Controller.exe* application and is updated periodically. Note: This function is actually not part of the *Configuration* library, but is referenced here for completeness.
+#### *printMultiMap(multiMap :: MultiMap)*
+Simular to *writeMultiMap*, but returns the textual Multi Map as a string.
 
 ***
 
@@ -273,6 +301,9 @@ You can call this function from a click handler of a GUI element. It will move t
 
 #### *getWindowPosition(descriptor :: String, ByRef x :: Integer, ByRef y :: Integer)*
 Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.
+
+#### *getWindowSize(descriptor :: String, ByRef w :: Integer, ByRef h :: Integer)*
+Retrieves the size of a window identified by the given *descriptor*, once it has been resized by the user. If a size is known, *getWindowSize* return *true* and *w* and *h* will be set. This will work only with instances of the [Window](*) class.
 
 #### *setButtonIcon(buttonHandle :: Handle, file :: String)*
 Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.
@@ -446,7 +477,7 @@ Selects the driver to take the car during the next pitstop. *selection* must be 
 #### *openRaceSettings(import :: Boolean := false)*
 Opens the settings tool, with which you can edit all the race specific settings, Jona needs for a given race. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration. If you supply *true* for the *import* parameter, the setup data is imported directly from a running simulation and the dialog is not opened.
 
-#### *openSetupAdvisor()*
+#### *openSetupWorkbench()*
 Opens the tool which helps you creating a suspension setup for a car. This action function is provided by the "Race Engineer" plugin and is available depending on the concrete configuration.
 
 #### *openSessionDatabase()*

@@ -335,7 +335,7 @@ int main(int argc, char* argv[])
 
 		if (timeLeft < 0)
 			if (gf->session == AC_PRACTICE)
-				timeLeft = 3600 * 1000;
+				timeLeft = 24 * 3600 * 1000;
 			else
 				timeLeft = 0.0;
 
@@ -394,14 +394,14 @@ int main(int argc, char* argv[])
 
 		if (timeLeft < 0)
 			if (gf->session == AC_PRACTICE)
-				timeLeft = 3600 * 1000;
+				timeLeft = 24 * 3600 * 1000;
 			else
 				timeLeft = 0.0;
 
 		printData("SessionTimeRemaining", timeLeft);
 
 		if (gf->session == AC_PRACTICE)
-			printData("SessionLapsRemaining", (gf->iBestTime > 0) ? timeLeft / gf->iBestTime : 99);
+			printData("SessionLapsRemaining", 1000);
 		else
 			printData("SessionLapsRemaining", (gf->iLastTime > 0) ? timeLeft / gf->iLastTime : 99);
 	}

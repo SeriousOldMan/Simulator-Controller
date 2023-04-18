@@ -518,7 +518,7 @@ You have to use the menus in the upper left area to specify the simulation, car,
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%204.jpg)
 
-You will get a summary of all available data in the list below the tabs. Please note, that the "Setup Repository" and the "Tyre Pressure Advisor" will only be available, when you have selected a specific car and a specific track before.
+You will get a summary of all available data in the list below the tabs. Please note, that the "Setups" and "Tyre Pressures" will only be available, when you have selected a specific car and a specific track before.
 
 Last, but not least, you can write some notes in the field in the upper right corner, which are also stored specifically for the simulator / car / track combination.
 

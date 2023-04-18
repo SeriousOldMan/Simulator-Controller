@@ -37,8 +37,8 @@ global vBuildConfiguration := "Development"
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include ..\Assistants\Libraries\TyresDatabase.ahk
-#Include ..\Assistants\Libraries\TelemetryDatabase.ahk
+#Include ..\Database\Libraries\TyresDatabase.ahk
+#Include ..\Database\Libraries\TelemetryDatabase.ahk
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -57,8 +57,8 @@ adjustPressureDistributions(code, car, track, compound, weather, airTemperature,
 
 		temperature := ConfigurationItem.descriptor(airTemperature, trackTemperature)
 		distributions := {FL: {}, FR: {}, RL: {}, RR: {}}
-		pressureData := readConfiguration(fileName)
-		tyrePressures := getConfigurationValue(pressureData, "Pressures", temperature, false)
+		pressureData := readMultiMap(fileName)
+		tyrePressures := getMultiMapValue(pressureData, "Pressures", temperature, false)
 
 		if tyrePressures {
 			tyrePressures := string2Values(";", tyrePressures)
@@ -80,9 +80,9 @@ adjustPressureDistributions(code, car, track, compound, weather, airTemperature,
 
 			tyrePressures := values2String(";", newTyrePressures*)
 
-			setConfigurationValue(pressureData, "Pressures", temperature, tyrePressures)
+			setMultiMapValue(pressureData, "Pressures", temperature, tyrePressures)
 
-			writeConfiguration(fileName, pressureData)
+			writeMultiMap(fileName, pressureData)
 
 			Sleep 100
 		}
@@ -90,7 +90,7 @@ adjustPressureDistributions(code, car, track, compound, weather, airTemperature,
 }
 
 cleanupTyrePressures() {
-	tyresDB := new TyresDatabase()
+	tyresDB := TyresDatabase()
 
 	dryCorrection := ""
 	prompt := "Please input the adjustment factor for cold DRY pressures in PSI (use ""."" as decimal point).`n`nExample: -0.1 will adjust 25.6 to 25.5."
@@ -144,7 +144,7 @@ cleanupTyrePressures() {
 }
 
 cleanupTelemetryData() {
-	tyresDB := new TyresDatabase()
+	tyresDB := TyresDatabase()
 
 	laptimeCorrection := ""
 	prompt := "Please input the adjustment factor for laptimes in DRY conditions (use ""."" as decimal point).`n`nExample: 0.5 will increase all lap times in telemetry data by half a second."
@@ -173,7 +173,7 @@ cleanupTelemetryData() {
 				if (progress > 100)
 					progress := 0
 
-				telemetryDB := new TelemetryDatabase("Assetto Corsa Competizione", car, track)
+				telemetryDB := TelemetryDatabase("Assetto Corsa Competizione", car, track)
 
 				for ignore, entry in telemetryDB.Database.Tables["Electronics"]
 					if (entry["Weather"] = "Dry")

@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Mathematical Functions          ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -10,39 +10,39 @@
 ;;;-------------------------------------------------------------------------;;;
 
 minimum(numbers) {
-	local min := kUndefined
+	local theMin := kUndefined
 	local ignore, value
 
 	for ignore, value in numbers
-		if value is Number
-			min := ((min == kUndefined) ? value : Min(min, value))
+		if isNumber(value)
+			theMin := ((theMin == kUndefined) ? value : Min(theMin, value))
 
-	return ((min == kUndefined) ? 0 : min)
+	return ((theMin == kUndefined) ? 0 : theMin)
 }
 
 maximum(numbers) {
-	local max := kUndefined
+	local theMax := kUndefined
 	local ignore, value
 
 	for ignore, value in numbers
-		if value is Number
-			max := ((max == kUndefined) ? value : Max(max, value))
+		if isNumber(value)
+			theMax := ((theMax == kUndefined) ? value : Max(theMax, value))
 
-	return ((max == kUndefined) ? 0 : max)
+	return ((theMax == kUndefined) ? 0 : theMax)
 }
 
 average(numbers) {
 	local avg := 0
-	local ignore, value, count
+	local ignore, value, cnt
 
 	for ignore, value in numbers
-		if value is Number
+		if isNumber(value)
 			avg += value
 
-	count := count(numbers, false)
+	cnt := count(numbers, false)
 
-	if (count > 0)
-		return (avg / count)
+	if (cnt > 0)
+		return (avg / cnt)
 	else
 		return false
 }
@@ -50,13 +50,17 @@ average(numbers) {
 stdDeviation(numbers) {
 	local avg := average(numbers)
 	local squareSum := 0
-	local ignore, value
+	local ignore, value, cnt
 
-	for ignore, value in numbers
-		if value is Number
-			squareSum += ((value - avg) * (value - avg))
+	cnt := count(numbers, false)
 
-	squareSum := (squareSum / count(numbers, false))
+	if (cnt > 0) {
+		for ignore, value in numbers
+			if isNumber(value)
+				squareSum += ((value - avg) * (value - avg))
+
+		squareSum := (squareSum / cnt)
+	}
 
 	return Sqrt(squareSum)
 }
@@ -65,7 +69,7 @@ count(values, null := true) {
 	local result, ignore, value
 
 	if null
-		return values.Length()
+		return values.Length
 	else {
 		result := 0
 
@@ -77,7 +81,7 @@ count(values, null := true) {
 	}
 }
 
-linRegression(xValues, yValues, ByRef a, ByRef b) {
+linRegression(xValues, yValues, &a, &b) {
 	local xAverage := average(xValues)
 	local yAverage := average(yValues)
 	local dividend := 0
@@ -85,8 +89,7 @@ linRegression(xValues, yValues, ByRef a, ByRef b) {
 	local index, xValue, xDelta, yDelta
 
 	for index, xValue in xValues {
-		if xValue is Number
-		{
+		if isNumber(xValue) {
 			xDelta := (xValue - xAverage)
 			yDelta := (yValues[index] - yAverage)
 

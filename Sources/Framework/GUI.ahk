@@ -149,6 +149,8 @@ class Theme extends ConfigurationItem {
 }
 
 class Window extends Gui {
+	static sCustomControlTypes := CaseInsenseMap()
+
 	iCloseable := false
 	iResizeable := false
 
@@ -161,6 +163,7 @@ class Window extends Gui {
 	iHeight := 0
 
 	iResizers := []
+	iCustomControls := []
 
 	iDescriptor := false
 
@@ -617,6 +620,10 @@ class Window extends Gui {
 	ApplyThemeProperties(control) {
 	}
 
+	static DefineCustomControl(type, constructor) {
+		Window.sCustomControlTypes[type] := constructor
+	}
+
 	Add(type, options := "", arguments*) {
 		local rules := false
 		local newOptions, ignore, option, control
@@ -639,7 +646,13 @@ class Window extends Gui {
 				options := values2String(A_Space, newOptions*)
 			}
 
-			control := super.Add(type, options, arguments*)
+			if Window.sCustomControlTypes.Has(type) {
+				control := Window.sCustomControlTypes[type](this, options, arguments*)
+
+				this.iCustomControls.Push(control)
+			}
+			else
+				control := super.Add(type, options, arguments*)
 
 			if (rules || this.Rules[false].Length > 0) {
 				if !rules
@@ -659,6 +672,10 @@ class Window extends Gui {
 		local fullHeight, clientHeight
 
 		super.Show(arguments*)
+
+		for ignore, control in this.iCustomControls
+			if control.HasProp("Show")
+				control.Show()
 
 		if !this.MinWidth {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)

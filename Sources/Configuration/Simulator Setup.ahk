@@ -32,6 +32,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\JSON.ahk"
 #Include "..\Libraries\RuleEngine.ahk"
@@ -218,7 +219,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 				for ignore, viewer in this.HTMLViewer
 					if viewer.Visible
-						viewer.Value.document.location.reload()
+						if viewer.HasOwnProp("Viewer")
+							viewer.Viewer.Resized()
+						else
+							viewer.Value.document.location.reload()
 			}
 
 			return Task.CurrentTask
@@ -657,13 +661,13 @@ class SetupWizard extends ConfiguratorPanel {
 
 		helpGui.Add("Text", "yp+20 w350 0x10 W:Grow")
 
-		helpGui.Add("ActiveX", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer", "shell.explorer")
+		helpGui.Add("HTMLViewer", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer")
 
-		helpGui["infoViewer"].Value.navigate("about:blank")
+		helpGui["infoViewer"].Viewer.navigate("about:blank")
 
 		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #" . helpGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-		helpGui["infoViewer"].Value.document.write(html)
+		helpGui["infoViewer"].Viewer.document.write(html)
 
 		helpGui.Add(SetupWizard.HTMLResizer(helpGui, helpGui["infoViewer"]))
 
@@ -1966,11 +1970,11 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	setInfo(html) {
-		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0; font-family: Arial, Helvetica, sans-serif; font-size: 11px'>" . html . "</p></body></html>"
 
-		this.HelpWindow["infoViewer"].Value.document.open()
-		this.HelpWindow["infoViewer"].Value.document.write(html)
-		this.HelpWindow["infoViewer"].Value.document.close()
+		this.HelpWindow["infoViewer"].Viewer.document.open()
+		this.HelpWindow["infoViewer"].Viewer.document.write(html)
+		this.HelpWindow["infoViewer"].Viewer.document.close()
 	}
 
 	saveKnowledgeBase() {
@@ -2631,7 +2635,7 @@ initializeSimulatorSetup() {
 	if wizard.Debug[kDebugKnowledgeBase]
 		SupportMenu.Check(label)
 
-	showSplashTheme("Rotating Brain")
+	; showSplashTheme("Rotating Brain")
 
 	wizard.ProgressCount := 0
 

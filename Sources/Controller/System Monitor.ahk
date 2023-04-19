@@ -32,6 +32,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
@@ -776,7 +777,8 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		simulationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+46 w300 h90", "shell.explorer").Value
+		; simulationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+46 w300 h90", "shell.explorer").Value
+		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h90").Viewer
 		simulationDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")

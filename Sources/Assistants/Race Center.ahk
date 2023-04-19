@@ -11463,7 +11463,7 @@ manageTeam(raceCenterOrCommand, teamDrivers := false, arguments*) {
 	else {
 		result := false
 
-		teamGui := Window({Descriptor: "Race Center.Team Manager", Options: "0x400000"}, "")
+		teamGui := Window({Descriptor: "Race Center.Team Manager", Options: "0x400000"})
 
 		teamGui.Opt("+Owner" . raceCenterOrCommand.Window.Hwnd)
 
@@ -11627,7 +11627,7 @@ pitstopSettings(raceCenterOrCommand := false, arguments*) {
 			}
 		}
 		else if (settingsListView && !isOpen) {
-			settingsGui.Show({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"}, "")
+			settingsGui.Show({Descriptor: "Race Center.Pitstop Settings", Options: "0x400000"})
 
 			isOpen := true
 		}

@@ -1124,6 +1124,7 @@ editTargets(command := "", *) {
 	else {
 		result := false
 
+		/*
 		if (gUpdateSettings.Count > 16)
 			throw "Too many update targets detected in editTargets..."
 
@@ -1135,6 +1136,7 @@ editTargets(command := "", *) {
 
 		if (gBuildSettings.Count > 24)
 			throw "Too many build targets detected in editTargets..."
+		*/
 
 		targetsGui := Window({Descriptor: "Simulator Tools", Closeable: true, Options: "+SysMenu +Caption"})
 
@@ -2650,12 +2652,19 @@ runCopyTargets(&buildProgress) {
 			else {
 				try {
 					srcLastModified := FileGetTime(targetSource, "M")
-					dstLastModified := FileGetTime(targetDestination, "M")
 				}
 				catch Any as exception {
 					logError(exception)
 
 					srcLastModified := false
+				}
+
+				try {
+					dstLastModified := FileGetTime(targetDestination, "M")
+				}
+				catch Any as exception {
+					logError(exception)
+
 					dstLastModified := false
 				}
 

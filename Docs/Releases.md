@@ -12,13 +12,14 @@
   9. Renamed plugin argument "openSetupAdvisor" to ["openSetupWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for all Race Assistant plugins.
   10. Big performance improvements in the rule engine.
   11. Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty.
-  12. Introduced support for the new Stream Deck Plus Layout.
-  13. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
-  14. Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap.
-  15. Updated th car meta data to the latest version.
-  16. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
-  17. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
-  18. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
+  12. Optimized collaboration between Strategist and Engineer for planned or recommended pitstops.
+  13. Introduced support for the new Stream Deck Plus Layout.
+  14. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
+  15. Reduced # of incorrect warnings and announcements for the Race Assistants after a pitstop with driver swap.
+  16. Updated th car meta data to the latest version.
+  17. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
+  18. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
+  19. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500).
 

@@ -45,6 +45,7 @@ Simulator Settings.ini=%kUserConfigDirectory%Simulator Settings.ini
 Tools Settings.ini=%kUserConfigDirectory%Simulator Tools.ini
 *.bak Files=%kHomeDirectory%, *.ahk.bak, R
 [Copy]
+HTML Viewer.1=%kBinariesDirectory%WebView2Loader.dll <- %kHomeDirectory%Utilities\3rd Party\WebView2\WebView2Loader.dll
 Data Provider.1=%kBinariesDirectory%ACC SHM Provider.exe <- %kSourcesDirectory%Special\ACC SHM Provider\Release\ACC SHM Provider.exe
 Data Provider.2=%kBinariesDirectory%R3E SHM Provider.exe <- %kSourcesDirectory%Special\R3E SHM Provider\Release\R3E SHM Provider.exe
 Data Provider.3=%kBinariesDirectory%RF2 SHM Provider.exe <- %kSourcesDirectory%Special\RF2 SHM Provider\Release\RF2 SHM Provider.exe

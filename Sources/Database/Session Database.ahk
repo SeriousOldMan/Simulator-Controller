@@ -2408,7 +2408,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteTrackAutomation() {
-		if this.SelectedTrackAutomation.HasOwnProp("Origin") {
+		if this.SelectedTrackAutomation.HasProp("Origin") {
 			this.TrackAutomations.RemoveAt(inList(this.TrackAutomations, this.SelectedTrackAutomation.Origin))
 
 			this.writeTrackAutomations()
@@ -2432,7 +2432,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		trackAutomation.Name := window["trackAutomationNameEdit"].Value
 
-		if trackAutomation.HasOwnProp("Origin") {
+		if trackAutomation.HasProp("Origin") {
 			origin := this.SelectedTrackAutomation.Origin
 
 			origin.Name := trackAutomation.Name

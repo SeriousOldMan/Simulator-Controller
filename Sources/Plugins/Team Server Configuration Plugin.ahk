@@ -1030,7 +1030,7 @@ class TeamServerConfigurator extends ConfiguratorPanel {
 		catch Any as exception {
 			local message := exception
 
-			if message.HasOwnProp("Message")
+			if message.HasProp("Message")
 				message := message.Message
 
 			OnMessage(0x44, translateOkButton)

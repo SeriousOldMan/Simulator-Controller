@@ -241,7 +241,7 @@ class GuiFunctionController extends FunctionController {
 			if (label != false) {
 				font := ("s8 c" . color)
 
-				if !label.HasOwnProp("Font")
+				if !label.HasProp("Font")
 					label.Font := false
 
 				if ((label.Font != font) || (label.Text != text)) {

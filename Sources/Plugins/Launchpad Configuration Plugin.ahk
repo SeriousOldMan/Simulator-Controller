@@ -97,7 +97,7 @@ class LaunchpadConfigurator extends ConfigurationItemList {
 		local ignore, launchpadApplication
 
 		try
-			if (isSet(ApplicationsConfigurator) && ApplicationsConfigurator.hasOwnProp("Instance"))
+			if (isSet(ApplicationsConfigurator) && ApplicationsConfigurator.hasProp("Instance"))
 				for ignore, launchpadApplication in ApplicationsConfigurator.Instance.Applications[[translate("Other")]]
 					launchpadApplicationsList.Push(launchpadApplication.Application)
 

@@ -86,7 +86,7 @@ class RaceReportViewer extends RaceReportReader {
 			return lapTime
 	}
 
-	showReportChart(drawChartFunction) {
+	showReportChart(drawChartFunction, margin := 0) {
 		local window, before, after, html
 
 		if this.ChartViewer {
@@ -119,7 +119,7 @@ class RaceReportViewer extends RaceReportReader {
 				</html>
 				)"
 
-				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.getWidth() - 2, height: this.ChartViewer.getHeight() - 2, backColor: this.Window.AltBackColor}))
+				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.getWidth() - 2 - margin, height: this.ChartViewer.getHeight() - 2 - margin, backColor: this.Window.AltBackColor}))
 
 				this.ChartViewer.document.write(html)
 			}
@@ -573,7 +573,7 @@ class RaceReportViewer extends RaceReportReader {
 			else
 				drawChartFunction .= "}"
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -706,7 +706,7 @@ class RaceReportViewer extends RaceReportReader {
 			else
 				drawChartFunction := "function drawChart() {}"
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -944,7 +944,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -1059,7 +1059,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -1167,7 +1167,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {

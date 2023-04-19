@@ -122,7 +122,7 @@ class ControllerEditor extends ConfiguratorPanel {
 
 	AutoSave {
 		Get {
-			if (isSet(ConfigurationEditor) && ConfigurationEditor.hasOwnProp("Instance"))
+			if (isSet(ConfigurationEditor) && ConfigurationEditor.hasProp("Instance"))
 				return ConfigurationEditor.Instance.AutoSave
 			else
 				return false
@@ -1912,7 +1912,7 @@ class DisplayRulesEditor extends ConfiguratorPanel {
 class DisplayRulesList extends ConfigurationItemList {
 	AutoSave {
 		Get {
-			if ControllerEditor.HasOwnProp("Instance")
+			if ControllerEditor.HasProp("Instance")
 				return ControllerEditor.Instance.AutoSave
 		}
 	}

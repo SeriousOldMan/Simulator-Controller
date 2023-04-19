@@ -219,7 +219,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 				for ignore, viewer in this.HTMLViewer
 					if viewer.Visible
-						if viewer.HasOwnProp("Resized")
+						if viewer.HasProp("Resized")
 							viewer.Resized()
 						else
 							viewer.Value.document.location.reload()
@@ -810,7 +810,7 @@ class SetupWizard extends ConfiguratorPanel {
 		viewers := []
 
 		for ignore, viewer in this.WizardWindow
-			if (isInstance(viewer, Gui.ActiveX) || viewer.HasOwnProp("Resized"))
+			if viewer.HasProp("Resized")
 				viewers.Push(viewer)
 
 		this.iHTMLResizer.HTMLViewer := viewers
@@ -2426,16 +2426,16 @@ class FinishStepWizard extends StepWizard {
 		local window := this.Window
 		local image, text, html
 
-		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h" . (height - 24) . " H:Center V:Center Hidden")
+		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h" . (height - 36) . " H:Center V:Center Hidden")
 
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
 
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' style='font-weight: 600'>" . text . "</div>"
+		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 48) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 50) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
 		widget1.navigate("about:blank")
 		widget1.document.write(html)

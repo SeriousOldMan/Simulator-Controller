@@ -5981,7 +5981,7 @@ class RaceCenter extends ConfigurationItem {
 					this.iAirTemperature := lastLap.AirTemperature
 					this.iTrackTemperature := lastLap.TrackTemperature
 
-					if lastLap.HasOwnProp("Weather10Min") {
+					if lastLap.HasProp("Weather10Min") {
 						this.iWeather10Min := lastLap.Weather10Min
 						this.iWeather30Min := lastLap.Weather30Min
 					}
@@ -7445,7 +7445,7 @@ class RaceCenter extends ConfigurationItem {
 	computeDuration(stint) {
 		local duration, duration, ignore, lap
 
-		if stint.HasOwnProp("Duration")
+		if stint.HasProp("Duration")
 			return stint.Duration
 		else {
 			duration := 0
@@ -7463,7 +7463,7 @@ class RaceCenter extends ConfigurationItem {
 	computeEndTime(stint, update := false) {
 		local time, duration
 
-		if stint.HasOwnProp("EndTime")
+		if stint.HasProp("EndTime")
 			return stint.EndTime
 		else {
 			time := this.computeStartTime(stint)
@@ -7481,7 +7481,7 @@ class RaceCenter extends ConfigurationItem {
 	computeStartTime(stint) {
 		local time
 
-		if stint.HasOwnProp("StartTime")
+		if stint.HasProp("StartTime")
 			return stint.StartTime
 		else {
 			if (stint.Nr = 1) {
@@ -8286,7 +8286,7 @@ class RaceCenter extends ConfigurationItem {
 							this.iAirTemperature := lastLap.AirTemperature
 							this.iTrackTemperature := lastLap.TrackTemperature
 
-							if lastLap.HasOwnProp("Weather10Min") {
+							if lastLap.HasProp("Weather10Min") {
 								this.iWeather10Min := lastLap.Weather10Min
 								this.iWeather30Min := lastLap.Weather30Min
 							}

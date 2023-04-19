@@ -265,7 +265,7 @@ class StrategyViewer {
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . width . "px; height: " . height . "px`">")
+		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . (width - 120) . "px; height: " . height . "px`">")
 	}
 
 	showStrategyInfo(strategy) {
@@ -301,7 +301,7 @@ class StrategyViewer {
 			drawChartFunction := false
 			chartID := false
 
-			width := (this.StrategyViewer.getWidth() - 10)
+			width := (this.StrategyViewer.getWidth() - 4)
 
 			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
 

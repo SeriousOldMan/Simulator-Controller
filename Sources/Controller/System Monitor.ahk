@@ -135,7 +135,7 @@ updateDashboard(window, viewer, html := "") {
 
 	script := substituteVariables(script, {tableCSS: getTableCSS(window)})
 
-	html := ("<html>" . script . "<body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+	html := ("<html>" . script . "<body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 10px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
 
 	viewer.document.open()
 	viewer.document.write(html)
@@ -777,8 +777,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		; simulationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+46 w300 h90", "shell.explorer").Value
-		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h90").Viewer
+		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h95")
 		simulationDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -787,7 +786,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
-		assistantsDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+46 w300 h90", "shell.explorer").Value
+		assistantsDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+46 w300 h95")
 		assistantsDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -796,7 +795,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
-		sessionDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+156 w300 h90", "shell.explorer").Value
+		sessionDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+156 w300 h95")
 		sessionDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -805,7 +804,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
-		dataDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+156 w300 h90", "shell.explorer").Value
+		dataDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+156 w300 h95")
 		dataDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -814,7 +813,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
-		automationDashboard := systemMonitorGui.Add("ActiveX", "x94 ys+266 w300 h90", "shell.explorer").Value
+		automationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+266 w300 h95")
 		automationDashboard.navigate("about:blank")
 
 		systemMonitorGui.SetFont("Italic", "Arial")
@@ -823,7 +822,7 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
-		mapperDashboard := systemMonitorGui.Add("ActiveX", "x475 ys+266 w300 h90", "shell.explorer").Value
+		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95")
 		mapperDashboard.navigate("about:blank")
 
 		monitorTabView.UseTab(2)

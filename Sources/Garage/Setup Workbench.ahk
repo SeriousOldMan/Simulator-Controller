@@ -32,6 +32,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Math.ahk"
 #Include "..\Libraries\RuleEngine.ahk"
@@ -117,11 +118,14 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	class AdivisorResizer extends Window.Resizer {
+	class WorkbenchResizer extends Window.Resizer {
+		iSettingsViewer := false
 		iRedraw := false
 
-		__New(arguments*) {
-			super.__New(arguments*)
+		__New(window, settingsViewer, arguments*) {
+			this.iSettingsViewer := settingsViewer
+
+			super.__New(window, arguments*)
 
 			Task.startTask(ObjBindMethod(this, "RedrawHTMLViwer"), 500, kLowPriority)
 		}
@@ -139,6 +143,8 @@ class SetupWorkbench extends ConfigurationItem {
 						return Task.CurrentTask
 
 				this.iRedraw := false
+
+				this.iSettingsViewer.Resized()
 
 				try
 					this.Window.Workbench.updateRecommendations(true, false)
@@ -505,7 +511,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
-		this.iSettingsViewer := workbenchGui.Add("ActiveX", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer", "shell.explorer").Value
+		this.iSettingsViewer := workbenchGui.Add("HTMLViewer", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer")
 		this.SettingsViewer.navigate("about:blank")
 
 		this.showSettingsChart(false)
@@ -521,7 +527,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Button", "x574 y738 w80 h23 Y:Move H:Center", translate("Close")).OnEvent("Click", closeSetupWorkbench)
 		*/
 
-		workbenchGui.Add(SetupWorkbench.AdivisorResizer(workbenchGui))
+		workbenchGui.Add(SetupWorkbench.WorkbenchResizer(workbenchGui, this.iSettingsViewer))
 	}
 
 	show() {
@@ -674,8 +680,8 @@ class SetupWorkbench extends ConfigurationItem {
 								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
 					)"
 
-					width := this.SettingsViewer.Width
-					height := (this.SettingsViewer.Height - 110 - 1)
+					width := this.SettingsViewer.getWidth() - 24
+					height := (this.SettingsViewer.getHeight() - 110 - 24)
 
 					info := getMultiMapValue(this.Definition, "Setup.Info", "ChangeWarning", "")
 
@@ -704,8 +710,8 @@ class SetupWorkbench extends ConfigurationItem {
 					this.SettingsViewer.document.write(before . content . after)
 				}
 				else {
-					width := this.SettingsViewer.Width
-					height := (this.SettingsViewer.Height - 1)
+					width := this.SettingsViewer.getWidth() - 24
+					height := (this.SettingsViewer.getHeight() - 24)
 
 					html := ""
 

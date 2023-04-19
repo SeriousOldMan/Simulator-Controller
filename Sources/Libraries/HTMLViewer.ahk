@@ -321,7 +321,7 @@ class WebView2 extends WebView2.Base {
 				options := WebView2.EnvironmentOptions(options)
 			}
 
-			if (R := DllCall(dllPath '\CreateCoreWebView2EnvironmentWithOptions', 'str', edgeruntime,
+			if (R := DllCall(dllPath . '\CreateCoreWebView2EnvironmentWithOptions', 'str', edgeruntime,
 				'str', datadir || RegExReplace(A_AppData, 'Roaming$', 'Local\Microsoft\Edge\User Data'), 'ptr', options,
 				'ptr', EnvironmentCompletedHandler, 'uint')) {
 				ControllerCompletedHandler := EnvironmentCompletedHandler := 0
@@ -1946,8 +1946,8 @@ class HTMLViewer {
 	iControl := false
 	iWebView2 := false
 
-	iLastUri := false
-	iLastHTML := false
+	iHTML := false
+	iHTMLFile := false
 
 	Control {
 		Get {
@@ -1974,18 +1974,22 @@ class HTMLViewer {
 	}
 
 	__New(control) {
+		local application := Strsplit(A_ScriptName, ".")[1]
+		local rnd := Random(1, 1000)
+
 		this.iControl := control
+
+		this.iHTMLFile := temporaryFileName("HTML\" . application . "\" . "html" . rnd, "html")
 	}
 
 	Show() {
-		if !this.WebView2
-			this.iWebView2 := WebView2.create(this.Control.Hwnd)
+		if this.Control.Visible {
+			if !this.WebView2
+				this.iWebView2 := WebView2.create(this.Control.Hwnd)
 
-		if this.iLastUri
-			this.Write(this.iLastUri)
-
-		if this.iLastHTML
-			this.Write(this.iLastHTML)
+			if this.iHTML
+				this.Write(this.iHTML, true)
+		}
 	}
 
 	Hide() {
@@ -1993,16 +1997,11 @@ class HTMLViewer {
 	}
 
 	Resized() {
-		this.WebView2.Fill()
+		if this.WebView2
+			this.WebView2.Fill()
 	}
 
 	Navigate(uri) {
-		/*
-		if this.WebView2
-			this.WebView2.CoreWebView2.Navigate(uri)
-
-		this.iLastUri := uri
-		*/
 	}
 
 	Open() {
@@ -2011,15 +2010,23 @@ class HTMLViewer {
 	Close() {
 	}
 
-	Write(html) {
-		if this.WebView2
-			this.WebView2.CoreWebView2.NavigateToString(html)
+	Write(html, force := false) {
+		if (force || (html != this.iHTML)) {
+			if this.WebView2 {
+				deleteFile(this.iHTMLFile)
 
-		this.iLastHTML := html
+				FileAppend(html, this.iHTMLFile)
+
+				this.WebView2.CoreWebView2.Navigate(this.iHTMLFile)
+			}
+
+			this.iHTML := html
+		}
 	}
 
 	Reload() {
-		this.Redraw()
+		if this.WebView2
+			this.WebView2.CoreWebView2.Reload()
 	}
 }
 
@@ -2036,15 +2043,53 @@ CoTaskMem_String(ptr) {
 	return s
 }
 
-registerHTMLViewerControl() {
+initializeHTMLViewer() {
 	createHTMLViewer(window, arguments*) {
 		local control := window.Add("Picture", arguments*)
+		local viewer := HTMLViewer(control)
 
-		control.Viewer := HTMLViewer(control)
-		control.Show := (*) => control.Viewer.Show()
+		control.HTMLViewer := viewer
+		control.Document := viewer
+
+		show() {
+			control.Visible := true
+			viewer.Show()
+		}
+
+		hide() {
+			viewer.Hide()
+			control.Visible := false
+		}
+
+		width() {
+			local width
+
+			ControlGetPos( , , &width, , control)
+
+			return width
+		}
+
+		height() {
+			local height
+
+			ControlGetPos( , , , &height, control)
+
+			return height
+		}
+
+		control.Show := (*) => show()
+		control.Hide := (*) => hide()
+		control.Navigate := (obj, uri) => viewer.Navigate(uri)
+		control.Resized := (*) => viewer.Resized()
+		control.getWidth := (*) => width()
+		control.getHeight := (*) => height()
 
 		return control
 	}
+
+	deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+
+	DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
 
 	Window.DefineCustomControl("HTMLViewer", createHTMLViewer)
 }
@@ -2054,4 +2099,4 @@ registerHTMLViewerControl() {
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-registerHTMLViewerControl()
+initializeHTMLViewer()

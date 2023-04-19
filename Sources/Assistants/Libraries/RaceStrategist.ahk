@@ -2309,7 +2309,7 @@ class RaceStrategist extends GridRaceAssistant {
 		else if !plannedLap
 			speaker.speakPhrase("NoPitstopNeeded")
 		else {
-			if (strategyLap && (Abs(strategyLap - plannedLap) < 5))
+			if (strategyLap && (Abs(strategyLap - plannedLap) < 6))
 				pitstopOptions := Array(refuel, tyreChange, tyreCompound, tyreCompoundColor)
 			else
 				pitstopOptions := []

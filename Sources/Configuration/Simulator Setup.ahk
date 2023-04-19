@@ -2267,7 +2267,7 @@ class StartStepWizard extends StepWizard {
 			}
 		}
 
-		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h" . height . " W:Grow H:Grow Hidden")
+		widget1 := window.Add("HTMLViewer", "x" . (x - 10) . " y" . y . " w" . (width + 20) . " h" . height . " W:Grow H:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
@@ -2294,7 +2294,7 @@ class StartStepWizard extends StepWizard {
 			labelY := y + 8
 
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Unblocking.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'>" . info . "</div>"
 
 			window.SetFont("s10 Bold", "Arial")
 
@@ -2305,7 +2305,7 @@ class StartStepWizard extends StepWizard {
 
 			Sleep(200)
 
-			widget3 := window.Add("ActiveX", "x" . x . " yp+30 w" . width . " h350 W:Grow H:Grow Hidden", "shell.explorer")
+			widget3 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h350 W:Grow H:Grow Hidden")
 
 			x := x + Round((width - 240) / 2)
 
@@ -2316,8 +2316,8 @@ class StartStepWizard extends StepWizard {
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget3.Value.navigate("about:blank")
-			widget3.Value.document.write(html)
+			widget3.navigate("about:blank")
+			widget3.document.write(html)
 
 			this.registerWidgets(2, widget1, widget2, widget3, widget4)
 		}
@@ -2426,7 +2426,7 @@ class FinishStepWizard extends StepWizard {
 		local window := this.Window
 		local image, text, html
 
-		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " H:Center V:Center Hidden", "shell.explorer")
+		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h" . (height - 24) . " H:Center V:Center Hidden")
 
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
@@ -2435,10 +2435,10 @@ class FinishStepWizard extends StepWizard {
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 48) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
-		widget1.Value.navigate("about:blank")
-		widget1.Value.document.write(html)
+		widget1.navigate("about:blank")
+		widget1.document.write(html)
 
 		this.registerWidget(1, widget1)
 	}

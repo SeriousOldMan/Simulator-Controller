@@ -60,7 +60,7 @@ class InstallationStepWizard extends StepWizard {
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Installation", "Installation." . software . ".Info." . getLanguage()))
 
 			label := (translate("Software: ") . software)
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
 			installed := (folder ? false : this.SetupWizard.isSoftwareInstalled(software))
 
@@ -97,14 +97,14 @@ class InstallationStepWizard extends StepWizard {
 				widget4.OnEvent("Click", locateSoftware.Bind(software))
 			}
 
-			widget5 := window.Add("ActiveX", "x" . x . " yp+33 w" . width . " h121 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden", "shell.explorer")
+			widget5 := window.Add("HTMLViewer", "x" . x . " yp+33 w" . width . " h117 Y:Move(" . factor . ") W:Grow H:Grow(0.33) Hidden")
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget5.Value.navigate("about:blank")
-			widget5.Value.document.write(html)
+			widget5.navigate("about:blank")
+			widget5.document.write(html)
 
-			y += 170
+			y += 163
 
 			page := Ceil(A_Index / 3)
 

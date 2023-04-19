@@ -197,14 +197,14 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		widget9.OnEvent("ContextMenu", simulatorActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Simulators", "Simulators.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget10 := window.Add("ActiveX", "x" . x . " yp+305 w" . width . " h76 Y:Move(0.66) H:Grow(0.33) W:Grow VactionsInfoText Hidden", "shell.explorer")
+		widget10 := window.Add("HTMLViewer", "x" . x . " yp+305 w" . width . " h76 Y:Move(0.66) H:Grow(0.33) W:Grow VactionsInfoText Hidden")
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget10.Value.navigate("about:blank")
-		widget10.Value.document.write(html)
+		widget10.navigate("about:blank")
+		widget10.document.write(html)
 
 		this.iControllerWidgets := [widget7, widget8, widget9]
 

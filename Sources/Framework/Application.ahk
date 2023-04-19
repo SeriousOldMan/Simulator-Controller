@@ -420,7 +420,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	editHeight := height - 102
 
-	htmlViewer := htmlGui.Add("ActiveX", "X8 YP+26 W" . innerWidth . " H" . editHeight . " vhtmlViewer", "shell.explorer").Value
+	htmlViewer := htmlGui.Add("HTMLViewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
 
 	htmlViewer.navigate("about:blank")
 

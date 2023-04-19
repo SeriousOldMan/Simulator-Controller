@@ -138,14 +138,14 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		widget7.OnEvent("ContextMenu", pedalCalibrationActionFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Pedal Calibration", "Pedal Calibration.Actions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget8 := window.Add("ActiveX", "x" . x . " yp+265 w" . width . " h80 Y:Move(0.66) W:Grow H:Grow(0.33) VpedalCalibrationInfoText Hidden", "shell.explorer")
+		widget8 := window.Add("HTMLViewer", "x" . x . " yp+265 w" . width . " h80 Y:Move(0.66) W:Grow H:Grow(0.33) VpedalCalibrationInfoText Hidden")
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget8.Value.navigate("about:blank")
-		widget8.Value.document.write(html)
+		widget8.navigate("about:blank")
+		widget8.document.write(html)
 
 		this.setActionsListView(widget7)
 

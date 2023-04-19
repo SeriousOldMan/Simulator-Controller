@@ -974,8 +974,6 @@ startSystemMonitor() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "System Monitor"
 
-	fixIE(11)
-
 	registerMessageHandler("Monitoring", monitoringMessageHandler)
 
 	deleteFile(kTempDirectory . "Simulator Controller.state")

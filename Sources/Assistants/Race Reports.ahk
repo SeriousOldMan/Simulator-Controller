@@ -32,6 +32,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "Libraries\RaceReportViewer.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
@@ -83,6 +84,7 @@ class RaceReports extends ConfigurationItem {
 
 		RedrawHTMLViwer() {
 			if this.iRedraw {
+				local reports := RaceReports.Instance
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -91,7 +93,10 @@ class RaceReports extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				RaceReports.Instance.loadReport(RaceReports.Instance.SelectedReport, true)
+				reports.ReportViewer.ChartViewer.Resized()
+				reports.ReportViewer.InfoViewer.Resized()
+
+				reports.loadReport(RaceReports.Instance.SelectedReport, true)
 			}
 
 			return Task.CurrentTask
@@ -294,7 +299,7 @@ class RaceReports extends ConfigurationItem {
 		setButtonIcon(raceReportsGui["deleteReportButton"], kIconsDirectory . "Minus.ico", 1)
 
 		raceReportsGui.Add("Text", "x16 yp+30 w70 h23 Y:Move +0x200", translate("Info"))
-		raceReportsGui.Add("ActiveX", "x90 yp-2 w180 h170 Y:Move W:Grow(0.25) Border vinfoViewer", "shell.explorer").Value.navigate("about:blank")
+		raceReportsGui.Add("HTMLViewer", "x90 yp-2 w180 h170 Y:Move W:Grow(0.25) Border vinfoViewer").navigate("about:blank")
 
 		raceReportsGui.Add("Text", "x290 ys w40 h23 +0x200 X:Move(0.25)", translate("Report"))
 		raceReportsGui.Add("DropDownList", "x334 yp w120 X:Move(0.25) Disabled Choose0 vreportsDropDown", collect(kRaceReports, translate)).OnEvent("Change", chooseReport)
@@ -302,9 +307,9 @@ class RaceReports extends ConfigurationItem {
 		raceReportsGui.Add("Button", "x1177 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(raceReportsGui["reportSettingsButton"], kIconsDirectory . "Report Settings.ico", 1)
 
-		raceReportsGui.Add("ActiveX", "x290 yp+24 w910 h475 X:Move(0.25) W:Grow(0.75) H:Grow Border vchartViewer", "shell.explorer").Value.navigate("about:blank")
+		raceReportsGui.Add("HTMLViewer", "x290 yp+24 w910 h475 X:Move(0.25) W:Grow(0.75) H:Grow Border vchartViewer").navigate("about:blank")
 
-		this.iReportViewer := RaceReportViewer(raceReportsGui, raceReportsGui["chartViewer"].Value, raceReportsGui["infoViewer"].Value)
+		this.iReportViewer := RaceReportViewer(raceReportsGui, raceReportsGui["chartViewer"], raceReportsGui["infoViewer"])
 
 		this.loadSimulator(simulator, true)
 
@@ -893,8 +898,6 @@ runRaceReports() {
 
 		ExitApp(0)
 	}
-
-	fixIE(11)
 
 	reports := RaceReports(reportsDirectory, kSimulatorConfiguration)
 

@@ -528,7 +528,6 @@ Important:
 
   1. If you change the scope using the dropdown menu mentioned above, this will affect only the behaviour and scope during the current run of the "Session Database" tool. If you want to alter the scope permanently, so that it will also influence the retrieved values ​​by other applications such as the Race Assistants, hold the Control key down while choosing a different scope from the dropdown menu.
   2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you run a session with a specific car on a specific track. It is not necessary to save any setup information by the Assistants, simply running one lap is enough.
-  3. "Session Database" displays some graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Session Database" once using administrator privileges.
 
 Following you will find an overview about the different database topics:
 

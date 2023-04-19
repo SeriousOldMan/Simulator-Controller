@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\HTMLViewer.ahk"
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "RaceReportReader.ahk"
@@ -118,7 +119,7 @@ class RaceReportViewer extends RaceReportReader {
 				</html>
 				)"
 
-				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.Width, height: this.ChartViewer.Height - 1, backColor: this.Window.AltBackColor}))
+				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.getWidth() - 2, height: this.ChartViewer.getHeight() - 2, backColor: this.Window.AltBackColor}))
 
 				this.ChartViewer.document.write(html)
 			}

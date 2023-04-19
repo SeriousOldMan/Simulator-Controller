@@ -602,14 +602,6 @@ checkInstallation() {
 						writeUninstallerInfo(installLocation)
 					}
 
-					fixIE(11, "Session Database.exe")
-					fixIE(11, "Setup Workbench.exe")
-					fixIE(11, "Race Reports.exe")
-					fixIE(11, "Strategy Workbench.exe")
-					fixIE(11, "Race Center.exe")
-					fixIE(10, "Simulator Setup.exe")
-					fixIE(11, "System Monitor.exe")
-
 					writeMultiMap(kUserConfigDirectory . "Simulator Controller.install", installInfo)
 
 					if (installLocation != packageLocation) {

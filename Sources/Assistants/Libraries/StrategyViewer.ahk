@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "Strategy.ahk"
+#Include "..\..\Libraries\HTMLViewer.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -300,7 +301,7 @@ class StrategyViewer {
 			drawChartFunction := false
 			chartID := false
 
-			width := (this.StrategyViewer.Width - 10)
+			width := (this.StrategyViewer.getWidth() - 10)
 
 			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
 
@@ -343,7 +344,7 @@ class StrategyViewer {
 			this.StrategyViewer.document.close()
 		}
 	}
-	
+
 	getTableCSS() {
 		local script
 

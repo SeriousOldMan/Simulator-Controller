@@ -2015,7 +2015,7 @@ class HTMLViewer {
 			if this.WebView2 {
 				deleteFile(this.iHTMLFile)
 
-				FileAppend(html, this.iHTMLFile)
+				FileAppend(html, this.iHTMLFile, "UTF-8")
 
 				this.WebView2.CoreWebView2.Navigate(this.iHTMLFile)
 			}

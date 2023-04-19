@@ -680,8 +680,8 @@ class SetupWorkbench extends ConfigurationItem {
 								google.charts.load('current', {'packages':['corechart', 'table', 'bar']}).then(drawChart);
 					)"
 
-					width := this.SettingsViewer.getWidth() - 24
-					height := (this.SettingsViewer.getHeight() - 110 - 24)
+					width := this.SettingsViewer.getWidth() - 4
+					height := (this.SettingsViewer.getHeight() - 110 - 4)
 
 					info := getMultiMapValue(this.Definition, "Setup.Info", "ChangeWarning", "")
 
@@ -710,8 +710,8 @@ class SetupWorkbench extends ConfigurationItem {
 					this.SettingsViewer.document.write(before . content . after)
 				}
 				else {
-					width := this.SettingsViewer.getWidth() - 24
-					height := (this.SettingsViewer.getHeight() - 24)
+					width := this.SettingsViewer.getWidth() - 4
+					height := (this.SettingsViewer.getHeight() - 4)
 
 					html := ""
 
@@ -3180,8 +3180,6 @@ runSetupWorkbench() {
 				index += 1
 		}
 	}
-
-	fixIE(11)
 
 	if car
 		car := SessionDatabase.getCarName(simulator, car)

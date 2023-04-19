@@ -34,6 +34,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\Math.ahk"
 #Include "..\Libraries\CLR.ahk"
@@ -303,6 +304,7 @@ class RaceCenter extends ConfigurationItem {
 
 		RedrawHTMLViwer() {
 			if this.iRedraw {
+				local center := RaceCenter.Instance
 				local ignore, button
 
 				for ignore, button in ["LButton", "MButton", "RButton"]
@@ -311,7 +313,10 @@ class RaceCenter extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				RaceCenter.Instance.pushTask(ObjBindMethod(RaceCenter.Instance, "updateReports", true))
+				center.ChartViewer.Resized()
+				center.DetailsViewer.Resized()
+
+				center.pushTask(ObjBindMethod(RaceCenter.Instance, "updateReports", true))
 			}
 
 			return Task.CurrentTask
@@ -1917,7 +1922,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
-		this.iChartViewer := centerGui.Add("ActiveX", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer", "shell.explorer").Value
+		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer")
 		this.iChartViewer.navigate("about:blank")
 
 		centerGui.Rules := "Y:Move(0.2)"
@@ -1931,7 +1936,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
 
-		this.iWaitViewer := centerGui.Add("ActiveX", "x1323 yp-8 w30 h30 X:Move vwaitViewer", "shell.explorer").Value
+		this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer")
 		this.iWaitViewer.navigate("about:blank")
 
 		centerGui.SetFont("s8 Norm cBlack", "Arial")
@@ -1952,7 +1957,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x619 ys+39 w80 h21", translate("Output"))
 		centerGui.Add("Text", "x700 yp+7 w651 0x10 W:Grow")
 
-		this.iDetailsViewer := centerGui.Add("ActiveX", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer", "shell.explorer").Value
+		this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
 		this.iDetailsViewer.navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(centerGui, this.iDetailsViewer)
@@ -8342,7 +8347,7 @@ class RaceCenter extends ConfigurationItem {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.Width - 5), height: (this.ChartViewer.Height - 5), backColor: this.Window.AltBackColor}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: (this.ChartViewer.getWidth() - 5), height: (this.ChartViewer.getHeight() - 5), backColor: this.Window.AltBackColor}))
 
 			this.ChartViewer.document.write(html)
 		}
@@ -8696,8 +8701,8 @@ class RaceCenter extends ConfigurationItem {
 			fileName := sessionDB.getTrackImage(this.Simulator, this.Track)
 
 			if (trackMap && fileName) {
-				width := this.ChartViewer.Width
-				height := this.ChartViewer.Height
+				width := this.ChartViewer.getWidth()
+				height := this.ChartViewer.getHeight()
 
 				scale := getMultiMapValue(trackMap, "Map", "Scale")
 
@@ -9968,7 +9973,7 @@ class RaceCenter extends ConfigurationItem {
 				temperatures.Push(lapTable[lap.Nr]["Tyre.Temperature.Average"])
 			}
 
-			width := (this.DetailsViewer.Width - 20)
+			width := (this.DetailsViewer.getWidth() - 20)
 
 			chart1 := this.createLapDetailsChart(1, width, 248, laps, positions, lapTimes, fuelConsumptions, temperatures)
 
@@ -10981,7 +10986,7 @@ class RaceCenter extends ConfigurationItem {
 
 		html .= ("<br>" . this.createDriverDetails(this.Drivers))
 
-		width := (this.DetailsViewer.Width - 20)
+		width := (this.DetailsViewer.getWidth() - 20)
 
 		html .= ("<br><br><div id=`"header`"><i>" . translate("Pace") . "</i></div>")
 
@@ -11160,7 +11165,7 @@ class RaceCenter extends ConfigurationItem {
 					tyreLaps.Push(kNull)
 			}
 
-		width := (this.DetailsViewer.Width - 20)
+		width := (this.DetailsViewer.getWidth() - 20)
 
 		chart1 := this.createSessionSummaryChart(1, width, 248, laps, positions, remainingFuels, tyreLaps)
 
@@ -11832,8 +11837,6 @@ startupRaceCenter() {
 
 	TraySetIcon(icon, "1")
 	A_IconTip := "Race Center"
-
-	fixIE(11)
 
 	rCenter := RaceCenter(kSimulatorConfiguration, readMultiMap(kUserConfigDirectory . "Race.settings"))
 

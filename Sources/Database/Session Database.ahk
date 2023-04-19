@@ -5016,7 +5016,7 @@ editSettings(editorOrCommand, arguments*) {
 			serverUpdateEdit := ""
 		}
 
-		settingsEditorGui := Window({Descriptor: "Session Database.Settings", Options: "0x400000"})
+		settingsEditorGui := Window({Descriptor: "Session Database.Settings", Options: "0x400000"}, "")
 
 		settingsEditorGui.SetFont("s10 Bold", "Arial")
 
@@ -5403,8 +5403,6 @@ showSessionDatabaseEditor() {
 
 	if (trackTemperature <= 0)
 		trackTemperature := 27
-
-	fixIE(11)
 
 	protectionOn()
 

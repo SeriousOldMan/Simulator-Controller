@@ -16,6 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\HTMLViewer.ahk"
 #Include "TyresDatabase.ahk"
 
 
@@ -184,7 +185,7 @@ class PressuresEditor {
 
 		pressuresEditorGui.Add("Text", "x270 yp w140 h23 +0x200", substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)}))
 
-		this.iPressuresViewer := pressuresEditorGui.Add("ActiveX", "x16 yp+30 w394 h160 Border vpressuresViewer", "shell.explorer").Value
+		this.iPressuresViewer := pressuresEditorGui.Add("HTMLViewer", "x16 yp+30 w394 h160 Border vpressuresViewer")
 		this.PressuresViewer.navigate("about:blank")
 		this.PressuresViewer.document.write("<html><body style='background-color: #" . pressuresEditorGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 
@@ -536,7 +537,7 @@ class PressuresEditor {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.Width, height: this.PressuresViewer.Height - 1, backColor: this.Window.AltBackColor}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.getWidth() - 4, height: this.PressuresViewer.getHeight() - 4, backColor: this.Window.AltBackColor}))
 
 			this.PressuresViewer.document.write(html)
 		}

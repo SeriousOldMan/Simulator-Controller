@@ -32,6 +32,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\GIFViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\RuleEngine.ahk"
@@ -60,20 +61,16 @@ showLogo(name) {
 	logoGui.SetFont("Bold")
 	logoGui.AddText("w279 Center", title1 . "`n" . title2)
 
-	videoPlayer := logoGui.Add("ActiveX", "x10 y40 w279 h155", "shell explorer").Value
+	videoPlayer := logoGui.Add("GIFViewer", "x10 y40 w279 h155", logo)
 
 	logoGui.SetFont("Norm")
 	logoGui.AddText("w279 Center", info)
 
-	videoPlayer.navigate("about:blank")
-
-	html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . logo . "' width=279 height=155 border=0 padding=0></body></html>"
-
-	videoPlayer.document.write(html)
-
 	logoGui.Show("X" . x . " Y" . y)
+	
+	videoPlayer.Start()
 
-	WinSetTransparent(255, , translate("Creative Commons - BY-NC-SA"))
+	WinSetTransparent(224, logoGui)
 }
 
 checkRemoteProcessAlive(pid) {

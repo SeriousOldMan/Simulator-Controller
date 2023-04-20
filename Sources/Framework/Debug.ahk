@@ -25,14 +25,14 @@ global LogMenu := Menu()
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Constants.ahk"
-#Include "..\Framework\Variables.ahk"
-#Include "..\Framework\Files.ahk"
-#Include "..\Framework\Strings.ahk"
-#Include "..\Framework\Localization.ahk"
-#Include "..\Framework\TrayMenu.ahk"
-#Include "..\Framework\Message.ahk"
-#Include "..\Framework\MultiMap.ahk"
+#Include "Constants.ahk"
+#Include "Variables.ahk"
+#Include "Files.ahk"
+#Include "Strings.ahk"
+#Include "Localization.ahk"
+#Include "TrayMenu.ahk"
+#Include "Message.ahk"
+#Include "MultiMap.ahk"
 #Include "..\Libraries\Messages.ahk"
 
 

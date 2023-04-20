@@ -2644,7 +2644,7 @@ initializeSimulatorSetup() {
 	if wizard.Debug[kDebugKnowledgeBase]
 		SupportMenu.Check(label)
 
-	; showSplashTheme("Rotating Brain")
+	showSplashTheme("Rotating Brain")
 
 	wizard.ProgressCount := 0
 

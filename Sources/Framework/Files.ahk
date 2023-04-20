@@ -9,11 +9,11 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Constants.ahk"
-#Include "..\Framework\Variables.ahk"
-#Include "..\Framework\Debug.ahk"
-#Include "..\Framework\Strings.ahk"
-#Include "..\Framework\Collections.ahk"
+#Include "Constants.ahk"
+#Include "Variables.ahk"
+#Include "Debug.ahk"
+#Include "Strings.ahk"
+#Include "Collections.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

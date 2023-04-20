@@ -810,7 +810,7 @@ class SetupWizard extends ConfiguratorPanel {
 		viewers := []
 
 		for ignore, viewer in this.WizardWindow
-			if (isInstance(viewer, Gui.ActiveX) || viewer.HasOwnProp("Resized"))
+			if viewer.HasOwnProp("Resized")
 				viewers.Push(viewer)
 
 		this.iHTMLResizer.HTMLViewer := viewers

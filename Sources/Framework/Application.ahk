@@ -9,13 +9,13 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
-#Include "..\Framework\GUI.ahk"
-#Include "..\Framework\Message.ahk"
-#Include "..\Framework\Progress.ahk"
-#Include "..\Framework\Splash.ahk"
-#Include "..\Framework\Configuration.ahk"
-#Include "..\Framework\Startup.ahk"
+#Include "Framework.ahk"
+#Include "GUI.ahk"
+#Include "Message.ahk"
+#Include "Progress.ahk"
+#Include "Splash.ahk"
+#Include "Configuration.ahk"
+#Include "Startup.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -9,13 +9,13 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Constants.ahk"
-#Include "..\Framework\Variables.ahk"
-#Include "..\Framework\Debug.ahk"
-#Include "..\Framework\Strings.ahk"
-#Include "..\Framework\Localization.ahk"
-#Include "..\Framework\MultiMap.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "Constants.ahk"
+#Include "Variables.ahk"
+#Include "Debug.ahk"
+#Include "Strings.ahk"
+#Include "Localization.ahk"
+#Include "MultiMap.ahk"
+#Include "Configuration.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -674,9 +674,8 @@ class Window extends Gui {
 		super.Show(arguments*)
 
 		for ignore, control in this.iCustomControls
-			if control.Visible
-				if control.HasProp("Show")
-					control.Show()
+			if control.HasProp("Show")
+				control.Show()
 
 		if !this.MinWidth {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)

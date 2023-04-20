@@ -32,6 +32,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\GIFViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
@@ -463,7 +464,7 @@ class SimulatorController extends ConfigurationItem {
 
 	iLastEvent := A_TickCount
 
-	iShowLogo := false
+	iShowLogo := true
 	iLogoGui := false
 	iLogoIsVisible := false
 
@@ -1137,20 +1138,16 @@ class SimulatorController extends ConfigurationItem {
 			logoGui.SetFont("Bold")
 			logoGui.AddText("w200 Center", translate("Modular Simulator") . "`n" . translate("Controller System"))
 
-			videoPlayer := logoGui.Add("ActiveX", "x10 y40 w209 h180", "shell explorer").Value
+			videoPlayer := logoGui.Add("GIFViewer", "x10 y40 w209 h180", this.getLogo())
 
 			logoGui.SetFont("Norm")
 			logoGui.AddText("w200 Center", info)
 
-			videoPlayer.navigate("about:blank")
-
-			html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . this.getLogo() . "' width=209 height=180 border=0 padding=0></body></html>"
-
-			videoPlayer.document.write(html)
-
 			logoGui.Show("X" . x . " Y" . y . " W239 H259")
 
-			WinSetTransparent(255, , translate("Creative Commons - BY-NC-SA"))
+			videoPlayer.Start()
+
+			WinSetTransparent(224, logoGui)
 
 			this.iLogoGui := logoGui
 			this.iLogoIsVisible := true

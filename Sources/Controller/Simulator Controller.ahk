@@ -1138,7 +1138,7 @@ class SimulatorController extends ConfigurationItem {
 			logoGui.SetFont("Bold")
 			logoGui.AddText("w200 Center", translate("Modular Simulator") . "`n" . translate("Controller System"))
 
-			videoPlayer := logoGui.Add("GIFViewer", "x10 y40 w209 h180", this.getLogo())
+			videoPlayer := logoGui.Add("GIFViewer", "x10 y40 w209 h180 vvideoPlayer", this.getLogo())
 
 			logoGui.SetFont("Norm")
 			logoGui.AddText("w200 Center", info)
@@ -1156,6 +1156,9 @@ class SimulatorController extends ConfigurationItem {
 
 	hideLogo() {
 		if this.iLogoIsVisible {
+			try
+				this.iLogoGui["videoPlayer"].Stop()
+
 			this.iLogoGui.Destroy()
 			this.iLogoGui := false
 

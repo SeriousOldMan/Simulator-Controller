@@ -674,7 +674,7 @@ class Window extends Gui {
 		super.Show(arguments*)
 
 		for ignore, control in this.iCustomControls
-			if control.HasProp("Show")
+			if (control.Visible && control.HasProp("Show"))
 				control.Show()
 
 		if !this.MinWidth {

@@ -20,6 +20,7 @@
   17. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
   18. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
   19. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
+  20. [Developer] Please note, that your own plugins must be ported to AutoHotkey 2 as well, to be used with the new version.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500).
 

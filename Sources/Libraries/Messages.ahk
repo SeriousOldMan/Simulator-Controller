@@ -400,7 +400,7 @@ class MessageManager extends PeriodicTask {
 ;;;-------------------------------------------------------------------------;;;
 
 createMessageReceiver() {
-	local messageReceiverGui := Gui("ToolWindow", A_ScriptName)
+	local messageReceiverGui := Gui("ToolWindow -Caption -SysMenu", A_ScriptName)
 
 	messageReceiverGui.BackColor := "D0D0D0"
 

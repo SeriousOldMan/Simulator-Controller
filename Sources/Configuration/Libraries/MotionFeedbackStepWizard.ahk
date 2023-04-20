@@ -150,11 +150,13 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		}
 
 		motionFeedbackActionFunctionSelect(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		motionFeedbackActionFunctionMenu(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		window.SetFont("s10 Bold", "Arial")

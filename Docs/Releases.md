@@ -1,5 +1,5 @@
 ## 5.0.0.0-beta 03/21/23 (planned)
-  **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to make a backup copy of the "Simulator Controller" in your "Documents" folder, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
+  **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to **make a backup copy of the "Simulator Controller" folder in your "Documents" folder**, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always
@@ -16,10 +16,12 @@
   13. Introduced support for the new Stream Deck Plus Layout.
   14. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
   15. Reduced # of incorrect warnings and announcements for the Race Assistants after a pitstop with driver swap.
-  16. Updated th car meta data to the latest version.
-  17. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
-  18. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
-  19. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
+  16. Updated the car meta data fpr *RaceRoom Racing Experience* to the latest version.
+  17. Updated car and track meta data for *Assetto Corsa Competizione* 1.9, incl. new default for target tyre pressures.
+  18. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
+  19. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
+  20. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
+  21. [Developer] Please note, that your own plugins must be ported to AutoHotkey 2 as well, to be used with the new version.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500).
 

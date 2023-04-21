@@ -119,11 +119,13 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		}
 
 		tactileFeedbackActionFunctionSelect(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		tactileFeedbackActionFunctionMenu(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		window.SetFont("s10 Bold", "Arial")

@@ -1042,7 +1042,7 @@ else {
 				break
 			else {
 				engineer.addLap(A_Index, &data)
-msgbox "break"
+
 				if (A_Index = 3) {
 					engineer.planPitstop()
 					engineer.preparePitstop()

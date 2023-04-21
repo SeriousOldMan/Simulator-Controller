@@ -308,7 +308,7 @@ int main(int argc, char* argv[])
 
 		string penalty = getPenalty(gf->penalty);
 
-		if (penalty != "")
+		if (penalty.length() != 0)
 			printData("Penalty", penalty);
 
 		printData("GapAhead", gf->gapAhead);

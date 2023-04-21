@@ -232,12 +232,14 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				this.iLaunchApplicationsListView.Modify(A_Index, "-Select")
 		}
 
-		applicationFunctionSelect(listView, row, *) {
-			updateApplicationFunction(row)
+		applicationFunctionSelect(listView, line, *) {
+			if line
+				updateApplicationFunction(line)
 		}
 
-		applicationFunctionMenu(listView, row, *) {
-			updateApplicationFunction(row)
+		applicationFunctionMenu(listView, line, *) {
+			if line
+				updateApplicationFunction(line)
 		}
 
 		window.SetFont("s10 Bold", "Arial")

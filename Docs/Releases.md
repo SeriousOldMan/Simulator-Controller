@@ -1,5 +1,5 @@
 ## 5.0.0.0-beta 03/21/23 (planned)
-  **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to make a backup copy of the "Simulator Controller" in your "Documents" folder, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
+  **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to **make a backup copy of the "Simulator Controller" folder in your "Documents" folder**, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
 
   1. Minor bugfixes, as always
   2. Documentation updates, as always
@@ -7,21 +7,31 @@
   4. Modernized UI for all windows, especially on Windows 11.
   5. Support for window resizing in almost all applications.
   6. Renamed controller action function "hotkey" to "trigger" to avoid conflict with a new builtin function.
-  7. Renamed "Setup Advisor" to "Setup Workbench".
+  7. Renamed "Setup Advisor" to ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench).
   8. Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor"
-  9. Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins.
+  9. Renamed plugin argument "openSetupAdvisor" to ["openSetupWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for all Race Assistant plugins.
   10. Big performance improvements in the rule engine.
   11. Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty.
-  12. Introduced Stream Deck Plus Layout.
-  13. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
-  14. Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap.
-  15. [Developer] Renamed configuration map functions to multi map functions.
-  16. [Developer] Introduced a couple of specialized Array and Map subtypes, which supports failure safe handling of unset elements.
-  17. [Developer] Introduced of a specialized subclass of *Gui* which supports seamless resizing rules for controls.
+  12. Optimized collaboration between Strategist and Engineer for planned or recommended pitstops.
+  13. Introduced support for the new Stream Deck Plus Layout.
+  14. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
+  15. Reduced # of incorrect warnings and announcements for the Race Assistants after a pitstop with driver swap.
+  16. Updated the car meta data for *RaceRoom Racing Experience* to the latest version.
+  17. Updated car and track meta data for *Assetto Corsa Competizione* 1.9, incl. new default for target tyre pressures.
+  18. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
+  19. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.
+  20. [Developer] Introduced of a [specialized subclass of *Gui*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) which supports seamless resizing rules for controls.
+  21. [Developer] Please note, that your own plugins must be ported to AutoHotkey 2 as well, to be used with the new version.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500).
 
-## 4.6.3.1-release 03/17/23 (planned)
+## 4.6.3.2-release 04/07/23
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Stint plans are now reset in the Race Center, when a session is cleared.
+  4. A couple of performance improvements in the session database.
+
+## 4.6.3.1-release 03/17/23
   1. Minor bugfixes, as always
   2. Documentation updates, as always
   3. Improved detection of retired cars in "Race Reports" and "Race Center".
@@ -53,6 +63,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   17. New car models for "Setup Advisor":
       - Assetto Corsa:
 	    - Audi TT Cup
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-463), when you are using a Stream Deck, or when you want to use the new audio routing capabilities for your streaming setup.
   
 ## 4.6.2.0-release 03/03/23
   1. Minor bugfixes, as always

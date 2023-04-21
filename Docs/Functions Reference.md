@@ -303,7 +303,7 @@ You can call this function from a click handler of a GUI element. It will move t
 Retrieves the position of a window identified by the given *descriptor*, once it has been moved by the user. If a position is known, *getWindowPosition* return *true* and *x* and *y* will be set.
 
 #### *getWindowSize(descriptor :: String, ByRef w :: Integer, ByRef h :: Integer)*
-Retrieves the size of a window identified by the given *descriptor*, once it has been resized by the user. If a size is known, *getWindowSize* return *true* and *w* and *h* will be set. This will work only with instances of the [Window](*) class.
+Retrieves the size of a window identified by the given *descriptor*, once it has been resized by the user. If a size is known, *getWindowSize* return *true* and *w* and *h* will be set. This will work only with instances of the [Window](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#window-guiahk) class.
 
 #### *setButtonIcon(buttonHandle :: Handle, file :: String)*
 Sets an icon for a button identified by *buttonHandle*, which must have been initialized with an HWND argument.

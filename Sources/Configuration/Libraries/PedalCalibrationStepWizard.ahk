@@ -78,11 +78,13 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 		}
 
 		pedalCalibrationActionFunctionSelect(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		pedalCalibrationActionFunctionMenu(window, listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		window.SetFont("s10 Bold", "Arial")

@@ -567,19 +567,20 @@ class StrategyWorkbench extends ConfigurationItem {
 			validateFloat("fuelCapacityEdit", 60.0)
 		}
 
-		chooseSimDriver(*) {
-			local driver := workbench.DriversListView.GetText(A_EventInfo, 2)
-			local ignore, id
+		chooseSimDriver(listView, line, *) {
+			if (line > 0) {
+				local driver := workbench.DriversListView.GetText(line, 2)
+				local ignore, id
 
+				for ignore, id in workbench.AvailableDrivers
+					if (SessionDatabase.getDriverName(workbench.SelectedSimulator, id) = driver) {
+						workbenchGui["simDriverDropDown"].Choose(A_Index)
 
-			for ignore, id in workbench.AvailableDrivers
-				if (SessionDatabase.getDriverName(workbench.SelectedSimulator, id) = driver) {
-					workbenchGui["simDriverDropDown"].Choose(A_Index)
+						break
+					}
 
-					break
-				}
-
-			workbench.updateState()
+				workbench.updateState()
+			}
 		}
 
 		updateSimDriver(*) {
@@ -675,19 +676,21 @@ class StrategyWorkbench extends ConfigurationItem {
 			}
 		}
 
-		chooseSimWeather(*) {
-			local time := string2Values(":", workbench.WeatherListView.GetText(A_EventInfo, 1))
-			local currentTime := "20200101000000"
+		chooseSimWeather(listView, line, *) {
+			if (line > 0) {
+				local time := string2Values(":", workbench.WeatherListView.GetText(line, 1))
+				local currentTime := "20200101000000"
 
-			currentTime := DateAdd(currentTime, time[1], "Hours")
-			currentTime := DateAdd(currentTime, time[2], "Minutes")
+				currentTime := DateAdd(currentTime, time[1], "Hours")
+				currentTime := DateAdd(currentTime, time[2], "Minutes")
 
-			workbenchGui["simWeatherTimeEdit"].Value := currentTime
-			workbenchGui["simWeatherAirTemperatureEdit"].Text := workbench.WeatherListView.GetText(A_EventInfo, 3)
-			workbenchGui["simWeatherTrackTemperatureEdit"].Text := workbench.WeatherListView.GetText(A_EventInfo, 4)
-			workbenchGui["simWeatherDropDown"].Choose(inList(collect(kWeatherConditions, translate), workbench.WeatherListView.GetText(A_EventInfo, 2)))
+				workbenchGui["simWeatherTimeEdit"].Value := currentTime
+				workbenchGui["simWeatherAirTemperatureEdit"].Text := workbench.WeatherListView.GetText(line, 3)
+				workbenchGui["simWeatherTrackTemperatureEdit"].Text := workbench.WeatherListView.GetText(line, 4)
+				workbenchGui["simWeatherDropDown"].Choose(inList(collect(kWeatherConditions, translate), workbench.WeatherListView.GetText(line, 2)))
 
-			workbench.updateState()
+				workbench.updateState()
+			}
 		}
 
 		updateSimWeather(*) {
@@ -1116,6 +1119,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x5 := x4 + 25
 
 		this.iDriversListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Stint", "Driver"], translate))
+		this.iDriversListView.OnEvent("Click", chooseSimDriver)
 		this.iDriversListView.OnEvent("DoubleClick", chooseSimDriver)
 
 		workbenchGui.Add("Text", "x" . x2 . " ys+34 w90 h23 +0x200", translate("Driver"))
@@ -1141,6 +1145,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		this.iWeatherListView := workbenchGui.Add("ListView", "x24 ys+34 w216 h171 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Time", "Weather", "T Air", "T Track"], translate))
 		this.iWeatherListView.OnEvent("Click", chooseSimWeather)
+		this.iWeatherListView.OnEvent("DoubleClick", chooseSimWeather)
 
 		workbenchGui.Add("Text", "x" . x2 . " ys+34 w70 h23 +0x200", translate("Time"))
 		workbenchGui.Add("DateTime", "x" . x3 . " yp w50 h23 vsimWeatherTimeEdit  1", "HH:mm").OnEvent("Change", updateSimWeather)

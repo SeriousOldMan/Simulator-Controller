@@ -176,6 +176,8 @@ class Window extends Gui {
 
 	iAltBackColor := "D8D8D8"
 
+	iBlockRedraw := 0
+
 	class Resizer {
 		iWindow := false
 
@@ -667,6 +669,16 @@ class Window extends Gui {
 		}
 	}
 
+	AddResizer(resizer) {
+		this.Resizers.Push(resizer)
+
+		return resizer
+	}
+
+	DefineResizeRule(control, rule) {
+		this.AddResizer(Window.ControlResizer(this, control, rule))
+	}
+
 	Show(arguments*) {
 		local x, y, cWidth, cHeight, width, height
 		local fullHeight, clientHeight
@@ -696,14 +708,30 @@ class Window extends Gui {
 		}
 	}
 
-	AddResizer(resizer) {
-		this.Resizers.Push(resizer)
-
-		return resizer
+	DisableRedraw() {
+		if (this.iBlockRedraw++ = 0)
+			SendMessage(0xB, 0, 0, , this)
 	}
 
-	DefineResizeRule(control, rule) {
-		this.AddResizer(Window.ControlResizer(this, control, rule))
+	EnableRedraw() {
+		if (--this.iBlockRedraw = 0) {
+			SendMessage(0xB, 1, 0, , this)
+
+			WinRedraw(this)
+		}
+		else if (this.iBlockRedraw < 0)
+			throw "Nesting error detected in Window.EnableRedraw..."
+	}
+
+	WithoutRedraw(function) {
+		this.DisableRedraw()
+
+		try {
+			return function.Call()
+		}
+		finally {
+			this.EnableRedraw()
+		}
 	}
 
 	UpdatePosition(descriptor) {
@@ -799,10 +827,15 @@ class Window extends Gui {
 				if restricted
 					WinMove( , , width, height, this)
 				else {
-					for ignore, resizer in this.Resizers
-						resizer.Redraw()
+					this.DisableRedraw()
 
-					WinRedraw(this)
+					try {
+						for ignore, resizer in this.Resizers
+							resizer.Redraw()
+					}
+					finally {
+						this.EnableRedraw()
+					}
 				}
 
 				if this.Descriptor

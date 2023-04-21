@@ -124,11 +124,13 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 		}
 
 		simulatorActionFunctionSelect(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		simulatorActionFunctionMenu(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		chooseSimulator(*) {

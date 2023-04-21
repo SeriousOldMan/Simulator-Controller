@@ -420,7 +420,7 @@ launchPad(command := false, arguments*) {
 		}
 	}
 
-	launchSimulatorDownload() {
+	launchSimulatorDownload(*) {
 		local msgResult
 
 		OnMessage(0x44, translateYesNoButtons)
@@ -431,7 +431,7 @@ launchPad(command := false, arguments*) {
 			launchPad("Launch", "Simulator Download.exe", true)
 	}
 
-	showApplicationInfo(wParam, lParam, msg, Hwnd) {
+	showApplicationInfo(wParam, lParam, msg, hwnd) {
 		local Text, CurrControl
 
 		static PrevHwnd := 0
@@ -439,7 +439,7 @@ launchPad(command := false, arguments*) {
 		if (Hwnd != PrevHwnd) {
 			Text := "", ToolTip()
 
-			CurrControl := GuiCtrlFromHwnd(Hwnd)
+			CurrControl := GuiCtrlFromHwnd(hwnd)
 
 			if CurrControl {
 				Text := launchPad("ToolTip", CurrControl)
@@ -451,7 +451,7 @@ launchPad(command := false, arguments*) {
 				SetTimer () => ToolTip(), -4000
 			}
 
-			PrevHwnd := Hwnd
+			PrevHwnd := hwnd
 		}
 	}
 
@@ -566,12 +566,19 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 
-		launchPadGui.Add("Text", "x560 YP w30", string2Values("-", kVersion)[1])
+		launchPadGui.Add("Text", "x560 YP w30 Section Right", string2Values("-", kVersion)[1])
+
+		launchPadGui.SetFont("c606060 s6")
+
+		try {
+			if (string2Values("-", kVersion)[2] != "release")
+				launchPadGui.Add("Text", "x562 YP+12 w30 BackgroundTrans Right", StrUpper(string2Values("-", kVersion)[2]))
+		}
 
 		launchPadGui.SetFont("s9 Norm", "Arial")
 		launchPadGui.SetFont("Italic Underline", "Arial")
 
-		launchPadGui.Add("Text", "x233 YP+20 w140 cBlue Center", translate("Applications")).OnEvent("Click", openDocumentation.Bind(launchPadGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller"))
+		launchPadGui.Add("Text", "x233 YS+20 w140 cBlue Center", translate("Applications")).OnEvent("Click", openDocumentation.Bind(launchPadGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller"))
 
 		launchPadGui.SetFont("s8 Norm", "Arial")
 

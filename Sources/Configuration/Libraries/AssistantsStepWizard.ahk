@@ -166,11 +166,13 @@ class AssistantsStepWizard extends ActionsStepWizard {
 		}
 
 		assistantActionFunctionSelect(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		assistantActionFunctionMenu(listView, line, *) {
-			this.actionFunctionSelect(line)
+			if line
+				this.actionFunctionSelect(line)
 		}
 
 		for page, assistant in this.Definition {

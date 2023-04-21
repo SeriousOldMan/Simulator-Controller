@@ -3758,6 +3758,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.selectSettings(false)
 			this.updateState()
+
+			this.SettingsListView.Redraw()
 		}
 		finally {
 			window.Opt("-Disabled")
@@ -3788,6 +3790,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.selectSettings(false)
 			this.updateState()
+
+			this.SettingsListView.Redraw()
 		}
 		finally {
 			window.Opt("-Disabled")
@@ -3842,6 +3846,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			this.selectSettings(false)
 			this.updateState()
+
+			this.SettingsListView.Redraw()
 		}
 		finally {
 			window.Opt("-Disabled")

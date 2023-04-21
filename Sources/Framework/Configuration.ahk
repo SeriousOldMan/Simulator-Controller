@@ -208,13 +208,7 @@ class Application extends ConfigurationItem {
 
 		if (special && (specialStartup && specialStartup != "")) {
 			try {
-				if IsLabel(specialStartup) {
-					%specialStartup%()
-
-					return this.CurrentPID
-				}
-				else
-					return (this.iRunningPID := %specialStartup%())
+				return (this.iRunningPID := %specialStartup%())
 			}
 			catch Any as exception {
 				logError(exception)

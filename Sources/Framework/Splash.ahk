@@ -80,7 +80,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 
 		SplitPath(image, , , &extension)
 
-		splashGui := Window()
+		splashGui := Window({Options: "+E0x02000000"})
 
 		splashGuis[splashCounter] := splashGui
 

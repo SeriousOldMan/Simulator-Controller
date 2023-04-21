@@ -5235,7 +5235,7 @@ class RaceCenter extends ConfigurationItem {
 	startWorking(state := true) {
 		local start := false
 		local document := this.WaitViewer.document
-		local html
+		local html, curAutoActivate
 
 		if state {
 			start := (this.iWorking == 0)
@@ -5254,7 +5254,16 @@ class RaceCenter extends ConfigurationItem {
 				this.iWorking := 0
 		}
 
-		this.Window.Opt(state ? "+Disabled" : "-Disabled")
+		curAutoActivate := this.Window.AutoActivate
+
+		try {
+			this.Window.AutoActivate := false
+
+			this.Window.Opt(state ? "+Disabled" : "-Disabled")
+		}
+		finally {
+			this.Window.AutoActivate := curAutoActivate
+		}
 
 		document.open()
 

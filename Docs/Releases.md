@@ -16,7 +16,7 @@
   13. Introduced support for the new Stream Deck Plus Layout.
   14. Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start.
   15. Reduced # of incorrect warnings and announcements for the Race Assistants after a pitstop with driver swap.
-  16. Updated the car meta data fpr *RaceRoom Racing Experience* to the latest version.
+  16. Updated the car meta data for *RaceRoom Racing Experience* to the latest version.
   17. Updated car and track meta data for *Assetto Corsa Competizione* 1.9, incl. new default for target tyre pressures.
   18. [Developer] Renamed configuration map functions to [Multi Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#multi-maps-multimapahk) functions.
   19. [Developer] Introduced a couple of [specialized Array and Map](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#collections-classes) subtypes, which supports failure safe handling of unset elements.

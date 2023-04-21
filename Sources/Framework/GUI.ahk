@@ -683,14 +683,10 @@ class Window extends Gui {
 
 		super.Show(arguments*)
 
-		WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
-		WinGetPos(&x, &y, &width, &height, this)
-
-		for ignore, control in this.iCustomControls
-			if (control.Visible && control.HasProp("Show"))
-				control.Show()
-
 		if !this.MinWidth {
+			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
+			WinGetPos(&x, &y, &width, &height, this)
+
 			this.iTitleBarHeight := (height - cHeight)
 
 			this.iMinWidth := width

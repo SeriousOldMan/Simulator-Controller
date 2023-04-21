@@ -124,7 +124,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		RestrictResize(&deltaWidth, &deltaHeight) {
 			if (deltaWidth > 300) {
-				deltaWidth := (this.Window.Width - this.Window.MinWidth)
+				deltaWidth := 300
 
 				return true
 			}

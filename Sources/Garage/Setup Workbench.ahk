@@ -671,9 +671,9 @@ class SetupWorkbench extends ConfigurationItem {
 						<meta charset='utf-8'>
 						<head>
 							<style>
-								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-								.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-								.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+								.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+								.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
 							</style>
 							<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 							<script type="text/javascript">

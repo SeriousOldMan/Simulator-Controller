@@ -1421,9 +1421,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			    <meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E8E8; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
@@ -1691,7 +1691,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		drawChartFunction .= "`n]);"
 
 		series := "series: {"
-		vAxis := "vAxis: { gridlines: { color: 'E0E0E0' }, "
+		vAxis := "vAxis: { gridlines: { color: '#E0E0E0' }, "
 
 		for ignore, yAxis in yAxises {
 			if (A_Index > 1) {
@@ -1712,7 +1712,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		vAxis .= "}"
 
 		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '#E0E0E0' } }, " . series . ", " . vAxis . "};")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
@@ -2716,9 +2716,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			<meta charset='utf-8'>
 			<head>
 				<style>
-					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-					.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-					.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+					.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+					.oddRowStyle { font-size: 11px; background-color: #E8E8E8; }
 				</style>
 				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 				<script type="text/javascript">

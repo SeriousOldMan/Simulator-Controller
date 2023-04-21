@@ -5243,6 +5243,7 @@ class RaceCenter extends ConfigurationItem {
 
 	startWorking(state := true) {
 		local start := false
+		local document := this.WaitViewer.document
 		local html, curAutoActivate
 
 		if state {
@@ -8341,9 +8342,9 @@ class RaceCenter extends ConfigurationItem {
 			    <meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
@@ -8355,6 +8356,11 @@ class RaceCenter extends ConfigurationItem {
 					</script>
 				</head>
 				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
+					</style>
 					<div id="chart_id" style="width: %width%px; height: %height%px"></div>
 				</body>
 			</html>
@@ -8508,9 +8514,9 @@ class RaceCenter extends ConfigurationItem {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
 						%tableCSS%
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -8536,10 +8542,12 @@ class RaceCenter extends ConfigurationItem {
 
 			script .= "</script></head>"
 		}
-		else
+		else {
 			script := ""
+			style := ""
+		}
 
-		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } </style><div>" . html . "</div></body></html>")
+		html := ("<html>" . script . "<body style='background-color: #" . this.Window.AltBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><style> div, table { font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style> #header { font-size: 12px; } " . style . "</style><div>" . html . "</div></body></html>")
 
 		this.iSelectedDetailHTML := html
 
@@ -8896,9 +8904,9 @@ class RaceCenter extends ConfigurationItem {
 					<style>
 						.lbox { float: left; text-align: center; width: %hWidth%; }
 						.rbox { float: right; }
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
 						%tableCSS%
 					</style>
 				</head>

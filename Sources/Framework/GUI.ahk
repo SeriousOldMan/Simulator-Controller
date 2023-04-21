@@ -176,6 +176,7 @@ class Window extends Gui {
 
 	iAltBackColor := "D8D8D8"
 
+	iAutoActivate := true
 	iBlockRedraw := 0
 
 	class Resizer {
@@ -522,6 +523,16 @@ class Window extends Gui {
 		}
 	}
 
+	AutoActivate {
+		Get {
+			return this.iAutoActivate
+		}
+
+		Set {
+			return (this.iAutoActivate := value)
+		}
+	}
+
 	Resizers[control?] {
 		Get {
 			if isSet(control) {
@@ -590,7 +601,7 @@ class Window extends Gui {
 	Opt(options) {
 		super.Opt(options)
 
-		if InStr(options, "-Disabled")
+		if (InStr(options, "-Disabled") && this.AutoActivate)
 			this.Show("NA")
 	}
 

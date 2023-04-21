@@ -538,7 +538,7 @@ changeProtection(up, protect := false, block := false) {
 			if protect
 				Critical("Off")
 		}
-		else if (level <= 0)
+		else if (level < 0)
 			throw "Nesting error detected in changeProtection..."
 	}
 }

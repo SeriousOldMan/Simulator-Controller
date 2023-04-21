@@ -1936,8 +1936,12 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
 
-		this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer")
+		this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
 		this.iWaitViewer.navigate("about:blank")
+
+		this.iWaitViewer.document.open()
+		this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
+		this.iWaitViewer.document.close()
 
 		centerGui.SetFont("s8 Norm cBlack", "Arial")
 
@@ -5239,7 +5243,6 @@ class RaceCenter extends ConfigurationItem {
 
 	startWorking(state := true) {
 		local start := false
-		local document := this.WaitViewer.document
 		local html, curAutoActivate
 
 		if state {
@@ -5270,13 +5273,10 @@ class RaceCenter extends ConfigurationItem {
 			this.Window.AutoActivate := curAutoActivate
 		}
 
-		document.open()
-
-		html := (state ? ("<img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>") : "")
-		html := ("<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>")
-
-		document.write(html)
-		document.close()
+		if state
+			this.WaitViewer.Show()
+		else
+			this.WaitViewer.Hide()
 
 		return (start || (this.iWorking == 0))
 	}

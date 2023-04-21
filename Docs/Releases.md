@@ -1,3 +1,7 @@
+## 5.0.0.1-beta 03/21/23
+  1. Fixed "Race Center" coming to the front of the window stack all 10 seconds.
+  2. Introduced a field with a subversion info in "Simulator Startup".
+
 ## 5.0.0.0-beta 03/21/23
   **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to **make a backup copy of the "Simulator Controller" folder in your "Documents" folder**, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
 

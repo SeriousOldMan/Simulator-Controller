@@ -1567,7 +1567,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if getWindowSize("Session Database", &w, &h)
 			window.Resize("Initialize", w, h)
-		this.updateState()
 
 		if (this.RequestorPID && this.moduleAvailable("Pressures"))
 			this.selectModule("Pressures")

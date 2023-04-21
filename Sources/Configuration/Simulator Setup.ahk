@@ -1966,7 +1966,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	setInfo(html) {
-		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "' style='overflow: auto' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . html . "</body></html>"
+		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; font-family: Arial, Helvetica, sans-serif; font-size: 11px; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>" . html . "</body></html>"
 
 		this.HelpWindow["infoViewer"].Value.document.open()
 		this.HelpWindow["infoViewer"].Value.document.write(html)

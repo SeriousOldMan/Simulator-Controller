@@ -1418,11 +1418,11 @@ class SetupWorkbench extends ConfigurationItem {
 				row := (A_Index + index)
 
 				for ignore, widget in this.SelectedCharacteristicsWidgets[this.SelectedCharacteristics[row]] {
-					widget.GetPos(&posX, &posY, &posW, &posH)
+					ControlGetPos(&posX, &posY, &posW, &posH, widget)
 
 					y := (posY - kCharacteristicHeight)
 
-					widget.Move(posX, Y)
+					ControlMove(posX, Y, , , widget)
 					widget.Redraw()
 				}
 			}

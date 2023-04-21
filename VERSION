@@ -2,7 +2,7 @@
 Version=5.0.0.1-beta
 Target=5.0.0.1-beta
 Date=04/21/2023
-Download=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout
+Download=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout, No more cut warnings in non-race sessions
 Changes=
 [Release]
 Version=5.0.0.1-beta

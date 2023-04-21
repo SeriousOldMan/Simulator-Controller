@@ -1854,7 +1854,7 @@ class RaceSpotter extends GridRaceAssistant {
 	cutWarning(lastLap, sector, wasValid, lastWarnings) {
 		local knowledgeBase := this.KnowledgeBase
 
-		if ((wasValid && !knowledgeBase.getValue("Lap.Valid", true)) || (lastWarnings < knowledgeBase.getValue("Lap.Warnings", 0))) {
+		if ((this.Session = kSessionRace) && ((wasValid && !knowledgeBase.getValue("Lap.Valid", true)) || (lastWarnings < knowledgeBase.getValue("Lap.Warnings", 0)))) {
 			this.getSpeaker().speakPhrase(((knowledgeBase.getValue("Lap.Warnings", 0) > 1) || (this.DriverCar.InvalidLaps > 3)) ? "RepeatedCut" : "Cut")
 
 			return true

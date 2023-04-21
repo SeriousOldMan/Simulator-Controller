@@ -998,7 +998,7 @@ moveByMouse(window, descriptor := false, *) {
 			newX := winX + (x - anchorX)
 			newY := winY + (y - anchorY)
 
-			window.Move(newX, newY)
+			WinMove(newX, newY, , , window)
 		}
 
 		WinGetPos(&winX, &winY, , , window)

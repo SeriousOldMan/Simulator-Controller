@@ -1,6 +1,6 @@
 ## 5.0.0.1-beta 03/24/23 (planned)
   1. A large list of minor fixes.
-  2. Fixed "Race Center" coming to the front of the window stack all 10 seconds.
+  2. Fixed "Race Center" coming to the front of the window stack and redraw reports every 10 seconds.
   3. Introduced a field with a subversion info in "Simulator Startup".
   4. Added a preset for the new Stream Deck Plus layout.
 

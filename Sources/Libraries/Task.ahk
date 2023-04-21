@@ -400,6 +400,7 @@ class Task {
 		local oldCurrentTask := Task.CurrentTask
 		local window := theTask.Window
 		local next := false
+		local curAutoActivate
 
 		Task.sCurrentTask := theTask
 
@@ -411,7 +412,20 @@ class Task {
 		}
 		finally {
 			if window
-				window.Opt("-Disabled")
+				if window.HasProp("AutoActivate") {
+					curAutoActivate := window.AutoActivate
+
+					try {
+						window.AutoActivate := false
+
+						window.Opt("-Disabled")
+					}
+					finally {
+						window.AutoActivate := curAutoActivate
+					}
+				}
+				else
+					window.Opt("-Disabled")
 
 			Task.sCurrentTask := oldCurrentTask
 		}

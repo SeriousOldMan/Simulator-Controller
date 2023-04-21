@@ -410,7 +410,7 @@ createMessageReceiver() {
 	messageReceiverGui.MarginX := "10"
 	messageReceiverGui.MarginY := "10"
 
-	messageReceiverGui.Show("X0 Y" . (A_ScreenHeight - 100) . "W1 H1")
+	messageReceiverGui.Show("X0 Y" . (A_ScreenHeight - 1) . "W1 H1 NA")
 }
 
 unknownMessageHandler(category, data) {

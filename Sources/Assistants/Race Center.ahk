@@ -5262,21 +5262,25 @@ class RaceCenter extends ConfigurationItem {
 				this.iWorking := 0
 		}
 
-		curAutoActivate := this.Window.AutoActivate
+		if state {
+			this.Window.Opt("+Disabled")
 
-		try {
-			this.Window.AutoActivate := false
-
-			this.Window.Opt(state ? "+Disabled" : "-Disabled")
-		}
-		finally {
-			this.Window.AutoActivate := curAutoActivate
-		}
-
-		if state
 			this.WaitViewer.Show()
-		else
+		}
+		else {
 			this.WaitViewer.Hide()
+
+			curAutoActivate := this.Window.AutoActivate
+
+			try {
+				this.Window.AutoActivate := false
+
+				this.Window.Opt("-Disabled")
+			}
+			finally {
+				this.Window.AutoActivate := curAutoActivate
+			}
+		}
 
 		return (start || (this.iWorking == 0))
 	}

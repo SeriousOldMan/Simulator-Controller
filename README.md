@@ -33,23 +33,21 @@ Simply download and run [Simulator Controller.exe](https://www.dropbox.com/s/vu3
 VERY IMPORTANT (for users with an already configured installation of Simulator Controller):
 An automated update mechanism for local configuration databases exists since Release 2.0. Please read the [information about the update process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes) carefully before starting one of the Simulator Controller applications. It might also be a good idea, to make a backup copy of the *Simulator Controller* folder in your user *Documents* folder, just to be on the safe side. Also, if you have installed and used a prerelease version, it will be necessary to rerun the automatic update. Please consult the documentation mentioned above on how to do this.
 
-[4.6.3.2-release](https://cutt.ly/h7h1E9o) (Changes: A couple of small fixes and improvements.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-463) of this version and all the versions you might have skipped, before installing and using this version.
-
-##### Earlier release builds
-
-[4.6.3.1-release](https://cutt.ly/i4ppetI) (Changes: Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC.)
-
-[4.6.3.0-release](https://cutt.ly/v8VeUy6) (Changes: Allow multiple actions for a custome voice command, Allow multiple actions for a custom controller function, Increased performance of lap update in "Race Center", Spotter informas about opponent pitstops, Better detection of retired cars in "Race Reports" and "Race Center", Fixed potential race condition in session database, Fixed update procedure for SilentAssistant, New voice command for requesting the number of active cars in a session, New information request action "ActiveCars" for Race Strategist and Race Spotter, New Stream Deck icon for the "ActiveCars" information request action, New car models for "Setup Advisor", Support for input audio routing, New voice test script in *Utilities* folder.)
-
-#### Latest development build
-
-[5.0.0.0-dev](https://www.dropbox.com/s/00vhdmem6thezbb/Simulator%20Controller%205.0.0.0-dev.zip?dl=1) (Early build for 5.0.0. Changes: Full rework of all applications to support the new AutoHotkey 2.0 language, Support for window reszing in allmost all applications, Renamed controller action function "hotkey" to "trigger" to avoid conflict with new builtin function, Renamed "Setup Advisor" to "Setup Workbench", Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor", Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins, Renamed configuration map functions to multi map functions, Big performance improvements, Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty, Modernized UI, especially on Windows 11, Introduced Stream Deck Plus Layout, Updated default value for target pressures to 26.5, Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start, Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap, New functions and classes for plugin developers, Car meta data update for R3E, Optimized collaboration between Strategist and Engineer for planned or recommended pitstops, Updated meta data for *Assetto Corsa Competizione* 1.9.)
+[5.0.0.0-beta](https://cutt.ly/j5yByMG) (Public Beta for 5.0.0. Changes: Full rework of all applications to support the new AutoHotkey 2.0 language, Support for window reszing in allmost all applications, Renamed controller action function "hotkey" to "trigger" to avoid conflict with new builtin function, Renamed "Setup Advisor" to "Setup Workbench", Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor", Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins, Renamed configuration map functions to multi map functions, Big performance improvements, Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty, Modernized UI, especially on Windows 11, Introduced Stream Deck Plus Layout, Updated default value for target pressures to 26.5, Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start, Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap, New functions and classes for plugin developers, Car meta data update for R3E, Optimized collaboration between Strategist and Engineer for planned or recommended pitstops, Updated meta data for *Assetto Corsa Competizione* 1.9.)
 
 IMPORTANT: This version introduces a rewrite of major parts of the suite. It may contain more bugs than usual and is therefore to be used with caution. Be sure to secure your personal data by making a backup copy of [Documents]\Simulator Controller **before** updating to this version.
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes) and - even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-500) of this version and all the versions you might have skipped, before installing and using this version.
+
+##### Earlier release builds
+
+[4.6.3.2-release](https://cutt.ly/h7h1E9o) (Changes: A couple of small fixes and improvements.)
+
+[4.6.3.1-release](https://cutt.ly/i4ppetI) (Changes: Improved detection of retired cars in "Race Reports" and "Race Center", Improved display of pitstops in "Race Center", Fixed a bug in audio routing where a route was forgotten when an assistants restarted, Fixed german grammars for Spotter and Strategist, New car models for "Setup Advisor", Fixed 0 penalty for ACC.)
+
+#### Latest development build
+
+None for the moment...
 
 ### Documentation
 

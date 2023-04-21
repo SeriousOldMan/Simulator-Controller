@@ -1,4 +1,10 @@
-## 5.0.0.0-beta 03/21/23 (planned)
+## 5.0.0.1-beta 03/24/23 (planned)
+  1. A large list of minor fixes.
+  2. Fixed "Race Center" coming to the front of the window stack and redraw reports every 10 seconds.
+  3. Introduced a field with a subversion info in "Simulator Startup".
+  4. Added a preset for the new Stream Deck Plus layout.
+
+## 5.0.0.0-beta 03/21/23
   **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to **make a backup copy of the "Simulator Controller" folder in your "Documents" folder**, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
 
   1. Minor bugfixes, as always
@@ -8,7 +14,7 @@
   5. Support for window resizing in almost all applications.
   6. Renamed controller action function "hotkey" to "trigger" to avoid conflict with a new builtin function.
   7. Renamed "Setup Advisor" to ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench).
-  8. Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor"
+  8. Allow multiple Setup Editor windows to be opened at the same time in "Setup Workbench"
   9. Renamed plugin argument "openSetupAdvisor" to ["openSetupWorkbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for all Race Assistant plugins.
   10. Big performance improvements in the rule engine.
   11. Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty.

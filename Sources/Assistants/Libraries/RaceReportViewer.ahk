@@ -250,7 +250,7 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local classes := CaseInsenseMap()
 		local invalids := 0
-		local raceData, drivers, positions, times, cars, carsCount, lapsCount, simulator, sessionDB, car
+		local raceData, drivers, positions, times, cars, carsCount, lapsCount, simulator, car
 		local class, hasClasses, classResults, valid
 		local ignore, lap, rows, hasDNF, result, lapTimes, hasNull, lapTime, min, avg, filteredLapTimes, nr, row
 
@@ -280,8 +280,6 @@ class RaceReportViewer extends RaceReportReader {
 			carsCount := getMultiMapValue(raceData, "Cars", "Count")
 			lapsCount := getMultiMapValue(raceData, "Laps", "Count")
 			simulator := getMultiMapValue(raceData, "Session", "Simulator")
-
-			sessionDB := SessionDatabase()
 
 			loop carsCount {
 				car := A_Index
@@ -367,7 +365,7 @@ class RaceReportViewer extends RaceReportReader {
 						classes[class].Push(Array(A_Index, result))
 
 					rows.Push(Array("'" . class . "'", "'" . nr . "'"
-								  , "'" . StrReplace(sessionDB.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
+								  , "'" . StrReplace(SessionDatabase.getCarName(simulator, cars[A_Index][2]), "'", "\'") . "'", "'" . StrReplace(drivers[1][A_Index], "'", "\'") . "'"
 								  , "'" . RaceReportViewer.lapTimeDisplayValue(min) . "'"
 								  , "'" . RaceReportViewer.lapTimeDisplayValue(avg) . "'", result, result))
 				}
@@ -587,7 +585,7 @@ class RaceReportViewer extends RaceReportReader {
 
 	showPositionsReport() {
 		local report := this.Report
-		local raceData, drivers, positions, times, cars, carsCount, simulator, sessionDB
+		local raceData, drivers, positions, times, cars, carsCount, simulator
 		local carIndices, minPosition, maxPosition, newMinPosition, newMaxPosition
 		local drawChartFunction, car, valid, ignore, lap, hasData, position, lapPositions, selectedClasses
 
@@ -604,7 +602,6 @@ class RaceReportViewer extends RaceReportReader {
 			carsCount := getMultiMapValue(raceData, "Cars", "Count")
 			simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
-			sessionDB := SessionDatabase()
 			carIndices := []
 			minPosition := 9999
 			maxPosition := 0
@@ -641,7 +638,7 @@ class RaceReportViewer extends RaceReportReader {
 						carIndices.Push(car)
 
 						cars.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
-									   . StrReplace(sessionDB.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
+									   . StrReplace(SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 					}
 				}
 			}
@@ -1076,7 +1073,7 @@ class RaceReportViewer extends RaceReportReader {
 		local report := this.Report
 		local raceData, drivers, positions, times, selectedCars, cars, laps, lapTimes, driverTimes, length
 		local ignore, car, carTimes, index, dIndex, time, text, columns, lap
-		local sessionDB, simulator, selectedClasses
+		local simulator, selectedClasses
 
 		if report {
 			raceData := true
@@ -1111,14 +1108,13 @@ class RaceReportViewer extends RaceReportReader {
 				length := false
 
 			simulator := getMultiMapValue(raceData, "Session", "Simulator")
-			sessionDB := SessionDatabase()
 			columns := ["'" . translate("Lap") . "'"]
 
 			for index, car in selectedCars
 				if inList(selectedClasses, getMultiMapValue(raceData, "Cars", "Car." . car . ".Class", kUnknown))
 					if driverTimes.Has(car) {
 						columns.Push("'#" . getMultiMapValue(raceData, "Cars", "Car." . car . ".Nr") . A_Space
-										  . StrReplace(sessionDB.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
+										  . StrReplace(SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . car . ".Car")), "'", "\'") . "'")
 
 						carTimes := []
 
@@ -1281,7 +1277,7 @@ getBoxAndWhiskerJSFunctions() {
 editReportSettings(raceReport, report := false, availableOptions := false) {
 	local x, y, oldEncoding
 	local lapsDef, laps, baseLap, lastLap, ignore, lap, yOption, headers, allDrivers, selectedDrivers
-	local sessionDB, simulator, ignore, driver, column1, column2, startLap, endLap, lap, index
+	local simulator, ignore, driver, column1, column2, startLap, endLap, lap, index
 	local newLaps, newDrivers, rowNumber, classes, selectedClass, valid
 
 	static reportSettingsGui
@@ -1355,7 +1351,6 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 				loop allDrivers.Length
 					selectedDrivers.Push(A_Index)
 
-			sessionDB := SessionDatabase()
 			simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
 			if inList(options, "Classes") {
@@ -1377,7 +1372,7 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 						else
 							column1 := driver
 
-						column2 := sessionDB.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car"))
+						column2 := SessionDatabase.getCarName(simulator, getMultiMapValue(raceData, "Cars", "Car." . A_Index . ".Car"))
 
 						driversListView.Add(inList(selectedDrivers, A_Index) ? "Check" : "", column1, column2)
 					}
@@ -1407,23 +1402,23 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 		drivers := []
 		laps := []
 
-		oldEncoding := A_FileEncoding
+		if (inList(options, "Drivers") || inList(options, "Cars")) {
+			oldEncoding := A_FileEncoding
 
-		FileEncoding("UTF-8")
+			FileEncoding("UTF-8")
 
-		try {
-			loop Read, report . "\Drivers.CSV"
-				drivers.Push(string2Values(";", A_LoopReadLine))
+			try {
+				loop Read, report . "\Drivers.CSV"
+					drivers.Push(string2Values(";", A_LoopReadLine))
 
-			drivers := correctEmptyValues(drivers)
-
-			loop Read, report . "\Laps.CSV"
-				laps.Push(string2Values(";", A_LoopReadLine))
-
-			laps := correctEmptyValues(laps)
-		}
-		finally {
-			FileEncoding(oldEncoding)
+				drivers := correctEmptyValues(drivers)
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+			finally {
+				FileEncoding(oldEncoding)
+			}
 		}
 
 		reportSettingsGui := Window()
@@ -1612,7 +1607,6 @@ editReportSettings(raceReport, report := false, availableOptions := false) {
 				allDrivers := reportViewer.getReportDrivers(raceData, drivers)
 				selectedDrivers := CaseInsenseMap()
 
-				sessionDB := SessionDatabase()
 				simulator := getMultiMapValue(raceData, "Session", "Simulator")
 
 				if inList(options, "Classes") {

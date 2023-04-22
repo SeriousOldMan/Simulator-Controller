@@ -853,6 +853,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			local x, y, originalX, originalY, currentX, currentY, msgResult
 
 			MouseGetPos(&x, &y)
+			
+			x := screen2Window(x)
+			y := screen2Window(y)
 
 			if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 				action := editor.findTrackAction(coordinateX, coordinateY)
@@ -872,6 +875,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						while (GetKeyState("LButton", "P")) {
 							MouseGetPos(&x, &y)
+			
+							x := screen2Window(x)
+							y := screen2Window(y)
 
 							if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 								action.X := coordinateX
@@ -1512,6 +1518,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if (this.SelectedModule = "Automation") {
 				MouseGetPos(&x, &y)
+			
+				x := screen2Window(x)
+				y := screen2Window(y)
 
 				coordinateX := false
 				coordinateY := false
@@ -2328,6 +2337,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		CoordMode("Mouse", "Screen")
 
 		MouseGetPos(&x, &y)
+			
+		x := screen2Window(x)
+		y := screen2Window(y)
 
 		CoordMode("Mouse", oldCoordMode)
 
@@ -2348,6 +2360,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		CoordMode("Mouse", "Screen")
 
 		MouseGetPos(&x, &y)
+			
+		x := screen2Window(x)
+		y := screen2Window(y)
 
 		CoordMode("Mouse", oldCoordMode)
 

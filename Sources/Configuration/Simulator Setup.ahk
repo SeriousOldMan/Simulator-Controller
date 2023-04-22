@@ -176,6 +176,8 @@ class SetupWizard extends ConfiguratorPanel {
 		Close(*) {
 			if this.SetupWizard.finishSetup(false)
 				ExitApp(0)
+			else
+				return true
 		}
 	}
 
@@ -1627,10 +1629,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 			name := function.RemoveAt(1)
 
-			knowledgeBase.addFact("Controller.Function." . A_Index, name)
+			knowledgeBase.setFact("Controller.Function." . A_Index, name)
 
 			if (function.Length > 0)
-				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String(" ### ", function*))
+				knowledgeBase.setFact("Controller.Function." . name . ".Triggers", values2String(" ### ", function*))
 		}
 
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length)

@@ -234,7 +234,10 @@ class ControllerEditor extends ConfiguratorPanel {
 			moveByMouse(window)
 
 			WinGetPos(&x, &y, &width, &height, window)
-
+			
+			x := screen2Window(x)
+			y := screen2Window(y)
+			
 			preview := ControllerPreview.ControllerPreviews[window]
 
 			preview.PreviewManager.setPreviewCenter(window, x + Round(width / 2), y + Round(height / 2))
@@ -1090,9 +1093,10 @@ class LayoutsList extends ConfigurationItemList {
 	}
 
 	buildItemFromEditor(isNew := false) {
-		local layout
+		local name := Trim(this.Control["layoutNameEdit"].Text)
+		local ignore, index, layout, duplicate
 
-		if ((Trim(this.Control["layoutNameEdit"].Text) = "") || (this.Control["layoutRowsEdit"].Text = 0) || (this.Control["layoutColumnsEdit"].Text = 0)) {
+		if ((name = "") || (this.Control["layoutRowsEdit"].Text = 0) || (this.Control["layoutColumnsEdit"].Text = 0)) {
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 			OnMessage(0x44, translateOkButton, 0)
@@ -1100,6 +1104,26 @@ class LayoutsList extends ConfigurationItemList {
 			return false
 		}
 		else {
+			duplicate := false
+
+			if isNew {
+				for ignore, layout in this.ItemList
+					if (layout[1] = name)
+						duplicate := true
+			}
+			else
+				for index, layout in this.ItemList
+					if ((layout[1] = name) && (index != this.CurrentItem))
+						duplicate := true
+
+			if duplicate {
+				OnMessage(0x44, translateOkButton)
+				MsgBox(translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+				OnMessage(0x44, translateOkButton, 0)
+
+				return false
+			}
+
 			if (this.Control["layoutRowDropDown"].Value > 0)
 				this.iRowDefinitions[this.Control["layoutRowDropDown"].Value] := this.Control["layoutRowEdit"].Text
 
@@ -2085,7 +2109,10 @@ controlClick(window, *) {
 
 	try {
 		MouseGetPos(&clickX, &clickY)
-
+		
+		clickX := screen2Window(clickX)
+		clickY := screen2Window(clickY)
+		
 		row := 0
 		column := 0
 		isEmpty := false

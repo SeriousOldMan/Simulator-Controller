@@ -351,11 +351,17 @@ controlEvent(window, control, *) {
 	local function, x, y, descriptor
 
 	MouseGetPos(&x, &y)
+			
+	x := screen2Window(x)
+	y := screen2Window(y)
 
 	function := ButtonBox.findButtonBox(window).findControl(control)
 
 	if function {
 		MouseGetPos(&x, &y)
+			
+		x := screen2Window(x)
+		y := screen2Window(y)
 
 		descriptor := ConfigurationItem.splitDescriptor(function[1])
 

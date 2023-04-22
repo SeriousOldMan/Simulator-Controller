@@ -411,6 +411,8 @@ createMessageReceiver() {
 	messageReceiverGui.MarginY := "10"
 
 	messageReceiverGui.Show("X0 Y" . (A_ScreenHeight - 1) . "W1 H1 NA")
+
+	WinSetTransparent(0, messageReceiverGui)
 }
 
 unknownMessageHandler(category, data) {

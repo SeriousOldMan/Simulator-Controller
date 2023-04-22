@@ -687,6 +687,9 @@ class Window extends Gui {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
 			WinGetPos(&x, &y, &width, &height, this)
 
+			cWidth := cWidth * A_ScreenDPI / 96
+			cHeight := cHeight * A_ScreenDPI / 96
+
 			this.iTitleBarHeight := (height - cHeight)
 
 			this.iMinWidth := width

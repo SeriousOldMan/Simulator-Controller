@@ -566,7 +566,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		deleteSetting(*) {
-			local settingDropDown := window["settingDropDown"].Text
+			local settingDropDown := editorGui["settingDropDown"].Text
 			local selected, settings, section, key, ignore, setting
 
 			selected := editor.SettingsListView.GetNext(0)
@@ -853,7 +853,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			local x, y, originalX, originalY, currentX, currentY, msgResult
 
 			MouseGetPos(&x, &y)
-			
+
 			x := screen2Window(x)
 			y := screen2Window(y)
 
@@ -875,7 +875,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						while (GetKeyState("LButton", "P")) {
 							MouseGetPos(&x, &y)
-			
+
 							x := screen2Window(x)
 							y := screen2Window(y)
 
@@ -1518,7 +1518,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			if (this.SelectedModule = "Automation") {
 				MouseGetPos(&x, &y)
-			
+
 				x := screen2Window(x)
 				y := screen2Window(y)
 
@@ -2337,7 +2337,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		CoordMode("Mouse", "Screen")
 
 		MouseGetPos(&x, &y)
-			
+
 		x := screen2Window(x)
 		y := screen2Window(y)
 
@@ -2360,7 +2360,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		CoordMode("Mouse", "Screen")
 
 		MouseGetPos(&x, &y)
-			
+
 		x := screen2Window(x)
 		y := screen2Window(y)
 

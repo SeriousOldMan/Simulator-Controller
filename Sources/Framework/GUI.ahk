@@ -1134,7 +1134,17 @@ getControllerActionIcons() {
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeGUI() {
+	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
+	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
+initializeGUI()

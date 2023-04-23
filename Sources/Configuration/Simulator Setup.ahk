@@ -665,8 +665,6 @@ class SetupWizard extends ConfiguratorPanel {
 
 		helpGui.Add("HTMLViewer", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer")
 
-		helpGui["infoViewer"].navigate("about:blank")
-
 		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #" . helpGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
 		helpGui["infoViewer"].document.write(html)
@@ -2280,7 +2278,6 @@ class StartStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
 
-		widget1.navigate("about:blank")
 		widget1.document.write(html)
 
 		; window.Add(StartStepWizard.RestartVideoResizer(this, window))
@@ -2318,7 +2315,6 @@ class StartStepWizard extends StepWizard {
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget3.navigate("about:blank")
 			widget3.document.write(html)
 
 			this.registerWidgets(2, widget1, widget2, widget3, widget4)
@@ -2439,7 +2435,6 @@ class FinishStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 50) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
-		widget1.navigate("about:blank")
 		widget1.document.write(html)
 
 		this.registerWidget(1, widget1)

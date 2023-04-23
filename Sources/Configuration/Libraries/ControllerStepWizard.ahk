@@ -234,7 +234,6 @@ class ControllerStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget4.navigate("about:blank")
 		widget4.document.write(html)
 
 		this.iFunctionsListView := widget3

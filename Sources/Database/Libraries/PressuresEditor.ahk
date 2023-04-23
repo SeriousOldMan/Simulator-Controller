@@ -186,7 +186,6 @@ class PressuresEditor {
 		pressuresEditorGui.Add("Text", "x270 yp w140 h23 +0x200", substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)}))
 
 		this.iPressuresViewer := pressuresEditorGui.Add("HTMLViewer", "x16 yp+30 w394 h160 Border vpressuresViewer")
-		this.PressuresViewer.navigate("about:blank")
 		this.PressuresViewer.document.write("<html><body style='background-color: #" . pressuresEditorGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 
 		this.iPressuresListView := pressuresEditorGui.Add("ListView", "x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit", collect(["Tyre", "Pressure", "#"], translate))

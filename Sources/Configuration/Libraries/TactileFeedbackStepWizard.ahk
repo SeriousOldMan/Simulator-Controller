@@ -178,7 +178,6 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget15.navigate("about:blank")
 		widget15.document.write(html)
 
 		this.setActionsListView(widget14)

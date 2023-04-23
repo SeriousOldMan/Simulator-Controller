@@ -551,7 +551,6 @@ class ModulesStepWizard extends StepWizard {
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget4.navigate("about:blank")
 			widget4.document.write(html)
 
 			y += 163
@@ -603,7 +602,6 @@ class ModulesStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget7.navigate("about:blank")
 		widget7.document.write(html)
 
 		this.registerWidgets(this.Pages, widget1, widget2, widget3, widget4, widget5, widget6, widget7)

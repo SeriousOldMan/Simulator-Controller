@@ -226,7 +226,6 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget18.navigate("about:blank")
 		widget18.document.write(html)
 
 		this.setActionsListView(widget17)

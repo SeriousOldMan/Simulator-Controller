@@ -778,8 +778,7 @@ systemMonitor(command := false, arguments*) {
 
 		simulationState := systemMonitorGui.Add("Picture", "x34 ys+73 w32 h32", kIconsDirectory . "Black.ico")
 		simulationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+46 w300 h95")
-		simulationDashboard.navigate("about:blank")
-
+		
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+28 w375 h9", translate("Race Assistants"))
 		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
@@ -787,8 +786,7 @@ systemMonitor(command := false, arguments*) {
 
 		assistantsState := systemMonitorGui.Add("Picture", "x415 ys+73 w32 h32", kIconsDirectory . "Black.ico")
 		assistantsDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+46 w300 h95")
-		assistantsDashboard.navigate("about:blank")
-
+		
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x24 ys+138 w375 h9", translate("Team Session"))
 		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
@@ -796,8 +794,7 @@ systemMonitor(command := false, arguments*) {
 
 		sessionState := systemMonitorGui.Add("Picture", "x34 ys+183 w32 h32 vsessionState", kIconsDirectory . "Black.ico")
 		sessionDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+156 w300 h95")
-		sessionDashboard.navigate("about:blank")
-
+		
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+138 w375 h9", translate("Data Synchronization"))
 		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
@@ -805,8 +802,7 @@ systemMonitor(command := false, arguments*) {
 
 		dataState := systemMonitorGui.Add("Picture", "x415 ys+183 w32 h32 vdataState", kIconsDirectory . "Black.ico")
 		dataDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+156 w300 h95")
-		dataDashboard.navigate("about:blank")
-
+		
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x24 ys+248 w375 h9", translate("Track Automation"))
 		systemMonitorGui.Add("Text", "x160 yp+7 w230 0x10")
@@ -814,8 +810,7 @@ systemMonitor(command := false, arguments*) {
 
 		automationState := systemMonitorGui.Add("Picture", "x34 ys+293 w32 h32 vautomationState", kIconsDirectory . "Black.ico")
 		automationDashboard := systemMonitorGui.Add("HTMLViewer", "x94 ys+266 w300 h95")
-		automationDashboard.navigate("about:blank")
-
+		
 		systemMonitorGui.SetFont("Italic", "Arial")
 		systemMonitorGui.Add("GroupBox", "x405 ys+248 w375 h9", translate("Track Mapping"))
 		systemMonitorGui.Add("Text", "x541 yp+7 w230 0x10")
@@ -823,8 +818,7 @@ systemMonitor(command := false, arguments*) {
 
 		mapperState := systemMonitorGui.Add("Picture", "x415 ys+293 w32 h32 vmapperState", kIconsDirectory . "Black.ico")
 		mapperDashboard := systemMonitorGui.Add("HTMLViewer", "x475 ys+266 w300 h95")
-		mapperDashboard.navigate("about:blank")
-
+		
 		monitorTabView.UseTab(2)
 
 		stateListView := systemMonitorGui.Add("ListView", "x24 ys+28 w756 h336 -Multi -LV0x10 BackgroundD0D0D0 AltSubmit NoSort NoSortHdr", collect(["Module", "Information"], translate))

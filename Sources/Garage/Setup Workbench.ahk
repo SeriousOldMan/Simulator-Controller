@@ -512,8 +512,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.SetFont("s8 Norm", "Arial")
 
 		this.iSettingsViewer := workbenchGui.Add("HTMLViewer", "x420 yp+30 w775 h621 W:Grow H:Grow Border vsettingsViewer")
-		this.SettingsViewer.navigate("about:blank")
-
+		
 		this.showSettingsChart(false)
 
 		/*

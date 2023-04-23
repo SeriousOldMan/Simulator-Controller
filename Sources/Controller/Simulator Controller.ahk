@@ -414,13 +414,23 @@ class GuiFunctionController extends FunctionController {
 
 		try {
 			MouseGetPos(&anchorX, &anchorY)
-			WinGetPos(&winX, &winY, &w, &h, "A")
-
+			
+			anchorX := screen2Window(anchorX)
+			anchorY := screen2Window(anchorY)
+			
+			WinGetPos(&winX, &winY, &w, &h, window)
+			
+			winX := screen2Window(winX)
+			winY := screen2Window(winY)
+			
 			newX := winX
 			newY := winY
 
 			while GetKeyState("LButton", "P") {
 				MouseGetPos(&x, &y)
+			
+				x := screen2Window(x)
+				y := screen2Window(y)
 
 				newX := winX + (x - anchorX)
 				newY := winY + (y - anchorY)

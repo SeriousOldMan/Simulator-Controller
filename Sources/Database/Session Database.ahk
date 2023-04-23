@@ -124,7 +124,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		RestrictResize(&deltaWidth, &deltaHeight) {
 			if (deltaWidth > 300) {
-				deltaWidth := (this.Window.Width - this.Window.MinWidth)
+				deltaWidth := 300
 
 				return true
 			}
@@ -566,7 +566,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		deleteSetting(*) {
-			local settingDropDown := window["settingDropDown"].Text
+			local settingDropDown := editorGui["settingDropDown"].Text
 			local selected, settings, section, key, ignore, setting
 
 			selected := editor.SettingsListView.GetNext(0)
@@ -854,6 +854,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			MouseGetPos(&x, &y)
 
+			x := screen2Window(x)
+			y := screen2Window(y)
+
 			if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 				action := editor.findTrackAction(coordinateX, coordinateY)
 
@@ -872,6 +875,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						while (GetKeyState("LButton", "P")) {
 							MouseGetPos(&x, &y)
+
+							x := screen2Window(x)
+							y := screen2Window(y)
 
 							if editor.findTrackCoordinate(x - editor.iTrackDisplayArea[1], y - editor.iTrackDisplayArea[2], &coordinateX, &coordinateY) {
 								action.X := coordinateX
@@ -1513,6 +1519,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			if (this.SelectedModule = "Automation") {
 				MouseGetPos(&x, &y)
 
+				x := screen2Window(x)
+				y := screen2Window(y)
+
 				coordinateX := false
 				coordinateY := false
 
@@ -1567,7 +1576,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		if getWindowSize("Session Database", &w, &h)
 			window.Resize("Initialize", w, h)
-		this.updateState()
 
 		if (this.RequestorPID && this.moduleAvailable("Pressures"))
 			this.selectModule("Pressures")
@@ -2330,6 +2338,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		MouseGetPos(&x, &y)
 
+		x := screen2Window(x)
+		y := screen2Window(y)
+
 		CoordMode("Mouse", oldCoordMode)
 
 		action := actionDialog(x, y)
@@ -2349,6 +2360,9 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		CoordMode("Mouse", "Screen")
 
 		MouseGetPos(&x, &y)
+
+		x := screen2Window(x)
+		y := screen2Window(y)
 
 		CoordMode("Mouse", oldCoordMode)
 

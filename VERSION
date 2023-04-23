@@ -1,16 +1,17 @@
 [Development]
 Version=5.0.0.1-beta
 Target=5.0.0.1-beta
-Date=04/21/2023
-Download=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout
+Date=04/23/2023
+Download=https://cutt.ly/n5djwmG;https://www.dropbox.com/s/srm7lngnkpduk0k/Simulator%20Controller%205.0.0.1-beta.zip?dl=1
+Changes=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout, No more cut warnings in non-race sessions, Fixed a couple of window operations on devices with active DPI scaling, Fixed report settings for sessions in "Race Center" without standings data, Fixed deletion of entries in the "Session Database", Fixed "Simulator Download", so that it can be manually activated from the application launchpad again
 Changes=
 [Release]
 Version=5.0.0.1-beta
-Date=04/21/2023
-Download=https://cutt.ly/j5yByMG;https://www.dropbox.com/s/xb3q72shkp9a0ne/Simulator%20Controller%205.0.0.0-beta.zip?dl=1
-Changes=Full rework of all applications to support the new AutoHotkey 2.0 language, Support for window reszing in allmost all applications, Renamed controller action function "hotkey" to "trigger" to avoid conflict with new builtin function, Renamed "Setup Advisor" to "Setup Workbench", Allow multiple Setup Editor windows to be opened at the same time in "Setup Advisor", Renamed plugin argument "openSetupAdvisor" to "openSetupWorkbench" for all Race Assistant plugins, Renamed configuration map functions to multi map functions, Big performance improvements, Fixed Spotter for reporting a penalty in ACC after actually clearing the penalty, Modernized UI, especially on Windows 11, Introduced Stream Deck Plus Layout, Updated default value for target pressures to 26.5, Copy menu for tyre pressures in "Race Center" now includes the initial setup from race start, Reduced # of incorrect warnings and announcement for the Race Assistants after a pitstop with driver swap, New functions and classes for plugin developers, Car meta data update for R3E, Optimized collaboration between Strategist and Engineer for planned or recommended pitstops, Updated meta data for *Assetto Corsa Competizione* 1.9
+Date=04/23/2023
+Download=https://cutt.ly/n5djwmG;https://www.dropbox.com/s/srm7lngnkpduk0k/Simulator%20Controller%205.0.0.1-beta.zip?dl=1
+Changes=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout, No more cut warnings in non-race sessions, Fixed a couple of window operations on devices with active DPI scaling, Fixed report settings for sessions in "Race Center" without standings data, Fixed deletion of entries in the "Session Database"
 [Current]
-Type=Development
+Type=Release
 [Version]
 Release=5.0.0.1-beta
 Development=5.0.0.1-beta

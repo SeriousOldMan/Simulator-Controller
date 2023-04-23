@@ -26,6 +26,13 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                   Public Constants Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kScreenResolution := 96
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -593,7 +600,9 @@ class Window extends Gui {
 			this.Opt("-SysMenu -Border -Caption +0x800000")
 
 		if !isObject(options)
-			this.Opt(options)
+			this.Opt("-DPIScale " . options)
+		else
+			this.Opt("-DPIScale")
 
 		this.ApplyTheme()
 	}
@@ -704,7 +713,12 @@ class Window extends Gui {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
 			WinGetPos(&x, &y, &width, &height, this)
 
-			this.iTitleBarHeight := (height - cHeight)
+			width := screen2Window(width)
+			height := screen2Window(height)
+			cWidth := screen2Window(cWidth)
+			cHeight := screen2Window(cHeight)
+
+			this.iTitleBarHeight := height - cHeight
 
 			this.iMinWidth := width
 			this.iMinHeight := height
@@ -750,6 +764,9 @@ class Window extends Gui {
 
 		try {
 			WinGetPos(&x, &y, , , this)
+
+			x := screen2Window(x)
+			y := screen2Window(y)
 
 			if (x && y) {
 				if (this.iLastX && ((this.iLastX != x) || (this.iLastY != y))) {
@@ -808,6 +825,9 @@ class Window extends Gui {
 
 			try {
 				WinGetPos( , , &width, &height, this)
+
+				width := screen2Window(width)
+				height := screen2Window(height)
 
 				if (width < this.MinWidth) {
 					width := this.MinWidth
@@ -996,6 +1016,10 @@ openDocumentation(dialog, url, *) {
 	Run(url)
 }
 
+window2Screen := (value) => (value * kScreenResolution / 96)
+
+screen2Window := (value) => (value / kScreenResolution * 96)
+
 moveByMouse(window, descriptor := false, *) {
 	local curCoordMode := A_CoordModeMouse
 	local anchorX, anchorY, winX, winY, x, y, newX, newY, settings
@@ -1006,19 +1030,30 @@ moveByMouse(window, descriptor := false, *) {
 		MouseGetPos(&anchorX, &anchorY)
 		WinGetPos(&winX, &winY, , , window)
 
+		anchorX := screen2Window(anchorX)
+		anchorY := screen2Window(anchorY)
+		winX := screen2Window(winX)
+		winY := screen2Window(winY)
+
 		newX := winX
 		newY := winY
 
 		while GetKeyState("LButton", "P") {
 			MouseGetPos(&x, &y)
 
+			x := screen2Window(x)
+			y := screen2Window(y)
+
 			newX := winX + (x - anchorX)
 			newY := winY + (y - anchorY)
 
-			window.Move(newX, newY)
+			WinMove(newX, newY, , , window)
 		}
 
 		WinGetPos(&winX, &winY, , , window)
+
+		winX := screen2Window(winX)
+		winY := screen2Window(winY)
 
 		if descriptor {
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
@@ -1113,3 +1148,20 @@ getControllerActionIcons() {
 
 	return icons
 }
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                   Private Function Declaration Section                  ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeGUI() {
+	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
+	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
+}
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                         Initialization Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+initializeGUI()

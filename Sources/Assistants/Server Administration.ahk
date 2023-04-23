@@ -54,7 +54,7 @@ global kToken := "Token"
 class AdministrationResizer extends Window.Resizer {
 	RestrictResize(&deltaWidth, &deltaHeight) {
 		if (deltaWidth > 100) {
-			deltaWidth := (this.Window.Width - this.Window.MinWidth)
+			deltaWidth := 100
 
 			return true
 		}

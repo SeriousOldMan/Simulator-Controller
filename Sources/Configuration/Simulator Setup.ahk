@@ -177,6 +177,8 @@ class SetupWizard extends ConfiguratorPanel {
 		Close(*) {
 			if this.SetupWizard.finishSetup(false)
 				ExitApp(0)
+			else
+				return true
 		}
 	}
 
@@ -1631,10 +1633,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 			name := function.RemoveAt(1)
 
-			knowledgeBase.addFact("Controller.Function." . A_Index, name)
+			knowledgeBase.setFact("Controller.Function." . A_Index, name)
 
 			if (function.Length > 0)
-				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String(" ### ", function*))
+				knowledgeBase.setFact("Controller.Function." . name . ".Triggers", values2String(" ### ", function*))
 		}
 
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length)
@@ -1970,7 +1972,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	setInfo(html) {
-		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0; font-family: Arial, Helvetica, sans-serif; font-size: 11px'>" . html . "</p></body></html>"
+		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; font-family: Arial, Helvetica, sans-serif; font-size: 11px; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>" . html . "</body></html>"
 
 		this.HelpWindow["infoViewer"].document.open()
 		this.HelpWindow["infoViewer"].document.write(html)

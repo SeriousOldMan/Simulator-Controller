@@ -2011,7 +2011,7 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Button", "x575 yp w23 h23 Center +0x200 vdeletePlanButton").OnEvent("Click", deletePlan)
 		setButtonIcon(centerGui["deletePlanButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		centerGui.Add("Button", "x408 ys+279 w160", translate("Release Plan")).OnEvent("Click", releasePlan)
+		centerGui.Add("Button", "x408 ys+279 w160 Y:Move(0.8)", translate("Release Plan")).OnEvent("Click", releasePlan)
 
 		centerTab.UseTab(2)
 
@@ -2198,7 +2198,7 @@ class RaceCenter extends ConfigurationItem {
 
 		centerGui.Add("DropDownList", "x106 yp w157 Choose5 vpitstopRepairsDropDown", choices)
 
-		centerGui.Add("Button", "x66 ys+279 w160", translate("Instruct Engineer")).OnEvent("Click", planPitstop)
+		centerGui.Add("Button", "x66 ys+279 w160 Y:Move(0.8)", translate("Instruct Engineer")).OnEvent("Click", planPitstop)
 
 		this.iPitstopsListView := centerGui.Add("ListView", "x270 ys+34 w331 h269 H:Grow(0.8) -Multi -LV0x10 AltSubmit Checked NoSort NoSortHdr", collect(["#", "Lap", "Driver", "Refuel", "Compound", "Set", "Pressures", "Repairs"], translate))
 		this.iPitstopsListView.OnEvent("Click", choosePitstop)

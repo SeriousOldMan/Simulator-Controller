@@ -410,7 +410,7 @@ createMessageReceiver() {
 	messageReceiverGui.MarginX := "10"
 	messageReceiverGui.MarginY := "10"
 
-	messageReceiverGui.Show("X0 Y" . (A_ScreenHeight - 1) . "W1 H1 NA")
+	messageReceiverGui.Show("X-10000 Y10000 W1 H1 NA")
 
 	WinSetTransparent(0, messageReceiverGui)
 }

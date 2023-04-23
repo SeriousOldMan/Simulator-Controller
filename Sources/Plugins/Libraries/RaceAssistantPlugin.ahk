@@ -838,7 +838,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 		if this.Active {
 			if this.RaceAssistantEnabled {
-				if (this.RaceAssistant && !this.RaceAssistantActive) {
+				if (this.RaceAssistant && !this.RaceAssistantActive && !this.WaitForShutdown) {
 					setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Waiting")
 
 					setMultiMapValue(configuration, this.Plugin, "State", "Active")
@@ -884,6 +884,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 
 					if this.WaitForShutdown {
 						setMultiMapValue(configuration, this.Plugin, "State", "Warning")
+						setMultiMapValue(configuration, "Race Assistants", this.Plugin, "Shutdown")
 
 						setMultiMapValue(configuration, this.Plugin, "Information", translate("Message: ") . translate("Waiting for shutdown..."))
 					}

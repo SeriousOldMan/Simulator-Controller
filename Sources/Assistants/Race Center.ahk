@@ -1923,7 +1923,6 @@ class RaceCenter extends ConfigurationItem {
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)
 
 		this.iChartViewer := centerGui.Add("HTMLViewer", "x400 yp+24 w950 h343 W:Grow H:Grow(0.2) Border vchartViewer")
-		this.iChartViewer.navigate("about:blank")
 
 		centerGui.Rules := "Y:Move(0.2)"
 
@@ -1937,7 +1936,6 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x935 yp+8 w381 0x2 X:Move vmessageField")
 
 		this.iWaitViewer := centerGui.Add("HTMLViewer", "x1323 yp-8 w30 h30 X:Move vwaitViewer Hidden")
-		this.iWaitViewer.navigate("about:blank")
 
 		this.iWaitViewer.document.open()
 		this.iWaitViewer.document.write("<html><body style='background-color: #" . this.Window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . (kResourcesDirectory . "Wait.gif") . "' width=28 height=28 border=0 padding=0></body></html>")
@@ -1962,7 +1960,6 @@ class RaceCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x700 yp+7 w651 0x10 W:Grow")
 
 		this.iDetailsViewer := centerGui.Add("HTMLViewer", "x619 yp+14 w732 h293 W:Grow H:Grow(0.8) Border vdetailsViewer")
-		this.iDetailsViewer.navigate("about:blank")
 
 		this.iStrategyViewer := StrategyViewer(centerGui, this.iDetailsViewer)
 

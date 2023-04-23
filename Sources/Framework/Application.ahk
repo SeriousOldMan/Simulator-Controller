@@ -422,8 +422,6 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	htmlViewer := htmlGui.Add("HTMLViewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
 
-	htmlViewer.navigate("about:blank")
-
 	htmlViewer.document.open()
 	htmlViewer.document.write(html)
 	htmlViewer.document.close()

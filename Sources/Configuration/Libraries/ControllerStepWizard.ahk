@@ -234,7 +234,6 @@ class ControllerStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget4.navigate("about:blank")
 		widget4.document.write(html)
 
 		this.iFunctionsListView := widget3
@@ -770,6 +769,9 @@ class ControllerPreviewStepWizard extends StepWizard {
 			moveByMouse(window)
 
 			WinGetPos(&x, &y, &width, &height, window)
+			
+			x := screen2Window(x)
+			y := screen2Window(y)
 
 			this.setPreviewCenter(window, x + Round(width / 2), y + Round(height / 2))
 		}

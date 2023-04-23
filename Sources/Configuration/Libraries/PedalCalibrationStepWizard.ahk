@@ -146,7 +146,6 @@ class PedalCalibrationStepWizard extends ActionsStepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget8.navigate("about:blank")
 		widget8.document.write(html)
 
 		this.setActionsListView(widget7)

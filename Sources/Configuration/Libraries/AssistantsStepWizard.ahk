@@ -218,7 +218,6 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget.navigate("about:blank")
 			widget.document.write(html)
 
 			widgets.Push(widget)

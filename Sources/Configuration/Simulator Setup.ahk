@@ -177,6 +177,8 @@ class SetupWizard extends ConfiguratorPanel {
 		Close(*) {
 			if this.SetupWizard.finishSetup(false)
 				ExitApp(0)
+			else
+				return true
 		}
 	}
 
@@ -662,8 +664,6 @@ class SetupWizard extends ConfiguratorPanel {
 		helpGui.Add("Text", "yp+20 w350 0x10 W:Grow")
 
 		helpGui.Add("HTMLViewer", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer")
-
-		helpGui["infoViewer"].navigate("about:blank")
 
 		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #" . helpGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
@@ -1631,10 +1631,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 			name := function.RemoveAt(1)
 
-			knowledgeBase.addFact("Controller.Function." . A_Index, name)
+			knowledgeBase.setFact("Controller.Function." . A_Index, name)
 
 			if (function.Length > 0)
-				knowledgeBase.addFact("Controller.Function." . name . ".Triggers", values2String(" ### ", function*))
+				knowledgeBase.setFact("Controller.Function." . name . ".Triggers", values2String(" ### ", function*))
 		}
 
 		knowledgeBase.setFact("Controller.Function.Count", functions.Length)
@@ -1970,7 +1970,7 @@ class SetupWizard extends ConfiguratorPanel {
 	}
 
 	setInfo(html) {
-		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0; font-family: Arial, Helvetica, sans-serif; font-size: 11px'>" . html . "</p></body></html>"
+		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; font-family: Arial, Helvetica, sans-serif; font-size: 11px; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>" . html . "</body></html>"
 
 		this.HelpWindow["infoViewer"].document.open()
 		this.HelpWindow["infoViewer"].document.write(html)
@@ -2278,7 +2278,6 @@ class StartStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
 
-		widget1.navigate("about:blank")
 		widget1.document.write(html)
 
 		; window.Add(StartStepWizard.RestartVideoResizer(this, window))
@@ -2316,7 +2315,6 @@ class StartStepWizard extends StepWizard {
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget3.navigate("about:blank")
 			widget3.document.write(html)
 
 			this.registerWidgets(2, widget1, widget2, widget3, widget4)
@@ -2437,7 +2435,6 @@ class FinishStepWizard extends StepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 50) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
-		widget1.navigate("about:blank")
 		widget1.document.write(html)
 
 		this.registerWidget(1, widget1)
@@ -2665,8 +2662,6 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 
 	loop {
-		fixIE(10)
-
 		wizard.createGui(wizard.Configuration)
 
 		wizard.startSetup()

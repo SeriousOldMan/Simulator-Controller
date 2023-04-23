@@ -166,7 +166,7 @@ class GIF {
 		local hHeight := 0
 		local tWidth := 0
 		local tHeight := 0
-		local hBitmap, tBitmap, tGraphics, tHBitmap
+		local hBitmap, pBitmap, tBitmap, tGraphics, tHBitmap
 
 		this.iCurrentFrame := Mod(++this.iCurrentFrame, this.iFrameCount)
 
@@ -192,9 +192,9 @@ class GIF {
 
 		Gdip_DeleteGraphics(tGraphics)
 
-		DeleteObject(pBitmap)
+		Gdip_DisposeImage(pBitmap)
 		DeleteObject(hBitmap)
-		DeleteObject(tBitmap)
+		Gdip_DisposeImage(tBitmap)
 		DeleteObject(tHBitmap)
 
 		if (next && this.iCurrentFrame < (this.iCycle ? 0xFFFFFFFF : this.iFrameCount - 1)) {

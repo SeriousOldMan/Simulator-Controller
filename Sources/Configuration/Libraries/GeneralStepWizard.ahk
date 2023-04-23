@@ -293,7 +293,6 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget16.navigate("about:blank")
 		widget16.document.write(html)
 
 		window.SetFont("Bold", "Arial")

@@ -575,7 +575,7 @@ launchPad(command := false, arguments*) {
 				launchPadGui.Add("Text", "x562 YP+12 w30 BackgroundTrans Right", StrUpper(string2Values("-", kVersion)[2]))
 		}
 
-		launchPadGui.SetFont("s9 Norm", "Arial")
+		launchPadGui.SetFont("s9 Norm cBlack", "Arial")
 		launchPadGui.SetFont("Italic Underline", "Arial")
 
 		launchPadGui.Add("Text", "x233 YS+20 w140 cBlue Center", translate("Applications")).OnEvent("Click", openDocumentation.Bind(launchPadGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller"))

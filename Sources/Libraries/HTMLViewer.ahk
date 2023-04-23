@@ -18,6 +18,15 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kExplorerVersions := CaseInsenseMap("Simulator Setup", 10)
+
+kExplorerVersions.Default := 11
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -1944,16 +1953,47 @@ class WebView2 extends WebView2.Base {
 
 class HTMLViewer {
 	iControl := false
-	iWebView2 := false
-
-	iHTML := false
-	iHTMLFile := false
 
 	Control {
 		Get {
 			return this.iControl
 		}
 	}
+
+	Document {
+	}
+
+	Location {
+	}
+
+	__New(control) {
+		this.iControl := control
+	}
+
+	Resized() {
+	}
+
+	Navigate(uri) {
+	}
+
+	Open() {
+	}
+
+	Close() {
+	}
+
+	Write(html, force := false) {
+	}
+
+	Reload() {
+	}
+}
+
+class WebView2Viewer {
+	iWebView2 := false
+
+	iHTML := false
+	iHTMLFile := false
 
 	WebView2 {
 		Get {
@@ -1977,9 +2017,9 @@ class HTMLViewer {
 		local application := Strsplit(A_ScriptName, ".")[1]
 		local rnd := Random(1, 1000)
 
-		this.iControl := control
-
 		this.iHTMLFile := temporaryFileName("HTML\" . application . "\" . "html" . rnd, "html")
+
+		super.__New(control)
 	}
 
 	Show() {
@@ -1999,15 +2039,6 @@ class HTMLViewer {
 	Resized() {
 		if this.WebView2
 			this.WebView2.Fill()
-	}
-
-	Navigate(uri) {
-	}
-
-	Open() {
-	}
-
-	Close() {
 	}
 
 	Write(html, force := false) {
@@ -2030,6 +2061,58 @@ class HTMLViewer {
 	}
 }
 
+class IEViewer extends HTMLViewer {
+	iExplorer := false
+	iControl := false
+
+	Control {
+		Get {
+			return this.iControl
+		}
+	}
+
+	Explorer {
+		Get {
+			return this.iExplorer
+		}
+	}
+
+	Document {
+		Get {
+			return this.Explorer.document
+		}
+	}
+
+	Location {
+		Get {
+			return this.Explorer.location
+		}
+	}
+
+	__New(control) {
+		this.iExplorer := control.Value
+	}
+
+	Navigate(uri) {
+	}
+
+	Open() {
+		this.Document.open()
+	}
+
+	Close() {
+		this.Document.close()
+	}
+
+	Write(html, force := false) {
+		this.Document.write(html)
+	}
+
+	Reload() {
+		this.Location.reload()
+	}
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Function Section                         ;;;
@@ -2043,10 +2126,50 @@ CoTaskMem_String(ptr) {
 	return s
 }
 
+fixIE(version := 0, exeName := "") {
+	local previousValue := ""
+
+	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
+	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
+
+	if versions.Has(version)
+		version := versions[version]
+
+	if !exeName {
+		if A_IsCompiled
+			exeName := A_ScriptName
+		else
+			SplitPath(A_AhkPath, &exeName)
+	}
+
+	try {
+		previousValue := RegRead("HKCU\" . key, exeName, "")
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
+
+	try {
+		if (version = "") {
+			RegDelete("HKCU\" . key, exeName)
+			RegDelete("HKLM\" . key, exeName)
+		}
+		else {
+			RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
+			RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
+		}
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
+
+	return previousValue
+}
+
 initializeHTMLViewer() {
-	createHTMLViewer(window, arguments*) {
+	createWebView2Viewer(window, arguments*) {
 		local control := window.Add("Picture", arguments*)
-		local viewer := HTMLViewer(control)
+		local viewer := WebView2Viewer(control)
 
 		control.HTMLViewer := viewer
 		control.Document := viewer
@@ -2087,11 +2210,53 @@ initializeHTMLViewer() {
 		return control
 	}
 
-	deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+	createIEViewer(window, options) {
+		local control := window.Add("ActiveX", options, "shell.explorer")
+		local viewer := IEViewer(control)
+		local explorer := viewer.Explorer
 
-	DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+		explorer.navigate("about:blank")
 
-	Window.DefineCustomControl("HTMLViewer", createHTMLViewer)
+		control.HTMLViewer := viewer
+		control.Document := explorer.document
+
+		show() {
+			control.Visible := true
+		}
+
+		hide() {
+			control.Visible := false
+		}
+
+		width() {
+			return explorer.Width
+		}
+
+		height() {
+			return explorer.Height
+		}
+
+		control.Show := (*) => show()
+		control.Hide := (*) => hide()
+		control.Navigate := (obj, uri) => explorer.Navigate(uri)
+		control.Resized := (*) => viewer.Resized()
+		control.getWidth := (*) => width()
+		control.getHeight := (*) => height()
+
+		return control
+	}
+
+	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
+
+	if true {
+		deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+
+		DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
+
+		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)
+	}
+	else
+		Window.DefineCustomControl("HTMLViewer", createIEViewer)
 }
 
 

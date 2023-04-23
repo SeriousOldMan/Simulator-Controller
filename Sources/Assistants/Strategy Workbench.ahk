@@ -941,8 +941,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		this.iChartViewer := workbenchGui.Add("HTMLViewer", "x400 yp+24 w950 h442 Border vchartViewer X:Move(0.1) W:Grow(0.9)")
-		this.iChartViewer.navigate("about:blank")
-
+		
 		workbenchGui.Add("Text", "x8 yp+450 w1350 0x10 W:Grow")
 
 		workbenchGui.SetFont("s10 Bold", "Arial")
@@ -966,7 +965,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x619 ys+39 w80 h21", translate("Strategy"))
 		workbenchGui.Add("Text", "x700 yp+7 w646 0x10 W:Grow")
 
-		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h193 Border vstratViewer H:Grow W:Grow").navigate("about:blank")
+		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h193 Border vstratViewer H:Grow W:Grow")
 
 		this.iStrategyViewer := StrategyViewer(workbenchGui, workbenchGui["stratViewer"])
 

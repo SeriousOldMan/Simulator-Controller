@@ -2662,8 +2662,6 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 
 	loop {
-		fixIE(10)
-
 		wizard.createGui(wizard.Configuration)
 
 		wizard.startSetup()

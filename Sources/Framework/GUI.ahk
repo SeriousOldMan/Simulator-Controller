@@ -972,46 +972,6 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
-fixIE(version := 0, exeName := "") {
-	local previousValue := ""
-
-	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
-	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
-
-	if versions.Has(version)
-		version := versions[version]
-
-	if !exeName {
-		if A_IsCompiled
-			exeName := A_ScriptName
-		else
-			SplitPath(A_AhkPath, &exeName)
-	}
-
-	try {
-		previousValue := RegRead("HKCU\" . key, exeName, "")
-	}
-	catch Any as exception {
-		logError(exception, false, false)
-	}
-
-	try {
-		if (version = "") {
-			RegDelete("HKCU\" . key, exeName)
-			RegDelete("HKLM\" . key, exeName)
-		}
-		else {
-			RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
-			RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
-		}
-	}
-	catch Any as exception {
-		logError(exception, false, false)
-	}
-
-	return previousValue
-}
-
 openDocumentation(dialog, url, *) {
 	Run(url)
 }

@@ -18,6 +18,15 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
+;;;                        Private Constant Section                         ;;;
+;;;-------------------------------------------------------------------------;;;
+
+global kExplorerVersions := CaseInsenseMap("Simulator Setup", 10)
+
+kExplorerVersions.Default := 11
+
+
+;;;-------------------------------------------------------------------------;;;
 ;;;                         Private Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -2117,6 +2126,46 @@ CoTaskMem_String(ptr) {
 	return s
 }
 
+fixIE(version := 0, exeName := "") {
+	local previousValue := ""
+
+	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
+	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
+
+	if versions.Has(version)
+		version := versions[version]
+
+	if !exeName {
+		if A_IsCompiled
+			exeName := A_ScriptName
+		else
+			SplitPath(A_AhkPath, &exeName)
+	}
+
+	try {
+		previousValue := RegRead("HKCU\" . key, exeName, "")
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
+
+	try {
+		if (version = "") {
+			RegDelete("HKCU\" . key, exeName)
+			RegDelete("HKLM\" . key, exeName)
+		}
+		else {
+			RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
+			RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
+		}
+	}
+	catch Any as exception {
+		logError(exception, false, false)
+	}
+
+	return previousValue
+}
+
 initializeHTMLViewer() {
 	createWebView2Viewer(window, arguments*) {
 		local control := window.Add("Picture", arguments*)
@@ -2197,7 +2246,9 @@ initializeHTMLViewer() {
 		return control
 	}
 
-	if false {
+	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
+
+	if true {
 		deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
 
 		DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])

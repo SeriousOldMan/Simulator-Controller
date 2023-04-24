@@ -254,7 +254,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 
 	chooseAccount(listView, line, *) {
 		if line
-			administrationEditor.Bind(kEvent, "AccountLoad", line)
+			administrationEditor(kEvent, "AccountLoad", line)
 	}
 
 	deleteAccount(*) {
@@ -424,7 +424,7 @@ administrationEditor(configurationOrCommand, arguments*) {
 				local accountNameEdit := administrationGui["accountNameEdit"].Text
 				local accountEMailEdit := administrationGui["accountEMailEdit"].Text
 				local accountPasswordEdit := administrationGui["accountPasswordEdit"].Text
-				local accountContractDropDown := administrationGui["accountContractDropDown"].Valu
+				local accountContractDropDown := administrationGui["accountContractDropDown"].Value
 				local accountMinutesEdit := administrationGui["accountMinutesEdit"].Text
 				local accountSessionAccessCheck := administrationGui["accountSessionAccessCheck"].Value
 				local accountDataAccessCheck := administrationGui["accountDataAccessCheck"].Value
@@ -454,8 +454,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 						account["EMail"] := accountEMailEdit
 					}
 
-					connector.ChangeAccountAccess(account.Identifier, accountSessionAccessCheck ? kTrue : kFalse
-																	, accountDataAccessCheck ? kTrue : kFalse)
+					connector.ChangeAccountAccess(account["Identifier"], accountSessionAccessCheck ? kTrue : kFalse
+																	   , accountDataAccessCheck ? kTrue : kFalse)
 				}
 
 				accounts := loadAccounts(connector, accountsListView)

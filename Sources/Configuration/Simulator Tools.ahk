@@ -2969,6 +2969,8 @@ startSimulatorTools() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Tools"
 
+	checkInstallation()
+
 	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashTheme, &gTargetConfiguration)
 
 	if (A_Args.Length > 0)
@@ -3061,9 +3063,6 @@ cancelBuild() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-if !isDebug()
-	checkInstallation()
 
 startSimulatorTools()
 

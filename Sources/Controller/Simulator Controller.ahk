@@ -414,21 +414,21 @@ class GuiFunctionController extends FunctionController {
 
 		try {
 			MouseGetPos(&anchorX, &anchorY)
-			
+
 			anchorX := screen2Window(anchorX)
 			anchorY := screen2Window(anchorY)
-			
+
 			WinGetPos(&winX, &winY, &w, &h, window)
-			
+
 			winX := screen2Window(winX)
 			winY := screen2Window(winY)
-			
+
 			newX := winX
 			newY := winY
 
 			while GetKeyState("LButton", "P") {
 				MouseGetPos(&x, &y)
-			
+
 				x := screen2Window(x)
 				y := screen2Window(y)
 
@@ -474,7 +474,7 @@ class SimulatorController extends ConfigurationItem {
 
 	iLastEvent := A_TickCount
 
-	iShowLogo := true
+	iShowLogo := false
 	iLogoGui := false
 	iLogoIsVisible := false
 

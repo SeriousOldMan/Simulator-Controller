@@ -1,17 +1,16 @@
 [Development]
-Version=5.0.0.1-beta
-Target=5.0.0.1-beta
-Date=04/23/2023
-Download=https://cutt.ly/n5djwmG;https://www.dropbox.com/s/srm7lngnkpduk0k/Simulator%20Controller%205.0.0.1-beta.zip?dl=1
-Changes=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout, No more cut warnings in non-race sessions, Fixed a couple of window operations on devices with active DPI scaling, Fixed report settings for sessions in "Race Center" without standings data, Fixed deletion of entries in the "Session Database", Fixed "Simulator Download", so that it can be manually activated from the application launchpad again
-Changes=
+Version=5.0.1.0-dev
+Target=5.0.1.0-release
+Date=04/24/2023
+Download=
+Changes=Full implementation of WebView2 as a substitute for the IE Com Object, New car models for "Setup Workbench"
 [Release]
 Version=5.0.0.1-beta
 Date=04/23/2023
 Download=https://cutt.ly/n5djwmG;https://www.dropbox.com/s/srm7lngnkpduk0k/Simulator%20Controller%205.0.0.1-beta.zip?dl=1
 Changes=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout, No more cut warnings in non-race sessions, Fixed a couple of window operations on devices with active DPI scaling, Fixed report settings for sessions in "Race Center" without standings data, Fixed deletion of entries in the "Session Database"
 [Current]
-Type=Release
+Type=Development
 [Version]
 Release=5.0.0.1-beta
-Development=5.0.0.1-beta
+Development=5.0.1.0-dev

@@ -169,6 +169,8 @@ class ACCSetupEditor extends FileSetupEditor {
 
 		if this.Window
 			this.Window.Opt("+OwnDialogs")
+		else
+			this.Workbench.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := FileSelect(1, directory, translate("Load ACC Setup File..."), "Setup (*.json)")
@@ -237,6 +239,8 @@ class ACCSetupComparator extends FileSetupComparator {
 
 		if this.Window
 			this.Window.Opt("+OwnDialogs")
+		else
+			this.Editor.Window.Opt("+OwnDialogs")
 
 		OnMessage(0x44, translateLoadCancelButtons)
 		fileName := FileSelect(1, directory, (translate("Load ") . translate((type = "A") ? "first" : "second") . translate(" ACC Setup File...")), "Setup (*.json)")

@@ -1,3 +1,15 @@
+## 5.0.1.0-release 03/28/23 (planned)
+  1. Minor bugfixes, as always
+  2. Documentation updates, as always
+  3. Full integration of the WebView2 HTML rendering engine as a substitute for the old Internet Explorer plugin, since the support for Internet Explorer has been canceled by Microsoft. The implementation is not activated by default, but you can take a testflight by following the instructions in the 
+  4. New car models for "Setup Workbench"
+      - Assetto Corsa Competizione
+	    - Ferrari 296 GT3
+	    - Porsche 992 GT3 R
+		- Lamborghini Huracan GT3 Evo2 
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-501) for instructions on how to enable the WebView2 HTML rendering engine.
+
 ## 5.0.0.1-beta 03/24/23
   1. A large list of minor fixes.
   2. Fixed "Race Center" coming to the front of the window stack and redraw reports every 10 seconds.

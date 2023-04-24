@@ -1989,7 +1989,7 @@ class HTMLViewer {
 	}
 }
 
-class WebView2Viewer {
+class WebView2Viewer extends HTMLViewer {
 	iWebView2 := false
 
 	iHTML := false
@@ -2049,6 +2049,7 @@ class WebView2Viewer {
 				FileAppend(html, this.iHTMLFile, "UTF-8")
 
 				this.WebView2.CoreWebView2.Navigate(this.iHTMLFile)
+				this.WebView2.CoreWebView2.Resume()
 			}
 
 			this.iHTML := html
@@ -2248,7 +2249,9 @@ initializeHTMLViewer() {
 
 	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
 
-	if true {
+	if ((getMultiMapValue(kSimulatorConfiguration, "General", "HTML Viewer", "IE11") = "WebView2") ||
+		(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+						, "General", "HTML Viewer", "IE11") = "WebView2")) {
 		deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
 
 		DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])

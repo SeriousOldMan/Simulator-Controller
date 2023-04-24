@@ -2,8 +2,10 @@
   1. A couple of small bugfixes here and there.
   2. Fixed the startup of the Race Assistants to create a short flicker in various simulators.
   3. Fixed a rare connection issue between Stream Deck and Simulator Controller.
+  4. Fixed that no account could be selected in "Server Administration".
+  5. Fixed new password creation in "Server Administration".
 
-## 5.0.0.1-beta 04/24/23
+## 5.0.0.1-beta 04/23/23
   1. A large list of minor fixes.
   2. Fixed "Race Center" coming to the front of the window stack and redraw reports every 10 seconds.
   3. Introduced a field with a subversion info in "Simulator Startup".

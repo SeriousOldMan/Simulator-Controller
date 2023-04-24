@@ -3,7 +3,7 @@ Version=5.0.0.2-dev
 Target=5.0.0.2-beta
 Date=04/24/2023
 Download=
-Changes=Eliminated short flicker when the Assistants start up, Fixed Stream Deck connectio to Simulator Controller
+Changes=Eliminated short flicker when the Assistants start up, Fixed Stream Deck connectio to Simulator Controller, Fixed "Server Administration" not selecting an account
 [Release]
 Version=5.0.0.1-beta
 Date=04/23/2023

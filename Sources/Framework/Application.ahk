@@ -388,18 +388,16 @@ broadcastMessage(applications, message, arguments*) {
 
 viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
 	local html, innerWidth, editHeight, buttonX
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, htmlGui
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 
+	static htmlGui
 	static htmlViewer
-	static dismissed := false
 
 	if !title
 		title := translate("News && Updates")
 
-	dismissed := false
-
 	if !fileName {
-		dismissed := true
+		htmlGui.Destroy()
 
 		return
 	}
@@ -459,11 +457,6 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	htmlGui.Opt("+AlwaysOnTop")
 	htmlGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
-
-	while !dismissed
-		Sleep(100)
-
-	htmlGui.Destroy()
 }
 
 

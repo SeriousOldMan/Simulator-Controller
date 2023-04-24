@@ -2168,8 +2168,6 @@ fixIE(version := 0, exeName := "") {
 }
 
 initializeHTMLViewer() {
-	local settings
-
 	createWebView2Viewer(window, arguments*) {
 		local control := window.Add("Picture", arguments*)
 		local viewer := WebView2Viewer(control)
@@ -2251,9 +2249,9 @@ initializeHTMLViewer() {
 
 	fixIE(kExplorerVersions[Strsplit(A_ScriptName, ".")[1]])
 
-	settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-	if (getMultiMapValue(settings, "General", "HTML Viewer", "IE11") = "WebView2") {
+	if ((getMultiMapValue(kSimulatorConfiguration, "General", "HTML Viewer", "IE11") = "WebView2") ||
+		(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+						, "General", "HTML Viewer", "IE11") = "WebView2")) {
 		deleteDirectory(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])
 
 		DirCreate(kTempDirectory . "HTML\" . Strsplit(A_ScriptName, ".")[1])

@@ -400,6 +400,8 @@ class MessageManager extends PeriodicTask {
 ;;;-------------------------------------------------------------------------;;;
 
 createMessageReceiver() {
+	local boundX := SysGet(78)
+	local boundY := SysGet(79)
 	local messageReceiverGui := Gui("ToolWindow -Caption -SysMenu", A_ScriptName)
 
 	messageReceiverGui.BackColor := "D0D0D0"
@@ -410,7 +412,7 @@ createMessageReceiver() {
 	messageReceiverGui.MarginX := "10"
 	messageReceiverGui.MarginY := "10"
 
-	messageReceiverGui.Show("X0 Y" . (A_ScreenHeight - 1) . "W1 H1 NA")
+	messageReceiverGui.Show("X" . boundX . " Y" . boundY . " W1 H1 NA")
 
 	WinSetTransparent(0, messageReceiverGui)
 }

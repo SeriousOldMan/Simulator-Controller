@@ -53,6 +53,8 @@ A couple of things to consider for this release:
 4. The Stream Deck integration now supports also the new Stream Deck Plus, so if you are lucky to own this little gem, you can npw also configure your action for this 2 x 4 buton layout.
 5. [Developer only] When you have created and installed your own plugins, you have to port them to AutoHotkey V2 also, and you hav to change the custom include files in your [Documents]\Simulator Controller\Plugins folder as well.
 
+Users of *Assetto Corsa Competizione* will have to change the target hot pressures for the GT3 cars in "Race Settings" and probably in the default settings in the "Session Database" as well. And, unfortunately, you might want to consider deleting all collected cold pressures as well, which can be easily done in the "Session Database".
+
 ***
 
 ## Release 4.6.3

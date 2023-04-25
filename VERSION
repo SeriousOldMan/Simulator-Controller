@@ -7,7 +7,7 @@ Changes=Eliminated short flicker when the Assistants start up, Fixed Stream Deck
 [Release]
 Version=5.0.0.1-beta
 Date=04/23/2023
-Download=https://cutt.ly/X5dhbiK;https://www.dropbox.com/s/xb3q72shkp9a0ne/Simulator%20Controller%205.0.0.0-beta.zip?dl=1
+Download=https://cutt.ly/n5djwmG;https://www.dropbox.com/s/srm7lngnkpduk0k/Simulator%20Controller%205.0.0.1-beta.zip?dl=1
 Changes=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout, No more cut warnings in non-race sessions, Fixed a couple of window operations on devices with active DPI scaling, Fixed report settings for sessions in "Race Center" without standings data, Fixed deletion of entries in the "Session Database"
 [Current]
 Type=Development

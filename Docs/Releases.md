@@ -4,6 +4,7 @@
   3. Fixed a rare connection issue between Stream Deck and Simulator Controller.
   4. Fixed that no account could be selected in "Server Administration".
   5. Fixed new password creation in "Server Administration".
+  6. Fixed enabling / disabling a couple of options in the Tray menus.
 
 ## 5.0.0.1-beta 04/23/23
   1. A large list of minor fixes.

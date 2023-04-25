@@ -76,7 +76,7 @@ generatePassword(length) {
 	while (0 < length--) {
 		index := Random(1, StrLen(valid))
 
-		result .= SubStr(valid, Round(index))
+		result .= SubStr(valid, Round(index), 1)
 	}
 
 	return result

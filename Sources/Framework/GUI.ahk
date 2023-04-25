@@ -74,7 +74,7 @@ class Theme {
 		}
 	}
 
-	static getSystemColor(code) {
+	static GetSystemColor(code, asText := false) {
 		local BGR
 
 		if !isNumber(code) && kSystemColors.Has(code)
@@ -82,7 +82,9 @@ class Theme {
 
 		BGR := DllCall("User32.dll\GetSysColor", "Int", code, "UInt")
 
-		return ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
+		BGR := ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
+
+		return (asText ? Format("{:06X}", BGR) : BGR)
 	}
 
 	ThemeWindow(window) {
@@ -183,9 +185,6 @@ class ConfigurableTheme extends ConfigurationItem {
 }
 
 class DefaultTheme extends Theme {
-}
-
-class StandardTheme extends Theme {
 	ThemeWindow(window) {
 		window.BackColor := "D0D0D0"
 		window.AltBackColor := "D8D8D8"

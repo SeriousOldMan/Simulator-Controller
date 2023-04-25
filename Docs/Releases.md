@@ -1,4 +1,11 @@
-## 5.0.0.1-beta 03/24/23
+## 5.0.0.2-beta 03/26/23 (planned)
+  1. A couple of small bugfixes here and there.
+  2. Fixed the startup of the Race Assistants to create a short flicker in various simulators.
+  3. Fixed a rare connection issue between Stream Deck and Simulator Controller.
+  4. Fixed that no account could be selected in "Server Administration".
+  5. Fixed new password creation in "Server Administration".
+
+## 5.0.0.1-beta 04/23/23
   1. A large list of minor fixes.
   2. Fixed "Race Center" coming to the front of the window stack and redraw reports every 10 seconds.
   3. Introduced a field with a subversion info in "Simulator Startup".
@@ -9,7 +16,7 @@
   8. Fixed deletion of entries in the "Session Database".
   9. Fixed "Simulator Download", so that it can be manually activated from the application launchpad again.
 
-## 5.0.0.0-beta 03/21/23
+## 5.0.0.0-beta 04/21/23
   **IMPORTANT**: This release is based on a complete rewrite of the suite for a new version of the underlying programming language. Although testing has been intense, there still might be a couple of bugs lurking here and there. Therefore be sure to **make a backup copy of the "Simulator Controller" folder in your "Documents" folder**, before using this version. If you encounter problems, be sure to report them including a ZIP of the "[Documents]\Simulator Controller\Logs" folder and go back to the last stable build, which can be downloaded from the GitHub page.
 
   1. Minor bugfixes, as always

@@ -1,10 +1,9 @@
 [Development]
 Version=5.0.0.2-dev
 Target=5.0.0.2-beta
-Date=04/23/2023
+Date=04/25/2023
 Download=
-Changes=Elimanted short flicker when the Assistants start up, Fixed enabling of Team Server with the Tray menu
-Changes=
+Changes=Eliminated short flicker when the Assistants start up, Fixed Stream Deck connectio to Simulator Controller, Fixed "Server Administration" not selecting an account, Fixed enabling of Team Server with the Tray menu
 [Release]
 Version=5.0.0.1-beta
 Date=04/23/2023

@@ -3964,10 +3964,19 @@ class RaceCenter extends ConfigurationItem {
 
 			pitstopTyreSet := this.Control["pitstopTyreSetEdit"].Text
 
-			pitstopPressureFL := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureFLEdit"].Text), false)
-			pitstopPressureFR := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureFREdit"].Text), false)
-			pitstopPressureRL := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureRLEdit"].Text), false)
-			pitstopPressureRR := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureRREdit"].Text), false)
+			pitstopPressureFL := false
+			pitstopPressureFR := false
+			pitstopPressureRL := false
+			pitstopPressureRR := false
+
+			if isNumber(internalValue("Float", this.Control["pitstopPressureFLEdit"].Text))
+				pitstopPressureFL := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureFLEdit"].Text), false)
+			if isNumber(internalValue("Float", this.Control["pitstopPressureFREdit"].Text))
+				pitstopPressureFR := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureFREdit"].Text), false)
+			if isNumber(internalValue("Float", this.Control["pitstopPressureRLEdit"].Text))
+				pitstopPressureRL := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureRLEdit"].Text), false)
+			if isNumber(internalValue("Float", this.Control["pitstopPressureRREdit"].Text))
+				pitstopPressureRR := convertUnit("Pressure", internalValue("Float", this.Control["pitstopPressureRREdit"].Text), false)
 
 			local pitstopRepairsDropDown := this.Control["pitstopRepairsDropDown"].Value
 
@@ -4137,17 +4146,23 @@ class RaceCenter extends ConfigurationItem {
 
 				lap := this.Connector.GetSessionLastLap(session)
 
-				this.Connector.SetLapValue(lap, "Pitstop Plan", printMultiMap(pitstopPlan))
-				this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
+				if (lap && (lap != "")) {
+					this.Connector.SetLapValue(lap, "Pitstop Plan", printMultiMap(pitstopPlan))
+					this.Connector.SetSessionValue(session, "Pitstop Plan", lap)
 
-				this.updatePitstopPlan(pitstopPlan)
+					this.updatePitstopPlan(pitstopPlan)
 
-				showMessage(translate("Race Engineer will be instructed as fast as possible."))
+					showMessage(translate("Race Engineer will be instructed as fast as possible."))
+				}
+				else
+					throw "No active session..."
 			}
 			else
 				throw "No active session..."
 		}
 		catch Any as exception {
+			logError(exception)
+
 			OnMessage(0x44, translateOkButton)
 			MsgBox(translate("You must be connected to an active session to plan a pitstop."), translate("Error"), 262192)
 			OnMessage(0x44, translateOkButton, 0)

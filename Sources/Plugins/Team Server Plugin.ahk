@@ -537,7 +537,7 @@ class TeamServerPlugin extends ControllerPlugin {
 
 		if !hasTrayMenu {
 			A_TrayMenu.Insert("1&")
-			A_TrayMenu.Insert("1&", label, ObjBindMethod(this, "toggleTeamServer"))
+			A_TrayMenu.Insert("1&", label, (*) => this.toggleTeamServer())
 
 			hasTrayMenu := true
 		}

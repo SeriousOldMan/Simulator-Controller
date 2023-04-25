@@ -1293,7 +1293,7 @@ class RaceAssistantPlugin extends ControllerPlugin  {
 			if first
 				A_TrayMenu.Insert("1&")
 
-			A_TrayMenu.Insert("1&", label, ObjBindMethod(this, "toggleRaceAssistant"))
+			A_TrayMenu.Insert("1&", label, (*) => this.toggleRaceAssistant())
 
 			hasTrayMenu[this] := true
 			first := false

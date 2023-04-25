@@ -3,7 +3,7 @@ Version=5.0.0.2-dev
 Target=5.0.0.2-beta
 Date=04/23/2023
 Download=
-Changes=Elimanted short flicker when the Assistants start up
+Changes=Elimanted short flicker when the Assistants start up, Fixed enabling of Team Server with the Tray menu
 Changes=
 [Release]
 Version=5.0.0.1-beta

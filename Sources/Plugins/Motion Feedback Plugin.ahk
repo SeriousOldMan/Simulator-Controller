@@ -1002,17 +1002,13 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 	}
 
 	updateTrayLabel(label, enabled) {
-		local callback
-
 		static hasTrayMenu := false
 
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
-			callback := ObjBindMethod(this, "toggleMotion")
-
 			A_TrayMenu.Insert("1&")
-			A_TrayMenu.Insert("1&", label, callback)
+			A_TrayMenu.Insert("1&", label, (*) => this.toggleMotion())
 
 			hasTrayMenu := true
 		}

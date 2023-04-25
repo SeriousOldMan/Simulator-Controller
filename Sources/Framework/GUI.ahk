@@ -31,6 +31,10 @@
 
 global kScreenResolution := 96
 
+global kSystemColors := CaseInsenseMap("ButtonTextColor", 18, "NormalTextColor", 8, "LinkTextColor", 26
+									 , "HighlightTextColor", 14, "HighlightBackColor", 13, "DisabledTextColor", 17
+									 , "ControlBackColor", 15, "WinBackColor", 5)
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                    Private Function Declaration Section                 ;;;
@@ -57,7 +61,7 @@ getControllerActionDefinitions(type) {
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class Theme extends ConfigurationItem {
+class Theme {
 	static sCurrentTheme := false
 
 	static CurrentTheme {
@@ -70,6 +74,29 @@ class Theme extends ConfigurationItem {
 		}
 	}
 
+	static getSystemColor(code) {
+		local BGR
+
+		if !isNumber(code) && kSystemColors.Has(code)
+			code := kSystemColors[code]
+
+		BGR := DllCall("User32.dll\GetSysColor", "Int", code, "UInt")
+
+		return ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
+	}
+
+	ThemeWindow(window) {
+	}
+
+	ComputeThemeOptions(window, type, options) {
+		return options
+	}
+
+	ApplyThemeProperties(window, control) {
+	}
+}
+
+class ConfigurableTheme extends ConfigurationItem {
 	Descriptor {
 		Get {
 			return this.iDescriptor
@@ -152,6 +179,39 @@ class Theme extends ConfigurationItem {
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "TextColor"), this.TextColor)
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"), this.ButtonColor)
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
+	}
+}
+
+class DefaultTheme extends Theme {
+}
+
+class StandardTheme extends Theme {
+	ThemeWindow(window) {
+		window.BackColor := "D0D0D0"
+		window.AltBackColor := "D8D8D8"
+	}
+
+	ComputeThemeOptions(window, type, options) {
+		options := StrReplace(options, "-Theme", "")
+
+		if !InStr(options, "Background") {
+			switch type, false {
+				case "ListView", "ListBox":
+					options .= (" Background" . window.AltBackColor)
+				case "Edit":
+					options .= " BackgroundE0E0E0"
+				case "Button":
+					options .= " BackgroundCCCCCC"
+			}
+		}
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		return options
+	}
+
+	ApplyControlProperties(window, control) {
 	}
 }
 
@@ -604,7 +664,7 @@ class Window extends Gui {
 		else
 			this.Opt("-DPIScale")
 
-		this.ApplyTheme()
+		this.ThemeWindow()
 	}
 
 	Opt(options) {
@@ -614,32 +674,16 @@ class Window extends Gui {
 			this.Show("NA")
 	}
 
-	ApplyTheme() {
-		this.BackColor := "D0D0D0"
-		this.AltBackColor := "D8D8D8"
+	ThemeWindow() {
+		Theme.CurrentTheme.ThemeWindow(this)
 	}
 
-	ApplyThemeOptions(type, options) {
-		options := StrReplace(options, "-Theme", "")
-
-		if !InStr(options, "Background") {
-			switch type, false {
-				case "ListView", "ListBox":
-					options .= (" Background" . this.AltBackColor)
-				case "Edit":
-					options .= " BackgroundE0E0E0"
-				case "Button":
-					options .= " BackgroundCCCCCC"
-			}
-		}
-
-		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
-			options := StrReplace(options, "0x10", "h1 Border")
-
-		return options
+	ComputeThemeOptions(type, options) {
+		return Theme.CurrentTheme.ComputeThemeOptions(this, type, options)
 	}
 
 	ApplyThemeProperties(control) {
+		Theme.CurrentTheme.ApplyThemeProperties(this, control)
 	}
 
 	static DefineCustomControl(type, constructor) {
@@ -653,7 +697,7 @@ class Window extends Gui {
 		if type is Window.Resizer
 			return this.AddResizer(type)
 		else {
-			options := this.ApplyThemeOptions(type, options)
+			options := this.ComputeThemeOptions(type, options)
 
 			if RegExMatch(options, "i)[xywhv].*:") {
 				newOptions := []
@@ -1115,6 +1159,8 @@ getControllerActionIcons() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeGUI() {
+	Theme.CurrentTheme := DefaultTheme()
+
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
 }

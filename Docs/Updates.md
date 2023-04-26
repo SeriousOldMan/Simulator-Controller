@@ -45,7 +45,7 @@ Note: Some of you might want to have more control. No problem. All the files in 
 
 ## Release 5.0.1
 
-This release implements an integration of the WebView2 HTML rendering engine. It is not activated by default, since it uses quite a lot of system resources. It will be enabled unconditionally, when Microsoft finally disable the Internet Explorer plugin. If you want to use WebView2 now, you can enable it by inserting the following lines in [Documents]\Simulator Controller\Config\Application Settings.ini:
+This release implements an integration of the WebView2 HTML rendering engine. It is not activated by default, since it uses quite a lot of system resources. It will be enabled unconditionally, when Microsoft finally disables the Internet Explorer plugin. If you want to use WebView2 now, you can enable it by inserting the following lines in [Documents]\Simulator Controller\Config\Application Settings.ini:
 
 	[General}
 	HTML Engine=WebView2

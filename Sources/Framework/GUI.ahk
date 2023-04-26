@@ -74,6 +74,60 @@ class Theme {
 		}
 	}
 
+	WindowBackColor {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor("WinBackColor"))
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	FieldBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	CompositeBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	HeaderBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	ButtonBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor((mode = "Normal") ? "NormalTextColor" : ((mode = "Disabled") ? "DisabledTextColor" : false)))
+		}
+	}
+
+	LinkColor {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor("LinkTextColor"))
+		}
+	}
+
+	ButtonColor {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor("ButtonTextColor"))
+		}
+	}
+
 	static getSystemColor(code) {
 		local BGR
 
@@ -85,10 +139,30 @@ class Theme {
 		return ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
 	}
 
-	ThemeWindow(window) {
+	InitializeWindow(window) {
+		window.BackColor := this.WindowBackColor
 	}
 
-	ComputeThemeOptions(window, type, options) {
+	ComputeControlOptions(window, type, options) {
+		options := StrReplace(options, "-Theme", "")
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		if !InStr(options, "Background") {
+			switch type, false {
+				case "ListView", "ListBox":
+					options .= (" Background" . this.CompositeBackColor)
+				case "Edit":
+					options .= (" Background" . this.FieldBackColor)
+				case "Button":
+					options .= (" Background" . this.ButtonBackColor)
+			}
+		}
+
+		if !RegExMatch(options, "c[0-9a-fA-F]{6}")
+			options .= (" c" . this.TextColor)
+
 		return options
 	}
 
@@ -96,7 +170,18 @@ class Theme {
 	}
 }
 
-class ConfigurableTheme extends ConfigurationItem {
+class UserTheme extends ConfigurationItem {
+	iDescriptor := false
+	/*
+	iWindowBackground := false
+	iAltBackground := false
+	iFieldBackground := false
+	iMenuBackground := false
+	iHeaderBackground := false
+	iTextColor := false
+	iButtonColor := false
+	iDropDownColor := false
+
 	Descriptor {
 		Get {
 			return this.iDescriptor
@@ -150,6 +235,7 @@ class ConfigurableTheme extends ConfigurationItem {
 			return this.iDropDownColor
 		}
 	}
+	*/
 
 	__New(descriptor, configuration := false) {
 		this.iDescriptor := descriptor
@@ -157,6 +243,7 @@ class ConfigurableTheme extends ConfigurationItem {
 		super.__New(configuration)
 	}
 
+	/*
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
@@ -180,43 +267,51 @@ class ConfigurableTheme extends ConfigurationItem {
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"), this.ButtonColor)
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
 	}
+	*/
 }
 
 class DefaultTheme extends Theme {
-}
-
-class StandardTheme extends Theme {
-	ThemeWindow(window) {
-		window.BackColor := "D0D0D0"
-		window.AltBackColor := "D8D8D8"
-	}
-
-	ComputeThemeOptions(window, type, options) {
-		options := StrReplace(options, "-Theme", "")
-
-		if !InStr(options, "Background") {
-			switch type, false {
-				case "ListView", "ListBox":
-					options .= (" Background" . window.AltBackColor)
-				case "Edit":
-					options .= " BackgroundE0E0E0"
-				case "Button":
-					options .= " BackgroundCCCCCC"
-			}
+	WindowBackColor {
+		Get {
+			return "D0D0D0"
 		}
-
-		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
-			options := StrReplace(options, "0x10", "h1 Border")
-
-		return options
 	}
 
-	ApplyControlProperties(window, control) {
+	AlternateBackColor {
+		Get {
+			return "D8D8D8"
+		}
+	}
+
+	FieldBackColor {
+		Get {
+			return "E0E0E0"
+		}
+	}
+
+	CompositeBackColor {
+		Get {
+			return this.AlternateBackColor
+		}
+	}
+
+	ButtonBackColor {
+		Get {
+			return "CCCCCC"
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			return ((mode = "Normal") ? "000000" : "444444")
+		}
 	}
 }
 
 class Window extends Gui {
 	static sCustomControlTypes := CaseInsenseMap()
+
+	iTheme := false
 
 	iCloseable := false
 	iResizeable := false
@@ -240,8 +335,6 @@ class Window extends Gui {
 	iRules := []
 
 	iTitleBarHeight := 0
-
-	iAltBackColor := "D8D8D8"
 
 	iAutoActivate := true
 	iBlockRedraw := 0
@@ -470,6 +563,12 @@ class Window extends Gui {
 		}
 	}
 
+	Theme {
+		Get {
+			return this.iTheme
+		}
+	}
+
 	Descriptor {
 		Get {
 			return this.iDescriptor
@@ -582,11 +681,7 @@ class Window extends Gui {
 
 	AltBackColor {
 		Get {
-			return this.iAltBackColor
-		}
-
-		Set {
-			return (this.iAltBackColor := value)
+			return this.Theme.AlternateBackColor
 		}
 	}
 
@@ -634,6 +729,8 @@ class Window extends Gui {
 
 		for name, argument in options.OwnProps()
 			switch name, false {
+				case "Theme":
+					this.iTheme := argument
 				case "Closeable":
 					this.iCloseable := argument
 				case "Resizeable":
@@ -648,6 +745,9 @@ class Window extends Gui {
 			}
 
 		super.__New("", name, arguments*)
+
+		if !this.Theme
+			this.iTheme := Theme.CurrentTheme
 
 		this.OnEvent("Close", this.Close)
 
@@ -664,7 +764,11 @@ class Window extends Gui {
 		else
 			this.Opt("-DPIScale")
 
-		this.ThemeWindow()
+		this.InitializeTheme()
+	}
+
+	static DefineCustomControl(type, constructor) {
+		Window.sCustomControlTypes[type] := constructor
 	}
 
 	Opt(options) {
@@ -674,20 +778,16 @@ class Window extends Gui {
 			this.Show("NA")
 	}
 
-	ThemeWindow() {
-		Theme.CurrentTheme.ThemeWindow(this)
+	InitializeTheme() {
+		this.Theme.InitializeWindow(this)
 	}
 
-	ComputeThemeOptions(type, options) {
-		return Theme.CurrentTheme.ComputeThemeOptions(this, type, options)
+	ComputeControlOptions(type, options) {
+		return this.Theme.ComputeControlOptions(this, type, options)
 	}
 
 	ApplyThemeProperties(control) {
-		Theme.CurrentTheme.ApplyThemeProperties(this, control)
-	}
-
-	static DefineCustomControl(type, constructor) {
-		Window.sCustomControlTypes[type] := constructor
+		this.Theme.ApplyThemeProperties(this, control)
 	}
 
 	Add(type, options := "", arguments*) {
@@ -697,7 +797,7 @@ class Window extends Gui {
 		if type is Window.Resizer
 			return this.AddResizer(type)
 		else {
-			options := this.ComputeThemeOptions(type, options)
+			options := this.ComputeControlOptions(type, options)
 
 			if RegExMatch(options, "i)[xywhv].*:") {
 				newOptions := []

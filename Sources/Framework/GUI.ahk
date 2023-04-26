@@ -309,6 +309,12 @@ class DefaultTheme extends Theme {
 			return ((mode = "Normal") ? "000000" : "444444")
 		}
 	}
+
+	LinkColor {
+		Get {
+			return "Blue"
+		}
+	}
 }
 
 class Window extends Gui {
@@ -341,6 +347,9 @@ class Window extends Gui {
 
 	iAutoActivate := true
 	iBlockRedraw := 0
+
+	iCurrentFont := false
+	iCurrentFontOptions := false
 
 	class Resizer {
 		iWindow := false
@@ -688,6 +697,18 @@ class Window extends Gui {
 		}
 	}
 
+	CurrentFont {
+		Get {
+			return this.iCurrentFont
+		}
+	}
+
+	CurrentFontOptions {
+		Get {
+			return this.iCurrentFontOptions
+		}
+	}
+
 	AutoActivate {
 		Get {
 			return this.iAutoActivate
@@ -779,6 +800,16 @@ class Window extends Gui {
 
 		if (InStr(options, "-Disabled") && this.AutoActivate)
 			this.Show("NA")
+	}
+
+	SetFont(options?, font?) {
+		if isSet(options)
+			this.iCurrentFontOptions := options
+
+		if isSet(font)
+			this.iCurrentFont := font
+
+		super.SetFont(options?, font?)
 	}
 
 	InitializeTheme() {
@@ -1262,6 +1293,25 @@ getControllerActionIcons() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeGUI() {
+	createDocumentation(window, options, label, link) {
+		local curFontOptions := window.CurrentFontOptions
+		local control
+
+		window.SetFont("Italic Underline")
+
+		control := window.Add("Text", "c" . window.Theme.LinkColor . A_Space . options, label)
+
+		window.SetFont(curFontOptions)
+
+		control.Link := link
+
+		control.OnEvent("Click", (*) => openDocumentation(window, control.Link))
+
+		return control
+	}
+
+	Window.DefineCustomControl("Documentation", createDocumentation)
+
 	Theme.CurrentTheme := DefaultTheme()
 
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)

@@ -762,9 +762,9 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.Add("Text", "w780 Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(systemMonitorGui, "System Monitor"))
 
 		systemMonitorGui.SetFont("s9 Norm", "Arial")
-		systemMonitorGui.SetFont("Italic Underline", "Arial")
 
-		systemMonitorGui.Add("Text", "x333 YP+20 w140 cBlue Center", translate("Monitoring")).OnEvent("Click", openDocumentation.Bind(systemMonitorGui, "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities"))
+		systemMonitorGui.Add("Documentation", "x333 YP+20 w140 Center", translate("Monitoring")
+						   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#monitoring-health-and-activities")
 
 		systemMonitorGui.SetFont("s8 Norm", "Arial")
 

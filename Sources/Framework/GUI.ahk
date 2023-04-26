@@ -128,7 +128,7 @@ class Theme {
 		}
 	}
 
-	static getSystemColor(code) {
+	static GetSystemColor(code, asText := true) {
 		local BGR
 
 		if !isNumber(code) && kSystemColors.Has(code)
@@ -136,7 +136,9 @@ class Theme {
 
 		BGR := DllCall("User32.dll\GetSysColor", "Int", code, "UInt")
 
-		return ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
+		BGR := ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
+
+		return (asText ? Format("{:06X}", BGR) : BGR)
 	}
 
 	InitializeWindow(window) {
@@ -160,8 +162,10 @@ class Theme {
 			}
 		}
 
+		/*
 		if !RegExMatch(options, "c[0-9a-fA-F]{6}")
 			options .= (" c" . this.TextColor)
+		*/
 
 		return options
 	}
@@ -170,9 +174,10 @@ class Theme {
 	}
 }
 
+/*
 class UserTheme extends ConfigurationItem {
 	iDescriptor := false
-	/*
+
 	iWindowBackground := false
 	iAltBackground := false
 	iFieldBackground := false
@@ -235,7 +240,6 @@ class UserTheme extends ConfigurationItem {
 			return this.iDropDownColor
 		}
 	}
-	*/
 
 	__New(descriptor, configuration := false) {
 		this.iDescriptor := descriptor
@@ -243,7 +247,6 @@ class UserTheme extends ConfigurationItem {
 		super.__New(configuration)
 	}
 
-	/*
 	loadFromConfiguration(configuration) {
 		super.loadFromConfiguration(configuration)
 
@@ -267,8 +270,8 @@ class UserTheme extends ConfigurationItem {
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "ButtonColor"), this.ButtonColor)
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
 	}
-	*/
 }
+*/
 
 class DefaultTheme extends Theme {
 	WindowBackColor {

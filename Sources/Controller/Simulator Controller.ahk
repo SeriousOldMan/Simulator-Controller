@@ -32,6 +32,7 @@
 ;;;                          Local Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\GIFViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\Messages.ahk"
 #Include "..\Libraries\SpeechRecognizer.ahk"
@@ -241,7 +242,7 @@ class GuiFunctionController extends FunctionController {
 			if (label != false) {
 				font := ("s8 c" . color)
 
-				if !label.HasOwnProp("Font")
+				if !label.HasProp("Font")
 					label.Font := false
 
 				if ((label.Font != font) || (label.Text != text)) {
@@ -413,21 +414,21 @@ class GuiFunctionController extends FunctionController {
 
 		try {
 			MouseGetPos(&anchorX, &anchorY)
-			
+
 			anchorX := screen2Window(anchorX)
 			anchorY := screen2Window(anchorY)
-			
+
 			WinGetPos(&winX, &winY, &w, &h, window)
-			
+
 			winX := screen2Window(winX)
 			winY := screen2Window(winY)
-			
+
 			newX := winX
 			newY := winY
 
 			while GetKeyState("LButton", "P") {
 				MouseGetPos(&x, &y)
-			
+
 				x := screen2Window(x)
 				y := screen2Window(y)
 
@@ -1147,20 +1148,16 @@ class SimulatorController extends ConfigurationItem {
 			logoGui.SetFont("Bold")
 			logoGui.AddText("w200 Center", translate("Modular Simulator") . "`n" . translate("Controller System"))
 
-			videoPlayer := logoGui.Add("ActiveX", "x10 y40 w209 h180", "shell explorer").Value
+			videoPlayer := logoGui.Add("GIFViewer", "x10 y40 w209 h180 vvideoPlayer", this.getLogo())
 
 			logoGui.SetFont("Norm")
 			logoGui.AddText("w200 Center", info)
 
-			videoPlayer.navigate("about:blank")
-
-			html := "<html><body style='background-color: transparent' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . this.getLogo() . "' width=209 height=180 border=0 padding=0></body></html>"
-
-			videoPlayer.document.write(html)
-
 			logoGui.Show("X" . x . " Y" . y . " W239 H259")
 
-			WinSetTransparent(255, , translate("Creative Commons - BY-NC-SA"))
+			videoPlayer.Start()
+
+			WinSetTransparent(224, logoGui)
 
 			this.iLogoGui := logoGui
 			this.iLogoIsVisible := true
@@ -1169,6 +1166,9 @@ class SimulatorController extends ConfigurationItem {
 
 	hideLogo() {
 		if this.iLogoIsVisible {
+			try
+				this.iLogoGui["videoPlayer"].Stop()
+
 			this.iLogoGui.Destroy()
 			this.iLogoGui := false
 

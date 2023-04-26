@@ -228,14 +228,13 @@ class ControllerStepWizard extends StepWizard {
 		widget3.OnEvent("ContextMenu", functionTriggersMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Controller", "Controller.Functions.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget4 := window.Add("ActiveX", "x" . x . " yp+245 w" . width . " h195 W:Grow Y:Move(0.66) H:Grow(0.33) VfunctionsInfoText Hidden", "shell.explorer")
+		widget4 := window.Add("HTMLViewer", "x" . x . " yp+245 w" . width . " h195 W:Grow Y:Move(0.66) H:Grow(0.33) VfunctionsInfoText Hidden")
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget4.Value.navigate("about:blank")
-		widget4.Value.document.write(html)
+		widget4.document.write(html)
 
 		this.iFunctionsListView := widget3
 

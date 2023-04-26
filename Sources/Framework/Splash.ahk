@@ -9,14 +9,21 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Constants.ahk"
-#Include "..\Framework\Variables.ahk"
-#Include "..\Framework\Files.ahk"
-#Include "..\Framework\Strings.ahk"
-#Include "..\Framework\Collections.ahk"
-#Include "..\Framework\Localization.ahk"
-#Include "..\Framework\MultiMap.ahk"
-#Include "..\Framework\GUI.ahk"
+#Include "Constants.ahk"
+#Include "Variables.ahk"
+#Include "Files.ahk"
+#Include "Strings.ahk"
+#Include "Collections.ahk"
+#Include "Localization.ahk"
+#Include "MultiMap.ahk"
+#Include "GUI.ahk"
+
+
+;;;-------------------------------------------------------------------------;;;
+;;;                          Local Include Section                          ;;;
+;;;-------------------------------------------------------------------------;;;
+
+#Include "..\Libraries\GIFViewer.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -35,7 +42,8 @@ playThemeSong(songFile) {
 ;;;-------------------------------------------------------------------------;;;
 
 showSplash(image, alwaysOnTop := true, video := false) {
-	local lastSplash, title, subTitle, extension, html, videoPlayer
+	local videoPlayer := false
+	local lastSplash, title, subTitle, extension, html, splashGui
 
 	static splashCounter := 0
 	static splashGuis := [false, false, false, false, false, false, false, false, false, false]
@@ -44,7 +52,12 @@ showSplash(image, alwaysOnTop := true, video := false) {
 
 	if !image {
 		if ((splashCounter > 0) && splashGuis[splashCounter]) {
-			splashGuis[splashCounter].Destroy()
+			splashGui := splashGuis[splashCounter]
+
+			try
+				splashGui["videoPlayer"].Stop()
+
+			splashGui.Destroy()
 
 			splashGuis[splashCounter] := false
 		}
@@ -67,7 +80,7 @@ showSplash(image, alwaysOnTop := true, video := false) {
 
 		SplitPath(image, , , &extension)
 
-		splashGui := Window()
+		splashGui := Window({Options: "+E0x02000000"})
 
 		splashGuis[splashCounter] := splashGui
 
@@ -75,15 +88,8 @@ showSplash(image, alwaysOnTop := true, video := false) {
 
 		splashGui.Add("Text", "x10 w780 Center", title)
 
-		if (extension = "GIF") {
-			videoPlayer := splashGui.Add("ActiveX", "x10 y30 w780 h439", "shell explorer").Value
-
-			videoPlayer.navigate("about:blank")
-
-			html := "<html><body style='background-color: #000000' style='overflow:hidden' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><img src='" . image . "' width=780 height=438 border=0 padding=0></body></html>"
-
-			videoPlayer.document.write(html)
-		}
+		if (extension = "GIF")
+			videoPlayer := splashGui.Add("GIFViewer", "x10 y30 w780 h439 vvideoPlayer", image)
 		else
 			splashGui.Add("Picture", "x10 y30 w780 h439", image)
 
@@ -95,6 +101,9 @@ showSplash(image, alwaysOnTop := true, video := false) {
 			splashGui.Opt("+AlwaysOnTop")
 
 		splashGui.Show("x" . Round((A_ScreenWidth - 800) / 2) . " y" . Round(A_ScreenHeight / 4) . " AutoSize NoActivate")
+
+		if videoPlayer
+			videoPlayer.Start()
 
 		if ((lastSplash > 0) && splashGuis[lastSplash]) {
 			splashGuis[lastSplash].Destroy()

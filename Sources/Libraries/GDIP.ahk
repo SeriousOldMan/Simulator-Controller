@@ -1356,6 +1356,8 @@ Gdip_DrawImage(pGraphics, pBitmap, dx:="", dy:="", dw:="", dh:="", sx:="", sy:="
 		ImageAttr := Gdip_SetImageAttributesColorMatrix(Matrix)
 	else if (Matrix != 1)
 		ImageAttr := Gdip_SetImageAttributesColorMatrix("1|0|0|0|0|0|1|0|0|0|0|0|1|0|0|0|0|0|" Matrix "|0|0|0|0|0|1")
+	else
+		ImageAttr := false
 
 	if (sx = "" && sy = "" && sw = "" && sh = "")
 	{
@@ -1728,7 +1730,6 @@ Gdip_GetImageDimensions(pBitmap, &Width, &Height)
 {
 	Width := 0
 	Height := 0
-	Ptr := "Ptr"
 	DllCall("gdiplus\GdipGetImageWidth", "Ptr", pBitmap, "uint*", &Width)
 	DllCall("gdiplus\GdipGetImageHeight", "Ptr", pBitmap, "uint*", &Height)
 }

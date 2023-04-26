@@ -32,6 +32,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Libraries\Task.ahk"
 #Include "..\Libraries\JSON.ahk"
 #Include "..\Libraries\RuleEngine.ahk"
@@ -220,7 +221,10 @@ class SetupWizard extends ConfiguratorPanel {
 
 				for ignore, viewer in this.HTMLViewer
 					if viewer.Visible
-						viewer.Value.document.location.reload()
+						if viewer.HasProp("Resized")
+							viewer.Resized()
+						else
+							viewer.Value.document.location.reload()
 			}
 
 			return Task.CurrentTask
@@ -659,13 +663,11 @@ class SetupWizard extends ConfiguratorPanel {
 
 		helpGui.Add("Text", "yp+20 w350 0x10 W:Grow")
 
-		helpGui.Add("ActiveX", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer", "shell.explorer")
-
-		helpGui["infoViewer"].Value.navigate("about:blank")
+		helpGui.Add("HTMLViewer", "x12 yp+10 w350 h545 W:Grow H:Grow vinfoViewer")
 
 		html := "<html><head><meta http-equiv=`"X-UA-Compatible`" content=`"IE=Edge`"></head><body style='background-color: #" . helpGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>"
 
-		helpGui["infoViewer"].Value.document.write(html)
+		helpGui["infoViewer"].document.write(html)
 
 		helpGui.Add(SetupWizard.HTMLResizer(helpGui, helpGui["infoViewer"]))
 
@@ -808,7 +810,7 @@ class SetupWizard extends ConfiguratorPanel {
 		viewers := []
 
 		for ignore, viewer in this.WizardWindow
-			if isInstance(viewer, Gui.ActiveX)
+			if viewer.HasProp("Resized")
 				viewers.Push(viewer)
 
 		this.iHTMLResizer.HTMLViewer := viewers
@@ -1970,9 +1972,9 @@ class SetupWizard extends ConfiguratorPanel {
 	setInfo(html) {
 		html := "<html><body style='background-color: #" . this.HelpWindow.BackColor . "; overflow: auto; font-family: Arial, Helvetica, sans-serif; font-size: 11px; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'>" . html . "</body></html>"
 
-		this.HelpWindow["infoViewer"].Value.document.open()
-		this.HelpWindow["infoViewer"].Value.document.write(html)
-		this.HelpWindow["infoViewer"].Value.document.close()
+		this.HelpWindow["infoViewer"].document.open()
+		this.HelpWindow["infoViewer"].document.write(html)
+		this.HelpWindow["infoViewer"].document.close()
 	}
 
 	saveKnowledgeBase() {
@@ -2136,7 +2138,11 @@ class StepWizard extends ConfiguratorPanel {
 		local ignore, widget
 
 		for ignore, widget in this.iWidgets[page] {
-			widget.Visible := true
+			if widget.HasProp("Show")
+				widget.Show()
+			else
+				widget.Visible := true
+
 			widget.Enabled := true
 		}
 	}
@@ -2146,7 +2152,11 @@ class StepWizard extends ConfiguratorPanel {
 
 		for ignore, widget in this.iWidgets[page] {
 			widget.Enabled := false
-			widget.Visible := false
+
+			if widget.HasProp("Hide")
+				widget.Hide()
+			else
+				widget.Visible := false
 		}
 
 		return true
@@ -2257,20 +2267,20 @@ class StartStepWizard extends StepWizard {
 			}
 		}
 
-		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " W:Grow H:Grow Hidden", "shell.explorer")
+		widget1 := window.Add("HTMLViewer", "x" . (x - 10) . " y" . y . " w" . (width + 20) . " h" . height . " W:Grow H:Grow Hidden")
 
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Text." . getLanguage()))
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Image"))
 
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' style='font-weight: 600'>" . text . "</div>"
+		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "; overflow: auto; leftmargin=0; topmargin=0; rightmargin=0; bottommargin=0'><br>" . text . "<br><center><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'></center></body></html>"
 
-		widget1.Value.navigate("about:blank")
+		widget1.document.write(html)
 
-		window.Add(StartStepWizard.RestartVideoResizer(this, widget1))
+		; window.Add(StartStepWizard.RestartVideoResizer(this, window))
 
 		this.iImageViewer := widget1
 		this.iImageViewerHTML := html
@@ -2283,7 +2293,7 @@ class StartStepWizard extends StepWizard {
 			labelY := y + 8
 
 			info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Unblocking.Info." . getLanguage()))
-			info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'>" . info . "</div>"
+			info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'>" . info . "</div>"
 
 			window.SetFont("s10 Bold", "Arial")
 
@@ -2294,7 +2304,7 @@ class StartStepWizard extends StepWizard {
 
 			Sleep(200)
 
-			widget3 := window.Add("ActiveX", "x" . x . " yp+30 w" . width . " h350 W:Grow H:Grow Hidden", "shell.explorer")
+			widget3 := window.Add("HTMLViewer", "x" . x . " yp+30 w" . width . " h350 W:Grow H:Grow Hidden")
 
 			x := x + Round((width - 240) / 2)
 
@@ -2305,8 +2315,7 @@ class StartStepWizard extends StepWizard {
 
 			html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-			widget3.Value.navigate("about:blank")
-			widget3.Value.document.write(html)
+			widget3.document.write(html)
 
 			this.registerWidgets(2, widget1, widget2, widget3, widget4)
 		}
@@ -2351,7 +2360,7 @@ class StartStepWizard extends StepWizard {
 		local imageViewer, audio
 
 		if (page == 1) {
-			imageViewer := this.iImageViewer.Value
+			imageViewer := this.iImageViewer
 
 			imageViewer.document.open()
 			imageViewer.document.write(this.iImageViewerHTML)
@@ -2386,7 +2395,7 @@ class StartStepWizard extends StepWizard {
 			local imageViewer
 
 			if (page == 1) {
-				imageViewer := this.iImageViewer.Value
+				imageViewer := this.iImageViewer
 
 				imageViewer.document.open()
 				imageViewer.document.write("<html></html>")
@@ -2415,19 +2424,18 @@ class FinishStepWizard extends StepWizard {
 		local window := this.Window
 		local image, text, html
 
-		widget1 := window.Add("ActiveX", "x" . x . " y" . y . " w" . width . " h" . height . " H:Center V:Center Hidden", "shell.explorer")
+		widget1 := window.Add("HTMLViewer", "x" . x . " y" . y . " w" . width . " h" . (height - 36) . " H:Center V:Center Hidden")
 
 		image := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Image"))
 		text := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Finish", "Finish.Text." . getLanguage()))
 
-		text := "<div style='text-align: center' style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px' style='font-weight: 600'>" . text . "</div>"
+		text := "<div style='text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 600'>" . text . "</div>"
 
 		height := Round(width / 16 * 9)
 
-		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . width . "' height='" . height . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
+		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='auto' bottommargin='0'><img src='" . image . "' width='" . (width - 24) . "' height='" . (height - 50) . "' border='0' padding='0'><br><br><br>" . text . "</body></html>"
 
-		widget1.Value.navigate("about:blank")
-		widget1.Value.document.write(html)
+		widget1.document.write(html)
 
 		this.registerWidget(1, widget1)
 	}
@@ -2654,8 +2662,6 @@ startupSimulatorSetup() {
 		wizard.dumpRules(wizard.KnowledgeBase)
 
 	loop {
-		fixIE(10)
-
 		wizard.createGui(wizard.Configuration)
 
 		wizard.startSetup()

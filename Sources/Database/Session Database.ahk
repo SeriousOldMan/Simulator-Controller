@@ -2422,7 +2422,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	deleteTrackAutomation() {
-		if this.SelectedTrackAutomation.HasOwnProp("Origin") {
+		if this.SelectedTrackAutomation.HasProp("Origin") {
 			this.TrackAutomations.RemoveAt(inList(this.TrackAutomations, this.SelectedTrackAutomation.Origin))
 
 			this.writeTrackAutomations()
@@ -2446,7 +2446,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		trackAutomation.Name := window["trackAutomationNameEdit"].Value
 
-		if trackAutomation.HasOwnProp("Origin") {
+		if trackAutomation.HasProp("Origin") {
 			origin := this.SelectedTrackAutomation.Origin
 
 			origin.Name := trackAutomation.Name
@@ -5036,7 +5036,7 @@ editSettings(editorOrCommand, arguments*) {
 			serverUpdateEdit := ""
 		}
 
-		settingsEditorGui := Window({Descriptor: "Session Database.Settings", Options: "0x400000"})
+		settingsEditorGui := Window({Descriptor: "Session Database.Settings", Options: "0x400000"}, "")
 
 		settingsEditorGui.SetFont("s10 Bold", "Arial")
 
@@ -5423,8 +5423,6 @@ showSessionDatabaseEditor() {
 
 	if (trackTemperature <= 0)
 		trackTemperature := 27
-
-	fixIE(11)
 
 	protectionOn()
 

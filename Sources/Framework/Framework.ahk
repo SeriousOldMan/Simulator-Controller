@@ -5,13 +5,13 @@
 ;;;   License:    (2023) Creative Commons - BY-NC-SA                        ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#Include "..\Framework\Constants.ahk"
-#Include "..\Framework\Variables.ahk"
-#Include "..\Framework\Types.ahk"
-#Include "..\Framework\Utils.ahk"
-#Include "..\Framework\Debug.ahk"
-#Include "..\Framework\Files.ahk"
-#Include "..\Framework\Strings.ahk"
-#Include "..\Framework\Collections.ahk"
-#Include "..\Framework\MultiMap.ahk"
-#Include "..\Framework\Localization.ahk"
+#Include "Constants.ahk"
+#Include "Variables.ahk"
+#Include "Types.ahk"
+#Include "Utils.ahk"
+#Include "Debug.ahk"
+#Include "Files.ahk"
+#Include "Strings.ahk"
+#Include "Collections.ahk"
+#Include "MultiMap.ahk"
+#Include "Localization.ahk"

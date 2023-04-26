@@ -153,14 +153,13 @@ class ApplicationsStepWizard extends StepWizard {
 		widget4.OnEvent("Click", locateSimulator)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Simulators.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget5 := window.Add("ActiveX", "x" . x . " ys+205 w" . width . " h180 Y:Move(0.5) W:Grow VsimulatorsInfoText Hidden", "shell.explorer")
+		widget5 := window.Add("HTMLViewer", "x" . x . " ys+205 w" . width . " h180 Y:Move(0.5) W:Grow VsimulatorsInfoText Hidden")
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget5.Value.navigate("about:blank")
-		widget5.Value.document.write(html)
+		widget5.document.write(html)
 
 		this.iSimulatorsListView := widget3
 
@@ -184,14 +183,13 @@ class ApplicationsStepWizard extends StepWizard {
 		widget4.OnEvent("Click", locateApplication)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Applications", "Applications.Applications.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget5 := window.Add("ActiveX", "x" . x . " ys+265 w" . width . " h120 Y:Move(0.5) W:Grow VapplicationsInfoText Hidden", "shell.explorer")
+		widget5 := window.Add("HTMLViewer", "x" . x . " ys+265 w" . width . " h120 Y:Move(0.5) W:Grow VapplicationsInfoText Hidden")
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget5.Value.navigate("about:blank")
-		widget5.Value.document.write(html)
+		widget5.document.write(html)
 
 		this.iApplicationsListView := widget3
 

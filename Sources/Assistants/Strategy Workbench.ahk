@@ -32,6 +32,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Libraries\HTMLViewer.ahk"
 #Include "..\Database\Libraries\SettingsDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryDatabase.ahk"
 #Include "Libraries\Strategy.ahk"
@@ -121,6 +122,9 @@ class StrategyWorkbench extends ConfigurationItem {
 						return Task.CurrentTask
 
 				this.iRedraw := false
+
+				workbench.StrategyViewer.StrategyViewer.Resized()
+				workbench.ChartViewer.Resized()
 
 				workbench.showStrategyInfo(workbench.SelectedStrategy)
 
@@ -936,9 +940,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("DropDownList", "x444 yp w80 X:Move(0.1) Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
 		workbenchGui.Add("DropDownList", "x529 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
-		this.iChartViewer := workbenchGui.Add("ActiveX", "x400 yp+24 w950 h442 Border vchartViewer X:Move(0.1) W:Grow(0.9)", "shell.explorer").Value
-		this.iChartViewer.navigate("about:blank")
-
+		this.iChartViewer := workbenchGui.Add("HTMLViewer", "x400 yp+24 w950 h442 Border vchartViewer X:Move(0.1) W:Grow(0.9)")
+		
 		workbenchGui.Add("Text", "x8 yp+450 w1350 0x10 W:Grow")
 
 		workbenchGui.SetFont("s10 Bold", "Arial")
@@ -962,9 +965,9 @@ class StrategyWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x619 ys+39 w80 h21", translate("Strategy"))
 		workbenchGui.Add("Text", "x700 yp+7 w646 0x10 W:Grow")
 
-		workbenchGui.Add("ActiveX", "x619 yp+14 w727 h193 Border vstratViewer H:Grow W:Grow", "shell.explorer").Value.navigate("about:blank")
+		workbenchGui.Add("HTMLViewer", "x619 yp+14 w727 h193 Border vstratViewer H:Grow W:Grow")
 
-		this.iStrategyViewer := StrategyViewer(workbenchGui, workbenchGui["stratViewer"].Value)
+		this.iStrategyViewer := StrategyViewer(workbenchGui, workbenchGui["stratViewer"])
 
 		this.showStrategyInfo(false)
 
@@ -1417,9 +1420,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			    <meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E8E8; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
@@ -1436,7 +1439,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after,  {width: (this.ChartViewer.Width - 5), height: (this.ChartViewer.Height - 5), backColor: this.Window.AltBackColor}))
+			html := (before . drawChartFunction . substituteVariables(after,  {width: (this.ChartViewer.getWidth() - 4), height: (this.ChartViewer.getHeight() - 4), backColor: this.Window.AltBackColor}))
 
 			this.ChartViewer.document.write(html)
 		}
@@ -1687,7 +1690,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		drawChartFunction .= "`n]);"
 
 		series := "series: {"
-		vAxis := "vAxis: { gridlines: { color: 'E0E0E0' }, "
+		vAxis := "vAxis: { gridlines: { color: '#E0E0E0' }, "
 
 		for ignore, yAxis in yAxises {
 			if (A_Index > 1) {
@@ -1708,7 +1711,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		vAxis .= "}"
 
 		if (this.SelectedChartType = "Scatter") {
-			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: 'E0E0E0' } }, " . series . ", " . vAxis . "};")
+			drawChartFunction .= ("`nvar options = { legend: {position: 'bottom'}, chartArea: { left: '10%', right: '10%', top: '10%', bottom: '30%' }, backgroundColor: '#" . this.Window.AltBackColor . "', hAxis: { title: '" . translate(xAxis) . "', gridlines: { color: '#E0E0E0' } }, " . series . ", " . vAxis . "};")
 
 			drawChartFunction := drawChartFunction . "`nvar chart = new google.visualization.ScatterChart(document.getElementById('chart_id')); chart.draw(data, options); }"
 		}
@@ -2712,9 +2715,9 @@ class StrategyWorkbench extends ConfigurationItem {
 			<meta charset='utf-8'>
 			<head>
 				<style>
-					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-					.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-					.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+					.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+					.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+					.oddRowStyle { font-size: 11px; background-color: #E8E8E8; }
 				</style>
 				<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 				<script type="text/javascript">
@@ -2791,7 +2794,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		chart .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-		chartArea := ("<div id=`"header`"><i><b>" . translate("Performance") . "</b></i></div><br><div id=`"chart_id`" style=`"width: " . (this.ChartViewer.Width - 5) . "px; height: 348px`">")
+		chartArea := ("<div id=`"header`"><i><b>" . translate("Performance") . "</b></i></div><br><div id=`"chart_id`" style=`"width: " . (this.ChartViewer.getWidth() - 24) . "px; height: 348px`">")
 
 		tableCSS := this.StrategyViewer.getTableCSS()
 
@@ -3350,8 +3353,6 @@ runStrategyWorkbench() {
 
 	if (trackTemperature <= 0)
 		trackTemperature := 27
-
-	fixIE(11)
 
 	workbench := StrategyWorkbench(simulator, car, track, weather, airTemperature, trackTemperature, compound, compoundColor)
 

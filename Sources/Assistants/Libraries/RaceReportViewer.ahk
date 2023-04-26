@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\HTMLViewer.ahk"
 #Include "..\..\Libraries\Math.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "RaceReportReader.ahk"
@@ -85,7 +86,7 @@ class RaceReportViewer extends RaceReportReader {
 			return lapTime
 	}
 
-	showReportChart(drawChartFunction) {
+	showReportChart(drawChartFunction, margin := 0) {
 		local window, before, after, html
 
 		if this.ChartViewer {
@@ -98,10 +99,10 @@ class RaceReportViewer extends RaceReportReader {
 					<meta charset='utf-8'>
 					<head>
 						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
 							.cellStyle { text-align: right; }
-							.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-							.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+							.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+							.oddRowStyle { font-size: 11px; background-color: #E8E8E8; }
 						</style>
 						<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 						<script type="text/javascript">
@@ -118,7 +119,7 @@ class RaceReportViewer extends RaceReportReader {
 				</html>
 				)"
 
-				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.Width, height: this.ChartViewer.Height - 1, backColor: this.Window.AltBackColor}))
+				html := (before . drawChartFunction . substituteVariables(after, {width: this.ChartViewer.getWidth() - 2 - margin, height: this.ChartViewer.getHeight() - 2 - margin, backColor: this.Window.AltBackColor}))
 
 				this.ChartViewer.document.write(html)
 			}
@@ -570,7 +571,7 @@ class RaceReportViewer extends RaceReportReader {
 			else
 				drawChartFunction .= "}"
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -702,7 +703,7 @@ class RaceReportViewer extends RaceReportReader {
 			else
 				drawChartFunction := "function drawChart() {}"
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -940,7 +941,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.ComboChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -1055,7 +1056,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {
@@ -1162,7 +1163,7 @@ class RaceReportViewer extends RaceReportReader {
 
 			drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_id')); chart.draw(data, options); }")
 
-			this.showReportChart(drawChartFunction)
+			this.showReportChart(drawChartFunction, 10)
 			this.showReportInfo(raceData)
 		}
 		else {

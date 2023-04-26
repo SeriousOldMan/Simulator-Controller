@@ -16,6 +16,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Libraries\HTMLViewer.ahk"
 #Include "TyresDatabase.ahk"
 
 
@@ -184,8 +185,7 @@ class PressuresEditor {
 
 		pressuresEditorGui.Add("Text", "x270 yp w140 h23 +0x200", substituteVariables(translate("Temperature (%unit%)"), {unit: getUnit("Temperature", true)}))
 
-		this.iPressuresViewer := pressuresEditorGui.Add("ActiveX", "x16 yp+30 w394 h160 Border vpressuresViewer", "shell.explorer").Value
-		this.PressuresViewer.navigate("about:blank")
+		this.iPressuresViewer := pressuresEditorGui.Add("HTMLViewer", "x16 yp+30 w394 h160 Border vpressuresViewer")
 		this.PressuresViewer.document.write("<html><body style='background-color: #" . pressuresEditorGui.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'></body></html>")
 
 		this.iPressuresListView := pressuresEditorGui.Add("ListView", "x16 yp+170 w394 h160 -Multi -LV0x10 AltSubmit", collect(["Tyre", "Pressure", "#"], translate))
@@ -516,10 +516,10 @@ class PressuresEditor {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
 						.cellStyle { text-align: right; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
@@ -536,7 +536,7 @@ class PressuresEditor {
 			</html>
 			)"
 
-			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.Width, height: this.PressuresViewer.Height - 1, backColor: this.Window.AltBackColor}))
+			html := (before . drawChartFunction . substituteVariables(after, {width: this.PressuresViewer.getWidth() - 4, height: this.PressuresViewer.getHeight() - 4, backColor: this.Window.AltBackColor}))
 
 			this.PressuresViewer.document.write(html)
 		}

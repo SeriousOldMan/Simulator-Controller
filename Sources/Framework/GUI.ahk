@@ -9,13 +9,13 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Constants.ahk"
-#Include "..\Framework\Variables.ahk"
-#Include "..\Framework\Debug.ahk"
-#Include "..\Framework\Strings.ahk"
-#Include "..\Framework\Localization.ahk"
-#Include "..\Framework\MultiMap.ahk"
-#Include "..\Framework\Configuration.ahk"
+#Include "Constants.ahk"
+#Include "Variables.ahk"
+#Include "Debug.ahk"
+#Include "Strings.ahk"
+#Include "Localization.ahk"
+#Include "MultiMap.ahk"
+#Include "Configuration.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -30,6 +30,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 global kScreenResolution := 96
+
+global kSystemColors := CaseInsenseMap("ButtonTextColor", 18, "NormalTextColor", 8, "LinkTextColor", 26
+									 , "HighlightTextColor", 14, "HighlightBackColor", 13, "DisabledTextColor", 17
+									 , "ControlBackColor", 15, "WinBackColor", 5)
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -57,7 +61,7 @@ getControllerActionDefinitions(type) {
 ;;;                    Public Classes Declaration Section                   ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-class Theme extends ConfigurationItem {
+class Theme {
 	static sCurrentTheme := false
 
 	static CurrentTheme {
@@ -69,6 +73,119 @@ class Theme extends ConfigurationItem {
 			return (Theme.sCurrentTheme := value)
 		}
 	}
+
+	WindowBackColor {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor("WinBackColor"))
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	FieldBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	CompositeBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	HeaderBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	ButtonBackColor {
+		Get {
+			return this.WindowBackColor
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor((mode = "Normal") ? "NormalTextColor" : ((mode = "Disabled") ? "DisabledTextColor" : false)))
+		}
+	}
+
+	LinkColor {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor("LinkTextColor"))
+		}
+	}
+
+	ButtonColor {
+		Get {
+			return Format("{:06X}", Theme.GetSystemColor("ButtonTextColor"))
+		}
+	}
+
+	static GetSystemColor(code, asText := true) {
+		local BGR
+
+		if !isNumber(code) && kSystemColors.Has(code)
+			code := kSystemColors[code]
+
+		BGR := DllCall("User32.dll\GetSysColor", "Int", code, "UInt")
+
+		BGR := ((BGR & 255) << 16 | (BGR & 65280) | (BGR >> 16))
+
+		return (asText ? Format("{:06X}", BGR) : BGR)
+	}
+
+	InitializeWindow(window) {
+		window.BackColor := this.WindowBackColor
+	}
+
+	ComputeControlOptions(window, type, options) {
+		options := StrReplace(options, "-Theme", "")
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		if !InStr(options, "Background") {
+			switch type, false {
+				case "ListView", "ListBox":
+					options .= (" Background" . this.CompositeBackColor)
+				case "Edit":
+					options .= (" Background" . this.FieldBackColor)
+				case "Button":
+					options .= (" Background" . this.ButtonBackColor)
+			}
+		}
+
+		/*
+		if !RegExMatch(options, "c[0-9a-fA-F]{6}")
+			options .= (" c" . this.TextColor)
+		*/
+
+		return options
+	}
+
+	ApplyThemeProperties(window, control) {
+	}
+}
+
+/*
+class UserTheme extends ConfigurationItem {
+	iDescriptor := false
+
+	iWindowBackground := false
+	iAltBackground := false
+	iFieldBackground := false
+	iMenuBackground := false
+	iHeaderBackground := false
+	iTextColor := false
+	iButtonColor := false
+	iDropDownColor := false
 
 	Descriptor {
 		Get {
@@ -154,8 +271,51 @@ class Theme extends ConfigurationItem {
 		setMultiMapValue(configuration, "Themes", ConfigurationItem.descriptor(this.Descriptor, "DropDownColor"), this.DropDownColor)
 	}
 }
+*/
+
+class DefaultTheme extends Theme {
+	WindowBackColor {
+		Get {
+			return "D0D0D0"
+		}
+	}
+
+	AlternateBackColor {
+		Get {
+			return "D8D8D8"
+		}
+	}
+
+	FieldBackColor {
+		Get {
+			return "E0E0E0"
+		}
+	}
+
+	CompositeBackColor {
+		Get {
+			return this.AlternateBackColor
+		}
+	}
+
+	ButtonBackColor {
+		Get {
+			return "CCCCCC"
+		}
+	}
+
+	TextColor[mode := "Normal"] {
+		Get {
+			return ((mode = "Normal") ? "000000" : "444444")
+		}
+	}
+}
 
 class Window extends Gui {
+	static sCustomControlTypes := CaseInsenseMap()
+
+	iTheme := false
+
 	iCloseable := false
 	iResizeable := false
 
@@ -168,6 +328,7 @@ class Window extends Gui {
 	iHeight := 0
 
 	iResizers := []
+	iCustomControls := []
 
 	iDescriptor := false
 
@@ -177,8 +338,6 @@ class Window extends Gui {
 	iRules := []
 
 	iTitleBarHeight := 0
-
-	iAltBackColor := "D8D8D8"
 
 	iAutoActivate := true
 	iBlockRedraw := 0
@@ -407,6 +566,12 @@ class Window extends Gui {
 		}
 	}
 
+	Theme {
+		Get {
+			return this.iTheme
+		}
+	}
+
 	Descriptor {
 		Get {
 			return this.iDescriptor
@@ -519,11 +684,7 @@ class Window extends Gui {
 
 	AltBackColor {
 		Get {
-			return this.iAltBackColor
-		}
-
-		Set {
-			return (this.iAltBackColor := value)
+			return this.Theme.AlternateBackColor
 		}
 	}
 
@@ -571,6 +732,8 @@ class Window extends Gui {
 
 		for name, argument in options.OwnProps()
 			switch name, false {
+				case "Theme":
+					this.iTheme := argument
 				case "Closeable":
 					this.iCloseable := argument
 				case "Resizeable":
@@ -585,6 +748,9 @@ class Window extends Gui {
 			}
 
 		super.__New("", name, arguments*)
+
+		if !this.Theme
+			this.iTheme := Theme.CurrentTheme
 
 		this.OnEvent("Close", this.Close)
 
@@ -601,7 +767,11 @@ class Window extends Gui {
 		else
 			this.Opt("-DPIScale")
 
-		this.ApplyTheme()
+		this.InitializeTheme()
+	}
+
+	static DefineCustomControl(type, constructor) {
+		Window.sCustomControlTypes[type] := constructor
 	}
 
 	Opt(options) {
@@ -611,32 +781,16 @@ class Window extends Gui {
 			this.Show("NA")
 	}
 
-	ApplyTheme() {
-		this.BackColor := "D0D0D0"
-		this.AltBackColor := "D8D8D8"
+	InitializeTheme() {
+		this.Theme.InitializeWindow(this)
 	}
 
-	ApplyThemeOptions(type, options) {
-		options := StrReplace(options, "-Theme", "")
-
-		if !InStr(options, "Background") {
-			switch type, false {
-				case "ListView", "ListBox":
-					options .= (" Background" . this.AltBackColor)
-				case "Edit":
-					options .= " BackgroundE0E0E0"
-				case "Button":
-					options .= " BackgroundCCCCCC"
-			}
-		}
-
-		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
-			options := StrReplace(options, "0x10", "h1 Border")
-
-		return options
+	ComputeControlOptions(type, options) {
+		return this.Theme.ComputeControlOptions(this, type, options)
 	}
 
 	ApplyThemeProperties(control) {
+		this.Theme.ApplyThemeProperties(this, control)
 	}
 
 	Add(type, options := "", arguments*) {
@@ -646,7 +800,7 @@ class Window extends Gui {
 		if type is Window.Resizer
 			return this.AddResizer(type)
 		else {
-			options := this.ApplyThemeOptions(type, options)
+			options := this.ComputeControlOptions(type, options)
 
 			if RegExMatch(options, "i)[xywhv].*:") {
 				newOptions := []
@@ -661,7 +815,13 @@ class Window extends Gui {
 				options := values2String(A_Space, newOptions*)
 			}
 
-			control := super.Add(type, options, arguments*)
+			if Window.sCustomControlTypes.Has(type) {
+				control := Window.sCustomControlTypes[type](this, options, arguments*)
+
+				this.iCustomControls.Push(control)
+			}
+			else
+				control := super.Add(type, options, arguments*)
 
 			if (rules || this.Rules[false].Length > 0) {
 				if !rules
@@ -691,6 +851,10 @@ class Window extends Gui {
 		local fullHeight, clientHeight
 
 		super.Show(arguments*)
+
+		for ignore, control in this.iCustomControls
+			if (control.Visible && control.HasProp("Show"))
+				control.Show()
 
 		if !this.MinWidth {
 			WinGetClientPos(&x, &y, &cWidth, &cHeight, this)
@@ -955,46 +1119,6 @@ setButtonIcon(buttonHandle, file, index := 1, options := "") {
 	return IL_Add(normal_il, file, index)
 }
 
-fixIE(version := 0, exeName := "") {
-	local previousValue := ""
-
-	static key := "Software\Microsoft\Internet Explorer\MAIN\FeatureControl\FEATURE_BROWSER_EMULATION"
-	static versions := Map(7, 7000, 8, 8888, 9, 9999, 10, 10001, 11, 11001)
-
-	if versions.Has(version)
-		version := versions[version]
-
-	if !exeName {
-		if A_IsCompiled
-			exeName := A_ScriptName
-		else
-			SplitPath(A_AhkPath, &exeName)
-	}
-
-	try {
-		previousValue := RegRead("HKCU\" . key, exeName, "")
-	}
-	catch Any as exception {
-		logError(exception, false, false)
-	}
-
-	try {
-		if (version = "") {
-			RegDelete("HKCU\" . key, exeName)
-			RegDelete("HKLM\" . key, exeName)
-		}
-		else {
-			RegWrite(version, "REG_DWORD", "HKCU\" . key, exeName)
-			RegWrite(version, "REG_DWORD", "HKLM\" . key, exeName)
-		}
-	}
-	catch Any as exception {
-		logError(exception, false, false)
-	}
-
-	return previousValue
-}
-
 openDocumentation(dialog, url, *) {
 	Run(url)
 }
@@ -1138,6 +1262,8 @@ getControllerActionIcons() {
 ;;;-------------------------------------------------------------------------;;;
 
 initializeGUI() {
+	Theme.CurrentTheme := DefaultTheme()
+
 	; DllCall("User32\SetProcessDpiAwarenessContext", "UInt" , -1)
 	; DllCall("User32\SetThreadDpiAwarenessContext", "UInt" , -1)
 }

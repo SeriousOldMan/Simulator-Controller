@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "Strategy.ahk"
+#Include "..\..\Libraries\HTMLViewer.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 
 
@@ -264,7 +265,7 @@ class StrategyViewer {
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
-		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . width . "px; height: " . height . "px`">")
+		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . (width - 120) . "px; height: " . height . "px`">")
 	}
 
 	showStrategyInfo(strategy) {
@@ -300,7 +301,7 @@ class StrategyViewer {
 			drawChartFunction := false
 			chartID := false
 
-			width := (this.StrategyViewer.Width - 10)
+			width := (this.StrategyViewer.getWidth() - 4)
 
 			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
 
@@ -309,9 +310,9 @@ class StrategyViewer {
 				<meta charset='utf-8'>
 				<head>
 					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: 'FFFFFF'; }
-						.rowStyle { font-size: 11px; background-color: 'E0E0E0'; }
-						.oddRowStyle { font-size: 11px; background-color: 'E8E8E8'; }
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+						.rowStyle { font-size: 11px; background-color: #E0E0E0; }
+						.oddRowStyle { font-size: 11px; background-color: #E8E0E0; }
 					</style>
 					<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 					<script type="text/javascript">
@@ -343,7 +344,7 @@ class StrategyViewer {
 			this.StrategyViewer.document.close()
 		}
 	}
-	
+
 	getTableCSS() {
 		local script
 

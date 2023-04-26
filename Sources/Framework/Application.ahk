@@ -9,13 +9,13 @@
 ;;;                         Global Include Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Framework.ahk"
-#Include "..\Framework\GUI.ahk"
-#Include "..\Framework\Message.ahk"
-#Include "..\Framework\Progress.ahk"
-#Include "..\Framework\Splash.ahk"
-#Include "..\Framework\Configuration.ahk"
-#Include "..\Framework\Startup.ahk"
+#Include "Framework.ahk"
+#Include "GUI.ahk"
+#Include "Message.ahk"
+#Include "Progress.ahk"
+#Include "Splash.ahk"
+#Include "Configuration.ahk"
+#Include "Startup.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -388,18 +388,16 @@ broadcastMessage(applications, message, arguments*) {
 
 viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 800, height := 400, *) {
 	local html, innerWidth, editHeight, buttonX
-	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom, htmlGui
+	local mainScreen, mainScreenLeft, mainScreenRight, mainScreenTop, mainScreenBottom
 
+	static htmlGui
 	static htmlViewer
-	static dismissed := false
 
 	if !title
 		title := translate("News && Updates")
 
-	dismissed := false
-
 	if !fileName {
-		dismissed := true
+		htmlGui.Destroy()
 
 		return
 	}
@@ -420,9 +418,7 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	editHeight := height - 102
 
-	htmlViewer := htmlGui.Add("ActiveX", "X8 YP+26 W" . innerWidth . " H" . editHeight . " vhtmlViewer", "shell.explorer").Value
-
-	htmlViewer.navigate("about:blank")
+	htmlViewer := htmlGui.Add("HTMLViewer", "X8 YP+26 W" . innerWidth . " H" . editHeight)
 
 	htmlViewer.document.open()
 	htmlViewer.document.write(html)
@@ -461,11 +457,6 @@ viewHTML(fileName, title := false, x := kUndefined, y := kUndefined, width := 80
 
 	htmlGui.Opt("+AlwaysOnTop")
 	htmlGui.Show("X" . x . " Y" . y . " W" . width . " H" . height . " NoActivate")
-
-	while !dismissed
-		Sleep(100)
-
-	htmlGui.Destroy()
 }
 
 

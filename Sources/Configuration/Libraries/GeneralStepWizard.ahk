@@ -287,14 +287,13 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		widget15.OnEvent("ContextMenu", applicationFunctionMenu)
 
 		info := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.General", "General.Settings.Info." . getLanguage()))
-		info := "<div style='font-family: Arial, Helvetica, sans-serif' style='font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
+		info := "<div style='font-family: Arial, Helvetica, sans-serif; font-size: 11px'><hr style='border-width:1pt;border-color:#AAAAAA;color:#AAAAAA;width: 90%'>" . info . "</div>"
 
-		widget16 := window.Add("ActiveX", "x" . x . " yp+118 w" . width . " h94 Y:Move(0.5) H:Grow(0.5) W:Grow Hidden", "shell.explorer")
+		widget16 := window.Add("HTMLViewer", "x" . x . " yp+118 w" . width . " h94 Y:Move(0.5) H:Grow(0.5) W:Grow Hidden")
 
 		html := "<html><body style='background-color: #" . window.BackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>" . info . "</body></html>"
 
-		widget16.Value.navigate("about:blank")
-		widget16.Value.document.write(html)
+		widget16.document.write(html)
 
 		window.SetFont("Bold", "Arial")
 

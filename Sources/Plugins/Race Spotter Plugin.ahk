@@ -215,17 +215,13 @@ class RaceSpotterPlugin extends RaceAssistantPlugin  {
 	}
 
 	updateAutomationTrayLabel(label, enabled) {
-		local callback
-
 		static hasTrayMenu := false
 
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
-			callback := ObjBindMethod(this, "toggleTrackAutomation")
-
 			A_TrayMenu.Insert("1&")
-			A_TrayMenu.Insert("1&", label, callback)
+			A_TrayMenu.Insert("1&", label, (*) => this.toggleTrackAutomation())
 
 			hasTrayMenu := true
 		}

@@ -1327,7 +1327,7 @@ class SetupWorkbench extends ConfigurationItem {
 	loadWeather(weather, force := false) {
 	}
 
-	startTelemetryAnalyzer(*) {
+	startTelemetryAnalyzer() {
 		local analyzerClass := getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 
 		if analyzerClass
@@ -1512,7 +1512,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		label := translate("Analyzer...")
 
-		characteristicsMenu.Add(label, ObjBindMethod(this, "startTelemetryAnalyzer"))
+		characteristicsMenu.Add(label, (*) => this.startTelemetryAnalyzer())
 
 		if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
 									  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))

@@ -999,9 +999,9 @@ openDocumentation(dialog, url, *) {
 	Run(url)
 }
 
-window2Screen := (value) => (value * kScreenResolution / 96)
+window2Screen := (value) => Round(value * kScreenResolution / 96)
 
-screen2Window := (value) => (value / kScreenResolution * 96)
+screen2Window := (value) => Round(value / kScreenResolution * 96)
 
 moveByMouse(window, descriptor := false, *) {
 	local curCoordMode := A_CoordModeMouse

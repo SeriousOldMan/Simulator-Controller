@@ -2371,7 +2371,14 @@ checkFileDependency(file, modification) {
 
 	logMessage(kLogInfo, translate("Checking file ") . file . translate(" for modification"))
 
-	lastModified := FileGetTime(file, "M")
+	try {
+		lastModified := FileGetTime(file, "M")
+	}
+	catch Any as exception {
+		logError(exception)
+
+		lastModified := false
+	}
 
 	if (lastModified > modification) {
 		logMessage(kLogInfo, translate("File ") . file . translate(" found more recent than ") . modification)
@@ -2611,8 +2618,23 @@ runCopyTargets(&buildProgress) {
 			loop Files, targetSource {
 				targetFile := (targetDestination . A_LoopFileName)
 
-				srcLastModified := FileGetTime(A_LoopFilePath, "M")
-				dstLastModified := FileGetTime(targetFile, "M")
+				try {
+					srcLastModified := FileGetTime(A_LoopFilePath, "M")
+				}
+				catch Any as exception {
+					logError(exception)
+
+					srcLastModified := false
+				}
+
+				try {
+					dstLastModified := FileGetTime(targetFile, "M")
+				}
+				catch Any as exception {
+					logError(exception)
+
+					dstLastModified := false
+				}
 
 				if srcLastModified {
 					if dstLastModified
@@ -2738,12 +2760,19 @@ runBuildTargets(&buildProgress) {
 
 		try {
 			srcLastModified := FileGetTime(targetSource, "M")
-			binLastModified := FileGetTime(targetBinary, "M")
 		}
 		catch Any as exception {
 			logError(exception)
 
 			srcLastModified := false
+		}
+
+		try {
+			binLastModified := FileGetTime(targetBinary, "M")
+		}
+		catch Any as exception {
+			logError(exception)
+
 			binLastModified := false
 		}
 
@@ -2940,6 +2969,8 @@ startSimulatorTools() {
 	TraySetIcon(icon, "1")
 	A_IconTip := "Simulator Tools"
 
+	checkInstallation()
+
 	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashTheme, &gTargetConfiguration)
 
 	if (A_Args.Length > 0)
@@ -3032,9 +3063,6 @@ cancelBuild() {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                         Initialization Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
-
-if !isDebug()
-	checkInstallation()
 
 startSimulatorTools()
 

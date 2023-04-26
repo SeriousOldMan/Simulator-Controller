@@ -517,7 +517,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 			if first
 				A_TrayMenu.Insert("1&")
 
-			A_TrayMenu.Insert("1&", label, ObjBindMethod(this, callback))
+			A_TrayMenu.Insert("1&", label, (*) => ObjBindMethod(this, callback).Call())
 
 			hasTrayMenu[callback] := true
 			first := false

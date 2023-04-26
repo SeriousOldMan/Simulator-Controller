@@ -261,6 +261,11 @@ systemMonitor(command := false, arguments*) {
 
 					state := translate("Waiting...")
 				}
+				else if (state = "Shutdown") {
+					overallState := "Warning"
+
+					state := translate("Waiting...")
+				}
 				else
 					state := translate("Inactive")
 

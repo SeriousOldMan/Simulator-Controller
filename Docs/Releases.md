@@ -1,4 +1,4 @@
-## 5.0.0.2-beta 03/26/23 (planned)
+## 5.0.0.2-beta 03/26/23
   1. A couple of small bugfixes here and there.
   2. Fixed the startup of the Race Assistants to create a short flicker in various simulators.
   3. Fixed a rare connection issue between Stream Deck and Simulator Controller.

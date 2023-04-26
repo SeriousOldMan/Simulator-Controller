@@ -1,16 +1,16 @@
 [Development]
-Version=5.0.0.2-dev
+Version=5.0.0.2-beta
 Target=5.0.0.2-beta
-Date=04/25/2023
-Download=
+Date=04/26/2023
+Download=https://cutt.ly/S5bqe68;https://www.dropbox.com/s/spjj4gk4tie5d9a/Simulator%20Controller%205.0.0.2-beta.zip?dl=1
 Changes=Eliminated short flicker when the Assistants start up, Fixed Stream Deck connectio to Simulator Controller, Fixed "Server Administration" not selecting an account, Fixed enabling of Team Server with the Tray menu, Fixed planning of pitstops w/o tyre swaps in "Race Center"
 [Release]
-Version=5.0.0.1-beta
-Date=04/23/2023
-Download=https://cutt.ly/n5djwmG;https://www.dropbox.com/s/srm7lngnkpduk0k/Simulator%20Controller%205.0.0.1-beta.zip?dl=1
-Changes=Fixed "Race Center" coming to the front of the window stack all 10 seconds, Introduced a field with a subversion info in "Simulator Startup", Added a preset for the new Stream Deck Plus layout, No more cut warnings in non-race sessions, Fixed a couple of window operations on devices with active DPI scaling, Fixed report settings for sessions in "Race Center" without standings data, Fixed deletion of entries in the "Session Database"
+Version=5.0.0.2-beta
+Date=04/26/2023
+Download=https://cutt.ly/S5bqe68;https://www.dropbox.com/s/spjj4gk4tie5d9a/Simulator%20Controller%205.0.0.2-beta.zip?dl=1
+Changes=Eliminated short flicker when the Assistants start up, Fixed Stream Deck connectio to Simulator Controller, Fixed "Server Administration" not selecting an account, Fixed enabling of Team Server with the Tray menu, Fixed planning of pitstops w/o tyre swaps in "Race Center"
 [Current]
-Type=Development
+Type=Release
 [Version]
-Release=5.0.0.1-beta
-Development=5.0.0.2-dev
+Release=5.0.0.2-beta
+Development=5.0.0.2-beta

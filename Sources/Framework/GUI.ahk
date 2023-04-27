@@ -283,6 +283,17 @@ class UserTheme extends ConfigurationItem {
 */
 
 class SystemTheme extends Theme {
+	InitializeWindow(window) {
+	}
+
+	ComputeControlOptions(window, type, options) {
+		options := StrReplace(options, "-Theme", "")
+
+		if ((type = "Text") && (InStr(options, "0x10") && !InStr(options, "0x100")))
+			options := StrReplace(options, "0x10", "h1 Border")
+
+		return options
+	}
 }
 
 class LightTheme extends Theme {

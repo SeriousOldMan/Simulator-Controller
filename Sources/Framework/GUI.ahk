@@ -173,8 +173,8 @@ class Theme {
 			}
 		}
 
-		if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
-			options .= (" c" . this.TextColor)
+		; if (!RegExMatch(options, "c[0-9a-fA-F]{6}") && !InStr(options, "c" . this.LinkColor))
+		;	options .= (" c" . this.TextColor)
 
 		return options
 	}

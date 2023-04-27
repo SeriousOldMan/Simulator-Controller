@@ -776,7 +776,7 @@ class ModulesStepWizard extends StepWizard {
 			preset := this.presetName(label)
 
 			class := getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Class")
-			arguments := string2Values(",", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments"))
+			arguments := string2Values(",", getMultiMapValue(this.SetupWizard.Definition, "Setup.Modules", "Modules.Presets." . preset . ".Arguments", ""))
 
 			this.SetupWizard.installPreset(%class%(preset, arguments*))
 

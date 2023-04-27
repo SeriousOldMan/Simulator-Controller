@@ -955,7 +955,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 
 		result := false
 
-		settingsGui := Window({Descriptor: "Race Settings", Options: "0x400000"}	)
+		settingsGui := Window({Descriptor: "Race Settings", Options: "0x400000"})
 
 		settingsGui.SetFont("Bold", "Arial")
 
@@ -983,7 +983,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 		else
 			tabs := collect(["Race", "Pitstop", "Strategy"], translate)
 
-		settingsTab := settingsGui.Add("Tab3", "x8 y48 w388 h444 -Wrap", tabs)
+		settingsTab := settingsGui.Add("Tab3", "x8 y48 w388 h444", tabs)
 
 		settingsTab.UseTab(2)
 
